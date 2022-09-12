@@ -20,9 +20,12 @@
 #include "logfiles.h"
 
 #include "log.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "cfg.h"
 #include "zbxregexp.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxsymbols.h"
@@ -2022,7 +2025,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
 		zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, const char *persistent_file_name,
-		zbx_vector_pre_persistent_t *prep_vec, char **err_msg)
+		zbx_vector_pre_persistent_t *prep_vec, const zbx_config_tls_t *zbx_config_tls, char **err_msg)
 {
 	static ZBX_THREAD_LOCAL char	*buf = NULL;
 
@@ -2113,7 +2116,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					buf[BUF_SIZE] = '\0';
 
 					if ('\0' != *encoding)
-						value = convert_to_utf8(buf, (size_t)BUF_SIZE, encoding);
+						value = zbx_convert_to_utf8(buf, (size_t)BUF_SIZE, encoding);
 					else
 						value = buf;
 
@@ -2159,7 +2162,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 							if (SUCCEED == (send_err = process_value(addrs, agent2_result,
 									hostname, key, item_value, ITEM_STATE_NORMAL,
 									&processed_size, mtime, NULL, NULL, NULL, NULL,
-									flags | ZBX_METRIC_FLAG_PERSISTENT)))
+									flags | ZBX_METRIC_FLAG_PERSISTENT, zbx_config_tls)))
 							{
 								*lastlogsize_sent = processed_size;
 
@@ -2235,7 +2238,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					*p_nl = '\0';
 
 					if ('\0' != *encoding)
-						value = convert_to_utf8(p_start, (size_t)(p_nl - p_start), encoding);
+						value = zbx_convert_to_utf8(p_start, (size_t)(p_nl - p_start), encoding);
 					else
 						value = p_start;
 
@@ -2273,7 +2276,8 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 							if (SUCCEED == (send_err = process_value(addrs, agent2_result,
 									hostname, key, item_value, ITEM_STATE_NORMAL,
 									&processed_size, mtime, NULL, NULL, NULL, NULL,
-									flags | ZBX_METRIC_FLAG_PERSISTENT)))
+									flags | ZBX_METRIC_FLAG_PERSISTENT,
+									zbx_config_tls)))
 							{
 								*lastlogsize_sent = processed_size;
 
@@ -2396,6 +2400,7 @@ out:
  *     persistent_file_name - [IN] name of file for saving persistent data    *
  *     prep_vec        - [IN/OUT] vector with data for writing into           *
  *                                persistent files                            *
+ *     zbx_config_tls  - [IN]                                                 *
  *     err_msg         - [IN/OUT] error message why an item became            *
  *                       NOTSUPPORTED                                         *
  *                                                                            *
@@ -2414,7 +2419,7 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		int *p_count, int *s_count, zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs,
 		zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key, zbx_uint64_t *processed_bytes,
 		zbx_uint64_t seek_offset, const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
-		char **err_msg)
+		const zbx_config_tls_t *zbx_config_tls, char **err_msg)
 {
 	int	f, ret = FAIL;
 
@@ -2432,7 +2437,8 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 
 		if (SUCCEED == (ret = zbx_read2(f, flags, logfile, lastlogsize, mtime, big_rec, encoding, regexps,
 				pattern, output_template, p_count, s_count, process_value, addrs, agent2_result,
-				hostname, key, lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec, err_msg)))
+				hostname, key, lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec,
+				zbx_config_tls, err_msg)))
 		{
 			*processed_bytes = *lastlogsize - seek_offset;
 		}
@@ -3264,6 +3270,7 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *     persistent_file_name - [IN] name of file for saving persistent data    *
  *     prep_vec         - [IN/OUT] vector with data for writing into          *
  *                                 persistent files                           *
+ *     zbx_config_tls   - [IN]                                                *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -3279,7 +3286,8 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		const char *hostname, const char *key, int *jumped, float max_delay, double *start_time,
 		zbx_uint64_t *processed_bytes, zbx_log_rotation_options_t rotation_type,
-		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec)
+		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
+		const zbx_config_tls_t *zbx_config_tls)
 {
 	int			i, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
 				from_first_file = 1, last_processed, limit_reached = 0, res;
@@ -3485,7 +3493,7 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 						mtime_sent, skip_old_data, big_rec, encoding, regexps, pattern,
 						output_template, p_count, s_count, process_value, addrs, agent2_result,
 						hostname, key, &processed_bytes_tmp, seek_offset, persistent_file_name,
-						prep_vec, err_msg);
+						prep_vec, zbx_config_tls, err_msg);
 
 				/* process_log() advances 'lastlogsize' only on success therefore */
 				/* we do not check for errors here */
@@ -3702,7 +3710,7 @@ static int	init_max_delay(int is_count_item, const AGENT_REQUEST *request, float
 		return SUCCEED;
 	}
 
-	if (SUCCEED != is_double(max_delay_str, &max_delay_tmp) || 0.0 > max_delay_tmp)
+	if (SUCCEED != zbx_is_double(max_delay_str, &max_delay_tmp) || 0.0 > max_delay_tmp)
 	{
 		*error = zbx_dsprintf(*error, "Invalid %s parameter.", (5 == max_delay_par_nr) ? "sixth" : "seventh");
 		return FAIL;
@@ -3793,7 +3801,7 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
 
 	/* set up directory for persistent file */
 
-	if (SUCCEED != is_ascii_string(persistent_dir))		/* reject non-ASCII directory name */
+	if (SUCCEED != zbx_is_ascii_string(persistent_dir))		/* reject non-ASCII directory name */
 	{
 		*error = zbx_dsprintf(*error, "Invalid %s parameter. It contains non-ASCII characters.",
 				(8 == persistent_dir_param_nr) ? "ninth" : "eighth");
@@ -3824,7 +3832,8 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
  ******************************************************************************/
 int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
 		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec)
+		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
+		const zbx_config_tls_t *zbx_config_tls)
 {
 	AGENT_REQUEST			request;
 	const char			*filename, *regexp, *encoding, *skip, *output_template;
@@ -4053,7 +4062,7 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, 
 			metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
 			output_template, &p_count, &s_count, process_value_cb, addrs, agent2_result, CONFIG_HOSTNAME,
 			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
-			rotation_type, metric->persistent_file_name, prep_vec);
+			rotation_type, metric->persistent_file_name, prep_vec, zbx_config_tls);
 
 	if (0 == is_count_item && NULL != logfiles_new)
 	{
@@ -4081,7 +4090,7 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, 
 
 			if (SUCCEED == process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig, buf,
 					ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL,
-					metric->flags | ZBX_METRIC_FLAG_PERSISTENT) || 0 != jumped)
+					metric->flags | ZBX_METRIC_FLAG_PERSISTENT, zbx_config_tls) || 0 != jumped)
 			{
 				/* if process_value() fails (i.e. log(rt).count result cannot be sent to server) but */
 				/* a jump took place to meet <maxdelay> then we discard the result and keep the state */

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:34:42Z'
+  version: '6.4'
+  date: '2022-08-16T11:12:08Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -20,7 +20,7 @@ zabbix_export:
         MIKROTIK-MIB
         IF-MIB
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Network devices'
@@ -273,6 +273,34 @@ zabbix_export:
                   tag: scope
                   value: notice
         -
+          uuid: 43da9de2e9b949ea9844ac7e8991aa51
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'system.hw.uptime[hrSystemUptime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 1e385c4c4f7145d1a7973fe1f7dcc1ed
           name: 'System location'
           type: SNMP_AGENT
@@ -335,6 +363,28 @@ zabbix_export:
                   tag: scope
                   value: security
         -
+          uuid: 2b284f4d96704b71920bc8b3beac050c
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.net.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 1c220049b4b94d08b35e03fde9111ded
           name: 'System object ID'
           type: SNMP_AGENT
@@ -391,45 +441,6 @@ zabbix_export:
                 -
                   name: 'System name has changed'
                   expression: 'last(/MikroTik CRS305-1G-4SIN SNMP/system.name,#1)<>last(/MikroTik CRS305-1G-4SIN SNMP/system.name,#2) and length(last(/MikroTik CRS305-1G-4SIN SNMP/system.name))>0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-        -
-          uuid: 2b284f4d96704b71920bc8b3beac050c
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'system.uptime[sysUpTime.0]'
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: a888ad0e55f14ba0803bf6923dc7d227
-              expression: 'last(/MikroTik CRS305-1G-4SIN SNMP/system.uptime[sysUpTime.0])<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes.'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'No SNMP data collection'
-                  expression: 'max(/MikroTik CRS305-1G-4SIN SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               tags:
                 -
                   tag: scope
@@ -2947,6 +2958,23 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: a888ad0e55f14ba0803bf6923dc7d227
+      expression: '(last(/MikroTik CRS305-1G-4SIN SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/MikroTik CRS305-1G-4SIN SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/MikroTik CRS305-1G-4SIN SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/MikroTik CRS305-1G-4SIN SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        -
+          name: 'No SNMP data collection'
+          expression: 'max(/MikroTik CRS305-1G-4SIN SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: cc0355295c4545f08e2499321ac6a787

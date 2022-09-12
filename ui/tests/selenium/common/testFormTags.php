@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
@@ -314,18 +315,18 @@ class testFormTags extends CWebTest {
 
 		if (!$this->problem_tags) {
 			$form->selectTab('Tags');
-			$tags_table = 'tags-table';
+			$tags_table = 'class:tags-table';
 		}
 		else {
-			$tags_table = 'problem_tags';
+			$tags_table = 'id:problem_tags';
 		}
-		$this->query('id', $tags_table)->asMultifieldTable()->one()->fill($data['tags']);
+		$this->query($tags_table)->asMultifieldTable()->one()->fill($data['tags']);
 
 		// Check screenshots of text area right after filling.
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 			$this->page->removeFocus();
 			$this->page->updateViewport();
-			$screenshot_area = $this->query('id', $tags_table)->one();
+			$screenshot_area = $this->query($tags_table)->one();
 			$screen_object = ($this->problem_tags) ? 'Service problem tags' : $object;
 			$this->assertScreenshot($screenshot_area, $data['name'].' '.$screen_object);
 		}
@@ -507,12 +508,12 @@ class testFormTags extends CWebTest {
 
 		if (!$this->problem_tags) {
 			$form->selectTab('Tags');
-			$tags_table = 'tags-table';
+			$tags_table = 'class:tags-table';
 		}
 		else {
-			$tags_table = 'problem_tags';
+			$tags_table = 'id:problem_tags';
 		}
-		$this->query('id', $tags_table)->asMultifieldTable()->waitUntilPresent()->one()->fill($data['tags']);
+		$this->query($tags_table)->asMultifieldTable()->waitUntilPresent()->one()->fill($data['tags']);
 
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -664,12 +665,12 @@ class testFormTags extends CWebTest {
 
 		if (!$this->problem_tags) {
 			$form->selectTab('Tags');
-			$tags_table = 'tags-table';
+			$tags_table = 'class:tags-table';
 		}
 		else {
-			$tags_table = 'problem_tags';
+			$tags_table = 'id:problem_tags';
 		}
-		$element = $this->query('id', $tags_table)->asMultifieldTable()->one();
+		$element = $this->query($tags_table)->asMultifieldTable()->one();
 		$tags = $element->getValue();
 
 		// Click Clone or Full Clone button.
@@ -774,10 +775,10 @@ class testFormTags extends CWebTest {
 
 		if (!$this->problem_tags) {
 			$form->selectTab('Tags');
-			$tags_table = 'tags-table';
+			$tags_table = 'class:tags-table';
 		}
 		else {
-			$tags_table = 'problem_tags';
+			$tags_table = 'id:problem_tags';
 		}
 
 		$expected = $data['tags'];
@@ -800,12 +801,12 @@ class testFormTags extends CWebTest {
 		}
 		unset($tag);
 
-		$this->query('id', $tags_table)->asMultifieldTable()->one()->checkValue($expected);
+		$this->query($tags_table)->asMultifieldTable()->one()->checkValue($expected);
 
 		// Check screenshot of text area after saving.
 		if ($data['name'] === 'With tags' || $data['name'] === 'Long tag name and value') {
 			$this->page->removeFocus();
-			$screenshot_area = $this->query('id', $tags_table)->one();
+			$screenshot_area = $this->query($tags_table)->one();
 			$screen_object = ($this->problem_tags) ? 'Service problem tags' : $object;
 			$this->assertScreenshot($screenshot_area, $data['name'].' '.$screen_object);
 		}
@@ -851,7 +852,7 @@ class testFormTags extends CWebTest {
 
 		$form = $this->query($form_selector)->asForm()->waitUntilPresent()->one();
 		$form->selectTab('Tags');
-		$element = $this->query('id:tags-table')->asMultifieldTable()->one();
+		$element = $this->query('class:tags-table')->asMultifieldTable()->one();
 		$tags = $element->getValue();
 
 		// Navigate to host or template for full cloning.
@@ -945,7 +946,7 @@ class testFormTags extends CWebTest {
 		// Get tags of object and return to the list.
 		$form = $this->query('xpath://main/form')->asForm()->waitUntilPresent()->one();
 		$form->selectTab('Tags');
-		$element = $this->query('id:tags-table')->asMultifieldTable()->one();
+		$element = $this->query('class:tags-table')->asMultifieldTable()->one();
 		$tags = $element->getValue();
 		$this->query('button:Cancel')->one()->click();
 
@@ -1071,7 +1072,7 @@ class testFormTags extends CWebTest {
 		$this->page->open($this->link);
 		$this->query('link', $data['name'])->waitUntilClickable()->one()->click();
 		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asMultifieldTable()->waitUntilVisible()->one();
+		$tags_table = $this->query('class:tags-table')->asMultifieldTable()->waitUntilVisible()->one();
 
 		// Check all tags (inherited from host/template and own) on created element.
 		if ($object === 'web scenario') {
@@ -1125,7 +1126,7 @@ class testFormTags extends CWebTest {
 		}
 		$this->query('link', $data['name'])->waitUntilClickable()->one()->click();
 		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asMultifieldTable()->waitUntilVisible()->one();
+		$tags_table = $this->query('class:tags-table')->asMultifieldTable()->waitUntilVisible()->one();
 
 		// Check all tags (inherited from host and template and own) on created element.
 		if ($object === 'web scenario') {
@@ -1138,7 +1139,7 @@ class testFormTags extends CWebTest {
 		$this->page->waitUntilReady();
 		$tags_table->checkValue($this->prepareAllTags($data['tags'], array_merge(self::HOST_TAGS, self::TEMPLATE_TAGS)));
 
-		// Check empty column "Parent templates" except for inhereted unique template tags.
+		// Check empty column "Parent templates" except for inherited unique template tags.
 		foreach ($tags_table->getRows() as $row) {
 			$parent_template = $row->getColumn('Parent templates')->getText();
 			$current_tag = [];
@@ -1165,7 +1166,7 @@ class testFormTags extends CWebTest {
 	private function getInheritedTags() {
 		$inherited_tags = [];
 
-		$tags_table = $this->query('id:tags-table')->asMultifieldTable()->one();
+		$tags_table = $this->query('class:tags-table')->asMultifieldTable()->one();
 		$headers = $tags_table->getHeadersText();
 		// Find disabled rows of host and/or template tags by disabled Name field.
 		$disabled_rows = $tags_table->findRows(function ($row) {
@@ -1277,13 +1278,13 @@ class testFormTags extends CWebTest {
 
 		if (!$this->problem_tags) {
 			$form->selectTab('Tags');
-			$tags_table = 'tags-table';
+			$tags_table = 'class:tags-table';
 		}
 		else {
-			$tags_table = 'problem_tags';
+			$tags_table = 'id:problem_tags';
 		}
 
-		$this->query('id', $tags_table)->asMultifieldTable()->waitUntilPresent()->one()->clear();
+		$this->query($tags_table)->asMultifieldTable()->waitUntilPresent()->one()->clear();
 		$form->submit();
 		$this->page->waitUntilReady();
 

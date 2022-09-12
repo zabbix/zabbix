@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+
+#include "zbxstr.h"
 #include "log.h"
 #include "zbxjson.h"
 
@@ -137,6 +138,7 @@ static int	zbx_get_service_config(SC_HANDLE hService, LPQUERY_SERVICE_CONFIG buf
 		return SUCCEED;
 
 	log_if_buffer_too_small("QueryServiceConfig", sz);
+
 	return FAIL;
 }
 
@@ -163,6 +165,7 @@ static int	zbx_get_service_config2(SC_HANDLE hService, DWORD dwInfoLevel, LPBYTE
 		return SUCCEED;
 
 	log_if_buffer_too_small("QueryServiceConfig2", sz);
+
 	return FAIL;
 }
 
@@ -387,17 +390,15 @@ next:
 	return SYSINFO_RET_OK;
 }
 
+int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
 #define ZBX_SRV_PARAM_STATE		0x01
 #define ZBX_SRV_PARAM_DISPLAYNAME	0x02
 #define ZBX_SRV_PARAM_PATH		0x03
 #define ZBX_SRV_PARAM_USER		0x04
 #define ZBX_SRV_PARAM_STARTUP		0x05
 #define ZBX_SRV_PARAM_DESCRIPTION	0x06
-
 #define ZBX_NON_EXISTING_SRV		255
-
-int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
 	SERVICE_STATUS		status;
 	SC_HANDLE		h_mgr, h_srv;
 	int			param_type;
@@ -539,6 +540,13 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	CloseServiceHandle(h_mgr);
 
 	return SYSINFO_RET_OK;
+#undef ZBX_SRV_PARAM_STATE
+#undef ZBX_SRV_PARAM_DISPLAYNAME
+#undef ZBX_SRV_PARAM_PATH
+#undef ZBX_SRV_PARAM_USER
+#undef ZBX_SRV_PARAM_STARTUP
+#undef ZBX_SRV_PARAM_DESCRIPTION
+#undef ZBX_NON_EXISTING_SRV
 }
 
 int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -771,7 +779,7 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 				{
 					utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
 
-					if (NULL == exclude || FAIL == str_in_list(exclude, utf8, ','))
+					if (NULL == exclude || FAIL == zbx_str_in_list(exclude, utf8, ','))
 						buf = zbx_strdcatf(buf, "%s\n", utf8);
 
 					zbx_free(utf8);
@@ -802,3 +810,17 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	return SYSINFO_RET_OK;
 }
+#undef	ZBX_SRV_STARTTYPE_ALL
+#undef	ZBX_SRV_STARTTYPE_AUTOMATIC
+#undef	ZBX_SRV_STARTTYPE_MANUAL
+#undef	ZBX_SRV_STARTTYPE_DISABLED
+
+#undef ZBX_SRV_STATE_STOPPED		0x0001
+#undef ZBX_SRV_STATE_START_PENDING	0x0002
+#undef ZBX_SRV_STATE_STOP_PENDING	0x0004
+#undef ZBX_SRV_STATE_RUNNING		0x0008
+#undef ZBX_SRV_STATE_CONTINUE_PENDING	0x0010
+#undef ZBX_SRV_STATE_PAUSE_PENDING	0x0020
+#undef ZBX_SRV_STATE_PAUSED		0x0040
+#undef ZBX_SRV_STATE_STARTED		0x007e
+#undef ZBX_SRV_STATE_ALL		0x007f

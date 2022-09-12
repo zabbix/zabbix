@@ -79,12 +79,12 @@ require_once dirname(__FILE__).'/proxies/testFormAdministrationGeneralProxies.ph
 require_once dirname(__FILE__).'/proxies/testPageAdministrationGeneralProxies.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAuditLog.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralHousekeeper.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
 //require_once dirname(__FILE__).'/testFormAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
+require_once dirname(__FILE__).'/testFormAdministrationHousekeeper.php';
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypeMessageTemplates.php';
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypeWebhook.php';
@@ -284,12 +284,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationGeneralProxies');
 		$suite->addTestSuite('testFormAdministrationGeneralAuditLog');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
-		$suite->addTestSuite('testFormAdministrationGeneralHousekeeper');
 		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');
 //		$suite->addTestSuite('testFormAdministrationGeneralImages');
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
 		$suite->addTestSuite('testFormAdministrationGeneralTrigDisplOptions');
+		$suite->addTestSuite('testFormAdministrationHousekeeper');
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
 		$suite->addTestSuite('testFormAdministrationMediaTypeMessageTemplates');
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');

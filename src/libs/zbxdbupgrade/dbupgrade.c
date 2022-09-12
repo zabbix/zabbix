@@ -846,7 +846,7 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(5050)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6000)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6010)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(6020)[];
-/*extern zbx_dbpatch_t	DBPATCH_VERSION(6030)[];*/
+extern zbx_dbpatch_t	DBPATCH_VERSION(6030)[];
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -875,7 +875,7 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(6000), "6.0 maintenance"},
 	{DBPATCH_VERSION(6010), "6.2 development"},
 	{DBPATCH_VERSION(6020), "6.2 maintenance"},
-/*	{DBPATCH_VERSION(6030), "6.4 development"},*/
+	{DBPATCH_VERSION(6030), "6.4 development"},
 	{NULL}
 };
 
@@ -953,6 +953,7 @@ int	DBcheck_version(void)
 				get_program_type_string(program_type), required);
 		zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
 
+		ret = NOTSUPPORTED;
 		goto out;
 #endif
 	}
@@ -985,7 +986,9 @@ int	DBcheck_version(void)
 				get_program_type_string(program_type), db_mandatory, db_optional, required);
 #ifdef HAVE_SQLITE3
 		if (required > db_mandatory)
-			zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
+			zabbix_log(LOG_LEVEL_WARNING, "Zabbix does not support SQLite3 database upgrade.");
+		else
+			ret = NOTSUPPORTED;
 #endif
 		goto out;
 	}
@@ -1302,4 +1305,3 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 }
 
 #endif
-

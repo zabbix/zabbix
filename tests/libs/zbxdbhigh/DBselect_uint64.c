@@ -21,7 +21,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockdb.h"
 
-#include "common.h"
+#include "zbxnum.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 
@@ -57,7 +57,7 @@ void	zbx_mock_test_entry(void **state)
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_string(expected_result, &expected_result_string)))
 			break;
 
-		if (SUCCEED != is_uint64(expected_result_string, &expected_result_uint64))
+		if (SUCCEED != zbx_is_uint64(expected_result_string, &expected_result_uint64))
 			fail_msg("Cannot convert expected result #%d to unsigned 64 bit integer.", i + 1);
 
 		if (i >= actual_results.values_num)

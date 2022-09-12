@@ -297,7 +297,7 @@ $fields = [
 	'sortorder' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'), null]
 ];
 
-if (getRequest('type') == ITEM_TYPE_HTTPAGENT && getRequest('interfaceid') == INTERFACE_TYPE_OPT) {
+if (getRequest('interfaceid') == INTERFACE_TYPE_OPT && itemTypeInterface(getRequest('type')) == INTERFACE_TYPE_OPT) {
 	unset($fields['interfaceid']);
 	unset($_REQUEST['interfaceid']);
 }
@@ -740,21 +740,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
 						$item['interfaceid'] = getRequest('interfaceid', 0);
 					}
-					if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
-						$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
-					}
-					if ($db_item['username'] !== getRequest('username', '')) {
-						$item['username'] = getRequest('username', '');
-					}
-					if ($db_item['password'] !== getRequest('password', '')) {
-						$item['password'] = getRequest('password', '');
-					}
-					if ($db_item['publickey'] !== getRequest('publickey', '')) {
-						$item['publickey'] = getRequest('publickey', '');
-					}
-					if ($db_item['privatekey'] !== getRequest('privatekey', '')) {
-						$item['privatekey'] = getRequest('privatekey', '');
-					}
 					if ($db_item['params'] !== getRequest('params', '')) {
 						$item['params'] = getRequest('params', '');
 					}
@@ -794,6 +779,41 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['templateid'] == 0 && $type == ITEM_TYPE_HTTPAGENT) {
 					$item = prepareItemHttpAgentFormData($http_item) + $item;
 				}
+			}
+
+			if ($type == ITEM_TYPE_HTTPAGENT) {
+				if ($db_item['authtype'] != getRequest('http_authtype', ITEM_AUTHTYPE_PASSWORD)) {
+					$item['authtype'] = getRequest('http_authtype', ITEM_AUTHTYPE_PASSWORD);
+				}
+
+				if ($db_item['username'] !== getRequest('http_username', '')) {
+					$item['username'] = getRequest('http_username', '');
+				}
+
+				if ($db_item['password'] !== getRequest('http_password', '')) {
+					$item['password'] = getRequest('http_password', '');
+				}
+			}
+			else {
+				if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
+					$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
+				}
+
+				if ($db_item['username'] !== getRequest('username', '')) {
+					$item['username'] = getRequest('username', '');
+				}
+
+				if ($db_item['password'] !== getRequest('password', '')) {
+					$item['password'] = getRequest('password', '');
+				}
+			}
+
+			if ($db_item['publickey'] !== getRequest('publickey', '')) {
+				$item['publickey'] = getRequest('publickey', '');
+			}
+
+			if ($db_item['privatekey'] !== getRequest('privatekey', '')) {
+				$item['privatekey'] = getRequest('privatekey', '');
 			}
 
 			if ($db_item['status'] != getRequest('status', ITEM_STATUS_DISABLED)) {
@@ -1330,19 +1350,19 @@ else {
 				if ($update_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
 					$delay = $update_interval_parser->getDelay();
 
-					$delay = ($delay[0] !== '{') ? convertUnitsS(timeUnitToSeconds($delay)) : $delay;
+					$delay = ($delay[0] !== '{') ? convertSecondsToTimeUnits(timeUnitToSeconds($delay)) : $delay;
 				}
 			}
 
 			$history = $item['history'];
-			$history = ($history[0] !== '{') ? convertUnitsS(timeUnitToSeconds($history)) : $history;
+			$history = ($history[0] !== '{') ? convertSecondsToTimeUnits(timeUnitToSeconds($history)) : $history;
 
 			// Hide trend (zero values) for non-numeric item types.
 			$trends = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
 				? $item['trends']
 				: '';
 			$trends = ($trends !== '' && $trends[0] !== '{')
-				? convertUnitsS(timeUnitToSeconds($trends))
+				? convertSecondsToTimeUnits(timeUnitToSeconds($trends))
 				: $trends;
 
 			$item['subfilters'] = [

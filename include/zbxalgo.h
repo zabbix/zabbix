@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXALGO_H
 #define ZABBIX_ZBXALGO_H
 
-#include "common.h"
+#include "zbxnum.h"
 #include "log.h"
 
 /* generic */
@@ -659,7 +659,6 @@ int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, unsigned *k, char **error);
 int	zbx_mode_code(char *mode_str, zbx_mode_t *mode, char **error);
 double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fit_t fit, unsigned k, zbx_mode_t mode);
 double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, zbx_fit_t fit, unsigned k);
-
 
 /* fifo queue of pointers */
 

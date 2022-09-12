@@ -708,6 +708,21 @@ switch ($data['method']) {
 		}
 		break;
 
+	case 'item_value_type.get':
+		$result = '';
+
+		if (array_key_exists('itemid', $data) && is_scalar($data['itemid'])) {
+			$items = API::Item()->get([
+				'output' => ['value_type'],
+				'itemids' => $data['itemid']
+			]);
+
+			if ($items) {
+				$result = $items[0]['value_type'];
+			}
+		}
+		break;
+
 	default:
 		fatal_error('Wrong RPC call to JS RPC!');
 }

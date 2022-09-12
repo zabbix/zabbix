@@ -19,9 +19,11 @@
 
 #include "dbupgrade.h"
 
+#include "zbxnum.h"
+#include "zbxparam.h"
 #include "zbxdbhigh.h"
 #include "log.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 /*
  * 2.2 development database patches
@@ -941,7 +943,7 @@ static int	DBpatch_2010101(void)
 
 			zbx_strncpy_alloc(&param, &param_alloc, &param_offset, row[1] + 15, key_len - 16);
 
-			if (1 != num_param(param))
+			if (1 != zbx_num_param(param))
 			{
 				if (FAIL == (ret = quote_key_param(&param, 0)))
 				{
@@ -1714,7 +1716,7 @@ static int	DBpatch_2010195(void)
 	{
 		key = zbx_strdup(key, row[1]);
 
-		if (SUCCEED != replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, DBpatch_2010195_replace_key_param_cb,
+		if (SUCCEED != zbx_replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, DBpatch_2010195_replace_key_param_cb,
 				NULL, error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": %s", row[1], error);

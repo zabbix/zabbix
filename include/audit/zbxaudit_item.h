@@ -20,7 +20,7 @@
 #ifndef ZABBIX_AUDIT_ITEM_H
 #define ZABBIX_AUDIT_ITEM_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #include "../src/libs/zbxdbhigh/template.h"
 #include "../src/zabbix_server/lld/lld.h"

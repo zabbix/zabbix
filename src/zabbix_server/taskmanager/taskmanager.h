@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TASKMANAGER_H
-#define ZABBIX_TASKMANAGER_H
+#ifndef ZABBIX_SERVER_TASKMANAGER_H
+#define ZABBIX_SERVER_TASKMANAGER_H
 
 #include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args);
 
-#endif
+#endif /* ZABBIX_SERVER_TASKMANAGER */

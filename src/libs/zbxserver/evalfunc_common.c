@@ -19,9 +19,10 @@
 
 #include "evalfunc_common.h"
 
-#include "common.h"
 #include "log.h"
 #include "zbxtrends.h"
+#include "zbxnum.h"
+#include "zbxexpr.h"
 
 const char	*zbx_type_string(zbx_value_type_t type)
 {
@@ -49,7 +50,7 @@ int	get_function_parameter_uint64(const char *parameters, int Nparam, zbx_uint64
 	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	if (SUCCEED == (ret = is_uint64(parameter, value)))
+	if (SUCCEED == (ret = zbx_is_uint64(parameter, value)))
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:" ZBX_FS_UI64, __func__, *value);
 
 	zbx_free(parameter);
@@ -69,9 +70,9 @@ int	get_function_parameter_float(const char *parameters, int Nparam, unsigned ch
 	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	if (SUCCEED == (ret = is_double_suffix(parameter, flags)))
+	if (SUCCEED == (ret = zbx_is_double_suffix(parameter, flags)))
 	{
-		*value = str2double(parameter);
+		*value = zbx_str2double(parameter);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:" ZBX_FS_DBL, __func__, *value);
 	}
 
@@ -137,14 +138,14 @@ int	get_function_parameter_hist_range(int from, const char *parameters, int Npar
 	}
 	else if ('#' != *parameter)
 	{
-		if (SUCCEED != is_time_suffix(parameter, value, ZBX_LENGTH_UNLIMITED) || 0 > *value)
+		if (SUCCEED != zbx_is_time_suffix(parameter, value, ZBX_LENGTH_UNLIMITED) || 0 > *value)
 			goto out;
 
 		*type = ZBX_VALUE_SECONDS;
 	}
 	else
 	{
-		if (SUCCEED != is_uint31(parameter + 1, value) || 0 >= *value)
+		if (SUCCEED != zbx_is_uint31(parameter + 1, value) || 0 >= *value)
 			goto out;
 		*type = ZBX_VALUE_NVALUES;
 	}

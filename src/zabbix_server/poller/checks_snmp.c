@@ -29,6 +29,8 @@
 #include "zbxcomms.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
+#include "zbxparam.h"
+#include "zbxsysinfo.h"
 
 /*
  * SNMP Dynamic Index Cache
@@ -1231,17 +1233,17 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result, &val_type))
 				{
-					if (ISSET_TEXT(&snmp_result) && ZBX_SNMP_STR_HEX == val_type)
+					if (ZBX_ISSET_TEXT(&snmp_result) && ZBX_SNMP_STR_HEX == val_type)
 						zbx_remove_chars(snmp_result.text, "\r\n");
 
-					str_res = GET_STR_RESULT(&snmp_result);
+					str_res = ZBX_GET_STR_RESULT(&snmp_result);
 				}
 
 				if (NULL == str_res)
 				{
 					char	**msg;
 
-					msg = GET_MSG_RESULT(&snmp_result);
+					msg = ZBX_GET_MSG_RESULT(&snmp_result);
 
 					zabbix_log(LOG_LEVEL_DEBUG, "cannot get index '%s' string value: %s",
 							oid_index, NULL != msg && NULL != *msg ? *msg : "(null)");
@@ -1422,7 +1424,7 @@ retry:
 			else
 				errcodes[j] = zbx_snmp_set_result(var, &results[j], &val_type);
 
-			if (ISSET_TEXT(&results[j]) && ZBX_SNMP_STR_HEX == val_type)
+			if (ZBX_ISSET_TEXT(&results[j]) && ZBX_SNMP_STR_HEX == val_type)
 				zbx_remove_chars(results[j].text, "\r\n");
 		}
 
@@ -1877,7 +1879,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 		if (SUCCEED != errcodes[i])
 			continue;
 
-		if (3 != num_key_param(items[i].snmp_oid))
+		if (3 != zbx_num_key_param(items[i].snmp_oid))
 		{
 			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
 					items[i].snmp_oid));
@@ -1885,9 +1887,9 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 			continue;
 		}
 
-		get_key_param(items[i].snmp_oid, 1, method, sizeof(method));
-		get_key_param(items[i].snmp_oid, 2, index_oids[i], sizeof(index_oids[i]));
-		get_key_param(items[i].snmp_oid, 3, index_values[i], sizeof(index_values[i]));
+		zbx_get_key_param(items[i].snmp_oid, 1, method, sizeof(method));
+		zbx_get_key_param(items[i].snmp_oid, 2, index_oids[i], sizeof(index_oids[i]));
+		zbx_get_key_param(items[i].snmp_oid, 3, index_values[i], sizeof(index_values[i]));
 
 		if (0 != strcmp("index", method))
 		{
@@ -1930,7 +1932,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 			if (SUCCEED != errcodes[j])
 				continue;
 
-			if (NULL == GET_STR_RESULT(&results[j]) || 0 != strcmp(results[j].str, index_values[j]))
+			if (NULL == ZBX_GET_STR_RESULT(&results[j]) || 0 != strcmp(results[j].str, index_values[j]))
 			{
 				to_walk[to_walk_num++] = j;
 			}
@@ -2065,7 +2067,7 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *ite
 		if (SUCCEED != errcodes[i])
 			continue;
 
-		if (0 != num_key_param(items[i].snmp_oid))
+		if (0 != zbx_num_key_param(items[i].snmp_oid))
 		{
 			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
 					items[i].snmp_oid));

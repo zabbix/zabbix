@@ -18,15 +18,17 @@
 **/
 
 #include "checks_internal.h"
+#include "zbxserver.h"
 
 #include "checks_java.h"
 #include "zbxself.h"
 #include "preproc.h"
 #include "zbxtrends.h"
 #include "../vmware/vmware.h"
-#include "zbxserver.h"
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
 #include "zbxavailability.h"
+#include "zbxnum.h"
+#include "zbxsysinfo.h"
 
 extern unsigned char	program_type;
 
@@ -260,14 +262,14 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 		}
 
 		if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp &&
-				FAIL == is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
+				FAIL == zbx_is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			goto out;
 		}
 
 		if (NULL != (tmp = get_rparam(&request, 2)) && '\0' != *tmp &&
-				FAIL == is_time_suffix(tmp, &to, ZBX_LENGTH_UNLIMITED))
+				FAIL == zbx_is_time_suffix(tmp, &to, ZBX_LENGTH_UNLIMITED))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;
@@ -499,7 +501,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 				aggr_func = ZBX_AGGR_FUNC_MAX;
 			else if (0 == strcmp(tmp, "min"))
 				aggr_func = ZBX_AGGR_FUNC_MIN;
-			else if (SUCCEED == is_ushort(tmp, &process_num) && 0 < process_num)
+			else if (SUCCEED == zbx_is_ushort(tmp, &process_num) && 0 < process_num)
 				aggr_func = ZBX_AGGR_FUNC_ONE;
 			else
 			{
@@ -746,7 +748,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 		{
 			port_number = ZBX_DEFAULT_SERVER_PORT;
 		}
-		else if (SUCCEED != is_ushort(port_str, &port_number))
+		else if (SUCCEED != zbx_is_ushort(port_str, &port_number))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;
@@ -787,14 +789,14 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 					int	from = ZBX_QUEUE_FROM_DEFAULT, to = ZBX_QUEUE_TO_INFINITY;
 
 					if (NULL != tmp && '\0' != *tmp &&
-							FAIL == is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
+							FAIL == zbx_is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
 					{
 						SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 						goto out;
 					}
 
 					if (NULL != tmp1 && '\0' != *tmp1 &&
-							FAIL == is_time_suffix(tmp1, &to, ZBX_LENGTH_UNLIMITED))
+							FAIL == zbx_is_time_suffix(tmp1, &to, ZBX_LENGTH_UNLIMITED))
 					{
 						SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid sixth parameter."));
 						goto out;
@@ -924,7 +926,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 
 	ret = SUCCEED;
 out:
-	if (NOTSUPPORTED == ret && !ISSET_MSG(result))
+	if (NOTSUPPORTED == ret && !ZBX_ISSET_MSG(result))
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Internal check is not supported."));
 
 	free_request(&request);

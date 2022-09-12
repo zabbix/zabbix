@@ -17,8 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 ZBX_METRIC	parameters_specific[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
@@ -33,8 +32,8 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
 
-	{"net.tcp.listen",	CF_HAVEPARAMS,	NET_TCP_LISTEN, 	"80"},
-	{"net.udp.listen",	CF_HAVEPARAMS,	NET_UDP_LISTEN, 	"68"},
+	{"net.tcp.listen",	CF_HAVEPARAMS,	NET_TCP_LISTEN,		"80"},
+	{"net.udp.listen",	CF_HAVEPARAMS,	NET_UDP_LISTEN,		"68"},
 
 	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"en0,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"en0,bytes"},

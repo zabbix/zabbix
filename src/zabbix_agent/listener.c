@@ -19,12 +19,12 @@
 
 #include "listener.h"
 
-#include "zbxcomms.h"
 #include "zbxconf.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "log.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
-extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
@@ -52,9 +52,9 @@ static void	process_listener(zbx_socket_t *s)
 
 		init_result(&result);
 
-		if (SUCCEED == process(s->buffer, PROCESS_WITH_ALIAS, &result))
+		if (SUCCEED == process(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result))
 		{
-			if (NULL != (value = GET_TEXT_RESULT(&result)))
+			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
 				ret = zbx_tcp_send_to(s, *value, CONFIG_TIMEOUT);
@@ -62,7 +62,7 @@ static void	process_listener(zbx_socket_t *s)
 		}
 		else
 		{
-			value = GET_MSG_RESULT(&result);
+			value = ZBX_GET_MSG_RESULT(&result);
 
 			if (NULL != value)
 			{
@@ -108,27 +108,30 @@ static void	zbx_listener_sigusr_handler(int flags)
 ZBX_THREAD_ENTRY(listener_thread, args)
 {
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	char		*msg = NULL;
+	char				*msg = NULL;
 #endif
-	int		ret;
-	zbx_socket_t	s;
+	int				ret;
+	zbx_socket_t			s;
+	zbx_thread_listener_args	*init_child_args_in;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
 
+	init_child_args_in = (zbx_thread_listener_args *)((((zbx_thread_args_t *)args))->args);
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(init_child_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 
-	memcpy(&s, (zbx_socket_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_socket_t));
+	memcpy(&s, (zbx_socket_t *)(init_child_args_in->listen_sock), sizeof(zbx_socket_t));
 
 	zbx_free(args);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child();
+	zbx_tls_init_child(init_child_args_in->zbx_config_tls, init_child_args_in->zbx_get_program_type_cb_arg);
 #endif
 
 #ifndef _WINDOWS
@@ -147,7 +150,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #endif
 
 		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
-		ret = zbx_tcp_accept(&s, configured_tls_accept_modes);
+		ret = zbx_tcp_accept(&s, init_child_args_in->zbx_config_tls->accept_modes);
 		zbx_update_env(zbx_time());
 
 		if (SUCCEED == ret)
@@ -159,7 +162,10 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				if (ZBX_TCP_SEC_TLS_CERT != s.connection_type ||
-						SUCCEED == (ret = zbx_check_server_issuer_subject(&s, &msg)))
+						SUCCEED == (ret = zbx_check_server_issuer_subject(&s,
+						init_child_args_in->zbx_config_tls->server_cert_issuer,
+						init_child_args_in->zbx_config_tls->server_cert_subject,
+						&msg)))
 #endif
 				{
 					process_listener(&s);

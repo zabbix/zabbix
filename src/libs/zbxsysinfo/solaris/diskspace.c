@@ -17,12 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
+#include "inodes.h"
+
 #include "zbxjson.h"
 #include "log.h"
 #include "zbxalgo.h"
-#include "inodes.h"
 
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused, char **error)
@@ -78,6 +80,8 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 	}
 
 	return SYSINFO_RET_OK;
+#undef ZBX_BSIZE
+#undef ZBX_STATFS
 }
 
 static int	VFS_FS_USED(const char *fs, AGENT_RESULT *result)
@@ -221,6 +225,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSNAME, mt.mnt_mountp, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSTYPE, mt.mnt_fstype, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSOPTIONS, mt.mnt_mntopts, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 	}
 
@@ -244,11 +249,11 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t		itotal, inot_used, iused;
 	double			pfree, pused;
 	double			ipfree, ipused;
-	char 			*error;
+	char			*error;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_mpoint_t		*mntpoint;
 	int			ret = SYSINFO_RET_FAIL;
-	char 			*mpoint;
+	char			*mpoint;
 
 	/* opening the mounted filesystems file */
 	if (NULL == (f = fopen("/etc/mnttab", "r")))
@@ -263,7 +268,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	while (-1 != getmntent(f, &mt))
 	{
 		mpoint = mt.mnt_mountp;
-		if (SYSINFO_RET_OK != get_fs_size_stat(mpoint, &total, &not_used, &used, &pfree, &pused,&error))
+		if (SYSINFO_RET_OK != get_fs_size_stat(mpoint, &total, &not_used, &used, &pfree, &pused, &error))
 		{
 			zbx_free(error);
 			continue;
@@ -288,6 +293,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		mntpoint->inodes.not_used = inot_used;
 		mntpoint->inodes.pfree = ipfree;
 		mntpoint->inodes.pused = ipused;
+		mntpoint->options = zbx_strdup(NULL, mt.mnt_mntopts);
 
 		zbx_vector_ptr_append(&mntpoints, mntpoint);
 	}
@@ -327,6 +333,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->inodes.pfree);
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->inodes.pused);
 			zbx_json_close(&j);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mntpoint->options, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
 	}
@@ -344,8 +351,8 @@ out:
 
 	return ret;
 }
+
 int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return zbx_execute_threaded_metric(vfs_fs_get, request, result);
-
 }

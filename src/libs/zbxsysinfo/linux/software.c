@@ -18,13 +18,14 @@
 **/
 
 #include "software.h"
+#include "zbxsysinfo.h"
 
-#include "sysinfo.h"
 #include "zbxalgo.h"
 #include "zbxexec.h"
 #include "cfg.h"
 #include "zbxregexp.h"
 #include "log.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 #       include <sys/utsname.h>
@@ -47,7 +48,7 @@ int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int     SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*type, line[MAX_STRING_LEN], tmp_line[MAX_STRING_LEN];
 	int	ret = SYSINFO_RET_FAIL, line_read = FAIL;
@@ -256,7 +257,8 @@ next:
 
 			if (1 == show_pm)
 			{
-				offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages, mng->name);
+				offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages,
+						mng->name);
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
 
 				zbx_vector_str_clear_ext(&packages, zbx_str_free);

@@ -22,8 +22,7 @@ package zbxlib
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../include
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "log.h"
 #include "../src/zabbix_agent/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
@@ -47,6 +46,7 @@ ZBX_ACTIVE_METRIC *new_metric(char *key, zbx_uint64_t lastlogsize, int mtime, in
 	metric->flags = (unsigned char)flags;
 	metric->skip_old_data = (0 != metric->lastlogsize ? 0 : 1);
 	metric->persistent_file_name = NULL;	// initialized but not used in Agent2
+
 	return metric;
 }
 
@@ -90,6 +90,7 @@ int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sen
 		}
 		metric->flags &= ~ZBX_METRIC_FLAG_NEW;
 	}
+
 	return ret;
 }
 
@@ -134,6 +135,7 @@ static log_result_t *new_log_result(int slots)
 	result = (log_result_t *)zbx_malloc(NULL, sizeof(log_result_t));
 	zbx_vector_ptr_create(&result->values);
 	result->slots = slots;
+
 	return result;
 }
 
@@ -160,6 +162,7 @@ static int get_log_value(log_result_t *result, int index, char **value, int *sta
 	*state = log->state;
 	*lastlogsize = log->lastlogsize;
 	*mtime = log->mtime;
+
 	return SUCCEED;
 }
 
@@ -188,6 +191,7 @@ int	process_value_cb(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, c
 		return FAIL;
 
 	add_log_value(result, value, state, *lastlogsize, *mtime);
+
 	return SUCCEED;
 }
 
@@ -197,6 +201,7 @@ static zbx_vector_pre_persistent_lp_t new_prep_vec(void)
 
 	vect = (zbx_vector_pre_persistent_lp_t)zbx_malloc(NULL, sizeof(zbx_vector_pre_persistent_t));
 	zbx_vector_pre_persistent_create(vect);
+
 	return vect;
 }
 
@@ -207,6 +212,35 @@ static void free_prep_vec(zbx_vector_pre_persistent_lp_t vect)
 	zbx_vector_pre_persistent_destroy(vect);
 	zbx_free(vect);
 }
+
+void	zbx_config_tls_init_for_agent2(zbx_config_tls_t *zbx_config_tls, unsigned int accept, unsigned int connect,
+		char *PSKIdentity, char *PSKKey, char *CAFile, char *CRLFile, char *CertFile, char *KeyFile,
+		char *ServerCertIssuer, char *ServerCertSubject)
+{
+	zbx_config_tls->connect_mode	= connect;
+	zbx_config_tls->accept_modes	= accept;
+
+	zbx_config_tls->connect		= NULL;
+	zbx_config_tls->accept		= NULL;
+	zbx_config_tls->ca_file		= CAFile;
+	zbx_config_tls->crl_file		= CRLFile;
+	zbx_config_tls->server_cert_issuer	= ServerCertIssuer;
+	zbx_config_tls->server_cert_subject	= ServerCertSubject;
+	zbx_config_tls->cert_file		= CertFile;
+	zbx_config_tls->key_file		= KeyFile;
+	zbx_config_tls->psk_identity		= PSKIdentity;
+	zbx_config_tls->psk_file		= PSKKey;
+	zbx_config_tls->cipher_cert13		= NULL;
+	zbx_config_tls->cipher_cert		= NULL;
+	zbx_config_tls->cipher_psk13		= NULL;
+	zbx_config_tls->cipher_psk		= NULL;
+	zbx_config_tls->cipher_all13		= NULL;
+	zbx_config_tls->cipher_all		= NULL;
+	zbx_config_tls->cipher_cmd13		= NULL;
+	zbx_config_tls->cipher_cmd		= NULL;
+
+	return;
+}
 */
 import "C"
 
@@ -216,6 +250,8 @@ import (
 	"unsafe"
 
 	"zabbix.com/pkg/itemutil"
+	"zabbix.com/internal/agent"
+	"zabbix.com/pkg/tls"
 )
 
 const (
@@ -275,6 +311,7 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 		return nil, errors.New("Unsupported item key.")
 	}
 	ckey := C.CString(itemutil.MakeKey(key, params))
+
 	return unsafe.Pointer(C.new_metric(ckey, C.zbx_uint64_t(lastLogsize), C.int(mtime), C.int(flags))), nil
 }
 
@@ -293,11 +330,35 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 
 	result := C.new_log_result(C.int(item.Output.PersistSlotsAvailable()))
 
+	var tlsConfig *tls.Config
+	var err error
+	var ctlsConfig C.zbx_config_tls_t;
+	var ctlsConfig_p *C.zbx_config_tls_t;
+
+	if tlsConfig, err = agent.GetTLSConfig(&agent.Options); err != nil {
+		result := &LogResult{
+			Ts:    time.Now(),
+			Error: err,
+		}
+		item.Results = append(item.Results, result)
+
+		return
+	}
+	if (nil != tlsConfig) {
+		C.zbx_config_tls_init_for_agent2(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
+			(C.CString)(tlsConfig.PSKIdentity), (C.CString)(tlsConfig.PSKKey),
+			(C.CString)(tlsConfig.CAFile), (C.CString)(tlsConfig.CRLFile), (C.CString)(tlsConfig.CertFile),
+			(C.CString)(tlsConfig.KeyFile), (C.CString)(tlsConfig.ServerCertIssuer),
+			(C.CString)(tlsConfig.ServerCertSubject));
+		ctlsConfig_p = &ctlsConfig
+	}
+
 	var cerrmsg *C.char
 	cprepVec := C.new_prep_vec() // In Agent2 it is always empty vector. Not used but required for linking.
 	ret := C.process_log_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)), C.zbx_vector_ptr_lp_t(cblob),
 		C.ZBX_ACTIVE_METRIC_LP(data), C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
-		&cmtimeSent, &cerrmsg, cprepVec)
+		&cmtimeSent, &cerrmsg, cprepVec, ctlsConfig_p)
+
 	C.free_prep_vec(cprepVec)
 
 	// add cached results

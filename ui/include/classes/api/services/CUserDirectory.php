@@ -442,8 +442,8 @@ class CUserDirectory extends CApiService {
 	 * @throws APIException
 	 */
 	protected static function validateTest(array &$userdirectory): void {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-			'userdirectoryid' =>	['type' => API_ID, 'flags' => API_ALLOW_NULL, 'default' => null],
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'userdirectoryid' =>	['type' => API_ID, 'default' => 0],
 			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'host')],
 			'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'base_dn' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory', 'base_dn')],
@@ -460,7 +460,7 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if ($userdirectory['userdirectoryid'] !== null) {
+		if ($userdirectory['userdirectoryid'] != 0) {
 			$db_userdirectory = DB::select('userdirectory', [
 				'output' => ['host', 'port', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute', 'start_tls',
 					'search_filter'

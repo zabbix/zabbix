@@ -17,11 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxjson.h"
+#include "zbxstr.h"
 
 #include <sys/sysctl.h>
 
@@ -113,7 +115,7 @@ static char	*proc_argv(pid_t pid)
 	return argv;
 }
 
-int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *args;
 	int			do_task, pagesize, count, i, proccount = 0, invalid_user = 0, proc_ok, comm_ok, op, arg;

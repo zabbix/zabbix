@@ -245,7 +245,7 @@ $fields = [
 	'sortorder' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 
-if (getRequest('type') == ITEM_TYPE_HTTPAGENT && getRequest('interfaceid') == INTERFACE_TYPE_OPT) {
+if (getRequest('interfaceid') == INTERFACE_TYPE_OPT && itemTypeInterface(getRequest('type')) == INTERFACE_TYPE_OPT) {
 	unset($fields['interfaceid']);
 	unset($_REQUEST['interfaceid']);
 }
@@ -268,13 +268,13 @@ if (!$discoveryRule) {
 
 $itemPrototypeId = getRequest('itemid');
 if ($itemPrototypeId) {
-	$item_prorotypes = API::ItemPrototype()->get([
+	$item_prototypes = API::ItemPrototype()->get([
 		'output' => [],
 		'itemids' => $itemPrototypeId,
 		'editable' => true
 	]);
 
-	if (!$item_prorotypes) {
+	if (!$item_prototypes) {
 		access_deny();
 	}
 }
@@ -524,6 +524,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'itemid', 'delay', 'delay_flex', 'history', 'trends', 'history_mode', 'trends_mode', 'allow_traps',
 					'description', 'status', 'discover', 'tags'
 				], true);
+
+				if ($db_item['type'] != ITEM_TYPE_HTTPAGENT) {
+					$allowed_fields += array_fill_keys([
+						'authtype', 'username', 'password', 'params', 'publickey', 'privatekey'
+					], true);
+				}
 
 				foreach ($item as $field => $value) {
 					if (!array_key_exists($field, $allowed_fields)) {

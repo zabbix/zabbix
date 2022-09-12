@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "alias.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "log.h"
 
 static ALIAS	*aliasList = NULL;

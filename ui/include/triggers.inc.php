@@ -733,7 +733,7 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 
 			if (!array_key_exists('only_true', $trigger_options)
 					|| ($trigger_options['only_true'] === null && $trigger_options['filter']['value'] === null)) {
-				// Overview type = 'Data', Maps, Dasboard or Overview 'show any' mode.
+				// Overview type = 'Data', Maps, Dashboard or Overview 'show any' mode.
 				$trigger['value'] = TRIGGER_VALUE_FALSE;
 			}
 			else {
@@ -1872,24 +1872,6 @@ function get_item_function_info(string $expr) {
 	}
 
 	return $result;
-}
-
-/**
- * Quoting $param if it contains special characters.
- *
- * @param string $param
- * @param bool   $forced
- *
- * @return string
- */
-function quoteFunctionParam($param, $forced = false) {
-	if (!$forced) {
-		if (!isset($param[0]) || ($param[0] != '"' && false === strpbrk($param, ',)'))) {
-			return $param;
-		}
-	}
-
-	return '"'.str_replace('"', '\\"', $param).'"';
 }
 
 /**

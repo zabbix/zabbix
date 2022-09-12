@@ -20,8 +20,8 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxcommon.h"
+#include "zbxsysinfo.h"
 
 #define FAIL_PARAM(NAME, MOCK_ERR)	fail_msg("Cannot get \"%s\": %s", NAME, zbx_mock_error_string(MOCK_ERR))
 
@@ -75,9 +75,9 @@ void	zbx_mock_test_entry(void **state)
 
 	/* we know the return code is one of these */
 	if (SYSINFO_RET_OK == actual_ret)
-		p_result = GET_STR_RESULT(&result);
+		p_result = ZBX_GET_STR_RESULT(&result);
 	else
-		p_result = GET_MSG_RESULT(&result);
+		p_result = ZBX_GET_MSG_RESULT(&result);
 
 	if (NULL == p_result)
 		fail_msg("NULL result in AGENT_RESULT while expected \"%s\"", expected_string);

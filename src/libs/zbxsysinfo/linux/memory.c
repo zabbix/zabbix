@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+
 #include "proc.h"
+
 #include "log.h"
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
@@ -210,6 +211,7 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 #else
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Supported for Linux 2.4 only."));
+
 	return SYSINFO_RET_FAIL;
 #endif
 }

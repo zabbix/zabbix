@@ -22,6 +22,8 @@
 #ifdef HAVE_UNIXODBC
 
 #include "log.h"
+#include "zbxsysinfo.h"
+
 #include "../odbc/odbc.h"
 
 /******************************************************************************

@@ -23,6 +23,8 @@
 #include "zbxtasks.h"
 #include "zbxregexp.h"
 #include "log.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
 
 extern unsigned char	program_type;
 
@@ -59,7 +61,7 @@ static int	DBpatch_3050001(void)
 		int		index;
 		zbx_uint64_t	widget_fieldid;
 
-		if (NULL == (p = strrchr(row[1], '.')) || SUCCEED != is_uint31(p + 1, &index))
+		if (NULL == (p = strrchr(row[1], '.')) || SUCCEED != zbx_is_uint31(p + 1, &index))
 			continue;
 
 		widget_fieldid = DBget_maxid_num("widget_field", 1);

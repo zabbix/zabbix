@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
 #include "../common/zbxsysinfo_common.h"
+#include "zbxsysinfo.h"
+
+#include "zbxnum.h"
 #include "log.h"
 
 static struct ifmibdata	ifmd;
@@ -193,7 +194,7 @@ int     NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	port_str = get_rparam(request, 0);
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
@@ -210,7 +211,7 @@ int     NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*port_str, command[64];
 	unsigned short	port;
@@ -224,7 +225,7 @@ int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	port_str = get_rparam(request, 0);
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
@@ -241,7 +242,7 @@ int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int     NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *error;
 

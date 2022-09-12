@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+
 #include "log.h"
 
 static int		mib[] = {CTL_VM, VM_UVMEXP};
@@ -108,7 +108,8 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 {
 	ZBX_SYSCTL(uvm);
 
-	SET_UI64_RESULT(result, (zbx_uint64_t)(uvm.inactive + uvm.free + uvm.vnodepages + uvm.vtextpages) * uvm.pagesize);
+	SET_UI64_RESULT(result, (zbx_uint64_t)(uvm.inactive + uvm.free + uvm.vnodepages + uvm.vtextpages) *
+			uvm.pagesize);
 
 	return SYSINFO_RET_OK;
 }
@@ -123,7 +124,8 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_DBL_RESULT(result, (zbx_uint64_t)(uvm.inactive + uvm.free + uvm.vnodepages + uvm.vtextpages) / (double)uvm.npages * 100);
+	SET_DBL_RESULT(result, (zbx_uint64_t)(uvm.inactive + uvm.free + uvm.vnodepages + uvm.vtextpages) /
+			(double)uvm.npages * 100);
 
 	return SYSINFO_RET_OK;
 }
@@ -160,10 +162,10 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char    *mode;
-	int 	ret = SYSINFO_RET_FAIL;
+	char	*mode;
+	int	ret = SYSINFO_RET_FAIL;
 
 	if (1 < request->nparam)
 	{

@@ -28,6 +28,7 @@
 #include "zbxembed.h"
 #include "zbxserialize.h"
 #include "zbxxml.h"
+#include "zbxtime.h"
 
 #define ZBX_AM_LOCATION_NOWHERE		0
 #define ZBX_AM_LOCATION_QUEUE		1
@@ -382,7 +383,7 @@ static zbx_am_mediatype_t	*am_get_mediatype(zbx_am_t *manager, zbx_uint64_t medi
 static void	zbx_am_update_webhook(zbx_am_t *manager, zbx_am_mediatype_t *mediatype, const char *script,
 		const char *timeout)
 {
-	if (FAIL == is_time_suffix(timeout, &mediatype->timeout, ZBX_LENGTH_UNLIMITED))
+	if (FAIL == zbx_is_time_suffix(timeout, &mediatype->timeout, ZBX_LENGTH_UNLIMITED))
 	{
 		mediatype->error = zbx_strdup(mediatype->error, "Invalid timeout value in media type configuration.");
 		return;
@@ -467,7 +468,7 @@ static void	am_update_mediatype(zbx_am_t *manager, zbx_uint64_t mediatypeid, uns
 	mediatype->maxattempts = maxattempts;
 	mediatype->content_type = content_type;
 
-	if (FAIL == is_time_suffix(attempt_interval, &mediatype->attempt_interval, ZBX_LENGTH_UNLIMITED))
+	if (FAIL == zbx_is_time_suffix(attempt_interval, &mediatype->attempt_interval, ZBX_LENGTH_UNLIMITED))
 	{
 		mediatype->error = zbx_strdup(mediatype->error, "Invalid media type attempt interval.");
 		return;
@@ -847,7 +848,8 @@ static zbx_am_alert_t	*am_pop_alert(zbx_am_t *manager)
 	if (NULL == (mediatype = am_pop_mediatype(manager)))
 		return NULL;
 
-	alertpool = am_pop_alertpool(mediatype);
+	if (NULL == (alertpool = am_pop_alertpool(mediatype)))
+		return NULL;
 
 	elem = zbx_binary_heap_find_min(&alertpool->queue);
 	alert = (zbx_am_alert_t *)elem->data;
@@ -2268,9 +2270,9 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
-		now = time_now;
+		now = (int)time_now;
 
-		if (time_ping + ZBX_DB_PING_FREQUENCY < now)
+		if ((time_ping + ZBX_DB_PING_FREQUENCY) < now)
 		{
 			manager.dbstatus = DBconnect(ZBX_DB_CONNECT_ONCE);
 			DBclose();

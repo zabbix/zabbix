@@ -271,6 +271,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_ui_checked_out',
 						'User type' => 'User',
+						'Dashboards' => false,
 						'Monitoring' => [],
 						'Services' => [],
 						'Inventory' => [],
@@ -286,11 +287,13 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_ui_checked_out',
 						'User type' => 'Admin',
+						'Dashboards' => false,
 						'Monitoring' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
-						'Configuration' => []
+						'Data collection' => [],
+						'Alerts' => []
 					],
 					'message_header' => 'Cannot create user role',
 					'message_details' => 'At least one UI element must be enabled for user role "admin_ui_checked_out".'
@@ -302,11 +305,14 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_ui_checked_out',
 						'User type' => 'Super admin',
+						'Dashboards' => false,
 						'Monitoring' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
-						'Configuration' => [],
+						'Data collection' => [],
+						'Alerts' => [],
+						'Users' => [],
 						'Administration' => []
 					],
 					'message_header' => 'Cannot create user role',
@@ -320,6 +326,7 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_everything_removed',
 						'User type' => 'User',
+						'Dashboards' => false,
 						'Monitoring' => [],
 						'Services' => [],
 						'Inventory' => [],
@@ -347,11 +354,13 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_everything_removed',
 						'User type' => 'Admin',
+						'Dashboards' => false,
 						'Monitoring' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
-						'Configuration' => [],
+						'Data collection' => [],
+						'Alerts' => [],
 						'Default access to new UI elements' => false,
 						'Default access to new modules' => false,
 						'Enabled' => false,
@@ -378,11 +387,14 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_everything_removed',
 						'User type' => 'Super admin',
+						'Dashboards' => false,
 						'Monitoring' => [],
 						'Services' => [],
 						'Inventory' => [],
 						'Reports' => [],
-						'Configuration' => [],
+						'Data collection' => [],
+						'Alerts' => [],
+						'Users' => [],
 						'Administration' => [],
 						'Default access to new UI elements' => false,
 						'Default access to new modules' => false,
@@ -523,6 +535,8 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'user_ui_one_left',
 						'User type' => 'User',
+						'Dashboards' => false,
+						'Monitoring' => [],
 						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => []
@@ -536,10 +550,13 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'admin_ui_one_left',
 						'User type' => 'Admin',
+						'Dashboards' => false,
+						'Monitoring' => [],
 						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => [],
-						'Configuration' => []
+						'Data collection' => [],
+						'Alerts' => []
 					],
 					'message_header' => 'User role created'
 				]
@@ -550,10 +567,14 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'super_admin_ui_one_left',
 						'User type' => 'Super admin',
+						'Dashboards' => false,
+						'Monitoring' => [],
 						'Services' => ['Services'],
 						'Inventory' => [],
 						'Reports' => [],
-						'Configuration' => [],
+						'Data collection' => [],
+						'Alerts' => [],
+						'Users' => [],
 						'Administration' => []
 					],
 					'message_header' => 'User role created'
@@ -795,7 +816,9 @@ class testFormUserRoles extends CWebTest {
 					'fields' => [
 						'Name' => 'Only read-only services',
 						'User type' => 'Super admin',
-						'Read-only access to services' => 'Service list'
+						'Read-only access to services' => 'Service list',
+						// added element 'API methods' with default value for page scroll
+						'API methods' => 'Deny list'
 					],
 					'read_services' => [
 						'xpath:(//div[@class="multiselect-control"])[2]' => ['Service_1', 'Service_2']
@@ -889,11 +912,12 @@ class testFormUserRoles extends CWebTest {
 						'hostgroup.get', 'hostinterface.get', 'hostprototype.get', 'housekeeping.get', 'httptest.get',
 						'iconmap.get', 'image.get', 'item.get', 'itemprototype.get', 'maintenance.get', 'map.create',
 						'map.delete', 'map.get', 'map.update', 'mediatype.get', 'module.get', 'problem.get', 'proxy.get',
-						'role.get', 'script.execute', 'script.get', 'script.getscriptsbyhosts', 'service.create',
-						'service.delete', 'service.get', 'service.update', 'settings.get', 'sla.get', 'sla.getsli',
-						'template.get', 'templatedashboard.get', 'templategroup.get', 'token.create', 'token.delete',
-						'token.generate', 'token.get', 'token.update', 'trend.get', 'trigger.get', 'triggerprototype.get',
-						'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.get', 'valuemap.get'
+						'role.get', 'script.execute', 'script.get', 'script.getscriptsbyevents', 'script.getscriptsbyhosts',
+						'service.create', 'service.delete', 'service.get', 'service.update', 'settings.get', 'sla.get',
+						'sla.getsli', 'template.get', 'templatedashboard.get', 'templategroup.get', 'token.create',
+						'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get', 'trigger.get',
+						'triggerprototype.get', 'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.get',
+						'valuemap.get'
 					]
 				]
 			],
@@ -921,13 +945,14 @@ class testFormUserRoles extends CWebTest {
 						'itemprototype.update', 'maintenance.create', 'maintenance.delete', 'maintenance.get', 'maintenance.update',
 						'map.create', 'map.delete', 'map.get', 'map.update', 'mediatype.get', 'module.get', 'problem.get', 'proxy.get',
 						'report.create', 'report.delete', 'report.get', 'report.update', 'role.get', 'script.execute', 'script.get',
-						'script.getscriptsbyhosts', 'service.create', 'service.delete', 'service.get', 'service.update',
-						'settings.get', 'sla.create', 'sla.delete', 'sla.get', 'sla.getsli', 'sla.update', 'template.create',
-						'template.delete', 'template.get', 'template.massadd', 'template.massremove', 'template.massupdate',
-						'template.update', 'templatedashboard.create', 'templatedashboard.delete', 'templatedashboard.get',
-						'templatedashboard.update', 'templategroup.delete', 'templategroup.get', 'templategroup.massadd', 'templategroup.massremove',
-						'templategroup.massupdate', 'templategroup.update', 'token.create', 'token.delete', 'token.generate', 'token.get',
-						'token.update', 'trend.get', 'trigger.create', 'trigger.delete', 'trigger.get', 'trigger.update', 'triggerprototype.create',
+						'script.getscriptsbyevents', 'script.getscriptsbyhosts', 'service.create', 'service.delete',
+						'service.get', 'service.update', 'settings.get', 'sla.create', 'sla.delete', 'sla.get', 'sla.getsli',
+						'sla.update', 'template.create', 'template.delete', 'template.get', 'template.massadd',
+						'template.massremove', 'template.massupdate', 'template.update', 'templatedashboard.create',
+						'templatedashboard.delete', 'templatedashboard.get', 'templatedashboard.update', 'templategroup.delete',
+						'templategroup.get', 'templategroup.massadd', 'templategroup.massremove', 'templategroup.massupdate',
+						'templategroup.update', 'token.create', 'token.delete', 'token.generate', 'token.get', 'token.update',
+						'trend.get', 'trigger.create', 'trigger.delete', 'trigger.get', 'trigger.update', 'triggerprototype.create',
 						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.get', 'user.logout', 'user.update',
 						'usergroup.get', 'usermacro.create', 'usermacro.delete', 'usermacro.get', 'usermacro.update', 'valuemap.create',
 						'valuemap.delete', 'valuemap.get', 'valuemap.update'
@@ -967,20 +992,20 @@ class testFormUserRoles extends CWebTest {
 						'module.update', 'problem.get', 'proxy.create', 'proxy.delete', 'proxy.get', 'proxy.update', 'regexp.create',
 						'regexp.delete', 'regexp.get', 'regexp.update', 'report.create', 'report.delete', 'report.get',
 						'report.update', 'role.create', 'role.delete', 'role.get', 'role.update', 'script.create',
-						'script.delete', 'script.execute', 'script.get', 'script.getscriptsbyhosts', 'script.update',
-						'service.create', 'service.delete', 'service.get', 'service.update', 'settings.get', 'settings.update',
-						'sla.create', 'sla.delete', 'sla.get', 'sla.getsli', 'sla.update', 'task.create', 'task.get',
-						'template.create', 'template.delete', 'template.get', 'template.massadd', 'template.massremove',
-						'template.massupdate', 'template.update', 'templatedashboard.create', 'templatedashboard.delete',
-						'templatedashboard.get', 'templatedashboard.update', 'templategroup.create', 'templategroup.delete',
-						'templategroup.get', 'templategroup.massadd', 'templategroup.massremove', 'templategroup.massupdate',
-						'templategroup.propagate', 'templategroup.update', 'token.create', 'token.delete', 'token.generate',
-						'token.get', 'token.update', 'trend.get', 'trigger.create', 'trigger.delete', 'trigger.get',
-						'trigger.update', 'triggerprototype.create', 'triggerprototype.delete', 'triggerprototype.get',
-						'triggerprototype.update', 'user.create', 'user.delete', 'user.get', 'user.logout',
-						'user.unblock', 'user.update', 'userdirectory.create', 'userdirectory.delete',
-						'userdirectory.get', 'userdirectory.test', 'userdirectory.update', 'usergroup.create',
-						'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create',
+						'script.delete', 'script.execute', 'script.get', 'script.getscriptsbyevents', 'script.getscriptsbyhosts',
+						'script.update', 'service.create', 'service.delete', 'service.get', 'service.update',
+						'settings.get', 'settings.update', 'sla.create', 'sla.delete', 'sla.get', 'sla.getsli', 'sla.update',
+						'task.create', 'task.get', 'template.create', 'template.delete', 'template.get', 'template.massadd',
+						'template.massremove', 'template.massupdate', 'template.update', 'templatedashboard.create',
+						'templatedashboard.delete', 'templatedashboard.get', 'templatedashboard.update', 'templategroup.create',
+						'templategroup.delete', 'templategroup.get', 'templategroup.massadd', 'templategroup.massremove',
+						'templategroup.massupdate', 'templategroup.propagate', 'templategroup.update', 'token.create',
+						'token.delete', 'token.generate', 'token.get', 'token.update', 'trend.get', 'trigger.create',
+						'trigger.delete', 'trigger.get', 'trigger.update', 'triggerprototype.create',
+						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.create',
+						'user.delete', 'user.get', 'user.logout', 'user.unblock', 'user.update', 'userdirectory.create',
+						'userdirectory.delete', 'userdirectory.get', 'userdirectory.test', 'userdirectory.update',
+						'usergroup.create', 'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create',
 						'usermacro.createglobal', 'usermacro.delete', 'usermacro.deleteglobal', 'usermacro.get',
 						'usermacro.update', 'usermacro.updateglobal', 'valuemap.create', 'valuemap.delete',
 						'valuemap.get', 'valuemap.update'
@@ -1070,6 +1095,7 @@ class testFormUserRoles extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
+						'Dashboards' => false,
 						'Monitoring' => [],
 						'Services' => [],
 						'Inventory' => [],
@@ -1243,7 +1269,9 @@ class testFormUserRoles extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Read-only access to services' => 'Service list'
+						'Read-only access to services' => 'Service list',
+						// added element 'API methods' with default value for page scroll
+						'API methods' => 'Deny list'
 					],
 					'read_services' => [
 						'xpath:(//div[@class="multiselect-control"])[2]' => ['Service_1', 'Service_2']
@@ -1257,7 +1285,9 @@ class testFormUserRoles extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Read-write access to services' => 'Service list',
-						'Read-only access to services' => 'Service list'
+						'Read-only access to services' => 'Service list',
+						// added element 'API methods' with default value for page scroll
+						'API methods' => 'Deny list'
 					],
 					'write_services' => [
 						'xpath:(//div[@class="multiselect-control"])[1]' => ['Service_1', 'Service_2'],

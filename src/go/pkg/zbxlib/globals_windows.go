@@ -20,8 +20,8 @@
 package zbxlib
 
 /*
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxstr.h"
+#include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "perfmon.h"
 #include "../src/zabbix_agent/metrics.h"
@@ -29,8 +29,15 @@ package zbxlib
 #cgo LDFLAGS: -Wl,--start-group
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/misc.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/str.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/num.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/param.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/interval.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/common_str.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/components_strings_representations.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/time.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/expr.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/token.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/fatal.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/disk.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/threads.o

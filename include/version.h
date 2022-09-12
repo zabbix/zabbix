@@ -20,11 +20,15 @@
 #ifndef ZABBIX_VERSION_H
 #define ZABBIX_VERSION_H
 
+#define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
+#define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
+#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFFFF)
+
 #define ZBX_STR2(str)	#str
 #define ZBX_STR(str)	ZBX_STR2(str)
 
 #define APPLICATION_NAME	"Zabbix Agent"
-#define ZABBIX_REVDATE		"4 July 2022"
+#define ZABBIX_REVDATE		"29 August 2022"
 #define ZABBIX_VERSION_MAJOR	6
 #define ZABBIX_VERSION_MINOR	4
 #define ZABBIX_VERSION_PATCH	0
@@ -42,5 +46,4 @@
 #define ZABBIX_REVISION		ZBX_STR(ZABBIX_VERSION_REVISION)
 
 int	zbx_get_component_version(char *value);
-
-#endif
+#endif /* ZABBIX_VERSION_H */

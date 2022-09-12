@@ -19,7 +19,7 @@
 
 #include "zbxserver.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "dbcache.h"
 #include "zbxself.h"
 #include "../../zabbix_server/vmware/vmware.h"

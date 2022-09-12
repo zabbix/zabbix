@@ -20,8 +20,8 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxcommon.h"
+#include "zbxsysinfo.h"
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -63,7 +63,7 @@ void	zbx_mock_test_entry(void **state)
 		case SYSINFO_RET_OK:
 			if (NULL == expected_result)
 				fail_msg("SYSTEM_BOOTTIME() was not expected to succeed.");
-			if (NULL == (actual_result = GET_TEXT_RESULT(&result)))
+			if (NULL == (actual_result = ZBX_GET_TEXT_RESULT(&result)))
 				fail_msg("Result is not set.");
 			if (0 != strcmp(*actual_result, expected_result))
 				fail_msg("Expected result \"%s\" instead of \"%s\".", expected_result, *actual_result);
@@ -71,7 +71,7 @@ void	zbx_mock_test_entry(void **state)
 		case SYSINFO_RET_FAIL:
 			if (NULL == expected_error)
 				fail_msg("SYSTEM_BOOTTIME() was not expected to fail.");
-			if (NULL == (actual_error = GET_MSG_RESULT(&result)))
+			if (NULL == (actual_error = ZBX_GET_MSG_RESULT(&result)))
 				fail_msg("Error message is not set.");
 			if (0 != strcmp(*actual_error, expected_error))
 				fail_msg("Expected error \"%s\" instead of \"%s\".", expected_error, *actual_error);

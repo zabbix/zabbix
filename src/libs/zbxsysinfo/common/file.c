@@ -18,14 +18,17 @@
 **/
 
 #include "file.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxparam.h"
 #include "zbxhash.h"
 #include "zbxregexp.h"
 #include "log.h"
 #include "dir.h"
-#include "zbxhash.h"
 #include "zbxalgo.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
@@ -374,7 +377,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == tmp)
 		*encoding = '\0';
 	else
-		strscpy(encoding, tmp);
+		zbx_strscpy(encoding, tmp);
 
 	if (NULL == filename || '\0' == *filename)
 	{
@@ -430,7 +433,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err;
 		}
 
-		utf8 = convert_to_utf8(read_buf, nbytes, encoding);
+		utf8 = zbx_convert_to_utf8(read_buf, nbytes, encoding);
 		zbx_strcpy_alloc(&contents, &contents_alloc, &contents_offset, utf8);
 		zbx_free(utf8);
 	}
@@ -499,11 +502,11 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == tmp)
 		*encoding = '\0';
 	else
-		strscpy(encoding, tmp);
+		zbx_strscpy(encoding, tmp);
 
 	if (NULL == start_line_str || '\0' == *start_line_str)
 		start_line = 0;
-	else if (FAIL == is_uint32(start_line_str, &start_line))
+	else if (FAIL == zbx_is_uint32(start_line_str, &start_line))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		goto err;
@@ -511,7 +514,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == end_line_str || '\0' == *end_line_str)
 		end_line = 0xffffffff;
-	else if (FAIL == is_uint32(end_line_str, &end_line))
+	else if (FAIL == zbx_is_uint32(end_line_str, &end_line))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		goto err;
@@ -546,7 +549,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		utf8 = convert_to_utf8(buf, nbytes, encoding);
+		utf8 = zbx_convert_to_utf8(buf, nbytes, encoding);
 		zbx_rtrim(utf8, "\r\n");
 		zbx_regexp_sub(utf8, regexp, output, &ptr);
 		zbx_free(utf8);
@@ -619,11 +622,11 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == tmp)
 		*encoding = '\0';
 	else
-		strscpy(encoding, tmp);
+		zbx_strscpy(encoding, tmp);
 
 	if (NULL == start_line_str || '\0' == *start_line_str)
 		start_line = 0;
-	else if (FAIL == is_uint32(start_line_str, &start_line))
+	else if (FAIL == zbx_is_uint32(start_line_str, &start_line))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		goto err;
@@ -631,7 +634,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == end_line_str || '\0' == *end_line_str)
 		end_line = 0xffffffff;
-	else if (FAIL == is_uint32(end_line_str, &end_line))
+	else if (FAIL == zbx_is_uint32(end_line_str, &end_line))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 		goto err;
@@ -668,7 +671,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		utf8 = convert_to_utf8(buf, nbytes, encoding);
+		utf8 = zbx_convert_to_utf8(buf, nbytes, encoding);
 		zbx_rtrim(utf8, "\r\n");
 		if (NULL != zbx_regexp_match(utf8, regexp, NULL))
 			res = 1;
