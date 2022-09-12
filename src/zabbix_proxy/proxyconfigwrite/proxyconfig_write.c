@@ -19,6 +19,8 @@
 
 #include "proxy.h"
 #include "zbxdbhigh.h"
+#include "zbxcommshigh.h"
+#include "zbxrtc.h"
 
 /*
  * The configuration sync is split into 4 parts for each table:
@@ -46,6 +48,8 @@
  * have parent rows updated/inserted when updating/inserting child rows.
  *
  */
+
+extern int	CONFIG_TRAPPER_TIMEOUT;
 
 typedef struct
 {
@@ -1872,7 +1876,7 @@ static int	proxyconfig_delete_globalmacros(char **error)
  * Purpose: update configuration                                              *
  *                                                                            *
  ******************************************************************************/
-int	proxyconfig_process(struct zbx_json_parse *jp, char **error)
+int	zbx_proxyconfig_process(struct zbx_json_parse *jp, char **error)
 {
 	zbx_vector_table_data_ptr_t	config_tables;
 	int			ret = SUCCEED, full_sync = 0, delete_globalmacros = 0;
@@ -1982,4 +1986,76 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: receive configuration tables from server (passive proxies)        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tls)
+{
+	struct zbx_json_parse	jp_config, jp_kvs_paths = {0};
+	int			ret;
+	struct zbx_json		j;
+	char			*error = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update", zbx_config_tls))
+		goto out;
+
+	zbx_json_init(&j, 1024);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)zbx_dc_get_received_revision());
+
+	if (SUCCEED != (ret = zbx_tcp_send_ext(sock, j.buffer, j.buffer_size, 0, sock->protocol, CONFIG_TIMEOUT)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy configuration information to sever at \"%s\": %s",
+				sock->peer, zbx_json_strerror());
+		goto out;
+	}
+
+	if (FAIL == (ret = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot receive proxy configuration data from server at \"%s\": %s",
+				sock->peer, zbx_json_strerror());
+		goto out;
+	}
+
+	if (NULL != sock->buffer && SUCCEED != (ret = zbx_json_open(sock->buffer, &jp_config)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data received from server at"
+				" \"%s\": %s", sock->peer, zbx_json_strerror());
+		zbx_send_proxy_response(sock, ret, zbx_json_strerror(), CONFIG_TIMEOUT);
+		goto out;
+	}
+
+	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server at \"%s\", datalen " ZBX_FS_SIZE_T,
+			sock->peer, (zbx_fs_size_t)(jp_config.end - jp_config.start + 1));
+
+	if (SUCCEED == (ret = zbx_proxyconfig_process(&jp_config, &error)))
+	{
+		if (SUCCEED == zbx_rtc_reload_config_cache(&error))
+		{
+			if (SUCCEED == zbx_json_brackets_by_name(&jp_config, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
+				DCsync_kvs_paths(&jp_kvs_paths);
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			zabbix_log(LOG_LEVEL_WARNING, "cannot send message to configuration syncer: %s", error);
+			zbx_free(error);
+		}
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy onfiguration data received from server at"
+				" \"%s\": %s", sock->peer, error);
+	}
+	zbx_send_proxy_response(sock, ret, error, CONFIG_TIMEOUT);
+	zbx_free(error);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

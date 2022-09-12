@@ -330,7 +330,7 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
  *               configured in passive mode or access denied)                 *
  *                                                                            *
  ******************************************************************************/
-int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, char **error)
+int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *proxy, char **error)
 {
 	char	*ch_error, host[ZBX_HOSTNAME_BUF_LEN];
 
@@ -2872,7 +2872,7 @@ int	proxy_get_history_count(void)
  *     FAIL    - otherwise                                                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_proxy_protocol_version(struct zbx_json_parse *jp)
+int	zbx_get_proxy_protocol_version(const struct zbx_json_parse *jp)
 {
 	char	value[MAX_STRING_LEN];
 	int	version;

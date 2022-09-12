@@ -37,15 +37,12 @@
 
 #define ZBX_PROXY_ACTIVE_CHECK_AVAIL_TIMEOUT		30
 
-int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, char **error);
+int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *proxy, char **error);
 int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock, char **error);
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
 		const zbx_config_tls_t *zbx_config_tls);
 
 void	update_proxy_lastaccess(const zbx_uint64_t hostid, time_t last_access);
-
-int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j, char **error);
-int	proxyconfig_process(struct zbx_json_parse *jp, char **error);
 
 int	get_interface_availability_data(struct zbx_json *json, int *ts);
 
@@ -67,7 +64,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 int	proxy_get_history_count(void);
 int	proxy_get_delay(zbx_uint64_t lastid);
 
-int	zbx_get_proxy_protocol_version(struct zbx_json_parse *jp);
+int	zbx_get_proxy_protocol_version(const struct zbx_json_parse *jp);
 void	zbx_update_proxy_data(DC_PROXY *proxy, int version, int lastaccess, int compress, zbx_uint64_t flags_add);
 
 int	process_proxy_history_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);

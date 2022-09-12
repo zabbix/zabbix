@@ -17,12 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "proxyconfig_read.h"
+
 #include "proxy.h"
 #include "zbxdbhigh.h"
-#include "../zbxkvs/kvs.h"
-#include "../zbxvault/vault.h"
+#include "libs/zbxkvs/kvs.h"
+#include "libs/zbxvault/vault.h"
+#include "log.h"
+#include "zbxcommshigh.h"
+#include "zbxcompress.h"
 
 extern char	*CONFIG_VAULTDBPATH;
+extern int	CONFIG_TRAPPER_TIMEOUT;
 
 typedef struct
 {
@@ -1006,7 +1012,8 @@ out:
  * Purpose: prepare proxy configuration data                                  *
  *                                                                            *
  ******************************************************************************/
-int	proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j, char **error)
+int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
+		char **error)
 {
 	int			ret = FAIL;
 	char			token[ZBX_SESSION_TOKEN_LEN + 1], tmp[ZBX_MAX_UINT64_LEN + 1];
@@ -1061,5 +1068,94 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send configuration tables to the proxy from server                *
+ *          (for active proxies)                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp)
+{
+	char		*error = NULL, *buffer = NULL;
+	struct zbx_json	j;
+	DC_PROXY	proxy;
+	int		ret, flags = ZBX_TCP_PROTOCOL;
+	size_t		buffer_size, reserved = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != get_active_proxy_from_request(jp, &proxy, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data request from active proxy at"
+				" \"%s\": %s", sock->peer, error);
+		goto out;
+	}
+
+	if (SUCCEED != zbx_proxy_check_permissions(&proxy, sock, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\", allowed address:"
+				" \"%s\": %s", proxy.host, sock->peer, proxy.proxy_address, error);
+		goto out;
+	}
+
+	zbx_update_proxy_data(&proxy, zbx_get_proxy_protocol_version(jp), (int)time(NULL),
+			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG);
+
+	if (0 != proxy.auto_compress)
+		flags |= ZBX_TCP_COMPRESS;
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	if (SUCCEED != zbx_proxyconfig_get_data(&proxy, jp, &j, &error))
+	{
+		zbx_send_response_ext(sock, FAIL, error, NULL, flags, CONFIG_TIMEOUT);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",
+				proxy.host, sock->peer, error);
+		goto clean;
+	}
+
+	if (0 != proxy.auto_compress)
+	{
+		if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+		{
+			zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
+			goto clean;
+		}
+
+		reserved = j.buffer_size;
+
+		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+
+		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
+				ZBX_FS_SIZE_T ", bytes " ZBX_FS_SIZE_T " with compression ratio %.1f", proxy.host,
+				sock->peer, (zbx_fs_size_t)reserved, (zbx_fs_size_t)buffer_size,
+				(double)reserved / (double)buffer_size);
+
+		ret = zbx_tcp_send_ext(sock, buffer, buffer_size, reserved, (unsigned char)flags,
+				CONFIG_TRAPPER_TIMEOUT);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
+				ZBX_FS_SIZE_T, proxy.host, sock->peer, (zbx_fs_size_t)j.buffer_size);
+
+		ret = zbx_tcp_send_ext(sock, j.buffer, strlen(j.buffer), 0, (unsigned char)flags,
+				CONFIG_TRAPPER_TIMEOUT);
+	}
+
+	if (SUCCEED != ret)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy \"%s\" at \"%s\": %s",
+				proxy.host, sock->peer, zbx_socket_strerror());
+	}
+clean:
+	zbx_json_free(&j);
+out:
+	zbx_free(error);
+	zbx_free(buffer);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

@@ -22,9 +22,7 @@ libzbxdbhigh_a_SOURCES = \
 	tag.c \
 	item_param.c \
 	lld_override.c \
-	mediatype.c \
-	proxyconfig_server.c \
-	proxyconfig_proxy.c
+	mediatype.c
 
 libzbxdbhigh_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \

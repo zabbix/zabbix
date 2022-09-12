@@ -17,16 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROXYCFG_H
-#define ZABBIX_PROXYCFG_H
+#ifndef ZABBIX_PROXYCONFIG_READ_H
+#define ZABBIX_PROXYCONFIG_READ_H
 
-#include "zbxcomms.h"
-#include "zbxjson.h"
+#include "dbcache.h"
 
-extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_TRAPPER_TIMEOUT;
+int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
+		char **error);
 
-void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp);
-void	recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config_tlsv);
+void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp);
 
 #endif

@@ -32,6 +32,7 @@
 #include "zbxcommshigh.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "proxyconfigread/proxyconfig_read.h"
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
@@ -286,7 +287,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 
 	zbx_json_clean(&j);
 
-	if (SUCCEED != (ret = proxyconfig_get_data(proxy, &jp, &j, &error)))
+	if (SUCCEED != (ret = zbx_proxyconfig_get_data(proxy, &jp, &j, &error)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
 				proxy->host, error);
