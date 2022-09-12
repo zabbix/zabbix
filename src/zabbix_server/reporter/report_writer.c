@@ -109,6 +109,7 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 	ZBX_UNUSED(config_tls_ca_file);
 	ZBX_UNUSED(config_tls_cert_file);
 	ZBX_UNUSED(config_tls_key_file);
+	ZBX_UNUSED(config_source_ip);
 
 	*error = zbx_strdup(NULL, "application compiled without cURL library");
 	return FAIL;
