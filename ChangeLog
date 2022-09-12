@@ -1,6 +1,7 @@
 Changes for 6.4.0alpha1
 
 New features:
+...GI...S. [ZBXNEXT-6797] increased length of host metadata (mprihodko)
 A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event context menu (asestakovs, Ivo)
 .......P.. [ZBXNEXT-6181] added functionality to remove SQLite3 DB file on proxy version increase (ssimonenko)
 ...G...... [ZBXNEXT-1616] added monitoring of mount point options for Unix-like OSes (ssimonenko)
@@ -13,6 +14,7 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
 
 Bug fixes:
+.......P.. [ZBX-21624] fixed "Something impossible" error and Vault macro not working on passive Zabbix proxy (vso)
 ........S. [ZBX-19783] added sourceip handling for scheduled reports (dgoloscapov)
 .......PS. [ZBX-21517] fixed invalid update interval handling in network discovery and web scenario scheduling (wiper)
 ........S. [ZBX-21558] fixed possible crash in value cache when a new item is being added in low memory situation (wiper)
