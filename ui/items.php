@@ -758,6 +758,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 						$item['preprocessing'] = $preprocessing;
 					}
 				}
+				else {
+					if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
+						$item['interfaceid'] = getRequest('interfaceid', 0);
+					}
+				}
 
 				if ($db_item['delay'] != $delay) {
 					$item['delay'] = $delay;
