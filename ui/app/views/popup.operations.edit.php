@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 // $inline_js = getPagePostJs().$this->readJsFile('popup.operation.common.js.php');
@@ -240,18 +241,19 @@ $form_grid->addItem([
 // Conditions type of calculation row.
 $select_operation_evaltype = (new CSelect('operation[evaltype]'))
 	->setValue((string) CONDITION_EVAL_TYPE_AND_OR)
+	->setId('operation-evaltype')
 	->setFocusableElementId('operation-evaltype')
 	->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND_OR, _('And/Or')))
 	->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND, _('And')))
 	->addOption(new CSelectOption(CONDITION_EVAL_TYPE_OR, _('Or')));
 
 $form_grid->addItem([
-	new CLabel(_('Type of calculation'), $select_operation_evaltype->getFocusableElementId()), [
+	(new CLabel(_('Type of calculation'), $select_operation_evaltype->getFocusableElementId()))
+		->setId('operation-evaltype-label'), [
 		$select_operation_evaltype,
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan())->setId('operation-condition-evaltype-formula')
-	],
-	//'operation-condition-evaltype'
+		//(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		//(new CSpan())->setId('operation-condition-evaltype-formula')
+	]
 ]);
 
 // Conditions row.
@@ -259,6 +261,7 @@ $form_grid->addItem([
 	new CLabel(_('Conditions')),
 	(new CFormField(
 	(new CTable())
+		->setId('operation-condition-list')
 		->addStyle('width: 100%;')
 		->setHeader([_('Label'), _('Name'), _('Action')])
 		->addRow(
@@ -270,8 +273,8 @@ $form_grid->addItem([
 		)
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-//	'operation-condition-list'
+		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+
 ]);
 
 $form->addItem($form_grid);
