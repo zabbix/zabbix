@@ -656,9 +656,8 @@ switch ($data['method']) {
 				break;
 
 			case 'items':
-				$hostids = null;
-
 				if (array_key_exists('hostids', $data)) {
+					$hostids = [];
 					foreach ($data['hostids'] as $name) {
 						$options = [
 							'output' => ['name'],
@@ -667,10 +666,10 @@ switch ($data['method']) {
 							'preservekeys' => true
 						];
 
-						$host = API::Host()->get($options);
+						$hosts = API::Host()->get($options);
 
-						if ($host) {
-							$hostids[] = array_key_first($host);
+						if ($hosts) {
+							$hostids = array_merge($hostids, array_keys($hosts));
 						}
 					}
 				}
