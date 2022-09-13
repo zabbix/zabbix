@@ -1187,4 +1187,103 @@ class testDashboardItemValueWidget extends CWebTest {
 		$this->assertEquals($old_widget_count - 1, $dashboard->getWidgets()->count());
 		$this->assertEquals('', CDBHelper::getRow('SELECT * from widget WHERE name = '.zbx_dbstr('Widget to delete')));
 	}
+
+	public static function getWarningMessageData() {
+		return [
+			[
+				[
+					'fields' => [
+							'Type' => 'Item value',
+							'Item' => 'System description',
+							'Name' => 'Item Widget with type of information - characters',
+							'Advanced configuration' => true
+					],
+					'error' => 'This setting applies only to numeric data.'
+				]
+			],
+			[
+				[
+					'fields' => [
+							'Type' => 'Item value',
+							'Item' => 'Software installed',
+							'Name' => 'Item Widget with type of information - text',
+							'Advanced configuration' => true
+					],
+					'error' => 'This setting applies only to numeric data.'
+				]
+			],
+			[
+				[
+					'fields' => [
+							'Type' => 'Item value',
+							'Item' => 'item_testPageHistory_CheckLayout_Log',
+							'Name' => 'Item Widget with type of information - log',
+							'Advanced configuration' => true
+					],
+					'error' => 'This setting applies only to numeric data.'
+				]
+			],
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+							'Type' => 'Item value',
+							'Item' => 'Free swap space',
+							'Name' => 'Item Widget with type of information - Numeric (unsigned)',
+							'Advanced configuration' => true
+					]
+				]
+			],
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+							'Type' => 'Item value',
+							'Item' => 'Interrupts per second',
+							'Name' => 'Item Widget with type of information - Numeric (float)',
+							'Advanced configuration' => true
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check warning message.
+	 *
+	 * @dataProvider getWarningMessageData
+	 */
+	public function testDashboardItemValueWidget_CheckWarningMessage($data) {
+		$warning = 'id:item-value-thresholds-warning';
+		$info = 'class:icon-info';
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->edit()->addWidget()->asForm();
+		$form->fill($data['fields']);
+		COverlayDialogElement::find()->waitUntilReady()->one();
+
+		if (!array_key_exists('numeric', $data)) {
+			// Check that warning item is displayed.
+			$this->assertTrue($form->query($warning)->one()->isVisible());
+
+			// Check that info icon is displayed.
+			$this->assertTrue($form->query($info)->one()->isVisible());
+
+			// Check hint-box.
+			$form->query($warning)->one()->click();
+			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+			$this->assertEquals($data['error'], $hint->one()->getText());
+
+			// Close the hint-box.
+			$hint->query('xpath://button[@class="overlay-close-btn"]')->one()->click();
+			$hint->waitUntilNotPresent();
+		}
+		else {
+			// Check that warning item is not displayed.
+			$this->assertFalse($form->query($warning)->one()->isVisible());
+
+			// Check that info icon is not displayed.
+			$this->assertFalse($form->query($info)->one()->isVisible());
+		}
+	}
 }
