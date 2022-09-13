@@ -180,6 +180,7 @@ class CControllerActionCreate extends CController {
 			'name' => $this->getInput('name'),
 			'status' => $this->hasInput('status') ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED,
 			'eventsource' => $this->getInput('eventsource'),
+			// todo E.S.: remove fake data. receive data from form.
 			'operations' => [
 				[
 					"esc_step_from" => '1',
@@ -197,8 +198,22 @@ class CControllerActionCreate extends CController {
 					'opmessage_usr' => []
 				]
 			],
-			'recovery_operations' => [],
-			'update_operations' => []
+			'recovery_operations' => [
+				[
+					"operationtype" => "11",
+					"opmessage" => ["default_msg" => 1]
+				]
+			],
+			'update_operations' => [
+				[
+					"operationtype" => "12",
+					"opmessage" => [
+						"default_msg" => 0,
+						"message" => "Custom update operation message body",
+						"subject"=> "Custom update operation message subject"]
+				]
+			]
+
 		];
 
 		$filter = [
@@ -318,7 +333,8 @@ class CControllerActionCreate extends CController {
 			case EVENT_SOURCE_DISCOVERY:
 			case EVENT_SOURCE_AUTOREGISTRATION:
 				unset($action['recovery_operations']);
-			// break; is not missing here
+				unset($action['update_operations']);
+				break;
 
 			case EVENT_SOURCE_INTERNAL:
 				unset($action['update_operations']);

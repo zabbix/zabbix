@@ -31,7 +31,7 @@
 $form = (new CForm())
 	->setName('action.edit')
 	->setId('action-form')
-	->addVar('actionid', $data['actionid']?:null)
+	->addVar('actionid', $data['actionid'] ?: 0)
 	->addVar('eventsource', $data['eventsource'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
@@ -177,6 +177,126 @@ else {
 	$operations_table->setHeader([_('Details'), _('Action')]);
 }
 
+if ($data['action']['operations']) {
+	$actionOperationDescriptions = getActionOperationDescriptions($data['eventsource'], [$data['action']], ACTION_OPERATION);
+
+	$simple_interval_parser = new CSimpleIntervalParser();
+
+	foreach ($data['action']['operations'] as $operationid => $operation) {
+		if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_OPERATION])) {
+			continue;
+		}
+
+		if (array_key_exists('opcommand', $operation)) {
+			$operation['opcommand'] += [
+				'scriptid' => '0'
+			];
+		}
+
+		if (!isset($operation['opconditions'])) {
+			$operation['opconditions'] = [];
+		}
+
+		$details = new CSpan($actionOperationDescriptions[0][$operationid]);
+
+		$operation_for_popup = array_merge($operation, ['id' => $operationid]);
+		foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
+			if (array_key_exists($var, $operation_for_popup)) {
+				$operation_for_popup[$var] = zbx_objectValues($operation_for_popup[$var], $field);
+			}
+		}
+
+		if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
+			$esc_steps_txt = null;
+			$esc_period_txt = null;
+			$esc_delay_txt = null;
+
+			if ($operation['esc_step_from'] < 1) {
+				$operation['esc_step_from'] = 1;
+			}
+
+			//$esc_steps_txt = $operation['esc_step_from'].' - '.$operation['esc_step_to'];
+
+			// display N-N as N
+			$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'])
+				? $operation['esc_step_from']
+				: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
+
+			$esc_period_txt = ($simple_interval_parser->parse($operation['esc_period']) == CParser::PARSE_SUCCESS
+				&& timeUnitToSeconds($operation['esc_period']) == 0)
+				? _('Default')
+				: $operation['esc_period'];
+
+			$esc_delay_txt = ($delays[$operation['esc_step_from']] === null)
+				? _('Unknown')
+				: ($delays[$operation['esc_step_from']] != 0
+					? convertUnits(['value' => $delays[$operation['esc_step_from']], 'units' => 'uptime'])
+					: _('Immediately')
+				);
+
+			$operation_row = [
+				$esc_steps_txt,
+				$details,
+				$esc_delay_txt,
+				$esc_period_txt,
+				(new CCol(
+					new CHorList([
+						(new CSimpleButton(_('Edit')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('js-edit-button')
+							->setAttribute('data-operation', json_encode([
+								'operationid' => $operationid,
+								'actionid' => $data['actionid'],
+								'eventsource' => $data['eventsource'],
+								'operationtype' => ACTION_OPERATION
+							])),
+						[
+							(new CButton('remove', _('Remove')))
+								->onClick('removeOperation('.$operationid.', '.ACTION_OPERATION.');')
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->removeId(),
+							new CVar('operations['.$operationid.']', $operation),
+							new CVar('operations_for_popup['.ACTION_OPERATION.']['.$operationid.']',
+								json_encode($operation_for_popup)
+							)
+						]
+					])
+				))->addClass(ZBX_STYLE_NOWRAP)
+			];
+		}
+		else {
+			$operation_row = [
+				$details,
+				(new CCol(
+					new CHorList([
+						(new CSimpleButton(_('Edit')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('js-edit-button')
+							->setAttribute('data-operation', json_encode([
+								'operationid' => $operationid,
+								'actionid' => $data['actionid'],
+								'eventsource' => $data['eventsource'],
+								'operationtype' => ACTION_OPERATION
+							])),
+						[
+							(new CButton('remove', _('Remove')))
+								->onClick('removeOperation('.$operationid.', '.ACTION_OPERATION.');')
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->removeId(),
+							new CVar('operations['.$operationid.']', $operation),
+							new CVar('operations_for_popup['.ACTION_OPERATION.']['.$operationid.']',
+								json_encode($operation_for_popup)
+							)
+						]
+					])
+				))->addClass(ZBX_STYLE_NOWRAP)
+			];
+		}
+
+		$operations_table->addRow($operation_row, null, 'operations_'.$operationid);
+	}
+}
+
 $operations_table->setFooter(
 	(new CSimpleButton(_('Add')))
 		->setAttribute('data-actionid', $data['actionid'])
@@ -195,10 +315,6 @@ $operations_tab->addItem([
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 ]);
 
-if ($data['action']['operations']) {
-	$actionOperationDescriptions = getActionOperationDescriptions($data['eventsource'], [$data['action']], ACTION_OPERATION);
-}
-
 // Recovery operations table.
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 	// Create operation table.
@@ -206,6 +322,64 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 		->setId('rec-table')
 		->setAttribute('style', 'width: 100%;');
 		$operations_table->setHeader([_('Details'), _('Action')]);
+
+
+	if ($data['action']['recovery_operations']) {
+		$actionOperationDescriptions = getActionOperationDescriptions($data['eventsource'], [$data['action']],
+			ACTION_RECOVERY_OPERATION
+		);
+		foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
+			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_RECOVERY_OPERATION])) {
+				continue;
+			}
+			if (!isset($operation['opconditions'])) {
+				$operation['opconditions'] = [];
+			}
+			if (!array_key_exists('opmessage', $operation)) {
+				$operation['opmessage'] = [];
+			}
+			$operation['opmessage'] += [
+				'mediatypeid' => '0',
+				'message' => '',
+				'subject' => '',
+				'default_msg' => '1'
+			];
+			$details = new CSpan($actionOperationDescriptions[0][$operationid]);
+			$operation_for_popup = array_merge($operation, ['id' => $operationid]);
+			foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
+				if (array_key_exists($var, $operation_for_popup)) {
+					$operation_for_popup[$var] = zbx_objectValues($operation_for_popup[$var], $field);
+				}
+			}
+			$operations_table->addRow([
+				$details,
+				(new CCol(
+					new CHorList([
+						(new CSimpleButton(_('Edit')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('js-edit-button')
+							->setAttribute('data-operation', json_encode([
+								'operationid' => $operationid,
+								'actionid' => $data['actionid'],
+								'eventsource' => $data['eventsource'],
+								'operationtype' => ACTION_RECOVERY_OPERATION
+							])),
+						[
+							(new CButton('remove', _('Remove')))
+								->setAttribute('data-operationid', $operationid)
+								->onClick('removeOperation(this.dataset.operationid, '.ACTION_RECOVERY_OPERATION.');')
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->removeId(),
+							new CVar('recovery_operations['.$operationid.']', $operation),
+							new CVar('operations_for_popup['.ACTION_RECOVERY_OPERATION.']['.$operationid.']',
+								json_encode($operation_for_popup)
+							)
+						]
+					])
+				))->addClass(ZBX_STYLE_NOWRAP)
+			], null, 'recovery_operations_'.$operationid);
+		}
+	}
 
 	$operations_table->setFooter(
 		(new CSimpleButton(_('Add')))
@@ -234,6 +408,54 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 		->setId('upd-table')
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Details'), _('Action')]);
+
+	if ($data['action']['update_operations']) {
+		$operation_descriptions = getActionOperationDescriptions($data['eventsource'], [$data['action']],
+			ACTION_UPDATE_OPERATION
+		);
+		foreach ($data['action']['update_operations'] as $operationid => $operation) {
+			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_UPDATE_OPERATION])) {
+				continue;
+			}
+			$operation += [
+				'opconditions'	=> []
+			];
+			$details = new CSpan($operation_descriptions[0][$operationid]);
+			$operation_for_popup = array_merge($operation, ['id' => $operationid]);
+			foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
+				if (array_key_exists($var, $operation_for_popup)) {
+					$operation_for_popup[$var] = zbx_objectValues($operation_for_popup[$var], $field);
+				}
+			}
+			$operations_table->addRow([
+				$details,
+				(new CCol(
+					new CHorList([
+						(new CSimpleButton(_('Edit')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('js-edit-button')
+							->setAttribute('data-operation', json_encode([
+								'operationid' => $operationid,
+								'actionid' => $data['actionid'],
+								'eventsource' => $data['eventsource'],
+								'operationtype' => ACTION_UPDATE_OPERATION
+							])),
+						[
+							(new CButton('remove', _('Remove')))
+								->setAttribute('data-operationid', $operationid)
+								->onClick('removeOperation(this.dataset.operationid, '.ACTION_UPDATE_OPERATION.');')
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->removeId(),
+							new CVar('update_operations['.$operationid.']', $operation),
+							new CVar('operations_for_popup['.ACTION_UPDATE_OPERATION.']['.$operationid.']',
+								json_encode($operation_for_popup)
+							)
+						]
+					])
+				))->addClass(ZBX_STYLE_NOWRAP)
+			], null, 'update_operations_'.$operationid);
+		}
+	}
 
 	$operations_table->setFooter(
 			(new CSimpleButton(_('Add')))
@@ -290,7 +512,7 @@ $form
 				'condition_operators' => condition_operator2str(),
 				'condition_types' => condition_type2str(),
 				'conditions' => $data['action']['filter']['conditions'],
-				'actionid' => $data['actionid'],
+				'actionid' => $data['actionid'] ?: 0,
 				'eventsource' => $data['eventsource']
 			], JSON_THROW_ON_ERROR) .');
 		'))->setOnDocumentReady()

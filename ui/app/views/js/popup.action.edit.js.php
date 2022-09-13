@@ -45,13 +45,13 @@ window.action_edit_popup = new class {
 				e.target.closest('tr').remove();
 			}
 			else if (e.target.classList.contains('js-operation-details')) {
-				this._openOperationPopup('0', '0', this.actionid);
+				this._openOperationPopup(this.eventsource, <?= ACTION_OPERATION ?>, this.actionid);
 			}
 			else if (e.target.classList.contains('js-recovery-operations-create')) {
-				this._openOperationPopup();
+				this._openOperationPopup(this.eventsource, <?= ACTION_RECOVERY_OPERATION ?>, this.actionid);
 			}
 			else if (e.target.classList.contains('js-update-operations-create')) {
-				this._openOperationPopup();
+				this._openOperationPopup(this.eventsource, <?= ACTION_UPDATE_OPERATION ?>, this.actionid);
 			}
 			else if (e.target.classList.contains('element-table-remove')) {
 				this.row_count--;
@@ -81,7 +81,7 @@ window.action_edit_popup = new class {
 		const parameters = {
 			// trigger_element: trigger_element,
 			eventsource: eventsource,
-			recovery_phase: recovery_phase,
+			recovery: recovery_phase,
 			actionid: actionid
 		};
 
@@ -219,7 +219,7 @@ window.action_edit_popup = new class {
 		const fields = getFormFields(this.form);
 		fields.name = fields.name.trim();
 		const curl = new Curl('zabbix.php', false);
-		curl.setArgument('action', this.actionid !== '' ? 'action.update' : 'action.create');
+		curl.setArgument('action', this.actionid !== 0 ? 'action.update' : 'action.create');
 
 		this._post(curl.getUrl(), fields);
 	}

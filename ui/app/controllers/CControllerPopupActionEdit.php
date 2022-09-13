@@ -83,6 +83,8 @@ class CControllerPopupActionEdit extends CController {
 				],
 				'actionids' => $this->getInput('actionid'),
 				'selectOperations' => 'extend',
+				'selectRecoveryOperations' => 'extend',
+				'selectUpdateOperations' => 'extend',
 				'selectFilter' => 'extend'
 			]);
 
@@ -111,10 +113,13 @@ class CControllerPopupActionEdit extends CController {
 					'eventsource' => $eventsource,
 					'status' => $this->action['status'],
 					'operations' => $this->action['operations'],
+					'recovery_operations' => $this->action['recovery_operations'],
+					'update_operations' => $this->action['update_operations'],
 					'filter' => $this->action['filter'],
 					'pause_suppressed' => $this->action['pause_suppressed'],
 					'notify_if_canceled' =>  $this->action['notify_if_canceled']
-				]
+				],
+				'allowedOperations' => getAllowedOperations($eventsource)
 			];
 			foreach ($data['action']['filter']['conditions'] as $condition) {
 				$condition_name = $this->conditionValueToString($condition);
@@ -135,13 +140,15 @@ class CControllerPopupActionEdit extends CController {
 					'status' =>'',
 					'operations' => [],
 					'filter' => [
-						'conditions' => []
+						'conditions' => [],
+						'evaltype' => ''
 					]
 				],
-				'formula' => $this->getInput('formula', '')
+				'formula' => $this->getInput('formula', ''),
+				'allowedOperations' => getAllowedOperations($eventsource)
 			];
 		}
-
+sdff($data);
 		if ($data['actionid'] && $this->hasInput('form_refresh')) {
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 				$data['action']['pause_suppressed'] = $this->getInput('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
