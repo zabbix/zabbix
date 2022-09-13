@@ -18,11 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * Test for checking Proxy host form.
+ *
+ * @dataSource Proxies
  *
  * @onBefore prepareProxyData
  *
@@ -1231,6 +1234,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	}
 
 	/**
+	 * Function for returning interface fields.
 	 *
 	 * @param COverlayDialogElement    $dialog    proxy form overlay dialog
 	 * @param array                    $fields	  passive proxy interface fields

@@ -1,0 +1,225 @@
+<?php
+/*
+** Zabbix
+** Copyright (C) 2001-2022 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
+class Proxies {
+
+	private static $enabled_hosts = [
+			'enabled_host1',
+			'enabled_host2',
+			'enabled_host3',
+			'enabled_host4',
+			'enabled_host5',
+			'enabled_host6',
+			'enabled_host7',
+			'enabled_host8',
+			'Host_1 with proxy',
+			'Host_2 with proxy'
+	];
+
+	private static $disabled_hosts = [
+			'disabled_host1',
+			'disabled_host2',
+			'disabled_host3',
+			'disabled_host4',
+			'disabled_host5',
+			'disabled_host6',
+			'disabled_host7',
+			'disabled_host8'
+	];
+
+	private static $active_proxies = [
+			'active_proxy1',
+			'active_proxy2',
+			'active_proxy3',
+			'active_proxy4',
+			'active_proxy5',
+			'active_proxy6',
+			'active_proxy7',
+			'active_current',
+			'active_unknown',
+			'Active proxy 1',
+			'Active proxy 2',
+			'Active proxy 3',
+			'Active proxy to delete',
+			'Proxy_1 for filter',
+			'Proxy_2 for filter'
+	];
+
+	private static $passive_proxies = [
+			'passive_proxy1',
+			'passive_proxy2',
+			'passive_proxy3',
+			'passive_proxy4',
+			'passive_proxy5',
+			'passive_proxy6',
+			'passive_proxy7',
+			'passive_outdated',
+			'passive_unsupported',
+			'Passive proxy 1',
+			'Passive proxy 2',
+			'Passive proxy 3',
+			'Passive proxy to delete'
+	];
+
+	/**
+	 * Preparing proxies and hosts.
+	 */
+	public static function load() {
+		// Create enabled hosts.
+		$enabled_hosts_data = [];
+		foreach (self::$enabled_hosts as $host) {
+			$enabled_hosts_data[] = [
+				'host' => $host,
+				'groups' => [['groupid' => 4]],
+				'status' => 0
+			];
+		}
+
+		$enabled_hosts = CDataHelper::call('host.create', $enabled_hosts_data);
+		$enabled_hostids = CDataHelper::getIds('host');
+
+		// Disabled hosts data.
+		$disabled_hosts_data = [];
+		foreach (self::$disabled_hosts as $host) {
+			$disabled_hosts_data[] = [
+				'host' => $host,
+				'groups' => [['groupid' => 4]],
+				'status' => 1
+			];
+		}
+		$disabled_hosts = CDataHelper::call('host.create', $disabled_hosts_data);
+		$disabled_hostids = CDataHelper::getIds('host');
+
+		// Create active proxies.
+		$active_proxy_data = [];
+		foreach (self::$active_proxies as $proxy) {
+			$active_proxy_data[] = [
+				'host' => $proxy,
+				'status' => 5
+			];
+		}
+
+		$active_proxies = CDataHelper::call('proxy.create', $active_proxy_data);
+		$active_proxyids = CDataHelper::getIds('host');
+
+		// Create passive proxies.
+		$passive_proxy_data = [];
+		foreach (self::$passive_proxies as $proxy) {
+			$passive_proxy_data[] = [
+				'host' => $proxy,
+				'status' => 6,
+				'interface' => [
+					'ip'=> '127.0.0.1',
+					'dns' => '',
+					'useip' => '1',
+					'port' => '10051'
+				]
+			];
+		}
+
+		$passive_proxies = CDataHelper::call('proxy.create', $passive_proxy_data);
+		$passive_proxyids = CDataHelper::getIds('host');
+
+		// Add hosts to proxies.
+		CDataHelper::call('proxy.update', [
+			[
+				'proxyid' => $active_proxyids['active_proxy1'],
+				'hosts' => [
+					['hostid' => $enabled_hostids['enabled_host1']]
+				]
+			],
+			[
+				'proxyid' => $passive_proxyids['passive_proxy1'],
+				'hosts' => [
+					['hostid' => $disabled_hostids['disabled_host1']]
+				]
+			],
+			[
+				'proxyid' => $active_proxyids['active_proxy2'],
+				'hosts' => [
+					['hostid' => $enabled_hostids['enabled_host2']],
+					['hostid' => $enabled_hostids['enabled_host3']]
+				]
+			],
+			[
+				'proxyid' => $passive_proxyids['passive_proxy2'],
+				'hosts' => [
+					['hostid' => $enabled_hostids['enabled_host4']],
+					['hostid' => $enabled_hostids['enabled_host5']]
+				]
+			],
+			[
+				'proxyid' => $active_proxyids['active_proxy3'],
+				'hosts' => [
+					['hostid' => $disabled_hostids['disabled_host2']],
+					['hostid' => $disabled_hostids['disabled_host3']]
+				]
+			],
+			[
+				'proxyid' => $passive_proxyids['passive_proxy3'],
+				'hosts' => [
+					['hostid' => $disabled_hostids['disabled_host4']],
+					['hostid' => $disabled_hostids['disabled_host5']]
+				]
+			],
+			[
+				'proxyid' =>  $active_proxyids['active_proxy4'],
+				'hosts' => [
+					['hostid' => $enabled_hostids['enabled_host6']],
+					['hostid' => $disabled_hostids['disabled_host6']]
+				]
+			],
+			[
+				'proxyid' => $passive_proxyids['passive_proxy4'],
+				'hosts' => [
+					['hostid' => $enabled_hostids['enabled_host7']],
+					['hostid' => $enabled_hostids['enabled_host8']],
+					['hostid' => $disabled_hostids['disabled_host7']],
+					['hostid' => $disabled_hostids['disabled_host8']]
+				]
+			],
+			[
+				'proxyid' => $active_proxyids['Active proxy 1'],
+				'hosts' => [
+					['hostid' => 99136]// Test item host.
+				]
+			],
+			[
+				'proxyid' => $active_proxyids['Proxy_1 for filter'],
+				'hosts' => [
+					['hostid' => $enabled_hostids['Host_1 with proxy']]
+				]
+			],
+			[
+				'proxyid' => $active_proxyids['Proxy_2 for filter'],
+				'hosts' => [
+					['hostid' => $enabled_hostids['Host_2 with proxy']]
+				]
+			]
+		]);
+
+		// Add proxies versions.
+		DBexecute('UPDATE host_rtdata SET version = 60400, compatibility=1 WHERE hostid = '.zbx_dbstr($active_proxyids['active_current']));
+		DBexecute('UPDATE host_rtdata SET version = 60200, compatibility=2 WHERE hostid = '.zbx_dbstr($passive_proxyids['passive_outdated']));
+		DBexecute('UPDATE host_rtdata SET version = 0, compatibility=0 WHERE hostid = '.zbx_dbstr($active_proxyids['active_unknown']));
+		DBexecute('UPDATE host_rtdata SET version = 50401, compatibility=3 WHERE hostid = '.zbx_dbstr($passive_proxyids['passive_unsupported']));
+	}
+}

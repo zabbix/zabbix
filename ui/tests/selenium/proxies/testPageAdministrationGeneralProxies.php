@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -25,53 +26,13 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * Test for checking Proxies page.
  *
+ * @dataSource Proxies
+ *
  * @backup hosts
  */
 class testPageAdministrationGeneralProxies extends CWebTest {
 
 	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
-
-	private static $enabled_hosts = [
-			'enabled_host1',
-			'enabled_host2',
-			'enabled_host3',
-			'enabled_host4',
-			'enabled_host5',
-			'enabled_host6',
-			'enabled_host7',
-			'enabled_host8'
-	];
-
-	private static $disabled_hosts = [
-			'disabled_host1',
-			'disabled_host2',
-			'disabled_host3',
-			'disabled_host4',
-			'disabled_host5',
-			'disabled_host6',
-			'disabled_host7',
-			'disabled_host8'
-	];
-
-	private static $active_proxies = [
-			'active_proxy1',
-			'active_proxy2',
-			'active_proxy3',
-			'active_proxy4',
-			'active_proxy5',
-			'active_proxy6',
-			'active_proxy7'
-	];
-
-	private static $passive_proxies = [
-			'passive_proxy1',
-			'passive_proxy2',
-			'passive_proxy3',
-			'passive_proxy4',
-			'passive_proxy5',
-			'passive_proxy6',
-			'passive_proxy7'
-	];
 
 	use TableTrait;
 
@@ -84,152 +45,89 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
-	/**
-	 * Preparing proxies and hosts for test.
-	 */
-	public function prepareProxyHostsData() {
-		// Create enabled hosts.
-		$enabled_hosts_data = [];
-		foreach (self::$enabled_hosts as $host) {
-			$enabled_hosts_data[] = [
-				'host' => $host,
-				'groups' => [['groupid' => 4]],
-				'status' => 0
-			];
-		}
-
-		$enabled_hosts = CDataHelper::call('host.create', $enabled_hosts_data);
-		$this->assertArrayHasKey('hostids', $enabled_hosts);
-		$enabled_hostids = CDataHelper::getIds('host');
-
-		// Disabled hosts data.
-		$disabled_hosts_data = [];
-		foreach (self::$disabled_hosts as $host) {
-			$disabled_hosts_data[] = [
-				'host' => $host,
-				'groups' => [['groupid' => 4]],
-				'status' => 1
-			];
-		}
-		$disabled_hosts = CDataHelper::call('host.create', $disabled_hosts_data);
-		$this->assertArrayHasKey('hostids', $disabled_hosts);
-		$disabled_hostids = CDataHelper::getIds('host');
-
-		// Create active proxies.
-		$active_proxy_data = [];
-		foreach (self::$active_proxies as $proxy) {
-			$active_proxy_data[] = [
-				'host' => $proxy,
-				'status' => 5
-			];
-		}
-
-		$active_proxies = CDataHelper::call('proxy.create', $active_proxy_data);
-		$this->assertArrayHasKey('proxyids', $active_proxies);
-		$active_proxyids = CDataHelper::getIds('host');
-
-		// Create passive proxies.
-		$passive_proxy_data = [];
-		foreach (self::$passive_proxies as $proxy) {
-			$passive_proxy_data[] = [
-				'host' => $proxy,
-				'status' => 6,
-				'interface' => [
-					'ip'=> '127.0.0.1',
-					'dns' => '',
-					'useip' => '1',
-					'port' => '10051'
-				]
-			];
-		}
-
-		$passive_proxies = CDataHelper::call('proxy.create', $passive_proxy_data);
-		$this->assertArrayHasKey('proxyids', $passive_proxies);
-		$passive_proxyids = CDataHelper::getIds('host');
-
-		// Add hosts to proxies.
-		CDataHelper::call('proxy.update', [
-			[
-				'proxyid' => $active_proxyids['active_proxy1'],
-				'hosts' => [
-					['hostid' => $enabled_hostids['enabled_host1']]
-				]
-			],
-			[
-				'proxyid' => $passive_proxyids['passive_proxy1'],
-				'hosts' => [
-					['hostid' => $disabled_hostids['disabled_host1']]
-				]
-			],
-			[
-				'proxyid' => $active_proxyids['active_proxy2'],
-				'hosts' => [
-					['hostid' => $enabled_hostids['enabled_host2']],
-					['hostid' => $enabled_hostids['enabled_host3']]
-				]
-			],
-			[
-				'proxyid' => $passive_proxyids['passive_proxy2'],
-				'hosts' => [
-					['hostid' => $enabled_hostids['enabled_host4']],
-					['hostid' => $enabled_hostids['enabled_host5']]
-				]
-			],
-			[
-				'proxyid' => $active_proxyids['active_proxy3'],
-				'hosts' => [
-					['hostid' => $disabled_hostids['disabled_host2']],
-					['hostid' => $disabled_hostids['disabled_host3']]
-				]
-			],
-			[
-				'proxyid' => $passive_proxyids['passive_proxy3'],
-				'hosts' => [
-					['hostid' => $disabled_hostids['disabled_host4']],
-					['hostid' => $disabled_hostids['disabled_host5']]
-				]
-			],
-			[
-				'proxyid' =>  $active_proxyids['active_proxy4'],
-				'hosts' => [
-					['hostid' => $enabled_hostids['enabled_host6']],
-					['hostid' => $disabled_hostids['disabled_host6']]
-				]
-			],
-			[
-				'proxyid' => $passive_proxyids['passive_proxy4'],
-				'hosts' => [
-					['hostid' => $enabled_hostids['enabled_host7']],
-					['hostid' => $enabled_hostids['enabled_host8']],
-					['hostid' => $disabled_hostids['disabled_host7']],
-					['hostid' => $disabled_hostids['disabled_host8']]
-				]
-			]
-		]);
-	}
-
 	public function testPageAdministrationGeneralProxies_Layout() {
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
 		$this->page->assertTitle('Configuration of proxies');
 		$this->page->assertHeader('Proxies');
+		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+
+		// Check default fields and values.
+		$fields = [
+			'Name' => [''],
+			'Mode' => ['Any', 'Active', 'Passive'],
+			'Version' => ['Any', 'Current', 'Outdated']
+		];
+
+		foreach ($fields as $field => $value) {
+			$this->assertEquals($value[0], $form->getField($field)->getValue());
+		}
+
+		array_shift($fields);
+		foreach ($fields as $radio => $labels) {
+			$this->assertEquals($labels, $form->getField($radio)->asSegmentedRadio()->getLabels()->asText());
+		}
 
 		// Check filter collapse/expand.
 		foreach ([true, false] as $status) {
-			$this->assertEquals($status, $this->query('xpath://div[contains(@class, "ui-tabs-panel")]')
-					->one()->isVisible()
-			);
+			$this->assertEquals($status, $this->query('xpath://div[contains(@class, "ui-tabs-panel")]')->one()->isVisible());
 			$this->query('xpath://a[contains(@class, "filter-trigger")]')->one()->click();
 		}
 
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
-		$this->assertEquals(['', 'Name', 'Mode', 'Encryption', 'Compression', 'Last seen (age)', 'Host count', 'Item count',
-				'Required performance (vps)', 'Hosts'], $table->getHeadersText()
+		$this->assertEquals(['', 'Name', 'Mode', 'Encryption', 'Version', 'Last seen (age)', 'Host count', 'Item count',
+				'Required vps', 'Hosts'], $table->getHeadersText()
 		);
 
 		// Check that sortable header is clickable.
 		$this->assertTrue($table->query('link:Name')->one()->isClickable());
 
-		// Check buttons are disabled by default.
+		// Check versions and hints.
+		$versions = [
+			'active_current' => ['version' => '6.4.0 '],
+			'active_unknown' => ['version' => ' '],
+			'passive_outdated' => ['version' => '6.2.0 ', 'color' => 'red', 'icon_color' => 'yellow', 'hint_text' =>
+					'Proxy version is outdated, only data collection and remote execution is available with server version .'
+			],
+			'passive_unsupported' => ['version' => '5.4.1 ', 'color' => 'red', 'icon_color' => 'red', 'hint_text' =>
+					'Proxy version is not supported by server version .', 'hint_color' => 'red'
+			]
+		];
+
+		foreach ($versions as $proxy => $parameters) {
+			$column = $table->findRow('Name', $proxy, true)->getColumn('Version');
+			$this->assertEquals($parameters['version'], $column->getText());
+
+			if (array_key_exists('color', $parameters)) {
+				// Check version text color.
+				$this->assertTrue($column->query("xpath:.//span[@class=".
+						CXPathHelper::escapeQuotes($parameters['color'])."]")->exists()
+				);
+
+				// Check info-icon color.
+				$this->assertTrue($column->query("xpath:.//a[@class=".
+						CXPathHelper::escapeQuotes("icon-info status-".$parameters['icon_color'])."]")->exists()
+				);
+
+				// Check version hint.
+				$column->query('xpath:.//a[@data-hintbox="1"]')->one()->waitUntilClickable()->click();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one();
+				$this->assertEquals($parameters['hint_text'], $hint->getText());
+
+				if (array_key_exists('hint_color', $parameters)) {
+					$this->assertTrue($hint->query("xpath:.//div[@class=".
+							CXPathHelper::escapeQuotes("hintbox-wrap ".$parameters['hint_color'])."]")->exists()
+					);
+				}
+
+				$hint->asOverlayDialog()->close();
+			}
+			else {
+				// Check that info-icon is absent.
+				$this->assertFalse($column->query('xpath:.//a[@class="rel-container"]')->exists());
+			}
+		}
+
+		// Check buttons disabled by default.
 		foreach (['Refresh configuration', 'Enable hosts', 'Disable hosts', 'Delete'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isVisible());
 			$this->assertFalse($this->query('button', $button)->one()->isClickable());
@@ -247,43 +145,32 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 		$table_contents = $this->getTableColumnData('Name');
 
 		// Fill filter form with data.
-		$form->fill(['Name' => '1']);
+		$form->fill(['Name' => 'proxy1']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
 		$filter_result = [
 			[
-				'Name' => 'Active proxy 1',
+				'Name' => 'active_proxy1',
 				'Mode' => 'Active',
 				'Encryption' => 'None',
-				'Compression' => 'On',
+				'Version' => ' ',
 				'Last seen (age)' => 'Never',
 				'Host count' => '',
 				'Item count' => '',
-				'Required performance (vps)' => '',
-				'Hosts' => 'Test item host'
+				'Required vps' => '',
+				'Hosts' => 'enabled_host1'
 			],
 			[
-				'Name' => 'Passive proxy 1',
+				'Name' => 'passive_proxy1',
 				'Mode' => 'Passive',
 				'Encryption' => 'None',
-				'Compression' => 'On',
+				'Version' => ' ',
 				'Last seen (age)' => 'Never',
 				'Host count' => '',
 				'Item count' => '',
-				'Required performance (vps)' => '',
-				'Hosts' => ''
-			],
-			[
-				'Name' => 'Proxy_1 for filter',
-				'Mode' => 'Active',
-				'Encryption' => 'None',
-				'Compression' => 'On',
-				'Last seen (age)' => 'Never',
-				'Host count' => '',
-				'Item count' => '',
-				'Required performance (vps)' => '',
-				'Hosts' => 'Host_1 with proxy'
+				'Required vps' => '',
+				'Hosts' => 'disabled_host1'
 			]
 		];
 
@@ -312,15 +199,13 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Mode' => 'Active'
+						'Name' => 'Active proxy'
 					],
 					'result' => [
 						'Active proxy 1',
 						'Active proxy 2',
 						'Active proxy 3',
-						'Active proxy to delete',
-						'Proxy_1 for filter',
-						'Proxy_2 for filter'
+						'Active proxy to delete'
 					],
 					'check_stats' => true
 				]
@@ -328,7 +213,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Mode' => 'Passive'
+						'Name' => 'Passive proxy'
 					],
 					'result' => [
 						'Passive proxy 1',
@@ -357,6 +242,31 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 						'Mode' => 'Passive'
 					],
 					'result' => []
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => 'Active',
+						'Mode' => 'Active',
+						'Version' => 'Current'
+					],
+					'result' => [
+						'active_current'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => '',
+						'Mode' => 'Passive',
+						'Version' => 'Outdated'
+					],
+					'result' => [
+						'passive_outdated',
+						'passive_unsupported'
+					]
 				]
 			]
 		];
@@ -594,11 +504,11 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 					'action' => 'Delete',
 					'proxies' => [
 						'passive_proxy7',
-						'Passive proxy 1'
+						'Proxy for Discovery rule'
 					],
 					'alert' => 'Delete selected proxies?',
 					'title' => 'Cannot delete proxies',
-					'error' => "Proxy \"Passive proxy 1\" is used by discovery rule \"Discovery rule for update\"."
+					'error' => "Proxy \"Proxy for Discovery rule\" is used by discovery rule \"Discovery rule for update\"."
 				]
 			],
 			// Delete one proxy with host.
@@ -620,18 +530,18 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 					'expected' => TEST_BAD,
 					'action' => 'Delete',
 					'proxies' => [
-						'Passive proxy 1'
+						'Proxy for Discovery rule'
 					],
 					'alert' => 'Delete selected proxy?',
 					'title' => 'Cannot delete proxy',
-					'error' => "Proxy \"Passive proxy 1\" is used by discovery rule \"Discovery rule for update\"."
+					'error' => "Proxy \"Proxy for Discovery rule\" is used by discovery rule \"Discovery rule for update\"."
 				]
 			]
 		];
 	}
 
 	/**
-	 * @onBeforeOnce prepareProxyHostsData
+	 * onBeforeOnce prepareProxyHostsData
 	 *
 	 * @dataProvider getActionsProxyData
 	 */
