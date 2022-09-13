@@ -39,7 +39,7 @@ $form = (new CForm())
 			->setArgument('action', ($data['reportid'] == 0) ? 'scheduledreport.create' : 'scheduledreport.update')
 			->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 if ($data['reportid'] != 0) {
 	$form->addVar('reportid', $data['reportid']);

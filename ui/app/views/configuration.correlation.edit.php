@@ -35,7 +35,7 @@ $form = (new CForm())
 		->setArgument('action', 'correlation.condition.add')
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 if ($data['correlationid'] != 0) {
 	$form->addVar('correlationid', $data['correlationid']);

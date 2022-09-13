@@ -607,6 +607,72 @@ function convertUnitsS($value, $ignore_millisec = false) {
 }
 
 /**
+ * Convert time period to a human-readable format.
+ * The following units will be used: weeks, days, hours, minutes and seconds.
+ * Only the 3 most significant units will be displayed: #w #d #h, #d #h #m or #h #m #s, omitting empty ones.
+ *
+ * @param int $value  Time period in seconds.
+ *
+ * @return string
+ */
+function convertSecondsToTimeUnits(int $value): string {
+	$parts = [];
+	$start = null;
+
+	if (($v = floor($value / SEC_PER_WEEK)) > 0) {
+		$parts['weeks'] = $v;
+		$value -= $v * SEC_PER_WEEK;
+		$start = 0;
+	}
+
+	$level = 1;
+
+	foreach ([
+		'days' => SEC_PER_DAY,
+		'hours' => SEC_PER_HOUR,
+		'minutes' => SEC_PER_MIN
+	] as $part => $sec_per_part) {
+		$v = floor($value / $sec_per_part);
+
+		if ($v > 0) {
+			$parts[$part] = $v;
+			$value -= $v * $sec_per_part;
+			$start = $start === null ? $level : $start;
+		}
+
+		if ($start !== null && $level - $start >= 2) {
+			break;
+		}
+
+		$level++;
+	}
+
+	if ($start === null || $start >= 2) {
+		$v = $value + round(fmod($value, 1), ZBX_UNITS_ROUNDOFF_SUFFIXED);
+
+		if ($v > 0) {
+			$parts['seconds'] = $v;
+		}
+	}
+
+	$units = [
+		'weeks' => _x('w', 'week short'),
+		'days' => _x('d', 'day short'),
+		'hours' => _x('h', 'hour short'),
+		'minutes' => _x('m', 'minute short'),
+		'seconds' => _x('s', 'second short')
+	];
+
+	$result = [];
+
+	foreach ($parts as $part_unit => $part_value) {
+		$result[] = $part_value.$units[$part_unit];
+	}
+
+	return $result ? implode(' ', $result) : '0';
+}
+
+/**
  * Converts a raw value to a user-friendly representation based on unit and other parameters.
  * Example:
  * 	6442450944 B convert to 6 GB

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:26:56Z'
+  date: '2022-08-22T14:09:56Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -547,6 +547,8 @@ zabbix_export:
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 1h
           history: 1w
+          trends: '0'
+          value_type: CHAR
           tags:
             -
               tag: component
@@ -851,8 +853,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'AIX by Zabbix agent'
                         name: 'CPU load'
-                        host: 'AIX by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -867,8 +869,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'AIX by Zabbix agent'
                         name: 'CPU jumps'
-                        host: 'AIX by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -883,8 +885,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CPU utilization'
                         host: 'AIX by Zabbix agent'
+                        name: 'CPU utilization'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -900,8 +902,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Memory usage'
                         host: 'AIX by Zabbix agent'
+                        name: 'Memory usage'
       valuemaps:
         -
           uuid: 4a25a6b3d6e4482ab2a748c79cb55524
