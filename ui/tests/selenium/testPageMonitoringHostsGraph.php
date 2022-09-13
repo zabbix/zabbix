@@ -20,6 +20,7 @@
 
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup profiles, hosts, items, graphs
@@ -27,6 +28,8 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
  * @onBefore prepareGraphsData
  */
 class testPageMonitoringHostsGraph extends CWebTest {
+
+	use TableTrait;
 
 	public function prepareGraphsData() {
 		$hosts = CDataHelper::call('host.create', [
@@ -207,7 +210,219 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	}
 
 	/**
-	 * Check graph page in layout mode.
+	 * Check tags filtering.
+	 */
+	public function testPageMonitoringHostsGraph_TagFilter() {
+		//		// Check that tags and information message are visible.
+//		$form->fill('Host for monitoring graphs')->submit();
+//		$this->page->waitUntilReady();
+	}
+
+	public static function getCheckFilterData() {
+		return [
+			// #0 One host with several items and graphs. Show all graphs.
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Show' => 'All graphs'
+					],
+					'graphs_amount' => 6
+				]
+			],
+			// #1 Show host graphs for host.
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Show' => 'Host graphs'
+					],
+					'graphs_amount' => 3
+				]
+			],
+			// #2 Show simple graphs for host.
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Show' => 'Simple graphs'
+					],
+					'graphs_amount' => 3
+				]
+			],
+			// #3 Show all graphs for host with graph name.
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'Graph_2',
+						'Show' => 'All graphs'
+					],
+					'graphs_amount' => 3
+				]
+			],
+			// #4 Show host graphs for host with graph name.
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'Graph_2',
+						'Show' => 'Host graphs'
+					],
+					'graphs_amount' => 3
+				]
+			],
+			// #5 Show simple graphs for host with graph name.
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'Graph_2',
+						'Show' => 'Host graphs'
+					]
+				]
+			],
+			// #6 Show all graphs with not existing graph name.
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'Nothing here',
+						'Show' => 'All graphs'
+					]
+				]
+			],
+			// #7 Show host graphs with not existing graph name.
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'Nothing here',
+						'Show' => 'Host graphs'
+					]
+				]
+			],
+			// #8 Show simple graphs with not existing graph name.
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'Nothing here',
+						'Show' => 'Simple graphs'
+					]
+				]
+			],
+			// #9 Show all graphs with partial graph name.
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'gr',
+						'Show' => 'All graphs'
+					],
+					'graphs_amount' => 6
+				]
+			],
+			// #10 Show host graphs with partial graph name.
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'gr',
+						'Show' => 'Host graphs'
+					],
+					'graphs_amount' => 3
+				]
+			],
+			// #11 Show simple graphs with partial graph name.
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Name' => 'gr',
+						'Show' => 'Simple graphs'
+					],
+					'graphs_amount' => 3
+				]
+			],
+			// #12 Show simple graphs with partial graph name .
+			[
+				[
+					'filter' => [
+						'Name' => 'Graph_2',
+						'Show' => 'All graphs'
+					]
+				]
+			],
+			// #13 Two hosts with several items and graphs. Show all graphs.
+			[
+				[
+					'filter' => [
+						'Hosts' => [
+							'Host_for_monitoring_graphs_1',
+							'Host_for_monitoring_graphs_2'
+						],
+						'Show' => 'All graphs'
+					],
+					'graphs_amount' => 8
+				]
+			],
+			// #14 One host with several items and graphs. Show Host graphs.
+			[
+				[
+					'filter' => [
+						'Hosts' => [
+							'Host_for_monitoring_graphs_1',
+							'Host_for_monitoring_graphs_2'
+						],
+						'Show' => 'Host graphs'
+					],
+					'graphs_amount' => 4
+				]
+			],
+			// #15 One host with several items and graphs. Show Simple graphs.
+			[
+				[
+					'filter' => [
+						'Hosts' => [
+							'Host_for_monitoring_graphs_1',
+							'Host_for_monitoring_graphs_2'
+						],
+						'Show' => 'Simple graphs'
+					],
+					'graphs_amount' => 4
+				]
+			],
+		];
+	}
+
+	/**
+	 * Check graph page filter.
+	 *
+	 * @dataProvider getCheckFilterData
+	 */
+	public function testPageMonitoringHostsGraph_CheckFilter($data) {
+		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to='.
+			'now&filter_search_type=0&filter_set=1');
+		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$form->query('button:Reset')->one()->click();
+		$form->fill($data['filter'])->submit();
+		$this->page->waitUntilReady();
+
+		// Check result amount.
+		if (array_key_exists('graphs_amount', $data)) {
+			$graphs_count = $this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count();
+			$this->assertEquals($data['graphs_result'], $graphs_count);
+			$this->assertTableStats($data['graphs_result']);
+		}
+		else {
+			$message = (!array_key_exists('filter'['Hosts'], $data)) ? 'Specify host to see the graphs.' : 'No data found.';
+			$this->assertEquals($message, $this->query('class:nothing-to-show')->one()->getText());
+		}
+	}
+
+	/**
+	 * Check graph page in kiosk mode.
 	 */
 	public function testPageMonitoringHostsGraph_KioskMode() {
 		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to'.
@@ -228,176 +443,5 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		// Check that Header and Filter are visible again.
 		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
 		$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
-	}
-
-	/**
-	 * Check tags filtering.
-	 */
-	public function testPageMonitoringHostsGraph_TagFilter() {
-		//		// Check that tags and information message are visible.
-//		$form->fill('Host for monitoring graphs')->submit();
-//		$this->page->waitUntilReady();
-	}
-
-	public static function getCheckFilterData() {
-		return [
-			// #0 One host with several items and graphs. Show all graphs.
-			[
-				[
-					'filter' => [
-						'Hosts' => 'Host_for_monitoring_graphs_1',
-						'Show' => 'All graphs'
-					],
-					'graphs_result' => 6
-				]
-			],
-			// #1 Show host graphs for host.
-			[
-				[
-					'filter' => [
-						'Hosts' => 'Host_for_monitoring_graphs_1',
-						'Show' => 'Host graphs'
-					],
-					'graphs_result' => 3
-				]
-			],
-			// #2 Show simple graphs for host.
-			[
-				[
-					'filter' => [
-						'Hosts' => 'Host_for_monitoring_graphs_1',
-						'Show' => 'Simple graphs'
-					],
-					'graphs_result' => 3
-				]
-			],
-			// #3 Show all graphs for host with graph name.
-			[
-				[
-					'filter' => [
-						'Hosts' => 'Host_for_monitoring_graphs_1',
-						'Name' => 'Graph_2',
-						'Show' => 'All graphs'
-					],
-					'graphs_result' => 3
-				]
-			],
-			// #4 Show host graphs for host with graph name.
-			[
-				[
-					'filter' => [
-						'Hosts' => 'Host_for_monitoring_graphs_1',
-						'Name' => 'Graph_2',
-						'Show' => 'Host graphs'
-					],
-					'graphs_result' => 3
-				]
-			],
-			// #5 Show simple graphs for host with graph name.
-			[
-				[
-					'filter' => [
-						'Hosts' => 'Host_for_monitoring_graphs_1',
-						'Name' => 'Graph_2',
-						'Show' => 'Host graphs'
-					],
-					'graphs_result' => 1
-				]
-			],
-			// #6 Show all graphs with not existing graph name .
-			[
-				[
-					'filter' => [
-						'Hosts' => 'Host_for_monitoring_graphs_1',
-						'Name' => 'Nothing here',
-						'Show' => 'All graphs'
-					],
-					'graphs_result' => 0
-				]
-			],
-			// #7 Show host graphs with not existing graph name .
-			[
-				[
-					'filter' => [
-						'Hosts' => 'Host_for_monitoring_graphs_1',
-						'Name' => 'Nothing here',
-						'Show' => 'Host graphs'
-					],
-					'graphs_result' => 0
-				]
-			],
-			// #8 Show simple graphs with not existing graph name .
-			[
-				[
-					'filter' => [
-						'Hosts' => 'Host_for_monitoring_graphs_1',
-						'Name' => 'Nothing here',
-						'Show' => 'Simple graphs'
-					],
-					'graphs_result' => 0
-				]
-			],
-			// #9 Show all graphs with partial graph name .
-			[
-				[
-					'filter' => [
-						'Hosts' => 'Host_for_monitoring_graphs_1',
-						'Name' => 'gr',
-						'Show' => 'All graphs'
-					],
-					'graphs_result' => 0
-				]
-			],
-			// #10 Show host graphs with partial graph name .
-			[
-				[
-					'filter' => [
-						'Hosts' => 'Host_for_monitoring_graphs_1',
-						'Name' => 'gr',
-						'Show' => 'Host graphs'
-					],
-					'graphs_result' => 0
-				]
-			],
-			// #11 Show simple graphs with partial graph name .
-			[
-				[
-					'filter' => [
-						'Hosts' => 'Host_for_monitoring_graphs_1',
-						'Name' => 'gr',
-						'Show' => 'Simple graphs'
-					],
-					'graphs_result' => 0
-				]
-			]
-		];
-	}
-
-	/**
-	 * Check graph page filter.
-	 *
-	 * @dataProvider getCheckFilterData
-	 */
-	public function testPageMonitoringHostsGraph_CheckFilter($data) {
-		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to='.
-			'now&filter_search_type=0&filter_set=1');
-
-		// If the filter is not visible - enable it.
-		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
-			$this->query('id:ui-id-2')->one()->click();
-		}
-
-		$form = $this->query('name:zbx_filter')->one()->asForm();
-		$form->fill($data['filter'])->submit();
-		$this->page->waitUntilReady();
-
-		// Check result amount.
-		if ($data['graphs_result'] !== 0) {
-			$graphs_count = $this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count();
-			$this->assertEquals($data['graphs_result'], $graphs_count);
-		}
-		else {
-			$this->assertEquals('No data found.', $this->query('class:nothing-to-show')->one()->getText());
-		}
 	}
 }
