@@ -22,8 +22,9 @@ window.operation_popup = new class {
 		this.overlay = overlays_stack.getById('operations');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.condition_count = (document.getElementById('operation-condition-list').rows.length - 2);
-
+		if (document.getElementById('operation-condition-list')) {
+			this.condition_count = (document.getElementById('operation-condition-list').rows.length - 2);
+		}
 		this._loadViews();
 	}
 

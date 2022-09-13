@@ -51,28 +51,32 @@ $form_grid->addItem([
 $step_from = (new CNumericBox('operation[esc_step_from]', 1, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 $step_from->onChange($step_from->getAttribute('onchange').' if (this.value < 1) this.value = 1;');
 
-$form_grid->addItem([
-	new CLabel(_('Steps')),
-	new CFormField([
-		$step_from,
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), '-', (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CNumericBox('operation[esc_step_to]', 0, 5, false, false, false))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), _('(0 - infinitely)')
-	])
+if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL ||
+		$data['eventsource'] == EVENT_SOURCE_SERVICE) && $data['recovery'] == ACTION_OPERATION) {
+	$form_grid->addItem([
+		new CLabel(_('Steps')),
+		new CFormField([
+			$step_from,
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), '-', (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CNumericBox('operation[esc_step_to]', 0, 5, false, false, false))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), _('(0 - infinitely)')
+		])
 	//'operation-step-range'
 ]);
 
 // Operation steps duration row.
-$form_grid->addItem([
-	new CLabel(_('Step duration')),
-	new CFormField([
-		(new CTextBox('operation[esc_period]', 0))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		_('(0 - use action default)')
-	]),
+	$form_grid->addItem([
+		new CLabel(_('Step duration')),
+		new CFormField([
+			(new CTextBox('operation[esc_period]', 0))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			_('(0 - use action default)')
+		]),
 		//'operation-step-duration'
-])->setId('operation-step-duration');
+	])->setId('operation-step-duration');
+}
+
 
 // Message recipient is required notice row.
 $form_grid->addItem(
@@ -237,7 +241,7 @@ $form_grid->addItem([
 //	// 'operation-attr-inventory'
 //]);
 
-// todo show only when in conditions table atleast 2 conditions
+
 // Conditions type of calculation row.
 $select_operation_evaltype = (new CSelect('operation[evaltype]'))
 	->setValue((string) CONDITION_EVAL_TYPE_AND_OR)
@@ -257,25 +261,28 @@ $form_grid->addItem([
 ]);
 
 // Conditions row.
-$form_grid->addItem([
-	new CLabel(_('Conditions')),
-	(new CFormField(
-	(new CTable())
-		->setId('operation-condition-list')
-		->addStyle('width: 100%;')
-		->setHeader([_('Label'), _('Name'), _('Action')])
-		->addRow(
-			(new CRow(
-				(new CCol(
-					(new CButton(null, _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-				))->setColSpan(3)
-			))->setId('operation-condition-list-footer')
-		)
-	))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS && $data['recovery'] == ACTION_OPERATION) {
+	$form_grid->addItem([
+		new CLabel(_('Conditions')),
+		(new CFormField(
+			(new CTable())
+				->setId('operation-condition-list')
+				->addStyle('width: 100%;')
+				->setHeader([_('Label'), _('Name'), _('Action')])
+				->addRow(
+					(new CRow(
+						(new CCol(
+							(new CButton(null, _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+						))->setColSpan(3)
+					))->setId('operation-condition-list-footer')
+				)
+		))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 
-]);
+	]);
+}
+
 
 $form->addItem($form_grid);
 
