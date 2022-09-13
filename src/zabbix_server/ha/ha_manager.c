@@ -31,6 +31,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
+#include "../rtc/rtc_server.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 

@@ -74,6 +74,7 @@
 #include "zbxtrends.h"
 #include "ha/ha.h"
 #include "zbxrtc.h"
+#include "rtc/rtc_server.h"
 #include "zbxha.h"
 #include "stats/zabbix_stats.h"
 #include "zbxdiag.h"
@@ -1347,7 +1348,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
-				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc)))
+				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc, rtc_process_request_ex)))
 					goto out;
 
 				if (SUCCEED != (ret = zbx_ha_get_status(ha_stat, ha_failover, &error)))
@@ -1869,7 +1870,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||
 					ZBX_RTC_LOG_LEVEL_INCREASE == message->code)
 			{
-				zbx_rtc_dispatch(&rtc, client, message);
+				zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_ex);
 			}
 			else
 			{

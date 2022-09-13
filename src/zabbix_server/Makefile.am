@@ -27,6 +27,7 @@ SUBDIRS = \
 	lld \
 	reporter \
 	service \
+	rtc \
 	ha
 
 sbin_PROGRAMS = zabbix_server
@@ -134,7 +135,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_builddir)/src/libs/zbxha/libzbxha.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_service.a \
-	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_server.a \
+	rtc/libzbxrtc_server.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc.a \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a \

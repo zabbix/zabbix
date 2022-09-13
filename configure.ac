@@ -2184,6 +2184,7 @@ AC_OUTPUT([
 	src/zabbix_proxy/heart/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
+	src/zabbix_proxy/rtc/Makefile
 	src/zabbix_proxy/stats/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_sender/Makefile
@@ -2206,6 +2207,7 @@ AC_OUTPUT([
 	src/zabbix_server/preprocessor/Makefile
 	src/zabbix_server/proxypoller/Makefile
 	src/zabbix_server/reporter/Makefile
+	src/zabbix_server/rtc/Makefile
 	src/zabbix_server/scripts/Makefile
 	src/zabbix_server/selfmon/Makefile
 	src/zabbix_server/service/Makefile

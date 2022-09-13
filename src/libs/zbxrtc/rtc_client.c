@@ -18,6 +18,7 @@
 **/
 
 #include "rtc.h"
+#include "zbxrtc.h"
 
 #include "zbxcommon.h"
 #include "zbxserialize.h"
@@ -84,7 +85,7 @@ finish:
  *               FAIL    - an error occurred                                  *
  *                                                                            *
  ******************************************************************************/
-static int	rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char **error)
+int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char **error)
 {
 	if (0 == strncmp(opt, ZBX_LOG_LEVEL_INCREASE, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
 	{
@@ -148,79 +149,6 @@ static int	rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, c
 			return SUCCEED;
 		}
 	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: process runtime control option and print result                   *
- *                                                                            *
- * Parameters: option   - [IN] the runtime control option                     *
- *             error    - [OUT] error message                                 *
- *                                                                            *
- * Return value: SUCCEED - the runtime control option was processed           *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_rtc_process(const char *option, char **error)
-{
-	zbx_uint32_t	code = ZBX_RTC_UNKNOWN, size = 0;
-	char		*data = NULL;
-	unsigned char	*result = NULL;
-	int		ret;
-
-	if (SUCCEED != rtc_parse_options(option, &code, &data, error))
-		return FAIL;
-
-	if (ZBX_RTC_UNKNOWN == code)
-	{
-		if (SUCCEED != rtc_parse_options_ex(option, &code, &data, error))
-			return FAIL;
-
-		if (ZBX_RTC_UNKNOWN == code)
-		{
-			*error = zbx_dsprintf(NULL, "unknown option \"%s\"", option);
-			return FAIL;
-		}
-	}
-
-#if !defined(HAVE_SIGQUEUE)
-	switch (code)
-	{
-		/* allow only socket based runtime control options */
-		case ZBX_RTC_LOG_LEVEL_DECREASE:
-		case ZBX_RTC_LOG_LEVEL_INCREASE:
-			*error = zbx_dsprintf(NULL, "operation is not supported on the given operating system");
-			return FAIL;
-	}
-#endif
-
-	if (NULL != data)
-		size = (zbx_uint32_t)strlen(data) + 1;
-
-	if (SUCCEED == (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_RTC, code, CONFIG_TIMEOUT, (unsigned char *)data,
-			size, &result, error)))
-	{
-		if (NULL != result)
-		{
-			printf("%s", result);
-			zbx_free(result);
-		}
-		else
-			printf("No response\n");
-
-	}
-
-	zbx_free(data);
-
-	return ret;
-}
-
-int	zbx_rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error)
-{
-	if (FAIL == zbx_ipc_async_socket_open(asocket, ZBX_IPC_SERVICE_RTC, timeout, error))
-		return FAIL;
 
 	return SUCCEED;
 }

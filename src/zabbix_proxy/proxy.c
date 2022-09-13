@@ -57,6 +57,7 @@
 #include "zbxdiag.h"
 #include "diag/diag_proxy.h"
 #include "zbxrtc.h"
+#include "rtc/rtc_proxy.h"
 #include "../zabbix_server/availability/avail_manager.h"
 #include "zbxserver.h"
 #include "stats/zabbix_stats.h"
@@ -1406,7 +1407,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				thread_args.args = &proxyconfig_args;
 				zbx_thread_start(proxyconfig_thread, &thread_args, &threads[i]);
-				if (FAIL == zbx_rtc_wait_config_sync(&rtc))
+				if (FAIL == zbx_rtc_wait_config_sync(&rtc, rtc_process_request_ex))
 					goto out;
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
@@ -1503,7 +1504,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (NULL != message)
 		{
-			zbx_rtc_dispatch(&rtc, client, message);
+			zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_ex);
 			zbx_ipc_message_free(message);
 		}
 
