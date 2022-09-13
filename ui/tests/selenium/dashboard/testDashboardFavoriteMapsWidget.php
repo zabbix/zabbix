@@ -29,8 +29,8 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 class testDashboardFavoriteMapsWidget extends CWebTest {
 
 	protected static $dashboardid;
-	public $mapTest = 'Test map 1';
-	public $mapTestId = 3;
+	public $map_test = 'Test map 1';
+	public $mapid = 3;
 
 	public static function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
@@ -58,7 +58,7 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 	public function testDashboardFavoriteMapsWidget_AddFavoriteMap() {
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
 		$this->page->assertHeader('Maps');
-		$this->query('link', $this->mapTest)->waitUntilClickable()->one()->click();
+		$this->query('link', $this->map_test)->waitUntilClickable()->one()->click();
 
 		$this->page->waitUntilReady();
 		$button = $this->query('xpath://button[@id="addrm_fav"]')->waitUntilVisible()->one();
@@ -68,23 +68,23 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$widget = CDashboardElement::find()->one()->getWidget('Favorite maps')->waitUntilReady()->getContent();
-		$this->assertEquals('zabbix.php?action=map.view&sysmapid='.$this->mapTestId,
-				$widget->query('link', $this->mapTest)->one()->getAttribute('href')
+		$this->assertEquals('zabbix.php?action=map.view&sysmapid='.$this->mapid,
+				$widget->query('link', $this->map_test)->one()->getAttribute('href')
 		);
 		$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.
-				zbx_dbstr('web.favorite.sysmapids').' AND value_id='.$this->mapTestId)
+				zbx_dbstr('web.favorite.sysmapids').' AND value_id='.zbx_dbstr($this->mapid))
 		);
 	}
 
 	public function testDashboardFavoriteMapsWidget_RemoveFavoriteMaps() {
-		$favourite_maps = CDBHelper::getAll('SELECT value_id FROM profiles WHERE idx='.zbx_dbstr('web.favorite.sysmapids'));
+		$favorite_maps = CDBHelper::getAll('SELECT value_id FROM profiles WHERE idx='.zbx_dbstr('web.favorite.sysmapids'));
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$widget = CDashboardElement::find()->one()->getWidget('Favorite maps')->getContent();
 
-		foreach ($favourite_maps as $favourite_map) {
+		foreach ($favorite_maps as $map) {
 			// Added variable due to External Hook.
-			$xpath = './/button[@data-sysmapid='.CXPathHelper::escapeQuotes($favourite_map['value_id']);
+			$xpath = './/button[@data-sysmapid='.CXPathHelper::escapeQuotes($map['value_id']);
 			$remove_item = $widget->query('xpath', $xpath.' and contains(@onclick, "rm4favorites")]')->waituntilClickable()->one();
 			$remove_item->click();
 			$remove_item->waitUntilNotVisible();
