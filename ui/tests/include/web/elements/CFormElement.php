@@ -91,6 +91,8 @@ class CFormElement extends CElement {
 		parent::invalidate();
 
 		$this->fields = new CElementCollection([]);
+
+		return $this;
 	}
 
 	/**

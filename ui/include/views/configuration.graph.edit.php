@@ -39,7 +39,7 @@ else {
 // Create form.
 $graphForm = (new CForm())
 	->setName('graphForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);
 

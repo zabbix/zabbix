@@ -2252,7 +2252,7 @@ abstract class CItemGeneral extends CApiService {
 
 		if (array_key_exists('templateid', $data) && $data['templateid']) {
 			$rules['interfaceid'] = [
-				'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY
+				'type' => API_ID, 'flags' => API_REQUIRED
 			];
 		}
 
