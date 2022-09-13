@@ -41,10 +41,12 @@ class testDashboardForm extends CWebTest {
 	 * Get all dashboard related tables hash values.
 	 */
 	public static function getHash() {
-		return CDBHelper::getHash('SELECT * FROM dashboard').
-				CDBHelper::getHash('SELECT * FROM dashboard_user ORDER by dashboard_userid').
-				CDBHelper::getHash('SELECT * FROM dashboard_usrgrp ORDER by dashboard_usrgrpid').
-				CDBHelper::getHash('SELECT * FROM widget ORDER by widgetid');
+		return [
+			'dashboard' => CDBHelper::getHash('SELECT * FROM dashboard'),
+			'dashboard_user' => CDBHelper::getHash('SELECT * FROM dashboard_user ORDER by dashboard_userid'),
+			'dashboard_user' => CDBHelper::getHash('SELECT * FROM dashboard_user ORDER by dashboard_usrgrpid'),
+			'widget' => CDBHelper::getHash('SELECT * FROM widget ORDER by widgetid')
+		];
 	}
 
 	/**
