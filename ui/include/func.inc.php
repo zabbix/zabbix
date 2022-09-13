@@ -2028,7 +2028,7 @@ function warning($messages): void {
 /**
  * Add an error to global message array.
  *
- * @param string|array $msg	                Error message text.
+ * @param string|array $msgs                Error message text.
  * @param bool         $is_technical_error
  */
 function error($msgs, bool $is_technical_error = false): void {
