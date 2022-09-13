@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-09-13T12:15:54Z'
+  date: '2022-09-13T14:37:28Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -300,6 +300,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.error
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: meraki.get.devices
           tags:
@@ -456,6 +460,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.error
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: meraki.get.networks
           tags:
@@ -599,6 +607,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.error
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: meraki.get.vpn.stats
           tags:
@@ -1023,6 +1035,27 @@ zabbix_export:
                     -
                       tag: scope
                       value: performance
+          graph_prototypes:
+            -
+              uuid: 923bac9f3ea84976be07e546721a6b39
+              name: 'Device uplink [{#IP}]: [{#UPLINK}]: [{#DEVICE.NAME}]: latency'
+              ymin_type_1: FIXED
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Cisco Meraki organization by HTTP'
+                    key: 'meraki.device.latency.ms[{#IP},{#UPLINK},{#SERIAL}]'
+            -
+              uuid: 4b745b276b934a199e645941cde26d01
+              name: 'Device uplink [{#IP}]: [{#UPLINK}]: [{#DEVICE.NAME}]: loss'
+              ymin_type_1: FIXED
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Cisco Meraki organization by HTTP'
+                    key: 'meraki.device.loss.pct[{#IP},{#UPLINK},{#SERIAL}]'
           master_item:
             key: meraki.get.devices
           timeout: 30s
@@ -1372,6 +1405,73 @@ zabbix_export:
                 -
                   tag: component
                   value: vpn
+          graph_prototypes:
+            -
+              uuid: 0794dc9d06844ee89099322f60382fc7
+              name: 'VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: jitter'
+              ymin_type_1: FIXED
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Cisco Meraki organization by HTTP'
+                    key: 'meraki.vpn.stat.jitter.avg[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Cisco Meraki organization by HTTP'
+                    key: 'meraki.vpn.stat.jitter.max[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Cisco Meraki organization by HTTP'
+                    key: 'meraki.vpn.stat.jitter.min[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
+            -
+              uuid: dd05787b5e0e4b4b870258b25c1a0503
+              name: 'VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: latency'
+              ymin_type_1: FIXED
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Cisco Meraki organization by HTTP'
+                    key: 'meraki.vpn.stat.latency.avg[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Cisco Meraki organization by HTTP'
+                    key: 'meraki.vpn.stat.latency.max[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Cisco Meraki organization by HTTP'
+                    key: 'meraki.vpn.stat.latency.min[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
+            -
+              uuid: c0ff7a5798cd4aa181223763d8962229
+              name: 'VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: loss'
+              ymin_type_1: FIXED
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Cisco Meraki organization by HTTP'
+                    key: 'meraki.vpn.stat.loss.avg[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Cisco Meraki organization by HTTP'
+                    key: 'meraki.vpn.stat.loss.max[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Cisco Meraki organization by HTTP'
+                    key: 'meraki.vpn.stat.loss.min[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
           master_item:
             key: meraki.get.vpn.stats
           timeout: 30s
