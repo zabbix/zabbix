@@ -482,16 +482,13 @@ static int	send_smtp_helo_plain(const char *addr, const char *helo, zbx_socket_t
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() HELO is not specified and failed to parse HELO from email address, "
-				"trying to form HELO command using system's hostname", __func__);
-
 		if (NULL == (helo_parsed = smtp_get_helo_from_addr(addr)))
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() HELO is not specified and failed to parse HELO from email address, "
+					"trying to form HELO command using system's hostname", __func__);
+
 			if (NULL == (helo_parsed = smtp_get_helo_from_system()))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() failed to form HELO command using system hostname",
-						__func__);
-
 				zbx_snprintf(*error, max_error_len, "failed to retrieve domain name for HELO command");
 				ret = FAIL;
 				goto out;
@@ -745,33 +742,21 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 						"from email address, trying to form HELO command using system's hostname",
 						__func__);
 
-				if (NULL == (helo_domain = smtp_get_helo_from_system()))
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() failed to form HELO command using system hostname", __func__);
-				}
-				else
-					zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", helo_domain);
 			}
-			else
-				zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", helo_domain);
-
-			zbx_free(helo_domain);
 		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() no outcoming addresses configured, trying to form HELO command using system's hostname",
-					__func__);
 
+		if (NULL == helo_domain)
+		{
 			if (NULL == (helo_domain = smtp_get_helo_from_system()))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() failed to form HELO command using system hostname", __func__);
-			}
-			else
-			{
-				zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", helo_domain);
-				zbx_free(helo_domain);
+				zbx_strlcpy(error, "failed to retrieve domain name for HELO command", max_error_len);
+				goto clean;
 			}
 		}
+
+		zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", helo_domain);
+		zbx_free(helo_domain);
+
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)))
