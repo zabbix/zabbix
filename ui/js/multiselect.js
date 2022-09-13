@@ -316,7 +316,7 @@
 	 * @param object options['autosuggest']         autosuggest options (optional)
 	 * @param object options['autosuggest']['filter_preselect_fields'] autosuggest preselect fields (optional)
 	 * @param string options['autosuggest']['filter_preselect_fields']['hosts'] autosuggest host preselect field (optional)
-	 * @param bool 	 options['autosuggest']['filter_multiple'] allows to filter multiple values (optional)
+	 * @param bool 	 options['autosuggest']['filter_multiple'] allows to filter multiple values, must be used together with options['autosuggest']['filter_preselect_fields'] (optional)
 	 * @param string options['styles']				additional style for multiselect wrapper HTML element (optional)
 	 * @param string options['styles']['property']
 	 * @param string options['styles']['value']

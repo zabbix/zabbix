@@ -1167,7 +1167,7 @@ class CWidgetHelper {
 							'numeric' => 1,
 							'dstfrm' => $form_name,
 							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
-						],
+						]
 					],
 					'autosuggest' => [
 						'filter_preselect_fields' => [
