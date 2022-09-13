@@ -662,18 +662,15 @@ switch ($data['method']) {
 					$hostids = [];
 					foreach ($data['hostids'] as $name) {
 						$options = [
-							'output' => ['name'],
+							'output' => [],
 							'search' => ['name' => $name.($data['wildcard_allowed'] ? '*' : '')],
 							'searchWildcardsEnabled' => $data['wildcard_allowed'],
 							'preservekeys' => true
 						];
 
-						$hosts = API::Host()->get($options);
-
-						if ($hosts) {
-							$hostids = array_merge($hostids, array_keys($hosts));
-						}
+						$hostids += API::Host()->get($options);
 					}
+					$hostids = array_keys($hostids);
 				}
 
 				$options = [
