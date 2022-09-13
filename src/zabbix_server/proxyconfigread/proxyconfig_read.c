@@ -827,6 +827,9 @@ out:
 	return ret;
 }
 
+static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_config_revision,
+		zbx_dc_revision_t *dc_revision, struct zbx_json *j, char **error)
+{
 #define ZBX_PROXYCONFIG_SYNC_HOSTS		0x0001
 #define ZBX_PROXYCONFIG_SYNC_GMACROS		0x0002
 #define ZBX_PROXYCONFIG_SYNC_HMACROS		0x0004
@@ -841,9 +844,6 @@ out:
 					ZBX_PROXYCONFIG_SYNC_EXPRESSIONS | ZBX_PROXYCONFIG_SYNC_CONFIG | 	\
 					ZBX_PROXYCONFIG_SYNC_HTTPTESTS | ZBX_PROXYCONFIG_SYNC_AUTOREG)
 
-static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_config_revision,
-		zbx_dc_revision_t *dc_revision, struct zbx_json *j, char **error)
-{
 	zbx_vector_uint64_t	hostids, httptestids, updated_hostids, removed_hostids, del_macro_hostids,
 				macro_hostids;
 	zbx_vector_ptr_t	keys_paths;
@@ -1005,6 +1005,15 @@ out:
 	zbx_vector_uint64_destroy(&hostids);
 
 	return ret;
+
+#undef ZBX_PROXYCONFIG_SYNC_HOSTS
+#undef ZBX_PROXYCONFIG_SYNC_GMACROS
+#undef ZBX_PROXYCONFIG_SYNC_HMACROS
+#undef ZBX_PROXYCONFIG_SYNC_DRULES
+#undef ZBX_PROXYCONFIG_SYNC_EXPRESSIONS
+#undef ZBX_PROXYCONFIG_SYNC_CONFIG
+#undef ZBX_PROXYCONFIG_SYNC_HTTPTESTS
+#undef ZBX_PROXYCONFIG_SYNC_AUTOREG
 }
 
 /******************************************************************************

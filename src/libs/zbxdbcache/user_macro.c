@@ -1129,6 +1129,7 @@ void	um_cache_resolve(const zbx_um_cache_t *cache, const zbx_uint64_t *hostids, 
  * Purpose: set value to the specified macros                                    *
  *                                                                               *
  * Parameters: cache          - [IN] the user macro cache                        *
+ *             revision       - [IN] the configuration revision                  *
  *             host_macro_ids - [IN] a vector of hostid,macroid pairs            *
  *             value          - [IN] the new value (stored in string pool)       *
  *                                                                               *
@@ -1343,7 +1344,8 @@ void	um_cache_get_macro_updates(const zbx_um_cache_t *cache, const zbx_uint64_t 
  *                                                                               *
  * Parameters: cache        - [IN] the user macro cache                          *
  *             hostid       - [IN] the parent hostid                             *
- *             templates    - [IN/OUT] the templates                             *
+ *             templates    - [IN/OUT] the leftover (not linked to hosts)        *
+ *                                     templates                                 *
  *                                                                               *
  *********************************************************************************/
 static void	um_cache_check_used_templates(const zbx_um_cache_t *cache, zbx_uint64_t hostid,

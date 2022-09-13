@@ -6212,8 +6212,8 @@ static void	dc_trigger_add_itemids(ZBX_DC_TRIGGER *trigger, const zbx_vector_uin
  * Purpose: reset item trigger links and remove corresponding itemids from    *
  *          affected triggers                                                 *
  *                                                                            *
- * Parameters: item    - the item to reset                                    *
- *             trigger - the trigger to exclude                               *
+ * Parameters: item            - the item to reset                            *
+ *             trigger_exclude - the trigger to exclude                       *
  *                                                                            *
  ******************************************************************************/
 static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude)

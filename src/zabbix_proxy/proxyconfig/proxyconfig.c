@@ -200,20 +200,23 @@ static void	proxyconfig_remove_unused_templates(void)
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts_templates where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
 				templateids.values_num);
-		DBexecute("%s", sql);
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto fail;
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hostmacro where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
 				templateids.values_num);
-		DBexecute("%s", sql);
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto fail;
 
 		sql_offset = 0;
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
 				templateids.values_num);
-		DBexecute("%s", sql);
-
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto fail;
+fail:
 		DBcommit();
 
 		zbx_free(sql);

@@ -46,6 +46,8 @@
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
 
+static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
+
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
@@ -1163,7 +1165,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		{
 			ret = process_active_check_heartbeat(&jp);
 		}
-		else if (SUCCEED != trapper_process_request(value, sock, &jp, zbx_config_tls))
+		else if (SUCCEED != trapper_process_request(value, sock, &jp, zbx_config_tls, zbx_get_program_type_cb))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);
@@ -1274,6 +1276,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
+	zbx_get_program_type_cb = trapper_args_in->zbx_get_program_type_cb_arg;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(trapper_args_in->zbx_get_program_type_cb_arg()),

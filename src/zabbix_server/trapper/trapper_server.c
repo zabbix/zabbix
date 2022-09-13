@@ -216,9 +216,10 @@ fail:
 }
 
 int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_tls_t *zbx_config_tls)
+		const zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f get_program_type_cb)
 {
 	ZBX_UNUSED(zbx_config_tls);
+	ZBX_UNUSED(get_program_type_cb);
 
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_REPORT_TEST))
 	{

@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "proxyconfig_write.h"
+
 #include "proxy.h"
 #include "zbxdbhigh.h"
 #include "zbxcommshigh.h"
@@ -95,11 +97,11 @@ static int	zbx_flags128_isclear(zbx_flags128_t *flags)
 	return SUCCEED;
 }
 
-/* bit defines for proxyconfig row flags, lower bits are reserved for field update flags */
-#define ZBX_PROXYCONFIG_ROW_UPDATE	126
-#define ZBX_PROXYCONFIG_ROW_EXISTS	127
-
 ZBX_PTR_VECTOR_DECL(table_row_ptr, struct zbx_table_row *)
+
+/* bit defines for proxyconfig row flags, lower bits are reserved for field update flags */
+#define PROXYCONFIG_ROW_UPDATE		126
+#define PROXYCONFIG_ROW_EXISTS		127
 
 typedef struct zbx_table_row
 {
@@ -573,11 +575,11 @@ static int	proxyconfig_compare_row(zbx_table_row_t *row, DB_ROW dbrow, char **bu
 
 	if (SUCCEED != zbx_flags128_isclear(&row->flags))
 	{
-		zbx_flags128_set(&row->flags, ZBX_PROXYCONFIG_ROW_UPDATE);
+		zbx_flags128_set(&row->flags, PROXYCONFIG_ROW_UPDATE);
 		ret = FAIL;
 	}
 
-	zbx_flags128_set(&row->flags, ZBX_PROXYCONFIG_ROW_EXISTS);
+	zbx_flags128_set(&row->flags, PROXYCONFIG_ROW_EXISTS);
 
 	return ret;
 }
@@ -749,14 +751,14 @@ out:
  * Purpose: convert text value to the database value according to its field   *
  *          type                                                              *
  *                                                                            *
- * Parameters: table - [IN] the table                                         *
- *             field - [IN] the field                                         *
+ * Parameters: table - [IN]                                                   *
+ *             field - [IN]                                                   *
  *             buf   - [IN] the value to convert                              *
  *             type  - [IN] the json value type                               *
  *             value - [OUT] the converted value (optional)                   *
  *             error - [OUT] the error message                                *
  *                                                                            *
- * Return value: SUCCEED - the operation was successfull                      *
+ * Return value: SUCCEED - the operation was successful                       *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function can be used to validate buffer by using NULL       *
@@ -950,7 +952,7 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 	zbx_hashset_iter_reset(&td->rows, &iter);
 	while (NULL != (row = (zbx_table_row_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (SUCCEED != zbx_flags128_isset(&row->flags, ZBX_PROXYCONFIG_ROW_EXISTS))
+		if (SUCCEED != zbx_flags128_isset(&row->flags, PROXYCONFIG_ROW_EXISTS))
 			zbx_vector_table_row_ptr_append(&rows, row);
 	}
 
@@ -1003,7 +1005,7 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 
 					/* insert null ID and add this row to updates, */
 					/* so the correct ID will be updated later     */
-					zbx_flags128_set(&row->flags, ZBX_PROXYCONFIG_ROW_EXISTS);
+					zbx_flags128_set(&row->flags, PROXYCONFIG_ROW_EXISTS);
 					zbx_flags128_set(&row->flags, j);
 					zbx_vector_table_row_ptr_append(&td->updates, row);
 
