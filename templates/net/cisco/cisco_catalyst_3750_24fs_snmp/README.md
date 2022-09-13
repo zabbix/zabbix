@@ -99,7 +99,8 @@ There are no template links in this template.
 |Status |ICMP ping | |SIMPLE |icmpping |
 |Status |ICMP loss | |SIMPLE |icmppingloss |
 |Status |ICMP response time | |SIMPLE |icmppingsec |
-|Status |Uptime |<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p> |SNMP |system.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |Uptime (network) |<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p> |SNMP |system.net.uptime<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |Uptime (hardware) |<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p> |SNMP |system.hw.uptime<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `0.01`</p> |
 |Status |SNMP agent availability | |INTERNAL |zabbix[host,snmp,available] |
 |Temperature |{#SNMPVALUE}: Temperature status |<p>MIB: CISCO-ENVMON-MIB</p><p>Object name: ciscoEnvMonTemperatureState</p><p>The current state of the test point being instrumented.</p> |SNMP |sensor.temp.status[{#SNMPINDEX}] |
 |Temperature |{#SNMPVALUE}: Temperature |<p>MIB: CISCO-ENVMON-MIB</p><p>Object name: ciscoEnvMonTemperatureValue</p><p>The current measurement of the test point being instrumented.</p> |SNMP |sensor.temp.value[{#SNMPINDEX}] |
@@ -128,7 +129,7 @@ There are no template links in this template.
 |Unavailable by ICMP ping |<p>Last three attempts returned timeout.  Please check device connectivity.</p> |`max(/Cisco Catalyst 3750V2-24FS SNMP/icmpping,#3)=0` |HIGH | |
 |High ICMP ping loss |<p>-</p> |`min(/Cisco Catalyst 3750V2-24FS SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Catalyst 3750V2-24FS SNMP/icmppingloss,5m)<100` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
 |High ICMP ping response time |<p>-</p> |`avg(/Cisco Catalyst 3750V2-24FS SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}` |WARNING |<p>**Depends on**:</p><p>- High ICMP ping loss</p><p>- Unavailable by ICMP ping</p> |
-|has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Cisco Catalyst 3750V2-24FS SNMP/system.uptime)<10m` |WARNING |<p>Manual close: YES</p> |
+|Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`(last(/Cisco Catalyst 3750V2-24FS SNMP/system.hw.uptime)>0 and last(/Cisco Catalyst 3750V2-24FS SNMP/system.hw.uptime)<10m) or (last(/Cisco Catalyst 3750V2-24FS SNMP/system.hw.uptime)=0 and last(/Cisco Catalyst 3750V2-24FS SNMP/system.net.uptime)<10m)` |WARNING |<p>Manual close: YES</p> |
 |No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/Cisco Catalyst 3750V2-24FS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
 |{#SNMPVALUE}: Temperature is in critical state |<p>This trigger uses temperature sensor state</p> |`last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.status[{#SNMPINDEX}])=4` |HIGH | |
 |{#SNMPVALUE}: Temperature is in warning state |<p>This trigger uses temperature sensor state</p> |`last(/Cisco Catalyst 3750V2-24FS SNMP/sensor.temp.status[{#SNMPINDEX}])=2` |WARNING |<p>**Depends on**:</p><p>- {#SNMPVALUE}: Temperature is in critical state</p> |

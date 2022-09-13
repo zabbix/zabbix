@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:35:22Z'
+  date: '2022-08-16T04:57:37Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -15,6 +15,7 @@ zabbix_export:
         
         MIBs used:
         CISCO-UNIFIED-COMPUTING-COMPUTE-MIB
+        HOST-RESOURCES-MIB
         SNMPv2-MIB
         CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB
         CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
@@ -182,6 +183,34 @@ zabbix_export:
               tag: component
               value: system
         -
+          uuid: a6d61b21f9f044a6912759e02787cb3f
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'system.hw.uptime[hrSystemUptime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 7ba9b86064ad432a9e6d1922ca29edda
           name: 'System location'
           type: SNMP_AGENT
@@ -244,6 +273,28 @@ zabbix_export:
                   tag: scope
                   value: security
         -
+          uuid: 1b0551aa2d184c8d923788b5d159ed7c
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.net.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 05fe3cb6d2004e7ea2d37742fc2549d3
           name: 'System object ID'
           type: SNMP_AGENT
@@ -265,45 +316,6 @@ zabbix_export:
             -
               tag: component
               value: system
-        -
-          uuid: 1b0551aa2d184c8d923788b5d159ed7c
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'system.uptime[sysUpTime.0]'
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: a933ba0e5c7f4e908afaba4381f65482
-              expression: 'last(/Cisco UCS SNMP/system.uptime[sysUpTime.0])<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'No SNMP data collection'
-                  expression: 'max(/Cisco UCS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
         -
           uuid: b80f6a30ad124a1ea863f2fdb868ba6f
           name: 'SNMP agent availability'
@@ -1821,3 +1833,20 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: a933ba0e5c7f4e908afaba4381f65482
+      expression: '(last(/Cisco UCS SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco UCS SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco UCS SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco UCS SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        -
+          name: 'No SNMP data collection'
+          expression: 'max(/Cisco UCS SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        -
+          tag: scope
+          value: notice

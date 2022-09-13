@@ -246,7 +246,7 @@ class testTimezone extends CWebTest {
 		}
 
 		$this->page->open('zabbix.php?action='.$page.'.edit');
-		$form = $this->query('xpath://form[@aria-labeledby="page-title-general"]')->one()->asForm();
+		$form = $this->query('xpath://form[@aria-labelledby="page-title-general"]')->one()->asForm();
 		$timezone = CDateTimeHelper::getTimeZoneFormat($timezone);
 		$form->fill([$field_name => $timezone]);
 		$form->submit();
