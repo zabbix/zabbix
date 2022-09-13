@@ -57,6 +57,13 @@ window.action_edit_popup = new class {
 				this.row_count--;
 				this._processTypeOfCalculation();
 			}
+			else if (e.target.classList.contains('js-edit-button')) {
+				// todo E.S. : pass data to edit form
+				this._openOperationPopup(this.eventsource, <?= ACTION_OPERATION ?>, this.actionid);
+			}
+			else if (e.target.classList.contains('js-remove-button')) {
+				e.target.closest('tr').remove();
+			}
 		});
 	}
 

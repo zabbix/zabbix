@@ -252,7 +252,7 @@ if ($data['action']['operations']) {
 							])),
 						[
 							(new CButton('remove', _('Remove')))
-								->onClick('removeOperation('.$operationid.', '.ACTION_OPERATION.');')
+								->addClass('js-remove-button')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
 							new CVar('operations['.$operationid.']', $operation),
@@ -280,7 +280,7 @@ if ($data['action']['operations']) {
 							])),
 						[
 							(new CButton('remove', _('Remove')))
-								->onClick('removeOperation('.$operationid.', '.ACTION_OPERATION.');')
+								->addClass('js-remove-button')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
 							new CVar('operations['.$operationid.']', $operation),
@@ -322,7 +322,6 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 		->setId('rec-table')
 		->setAttribute('style', 'width: 100%;');
 		$operations_table->setHeader([_('Details'), _('Action')]);
-
 
 	if ($data['action']['recovery_operations']) {
 		$actionOperationDescriptions = getActionOperationDescriptions($data['eventsource'], [$data['action']],
@@ -367,7 +366,7 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 						[
 							(new CButton('remove', _('Remove')))
 								->setAttribute('data-operationid', $operationid)
-								->onClick('removeOperation(this.dataset.operationid, '.ACTION_RECOVERY_OPERATION.');')
+								->addClass('js-remove-button')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
 							new CVar('recovery_operations['.$operationid.']', $operation),
@@ -443,7 +442,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 						[
 							(new CButton('remove', _('Remove')))
 								->setAttribute('data-operationid', $operationid)
-								->onClick('removeOperation(this.dataset.operationid, '.ACTION_UPDATE_OPERATION.');')
+								->addClass('js-remove-button')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
 							new CVar('update_operations['.$operationid.']', $operation),
