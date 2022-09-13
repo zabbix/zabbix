@@ -656,6 +656,8 @@ switch ($data['method']) {
 				break;
 
 			case 'items':
+				$hostids = null;
+
 				if (array_key_exists('hostids', $data)) {
 					$hostids = [];
 					foreach ($data['hostids'] as $name) {
