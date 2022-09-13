@@ -939,7 +939,63 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $db_items
 	 */
 	protected static function addFieldDefaultsByType(array &$items, array $db_items): void {
-		$defaults = CItemBaseHelper::getFieldDefaults();
+		$type_field_defaults = [
+			// The fields used for multiple item types.
+			'interfaceid' => 0,
+			'authtype' => DB::getDefault('items', 'authtype'),
+			'username' => DB::getDefault('items', 'username'),
+			'password' => DB::getDefault('items', 'password'),
+			'params' => DB::getDefault('items', 'params'),
+			'timeout' => DB::getDefault('items', 'timeout'),
+			'delay' => DB::getDefault('items', 'delay'),
+			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
+
+			// Dependent item type spcecific fields.
+			'master_itemid' => 0,
+
+			// HTTP Agent item type spcecific fields.
+			'url' => DB::getDefault('items', 'url'),
+			'query_fields' => DB::getDefault('items', 'query_fields'),
+			'request_method' => DB::getDefault('items', 'request_method'),
+			'post_type' => DB::getDefault('items', 'post_type'),
+			'posts' => DB::getDefault('items', 'posts'),
+			'headers' => DB::getDefault('items', 'headers'),
+			'status_codes' => DB::getDefault('items', 'status_codes'),
+			'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
+			'retrieve_mode' => DB::getDefault('items', 'retrieve_mode'),
+			'output_format' => DB::getDefault('items', 'output_format'),
+			'http_proxy' => DB::getDefault('items', 'http_proxy'),
+			'verify_peer' => DB::getDefault('items', 'verify_peer'),
+			'verify_host' => DB::getDefault('items', 'verify_host'),
+			'ssl_cert_file' => DB::getDefault('items', 'ssl_cert_file'),
+			'ssl_key_file' => DB::getDefault('items', 'ssl_key_file'),
+			'ssl_key_password' => DB::getDefault('items', 'ssl_key_password'),
+			'allow_traps' => DB::getDefault('items', 'allow_traps'),
+
+			// IPMI item type spcecific fields.
+			'ipmi_sensor' => DB::getDefault('items', 'ipmi_sensor'),
+
+			// JMX item type spcecific fields.
+			'jmx_endpoint' => DB::getDefault('items', 'jmx_endpoint'),
+
+			// Script item type spcecific fields.
+			'parameters' => [],
+
+			// SNMP item type spcecific fields.
+			'snmp_oid' => DB::getDefault('items', 'snmp_oid'),
+
+			// SSH item type spcecific fields.
+			'publickey' => DB::getDefault('items', 'publickey'),
+			'privatekey' => DB::getDefault('items', 'privatekey')
+		];
+
+		$value_type_field_defaults = [
+			'units' => DB::getDefault('items', 'units'),
+			'trends' => DB::getDefault('items', 'trends'),
+			'valuemapid' => 0,
+			'logtimefmt' => DB::getDefault('items', 'logtimefmt'),
+			'inventory_link' => DB::getDefault('items', 'inventory_link')
+		];
 
 		foreach ($items as &$item) {
 			if (!array_key_exists('type', $db_items[$item['itemid']])) {
@@ -962,28 +1018,28 @@ abstract class CItemGeneral extends CApiService {
 					unset($field_names['interfaceid']);
 				}
 
-				$item += array_intersect_key($defaults, $field_names);
+				$item += array_intersect_key($type_field_defaults, $field_names);
 			}
 			elseif ($item['type'] == ITEM_TYPE_SSH) {
 				if (array_key_exists('authtype', $item) && $item['authtype'] !== $db_item['authtype']
 						&& $item['authtype'] == ITEM_AUTHTYPE_PASSWORD) {
-					$item += array_intersect_key($defaults, array_flip(['publickey', 'privatekey']));
+					$item += array_intersect_key($type_field_defaults, array_flip(['publickey', 'privatekey']));
 				}
 			}
 			elseif ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 				if (array_key_exists('request_method', $item) && $item['request_method'] != $db_item['request_method']
 						&& $item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
-					$item += ['retrieve_mode' => HTTPCHECK_REQUEST_HEAD];
+					$item += ['retrieve_mode' => HTTPTEST_STEP_RETRIEVE_MODE_HEADERS];
 				}
 
 				if (array_key_exists('authtype', $item) && $item['authtype'] != $db_item['authtype']
 						&& $item['authtype'] == HTTPTEST_AUTH_NONE) {
-					$item += array_intersect_key($defaults, array_flip(['username', 'password']));
+					$item += array_intersect_key($type_field_defaults, array_flip(['username', 'password']));
 				}
 
 				if (array_key_exists('allow_traps', $item) && $item['allow_traps'] != $db_item['allow_traps']
 						&& $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF) {
-					$item += array_intersect_key($defaults, array_flip(['trapper_hosts']));
+					$item += array_intersect_key($type_field_defaults, array_flip(['trapper_hosts']));
 				}
 			}
 
@@ -993,7 +1049,11 @@ abstract class CItemGeneral extends CApiService {
 
 				$field_names = array_flip(array_diff($db_type_field_names, $type_field_names));
 
-				$item += array_intersect_key($defaults, $field_names);
+				if (array_key_exists('trends', $field_names)) {
+					$item += ['trends' => 0];
+				}
+
+				$item += array_intersect_key($value_type_field_defaults, $field_names);
 			}
 		}
 		unset($item);
@@ -1026,14 +1086,9 @@ abstract class CItemGeneral extends CApiService {
 						$update = true;
 					}
 				}
-				elseif ($db_items[$item['itemid']]['type'] == ITEM_TYPE_SCRIPT) {
-					if ($db_items[$item['itemid']]['parameters']) {
-						$update = true;
-
-						if (!array_key_exists('parameters', $item)) {
-							$item['parameters'] = [];
-						}
-					}
+				elseif ($db_items[$item['itemid']]['type'] == ITEM_TYPE_SCRIPT
+						&& $db_items[$item['itemid']]['parameters']) {
+					$update = true;
 				}
 			}
 
