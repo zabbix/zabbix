@@ -119,6 +119,7 @@ class CControllerPopupActionEdit extends CController {
 					'pause_suppressed' => $this->action['pause_suppressed'],
 					'notify_if_canceled' =>  $this->action['notify_if_canceled']
 				],
+				'formula' => $this->getInput('formula', ''),
 				'allowedOperations' => getAllowedOperations($eventsource)
 			];
 			foreach ($data['action']['filter']['conditions'] as $condition) {
@@ -139,6 +140,8 @@ class CControllerPopupActionEdit extends CController {
 					'eventsource' => $eventsource,
 					'status' =>'',
 					'operations' => [],
+					'recovery_operations' => [],
+					'update_operations' => [],
 					'filter' => [
 						'conditions' => [],
 						'evaltype' => ''
