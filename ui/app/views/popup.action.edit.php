@@ -26,7 +26,7 @@
  * @var array $data
  */
 
-$this->addJsFile('popup.operation.common.js');
+// $this->addJsFile('popup.operation.common.js');
 
 $form = (new CForm())
 	->setName('action.edit')
@@ -95,7 +95,8 @@ if ($data['action']['filter']['conditions']) {
 		$i++;
 	}
 }
-$formula = (new CTextBox('formula', $data['action']['filter']['formula'], DB::getFieldLength('actions', 'formula')))
+
+$formula = (new CTextBox('formula', $data['formula'], DB::getFieldLength('actions', 'formula')))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setId('formula')
 	->setAttribute('placeholder', 'A or (B and C) &hellip;');
@@ -118,7 +119,7 @@ $action_tab
 			(new CSpan(''))
 				->addStyle('white-space: normal;')
 				->setId('expression'),
-			(new CTextBox('formula', $data['action']['filter']['formula'],
+			(new CTextBox('formula', $data['formula'],
 				DB::getFieldLength('actions', 'formula')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setId('formula')
@@ -151,6 +152,18 @@ $action_tab
 		new CFormField((new CLabel(_('At least one operation must exist.')))->setAsteriskMark())
 	);
 
+// Operations tab.
+$operations_tab = (new CFormGrid());
+
+if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
+	$operations_tab->addItem([
+		(new CLabel(_('Default operation step duration'), 'esc_period'))->setAsteriskMark(),
+		(new CTextBox('esc_period', $data['action']['esc_period']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired()
+	]);
+}
+
 // Operations table.
 $operations_table = (new CTable())
 	->setId('op-table')
@@ -166,7 +179,7 @@ else {
 
 $operations_table->setFooter(
 	(new CSimpleButton(_('Add')))
-		->setAttribute('data-actionid', 0)
+		->setAttribute('data-actionid', $data['actionid'])
 		->setAttribute('data-eventsource', $data['eventsource'])
 		->addClass('js-operation-details')
 		->setAttribute('actionid', $data['actionid'])
@@ -174,18 +187,6 @@ $operations_table->setFooter(
 		->setAttribute('operation_type', ACTION_OPERATION)
 		->addClass(ZBX_STYLE_BTN_LINK)
 );
-
-// Operations tab.
-$operations_tab = (new CFormGrid());
-
-if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
-	$operations_tab->addItem([
-		(new CLabel(_('Default operation step duration'), 'esc_period'))->setAsteriskMark(),
-		(new CTextBox('esc_period', $data['action']['esc_period']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-	]);
-}
 
 $operations_tab->addItem([
 	new CLabel(_('Operations')),
@@ -211,7 +212,7 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 			->setAttribute('data-actionid', $data['actionid'])
 			->setAttribute('data-eventsource', $data['eventsource'])
 //			->onClick('
-//					action_edit_popup.open(this, this.dataset.actionid, this.dataset.eventsource,
+//					action_edit_popup.openOperationPopup(this, this.dataset.actionid, this.dataset.eventsource,
 //					'.ACTION_RECOVERY_OPERATION.'
 //				);
 //			')

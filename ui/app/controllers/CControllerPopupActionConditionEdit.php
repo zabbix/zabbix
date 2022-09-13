@@ -125,7 +125,7 @@ class CControllerPopupActionConditionEdit extends CController {
 			'allowed_conditions' => get_conditions_by_eventsource($this->getInput('source')),
 			'trigger_context' => $this->getInput('trigger_context', 'host'),
 			'user' => ['debug_mode' => $this->getDebugMode()],
-			'actionid' => $this->getInput('actionid')
+			'actionid' => $this->hasInput('actionid') ? $this->getInput('actionid') : ''
 		];
 
 		$response = new CControllerResponseData($data);

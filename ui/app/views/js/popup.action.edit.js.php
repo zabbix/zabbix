@@ -30,7 +30,6 @@ window.action_edit_popup = new class {
 		this.conditions = conditions;
 		this.actionid = actionid;
 		this.eventsource = eventsource;
-		this.row_count = document.getElementById('conditionTable').rows.length-2;
 
 		this._initActionButtons();
 		this._processTypeOfCalculation();
@@ -73,11 +72,7 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
-				this.row = document.createElement('tr');
-				this._createRow(this.row, e.detail);
-
-			$('#conditionTable tr:last').before(this.row);
-				this._processTypeOfCalculation();
+			this._checkRow(e.detail);
 		});
 	}
 
@@ -95,12 +90,14 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
+
 			// todo : add function to create row in operation table
+			document.getElementById('op-table').append('test row');
 		});
 
 	}
 
-	_createRow(row, input) {
+	_checkRow(input) {
 		// todo: check if condition with the same value already exists in the table.
 
 		// check if identical condition already exists in table
@@ -112,14 +109,25 @@ window.action_edit_popup = new class {
 		});
 
 		const hasRow = [hasRows.some(it => it === true)]
-		if (hasRow[0] === true) return;
+		if (hasRow[0] === true) {
+			return;
+		}
+		else {
+			this._createRow(input)
+		}
+	}
 
-		row.append(this._createLabelCell(input));
-		row.append(this._createNameCell(input));
-		row.append(this._createRemoveCell());
+	_createRow(input) {
+		this.row = document.createElement('tr');
+		this.row.append(this._createLabelCell(input));
+		this.row.append(this._createNameCell(input));
+		this.row.append(this._createRemoveCell());
 
 		this.table = document.getElementById('conditionTable');
 		this.row_count = this.table.rows.length -1;
+
+		$('#conditionTable tr:last').before(this.row);
+		this._processTypeOfCalculation();
 	}
 
 	_createLabelCell(input) {
@@ -189,7 +197,7 @@ window.action_edit_popup = new class {
 		input.type = 'hidden';
 		input.id = `conditions_${this.row_count}_${name}`;
 		input.name = `conditions[${this.row_count}][${name}]`;
-		input.value =value;
+		input.value = value;
 
 		return input;
 	}
@@ -312,6 +320,8 @@ window.action_edit_popup = new class {
 	}
 
 	_processTypeOfCalculation() {
+		// todo E.S.: rewrite jqueries.
+
 		this.show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
 
 		jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");

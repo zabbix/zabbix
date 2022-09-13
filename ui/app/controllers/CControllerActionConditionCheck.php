@@ -53,7 +53,7 @@ class CControllerActionConditionCheck extends CController {
 					CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_NOT_IN, CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO,
 					CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP
 			]),
-			'value' => 'required|not_empty',
+			'value' => 'not_empty',
 			'value2' => 'not_empty'
 		];
 
@@ -80,7 +80,7 @@ class CControllerActionConditionCheck extends CController {
 		$validator = new CActionCondValidator();
 		$is_valid = $validator->validate([
 			'conditiontype' => $this->getInput('condition_type'),
-			'value' => $this->getInput('value'),
+			'value' => $this->hasInput('value') ? $this->getInput('value') : null,
 			'value2' => $this->hasInput('value2') ? $this->getInput('value2') : null,
 			'operator' => $this->getInput('operator')
 		]);
@@ -99,8 +99,8 @@ class CControllerActionConditionCheck extends CController {
 		$condition = [
 			'condition_type' => $this->getInput('condition_type'),
 			'operator' => $this->getInput('operator'),
-			'value' => $this->getInput('value'),
-			'value2' => $this->getInput('value2')
+			'value' => $this->hasInput('value') ? $this->getInput('value') : null,
+			'value2' => $this->hasInput('value2') ? $this->getInput('value2') : null
 		];
 		$actionConditionStringValues = $this->conditionValueToString($condition);
 
@@ -112,7 +112,7 @@ class CControllerActionConditionCheck extends CController {
 			'action' => $this->getAction(),
 			'type' => $this->getInput('type'),
 			'conditiontype' => $this->getInput('condition_type'),
-			'value' => $this->getInput('value'),
+			'value' => $this->hasInput('value') ? $this->getInput('value') : null,
 			'value2' => $this->hasInput('value2') ? $this->getInput('value2') : null,
 			'operator' => $this->getInput('operator'),
 			//'last_type' => $this->getConditionLastType(),
