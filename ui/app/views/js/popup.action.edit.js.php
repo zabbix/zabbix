@@ -92,7 +92,7 @@ window.action_edit_popup = new class {
 			actionid: actionid
 		};
 
-		const overlay = PopUp('popup.operations', parameters, {
+		const overlay = PopUp('popup.action.operations', parameters, {
 			dialogueid: 'operations',
 			dialogue_class: 'modal-popup-medium'
 		});
