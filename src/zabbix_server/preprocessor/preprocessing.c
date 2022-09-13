@@ -19,11 +19,11 @@
 
 #include "preprocessing.h"
 
-#include "zbxcommon.h"
 #include "log.h"
 #include "zbxserialize.h"
 #include "preproc_history.h"
 #include "item_preproc.h"
+#include "zbxsysinfo.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
@@ -1536,16 +1536,16 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 
 	if (ITEM_STATE_NORMAL == state)
 	{
-		if (0 != ISSET_STR(result))
+		if (0 != ZBX_ISSET_STR(result))
 			value_len = strlen(result->str);
 
-		if (0 != ISSET_TEXT(result))
+		if (0 != ZBX_ISSET_TEXT(result))
 		{
 			if (value_len < (len = strlen(result->text)))
 				value_len = len;
 		}
 
-		if (0 != ISSET_LOG(result))
+		if (0 != ZBX_ISSET_LOG(result))
 		{
 			if (value_len < (len = strlen(result->log->value)))
 				value_len = len;

@@ -21,6 +21,7 @@
 
 #include "log.h"
 #include "zbxexec.h"
+#include "zbxsysinfo.h"
 
 extern char	*CONFIG_EXTERNALSCRIPTS;
 

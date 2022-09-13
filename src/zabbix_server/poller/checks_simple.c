@@ -23,6 +23,7 @@
 #include "simple.h"
 #include "log.h"
 #include "zbxself.h"
+#include "zbxsysinfo.h"
 
 typedef int	(*vmfunc_t)(AGENT_REQUEST *, const char *, const char *, AGENT_RESULT *);
 
@@ -253,11 +254,11 @@ int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	else
 	{
 		/* it will execute item from a loadable module if any */
-		if (SUCCEED == process(item->key, PROCESS_MODULE_COMMAND, result))
+		if (SUCCEED == process(item->key, ZBX_PROCESS_MODULE_COMMAND, result))
 			ret = SUCCEED;
 	}
 
-	if (NOTSUPPORTED == ret && !ISSET_MSG(result))
+	if (NOTSUPPORTED == ret && !ZBX_ISSET_MSG(result))
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Simple check is not supported."));
 
 out:

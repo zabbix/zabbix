@@ -39,6 +39,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
+#include "zbxsysinfo.h"
 
 int	sync_in_progress = 0;
 
@@ -5826,14 +5827,13 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	DCsync_host_tags(&host_tag_sync);
 	host_tag_sec2 = zbx_time() - sec;
 
+	FINISH_SYNC;
 	/* postpone configuration sync until macro secrets are received from Zabbix server */
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != config->kvs_paths.values_num &&
 			ZBX_DBSYNC_INIT == mode)
 	{
-		goto out;
+		goto clean;
 	}
-
-	FINISH_SYNC;
 
 	/* sync host data to support host lookups when resolving macros during configuration sync */
 
@@ -6464,7 +6464,7 @@ out:
 		queues_sec = zbx_time() - sec;
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reschedule : " ZBX_FS_DBL " sec.", __func__, queues_sec);
 	}
-
+clean:
 	zbx_dbsync_clear(&config_sync);
 	zbx_dbsync_clear(&autoreg_config_sync);
 	zbx_dbsync_clear(&autoreg_host_sync);

@@ -556,8 +556,8 @@ static void	set_defaults(void)
 
 		init_result(&result);
 
-		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result) &&
-				NULL != (value = GET_STR_RESULT(&result)))
+		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS,
+				&result) && NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
 			assert(*value);
 			zbx_trim_str_list(*value, ',');
@@ -652,13 +652,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 			zbx_free(ch_error);
 			err = 1;
 		}
-	}
-
-	if (NULL != CONFIG_HOST_METADATA && HOST_METADATA_LEN < zbx_strlen_utf8(CONFIG_HOST_METADATA))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostMetadata\" configuration parameter cannot be longer than"
-				" %d characters", HOST_METADATA_LEN);
-		err = 1;
 	}
 
 	if (NULL != CONFIG_HOST_INTERFACE && HOST_INTERFACE_LEN < zbx_strlen_utf8(CONFIG_HOST_INTERFACE))
