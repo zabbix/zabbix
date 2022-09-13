@@ -292,7 +292,7 @@ class CControllerPopupActionOperationsEdit extends CController {
 		$data = [
 			'eventsource' => $eventsource,
 			'recovery' => $recovery,
-			'operation' => $this->getInput('operation')
+			'operation' => $this->hasInput('operation') ? $this->getInput('operation') : null
 		];
 
 		$this->setResponse(new CControllerResponseData($data));
