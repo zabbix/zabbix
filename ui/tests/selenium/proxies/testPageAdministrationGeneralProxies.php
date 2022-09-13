@@ -541,8 +541,6 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 	}
 
 	/**
-	 * onBeforeOnce prepareProxyHostsData
-	 *
 	 * @dataProvider getActionsProxyData
 	 */
 	public function testPageAdministrationGeneralProxies_Actions($data) {
