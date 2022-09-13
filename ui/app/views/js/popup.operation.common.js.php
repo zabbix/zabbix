@@ -22,28 +22,32 @@ window.operation_popup = new class {
 		this.overlay = overlays_stack.getById('operations');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.condition_count = (document.getElementById('operation-condition-list').rows.length - 2);
 
 		this._loadViews();
 	}
 
 	_loadViews() {
+		// todo E.S. : rewrite jqueries:
+
 		$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
 		$('[id="operation-message-body"],[id="operation-message-label"]').hide();
 
 		$('#operation_opmessage_default_msg')
 			.change(function() {
-			if($('#operation_opmessage_default_msg')[0].checked) {
-				$('[id="operation-message-subject"],[id="operation-message-subject-label"]').show();
-				$('[id="operation-message-body"],[id="operation-message-label"]').show();
-			}
-			else {
-				$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
-				$('[id="operation-message-body"],[id="operation-message-label"]').hide();
-			}
+				if($('#operation_opmessage_default_msg')[0].checked) {
+					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').show();
+					$('[id="operation-message-body"],[id="operation-message-label"]').show();
+				}
+				else {
+					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
+					$('[id="operation-message-body"],[id="operation-message-label"]').hide();
+				}
 			})
 
-		this.form.addEventListener('click', (e) => {
+		this._processTypeOfCalculation();
 
+		this.form.addEventListener('click', (e) => {
 		})
 	}
 
@@ -52,7 +56,7 @@ window.operation_popup = new class {
 
 		const fields = getFormFields(this.form);
 		const url = new Curl('zabbix.php');
-		url.setArgument('action', 'popup.operations');
+		url.setArgument('action', 'popup.action.operations');
 
 		// todo: pass eventsource and recovery
 		url.setArgument('eventsource', 0);
@@ -118,6 +122,12 @@ window.operation_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	_processTypeOfCalculation() {
+		// todo E.S.: rewrite jqueries.
+		jQuery('#operation-evaltype').toggle(this.condition_count > 1);
+		jQuery('#operation-evaltype-label').toggle(this.condition_count > 1);
 	}
 }
 
