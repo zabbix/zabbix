@@ -613,17 +613,16 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
  * @return array
  */
 function prepareItemHttpAgentFormData(array $item) {
-	if (array_key_exists('request_method', $item) && $item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+	if ($item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
 		$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
 	}
 
-	$query_fields = [];
-	$headers = [];
+	if ($item['query_fields']) {
+		$query_fields = [];
 
-	if (array_key_exists('query_fields', $item) && $item['query_fields']) {
 		foreach ($item['query_fields']['name'] as $index => $key) {
 			$value = $item['query_fields']['value'][$index];
-			$sortorder = CItemBaseHelper::getInput($item, ['query_fields', 'sortorder', $index], count($query_fields));
+			$sortorder = $item['query_fields']['sortorder'][$index];
 
 			if ($key !== '' || $value !== '') {
 				$query_fields[$sortorder] = [$key => $value];
@@ -631,14 +630,15 @@ function prepareItemHttpAgentFormData(array $item) {
 		}
 
 		ksort($query_fields);
+		$item['query_fields'] = $query_fields;
 	}
 
-	if (array_key_exists('headers', $item) && $item['headers']) {
+	if ($item['headers']) {
 		$tmp_headers = [];
 
 		foreach ($item['headers']['name'] as $index => $key) {
 			$value = $item['headers']['value'][$index];
-			$sortorder = CItemBaseHelper::getInput($item, ['headers', 'sortorder', $index], count($tmp_headers));
+			$sortorder = $item['headers']['sortorder'][$index];
 
 			if ($key !== '' || $value !== '') {
 				$tmp_headers[$sortorder] = [$key => $value];
@@ -651,10 +651,9 @@ function prepareItemHttpAgentFormData(array $item) {
 		foreach ($tmp_headers as $key_value_pair) {
 			$headers[key($key_value_pair)] = reset($key_value_pair);
 		}
-	}
 
-	$item['query_fields'] = $query_fields;
-	$item['headers'] = $headers;
+		$item['headers'] = $headers;
+	}
 
 	return $item;
 }
@@ -696,8 +695,8 @@ function prepareItemHttpAgentFormData(array $item) {
 function prepareScriptItemFormData(array $item): array {
 	$values = [];
 
-	if (array_key_exists('parameters', $item) && is_array($item['parameters'])
-			&& array_key_exists('name', $item['parameters']) && array_key_exists('value', $item['parameters'])) {
+	if (is_array($item['parameters']) && array_key_exists('name', $item['parameters'])
+			&& array_key_exists('value', $item['parameters'])) {
 		foreach ($item['parameters']['name'] as $index => $key) {
 			if (array_key_exists($index, $item['parameters']['value'])
 					&& ($key !== '' || $item['parameters']['value'][$index] !== '')) {

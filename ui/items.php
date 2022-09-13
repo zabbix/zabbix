@@ -318,21 +318,20 @@ $subfiltersList = ['subfilter_types', 'subfilter_value_types', 'subfilter_status
 $itemid = getRequest('itemid');
 
 if ($itemid) {
-	$db_items = API::Item()->get([
-		'output' => CItemBaseHelper::CONDITION_FIELDS,
-		'selectHosts' => ['status'],
+	$items = API::Item()->get([
+		'output' => ['itemid'],
+		'selectHosts' => ['hostid', 'status'],
 		'itemids' => $itemid,
 		'editable' => true
 	]);
 
-	if (!$db_items) {
+	if (!$items) {
 		access_deny();
 	}
 
-	$hosts = $db_items[0]['hosts'];
+	$hosts = $items[0]['hosts'];
 }
 else {
-	$db_items = null;
 	$hostid = getRequest('hostid');
 
 	if ($hostid) {
@@ -352,7 +351,6 @@ else {
 // Set sub-groups of selected groups.
 if (!empty($hosts)) {
 	$host = reset($hosts);
-	$item_host = $host;
 	$_REQUEST['filter_hostids'] = [$host['hostid']];
 }
 
@@ -529,21 +527,180 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	show_messages($result, _('Item deleted'), _('Cannot delete item'));
 }
 elseif (hasRequest('add') || hasRequest('update')) {
+	DBstart();
+
 	$result = false;
-	$input = hasRequest('add')
-		? ['host_status' => $item_host['status'], 'flags' => ZBX_FLAG_DISCOVERY_NORMAL] + $_REQUEST
-		: $_REQUEST;
-	$items = CItemBaseHelper::extractItems([$input], $db_items);
 
-	if ($items) {
-		DBstart();
+	$type = (int) getRequest('type', DB::getDefault('items', 'type'));
+	$key = getRequest('key', DB::getDefault('items', 'key_'));
+	$delay = getRequest('delay', DB::getDefault('items', 'delay'));
 
-		$result = hasRequest('add')
-			? (bool) API::Item()->create($items)
-			: (bool) API::Item()->update($items);
+	if (isValidCustomIntervals($type, $key, getRequest('delay_flex', []), false, $delay)) {
+		$value_type = (int) getRequest('value_type', DB::getDefault('items', 'value_type'));
+		$trends_default = in_array($value_type, [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+			? DB::getDefault('items', 'trends')
+			: 0;
 
-		$result = DBend($result);
+		if (hasRequest('add')) {
+			$item = ['hostid' => getRequest('hostid')];
+
+			$flags = ZBX_FLAG_DISCOVERY_NORMAL;
+			$templateid = '0';
+		}
+		else {
+			$item = ['itemid' => $itemid];
+
+			$db_items = API::Item()->get([
+				'output' => ['flags', 'templateid'],
+				'itemids' => $itemid
+			]);
+
+			$flags = (int) $db_items[0]['flags'];
+			$templateid = $db_items[0]['templateid'];
+		}
+
+		$item += getSanitizedItemFields($flags, $templateid, $type, [
+			'name' => getRequest('name', DB::getDefault('items', 'name')),
+			'type' => $type,
+			'key_' => $key,
+			'value_type' => $value_type,
+			'units' => getRequest('units', DB::getDefault('items', 'units')),
+			'history' => getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF
+				? ITEM_NO_STORAGE_VALUE
+				: getRequest('history', DB::getDefault('items', 'history')),
+			'trends' => getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF
+				? ITEM_NO_STORAGE_VALUE
+				: getRequest('trends', $trends_default),
+			'valuemapid' => getRequest('valuemapid', 0),
+			'inventory_link' => getRequest('inventory_link', DB::getDefault('items', 'inventory_link')),
+			'logtimefmt' => getRequest('logtimefmt', DB::getDefault('items', 'logtimefmt')),
+			'description' => getRequest('description', DB::getDefault('items', 'description')),
+			'status' => getRequest('status', ITEM_STATUS_DISABLED),
+			'tags' => prepareItemTags(getRequest('tags', [])),
+			'preprocessing' => normalizeItemPreprocessingSteps(getRequest('preprocessing', [])),
+
+			// Type fields.
+			// The fields used for multiple item types.
+			'interfaceid' => getRequest('interfaceid', 0),
+			'authtype' => $type == ITEM_TYPE_HTTPAGENT
+				? getRequest('http_authtype', DB::getDefault('items', 'authtype'))
+				: getRequest('authtype', DB::getDefault('items', 'authtype')),
+			'username' => $type == ITEM_TYPE_HTTPAGENT
+				? getRequest('http_username', DB::getDefault('items', 'username'))
+				: getRequest('username', DB::getDefault('items', 'username')),
+			'password' => $type == ITEM_TYPE_HTTPAGENT
+				? getRequest('http_password', DB::getDefault('items', 'password'))
+				: getRequest('password', DB::getDefault('items', 'password')),
+			'params' => getRequest('params', DB::getDefault('items', 'params')),
+			'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
+			'delay' => $delay,
+			'trapper_hosts' => getRequest('trapper_hosts', DB::getDefault('items', 'trapper_hosts')),
+
+			// Dependent item type spcecific fields.
+			'master_itemid' => getRequest('master_itemid', 0),
+
+			// HTTP Agent item type spcecific fields.
+			'url' => getRequest('url', DB::getDefault('items', 'url')),
+			'query_fields' => prepareItemQueryFields(getRequest('query_fields', [])),
+			'request_method' => getRequest('request_method', DB::getDefault('items', 'request_method')),
+			'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
+			'posts' => getRequest('posts', DB::getDefault('items', 'posts')),
+			'headers' => prepareItemHeaders(getRequest('headers', [])),
+			'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
+			'follow_redirects' => getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
+			'retrieve_mode' => getRequest('retrieve_mode', DB::getDefault('items', 'retrieve_mode')),
+			'output_format' => getRequest('output_format', DB::getDefault('items', 'output_format')),
+			'http_proxy' => getRequest('http_proxy', DB::getDefault('items', 'http_proxy')),
+			'verify_peer' => getRequest('verify_peer', DB::getDefault('items', 'verify_peer')),
+			'verify_host' => getRequest('verify_host', DB::getDefault('items', 'verify_host')),
+			'ssl_cert_file' => getRequest('ssl_cert_file', DB::getDefault('items', 'ssl_cert_file')),
+			'ssl_key_file' => getRequest('ssl_key_file', DB::getDefault('items', 'ssl_key_file')),
+			'ssl_key_password' => getRequest('ssl_key_password', DB::getDefault('items', 'ssl_key_password')),
+			'allow_traps' => getRequest('allow_traps', DB::getDefault('items', 'allow_traps')),
+
+			// IPMI item type spcecific fields.
+			'ipmi_sensor' => getRequest('ipmi_sensor', DB::getDefault('items', 'ipmi_sensor')),
+
+			// JMX item type spcecific fields.
+			'jmx_endpoint' => getRequest('jmx_endpoint', DB::getDefault('items', 'jmx_endpoint')),
+
+			// Script item type spcecific fields.
+			'parameters' => prepareItemParameters(getRequest('parameters', [])),
+
+			// SNMP item type spcecific fields.
+			'snmp_oid' => getRequest('snmp_oid', DB::getDefault('items', 'snmp_oid')),
+
+			// SSH item type spcecific fields.
+			'publickey' => getRequest('publickey', DB::getDefault('items', 'publickey')),
+			'privatekey' => getRequest('privatekey', DB::getDefault('items', 'privatekey'))
+		]);
+
+		$result = true;
+
+		if (hasRequest('add')) {
+			$result = (bool) API::Item()->create($item);
+		}
+
+		if (hasRequest('update')) {
+			$options = [
+				'output' => array_diff(array_keys($item), ['tags', 'preprocessing']),
+				'itemids' => $itemid
+			];
+
+			if (array_key_exists('tags', $item)) {
+				$options['selectTags'] = ['tag', 'value'];
+			}
+
+			if (array_key_exists('preprocessing', $item)) {
+				$options['selectPreprocessing'] = ['type', 'params', 'error_handler', 'error_handler_params'];
+			}
+
+			$db_items = API::Item()->get($options);
+
+			$upd_item = DB::getUpdatedValues('items', array_diff_key($item, array_flip(['query_fields', 'headers'])),
+				$db_items[0]
+			);
+
+			if (array_key_exists('tags', $item)) {
+				$tags = $item['tags'];
+				CArrayHelper::sort($tags, ['tag', 'value']);
+
+				$db_tags = $db_items[0]['tags'];
+				CArrayHelper::sort($db_tags, ['tag', 'value']);
+
+				if ($tags !== $db_tags) {
+					$upd_item['tags'] = $item['tags'];
+				}
+			}
+
+			if (array_key_exists('preprocessing', $item) && $item['preprocessing'] != $db_items[0]['preprocessing']) {
+				$upd_item['preprocessing'] = $item['preprocessing'];
+			}
+
+			if (array_key_exists('parameters', $item)) {
+				$parameters = array_column($item['parameters'], 'value', 'name');
+				$db_parameters = array_column($db_items[0]['parameters'], 'value', 'name');
+
+				if ($parameters != $db_parameters) {
+					$upd_item['parameters'] = $item['parameters'];
+				}
+			}
+
+			if (array_key_exists('query_fields', $item) && $item['query_fields'] != $db_items[0]['query_fields']) {
+				$upd_item['query_fields'] = $item['query_fields'];
+			}
+
+			if (array_key_exists('headers', $item) && $item['headers'] != $db_items[0]['headers']) {
+				$upd_item['headers'] = $item['headers'];
+			}
+
+			if ($upd_item) {
+				$result = (bool) API::Item()->update(['itemid' => $itemid] + $upd_item);
+			}
+		}
 	}
+
+	DBend($result);
 
 	if (hasRequest('add')) {
 		show_messages($result, _('Item added'), _('Cannot add item'));
