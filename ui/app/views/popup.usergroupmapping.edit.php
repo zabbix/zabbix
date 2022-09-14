@@ -75,6 +75,10 @@ $user_role_multiselect = (new CMultiSelect([
 	->setId('roleid');
 $inline_js .= $user_role_multiselect->getPostJS();
 
+$source = $data['idp_type'] == IDP_TYPE_SAML
+	? _('SAML')
+	: _('LDAP');
+
 if ($data['is_fallback'] == GROUP_MAPPING_FALLBACK) {
 	$name_hint_icon = makeHelpIcon([
 		_('Use fallback group to define user groups and a role for users not covered by group mapping.'),
@@ -84,7 +88,7 @@ else {
 	$name_hint_icon = makeHelpIcon([
 		_('Naming requirements:'),
 		(new CList([
-			_('group name must match LDAP group name'),
+			_s('group name must match %1$s group name', $source),
 			_("wildcard patterns with '*' may be used")
 		]))->addClass(ZBX_STYLE_LIST_DASHED)
 	])
@@ -94,7 +98,7 @@ else {
 $form
 	->addItem((new CFormGrid())
 		->addItem([
-			(new CLabel([_('LDAP group pattern'), $name_hint_icon], 'name'))->setAsteriskMark(),
+			(new CLabel([_s('%1$s group pattern', $source), $name_hint_icon], 'name'))->setAsteriskMark(),
 			new CFormField($data['is_fallback'] == GROUP_MAPPING_REGULAR
 				? (new CTextBox('name', $data['name']))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)

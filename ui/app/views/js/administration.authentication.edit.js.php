@@ -325,8 +325,7 @@
 				};
 			}
 
-			popup_params.name_label = t('SAML group pattern'); // TODO: this will be deleted, need to discuss with Miks how to perform it correctly.
-																// TODO: don't forget to discuss this with Elīna how to perfom it correctly.
+			popup_params.idp_type = <?= IDP_TYPE_SAML?>;
 
 			const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
 
