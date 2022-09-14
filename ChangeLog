@@ -14,6 +14,7 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
 
 Bug fixes:
+..F....... [ZBX-20644] fixed slow loading of Latest data when filtered by single host (averza)
 .......P.. [ZBX-21624] fixed "Something impossible" error and Vault macro not working on passive Zabbix proxy (vso)
 ........S. [ZBX-19783] added sourceip handling for scheduled reports (dgoloscapov)
 .......PS. [ZBX-21517] fixed invalid update interval handling in network discovery and web scenario scheduling (wiper)
