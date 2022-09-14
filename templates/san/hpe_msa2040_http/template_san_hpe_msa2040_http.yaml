@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-22T09:17:07Z'
+  date: '2022-09-14T09:26:53Z'
   template_groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -27,6 +27,50 @@ zabbix_export:
         -
           name: Templates/SAN
       items:
+        -
+          uuid: 4a9a463f471c4c3bba031acab3c4d72e
+          name: 'Get controllers'
+          type: DEPENDENT
+          key: hpe.msa.controllers.get
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get data about controllers.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''controllers'']'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.msa.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 54c0f623616a4f5c9505c0ae0ff6a85b
+          name: 'Get controller statistics'
+          type: DEPENDENT
+          key: hpe.msa.controller_statistics.get
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get data about controllers statistics.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''controller-statistics'']'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.msa.data.get
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: 51d0ae1b4663471d868c27ccd2fb4fed
           name: 'Get method errors'
@@ -216,6 +260,204 @@ zabbix_export:
               tag: component
               value: raw
         -
+          uuid: d4c534635bb74c2e8db99d68df6f9da2
+          name: 'Get disks'
+          type: DEPENDENT
+          key: hpe.msa.disks.get
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get data about disks.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''disks'']'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.msa.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 3dc7a4c4e70c48f995d7d65c1652198a
+          name: 'Get disk groups'
+          type: DEPENDENT
+          key: hpe.msa.disks.groups.get
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get data about disk groups.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''disk-groups'']'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.msa.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: da724e20acee406b8dce3a1be24945a8
+          name: 'Get disk group statistics'
+          type: DEPENDENT
+          key: hpe.msa.disks.groups.statistics.get
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get data about disk groups statistics.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''disk-group-statistics'']'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.msa.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 2e94a9c8fe5f4d6c90458b13cf1f6d64
+          name: 'Get enclosures'
+          type: DEPENDENT
+          key: hpe.msa.enclosures.get
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get data about enclosures.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''enclosures'']'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.msa.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 2b356e770025451e94e899123a2efc1b
+          name: 'Get fans'
+          type: DEPENDENT
+          key: hpe.msa.fans.get
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get data about fans.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''fans'']'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.msa.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: ae00d12bb47e4c25b79a47ca8dc49538
+          name: 'Get FRU'
+          type: DEPENDENT
+          key: hpe.msa.fru.get
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get data about FRU.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''frus'']'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.msa.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 3151c9e9e3bf4e6c9305848cfd2c77c5
+          name: 'Get pools'
+          type: DEPENDENT
+          key: hpe.msa.pools.get
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get data about pools.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''pools'']'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.msa.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 2c4012cbf947439f8938b9d432257067
+          name: 'Get ports'
+          type: DEPENDENT
+          key: hpe.msa.ports.get
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get data about ports.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''ports'']'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.msa.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: a24264fada444ed68f48d8b2ff17ab15
+          name: 'Get power supplies'
+          type: DEPENDENT
+          key: hpe.msa.power_supplies.get
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get data about power supplies.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''power-supplies'']'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.msa.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+        -
           uuid: 802692ec1429407a8bbb55e338959c0b
           name: 'System contact'
           type: DEPENDENT
@@ -230,17 +472,39 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.system[0].[''system-contact'']'
+                - '$.[''system-contact'']'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.system.get
           tags:
             -
               tag: component
               value: system
+        -
+          uuid: f9ec5e52bf22476d997c9ec5c445f11b
+          name: 'Get system'
+          type: DEPENDENT
+          key: hpe.msa.system.get
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get data about system.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.system[0]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.msa.data.get
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: 4516edee03084515bcf139c22abc4c7c
           name: 'System health'
@@ -255,11 +519,11 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.system[0].[''health-numeric'']'
+                - '$.[''health-numeric'']'
               error_handler: CUSTOM_VALUE
               error_handler_params: '4'
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.system.get
           tags:
             -
               tag: component
@@ -313,13 +577,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.system[0].[''system-information'']'
+                - '$.[''system-information'']'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.system.get
           tags:
             -
               tag: component
@@ -339,13 +603,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.system[0].[''system-location'']'
+                - '$.[''system-location'']'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.system.get
           tags:
             -
               tag: component
@@ -365,13 +629,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.system[0].[''system-name'']'
+                - '$.[''system-name'']'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.system.get
           tags:
             -
               tag: component
@@ -391,13 +655,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.system[0].[''product-id'']'
+                - '$.[''product-id'']'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.system.get
           tags:
             -
               tag: component
@@ -417,17 +681,61 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.system[0].[''vendor-name'']'
+                - '$.[''vendor-name'']'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.system.get
           tags:
             -
               tag: component
               value: system
+        -
+          uuid: e67d5b42bf1b431ab9b1659377195d82
+          name: 'Get volumes'
+          type: DEPENDENT
+          key: hpe.msa.volumes.get
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get data about volumes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''volumes'']'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.msa.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: d6ef8a24c09a478c817a1a7121bd383f
+          name: 'Get volume statistics'
+          type: DEPENDENT
+          key: hpe.msa.volumes.statistics.get
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get data about volumes statistics.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''volume-statistics'']'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.msa.data.get
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: d1242f5aede14008ae6896123bb944a5
           name: 'HPE MSA: Service ping'
@@ -479,13 +787,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''read-cache-hits''].first()'
+                    - '$.[''read-cache-hits'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controller_statistics["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -505,13 +813,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''read-cache-misses''].first()'
+                    - '$.[''read-cache-misses'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controller_statistics["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -531,13 +839,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''write-cache-hits''].first()'
+                    - '$.[''write-cache-hits'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controller_statistics["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -557,13 +865,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''write-cache-misses''].first()'
+                    - '$.[''write-cache-misses'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controller_statistics["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -584,9 +892,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''write-cache-used''].first()'
+                    - '$.[''write-cache-used'']'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controller_statistics["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -607,7 +915,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''cache-memory-size''].first()'
+                    - '$.[''cache-memory-size'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -617,7 +925,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controllers["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -638,9 +946,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''cpu-load''].first()'
+                    - '$.[''cpu-load'']'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controller_statistics["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -674,13 +982,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''data-read-numeric''].first()'
+                    - '$.[''data-read-numeric'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controller_statistics["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -701,9 +1009,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''bytes-per-second-numeric''].first()'
+                    - '$.[''bytes-per-second-numeric'']'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controller_statistics["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -725,13 +1033,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''data-written-numeric''].first()'
+                    - '$.[''data-written-numeric'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controller_statistics["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -753,13 +1061,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''number-of-reads''].first()'
+                    - '$.[''number-of-reads'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controller_statistics["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -780,9 +1088,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''iops''].first()'
+                    - '$.[''iops'']'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controller_statistics["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -804,17 +1112,44 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''number-of-writes''].first()'
+                    - '$.[''number-of-writes'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controller_statistics["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
                   value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: 42b163abb92b42a3921364222807843b
+              name: 'Controller [{#CONTROLLER.ID}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers["{#CONTROLLER.ID}",data]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get discovered controller data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].first()'
+              master_item:
+                key: hpe.msa.controllers.get
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: controller
                   value: '{#CONTROLLER.ID}'
@@ -830,13 +1165,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''disks''].first()'
+                    - '$.[''disks'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controllers["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -856,13 +1191,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''virtual-disks''].first()'
+                    - '$.[''virtual-disks'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controllers["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -884,13 +1219,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''sc-fw''].first()'
+                    - '$.[''sc-fw'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controllers["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -912,7 +1247,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
+                    - '$.[''health-numeric'']'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -920,7 +1255,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controllers["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -988,13 +1323,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''ip-address''].first()'
+                    - '$.[''ip-address'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controllers["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1016,13 +1351,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''part-number''].first()'
+                    - '$.[''part-number'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controllers["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1042,13 +1377,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''number-of-storage-pools''].first()'
+                    - '$.[''number-of-storage-pools'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controllers["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1070,13 +1405,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''serial-number''].first()'
+                    - '$.[''serial-number'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controllers["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1098,13 +1433,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''status-numeric''].first()'
+                    - '$.[''status-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controllers["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1139,9 +1474,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''power-on-time''].first()'
+                    - '$.[''power-on-time'']'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.controller_statistics["{#CONTROLLER.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1161,6 +1496,33 @@ zabbix_export:
                     -
                       tag: scope
                       value: availability
+            -
+              uuid: 682fb8c5a4bd40889dcb76070aaefb06
+              name: 'Controller [{#CONTROLLER.ID}]: Get statistics data'
+              type: DEPENDENT
+              key: 'hpe.msa.controller_statistics["{#CONTROLLER.ID}",data]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get discovered controller statistics data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].first()'
+              master_item:
+                key: hpe.msa.controller_statistics.get
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
           graph_prototypes:
             -
               uuid: 93aeac1a193e43d3a93a3892bd26b0ff
@@ -1238,7 +1600,7 @@ zabbix_export:
                     host: 'HPE MSA 2040 Storage by HTTP'
                     key: 'hpe.msa.controllers.iops.write["{#CONTROLLER.ID}",rate]'
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.controllers.get
           lld_macro_paths:
             -
               lld_macro: '{#CONTROLLER.ID}'
@@ -1246,16 +1608,6 @@ zabbix_export:
             -
               lld_macro: '{#DURABLE.ID}'
               path: '$.[''durable-id'']'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''controllers'']'
-              error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
         -
           uuid: 16b9a9b6da11463d865cb2b59f77f376
           name: 'Disks discovery'
@@ -1277,7 +1629,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''size-numeric''].first()'
+                    - '$.[''size-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1287,7 +1639,7 @@ zabbix_export:
                   parameters:
                     - '512'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1309,17 +1661,44 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''ssd-life-left-numeric''].first()'
+                    - '$.[''ssd-life-left-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
                   value: disk
+                -
+                  tag: disk
+                  value: '{#DURABLE.ID}'
+            -
+              uuid: e5faef5f8750462b8d676a74fa67b97c
+              name: 'Disk [{#DURABLE.ID}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.msa.disks["{#DURABLE.ID}",data]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get discovered disk data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@[''durable-id''] == "{#DURABLE.ID}")].first()'
+              master_item:
+                key: hpe.msa.disks.get
+              tags:
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: disk
                   value: '{#DURABLE.ID}'
@@ -1337,14 +1716,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''disk-group''].first()'
+                    - '$.[''disk-group'']'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1366,7 +1745,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
+                    - '$.[''health-numeric''].first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -1374,7 +1753,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1430,13 +1809,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''model''].first()'
+                    - '$.[''model'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1458,14 +1837,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''storage-pool-name''].first()'
+                    - '$.[''storage-pool-name'']'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1487,13 +1866,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''serial-number''].first()'
+                    - '$.[''serial-number'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1514,14 +1893,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''temperature-numeric''].first()'
+                    - '$.[''temperature-numeric'']'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1543,7 +1922,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''temperature-status-numeric''].first()'
+                    - '$.[''temperature-status-numeric'']'
                   error_handler: DISCARD_VALUE
                 -
                   type: IN_RANGE
@@ -1557,7 +1936,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1617,13 +1996,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''description-numeric''].first()'
+                    - '$.[''description-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1645,13 +2024,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''vendor''].first()'
+                    - '$.[''vendor'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -1660,7 +2039,7 @@ zabbix_export:
                   tag: disk
                   value: '{#DURABLE.ID}'
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.disks.get
           lld_macro_paths:
             -
               lld_macro: '{#DURABLE.ID}'
@@ -1668,16 +2047,6 @@ zabbix_export:
             -
               lld_macro: '{#TYPE}'
               path: '$.[''description-numeric'']'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''disks'']'
-              error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
           overrides:
             -
               name: 'SSD life left'
@@ -1693,7 +2062,6 @@ zabbix_export:
                   operationobject: ITEM_PROTOTYPE
                   operator: REGEXP
                   value: 'SSD life left'
-                  status: ENABLED
                   discover: DISCOVER
         -
           uuid: dd952ff876134376baef061dc260884c
@@ -1717,13 +2085,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''avg-read-rsp-time''].first()'
+                    - '$.[''avg-read-rsp-time'']'
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.000001'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1745,13 +2113,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''avg-rsp-time''].first()'
+                    - '$.[''avg-rsp-time'']'
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.000001'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1773,13 +2141,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''avg-write-rsp-time''].first()'
+                    - '$.[''avg-write-rsp-time'']'
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.000001'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1801,13 +2169,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''data-read-numeric''].first()'
+                    - '$.[''data-read-numeric'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1828,9 +2196,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''bytes-per-second-numeric''].first()'
+                    - '$.[''bytes-per-second-numeric'']'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1852,13 +2220,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''data-written-numeric''].first()'
+                    - '$.[''data-written-numeric'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1880,13 +2248,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''number-of-reads''].first()'
+                    - '$.[''number-of-reads'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1907,9 +2275,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''iops''].first()'
+                    - '$.[''iops'']'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1931,13 +2299,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''number-of-writes''].first()'
+                    - '$.[''number-of-writes'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1959,13 +2327,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''raidtype-numeric''].first()'
+                    - '$.[''raidtype-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1986,7 +2354,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''freespace-numeric''].first()'
+                    - '$[''freespace-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1996,7 +2364,7 @@ zabbix_export:
                   parameters:
                     - '512'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2017,13 +2385,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''pool-percentage''].first()'
+                    - '$.[''pool-percentage'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2044,7 +2412,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''size-numeric''].first()'
+                    - '$.[''size-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2054,7 +2422,7 @@ zabbix_export:
                   parameters:
                     - '512'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2112,6 +2480,60 @@ zabbix_export:
                       tag: scope
                       value: performance
             -
+              uuid: 20c557ea7c4e439c8c8c7fe5f8bb3356
+              name: 'Disk group [{#NAME}]: Get statistics data'
+              type: DEPENDENT
+              key: 'hpe.msa.disks.groups.statistics["{#NAME}",data]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get discovered disk group statistics data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''name''] == "{#NAME}")].first()'
+              master_item:
+                key: hpe.msa.disks.groups.statistics.get
+              tags:
+                -
+                  tag: component
+                  value: disk-group
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: disk-group
+                  value: '{#NAME}'
+            -
+              uuid: 42666f013abf4441b85d94b89ed6cac1
+              name: 'Disk group [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.msa.disks.groups["{#NAME}",data]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get discovered disk group data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''name''] == "{#NAME}")].first()'
+              master_item:
+                key: hpe.msa.disks.groups.get
+              tags:
+                -
+                  tag: component
+                  value: disk-group
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: disk-group
+                  value: '{#NAME}'
+            -
               uuid: 085fae4f87444b62ae5c52703176a533
               name: 'Disk group [{#NAME}]: Disks count'
               type: DEPENDENT
@@ -2123,14 +2545,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''diskcount''].first()'
+                    - '$.[''diskcount'']'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2152,7 +2574,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''health-numeric''].first()'
+                    - '$.[''health-numeric'']'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -2160,7 +2582,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2231,13 +2653,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''status-numeric''].first()'
+                    - '$.[''status-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.disks.groups["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2411,21 +2833,11 @@ zabbix_export:
                     host: 'HPE MSA 2040 Storage by HTTP'
                     key: 'hpe.msa.disks.groups.space["{#NAME}",total]'
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.disks.groups.get
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
               path: '$.[''name'']'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''disk-groups'']'
-              error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
         -
           uuid: c6713507122242988dc9fae6e77bdff6
           name: 'Enclosures discovery'
@@ -2434,6 +2846,33 @@ zabbix_export:
           delay: '0'
           description: 'Discover enclosures.'
           item_prototypes:
+            -
+              uuid: db3050d98b0548acbc3cf318ce71e9e3
+              name: 'Enclosure [{#DURABLE.ID}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.msa.enclosures["{#DURABLE.ID}",data]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get discovered enclosure data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@[''durable-id''] == "{#DURABLE.ID}")].first()'
+              master_item:
+                key: hpe.msa.enclosures.get
+              tags:
+                -
+                  tag: component
+                  value: enclosure
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: enclosure
+                  value: '{#DURABLE.ID}'
             -
               uuid: 806b44d4f2dd44eea6db7e982c5fea16
               name: 'Enclosure [{#DURABLE.ID}]: Health'
@@ -2448,7 +2887,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''enclosures''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
+                    - '$.[''health-numeric'']'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -2456,7 +2895,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.enclosures["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -2512,13 +2951,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''enclosures''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''midplane-serial-number''].first()'
+                    - '$.[''midplane-serial-number'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.enclosures["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -2540,13 +2979,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''enclosures''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''model''].first()'
+                    - '$.[''model'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.enclosures["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -2568,13 +3007,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''enclosures''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''part-number''].first()'
+                    - '$.[''part-number'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.enclosures["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -2596,9 +3035,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''enclosures''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''enclosure-power''].first()'
+                    - '$.[''enclosure-power'']'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.enclosures["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -2620,7 +3059,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''enclosures''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''status-numeric''].first()'
+                    - '$.[''status-numeric'']'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '6'
                 -
@@ -2628,7 +3067,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.enclosures["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -2691,21 +3130,11 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.enclosures.get
           lld_macro_paths:
             -
               lld_macro: '{#DURABLE.ID}'
               path: '$.[''durable-id'']'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''enclosures'']'
-              error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
         -
           uuid: 6900c1efa2b3456ead4ae5e5a033700e
           name: 'Fans discovery'
@@ -2714,6 +3143,33 @@ zabbix_export:
           delay: '0'
           description: 'Discover fans.'
           item_prototypes:
+            -
+              uuid: 8fe64d81153d430c8aa862394a384172
+              name: 'Fan [{#DURABLE.ID}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.msa.fans["{#DURABLE.ID}",data]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get discovered fan data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@[''durable-id''] == "{#DURABLE.ID}")].first()'
+              master_item:
+                key: hpe.msa.fans.get
+              tags:
+                -
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: fan
+                  value: '{#DURABLE.ID}'
             -
               uuid: b4732ef73f0e4fcc9458797b28e2b829
               name: 'Fan [{#DURABLE.ID}]: Health'
@@ -2728,7 +3184,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''fans''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
+                    - '$.[''health-numeric'']'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -2736,7 +3192,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.fans["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -2791,9 +3247,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''fans''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''speed''].first()'
+                    - '$.[''speed'']'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.fans["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -2815,13 +3271,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''fans''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''status-numeric''].first()'
+                    - '$.[''status-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.fans["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -2874,24 +3330,11 @@ zabbix_export:
                     host: 'HPE MSA 2040 Storage by HTTP'
                     key: 'hpe.msa.fans["{#DURABLE.ID}",speed]'
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.fans.get
           lld_macro_paths:
             -
               lld_macro: '{#DURABLE.ID}'
               path: '$.[''durable-id'']'
-            -
-              lld_macro: '{#NAME}'
-              path: '$.[''name'']'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''fans'']'
-              error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
         -
           uuid: ec7d856fd690401888f93f8d9c135828
           name: 'FRU discovery'
@@ -2908,6 +3351,33 @@ zabbix_export:
           description: 'Discover FRU.'
           item_prototypes:
             -
+              uuid: e65d0d09a9244e46b7fd16e89128d50b
+              name: 'FRU [{#ENCLOSURE.ID}: {#LOCATION}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",data]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get discovered FRU data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@[''name''] == "{#TYPE}")].first()'
+              master_item:
+                key: hpe.msa.fru.get
+              tags:
+                -
+                  tag: component
+                  value: fru
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: fru
+                  value: 'Enclosure {#ENCLOSURE.ID}: {#LOCATION}'
+            -
               uuid: 77df1d8bfba9428e887025a05f02f306
               name: 'FRU [{#ENCLOSURE.ID}: {#LOCATION}]: Part number'
               type: DEPENDENT
@@ -2921,13 +3391,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''frus''][?(@[''name''] == "{#TYPE}" && @[''fru-location''] == "{#LOCATION}")].[''part-number''].first()'
+                    - '$.[''part-number'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -2949,13 +3419,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''frus''][?(@[''name''] == "{#TYPE}" && @[''fru-location''] == "{#LOCATION}")].[''serial-number''].first()'
+                    - '$.[''serial-number'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -2984,7 +3454,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''frus''][?(@[''name''] == "{#TYPE}" && @[''fru-location''] == "{#LOCATION}")].[''fru-status''].first()'
+                    - '$.[''fru-status'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3010,7 +3480,7 @@ zabbix_export:
                       }
                       return 6;
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -3043,7 +3513,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.fru.get
           lld_macro_paths:
             -
               lld_macro: '{#DESCRIPTION}'
@@ -3057,16 +3527,6 @@ zabbix_export:
             -
               lld_macro: '{#TYPE}'
               path: '$.[''name'']'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''frus'']'
-              error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
         -
           uuid: 082c1cfb851548928911b9ab69f6f75e
           name: 'Pools discovery'
@@ -3087,7 +3547,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''pools''][?(@[''name''] == "{#NAME}")].[''total-avail-numeric''].first()'
+                    - '$[''total-avail-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3097,7 +3557,7 @@ zabbix_export:
                   parameters:
                     - '512'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.pools["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3118,7 +3578,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''pools''][?(@[''name''] == "{#NAME}")].[''total-size-numeric''].first()'
+                    - '$[''total-size-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3128,7 +3588,7 @@ zabbix_export:
                   parameters:
                     - '512'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.pools["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3186,6 +3646,33 @@ zabbix_export:
                       tag: scope
                       value: performance
             -
+              uuid: 227c8ed5f3514aa886e27f28b49fe7fd
+              name: 'Pool [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.msa.pools["{#NAME}",data]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get discovered pool data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@[''name''] == "{#NAME}")].first()'
+              master_item:
+                key: hpe.msa.pools.get
+              tags:
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: pool
+                  value: '{#NAME}'
+            -
               uuid: 4b79ed6e64cc484bb69f3677cd7932ef
               name: 'Pool [{#NAME}]: Health'
               type: DEPENDENT
@@ -3199,7 +3686,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''pools''][?(@[''name''] == "{#NAME}")].[''health-numeric''].first()'
+                    - '$.[''health-numeric'']'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -3207,7 +3694,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.pools["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3266,21 +3753,11 @@ zabbix_export:
                     host: 'HPE MSA 2040 Storage by HTTP'
                     key: 'hpe.msa.pools.space["{#NAME}",total]'
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.pools.get
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
               path: '$.[''name'']'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''pools'']'
-              error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
         -
           uuid: 09754bd16c674ff08fad52f060035961
           name: 'Ports discovery'
@@ -3289,6 +3766,33 @@ zabbix_export:
           delay: '0'
           description: 'Discover ports.'
           item_prototypes:
+            -
+              uuid: c0643381ec274865826cddd3ce598326
+              name: 'Port [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.msa.ports["{#NAME}",,data]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get discovered port data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@[''port''] == "{#NAME}")].first()'
+              master_item:
+                key: hpe.msa.ports.get
+              tags:
+                -
+                  tag: component
+                  value: port
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: port
+                  value: '{#NAME}'
             -
               uuid: 27564169c2b04cba924162a5630bbd4b
               name: 'Port [{#NAME}]: Health'
@@ -3303,7 +3807,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''ports''][?(@[''port''] == "{#NAME}")].[''health-numeric''].first()'
+                    - '$.[''health-numeric'']'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -3311,7 +3815,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.ports["{#NAME}",,data]'
               tags:
                 -
                   tag: component
@@ -3367,7 +3871,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''ports''][?(@[''port''] == "{#NAME}")].[''status-numeric''].first()'
+                    - '$.[''status-numeric'']'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -3375,7 +3879,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.ports["{#NAME}",,data]'
               tags:
                 -
                   tag: component
@@ -3431,13 +3935,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''ports''][?(@[''port''] == "{#NAME}")].[''port-type-numeric''].first()'
+                    - '$.[''port-type-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.ports["{#NAME}",,data]'
               tags:
                 -
                   tag: component
@@ -3446,21 +3950,11 @@ zabbix_export:
                   tag: port
                   value: '{#NAME}'
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.ports.get
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
               path: '$.[''port'']'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''ports'']'
-              error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
         -
           uuid: 2cf7945eea95414a88ce572f4c075bb1
           name: 'Power supplies discovery'
@@ -3469,6 +3963,33 @@ zabbix_export:
           delay: '0'
           description: 'Discover power supplies.'
           item_prototypes:
+            -
+              uuid: 029b4173b22f4359b5ee6013a524dd4f
+              name: 'Power supply [{#DURABLE.ID}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.msa.power_supplies["{#DURABLE.ID}",data]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get discovered power supply data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@[''durable-id''] == "{#DURABLE.ID}")].first()'
+              master_item:
+                key: hpe.msa.power_supplies.get
+              tags:
+                -
+                  tag: component
+                  value: power-supply
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: power-supply
+                  value: '{#DURABLE.ID}'
             -
               uuid: 4e4f593738fb451cbfd1589a3054387e
               name: 'Power supply [{#DURABLE.ID}]: Health'
@@ -3483,7 +4004,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''power-supplies''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
+                    - '$.[''health-numeric'']'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -3491,7 +4012,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.power_supplies["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -3547,13 +4068,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''power-supplies''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''part-number''].first()'
+                    - '$.[''part-number'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.power_supplies["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -3575,13 +4096,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''power-supplies''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''serial-number''].first()'
+                    - '$.[''serial-number'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.power_supplies["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -3603,7 +4124,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''power-supplies''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''status-numeric''].first()'
+                    - '$.[''status-numeric'']'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -3611,7 +4132,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.power_supplies["{#DURABLE.ID}",data]'
               tags:
                 -
                   tag: component
@@ -3691,21 +4212,11 @@ zabbix_export:
                     host: 'HPE MSA 2040 Storage by HTTP'
                     key: 'hpe.msa.power_supplies["{#DURABLE.ID}",temperature]'
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.power_supplies.get
           lld_macro_paths:
             -
               lld_macro: '{#DURABLE.ID}'
               path: '$.[''durable-id'']'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''power-supplies'']'
-              error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
         -
           uuid: faae0d9be7ea4531a584a52002317cc9
           name: 'Volumes discovery'
@@ -3726,13 +4237,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''read-cache-hits''].first()'
+                    - '$.[''read-cache-hits'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.volumes.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3752,13 +4263,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''read-cache-misses''].first()'
+                    - '$.[''read-cache-misses'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.volumes.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3778,13 +4289,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''write-cache-hits''].first()'
+                    - '$.[''write-cache-hits'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.volumes.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3804,13 +4315,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''write-cache-misses''].first()'
+                    - '$.[''write-cache-misses'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.volumes.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3832,13 +4343,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''data-read-numeric''].first()'
+                    - '$.[''data-read-numeric'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.volumes.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3859,9 +4370,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''bytes-per-second-numeric''].first()'
+                    - '$.[''bytes-per-second-numeric'']'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.volumes.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3883,13 +4394,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''data-written-numeric''].first()'
+                    - '$.[''data-written-numeric'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.volumes.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3911,13 +4422,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''number-of-reads''].first()'
+                    - '$.[''number-of-reads'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.volumes.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3933,14 +4444,14 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!iops'
-              description: 'Input/output operations per second, calculated over the interval since these statistics were last requested or reset. This value will be zero if it has not been requested or reset since a controller restart.'
+              description: 'Total input/output operations per second, calculated over the interval since these statistics were last requested or reset. This value will be zero if it has not been requested or reset since a controller restart.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''iops''].first()'
+                    - '$.[''iops'']'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.volumes.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3962,13 +4473,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''number-of-writes''].first()'
+                    - '$.[''number-of-writes'']'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.volumes.statistics["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3989,7 +4500,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''volumes''][?(@[''volume-name''] == "{#NAME}")].[''allocated-size-numeric''].first()'
+                    - '$[''allocated-size-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3999,7 +4510,7 @@ zabbix_export:
                   parameters:
                     - '512'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.volumes["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4020,7 +4531,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''volumes''][?(@[''volume-name''] == "{#NAME}")].[''size-numeric''].first()'
+                    - '$.[''size-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -4030,8 +4541,62 @@ zabbix_export:
                   parameters:
                     - '512'
               master_item:
-                key: hpe.msa.data.get
+                key: 'hpe.msa.volumes["{#NAME}",data]'
               tags:
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: 971c984b8fc44f05b24a30d11a482b3a
+              name: 'Volume [{#NAME}]: Get statistics data'
+              type: DEPENDENT
+              key: 'hpe.msa.volumes.statistics["{#NAME}",data]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get discovered volume statistics data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''volume-name''] == "{#NAME}")].first()'
+              master_item:
+                key: hpe.msa.volumes.statistics.get
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: 2515db4e86d7486481583114c067d522
+              name: 'Volume [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.msa.volumes["{#NAME}",data]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get discovered volume data.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''volume-name''] == "{#NAME}")].first()'
+              master_item:
+                key: hpe.msa.volumes.get
+              tags:
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: component
                   value: volume
@@ -4112,21 +4677,11 @@ zabbix_export:
                     host: 'HPE MSA 2040 Storage by HTTP'
                     key: 'hpe.msa.volumes.space["{#NAME}",total]'
           master_item:
-            key: hpe.msa.data.get
+            key: hpe.msa.volumes.get
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
               path: '$.[''volume-name'']'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''volumes'']'
-              error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
       tags:
         -
           tag: class
