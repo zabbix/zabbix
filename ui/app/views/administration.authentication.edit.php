@@ -212,9 +212,9 @@ $ldap_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Provisioning period'), 'provisioning_period'),
+		new CLabel(_('Provisioning period'), 'jit_provision_interval'),
 		new CFormField(
-			(new CTextBox('provisioning_period', $data['jit_provision_interval']))
+			(new CTextBox('jit_provision_interval', $data['jit_provision_interval']))
 				->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
 		)
 	]);

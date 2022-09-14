@@ -48,6 +48,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_removed_userdirectoryids' =>	'array_id',
 			'ldap_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
+			'jit_provision_interval' =>			'db config.jit_provision_interval',
 			'http_auth_enabled' =>				'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 			'http_strip_domains' =>				'db config.http_strip_domains',
@@ -322,7 +323,8 @@ class CControllerAuthenticationUpdate extends CController {
 			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
 			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
 			'passwd_min_length' => DB::getDefault('config', 'passwd_min_length'),
-			'passwd_check_rules' => DB::getDefault('config', 'passwd_check_rules')
+			'passwd_check_rules' => DB::getDefault('config', 'passwd_check_rules'),
+			'jit_provision_interval' => '1h'
 		];
 
 		if ($this->getInput('http_auth_enabled', ZBX_AUTH_HTTP_DISABLED) == ZBX_AUTH_HTTP_ENABLED) {
@@ -350,6 +352,7 @@ class CControllerAuthenticationUpdate extends CController {
 			CAuthenticationHelper::LDAP_USERDIRECTORYID,
 			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
 			CAuthenticationHelper::LDAP_JIT_STATUS,
+			CAuthenticationHelper::JIT_PROVISION_INTERVAL,
 			CAuthenticationHelper::SAML_AUTH_ENABLED,
 			CAuthenticationHelper::SAML_JIT_STATUS,
 			CAuthenticationHelper::SAML_CASE_SENSITIVE,
