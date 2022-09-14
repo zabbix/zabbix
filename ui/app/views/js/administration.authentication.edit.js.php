@@ -397,9 +397,9 @@
 					`[name^="ldap_servers[${row_index}][provision_groups]"][name$="[is_fallback]"]`
 				)].map((element) => {
 					let start = 33 + row_index.toString().length;
-					let end = element.name.length - start - 14;
+					let end = element.name.length - 14;
 
-					return element.name.substr(start, end);
+					return element.name.substring(start, end);
 				});
 				const provision_groups = provision_group_indexes.map((i) => {
 					let user_groups = row.querySelectorAll(
@@ -436,9 +436,9 @@
 					`[name^="ldap_servers[${row_index}][provision_media]"][name$="[name]"]`
 				)].map((element) => {
 					let start = 32 + row_index.toString().length;
-					let end = element.name.length - start - 7;
+					let end = element.name.length - 7;
 
-					return element.name.substr(start, end);
+					return element.name.substring(start, end);
 				});
 				const provision_media = provision_media_indexes.map((i) => {
 					return {
