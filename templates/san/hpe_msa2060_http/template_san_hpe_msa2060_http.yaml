@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-09-14T04:56:56Z'
+  date: '2022-09-14T08:39:48Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -1129,7 +1129,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '[?(@[''durable-id''] == "{#DURABLE.ID}")].first()'
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].first()'
               master_item:
                 key: hpe.msa.controllers.get
               tags:
@@ -1499,7 +1499,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '[?(@[''durable-id''] == "{#DURABLE.ID}")].first()'
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].first()'
               master_item:
                 key: hpe.msa.controller_statistics.get
               tags:
@@ -2585,7 +2585,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '[?(@[''name''] == "{#NAME}")].first()'
+                    - '$.[?(@[''name''] == "{#NAME}")].first()'
               master_item:
                 key: hpe.msa.disks.groups.statistics.get
               tags:
@@ -2612,7 +2612,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '[?(@[''name''] == "{#NAME}")].first()'
+                    - '$.[?(@[''name''] == "{#NAME}")].first()'
               master_item:
                 key: hpe.msa.disks.groups.get
               tags:
@@ -3546,7 +3546,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''fru-status-numeric''].first()'
+                    - '$.[''fru-status-numeric'']'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -4717,7 +4717,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '[?(@[''volume-name''] == "{#NAME}")].first()'
+                    - '$.[?(@[''volume-name''] == "{#NAME}")].first()'
               master_item:
                 key: hpe.msa.volumes.statistics.get
               tags:
@@ -4744,7 +4744,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '[?(@[''volume-name''] == "{#NAME}")].first()'
+                    - '$.[?(@[''volume-name''] == "{#NAME}")].first()'
               master_item:
                 key: hpe.msa.volumes.get
               tags:
