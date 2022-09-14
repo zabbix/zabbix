@@ -28,9 +28,9 @@ class CItemTypeHttpAgent extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	const FIELD_NAMES = ['url', 'query_fields', 'request_method', 'timeout', 'post_type', 'posts', 'headers',
-		'status_codes', 'follow_redirects', 'retrieve_mode', 'output_format', 'http_proxy', 'authtype', 'username',
-		'password', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'interfaceid',
+	const FIELD_NAMES = ['url', 'query_fields', 'request_method', 'post_type', 'posts', 'headers', 'status_codes',
+		'follow_redirects', 'retrieve_mode', 'output_format', 'http_proxy', 'interfaceid', 'authtype', 'username',
+		'password', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'timeout',
 		'delay', 'allow_traps', 'trapper_hosts'
 	];
 
