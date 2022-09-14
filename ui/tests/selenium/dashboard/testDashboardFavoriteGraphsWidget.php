@@ -78,6 +78,7 @@ class testDashboardFavoriteGraphsWidget extends CWebTest {
 			$button->waitUntilClickable()->click();
 			$button->waitUntilAttributesPresent(['title' => 'Remove from favorites']);
 			$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
+			$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		}
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
