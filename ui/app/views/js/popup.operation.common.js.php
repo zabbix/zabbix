@@ -31,6 +31,7 @@ window.operation_popup = new class {
 	_loadViews() {
 		// todo E.S. : rewrite jqueries:
 
+		// todo : add this as another function
 		$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
 		$('[id="operation-message-body"],[id="operation-message-label"]').hide();
 
@@ -48,8 +49,45 @@ window.operation_popup = new class {
 
 		this._processTypeOfCalculation();
 
-		this.form.addEventListener('click', (e) => {
-		})
+		this.dialogue.addEventListener('click', (e) => {
+			if (e.target.classList.contains('operation-message-user-groups-footer')) {
+				this._openUserGroupPopup(e.target);
+			}
+			else if (e.target.classList.contains('operation-message-users-footer')) {
+				this._openUserPopup(e.target);
+			}
+			else if (e.target.classList.contains('operation-condition-list-footer')) {
+				// todo E.S.: add function to open condition popup
+			}
+		});
+	}
+
+	_openUserGroupPopup(trigger_element) {
+		PopUp('popup.generic', {
+			'srctbl': 'usrgrp',
+			'srcfld1': 'usrgrpid',
+			'srcfld2': 'name',
+			'dstfrm': 'popup.operation',
+			'dstfld1': 'operation-message-user-groups-footer',
+			'multiselect': '1'
+		}, {dialogue_class: 'modal-popup-generic', trigger_element});
+	}
+
+	_openUserPopup(trigger_element) {
+		PopUp('popup.generic', {
+			'srctbl': 'users',
+			'srcfld1': 'userid',
+			'srcfld2': 'fullname',
+			'dstfrm': 'popup.operation',
+			'dstfld1': 'operation-message-users-footer',
+			'multiselect': '1'
+		}, {dialogue_class: 'modal-popup-generic', trigger_element});
+	}
+
+	_addPopupValues() {
+		// todo: pass popup data - objectid - usrgrpid
+		//  todo: pass values: usrgrpid name gui_access, user_status ??
+		const objectid = 'usrgrpid'
 	}
 
 	submit() {

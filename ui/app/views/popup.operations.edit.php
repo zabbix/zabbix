@@ -93,7 +93,9 @@ $form_grid->addItem([
 			->addRow(
 				(new CRow(
 					(new CCol(
-						(new CButton(null, _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+						(new CButton(null, _('Add')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('operation-message-user-groups-footer')
 					))->setColSpan(2)
 				))->setId('operation-message-user-groups-footer')
 			)
@@ -113,7 +115,9 @@ $form_grid->addItem([
 		->addRow(
 			(new CRow(
 				(new CCol(
-					(new CButton(null, _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+					(new CButton(null, _('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('operation-message-users-footer')
 				))->setColSpan(2)
 			))->setId('operation-message-users-footer')
 		)
@@ -272,7 +276,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS && $data['recovery'] == ACTION
 				->addRow(
 					(new CRow(
 						(new CCol(
-							(new CButton(null, _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+							(new CButton(null, _('Add')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->addClass('operation-condition-list-footer')
 						))->setColSpan(3)
 					))->setId('operation-condition-list-footer')
 				)
