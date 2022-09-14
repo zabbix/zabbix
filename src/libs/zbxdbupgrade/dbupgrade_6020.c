@@ -57,6 +57,13 @@ static int	DBpatch_6020002(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6020003(void)
+{
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("users", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(6020)
@@ -66,5 +73,6 @@ DBPATCH_START(6020)
 DBPATCH_ADD(6020000, 0, 1)
 DBPATCH_ADD(6020001, 0, 0)
 DBPATCH_ADD(6020002, 0, 0)
+DBPATCH_ADD(6020003, 0, 0)
 
 DBPATCH_END()
