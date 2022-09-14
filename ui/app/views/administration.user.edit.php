@@ -280,7 +280,9 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
-		(new CTextBox('url', $data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('url', $data['url']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('users', 'url'))
 	);
 
 $tabs->addTab('userTab', _('User'), $user_form_list);
