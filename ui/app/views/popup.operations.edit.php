@@ -24,8 +24,6 @@
  * @var array $data
  */
 
-// $inline_js = getPagePostJs().$this->readJsFile('popup.operation.common.js.php');
-
 $form = (new CForm())
 	->cleanItems()
 	->setId('popup.operation')
@@ -75,7 +73,6 @@ if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EV
 		]),
 	])->setId('operation-step-duration');
 }
-
 
 // Message recipient is required notice row.
 $form_grid->addItem(
@@ -154,8 +151,6 @@ $form_grid->addItem([
 	// new CCheckBox('', 0)
 ]);
 
-
-// todo: show this only when checkbox is checked from here
 // Operation custom message subject row.
 $form_grid->addItem([
 	(new CLabel(_('Subject')))->setId('operation-message-subject-label'),
@@ -170,6 +165,7 @@ $form_grid->addItem([
 		->setId('operation-message-body')
 ]);
 // todo: til here
+
 
 // todo show only when ping (and other??) operation is selected
 // todo show when discovery or autoregistration action and operation type = ping ??
@@ -244,7 +240,6 @@ $form_grid->addItem([
 //	// 'operation-attr-inventory'
 //]);
 
-
 // Conditions type of calculation row.
 $select_operation_evaltype = (new CSelect('operation[evaltype]'))
 	->setValue((string) CONDITION_EVAL_TYPE_AND_OR)
@@ -289,7 +284,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS && $data['recovery'] == ACTION
 
 	]);
 }
-
 
 $form->addItem($form_grid);
 
