@@ -41,7 +41,7 @@ For more information, please see [Zabbix](https://www.zabbix.com/documentation/5
 
 ## Known issue:
 
-When recovery & update operations both defined in action and problem is closed manually in frontend: First operation executed is close event, next update of already closed event. Update operation which closes event will be skipped, but status operation shown as sent(to avoid failed request attempts).
+If both recovery and update operations are defined for an action and the problem is closed manually in the frontend, closing operation will be executed first. Update operations for the resolved event will not be executed, but the status of these operations will be changed to 'Sent' to stop failed request attempts.
 
 ## Supported Versions
 
