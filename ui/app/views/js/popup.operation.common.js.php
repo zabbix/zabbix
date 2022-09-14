@@ -27,6 +27,7 @@ window.operation_popup = new class {
 			this.condition_count = (document.getElementById('operation-condition-list').rows.length - 2);
 		}
 		this._loadViews();
+		this._processTypeOfCalculation();
 	}
 
 	_loadViews() {
@@ -48,8 +49,6 @@ window.operation_popup = new class {
 				}
 			})
 
-		this._processTypeOfCalculation();
-
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('operation-message-user-groups-footer')) {
 				this._openUserGroupPopup(e.target);
@@ -60,6 +59,10 @@ window.operation_popup = new class {
 			else if (e.target.classList.contains('operation-condition-list-footer')) {
 				// todo E.S.: add function to open condition popup
 				this._openConditionsPopup(e.target);
+			}
+			else if (e.target.classList.contains('element-table-remove')) {
+				this.row_count--;
+				this._processTypeOfCalculation();
 			}
 		});
 	}
@@ -120,15 +123,77 @@ window.operation_popup = new class {
 	}
 
 	_openConditionsPopup(trigger_element) {
-		PopUp('popup.condition.operations', {
+		const parameters = {
 			'type': <?= ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION ?>,
 			'source': <?= EVENT_SOURCE_TRIGGERS ?>
-		},
-		{
+		};
+
+		const overlay = PopUp('popup.condition.operations', parameters, {
 			dialogue_class: 'modal-popup-medium',
 			trigger_element: trigger_element,
 			dialogueid: 'operation-condition'
 		});
+
+		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
+			// this._checkRow(e.detail)
+			// todo : check if row already exists
+			this._createRow(e.detail);
+			this._processTypeOfCalculation();
+
+		});
+	}
+
+	_checkRow(input) {
+	// todo: add function to check if row already exists
+	}
+
+	_createRow(input) {
+		this.row = document.createElement('tr');
+
+		this.row.append(this._createLabel(input));
+		this.row.append(this._createName(input));
+		this.row.append(this._createRemoveCell());
+
+		this.table = document.getElementById('operation-condition-list');
+		this.row_count = this.table.rows.length -1;
+
+		$('#operation-condition-list tr:last').before(this.row);
+	}
+
+	_createLabel(input) {
+		// todo E.S. : FIX LABEL WHEN DELETE ROW AND ADD A NEW ONE!!
+		const cell = document.createElement('td');
+
+		this.label = num2letter(document.getElementById('operation-condition-list').rows.length -2);
+		cell.setAttribute('class', 'label');
+		cell.setAttribute('data-formulaid', this.label);
+		cell.setAttribute('data-conditiontype', input.conditiontype);
+		cell.append(this.label);
+		return cell;
+	}
+
+	_createName(input) {
+		const cell = document.createElement('td');
+		if (input.conditiontype == <?= CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
+			if (input.value == 1) {
+				cell.append('Event is acknowledged');
+			} else if (input.value == 0) {
+				cell.append('Event is not acknowledged');
+			}
+		}
+		return cell;
+	}
+
+	_createRemoveCell() {
+		const cell = document.createElement('td');
+		const btn = document.createElement('button');
+		btn.type = 'button';
+		btn.classList.add('btn-link', 'element-table-remove');
+		btn.textContent = <?= json_encode(_('Remove')) ?>;
+		btn.addEventListener('click', () => btn.closest('tr').remove());
+
+		cell.appendChild(btn);
+		return cell;
 	}
 
 	submit() {
@@ -206,8 +271,37 @@ window.operation_popup = new class {
 
 	_processTypeOfCalculation() {
 		// todo E.S.: rewrite jqueries.
-		jQuery('#operation-evaltype').toggle(this.condition_count > 1);
-		jQuery('#operation-evaltype-label').toggle(this.condition_count > 1);
+		jQuery('#operation-evaltype').toggle(this.row_count > 1);
+		jQuery('#operation-evaltype-label').toggle(this.row_count > 1);
+		jQuery('#operation-condition-row').toggle(this.row_count > 1);
+
+		const labels = jQuery('#operation-condition-list .label');
+		var conditions = [];
+		labels.each(function(index, label) {
+			var label = jQuery(label);
+
+			conditions.push({
+				id: label.data('formulaid'),
+				type: label.data('conditiontype')
+			});
+		});
+		jQuery('#operation-condition-evaltype-formula').html(getConditionFormula(conditions, +jQuery('#operation-evaltype').val()));
+
+		jQuery('#operation-evaltype').change(function() {
+			const labels = jQuery('#operation-condition-list .label');
+			var conditions = [];
+
+			labels.each(function(index, label) {
+				var label = jQuery(label);
+
+				conditions.push({
+					id: label.data('formulaid'),
+					type: label.data('conditiontype')
+				});
+			});
+
+			jQuery('#operation-condition-evaltype-formula').html(getConditionFormula(conditions, +jQuery('#operation-evaltype').val()));
+		});
 	}
 }
 

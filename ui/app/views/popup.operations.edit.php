@@ -257,11 +257,13 @@ $select_operation_evaltype = (new CSelect('operation[evaltype]'))
 
 $form_grid->addItem([
 	(new CLabel(_('Type of calculation'), $select_operation_evaltype->getFocusableElementId()))
-		->setId('operation-evaltype-label'), [
+		->setId('operation-evaltype-label'),
+	(new CFormField([
 		$select_operation_evaltype,
-		//(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		//(new CSpan())->setId('operation-condition-evaltype-formula')
-	]
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CSpan())
+			->setId('operation-condition-evaltype-formula'),
+	]))->setId('operation-condition-row')
 ]);
 
 // Conditions row.
