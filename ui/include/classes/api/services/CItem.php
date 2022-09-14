@@ -934,25 +934,14 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * @param array      $items
-	 * @param array      $db_items
-	 * @param array|null $hostids
-	 * @param bool       $is_dep_items  Inherit called for dependent items.
+	 * @inheritDoc
 	 */
-	private static function inherit(array $items, array $db_items = [], array $hostids = null,
+	protected static function inherit(array $items, array $db_items = [], array $hostids = null,
 			bool $is_dep_items = false): void {
 		$tpl_links = self::getTemplateLinks($items, $hostids);
 
 		if ($hostids === null) {
-			foreach ($items as $i => $item) {
-				if (!array_key_exists($item['hostid'], $tpl_links)) {
-					unset($items[$i]);
-
-					if (array_key_exists($item['itemid'], $db_items)) {
-						unset($db_items[$item['itemid']]);
-					}
-				}
-			}
+			self::filterObjectsToInherit($items, $db_items, $tpl_links);
 
 			if (!$items) {
 				return;
@@ -961,49 +950,56 @@ class CItem extends CItemGeneral {
 
 		self::checkDoubleInheritedNames($items, $db_items, $tpl_links);
 
-		$dep_items = [];
+		$items_to_link = [];
+		$items_to_update = [];
 
-		/*
-		 * Upon template linking, the first iteration inherits non-dependent items, the second one inherits dependent
-		 * ones.
-		 */
-		if ($hostids !== null && !$is_dep_items) {
-			foreach ($items as $i => $item) {
-				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-					$dep_items[] = $item;
-					unset($items[$i]);
-				}
+		foreach ($items as $i => $item) {
+			if (!array_key_exists($item['itemid'], $db_items)) {
+				$items_to_link[] = $item;
 			}
+			else {
+				$items_to_update[] = $item;
+			}
+
+			unset($items[$i]);
 		}
 
 		$ins_items = [];
 		$upd_items = [];
 		$upd_db_items = [];
 
-		if ($db_items) {
-			$upd_db_items = self::getChildObjectsUsingTemplateid($items, $db_items);
-			$upd_items = self::getUpdChildObjectsUsingTemplateid($items, $db_items, $upd_db_items);
+		if ($items_to_link) {
+			if ($hostids !== null && !$is_dep_items) {
+				$dep_items_to_link = [];
 
-			self::checkDuplicates($upd_items, $upd_db_items);
-		}
+				$item_indexes = array_flip(array_column($items_to_link, 'itemid'));
 
-		if (count($items) != count($db_items)) {
-			foreach ($items as $i => $item) {
-				if (array_key_exists($item['itemid'], $db_items)) {
-					unset($items[$i]);
+				foreach ($items_to_link as $i => $item) {
+					if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+						$dep_items_to_link[$item_indexes[$item['master_itemid']]][$i] = $item;
+
+						unset($items_to_link[$i]);
+					}
 				}
 			}
 
-			$_upd_db_items = self::getChildObjectsUsingName($items, $hostids);
+			$upd_db_items = self::getChildObjectsUsingName($items_to_link, $hostids);
 
-			if ($_upd_db_items) {
-				$_upd_items = self::getUpdChildObjectsUsingName($items, $_upd_db_items);
-
-				$upd_items = array_merge($upd_items, $_upd_items);
-				$upd_db_items += $_upd_db_items;
+			if ($upd_db_items) {
+				$upd_items = self::getUpdChildObjectsUsingName($items_to_link, $upd_db_items);
 			}
 
-			$ins_items = self::getInsChildObjects($items, $_upd_db_items, $tpl_links);
+			$ins_items = self::getInsChildObjects($items_to_link, $upd_db_items, $tpl_links);
+		}
+
+		if ($items_to_update) {
+			$_upd_db_items = self::getChildObjectsUsingTemplateid($items_to_update, $db_items);
+			$_upd_items = self::getUpdChildObjectsUsingTemplateid($items_to_update, $db_items, $_upd_db_items);
+
+			self::checkDuplicates($_upd_items, $_upd_db_items);
+
+			$upd_items = array_merge($upd_items, $_upd_items);
+			$upd_db_items += $_upd_db_items;
 		}
 
 		self::setChildMasterItemIds($upd_items, $ins_items, $hostids);
@@ -1025,8 +1021,8 @@ class CItem extends CItemGeneral {
 
 		self::inherit(array_merge($upd_items, $ins_items), $upd_db_items);
 
-		if ($dep_items) {
-			self::inherit($dep_items, [], $hostids, true);
+		if ($hostids !== null && !$is_dep_items) {
+			self::inheritDependentItems($dep_items_to_link, $items_to_link, $hostids);
 		}
 	}
 

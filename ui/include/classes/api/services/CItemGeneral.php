@@ -472,6 +472,25 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Filter out inheritable items from the given items.
+	 *
+	 * @param array $items
+	 * @param array $db_items
+	 * @param array $tpl_links
+	 */
+	protected static function filterObjectsToInherit(array &$items, array &$db_items, array $tpl_links): void {
+		foreach ($items as $i => $item) {
+			if (!array_key_exists($item['hostid'], $tpl_links)) {
+				unset($items[$i]);
+
+				if (array_key_exists($item['itemid'], $db_items)) {
+					unset($db_items[$item['itemid']]);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Check that no items with repeating keys would be inherited to a single host or template.
 	 *
 	 * @param array $items
@@ -716,13 +735,13 @@ abstract class CItemGeneral extends CApiService {
 
 		foreach ($upd_items as $i => $upd_item) {
 			if ($upd_item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists('master_itemid', $upd_item)) {
-				$upd_item_indexes[$upd_item['master_itemid']][$upd_item['hostid']] = $i;
+				$upd_item_indexes[$upd_item['master_itemid']][$upd_item['hostid']][] = $i;
 			}
 		}
 
 		foreach ($ins_items as $i => $ins_item) {
 			if ($ins_item['type'] == ITEM_TYPE_DEPENDENT) {
-				$ins_item_indexes[$ins_item['master_itemid']][$ins_item['hostid']] = $i;
+				$ins_item_indexes[$ins_item['master_itemid']][$ins_item['hostid']][] = $i;
 			}
 		}
 
@@ -743,16 +762,16 @@ abstract class CItemGeneral extends CApiService {
 		while ($row = DBfetch($result)) {
 			if (array_key_exists($row['templateid'], $upd_item_indexes)
 					&& array_key_exists($row['hostid'], $upd_item_indexes[$row['templateid']])) {
-				$i = $upd_item_indexes[$row['templateid']][$row['hostid']];
-
-				$upd_items[$i]['master_itemid'] = $row['itemid'];
+				foreach ($upd_item_indexes[$row['templateid']][$row['hostid']] as $i) {
+					$upd_items[$i]['master_itemid'] = $row['itemid'];
+				}
 			}
 
 			if (array_key_exists($row['templateid'], $ins_item_indexes)
 					&& array_key_exists($row['hostid'], $ins_item_indexes[$row['templateid']])) {
-				$i = $ins_item_indexes[$row['templateid']][$row['hostid']];
-
-				$ins_items[$i]['master_itemid'] = $row['itemid'];
+				foreach ($ins_item_indexes[$row['templateid']][$row['hostid']] as $i) {
+					$ins_items[$i]['master_itemid'] = $row['itemid'];
+				}
 			}
 		}
 	}
@@ -931,6 +950,40 @@ abstract class CItemGeneral extends CApiService {
 			$hosts[0]['host'], interfaceType2str($interface_type)
 		));
 	}
+
+	/**
+	 * Inherit dependent items in nesting order.
+	 *
+	 * @param array $dep_items_to_link[<master item index>][<dependent item index>]
+	 * @param array $items_to_link
+	 * @param array $hostids
+	 */
+	protected static function inheritDependentItems(array $dep_items_to_link, array $items_to_link,
+			array $hostids): void {
+		while ($dep_items_to_link) {
+			$items = [];
+
+			foreach ($dep_items_to_link as $i => $_items) {
+				if (array_key_exists($i, $items_to_link)) {
+					$items += $_items;
+					unset($dep_items_to_link[$i]);
+				}
+			}
+
+			static::inherit(array_values($items), [], $hostids, true);
+
+			$items_to_link = $items;
+		}
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array      $db_items
+	 * @param array|null $hostids
+	 * @param bool       $is_dep_items  Inherit called for dependent items.
+	 */
+	abstract protected static function inherit(array $items, array $db_items = [], array $hostids = null,
+			bool $is_dep_items = false): void;
 
 	/**
 	 * Add default values for fields that became unnecessary as the result of the change of the type fields.
