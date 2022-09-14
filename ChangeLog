@@ -388,7 +388,7 @@ Bug fixes:
 ........S. [ZBX-21558] fixed possible crash in value cache when a new item is being added in low memory situation (wiper)
 A......... [ZBX-21116] fixed undefined offset error when adding dependency for trigger prototype on host trigger (vmaksimovs)
 ..F....... [ZBX-21536] fixed backslash escape in trigger expression constructor (gcalenko)
-....I..PS. [ZBX-20943] fixed long hostgroup names in LLD hostgroup prototypes fails 2nd and consequent runs (mprihodko, Sasha)
+....I..PS. [ZBX-20943] fixed LLD hostgroup prototypes failure at 2nd and consequent runs because of long hostgroup names (mprihodko, Sasha)
 .D.......T [ZBX-21519] added note about php-fpm process name in documentation of PHP-FPM by Zabbix agent template (drasihov)
 A......... [ZBX-21608] fixed inability to import a template without linked templates when no changes in template linkage are selected in import options (vmaksimovs)
 ..F....... [ZBX-21494] fixed 'Highlight whole row' checkbox label clickability on Problems page (kkuzmina)
