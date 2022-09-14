@@ -1003,10 +1003,10 @@ abstract class CItemGeneral extends CApiService {
 			'delay' => DB::getDefault('items', 'delay'),
 			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
 
-			// Dependent item type spcecific fields.
+			// Dependent item type specific fields.
 			'master_itemid' => 0,
 
-			// HTTP Agent item type spcecific fields.
+			// HTTP Agent item type specific fields.
 			'url' => DB::getDefault('items', 'url'),
 			'query_fields' => DB::getDefault('items', 'query_fields'),
 			'request_method' => DB::getDefault('items', 'request_method'),
@@ -1025,19 +1025,19 @@ abstract class CItemGeneral extends CApiService {
 			'ssl_key_password' => DB::getDefault('items', 'ssl_key_password'),
 			'allow_traps' => DB::getDefault('items', 'allow_traps'),
 
-			// IPMI item type spcecific fields.
+			// IPMI item type specific fields.
 			'ipmi_sensor' => DB::getDefault('items', 'ipmi_sensor'),
 
-			// JMX item type spcecific fields.
+			// JMX item type specific fields.
 			'jmx_endpoint' => DB::getDefault('items', 'jmx_endpoint'),
 
-			// Script item type spcecific fields.
+			// Script item type specific fields.
 			'parameters' => [],
 
-			// SNMP item type spcecific fields.
+			// SNMP item type specific fields.
 			'snmp_oid' => DB::getDefault('items', 'snmp_oid'),
 
-			// SSH item type spcecific fields.
+			// SSH item type specific fields.
 			'publickey' => DB::getDefault('items', 'publickey'),
 			'privatekey' => DB::getDefault('items', 'privatekey')
 		];

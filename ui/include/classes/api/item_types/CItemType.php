@@ -36,27 +36,27 @@ abstract class CItemType {
 		// The fields used for multiple item types.
 		'interfaceid', 'authtype', 'username', 'password', 'params', 'timeout', 'delay', 'trapper_hosts',
 
-		// Dependent item type spcecific fields.
+		// Dependent item type specific fields.
 		'master_itemid',
 
-		// HTTP Agent item type spcecific fields.
+		// HTTP Agent item type specific fields.
 		'url', 'query_fields', 'request_method', 'post_type', 'posts',
 		'headers', 'status_codes', 'follow_redirects', 'retrieve_mode', 'output_format', 'http_proxy',
 		'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'allow_traps',
 
-		// IPMI item type spcecific fields.
+		// IPMI item type specific fields.
 		'ipmi_sensor',
 
-		// JMX item type spcecific fields.
+		// JMX item type specific fields.
 		'jmx_endpoint',
 
-		// Script item type spcecific fields.
+		// Script item type specific fields.
 		'parameters',
 
-		// SNMP item type spcecific fields.
+		// SNMP item type specific fields.
 		'snmp_oid',
 
-		// SSH item type spcecific fields.
+		// SSH item type specific fields.
 		'publickey', 'privatekey'
 	];
 
@@ -477,10 +477,10 @@ abstract class CItemType {
 			'delay' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'delay')],
 			'trapper_hosts' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'trapper_hosts')],
 
-			// Dependent item type spcecific fields.
+			// Dependent item type specific fields.
 			'master_itemid' =>		['type' => API_ID, 'in' => '0'],
 
-			// HTTP Agent item type spcecific fields.
+			// HTTP Agent item type specific fields.
 			'url' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'url')],
 			'query_fields' =>		['type' => API_OBJECTS, 'length' => 0],
 			'request_method' =>		['type' => API_INT32, 'in' => DB::getDefault('items', 'request_method')],
@@ -499,19 +499,19 @@ abstract class CItemType {
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'ssl_key_password')],
 			'allow_traps' =>		['type' => API_INT32, 'in' => DB::getDefault('items', 'allow_traps')],
 
-			// IPMI item type spcecific fields.
+			// IPMI item type specific fields.
 			'ipmi_sensor' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'ipmi_sensor')],
 
-			// JMX item type spcecific fields.
+			// JMX item type specific fields.
 			'jmx_endpoint' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'jmx_endpoint')],
 
-			// Script item type spcecific fields.
+			// Script item type specific fields.
 			'parameters' =>			['type' => API_OBJECTS, 'length' => 0],
 
-			// SNMP item type spcecific fields.
+			// SNMP item type specific fields.
 			'snmp_oid' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'snmp_oid')],
 
-			// SSH item type spcecific fields.
+			// SSH item type specific fields.
 			'publickey' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'publickey')],
 			'privatekey' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'privatekey')]
 		];

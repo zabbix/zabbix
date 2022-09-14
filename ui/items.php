@@ -596,10 +596,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'delay' => $delay,
 			'trapper_hosts' => getRequest('trapper_hosts', DB::getDefault('items', 'trapper_hosts')),
 
-			// Dependent item type spcecific fields.
+			// Dependent item type specific fields.
 			'master_itemid' => getRequest('master_itemid', 0),
 
-			// HTTP Agent item type spcecific fields.
+			// HTTP Agent item type specific fields.
 			'url' => getRequest('url', DB::getDefault('items', 'url')),
 			'query_fields' => prepareItemQueryFields(getRequest('query_fields', [])),
 			'request_method' => getRequest('request_method', DB::getDefault('items', 'request_method')),
@@ -618,19 +618,19 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'ssl_key_password' => getRequest('ssl_key_password', DB::getDefault('items', 'ssl_key_password')),
 			'allow_traps' => getRequest('allow_traps', DB::getDefault('items', 'allow_traps')),
 
-			// IPMI item type spcecific fields.
+			// IPMI item type specific fields.
 			'ipmi_sensor' => getRequest('ipmi_sensor', DB::getDefault('items', 'ipmi_sensor')),
 
-			// JMX item type spcecific fields.
+			// JMX item type specific fields.
 			'jmx_endpoint' => getRequest('jmx_endpoint', DB::getDefault('items', 'jmx_endpoint')),
 
-			// Script item type spcecific fields.
+			// Script item type specific fields.
 			'parameters' => prepareItemParameters(getRequest('parameters', [])),
 
-			// SNMP item type spcecific fields.
+			// SNMP item type specific fields.
 			'snmp_oid' => getRequest('snmp_oid', DB::getDefault('items', 'snmp_oid')),
 
-			// SSH item type spcecific fields.
+			// SSH item type specific fields.
 			'publickey' => getRequest('publickey', DB::getDefault('items', 'publickey')),
 			'privatekey' => getRequest('privatekey', DB::getDefault('items', 'privatekey'))
 		]);
