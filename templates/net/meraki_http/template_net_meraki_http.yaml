@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-09-13T14:37:28Z'
+  date: '2022-09-14T20:31:09Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -56,11 +56,11 @@ zabbix_export:
             conditions:
               -
                 macro: '{#NAME}'
-                value: '{$ORGANIZATION.NAME.MATCHES}'
+                value: '{$MERAKI.ORGANIZATION.NAME.MATCHES}'
                 formulaid: A
               -
                 macro: '{#NAME}'
-                value: '{$ORGANIZATION.NAME.NOT_MATCHES}'
+                value: '{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           host_prototypes:
@@ -111,17 +111,17 @@ zabbix_export:
           value: api.meraki.com/api/v1
           description: 'Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1'
         -
-          macro: '{$MERAKI.TOKEN}'
-          value: 1602d56388ae3a7b76d272a7887542a1cf86019c
-          description: 'Cisco Meraki Dashboard API Token.'
-        -
-          macro: '{$ORGANIZATION.NAME.MATCHES}'
+          macro: '{$MERAKI.ORGANIZATION.NAME.MATCHES}'
           value: .+
           description: 'This macro is used in organizations discovery. Can be overridden on the host or linked template level.'
         -
-          macro: '{$ORGANIZATION.NAME.NOT_MATCHES}'
+          macro: '{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in organizations discovery. Can be overridden on the host or linked template level.'
+        -
+          macro: '{$MERAKI.TOKEN}'
+          value: 1602d56388ae3a7b76d272a7887542a1cf86019c
+          description: 'Cisco Meraki Dashboard API Token.'
     -
       uuid: 39e2f742d0b24ea489b7f61d27a5df1c
       template: 'Cisco Meraki organization by HTTP'
@@ -673,8 +673,8 @@ zabbix_export:
           triggers:
             -
               uuid: 8694c7fc18904004978a3ce46f06a67e
-              expression: 'last(/Cisco Meraki organization by HTTP/meraki.license.expire)<{$LICENSE.EXPIRE} and last(/Cisco Meraki organization by HTTP/meraki.license.expire)>=0'
-              name: 'Meraki: License expires in less than {$LICENSE.EXPIRE} seconds'
+              expression: 'last(/Cisco Meraki organization by HTTP/meraki.license.expire)<{$MERAKI.LICENSE.EXPIRE} and last(/Cisco Meraki organization by HTTP/meraki.license.expire)>=0'
+              name: 'Meraki: License expires in less than {$MERAKI.LICENSE.EXPIRE} seconds'
               priority: WARNING
               tags:
                 -
@@ -1177,9 +1177,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vpnStats[?(@.networkId==''{#NETWORK.ID}'' && @.senderUplink==''{#SENDER.UPLINK}'' && @.peerNetworkId==''{#PEER.NETWORK.ID}'' && @.receiverUplink==''{#RECEIVER.UPLINK}'')].avgJitter.first()'
+                    - $.avgJitter
               master_item:
-                key: meraki.get.vpn.stats
+                key: 'meraki.vpn.stat.raw[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               tags:
                 -
                   tag: component
@@ -1196,9 +1196,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vpnStats[?(@.networkId==''{#NETWORK.ID}'' && @.senderUplink==''{#SENDER.UPLINK}'' && @.peerNetworkId==''{#PEER.NETWORK.ID}'' && @.receiverUplink==''{#RECEIVER.UPLINK}'')].maxJitter.first()'
+                    - $.maxJitter
               master_item:
-                key: meraki.get.vpn.stats
+                key: 'meraki.vpn.stat.raw[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               tags:
                 -
                   tag: component
@@ -1215,9 +1215,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vpnStats[?(@.networkId==''{#NETWORK.ID}'' && @.senderUplink==''{#SENDER.UPLINK}'' && @.peerNetworkId==''{#PEER.NETWORK.ID}'' && @.receiverUplink==''{#RECEIVER.UPLINK}'')].minJitter.first()'
+                    - $.minJitter
               master_item:
-                key: meraki.get.vpn.stats
+                key: 'meraki.vpn.stat.raw[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               tags:
                 -
                   tag: component
@@ -1235,9 +1235,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vpnStats[?(@.networkId==''{#NETWORK.ID}'' && @.senderUplink==''{#SENDER.UPLINK}'' && @.peerNetworkId==''{#PEER.NETWORK.ID}'' && @.receiverUplink==''{#RECEIVER.UPLINK}'')].avgLatencyMs.first()'
+                    - $.avgLatencyMs
               master_item:
-                key: meraki.get.vpn.stats
+                key: 'meraki.vpn.stat.raw[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               tags:
                 -
                   tag: component
@@ -1255,9 +1255,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vpnStats[?(@.networkId==''{#NETWORK.ID}'' && @.senderUplink==''{#SENDER.UPLINK}'' && @.peerNetworkId==''{#PEER.NETWORK.ID}'' && @.receiverUplink==''{#RECEIVER.UPLINK}'')].maxLatencyMs.first()'
+                    - $.maxLatencyMs
               master_item:
-                key: meraki.get.vpn.stats
+                key: 'meraki.vpn.stat.raw[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               tags:
                 -
                   tag: component
@@ -1275,9 +1275,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vpnStats[?(@.networkId==''{#NETWORK.ID}'' && @.senderUplink==''{#SENDER.UPLINK}'' && @.peerNetworkId==''{#PEER.NETWORK.ID}'' && @.receiverUplink==''{#RECEIVER.UPLINK}'')].minLatencyMs.first()'
+                    - $.minLatencyMs
               master_item:
-                key: meraki.get.vpn.stats
+                key: 'meraki.vpn.stat.raw[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               tags:
                 -
                   tag: component
@@ -1296,9 +1296,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vpnStats[?(@.networkId==''{#NETWORK.ID}'' && @.senderUplink==''{#SENDER.UPLINK}'' && @.peerNetworkId==''{#PEER.NETWORK.ID}'' && @.receiverUplink==''{#RECEIVER.UPLINK}'')].avgLossPercentage.first()'
+                    - $.avgLossPercentage
               master_item:
-                key: meraki.get.vpn.stats
+                key: 'meraki.vpn.stat.raw[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               tags:
                 -
                   tag: component
@@ -1317,9 +1317,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vpnStats[?(@.networkId==''{#NETWORK.ID}'' && @.senderUplink==''{#SENDER.UPLINK}'' && @.peerNetworkId==''{#PEER.NETWORK.ID}'' && @.receiverUplink==''{#RECEIVER.UPLINK}'')].maxLossPercentage.first()'
+                    - $.maxLossPercentage
               master_item:
-                key: meraki.get.vpn.stats
+                key: 'meraki.vpn.stat.raw[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               tags:
                 -
                   tag: component
@@ -1338,9 +1338,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vpnStats[?(@.networkId==''{#NETWORK.ID}'' && @.senderUplink==''{#SENDER.UPLINK}'' && @.peerNetworkId==''{#PEER.NETWORK.ID}'' && @.receiverUplink==''{#RECEIVER.UPLINK}'')].minLossPercentage.first()'
+                    - $.minLossPercentage
               master_item:
-                key: meraki.get.vpn.stats
+                key: 'meraki.vpn.stat.raw[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               tags:
                 -
                   tag: component
@@ -1358,9 +1358,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vpnStats[?(@.networkId==''{#NETWORK.ID}'' && @.senderUplink==''{#SENDER.UPLINK}'' && @.peerNetworkId==''{#PEER.NETWORK.ID}'' && @.receiverUplink==''{#RECEIVER.UPLINK}'')].avgMos.first()'
+                    - $.avgMos
               master_item:
-                key: meraki.get.vpn.stats
+                key: 'meraki.vpn.stat.raw[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               tags:
                 -
                   tag: component
@@ -1378,9 +1378,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vpnStats[?(@.networkId==''{#NETWORK.ID}'' && @.senderUplink==''{#SENDER.UPLINK}'' && @.peerNetworkId==''{#PEER.NETWORK.ID}'' && @.receiverUplink==''{#RECEIVER.UPLINK}'')].maxMos.first()'
+                    - $.maxMos
               master_item:
-                key: meraki.get.vpn.stats
+                key: 'meraki.vpn.stat.raw[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               tags:
                 -
                   tag: component
@@ -1398,13 +1398,34 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.vpnStats[?(@.networkId==''{#NETWORK.ID}'' && @.senderUplink==''{#SENDER.UPLINK}'' && @.peerNetworkId==''{#PEER.NETWORK.ID}'' && @.receiverUplink==''{#RECEIVER.UPLINK}'')].minMos.first()'
+                    - $.minMos
               master_item:
-                key: meraki.get.vpn.stats
+                key: 'meraki.vpn.stat.raw[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
               tags:
                 -
                   tag: component
                   value: vpn
+            -
+              uuid: 2c968e21c8a34c73a17ed0fc4e2756b5
+              name: 'VPN [{#NETWORK.NAME}]=>[{#PEER.NETWORK.NAME}]: stats raw'
+              type: DEPENDENT
+              key: 'meraki.vpn.stat.raw[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'VPN connection stats raw.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.vpnStats[?(@.networkId==''{#NETWORK.ID}'' && @.senderUplink==''{#SENDER.UPLINK}'' && @.peerNetworkId==''{#PEER.NETWORK.ID}'' && @.receiverUplink==''{#RECEIVER.UPLINK}'')].first()'
+              master_item:
+                key: meraki.get.vpn.stats
+              tags:
+                -
+                  tag: Application
+                  value: Meraki
           graph_prototypes:
             -
               uuid: 0794dc9d06844ee89099322f60382fc7
@@ -1508,10 +1529,6 @@ zabbix_export:
           value: cisco-meraki-dashboard
       macros:
         -
-          macro: '{$LICENSE.EXPIRE}'
-          value: '86400'
-          description: 'Time in seconds for license expire.'
-        -
           macro: '{$MERAKI.API.URL}'
           value: api.meraki.com/api/v1
           description: 'Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1'
@@ -1523,6 +1540,10 @@ zabbix_export:
           macro: '{$MERAKI.DEVICE.LOSS}'
           value: '15'
           description: 'Devices uplink loss threshold in percents.'
+        -
+          macro: '{$MERAKI.LICENSE.EXPIRE}'
+          value: '86400'
+          description: 'Time in seconds for license to expire.'
         -
           macro: '{$MERAKI.TOKEN}'
           value: 1602d56388ae3a7b76d272a7887542a1cf86019c
