@@ -39,7 +39,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	private static $change_active_proxy = 'Active proxy for refresh cancel simple update';
 	private static $change_passive_proxy = 'Passive proxy for refresh cancel simple update';
 	private static $delete_proxy_with_hosts = 'Proxy_2 for filter';
-	private static $delete_proxy_with_discovery_rule = 'Passive proxy 1';
+	private static $delete_proxy_with_discovery_rule = 'Proxy for Discovery rule';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -1092,7 +1092,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, null, $data['error']);
+			$this->assertMessage(TEST_BAD, ($update ? 'Cannot update proxy' : 'Cannot add proxy'), $data['error']);
 
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
@@ -1377,7 +1377,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy' => self::$delete_proxy_with_discovery_rule,
-					'error' => "Proxy \"Passive proxy 1\" is used by discovery rule \"Discovery rule for update\"."
+					'error' => "Proxy \"Proxy for Discovery rule\" is used by discovery rule \"Discovery rule for update\"."
 				]
 			]
 		]);

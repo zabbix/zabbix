@@ -83,13 +83,13 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 
 		// Check versions and hints.
 		$versions = [
-			'active_current' => ['version' => '6.4.0 '],
-			'active_unknown' => ['version' => ' '],
+			'active_current' => ['version' => '6.4.0'],
+			'active_unknown' => ['version' => ''],
 			'passive_outdated' => ['version' => '6.2.0 ', 'color' => 'red', 'icon_color' => 'yellow', 'hint_text' =>
-					'Proxy version is outdated, only data collection and remote execution is available with server version .'
+					'Proxy version is outdated, only data collection and remote execution is available with server version 6.4.0.'
 			],
 			'passive_unsupported' => ['version' => '5.4.1 ', 'color' => 'red', 'icon_color' => 'red', 'hint_text' =>
-					'Proxy version is not supported by server version .', 'hint_color' => 'red'
+					'Proxy version is not supported by server version 6.4.0.', 'hint_color' => 'red'
 			]
 		];
 
@@ -154,7 +154,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 				'Name' => 'active_proxy1',
 				'Mode' => 'Active',
 				'Encryption' => 'None',
-				'Version' => ' ',
+				'Version' => '',
 				'Last seen (age)' => 'Never',
 				'Host count' => '',
 				'Item count' => '',
@@ -165,7 +165,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 				'Name' => 'passive_proxy1',
 				'Mode' => 'Passive',
 				'Encryption' => 'None',
-				'Version' => ' ',
+				'Version' => '',
 				'Last seen (age)' => 'Never',
 				'Host count' => '',
 				'Item count' => '',
