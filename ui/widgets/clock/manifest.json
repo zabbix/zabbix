@@ -1,0 +1,16 @@
+{
+	"id": "clock",
+	"type": "widget",
+	"name": "Clock",
+	"namespace": "",
+	"widget": {
+		"template_dashboard": true,
+		"size": {
+			"width": 4,
+			"height": 3
+		},
+		"form_class": "CWidgetFormClock",
+		"js_class": "CWidgetClock",
+		"refresh_rate": 900
+	}
+}

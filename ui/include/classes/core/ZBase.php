@@ -270,10 +270,8 @@ class ZBase {
 
 	/**
 	 * Returns the absolute path to the root dir.
-	 *
-	 * @return string
 	 */
-	public static function getRootDir() {
+	public static function getRootDir(): string {
 		return self::getInstance()->rootDir;
 	}
 
@@ -389,7 +387,7 @@ class ZBase {
 	 * Load zabbix config file.
 	 */
 	protected function loadConfigFile(): void {
-		$configFile = $this->getRootDir().CConfigFile::CONFIG_FILE_PATH;
+		$configFile = self::getRootDir().CConfigFile::CONFIG_FILE_PATH;
 
 		$config = new CConfigFile($configFile);
 
@@ -490,7 +488,7 @@ class ZBase {
 			error($error);
 		}
 
-		require_once $this->getRootDir().'/include/translateDefines.inc.php';
+		require_once self::getRootDir().'/include/translateDefines.inc.php';
 	}
 
 	/**
@@ -807,7 +805,7 @@ class ZBase {
 	 * Initialize module manager and load all enabled and allowed modules according to user role settings.
 	 */
 	private function initModuleManager() {
-		$this->module_manager = new CModuleManager($this->rootDir);
+		$this->module_manager = new CModuleManager(self::getRootDir());
 
 		$db_modules = API::getApiService('module')->get([
 			'output' => ['moduleid', 'id', 'relative_path', 'config'],

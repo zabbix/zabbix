@@ -33,9 +33,9 @@ final class CModuleManager {
 	private const MAX_MANIFEST_VERSION = 1;
 
 	/**
-	 * Home path of modules.
+	 * Root path of modules.
 	 */
-	private string $modules_dir;
+	private string $root_path;
 
 	/**
 	 * Manifest data of added modules.
@@ -53,17 +53,10 @@ final class CModuleManager {
 	private array $errors = [];
 
 	/**
-	 * @param string $modules_dir  Home path of modules.
+	 * @param string $root_path  Root path of modules.
 	 */
-	public function __construct(string $modules_dir) {
-		$this->modules_dir = $modules_dir;
-	}
-
-	/**
-	 * Get home path of modules.
-	 */
-	public function getModulesDir(): string {
-		return $this->modules_dir;
+	public function __construct(string $root_path) {
+		$this->root_path = $root_path;
 	}
 
 	/**
@@ -186,7 +179,7 @@ final class CModuleManager {
 		$namespaces = [];
 
 		foreach ($this->manifests as $relative_path => $manifest) {
-			$module_path = $this->modules_dir.'/'.$relative_path;
+			$module_path = $this->root_path.'/'.$relative_path;
 			$namespaces['Modules\\'.$manifest['namespace']] = [$module_path];
 		}
 
@@ -207,7 +200,7 @@ final class CModuleManager {
 		$non_conflicting_manifests = array_diff_key($this->manifests, array_flip($conflicting_manifests));
 
 		foreach ($non_conflicting_manifests as $relative_path => $manifest) {
-			$module_dir = $this->modules_dir.'/'.$relative_path;
+			$module_dir = $this->root_path.'/'.$relative_path;
 
 			if (is_file($module_dir.'/Module.php')) {
 				$module_class = implode('\\', ['Modules', $manifest['namespace'], 'Module']);
@@ -224,7 +217,7 @@ final class CModuleManager {
 
 			try {
 				/** @var CModule $instance */
-				$instance = new $module_class($this->modules_dir, $relative_path, $manifest);
+				$instance = new $module_class($this->root_path, $relative_path, $manifest);
 
 				if ($instance instanceof CModule) {
 					$instance->init();
@@ -321,7 +314,7 @@ final class CModuleManager {
 	 * @return array|null  Either manifest data or null if manifest file had errors.
 	 */
 	private function loadManifest(string $relative_path): ?array {
-		$module_path = $this->modules_dir.'/'.$relative_path;
+		$module_path = $this->root_path.'/'.$relative_path;
 		$manifest_file_name = $module_path.'/manifest.json';
 
 		if (!is_file($manifest_file_name) || !is_readable($manifest_file_name)) {
@@ -363,7 +356,8 @@ final class CModuleManager {
 			'description' => '',
 			'actions' => [],
 			'assets' => [],
-			'config' => []
+			'config' => [],
+			'widget' => []
 		];
 
 		return $manifest;

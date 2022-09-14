@@ -312,7 +312,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		]);
 
 		if ($db_modules) {
-			$module_manager = new CModuleManager(APP::ModuleManager()->getModulesDir());
+			$module_manager = new CModuleManager(APP::getRootDir());
 			foreach ($db_modules as $module) {
 				$manifest = $module_manager->addModule($module['relative_path']);
 				$labels['modules'][$module['moduleid']] = $manifest['name'];

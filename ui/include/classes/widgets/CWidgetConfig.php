@@ -50,7 +50,7 @@ class CWidgetConfig {
 	public static function getKnownWidgetTypes(string $context): array {
 		$types = [
 			WIDGET_ACTION_LOG			=> _('Action log'),
-			WIDGET_CLOCK				=> _('Clock'),
+			WIDGET_CLOCK				=> _('Clock'), // TODO AS: moved to manifest
 			WIDGET_DATA_OVER			=> _('Data overview'),
 			WIDGET_DISCOVERY			=> _('Discovery status'),
 			WIDGET_FAV_GRAPHS			=> _('Favorite graphs'),
@@ -95,7 +95,7 @@ class CWidgetConfig {
 	public static function getJSClasses(): array {
 		return [
 			WIDGET_ACTION_LOG			=> 'CWidget',
-			WIDGET_CLOCK				=> 'CWidgetClock',
+			WIDGET_CLOCK				=> 'CWidgetClock', // TODO AS: moved to manifest
 			WIDGET_DATA_OVER			=> 'CWidget',
 			WIDGET_DISCOVERY			=> 'CWidget',
 			WIDGET_FAV_GRAPHS			=> 'CWidget',
@@ -166,7 +166,7 @@ class CWidgetConfig {
 	private static function getDefaultDimensions(): array {
 		return [
 			WIDGET_ACTION_LOG			=> ['width' => 12,	'height' => 5],
-			WIDGET_CLOCK				=> ['width' => 4,	'height' => 3],
+			WIDGET_CLOCK				=> ['width' => 4,	'height' => 3], // TODO AS: moved to manifest
 			WIDGET_DATA_OVER			=> ['width' => 12,	'height' => 5],
 			WIDGET_DISCOVERY			=> ['width' => 6,	'height' => 3],
 			WIDGET_FAV_GRAPHS			=> ['width' => 4,	'height' => 3],
@@ -238,7 +238,7 @@ class CWidgetConfig {
 
 			case self::CONTEXT_TEMPLATE_DASHBOARD:
 				switch ($type) {
-					case WIDGET_CLOCK:
+					case WIDGET_CLOCK: // TODO AS: moved to manifest
 					case WIDGET_GRAPH:
 					case WIDGET_GRAPH_PROTOTYPE:
 					case WIDGET_ITEM:
@@ -279,7 +279,7 @@ class CWidgetConfig {
 			case WIDGET_WEB:
 				return SEC_PER_MIN;
 
-			case WIDGET_CLOCK:
+			case WIDGET_CLOCK: // TODO AS: moved to manifest
 			case WIDGET_FAV_GRAPHS:
 			case WIDGET_FAV_MAPS:
 			case WIDGET_HOST_AVAIL:
@@ -432,7 +432,7 @@ class CWidgetConfig {
 				return new CWidgetFormActionLog($values, $templateid);
 
 			case WIDGET_CLOCK:
-				return new CWidgetFormClock($values, $templateid);
+				return new CWidgetFormClock($values, $templateid); // TODO AS: moved to manifest
 
 			case WIDGET_DATA_OVER:
 				return new CWidgetFormDataOver($values, $templateid);

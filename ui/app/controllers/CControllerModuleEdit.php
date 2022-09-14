@@ -73,7 +73,7 @@ class CControllerModuleEdit extends CController {
 	}
 
 	protected function doAction() {
-		$module_manager = new CModuleManager(APP::ModuleManager()->getModulesDir());
+		$module_manager = new CModuleManager(APP::getRootDir());
 
 		$manifest = $module_manager->addModule($this->module['relative_path']);
 

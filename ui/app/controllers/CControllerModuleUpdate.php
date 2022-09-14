@@ -78,8 +78,8 @@ class CControllerModuleUpdate extends CController {
 			'preservekeys' => true
 		]);
 
-		$module_manager = new CModuleManager(APP::ModuleManager()->getModulesDir());
-		$module_manager_enabled = new CModuleManager(APP::ModuleManager()->getModulesDir());
+		$module_manager = new CModuleManager(APP::getRootDir());
+		$module_manager_enabled = new CModuleManager(APP::getRootDir());
 
 		foreach ($db_modules as $moduleid => $db_module) {
 			$new_status = array_key_exists($moduleid, $this->modules) ? $set_status : $db_module['status'];
