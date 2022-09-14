@@ -187,8 +187,8 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
 		$encryption,
-		[$version, '&nbsp;', makeInformationList($info_icons)],
-		($proxy['lastaccess'] == 0)
+		$info_icons ? [$version, '&nbsp;', makeInformationList($info_icons)] : $version,
+		$proxy['lastaccess'] == 0
 			? (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED)
 			: zbx_date2age($proxy['lastaccess']),
 		array_key_exists('host_count', $proxy) ? $proxy['host_count'] : '',
