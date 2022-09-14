@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-03-25 14:20+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-09-05 08:15+0000\n"
+"Last-Translator: Sergey <sergey.sorokin@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -213,7 +213,7 @@ msgstr[2] "%1$s из %2$s элементов в состоянии пробле�
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$s percentile: %2$s"
-msgstr ""
+msgstr "%1$s процентиль: %2$s"
 
 #: jsLoader.php:348
 #, c-format
@@ -290,7 +290,7 @@ msgstr "%1$s, выбрано"
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "%1$s-й процентиль: %2$s"
 
 #: include/func.inc.php:1947
 #, c-format
@@ -330,7 +330,7 @@ msgstr "(Только супер администраторы могут соз�
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(создано при обнаружении узла сети)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
@@ -740,7 +740,7 @@ msgstr "Активно"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "Активные проверки"
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -2032,7 +2032,7 @@ msgstr "Не удалось добавить узел сети"
 #: app/controllers/CControllerHostGroupCreate.php:40
 #: app/controllers/CControllerHostGroupCreate.php:70
 msgid "Cannot add host group"
-msgstr ""
+msgstr "Не удалось добавить группу узлов сети"
 
 #: host_prototypes.php:304
 msgid "Cannot add host prototype"
@@ -2118,7 +2118,7 @@ msgstr "Не удалось добавить шаблон"
 #: app/controllers/CControllerTemplateGroupCreate.php:40
 #: app/controllers/CControllerTemplateGroupCreate.php:70
 msgid "Cannot add template group"
-msgstr ""
+msgstr "Не удалось добавить группу шаблонов"
 
 #: triggers.php:306
 msgid "Cannot add trigger"
@@ -2229,7 +2229,7 @@ msgstr[2] "Не удалось скопировать триггеры"
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Не удалось скопировать триггер \"%1$s\", потому что он содержит несколько узлов сети в выражении."
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2274,7 +2274,7 @@ msgstr "Не удалось создать соответствие иконок
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
-msgstr ""
+msgstr "Не удалось создать запрос"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
@@ -23674,6 +23674,11 @@ msgstr "varsamp() - Выборочная дисперсия"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "через"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

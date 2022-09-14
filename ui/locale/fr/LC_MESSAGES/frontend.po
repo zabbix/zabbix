@@ -23531,6 +23531,11 @@ msgstr "varsamp() - Variance de l'échantillon"
 msgid "via"
 msgstr "via"
 
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
+
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"
 msgstr "mauvais type de règle de découverte"
