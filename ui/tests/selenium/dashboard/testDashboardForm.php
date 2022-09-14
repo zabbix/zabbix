@@ -44,7 +44,7 @@ class testDashboardForm extends CWebTest {
 		return [
 			'dashboard' => CDBHelper::getHash('SELECT * FROM dashboard'),
 			'dashboard_user' => CDBHelper::getHash('SELECT * FROM dashboard_user ORDER by dashboard_userid'),
-			'dashboard_user' => CDBHelper::getHash('SELECT * FROM dashboard_user ORDER by dashboard_usrgrpid'),
+			'dashboard_usrgrp' => CDBHelper::getHash('SELECT * FROM dashboard_usrgrp ORDER by dashboard_usrgrpid'),
 			'widget' => CDBHelper::getHash('SELECT * FROM widget ORDER by widgetid')
 		];
 	}
