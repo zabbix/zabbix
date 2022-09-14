@@ -1799,8 +1799,8 @@ abstract class CItemGeneral extends CApiService {
 
 			if ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE && $db_master_item['ruleid'] != 0) {
 				$item_ruleid = array_key_exists('itemid', $item)
-					? $item['ruleid']
-					: $db_items[$item['itemid']]['ruleid'];
+					? $db_items[$item['itemid']]['ruleid']
+					: $item['ruleid'];
 
 				if (bccomp($db_master_item['ruleid'], $item_ruleid) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
