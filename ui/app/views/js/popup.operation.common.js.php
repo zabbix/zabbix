@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 window.operation_popup = new class {
 	init() {
 		this.overlay = overlays_stack.getById('operations');
@@ -58,6 +59,7 @@ window.operation_popup = new class {
 			}
 			else if (e.target.classList.contains('operation-condition-list-footer')) {
 				// todo E.S.: add function to open condition popup
+				this._openConditionsPopup(e.target);
 			}
 		});
 	}
@@ -71,6 +73,9 @@ window.operation_popup = new class {
 			'dstfld1': 'operation-message-user-groups-footer',
 			'multiselect': '1'
 		}, {dialogue_class: 'modal-popup-generic', trigger_element});
+
+		//this._addUserGroup();
+		// todo E.S : ADD DATA TO 'SEND TO USER GROUPS' TABLE
 	}
 
 	_openUserPopup(trigger_element) {
@@ -82,12 +87,48 @@ window.operation_popup = new class {
 			'dstfld1': 'operation-message-users-footer',
 			'multiselect': '1'
 		}, {dialogue_class: 'modal-popup-generic', trigger_element});
+
+		// todo E.S : ADD DATA TO 'SEND TO USER' TABLE
+	}
+
+	_addUserGroup() {
+		this.tmpl_usergroup_row = new Template(this._usrgrpTemplate());
+		document.getElementById('operation-message-user-groups-footer')
+			.before(this.tmpl_usergroup_row);
+	}
+
+	_usrgrpTemplate() {
+		return `
+			<tr data-id="#{usrgrpid}">
+				<td>
+					<span>#{name}</span>
+				</td>
+				<td class="<?= ZBX_STYLE_NOWRAP ?>">
+					<input name="operation[opmessage_grp][][usrgrpid]" type="hidden" value="#{usrgrpid}" />
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="$(this).closest('tr').remove();">
+						<?= _('Remove') ?>
+					</button>
+				</td>
+			</tr>
+		`
 	}
 
 	_addPopupValues() {
 		// todo: pass popup data - objectid - usrgrpid
 		//  todo: pass values: usrgrpid name gui_access, user_status ??
 		const objectid = 'usrgrpid'
+	}
+
+	_openConditionsPopup(trigger_element) {
+		PopUp('popup.condition.operations', {
+			'type': <?= ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION ?>,
+			'source': <?= EVENT_SOURCE_TRIGGERS ?>
+		},
+		{
+			dialogue_class: 'modal-popup-medium',
+			trigger_element: trigger_element,
+			dialogueid: 'operation-condition'
+		});
 	}
 
 	submit() {

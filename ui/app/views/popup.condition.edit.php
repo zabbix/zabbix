@@ -31,9 +31,15 @@ $form = (new CForm())
 	->setName('popup.condition')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
-	->addVar('type', ZBX_POPUP_CONDITION_TYPE_ACTION)
-	->addVar('source', $data['eventsource'])
+	->addVar('type', $data['type'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+
+if ($data['type'] == ZBX_POPUP_CONDITION_TYPE_ACTION) {
+	$form->addVar('source', $data['eventsource']);
+}
+else if ($data['type'] == ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION) {
+	$form->addVar('source', $data['source']);
+}
 
 $condition_type = (int) $data['last_type'];
 $form_grid = (new CFormGrid());
@@ -46,7 +52,7 @@ switch ($data['type']) {
 				new CLabel(_('Type'), 'label-condition-type'),
 				new CFormField((new CSelect('condition_type'))
 					->setFocusableElementId('label-condition-type')
-					//->setValue($condition_type)
+					->setValue($condition_type)
 					->setId('condition-type')
 					->addOptions(CSelect::createOptionsFromArray(CCorrelationHelper::getConditionTypes()))
 				)
@@ -871,9 +877,6 @@ switch ($data['type']) {
 					->addOptions(CSelect::createOptionsFromArray($condition_options))
 				)
 			]);
-
-//		$inline_js .= '$(() => $("#condition-type").on("change",'
-//			.'(e) => reloadPopup($(e.target).closest("form").get(0), "popup.condition.operations")));';
 
 		// Acknowledge form elements.
 		$operators_options = [];

@@ -25,8 +25,12 @@ window.condition_popup = new class {
 			this.overlay = overlays_stack.getById('event_corr_condition');
 		}
 		if (overlays_stack.stack[0] === 'action-edit') {
-			this.overlay = overlays_stack.getById('condition');
+			this.overlay = overlays_stack.getById('action-condition');
 		}
+		if (overlays_stack.stack.includes('operation-condition')) {
+			this.overlay = overlays_stack.getById('operation-condition');
+		}
+
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
@@ -46,17 +50,27 @@ window.condition_popup = new class {
 			$("#condition-type").change(function() {
 				reloadPopup(e.target.closest('form'), 'popup.condition.edit')
 			})
-			//$("#condition-type").change(function() {
-			// reloadPopup(e.target.closest("form"), "popup.condition.event.corr")
-			//})
 			$("#trigger_context").change(function() {
 				reloadPopup(e.target.closest("form"), 'popup.condition.edit')
 			})
 		})
+
 	}
 
 	submit() {
+		let curl = new Curl('zabbix.php', false);
 		const fields = getFormFields(this.form);
+
+		if (this.overlay == overlays_stack.getById('event_corr_condition')) {
+			curl.setArgument('action', 'popup.condition.event.corr');
+			curl.setArgument('validate', '1')
+		}
+		else if (this.overlay == overlays_stack.getById('operation-condition')) {
+			curl.setArgument('action', 'action.operation.condition.check');
+		}
+		else {
+			curl.setArgument('action', 'popup.condition.check');
+		}
 
 		if (typeof(fields.value) == 'string') {
 			fields.value = fields.value.trim();
@@ -64,9 +78,6 @@ window.condition_popup = new class {
 		if (fields.value2 !== null && typeof(fields.value2) == 'string') {
 			fields.value2 = fields.value2.trim();
 		}
-
-		let curl = new Curl('zabbix.php', false);
-		curl.setArgument('action', 'popup.condition.check');
 
 		this._post(curl.getUrl(), fields);
 	}
