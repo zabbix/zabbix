@@ -54,11 +54,8 @@ INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) 
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (9,'Autoregistration action 1',2,0,0,'1h');
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (15,'Autoregistration action 2',2,0,1,'1h');
 
-INSERT INTO hosts (hostid, host, status, description) VALUES (20000, 'Proxy for Discovery rule', 6, '');
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10018,20000,1,0,1,'127.0.0.1','proxy1.zabbix.com','10051');
-
-INSERT INTO hosts (hostid, host, status, description) VALUES (20001, 'Proxy for Actions', 6, '');
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10018,20000,1,0,1,'127.0.0.1','proxy1.zabbix.com','10051');
+INSERT INTO hosts (hostid, host, status, description) VALUES (20000, 'Proxy for Discovery rule', 5, '');
+INSERT INTO hosts (hostid, host, status, description) VALUES (20001, 'Proxy for Actions', 5, '');
 
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (500, 9, 22, 3, 'DB2');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (501, 9, 22, 2, 'MySQL');
