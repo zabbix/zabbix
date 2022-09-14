@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup role
  * @onBefore prepareRoleData
+ * @dataSource LoginUsers
  */
 class testPageUserRoles extends CWebTest {
 
@@ -142,8 +143,8 @@ class testPageUserRoles extends CWebTest {
 			],
 			[
 				'Name' => 'Admin role',
-				'#' => 'Users 2',
-				'Users' => 'admin-zabbix, http-auth-admin'
+				'#' => 'Users 4',
+				'Users' => 'admin-zabbix, admin user for testFormScheduledReport, http-auth-admin, user-recipient of the report'
 			],
 			[
 				'Name' => 'Guest role',
@@ -172,18 +173,8 @@ class testPageUserRoles extends CWebTest {
 			],
 			[
 				'Name' => 'Super admin role',
-				'#' => 'Users 5',
-				'Users' => 'Admin (Zabbix Administrator), filter-create, filter-delete, filter-update, test-timezone'
-			],
-			[
-				'Name' => 'UR1-executenow-on',
-				'#' => 'Users 1',
-				'Users' => 'U1-r-on'
-			],
-			[
-				'Name' => 'UR2-executenow-off',
-				'#' => 'Users 2',
-				'Users' => 'U2-r-off, U3-rw-off'
+				'#' => 'Users 6',
+				'Users' => 'Admin (Zabbix Administrator), filter-create, filter-delete, filter-update, LDAP user, test-timezone'
 			],
 			[
 				'Name' => 'User role',
@@ -244,8 +235,6 @@ class testPageUserRoles extends CWebTest {
 						'Remove_role_3',
 						'role_with_min end',
 						'Super admin role',
-						'UR1-executenow-on',
-						'UR2-executenow-off',
 						'User role'
 					]
 				]
