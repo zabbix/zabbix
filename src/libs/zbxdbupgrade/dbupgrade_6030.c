@@ -162,6 +162,13 @@ static int	DBpatch_6030006(void)
 	return DBmodify_field_type("proxy_autoreg_host", &field, &old_field);
 }
 
+static int	DBpatch_6030007(void)
+{
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("users", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -175,5 +182,6 @@ DBPATCH_ADD(6030003, 0, 1)
 DBPATCH_ADD(6030004, 0, 1)
 DBPATCH_ADD(6030005, 0, 1)
 DBPATCH_ADD(6030006, 0, 1)
+DBPATCH_ADD(6030007, 0, 1)
 
 DBPATCH_END()
