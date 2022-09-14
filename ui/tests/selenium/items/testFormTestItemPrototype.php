@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../common/testItemTest.php';
 /**
  * "Test item prototype" function tests.
  *
+ * @dataSource Proxies
+ *
  * @backup items
  */
 class testFormTestItemPrototype extends testItemTest {
