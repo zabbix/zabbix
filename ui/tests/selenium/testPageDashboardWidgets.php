@@ -21,6 +21,8 @@
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 
 /**
+ * @dataSource Proxies
+ *
  * @backup dashboard, profiles
  */
 class testPageDashboardWidgets extends CWebTest {

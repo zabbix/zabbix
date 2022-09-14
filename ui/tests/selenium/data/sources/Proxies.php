@@ -34,9 +34,7 @@ class Proxies {
 			'enabled_host5',
 			'enabled_host6',
 			'enabled_host7',
-			'enabled_host8',
-			'Host_1 with proxy',
-			'Host_2 with proxy'
+			'enabled_host8'
 	];
 
 	/**
@@ -103,12 +101,16 @@ class Proxies {
 	 * Preparing proxies and hosts.
 	 */
 	public static function load() {
+		// Create host group.
+		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'HG_for_proxies']]);
+		$hostgroupid = $hostgroups['groupids'][0];
+
 		// Create enabled hosts.
 		$enabled_hosts_data = [];
 		foreach (self::$enabled_hosts as $host) {
 			$enabled_hosts_data[] = [
 				'host' => $host,
-				'groups' => [['groupid' => 4]],
+				'groups' => [['groupid' => $hostgroupid]],
 				'status' => 0
 			];
 		}
@@ -116,12 +118,19 @@ class Proxies {
 		$enabled_hosts = CDataHelper::call('host.create', $enabled_hosts_data);
 		$enabled_hostids = CDataHelper::getIds('host');
 
+		// Create hosts fo filtering scenario.
+		CDataHelper::call('host.create',  [
+			['host' => 'Host_1 with proxy', 'groups' => [['groupid' => 4]]],
+			['host' => 'Host_2 with proxy', 'groups' => [['groupid' => 4]]],
+		]);
+		$filter_hostids = CDataHelper::getIds('host');
+
 		// Disabled hosts data.
 		$disabled_hosts_data = [];
 		foreach (self::$disabled_hosts as $host) {
 			$disabled_hosts_data[] = [
 				'host' => $host,
-				'groups' => [['groupid' => 4]],
+				'groups' => [['groupid' => $hostgroupid]],
 				'status' => 1
 			];
 		}
@@ -225,13 +234,13 @@ class Proxies {
 			[
 				'proxyid' => $active_proxyids['Proxy_1 for filter'],
 				'hosts' => [
-					['hostid' => $enabled_hostids['Host_1 with proxy']]
+					['hostid' => $filter_hostids['Host_1 with proxy']]
 				]
 			],
 			[
 				'proxyid' => $active_proxyids['Proxy_2 for filter'],
 				'hosts' => [
-					['hostid' => $enabled_hostids['Host_2 with proxy']]
+					['hostid' => $filter_hostids['Host_2 with proxy']]
 				]
 			]
 		]);
