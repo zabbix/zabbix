@@ -25,8 +25,6 @@
 #include "base64.h"
 #include "zbxalgo.h"
 
-#include <sys/utsname.h>
-
 /* number of characters per line when wrapping Base64 data in Email */
 #define ZBX_EMAIL_B64_MAXLINE			76
 
