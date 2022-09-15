@@ -18,7 +18,9 @@
 **/
 
 window.operation_popup = new class {
-	init() {
+	init({eventsource, recovery_phase}) {
+		this.recovery_phase = recovery_phase;
+		this.eventsource = eventsource;
 		this.overlay = overlays_stack.getById('operations');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -26,29 +28,13 @@ window.operation_popup = new class {
 		if (document.getElementById('operation-condition-list')) {
 			this.condition_count = (document.getElementById('operation-condition-list').rows.length - 2);
 		}
+
 		this._loadViews();
 		this._processTypeOfCalculation();
 	}
 
 	_loadViews() {
-		// todo E.S. : rewrite jqueries:
-
-		// todo : add this as another function
-		$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
-		$('[id="operation-message-body"],[id="operation-message-label"]').hide();
-
-		$('#operation_opmessage_default_msg')
-			.change(function() {
-				if($('#operation_opmessage_default_msg')[0].checked) {
-					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').show();
-					$('[id="operation-message-body"],[id="operation-message-label"]').show();
-				}
-				else {
-					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
-					$('[id="operation-message-body"],[id="operation-message-label"]').hide();
-				}
-			})
-		this.loadOperations();
+		this._addCustomMessageFields();
 
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('operation-message-user-groups-footer')) {
@@ -67,60 +53,61 @@ window.operation_popup = new class {
 		});
 	}
 
-	loadOperations() {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'action.operation.get');
-		curl.setArgument('eventsource', <?= EVENT_SOURCE_TRIGGERS ?>);
-		curl.setArgument('recovery', <?= ACTION_OPERATION ?>);
+	// addPopupValues() {
+	//	if (sourceid === 'operation-message-user-groups-footer') {
+	//		overlay.$dialogue[0].dispatchEvent(new CustomEvent('submit-usergroups-popup', {detail:values}));
+	//	}
+	// else if (sourceid === 'operation-command-target-hosts') {
+	//	operation_popup.view.operation_command.$targets_hosts_ms.multiSelect('addData', values);
+	// }
+	// else if (sourceid === 'operation-command-target-groups') {
+	//	operation_popup.view.operation_command.$targets_groups_ms.multiSelect('addData', values);
+	// }
+	//}
 
-		// if (operation) {
-		//	this.operation_num = operation.id;
-		// }
-		// else {
-		//	this.operation_num = null;
-		// }
+	// _createHiddenInput() {
+	//	let recovery_prefix = '';
+	//	if (this.recovery_phase == operation_details.ACTION_RECOVERY_OPERATION) {
+	//		recovery_prefix = 'recovery_';
+	//	}
+	//	else if (this.recovery_phase == operation_details.ACTION_UPDATE_OPERATION) {
+	//		recovery_prefix = 'update_';
+	//	}
 
-		this.overlay.xhr = $.post(curl.getUrl());
-		// this.overlay.xhr
-		//	.done((res) => {
-		//		if ('error' in res) {
-		//			const message_box = makeMessageBox('bad', res.error.messages, res.error.title, false);
+	//	const form = document.forms['action.edit'];
+	//	const input = document.createElement('input');
+	//	input.setAttribute('type', 'hidden');
+	//	input.setAttribute('name', `add_${recovery_prefix}operation`);
+	//	input.setAttribute('value', '1');
+	//	form.appendChild(input);
 
-		//			this.overlay.setProperties({content: message_box});
-
-		//			return;
-		//		}
-
-		//	})
-		//	.fail(({statusText}) => this.overlay.setProperties({content: makeMessageBox('bad', [statusText])}));
-	}
-
-	addPopupValues() {
-		if (sourceid === 'operation-message-user-groups-footer') {
-			overlay.$dialogue[0].dispatchEvent(new CustomEvent('submit-usergroups-popup', {detail:values}));
-		}
-	}
+	//	operation_form.forEach((value, name) => {
+	//		const input = document.createElement('input');
+	//		input.setAttribute('type', 'hidden');
+	//		input.setAttribute('name', `new_${recovery_prefix}${name}`);
+	//		input.setAttribute('value', value);
+	//		form.appendChild(input);
+	//	});
+	//}
 
 	_openUserGroupPopup(trigger_element) {
-		const overlay = PopUp('popup.generic', {
+		const parameters = {
 			'srctbl': 'usrgrp',
 			'srcfld1': 'usrgrpid',
 			'srcfld2': 'name',
 			'dstfrm': 'popup.operation',
 			'dstfld1': 'operation-message-user-groups-footer',
 			'multiselect': '1'
-		}, {dialogue_class: 'modal-popup-generic', trigger_element, dialogueid: 'usergroup-popup'});
+		}
+
+		const overlay = PopUp('popup.generic', parameters, {
+			dialogue_class: 'modal-popup-generic', trigger_element, dialogueid: 'usergroup-popup'
+		});
 
 		window.addPopupValues = ({object: objectid, parentId: sourceid, values}) => {
 			if (sourceid === 'operation-message-user-groups-footer') {
 				overlay.$dialogue[0].dispatchEvent(new CustomEvent('submit-usergroups-popup', {detail:values}));
 			}
-			// else if (sourceid === 'operation-command-target-hosts') {
-			//	operation_popup.view.operation_command.$targets_hosts_ms.multiSelect('addData', values);
-			// }
-			// else if (sourceid === 'operation-command-target-groups') {
-			//	operation_popup.view.operation_command.$targets_groups_ms.multiSelect('addData', values);
-			// }
 		};
 
 		overlay.$dialogue[0].addEventListener('submit-usergroups-popup', (e) => {
@@ -130,12 +117,11 @@ window.operation_popup = new class {
 
 	_addUserGroup(values) {
 		values.forEach(value => {
-				const row = document.createElement('tr');
-				row.append(value.name)
-				row.append(this._createRemoveCell())
+			const row = document.createElement('tr');
+			row.append(value.name)
+			row.append(this._createRemoveCell())
 
-			document.getElementById('operation-message-user-groups-footer')
-				.before(row);
+			document.getElementById('operation-message-user-groups-footer').before(row);
 		});
 	}
 
@@ -174,7 +160,7 @@ window.operation_popup = new class {
 	_openConditionsPopup(trigger_element) {
 		const parameters = {
 			'type': <?= ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION ?>,
-			'source': <?= EVENT_SOURCE_TRIGGERS ?>
+			'source': this.eventsource
 		};
 
 		const overlay = PopUp('popup.condition.operations', parameters, {
@@ -251,10 +237,8 @@ window.operation_popup = new class {
 		const fields = getFormFields(this.form);
 		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'popup.action.operations');
-
-		// todo: pass eventsource and recovery
-		url.setArgument('eventsource', 0);
-		url.setArgument('recovery', 0);
+		url.setArgument('eventsource', this.eventsource);
+		url.setArgument('recovery', this.recovery_phase);
 
 		this._post(url.getUrl(), fields);
 	}
@@ -265,15 +249,16 @@ window.operation_popup = new class {
 		url.setArgument('action', 'action.operation.validate');
 		url.setArgument('actionid', 0);
 
-		// todo: rewrite this:
-		return $.ajax({
-			url: url.getUrl(),
-			processData: false,
-			contentType: false,
-			data: this.form,
-			dataType: 'json',
-			method: 'POST'
-		});
+		this.overlay.xhr = $.post(url.getUrl());
+
+		// return $.ajax({
+		//	url: url.getUrl(),
+		//	processData: false,
+		//	contentType: false,
+		//	data: this.form,
+		//	dataType: 'json',
+		//	method: 'POST'
+		//});
 	}
 
 	_post(url, data, success_callback) {
@@ -288,6 +273,7 @@ window.operation_popup = new class {
 					throw {error: response.error};
 				}
 
+				console.log(data);
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
 				this.dialogue.dispatchEvent(new CustomEvent('operation.submit', {detail: response}));
@@ -316,6 +302,24 @@ window.operation_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	_addCustomMessageFields() {
+		// todo E.S. : rewrite jqueries:
+		$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
+		$('[id="operation-message-body"],[id="operation-message-label"]').hide();
+
+		$('#operation_opmessage_default_msg')
+			.change(function() {
+				if($('#operation_opmessage_default_msg')[0].checked) {
+					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').show();
+					$('[id="operation-message-body"],[id="operation-message-label"]').show();
+				}
+				else {
+					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
+					$('[id="operation-message-body"],[id="operation-message-label"]').hide();
+				}
+			})
 	}
 
 	_processTypeOfCalculation() {

@@ -35,12 +35,12 @@ $form_grid = (new CFormGrid());
 // Operation type row.
 $select_operationtype = (new CSelect(''))
 	->setFocusableElementId('operationtype')
+	->addOptions(CSelect::createOptionsFromArray($data['operation_types']))
 	->setId('operation-type-select');
 
 $form_grid->addItem([
 	new CLabel(_('Operation'), $select_operationtype->getFocusableElementId()),
-	(new CFormField($select_operationtype)),
-	// 'operation-type'
+	(new CFormField($select_operationtype))->setId('operation-type')
 	]);
 
 /*
@@ -135,7 +135,9 @@ $form_grid->addItem([
 
 // Operation message media type row (explicit).
 $select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
+	->addOptions(CSelect::createOptionsFromArray($data['media_types']))
 	->setFocusableElementId('operation-opmessage-mediatypeid');
+
 
 $form_grid->addItem([
 	new CLabel(_('Send only to'), $select_opmessage_mediatype->getFocusableElementId()),
@@ -165,8 +167,7 @@ $form_grid->addItem([
 // todo: til here
 
 
-// todo show only when ping (and other??) operation is selected
-// todo show when discovery or autoregistration action and operation type = ping ??
+// todo show when operation type = ping ?? (and other??)
 // todo add ms buttons
 // Command execution targets row.
 //$form_grid->addItem([
@@ -227,7 +228,7 @@ $form_grid->addItem([
 ////	'operation-attr-templates'
 //]);
 
-//// todo : show when discovery action and operation type = set host inventory mode
+//// todo : show when discovery action and operation type = set host inventory mode (on change)
 //// Host inventory mode attribute row.
 // $form_grid->addItem([
 //	new CLabel(_('Inventory mode'), 'operation_opinventory_inventory_mode'),
@@ -300,7 +301,10 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().$this->readJsFile('popup.operation.common.js.php').
-		'operation_popup.init();',
+		'operation_popup.init('.json_encode([
+			'eventsource' => $data['eventsource'],
+			'recovery_phase' => $data['recovery']
+		]).');',
 	//'script_inline' => getPagePostJs().
 	//	$this->readJsFile('popup.operations.js.php')
 ];

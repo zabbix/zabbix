@@ -183,6 +183,7 @@ if ($data['action']['operations']) {
 	$simple_interval_parser = new CSimpleIntervalParser();
 
 	foreach ($data['action']['operations'] as $operationid => $operation) {
+
 		if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_OPERATION])) {
 			continue;
 		}
@@ -304,7 +305,7 @@ $operations_table->setFooter(
 		->addClass('js-operation-details')
 		->setAttribute('actionid', $data['actionid'])
 		->setAttribute('eventsource', $data['eventsource'])
-		->setAttribute('operation_type', ACTION_OPERATION)
+		->setAttribute('operationtype', ACTION_OPERATION)
 		->addClass(ZBX_STYLE_BTN_LINK)
 );
 
@@ -512,7 +513,8 @@ $form
 				'condition_types' => condition_type2str(),
 				'conditions' => $data['action']['filter']['conditions'],
 				'actionid' => $data['actionid'] ?: 0,
-				'eventsource' => $data['eventsource']
+				'eventsource' => $data['eventsource'],
+				'allowed_operations' => $data['allowedOperations']
 			], JSON_THROW_ON_ERROR) .');
 		'))->setOnDocumentReady()
 	);
