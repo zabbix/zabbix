@@ -36,7 +36,7 @@ static int execute_check(const char *key, zbx_agent_check_t check_func, char **v
 	AGENT_RESULT result;
 	AGENT_REQUEST request;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&result);
 	if (SUCCEED != parse_item_key(key, &request))
 	{

@@ -79,7 +79,7 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Cannot get expected parameters from test case data: %s", zbx_mock_error_string(error));
 	}
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
 	if (expected_result != (actual_result = parse_item_key(item_key, &request)))
 	{

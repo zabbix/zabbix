@@ -189,7 +189,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	int		ret = NOTSUPPORTED;
 	AGENT_REQUEST	request;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
 	if (SUCCEED != parse_item_key(key, &request))
 	{

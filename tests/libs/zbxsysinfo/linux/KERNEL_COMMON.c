@@ -63,7 +63,7 @@ void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func)
 		fail_msg("Cannot get expected numeric parameter from test case data: %s", expected_param_value_string);
 	}
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&param_result);
 
 	if (ZABBIX_MOCK_KERNEL_MAXPROC == kernel_func)

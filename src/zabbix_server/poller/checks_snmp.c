@@ -1680,7 +1680,7 @@ static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *er
 {
 	int	i, j, ret = CONFIG_ERROR;
 
-	init_request(&data->request);
+	zbx_init_agent_request(&data->request);
 
 	if (SUCCEED != parse_item_key(key, &data->request))
 	{

@@ -38,7 +38,7 @@ void	zbx_mock_test_entry(void **state)
 	expected_value = zbx_mock_get_parameter_string("out.value");
 	expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&result);
 
 	if (SUCCEED != parse_item_key(param, &request))

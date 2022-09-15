@@ -57,7 +57,7 @@ void	zbx_mock_test_entry(void **state)
 		expected_string = expected_json;
 	}
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&result);
 
 	if (SUCCEED != parse_item_key("net.if.discovery", &request))

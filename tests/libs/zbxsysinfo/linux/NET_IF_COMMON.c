@@ -75,7 +75,7 @@ void	zbx_mock_test_entry_NET_IF_COMMON(void **state, int net_if_func)
 		}
 	}
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&param_result);
 
 	if (SUCCEED != parse_item_key(init_param, &request))

@@ -185,7 +185,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 	int		ret = NOTSUPPORTED, nparams;
 	const char	*tmp, *tmp1;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
 	if (SUCCEED != parse_item_key(item->key, &request))
 	{

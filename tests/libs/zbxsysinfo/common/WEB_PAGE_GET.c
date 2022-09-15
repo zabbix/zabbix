@@ -73,7 +73,7 @@ void	zbx_mock_test_entry(void **state)
 
 	expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&param_result);
 	init_param = zbx_mock_get_parameter_string("in.key");
 

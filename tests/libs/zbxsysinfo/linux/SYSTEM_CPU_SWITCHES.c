@@ -80,7 +80,7 @@ void	zbx_mock_test_entry(void **state)
 		}
 	}
 
-	init_request(&zbx_agent_request);
+	zbx_init_agent_request(&zbx_agent_request);
 	zbx_init_agent_result(&zbx_agent_result);
 
 	/* call the function-under-test */

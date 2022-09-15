@@ -205,7 +205,7 @@ int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' addr:'%s'", __func__, item->key_orig, item->interface.addr);
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
 	if (SUCCEED != parse_item_key(item->key, &request))
 	{

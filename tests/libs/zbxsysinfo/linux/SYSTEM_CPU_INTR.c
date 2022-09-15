@@ -38,7 +38,7 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	zbx_init_agent_result(&result);
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
 	if (SUCCEED != parse_item_key(itemkey, &request))
 		fail_msg("Invalid item key format '%s'", itemkey);

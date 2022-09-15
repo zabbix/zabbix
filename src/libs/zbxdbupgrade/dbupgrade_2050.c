@@ -178,7 +178,7 @@ static int	DBpatch_2050012(void)
 
 	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
-		init_request(&request);
+		zbx_init_agent_request(&request);
 
 		if (SUCCEED != parse_item_key(row[2], &request))
 		{

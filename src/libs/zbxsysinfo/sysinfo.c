@@ -170,7 +170,7 @@ int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size
 	ZBX_METRIC	metric;
 	AGENT_REQUEST	request;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
 	if (SUCCEED == (ret = parse_item_key(itemkey, &request)))
 	{
@@ -762,7 +762,7 @@ int	zbx_check_key_access_rules(const char *metric)
 	int		ret;
 	AGENT_REQUEST	request;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
 	if (SUCCEED == parse_item_key(metric, &request))
 		ret = zbx_check_request_access_rules(&request);
@@ -832,7 +832,7 @@ void	zbx_free_agent_result(AGENT_RESULT *result)
  * Parameters: request - pointer to the structure                             *
  *                                                                            *
  ******************************************************************************/
-void	init_request(AGENT_REQUEST *request)
+void	zbx_init_agent_request(AGENT_REQUEST *request)
 {
 	request->key = NULL;
 	request->nparam = 0;
@@ -1120,7 +1120,7 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 	ZBX_METRIC	*command = NULL;
 	AGENT_REQUEST	request;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
 	if (SUCCEED != parse_item_key((0 == (flags & ZBX_PROCESS_WITH_ALIAS) ? in_command : zbx_alias_get(in_command)),
 			&request))

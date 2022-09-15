@@ -5469,7 +5469,7 @@ static int	DBpatch_5030169(void)
 
 		params_offset = 0;
 
-		init_request(&request);
+		zbx_init_agent_request(&request);
 
 		if (SUCCEED != parse_item_key(row[1], &request))
 		{

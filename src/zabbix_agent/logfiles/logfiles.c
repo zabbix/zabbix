@@ -3850,7 +3850,7 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, 
 	else
 		is_count_item = 0;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
 	/* Expected parameters by item: */
 	/* log        [file,       <regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>,<persistent_dir>] 9 params */

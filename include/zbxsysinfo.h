@@ -213,7 +213,7 @@ void	zbx_init_agent_result(AGENT_RESULT *result);
 void	zbx_log_free(zbx_log_t *log);
 void	zbx_free_agent_result(AGENT_RESULT *result);
 
-void	init_request(AGENT_REQUEST *request);
+void	zbx_init_agent_request(AGENT_REQUEST *request);
 void	free_request(AGENT_REQUEST *request);
 
 int	parse_item_key(const char *itemkey, AGENT_REQUEST *request);

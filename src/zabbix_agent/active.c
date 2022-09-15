@@ -272,7 +272,7 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 	else						/* log.count[] */
 		max_num_parameters = 6;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
 	if (SUCCEED == parse_item_key(itemkey, &request) && 0 < get_rparams_num(&request) &&
 			max_num_parameters >= get_rparams_num(&request) && NULL != (skip = get_rparam(&request, 4)) &&

@@ -122,7 +122,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 			continue;
 		}
 
-		init_request(&request);
+		zbx_init_agent_request(&request);
 
 		if (SUCCEED != parse_item_key(items[i].key, &request))
 			goto next;

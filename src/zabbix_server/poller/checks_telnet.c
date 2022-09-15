@@ -28,7 +28,7 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 	int		ret = NOTSUPPORTED;
 	const char	*port, *encoding, *dns;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
 	if (SUCCEED != parse_item_key(item->key, &request))
 	{

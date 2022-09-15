@@ -53,7 +53,7 @@ void	zbx_mock_test_entry(void **state)
 	ip = zbx_mock_get_parameter_string("in.ip");
 
 	zbx_init_agent_result(&result);
-	init_request(&request);
+	zbx_init_agent_request(&request);
 	*key = '\0';
 	strcat(key, "net.tcp.service[smtp");
 

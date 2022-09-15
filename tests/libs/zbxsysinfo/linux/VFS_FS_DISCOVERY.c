@@ -68,7 +68,7 @@ void	zbx_mock_test_entry(void **state)
 		expected_string = expected_json;
 	}
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&result);
 
 	if (expected_result != (actual_result = VFS_FS_DISCOVERY(&request, &result)))

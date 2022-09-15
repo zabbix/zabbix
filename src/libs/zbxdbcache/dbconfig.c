@@ -179,7 +179,7 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 				AGENT_REQUEST	request;
 				char		*arg1, *arg2, *arg3;
 
-				init_request(&request);
+				zbx_init_agent_request(&request);
 
 				if (SUCCEED != parse_item_key(key, &request) || 3 != request.nparam)
 					goto clean;

@@ -351,7 +351,7 @@ static int	expression_match_item_key(const char *item_key, const AGENT_REQUEST *
 	AGENT_REQUEST	key;
 	int		i, ret = FAIL;
 
-	init_request(&key);
+	zbx_init_agent_request(&key);
 
 	if (SUCCEED != parse_item_key(item_key, &key))
 		goto out;
@@ -413,7 +413,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 
 	if (0 != (query->flags & ZBX_ITEM_QUERY_KEY_SOME))
 	{
-		init_request(&pattern);
+		zbx_init_agent_request(&pattern);
 		if (SUCCEED != parse_item_key(query->ref.key, &pattern))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
