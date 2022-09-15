@@ -259,12 +259,12 @@ void	reload_user_parameters(unsigned char process_type, int process_num)
 		goto out;
 	}
 
-	get_metrics_copy(&metrics_fallback);
-	remove_user_parameters();
+	zbx_get_metrics_copy(&metrics_fallback);
+	zbx_remove_user_parameters();
 
 	if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
 	{
-		set_metrics(metrics_fallback);
+		zbx_set_metrics(metrics_fallback);
 		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d], %s",
 				get_process_type_string(process_type), process_num, error);
 		zbx_free(error);

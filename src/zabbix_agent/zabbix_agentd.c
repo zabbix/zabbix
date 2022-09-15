@@ -1430,7 +1430,7 @@ int	main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 			}
 #endif
-			set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
+			zbx_set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
 
 			if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
 			{
@@ -1442,9 +1442,9 @@ int	main(int argc, char **argv)
 			load_aliases(CONFIG_ALIASES);
 			zbx_free_config();
 			if (ZBX_TASK_TEST_METRIC == t.task)
-				test_parameter(TEST_METRIC);
+				zbx_test_parameter(TEST_METRIC);
 			else
-				test_parameters();
+				zbx_test_parameters();
 #ifdef _WINDOWS
 			free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
 
@@ -1478,7 +1478,7 @@ int	main(int argc, char **argv)
 			break;
 		default:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
-			set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
+			zbx_set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
 			load_aliases(CONFIG_ALIASES);
 			break;
 	}

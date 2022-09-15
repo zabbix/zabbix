@@ -200,14 +200,14 @@ void	zbx_free_key_access_rules(void);
 
 int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result);
 
-void	set_user_parameter_dir(const char *path);
+void	zbx_set_user_parameter_dir(const char *path);
 int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len);
-void	remove_user_parameters(void);
-void	get_metrics_copy(ZBX_METRIC **metrics);
-void	set_metrics(ZBX_METRIC *metrics);
-int	add_user_module(const char *key, int (*function)(void));
-void	test_parameters(void);
-void	test_parameter(const char *key);
+void	zbx_remove_user_parameters(void);
+void	zbx_get_metrics_copy(ZBX_METRIC **metrics);
+void	zbx_set_metrics(ZBX_METRIC *metrics);
+int	zbx_add_user_module(const char *key, int (*function)(void));
+void	zbx_test_parameters(void);
+void	zbx_test_parameter(const char *key);
 
 void	init_result(AGENT_RESULT *result);
 void	zbx_log_free(zbx_log_t *log);

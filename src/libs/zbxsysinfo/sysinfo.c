@@ -197,7 +197,7 @@ int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size
 	return ret;
 }
 
-void	remove_user_parameters(void)
+void	zbx_remove_user_parameters(void)
 {
 	int	i, usr = -1;
 
@@ -227,7 +227,7 @@ void	remove_user_parameters(void)
 	}
 }
 
-void	get_metrics_copy(ZBX_METRIC **metrics)
+void	zbx_get_metrics_copy(ZBX_METRIC **metrics)
 {
 	unsigned int	i;
 
@@ -254,7 +254,7 @@ void	get_metrics_copy(ZBX_METRIC **metrics)
 	memset(&(*metrics)[i], 0, sizeof(ZBX_METRIC));
 }
 
-void	set_metrics(ZBX_METRIC *metrics)
+void	zbx_set_metrics(ZBX_METRIC *metrics)
 {
 	zbx_free_metrics_ext(&commands);
 	commands = metrics;
@@ -940,7 +940,7 @@ out:
 #undef ZBX_COMMAND_WITHOUT_PARAMS
 #undef ZBX_COMMAND_WITH_PARAMS
 
-void	test_parameter(const char *key)
+void	zbx_test_parameter(const char *key)
 {
 #define ZBX_KEY_COLUMN_WIDTH	45
 	AGENT_RESULT	result;
@@ -984,7 +984,7 @@ void	test_parameter(const char *key)
 #undef ZBX_KEY_COLUMN_WIDTH
 }
 
-void	test_parameters(void)
+void	zbx_test_parameters(void)
 {
 	int	i;
 	char	*key = NULL;
@@ -1006,7 +1006,7 @@ void	test_parameters(void)
 			}
 
 			if (ZBX_KEY_ACCESS_ALLOW == zbx_check_key_access_rules(key))
-				test_parameter(key);
+				zbx_test_parameter(key);
 		}
 	}
 
