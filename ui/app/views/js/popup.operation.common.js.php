@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 window.operation_popup = new class {
 	init() {
 		this.overlay = overlays_stack.getById('operations');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+
 		if (document.getElementById('operation-condition-list')) {
 			this.condition_count = (document.getElementById('operation-condition-list').rows.length - 2);
 		}
@@ -48,6 +48,7 @@ window.operation_popup = new class {
 					$('[id="operation-message-body"],[id="operation-message-label"]').hide();
 				}
 			})
+		this.loadOperations();
 
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('operation-message-user-groups-footer')) {
@@ -57,7 +58,6 @@ window.operation_popup = new class {
 				this._openUserPopup(e.target);
 			}
 			else if (e.target.classList.contains('operation-condition-list-footer')) {
-				// todo E.S.: add function to open condition popup
 				this._openConditionsPopup(e.target);
 			}
 			else if (e.target.classList.contains('element-table-remove')) {
@@ -67,22 +67,80 @@ window.operation_popup = new class {
 		});
 	}
 
+	loadOperations() {
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', 'action.operation.get');
+		curl.setArgument('eventsource', <?= EVENT_SOURCE_TRIGGERS ?>);
+		curl.setArgument('recovery', <?= ACTION_OPERATION ?>);
+
+		// if (operation) {
+		//	this.operation_num = operation.id;
+		// }
+		// else {
+		//	this.operation_num = null;
+		// }
+
+		this.overlay.xhr = $.post(curl.getUrl());
+		// this.overlay.xhr
+		//	.done((res) => {
+		//		if ('error' in res) {
+		//			const message_box = makeMessageBox('bad', res.error.messages, res.error.title, false);
+
+		//			this.overlay.setProperties({content: message_box});
+
+		//			return;
+		//		}
+
+		//	})
+		//	.fail(({statusText}) => this.overlay.setProperties({content: makeMessageBox('bad', [statusText])}));
+	}
+
+	addPopupValues() {
+		if (sourceid === 'operation-message-user-groups-footer') {
+			overlay.$dialogue[0].dispatchEvent(new CustomEvent('submit-usergroups-popup', {detail:values}));
+		}
+	}
+
 	_openUserGroupPopup(trigger_element) {
-		PopUp('popup.generic', {
+		const overlay = PopUp('popup.generic', {
 			'srctbl': 'usrgrp',
 			'srcfld1': 'usrgrpid',
 			'srcfld2': 'name',
 			'dstfrm': 'popup.operation',
 			'dstfld1': 'operation-message-user-groups-footer',
 			'multiselect': '1'
-		}, {dialogue_class: 'modal-popup-generic', trigger_element});
+		}, {dialogue_class: 'modal-popup-generic', trigger_element, dialogueid: 'usergroup-popup'});
 
-		//this._addUserGroup();
-		// todo E.S : ADD DATA TO 'SEND TO USER GROUPS' TABLE
+		window.addPopupValues = ({object: objectid, parentId: sourceid, values}) => {
+			if (sourceid === 'operation-message-user-groups-footer') {
+				overlay.$dialogue[0].dispatchEvent(new CustomEvent('submit-usergroups-popup', {detail:values}));
+			}
+			// else if (sourceid === 'operation-command-target-hosts') {
+			//	operation_popup.view.operation_command.$targets_hosts_ms.multiSelect('addData', values);
+			// }
+			// else if (sourceid === 'operation-command-target-groups') {
+			//	operation_popup.view.operation_command.$targets_groups_ms.multiSelect('addData', values);
+			// }
+		};
+
+		overlay.$dialogue[0].addEventListener('submit-usergroups-popup', (e) => {
+			this._addUserGroup(e.detail);
+		})
+	}
+
+	_addUserGroup(values) {
+		values.forEach(value => {
+				const row = document.createElement('tr');
+				row.append(value.name)
+				row.append(this._createRemoveCell())
+
+			document.getElementById('operation-message-user-groups-footer')
+				.before(row);
+		});
 	}
 
 	_openUserPopup(trigger_element) {
-		PopUp('popup.generic', {
+		const overlay = PopUp('popup.generic', {
 			'srctbl': 'users',
 			'srcfld1': 'userid',
 			'srcfld2': 'fullname',
@@ -91,35 +149,26 @@ window.operation_popup = new class {
 			'multiselect': '1'
 		}, {dialogue_class: 'modal-popup-generic', trigger_element});
 
-		// todo E.S : ADD DATA TO 'SEND TO USER' TABLE
+		window.addPopupValues = ({object: objectid, parentId: sourceid, values}) => {
+			if (sourceid === 'operation-message-users-footer') {
+				overlay.$dialogue[0].dispatchEvent(new CustomEvent('submit-users-popup', {detail: values}));
+			}
+		}
+
+		overlay.$dialogue[0].addEventListener('submit-users-popup', (e) => {
+			this._addUser(e.detail);
+		})
 	}
 
-	_addUserGroup() {
-		this.tmpl_usergroup_row = new Template(this._usrgrpTemplate());
-		document.getElementById('operation-message-user-groups-footer')
-			.before(this.tmpl_usergroup_row);
-	}
+	_addUser(values) {
+		values.forEach(value => {
+			const row = document.createElement('tr');
+			row.append(value.name)
+			row.append(this._createRemoveCell())
 
-	_usrgrpTemplate() {
-		return `
-			<tr data-id="#{usrgrpid}">
-				<td>
-					<span>#{name}</span>
-				</td>
-				<td class="<?= ZBX_STYLE_NOWRAP ?>">
-					<input name="operation[opmessage_grp][][usrgrpid]" type="hidden" value="#{usrgrpid}" />
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="$(this).closest('tr').remove();">
-						<?= _('Remove') ?>
-					</button>
-				</td>
-			</tr>
-		`
-	}
-
-	_addPopupValues() {
-		// todo: pass popup data - objectid - usrgrpid
-		//  todo: pass values: usrgrpid name gui_access, user_status ??
-		const objectid = 'usrgrpid'
+			document.getElementById('operation-message-users-footer')
+				.before(row);
+		});
 	}
 
 	_openConditionsPopup(trigger_element) {
