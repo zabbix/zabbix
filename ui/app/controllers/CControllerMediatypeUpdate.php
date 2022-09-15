@@ -119,6 +119,10 @@ class CControllerMediatypeUpdate extends CController {
 					$mediatype['username'] = $this->getInput('smtp_username');
 				}
 
+				if ($mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
+					$mediatype['username'] = $this->getInput('smtp_email');
+				}
+
 				$mediatype['smtp_verify_peer'] = $this->getInput('smtp_verify_peer', 0);
 				$mediatype['smtp_verify_host'] = $this->getInput('smtp_verify_host', 0);
 

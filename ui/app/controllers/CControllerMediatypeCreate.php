@@ -108,6 +108,11 @@ class CControllerMediatypeCreate extends CController {
 				if ($this->hasInput('smtp_username')) {
 					$mediatype['username'] = $this->getInput('smtp_username');
 				}
+
+				if ($mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
+					$mediatype['username'] = $this->getInput('smtp_email');
+				}
+
 				break;
 
 			case MEDIA_TYPE_EXEC:
