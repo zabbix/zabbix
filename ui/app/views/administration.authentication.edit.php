@@ -420,6 +420,29 @@ $saml_tab = (new CFormGrid())
 		))->addClass('saml-provision-status')
 	])
 	->addItem([
+		(new CLabel(_('Authorization token'), 'scim_token'))->addClass('saml-provision-status'),
+		(new CFormField($data['saml_provision_status'] == JIT_PROVISIONING_ENABLED && $data['scim_token'] != ''
+			? [
+				(new CSimpleButton(_('Change token')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->setId('scim-token-btn')
+					->addClass('saml-enabled'),
+				(new CPassBox('scim_token', '', DB::getFieldLength('userdirectory_saml', 'scim_token')))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					->addStyle('display: none;')
+					->setAttribute('disabled', 'disabled'),
+				$data['token_is_expired']
+					? ['&nbsp;',
+						makeErrorIcon(_('The token has expired. Please update the expiry date to use the token.'))
+					]
+					: null
+			]
+			: (new CPassBox('scim_token', '', DB::getFieldLength('userdirectory_saml', 'scim_token')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->addClass('saml-enabled')
+		))->addClass('saml-provision-status')
+	])
+	->addItem([
 		(new CLabel(_('User group mapping')))->addClass('saml-provision-status'),
 		(new CFormField(
 			(new CDiv(
@@ -483,17 +506,6 @@ $saml_tab = (new CFormGrid())
 			(new CCheckBox('scim_status', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
 				->setChecked($data['scim_status'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
 				->setUncheckedValue(ZBX_AUTH_SCIM_PROVISIONING_DISABLED)
-				->addClass('saml-enabled')
-		))->addClass('saml-provision-status')
-	])
-	->addItem([
-		(new CLabel(_('Authorization token'), 'scim_token'))->addClass('saml-provision-status'),
-		(new CFormField(
-			(new CTextBox('scim_token', $data['scim_token'], false,
-				DB::getFieldLength('userdirectory_saml', 'scim_token')
-			))
-				->setAriaRequired()
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->addClass('saml-enabled')
 		))->addClass('saml-provision-status')
 	]);

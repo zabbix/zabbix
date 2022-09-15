@@ -176,6 +176,12 @@ class CControllerAuthenticationEdit extends CController {
 				$data['saml_provision_media'] = $this->extendProvisionMedia($data['saml_provision_media']);
 			}
 
+			$data['token_is_expired'] = false;
+			if (array_key_exists('scim_token', $data)) {
+				$data['token_is_expired'] = $this->checkTokenExpiration($data['scim_token']);
+			}
+
+
 			$data['ldap_servers'] = $this->getLdapServerUserGroupCount($this->getInput('ldap_servers', []));
 			$data['ldap_default_row_index'] = $this->getInput('ldap_default_row_index', 0);
 			$data['ldap_removed_userdirectoryids'] = $this->getInput('ldap_removed_userdirectoryids', []);
@@ -212,6 +218,10 @@ class CControllerAuthenticationEdit extends CController {
 					'provision_groups' => 'saml_provision_groups',
 					'provision_media' => 'saml_provision_media'
 				]);
+
+				$saml_configuration['token_is_expired'] = $this->checkTokenExpiration(
+					$saml_configuration['scim_token']
+				);
 			}
 			else {
 				$saml_configuration = [
@@ -406,5 +416,34 @@ class CControllerAuthenticationEdit extends CController {
 		}
 
 		return $provision_media;
+	}
+
+	/**
+	 * Return true if API token is expired.
+	 *
+	 * @param string $token
+	 *
+	 * @return bool
+	 *
+	 */
+	private function checkTokenExpiration(string $token): bool {
+		if ($token == '') {
+			return false;
+		}
+
+		$token_is_expired = false;
+
+		$db_token = API::Token()->get([
+			'output' => ['expires_at'],
+			'token' => $token
+		]);
+
+		if ($db_token) {
+			$token_is_expired = $db_token[0]['expires_at']
+				? time() > $db_token[0]['expires_at']
+				: false;
+		}
+
+		return $token_is_expired;
 	}
 }

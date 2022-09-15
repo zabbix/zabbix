@@ -472,10 +472,13 @@ class CControllerAuthenticationUpdate extends CController {
 			'saml_provision_groups' => [],
 			'saml_provision_media' => [],
 			'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED,
-			'scim_token' => ''
 		];
 
 		$this->getInputs($saml_fields, array_keys($saml_fields));
+
+		if ($this->hasInput('scim_token')) {
+			$saml_fields['scim_token'] = $this->getInput('scim_token');
+		}
 
 		$saml_data = [
 			'idp_type' => IDP_TYPE_SAML,
