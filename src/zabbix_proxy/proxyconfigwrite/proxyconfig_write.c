@@ -1878,16 +1878,21 @@ static int	proxyconfig_delete_globalmacros(char **error)
  * Purpose: update configuration                                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_proxyconfig_process(struct zbx_json_parse *jp, char **error)
+int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **error)
 {
 	zbx_vector_table_data_ptr_t	config_tables;
-	int			ret = SUCCEED, full_sync = 0, delete_globalmacros = 0;
+	int			ret = SUCCEED, full_sync = 0, delete_globalmacros = 0, loglevel;
 	char			tmp[ZBX_MAX_UINT64_LEN + 1];
 	struct zbx_json_parse	jp_data, jp_del_hostids;
 	zbx_uint64_t		config_revision;
 	zbx_vector_uint64_t	del_hostids, del_macro_hostids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	loglevel = (1 == jp->end - jp->start ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING);
+
+	zabbix_log(loglevel, "received configuration data from server at \"%s\", datalen " ZBX_FS_SIZE_T,
+			addr, jp->end - jp->start + 1);
 
 	if (1 == jp->end - jp->start)
 	{
@@ -2034,10 +2039,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server at \"%s\", datalen " ZBX_FS_SIZE_T,
-			sock->peer, (zbx_fs_size_t)(jp_config.end - jp_config.start + 1));
-
-	if (SUCCEED == (ret = zbx_proxyconfig_process(&jp_config, &error)))
+	if (SUCCEED == (ret = zbx_proxyconfig_process(sock->peer, &jp_config, &error)))
 	{
 		if (SUCCEED == zbx_rtc_reload_config_cache(&error))
 		{
