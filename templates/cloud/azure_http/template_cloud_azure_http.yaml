@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-08T13:29:03Z'
+  date: '2022-09-15T06:33:18Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -680,6 +680,18 @@ zabbix_export:
             -
               tag: component
               value: network
+          triggers:
+            -
+              uuid: 3346ea2331c14fa18658eb33e461ec7c
+              expression: 'min(/Azure MySQL flexible server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED_CONN.MAX.WARN}'
+              name: 'Azure MySQL: Server has aborted connections'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The number of failed attempts to connect to MySQL server is more than {$AZURE.DB.ABORTED_CONN.MAX.WARN}.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 71b33f0a5d37498dbb57d185ac0f2741
           name: 'Azure MySQL: Connections active'
@@ -1265,6 +1277,10 @@ zabbix_export:
           value: 60s
           description: 'Response timeout for API.'
         -
+          macro: '{$AZURE.DB.ABORTED_CONN.MAX.WARN}'
+          value: '10'
+          description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
+        -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
           description: 'The critical threshold of the CPU utilization in %.'
@@ -1486,6 +1502,18 @@ zabbix_export:
             -
               tag: component
               value: network
+          triggers:
+            -
+              uuid: 5b3a09ca04704e6a9972ee4865d358cd
+              expression: 'min(/Azure MySQL single server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED_CONN.MAX.WARN}'
+              name: 'Azure MySQL: Server has failed connections'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The number of failed attempts to connect to MySQL server is more than {$AZURE.DB.FAILED_CONN.MAX.WARN}.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: d0b5864a56094166b76fbc58a5e05c7c
           name: 'Azure MySQL: Percentage CPU'
@@ -2048,6 +2076,10 @@ zabbix_export:
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
           description: 'The critical threshold of the CPU utilization in %.'
+        -
+          macro: '{$AZURE.DB.FAILED_CONN.MAX.WARN}'
+          value: '10'
+          description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'

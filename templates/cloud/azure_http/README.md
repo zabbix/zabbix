@@ -222,6 +222,7 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`60s` |
+|{$AZURE.DB.ABORTED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p> |`10` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
 |{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization in %.</p> |`90` |
@@ -272,6 +273,7 @@ There are no template links in this template.
 |Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
 |Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
 |Azure MySQL: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL flexible server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure MySQL: Server has aborted connections |<p>The number of failed attempts to connect to MySQL server is more than {$AZURE.DB.ABORTED_CONN.MAX.WARN}.</p> |`min(/Azure MySQL flexible server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED_CONN.MAX.WARN}` |AVERAGE | |
 |Azure MySQL: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
 |Azure MySQL: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
@@ -313,6 +315,7 @@ No specific Zabbix configuration is required.
 |{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
+|{$AZURE.DB.FAILED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p> |`10` |
 |{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization in %.</p> |`80` |
@@ -362,6 +365,7 @@ There are no template links in this template.
 |Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
 |Azure MySQL: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
 |Azure MySQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
+|Azure MySQL: Server has failed connections |<p>The number of failed attempts to connect to MySQL server is more than {$AZURE.DB.FAILED_CONN.MAX.WARN}.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED_CONN.MAX.WARN}` |AVERAGE | |
 |Azure MySQL: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
 |Azure MySQL: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
