@@ -1587,26 +1587,6 @@ int	zbx_quote_key_param(char **param, int forced)
 	return SUCCEED;
 }
 
-#ifdef HAVE_KSTAT_H
-zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn)
-{
-	switch (kn->data_type)
-	{
-		case KSTAT_DATA_INT32:
-			return kn->value.i32;
-		case KSTAT_DATA_UINT32:
-			return kn->value.ui32;
-		case KSTAT_DATA_INT64:
-			return kn->value.i64;
-		case KSTAT_DATA_UINT64:
-			return kn->value.ui64;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return 0;
-	}
-}
-#endif
-
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 #if defined(WITH_AGENT2_METRICS)
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result)

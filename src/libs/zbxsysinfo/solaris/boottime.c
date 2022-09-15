@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "kstat.h"
 
 #include "log.h"
 
