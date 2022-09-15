@@ -800,7 +800,7 @@ static int	load_enable_remote_commands(const char *value, const struct cfg_line 
 	zabbix_log(LOG_LEVEL_WARNING, "EnableRemoteCommands parameter is deprecated,"
 				" use AllowKey=system.run[*] or DenyKey=system.run[*] instead");
 
-	return add_key_access_rule(cfg->parameter, sysrun, rule_type);
+	return zbx_add_key_access_rule(cfg->parameter, sysrun, rule_type);
 }
 
 /******************************************************************************

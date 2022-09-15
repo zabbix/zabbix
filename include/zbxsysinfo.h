@@ -193,10 +193,10 @@ void	zbx_free_metrics(void);
 
 void	zbx_init_key_access_rules(void);
 void	zbx_finalize_key_access_rules_configuration(void);
-int	add_key_access_rule(const char *parameter, char *pattern, zbx_key_access_rule_type_t type);
-int	check_key_access_rules(const char *metric);
-int	check_request_access_rules(AGENT_REQUEST *request);
-void	free_key_access_rules(void);
+int	zbx_add_key_access_rule(const char *parameter, char *pattern, zbx_key_access_rule_type_t type);
+int	zbx_check_key_access_rules(const char *metric);
+int	zbx_check_request_access_rules(AGENT_REQUEST *request);
+void	zbx_free_key_access_rules(void);
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 

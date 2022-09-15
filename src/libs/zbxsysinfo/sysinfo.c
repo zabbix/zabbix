@@ -366,7 +366,7 @@ void	zbx_free_metrics(void)
 {
 	zbx_free_metrics_ext(&commands);
 	zbx_free_metrics_ext(&commands_local);
-	free_key_access_rules();
+	zbx_free_key_access_rules();
 }
 
 /******************************************************************************
@@ -634,7 +634,7 @@ static int	compare_key_access_rules(const void *rule_a, const void *rule_b)
  *               FAIL    - pattern parsing failed                             *
  *                                                                            *
  ******************************************************************************/
-int	add_key_access_rule(const char *parameter, char *pattern, zbx_key_access_rule_type_t type)
+int	zbx_add_key_access_rule(const char *parameter, char *pattern, zbx_key_access_rule_type_t type)
 {
 	zbx_key_access_rule_t	*rule, *r;
 	int			i;
@@ -673,7 +673,7 @@ int	add_key_access_rule(const char *parameter, char *pattern, zbx_key_access_rul
  *               ZBX_KEY_ACCESS_DENY  - metric access denied                  *
  *                                                                            *
  ******************************************************************************/
-int	check_request_access_rules(AGENT_REQUEST *request)
+int	zbx_check_request_access_rules(AGENT_REQUEST *request)
 {
 	int			i, j, empty_arguments;
 	zbx_key_access_rule_t	*rule;
@@ -757,7 +757,7 @@ int	check_request_access_rules(AGENT_REQUEST *request)
  *               ZBX_KEY_ACCESS_DENY  - metric access denied                  *
  *                                                                            *
  ******************************************************************************/
-int	check_key_access_rules(const char *metric)
+int	zbx_check_key_access_rules(const char *metric)
 {
 	int		ret;
 	AGENT_REQUEST	request;
@@ -765,7 +765,7 @@ int	check_key_access_rules(const char *metric)
 	init_request(&request);
 
 	if (SUCCEED == parse_item_key(metric, &request))
-		ret = check_request_access_rules(&request);
+		ret = zbx_check_request_access_rules(&request);
 	else
 		ret = ZBX_KEY_ACCESS_DENY;
 
@@ -779,7 +779,7 @@ int	check_key_access_rules(const char *metric)
  * Purpose: cleanup key access rule list                                      *
  *                                                                            *
  ******************************************************************************/
-void	free_key_access_rules(void)
+void	zbx_free_key_access_rules(void)
 {
 	int	i;
 
@@ -1005,7 +1005,7 @@ void	test_parameters(void)
 				zbx_chrcpy_alloc(&key, &key_alloc, &key_offset, ']');
 			}
 
-			if (ZBX_KEY_ACCESS_ALLOW == check_key_access_rules(key))
+			if (ZBX_KEY_ACCESS_ALLOW == zbx_check_key_access_rules(key))
 				test_parameter(key);
 		}
 	}
@@ -1131,7 +1131,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		goto notsupported;
 	}
 
-	if (0 == (flags & ZBX_PROCESS_LOCAL_COMMAND) && ZBX_KEY_ACCESS_ALLOW != check_request_access_rules(&request))
+	if (0 == (flags & ZBX_PROCESS_LOCAL_COMMAND) && ZBX_KEY_ACCESS_ALLOW != zbx_check_request_access_rules(&request))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Key access denied: \"%s\"", in_command);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key."));

@@ -130,7 +130,7 @@ int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
 	else
 		return FAIL;
 
-	return add_key_access_rule(cfg->parameter, (char *)value, rule_type);
+	return zbx_add_key_access_rule(cfg->parameter, (char *)value, rule_type);
 }
 
 #ifdef _WINDOWS
