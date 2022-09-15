@@ -21,7 +21,7 @@
 #include "zbxdbhigh.h"
 
 #include "log.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxserver.h"
 #include "zbxtasks.h"
 #include "zbxdiscovery.h"
@@ -1352,7 +1352,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
 		if (0 != value->meta)
 			set_result_meta(&result, value->lastlogsize, value->mtime);
 
-		if (0 != ISSET_VALUE(&result) || 0 != ISSET_META(&result))
+		if (0 != ZBX_ISSET_VALUE(&result) || 0 != ZBX_ISSET_META(&result))
 		{
 			item->state = ITEM_STATE_NORMAL;
 			process_item_value(item, &result, &value->ts, h_num, NULL);

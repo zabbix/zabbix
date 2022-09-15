@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 #include "zbxnum.h"
-#include "stats.h"
 #include "log.h"
 
+#include "stats.h"
 #include <uvm/uvm_extern.h>
 
 static int	get_cpu_num()
@@ -186,7 +186,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int			mib[] = {CTL_VM, VM_UVMEXP2};
 	size_t			len;
@@ -205,7 +205,7 @@ int     SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int     SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int			mib[] = {CTL_VM, VM_UVMEXP2};
 	size_t			len;

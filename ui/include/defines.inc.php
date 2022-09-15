@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.4.0alpha1');
 define('ZABBIX_API_VERSION',	'6.4.0');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6030049);
+define('ZABBIX_DB_VERSION',		6030053);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -101,6 +101,10 @@ define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);
 define('ZBX_SCRIPT_TYPE_TELNET',		3);
 define('ZBX_SCRIPT_TYPE_WEBHOOK',		5);
+define('ZBX_SCRIPT_TYPE_URL',			6);
+
+define('ZBX_SCRIPT_URL_NEW_WINDOW_NO',	0);
+define('ZBX_SCRIPT_URL_NEW_WINDOW_YES',	1);
 
 define('ZBX_SCRIPT_SCOPE_ACTION', 0x1);
 define('ZBX_SCRIPT_SCOPE_HOST', 0x2);

@@ -32,6 +32,7 @@
 #include "zbxexpr.h"
 #include "zbxnum.h"
 #include "zbxparam.h"
+#include "zbxsysinfo.h"
 
 typedef struct
 {

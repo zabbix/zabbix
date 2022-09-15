@@ -22,7 +22,7 @@
 
 #include "zbxserver.h"
 #include "zbxparam.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 /******************************************************************************
  *                                                                            *

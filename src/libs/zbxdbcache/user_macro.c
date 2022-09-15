@@ -509,10 +509,9 @@ static void	um_macro_register_kvs(zbx_um_macro_t *macro, const char *location)
 	{
 		kv_local.key = dc_strpool_intern(key);
 		kv_local.value = NULL;
-
 		zbx_vector_uint64_pair_create_ext(&kv_local.macros, __config_shmem_malloc_func,
-				__config_shmem_realloc_func,
-				__config_shmem_free_func);
+				__config_shmem_realloc_func, __config_shmem_free_func);
+
 		kv = (zbx_dc_kv_t *)zbx_hashset_insert(&kvs_path->kvs, &kv_local, sizeof(zbx_dc_kv_t));
 	}
 

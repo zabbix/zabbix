@@ -39,6 +39,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
+#include "zbxsysinfo.h"
 
 int	sync_in_progress = 0;
 
@@ -7336,7 +7337,6 @@ out:
 
 		queues_sec = zbx_time() - sec;
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reschedule : " ZBX_FS_DBL " sec.", __func__, queues_sec);
-
 	}
 clean:
 	zbx_dbsync_clear(&config_sync);
