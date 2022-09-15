@@ -542,10 +542,18 @@ class CMediatype extends CApiService {
 				}
 
 				if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL) {
-					$api_input_rules['fields'] += [
-						'username' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'username')],
-						'passwd' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'passwd')]
-					];
+					if ($mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
+						$api_input_rules['fields'] += [
+							'username' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'username')],
+							'passwd' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'passwd')]
+						];
+					}
+					else {
+						$api_input_rules['fields'] += [
+							'username' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'username')],
+							'passwd' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type', 'passwd')]
+						];
+					}
 				}
 
 				if ($method === 'create' || $type != $db_mediatype['type']) {
