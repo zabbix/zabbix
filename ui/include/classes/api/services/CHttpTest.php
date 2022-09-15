@@ -630,28 +630,34 @@ class CHttpTest extends CApiService {
 		$del_itemids = [];
 		$del_httpstepids = [];
 
-		$db_httptestitems = DBselect(
+		$del_httptestitemids = DBfetchArrayAssoc(DBselect(
 			'SELECT hti.itemid'.
 			' FROM httptestitem hti'.
 			' WHERE '.dbConditionInt('hti.httptestid', $del_httptestids)
-		);
-		while ($db_httptestitem = DBfetch($db_httptestitems)) {
-			$del_itemids[] = $db_httptestitem['itemid'];
-		}
+		), 'itemid');
 
-		$db_httpstepitems = DBselect(
+		$del_httpstepitems = DBfetchArrayAssoc(DBselect(
 			'SELECT hsi.itemid, hsi.httpstepid'.
 			' FROM httpstepitem hsi,httpstep hs'.
-			' WHERE hsi.httpstepid=hs.httpstepid'.
-				' AND '.dbConditionInt('hs.httptestid', $del_httptestids)
-		);
+			' WHERE '.dbConditionInt('hs.httptestid', $del_httptestids).
+			' AND hsi.httpstepid=hs.httpstepid'
+		), 'itemid');
 
-		while ($db_httpstepitem = DBfetch($db_httpstepitems)) {
-			$del_itemids[] = $db_httpstepitem['itemid'];
-			$del_httpstepids[] = $db_httpstepitem['httpstepid'];
-		}
+		$del_httpstepids = array_values(array_map(function ($step) {
+			return $step['httpstepid'];
+		}, $del_httpstepitems));
+
+		$del_itemids = array_merge(array_keys($del_httptestitemids), array_keys($del_httpstepitems));
 
 		if ($del_itemids) {
+			$result = DBfetchArrayAssoc(DBselect(
+				'SELECT hi.itemid'.
+				' FROM items hi'.
+				' WHERE '.dbConditionInt('hi.templateid', $del_itemids)
+			), 'itemid');
+
+			$del_itemids = array_merge([...$del_itemids, ...array_keys($result)]);
+
 			DB::delete('httpstepitem', ['itemid' => $del_itemids]);
 			DB::delete('httptestitem', ['itemid' => $del_itemids]);
 
@@ -662,10 +668,10 @@ class CHttpTest extends CApiService {
 
 		DB::delete('httpstep_field', ['httpstepid' => $del_httpstepids]);
 
-		DB::delete('httpstep', ['httptestid' => $del_httptestids]);
+		DB::delete('httpstep', ['httpstepid' => $del_httpstepids]);
 
 		DB::update('httptest', [
-			'values' => ['templateid' => null],
+			'values' => ['templateid' => 0],
 			'where' => ['httptestid' => $del_httptestids]
 		]);
 
