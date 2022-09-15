@@ -1233,7 +1233,7 @@ static void	add_log_result(AGENT_RESULT *result, const char *value)
 	result->type |= AR_LOG;
 }
 
-int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
+int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c)
 {
 	zbx_uint64_t	value_uint64;
 	int		ret = FAIL;
@@ -1283,7 +1283,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 	return ret;
 }
 
-void	set_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime)
+void	zbx_set_agent_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime)
 {
 	result->lastlogsize = lastlogsize;
 	result->mtime = mtime;
@@ -1729,16 +1729,16 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
 	switch (type)
 	{
 		case 't':
-			ret = set_result_type(result, ITEM_VALUE_TYPE_TEXT, data);
+			ret = zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, data);
 			break;
 		case 's':
-			ret = set_result_type(result, ITEM_VALUE_TYPE_STR, data);
+			ret = zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_STR, data);
 			break;
 		case 'u':
-			ret = set_result_type(result, ITEM_VALUE_TYPE_UINT64, data);
+			ret = zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_UINT64, data);
 			break;
 		case 'd':
-			ret = set_result_type(result, ITEM_VALUE_TYPE_FLOAT, data);
+			ret = zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_FLOAT, data);
 			break;
 		default:
 			ret = SUCCEED;

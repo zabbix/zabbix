@@ -79,7 +79,7 @@ int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result)
 	{
 		zbx_rtrim(buf, ZBX_WHITESPACE);
 
-		set_result_type(result, ITEM_VALUE_TYPE_TEXT, buf);
+		zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, buf);
 		zbx_free(buf);
 	}
 	else

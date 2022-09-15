@@ -768,7 +768,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 
 				zbx_json_close(&json);
 
-				set_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
+				zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
 
 				zbx_json_free(&json);
 			}
@@ -814,7 +814,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 					zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE,
 							DCget_item_queue(NULL, from, to));
 
-					set_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
+					zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
 
 					zbx_json_free(&json);
 				}

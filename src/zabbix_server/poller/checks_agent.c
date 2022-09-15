@@ -127,7 +127,7 @@ int	get_value_agent(const DC_ITEM *item, AGENT_RESULT *result)
 			ret = NETWORK_ERROR;
 		}
 		else
-			set_result_type(result, ITEM_VALUE_TYPE_TEXT, s.buffer);
+			zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, s.buffer);
 	}
 	else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));

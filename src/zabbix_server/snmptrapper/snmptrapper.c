@@ -163,7 +163,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		}
 
 		value_type = (ITEM_VALUE_TYPE_LOG == items[i].value_type ? ITEM_VALUE_TYPE_LOG : ITEM_VALUE_TYPE_TEXT);
-		set_result_type(&results[i], value_type, trap);
+		zbx_set_agent_result_type(&results[i], value_type, trap);
 		errcodes[i] = SUCCEED;
 		ret = SUCCEED;
 next:
@@ -173,7 +173,7 @@ next:
 	if (FAIL == ret && -1 != fb)
 	{
 		value_type = (ITEM_VALUE_TYPE_LOG == items[fb].value_type ? ITEM_VALUE_TYPE_LOG : ITEM_VALUE_TYPE_TEXT);
-		set_result_type(&results[fb], value_type, trap);
+		zbx_set_agent_result_type(&results[fb], value_type, trap);
 		errcodes[fb] = SUCCEED;
 		ret = SUCCEED;
 	}

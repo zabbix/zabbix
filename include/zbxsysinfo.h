@@ -221,8 +221,8 @@ int	zbx_parse_item_key(const char *itemkey, AGENT_REQUEST *request);
 void	zbx_unquote_key_param(char *param);
 int	zbx_quote_key_param(char **param, int forced);
 
-int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
-void	set_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime);
+int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c);
+void	zbx_set_agent_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime);
 
 #ifdef HAVE_KSTAT_H
 zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn);
