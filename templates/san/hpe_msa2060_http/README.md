@@ -64,20 +64,20 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|HPE |Get system |<p>Data about the system.</p> |DEPENDENT |hpe.msa.get.system<p>**Preprocessing**:</p><p>- JSONPATH: `$.system[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|HPE |Get FRU |<p>Data about FRU.</p> |DEPENDENT |hpe.msa.get.fru<p>**Preprocessing**:</p><p>- JSONPATH: `$.['frus']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|HPE |Get fans |<p>Data about fans.</p> |DEPENDENT |hpe.msa.get.fans<p>**Preprocessing**:</p><p>- JSONPATH: `$.['fans']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|HPE |Get disks |<p>Data about disks.</p> |DEPENDENT |hpe.msa.get.disks<p>**Preprocessing**:</p><p>- JSONPATH: `$.['disks']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|HPE |Get enclosures |<p>Data about enclosures.</p> |DEPENDENT |hpe.msa.get.enclosures<p>**Preprocessing**:</p><p>- JSONPATH: `$.['enclosures']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|HPE |Get ports |<p>Data about ports.</p> |DEPENDENT |hpe.msa.get.ports<p>**Preprocessing**:</p><p>- JSONPATH: `$.['ports']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|HPE |Get power supplies |<p>Data about power supplies.</p> |DEPENDENT |hpe.msa.get.power_supplies<p>**Preprocessing**:</p><p>- JSONPATH: `$.['power-supplies']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|HPE |Get pools |<p>Data about pools.</p> |DEPENDENT |hpe.msa.get.pools<p>**Preprocessing**:</p><p>- JSONPATH: `$.['pools']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|HPE |Get controllers |<p>Data about controllers.</p> |DEPENDENT |hpe.msa.get.controllers<p>**Preprocessing**:</p><p>- JSONPATH: `$.['controllers']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|HPE |Get controller statistics |<p>Data about controllers statistics.</p> |DEPENDENT |hpe.msa.get.controller_statistics<p>**Preprocessing**:</p><p>- JSONPATH: `$.['controller-statistics']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|HPE |Get disk groups |<p>Data about disk groups.</p> |DEPENDENT |hpe.msa.get.disks.groups<p>**Preprocessing**:</p><p>- JSONPATH: `$.['disk-groups']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|HPE |Get disk group statistics |<p>Data about disk groups statistics.</p> |DEPENDENT |hpe.msa.disks.get.groups.statistics<p>**Preprocessing**:</p><p>- JSONPATH: `$.['disk-group-statistics']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|HPE |Get volumes |<p>Data about volumes.</p> |DEPENDENT |hpe.msa.get.volumes<p>**Preprocessing**:</p><p>- JSONPATH: `$.['volumes']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|HPE |Get volume statistics |<p>Data about volumes statistics.</p> |DEPENDENT |hpe.msa.get.volumes.statistics<p>**Preprocessing**:</p><p>- JSONPATH: `$.['volume-statistics']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|HPE |Get system |<p>The system data.</p> |DEPENDENT |hpe.msa.get.system<p>**Preprocessing**:</p><p>- JSONPATH: `$.system[0]`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|HPE |Get FRU |<p>FRU data.</p> |DEPENDENT |hpe.msa.get.fru<p>**Preprocessing**:</p><p>- JSONPATH: `$.['frus']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|HPE |Get fans |<p>Fans data.</p> |DEPENDENT |hpe.msa.get.fans<p>**Preprocessing**:</p><p>- JSONPATH: `$.['fans']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|HPE |Get disks |<p>Disks data.</p> |DEPENDENT |hpe.msa.get.disks<p>**Preprocessing**:</p><p>- JSONPATH: `$.['disks']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|HPE |Get enclosures |<p>Enclosures data.</p> |DEPENDENT |hpe.msa.get.enclosures<p>**Preprocessing**:</p><p>- JSONPATH: `$.['enclosures']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|HPE |Get ports |<p>Ports data.</p> |DEPENDENT |hpe.msa.get.ports<p>**Preprocessing**:</p><p>- JSONPATH: `$.['ports']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|HPE |Get power supplies |<p>Power supplies data.</p> |DEPENDENT |hpe.msa.get.power_supplies<p>**Preprocessing**:</p><p>- JSONPATH: `$.['power-supplies']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|HPE |Get pools |<p>Pools data.</p> |DEPENDENT |hpe.msa.get.pools<p>**Preprocessing**:</p><p>- JSONPATH: `$.['pools']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|HPE |Get controllers |<p>Controllers data.</p> |DEPENDENT |hpe.msa.get.controllers<p>**Preprocessing**:</p><p>- JSONPATH: `$.['controllers']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|HPE |Get controller statistics |<p>Controllers statistics data.</p> |DEPENDENT |hpe.msa.get.controller_statistics<p>**Preprocessing**:</p><p>- JSONPATH: `$.['controller-statistics']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|HPE |Get disk groups |<p>Disk groups data.</p> |DEPENDENT |hpe.msa.get.disks.groups<p>**Preprocessing**:</p><p>- JSONPATH: `$.['disk-groups']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|HPE |Get disk group statistics |<p>Disk groups statistics data.</p> |DEPENDENT |hpe.msa.disks.get.groups.statistics<p>**Preprocessing**:</p><p>- JSONPATH: `$.['disk-group-statistics']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|HPE |Get volumes |<p>Volumes data.</p> |DEPENDENT |hpe.msa.get.volumes<p>**Preprocessing**:</p><p>- JSONPATH: `$.['volumes']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|HPE |Get volume statistics |<p>Volumes statistics data.</p> |DEPENDENT |hpe.msa.get.volumes.statistics<p>**Preprocessing**:</p><p>- JSONPATH: `$.['volume-statistics']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |HPE |Get method errors |<p>A list of method errors from API requests.</p> |DEPENDENT |hpe.msa.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.['errors']`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |HPE |Product ID |<p>The product model identifier.</p> |DEPENDENT |hpe.msa.system.product_id<p>**Preprocessing**:</p><p>- JSONPATH: `$.['product-id']`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |HPE |System contact |<p>The name of the person who administers the system.</p> |DEPENDENT |hpe.msa.system.contact<p>**Preprocessing**:</p><p>- JSONPATH: `$.['system-contact']`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
