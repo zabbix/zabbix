@@ -1251,7 +1251,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 				else
 					walk_cb_func(walk_cb_arg, snmp_oid, oid_index, snmp_result.str);
 
-				free_result(&snmp_result);
+				zbx_free_agent_result(&snmp_result);
 
 				/* go to next variable */
 				memcpy((char *)anOID, (char *)var->name, var->name_length * sizeof(oid));
@@ -1953,7 +1953,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 				zbx_strlcat(oids_translated[j], to_verify_oids[j] + len, sizeof(oids_translated[j]));
 			}
 
-			free_result(&results[j]);
+			zbx_free_agent_result(&results[j]);
 		}
 	}
 

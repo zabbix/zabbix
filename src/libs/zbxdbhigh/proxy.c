@@ -3018,7 +3018,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
 			process_item_value(item, &result, &value->ts, h_num, NULL);
 		}
 
-		free_result(&result);
+		zbx_free_agent_result(&result);
 	}
 
 	return SUCCEED;

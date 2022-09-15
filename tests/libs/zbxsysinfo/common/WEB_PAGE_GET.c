@@ -109,7 +109,7 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Got '%s' instead of '%s' as a value.", rvalue, buffer);
 
 	free_request(&request);
-	free_result(&param_result);
+	zbx_free_agent_result(&param_result);
 }
 
 #ifdef HAVE_LIBCURL

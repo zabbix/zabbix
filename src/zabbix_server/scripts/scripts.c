@@ -90,7 +90,7 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 
 	zbx_alarm_off();
 
-	free_result(&agent_result);
+	zbx_free_agent_result(&agent_result);
 
 	zbx_free(item.key);
 fail:
@@ -182,7 +182,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 
 	zbx_alarm_off();
 
-	free_result(&agent_result);
+	zbx_free_agent_result(&agent_result);
 
 	zbx_free(item.params);
 	zbx_free(item.key);

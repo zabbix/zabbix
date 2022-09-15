@@ -85,7 +85,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 		zbx_preprocess_item_value(item.itemid, item.host.hostid, item.value_type, item.flags, &value, ts,
 				item.state, NULL);
 
-		free_result(&value);
+		zbx_free_agent_result(&value);
 	}
 clean:
 	DCrequeue_items(&item.itemid, &ts->sec, &errcode, 1);

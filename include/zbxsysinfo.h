@@ -211,7 +211,7 @@ void	zbx_test_parameter(const char *key);
 
 void	zbx_init_agent_result(AGENT_RESULT *result);
 void	zbx_log_free(zbx_log_t *log);
-void	free_result(AGENT_RESULT *result);
+void	zbx_free_agent_result(AGENT_RESULT *result);
 
 void	init_request(AGENT_REQUEST *request);
 void	free_request(AGENT_REQUEST *request);

@@ -167,7 +167,7 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	free_request(&request);
-	free_result(&param_result);
+	zbx_free_agent_result(&param_result);
 }
 
 time_t	__wrap_time(time_t *seconds)

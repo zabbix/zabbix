@@ -40,7 +40,7 @@ int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error)
 		zbx_strlcpy(*error, result.msg, strlen(result.msg) * sizeof(char));
 	}
 
-	free_result(&result);
+	zbx_free_agent_result(&result);
 
 	return ret;
 }

@@ -590,7 +590,7 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get host %s using \"%s\" item specified by"
 				" \"%s\" configuration parameter",config_type, config,config_name);
 
-	free_result(&result);
+	zbx_free_agent_result(&result);
 }
 
 /******************************************************************************
@@ -1176,7 +1176,7 @@ static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metr
 				NULL, NULL, NULL, NULL, metric->flags, zbx_config_tls);
 	}
 out:
-	free_result(&result);
+	zbx_free_agent_result(&result);
 
 	return ret;
 }

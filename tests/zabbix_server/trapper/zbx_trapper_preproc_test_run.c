@@ -39,7 +39,7 @@ int	__wrap_DBget_user_by_auth_token(const char *formatted_auth_token_hash, zbx_u
 void	__wrap_zbx_user_init(zbx_user_t *user);
 void	__wrap_zbx_user_free(zbx_user_t *user);
 void	__wrap_zbx_init_agent_result(AGENT_RESULT *result);
-void	__wrap_free_result(AGENT_RESULT *result);
+void	__wrap_zbx_free_agent_result(AGENT_RESULT *result);
 
 int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
 		const zbx_vector_ptr_t *steps, zbx_vector_ptr_t *results, zbx_vector_ptr_t *history,
@@ -123,7 +123,7 @@ void	__wrap_zbx_init_agent_result(AGENT_RESULT *result)
 	ZBX_UNUSED(result);
 }
 
-void	__wrap_free_result(AGENT_RESULT *result)
+void	__wrap_zbx_free_agent_result(AGENT_RESULT *result)
 {
 	ZBX_UNUSED(result);
 }

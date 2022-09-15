@@ -58,7 +58,7 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 clean:
-	free_result(&result_tmp);
+	zbx_free_agent_result(&result_tmp);
 
 	return ret;
 }
@@ -97,7 +97,7 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 clean:
-	free_result(&result_tmp);
+	zbx_free_agent_result(&result_tmp);
 
 	return ret;
 }
@@ -141,7 +141,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 clean:
-	free_result(&result_tmp);
+	zbx_free_agent_result(&result_tmp);
 
 	return ret;
 }

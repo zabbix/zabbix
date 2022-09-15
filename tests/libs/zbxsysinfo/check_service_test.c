@@ -72,6 +72,6 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_result_eq("Return value", expected_code, returned_code);
 
-	free_result(&result);
+	zbx_free_agent_result(&result);
 	free_request(&request);
 }

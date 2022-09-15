@@ -90,7 +90,7 @@ static void	process_listener(zbx_socket_t *s)
 			}
 		}
 
-		free_result(&result);
+		zbx_free_agent_result(&result);
 	}
 
 	if (FAIL == ret)

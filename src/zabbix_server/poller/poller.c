@@ -281,7 +281,7 @@ out:
 
 void	zbx_free_result_ptr(AGENT_RESULT *result)
 {
-	free_result(result);
+	zbx_free_agent_result(result);
 	zbx_free(result);
 }
 
@@ -788,7 +788,7 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
 				break;
 		}
 
-		free_result(&results[i]);
+		zbx_free_agent_result(&results[i]);
 	}
 }
 

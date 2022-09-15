@@ -207,7 +207,7 @@ next:
 		}
 
 		zbx_free(items[i].key);
-		free_result(&results[i]);
+		zbx_free_agent_result(&results[i]);
 	}
 
 	zbx_free(results);

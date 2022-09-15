@@ -81,5 +81,5 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	free_request(&request);
-	free_result(&result);
+	zbx_free_agent_result(&result);
 }

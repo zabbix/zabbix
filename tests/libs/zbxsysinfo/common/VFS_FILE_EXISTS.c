@@ -59,6 +59,6 @@ void	zbx_mock_test_entry(void **state)
 			zbx_mock_get_parameter_string("out.error"), result.msg);
 	}
 
-	free_result(&result);
+	zbx_free_agent_result(&result);
 	free_request(&request);
 }

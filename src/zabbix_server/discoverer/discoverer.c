@@ -335,7 +335,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 
 		zbx_alarm_off();
 	}
-	free_result(&result);
+	zbx_free_agent_result(&result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

@@ -91,5 +91,5 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Unexpected result string: expected \"%s\", got \"%s\"", expected_string, actual_string);
 
 	free_request(&request);
-	free_result(&result);
+	zbx_free_agent_result(&result);
 }

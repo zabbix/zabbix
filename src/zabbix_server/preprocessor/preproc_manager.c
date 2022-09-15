@@ -641,7 +641,7 @@ static void	preproc_item_value_clear(zbx_preproc_item_value_t *value)
 
 	if (NULL != value->result)
 	{
-		free_result(value->result);
+		zbx_free_agent_result(value->result);
 		zbx_free(value->result);
 	}
 }
@@ -1173,7 +1173,7 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 	if (ZBX_VARIANT_NONE == value->type)
 	{
 		if (NULL != request->value.result)
-			free_result(request->value.result);
+			zbx_free_agent_result(request->value.result);
 
 		zbx_free(request->value.error);
 
@@ -1209,7 +1209,7 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 		{
 			/* preserve eventlog related information */
 			if (ITEM_VALUE_TYPE_LOG != request->value_type)
-				free_result(request->value.result);
+				zbx_free_agent_result(request->value.result);
 		}
 
 		if (ITEM_STATE_NOTSUPPORTED == request->value.state)

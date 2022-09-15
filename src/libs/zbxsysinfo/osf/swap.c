@@ -211,7 +211,7 @@ static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
 	/* Check for division by zero */
 	if (0 == tot_val)
 	{
-		free_result(&result_tmp);
+		zbx_free_agent_result(&result_tmp);
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -219,7 +219,7 @@ static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	free_val = result_tmp.ui64;
 
-	free_result(&result_tmp);
+	zbx_free_agent_result(&result_tmp);
 
 	SET_DBL_RESULT(result, (100.0 * (double)free_val) / (double)tot_val);
 
@@ -241,7 +241,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 	/* Check for division by zero */
 	if (0 == tot_val)
 	{
-		free_result(&result_tmp);
+		zbx_free_agent_result(&result_tmp);
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -249,7 +249,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	free_val = result_tmp.ui64;
 
-	free_result(&result_tmp);
+	zbx_free_agent_result(&result_tmp);
 
 	SET_DBL_RESULT(result, 100.0 - (100.0 * (double)free_val) / (double)tot_val);
 

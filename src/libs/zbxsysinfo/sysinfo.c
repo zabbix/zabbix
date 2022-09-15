@@ -815,7 +815,7 @@ void	zbx_log_free(zbx_log_t *log)
 	zbx_free(log);
 }
 
-void	free_result(AGENT_RESULT *result)
+void	zbx_free_agent_result(AGENT_RESULT *result)
 {
 	ZBX_UNSET_UI64_RESULT(result);
 	ZBX_UNSET_DBL_RESULT(result);
@@ -976,7 +976,7 @@ void	zbx_test_parameter(const char *key)
 			printf(" [m|" ZBX_NOTSUPPORTED "]");
 	}
 
-	free_result(&result);
+	zbx_free_agent_result(&result);
 
 	printf("\n");
 
@@ -1803,7 +1803,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		ret = zbx_write_all(fds[1], data, data_offset);
 
 		zbx_free(data);
-		free_result(result);
+		zbx_free_agent_result(result);
 
 		close(fds[1]);
 
