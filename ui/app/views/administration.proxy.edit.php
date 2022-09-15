@@ -39,7 +39,7 @@ $proxyForm = (new CForm())
 	->addVar('proxyid', $data['proxyid'])
 	->addVar('tls_accept', $data['tls_accept'])
 	->addVar('psk_edit_mode', $data['psk_edit_mode'])
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 if (array_key_exists('clone_proxyid', $data)) {
 	$proxyForm->addVar('clone_proxyid', $data['clone_proxyid']);

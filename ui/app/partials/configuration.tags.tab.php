@@ -33,7 +33,7 @@ $show_inherited_tags = (array_key_exists('show_inherited_tags', $data) && $data[
 $tags_form_list = new CFormList('tagsFormList');
 
 $table = (new CTable())
-	->setId('tags-table')
+	->addClass('tags-table')
 	->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
 	->setHeader([
 		_('Name'),

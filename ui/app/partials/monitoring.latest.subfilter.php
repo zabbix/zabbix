@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,18 +30,20 @@ $subfilters = $data['subfilters'];
 $subfilter_options = [];
 
 foreach (['hostids', 'tagnames', 'data'] as $key) {
-	if (!array_key_exists($key, $subfilters) || count($subfilters[$key]) <= 1) {
+	if (($key === 'hostids' || $key === 'tagnames') && count($subfilters[$key]) == 0) {
 		$subfilter_options[$key] = null;
+
 		continue;
 	}
-	else {
-		$subfilter_options[$key] = [];
-	}
 
-	// Remove non-selected filter fields with 0 occurrences.
-	$subfilters[$key] = array_filter($subfilters[$key], function ($field) {
-		return ($field['selected'] || $field['count'] != 0);
-	});
+	$subfilter_options[$key] = [];
+
+	// Remove non-selected filter fields with 0 occurrences (for hosts and tag names).
+	if ($key === 'hostids' || $key === 'tagnames') {
+		$subfilters[$key] = array_filter($subfilters[$key], function ($field) {
+			return $field['selected'] || $field['count'] > 0;
+		});
+	}
 
 	$subfilter_used = (bool) array_filter($subfilters[$key], function ($field) {
 		return $field['selected'];
@@ -63,20 +65,23 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 				->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 		}
 		else {
-			if ($element['count'] == 0) {
-				$subfilter_options[$key][] = (new CSpan([
-					(new CSpan($element['name']))->addClass(ZBX_STYLE_GREY),
-					' ',
-					new CSup($element['count'])
-				]))->addClass(ZBX_STYLE_SUBFILTER);
-			}
-			else {
+			if ($element['count'] > 0 || $key === 'data') {
+				// Data subfilter counters are only known when the filter is in use.
+				$count_text = $key !== 'data' || $subfilter_used ? $element['count'] : '';
+
 				$subfilter_options[$key][] = (new CSpan([
 					(new CLinkAction($element['name']))->onClick(CHtml::encode(
 						'view.setSubfilter('.json_encode(['subfilter_'.$key.'[]', $value]).')'
 					)),
 					' ',
-					new CSup(($subfilter_used ? '+' : '').$element['count'])
+					new CSup(($subfilter_used ? '+' : '').$count_text)
+				]))->addClass(ZBX_STYLE_SUBFILTER);
+			}
+			else {
+				$subfilter_options[$key][] = (new CSpan([
+					(new CSpan($element['name']))->addClass(ZBX_STYLE_GREY),
+					' ',
+					new CSup($element['count'])
 				]))->addClass(ZBX_STYLE_SUBFILTER);
 			}
 		}
@@ -113,28 +118,33 @@ if (count($subfilters['tags']) > 0) {
 				return (new CSpan([
 					(new CLinkAction($element_name))
 						->addStyle($element_style)
-						->onClick('view.unsetSubfilter('.json_encode([
-							'subfilter_tags['.$tag.'][]',
-							$element['name']
-						]).')'),
+						->setAttribute('data-key', $tag)
+						->setAttribute('data-value', $element['name'])
+						->onClick(
+							'view.unsetSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+								'this.dataset.value]'.
+							');'
+						),
 					' ',
 					new CSup($element['count'])
 				]))
 					->addClass(ZBX_STYLE_SUBFILTER)
 					->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 			}
-			else {
-				return (new CSpan([
-					(new CLinkAction($element_name))
-						->addStyle($element_style)
-						->onClick('view.setSubfilter('.json_encode([
-							'subfilter_tags['.$tag.'][]',
-							$element['name']
-						]).')'),
-					' ',
-					new CSup(($subfilter_used ? '+' : '').$element['count'])
-				]))->addClass(ZBX_STYLE_SUBFILTER);
-			}
+
+			return (new CSpan([
+				(new CLinkAction($element_name))
+					->addStyle($element_style)
+					->setAttribute('data-key', $tag)
+					->setAttribute('data-value', $element['name'])
+					->onClick(
+						'view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'.
+							'this.dataset.value]'.
+						');'
+					),
+				' ',
+				new CSup(($subfilter_used ? '+' : '').$element['count'])
+			]))->addClass(ZBX_STYLE_SUBFILTER);
 		}, $tags_group['values']);
 
 		$tag_values = $tags_group['trimmed'] ? [$tag_values, new CSpan('...')] : $tag_values;
@@ -168,7 +178,7 @@ else {
 		])
 	]], ZBX_STYLE_HOVER_NOBG)
 	->addRow(
-		$subfilter_options['hostids']
+		$subfilter_options['hostids'] !== null
 			? [[
 				new CTag('h3', true, _('Hosts')),
 				(new CExpandableSubfilter('hostids', $subfilter_options['hostids'],
@@ -178,7 +188,7 @@ else {
 			: null
 	)
 	->addRow(
-		$subfilter_options['tagnames']
+		$subfilter_options['tagnames'] !== null
 			? [[
 				new CTag('h3', true, _('Tags')),
 				(new CExpandableSubfilter('tagnames', $subfilter_options['tagnames'],
@@ -188,7 +198,7 @@ else {
 			: null
 	)
 	->addRow(
-		$subfilter_options['tags']
+		$subfilter_options['tags'] !== null
 			? [[
 				new CTag('h3', true, _('Tag values')),
 				$subfilter_options['tags']
@@ -196,7 +206,7 @@ else {
 			: null
 	)
 	->addRow(
-		$subfilter_options['data']
+		$subfilter_options['data'] !== null
 			? [[
 				new CTag('h3', true, _('Data')),
 				$subfilter_options['data']

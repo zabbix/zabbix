@@ -11163,6 +11163,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "Po"
 
+#: include/func.inc.php:592 jsLoader.php:223
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
 msgstr "MAC adresa A"
@@ -13935,6 +13940,10 @@ msgstr "Nadřazená pravidla nálezu"
 #: include/views/configuration.graph.edit.php:66
 msgid "Parent graphs"
 msgstr "Nadřazené grafy"
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr ""
 
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
@@ -22746,6 +22755,11 @@ msgstr ""
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "přes"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

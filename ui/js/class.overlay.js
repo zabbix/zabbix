@@ -43,7 +43,7 @@ function Overlay(type, dialogueid) {
 		'data-dialogueid': this.dialogueid,
 		'role': 'dialog',
 		'aria-modal': 'true',
-		'aria-labeledby': this.headerid
+		'aria-labelledby': this.headerid
 	});
 
 	var $close_btn = jQuery('<button>', {
