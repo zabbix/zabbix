@@ -86,15 +86,14 @@ class CControllerPopupActionOperationsEdit extends CController {
 
 		$operation_types = $this->popupConfigOperationTypes($operation, $eventsource, $recovery)['options'];
 		foreach ($operation_types as $type) {
-			$operation_type[] = $type['name'];
+			$operation_type[$type['value']] = $type['name'];
 		}
-		sdff($operation_types);
 
 		$media_types = $this->popupConfigOperationMessage($operation, $eventsource)['mediatypes'];
 		foreach($media_types as $type) {
-			$media_type[0] = '- All -';
+			$media_type[] = '- All -';
 			// todo : fix mediatype 0 !!!
-			$media_type[] = $type['name'];
+			$media_type[$type['mediatypeid']] = $type['name'];
 		}
 
 		$data = [

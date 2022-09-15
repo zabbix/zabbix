@@ -36,6 +36,10 @@ window.operation_popup = new class {
 	_loadViews() {
 		this._addCustomMessageFields();
 
+		jQuery('#operation-type-select').on('change', (e) => {
+			// todo : add functions that change popup view based on operation type
+		});
+
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('operation-message-user-groups-footer')) {
 				this._openUserGroupPopup(e.target);
@@ -120,9 +124,19 @@ window.operation_popup = new class {
 			const row = document.createElement('tr');
 			row.append(value.name)
 			row.append(this._createRemoveCell())
+			row.appendChild(this._createHiddenInput('operation[opmessage_grp][][usrgrpid]',value.usrgrpid));
 
 			document.getElementById('operation-message-user-groups-footer').before(row);
 		});
+	}
+
+	_createHiddenInput(name, value) {
+		const input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = name;
+		input.value = value;
+
+		return input;
 	}
 
 	_openUserPopup(trigger_element) {
@@ -151,6 +165,7 @@ window.operation_popup = new class {
 			const row = document.createElement('tr');
 			row.append(value.name)
 			row.append(this._createRemoveCell())
+			row.append(this._createHiddenInput('operation[opmessage_usr][][userid]', value.id))
 
 			document.getElementById('operation-message-users-footer')
 				.before(row);
@@ -183,16 +198,21 @@ window.operation_popup = new class {
 	}
 
 	_createRow(input) {
-		this.row = document.createElement('tr');
+		const row = document.createElement('tr');
 
-		this.row.append(this._createLabel(input));
-		this.row.append(this._createName(input));
-		this.row.append(this._createRemoveCell());
+		row.append(this._createLabel(input));
+		row.append(this._createName(input));
+		row.append(this._createRemoveCell());
+
+		row.appendChild(this._createHiddenInput('formulaid',this.label));
+		row.appendChild(this._createHiddenInput('conditiontype',input.conditiontype));
+		row.appendChild(this._createHiddenInput('operator',input.operator));
+		row.appendChild(this._createHiddenInput('value',input.value));
 
 		this.table = document.getElementById('operation-condition-list');
 		this.row_count = this.table.rows.length -1;
 
-		$('#operation-condition-list tr:last').before(this.row);
+		$('#operation-condition-list tr:last').before(row);
 	}
 
 	_createLabel(input) {
@@ -233,8 +253,8 @@ window.operation_popup = new class {
 
 	submit() {
 		this.validate();
-
 		const fields = getFormFields(this.form);
+
 		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'popup.action.operations');
 		url.setArgument('eventsource', this.eventsource);
@@ -273,10 +293,8 @@ window.operation_popup = new class {
 					throw {error: response.error};
 				}
 
-				console.log(data);
 				overlayDialogueDestroy(this.overlay.dialogueid);
-
-				this.dialogue.dispatchEvent(new CustomEvent('operation.submit', {detail: response}));
+				this.dialogue.dispatchEvent(new CustomEvent('operation.submit', {detail: data}));
 			})
 			.then(success_callback)
 			.catch((exception) => {

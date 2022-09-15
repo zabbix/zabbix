@@ -36,11 +36,13 @@ $form_grid = (new CFormGrid());
 $select_operationtype = (new CSelect(''))
 	->setFocusableElementId('operationtype')
 	->addOptions(CSelect::createOptionsFromArray($data['operation_types']))
-	->setId('operation-type-select');
+	->setId('operation-type-select')
+	->setName('operation-type');
 
 $form_grid->addItem([
 	new CLabel(_('Operation'), $select_operationtype->getFocusableElementId()),
-	(new CFormField($select_operationtype))->setId('operation-type')
+	(new CFormField($select_operationtype))
+		->setId('operation-type')
 	]);
 
 /*
@@ -136,12 +138,15 @@ $form_grid->addItem([
 // Operation message media type row (explicit).
 $select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
 	->addOptions(CSelect::createOptionsFromArray($data['media_types']))
-	->setFocusableElementId('operation-opmessage-mediatypeid');
+	->setFocusableElementId('operation-opmessage-mediatypeid')
+	->setName('operation-message-mediatype-only');
 
 
 $form_grid->addItem([
 	new CLabel(_('Send only to'), $select_opmessage_mediatype->getFocusableElementId()),
-	(new CFormField($select_opmessage_mediatype))->setId('operation-message-mediatype-only')
+	(new CFormField($select_opmessage_mediatype))
+		->setId('operation-message-mediatype-only')
+		->setName('operation[opmessage][default_msg]')
 ]);
 
 // Operation custom message checkbox row.
