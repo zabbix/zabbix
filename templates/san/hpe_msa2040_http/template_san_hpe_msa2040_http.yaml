@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-09-14T13:17:08Z'
+  date: '2022-09-15T07:40:03Z'
   template_groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -76,7 +76,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Data about disk groups statistics.'
+          description: 'Disk groups statistics data.'
           preprocessing:
             -
               type: JSONPATH
@@ -98,7 +98,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Data about controllers.'
+          description: 'Controllers data.'
           preprocessing:
             -
               type: JSONPATH
@@ -120,7 +120,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Data about controllers statistics.'
+          description: 'Controllers statistics data.'
           preprocessing:
             -
               type: JSONPATH
@@ -290,7 +290,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Data about disks.'
+          description: 'Disks data.'
           preprocessing:
             -
               type: JSONPATH
@@ -312,7 +312,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Data about disk groups.'
+          description: 'Disk groups data.'
           preprocessing:
             -
               type: JSONPATH
@@ -334,7 +334,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Data about enclosures.'
+          description: 'Enclosures data.'
           preprocessing:
             -
               type: JSONPATH
@@ -356,7 +356,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Data about fans.'
+          description: 'Fans data.'
           preprocessing:
             -
               type: JSONPATH
@@ -378,7 +378,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Data about FRU.'
+          description: 'FRU data.'
           preprocessing:
             -
               type: JSONPATH
@@ -400,7 +400,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Data about pools.'
+          description: 'Pools data.'
           preprocessing:
             -
               type: JSONPATH
@@ -422,7 +422,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Data about ports.'
+          description: 'Ports data.'
           preprocessing:
             -
               type: JSONPATH
@@ -444,7 +444,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Data about power supplies.'
+          description: 'Power supplies data.'
           preprocessing:
             -
               type: JSONPATH
@@ -466,7 +466,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Data about the system.'
+          description: 'The system data.'
           preprocessing:
             -
               type: JSONPATH
@@ -488,7 +488,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Data about volumes.'
+          description: 'Volumes data.'
           preprocessing:
             -
               type: JSONPATH
@@ -510,7 +510,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Data about volumes statistics.'
+          description: 'Volumes statistics data.'
           preprocessing:
             -
               type: JSONPATH
@@ -1478,7 +1478,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get discovered controller data.'
+              description: 'The discovered controller data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1505,7 +1505,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get discovered controller statistics data.'
+              description: 'The discovered controller statistics data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2020,7 +2020,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get discovered disk data.'
+              description: 'The discovered disk data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2726,7 +2726,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get discovered disk group statistics data.'
+              description: 'The discovered disk group statistics data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2753,7 +2753,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get discovered disk group data.'
+              description: 'The discovered disk group data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3111,7 +3111,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get discovered enclosure data.'
+              description: 'The discovered enclosure data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3301,7 +3301,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get discovered fan data.'
+              description: 'The discovered fan data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3494,7 +3494,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get discovered FRU data.'
+              description: 'The discovered FRU data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3544,7 +3544,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get discovered pool data.'
+              description: 'The discovered pool data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3775,7 +3775,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get discovered port data.'
+              description: 'The discovered port data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3972,7 +3972,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get discovered power supply data.'
+              description: 'The discovered power supply data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4234,7 +4234,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get discovered volume statistics data.'
+              description: 'The discovered volume statistics data.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4261,7 +4261,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get discovered volume data.'
+              description: 'The discovered volume data.'
               preprocessing:
                 -
                   type: JSONPATH
