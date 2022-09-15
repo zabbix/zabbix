@@ -3232,7 +3232,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint32_t revision)
 	int		found, ret;
 	zbx_uint64_t	triggerid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()1 ", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -3262,8 +3262,6 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint32_t revision)
 		ZBX_STR2UCHAR(trigger->status, row[9]);
 		ZBX_STR2UCHAR(trigger->recovery_mode, row[10]);
 		ZBX_STR2UCHAR(trigger->correlation_mode, row[12]);
-
-		zabbix_log(1, "DBG trigger expr '%s'", trigger->expression);
 
 		if (0 == found)
 		{
