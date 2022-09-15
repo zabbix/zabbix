@@ -205,7 +205,7 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 						(0 == strcmp(arg3, "lastaccess") || 0 == strcmp(arg3, "delay")))
 					ret = SUCCEED;
 clean:
-				free_request(&request);
+				zbx_free_agent_request(&request);
 			}
 			break;
 	}

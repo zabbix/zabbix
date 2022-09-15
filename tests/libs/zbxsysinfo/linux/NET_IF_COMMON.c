@@ -122,6 +122,6 @@ void	zbx_mock_test_entry_NET_IF_COMMON(void **state, int net_if_func)
 		}
 	}
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 	zbx_free_agent_result(&param_result);
 }

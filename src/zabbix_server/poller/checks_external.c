@@ -92,7 +92,7 @@ int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result)
 out:
 	zbx_free(cmd);
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

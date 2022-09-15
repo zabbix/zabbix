@@ -103,6 +103,6 @@ void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func)
 		}
 	}
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 	zbx_free_agent_result(&param_result);
 }

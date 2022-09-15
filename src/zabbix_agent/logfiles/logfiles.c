@@ -4146,7 +4146,7 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, 
 	}
 out:
 	zbx_free(encoding_uc);
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

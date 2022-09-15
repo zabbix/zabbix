@@ -166,7 +166,7 @@ void	zbx_mock_test_entry(void **state)
 				expected_value_string);
 	}
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 	zbx_free_agent_result(&param_result);
 }
 

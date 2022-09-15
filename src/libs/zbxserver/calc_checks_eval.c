@@ -373,7 +373,7 @@ static int	expression_match_item_key(const char *item_key, const AGENT_REQUEST *
 
 	ret = SUCCEED;
 out:
-	free_request(&key);
+	zbx_free_agent_request(&key);
 
 	return ret;
 }
@@ -524,7 +524,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 	DBfree_result(result);
 
 	if (0 != (query->flags & ZBX_ITEM_QUERY_KEY_SOME))
-		free_request(&pattern);
+		zbx_free_agent_request(&pattern);
 
 	zbx_free(sql);
 }

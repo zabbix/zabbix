@@ -65,7 +65,7 @@ void	zbx_mock_test_entry(void **state)
 
 	actual_ret = NET_IF_DISCOVERY(&request, &result);
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	if (actual_ret != expected_ret)
 	{

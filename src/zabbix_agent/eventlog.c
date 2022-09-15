@@ -1827,7 +1827,7 @@ int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 				error);
 	}
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

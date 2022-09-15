@@ -90,6 +90,6 @@ void	zbx_mock_test_entry(void **state)
 	if (0 != strcmp(expected_string, actual_string))
 		fail_msg("Unexpected result string: expected \"%s\", got \"%s\"", expected_string, actual_string);
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 	zbx_free_agent_result(&result);
 }

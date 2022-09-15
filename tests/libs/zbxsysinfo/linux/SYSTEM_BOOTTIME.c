@@ -80,6 +80,6 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("Unexpected return of SYSTEM_BOOTTIME(): %d (%s).", ret, zbx_sysinfo_ret_string(ret));
 	}
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 	zbx_free_agent_result(&result);
 }

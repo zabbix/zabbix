@@ -108,7 +108,7 @@ void	zbx_mock_test_entry(void **state)
 	if (0 != strcmp(buffer, rvalue))
 		fail_msg("Got '%s' instead of '%s' as a value.", rvalue, buffer);
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 	zbx_free_agent_result(&param_result);
 }
 

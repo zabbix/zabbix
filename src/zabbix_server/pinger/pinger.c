@@ -303,7 +303,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 
 	ret = SUCCEED;
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

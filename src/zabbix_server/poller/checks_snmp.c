@@ -1728,7 +1728,7 @@ static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *er
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
-		free_request(&data->request);
+		zbx_free_agent_request(&data->request);
 
 	return ret;
 }
@@ -1760,7 +1760,7 @@ static void	zbx_snmp_ddata_clean(zbx_snmp_ddata_t *data)
 
 	zbx_hashset_destroy(&data->objects);
 
-	free_request(&data->request);
+	zbx_free_agent_request(&data->request);
 }
 
 static void	zbx_snmp_walk_discovery_cb(void *arg, const char *snmp_oid, const char *index, const char *value)

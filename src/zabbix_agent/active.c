@@ -281,7 +281,7 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 		ret = SUCCEED;
 	}
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

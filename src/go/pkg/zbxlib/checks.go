@@ -60,7 +60,7 @@ static int execute_check(const char *key, zbx_agent_check_t check_func, char **v
 	ret = SUCCEED;
 out:
 	zbx_free_agent_result(&result);
-	free_request(&request);
+	zbx_free_agent_request(&request);
 	return ret;
 }
 

@@ -116,7 +116,7 @@ int	get_value_db(const DC_ITEM *item, AGENT_RESULT *result)
 	if (SUCCEED != ret)
 		SET_MSG_RESULT(result, error);
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

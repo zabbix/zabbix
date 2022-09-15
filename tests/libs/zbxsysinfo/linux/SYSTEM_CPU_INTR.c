@@ -59,6 +59,6 @@ void	zbx_mock_test_entry(void **state)
 	else if (NULL == ZBX_GET_MSG_RESULT(&result))
 		fail_msg("result does not contain failure message");
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 	zbx_free_agent_result(&result);
 }

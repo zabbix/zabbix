@@ -129,5 +129,5 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("There are more actual parameters (%d) than expected (%d).", i, request.nparam);
 	}
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 }

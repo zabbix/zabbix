@@ -192,7 +192,7 @@ int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size
 	else
 		zbx_strlcpy(error, "syntax error", max_error_len);
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }
@@ -769,7 +769,7 @@ int	zbx_check_key_access_rules(const char *metric)
 	else
 		ret = ZBX_KEY_ACCESS_DENY;
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }
@@ -868,7 +868,7 @@ static void	free_request_params(AGENT_REQUEST *request)
  * Parameters: request - pointer to the request structure                     *
  *                                                                            *
  ******************************************************************************/
-void	free_request(AGENT_REQUEST *request)
+void	zbx_free_agent_request(AGENT_REQUEST *request)
 {
 	zbx_free(request->key);
 	free_request_params(request);
@@ -1218,7 +1218,7 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 
 	ret = SUCCEED;
 notsupported:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

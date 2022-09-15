@@ -65,6 +65,6 @@ void	zbx_mock_test_entry(void **state)
 		}
 	}
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 	zbx_free_agent_result(&result);
 }

@@ -78,7 +78,7 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 
 	ret = telnet_run(item, result, ZBX_NULL2EMPTY_STR(encoding));
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

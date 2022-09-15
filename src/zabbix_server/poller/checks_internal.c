@@ -929,7 +929,7 @@ out:
 	if (NOTSUPPORTED == ret && !ZBX_ISSET_MSG(result))
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Internal check is not supported."));
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

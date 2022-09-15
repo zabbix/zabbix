@@ -167,7 +167,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		errcodes[i] = SUCCEED;
 		ret = SUCCEED;
 next:
-		free_request(&request);
+		zbx_free_agent_request(&request);
 	}
 
 	if (FAIL == ret && -1 != fb)

@@ -191,7 +191,7 @@ static int	DBpatch_2050012(void)
 		/* NULL check to silence static analyzer warning */
 		if (NULL == param || (0 != strcmp("service.ntp", param) && 0 != strcmp("ntp", param)))
 		{
-			free_request(&request);
+			zbx_free_agent_request(&request);
 			continue;
 		}
 
@@ -212,7 +212,7 @@ static int	DBpatch_2050012(void)
 			while ('\0' != *(p++));
 		}
 
-		free_request(&request);
+		zbx_free_agent_request(&request);
 
 		/* replace "net.tcp.service" with "net.udp.service" */
 

@@ -416,7 +416,7 @@ static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t
 			zbx_vector_str_append_uniq(regexps, param + 1);
 	}
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 }
 
 /******************************************************************************
