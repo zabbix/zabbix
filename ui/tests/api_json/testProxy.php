@@ -24,10 +24,7 @@ require_once __DIR__.'/../include/CAPITest.php';
 /**
  * @onBefore prepareTestData
  *
- * @backup hstgrp
- * @backup hosts
- * @backup actions
- * @backup drules
+ * @onAfter clearData
  */
 class testProxy extends CAPITest {
 
@@ -56,7 +53,7 @@ class testProxy extends CAPITest {
 			'delete_action' => null,
 			'delete_discovery' => null
 		],
-		'hostgroupids' => null,
+		'groupids' => null,
 		'hostids' => null,
 		'actionids' => null,
 		'druleids' => null,
@@ -1319,7 +1316,7 @@ class testProxy extends CAPITest {
 		CDataHelper::call('host.delete', array_values(self::$data['hostids']));
 
 		// Delete host groups.
-		CDataHelper::call('hostgroup.delete', self::$data['hostgroupids']);
+		CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 		// Delete proxies.
 		$proxyids = array_values(self::$data['proxyids']);
