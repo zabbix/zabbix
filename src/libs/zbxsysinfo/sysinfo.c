@@ -163,7 +163,7 @@ int	zbx_add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len)
 }
 
 #if !defined(__MINGW32__)
-int	add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len)
+int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len)
 {
 	int		ret;
 	unsigned	flags = CF_USERPARAMETER;
@@ -949,7 +949,7 @@ void	test_parameter(const char *key)
 
 	init_result(&result);
 
-	if (SUCCEED == process(key, ZBX_PROCESS_WITH_ALIAS, &result))
+	if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result))
 	{
 		char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
@@ -1104,8 +1104,6 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, char **o
 
 /**********************************************************************************
  *                                                                                *
- * Purpose: execute agent check                                                   *
- *                                                                                *
  * Parameters: in_command - item key                                              *
  *             flags - ZBX_PROCESS_LOCAL_COMMAND, allow execution of system.run   *
  *                     ZBX_PROCESS_MODULE_COMMAND, execute item from a module     *
@@ -1116,7 +1114,7 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, char **o
  *               result - contains item value or error message                    *
  *                                                                                *
  **********************************************************************************/
-int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
+int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
 	int		ret = NOTSUPPORTED;
 	ZBX_METRIC	*command = NULL;

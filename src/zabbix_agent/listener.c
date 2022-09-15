@@ -52,7 +52,7 @@ static void	process_listener(zbx_socket_t *s)
 
 		init_result(&result);
 
-		if (SUCCEED == process(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result))
+		if (SUCCEED == zbx_execute_agent_check(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result))
 		{
 			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
 			{

@@ -71,7 +71,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_init_metrics();
 
-	process(in_command_string, flags_uint32, &result);
+	zbx_execute_agent_check(in_command_string, flags_uint32, &result);
 
 	if (NULL != (p = strchr(in_command_string, '[')))
 		zbx_strlcpy(key, in_command_string, p - in_command_string + 1);
