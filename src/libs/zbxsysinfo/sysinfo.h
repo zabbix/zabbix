@@ -74,4 +74,53 @@
 #define ZBX_SYSINFO_FILE_TAG_TIME_MODIFY	"modify"
 #define ZBX_SYSINFO_FILE_TAG_TIME_CHANGE	"change"
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event);
+#else
+typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
+#endif
+
+typedef struct
+{
+	const char	*mode;
+	int		(*function)(const char *devname, AGENT_RESULT *result);
+}
+MODE_FUNCTION;
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+#ifndef _WINDOWS
+int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname);
+
+typedef struct
+{
+	zbx_uint64_t	flag;
+	const char	*name;
+}
+zbx_mntopt_t;
+
+char		*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags);
+#endif
+
 #endif /* ZABBIX_SYSINFO_H */

@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "log.h"
 
@@ -169,6 +170,415 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 
 	return SYSINFO_RET_OK;
 }
+
+typedef struct
+{
+	const char	*mode;
+	int		(*function)(const char *devname, AGENT_RESULT *result);
+}
+MODE_FUNCTION;
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+
+
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+
+
+typedef struct
+{
+	zbx_uint64_t	total;
+	zbx_uint64_t	not_used;
+	zbx_uint64_t	used;
+	double		pfree;
+	double		pused;
+}
+zbx_fs_metrics_t;
+
+typedef struct
+{
+	char			fsname[MAX_STRING_LEN];
+	char			fstype[MAX_STRING_LEN];
+	zbx_fs_metrics_t	bytes;
+	zbx_fs_metrics_t	inodes;
+	char			*options;
+}
+zbx_mpoint_t;
+
+int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
 
 static int	process_mode_function(AGENT_REQUEST *request, AGENT_RESULT *result, const MODE_FUNCTION *fl)
 {

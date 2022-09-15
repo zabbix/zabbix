@@ -178,13 +178,6 @@ int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat);
 #define ZBX_PROCESS_MODULE_COMMAND	0x2
 #define ZBX_PROCESS_WITH_ALIAS		0x4
 
-typedef enum
-{
-	ZBX_KEY_ACCESS_ALLOW,
-	ZBX_KEY_ACCESS_DENY
-}
-zbx_key_access_rule_type_t;
-
 void	zbx_init_metrics(void);
 int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
 int	zbx_add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len);
@@ -193,7 +186,15 @@ void	zbx_free_metrics(void);
 
 void	zbx_init_key_access_rules(void);
 void	zbx_finalize_key_access_rules_configuration(void);
+
+typedef enum
+{
+	ZBX_KEY_ACCESS_ALLOW,
+	ZBX_KEY_ACCESS_DENY
+}
+zbx_key_access_rule_type_t;
 int	zbx_add_key_access_rule(const char *parameter, char *pattern, zbx_key_access_rule_type_t type);
+
 int	zbx_check_key_access_rules(const char *metric);
 int	zbx_check_request_access_rules(AGENT_REQUEST *request);
 void	zbx_free_key_access_rules(void);
@@ -299,42 +300,6 @@ int	REGISTRY_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
-#if defined(_WINDOWS) || defined(__MINGW32__)
-typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event);
-#else
-typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
-#endif
-
-typedef struct
-{
-	const char	*mode;
-	int		(*function)(const char *devname, AGENT_RESULT *result);
-}
-MODE_FUNCTION;
-
-typedef struct
-{
-	zbx_uint64_t	total;
-	zbx_uint64_t	not_used;
-	zbx_uint64_t	used;
-	double		pfree;
-	double		pused;
-}
-zbx_fs_metrics_t;
-
-typedef struct
-{
-	char			fsname[MAX_STRING_LEN];
-	char			fstype[MAX_STRING_LEN];
-	zbx_fs_metrics_t	bytes;
-	zbx_fs_metrics_t	inodes;
-	char			*options;
-}
-zbx_mpoint_t;
-
-int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
-void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
-
 /* the fields used by proc queries */
 #define ZBX_SYSINFO_PROC_NONE		0x0000
 #define ZBX_SYSINFO_PROC_PID		0x0001
@@ -346,20 +311,7 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
 #define ZBX_MUTEX_ALL_ALLOW		0
 #define ZBX_MUTEX_THREAD_DENIED		1
 #define ZBX_MUTEX_LOGGING_DENIED	2
-zbx_uint32_t get_thread_global_mutex_flag(void);
-#endif
-
-#ifndef _WINDOWS
-int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname);
-
-typedef struct
-{
-	zbx_uint64_t	flag;
-	const char	*name;
-}
-zbx_mntopt_t;
-
-char		*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags);
+zbx_uint32_t	zbx_get_thread_global_mutex_flag(void);
 #endif
 
 void		zbx_add_alias(const char *name, const char *value);

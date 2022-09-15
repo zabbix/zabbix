@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "sysinfo.h"
 #include "alias/alias.h"
 
 #include "log.h"
@@ -1869,7 +1870,7 @@ out:
 
 static ZBX_THREAD_LOCAL zbx_uint32_t	mutex_flag = ZBX_MUTEX_ALL_ALLOW;
 
-zbx_uint32_t get_thread_global_mutex_flag()
+zbx_uint32_t zbx_get_thread_global_mutex_flag()
 {
 	return mutex_flag;
 }
