@@ -75,7 +75,7 @@ window.action_edit_popup = new class {
 		};
 
 		const overlay =  PopUp('popup.condition.edit', parameters, {
-			dialogueid: 'condition',
+			dialogueid: 'action-condition',
 			dialogue_class: 'modal-popup-medium'
 		});
 
@@ -86,7 +86,6 @@ window.action_edit_popup = new class {
 
 	_openOperationPopup(eventsource, recovery_phase, actionid) {
 		const parameters = {
-			// trigger_element: trigger_element,
 			eventsource: eventsource,
 			recovery: recovery_phase,
 			actionid: actionid
