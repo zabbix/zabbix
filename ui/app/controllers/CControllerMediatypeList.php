@@ -106,7 +106,7 @@ class CControllerMediatypeList extends CController {
 
 			foreach ($data['mediatypes'] as &$mediaType) {
 				$mediaType['typeid'] = $mediaType['type'];
-				$mediaType['type'] = CMediatypeHelper::type2str($mediaType['type']);
+				$mediaType['type'] = CMediatypeHelper::getMediaTypes($mediaType['type']);
 				$mediaType['listOfActions'] = [];
 
 				foreach ($actions as $action) {

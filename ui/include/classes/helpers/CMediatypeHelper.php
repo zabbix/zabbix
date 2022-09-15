@@ -122,10 +122,14 @@ class CMediatypeHelper {
 	 */
 	public static function getAllEmailProvidersNames() {
 		return array_column(self::getEmailProviders(), 'name');
-
 	}
 
-	public static function type2str($type = null) {
+	/**
+	 * Returns media types names.
+	 *
+	 * @return array
+	 */
+	public static function getMediaTypes($type = null) {
 		$types = [
 			MEDIA_TYPE_EMAIL => _('Email'),
 			MEDIA_TYPE_EXEC => _('Script'),

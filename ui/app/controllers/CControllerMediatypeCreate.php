@@ -23,7 +23,7 @@ class CControllerMediatypeCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(CMediatypeHelper::type2str())),
+			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
 			'name' =>					'db media_type.name|not_empty',
 			'smtp_server' =>			'db media_type.smtp_server',
 			'smtp_port' =>				'db media_type.smtp_port',
