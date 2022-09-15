@@ -171,7 +171,7 @@ extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 #define ZBX_DSTAT_W_OPER	4
 #define ZBX_DSTAT_W_BYTE	5
 #define ZBX_DSTAT_MAX		6
-int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
+int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat);
 
 /* flags for process */
 #define ZBX_PROCESS_LOCAL_COMMAND	0x1
@@ -185,14 +185,14 @@ typedef enum
 }
 zbx_key_access_rule_type_t;
 
-void	init_metrics(void);
-int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
-int	add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len);
-void	free_metrics_ext(ZBX_METRIC **metrics);
-void	free_metrics(void);
+void	zbx_init_metrics(void);
+int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
+int	zbx_add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len);
+void	zbx_free_metrics_ext(ZBX_METRIC **metrics);
+void	zbx_free_metrics(void);
 
-void	init_key_access_rules(void);
-void	finalize_key_access_rules_configuration(void);
+void	zbx_init_key_access_rules(void);
+void	zbx_finalize_key_access_rules_configuration(void);
 int	add_key_access_rule(const char *parameter, char *pattern, zbx_key_access_rule_type_t type);
 int	check_key_access_rules(const char *metric);
 int	check_request_access_rules(AGENT_REQUEST *request);

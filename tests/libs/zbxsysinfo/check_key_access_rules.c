@@ -52,7 +52,7 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	hrules = zbx_mock_get_parameter_handle("in.rules");
-	init_key_access_rules();
+	zbx_init_key_access_rules();
 
 	while (ZBX_MOCK_SUCCESS == zbx_mock_vector_element(hrules, &hrule))
 	{
@@ -66,7 +66,7 @@ void	zbx_mock_test_entry(void **state)
 		}
 	}
 
-	finalize_key_access_rules_configuration();
+	zbx_finalize_key_access_rules_configuration();
 
 	if (ZBX_MOCK_NO_EXIT_CODE != (error = zbx_mock_exit_code(&exit_code)))
 	{

@@ -956,7 +956,7 @@ static void	zbx_on_exit(int ret)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_disable();
 #endif
-	free_metrics();
+	zbx_free_metrics();
 	zbx_ipc_service_free_env();
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
@@ -1079,7 +1079,7 @@ int	main(int argc, char **argv)
 		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 
 	/* required for simple checks */
-	init_metrics();
+	zbx_init_metrics();
 
 	zbx_load_config(&t);
 

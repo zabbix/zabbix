@@ -955,7 +955,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 #endif
 	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 
-	finalize_key_access_rules_configuration();
+	zbx_finalize_key_access_rules_configuration();
 
 	set_defaults();
 
@@ -1305,7 +1305,7 @@ void	zbx_free_service_resources(int ret)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_disable();
 #endif
-	free_metrics();
+	zbx_free_metrics();
 	zbx_alias_list_free();
 	free_collector_data();
 	zbx_deinit_modbus();
@@ -1361,7 +1361,7 @@ int	main(int argc, char **argv)
 #endif
 
 	/* this is needed to set default hostname in zbx_load_config() */
-	init_metrics();
+	zbx_init_metrics();
 
 	switch (t.task)
 	{
@@ -1404,7 +1404,7 @@ int	main(int argc, char **argv)
 			while (0 == WSACleanup())
 				;
 
-			free_metrics();
+			zbx_free_metrics();
 			exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #endif
@@ -1456,7 +1456,7 @@ int	main(int argc, char **argv)
 #ifndef _WINDOWS
 			zbx_unload_modules();
 #endif
-			free_metrics();
+			zbx_free_metrics();
 			zbx_alias_list_free();
 			exit(EXIT_SUCCESS);
 			break;

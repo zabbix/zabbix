@@ -147,7 +147,7 @@ static int	add_to_metrics(ZBX_METRIC **metrics, ZBX_METRIC *metric, char *error,
  * Purpose: registers a new item key into the system                          *
  *                                                                            *
  ******************************************************************************/
-int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
+int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
 {
 	return add_to_metrics(&commands, metric, error, max_error_len);
 }
@@ -157,7 +157,7 @@ int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
  * Purpose: registers a new item key as local into the system                 *
  *                                                                            *
  ******************************************************************************/
-int	add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len)
+int	zbx_add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len)
 {
 	return add_to_metrics(&commands_local, metric, error, max_error_len);
 }
@@ -187,7 +187,7 @@ int	add_user_parameter(const char *itemkey, char *command, char *error, size_t m
 		metric.function = &EXECUTE_USER_PARAMETER;
 		metric.test_param = command;
 
-		ret = add_metric(&metric, error, max_error_len);
+		ret = zbx_add_metric(&metric, error, max_error_len);
 	}
 	else
 		zbx_strlcpy(error, "syntax error", max_error_len);
@@ -256,17 +256,17 @@ void	get_metrics_copy(ZBX_METRIC **metrics)
 
 void	set_metrics(ZBX_METRIC *metrics)
 {
-	free_metrics_ext(&commands);
+	zbx_free_metrics_ext(&commands);
 	commands = metrics;
 }
 #endif
 
-void	init_metrics(void)
+void	zbx_init_metrics(void)
 {
 	int	i;
 	char	error[MAX_STRING_LEN];
 
-	init_key_access_rules();
+	zbx_init_key_access_rules();
 
 	commands = (ZBX_METRIC *)zbx_malloc(commands, sizeof(ZBX_METRIC));
 	commands[0].key = NULL;
@@ -276,7 +276,7 @@ void	init_metrics(void)
 #ifdef WITH_AGENT_METRICS
 	for (i = 0; NULL != parameters_agent[i].key; i++)
 	{
-		if (SUCCEED != add_metric(&parameters_agent[i], error, sizeof(error)))
+		if (SUCCEED != zbx_add_metric(&parameters_agent[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
@@ -287,7 +287,7 @@ void	init_metrics(void)
 #ifdef WITH_COMMON_METRICS
 	for (i = 0; NULL != parameters_common[i].key; i++)
 	{
-		if (SUCCEED != add_metric(&parameters_common[i], error, sizeof(error)))
+		if (SUCCEED != zbx_add_metric(&parameters_common[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
@@ -296,7 +296,7 @@ void	init_metrics(void)
 
 	for (i = 0; NULL != parameters_common_local[i].key; i++)
 	{
-		if (SUCCEED != add_metric_local(&parameters_common_local[i], error, sizeof(error)))
+		if (SUCCEED != zbx_add_metric_local(&parameters_common_local[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
@@ -307,7 +307,7 @@ void	init_metrics(void)
 #ifdef WITH_HTTP_METRICS
 	for (i = 0; NULL != parameters_common_http[i].key; i++)
 	{
-		if (SUCCEED != add_metric(&parameters_common_http[i], error, sizeof(error)))
+		if (SUCCEED != zbx_add_metric(&parameters_common_http[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
@@ -318,7 +318,7 @@ void	init_metrics(void)
 #ifdef WITH_SPECIFIC_METRICS
 	for (i = 0; NULL != parameters_specific[i].key; i++)
 	{
-		if (SUCCEED != add_metric(&parameters_specific[i], error, sizeof(error)))
+		if (SUCCEED != zbx_add_metric(&parameters_specific[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
@@ -329,7 +329,7 @@ void	init_metrics(void)
 #ifdef WITH_SIMPLE_METRICS
 	for (i = 0; NULL != parameters_simple[i].key; i++)
 	{
-		if (SUCCEED != add_metric(&parameters_simple[i], error, sizeof(error)))
+		if (SUCCEED != zbx_add_metric(&parameters_simple[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
@@ -338,7 +338,7 @@ void	init_metrics(void)
 #endif
 
 #ifdef WITH_HOSTNAME_METRIC
-	if (SUCCEED != add_metric(&parameter_hostname, error, sizeof(error)))
+	if (SUCCEED != zbx_add_metric(&parameter_hostname, error, sizeof(error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 		exit(EXIT_FAILURE);
@@ -346,7 +346,7 @@ void	init_metrics(void)
 #endif
 }
 
-void	free_metrics_ext(ZBX_METRIC **metrics)
+void	zbx_free_metrics_ext(ZBX_METRIC **metrics)
 {
 	if (NULL != *metrics)
 	{
@@ -362,10 +362,10 @@ void	free_metrics_ext(ZBX_METRIC **metrics)
 	}
 }
 
-void	free_metrics(void)
+void	zbx_free_metrics(void)
 {
-	free_metrics_ext(&commands);
-	free_metrics_ext(&commands_local);
+	zbx_free_metrics_ext(&commands);
+	zbx_free_metrics_ext(&commands_local);
 	free_key_access_rules();
 }
 
@@ -374,7 +374,7 @@ void	free_metrics(void)
  * Purpose: initializes key access rule list                                  *
  *                                                                            *
  ******************************************************************************/
-void	init_key_access_rules(void)
+void	zbx_init_key_access_rules(void)
 {
 	zbx_vector_ptr_create(&key_access_rules);
 }
@@ -424,7 +424,7 @@ static zbx_key_access_rule_t	*zbx_key_access_rule_create(char *pattern, zbx_key_
  * Purpose: validates key access rules configuration                          *
  *                                                                            *
  ******************************************************************************/
-void	finalize_key_access_rules_configuration(void)
+void	zbx_finalize_key_access_rules_configuration(void)
 {
 	int			i, j, rules_num, sysrun_index = ZBX_MAX_UINT31_1;
 	zbx_key_access_rule_t	*rule, *sysrun_deny;

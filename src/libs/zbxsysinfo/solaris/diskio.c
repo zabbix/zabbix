@@ -30,7 +30,7 @@ typedef struct
 }
 zbx_kstat_t;
 
-int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
+int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	return FAIL;
 }

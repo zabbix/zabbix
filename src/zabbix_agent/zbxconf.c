@@ -271,7 +271,7 @@ void	reload_user_parameters(unsigned char process_type, int process_num)
 		goto out;
 	}
 
-	free_metrics_ext(&metrics_fallback);
+	zbx_free_metrics_ext(&metrics_fallback);
 	zabbix_log(LOG_LEVEL_INFORMATION, "user parameters reloaded [%s #%d]", get_process_type_string(process_type),
 			process_num);
 out:
