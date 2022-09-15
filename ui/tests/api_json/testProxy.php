@@ -647,7 +647,7 @@ class testProxy extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/filter/lastaccess/1": an integer is expected.'
 			],
-			'Test proxy.get invalid lastaccess (too small) in filter' => [
+			'Test proxy.get invalid lastaccess (out of range) in filter' => [
 				'request' => [
 					'filter' => [
 						'lastaccess' => [-1]
@@ -1268,7 +1268,7 @@ class testProxy extends CAPITest {
 				'tls_issuer', 'tls_subject', 'proxy_address', 'auto_compress', 'version', 'compatibility'
 			],
 			'selectHosts' => ['hostid'],
-			'selectInterface' => ['dns'],
+			'selectInterface' => ['useip', 'ip', 'dns', 'port'],
 			'proxyids' => $proxyids,
 			'preservekeys' => true,
 			'nopermissions' => true
@@ -1289,7 +1289,7 @@ class testProxy extends CAPITest {
 	}
 
 	/**
-	 * Restore proxies to its original state.
+	 * Restore proxies to their original state.
 	 *
 	 * @param array $proxies
 	 */
@@ -1363,7 +1363,7 @@ class testProxy extends CAPITest {
 	}
 
 	/**
-	 * Helper method to validate ID placeholder.
+	 * Helper method to check ID placeholder.
 	 *
 	 * @param $id
 	 *
