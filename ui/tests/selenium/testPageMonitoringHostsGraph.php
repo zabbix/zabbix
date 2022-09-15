@@ -20,7 +20,7 @@
 
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
  * @backup profiles, hosts, items, graphs
@@ -209,13 +209,268 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		$this->assertEquals('Specify host to see the graphs.', $this->query('class:nothing-to-show')->one()->getText());
 	}
 
+	public static function getCheckTagFilterData() {
+		return [
+			// #0 All graphs - filter by Tags.
+			[
+				[
+					'filter' => [
+						'Show' => 'All graphs'
+					],
+					'subfilter' => [
+						'Tags' =>[ 'tag_name_2']
+					],
+					'graphs_amount' => 3
+				]
+			],
+			// #1 Host graphs - filter by Tags.
+			[
+				[
+					'filter' => [
+						'Show' => 'Host graphs'
+					],
+					'subfilter' => [
+						'Tags' => ['tag_name_2']
+					],
+					'graphs_amount' => 2
+				]
+			],
+			// #2 Simple graphs - filter by Tags.
+			[
+				[
+					'filter' => [
+						'Show' => 'Simple graphs'
+					],
+					'subfilter' => [
+						'Tags' => ['tag_name_2']
+					],
+					'graphs_amount' => 1
+				]
+			],
+			// #3 All graphs - filter by 2 Tags.
+			[
+				[
+					'filter' => [
+						'Show' => 'All graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_2',
+							'tag_name_1'
+						]
+					],
+					'graphs_amount' => 5
+				]
+			],
+			// #4 Host graphs - filter by 2 Tags.
+			[
+				[
+					'filter' => [
+						'Show' => 'Host graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_2',
+							'tag_name_1'
+						]
+					],
+					'graphs_amount' => 3
+				]
+			],
+			// #5 Simple graphs - filter by 2 Tags.
+			[
+				[
+					'filter' => [
+						'Show' => 'Simple graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_2',
+							'tag_name_1'
+						]
+					],
+					'graphs_amount' => 2
+				]
+			],
+			// #6 All graphs - filter by Tags and Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'All graphs'
+					],
+					'subfilter' => [
+						'Tags' => ['tag_name_2'],
+						'Tag values' => ['tag_value_3']
+					],
+					'graphs_amount' => 1
+				]
+			],
+			// #7 Host graphs - filter by Tag and Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'Host graphs'
+					],
+					'subfilter' => [
+						'Tags' => ['tag_name_2'],
+						'Tag values' => ['tag_value_3']
+					],
+					'graphs_amount' => 1
+				]
+			],
+			// #8 Simple graphs - filter by Tag and Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'Simple graphs'
+					],
+					'subfilter' => [
+						'Tags' => ['tag_name_2'],
+						'Tag values' => ['tag_value_3']
+					]
+				]
+			],
+			// #9 All graphs - filter by 2 Tags and Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'All graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_1',
+							'tag_name_2'
+						],
+						'Tag values' => ['tag_value_3']
+					],
+					'graphs_amount' => 1
+				]
+			],
+			// #10 Host graphs - filter by 2 Tags and Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'Host graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_1',
+							'tag_name_2'
+						],
+						'Tag values' => ['tag_value_3']
+					],
+					'graphs_amount' => 1
+				]
+			],
+			// #10 Simple graphs - filter by 2 Tags and Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'Simple graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_1',
+							'tag_name_2'
+						],
+						'Tag values' => ['tag_value_3']
+					]
+				]
+			],
+			// #11 All graphs - filter by 2 Tags and 2 Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'All graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_1',
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_2',
+							'tag_value_3'
+						]
+					],
+					'graphs_amount' => 3
+				]
+			],
+			// #11 Host graphs - filter by 2 Tags and 2 Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'Host graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_1',
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_2',
+							'tag_value_3'
+						]
+					],
+					'graphs_amount' => 2
+				]
+			],
+			// #11 Simple graphs - filter by 2 Tags and 2 Tag value.
+			[
+				[
+					'filter' => [
+						'Show' => 'Simple graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_1',
+							'tag_name_2'
+						],
+						'Tag values' => [
+							'tag_value_2',
+							'tag_value_3'
+						]
+					],
+					'graphs_amount' => 1
+				]
+			]
+		];
+	}
+
 	/**
 	 * Check tags filtering.
+	 *
+	 * @dataProvider getCheckTagFilterData
 	 */
-	public function testPageMonitoringHostsGraph_TagFilter() {
-		//		// Check that tags and information message are visible.
-//		$form->fill('Host for monitoring graphs')->submit();
-//		$this->page->waitUntilReady();
+	public function testPageMonitoringHostsGraph_TagFilter($data) {
+		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to='.
+			'now&filter_search_type=0&filter_set=1');
+		$form = $this->query('name:zbx_filter')->one()->asForm();
+		$form->query('button:Reset')->one()->click();
+		$form->fill(['Hosts' => 'Host_for_monitoring_graphs_1', 'Show' => 'All graphs'])->submit();
+		$this->page->waitUntilReady();
+
+		// Click on subfilter.
+		foreach ($data['subfilter'] as $header => $values) {
+			foreach ($values as $value) {
+				$this->query("xpath://h3[text()=".CXPathHelper::escapeQuotes($header)."]/..//a[text()=".
+					CXPathHelper::escapeQuotes($value)."]")->waitUntilClickable()->one()->click();
+				$this->page->waitUntilReady();
+			}
+		}
+
+		$form->fill($data['filter'])->submit();
+		$this->page->waitUntilReady();
+
+		// Check result amount.
+		if (array_key_exists('graphs_amount', $data)) {
+			$graphs_count = $this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count();
+			$this->assertEquals($data['graphs_amount'], $graphs_count);
+			$this->assertTableStats($data['graphs_amount']);
+		}
+		else {
+			$this->assertEquals('No data found.', $this->query('class:nothing-to-show')->one()->getText());
+		}
 	}
 
 	public static function getCheckFilterData() {
@@ -269,7 +524,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Name' => 'Graph_2',
 						'Show' => 'Host graphs'
 					],
-					'graphs_amount' => 3
+					'graphs_amount' => 2
 				]
 			],
 			// #5 Show simple graphs for host with graph name.
@@ -278,8 +533,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'filter' => [
 						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Name' => 'Graph_2',
-						'Show' => 'Host graphs'
-					]
+						'Show' => 'Simple graphs'
+					],
+					'graphs_amount' => 1
 				]
 			],
 			// #6 Show all graphs with not existing graph name.
@@ -345,7 +601,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'graphs_amount' => 3
 				]
 			],
-			// #12 Show simple graphs with partial graph name .
+			// #12 Show graphs without Hosts.
 			[
 				[
 					'filter' => [
@@ -412,11 +668,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		// Check result amount.
 		if (array_key_exists('graphs_amount', $data)) {
 			$graphs_count = $this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count();
-			$this->assertEquals($data['graphs_result'], $graphs_count);
-			$this->assertTableStats($data['graphs_result']);
+			$this->assertEquals($data['graphs_amount'], $graphs_count);
+			$this->assertTableStats($data['graphs_amount']);
 		}
 		else {
-			$message = (!array_key_exists('filter'['Hosts'], $data)) ? 'Specify host to see the graphs.' : 'No data found.';
+			$message = (array_key_exists('Hosts', $data['filter'])) ? 'No data found.' : 'Specify host to see the graphs.';
 			$this->assertEquals($message, $this->query('class:nothing-to-show')->one()->getText());
 		}
 	}
