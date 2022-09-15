@@ -204,53 +204,118 @@ function getMenuPopupHost(options, trigger_element) {
 
 		var items = [];
 
-		if (options.allowed_ui_inventory) {
-			items.push(host_inventory);
-		}
 
-		if (options.allowed_ui_latest_data) {
-			items.push(latest_data);
+		if (options.allowed_ui_hosts) {
+			items.push(dashboards);
 		}
 
 		if (options.allowed_ui_problems) {
 			items.push(problems);
 		}
 
+		if (options.allowed_ui_latest_data) {
+			items.push(latest_data);
+		}
+
 		if (options.allowed_ui_hosts) {
 			items.push(graphs);
-			items.push(dashboards);
 			items.push(web);
 		}
 
-		if (options.allowed_ui_conf_hosts) {
-			var config = {
-				label: t('Configuration'),
-				disabled: !options.isWriteable
-			};
-
-			if (options.isWriteable) {
-				const config_url = new Curl('zabbix.php', false);
-				config_url.setArgument('action', 'host.edit');
-				config_url.setArgument('hostid', options.hostid);
-				config.url = config_url.getUrl();
-
-				config.clickCallback = function (e) {
-					e.preventDefault();
-					jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-					view.editHost(options.hostid);
-				};
-			}
-
-			items.push(config);
+		if (options.allowed_ui_inventory) {
+			items.push(host_inventory);
 		}
 
 		if (items.length) {
 			sections.push({
-				label: t('Host'),
+				label: t('View'),
 				items: items
 			});
 		}
+	}
+
+	// Configuration
+	if (options.allowed_ui_conf_hosts) {
+		const config_urls = [];
+		const config = {
+			host: {
+				label: t('Host'),
+				disabled: !options.isWriteable
+			},
+			item: {
+				label: t('Items'),
+				disabled: !options.isWriteable
+			},
+			trigger: {
+				label: t('Triggers'),
+				disabled: !options.isWriteable
+			},
+			discovery: {
+				label: t('Discovery'),
+				disabled: !options.isWriteable
+			},
+			web: {
+				label: t('Web'),
+				disabled: !options.isWriteable
+			}
+		};
+
+		if (options.isWriteable) {
+			const config_url = new Curl('zabbix.php', false);
+			config_url.setArgument('action', 'host.edit');
+			config_url.setArgument('hostid', options.hostid);
+			config.host.url = config_url.getUrl();
+
+			config.host.clickCallback = function (e) {
+				e.preventDefault();
+				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+				view.editHost(options.hostid);
+			};
+		}
+
+		config_urls.push(config.host);
+
+		if (options.isWriteable) {
+			const item_url = new Curl('items.php', false);
+			item_url.setArgument('filter_set', '1');
+			item_url.setArgument('filter_hostids[]', options.hostid);
+			item_url.setArgument('context', 'host');
+			config.item.url = item_url.getUrl();
+		}
+		config_urls.push(config.item);
+
+		if (options.isWriteable) {
+			const trigger_url = new Curl('triggers.php', false);
+			trigger_url.setArgument('filter_set', '1');
+			trigger_url.setArgument('filter_hostids[]', options.hostid);
+			trigger_url.setArgument('context', 'host');
+			config.trigger.url = trigger_url.getUrl();
+		}
+		config_urls.push(config.trigger);
+
+		if (options.isWriteable) {
+			const discovery_url = new Curl('host_discovery.php', false);
+			discovery_url.setArgument('filter_set', '1');
+			discovery_url.setArgument('filter_hostids[]', options.hostid);
+			discovery_url.setArgument('context', 'host');
+			config.discovery.url = discovery_url.getUrl();
+		}
+		config_urls.push(config.discovery);
+
+		if (options.isWriteable) {
+			const http_url = new Curl('httpconf.php', false);
+			http_url.setArgument('filter_set', '1');
+			http_url.setArgument('filter_hostids[]', options.hostid);
+			http_url.setArgument('context', 'host');
+			config.web.url = http_url.getUrl();
+		}
+		config_urls.push(config.web);
+
+		sections.push({
+			label: t('Configuration'),
+			items: config_urls
+		});
 	}
 
 	// urls
@@ -580,8 +645,9 @@ function getMenuPopupDashboard(options, trigger_element) {
  * @return array
  */
 function getMenuPopupTrigger(options, trigger_element) {
-	var sections = [],
-		items = [];
+	const sections = [];
+	const items = [];
+	let url;
 
 	if (options.allowed_ui_problems) {
 		// events
@@ -590,7 +656,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		};
 
 	if (typeof options.showEvents !== 'undefined' && options.showEvents) {
-		var url = new Curl('zabbix.php', false);
+		url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'problem.view');
 		url.setArgument('filter_name', '');
 		url.setArgument('triggerids[]', options.triggerid);
@@ -601,69 +667,87 @@ function getMenuPopupTrigger(options, trigger_element) {
 			events.disabled = true;
 		}
 
-		items[items.length] = events;
+		items.push(events);
 	}
 
 	// acknowledge
 	if (typeof options.acknowledge !== 'undefined' && options.acknowledge) {
-		items[items.length] = {
+		items.push({
 			label: t('Acknowledge'),
 			clickCallback: function() {
 				jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
 
 				acknowledgePopUp({eventids: [options.eventid]}, trigger_element);
 			}
-		};
+		});
 	}
 
-	// configuration
-	if (options.allowed_ui_conf_hosts) {
-		var url = new Curl('triggers.php', false);
+	// items problems
+	if (options.allowed_ui_latest_data && typeof options.items !== 'undefined' && options.items.length) {
+		for (const item of options.items) {
+			url = new Curl('history.php', false);
+			url.setArgument('action', item.params.action);
+			url.setArgument('itemids[]', item.params.itemid);
 
-		url.setArgument('form', 'update');
-		url.setArgument('triggerid', options.triggerid);
-		url.setArgument('context', 'host');
-
-		items[items.length] = {
-			label: t('Configuration'),
-			url: url.getUrl()
+			items.push({
+				label: item.name,
+				url: url.getUrl()
+			});
 		};
 	}
 
 	if (items.length) {
-		sections[sections.length] = {
-			label: t('S_TRIGGER'),
+		sections.push({
+			label: t('View'),
 			items: items
-		};
+		});
+	}
+
+	// configuration
+	if (options.allowed_ui_conf_hosts) {
+		const config_urls = [];
+		const item_urls = [];
+
+		url = new Curl('triggers.php', false);
+		url.setArgument('form', 'update');
+		url.setArgument('triggerid', options.triggerid);
+		url.setArgument('context', 'host');
+		config_urls.push({
+			label: t('Trigger'),
+			url: url.getUrl()
+		});
+
+		if (typeof options.items !== 'undefined' && options.items.length) {
+			for (const item of options.items) {
+				url = new Curl('items.php', false);
+				url.setArgument('form', 'update');
+				url.setArgument('itemid', item.params.itemid);
+				url.setArgument('context', 'host');
+
+				item_urls.push({
+					label: item.name,
+					url: url.getUrl()
+				});
+			};
+
+			config_urls.push({
+				label: t('Items'),
+				items: item_urls
+			});
+		}
+
+		sections.push({
+			label: t('Configuration'),
+			items: config_urls
+		});
 	}
 
 	// urls
 	if ('urls' in options) {
-		sections[sections.length] = {
+		sections.push({
 			label: t('Links'),
 			items: getMenuPopupURLData(options.urls, trigger_element)
-		};
-	}
-
-	// items
-	if (options.allowed_ui_latest_data && typeof options.items !== 'undefined' && objectSize(options.items) > 0) {
-		var items = [];
-
-		jQuery.each(options.items, function(i, item) {
-			var url = new Curl('history.php', false);
-			url.setArgument('action', item.params.action);
-			url.setArgument('itemids[]', item.params.itemid);
-
-			items[items.length] = {
-				label: item.name,
-				url: url.getUrl()
-			};
 		});
-
-		sections[sections.length] = {
-			label: t('History'),
-			items: items
-		};
 	}
 
 	// scripts
@@ -691,8 +775,24 @@ function getMenuPopupTrigger(options, trigger_element) {
  * @return array
  */
 function getMenuPopupItem(options) {
+	const sections = [];
+	const action_urls = [];
 	const items = [];
 	let url;
+
+	// latest data link
+	url = new Curl('zabbix.php', false);
+	url.setArgument('action', 'latest.view');
+	url.setArgument('hostids[]', options.hostid);
+	url.setArgument('name', options.name);
+	url.setArgument('filter_name', '');
+
+	if (options.allowed_ui_latest_data) {
+		items.push({
+			label: t('Latest data'),
+			url: url.getUrl()
+		});
+	}
 
 	url = new Curl('history.php', false);
 	url.setArgument('action', 'showgraph');
@@ -730,10 +830,19 @@ function getMenuPopupItem(options) {
 	items.push(values);
 	items.push(latest);
 
+	sections.push({
+		label: t('View'),
+		items: items
+	});
+
 	if (options.allowed_ui_conf_hosts) {
+		const config_urls = [];
 		const config = {
-			label: t('Configuration'),
+			label: t('Item'),
 			disabled: !options.isWriteable
+		};
+		const conf_triggers = {
+			label: t('Triggers')
 		};
 
 		if (options.isWriteable) {
@@ -742,11 +851,79 @@ function getMenuPopupItem(options) {
 			url.setArgument('hostid', options.hostid);
 			url.setArgument('itemid', options.itemid);
 			url.setArgument('context', 'host');
-
 			config.url = url.getUrl();
 		}
 
-		items.push(config);
+		config_urls.push(config);
+
+
+		if (options.triggers.length) {
+			const trigger_items = [];
+
+			for (const value of options.triggers) {
+				url = new Curl('triggers.php', false);
+				url.setArgument('form', 'update');
+				url.setArgument('triggerid', value.triggerid);
+				url.setArgument('context', 'host');
+
+				trigger_items.push({
+					label: value.description,
+					url: url.getUrl()
+				});
+			}
+
+			conf_triggers.items = trigger_items;
+
+		} else {
+			conf_triggers.disabled = true;
+		}
+
+		config_urls.push(conf_triggers);
+
+
+		url = new Curl('triggers.php', false);
+		url.setArgument('form', 'create');
+		url.setArgument('hostid', options.hostid);
+		url.setArgument('description', options.name);
+		url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
+		url.setArgument('context', 'host');
+
+		config_urls.push({
+			label: t('Create trigger'),
+			disabled: !options.isWriteable,
+			url: url.getUrl()
+		});
+
+		url = new Curl('items.php', false);
+		url.setArgument('form', 'create');
+		url.setArgument('hostid', options.hostid);
+		url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
+		url.setArgument('master_itemid', options.itemid);
+		url.setArgument('context', 'host');
+
+		config_urls.push({
+			label: t('Create dependent item'),
+			url: url.getUrl(),
+			disabled: !options.create_dependent_item
+		});
+
+		url = new Curl('host_discovery.php', false);
+		url.setArgument('form', 'create');
+		url.setArgument('hostid', options.hostid);
+		url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
+		url.setArgument('master_itemid', options.itemid);
+		url.setArgument('context', 'host');
+
+		config_urls.push({
+			label: t('Create dependent discovery rule'),
+			url: url.getUrl(),
+			disabled: !options.create_dependent_discovery
+		});
+
+		sections.push({
+			label: t('Configuration'),
+			items: config_urls
+		});
 	}
 
 	const execute = {
@@ -762,12 +939,14 @@ function getMenuPopupItem(options) {
 		};
 	}
 
-	items.push(execute);
+	action_urls.push(execute);
 
-	return [{
-		label: t('Item'),
-		items: items
-	}];
+	sections.push({
+		label: t('Actions'),
+		items: action_urls
+	});
+
+	return sections;
 }
 
 /**
