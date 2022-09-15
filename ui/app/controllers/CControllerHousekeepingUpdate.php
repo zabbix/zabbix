@@ -114,13 +114,12 @@ class CControllerHousekeepingUpdate extends CController {
 		}
 
 		if (CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) === ZBX_DB_EXTENSION_TIMESCALEDB) {
-			$dbversion_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
+			$dbversion_status = CSettingsHelper::getDbVersionStatus();
 
-			if ($dbversion_status !== '') {
-				foreach (json_decode($dbversion_status, true) as $dbversion) {
-					if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB
-							&& array_key_exists('compression_availability', $dbversion)
-							&& $dbversion['compression_availability']) {
+			foreach ($dbversion_status as $dbversion) {
+				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+					if (array_key_exists('compression_availability', $dbversion)
+							&& (bool) $dbversion['compression_availability']) {
 						$hk[CHousekeepingHelper::COMPRESSION_STATUS] = $this->getInput('compression_status', 0);
 
 						if ($hk[CHousekeepingHelper::COMPRESSION_STATUS] == 1) {
@@ -128,9 +127,9 @@ class CControllerHousekeepingUpdate extends CController {
 								DB::getDefault('config', 'compress_older')
 							);
 						}
-
-						break;
 					}
+
+					break;
 				}
 			}
 		}
