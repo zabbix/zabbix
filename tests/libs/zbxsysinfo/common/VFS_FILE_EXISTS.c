@@ -42,7 +42,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED != parse_item_key(key, &request))
+	if (SUCCEED != zbx_parse_item_key(key, &request))
 		fail_msg("Cannot parse item key: %s", key);
 
 	ret = VFS_FILE_EXISTS(&request, &result);

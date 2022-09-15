@@ -1682,7 +1682,7 @@ static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *er
 
 	zbx_init_agent_request(&data->request);
 
-	if (SUCCEED != parse_item_key(key, &data->request))
+	if (SUCCEED != zbx_parse_item_key(key, &data->request))
 	{
 		zbx_strlcpy(error, "Invalid SNMP OID: cannot parse expression.", max_error_len);
 		goto out;

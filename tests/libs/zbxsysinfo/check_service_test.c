@@ -64,7 +64,7 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	strcat(key, "]");
-	parse_item_key(key, &request);
+	zbx_parse_item_key(key, &request);
 
 	returned_code = check_service(&request, default_addr, &result, 0);
 	if (SUCCEED != returned_code && NULL != result.msg && '\0' != *(result.msg))

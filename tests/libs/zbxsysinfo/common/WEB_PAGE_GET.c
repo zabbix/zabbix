@@ -77,7 +77,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_init_agent_result(&param_result);
 	init_param = zbx_mock_get_parameter_string("in.key");
 
-	if (SUCCEED != parse_item_key(init_param, &request))
+	if (SUCCEED != zbx_parse_item_key(init_param, &request))
 		fail_msg("Cannot parse item key: %s", init_param);
 
 	if (expected_result != (actual_result = WEB_PAGE_GET(&request, &param_result)))

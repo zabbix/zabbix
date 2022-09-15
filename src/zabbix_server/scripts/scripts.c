@@ -66,7 +66,7 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 	}
 
 	param = zbx_strdup(param, command);
-	if (SUCCEED != (ret = quote_key_param(&param, 0)))
+	if (SUCCEED != (ret = zbx_quote_key_param(&param, 0)))
 	{
 		zbx_snprintf(error, max_error_len, "Invalid param [%s]", param);
 		goto fail;

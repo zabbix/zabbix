@@ -5471,7 +5471,7 @@ static int	DBpatch_5030169(void)
 
 		zbx_init_agent_request(&request);
 
-		if (SUCCEED != parse_item_key(row[1], &request))
+		if (SUCCEED != zbx_parse_item_key(row[1], &request))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot parse aggregate checks item key \"%s\"", row[1]);
 			continue;

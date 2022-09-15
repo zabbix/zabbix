@@ -78,7 +78,7 @@ void	zbx_mock_test_entry_NET_IF_COMMON(void **state, int net_if_func)
 	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&param_result);
 
-	if (SUCCEED != parse_item_key(init_param, &request))
+	if (SUCCEED != zbx_parse_item_key(init_param, &request))
 		fail_msg("Cannot parse item key: %s", init_param);
 
 	if (ZABBIX_MOCK_NET_IF_IN == net_if_func)

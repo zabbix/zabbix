@@ -394,7 +394,7 @@ static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t
 
 	zbx_init_agent_request(&request);
 
-	if(SUCCEED != parse_item_key(key, &request))
+	if(SUCCEED != zbx_parse_item_key(key, &request))
 		goto out;
 
 	/* "params" parameter */

@@ -324,12 +324,12 @@ static int	replace_key_param_wildcard_cb(const char *data, int key_type, int lev
 		return SUCCEED;
 
 	tmp = zbx_strdup(NULL, data);
-	unquote_key_param(tmp);
+	zbx_unquote_key_param(tmp);
 	*param = zbx_dyn_escape_string(tmp, "\\%%");
 	zbx_free(tmp);
 
 	/* escaping cannot result in unquotable parameter */
-	if (FAIL == quote_key_param(param, quoted))
+	if (FAIL == zbx_quote_key_param(param, quoted))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		zbx_free(*param);
@@ -353,7 +353,7 @@ static int	expression_match_item_key(const char *item_key, const AGENT_REQUEST *
 
 	zbx_init_agent_request(&key);
 
-	if (SUCCEED != parse_item_key(item_key, &key))
+	if (SUCCEED != zbx_parse_item_key(item_key, &key))
 		goto out;
 
 	if (pattern->nparam != key.nparam)
@@ -414,7 +414,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 	if (0 != (query->flags & ZBX_ITEM_QUERY_KEY_SOME))
 	{
 		zbx_init_agent_request(&pattern);
-		if (SUCCEED != parse_item_key(query->ref.key, &pattern))
+		if (SUCCEED != zbx_parse_item_key(query->ref.key, &pattern))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			zbx_free(sql);

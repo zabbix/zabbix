@@ -172,7 +172,7 @@ int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size
 
 	zbx_init_agent_request(&request);
 
-	if (SUCCEED == (ret = parse_item_key(itemkey, &request)))
+	if (SUCCEED == (ret = zbx_parse_item_key(itemkey, &request)))
 	{
 		if (1 == get_rparams_num(&request) && 0 == strcmp("[*]", itemkey + strlen(get_rkey(&request))))
 			flags |= CF_HAVEPARAMS;
@@ -764,7 +764,7 @@ int	zbx_check_key_access_rules(const char *metric)
 
 	zbx_init_agent_request(&request);
 
-	if (SUCCEED == parse_item_key(metric, &request))
+	if (SUCCEED == zbx_parse_item_key(metric, &request))
 		ret = zbx_check_request_access_rules(&request);
 	else
 		ret = ZBX_KEY_ACCESS_DENY;
@@ -904,7 +904,7 @@ static void	add_request_param(AGENT_REQUEST *request, char *pvalue, zbx_request_
  * Comments: thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
-int	parse_item_key(const char *itemkey, AGENT_REQUEST *request)
+int	zbx_parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 {
 	int	i, ret = FAIL;
 	char	*key = NULL, *params = NULL;
@@ -1122,7 +1122,7 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 
 	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key((0 == (flags & ZBX_PROCESS_WITH_ALIAS) ? in_command : zbx_alias_get(in_command)),
+	if (SUCCEED != zbx_parse_item_key((0 == (flags & ZBX_PROCESS_WITH_ALIAS) ? in_command : zbx_alias_get(in_command)),
 			&request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
@@ -1520,7 +1520,7 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
  *   "\"param\"" => "param"                                                   *
  *                                                                            *
  ******************************************************************************/
-void	unquote_key_param(char *param)
+void	zbx_unquote_key_param(char *param)
 {
 	char	*dst;
 
@@ -1553,7 +1553,7 @@ void	unquote_key_param(char *param)
  *                         backslash in the end                               *
  *                                                                            *
  ******************************************************************************/
-int	quote_key_param(char **param, int forced)
+int	zbx_quote_key_param(char **param, int forced)
 {
 	size_t	sz_src, sz_dst;
 

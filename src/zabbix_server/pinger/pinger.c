@@ -191,7 +191,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 
 	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(key, &request))
+	if (SUCCEED != zbx_parse_item_key(key, &request))
 	{
 		zbx_snprintf(error, max_error_len, "Invalid item key format.");
 		goto out;

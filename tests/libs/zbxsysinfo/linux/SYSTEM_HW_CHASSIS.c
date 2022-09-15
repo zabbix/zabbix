@@ -41,7 +41,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED != parse_item_key(param, &request))
+	if (SUCCEED != zbx_parse_item_key(param, &request))
 		fail_msg("Cannot parse item key: %s", param);
 
 	if (expected_result != (actual_result = SYSTEM_HW_CHASSIS(&request, &result)))

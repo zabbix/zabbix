@@ -81,7 +81,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_init_agent_request(&request);
 
-	if (expected_result != (actual_result = parse_item_key(item_key, &request)))
+	if (expected_result != (actual_result = zbx_parse_item_key(item_key, &request)))
 	{
 		fail_msg("Got %s instead of %s as a result.", zbx_result_string(actual_result),
 				zbx_result_string(expected_result));

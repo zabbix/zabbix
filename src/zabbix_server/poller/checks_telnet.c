@@ -30,7 +30,7 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 
 	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key, &request))
+	if (SUCCEED != zbx_parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;

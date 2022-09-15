@@ -40,7 +40,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_init_agent_result(&result);
 	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(itemkey, &request))
+	if (SUCCEED != zbx_parse_item_key(itemkey, &request))
 		fail_msg("Invalid item key format '%s'", itemkey);
 
 	if (read_yaml_ret() != (ret = SYSTEM_CPU_INTR(&request, &result)))

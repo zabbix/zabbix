@@ -274,7 +274,7 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 
 	zbx_init_agent_request(&request);
 
-	if (SUCCEED == parse_item_key(itemkey, &request) && 0 < get_rparams_num(&request) &&
+	if (SUCCEED == zbx_parse_item_key(itemkey, &request) && 0 < get_rparams_num(&request) &&
 			max_num_parameters >= get_rparams_num(&request) && NULL != (skip = get_rparam(&request, 4)) &&
 			0 == strcmp(skip, "skip"))
 	{
