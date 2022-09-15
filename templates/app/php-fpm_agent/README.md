@@ -93,18 +93,16 @@ There are no template links in this template.
 
 ## Discovery rules
 
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|----|
+|PHP-FPM process discovery |<p>Discovery of summary process PHP-FPM.</p> |DEPENDENT |php-fpm.proc.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$PHP_FPM.PROCESS_NAME}`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|PHP-FPM |PHP-FPM: Get process summary |<p>-</p> |ZABBIX_PASSIVE |proc.get["{$PHP_FPM.PROCESS_NAME}",,,summary] |
-|PHP-FPM |PHP-FPM: Number of processes running |<p>-</p> |DEPENDENT |php-fpm.proc.count<p>**Preprocessing**:</p><p>- JSONPATH: `$..processes.first()`</p> |
-|PHP-FPM |PHP-FPM: Memory usage (rss) |<p>Summary resident set size memory used by processes in bytes.</p> |DEPENDENT |php-fmp.proc.rss<p>**Preprocessing**:</p><p>- JSONPATH: `$..rss.first()`</p> |
-|PHP-FPM |PHP-FPM: Memory usage (vsize) |<p>Summary virtual memory size used by processes in bytes.</p> |DEPENDENT |php-fpm.proc.vmem<p>**Preprocessing**:</p><p>- JSONPATH: `$..vsize.first()`</p> |
-|PHP-FPM |PHP-FPM: Memory usage, % |<p>Memory used percentage relative to total memory available.</p> |DEPENDENT |php-fpm.proc.pmem<p>**Preprocessing**:</p><p>- JSONPATH: `$..pmem.first()`</p> |
-|PHP-FPM |PHP-FPM: CPU utilization |<p>Process CPU utilization percentage.</p> |ZABBIX_PASSIVE |proc.cpu.util["{$PHP_FPM.PROCESS_NAME}"] |
-|PHP-FPM |PHP-FPM: Ping |<p>-</p> |DEPENDENT |php-fpm.ping<p>**Preprocessing**:</p><p>- REGEX: `{$PHP_FPM.PING.REPLY}($|\n) 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|PHP-FPM |PHP-FPM: Get process summary |<p>-</p> |ZABBIX_PASSIVE |proc.get[,,,summary] |
+|PHP-FPM |PHP-FPM: Ping |<p>-</p> |DEPENDENT |php-fpm.ping<p>**Preprocessing**:</p><p>- REGEX: `{$PHP_FPM.PING.REPLY}($|\r?\n) 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |PHP-FPM |PHP-FPM: Processes, active |<p>The total number of active processes.</p> |DEPENDENT |php-fpm.processes_active<p>**Preprocessing**:</p><p>- JSONPATH: `$.['active processes']`</p> |
 |PHP-FPM |PHP-FPM: Version |<p>Current version PHP. Get from HTTP-Header "X-Powered-By" and may not work if you change default HTTP-headers.</p> |DEPENDENT |php-fpm.version<p>**Preprocessing**:</p><p>- REGEX: `^[.\s\S]*X-Powered-By: PHP/([.\d]{1,}) \1`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |PHP-FPM |PHP-FPM: Pool name |<p>The name of current pool.</p> |DEPENDENT |php-fpm.name<p>**Preprocessing**:</p><p>- JSONPATH: `$.pool`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
@@ -121,6 +119,12 @@ There are no template links in this template.
 |PHP-FPM |PHP-FPM: Listen queue, max |<p>The maximum number of requests in the queue of pending connections since this FPM pool has started.</p> |DEPENDENT |php-fpm.listen_queue_max<p>**Preprocessing**:</p><p>- JSONPATH: `$.['max listen queue']`</p> |
 |PHP-FPM |PHP-FPM: Listen queue, len |<p>Size of the socket queue of pending connections.</p> |DEPENDENT |php-fpm.listen_queue_len<p>**Preprocessing**:</p><p>- JSONPATH: `$.['listen queue len']`</p> |
 |PHP-FPM |PHP-FPM: Max children reached |<p>The number of times that pm.max_children has been reached since the php-fpm pool started </p> |DEPENDENT |php-fpm.max_children<p>**Preprocessing**:</p><p>- JSONPATH: `$.['max children reached']`</p><p>- SIMPLE_CHANGE</p> |
+|PHP-FPM |PHP-FPM: Get process php-fpm |<p>-</p> |DEPENDENT |php-fpm.proc.get[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@["name"]=="{#NAME}")]`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|PHP-FPM |PHP-FPM: Memory usage (rss) |<p>Resident set size memory used by process {#NAME} in bytes.</p> |DEPENDENT |php-fpm.proc.rss[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..rss.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|PHP-FPM |PHP-FPM: Memory usage (vsize) |<p>Virtual memory used by process {#NAME} in bytes.</p> |DEPENDENT |php-fpm.proc.vmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..vsize.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|PHP-FPM |PHP-FPM: Memory usage, % |<p>Percentage of real memory used by process {#NAME}.</p> |DEPENDENT |php-fpm.proc.pmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..pmem.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|PHP-FPM |PHP-FPM: Number of processes running |<p>-</p> |DEPENDENT |php-fpm.proc.num[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..processes.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|PHP-FPM |PHP-FPM: CPU utilization |<p>Process CPU utilization percentage.</p> |ZABBIX_PASSIVE |proc.cpu.util[{#NAME}] |
 |Zabbix raw items |PHP-FPM: php-fpm_ping |<p>-</p> |ZABBIX_PASSIVE |web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.PING.PAGE}","{$PHP_FPM.PORT}"] |
 |Zabbix raw items |PHP-FPM: Get status page |<p>-</p> |ZABBIX_PASSIVE |web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]<p>**Preprocessing**:</p><p>- REGEX: `^[.\s\S]*({.+}) \1`</p> |
 
@@ -128,14 +132,14 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|PHP-FPM: Process is not running |<p>-</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.proc.count)=0` |HIGH | |
-|PHP-FPM: Service is down |<p>-</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.ping)=0 or nodata(/PHP-FPM by Zabbix agent/php-fpm.ping,3m)=1` |HIGH |<p>Manual close: YES</p><p>**Depends on**:</p><p>- PHP-FPM: Process is not running</p> |
 |PHP-FPM: Version has changed |<p>PHP-FPM version has changed. Ack to close.</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.version,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.version,#2) and length(last(/PHP-FPM by Zabbix agent/php-fpm.version))>0` |INFO |<p>Manual close: YES</p> |
-|PHP-FPM: Failed to fetch info data |<p>Zabbix has not received data for items for the last 30 minutes</p> |`nodata(/PHP-FPM by Zabbix agent/php-fpm.uptime,30m)=1` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- PHP-FPM: Process is not running</p> |
-|PHP-FPM: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|PHP-FPM: Pool has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |PHP-FPM: Queue utilization is high |<p>The queue for this pool reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in queue represent the current number of connections that have been initiated on this pool, but not yet accepted.</p> |`min(/PHP-FPM by Zabbix agent/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}` |WARNING | |
 |PHP-FPM: Manager  changed |<p>PHP-FPM manager changed. Ack to close.</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#2)` |INFO |<p>Manual close: YES</p> |
 |PHP-FPM: Detected slow requests |<p>PHP-FPM detected slow request. A slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p> |`min(/PHP-FPM by Zabbix agent/php-fpm.slow_requests,#3)>0` |WARNING | |
+|PHP-FPM: Process is not running |<p>-</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.proc.num[{#NAME}])=0` |HIGH | |
+|PHP-FPM: Failed to fetch info data |<p>Zabbix has not received data for items for the last 30 minutes</p> |`nodata(/PHP-FPM by Zabbix agent/php-fpm.uptime,30m)=1 and last(/PHP-FPM by Zabbix agent/php-fpm.proc.num[{#NAME}])>0` |INFO |<p>Manual close: YES</p> |
+|PHP-FPM: Service is down |<p>-</p> |`(last(/PHP-FPM by Zabbix agent/php-fpm.ping)=0 or nodata(/PHP-FPM by Zabbix agent/php-fpm.ping,3m)=1) and last(/PHP-FPM by Zabbix agent/php-fpm.proc.num[{#NAME}])>0` |HIGH |<p>Manual close: YES</p> |
 
 ## Feedback
 

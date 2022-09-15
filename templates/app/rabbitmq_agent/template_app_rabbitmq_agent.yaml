@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-01T14:44:57Z'
+  date: '2022-09-15T13:19:57Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1319,25 +1319,6 @@ zabbix_export:
             -
               tag: component
               value: system
-          triggers:
-            -
-              uuid: 5cb80a7552d74e44a83d0825f039f89f
-              expression: 'min(/RabbitMQ node by Zabbix agent/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
-              name: 'RabbitMQ: Service response time is too high'
-              event_name: 'RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)'
-              priority: WARNING
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'RabbitMQ: Process is not running'
-                  expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.count)=0'
-                -
-                  name: 'RabbitMQ: Service is down'
-                  expression: 'last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0'
-              tags:
-                -
-                  tag: scope
-                  value: performance
         -
           uuid: 6229b623f5ff40f9a65e9573b3b86e3f
           name: 'RabbitMQ: Service ping'
@@ -1357,37 +1338,10 @@ zabbix_export:
             -
               tag: component
               value: network
-          triggers:
-            -
-              uuid: af5cfb0004e04562a9720b9e1b41fd5b
-              expression: 'last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0'
-              name: 'RabbitMQ: Service is down'
-              priority: AVERAGE
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'RabbitMQ: Process is not running'
-                  expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.count)=0'
-              tags:
-                -
-                  tag: scope
-                  value: availability
-        -
-          uuid: 0b195bf594c44b1f869b4a7671f61453
-          name: 'RabbitMQ: CPU utilization'
-          key: 'proc.cpu.util["{$RABBITMQ.PROCESS_NAME}"]'
-          history: 7d
-          value_type: FLOAT
-          units: '%'
-          description: 'Process CPU utilization percentage.'
-          tags:
-            -
-              tag: component
-              value: cpu
         -
           uuid: 8201cc537b124d9292fcf692922ee0ad
           name: 'RabbitMQ: Get process summary'
-          key: 'proc.get["{$RABBITMQ.PROCESS_NAME}",,,summary]'
+          key: 'proc.get[,,,summary]'
           history: 0d
           trends: '0'
           value_type: TEXT
@@ -1694,25 +1648,6 @@ zabbix_export:
             -
               tag: component
               value: system
-          triggers:
-            -
-              uuid: 253acf98446e4790975b330d44dd6b96
-              expression: 'max(/RabbitMQ node by Zabbix agent/rabbitmq.node.running,5m)=0'
-              name: 'RabbitMQ: Node is not running'
-              opdata: 'Current state: {ITEM.LASTVALUE1}'
-              priority: AVERAGE
-              description: 'RabbitMQ node is not running'
-              dependencies:
-                -
-                  name: 'RabbitMQ: Process is not running'
-                  expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.count)=0'
-                -
-                  name: 'RabbitMQ: Service is down'
-                  expression: 'last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0'
-              tags:
-                -
-                  tag: scope
-                  value: availability
         -
           uuid: 1ae6f429e99d4ddaa54aa6adab6b8100
           name: 'RabbitMQ: Runtime run queue'
@@ -1809,76 +1744,8 @@ zabbix_export:
                   tag: scope
                   value: notice
         -
-          uuid: 8f1c8d2449c44ab590842184d9deb3a6
-          name: 'RabbitMQ: Number of processes running'
-          type: DEPENDENT
-          key: rabbitmq.proc.count
-          delay: '0'
-          history: 7d
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $..processes.first()
-          master_item:
-            key: 'proc.get["{$RABBITMQ.PROCESS_NAME}",,,summary]'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 2979bc7d779b404696f7eac273e99ea7
-              expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.count)=0'
-              name: 'RabbitMQ: Process is not running'
-              priority: HIGH
-              tags:
-                -
-                  tag: scope
-                  value: availability
-        -
-          uuid: 6f13f672d8ce4c9592e0f3f5ec3b0ec4
-          name: 'RabbitMQ: Memory usage (rss)'
-          type: DEPENDENT
-          key: rabbitmq.proc.rss
-          delay: '0'
-          history: 7d
-          units: B
-          description: 'Resident set size memory used by process in bytes.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $..rss.first()
-          master_item:
-            key: 'proc.get["{$RABBITMQ.PROCESS_NAME}",,,summary]'
-          tags:
-            -
-              tag: component
-              value: memory
-        -
-          uuid: 4faac75027d14304ab071602df8f2937
-          name: 'RabbitMQ: Memory usage (vsize)'
-          type: DEPENDENT
-          key: rabbitmq.proc.vmem
-          delay: '0'
-          history: 7d
-          units: B
-          description: 'Virtual memory size used by process in bytes.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $..vsize.first()
-          master_item:
-            key: 'proc.get["{$RABBITMQ.PROCESS_NAME}",,,summary]'
-          tags:
-            -
-              tag: component
-              value: memory
-        -
           uuid: 61730555a0ae4f798ea740effb82764c
-          name: 'RabbitMQ: Get nodes'
+          name: 'RabbitMQ: Get node overview'
           key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           history: 1h
           trends: '0'
@@ -1892,28 +1759,8 @@ zabbix_export:
                 - \1
           tags:
             -
-              tag: component
-              value: raw
-          triggers:
-            -
-              uuid: 4f2a88d09b1b49879d80e0794ec19e0e
-              expression: 'nodata(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"],30m)=1'
-              name: 'RabbitMQ: Failed to fetch nodes data'
-              event_name: 'RabbitMQ: Failed to fetch nodes data (or no data for 30m)'
-              priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes.'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'RabbitMQ: Process is not running'
-                  expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.count)=0'
-                -
-                  name: 'RabbitMQ: Service is down'
-                  expression: 'last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0'
-              tags:
-                -
-                  tag: scope
-                  value: availability
+              tag: Application
+              value: RabbitMQ
         -
           uuid: 1af326f40cdb407a96b34025062b4743
           name: 'RabbitMQ: Get node overview'
@@ -2285,6 +2132,206 @@ zabbix_export:
                                        parseInt(value.split('.')[1]) * 100 +
                                        parseInt(value.split('.')[2])
                   return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
+        -
+          uuid: 7cdf2316fa664f34b5de4f315bb7caf9
+          name: 'RabbitMQ process discovery'
+          type: DEPENDENT
+          key: rabbitmq.proc.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$RABBITMQ.PROCESS_NAME}'
+                formulaid: A
+          description: 'Discovery of summary process RabbitMQ.'
+          item_prototypes:
+            -
+              uuid: 0b195bf594c44b1f869b4a7671f61453
+              name: 'RabbitMQ: CPU utilization'
+              key: 'proc.cpu.util[{#NAME}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Process CPU utilization percentage.'
+              tags:
+                -
+                  tag: component
+                  value: cpu
+            -
+              uuid: 882cf9cfecb448f3af17e12bf9aa7bef
+              name: 'RabbitMQ: Get process apache'
+              type: DEPENDENT
+              key: 'rabbitmq.proc.get[{#NAME}]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@["name"]=="{#NAME}")]'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'proc.get[,,,summary]'
+              tags:
+                -
+                  tag: component
+                  value: raw
+            -
+              uuid: 8f1c8d2449c44ab590842184d9deb3a6
+              name: 'RabbitMQ: Number of processes running'
+              type: DEPENDENT
+              key: 'rabbitmq.proc.num[{#NAME}]'
+              delay: '0'
+              history: 7d
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $..processes.first()
+              master_item:
+                key: 'rabbitmq.proc.get[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: system
+              trigger_prototypes:
+                -
+                  uuid: 2979bc7d779b404696f7eac273e99ea7
+                  expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#NAME}])=0'
+                  name: 'RabbitMQ: Process is not running'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 6f13f672d8ce4c9592e0f3f5ec3b0ec4
+              name: 'RabbitMQ: Memory usage (rss)'
+              type: DEPENDENT
+              key: 'rabbitmq.proc.rss[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Resident set size memory used by process in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $..rss.first()
+              master_item:
+                key: 'rabbitmq.proc.get[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+            -
+              uuid: 4faac75027d14304ab071602df8f2937
+              name: 'RabbitMQ: Memory usage (vsize)'
+              type: DEPENDENT
+              key: 'rabbitmq.proc.vmem[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Virtual memory size used by process in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $..vsize.first()
+              master_item:
+                key: 'rabbitmq.proc.get[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+          trigger_prototypes:
+            -
+              uuid: 4f2a88d09b1b49879d80e0794ec19e0e
+              expression: 'nodata(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"],30m)=1 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#NAME}])>0'
+              name: 'RabbitMQ: Failed to fetch nodes data'
+              event_name: 'RabbitMQ: Failed to fetch nodes data (or no data for 30m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'RabbitMQ: Process is not running'
+                  expression: 'last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#NAME}])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: 253acf98446e4790975b330d44dd6b96
+              expression: 'max(/RabbitMQ node by Zabbix agent/rabbitmq.node.running,5m)=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#NAME}])>0'
+              name: 'RabbitMQ: Node is not running'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'RabbitMQ node is not running'
+              dependencies:
+                -
+                  name: 'RabbitMQ: Service is down'
+                  expression: 'last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#NAME}])>0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: af5cfb0004e04562a9720b9e1b41fd5b
+              expression: 'last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#NAME}])>0'
+              name: 'RabbitMQ: Service is down'
+              priority: AVERAGE
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: 5cb80a7552d74e44a83d0825f039f89f
+              expression: 'min(/RabbitMQ node by Zabbix agent/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN} and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#NAME}])>0'
+              name: 'RabbitMQ: Service response time is too high'
+              event_name: 'RabbitMQ: Service response time is too high (over {$RABBITMQ.RESPONSE_TIME.MAX.WARN}s for 5m)'
+              priority: WARNING
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'RabbitMQ: Service is down'
+                  expression: 'last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#NAME}])>0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+          graph_prototypes:
+            -
+              uuid: 180a5d36d48f44fbaf6f86c5cf9e10f9
+              name: 'RabbitMQ: Memory usage[{#NAME}]'
+              graph_items:
+                -
+                  drawtype: BOLD_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'RabbitMQ node by Zabbix agent'
+                    key: 'rabbitmq.proc.vmem[{#NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: BOLD_LINE
+                  color: 2774A4
+                  item:
+                    host: 'RabbitMQ node by Zabbix agent'
+                    key: 'rabbitmq.proc.rss[{#NAME}]'
+          master_item:
+            key: 'proc.get[,,,summary]'
+          lld_macro_paths:
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
         -
           uuid: d1d32fc6ae1f445a98144a31214ca825
           name: 'Queues discovery'
@@ -3151,21 +3198,6 @@ zabbix_export:
           item:
             host: 'RabbitMQ node by Zabbix agent'
             key: rabbitmq.node.fd_used
-    -
-      uuid: 180a5d36d48f44fbaf6f86c5cf9e10f9
-      name: 'RabbitMQ: Memory usage'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'RabbitMQ node by Zabbix agent'
-            key: rabbitmq.proc.vmem
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'RabbitMQ node by Zabbix agent'
-            key: rabbitmq.proc.rss
     -
       uuid: a5949ccf83434f1fb26cfe0a3671085e
       name: 'RabbitMQ: Memory used'
