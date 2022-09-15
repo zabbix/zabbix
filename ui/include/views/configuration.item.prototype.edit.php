@@ -597,8 +597,7 @@ if ($data['display_interfaces']) {
 		->setValue($data['interfaceid'])
 		->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
 		->setFocusableElementId('interfaceid')
-		->setAriaRequired()
-		->setReadonly($readonly);
+		->setAriaRequired();
 
 	$item_tab->addItem([
 		(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
