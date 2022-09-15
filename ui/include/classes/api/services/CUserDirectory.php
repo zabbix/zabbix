@@ -946,21 +946,23 @@ class CUserDirectory extends CApiService {
 
 	/**
 	 * Test user against specific userdirectory connection.
+	 * Return user data in LDAP
 	 *
 	 * @param array $userdirectory
 	 *
 	 * @throws APIException
 	 *
-	 * @return bool
+	 * @return array
 	 */
-	public function test(array $userdirectory): bool {
+	public function test(array $userdirectory): array {
 		$this->validateTest($userdirectory);
 
 		$user = [
 			'username' => $userdirectory['test_username'],
 			'password' => $userdirectory['test_password']
 		];
-		$ldap_validator = new CLdapAuthValidator(['conf' => $userdirectory]);
+		$ldap = new CLdap($userdirectory);
+		$ldap_validator = new CLdapAuthValidator(['ldap' => $ldap]);
 
 		if (!$ldap_validator->validate($user)) {
 			self::exception(
@@ -969,7 +971,12 @@ class CUserDirectory extends CApiService {
 			);
 		}
 
-		return true;
+		// if ($userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
+			// TODO: add methods to get user groups and user media and all other provisioned fields.
+			$ldap_data = $ldap->getUserData(['memberof', 'cn'], $user['username'], $user['password']);
+		// }
+
+		return $user;
 	}
 
 	/**
@@ -1001,7 +1008,7 @@ class CUserDirectory extends CApiService {
 		if ($userdirectory['userdirectoryid'] != 0) {
 			$db_userdirectory = $this->get([
 				'output' => ['host', 'port', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute', 'start_tls',
-					'search_filter'
+					'search_filter', 'provision_status'
 				],
 				'userdirectoryids' => $userdirectory['userdirectoryid'],
 				'filter' => [
