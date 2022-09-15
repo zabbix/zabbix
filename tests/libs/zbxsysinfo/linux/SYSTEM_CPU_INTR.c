@@ -37,7 +37,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	init_result(&result);
+	zbx_init_agent_result(&result);
 	init_request(&request);
 
 	if (SUCCEED != parse_item_key(itemkey, &request))

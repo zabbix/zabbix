@@ -53,7 +53,7 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	init_request(&request);
-	init_result(&result);
+	zbx_init_agent_result(&result);
 
 	if (SUCCEED != parse_item_key("system.boottime", &request))
 		fail_msg("Parsing of \"system.boottime\" key failed.");

@@ -1229,7 +1229,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 				}
 
 				str_res = NULL;
-				init_result(&snmp_result);
+				zbx_init_agent_result(&snmp_result);
 
 				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result, &val_type))
 				{

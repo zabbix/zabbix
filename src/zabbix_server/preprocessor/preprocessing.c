@@ -1220,7 +1220,7 @@ static void	agent_result_set_value(zbx_variant_t *value, zbx_item_value_type_t v
 	unsigned char	type;
 	zbx_log_t	*log;
 
-	init_result(result);
+	zbx_init_agent_result(result);
 
 	if (NULL != *error)
 		return;

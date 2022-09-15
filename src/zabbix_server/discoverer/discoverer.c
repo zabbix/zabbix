@@ -122,7 +122,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	init_result(&result);
+	zbx_init_agent_result(&result);
 
 	**value = '\0';
 

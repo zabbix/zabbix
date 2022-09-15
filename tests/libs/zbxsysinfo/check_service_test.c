@@ -52,7 +52,7 @@ void	zbx_mock_test_entry(void **state)
 	default_addr = zbx_mock_get_parameter_string("in.interface");
 	ip = zbx_mock_get_parameter_string("in.ip");
 
-	init_result(&result);
+	zbx_init_agent_result(&result);
 	init_request(&request);
 	*key = '\0';
 	strcat(key, "net.tcp.service[smtp");

@@ -1012,7 +1012,7 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
 			continue;
 
 		add_result = (AGENT_RESULT *)zbx_malloc(add_result, sizeof(AGENT_RESULT));
-		init_result(add_result);
+		zbx_init_agent_result(add_result);
 
 		if (SUCCEED == set_result_type(add_result, item->value_type, event->message))
 		{

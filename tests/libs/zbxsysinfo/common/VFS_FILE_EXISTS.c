@@ -40,7 +40,7 @@ void	zbx_mock_test_entry(void **state)
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 
 	init_request(&request);
-	init_result(&result);
+	zbx_init_agent_result(&result);
 
 	if (SUCCEED != parse_item_key(key, &request))
 		fail_msg("Cannot parse item key: %s", key);

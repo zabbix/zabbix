@@ -50,7 +50,7 @@ static void	process_listener(zbx_socket_t *s)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", s->buffer);
 
-		init_result(&result);
+		zbx_init_agent_result(&result);
 
 		if (SUCCEED == zbx_execute_agent_check(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result))
 		{

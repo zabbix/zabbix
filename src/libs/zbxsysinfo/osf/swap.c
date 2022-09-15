@@ -202,7 +202,7 @@ static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
 	zbx_uint64_t	tot_val = 0;
 	zbx_uint64_t	free_val = 0;
 
-	init_result(&result_tmp);
+	zbx_init_agent_result(&result_tmp);
 
 	if (SYSINFO_RET_OK != SYSTEM_SWAP_TOTAL(&result_tmp) || !(result_tmp.type & AR_UINT64))
 		return SYSINFO_RET_FAIL;
@@ -232,7 +232,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 	zbx_uint64_t	tot_val = 0;
 	zbx_uint64_t	free_val = 0;
 
-	init_result(&result_tmp);
+	zbx_init_agent_result(&result_tmp);
 
 	if (SYSINFO_RET_OK != SYSTEM_SWAP_TOTAL(&result_tmp) || !(result_tmp.type & AR_UINT64))
 		return SYSINFO_RET_FAIL;

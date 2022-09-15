@@ -798,7 +798,7 @@ static void	zbx_log_init(zbx_log_t *log)
 	log->logeventid = 0;
 }
 
-void	init_result(AGENT_RESULT *result)
+void	zbx_init_agent_result(AGENT_RESULT *result)
 {
 	memset(result, 0, sizeof(AGENT_RESULT));
 }
@@ -947,7 +947,7 @@ void	zbx_test_parameter(const char *key)
 
 	printf("%-*s", ZBX_KEY_COLUMN_WIDTH, key);
 
-	init_result(&result);
+	zbx_init_agent_result(&result);
 
 	if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result))
 	{

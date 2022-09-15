@@ -909,7 +909,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 			state = ITEM_STATE_NORMAL;
 			if (NULL != value)
 			{
-				init_result(&result);
+				zbx_init_agent_result(&result);
 				SET_TEXT_RESULT(&result, value);
 				value = NULL;
 				zbx_preprocess_item_value(itemid, poller->request->hostid, ITEM_VALUE_TYPE_TEXT, flags,

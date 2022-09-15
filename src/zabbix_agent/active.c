@@ -559,7 +559,7 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
 		config_type = "interface";
 	}
 
-	init_result(&result);
+	zbx_init_agent_result(&result);
 
 	if (SUCCEED == zbx_execute_agent_check(config, ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, &result) &&
 			NULL != (value = ZBX_GET_STR_RESULT(&result)) && NULL != *value)
@@ -1159,7 +1159,7 @@ static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metr
 	AGENT_RESULT	result;
 	char		**pvalue;
 
-	init_result(&result);
+	zbx_init_agent_result(&result);
 
 	if (SUCCEED != (ret = zbx_execute_agent_check(metric->key, 0, &result)))
 	{

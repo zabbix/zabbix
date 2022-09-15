@@ -69,7 +69,7 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	init_request(&request);
-	init_result(&result);
+	zbx_init_agent_result(&result);
 
 	if (expected_result != (actual_result = VFS_FS_DISCOVERY(&request, &result)))
 	{

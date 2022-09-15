@@ -209,7 +209,7 @@ int	zbx_add_user_module(const char *key, int (*function)(void));
 void	zbx_test_parameters(void);
 void	zbx_test_parameter(const char *key);
 
-void	init_result(AGENT_RESULT *result);
+void	zbx_init_agent_result(AGENT_RESULT *result);
 void	zbx_log_free(zbx_log_t *log);
 void	free_result(AGENT_RESULT *result);
 

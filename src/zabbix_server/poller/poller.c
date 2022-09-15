@@ -446,7 +446,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 
 	for (i = 0; i < num; i++)
 	{
-		init_result(&results[i]);
+		zbx_init_agent_result(&results[i]);
 		errcodes[i] = SUCCEED;
 
 		if (MACRO_EXPAND_YES == expand_macros)

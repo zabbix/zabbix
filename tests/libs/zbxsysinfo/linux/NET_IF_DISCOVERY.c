@@ -58,7 +58,7 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	init_request(&request);
-	init_result(&result);
+	zbx_init_agent_result(&result);
 
 	if (SUCCEED != parse_item_key("net.if.discovery", &request))
 		fail_msg("Unexpected return code from parse_item_key()");

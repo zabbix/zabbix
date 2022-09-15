@@ -37,7 +37,7 @@ static int execute_check(const char *key, zbx_agent_check_t check_func, char **v
 	AGENT_REQUEST request;
 
 	init_request(&request);
-	init_result(&result);
+	zbx_init_agent_result(&result);
 	if (SUCCEED != parse_item_key(key, &request))
 	{
 		*value = zbx_strdup(NULL, "Invalid item key format.");

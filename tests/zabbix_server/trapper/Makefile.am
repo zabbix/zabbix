@@ -54,7 +54,7 @@ zbx_trapper_preproc_test_run_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=DBget_user_by_auth_token \
 	-Wl,--wrap=zbx_user_init \
 	-Wl,--wrap=zbx_user_free \
-	-Wl,--wrap=init_result \
+	-Wl,--wrap=zbx_init_agent_result \
 	-Wl,--wrap=free_result
 
 zbx_trapper_preproc_test_run_CFLAGS = \

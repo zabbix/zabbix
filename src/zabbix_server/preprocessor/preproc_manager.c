@@ -1203,7 +1203,7 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 		if (NULL == request->value.result)
 		{
 			request->value.result = (AGENT_RESULT *)zbx_malloc(NULL, sizeof(AGENT_RESULT));
-			init_result(request->value.result);
+			zbx_init_agent_result(request->value.result);
 		}
 		else
 		{

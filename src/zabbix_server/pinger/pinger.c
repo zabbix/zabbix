@@ -74,7 +74,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	}
 	else
 	{
-		init_result(&value);
+		zbx_init_agent_result(&value);
 
 		if (NULL != value_ui64)
 			SET_UI64_RESULT(&value, *value_ui64);

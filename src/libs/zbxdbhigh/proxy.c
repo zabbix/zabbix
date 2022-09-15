@@ -2972,7 +2972,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
 	{
 		AGENT_RESULT	result;
 
-		init_result(&result);
+		zbx_init_agent_result(&result);
 
 		if (NULL != value->value)
 		{
