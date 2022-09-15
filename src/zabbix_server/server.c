@@ -667,7 +667,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	}
 
 	if (NULL != CONFIG_NODE_ADDRESS &&
-			(FAIL == parse_serveractive_element(CONFIG_NODE_ADDRESS, &address, &port, 10051) ||
+			(FAIL == parse_serveractive_element(CONFIG_NODE_ADDRESS, &address, &port, 0) ||
 			(FAIL == is_supported_ip(address) && FAIL == zbx_validate_hostname(address))))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"NodeAddress\" configuration parameter: address \"%s\""

@@ -461,30 +461,26 @@ static zbx_ha_node_t	*ha_find_node_by_name(zbx_vector_ha_node_t *nodes, const ch
 static void	ha_get_external_address(char **address, unsigned short *port)
 {
 	if (NULL != CONFIG_NODE_ADDRESS)
-		(void)parse_serveractive_element(CONFIG_NODE_ADDRESS, address, port, 0);
-
-	if (NULL == *address)
 	{
-		if (NULL != CONFIG_LISTEN_IP)
-		{
-			char	*tmp;
-
-			zbx_strsplit_first(CONFIG_LISTEN_IP, ',', address, &tmp);
-			zbx_free(tmp);
-
-			if (0 == strcmp(*address, "0.0.0.0") || 0 == strcmp(*address, "::"))
-				*address = zbx_strdup(*address, "localhost");
-		}
-		else
-			*address = zbx_strdup(NULL, "localhost");
+		(void)parse_serveractive_element(CONFIG_NODE_ADDRESS, address, port, 0);
 	}
+	else if (NULL != CONFIG_LISTEN_IP)
+	{
+		char	*tmp;
+
+		zbx_strsplit_first(CONFIG_LISTEN_IP, ',', address, &tmp);
+		zbx_free(tmp);
+	}
+
+	if (NULL == *address || 0 == strcmp(*address, "0.0.0.0") || 0 == strcmp(*address, "::"))
+		*address = zbx_strdup(*address, "localhost");
 
 	if (0 == *port)
 	{
 		if (0 != CONFIG_LISTEN_PORT)
 			*port = (unsigned short)CONFIG_LISTEN_PORT;
 		else
-			*port = 10051;
+			*port = ZBX_DEFAULT_SERVER_PORT;
 	}
 }
 
