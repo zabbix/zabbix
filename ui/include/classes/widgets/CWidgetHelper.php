@@ -1167,13 +1167,27 @@ class CWidgetHelper {
 							'numeric' => 1,
 							'dstfrm' => $form_name,
 							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
+						],
+						'filter_preselect' => [
+							'id' => $host_pattern_field->getId(),
+							'submit_as' => 'host_pattern',
+							'submit_parameters' => [
+								'host_pattern_wildcard_allowed' => 1,
+								'host_pattern_multiple' => 1
+							],
+							'multiple' => true
 						]
 					],
 					'autosuggest' => [
-						'filter_preselect_fields' => [
-							'hosts' => $host_pattern_field->getId()
-						],
-						'filter_multiple' => true
+						'filter_preselect' => [
+							'id' => $host_pattern_field->getId(),
+							'submit_as' => 'host_pattern',
+							'submit_parameters' => [
+								'host_pattern_wildcard_allowed' => 1,
+								'host_pattern_multiple' => 1
+							],
+							'multiple' => true
+						]
 					],
 					'add_post_js' => false
 				]))

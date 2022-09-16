@@ -658,19 +658,27 @@ switch ($data['method']) {
 			case 'items':
 				$hostids = null;
 
-				if (array_key_exists('hostids', $data)) {
-					$hostids = [];
-					foreach ($data['hostids'] as $name) {
-						$options = [
-							'output' => [],
-							'search' => ['name' => $name.($data['wildcard_allowed'] ? '*' : '')],
-							'searchWildcardsEnabled' => $data['wildcard_allowed'],
-							'preservekeys' => true
-						];
+				if (array_key_exists('host_pattern', $data)) {
+					$host_pattern_multiple = array_key_exists('host_pattern_multiple', $data)
+						&& $data['host_pattern_multiple'] == 1;
 
-						$hostids += API::Host()->get($options);
-					}
-					$hostids = array_keys($hostids);
+					$host_patterns = $host_pattern_multiple ? $data['host_pattern'] : [$data['host_pattern']];
+
+					$host_pattern_wildcard_enabled = array_key_exists('host_pattern_wildcard_allowed', $data)
+						&& $data['host_pattern_wildcard_allowed'] == 1
+						&& !in_array('*', $host_patterns, true);
+
+					$hosts = API::Host()->get([
+						'output' => [],
+						'search' => [
+							'name' => $host_pattern_wildcard_enabled ? $host_patterns : null
+						],
+						'searchWildcardsEnabled' => $host_pattern_wildcard_enabled,
+						'searchByAny' => true,
+						'preservekeys' => true
+					]);
+
+					$hostids = array_keys($hosts);
 				}
 
 				$options = [

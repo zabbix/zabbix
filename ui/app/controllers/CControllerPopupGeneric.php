@@ -533,7 +533,10 @@ class CControllerPopupGeneric extends CController {
 			'filter_hostid_rst' =>					'in 1',
 			'filter_templateid_rst' =>				'in 1',
 			'user_type' =>							'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
-			'hostids' => 							'array'
+			'hostids' =>							'array',
+			'host_pattern' =>						'array|not_empty',
+			'host_pattern_wildcard_allowed' =>		'in 1',
+			'host_pattern_multiple' =>				'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -983,6 +986,32 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		if ($this->hostids) {
+			CProfile::updateArray('web.popup.generic.filter_hostid', $this->hostids, PROFILE_TYPE_ID);
+		}
+		elseif ($this->hasInput('host_pattern')) {
+			$host_pattern_multiple = $this->hasInput('host_pattern_multiple');
+
+			$host_patterns = $host_pattern_multiple
+				? $this->getInput('host_pattern')
+				: [$this->getInput('host_pattern')];
+
+			$host_pattern_wildcard_enabled = $this->hasInput('host_pattern_wildcard_allowed')
+				&& !in_array('*', $host_patterns, true);
+
+			$hosts = API::Host()->get([
+				'output' => ['name'],
+				'search' => [
+					'name' => $host_pattern_wildcard_enabled ? $host_patterns : null
+				],
+				'searchWildcardsEnabled' => $host_pattern_wildcard_enabled,
+				'searchByAny' => true,
+				'preservekeys' => true
+			]);
+
+			CArrayHelper::sort($hosts, ['name']);
+
+			$this->hostids = $hosts ? [array_key_first($hosts)] : [];
+
 			CProfile::updateArray('web.popup.generic.filter_hostid', $this->hostids, PROFILE_TYPE_ID);
 		}
 		elseif ($this->hasInput('filter_hostid_rst')) {

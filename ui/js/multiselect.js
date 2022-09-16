@@ -310,13 +310,19 @@
 	 * @param int    options['limit']				how many available items can be received from backend (optional)
 	 * @param object options['popup']				popup data {parameters, width, height} (optional)
 	 * @param string options['popup']['parameters']
-	 * @param string options['popup']['filter_preselect_fields']
+	 * @param string options['popup']['filter_preselect']
+	 * @param string options['popup']['filter_preselect']['id']
+	 * @param string options['popup']['filter_preselect']['submit_as']
+	 * @param object options['popup']['filter_preselect']['submit_parameters']
+	 * @param bool   options['popup']['filter_preselect']['multiple']
 	 * @param int    options['popup']['width']
 	 * @param int    options['popup']['height']
 	 * @param object options['autosuggest']         autosuggest options (optional)
-	 * @param object options['autosuggest']['filter_preselect_fields'] autosuggest preselect fields (optional)
-	 * @param string options['autosuggest']['filter_preselect_fields']['hosts'] autosuggest host preselect field (optional)
-	 * @param bool 	 options['autosuggest']['filter_multiple'] allows to filter multiple values, must be used together with options['autosuggest']['filter_preselect_fields'] (optional)
+	 * @param object options['autosuggest']['filter_preselect']
+	 * @param string options['autosuggest']['filter_preselect']['id']
+	 * @param string options['autosuggest']['filter_preselect']['submit_as']
+	 * @param object options['autosuggest']['filter_preselect']['submit_parameters']
+	 * @param bool   options['autosuggest']['filter_preselect']['multiple']
 	 * @param string options['styles']				additional style for multiselect wrapper HTML element (optional)
 	 * @param string options['styles']['property']
 	 * @param string options['styles']['value']
@@ -456,8 +462,8 @@
 					ms.select_button.on('click', function(event) {
 						var parameters = ms.options.popup.parameters;
 
-						if (ms.options.popup.filter_preselect_fields) {
-							parameters = jQuery.extend(parameters, getFilterPreselectField($obj, MS_ACTION_POPUP));
+						if (ms.options.popup.filter_preselect) {
+							parameters = jQuery.extend(parameters, getFilterPreselect($obj, MS_ACTION_POPUP));
 						}
 
 						if (typeof parameters['disable_selected'] !== 'undefined' && parameters['disable_selected']) {
@@ -487,59 +493,38 @@
 	 *
 	 * @return {object}
 	 */
-	function getFilterPreselectField($obj, action) {
+	function getFilterPreselect($obj, action) {
 		const ms = $obj.data('multiSelect');
-		const preselect_options = ms.options[(action == MS_ACTION_AUTOSUGGEST) ? 'autosuggest' : 'popup'] || null;
-		const ret = {};
 
-		if (!preselect_options) {
-			return ret;
+		const options_key = action == MS_ACTION_AUTOSUGGEST ? 'autosuggest' : 'popup';
+
+		if (!(options_key in ms.options) || !('filter_preselect' in ms.options[options_key])) {
+			return {};
 		}
 
-		if (preselect_options.filter_preselect_fields.hosts !== undefined) {
-			const hosts = $('#' + preselect_options.filter_preselect_fields.hosts).multiSelect('getData');
+		const filter_preselect = ms.options[options_key].filter_preselect;
 
-			if (preselect_options.filter_multiple) {
-				ret.hostids = [];
+		const data = $('#' + filter_preselect.id).multiSelect('getData');
 
-				for (const host of hosts) {
-					ret.hostids.push(host.id);
-				}
-			}
-			else if (hosts.length != 0) {
-				ret.hostid = hosts[0].id;
-			}
+		if (data.length === 0) {
+			return {};
 		}
 
-		if (preselect_options.filter_preselect_fields.hostgroups !== undefined) {
-			const host_groups = $('#' + preselect_options.filter_preselect_fields.hostgroups).multiSelect('getData');
+		let ret = {};
 
-			if (preselect_options.filter_multiple) {
-				ret.groupids = [];
+		if ('multiple' in filter_preselect && filter_preselect.multiple) {
+			ret[filter_preselect.submit_as] = [];
 
-				for (const host_group of host_groups) {
-					ret.groupids.push(host_group.id);
-				}
-			}
-			else if (host_groups.length != 0) {
-				ret.groupid = host_groups[0].id;
+			for (const item of data) {
+				ret[filter_preselect.submit_as].push(item.id);
 			}
 		}
+		else {
+			ret[filter_preselect.submit_as] = data[0].id;
+		}
 
-		if (preselect_options.filter_preselect_fields.templategroups !== undefined) {
-			const template_groups = $('#' + preselect_options.filter_preselect_fields.templategroups)
-				.multiSelect('getData');
-
-			if (preselect_options.filter_multiple) {
-				ret.templategroupids = [];
-
-				for (const template_group of template_groups) {
-					ret.templategroupids.push(template_group.id);
-				}
-			}
-			else if (template_groups.length != 0) {
-				ret.templategroupid = template_groups[0].id;
-			}
+		if ('submit_parameters' in filter_preselect) {
+			ret = {...ret, ...filter_preselect.submit_parameters};
 		}
 
 		return ret;
@@ -584,7 +569,7 @@
 					}
 
 					if (search !== '') {
-						var preselect_values = getFilterPreselectField($obj, MS_ACTION_AUTOSUGGEST),
+						var preselect_values = getFilterPreselect($obj, MS_ACTION_AUTOSUGGEST),
 							cache_key = search + JSON.stringify(preselect_values);
 
 						/*
