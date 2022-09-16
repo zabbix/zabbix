@@ -20,6 +20,7 @@
 #ifndef ZABBIX_SYSINFO_H
 #define ZABBIX_SYSINFO_H
 
+#include "zbxsysinfo.h"
 #include "module.h"
 
 #define ZBX_PROC_STAT_ALL	0
