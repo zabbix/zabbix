@@ -512,6 +512,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($item['parameters']);
 			}
 
+			if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
+				$item['interfaceid'] = getRequest('interfaceid', 0);
+			}
+
 			CArrayHelper::sort($db_item['tags'], ['tag', 'value']);
 			CArrayHelper::sort($tags, ['tag', 'value']);
 
@@ -522,7 +526,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($db_item['templateid'] != 0) {
 				$allowed_fields = array_fill_keys([
 					'itemid', 'delay', 'delay_flex', 'history', 'trends', 'history_mode', 'trends_mode', 'allow_traps',
-					'description', 'status', 'discover', 'tags'
+					'description', 'status', 'discover', 'tags', 'interfaceid'
 				], true);
 
 				if ($db_item['type'] != ITEM_TYPE_HTTPAGENT) {
