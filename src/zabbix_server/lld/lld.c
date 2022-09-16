@@ -217,7 +217,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, const 
  *                                                                            *
  ******************************************************************************/
 static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
-		const lld_condition_t *condition, char **info)
+		const lld_condition_t *condition, char **info, zbx_vector_str_t *non_existent_macro)
 {
 	char	*value = NULL;
 	int	ret;
@@ -249,9 +249,17 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 	}
 	else if (CONDITION_OPERATOR_EXIST != condition->op)
 	{
-		*info = zbx_strdcatf(*info,
-				"Cannot accurately apply filter: no value received for macro \"%s\".\n",
-				condition->macro);
+		if (NULL != non_existent_macro && SUCCEED == zbx_vector_str_search(non_existent_macro,
+				condition->macro, ZBX_DEFAULT_STR_COMPARE_FUNC))
+		{
+			ret = SUCCEED;
+		}
+		else
+		{
+			*info = zbx_strdcatf(*info,
+					"Cannot accurately apply filter: no value received for macro \"%s\".\n",
+					condition->macro);
+		}
 	}
 
 	zbx_free(value);
@@ -285,7 +293,7 @@ static int	filter_evaluate_and_or(const lld_filter_t *filter, const struct zbx_j
 		int			rc;
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
-		rc = filter_condition_match(jp_row, lld_macro_paths, condition, info);
+		rc = filter_condition_match(jp_row, lld_macro_paths, condition, info, NULL);
 		/* check if a new condition group has started */
 		if (NULL == lastmacro || 0 != strcmp(lastmacro, condition->macro))
 		{
@@ -333,7 +341,7 @@ static int	filter_evaluate_and(const lld_filter_t *filter, const struct zbx_json
 	{
 		/* if any of conditions are false the evaluation returns false */
 		if (SUCCEED != (ret = filter_condition_match(jp_row, lld_macro_paths,
-				(lld_condition_t *)filter->conditions.values[i], info)))
+				(lld_condition_t *)filter->conditions.values[i], info, NULL)))
 		{
 			break;
 		}
@@ -368,7 +376,7 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
 	{
 		/* if any of conditions are true the evaluation returns true */
 		if (SUCCEED == (ret = filter_condition_match(jp_row, lld_macro_paths,
-				(lld_condition_t *)filter->conditions.values[i], info)))
+				(lld_condition_t *)filter->conditions.values[i], info, NULL)))
 		{
 			break;
 		}
@@ -400,19 +408,25 @@ static int	filter_evaluate_or(const lld_filter_t *filter, const struct zbx_json_
 static int	filter_evaluate_expression(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **info)
 {
-	int	i, ret = FAIL, id_len;
-	char	*expression, id[ZBX_MAX_UINT64_LEN + 2], *p, error[256];
-	double	result;
+	int			i, ret = FAIL, id_len;
+	char			*expression, id[ZBX_MAX_UINT64_LEN + 2], *p, error[256];
+	double			result;
+	zbx_vector_str_t	non_existent_macros;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:%s", __func__, filter->expression);
 
 	expression = zbx_strdup(NULL, filter->expression);
 
+	zbx_vector_str_create(&non_existent_macros);
+
 	for (i = 0; i < filter->conditions.values_num; i++)
 	{
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
-		ret = filter_condition_match(jp_row, lld_macro_paths, condition, info);
+		ret = filter_condition_match(jp_row, lld_macro_paths, condition, info, &non_existent_macros);
+
+		if (CONDITION_OPERATOR_EXIST == condition->op && ret == FAIL)
+			zbx_vector_str_append(&non_existent_macros, condition->macro);
 
 		zbx_snprintf(id, sizeof(id), "{" ZBX_FS_UI64 "}", condition->id);
 
@@ -431,6 +445,7 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
 		ret = (SUCCEED != zbx_double_compare(result, 0) ? SUCCEED : FAIL);
 
 	zbx_free(expression);
+	zbx_vector_str_destroy(&non_existent_macros);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
