@@ -164,7 +164,7 @@ class testProxy extends CAPITest {
 					'dns' => 'localhost',
 					'port' => '10050'
 				],
-				'tls_connect' => HOST_ENCRYPTION_PSK,
+				'tls_connect' => HOST_ENCRYPTION_PSK
 			],
 			[
 				'host' => 'API test proxy.update - passive with certificate-based connections to proxy',
@@ -235,7 +235,7 @@ class testProxy extends CAPITest {
 				'values' => [
 					'lastaccess' => $rtdata['lastaccess'],
 					'version' => $rtdata['version'],
-					'compatibility' => $rtdata['compatibility'],
+					'compatibility' => $rtdata['compatibility']
 				],
 				'where' => ['hostid' => $proxyid]
 			];
@@ -1389,7 +1389,7 @@ class testProxy extends CAPITest {
 						'proxyid' => 'update_passive_defaults',
 						'host' => 'API test proxy.update - passive proxy updated',
 						'description' => 'Passive proxy'
-					],
+					]
 				],
 				'expected_error' => null
 			],
