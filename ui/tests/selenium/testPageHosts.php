@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
 /**
  * @dataSource TagFilter, Proxies
  *
- * @backup !hosts, !profiles
+ * @backup hosts
  */
 class testPageHosts extends CLegacyWebTest {
 	public $HostName = 'ЗАББИКС Сервер';
