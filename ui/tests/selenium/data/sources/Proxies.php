@@ -121,7 +121,7 @@ class Proxies {
 		// Create hosts fo filtering scenario.
 		CDataHelper::call('host.create',  [
 			['host' => 'Host_1 with proxy', 'groups' => [['groupid' => 4]]],
-			['host' => 'Host_2 with proxy', 'groups' => [['groupid' => 4]]],
+			['host' => 'Host_2 with proxy', 'groups' => [['groupid' => 4]]]
 		]);
 		$filter_hostids = CDataHelper::getIds('host');
 
