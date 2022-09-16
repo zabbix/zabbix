@@ -304,6 +304,7 @@ class CControllerMenuPopup extends CController {
 		$db_items = API::Item()->get([
 			'output' => ['hostid', 'key_', 'name', 'flags', 'type', 'value_type', 'history', 'trends'],
 			'selectHosts' => ['host'],
+			'selectTriggers' => ['triggerid', 'description'],
 			'itemids' => $data['itemid'],
 			'webitems' => true
 		]);
@@ -330,12 +331,6 @@ class CControllerMenuPopup extends CController {
 				$is_executable = $is_writable ? true : CWebUser::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW);
 			}
 
-			// Triggers
-			$db_triggers = API::Trigger()->get([
-				'output' => ['triggerid', 'description'],
-				'itemids' => $data['itemid']
-			]);
-
 			return [
 				'type' => 'item',
 				'itemid' => $data['itemid'],
@@ -343,7 +338,7 @@ class CControllerMenuPopup extends CController {
 				'key' => $db_item['key_'],
 				'hostid' => $db_item['hostid'],
 				'host' => $db_item['hosts'][0]['host'],
-				'triggers' => $db_triggers,
+				'triggers' => $db_item['triggers'],
 				'showGraph' => ($db_item['value_type'] == ITEM_VALUE_TYPE_FLOAT
 					|| $db_item['value_type'] == ITEM_VALUE_TYPE_UINT64
 				),
@@ -353,8 +348,7 @@ class CControllerMenuPopup extends CController {
 				'isExecutable' => $is_executable,
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-				'create_dependent_item' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
-				'create_dependent_discovery' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+				'isDiscovery' => ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			];
 		}
 

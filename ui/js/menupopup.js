@@ -107,36 +107,52 @@ function getMenuPopupHistory(options) {
  * @return array
  */
 function getMenuPopupHost(options, trigger_element) {
-	var sections = [];
+	const sections = [];
+	const items = [];
+	const config_urls = [];
+	let url;
 
 	// go to section
 	if (options.hasGoTo) {
-		var	host_inventory = {
-				label: t('Inventory')
-			},
-			latest_data = {
-				label: t('Latest data')
-			},
-			problems = {
-				label: t('Problems')
-			},
-			graphs = {
-				label: t('Graphs')
-			},
-			dashboards = {
-				label: t('Dashboards')
-			},
-			web = {
-				label: t('Web')
-			};
+		// dashboard
+		url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'host.dashboard.view')
+		url.setArgument('hostid', options.hostid)
 
-		// inventory link
-		var url = new Curl('hostinventories.php', false);
-		url.setArgument('hostid', options.hostid);
-		host_inventory.url = url.getUrl();
+		if (options.allowed_ui_hosts) {
+			items.push({
+				label: t('Dashboards'),
+				disabled: !options.showDashboards,
+				url: url.getUrl()
+			});
+		}
 
-		// latest data link
-		var url = new Curl('zabbix.php', false);
+		// problems
+		url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'problem.view');
+		url.setArgument('filter_name', '');
+		url.setArgument('hostids[]', options.hostid);
+		if (typeof options.severities !== 'undefined') {
+			url.setArgument('severities[]', options.severities);
+		}
+		if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
+			url.setArgument('show_suppressed', '1');
+		}
+		if (typeof options.tags !== 'undefined') {
+			url.setArgument('tags', options.tags);
+			url.setArgument('evaltype', options.evaltype);
+		}
+
+		if (options.allowed_ui_problems) {
+			items.push({
+				label: t('Problems'),
+				disabled: !options.showTriggers,
+				url: url.getUrl()
+			});
+		}
+
+		// latest data
+		url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'latest.view');
 		if (typeof options.tags !== 'undefined') {
 			url.setArgument('tags', options.tags);
@@ -144,86 +160,52 @@ function getMenuPopupHost(options, trigger_element) {
 		}
 		url.setArgument('filter_name', '');
 		url.setArgument('hostids[]', options.hostid);
-		latest_data.url = url.getUrl();
 
-		if (!options.showTriggers) {
-			problems.disabled = true;
-		}
-		else {
-			var url = new Curl('zabbix.php', false);
-			url.setArgument('action', 'problem.view');
-			url.setArgument('filter_name', '');
-			url.setArgument('hostids[]', options.hostid);
-			if (typeof options.severities !== 'undefined') {
-				url.setArgument('severities[]', options.severities);
-			}
-			if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
-				url.setArgument('show_suppressed', '1');
-			}
-			if (typeof options.tags !== 'undefined') {
-				url.setArgument('tags', options.tags);
-				url.setArgument('evaltype', options.evaltype);
-			}
-
-			problems.url = url.getUrl();
-		}
-
-		if (!options.showGraphs) {
-			graphs.disabled = true;
-		}
-		else {
-			var graphs_url = new Curl('zabbix.php', false);
-
-			graphs_url.setArgument('action', 'charts.view')
-			graphs_url.setArgument('filter_hostids[]', options.hostid);
-			graphs_url.setArgument('filter_set', '1');
-			graphs.url = graphs_url.getUrl();
-		}
-
-		if (!options.showDashboards) {
-			dashboards.disabled = true;
-		}
-		else {
-			var dashboards_url = new Curl('zabbix.php', false);
-
-			dashboards_url.setArgument('action', 'host.dashboard.view')
-			dashboards_url.setArgument('hostid', options.hostid)
-			dashboards.url = dashboards_url.getUrl();
-		}
-
-		if (!options.showWeb) {
-			web.disabled = true;
-		}
-		else {
-			var web_url = new Curl('zabbix.php', false);
-			web_url.setArgument('action', 'web.view');
-			web_url.setArgument('filter_hostids[]', options.hostid);
-			web_url.setArgument('filter_set', '1');
-			web.url = web_url.getUrl();
-		}
-
-		var items = [];
-
-
-		if (options.allowed_ui_hosts) {
-			items.push(dashboards);
-		}
-
-		if (options.allowed_ui_problems) {
-			items.push(problems);
-		}
 
 		if (options.allowed_ui_latest_data) {
-			items.push(latest_data);
+			items.push({
+				label: t('Latest data'),
+				url: url.getUrl()
+			});
 		}
+
+		// graphs
+		url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'charts.view')
+		url.setArgument('filter_hostids[]', options.hostid);
+		url.setArgument('filter_set', '1');
 
 		if (options.allowed_ui_hosts) {
-			items.push(graphs);
-			items.push(web);
+			items.push({
+				label: t('Graphs'),
+				disabled: !options.showGraphs,
+				url: url.getUrl()
+			});
 		}
 
+		// web
+		url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'web.view');
+		url.setArgument('filter_hostids[]', options.hostid);
+		url.setArgument('filter_set', '1');
+
+		if (options.allowed_ui_hosts) {
+			items.push({
+				label: t('Web'),
+				disabled: !options.showWeb,
+				url: url.getUrl()
+			});
+		}
+
+		// inventory link
+		url = new Curl('hostinventories.php', false);
+		url.setArgument('hostid', options.hostid);
+
 		if (options.allowed_ui_inventory) {
-			items.push(host_inventory);
+			items.push({
+				label: t('Inventory'),
+				url: url.getUrl()
+			});
 		}
 
 		if (items.length) {
@@ -236,81 +218,70 @@ function getMenuPopupHost(options, trigger_element) {
 
 	// Configuration
 	if (options.allowed_ui_conf_hosts) {
-		const config_urls = [];
-		const config = {
-			host: {
-				label: t('Host'),
-				disabled: !options.isWriteable
-			},
-			item: {
-				label: t('Items'),
-				disabled: !options.isWriteable
-			},
-			trigger: {
-				label: t('Triggers'),
-				disabled: !options.isWriteable
-			},
-			discovery: {
-				label: t('Discovery'),
-				disabled: !options.isWriteable
-			},
-			web: {
-				label: t('Web'),
-				disabled: !options.isWriteable
-			}
-		};
+		// host
+		url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'host.edit');
+		url.setArgument('hostid', options.hostid);
 
-		if (options.isWriteable) {
-			const config_url = new Curl('zabbix.php', false);
-			config_url.setArgument('action', 'host.edit');
-			config_url.setArgument('hostid', options.hostid);
-			config.host.url = config_url.getUrl();
-
-			config.host.clickCallback = function (e) {
+		config_urls.push({
+			label: t('Host'),
+			disabled: !options.isWriteable,
+			url: url.getUrl(),
+			clickCallback: function(e){
 				e.preventDefault();
 				jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
 				view.editHost(options.hostid);
-			};
-		}
+			}
+		});
 
-		config_urls.push(config.host);
+		// items
+		url = new Curl('items.php', false);
+		url.setArgument('filter_set', '1');
+		url.setArgument('filter_hostids[]', options.hostid);
+		url.setArgument('context', 'host');
 
-		if (options.isWriteable) {
-			const item_url = new Curl('items.php', false);
-			item_url.setArgument('filter_set', '1');
-			item_url.setArgument('filter_hostids[]', options.hostid);
-			item_url.setArgument('context', 'host');
-			config.item.url = item_url.getUrl();
-		}
-		config_urls.push(config.item);
+		config_urls.push({
+			label: t('Items'),
+			disabled: !options.isWriteable,
+			url: url.getUrl()
+		});
 
-		if (options.isWriteable) {
-			const trigger_url = new Curl('triggers.php', false);
-			trigger_url.setArgument('filter_set', '1');
-			trigger_url.setArgument('filter_hostids[]', options.hostid);
-			trigger_url.setArgument('context', 'host');
-			config.trigger.url = trigger_url.getUrl();
-		}
-		config_urls.push(config.trigger);
+		// triggers
+		url = new Curl('triggers.php', false);
+		url.setArgument('filter_set', '1');
+		url.setArgument('filter_hostids[]', options.hostid);
+		url.setArgument('context', 'host');
 
-		if (options.isWriteable) {
-			const discovery_url = new Curl('host_discovery.php', false);
-			discovery_url.setArgument('filter_set', '1');
-			discovery_url.setArgument('filter_hostids[]', options.hostid);
-			discovery_url.setArgument('context', 'host');
-			config.discovery.url = discovery_url.getUrl();
-		}
-		config_urls.push(config.discovery);
+		config_urls.push({
+			label: t('Triggers'),
+			disabled: !options.isWriteable,
+			url: url.getUrl()
+		});
 
-		if (options.isWriteable) {
-			const http_url = new Curl('httpconf.php', false);
-			http_url.setArgument('filter_set', '1');
-			http_url.setArgument('filter_hostids[]', options.hostid);
-			http_url.setArgument('context', 'host');
-			config.web.url = http_url.getUrl();
-		}
-		config_urls.push(config.web);
+		// discovery
+		url = new Curl('host_discovery.php', false);
+		url.setArgument('filter_set', '1');
+		url.setArgument('filter_hostids[]', options.hostid);
+		url.setArgument('context', 'host');
+
+		config_urls.push({
+			label: t('Discovery'),
+			disabled: !options.isWriteable,
+			url: url.getUrl()
+		});
+
+		// web scenario
+		url = new Curl('httpconf.php', false);
+		url.setArgument('filter_set', '1');
+		url.setArgument('filter_hostids[]', options.hostid);
+		url.setArgument('context', 'host');
+
+		config_urls.push({
+			label: t('Web'),
+			disabled: !options.isWriteable,
+			url: url.getUrl()
+		});
 
 		sections.push({
 			label: t('Configuration'),
@@ -651,23 +622,16 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 	if (options.allowed_ui_problems) {
 		// events
-		var events = {
-			label: t('Problems')
-		};
-
-	if (typeof options.showEvents !== 'undefined' && options.showEvents) {
 		url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'problem.view');
 		url.setArgument('filter_name', '');
 		url.setArgument('triggerids[]', options.triggerid);
 
-			events.url = url.getUrl();
-		}
-		else {
-			events.disabled = true;
-		}
-
-		items.push(events);
+		items.push({
+			label: t('Problems'),
+			disabled: !options.showEvents,
+			url: url.getUrl()
+		});
 	}
 
 	// acknowledge
@@ -683,7 +647,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 	}
 
 	// items problems
-	if (options.allowed_ui_latest_data && typeof options.items !== 'undefined' && options.items.length) {
+	if (options.allowed_ui_latest_data && options.items.length) {
 		for (const item of options.items) {
 			url = new Curl('history.php', false);
 			url.setArgument('action', item.params.action);
@@ -712,12 +676,13 @@ function getMenuPopupTrigger(options, trigger_element) {
 		url.setArgument('form', 'update');
 		url.setArgument('triggerid', options.triggerid);
 		url.setArgument('context', 'host');
+
 		config_urls.push({
 			label: t('Trigger'),
 			url: url.getUrl()
 		});
 
-		if (typeof options.items !== 'undefined' && options.items.length) {
+		if (options.items.length) {
 			for (const item of options.items) {
 				url = new Curl('items.php', false);
 				url.setArgument('form', 'update');
@@ -808,27 +773,21 @@ function getMenuPopupItem(options) {
 	url.setArgument('action', 'showvalues');
 	url.setArgument('itemids[]', options.itemid);
 
-	const values = {
+	items.push({
 		label: t('Values'),
-		url: url.getUrl()
-	}
+		url: url.getUrl(),
+		disabled: !options.history && !options.trends
+	});
 
 	url = new Curl('history.php', false);
 	url.setArgument('action', 'showlatest');
 	url.setArgument('itemids[]', options.itemid);
 
-	const latest = {
+	items.push({
 		label: t('500 latest values'),
-		url: url.getUrl()
-	}
-
-	if (!options.history && !options.trends) {
-		values.disabled = true;
-		latest.disabled = true;
-	}
-
-	items.push(values);
-	items.push(latest);
+		url: url.getUrl(),
+		disabled: !options.history && !options.trends
+	});
 
 	sections.push({
 		label: t('View'),
@@ -837,25 +796,24 @@ function getMenuPopupItem(options) {
 
 	if (options.allowed_ui_conf_hosts) {
 		const config_urls = [];
-		const config = {
-			label: t('Item'),
-			disabled: !options.isWriteable
-		};
 		const conf_triggers = {
-			label: t('Triggers')
+			label: t('Triggers'),
+			disabled: options.triggers.length === 0
 		};
+
+		url = new Curl('items.php', false);
+		url.setArgument('form', 'update');
+		url.setArgument('hostid', options.hostid);
+		url.setArgument('itemid', options.itemid);
+		url.setArgument('context', 'host');
 
 		if (options.isWriteable) {
-			url = new Curl('items.php', false);
-			url.setArgument('form', 'update');
-			url.setArgument('hostid', options.hostid);
-			url.setArgument('itemid', options.itemid);
-			url.setArgument('context', 'host');
-			config.url = url.getUrl();
+			config_urls.push({
+				label: t('Item'),
+				disabled: !options.isWriteable,
+				url: url.getUrl()
+			});
 		}
-
-		config_urls.push(config);
-
 
 		if (options.triggers.length) {
 			const trigger_items = [];
@@ -873,13 +831,9 @@ function getMenuPopupItem(options) {
 			}
 
 			conf_triggers.items = trigger_items;
-
-		} else {
-			conf_triggers.disabled = true;
 		}
 
 		config_urls.push(conf_triggers);
-
 
 		url = new Curl('triggers.php', false);
 		url.setArgument('form', 'create');
@@ -897,27 +851,27 @@ function getMenuPopupItem(options) {
 		url = new Curl('items.php', false);
 		url.setArgument('form', 'create');
 		url.setArgument('hostid', options.hostid);
-		url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
+		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
 		url.setArgument('master_itemid', options.itemid);
 		url.setArgument('context', 'host');
 
 		config_urls.push({
 			label: t('Create dependent item'),
 			url: url.getUrl(),
-			disabled: !options.create_dependent_item
+			disabled: options.isDiscovery
 		});
 
 		url = new Curl('host_discovery.php', false);
 		url.setArgument('form', 'create');
 		url.setArgument('hostid', options.hostid);
-		url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
+		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
 		url.setArgument('master_itemid', options.itemid);
 		url.setArgument('context', 'host');
 
 		config_urls.push({
 			label: t('Create dependent discovery rule'),
 			url: url.getUrl(),
-			disabled: !options.create_dependent_discovery
+			disabled: options.isDiscovery
 		});
 
 		sections.push({
