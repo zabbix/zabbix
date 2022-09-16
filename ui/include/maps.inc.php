@@ -722,7 +722,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				: [];
 
 			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
-				|| $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
+					|| $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
 				$filtered_problems = getProblemsMatchingTags($filtered_problems, $selement['tags'],
 					$selement['evaltype']
 				);
