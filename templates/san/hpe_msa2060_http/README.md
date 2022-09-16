@@ -78,7 +78,7 @@ There are no template links in this template.
 |HPE |Get disk group statistics |<p>Disk groups statistics data.</p> |DEPENDENT |hpe.msa.disks.get.groups.statistics<p>**Preprocessing**:</p><p>- JSONPATH: `$.['disk-group-statistics']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |HPE |Get volumes |<p>Volumes data.</p> |DEPENDENT |hpe.msa.get.volumes<p>**Preprocessing**:</p><p>- JSONPATH: `$.['volumes']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |HPE |Get volume statistics |<p>Volumes statistics data.</p> |DEPENDENT |hpe.msa.get.volumes.statistics<p>**Preprocessing**:</p><p>- JSONPATH: `$.['volume-statistics']`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|HPE |Get method errors |<p>A list of method errors from API requests.</p> |DEPENDENT |hpe.msa.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.['errors']`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|HPE |Get method errors |<p>A list of method errors from API requests.</p> |DEPENDENT |hpe.msa.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.['errors']`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |HPE |Product ID |<p>The product model identifier.</p> |DEPENDENT |hpe.msa.system.product_id<p>**Preprocessing**:</p><p>- JSONPATH: `$.['product-id']`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |HPE |System contact |<p>The name of the person who administers the system.</p> |DEPENDENT |hpe.msa.system.contact<p>**Preprocessing**:</p><p>- JSONPATH: `$.['system-contact']`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |HPE |System information |<p>A brief description of what the system is used for or how it is configured.</p> |DEPENDENT |hpe.msa.system.info<p>**Preprocessing**:</p><p>- JSONPATH: `$.['system-information']`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
@@ -203,7 +203,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|There are errors in method requests to API |<p>There are errors in method requests to API.</p> |`length(last(/HPE MSA 2060 Storage by HTTP/hpe.msa.data.errors))>0` |AVERAGE |<p>**Depends on**:</p><p>- Service is down or unavailable</p> |
+|There are errors in method requests to API |<p>There are errors in method requests to API.</p> |`length(last(/HPE MSA 2060 Storage by HTTP/hpe.msa.get.errors))>0` |AVERAGE |<p>**Depends on**:</p><p>- Service is down or unavailable</p> |
 |System health is in degraded state |<p>System health is in degraded state.</p> |`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.system.health)=1` |WARNING | |
 |System health is in fault state |<p>System health is in fault state.</p> |`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.system.health)=2` |AVERAGE | |
 |System health is in unknown state |<p>System health is in unknown state.</p> |`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.system.health)=3` |INFO | |
