@@ -711,17 +711,18 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		'recent' => true
 	]);
 
-	$problems_by_trigger = array_fill_keys($triggerids, []);
+	$problems_by_trigger = [];
 	foreach ($problems as $problem) {
 		$problems_by_trigger[$problem['objectid']][] = $problem;
 	}
 
-	foreach ($selements as $snum => &$selement) {
-		$selement['triggers'] = array_map(function ($trigger) use ($problems_by_trigger) {
-			$trigger['problems'] = $problems_by_trigger[$trigger['triggerid']];
-
-			return $trigger;
-		}, $selement['triggers']);
+	foreach ($selements as &$selement) {
+		foreach ($selement['triggers'] as $trigger) {
+			$selement['triggers'][$trigger['triggerid']]['problems'] =
+				array_key_exists($trigger['triggerid'], $problems_by_trigger)
+					? $problems_by_trigger[$trigger['triggerid']]
+					: [];
+		}
 	}
 	unset($selement);
 
