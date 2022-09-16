@@ -28,8 +28,6 @@ require_once dirname(__FILE__).'/../common/testFormMacros.php';
  */
 class testFormMacrosDiscoveredHost extends testFormMacros {
 
-	use MacrosTrait;
-
 	/**
 	 * Parent hostid for macros test.
 	 *
@@ -66,21 +64,21 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 */
 	public function prepareDiscoveredHostMacrosData() {
 		$cases = [
-			0 => 'macros_update',
-			1 => 'macros_remove',
-			2 => 'secret_macros_layout',
-			3 => 'secret_macros_create',
-			4 => 'secret_macros_revert',
-			5 => 'vault_validation',
-			6 => 'empty',
-			7 => 'vault_create',
-			8 => 'macros_inheritance'
+			'macros_update',
+			'macros_remove',
+			'secret_macros_layout',
+			'secret_macros_create',
+			'secret_macros_revert',
+			'vault_validation',
+			'empty',
+			'vault_create',
+			'macros_inheritance'
 		];
 
 		// Create prototypes and discovered host names and ids.
-		for ($i = 0; $i < count($cases); $i++) {
-			self::$hosts[$i]['prototype_name'] = '{#KEY} Discovered host '.$cases[$i];
-			self::$hosts[$i]['name'] = $i.' Discovered host '.$cases[$i];
+		foreach ($cases as $i => $case) {
+			self::$hosts[$i]['prototype_name'] = '{#KEY} Discovered host '.$case;
+			self::$hosts[$i]['name'] = $i.' Discovered host '.$case;
 			self::$hosts[$i]['hostid'] = $i + 700000;
 			self::$hosts[$i]['interfaceid'] = $i + 800000;
 			self::$hosts[$i]['host_groupid'] = $i + 900000;
@@ -386,13 +384,13 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 		// Emulate host discoveries in DB.
 		foreach (self::$hosts as $host) {
 			DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr($host['hostid']).
-					",".zbx_dbstr($host['name']).",".zbx_dbstr($host['name']).", 0, 4, '')"
+					", ".zbx_dbstr($host['name']).", ".zbx_dbstr($host['name']).", 0, 4, '')"
 			);
 			DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr($host['hostid']).", ".
 					zbx_dbstr($prototypeids[$host['prototype_name']]).")"
 			);
 			DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
-					zbx_dbstr($host['interfaceid']).",".zbx_dbstr($host['hostid']).", 1, 1, 1, '127.0.0.1', '', '10050')"
+					zbx_dbstr($host['interfaceid']).", ".zbx_dbstr($host['hostid']).", 1, 1, 1, '127.0.0.1', '', '10050')"
 			);
 			DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr($host['host_groupid']).
 					", ".zbx_dbstr($host['hostid']).", 4)"
@@ -401,7 +399,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 
 		// Write macros to discovered hosts.
 		$j = 0;
-		foreach ($host_macros  as $hostmacro) {
+		foreach ($host_macros as $hostmacro) {
 			foreach ($hostmacro['macros'] as $macro) {
 				DBexecute("INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, type, automatic) VALUES (".
 						(9000000 + $j).", ".zbx_dbstr($hostmacro['hostid']).", ".zbx_dbstr($macro['macro']).", ".
@@ -421,7 +419,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'value' => 'updated value1',
+							'value' => 'updated value 1',
 							'description' => 'updated description 1'
 						],
 						[
@@ -604,9 +602,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 */
 	public function testFormMacrosDiscoveredHost_CheckInheritedMacros() {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
-		$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()
-				->findRow('Name', self::$hosts[8]['name'])->getColumn('Name');
-		$column->query('link', self::$hosts[8]['name'])->asPopupButton()->one()->select('Configuration');
+		$this->query('link', self::$hosts[8]['name'])->asPopupButton()->one()->select('Configuration');
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->selectTab('Macros');
 
@@ -651,7 +647,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 
 		$this->assertEquals($expected_macros, $this->getMacros(true));
 
-		for($i = 0; $i < count($this->getMacros()); $i++)  {
+		for ($i = 0; $i < count($this->getMacros()); $i++)  {
 			// Check that all macros fields are disabled.
 			foreach (['macro', 'value', 'description'] as $field) {
 				$this->assertFalse($form->query('id:macros_'.$i.'_'.$field)->one()->isEnabled());

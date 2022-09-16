@@ -40,8 +40,6 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		return [CMessageBehavior::class];
 	}
 
-	use MacrosTrait;
-
 	private $macroMaxLength = 255;
 	private $macroPlaceholder = '{$MACRO}';
 	private $macroClass = 'textarea-flexible macro';

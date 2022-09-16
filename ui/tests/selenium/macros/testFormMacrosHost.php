@@ -44,8 +44,6 @@ class testFormMacrosHost extends testFormMacros {
 		]);
 	}
 
-	use MacrosTrait;
-
 	/**
 	 * The name of the host for updating macros, id=20006.
 	 *

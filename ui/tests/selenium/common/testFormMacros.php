@@ -33,17 +33,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
 
-	public $macro_resolve;
-	public $macro_resolve_hostid;
-
-	public $vault_object;
-	public $vault_error_field;
-	public $vault_macro_index;
-	public $update_vault_macro;
-
-	public $revert_macro_1;
-	public $revert_macro_2;
-	public $revert_macro_object;
 	/**
 	 * Attach Behaviors to the test.
 	 *
@@ -561,7 +550,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		// Click "Change" button for every macros row in first case for discovered host form.
 		if (CTestArrayHelper::get($data, 'expected_macros')) {
-			for($i = 0; $i < count($this->getMacros()); $i++)  {
+			for ($i = 0; $i < count($this->getMacros()); $i++)  {
 				$form->query('id:macros_'.$i.'_change_state')->one()->waitUntilClickable()->click();
 				$this->assertFalse($form->query('id:macros_'.$i.'_macro')->one()->isEnabled());
 			}
@@ -739,6 +728,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					$group_field => $group_name
 			]);
 		}
+
 		$form->selectTab('Macros');
 		$radio_switcher = $this->query('id:show_inherited_macros')->asSegmentedRadio()->waitUntilPresent()->one();
 
@@ -1396,7 +1386,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$value_field = $this->getValueField($data['macro']);
 
 			if ($discovered) {
-				for($i = 0; $i < count($this->getMacros()); $i++)  {
+				for ($i = 0; $i < count($this->getMacros()); $i++)  {
 					$this->query('id:macros_'.$i.'_change_state')->one()->waitUntilClickable()->click();
 				}
 			}
@@ -1677,7 +1667,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		// Click "Change" button for every macros row in first case for discovered host form.
 		if ($discovered && CTestArrayHelper::get($data, 'first_case')) {
-			for($i = 0; $i < count($this->getMacros()); $i++)  {
+			for ($i = 0; $i < count($this->getMacros()); $i++) {
 				$form->query('id:macros_'.$i.'_change_state')->one()->waitUntilClickable()->click();
 			}
 		}

@@ -44,8 +44,6 @@ class testFormMacrosTemplate extends testFormMacros {
 		]);
 	}
 
-	use MacrosTrait;
-
 	/**
 	 * The name of the template for updating macros, id=40000.
 	 *
