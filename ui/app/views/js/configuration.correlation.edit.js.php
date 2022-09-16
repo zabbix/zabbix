@@ -80,7 +80,6 @@
 	}
 
 	function createRow(input) {
-		console.log(input);
 		this.row = document.createElement('tr');
 		this.row.append(createLabelCell(input));
 		this.row.append(createNameCell(input));
@@ -118,7 +117,6 @@
 	}
 
 	function createNameCell(input) {
-		console.log(input);
 		const cell = document.createElement('tr');
 		const span = document.createElement('td');
 		const value = document.createElement('em');

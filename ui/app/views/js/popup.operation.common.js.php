@@ -252,33 +252,11 @@ window.operation_popup = new class {
 	}
 
 	submit() {
-		this.validate();
+		let curl = new Curl('zabbix.php', false);
+		curl.setArgument('action', 'action.operation.validate');
 		const fields = getFormFields(this.form);
 
-		const url = new Curl('zabbix.php');
-		url.setArgument('action', 'popup.action.operations');
-		url.setArgument('eventsource', this.eventsource);
-		url.setArgument('recovery', this.recovery_phase);
-
-		this._post(url.getUrl(), fields);
-	}
-
-	validate() {
-		// todo : pass actionid (0 if create new action???)
-		const url = new Curl('zabbix.php');
-		url.setArgument('action', 'action.operation.validate');
-		url.setArgument('actionid', 0);
-
-		this.overlay.xhr = $.post(url.getUrl());
-
-		// return $.ajax({
-		//	url: url.getUrl(),
-		//	processData: false,
-		//	contentType: false,
-		//	data: this.form,
-		//	dataType: 'json',
-		//	method: 'POST'
-		//});
+		this._post(curl.getUrl(), fields);
 	}
 
 	_post(url, data, success_callback) {

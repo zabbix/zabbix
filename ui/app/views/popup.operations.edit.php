@@ -28,6 +28,8 @@ $form = (new CForm())
 	->cleanItems()
 	->setId('popup.operation')
 	->setName('popup.operation')
+	->addVar('operation[eventsource]', $data['eventsource'])
+	->addVar('operation[recovery]', $data['recovery'])
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
 $form_grid = (new CFormGrid());
@@ -37,7 +39,7 @@ $select_operationtype = (new CSelect(''))
 	->setFocusableElementId('operationtype')
 	->addOptions(CSelect::createOptionsFromArray($data['operation_types']))
 	->setId('operation-type-select')
-	->setName('operation-type');
+	->setName('operation[operationtype]');
 
 $form_grid->addItem([
 	new CLabel(_('Operation'), $select_operationtype->getFocusableElementId()),
@@ -139,7 +141,7 @@ $form_grid->addItem([
 $select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
 	->addOptions(CSelect::createOptionsFromArray($data['media_types']))
 	->setFocusableElementId('operation-opmessage-mediatypeid')
-	->setName('operation-message-mediatype-only');
+	->setName('operation[operation-message-mediatype-only]');
 
 
 $form_grid->addItem([

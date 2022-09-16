@@ -97,11 +97,57 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
-
 			// todo : add function to create row in operation table
-			document.getElementById('op-table').append('test row');
+			this._createOperationsRow(e);
 		});
+	}
 
+	_createOperationsRow(input) {
+		this.operation_table = document.getElementById('op-table');
+		this.operation_row_count = this.operation_table.rows.length -1;
+		this.operation_row = document.createElement('tr');
+
+		this.operation_row.append(this._steps(input.detail.operation));
+		this.operation_row.append(this._details(input.detail));
+		this.operation_row.append(this._startIn(input));
+		this.operation_row.append(this._duration(input));
+
+		this.operation_row.append(this._createRemoveCell());
+		$('#op-table tr:last').before(this.operation_row);
+	}
+
+	_steps(input) {
+		// todo : check if esc step from = 0
+		// todo : check if are the same
+		// todo : check if 'to' is not smaller than 'from' - validator?
+		const cell = document.createElement('td');
+		const esc_step_text = (input.esc_step_from === input.esc_step_to)
+			? input.esc_step_from
+			: input.esc_step_from + ' - ' +input.esc_step_to;
+
+		cell.append(esc_step_text);
+		return cell;
+	}
+
+	_details(input) {
+		// todo : function for creating details or recieve data from validation controller
+		const cell = document.createElement('td');
+		cell.append('here will be details');
+		return cell;
+	}
+
+	_startIn() {
+		// todo : function for start in column or recieve data from validation controller
+		const cell = document.createElement('td');
+		cell.append('start in');
+		return cell;
+	}
+
+	_duration() {
+		// todo : function for duration column or recieve data from validation controller
+		const cell = document.createElement('td');
+		cell.append('duration');
+		return cell;
 	}
 
 	_checkRow(input) {
@@ -222,6 +268,7 @@ window.action_edit_popup = new class {
 	}
 
 	submit() {
+
 		const fields = getFormFields(this.form);
 		fields.name = fields.name.trim();
 		const curl = new Curl('zabbix.php', false);
