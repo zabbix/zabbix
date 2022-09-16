@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "config.h"
+#include "zbxtypes.h"
 
 #ifdef HAVE_KSTAT_H
 zbx_uint64_t    get_kstat_numeric_value(const kstat_named_t *kn);

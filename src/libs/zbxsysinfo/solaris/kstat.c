@@ -18,6 +18,7 @@
 **/
 
 #include "kstat.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_KSTAT_H
 zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn)
