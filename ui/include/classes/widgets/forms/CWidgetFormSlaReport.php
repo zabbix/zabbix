@@ -19,6 +19,18 @@
 **/
 
 
+use Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
+
+use Widgets\Fields\{
+	CWidgetFieldDatePicker,
+	CWidgetFieldIntegerBox,
+	CWidgetFieldMultiSelectService,
+	CWidgetFieldMultiSelectSla
+};
+
 class CWidgetFormSlaReport extends CWidgetForm {
 
 	public function __construct(array $values, ?string $templateid) {

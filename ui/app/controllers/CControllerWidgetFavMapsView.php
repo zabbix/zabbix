@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\CWidgetConfig;
+
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerWidgetFavMapsView extends CControllerDashboardWidgetView {

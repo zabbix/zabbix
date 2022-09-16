@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldThresholds;
+
 class CWidgetFieldThresholdsView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldThresholds $field) {

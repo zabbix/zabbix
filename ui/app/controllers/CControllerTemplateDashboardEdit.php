@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\CWidgetConfig;
+
 class CControllerTemplateDashboardEdit extends CController {
 
 	private $dashboard;

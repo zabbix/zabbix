@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldMultiSelectHost;
+
 class CWidgetFieldMultiSelectHostView extends CWidgetFieldMultiSelectView {
 
 	public function __construct(CWidgetFieldMultiSelectHost $field, array $data) {

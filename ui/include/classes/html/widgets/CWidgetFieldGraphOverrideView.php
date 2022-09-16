@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldGraphOverride;
+
 class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldGraphOverride $field) {

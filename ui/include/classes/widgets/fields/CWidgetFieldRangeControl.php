@@ -19,6 +19,10 @@
 **/
 
 
+namespace Widgets\Fields;
+
+use Widgets\CWidgetField;
+
 class CWidgetFieldRangeControl extends CWidgetField {
 
 	private int $min;

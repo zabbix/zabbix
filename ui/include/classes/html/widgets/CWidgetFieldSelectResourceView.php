@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldSelectResource;
+
 class CWidgetFieldSelectResourceView extends CWidgetFieldView {
 
 	private array $data;

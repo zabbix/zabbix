@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldSeverities;
+
 class CWidgetFieldSeveritiesView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldSeverities $field) {

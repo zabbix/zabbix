@@ -19,6 +19,10 @@
 **/
 
 
+namespace Widgets\Fields;
+
+use Widgets\CWidgetField;
+
 class CWidgetFieldIntegerBox extends CWidgetField {
 
 	private int $max;

@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldMultiSelectGraph;
+
 class CWidgetFieldMultiSelectGraphView extends CWidgetFieldMultiSelectView {
 
 	public function __construct(CWidgetFieldMultiSelectGraph $field, array $data) {

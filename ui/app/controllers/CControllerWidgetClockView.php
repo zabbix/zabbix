@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\CWidgetConfig;
+
 class CControllerWidgetClockView extends CControllerDashboardWidgetView {
 
 	public function __construct() {

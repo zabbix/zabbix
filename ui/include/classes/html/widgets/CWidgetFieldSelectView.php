@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldSelect;
+
 class CWidgetFieldSelectView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldSelect $field) {

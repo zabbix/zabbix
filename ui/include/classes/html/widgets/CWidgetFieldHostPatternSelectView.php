@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldHostPatternSelect;
+
 class CWidgetFieldHostPatternSelectView extends CWidgetFieldView {
 
 	private string $placeholder = '';

@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\CWidgetConfig;
+
 class CControllerWidgetItemView extends CControllerDashboardWidgetView {
 
 	public const CHANGE_INDICATOR_UP = 1;

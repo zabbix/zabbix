@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldTags;
+
 class CWidgetFieldTagsView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldTags $field) {

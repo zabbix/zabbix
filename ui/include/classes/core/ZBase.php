@@ -344,9 +344,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/regexp',
 			$this->rootDir.'/include/classes/ldap',
 			$this->rootDir.'/include/classes/pagefilter',
-			$this->rootDir.'/include/classes/widgets/fields',
 			$this->rootDir.'/include/classes/widgets/forms',
-			$this->rootDir.'/include/classes/widgets',
 			$this->rootDir.'/include/classes/xml',
 			$this->rootDir.'/include/classes/vaults',
 			$this->rootDir.'/local/app/controllers',
@@ -403,6 +401,8 @@ class ZBase {
 		$autoloader = new CAutoloader;
 		$autoloader->addNamespace('', $this->getIncludePaths());
 		$autoloader->addNamespace('Core', [$this->rootDir.'/include/classes/core']);
+		$autoloader->addNamespace('Html', [$this->rootDir.'/include/classes/html']);
+		$autoloader->addNamespace('Widgets', [$this->rootDir.'/include/classes/widgets']);
 		$autoloader->register();
 		$this->autoloader = $autoloader;
 	}

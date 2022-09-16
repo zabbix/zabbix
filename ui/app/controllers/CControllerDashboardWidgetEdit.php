@@ -19,6 +19,23 @@
 **/
 
 
+use Widgets\{
+	CWidgetConfig,
+	CWidgetForm
+};
+
+use Widgets\Fields\{
+	CWidgetFieldMultiSelectGraph,
+	CWidgetFieldMultiSelectGraphPrototype,
+	CWidgetFieldMultiSelectGroup,
+	CWidgetFieldMultiSelectHost,
+	CWidgetFieldMultiSelectItem,
+	CWidgetFieldMultiSelectItemPrototype,
+	CWidgetFieldMultiSelectService,
+	CWidgetFieldMultiSelectSla,
+	CWidgetFieldSelectResource
+};
+
 class CControllerDashboardWidgetEdit extends CController {
 
 	private $context;

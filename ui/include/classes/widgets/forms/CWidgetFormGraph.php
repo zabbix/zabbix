@@ -19,6 +19,18 @@
 **/
 
 
+use Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
+
+use Widgets\Fields\{
+	CWidgetFieldCheckBox,
+	CWidgetFieldMultiSelectGraph,
+	CWidgetFieldMultiSelectItem,
+	CWidgetFieldRadioButtonList
+};
+
 /**
  * Graph widget form.
  */

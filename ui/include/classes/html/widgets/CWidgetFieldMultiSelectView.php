@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldMultiSelect;
+
 abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 
 	protected const OBJECT_NAME = '';

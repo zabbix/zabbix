@@ -19,6 +19,13 @@
 **/
 
 
+namespace Widgets\Fields;
+
+use API,
+	CApiInputValidator;
+
+use Widgets\CWidgetField;
+
 /**
  * Class for data set widget field used in Graph widget configuration Data set tab.
  */
@@ -151,13 +158,14 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			? $this->strict_validation_rules
 			: $this->validation_rules;
 		$validation_rules += $this->ex_validation_rules;
-		$value = ($this->value === null) ? $this->default : $this->value;
+
+		$value = $this->value ?? $this->default;
 
 		if ($this->full_name !== null) {
 			$label = $this->full_name;
 		}
 		else {
-			$label = ($this->label === null) ? $this->name : $this->label;
+			$label = $this->label ?? $this->name;
 		}
 
 		if ($strict) {

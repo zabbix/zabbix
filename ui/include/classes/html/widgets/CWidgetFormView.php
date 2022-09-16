@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\CWidgetField;
+
 class CWidgetFormView {
 
 	private array $data;
@@ -233,8 +235,8 @@ class CWidgetFormView {
 				new CLabel(_('Name'), 'name'),
 				new CFormField(
 					(new CTextBox('name', $this->data['name']))
-						->setAttribute('placeholder', _('default'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAttribute('placeholder', _('default'))
 				)
 			]);
 

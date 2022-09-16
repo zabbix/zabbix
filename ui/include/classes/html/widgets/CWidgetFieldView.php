@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\CWidgetField;
+
 abstract class CWidgetFieldView {
 
 	protected CWidgetField $field;

@@ -19,6 +19,26 @@
 **/
 
 
+use Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
+
+use Widgets\Fields\{
+	CWidgetFieldCheckBox,
+	CWidgetFieldDatePicker,
+	CWidgetFieldGraphDataSet,
+	CWidgetFieldGraphOverride,
+	CWidgetFieldHostPatternSelect,
+	CWidgetFieldNumericBox,
+	CWidgetFieldRadioButtonList,
+	CWidgetFieldRangeControl,
+	CWidgetFieldSelect,
+	CWidgetFieldSeverities,
+	CWidgetFieldTags,
+	CWidgetFieldTextBox
+};
+
 class CWidgetFormSvgGraph extends CWidgetForm {
 
 	private const PERCENTILE_MIN = 1;

@@ -19,6 +19,24 @@
 **/
 
 
+use Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
+
+use Widgets\Fields\{
+	CWidgetFieldCheckBox,
+	CWidgetFieldCheckBoxList,
+	CWidgetFieldColor,
+	CWidgetFieldIntegerBox,
+	CWidgetFieldMultiSelectItem,
+	CWidgetFieldRadioButtonList,
+	CWidgetFieldSelect,
+	CWidgetFieldTextArea,
+	CWidgetFieldTextBox,
+	CWidgetFieldThresholds
+};
+
 /**
  * Single item widget form.
  */

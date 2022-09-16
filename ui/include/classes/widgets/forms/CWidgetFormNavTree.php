@@ -19,6 +19,14 @@
 **/
 
 
+use Widgets\CWidgetForm;
+
+use Widgets\Fields\{
+	CWidgetFieldCheckBox,
+	CWidgetFieldNavTree,
+	CWidgetFieldReference
+};
+
 /**
  * Map navigation widget form.
  */

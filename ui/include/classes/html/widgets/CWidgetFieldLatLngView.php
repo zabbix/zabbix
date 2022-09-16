@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldLatLng;
+
 class CWidgetFieldLatLngView extends CWidgetFieldView {
 
 	private string $placeholder = '';

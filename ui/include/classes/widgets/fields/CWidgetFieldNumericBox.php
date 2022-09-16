@@ -19,6 +19,10 @@
 **/
 
 
+namespace Widgets\Fields;
+
+use Widgets\CWidgetField;
+
 class CWidgetFieldNumericBox extends CWidgetField {
 
 	public const DEFAULT_VALUE = '';

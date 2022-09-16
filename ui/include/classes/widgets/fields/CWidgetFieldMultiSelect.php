@@ -19,6 +19,10 @@
 **/
 
 
+namespace Widgets\Fields;
+
+use Widgets\CWidgetField;
+
 abstract class CWidgetFieldMultiSelect extends CWidgetField {
 
 	// Is selecting multiple objects or a single one?

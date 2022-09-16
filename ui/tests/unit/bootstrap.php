@@ -74,4 +74,6 @@ $autoloader->addNamespace('', [
 	__DIR__.'/include/classes/include/classes/vaults'
 ]);
 $autoloader->addNamespace('Core', [__DIR__.'/../../include/classes/core']);
+$autoloader->addNamespace('Html', [__DIR__.'/../../include/classes/html']);
+$autoloader->addNamespace('Widgets', [__DIR__.'/../../include/classes/widgets']);
 $autoloader->register();

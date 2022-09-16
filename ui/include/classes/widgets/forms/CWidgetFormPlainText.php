@@ -19,6 +19,18 @@
 **/
 
 
+use Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
+
+use Widgets\Fields\{
+	CWidgetFieldCheckBox,
+	CWidgetFieldIntegerBox,
+	CWidgetFieldMultiSelectItem,
+	CWidgetFieldRadioButtonList
+};
+
 /**
  * Plain text widget form.
  */

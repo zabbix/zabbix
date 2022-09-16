@@ -19,6 +19,16 @@
 **/
 
 
+use Widgets\CWidgetForm;
+
+use Widgets\Fields\{
+	CWidgetFieldCheckBox,
+	CWidgetFieldMultiSelectGroup,
+	CWidgetFieldMultiSelectHost,
+	CWidgetFieldRadioButtonList,
+	CWidgetFieldTags
+};
+
 /**
  * Data overview widget form.
  */

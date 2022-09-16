@@ -19,6 +19,21 @@
 **/
 
 
+use Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
+
+use Widgets\Fields\{
+	CWidgetFieldCheckBox,
+	CWidgetFieldMultiSelectGroup,
+	CWidgetFieldMultiSelectHost,
+	CWidgetFieldRadioButtonList,
+	CWidgetFieldSeverities,
+	CWidgetFieldTags,
+	CWidgetFieldTextBox
+};
+
 /**
  * Problems by severity widget form.
  */

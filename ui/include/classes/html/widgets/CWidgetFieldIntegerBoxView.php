@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldIntegerBox;
+
 class CWidgetFieldIntegerBoxView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldIntegerBox $field) {

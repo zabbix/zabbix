@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldCheckBoxList;
+
 class CWidgetFieldCheckBoxListView extends CWidgetFieldView {
 
 	private array $classes = [];

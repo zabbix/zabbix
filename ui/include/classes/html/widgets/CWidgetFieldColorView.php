@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldColor;
+
 class CWidgetFieldColorView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldColor $field) {

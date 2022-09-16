@@ -19,6 +19,10 @@
 **/
 
 
+namespace Widgets\Fields;
+
+use Widgets\CWidgetField;
+
 class CWidgetFieldReference extends CWidgetField {
 
 	public const DEFAULT_VALUE = '';

@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldRadioButtonList;
+
 class CWidgetFieldRadioButtonListView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldRadioButtonList $field) {

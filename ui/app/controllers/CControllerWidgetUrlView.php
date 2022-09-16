@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\CWidgetConfig;
+
 class CControllerWidgetUrlView extends CControllerDashboardWidgetView {
 
 	public function __construct() {

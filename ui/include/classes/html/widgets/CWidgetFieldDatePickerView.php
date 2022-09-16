@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldDatePicker;
+
 class CWidgetFieldDatePickerView extends CWidgetFieldView {
 
 	private string $date_format = '';

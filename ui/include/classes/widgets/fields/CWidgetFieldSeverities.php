@@ -19,6 +19,8 @@
 **/
 
 
+namespace Widgets\Fields;
+
 class CWidgetFieldSeverities extends CWidgetFieldCheckBoxList {
 
 	public function __construct(string $name, string $label = null) {

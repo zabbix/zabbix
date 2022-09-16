@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldMultiSelectGroup;
+
 class CWidgetFieldMultiSelectGroupView extends CWidgetFieldMultiSelectView {
 
 	public function __construct(CWidgetFieldMultiSelectGroup $field, array $data) {

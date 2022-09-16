@@ -19,6 +19,23 @@
 **/
 
 
+use Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
+
+use Widgets\Fields\{
+	CWidgetFieldCheckBox,
+	CWidgetFieldIntegerBox,
+	CWidgetFieldMultiSelectGroup,
+	CWidgetFieldMultiSelectHost,
+	CWidgetFieldRadioButtonList,
+	CWidgetFieldSelect,
+	CWidgetFieldSeverities,
+	CWidgetFieldTags,
+	CWidgetFieldTextBox
+};
+
 /**
  * Problems widget form.
  */

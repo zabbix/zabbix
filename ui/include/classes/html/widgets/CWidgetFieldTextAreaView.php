@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldTextArea;
+
 class CWidgetFieldTextAreaView extends CWidgetFieldView {
 
 	private int $width = ZBX_TEXTAREA_STANDARD_WIDTH;

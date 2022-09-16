@@ -19,6 +19,21 @@
 **/
 
 
+use Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
+
+use Widgets\Fields\{
+	CWidgetFieldColumnsList,
+	CWidgetFieldIntegerBox,
+	CWidgetFieldMultiSelectGroup,
+	CWidgetFieldMultiSelectHost,
+	CWidgetFieldRadioButtonList,
+	CWidgetFieldSelect,
+	CWidgetFieldTags
+};
+
 /**
  * Top hosts data widget form.
  */

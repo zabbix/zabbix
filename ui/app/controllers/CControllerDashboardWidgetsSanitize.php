@@ -18,6 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+use Widgets\CWidgetConfig;
+
 
 /**
  * Controller for sanitizing fields of widgets before pasting previously copied widget.

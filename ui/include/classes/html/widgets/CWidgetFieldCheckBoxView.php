@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldCheckBox;
+
 class CWidgetFieldCheckBoxView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldCheckBox $field) {

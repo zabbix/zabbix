@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldMultiSelectSla;
+
 class CWidgetFieldMultiSelectSlaView extends CWidgetFieldMultiSelectView {
 
 	public function __construct(CWidgetFieldMultiSelectSla $field, array $data) {

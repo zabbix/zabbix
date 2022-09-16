@@ -19,6 +19,8 @@
 **/
 
 
+namespace Widgets\Fields;
+
 class CWidgetFieldTimeZone extends CWidgetFieldSelect {
 
 	public const DEFAULT_VALUE = '';

@@ -19,6 +19,10 @@
 **/
 
 
+namespace Widgets\Fields;
+
+use Widgets\CWidgetField;
+
 class CWidgetFieldSelectResource extends CWidgetField {
 
 	public const DEFAULT_VALUE = '0';

@@ -19,6 +19,10 @@
 **/
 
 
+namespace Widgets\Fields;
+
+use Widgets\CWidgetField;
+
 /**
  * Class for override widget field used in Graph widget configuration overrides tab.
  */
@@ -89,7 +93,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 		$value = $this->getValue();
-		$label = ($this->label === null) ? $this->name : $this->label;
+		$label = $this->label ?? $this->name;
 
 		// Validate options.
 		if (!$errors && $strict) {

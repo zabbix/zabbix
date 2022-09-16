@@ -19,6 +19,15 @@
 **/
 
 
+namespace Widgets\Fields;
+
+use CAbsoluteTimeParser,
+	CParser,
+	CRelativeTimeParser,
+	DB;
+
+use Widgets\CWidgetField;
+
 class CWidgetFieldDatePicker extends CWidgetField {
 
 	public const DEFAULT_VALUE = '';

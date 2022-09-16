@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldTimeZone;
+
 class CWidgetFieldTimeZoneView extends CWidgetFieldSelectView {
 
 	public function __construct(CWidgetFieldTimeZone $field) {

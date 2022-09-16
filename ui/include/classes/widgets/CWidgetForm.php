@@ -19,6 +19,10 @@
 **/
 
 
+namespace Widgets;
+
+use Widgets\Fields\CWidgetFieldSelect;
+
 class CWidgetForm {
 
 	protected string $type;

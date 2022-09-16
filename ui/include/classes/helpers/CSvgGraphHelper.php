@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldGraphDataSet;
+
 /**
  * Class calculates graph data and makes SVG graph.
  */

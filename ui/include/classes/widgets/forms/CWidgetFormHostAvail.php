@@ -19,6 +19,15 @@
 **/
 
 
+use Widgets\CWidgetForm;
+
+use Widgets\Fields\{
+	CWidgetFieldCheckBox,
+	CWidgetFieldCheckBoxList,
+	CWidgetFieldMultiSelectGroup,
+	CWidgetFieldRadioButtonList
+};
+
 /**
  * Host availability widget form.
  */

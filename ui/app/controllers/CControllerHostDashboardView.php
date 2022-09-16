@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\CWidgetConfig;
+
 class CControllerHostDashboardView extends CController {
 
 	private $host;

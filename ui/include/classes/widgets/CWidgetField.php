@@ -19,6 +19,10 @@
 **/
 
 
+namespace Widgets;
+
+use CApiInputValidator;
+
 abstract class CWidgetField {
 
 	public const FLAG_ACKNOWLEDGES = 0x01;
@@ -37,7 +41,7 @@ abstract class CWidgetField {
 
 	protected ?string $action = null;
 
-	protected int $flags;
+	protected int $flags = 0x00;
 
 	protected array $validation_rules = [];
 	protected ?array $strict_validation_rules = null;
@@ -52,7 +56,6 @@ abstract class CWidgetField {
 		$this->label = $label;
 		$this->value = null;
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->flags = 0x00;
 	}
 
 	public function getName(): string {
@@ -77,7 +80,7 @@ abstract class CWidgetField {
 	 * Get field value. If no value is set, will return default value.
 	 */
 	public function getValue() {
-		return ($this->value === null) ? $this->default : $this->value;
+		return $this->value ?? $this->default;
 	}
 
 	public function setValue($value): self {
@@ -135,13 +138,14 @@ abstract class CWidgetField {
 			? $this->strict_validation_rules
 			: $this->validation_rules;
 		$validation_rules += $this->ex_validation_rules;
-		$value = ($this->value === null) ? $this->default : $this->value;
+
+		$value = $this->value ?? $this->default;
 
 		if ($this->full_name !== null) {
 			$label = $this->full_name;
 		}
 		else {
-			$label = ($this->label === null) ? $this->name : $this->label;
+			$label = $this->label ?? $this->name;
 		}
 
 		if (CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
@@ -160,7 +164,7 @@ abstract class CWidgetField {
 	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget
 	 * fields it causes significant performance decrease.
 	 *
-	 * @param array $widget_fields   reference to Array of widget fields.
+	 * @param array $widget_fields  reference to Array of widget fields.
 	 */
 	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();

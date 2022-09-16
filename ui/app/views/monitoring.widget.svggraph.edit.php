@@ -26,6 +26,8 @@
  * @var array $data
  */
 
+use Widgets\Fields\CWidgetFieldGraphDataSet;
+
 $form = (new CWidgetFormView($data));
 
 $preview = (new CDiv())

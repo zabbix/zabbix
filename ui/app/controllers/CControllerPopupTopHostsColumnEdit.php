@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldColumnsList;
+
 class CControllerPopupTopHostsColumnEdit extends CController {
 
 	protected $column_defaults = [

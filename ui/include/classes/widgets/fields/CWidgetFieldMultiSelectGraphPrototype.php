@@ -19,6 +19,8 @@
 **/
 
 
+namespace Widgets\Fields;
+
 class CWidgetFieldMultiSelectGraphPrototype extends CWidgetFieldMultiSelect {
 
 	public function __construct(string $name, string $label = null, $hostid = null) {

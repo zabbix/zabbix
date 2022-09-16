@@ -26,6 +26,8 @@
  * @var array $data
  */
 
+use Widgets\Fields\CWidgetFieldColumnsList;
+
 $form = new CWidgetFormView($data);
 
 $form
@@ -33,7 +35,7 @@ $form
 		new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['ms']['items']['itemid'])
 	)
 	->addField(
-		new CWidgetFieldCheckBoxListView($data['fields']['show']) // TODO AS: list should be in two kolums
+		new CWidgetFieldCheckBoxListView($data['fields']['show']) // TODO AS: list should be in two columns
 	)
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['adv_conf'])

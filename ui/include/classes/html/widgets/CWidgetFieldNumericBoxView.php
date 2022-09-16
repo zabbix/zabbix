@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldNumericBox;
+
 class CWidgetFieldNumericBoxView extends CWidgetFieldView {
 
 	private string $placeholder = '';

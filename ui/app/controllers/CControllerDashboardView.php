@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\CWidgetConfig;
+
 class CControllerDashboardView extends CController {
 
 	protected function init() {

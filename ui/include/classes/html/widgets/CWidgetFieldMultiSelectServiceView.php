@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldMultiSelectService;
+
 class CWidgetFieldMultiSelectServiceView extends CWidgetFieldMultiSelectView {
 
 	public function __construct(CWidgetFieldMultiSelectService $field, array $data) {

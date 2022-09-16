@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\CWidgetConfig;
+
 class CControllerWidgetGraphView extends CControllerDashboardWidgetView {
 
 	public function __construct() {

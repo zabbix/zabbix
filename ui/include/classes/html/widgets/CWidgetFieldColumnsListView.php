@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldColumnsList;
+
 class CWidgetFieldColumnsListView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldColumnsList $field) {

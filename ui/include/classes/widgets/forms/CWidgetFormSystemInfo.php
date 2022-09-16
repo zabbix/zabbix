@@ -19,6 +19,9 @@
 **/
 
 
+use Widgets\CWidgetForm;
+use Widgets\Fields\CWidgetFieldRadioButtonList;
+
 /**
  * System information widget form.
  */

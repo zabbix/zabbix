@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\CWidgetConfig;
+
 class CControllerDashboardWidgetCheck extends CController {
 
 	private $context;

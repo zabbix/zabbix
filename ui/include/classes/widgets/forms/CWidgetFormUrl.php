@@ -19,6 +19,16 @@
 **/
 
 
+use Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
+
+use Widgets\Fields\{
+	CWidgetFieldCheckBox,
+	CWidgetFieldUrl
+};
+
 /**
  * URL widget form.
  */

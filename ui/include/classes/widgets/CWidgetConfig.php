@@ -19,6 +19,8 @@
 **/
 
 
+namespace Widgets;
+
 class CWidgetConfig {
 
 	/**
@@ -429,67 +431,67 @@ class CWidgetConfig {
 	public static function getForm(string $type, array $values, ?string $templateid): CWidgetForm {
 		switch ($type) {
 			case WIDGET_ACTION_LOG:
-				return new CWidgetFormActionLog($values, $templateid);
+				return new \CWidgetFormActionLog($values, $templateid);
 
 			case WIDGET_CLOCK:
-				return new CWidgetFormClock($values, $templateid); // TODO AS: moved to manifest
+				return new \CWidgetFormClock($values, $templateid); // TODO AS: moved to manifest
 
 			case WIDGET_DATA_OVER:
-				return new CWidgetFormDataOver($values, $templateid);
+				return new \CWidgetFormDataOver($values, $templateid);
 
 			case WIDGET_GEOMAP:
-				return new CWidgetFormGeoMap($values, $templateid);
+				return new \CWidgetFormGeoMap($values, $templateid);
 
 			case WIDGET_GRAPH:
-				return new CWidgetFormGraph($values, $templateid);
+				return new \CWidgetFormGraph($values, $templateid);
 
 			case WIDGET_GRAPH_PROTOTYPE:
-				return new CWidgetFormGraphPrototype($values, $templateid);
+				return new \CWidgetFormGraphPrototype($values, $templateid);
 
 			case WIDGET_HOST_AVAIL:
-				return new CWidgetFormHostAvail($values, $templateid);
+				return new \CWidgetFormHostAvail($values, $templateid);
 
 			case WIDGET_ITEM:
-				return new CWidgetFormItem($values, $templateid);
+				return new \CWidgetFormItem($values, $templateid);
 
 			case WIDGET_MAP:
-				return new CWidgetFormMap($values, $templateid);
+				return new \CWidgetFormMap($values, $templateid);
 
 			case WIDGET_NAV_TREE:
-				return new CWidgetFormNavTree($values, $templateid);
+				return new \CWidgetFormNavTree($values, $templateid);
 
 			case WIDGET_PLAIN_TEXT:
-				return new CWidgetFormPlainText($values, $templateid);
+				return new \CWidgetFormPlainText($values, $templateid);
 
 			case WIDGET_PROBLEM_HOSTS:
-				return new CWidgetFormProblemHosts($values, $templateid);
+				return new \CWidgetFormProblemHosts($values, $templateid);
 
 			case WIDGET_PROBLEMS:
-				return new CWidgetFormProblems($values, $templateid);
+				return new \CWidgetFormProblems($values, $templateid);
 
 			case WIDGET_PROBLEMS_BY_SV:
-				return new CWidgetFormProblemsBySv($values, $templateid);
+				return new \CWidgetFormProblemsBySv($values, $templateid);
 
 			case WIDGET_SLA_REPORT:
-				return new CWidgetFormSlaReport($values, $templateid);
+				return new \CWidgetFormSlaReport($values, $templateid);
 
 			case WIDGET_SVG_GRAPH:
-				return new CWidgetFormSvgGraph($values, $templateid);
+				return new \CWidgetFormSvgGraph($values, $templateid);
 
 			case WIDGET_SYSTEM_INFO:
-				return new CWidgetFormSystemInfo($values, $templateid);
+				return new \CWidgetFormSystemInfo($values, $templateid);
 
 			case WIDGET_TOP_HOSTS:
-				return new CWidgetFormTopHosts($values, $templateid);
+				return new \CWidgetFormTopHosts($values, $templateid);
 
 			case WIDGET_TRIG_OVER:
-				return new CWidgetFormTrigOver($values, $templateid);
+				return new \CWidgetFormTrigOver($values, $templateid);
 
 			case WIDGET_URL:
-				return new CWidgetFormUrl($values, $templateid);
+				return new \CWidgetFormUrl($values, $templateid);
 
 			case WIDGET_WEB:
-				return new CWidgetFormWeb($values, $templateid);
+				return new \CWidgetFormWeb($values, $templateid);
 
 			default:
 				return new CWidgetForm($type, $values, $templateid);

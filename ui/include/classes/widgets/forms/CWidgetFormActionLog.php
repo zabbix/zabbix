@@ -18,6 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+use Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
+
+use Widgets\Fields\{
+	CWidgetFieldIntegerBox,
+	CWidgetFieldSelect
+};
+
 
 /**
  * Action log widget form.

@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldUrl;
+
 class CWidgetFieldUrlView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldUrl $field) {

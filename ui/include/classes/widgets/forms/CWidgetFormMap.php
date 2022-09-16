@@ -19,6 +19,18 @@
 **/
 
 
+use Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
+
+use Widgets\Fields\{
+	CWidgetFieldRadioButtonList,
+	CWidgetFieldReference,
+	CWidgetFieldSelectResource,
+	CWidgetFieldWidgetSelect
+};
+
 /**
  * Map widget form.
  */

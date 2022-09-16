@@ -19,8 +19,8 @@
 **/
 
 
-use Core\CModule,
-	CController as CAction;
+use Core\CModule;
+use CController as CAction;
 
 /**
  * Module manager class for testing and loading user modules.

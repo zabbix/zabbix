@@ -19,6 +19,10 @@
 **/
 
 
+namespace Widgets\Fields;
+
+use Widgets\CWidgetField;
+
 class CWidgetFieldColumnsList extends CWidgetField {
 
 	// Source of value to display in column.

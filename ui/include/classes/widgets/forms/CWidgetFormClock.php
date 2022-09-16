@@ -19,6 +19,22 @@
 **/
 
 
+use Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
+
+use Widgets\Fields\{
+	CWidgetFieldCheckBox,
+	CWidgetFieldCheckBoxList,
+	CWidgetFieldColor,
+	CWidgetFieldIntegerBox,
+	CWidgetFieldMultiSelectItem,
+	CWidgetFieldRadioButtonList,
+	CWidgetFieldSelect,
+	CWidgetFieldTimeZone
+};
+
 /**
  * Clock widget form.
  */

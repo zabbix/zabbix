@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldTextBox;
+
 class CWidgetFieldTextBoxView extends CWidgetFieldView {
 
 	private string $placeholder = '';

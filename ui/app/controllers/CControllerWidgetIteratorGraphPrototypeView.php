@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\CWidgetConfig;
+
 class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetIterator {
 
 	public function __construct() {

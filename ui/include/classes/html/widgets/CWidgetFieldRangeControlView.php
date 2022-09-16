@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldRangeControl;
+
 class CWidgetFieldRangeControlView extends CWidgetFieldView {
 
 	protected ?CRangeControl $range_control = null;

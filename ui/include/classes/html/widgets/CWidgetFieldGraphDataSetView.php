@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldGraphDataSet;
+
 class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 
 	public function __construct(CWidgetFieldGraphDataSet $field) {
@@ -38,6 +40,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 
 		// Get item names for single item datasets.
 		$itemids = array_merge(...array_column($values, 'itemids'));
+		$item_names = [];
 		if ($itemids) {
 			$item_names = CWidgetFieldGraphDataSet::getItemNames($itemids);
 		}
@@ -86,7 +89,8 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		];
 	}
 
-	private function getGraphDataSetLayout(array $value, int $dataset_type, bool $is_opened, $row_num = '#{rowNum}') {
+	private function getGraphDataSetLayout(array $value, int $dataset_type, bool $is_opened,
+			$row_num = '#{rowNum}'): CListItem {
 		$field_name = $this->field->getName();
 
 		$dataset_head = [
@@ -211,7 +215,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 									->addValue(_('Points'), SVG_GRAPH_TYPE_POINTS)
 									->addValue(_('Staircase'), SVG_GRAPH_TYPE_STAIRCASE)
 									->addValue(_('Bar'), SVG_GRAPH_TYPE_BAR)
-									->setModern(true)
+									->setModern()
 							)
 						])
 						->addItem([
@@ -287,7 +291,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 										SVG_GRAPH_MISSING_DATA_LAST_KNOWN
 									)
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
-									->setModern(true)
+									->setModern()
 							)
 						])
 						->addItem([
@@ -296,15 +300,15 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 								(new CRadioButtonList($field_name.'['.$row_num.'][axisy]', (int) $value['axisy']))
 									->addValue(_('Left'), GRAPH_YAXIS_SIDE_LEFT)
 									->addValue(_('Right'), GRAPH_YAXIS_SIDE_RIGHT)
-									->setModern(true)
+									->setModern()
 							)
 						])
 						->addItem([
 							new CLabel(_('Time shift'), $field_name.'['.$row_num.'][timeshift]'),
 							new CFormField(
 								(new CTextBox($field_name.'['.$row_num.'][timeshift]', $value['timeshift']))
-									->setAttribute('placeholder', _('none'))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+									->setAttribute('placeholder', _('none'))
 							)
 						])
 						->addItem([
@@ -336,8 +340,8 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 									$value['aggregate_interval']
 								))
 									->setEnabled($value['aggregate_function'] != AGGREGATE_NONE)
-									->setAttribute('placeholder', GRAPH_AGGREGATE_DEFAULT_INTERVAL)
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+									->setAttribute('placeholder', GRAPH_AGGREGATE_DEFAULT_INTERVAL)
 							)
 						])
 						->addItem([
@@ -349,7 +353,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 									->addValue(_('Each item'), GRAPH_AGGREGATE_BY_ITEM)
 									->addValue(_('Data set'), GRAPH_AGGREGATE_BY_DATASET)
 									->setEnabled($value['aggregate_function'] != AGGREGATE_NONE)
-									->setModern(true)
+									->setModern()
 							)
 						])
 						->addItem([
@@ -364,7 +368,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 									->addOptions(CSelect::createOptionsFromArray([
 										APPROXIMATION_ALL => [
 											'label' => _('all'),
-											'disabled' => ($value['type'] != SVG_GRAPH_TYPE_LINE || (bool) $value['stacked'])
+											'disabled' => $value['type'] != SVG_GRAPH_TYPE_LINE || $value['stacked']
 										],
 										APPROXIMATION_MIN => _('min'),
 										APPROXIMATION_AVG => _('avg'),

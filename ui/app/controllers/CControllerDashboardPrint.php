@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\CWidgetConfig;
+
 class CControllerDashboardPrint extends CController {
 
 	protected function init() {

@@ -19,6 +19,16 @@
 **/
 
 
+use Widgets\CWidgetForm;
+
+use Widgets\Fields\{
+	CWidgetFieldLatLng,
+	CWidgetFieldMultiSelectGroup,
+	CWidgetFieldMultiSelectHost,
+	CWidgetFieldRadioButtonList,
+	CWidgetFieldTags
+};
+
 /**
  * Geomap widget form.
  */
