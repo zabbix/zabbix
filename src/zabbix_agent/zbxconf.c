@@ -80,7 +80,7 @@ void	load_aliases(char **lines)
  * Return value: SUCCEED - successfully loaded user parameters                *
  *               FAIL    - failed to load user parameters                     *
  *                                                                            *
- * Comments: calls zbx_add_user_parameter() for each entry                        *
+ * Comments: calls zbx_add_user_parameter() for each entry                    *
  *                                                                            *
  ******************************************************************************/
 int	load_user_parameters(char **lines, char **err)
