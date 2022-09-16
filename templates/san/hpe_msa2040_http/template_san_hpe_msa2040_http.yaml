@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-09-15T07:32:17Z'
+  date: '2022-09-16T11:01:48Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -27,46 +27,6 @@ zabbix_export:
         -
           name: Templates/SAN
       items:
-        -
-          uuid: 51d0ae1b4663471d868c27ccd2fb4fed
-          name: 'Get method errors'
-          type: DEPENDENT
-          key: hpe.msa.data.errors
-          delay: '0'
-          history: 7d
-          trends: '0'
-          value_type: TEXT
-          description: 'A list of method errors from API requests.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''errors'']'
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1d
-          master_item:
-            key: hpe.msa.get.data
-          tags:
-            -
-              tag: component
-              value: errors
-          triggers:
-            -
-              uuid: 7f80562a0b4f4329be454c418de3f517
-              expression: 'length(last(/HPE MSA 2040 Storage by HTTP/hpe.msa.data.errors))>0'
-              name: 'There are errors in method requests to API'
-              priority: AVERAGE
-              description: 'There are errors in method requests to API.'
-              dependencies:
-                -
-                  name: 'Service is down or unavailable'
-                  expression: 'max(/HPE MSA 2040 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"],5m)=0'
-              tags:
-                -
-                  tag: scope
-                  value: availability
         -
           uuid: da724e20acee406b8dce3a1be24945a8
           name: 'Get disk group statistics'
@@ -347,6 +307,46 @@ zabbix_export:
             -
               tag: component
               value: raw
+        -
+          uuid: 51d0ae1b4663471d868c27ccd2fb4fed
+          name: 'Get method errors'
+          type: DEPENDENT
+          key: hpe.msa.get.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'A list of method errors from API requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''errors'']'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hpe.msa.get.data
+          tags:
+            -
+              tag: component
+              value: errors
+          triggers:
+            -
+              uuid: 7f80562a0b4f4329be454c418de3f517
+              expression: 'length(last(/HPE MSA 2040 Storage by HTTP/hpe.msa.get.errors))>0'
+              name: 'There are errors in method requests to API'
+              priority: AVERAGE
+              description: 'There are errors in method requests to API.'
+              dependencies:
+                -
+                  name: 'Service is down or unavailable'
+                  expression: 'max(/HPE MSA 2040 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"],5m)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 2b356e770025451e94e899123a2efc1b
           name: 'Get fans'
