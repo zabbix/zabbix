@@ -31,7 +31,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  *
  * @backup hosts
  */
-class testFormAdministrationGeneralProxies extends CWebTest {
+class testFormAdministrationProxies extends CWebTest {
 
 	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
 
@@ -480,7 +480,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	/**
 	 * @dataProvider getLayoutData
 	 */
-	public function testFormAdministrationGeneralProxies_Layout($data) {
+	public function testFormAdministrationProxies_Layout($data) {
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
 		$this->query('button:Create proxy')->one()->waitUntilClickable()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -1029,14 +1029,14 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	 *
 	 * @backupOnce hosts
 	 */
-	public function testFormAdministrationGeneralProxies_Create($data) {
+	public function testFormAdministrationProxies_Create($data) {
 		$this->checkForm($data);
 	}
 
 	/**
 	 * @dataProvider getUpdateProxyData
 	 */
-	public function testFormAdministrationGeneralProxies_Update($data) {
+	public function testFormAdministrationProxies_Update($data) {
 		$this->checkForm($data, true);
 	}
 
@@ -1164,7 +1164,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	/**
 	 * @dataProvider getActivePassiveProxyData
 	 */
-	public function testFormAdministrationGeneralProxies_RefreshConfiguration($data) {
+	public function testFormAdministrationProxies_RefreshConfiguration($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
 		$this->query('link', $data['proxy'])->one()->waitUntilClickable()->click();
@@ -1195,7 +1195,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	/**
 	 * @dataProvider getActivePassiveProxyData
 	 */
-	public function testFormAdministrationGeneralProxies_Clone($data) {
+	public function testFormAdministrationProxies_Clone($data) {
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
 		$this->query('link', $data['proxy'])->one()->waitUntilClickable()->click();
 
@@ -1253,7 +1253,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	/**
 	 * @dataProvider getActivePassiveProxyData
 	 */
-	public function testFormAdministrationGeneralProxies_SimpleUpdate($data) {
+	public function testFormAdministrationProxies_SimpleUpdate($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
 		$this->query('link', $data['proxy'])->one()->waitUntilClickable()->click();
@@ -1306,7 +1306,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	/**
 	 * @dataProvider getCancelData
 	 */
-	public function testFormAdministrationGeneralProxies_Cancel($data) {
+	public function testFormAdministrationProxies_Cancel($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
 
 		$fields = [
@@ -1386,7 +1386,7 @@ class testFormAdministrationGeneralProxies extends CWebTest {
 	/**
 	 * @dataProvider getProxyDeleteData
 	 */
-	public function testFormAdministrationGeneralProxies_Delete($data) {
+	public function testFormAdministrationProxies_Delete($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($this->sql);
 		}

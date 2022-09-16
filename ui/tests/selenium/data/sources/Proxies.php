@@ -228,7 +228,7 @@ class Proxies {
 			[
 				'proxyid' => $active_proxyids['Active proxy 1'],
 				'hosts' => [
-					['hostid' => 99136]// Test item host.
+					['hostid' => 99136] // Test item host.
 				]
 			],
 			[
@@ -250,10 +250,10 @@ class Proxies {
 		 * Supported version "60400" is hardcoded one time, so that no need to change it,
 		 * even if newer versions of Zabbix are released.
 		 */
-		DBexecute('UPDATE host_rtdata SET version = 60400, compatibility=1 WHERE hostid = '.zbx_dbstr($active_proxyids['active_current']));
-		DBexecute('UPDATE host_rtdata SET version = 60200, compatibility=2 WHERE hostid = '.zbx_dbstr($passive_proxyids['passive_outdated']));
-		DBexecute('UPDATE host_rtdata SET version = 0, compatibility=0 WHERE hostid = '.zbx_dbstr($active_proxyids['active_unknown']));
-		DBexecute('UPDATE host_rtdata SET version = 50401, compatibility=3 WHERE hostid = '.zbx_dbstr($passive_proxyids['passive_unsupported']));
-		DBexecute('UPDATE config SET server_status = '.zbx_dbstr('{"version": "6.4.0alpha1"}'));
+		DBexecute('UPDATE host_rtdata SET version=60400, compatibility=1 WHERE hostid='.zbx_dbstr($active_proxyids['active_current']));
+		DBexecute('UPDATE host_rtdata SET version=60200, compatibility=2 WHERE hostid='.zbx_dbstr($passive_proxyids['passive_outdated']));
+		DBexecute('UPDATE host_rtdata SET version=0, compatibility=0 WHERE hostid='.zbx_dbstr($active_proxyids['active_unknown']));
+		DBexecute('UPDATE host_rtdata SET version=50401, compatibility=3 WHERE hostid='.zbx_dbstr($passive_proxyids['passive_unsupported']));
+		DBexecute('UPDATE config SET server_status='.zbx_dbstr('{"version": "6.4.0alpha1"}'));
 	}
 }

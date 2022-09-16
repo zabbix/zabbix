@@ -30,7 +30,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  *
  * @backup hosts
  */
-class testPageAdministrationGeneralProxies extends CWebTest {
+class testPageAdministrationProxies extends CWebTest {
 
 	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
 
@@ -45,7 +45,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
-	public function testPageAdministrationGeneralProxies_Layout() {
+	public function testPageAdministrationProxies_Layout() {
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
 		$this->page->assertTitle('Configuration of proxies');
 		$this->page->assertHeader('Proxies');
@@ -78,8 +78,12 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 				'Required vps', 'Hosts'], $table->getHeadersText()
 		);
 
-		// Check that sortable header is clickable.
+		// Check that sortable headers are clickable.
 		$this->assertTrue($table->query('link:Name')->one()->isClickable());
+		$this->assertTrue($table->query('link:Mode')->one()->isClickable());
+		$this->assertTrue($table->query('link:Encryption')->one()->isClickable());
+		$this->assertTrue($table->query('link:Version')->one()->isClickable());
+		$this->assertTrue($table->query('link:Last seen (age)')->one()->isClickable());
 
 		// Check versions and hints.
 		$versions = [
@@ -134,7 +138,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 		}
 	}
 
-	public function testPageAdministrationGeneralProxies_CheckTableAndFilterReset() {
+	public function testPageAdministrationProxies_CheckTableAndFilterReset() {
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 
@@ -275,7 +279,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 	/**
 	 * @dataProvider getFilterProxyData
 	 */
-	public function testPageAdministrationGeneralProxies_Filter($data) {
+	public function testPageAdministrationProxies_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 
@@ -543,7 +547,7 @@ class testPageAdministrationGeneralProxies extends CWebTest {
 	/**
 	 * @dataProvider getActionsProxyData
 	 */
-	public function testPageAdministrationGeneralProxies_Actions($data) {
+	public function testPageAdministrationProxies_Actions($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($this->sql);
 		}
