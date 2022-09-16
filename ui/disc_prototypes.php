@@ -512,10 +512,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($item['parameters']);
 			}
 
-			if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
-				$item['interfaceid'] = getRequest('interfaceid', 0);
-			}
-
 			CArrayHelper::sort($db_item['tags'], ['tag', 'value']);
 			CArrayHelper::sort($tags, ['tag', 'value']);
 
