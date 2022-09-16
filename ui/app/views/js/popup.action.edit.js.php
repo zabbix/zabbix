@@ -104,7 +104,7 @@ window.action_edit_popup = new class {
 
 	_createOperationsRow(input) {
 		this.operation_table = document.getElementById('op-table');
-		this.operation_row_count = this.operation_table.rows.length -1;
+		this.operation_row_count = this.operation_table.rows.length - 2;
 		this.operation_row = document.createElement('tr');
 
 		this.operation_row.append(this._steps(input.detail.operation));
@@ -112,14 +112,60 @@ window.action_edit_popup = new class {
 		this.operation_row.append(this._startIn(input));
 		this.operation_row.append(this._duration(input));
 
+		// add operation data as hidden input to action form
+		// todo : move this to new function
+		const recovery_prefix = '';
+		const form = document.forms['action.edit'];
+		const operation_input = document.createElement('input');
+		operation_input.setAttribute('type', 'hidden');
+		operation_input.setAttribute('name', `add_${recovery_prefix}operation`);
+		operation_input.setAttribute('value', '1');
+		form.appendChild(operation_input);
+
+		for (const [name, value] of Object.entries(input.detail.operation)) {
+			const operation_input = document.createElement('operation_input');
+			operation_input.setAttribute('type', 'hidden');
+			operation_input.setAttribute('name', `operations[${this.operation_row_count}][${name}]`);
+			operation_input.setAttribute('id', `operations_${this.operation_row_count}_${name}`);
+			operation_input.setAttribute('value', value);
+			form.appendChild(operation_input);
+		}
+
+		for (const [index, value] of Object.entries(input.detail.operation.opmessage_grp)) {
+			this.operation_row.append(this._addUserFields(index, 'usrgrpid',value.usrgrpid));
+		}
+		this.operation_row.append(this._addHiddenOperationsFields('operationtype', 0));
+
 		this.operation_row.append(this._createRemoveCell());
 		$('#op-table tr:last').before(this.operation_row);
+
 	}
 
+	_addHiddenOperationsFields(name, value) {
+		const input = document.createElement('input');
+		input.type = 'hidden';
+		input.id = `operations_${this.row_count}_${name}`;
+		input.name = `operations[${this.row_count}][${name}]`;
+		input.value = value;
+
+		return input;
+	}
+
+	_addUserFields(index, name, value) {
+		const input = document.createElement('input');
+		input.type = 'hidden';
+		input.id = `operations_${this.row_count}_opmessage_grp_${index}_${name}`;
+		input.name = `operations[${this.row_count}][opmessage_grp][${index}][${name}]`;
+		input.value = value;
+
+		return input;
+	}
+
+
 	_steps(input) {
-		// todo : check if esc step from = 0
 		// todo : check if are the same
 		// todo : check if 'to' is not smaller than 'from' - validator?
+
 		const cell = document.createElement('td');
 		const esc_step_text = (input.esc_step_from === input.esc_step_to)
 			? input.esc_step_from
@@ -131,6 +177,7 @@ window.action_edit_popup = new class {
 
 	_details(input) {
 		// todo : function for creating details or recieve data from validation controller
+
 		const cell = document.createElement('td');
 		cell.append('here will be details');
 		return cell;
@@ -138,6 +185,7 @@ window.action_edit_popup = new class {
 
 	_startIn() {
 		// todo : function for start in column or recieve data from validation controller
+
 		const cell = document.createElement('td');
 		cell.append('start in');
 		return cell;
@@ -145,6 +193,7 @@ window.action_edit_popup = new class {
 
 	_duration() {
 		// todo : function for duration column or recieve data from validation controller
+
 		const cell = document.createElement('td');
 		cell.append('duration');
 		return cell;
@@ -220,18 +269,18 @@ window.action_edit_popup = new class {
 		}
 		else if (input.conditiontype == <?= CONDITION_TYPE_SUPPRESSED ?>) {
 			if (input.operator == <?= CONDITION_OPERATOR_YES ?>) {
-				span.append('Problem is suppressed');
+				span.append(<?= json_encode(_('Problem is suppressed')) ?>);
 			}
 			else {
-				span.append('Problem is not suppressed');
+				span.append(<?= json_encode(_('Problem is not suppressed')) ?>);
 			}
 		}
 		else if (input.conditiontype == <?= CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
 			if (input.value) {
-				span.append('Event is acknowledged');
+				span.append(<?= json_encode(_('Event is acknowledged')) ?>);
 			}
 			else {
-				span.append('Event is not acknowledged');
+				span.append(<?= json_encode(_('Event is not acknowledged')) ?>);
 			}
 		}
 		else {
@@ -261,6 +310,7 @@ window.action_edit_popup = new class {
 		btn.type = 'button';
 		btn.classList.add('btn-link', 'element-table-remove');
 		btn.textContent = <?= json_encode(_('Remove')) ?>;
+
 		btn.addEventListener('click', () => btn.closest('tr').remove());
 
 		cell.appendChild(btn);

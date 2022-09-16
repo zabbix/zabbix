@@ -98,9 +98,9 @@ class CControllerPopupActionOperationsEdit extends CController {
 
 		$data = [
 			'eventsource' => $eventsource,
-			'actionid' => $this->hasInput('actionid') ? $this->getInput('actionid') : 0,
+			'actionid' => $this->getInput('actionid', []),
 			'recovery' => $recovery,
-			'operation' => $this->hasInput('operation') ? $this->getInput('operation') : null,
+			'operation' => $this->getInput('operation') ? $this->getInput('operation') : null,
 			'operation_types' => $operation_type,
 			'media_types' => $media_type
 		];

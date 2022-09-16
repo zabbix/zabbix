@@ -93,115 +93,100 @@ class CControllerActionUpdate extends CController {
 
 	protected function doAction(): void {
 		$eventsource = $this->getInput('eventsource');
-		// todo : receive operations tables data from form
-
-//		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
-//			foreach ($action[$operation_group] as &$operation) {
-//				if ($operation_group === 'operations') {
-//					if ($eventsource == EVENT_SOURCE_TRIGGERS) {
-//						if (array_key_exists('opconditions', $operation)) {
-//							foreach ($operation['opconditions'] as &$opcondition) {
-//								unset($opcondition['opconditionid'], $opcondition['operationid']);
-//							}
-//							unset($opcondition);
-//						}
-//						else {
-//							$operation['opconditions'] = [];
-//						}
-//					}
-//					elseif ($eventsource == EVENT_SOURCE_DISCOVERY || $eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
-//						unset($operation['esc_period'], $operation['esc_step_from'], $operation['esc_step_to'],
-//							$operation['evaltype']
-//						);
-//					}
-//					elseif ($eventsource == EVENT_SOURCE_INTERNAL || $eventsource == EVENT_SOURCE_SERVICE) {
-//						unset($operation['evaltype']);
-//					}
-//				}
-//				elseif ($operation_group === 'recovery_operations') {
-//					if ($operation['operationtype'] != OPERATION_TYPE_MESSAGE) {
-//						unset($operation['opmessage']['mediatypeid']);
-//					}
-
-//					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
-//						unset($operation['opmessage']);
-//					}
-//				}
-
-//				if (array_key_exists('opmessage', $operation)) {
-//					if (!array_key_exists('default_msg', $operation['opmessage'])) {
-//						$operation['opmessage']['default_msg'] = 1;
-//					}
-
-//					if ($operation['opmessage']['default_msg'] == 1) {
-//						unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
-//					}
-//				}
-
-//				if (array_key_exists('opmessage_grp', $operation) || array_key_exists('opmessage_usr', $operation)) {
-//					if (!array_key_exists('opmessage_grp', $operation)) {
-//						$operation['opmessage_grp'] = [];
-//					}
-
-//					if (!array_key_exists('opmessage_usr', $operation)) {
-//						$operation['opmessage_usr'] = [];
-//					}
-//				}
-
-//				if (array_key_exists('opcommand_grp', $operation) || array_key_exists('opcommand_hst', $operation)) {
-//					if (array_key_exists('opcommand_grp', $operation)) {
-//						foreach ($operation['opcommand_grp'] as &$opcommand_grp) {
-//							unset($opcommand_grp['opcommand_grpid']);
-//						}
-//						unset($opcommand_grp);
-//					}
-//					else {
-//						$operation['opcommand_grp'] = [];
-//					}
-
-//					if (array_key_exists('opcommand_hst', $operation)) {
-//						foreach ($operation['opcommand_hst'] as &$opcommand_hst) {
-//							unset($opcommand_hst['opcommand_hstid']);
-//						}
-//						unset($opcommand_hst);
-//					}
-//					else {
-//						$operation['opcommand_hst'] = [];
-//					}
-//				}
-
-//				unset($operation['operationid'], $operation['actionid'], $operation['eventsource'], $operation['recovery'],
-//					$operation['id']
-//				);
-//			}
-//			unset($operation);
-//		}
 
 		$action = [
 			'name' => $this->getInput('name'),
 			'actionid' => $this->getInput('actionid'),
 			'status' => $this->hasInput('status') ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED,
 			'eventsource' => $eventsource,
-			'operations' => [
-				[
-					"esc_step_from" => '1',
-					'esc_step_to' => '1',
-					'opmessage_grp' => [
-						['usrgrpid' => '8']
-					],
-					'opmessage' => [
-						'mediatypeid' => '0',
-						'default_msg' => '1'
-					],
-					'evaltype' => '0',
-					'operationtype' => '0',
-					'opconditions' => [],
-					'opmessage_usr' => []
-				]
-			],
-			'recovery_operations' => [],
-			'update_operations' => []
+			'operations' => $this->getInput('operations', []),
+			'recovery_operations' => $this->getInput('recovery_operations', []),
+			'update_operations' => $this->getInput('update_operations', [])
 		];
+
+		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
+			foreach ($action[$operation_group] as &$operation) {
+				if ($operation_group === 'operations') {
+					if ($eventsource == EVENT_SOURCE_TRIGGERS) {
+						if (array_key_exists('opconditions', $operation)) {
+							foreach ($operation['opconditions'] as &$opcondition) {
+								unset($opcondition['opconditionid'], $opcondition['operationid']);
+							}
+							unset($opcondition);
+						}
+						else {
+							$operation['opconditions'] = [];
+						}
+					}
+					elseif ($eventsource == EVENT_SOURCE_DISCOVERY || $eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
+						unset($operation['esc_period'], $operation['esc_step_from'], $operation['esc_step_to'],
+							$operation['evaltype']
+						);
+					}
+					elseif ($eventsource == EVENT_SOURCE_INTERNAL || $eventsource == EVENT_SOURCE_SERVICE) {
+						unset($operation['evaltype']);
+					}
+				}
+				elseif ($operation_group === 'recovery_operations') {
+					if ($operation['operationtype'] != OPERATION_TYPE_MESSAGE) {
+						unset($operation['opmessage']['mediatypeid']);
+					}
+
+					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
+						unset($operation['opmessage']);
+					}
+				}
+
+				if (array_key_exists('opmessage', $operation)) {
+					if (!array_key_exists('default_msg', $operation['opmessage'])) {
+						$operation['opmessage']['default_msg'] = 1;
+					}
+
+					if ($operation['opmessage']['default_msg'] == 1) {
+						unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
+					}
+				}
+				// todo : remove this. this is just while testing
+				else $operation['opmessage'] = [];
+
+				if (array_key_exists('opmessage_grp', $operation) || array_key_exists('opmessage_usr', $operation)) {
+					if (!array_key_exists('opmessage_grp', $operation)) {
+						$operation['opmessage_grp'] = [];
+					}
+
+					if (!array_key_exists('opmessage_usr', $operation)) {
+						$operation['opmessage_usr'] = [];
+					}
+				}
+
+				if (array_key_exists('opcommand_grp', $operation) || array_key_exists('opcommand_hst', $operation)) {
+					if (array_key_exists('opcommand_grp', $operation)) {
+						foreach ($operation['opcommand_grp'] as &$opcommand_grp) {
+							unset($opcommand_grp['opcommand_grpid']);
+						}
+						unset($opcommand_grp);
+					}
+					else {
+						$operation['opcommand_grp'] = [];
+					}
+
+					if (array_key_exists('opcommand_hst', $operation)) {
+						foreach ($operation['opcommand_hst'] as &$opcommand_hst) {
+							unset($opcommand_hst['opcommand_hstid']);
+						}
+						unset($opcommand_hst);
+					}
+					else {
+						$operation['opcommand_hst'] = [];
+					}
+				}
+
+				unset($operation['operationid'], $operation['actionid'], $operation['eventsource'], $operation['recovery'],
+					$operation['id']
+				);
+			}
+			unset($operation);
+		}
 
 		$filter = [
 			'conditions' => $this->getInput('conditions', []),
@@ -250,32 +235,6 @@ class CControllerActionUpdate extends CController {
 		if ($eventsource == EVENT_SOURCE_TRIGGERS) {
 			$action['pause_suppressed'] = $this->getInput('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
 			$action['notify_if_canceled'] = $this->getInput('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_FALSE);
-		}
-
-		if ($eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
-			// todo : remove this. this is just for testing
-			$action['operations'][0]['operationtype'] = '4';
-			$action['operations'][0]['opgroup'] = [['groupid' => '2']];
-			unset(
-				$action['operations'][0]['opmessage'], $action['operations'][0]['opmessage_usr'],
-				$action['operations'][0]['opmessage_grp']
-			);
-		}
-
-		if ($eventsource == EVENT_SOURCE_INTERNAL || $eventsource == EVENT_SOURCE_SERVICE ||
-				$eventsource == EVENT_SOURCE_DISCOVERY || $eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
-			// todo : remove this. this is just for testing
-			unset ($action['operations'][0]['evaltype'], $action['operations'][0]['opconditions']);
-		}
-
-		if ($eventsource == EVENT_SOURCE_DISCOVERY) {
-			// todo : remove this. this is just for testing
-			unset ($action['operations'][0]['esc_step_from'], $action['operations'][0]['esc_step_to']);
-		}
-
-		if ($eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
-			// todo : remove this. this is just for testing
-			unset ($action['operations'][0]['esc_step_from'], $action['operations'][0]['esc_step_to']);
 		}
 
 		switch ($eventsource) {

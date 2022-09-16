@@ -69,31 +69,6 @@ window.operation_popup = new class {
 	// }
 	//}
 
-	// _createHiddenInput() {
-	//	let recovery_prefix = '';
-	//	if (this.recovery_phase == operation_details.ACTION_RECOVERY_OPERATION) {
-	//		recovery_prefix = 'recovery_';
-	//	}
-	//	else if (this.recovery_phase == operation_details.ACTION_UPDATE_OPERATION) {
-	//		recovery_prefix = 'update_';
-	//	}
-
-	//	const form = document.forms['action.edit'];
-	//	const input = document.createElement('input');
-	//	input.setAttribute('type', 'hidden');
-	//	input.setAttribute('name', `add_${recovery_prefix}operation`);
-	//	input.setAttribute('value', '1');
-	//	form.appendChild(input);
-
-	//	operation_form.forEach((value, name) => {
-	//		const input = document.createElement('input');
-	//		input.setAttribute('type', 'hidden');
-	//		input.setAttribute('name', `new_${recovery_prefix}${name}`);
-	//		input.setAttribute('value', value);
-	//		form.appendChild(input);
-	//	});
-	//}
-
 	_openUserGroupPopup(trigger_element) {
 		const parameters = {
 			'srctbl': 'usrgrp',
@@ -120,11 +95,11 @@ window.operation_popup = new class {
 	}
 
 	_addUserGroup(values) {
-		values.forEach(value => {
+		values.forEach((value, index) => {
 			const row = document.createElement('tr');
 			row.append(value.name)
 			row.append(this._createRemoveCell())
-			row.appendChild(this._createHiddenInput('operation[opmessage_grp][][usrgrpid]',value.usrgrpid));
+			row.appendChild(this._createHiddenInput(`operation[opmessage_grp][${index}][usrgrpid]`,value.usrgrpid));
 
 			document.getElementById('operation-message-user-groups-footer').before(row);
 		});
@@ -161,11 +136,11 @@ window.operation_popup = new class {
 	}
 
 	_addUser(values) {
-		values.forEach(value => {
+		values.forEach((value, index) => {
 			const row = document.createElement('tr');
 			row.append(value.name)
 			row.append(this._createRemoveCell())
-			row.append(this._createHiddenInput('operation[opmessage_usr][][userid]', value.id))
+			row.append(this._createHiddenInput(`operation[opmessage_usr][${index}][userid]`, value.id))
 
 			document.getElementById('operation-message-users-footer')
 				.before(row);
@@ -204,10 +179,10 @@ window.operation_popup = new class {
 		row.append(this._createName(input));
 		row.append(this._createRemoveCell());
 
-		row.appendChild(this._createHiddenInput('formulaid',this.label));
-		row.appendChild(this._createHiddenInput('conditiontype',input.conditiontype));
-		row.appendChild(this._createHiddenInput('operator',input.operator));
-		row.appendChild(this._createHiddenInput('value',input.value));
+		row.appendChild(this._createHiddenInput('operation[condition][formulaid]',this.label));
+		row.appendChild(this._createHiddenInput('operation[condition][conditiontype]',input.conditiontype));
+		row.appendChild(this._createHiddenInput('operation[condition][operator]',input.operator));
+		row.appendChild(this._createHiddenInput('operation[condition][value]',input.value));
 
 		this.table = document.getElementById('operation-condition-list');
 		this.row_count = this.table.rows.length -1;
