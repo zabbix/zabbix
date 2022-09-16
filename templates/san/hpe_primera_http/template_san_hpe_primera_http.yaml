@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.4'
-  date: '2022-09-16T12:32:31Z'
+  version: '6.2'
+  date: '2022-09-16T12:50:03Z'
   template_groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -981,7 +981,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $SAUsage.rawTotalMiB
+                    - $.SAUsage.rawTotalMiB
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:

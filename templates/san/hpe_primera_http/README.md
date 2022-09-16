@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor HPE Primera by HTTP.
 It works without any external scripts and uses the script item.
 
@@ -13,7 +13,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1. Create user zabbix on the storage with browse role and enable it for all domains.
 2. The WSAPI server does not start automatically.
@@ -100,7 +100,7 @@ There are no template links in this template.
 |HPE |CPG [{#NAME}]: Raw space: Total |<p>Raw total space.</p> |DEPENDENT |hpe.primera.cpg.space.raw["{#ID}",total]<p>**Preprocessing**:</p><p>- JSONPATH: `$.rawTotalSpaceMiB`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- MULTIPLIER: `1048576`</p> |
 |HPE |CPG [{#NAME}]: CPG space: Shared |<p>Shared CPG space.</p> |DEPENDENT |hpe.primera.cpg.space["{#ID}",shared]<p>**Preprocessing**:</p><p>- JSONPATH: `$.sharedSpaceMiB`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- MULTIPLIER: `1048576`</p> |
 |HPE |CPG [{#NAME}]: State |<p>Overall state of the CPG:</p><p>NORMAL (1) - normal operation;</p><p>DEGRADED (2) - degraded state;</p><p>FAILED (3) - abnormal operation;</p><p>UNKNOWN (99) - unknown state.</p> |DEPENDENT |hpe.primera.cpg.state["{#ID}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.state`</p> |
-|HPE |CPG [{#NAME}]: Logical disk space: Snapshot administration: Total (raw) |<p>Total physical (raw) logical disk space in snapshot administration.</p> |DEPENDENT |hpe.primera.cpg.space.sa["{#ID}",raw_total]<p>**Preprocessing**:</p><p>- JSONPATH: `$SAUsage.rawTotalMiB`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- MULTIPLIER: `1048576`</p> |
+|HPE |CPG [{#NAME}]: Logical disk space: Snapshot administration: Total (raw) |<p>Total physical (raw) logical disk space in snapshot administration.</p> |DEPENDENT |hpe.primera.cpg.space.sa["{#ID}",raw_total]<p>**Preprocessing**:</p><p>- JSONPATH: `$.SAUsage.rawTotalMiB`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- MULTIPLIER: `1048576`</p> |
 |HPE |CPG [{#NAME}]: Logical disk space: Snapshot data: Total (raw) |<p>Total physical (raw) logical disk space in snapshot data space.</p> |DEPENDENT |hpe.primera.cpg.space.sd["{#ID}",raw_total]<p>**Preprocessing**:</p><p>- JSONPATH: `$.SDUsage.rawTotalMiB`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- MULTIPLIER: `1048576`</p> |
 |HPE |CPG [{#NAME}]: Logical disk space: User space: Total (raw) |<p>Total physical (raw) logical disk space in user data space.</p> |DEPENDENT |hpe.primera.cpg.space.usr["{#ID}",raw_total]<p>**Preprocessing**:</p><p>- JSONPATH: `$.UsrUsage.rawTotalMiB`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- MULTIPLIER: `1048576`</p> |
 |HPE |CPG [{#NAME}]: Logical disk space: Snapshot administration: Total |<p>Total logical disk space in snapshot administration.</p> |DEPENDENT |hpe.primera.cpg.space.sa["{#ID}",total]<p>**Preprocessing**:</p><p>- JSONPATH: `$.SAUsage.totalMiB`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- MULTIPLIER: `1048576`</p> |
