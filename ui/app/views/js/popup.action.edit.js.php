@@ -112,8 +112,16 @@ window.action_edit_popup = new class {
 		this.operation_row.append(this._startIn(input));
 		this.operation_row.append(this._duration(input));
 
+		this.addOperationsData(input);
+
+		this.operation_row.append(this._createRemoveCell());
+		$('#op-table tr:last').before(this.operation_row);
+
+	}
+
+	addOperationsData(input) {
+		// todo : REWRITE THIS
 		// add operation data as hidden input to action form
-		// todo : move this to new function
 		const recovery_prefix = '';
 		const form = document.forms['action.edit'];
 		const operation_input = document.createElement('input');
@@ -121,6 +129,8 @@ window.action_edit_popup = new class {
 		operation_input.setAttribute('name', `add_${recovery_prefix}operation`);
 		operation_input.setAttribute('value', '1');
 		form.appendChild(operation_input);
+
+		// todo : remove usrgrp and usrid from here, because now the data repeats
 
 		for (const [name, value] of Object.entries(input.detail.operation)) {
 			const operation_input = document.createElement('operation_input');
@@ -130,14 +140,19 @@ window.action_edit_popup = new class {
 			operation_input.setAttribute('value', value);
 			form.appendChild(operation_input);
 		}
+		// todo : add check, if these fields exist
 
-		for (const [index, value] of Object.entries(input.detail.operation.opmessage_grp)) {
-			this.operation_row.append(this._addUserFields(index, 'usrgrpid',value.usrgrpid));
+		if (input.detail.operation.opmessage_grp !== undefined) {
+			for (const [index, value] of Object.entries(input.detail.operation.opmessage_grp)) {
+				this.operation_row.append(this._addUserFields(index, 'usrgrpid',value.usrgrpid, 'opmessage_grp'));
+			}
+		}
+		if (input.detail.operation.opmessage_usr !== undefined) {
+			for (const [index, value] of Object.entries(input.detail.operation.opmessage_usr)) {
+				this.operation_row.append(this._addUserFields(index, 'userid', value.userid, 'opmessage_usr'));
+			}
 		}
 		this.operation_row.append(this._addHiddenOperationsFields('operationtype', 0));
-
-		this.operation_row.append(this._createRemoveCell());
-		$('#op-table tr:last').before(this.operation_row);
 
 	}
 
@@ -151,11 +166,11 @@ window.action_edit_popup = new class {
 		return input;
 	}
 
-	_addUserFields(index, name, value) {
+	_addUserFields(index, name, value, group) {
 		const input = document.createElement('input');
 		input.type = 'hidden';
-		input.id = `operations_${this.row_count}_opmessage_grp_${index}_${name}`;
-		input.name = `operations[${this.row_count}][opmessage_grp][${index}][${name}]`;
+		input.id = `operations_${this.row_count}_${group}_${index}_${name}`;
+		input.name = `operations[${this.row_count}][${group}][${index}][${name}]`;
 		input.value = value;
 
 		return input;
@@ -167,9 +182,10 @@ window.action_edit_popup = new class {
 		// todo : check if 'to' is not smaller than 'from' - validator?
 
 		const cell = document.createElement('td');
-		const esc_step_text = (input.esc_step_from === input.esc_step_to)
-			? input.esc_step_from
-			: input.esc_step_from + ' - ' +input.esc_step_to;
+		// const esc_step_text = (input.esc_step_from === input.esc_step_to)
+		//	? input.esc_step_from
+		//	: input.esc_step_from + ' - ' +input.esc_step_to;
+		const esc_step_text =input.esc_step_from;
 
 		cell.append(esc_step_text);
 		return cell;
@@ -318,7 +334,6 @@ window.action_edit_popup = new class {
 	}
 
 	submit() {
-
 		const fields = getFormFields(this.form);
 		fields.name = fields.name.trim();
 		const curl = new Curl('zabbix.php', false);
