@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-16T07:14:01Z'
+  date: '2022-09-16T12:32:31Z'
   template_groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -73,7 +73,185 @@ zabbix_export:
                 - $.cpgs
               error_handler: DISCARD_VALUE
           master_item:
-            key: primera.get.data
+            key: hpe.primera.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 530e20083da8423e9d30c8342f1b7da3
+          name: 'HPE Primera: Get data'
+          type: SCRIPT
+          key: hpe.primera.get.data
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Primera = {
+                params: {},
+                session_key: null,
+            
+                setParams: function (params) {
+                    ['username', 'password', 'base_url'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
+            
+                    Primera.params = params;
+                    if (typeof Primera.params.base_url === 'string' && !Primera.params.base_url.endsWith('/')) {
+                        Primera.params.base_url += '/';
+                    }
+                },
+            
+                login: function () {
+                    if (Primera.session_key !== null) {
+                        return;
+                    }
+            
+                    var response, request = new HttpRequest();
+                    request.addHeader('Content-Type: application/json');
+            
+                    response = request.post(Primera.params.base_url + 'api/v1/credentials', JSON.stringify({
+                        'user': Primera.params.username,
+                        'password': Primera.params.password
+                    }));
+            
+                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                        throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    if (response !== null) {
+                        try {
+                            auth_data = JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse auth response received from device API.';
+                        }
+                    }
+                    else {
+                        throw 'No data received by auth request.'
+                    }
+            
+                    if ('key' in auth_data) {
+                        Primera.session_key = auth_data['key'];
+                    } else {
+                        throw 'Auth response does not contain session key.'
+                    }
+                },
+            
+                logout: function () {
+                    if (Primera.session_key !== null) {
+                        (new HttpRequest()).delete(Primera.params.base_url + 'api/v1/credentials/' + Primera.session_key);
+                    }
+                },
+            
+                requestData: function (method) {
+                    if (Primera.session_key === null) {
+                        return;
+                    }
+            
+                    request = new HttpRequest();
+                    request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + Primera.session_key);
+            
+                    raw_data = request.get(Primera.params.base_url + 'api/v1/' + method);
+            
+                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    if (raw_data !== null) {
+                        try {
+                            return JSON.parse(raw_data);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from device API.';
+                        }
+                    }
+                    else {
+                        throw 'No data received by ' + method + ' request.';
+                    }
+                }
+            };
+            
+            var methods = ['disks', 'cpgs', 'hosts', 'ports', 'system', 'tasks', 'volumes'],
+                data = {};
+            
+            data['errors'] = {};
+            
+            try {
+                Primera.setParams(JSON.parse(value));
+            
+                try {
+                    Primera.login();
+                }
+                catch (error) {
+                    data.errors.auth = error.toString();
+                }
+            
+                if (!('auth' in data.errors)) {
+                    for (var i in methods) {
+                        try {
+                            if (methods[i] === 'tasks') {
+                                var result = [],
+                                    tmp_tasks = {};
+            
+                                tasks = Primera.requestData(methods[i]);
+            
+                                tasks.members.forEach(function (task) {
+                                    tmp_tasks[task.name] = task;
+                                });
+            
+                                for (var task in tmp_tasks) {
+                                    result.push(tmp_tasks[task]);
+                                }
+            
+                                data[methods[i]] = result;
+                            }
+                            else {
+                                data[methods[i]] = Primera.requestData(methods[i]);
+                            }
+                        }
+                        catch (error) {
+                            data.errors[methods[i]] = error.toString();
+                        }
+                    }
+                }
+            }
+            catch (error) {
+                data.errors.params = error.toString();
+            }
+            
+            try {
+                Primera.logout();
+            }
+            catch (error) {
+            }
+            
+            if (Object.keys(data.errors).length !== 0) {
+                errors = 'Failed to receive data:';
+                for (var error in data.errors) {
+                    errors += '\n' + error + ' : ' + data.errors[error];
+                }
+                data.errors = errors;
+            }
+            else {
+                data.errors = '';
+            }
+            
+            return JSON.stringify(data);
+          description: 'The JSON with result of WSAPI requests.'
+          timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: base_url
+              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
+            -
+              name: password
+              value: '{$HPE.PRIMERA.API.PASSWORD}'
+            -
+              name: username
+              value: '{$HPE.PRIMERA.API.USERNAME}'
           tags:
             -
               tag: component
@@ -95,7 +273,7 @@ zabbix_export:
                 - $.disks
               error_handler: DISCARD_VALUE
           master_item:
-            key: primera.get.data
+            key: hpe.primera.get.data
           tags:
             -
               tag: component
@@ -120,7 +298,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: primera.get.data
+            key: hpe.primera.get.data
           tags:
             -
               tag: component
@@ -158,7 +336,7 @@ zabbix_export:
                 - $.hosts
               error_handler: DISCARD_VALUE
           master_item:
-            key: primera.get.data
+            key: hpe.primera.get.data
           tags:
             -
               tag: component
@@ -180,7 +358,7 @@ zabbix_export:
                 - $.ports
               error_handler: DISCARD_VALUE
           master_item:
-            key: primera.get.data
+            key: hpe.primera.get.data
           tags:
             -
               tag: component
@@ -202,7 +380,7 @@ zabbix_export:
                 - $.system
               error_handler: DISCARD_VALUE
           master_item:
-            key: primera.get.data
+            key: hpe.primera.get.data
           tags:
             -
               tag: component
@@ -224,7 +402,7 @@ zabbix_export:
                 - $.tasks
               error_handler: DISCARD_VALUE
           master_item:
-            key: primera.get.data
+            key: hpe.primera.get.data
           tags:
             -
               tag: component
@@ -246,7 +424,7 @@ zabbix_export:
                 - $.volumes
               error_handler: DISCARD_VALUE
           master_item:
-            key: primera.get.data
+            key: hpe.primera.get.data
           tags:
             -
               tag: component
@@ -641,184 +819,6 @@ zabbix_export:
                 -
                   tag: scope
                   value: availability
-        -
-          uuid: 530e20083da8423e9d30c8342f1b7da3
-          name: 'HPE Primera: Get data'
-          type: SCRIPT
-          key: primera.get.data
-          history: 0d
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var Primera = {
-                params: {},
-                session_key: null,
-            
-                setParams: function (params) {
-                    ['username', 'password', 'base_url'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
-            
-                    Primera.params = params;
-                    if (typeof Primera.params.base_url === 'string' && !Primera.params.base_url.endsWith('/')) {
-                        Primera.params.base_url += '/';
-                    }
-                },
-            
-                login: function () {
-                    if (Primera.session_key !== null) {
-                        return;
-                    }
-            
-                    var response, request = new HttpRequest();
-                    request.addHeader('Content-Type: application/json');
-            
-                    response = request.post(Primera.params.base_url + 'api/v1/credentials', JSON.stringify({
-                        'user': Primera.params.username,
-                        'password': Primera.params.password
-                    }));
-            
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
-            
-                    if (response !== null) {
-                        try {
-                            auth_data = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse auth response received from device API.';
-                        }
-                    }
-                    else {
-                        throw 'No data received by auth request.'
-                    }
-            
-                    if ('key' in auth_data) {
-                        Primera.session_key = auth_data['key'];
-                    } else {
-                        throw 'Auth response does not contain session key.'
-                    }
-                },
-            
-                logout: function () {
-                    if (Primera.session_key !== null) {
-                        (new HttpRequest()).delete(Primera.params.base_url + 'api/v1/credentials/' + Primera.session_key);
-                    }
-                },
-            
-                requestData: function (method) {
-                    if (Primera.session_key === null) {
-                        return;
-                    }
-            
-                    request = new HttpRequest();
-                    request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + Primera.session_key);
-            
-                    raw_data = request.get(Primera.params.base_url + 'api/v1/' + method);
-            
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
-            
-                    if (raw_data !== null) {
-                        try {
-                            return JSON.parse(raw_data);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from device API.';
-                        }
-                    }
-                    else {
-                        throw 'No data received by ' + method + ' request.';
-                    }
-                }
-            };
-            
-            var methods = ['disks', 'cpgs', 'hosts', 'ports', 'system', 'tasks', 'volumes'],
-                data = {};
-            
-            data['errors'] = {};
-            
-            try {
-                Primera.setParams(JSON.parse(value));
-            
-                try {
-                    Primera.login();
-                }
-                catch (error) {
-                    data.errors.auth = error.toString();
-                }
-            
-                if (!('auth' in data.errors)) {
-                    for (var i in methods) {
-                        try {
-                            if (methods[i] === 'tasks') {
-                                var result = [],
-                                    tmp_tasks = {};
-            
-                                tasks = Primera.requestData(methods[i]);
-            
-                                tasks.members.forEach(function (task) {
-                                    tmp_tasks[task.name] = task;
-                                });
-            
-                                for (var task in tmp_tasks) {
-                                    result.push(tmp_tasks[task]);
-                                }
-            
-                                data[methods[i]] = result;
-                            }
-                            else {
-                                data[methods[i]] = Primera.requestData(methods[i]);
-                            }
-                        }
-                        catch (error) {
-                            data.errors[methods[i]] = error.toString();
-                        }
-                    }
-                }
-            }
-            catch (error) {
-                data.errors.params = error.toString();
-            }
-            
-            try {
-                Primera.logout();
-            }
-            catch (error) {
-            }
-            
-            if (Object.keys(data.errors).length !== 0) {
-                errors = 'Failed to receive data:';
-                for (var error in data.errors) {
-                    errors += '\n' + error + ' : ' + data.errors[error];
-                }
-                data.errors = errors;
-            }
-            else {
-                data.errors = '';
-            }
-            
-            return JSON.stringify(data);
-          description: 'The JSON with result of WSAPI requests.'
-          timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
-            -
-              name: password
-              value: '{$HPE.PRIMERA.API.PASSWORD}'
-            -
-              name: username
-              value: '{$HPE.PRIMERA.API.USERNAME}'
-          tags:
-            -
-              tag: component
-              value: raw
       discovery_rules:
         -
           uuid: b9132b095eb349c99e868ea40364596d
@@ -981,7 +981,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.cpgs.members[?(@.id == "{#ID}")].SAUsage.rawTotalMiB.first()'
+                    - $SAUsage.rawTotalMiB
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -991,7 +991,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: primera.get.data
+                key: 'hpe.primera.cpg["{#ID}",data]'
               tags:
                 -
                   tag: component
@@ -3532,7 +3532,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..adminSpace.usedMiB
+                    - $.adminSpace.usedMiB
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
