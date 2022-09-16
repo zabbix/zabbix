@@ -49,12 +49,16 @@ class testProxy extends CAPITest {
 			'delete_single' => null,
 			'delete_multiple_1' => null,
 			'delete_multiple_2' => null,
-			'delete_host' => null,
-			'delete_action' => null,
-			'delete_discovery' => null
+			'delete_used_in_host' => null,
+			'delete_used_in_action' => null,
+			'delete_used_in_discovery' => null
 		],
 		'groupids' => null,
-		'hostids' => null,
+		'hostids' => [
+			'with_proxy' => null,
+			'without_proxy_1' => null,
+			'without_proxy_2' => null
+		],
 		'actionids' => null,
 		'druleids' => null,
 
@@ -204,30 +208,7 @@ class testProxy extends CAPITest {
 		];
 		$proxies = CDataHelper::call('proxy.create', $proxies_data);
 		$this->assertArrayHasKey('proxyids', $proxies, __FUNCTION__.'() failed: Could not create proxies.');
-		self::$data['proxyids'] = [
-			'get_active_defaults' => $proxies['proxyids'][0],
-			'get_passive_defaults' => $proxies['proxyids'][1],
-			'get_version_undefined' => $proxies['proxyids'][2],
-			'get_version_current' => $proxies['proxyids'][3],
-			'get_version_outdated' => $proxies['proxyids'][4],
-			'get_version_unsupported' => $proxies['proxyids'][5],
-			'update_active_defaults' => $proxies['proxyids'][6],
-			'update_passive_defaults' => $proxies['proxyids'][7],
-			'update_active_psk' => $proxies['proxyids'][8],
-			'update_active_cert' => $proxies['proxyids'][9],
-			'update_active_any' => $proxies['proxyids'][10],
-			'update_passive_dns' => $proxies['proxyids'][11],
-			'update_passive_ip' => $proxies['proxyids'][12],
-			'update_passive_psk' => $proxies['proxyids'][13],
-			'update_passive_cert' => $proxies['proxyids'][14],
-			'update_hosts' => $proxies['proxyids'][15],
-			'delete_single' => $proxies['proxyids'][16],
-			'delete_multiple_1' => $proxies['proxyids'][17],
-			'delete_multiple_2' => $proxies['proxyids'][18],
-			'delete_host' => $proxies['proxyids'][19],
-			'delete_action' => $proxies['proxyids'][20],
-			'delete_discovery' => $proxies['proxyids'][21]
-		];
+		self::$data['proxyids'] = array_combine(array_keys(self::$data['proxyids']), $proxies['proxyids']);
 
 		// Manually update "host_rtdata" table.
 		$proxy_rtdata = [
@@ -249,16 +230,12 @@ class testProxy extends CAPITest {
 		];
 
 		$upd_proxy_rtdata = [];
-		foreach ($proxies['proxyids'] as $proxyid) {
-			if (!array_key_exists($proxyid, $proxy_rtdata)) {
-				continue;
-			}
-
+		foreach ($proxy_rtdata as $proxyid => $rtdata) {
 			$upd_proxy_rtdata[] = [
 				'values' => [
-					'lastaccess' => $proxy_rtdata[$proxyid]['lastaccess'],
-					'version' => $proxy_rtdata[$proxyid]['version'],
-					'compatibility' => $proxy_rtdata[$proxyid]['compatibility'],
+					'lastaccess' => $rtdata['lastaccess'],
+					'version' => $rtdata['version'],
+					'compatibility' => $rtdata['compatibility'],
 				],
 				'where' => ['hostid' => $proxyid]
 			];
@@ -278,7 +255,7 @@ class testProxy extends CAPITest {
 			[
 				'host' => 'api_test_host_with_proxy',
 				'name' => 'API test host - with proxy',
-				'proxy_hostid' => self::$data['proxyids']['delete_host'],
+				'proxy_hostid' => self::$data['proxyids']['delete_used_in_host'],
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids'][0]
@@ -306,11 +283,7 @@ class testProxy extends CAPITest {
 		];
 		$hosts = CDataHelper::call('host.create', $hosts_data);
 		$this->assertArrayHasKey('hostids', $hosts, __FUNCTION__.'() failed: Could not create hosts.');
-		self::$data['hostids'] = [
-			'api_test_host_with_proxy' => $hosts['hostids'][0],
-			'api_test_host_without_proxy_1' => $hosts['hostids'][1],
-			'api_test_host_without_proxy_2' => $hosts['hostids'][2]
-		];
+		self::$data['hostids'] = array_combine(array_keys(self::$data['hostids']), $hosts['hostids']);
 
 		// actions
 		$actions_data = [
@@ -322,7 +295,7 @@ class testProxy extends CAPITest {
 					[
 						'conditiontype' => CONDITION_TYPE_PROXY,
 						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => self::$data['proxyids']['delete_action']
+						'value' => self::$data['proxyids']['delete_used_in_action']
 					]
 				]
 			],
@@ -349,7 +322,7 @@ class testProxy extends CAPITest {
 		$drules_data = [
 			'name' => 'API test discovery rule',
 			'iprange' => '192.168.1.1-255',
-			'proxy_hostid' => self::$data['proxyids']['delete_discovery'],
+			'proxy_hostid' => self::$data['proxyids']['delete_used_in_discovery'],
 			'dchecks' => [
 				[
 					'type' => SVC_AGENT,
@@ -371,65 +344,84 @@ class testProxy extends CAPITest {
 	 */
 	public static function getProxyCreateDataInvalid(): array {
 		return [
-			'Test proxy.create missing fields' => [
+			'Test proxy.create: empty request' => [
 				'proxy' => [],
 				'expected_error' => 'Invalid parameter "/": cannot be empty.'
 			],
-			'Test proxy.create unexpected field' => [
+			'Test proxy.create: unexpected parameter' => [
 				'proxy' => [
 					'abc' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "abc".'
 			],
 
-			// Check host.
-			'Test proxy.create missing host' => [
+			// Check "host".
+			'Test proxy.create: missing "host"' => [
 				'proxy' => [
 					'description' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "host" is missing.'
 			],
-			'Test proxy.create invalid host (empty string)' => [
+			'Test proxy.create: invalid "host" (empty string)' => [
 				'proxy' => [
 					'host' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/host": cannot be empty.'
 			],
-			'Test proxy.create UTF-8 proxy host' => [
+			'Test proxy.create: invalid "host" (UTF-8 string)' => [
 				'proxy' => [
 					'host' => 'АПИ прокси УТФ-8'
 				],
 				'expected_error' => 'Invalid parameter "/1/host": invalid host name.'
 			],
-			'Test proxy.create invalid host (does not match naming pattern)' => [
+			'Test proxy.create: invalid "host" (does not match naming pattern)' => [
 				'proxy' => [
 					'host' => 'API create proxy?'
 				],
 				'expected_error' => 'Invalid parameter "/1/host": invalid host name.'
 			],
+			'Test proxy.create: invalid "host" (too long)' => [
+				'proxy' => [
+					'host' => str_repeat('h', DB::getFieldLength('hosts', 'host') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/host": value is too long.'
+			],
+			'Test proxy.create: multiple proxies with the same "host"' => [
+				'proxy' => [
+					[
+						'host' => 'API create proxy',
+						'status' => HOST_STATUS_PROXY_ACTIVE
+					],
+					[
+						'host' => 'API create proxy',
+						'status' => HOST_STATUS_PROXY_ACTIVE
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (host)=(API create proxy) already exists.'
+			],
+			'Test proxy.create: invalid "host" (duplicate)' => [
+				'proxy' => [
+					'host' => 'API test proxy.get - active',
+					'status' => HOST_STATUS_PROXY_ACTIVE
+				],
+				'expected_error' => 'Proxy "API test proxy.get - active" already exists.'
+			],
 
-			// Check status.
-			'Test proxy.create missing status' => [
+			// Check "status".
+			'Test proxy.create: missing "status"' => [
 				'proxy' => [
 					'host' => 'API create proxy'
 				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "status" is missing.'
 			],
-			'Test proxy.create invalid status (empty string)' => [
-				'proxy' => [
-					'host' => 'API create proxy',
-					'status' => ''
-				],
-				'expected_error' => 'Invalid parameter "/1/status": an integer is expected.'
-			],
-			'Test proxy.create invalid status (string)' => [
+			'Test proxy.create: invalid "status" (string)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
 					'status' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/status": an integer is expected.'
 			],
-			'Test proxy.create invalid status' => [
+			'Test proxy.create: invalid "status" (not in range)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
 					'status' => 999999
@@ -437,6 +429,269 @@ class testProxy extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/status": value must be one of '.
 					implode(', ', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]).'.'
 			],
+
+			// Check "description".
+			'Test proxy.create: invalid "description" (bool)' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'description' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/description": a character string is expected.'
+			],
+			'Test proxy.create: invalid "description" (too long)' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'description' => str_repeat('d', DB::getFieldLength('hosts', 'description') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/description": value is too long.'
+			],
+
+			// Check "proxy_address".
+			'Test proxy.create: invalid "proxy_address" (bool)' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'proxy_address' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/proxy_address": a character string is expected.'
+			],
+			'Test proxy.create: invalid "proxy_address" (IP address range)' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'proxy_address' => '192.168.0-255.0/30'
+				],
+				'expected_error' => 'Invalid parameter "/1/proxy_address": invalid address range "192.168.0-255.0/30".'
+			],
+			'Test proxy.create: invalid "proxy_address" (IPv6 address range)' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'proxy_address' => '::ff-0ffff'
+				],
+				'expected_error' => 'Invalid parameter "/1/proxy_address": invalid address range "::ff-0ffff".'
+			],
+			'Test proxy.create: invalid "proxy_address" (user macro)' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'proxy_address' => '{$MACRO}'
+				],
+				'expected_error' => 'Invalid parameter "/1/proxy_address": invalid address range "{$MACRO}".'
+			],
+			'Test proxy.create: invalid "proxy_address" (too long)' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'proxy_address' => str_repeat('a', DB::getFieldLength('hosts', 'proxy_address') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/proxy_address": value is too long.'
+			],
+
+			// Check "hosts".
+			'Test proxy.create: invalid "hosts" (string)' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'hosts' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/hosts": an array is expected.'
+			],
+			'Test proxy.create: invalid "hosts" (array with string)' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'hosts' => ['abc']
+				],
+				'expected_error' => 'Invalid parameter "/1/hosts/1": an array is expected.'
+			],
+			'Test proxy.create: missing "hostid" for "hosts"' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'hosts' => [
+						[]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/hosts/1": the parameter "hostid" is missing.'
+			],
+			'Test proxy.create: unexpected parameter for "hosts"' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'hosts' => [
+						['abc' => '']
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/hosts/1": unexpected parameter "abc".'
+			],
+			'Test proxy.create: invalid "hostid" (string) for "hosts"' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'hosts' => [
+						['hostid' => 'abc']
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/hosts/1/hostid": a number is expected.'
+			],
+			'Test proxy.create: invalid "hostid" (non-existent) for "hosts"' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'hosts' => [
+						['hostid' => 999999]
+					]
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			'Test proxy.create: invalid "hostid" (duplicate) for "hosts"' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'hosts' => [
+						['hostid' => 0],
+						['hostid' => 0]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/hosts/2": value (hostid)=(0) already exists.'
+			],
+
+			// Check "interface".
+			'Test proxy.create: invalid "interface" (string)' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'interface' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/interface": an array is expected.'
+			],
+			'Test proxy.create: unexpected parameter for "interface"' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'interface' => [
+						'abc' => ''
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/interface": unexpected parameter "abc".'
+			],
+			'Test proxy.create: invalid "useip" (string) for "interface"' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'interface' => [
+						'useip' => 'abc'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/interface/useip": an integer is expected.'
+			],
+			'Test proxy.create: invalid "useip" (not in range) for "interface"' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'interface' => [
+						'useip' => 999999
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/interface/useip": value must be one of '.
+					implode(', ', [INTERFACE_USE_DNS, INTERFACE_USE_IP]).'.'
+			],
+			'Test proxy.create: invalid "ip" (string) for "interface"' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'interface' => [
+						'ip' => 'abc'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/interface/ip": an IP address is expected.'
+			],
+			'Test proxy.create: invalid "ip" (too long) for "interface"' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'interface' => [
+						'ip' => str_repeat('i', DB::getFieldLength('interface', 'ip') + 1)
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/interface/ip": value is too long.'
+			],
+			'Test proxy.create: invalid "dns" (bool) for "interface"' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'interface' => [
+						'dns' => false
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/interface/dns": a character string is expected.'
+			],
+			'Test proxy.create: invalid "dns" (too long) for "interface"' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'interface' => [
+						'dns' => str_repeat('d', DB::getFieldLength('interface', 'dns') + 1)
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/interface/dns": value is too long.'
+			],
+			'Test proxy.create: invalid "port" (string) for "interface"' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'interface' => [
+						'port' => 'abc'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/interface/port": an integer is expected.'
+			],
+			'Test proxy.create: invalid "port" (not in range) for "interface"' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'interface' => [
+						'port' => 999999
+					]
+				],
+				'expected_error' =>
+					'Invalid parameter "/1/interface/port": value must be one of 0-'.ZBX_MAX_PORT_NUMBER.'.'
+			],
+			'Test proxy.create: invalid "tls_connect" (string)' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'tls_connect' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_connect": an integer is expected.'
+			],
+			'Test proxy.create: invalid "tls_connect" (not in range) for active proxy' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'tls_connect' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_connect": value must be '.HOST_ENCRYPTION_NONE.'.'
+			],
+			'Test proxy.create: invalid "tls_accept" (string)' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'tls_accept' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_accept": an integer is expected.'
+			],
+			'Test proxy.create: invalid "tls_accept" (not in range) for active proxy' => [
+				'proxy' => [
+					'host' => 'API create proxy',
+					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'tls_accept' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_accept": value must be one of 1-7.'
+			]
 
 			// TODO: add more test cases
 		];
@@ -449,14 +704,14 @@ class testProxy extends CAPITest {
 	 */
 	public static function getProxyCreateDataValid(): array {
 		return [
-			'Test proxy.create successful single proxy' => [
+			'Test proxy.create: single proxy' => [
 				'proxy' => [
 					'host' => 'API create single proxy',
 					'status' => HOST_STATUS_PROXY_ACTIVE
 				],
 				'expected_error' => null
 			],
-			'Test proxy.create successful multiple proxies' => [
+			'Test proxy.create: multiple proxies' => [
 				'proxy' => [
 					[
 						'host' => 'API create first proxy',
@@ -468,7 +723,7 @@ class testProxy extends CAPITest {
 					]
 				],
 				'expected_error' => null
-			],
+			]
 
 			// TODO: add more test cases
 		];
@@ -566,7 +821,7 @@ class testProxy extends CAPITest {
 	public static function getProxyGetDataInvalid(): array {
 		return [
 			// Check unexpected params.
-			'Test proxy.get unexpected field' => [
+			'Test proxy.get: unexpected parameter' => [
 				'request' => [
 					'abc' => 'abc'
 				],
@@ -575,14 +830,14 @@ class testProxy extends CAPITest {
 			],
 
 			// Check "proxyids" field.
-			'Test proxy.get invalid "proxyids" field (empty string)' => [
+			'Test proxy.get: invalid "proxyids" (empty string)' => [
 				'request' => [
 					'proxyids' => ''
 				],
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/proxyids": an array is expected.'
 			],
-			'Test proxy.get invalid "proxyids" field (array with empty string)' => [
+			'Test proxy.get: invalid "proxyids" (array with empty string)' => [
 				'request' => [
 					'proxyids' => ['']
 				],
@@ -591,7 +846,7 @@ class testProxy extends CAPITest {
 			],
 
 			// Check filter.
-			'Test proxy.get invalid filter (empty string)' => [
+			'Test proxy.get: invalid "filter" (empty string)' => [
 				'request' => [
 					'filter' => ''
 				],
@@ -600,7 +855,7 @@ class testProxy extends CAPITest {
 			],
 
 			// Check unexpected parameters that exist in object, but not in filter.
-			'Test proxy.get unexpected parameter in filter' => [
+			'Test proxy.get: unexpected parameter in "filter"' => [
 				'request' => [
 					'filter' => [
 						'proxy_address' => 'proxy_address'
@@ -610,7 +865,7 @@ class testProxy extends CAPITest {
 				'expected_error' => 'Invalid parameter "/filter": unexpected parameter "proxy_address".'
 			],
 
-			'Test proxy.get invalid status (string) in filter' => [
+			'Test proxy.get: invalid "status" (string) in "filter"' => [
 				'request' => [
 					'filter' => [
 						'status' => 'abc'
@@ -619,7 +874,7 @@ class testProxy extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/filter/status": an array is expected.'
 			],
-			'Test proxy.get invalid status in filter' => [
+			'Test proxy.get: invalid "status" in "filter"' => [
 				'request' => [
 					'filter' => [
 						'status' => 999999
@@ -629,7 +884,7 @@ class testProxy extends CAPITest {
 				'expected_error' => 'Invalid parameter "/filter/status/1": value must be one of '.
 					implode(', ', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]).'.'
 			],
-			'Test proxy.get invalid lastaccess (string) in filter' => [
+			'Test proxy.get: invalid "lastaccess" (string) in "filter"' => [
 				'request' => [
 					'filter' => [
 						'lastaccess' => 'abc'
@@ -638,7 +893,7 @@ class testProxy extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/filter/lastaccess": an array is expected.'
 			],
-			'Test proxy.get invalid lastaccess in filter' => [
+			'Test proxy.get: invalid "lastaccess" (array with string) in "filter"' => [
 				'request' => [
 					'filter' => [
 						'lastaccess' => ['abc']
@@ -647,7 +902,7 @@ class testProxy extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/filter/lastaccess/1": an integer is expected.'
 			],
-			'Test proxy.get invalid lastaccess (out of range) in filter' => [
+			'Test proxy.get: invalid "lastaccess" (not in range) in "filter"' => [
 				'request' => [
 					'filter' => [
 						'lastaccess' => [-1]
@@ -656,7 +911,7 @@ class testProxy extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/filter/lastaccess/1": value must be one of 0-'.ZBX_MAX_DATE.'.'
 			],
-			'Test proxy.get invalid lastaccess (too large) in filter' => [
+			'Test proxy.get: invalid "lastaccess" (too large) in "filter"' => [
 				'request' => [
 					'filter' => [
 						'lastaccess' => [ZBX_MAX_DATE + 1]
@@ -665,7 +920,7 @@ class testProxy extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/filter/lastaccess/1": a number is too large.'
 			],
-			'Test proxy.get invalid compatibility (string) in filter' => [
+			'Test proxy.get: invalid "compatibility" (string) for "filter"' => [
 				'request' => [
 					'filter' => [
 						'compatibility' => 'abc'
@@ -674,7 +929,7 @@ class testProxy extends CAPITest {
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/filter/compatibility": an array is expected.'
 			],
-			'Test proxy.get invalid compatibility in filter' => [
+			'Test proxy.get: invalid "compatibility" (not in range) for "filter"' => [
 				'request' => [
 					'filter' => [
 						'compatibility' => 999999
@@ -689,7 +944,7 @@ class testProxy extends CAPITest {
 			],
 
 			// Check "search" option.
-			'Test proxy.get invalid search (string)' => [
+			'Test proxy.get: invalid "search" (string)' => [
 				'request' => [
 					'search' => 'abc'
 				],
@@ -698,7 +953,7 @@ class testProxy extends CAPITest {
 			],
 
 			// Check unexpected parameters that exist in object, but not in search.
-			'Test proxy.get unexpected parameter in search' => [
+			'Test proxy.get: unexpected parameter in "search"' => [
 				'request' => [
 					'search' => [
 						'proxyid' => 'proxyid'
@@ -709,14 +964,14 @@ class testProxy extends CAPITest {
 			],
 
 			// Check "output" option.
-			'Test proxy.get invalid parameter "output" (string)' => [
+			'Test proxy.get: invalid parameter "output" (string)' => [
 				'request' => [
 					'output' => 'abc'
 				],
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/output": value must be "'.API_OUTPUT_EXTEND.'".'
 			],
-			'Test proxy.get invalid parameter "output"' => [
+			'Test proxy.get: invalid parameter "output" (array with string)' => [
 				'request' => [
 					'output' => ['abc']
 				],
@@ -725,14 +980,14 @@ class testProxy extends CAPITest {
 			],
 
 			// Check write-only fields are not returned.
-			'Test proxy.get write-only field "tls_psk_identity"' => [
+			'Test proxy.get: write-only field "tls_psk_identity"' => [
 				'request' => [
 					'output' => ['tls_psk_identity']
 				],
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "host", "status", "description", "lastaccess", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "proxy_address", "auto_compress", "version", "compatibility".'
 			],
-			'Test proxy.get write-only field "tls_psk"' => [
+			'Test proxy.get: write-only field "tls_psk"' => [
 				'request' => [
 					'output' => ['tls_psk']
 				],
@@ -741,14 +996,14 @@ class testProxy extends CAPITest {
 			],
 
 			// Check "selectHosts" option.
-			'Test proxy.get invalid parameter "selectHosts" (string)' => [
+			'Test proxy.get: invalid parameter "selectHosts" (string)' => [
 				'request' => [
 					'selectHosts' => 'abc'
 				],
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/selectHosts": value must be "'.API_OUTPUT_EXTEND.'".'
 			],
-			'Test proxy.get invalid parameter "selectHosts"' => [
+			'Test proxy.get: invalid parameter "selectHosts" (array with string)' => [
 				'request' => [
 					'selectHosts' => ['abc']
 				],
@@ -757,14 +1012,14 @@ class testProxy extends CAPITest {
 			],
 
 			// Check "selectInterface" option.
-			'Test proxy.get invalid parameter "selectInterface" (string)' => [
+			'Test proxy.get: invalid parameter "selectInterface" (string)' => [
 				'request' => [
 					'selectInterface' => 'abc'
 				],
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/selectInterface": value must be "'.API_OUTPUT_EXTEND.'".'
 			],
-			'Test proxy.get invalid parameter "selectInterface"' => [
+			'Test proxy.get: invalid parameter "selectInterface" (array with string)' => [
 				'request' => [
 					'selectInterface' => ['abc']
 				],
@@ -773,42 +1028,42 @@ class testProxy extends CAPITest {
 			],
 
 			// Check common fields that are not flags, but require strict validation.
-			'Test proxy.get invalid parameter "searchByAny" (string)' => [
+			'Test proxy.get: invalid parameter "searchByAny" (string)' => [
 				'request' => [
 					'searchByAny' => 'abc'
 				],
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/searchByAny": a boolean is expected.'
 			],
-			'Test proxy.get invalid parameter "searchWildcardsEnabled" (string)' => [
+			'Test proxy.get: invalid parameter "searchWildcardsEnabled" (string)' => [
 				'request' => [
 					'searchWildcardsEnabled' => 'abc'
 				],
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/searchWildcardsEnabled": a boolean is expected.'
 			],
-			'Test proxy.get invalid parameter "sortfield" (bool)' => [
+			'Test proxy.get: invalid parameter "sortfield" (bool)' => [
 				'request' => [
 					'sortfield' => false
 				],
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/sortfield": an array is expected.'
 			],
-			'Test proxy.get invalid parameter "sortfield"' => [
+			'Test proxy.get: invalid parameter "sortfield"' => [
 				'request' => [
 					'sortfield' => 'abc'
 				],
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/sortfield/1": value must be one of "hostid", "host", "status".'
 			],
-			'Test proxy.get invalid parameter "sortorder" (bool)' => [
+			'Test proxy.get: invalid parameter "sortorder" (bool)' => [
 				'request' => [
 					'sortorder' => false
 				],
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/sortorder": an array or a character string is expected.'
 			],
-			'Test proxy.get invalid parameter "sortorder"' => [
+			'Test proxy.get: invalid parameter "sortorder" (not in range)' => [
 				'request' => [
 					'sortorder' => 'abc'
 				],
@@ -816,21 +1071,21 @@ class testProxy extends CAPITest {
 				'expected_error' =>
 					'Invalid parameter "/sortorder": value must be one of "'.ZBX_SORT_UP.'", "'.ZBX_SORT_DOWN.'".'
 			],
-			'Test proxy.get invalid parameter "limit" (bool)' => [
+			'Test proxy.get: invalid parameter "limit" (bool)' => [
 				'request' => [
 					'limit' => false
 				],
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/limit": an integer is expected.'
 			],
-			'Test proxy.get invalid parameter "editable" (string)' => [
+			'Test proxy.get: invalid parameter "editable" (string)' => [
 				'request' => [
 					'editable' => 'abc'
 				],
 				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/editable": a boolean is expected.'
 			],
-			'Test proxy.get invalid parameter "preservekeys" (string)' => [
+			'Test proxy.get: invalid parameter "preservekeys" (string)' => [
 				'request' => [
 					'preservekeys' => 'abc'
 				],
@@ -848,7 +1103,7 @@ class testProxy extends CAPITest {
 	public static function getProxyGetDataValid(): array {
 		return [
 			// Check validity of "proxyids" without getting any results.
-			'Test proxy.get empty "proxyids" parameter' => [
+			'Test proxy.get: empty "proxyids"' => [
 				'request' => [
 					'proxyids' => []
 				],
@@ -857,7 +1112,7 @@ class testProxy extends CAPITest {
 			],
 
 			// Check no fields are returned on empty selection.
-			'Test proxy.get empty output' => [
+			'Test proxy.get: empty "output"' => [
 				'request' => [
 					'output' => [],
 					'proxyids' => ['get_active_defaults', 'get_passive_defaults']
@@ -870,7 +1125,7 @@ class testProxy extends CAPITest {
 			],
 
 			// Check fields from "host_rtdata" table are returned.
-			'Test proxy.get "lastaccess", "version", "compatibility"' => [
+			'Test proxy.get: "lastaccess", "version", "compatibility"' => [
 				'request' => [
 					'output' => ['lastaccess', 'version', 'compatibility'],
 					'proxyids' => ['get_version_current', 'get_version_outdated', 'get_version_unsupported']
@@ -896,7 +1151,7 @@ class testProxy extends CAPITest {
 			],
 
 			// Filter by proxy mode.
-			'Test proxy.get filter by "status"' => [
+			'Test proxy.get: filter by "status"' => [
 				'request' => [
 					'output' => ['host', 'status'],
 					'proxyids' => ['get_active_defaults', 'get_passive_defaults'],
@@ -914,7 +1169,7 @@ class testProxy extends CAPITest {
 			],
 
 			// Filter by Zabbix version.
-			'Test proxy.get filter by "version"' => [
+			'Test proxy.get: filter by "version"' => [
 				'request' => [
 					'output' => ['host', 'version'],
 					'proxyids' => ['get_version_current', 'get_version_outdated', 'get_version_unsupported'],
@@ -936,7 +1191,7 @@ class testProxy extends CAPITest {
 			],
 
 			// Filter by version compatibility.
-			'Test proxy.get filter by "compatibility"' => [
+			'Test proxy.get: filter by "compatibility"' => [
 				'request' => [
 					'output' => ['host', 'compatibility'],
 					'proxyids' => ['get_version_current', 'get_version_outdated', 'get_version_unsupported'],
@@ -958,7 +1213,7 @@ class testProxy extends CAPITest {
 			],
 
 			// Search by proxy name.
-			'Test proxy.get search by "host"' => [
+			'Test proxy.get: search by "host"' => [
 				'request' => [
 					'output' => ['host'],
 					'search' => [
@@ -1002,31 +1257,109 @@ class testProxy extends CAPITest {
 	 */
 	public static function getProxyUpdateDataInvalid(): array {
 		return [
-			// Check proxy ID.
-			'Test proxy.update empty request' => [
+			'Test proxy.update: empty request' => [
 				'proxy' => [],
 				'expected_error' => 'Invalid parameter "/": cannot be empty.'
 			],
-			'Test proxy.update missing ID' => [
-				'proxy' => [[
-					'host' => 'API updated proxy'
-				]],
+
+			// Check "proxyid".
+			'Test proxy.update: missing "proxyid"' => [
+				'proxy' => [
+					'host' => 'API update proxy'
+				],
 				'expected_error' => 'Invalid parameter "/1": the parameter "proxyid" is missing.'
 			],
-			'Test proxy.update empty ID' => [
-				'proxy' => [[
-					'proxyid' => '',
-					'host' => 'API updated proxy'
-				]],
+			'Test proxy.update: invalid "proxyid" (empty string)' => [
+				'proxy' => [
+					'proxyid' => ''
+				],
 				'expected_error' => 'Invalid parameter "/1/proxyid": a number is expected.'
 			],
-			'Test proxy.update invalid ID (non-existent)' => [
-				'proxy' => [[
-					'proxyid' => 999999,
-					'host' => 'API updated proxy'
-				]],
+			'Test proxy.update: invalid "proxyid" (non-existent)' => [
+				'proxy' => [
+					'proxyid' => 999999
+				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
+			'Test proxy.update: multiple proxies with the same "proxyid"' => [
+				'proxy' => [
+					['proxyid' => 0],
+					['proxyid' => 0]
+				],
+				'expected_error' => 'Invalid parameter "/2": value (proxyid)=(0) already exists.'
+			],
+
+			// Check "status".
+			'Test proxy.update: invalid "status" (string)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'status' => 'abc'
+				],
+				'expected_error' => 'Invalid parameter "/1/status": an integer is expected.'
+			],
+			'Test proxy.update: invalid "status" (not in range)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'status' => 999999
+				],
+				'expected_error' => 'Invalid parameter "/1/status": value must be one of '.
+					implode(', ', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]).'.'
+			],
+
+			// Check "host".
+			'Test proxy.update: invalid "host" (bool)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'host' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/host": a character string is expected.'
+			],
+			'Test proxy.update: invalid "host" (empty string)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'host' => ''
+				],
+				'expected_error' => 'Invalid parameter "/1/host": cannot be empty.'
+			],
+			'Test proxy.update: invalid "host" (too long)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'host' => str_repeat('d', DB::getFieldLength('hosts', 'host') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/host": value is too long.'
+			],
+
+			// Check "description".
+			'Test proxy.update: invalid "description" (bool)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'description' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/description": a character string is expected.'
+			],
+			'Test proxy.update: invalid "description" (too long)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'description' => str_repeat('d', DB::getFieldLength('hosts', 'description') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/description": value is too long.'
+			],
+
+			// Check "proxy_address".
+			'Test proxy.update: invalid "proxy_address" (bool)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'proxy_address' => false
+				],
+				'expected_error' => 'Invalid parameter "/1/proxy_address": a character string is expected.'
+			],
+			'Test proxy.update: invalid "proxy_address" (too long)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'proxy_address' => str_repeat('a', DB::getFieldLength('hosts', 'proxy_address') + 1)
+				],
+				'expected_error' => 'Invalid parameter "/1/proxy_address": value is too long.'
+			]
 
 			// TODO: add more test cases
 		];
@@ -1039,53 +1372,47 @@ class testProxy extends CAPITest {
 	 */
 	public static function getProxyUpdateDataValid(): array {
 		return [
-			'Test proxy.update successful single proxy update without changes' => [
+			'Test proxy.update: update single proxy without changes' => [
 				'proxy' => [
-					[
-						'proxyid' => 'update_active_defaults'
-					]
+					'proxyid' => 'update_active_defaults'
 				],
 				'expected_error' => null
 			],
-			'Test proxy.update successful multiple proxies update' => [
+			'Test proxy.update: update multiple proxies' => [
 				'proxy' => [
 					[
 						'proxyid' => 'update_active_defaults',
-						'name' => 'API test proxy.update - active proxy updated',
+						'host' => 'API test proxy.update - active proxy updated',
 						'description' => 'Active proxy'
 					],
 					[
 						'proxyid' => 'update_passive_defaults',
-						'name' => 'API test proxy.update - passive proxy updated',
+						'host' => 'API test proxy.update - passive proxy updated',
 						'description' => 'Passive proxy'
 					],
 				],
 				'expected_error' => null
 			],
 
-			'Test proxy.update successful proxy assign to single host' => [
+			'Test proxy.update: assign proxy to single host' => [
 				'proxy' => [
-					[
-						'proxyid' => 'update_hosts',
-						'hosts' => [
-							['hostid' => 'api_test_host_without_proxy_1']
-						]
+					'proxyid' => 'update_hosts',
+					'hosts' => [
+						['hostid' => 'without_proxy_1']
 					]
 				],
 				'expected_error' => null
 			],
-			'Test proxy.update successful proxy assign to multiple hosts' => [
+			'Test proxy.update: assign proxy to multiple hosts' => [
 				'proxy' => [
-					[
-						'proxyid' => 'update_hosts',
-						'hosts' => [
-							['hostid' => 'api_test_host_without_proxy_1'],
-							['hostid' => 'api_test_host_without_proxy_2']
-						]
+					'proxyid' => 'update_hosts',
+					'hosts' => [
+						['hostid' => 'without_proxy_1'],
+						['hostid' => 'without_proxy_2']
 					]
 				],
 				'expected_error' => null
-			],
+			]
 
 			// TODO: add more test cases
 		];
@@ -1160,34 +1487,36 @@ class testProxy extends CAPITest {
 	public static function getProxyDeleteDataInvalid(): array {
 		return [
 			// Check proxy IDs.
-			'Test proxy.delete with empty ID' => [
+			'Test proxy.delete: empty ID' => [
 				'proxyids' => [''],
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
-			'Test proxy.delete with non-existent ID' => [
+			'Test proxy.delete: non-existent ID' => [
 				'proxyids' => [999999],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			'Test proxy.delete with two same IDs' => [
+			'Test proxy.delete: with two same IDs' => [
 				'proxyids' => [0, 0],
 				'expected_error' => 'Invalid parameter "/2": value (0) already exists.'
 			],
 
 			// Check if deleted proxies used to monitor hosts.
-			'Test proxy.delete with attached host' => [
-				'proxyids' => ['delete_host'],
-				'expected_error' => 'Host "API test host - with proxy" is monitored by proxy "API test proxy.delete - used in hosts".'
+			'Test proxy.delete: used in host' => [
+				'proxyids' => ['delete_used_in_host'],
+				'expected_error' =>
+					'Host "API test host - with proxy" is monitored by proxy "API test proxy.delete - used in hosts".'
 			],
 
 			// Check if deleted proxies used in actions.
-			'Test proxy.delete with attached action' => [
-				'proxyids' => ['delete_action'],
-				'expected_error' => 'Proxy "API test proxy.delete - used in actions" is used by action "API test discovery action".'
+			'Test proxy.delete: used in action' => [
+				'proxyids' => ['delete_used_in_action'],
+				'expected_error' =>
+					'Proxy "API test proxy.delete - used in actions" is used by action "API test discovery action".'
 			],
 
 			// Check if deleted proxies used in network discovery rules.
-			'Test proxy.delete with attached discovery rule' => [
-				'proxyids' => ['delete_discovery'],
+			'Test proxy.delete: used in discovery rule' => [
+				'proxyids' => ['delete_used_in_discovery'],
 				'expected_error' => 'Proxy "API test proxy.delete - used in discovery rules" is used by discovery rule "API test discovery rule".'
 			]
 		];
@@ -1200,11 +1529,11 @@ class testProxy extends CAPITest {
 	 */
 	public static function getProxyDeleteDataValid(): array {
 		return [
-			'Test proxy.delete' => [
+			'Test proxy.delete: delete single' => [
 				'proxy' => ['delete_single'],
 				'expected_error' => null
 			],
-			'Test proxy.delete (multiple)' => [
+			'Test proxy.delete: delete multiple' => [
 				'proxy' => [
 					'delete_multiple_1',
 					'delete_multiple_2'
