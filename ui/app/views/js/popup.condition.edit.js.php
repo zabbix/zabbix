@@ -95,6 +95,7 @@ window.condition_popup = new class {
 				}
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
+				document.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
 				this.dialogue.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
 			})
 			.catch((exception) => {

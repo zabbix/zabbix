@@ -29,7 +29,12 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 			'type' =>			'required|in '.ZBX_POPUP_CONDITION_TYPE_EVENT_CORR,
 			'validate' =>		'in 1',
 			'condition_type' =>	'in '.implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE]),
-			'operator' =>		'in '.implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])
+			'operator' =>		'in '.implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]),
+			'tag' => 'string',
+			'oldtag' => 'string',
+			'newtag' => 'string',
+			'value' => 'string',
+			'groupids' => 'array_id'
 		];
 	}
 
@@ -49,11 +54,11 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 		$is_valid = $validator->validate([
 			'type' => $this->getInput('condition_type'),
 			'operator' => $this->getInput('operator'),
-			'tag' => getRequest('tag'),
-			'oldtag' => getRequest('oldtag'),
-			'newtag' => getRequest('newtag'),
-			'value' => getRequest('value'),
-			'groupids' => getRequest('groupids')
+			'tag' =>  $this->hasInput('tag')? $this->getInput('tag') : '',
+			'oldtag' =>  $this->hasInput('oldtag')? $this->getInput('oldtag') : '',
+			'newtag' =>  $this->hasInput('newtag')? $this->getInput('newtag') : '',
+			'value' =>  $this->hasInput('value')? $this->getInput('value') : '',
+			'groupids' =>  $this->hasInput('groupids')? $this->getInput('groupids') : ''
 		]);
 
 		if (!$is_valid) {
@@ -73,13 +78,27 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 			'inputs' => [
 				'type' => $this->getInput('condition_type'),
 				'operator' => $this->getInput('operator'),
-				'tag' => getRequest('tag'),
-				'groupids' => getRequest('groupids'),
-				'oldtag' => getRequest('oldtag'),
-				'newtag' => getRequest('newtag'),
-				'value' => getRequest('value')
+				'tag' =>  $this->hasInput('tag')? $this->getInput('tag') : '',
+				'oldtag' =>  $this->hasInput('oldtag')? $this->getInput('oldtag') : '',
+				'newtag' =>  $this->hasInput('newtag')? $this->getInput('newtag') : '',
+				'value' =>  $this->hasInput('value')? $this->getInput('value') : '',
+				'groupids' =>  $this->hasInput('groupids')? $this->getInput('groupids') : '',
+				'operator_name' => $this->getLabelByOperator()
 			]
 		];
+	}
+
+	protected function getLabelByOperator(int $operator = null): array {
+		$operators = [
+			CONDITION_OPERATOR_EQUAL => _('equals'),
+			CONDITION_OPERATOR_NOT_EQUAL => _('does not equal'),
+			CONDITION_OPERATOR_LIKE => _('contains'),
+			CONDITION_OPERATOR_NOT_LIKE => _('does not contain')
+		];
+
+		return $operator !== null
+			? $operators[$operator]
+			: $operators;
 	}
 
 	protected function getControllerResponseData() {
