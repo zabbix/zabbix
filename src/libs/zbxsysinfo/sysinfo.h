@@ -85,13 +85,6 @@ typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 typedef struct
 {
-	const char	*mode;
-	int		(*function)(const char *devname, AGENT_RESULT *result);
-}
-MODE_FUNCTION;
-
-typedef struct
-{
 	zbx_uint64_t	total;
 	zbx_uint64_t	not_used;
 	zbx_uint64_t	used;
