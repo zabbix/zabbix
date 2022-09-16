@@ -966,6 +966,16 @@ class CApiService {
 					}
 					break;
 
+				case DB::FIELD_TYPE_FLOAT:
+					foreach ((array) $value as $val) {
+						if (!is_numeric($val)) {
+							continue;
+						}
+
+						$values[] = $val;
+					}
+					break;
+
 				default:
 					$values = (array) $value;
 			}
