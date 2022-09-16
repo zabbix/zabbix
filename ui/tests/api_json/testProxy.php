@@ -1185,7 +1185,7 @@ class testProxy extends CAPITest {
 					[
 						'host' => 'API test proxy.get for filter - version outdated',
 						'version' => '60200'
-					],
+					]
 				],
 				'expected_error' => null
 			],
