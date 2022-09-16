@@ -26,6 +26,7 @@
 #include "log.h"
 #include "zbxcommshigh.h"
 #include "zbxcompress.h"
+#include "zbxcrypto.h"
 
 extern char	*CONFIG_VAULTDBPATH;
 extern int	CONFIG_TRAPPER_TIMEOUT;
@@ -1025,9 +1026,11 @@ int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_re
 		char **error)
 {
 	int			ret = FAIL;
-	char			token[ZBX_SESSION_TOKEN_LEN + 1], tmp[ZBX_MAX_UINT64_LEN + 1];
+	char			*token, tmp[ZBX_MAX_UINT64_LEN + 1];
 	zbx_uint64_t		proxy_config_revision;
 	zbx_dc_revision_t	dc_revision;
+
+	token = (char *)zbx_malloc(NULL, zbx_get_token_len() + 1);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxy_hostid:" ZBX_FS_UI64, __func__, proxy->hostid);
 
@@ -1074,6 +1077,8 @@ int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_re
 	else
 		ret = SUCCEED;
 out:
+	zbx_free(token);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

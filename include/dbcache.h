@@ -993,8 +993,6 @@ void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, 
 
 /* data session support */
 
-#define ZBX_SESSION_TOKEN_LEN	(16 * 2)	/* ZBX_MD5_DIGEST_SIZE * 2 */
-
 typedef struct
 {
 	zbx_uint64_t	hostid;
