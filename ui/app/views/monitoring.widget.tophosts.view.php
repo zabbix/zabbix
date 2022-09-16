@@ -24,6 +24,8 @@
  * @var array $data
  */
 
+use Widgets\Fields\CWidgetFieldColumnsList;
+
 $header = [];
 
 foreach ($data['configuration'] as $column_config) {

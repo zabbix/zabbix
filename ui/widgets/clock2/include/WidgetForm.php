@@ -18,22 +18,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 namespace Modules\Clock;
 
-use Widgets\CWidgetForm;
-
-
-//use Widgets\Fields as Field;
-
-
-//use Widgets\Fields\CWidgetFieldCheckBox;
-
-
-use Widgets\Fields\ {
-	CWidgetFieldSelect,
-	CWidgetFieldSelect
+use Widgets\{
+	CWidgetField,
+	CWidgetForm
 };
 
+use Widgets\Fields\{
+	CWidgetFieldCheckBox,
+	CWidgetFieldCheckBoxList,
+	CWidgetFieldColor,
+	CWidgetFieldIntegerBox,
+	CWidgetFieldMultiSelectItem,
+	CWidgetFieldRadioButtonList,
+	CWidgetFieldSelect,
+	CWidgetFieldTimeZone
+};
 
 /**
  * Clock widget form.
@@ -65,19 +67,19 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(TIME_TYPE_LOCAL)
 			)
 			->addField($time_type == TIME_TYPE_HOST
-				? (new \CWidgetFieldMultiSelectItem('itemid', _('Item'), $this->templateid))
+				? (new CWidgetFieldMultiSelectItem('itemid', _('Item'), $this->templateid))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
 				: null
 			)
 			->addField(
-				(new CRadioButtonList('clock_type', _('Clock type'), [
+				(new CWidgetFieldRadioButtonList('clock_type', _('Clock type'), [
 					WIDGET_CLOCK_TYPE_ANALOG => _('Analog'),
 					WIDGET_CLOCK_TYPE_DIGITAL => _('Digital')
 				]))->setDefault(WIDGET_CLOCK_TYPE_ANALOG)
 			)
 			->addField(
-				(new Field\CWidgetFieldCheckBoxList('show', _('Show'), [
+				(new CWidgetFieldCheckBoxList('show', _('Show'), [
 					WIDGET_CLOCK_SHOW_DATE => _('Date'),
 					WIDGET_CLOCK_SHOW_TIME => _('Time'),
 					WIDGET_CLOCK_SHOW_TIMEZONE => _('Time zone')
@@ -86,7 +88,7 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
-				new \CWidgetFieldCheckBox('adv_conf', _('Advanced configuration'))
+				new CWidgetFieldCheckBox('adv_conf', _('Advanced configuration'))
 			)
 			->addField(
 				(new CWidgetFieldColor('bg_color', _('Background color')))->allowInherited()

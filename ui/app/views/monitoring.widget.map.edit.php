@@ -26,6 +26,8 @@
  * @var array $data
  */
 
+use Widgets\Fields\CWidgetFieldReference;
+
 (new CWidgetFormView($data))
 	->addFieldVar($data['fields'][CWidgetFieldReference::FIELD_NAME])
 	->addField(

@@ -26,6 +26,11 @@
  * @var array $data
  */
 
+use Widgets\Fields\{
+	CWidgetFieldColumnsList,
+	CWidgetFieldSelect
+};
+
 $form = (new CWidgetFormView($data));
 
 $form

@@ -24,6 +24,8 @@
  * @var array $data
  */
 
+use Widgets\Fields\CWidgetFieldColumnsList;
+
 $form = (new CForm())
 	->setName('tophosts_column')
 	->addStyle('display: none;')

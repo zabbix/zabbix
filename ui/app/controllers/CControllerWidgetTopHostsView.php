@@ -19,6 +19,8 @@
 **/
 
 
+use Widgets\Fields\CWidgetFieldColumnsList;
+
 class CControllerWidgetTopHostsView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
