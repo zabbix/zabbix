@@ -8403,6 +8403,48 @@ static char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_t *cq_values,
 
 	return buff;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set CURL headers for soap request                                 *
+ *                                                                            *
+ * Parameters: easyhandle - [IN] prepared cURL connection handle              *
+ *             vc_version - [IN] major version of vc                          *
+ *             headers    - [IN/OUT] the CURL headers                         *
+ *             error      - [OUT] the error message in the case of failure    *
+ *                                                                            *
+ * Return value: SUCCEED - the headers were set successfully                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_slist **headers, char **error)
+{
+	char		soapver[MAX_STRING_LEN / 32];
+	CURLoption	opt;
+	CURLcode	err;
+
+	if (0 != vc_version && 6 > vc_version)
+		return SUCCEED;
+	else if (6 > vc_version)
+		zbx_strlcpy(soapver, ZBX_XML_HEADER1_V4, sizeof(soapver));
+	else
+		zbx_strlcpy(soapver, ZBX_XML_HEADER1_V6, sizeof(soapver));
+
+	curl_slist_free_all(*headers);
+	*headers = NULL;
+	*headers = curl_slist_append(*headers, soapver);
+	*headers = curl_slist_append(*headers, ZBX_XML_HEADER2);
+	*headers = curl_slist_append(*headers, ZBX_XML_HEADER3);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, *headers)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: updates object with a new data from vmware service                *
@@ -8413,8 +8455,6 @@ static char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_t *cq_values,
 int	zbx_vmware_service_update(zbx_vmware_service_t *service)
 {
 	CURL			*easyhandle = NULL;
-	CURLoption		opt;
-	CURLcode		err;
 	struct curl_slist	*headers = NULL;
 	zbx_vmware_data_t	*data;
 	zbx_vector_str_t	hvs, dss;
@@ -8425,7 +8465,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service)
 	ZBX_HTTPPAGE		page;	/* 347K/87K */
 	unsigned char		evt_pause = 0, evt_skip_old;
 	zbx_uint64_t		evt_last_key, events_sz = 0;
-	char			msg[MAX_STRING_LEN / 8], soapver[MAX_STRING_LEN / 32];
+	char			msg[MAX_STRING_LEN / 8];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
 
@@ -8459,11 +8499,6 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service)
 
 	zbx_vector_cq_value_sort(&prop_query_values, vmware_cq_instance_id_compare);
 
-	if (6 > service->major_version)
-		zbx_strlcpy(soapver, ZBX_XML_HEADER1_V4, sizeof(soapver));
-	else
-		zbx_strlcpy(soapver, ZBX_XML_HEADER1_V6, sizeof(soapver));
-
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot initialize cURL library");
@@ -8472,20 +8507,17 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service)
 
 	page.alloc = ZBX_INIT_UPD_XML_SIZE;
 	page.data = (char *)zbx_malloc(NULL, page.alloc);
-	headers = curl_slist_append(headers, soapver);
-	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
-	headers = curl_slist_append(headers, ZBX_XML_HEADER3);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+	if (SUCCEED != vmware_curl_set_header(easyhandle, service->major_version, &headers, &data->error))
 		goto clean;
-	}
 
 	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, &data->error))
 		goto clean;
 
 	if (SUCCEED != vmware_service_initialize(service, easyhandle, &data->error))
+		goto clean;
+
+	if (SUCCEED != vmware_curl_set_header(easyhandle, service->major_version, &headers, &data->error))
 		goto clean;
 
 	if (NULL != service->data && 0 != service->data->events.values_num && 0 == evt_skip_old &&
