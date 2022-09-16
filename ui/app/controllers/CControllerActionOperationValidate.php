@@ -206,6 +206,22 @@ class CControllerActionOperationValidate extends CController {
 	}
 
 	protected function doAction() {
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode([])]));
+		$operation = $this->getInput('operation');
+
+		// todo: add all data and pass correct fields for operation table based on operation recovery type
+		$data['operation'] = [
+			'eventsource' => $operation['eventsource'],
+			'recovery' => $operation['recovery'],
+			'operationtype' => $operation['operationtype'],
+			'esc_step_from' => $operation['esc_step_from'],
+			'esc_step_to' => $operation['esc_step_to'],
+			'esc_period' => $operation['esc_period'],
+			'operation-message-mediatype-only' => $operation['operation-message-mediatype-only'],
+			'opmessage_grp' => $operation['opmessage_grp'],
+		];
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data, JSON_THROW_ON_ERROR)]));
+
+		//$this->setResponse(new CControllerResponseData(['main_block' => json_encode([])]));
 	}
 }

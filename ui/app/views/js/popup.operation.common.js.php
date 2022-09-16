@@ -245,8 +245,11 @@ window.operation_popup = new class {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
-
 				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				console.log(response);
+				// todo : change data to response :
+
 				this.dialogue.dispatchEvent(new CustomEvent('operation.submit', {detail: data}));
 			})
 			.then(success_callback)

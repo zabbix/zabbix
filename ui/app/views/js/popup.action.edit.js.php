@@ -140,7 +140,6 @@ window.action_edit_popup = new class {
 			operation_input.setAttribute('value', value);
 			form.appendChild(operation_input);
 		}
-		// todo : add check, if these fields exist
 
 		if (input.detail.operation.opmessage_grp !== undefined) {
 			for (const [index, value] of Object.entries(input.detail.operation.opmessage_grp)) {
