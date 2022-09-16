@@ -82,7 +82,7 @@ window.popup_generic = {
 				const hosts = jQuery(this).multiSelect('getData').map((item) => item.id);
 				const parameters = hosts.length
 					? {hostid: hosts[0]}
-					: {filter_hostid_rst: 1, host: undefined, hostid: undefined, host_pattern_wildcard: undefined};
+					: {filter_hostid_rst: 1, host: undefined, hostid: undefined, host_pattern: undefined};
 
 				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
 					dialogueid: e.data.overlay.dialogueid
