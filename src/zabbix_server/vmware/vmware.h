@@ -323,7 +323,6 @@ typedef struct
 	char			*id;
 	char			*name;
 	char			*status;
-	char			*vsan_uuid;
 	zbx_vector_str_t	dss_uuid;
 	zbx_vector_str_t	alarm_ids;
 }
@@ -615,9 +614,8 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t 
 #define ZBX_VMWARE_HVPROP_CONNECTIONSTATE		20
 #define ZBX_VMWARE_HVPROP_HW_SERIALNUMBER		21
 #define ZBX_VMWARE_HVPROP_HW_SENSOR			22
-#define ZBX_VMWARE_HVPROP_VSAN_UUID			23
 
-#define ZBX_VMWARE_HVPROPS_NUM				24
+#define ZBX_VMWARE_HVPROPS_NUM				23
 
 /* virtual machine properties */
 #define ZBX_VMWARE_VMPROP_CPU_NUM			0

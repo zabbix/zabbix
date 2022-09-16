@@ -805,7 +805,6 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 		zbx_json_addarray(&json_data, "tags");
 		vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_CLUSTER, cluster->id, &json_data, NULL);
 		zbx_json_close(&json_data);
-		zbx_json_addstring(&json_data, "{#CLUSTER.VSAN.UUID}", cluster->vsan_uuid, ZBX_JSON_TYPE_STRING);
 		zbx_json_addarray(&json_data, "datastore_uuid");
 
 		for (j = 0; j < cluster->dss_uuid.values_num; j++)
@@ -1476,8 +1475,6 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_json_addstring(&json_data, "{#PARENT.TYPE}", hv->parent_type, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#HV.NETNAME}",
 				ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NET_NAME]), ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json_data, "{#VSAN.UUID}",
-				ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_VSAN_UUID]), ZBX_JSON_TYPE_STRING);
 		zbx_json_addarray(&json_data, "resource_pool");
 
 		for (i = 0; NULL == cluster && i < service->data->resourcepools.values_num; i++)

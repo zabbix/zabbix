@@ -429,8 +429,7 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_HVPROPMAP("runtime.connectionState"),		/* ZBX_VMWARE_HVPROP_CONNECTIONSTATE */
 	ZBX_HVPROPMAP_EXT("hardware.systemInfo.serialNumber", NULL, 67),/* ZBX_VMWARE_HVPROP_HW_SERIALNUMBER */
 	ZBX_HVPROPMAP_EXT("runtime.healthSystemRuntime.hardwareStatusInfo",
-			zbx_xmlnode_to_json, 0),		/* ZBX_VMWARE_HVPROP_HW_SENSOR */
-	ZBX_HVPROPMAP("config.vsanHostConfig.clusterInfo.uuid")	/* ZBX_VMWARE_HVPROP_VSAN_UUID */
+			zbx_xmlnode_to_json, 0)			/* ZBX_VMWARE_HVPROP_HW_SENSOR */
 };
 
 static zbx_vmware_propmap_t	vm_propmap[] = {
@@ -1511,9 +1510,6 @@ static void	vmware_cluster_shared_free(zbx_vmware_cluster_t *cluster)
 	if (NULL != cluster->status)
 		vmware_shared_strfree(cluster->status);
 
-	if (NULL != cluster->vsan_uuid)
-		vmware_shared_strfree(cluster->vsan_uuid);
-
 	zbx_vector_str_clear_ext(&cluster->dss_uuid, vmware_shared_strfree);
 	zbx_vector_str_destroy(&cluster->dss_uuid);
 
@@ -1737,7 +1733,6 @@ static zbx_vmware_cluster_t	*vmware_cluster_shared_dup(const zbx_vmware_cluster_
 	cluster->id = vmware_shared_strdup(src->id);
 	cluster->name = vmware_shared_strdup(src->name);
 	cluster->status = vmware_shared_strdup(src->status);
-	cluster->vsan_uuid = vmware_shared_strdup(src->vsan_uuid);
 	VMWARE_VECTOR_CREATE(&cluster->dss_uuid, str);
 	zbx_vector_str_reserve(&cluster->dss_uuid, (size_t)src->dss_uuid.values_num);
 	VMWARE_VECTOR_CREATE(&cluster->alarm_ids, str);
@@ -2632,7 +2627,6 @@ static void	vmware_cluster_free(zbx_vmware_cluster_t *cluster)
 	zbx_free(cluster->name);
 	zbx_free(cluster->id);
 	zbx_free(cluster->status);
-	zbx_free(cluster->vsan_uuid);
 	zbx_vector_str_clear_ext(&cluster->dss_uuid, zbx_str_free);
 	zbx_vector_str_destroy(&cluster->dss_uuid);
 	zbx_vector_str_clear_ext(&cluster->alarm_ids, zbx_str_free);
@@ -5232,7 +5226,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 	zbx_vector_str_t		scsi_luns;
 	xmlDoc				*doc = NULL, *doc_dinfo = NULL;
 	zbx_property_collection_iter	*iter = NULL;
-	char				*tmp = NULL, *hvid_esc, *scsi_req = NULL, *err;
+	char				*tmp = NULL, *hvid_esc, *scsi_req = NULL, *err = NULL;
 	int				i, total, updated = 0, updated_vsan = 0, ret = SUCCEED;
 	const char			*pcollecter = vmware_service_objects[service->type].property_collector;
 
@@ -5276,6 +5270,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 	}
 
 	zbx_property_collection_free(iter);
+	iter = NULL;
 	zbx_vector_ptr_pair_sort(disks_info, vmware_diskinfo_diskname_compare);
 	hvid_esc = zbx_xml_escape_dyn(hvid);
 	tmp = zbx_dsprintf(NULL, ZBX_POST_HV_DISK_INFO, pcollecter ,
@@ -7495,6 +7490,7 @@ out:
  *             datastores   - [IN] all available Datastores                   *
  *             cq_values    - [IN/OUT] the vector with custom query entries   *
  *             status       - [OUT] a pointer to the output variable          *
+ *             dss          - [OUT] a list of DS available for cluster        *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
@@ -7503,7 +7499,7 @@ out:
  ******************************************************************************/
 static int	vmware_service_get_cluster_state(CURL *easyhandle, const char *clusterid,
 		const zbx_vector_vmware_datastore_t *datastores, zbx_vector_cq_value_t *cq_values, char **status,
-		char **vsan_uuid, zbx_vector_str_t *dss, char **error)
+		zbx_vector_str_t *dss, char **error)
 {
 #	define ZBX_POST_VMWARE_CLUSTER_STATUS 								\
 		ZBX_POST_VSPHERE_HEADER									\
@@ -7515,7 +7511,6 @@ static int	vmware_service_get_cluster_state(CURL *easyhandle, const char *cluste
 					"<ns0:all>false</ns0:all>"					\
 					"<ns0:pathSet>summary.overallStatus</ns0:pathSet>"		\
 					"<ns0:pathSet>datastore</ns0:pathSet>"				\
-					"<ns0:pathSet>configurationEx</ns0:pathSet>"\
 					"%s"								\
 				"</ns0:propSet>"							\
 				"<ns0:objectSet>"							\
@@ -7550,7 +7545,6 @@ static int	vmware_service_get_cluster_state(CURL *easyhandle, const char *cluste
 		goto out;
 
 	*status = zbx_xml_doc_read_value(doc, ZBX_XPATH_PROP_NAME("summary.overallStatus"));
-	*vsan_uuid = zbx_xml_doc_read_value(doc, "/" ZBX_XPATH_LN3("vsanConfigInfo", "defaultConfig", "uuid"));
 
 	if (0 != cqvs.values_num)
 		vmware_service_cq_prop_value(__func__, doc, &cqvs);
@@ -7628,7 +7622,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 
 	for (i = 0; i < ids.values_num; i++)
 	{
-		char	*status, *vsan_uuid, *name;
+		char	*status, *name;
 
 		zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_CLUSTER, "[text()='%s']")
 				"/" ZBX_XPATH_PROP_NAME_NODE("name"), ids.values[i]);
@@ -7637,7 +7631,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 			continue;
 
 		if (SUCCEED != vmware_service_get_cluster_state(easyhandle, ids.values[i], datastores, cq_values,
-				&status, &vsan_uuid, &dss,error))
+				&status, &dss, error))
 		{
 			zbx_free(name);
 			goto out;
@@ -7647,7 +7641,6 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 		cluster->id = zbx_strdup(NULL, ids.values[i]);
 		cluster->name = name;
 		cluster->status = status;
-		cluster->vsan_uuid = vsan_uuid;
 		zbx_vector_str_create(&cluster->dss_uuid);
 		zbx_vector_str_append_array(&cluster->dss_uuid, dss.values, dss.values_num);
 		zbx_vector_str_clear(&dss);
