@@ -23380,6 +23380,11 @@ msgstr ""
 msgid "via"
 msgstr "via"
 
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
+
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"
 msgstr "디스커버리 규칙의 타입이 잘못되었습니다"
