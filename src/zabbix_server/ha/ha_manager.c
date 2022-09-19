@@ -25,6 +25,7 @@
 #include "zbxserialize.h"
 #include "zbxthreads.h"
 #include "zbxmutexs.h"
+#include "zbxcomms.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_ha.h"
 #include "audit/zbxaudit_settings.h"
