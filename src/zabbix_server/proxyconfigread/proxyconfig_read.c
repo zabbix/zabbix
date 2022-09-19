@@ -1090,7 +1090,10 @@ int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_re
 		zabbix_log(LOG_LEVEL_TRACE, "%s() configuration: %s", __func__, j->buffer);
 	}
 	else
+	{
+		*status = ZBX_PROXYCONFIG_STATUS_EMPTY;
 		ret = SUCCEED;
+	}
 out:
 	zbx_free(token);
 
