@@ -43,6 +43,8 @@ zbx_str_uint64_pair_t;
 ZBX_PTR_VECTOR_DECL(str_uint64_pair, zbx_str_uint64_pair_t)
 int	zbx_str_uint64_pair_name_compare(const void *p1, const void *p2);
 
+#define UC(v)	((unsigned char)v)
+
 /* performance counter data */
 typedef struct
 {
@@ -54,12 +56,12 @@ typedef struct
 	/*    pair->value - value                   */
 	zbx_vector_str_uint64_pair_t	values;
 
-#define ZBX_VMWARE_COUNTER_NEW		0x00
-#define ZBX_VMWARE_COUNTER_READY	0x01
-#define ZBX_VMWARE_COUNTER_UPDATING	0x02
-#define ZBX_VMWARE_COUNTER_CUSTOM	0x10
-#define ZBX_VMWARE_COUNTER_ACCEPTABLE	0x20
-#define ZBX_VMWARE_COUNTER_NOTSUPPORTED	0x40
+#define ZBX_VMWARE_COUNTER_NEW		UC(0x00)
+#define ZBX_VMWARE_COUNTER_READY	UC(0x01)
+#define ZBX_VMWARE_COUNTER_UPDATING	UC(0x02)
+#define ZBX_VMWARE_COUNTER_CUSTOM	UC(0x10)
+#define ZBX_VMWARE_COUNTER_ACCEPTABLE	UC(0x20)
+#define ZBX_VMWARE_COUNTER_NOTSUPPORTED	UC(0x40)
 
 #define ZBX_VMWARE_COUNTER_STATE_MASK	0xF0
 	/* the vmware performance counter state */
@@ -423,11 +425,11 @@ typedef struct
 	/* the result of query */
 	char				*value;
 
-#define ZBX_VMWARE_CQ_NEW		1
-#define ZBX_VMWARE_CQ_READY		2
-#define ZBX_VMWARE_CQ_ERROR		4
-#define ZBX_VMWARE_CQ_PAUSED		8
-#define ZBX_VMWARE_CQ_SEPARATE		16
+#define ZBX_VMWARE_CQ_NEW		UC(0x01)
+#define ZBX_VMWARE_CQ_READY		UC(0x02)
+#define ZBX_VMWARE_CQ_ERROR		UC(0x04)
+#define ZBX_VMWARE_CQ_PAUSED		UC(0x08)
+#define ZBX_VMWARE_CQ_SEPARATE		UC(0x10)
 	/* the state of query */
 	unsigned char			state;
 

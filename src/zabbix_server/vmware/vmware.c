@@ -28,6 +28,7 @@
 #include "zbxshmem.h"
 #include "zbxnix.h"
 #include "zbxstr.h"
+#include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
 
@@ -5188,7 +5189,6 @@ clean:
  *             hv_data      - [IN] the hv data with scsi topology info        *
  *             hvid         - [IN] the vmware hypervisor id                   *
  *             dss          - [IN] all known Datastores                       *
- *             xdoc         - [OUT] a reference to output xml document        *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
