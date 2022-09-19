@@ -743,7 +743,9 @@ class CAudit {
 				}
 			}
 
-			return ($true_conditions == $all_conditions);
+			if ($true_conditions == $all_conditions) {
+				return true;
+			}
 		}
 
 		return false;
