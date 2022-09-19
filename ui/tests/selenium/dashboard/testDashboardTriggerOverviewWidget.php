@@ -140,10 +140,10 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$triggerids = CDBHelper::getColumn('SELECT triggerid FROM triggers WHERE description IN ('.
 				zbx_dbstr(self::$resolved_trigger).', '.zbx_dbstr(self::$dependency_trigger).')', 'triggerid'
 		);
-		DBexecute('UPDATE triggers SET value=0 WHERE triggerid='.$triggerids[0]);
-		DBexecute('UPDATE triggers SET lastchange='.$timestamp.' WHERE triggerid='.$triggerids[0]);
-		DBexecute('UPDATE problem SET r_eventid=9001 WHERE objectid='.$triggerids[0]);
-		DBexecute('UPDATE problem SET r_clock='.$timestamp.' WHERE objectid='.$triggerids[0]);
+		DBexecute('UPDATE triggers SET value=0 WHERE triggerid='.zbx_dbstr($triggerids[0]));
+		DBexecute('UPDATE triggers SET lastchange='.zbx_dbstr($timestamp).' WHERE triggerid='.zbx_dbstr($triggerids[0]));
+		DBexecute('UPDATE problem SET r_eventid=9001 WHERE objectid='.zbx_dbstr($triggerids[0]));
+		DBexecute('UPDATE problem SET r_clock='.zbx_dbstr($timestamp).' WHERE objectid='.zbx_dbstr($triggerids[0]));
 
 		// Change the resolved triggers blinking period as the default value is too small for this test.
 		CDataHelper::call('settings.update', ['blink_period' => '5m']);
