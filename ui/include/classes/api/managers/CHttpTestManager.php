@@ -145,9 +145,9 @@ class CHttpTestManager {
 			'preservekeys' => true
 		]);
 
-		$del_steps = [];
 		$steps_create = [];
 		$steps_update = [];
+		$del_steps = [];
 		$itemids = [];
 
 		foreach ($httptests as $key => $httptest) {
@@ -213,33 +213,18 @@ class CHttpTestManager {
 					}
 				}
 
-				$del_stepsids = array_keys($dbSteps);
+				$del_steps += $dbSteps;
 			}
 		}
 
 		// Old items must be deleted prior to createStepsReal() since identical items cannot be created in DB.
-		if ($del_stepsids) {
-			$result = DBfetchArrayAssoc(DBselect(
-				'SELECT hti.itemid'.
-				' FROM httpstepitem hti'.
-				' WHERE '.dbConditionInt('hti.httpstepid', $del_stepsids)
-			), 'itemid');
+		if ($del_steps) {
+			$del_stepids = array_keys($del_steps);
 
-			$del_items = DBfetchArrayAssoc(DBselect(
-				'SELECT hi.itemid'.
-				' FROM items hi'.
-				' WHERE '.dbConditionInt('hi.templateid', array_keys($result))
-			), 'itemid');
+			CHttpTest::deleteAffectedStepItems($del_stepids);
 
-			$del_items = array_merge(array_keys($del_items), array_keys($result));
-
-			DB::delete('httpstepitem', ['itemid' => $del_items]);
-
-			CItemManager::delete($del_items);
-
-			DB::delete('httpstep_field', ['httpstepid' => $del_stepsids]);
-
-			DB::delete('httpstep', ['httpstepid' => $del_stepsids]);
+			DB::delete('httpstep_field', ['httpstepid' => $del_stepids]);
+			DB::delete('httpstep', ['httpstepid' => $del_stepids]);
 		}
 
 		foreach ($httptests as $key => $httptest) {

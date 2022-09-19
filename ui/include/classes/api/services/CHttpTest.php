@@ -613,73 +613,125 @@ class CHttpTest extends CApiService {
 			}
 		}
 
-		$parent_httptestids = $httptestids;
-		$child_httptestids = [];
-		do {
-			$parent_httptestids = array_keys(DB::select('httptest', [
-				'output' => [],
-				'filter' => ['templateid' => $parent_httptestids],
-				'preservekeys' => true
-			]));
+		self::addInheritedHttptests($db_httptests);
 
-			$child_httptestids = array_merge($child_httptestids, $parent_httptestids);
-		}
-		while ($parent_httptestids);
+		$del_httptestids = array_keys($db_httptests);
 
-		$del_httptestids = array_merge($httptestids, $child_httptestids);
-		$del_itemids = [];
-		$del_httpstepids = [];
-
-		$del_httptestitemids = DBfetchArrayAssoc(DBselect(
-			'SELECT hti.itemid'.
-			' FROM httptestitem hti'.
-			' WHERE '.dbConditionInt('hti.httptestid', $del_httptestids)
-		), 'itemid');
-
-		$del_httpstepitems = DBfetchArrayAssoc(DBselect(
-			'SELECT hsi.itemid, hsi.httpstepid'.
-			' FROM httpstepitem hsi,httpstep hs'.
-			' WHERE '.dbConditionInt('hs.httptestid', $del_httptestids).
-			' AND hsi.httpstepid=hs.httpstepid'
-		), 'itemid');
-
-		$del_httpstepids = array_values(array_map(function ($step) {
-			return $step['httpstepid'];
-		}, $del_httpstepitems));
-
-		$del_itemids = array_merge(array_keys($del_httptestitemids), array_keys($del_httpstepitems));
-
-		if ($del_itemids) {
-			$result = DBfetchArrayAssoc(DBselect(
-				'SELECT hi.itemid'.
-				' FROM items hi'.
-				' WHERE '.dbConditionInt('hi.templateid', $del_itemids)
-			), 'itemid');
-
-			$del_itemids = array_merge([...$del_itemids, ...array_keys($result)]);
-
-			DB::delete('httpstepitem', ['itemid' => $del_itemids]);
-			DB::delete('httptestitem', ['itemid' => $del_itemids]);
-
-			CItemManager::delete($del_itemids);
-		}
+		self::deleteAffectedItems($del_httptestids);
+		self::deleteAffectedSteps($del_httptestids);
 
 		DB::delete('httptest_field', ['httptestid' => $del_httptestids]);
-
-		DB::delete('httpstep_field', ['httpstepid' => $del_httpstepids]);
-
-		DB::delete('httpstep', ['httpstepid' => $del_httpstepids]);
-
+		DB::delete('httptest_tag', ['httptestid' => $del_httptestids]);
 		DB::update('httptest', [
 			'values' => ['templateid' => 0],
 			'where' => ['httptestid' => $del_httptestids]
 		]);
-
 		DB::delete('httptest', ['httptestid' => $del_httptestids]);
 
 		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_SCENARIO, $db_httptests);
 
 		return ['httptestids' => $httptestids];
+	}
+
+	/**
+	 * @param array $db_httptests
+	 */
+	private static function addInheritedHttptests(array &$db_httptests): void {
+		$templateids = array_keys($db_httptests);
+
+		do {
+			$options = [
+				'output' => ['httptestid', 'name'],
+				'filter' => ['templateid' => $templateids]
+			];
+			$result = DBselect(DB::makeSql('httptest', $options));
+
+			$templateids = [];
+
+			while ($row = DBfetch($result)) {
+				if (!array_key_exists($row['httptestid'], $db_httptests)) {
+					$templateids[] = $row['httptestid'];
+
+					$db_httptests[$row['httptestid']] = $row;
+				}
+			}
+		} while ($templateids);
+	}
+
+	/**
+	 * @param array $db_items
+	 */
+	private static function addInheritedItems(array &$db_items): void {
+		$templateids = array_keys($db_items);
+
+		do {
+			$options = [
+				'output' => ['itemid'],
+				'filter' => ['templateid' => $templateids]
+			];
+			$result = DBselect(DB::makeSql('items', $options));
+
+			$templateids = [];
+
+			while ($row = DBfetch($result)) {
+				if (!array_key_exists($row['itemid'], $db_items)) {
+					$templateids[] = $row['itemid'];
+
+					$db_items[$row['itemid']] = $row;
+				}
+			}
+		} while ($templateids);
+	}
+
+	/**
+	 * @param array $del_httptestids
+	 */
+	private static function deleteAffectedItems(array $del_httptestids): void {
+		$db_items = DBfetchArrayAssoc(DBselect(
+			'SELECT hti.itemid'.
+			' FROM httptestitem hti,items i'.
+			' WHERE hti.itemid=i.itemid'.
+				' AND '.dbConditionId('hti.httptestid', $del_httptestids)
+		), 'itemid');
+
+		self::addInheritedItems($db_items);
+
+		$del_itemids = array_keys($db_items);
+		DB::delete('httptestitem', ['itemid' => $del_itemids]);
+		CItemManager::delete($del_itemids);
+	}
+
+	/**
+	 * @param array $del_httptestids
+	 */
+	private static function deleteAffectedSteps(array $del_httptestids): void {
+		$del_stepids = array_column(DB::select('httpstep', [
+			'output' => ['httpstepid'],
+			'filter' => ['httptestid' => $del_httptestids]
+		]), 'httpstepid');
+
+		self::deleteAffectedStepItems($del_stepids);
+
+		DB::delete('httpstep_field', ['httpstepid' => $del_stepids]);
+		DB::delete('httpstep', ['httpstepid' => $del_stepids]);
+	}
+
+	/**
+	 * @param array $del_stepids
+	 */
+	public static function deleteAffectedStepItems(array $del_stepids): void {
+		$db_items = DBfetchArrayAssoc(DBselect(
+			'SELECT hsi.itemid'.
+			' FROM httpstepitem hsi,items i'.
+			' WHERE hsi.itemid=i.itemid'.
+				' AND '.dbConditionId('hsi.httpstepid', $del_stepids)
+		), 'itemid');
+
+		self::addInheritedItems($db_items);
+
+		$del_itemids = array_keys($db_items);
+		DB::delete('httpstepitem', ['itemid' => $del_itemids]);
+		CItemManager::delete($del_itemids);
 	}
 
 	/**
