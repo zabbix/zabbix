@@ -1,8 +1,11 @@
 Changes for 6.4.0alpha2
 
 New features:
+.......PS. [ZBXNEXT-7931] removed heartbeats support from Zabbix proxy (jxl)
+A.F.I..PST [ZBXNEXT-2557] added support of Zabbix proxies with legacy version (abakaldin, esekace, mprihodko)
 
 Bug fixes:
+........S. [ZBX-21664] fixed Zabbix server crashing during database upgrade when converting service times and there is downtime inside uptime (vso)
 ...G...... [ZBX-21466] fixed race condition in Zabbix agent 2 leading to permanently stuck mount reads (arimdjonoks)
 
 --------------------------------------------------------------------------------
