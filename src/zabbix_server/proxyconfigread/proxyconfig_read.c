@@ -1029,12 +1029,15 @@ int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_re
 	char			*token, tmp[ZBX_MAX_UINT64_LEN + 1];
 	zbx_uint64_t		proxy_config_revision;
 	zbx_dc_revision_t	dc_revision;
+	size_t			token_len;
 
-	token = (char *)zbx_malloc(NULL, zbx_get_token_len() + 1);
+	token_len = zbx_get_token_len() + 1;
+
+	token = (char *)zbx_malloc(NULL, token_len);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxy_hostid:" ZBX_FS_UI64, __func__, proxy->hostid);
 
-	if (SUCCEED != zbx_json_value_by_name(jp_request, ZBX_PROTO_TAG_SESSION, token, sizeof(token), NULL))
+	if (SUCCEED != zbx_json_value_by_name(jp_request, ZBX_PROTO_TAG_SESSION, token, token_len, NULL))
 	{
 		*error = zbx_strdup(NULL, "cannot get session from proxy configuration request");
 		goto out;
