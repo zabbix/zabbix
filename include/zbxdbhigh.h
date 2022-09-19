@@ -25,6 +25,7 @@
 #include "zbxdbschema.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxversion.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;
@@ -685,14 +686,16 @@ void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
 
 typedef struct
 {
-	zbx_uint64_t		hostid;
-	unsigned char		compress;
-	int			version;
-	int			lastaccess;
-	int			last_version_error_time;
-	int			proxy_delay;
-	int			more_data;
-	zbx_proxy_suppress_t	nodata_win;
+	zbx_uint64_t			hostid;
+	unsigned char			compress;
+	char				*version_str;
+	int				version_int;
+	zbx_proxy_compatibility_t	compatibility;
+	int				lastaccess;
+	int				last_version_error_time;
+	int				proxy_delay;
+	int				more_data;
+	zbx_proxy_suppress_t		nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)
@@ -707,7 +710,7 @@ typedef struct
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
-	zbx_uint64_t	flags;
+	zbx_uint64_t			flags;
 }
 zbx_proxy_diff_t;
 

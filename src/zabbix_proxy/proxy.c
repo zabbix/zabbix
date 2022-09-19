@@ -58,7 +58,7 @@
 #include "diag/diag_proxy.h"
 #include "zbxrtc.h"
 #include "../zabbix_server/availability/avail_manager.h"
-#include "zbxserver.h"
+#include "zbxstats.h"
 #include "stats/zabbix_stats.h"
 #include "zbxip.h"
 
@@ -1185,14 +1185,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t			rtc;
 	zbx_timespec_t			rtc_timeout = {1, 0};
 
+	zbx_config_comms_args_t		zbx_config = {zbx_config_tls, CONFIG_HOSTNAME, CONFIG_PROXYMODE};
+
 	zbx_thread_args_t		thread_args;
-	zbx_thread_poller_args		poller_args = {zbx_config_tls, get_program_type, ZBX_NO_POLLER};
+	zbx_thread_poller_args		poller_args = {&zbx_config, get_program_type, ZBX_NO_POLLER};
 	zbx_thread_heart_args		heart_args = {zbx_config_tls, get_program_type};
 	zbx_thread_proxyconfig_args	proxyconfig_args = {zbx_config_tls, get_program_type};
 	zbx_thread_datasender_args	datasender_args = {zbx_config_tls, get_program_type};
-	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_tls, get_program_type};
+	zbx_thread_taskmanager_args	taskmanager_args = {&zbx_config, get_program_type};
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
-	zbx_thread_trapper_args		trapper_args = {zbx_config_tls, get_program_type, &listen_sock};
+	zbx_thread_trapper_args		trapper_args = {&zbx_config, get_program_type, &listen_sock};
+
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1387,7 +1390,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
-	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext);
+	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get);
 	zbx_diag_init(diag_add_section_info);
 
 	for (i = 0; i < threads_num; i++)

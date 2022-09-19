@@ -18,11 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
+ * @dataSource Proxies
+ *
  * @backup profiles, module, services, token
  *
  * @onBefore prepareServiceData
