@@ -1186,6 +1186,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
 	zbx_thread_trapper_args		trapper_args = {zbx_config_tls, get_program_type, &listen_sock};
 
+
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
 		printf("Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
@@ -1379,7 +1380,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
-	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext);
+	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get);
 	zbx_diag_init(diag_add_section_info);
 
 	for (i = 0; i < threads_num; i++)

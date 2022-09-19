@@ -18,7 +18,7 @@
 **/
 
 #include "checks_internal.h"
-#include "zbxserver.h"
+#include "zbxstats.h"
 
 #include "checks_java.h"
 #include "zbxself.h"
@@ -173,13 +173,15 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
  *                                                                            *
  * Purpose: retrieve data from Zabbix server (internally supported items)     *
  *                                                                            *
- * Parameters: item - item we are interested in                               *
+ * Parameters: item       - [IN] item we are interested in                    *
+ *             result     - [OUT] value of the requested item                 *
+ *             zbx_config - [IN] Zabbix server/proxy config                   *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_comms_args_t *zbx_config)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
@@ -763,7 +765,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 				/* work for both data received from internal and external source. */
 				zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 
-				zbx_get_zabbix_stats(&json);
+				zbx_zabbix_stats_get(&json, zbx_config);
 
 				zbx_json_close(&json);
 

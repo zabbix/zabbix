@@ -2799,6 +2799,11 @@ return [
 				'default' => NULL,
 				'ref_table' => 'userdirectory',
 				'ref_field' => 'userdirectoryid'
+			],
+			'server_status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => ''
 			]
 		]
 	],
@@ -5197,8 +5202,7 @@ return [
 			],
 			'host_metadata' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => ''
 			],
 			'flags' => [
@@ -5255,8 +5259,7 @@ return [
 			],
 			'host_metadata' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => ''
 			],
 			'flags' => [
@@ -8934,6 +8937,18 @@ return [
 				'default' => '0'
 			],
 			'lastaccess' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'version' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'compatibility' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
