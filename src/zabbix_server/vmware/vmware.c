@@ -5118,13 +5118,15 @@ clean:
  *                                                                            *
  * Purpose: parse the vmware hypervisor vsan disks details info               *
  *                                                                            *
- * Parameters: xdoc       - [IN] a reference to xml document with disks info  *
+ * Parameters: xdoc       - [IN] - a reference to xml document with disks info*
+ *             vsan_uuid  - [IN] - uuid of vsan DS                            *
  *             disks_info - [IN/OUT] - collected the hv internal disks        *
  *                                                                            *
  * Return value: count of updated vsan disk objects                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_hv_vsan_parse_info(xmlDoc *xdoc, zbx_vector_ptr_pair_t *disks_info)
+static int	vmware_service_hv_vsan_parse_info(xmlDoc *xdoc, const char *vsan_uuid,
+		zbx_vector_ptr_pair_t *disks_info)
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -5169,6 +5171,10 @@ static int	vmware_service_hv_vsan_parse_info(xmlDoc *xdoc, zbx_vector_ptr_pair_t
 				"number(." ZBX_XPATH_LN2("capacity", "block") ")", (int *)&di->vsan->block);
 		zbx_xml_node_read_num(xdoc, mapinfo_node,
 				"number(." ZBX_XPATH_LN2("capacity", "blockSize") ")", (int *)&di->vsan->block_size);
+
+		if (NULL == di->ds_uuid)
+			di->ds_uuid = zbx_strdup(di->ds_uuid, vsan_uuid);
+
 		updated_vsan++;
 	}
 clean:
@@ -5189,6 +5195,8 @@ clean:
  *             hv_data      - [IN] the hv data with scsi topology info        *
  *             hvid         - [IN] the vmware hypervisor id                   *
  *             dss          - [IN] all known Datastores                       *
+ *             vsan_uuid    - [IN] uuid of vsan Datastore                    *
+ *             disks_info   - [OUT]
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
@@ -5196,7 +5204,7 @@ clean:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service, CURL *easyhandle,
-		xmlDoc *hv_data, const char *hvid, const zbx_vector_vmware_datastore_t *dss,
+		xmlDoc *hv_data, const char *hvid, const zbx_vector_vmware_datastore_t *dss, const char *vsan_uuid,
 		zbx_vector_ptr_pair_t *disks_info, char **error)
 {
 #	define ZBX_POST_HV_DISK_INFO									\
@@ -5273,6 +5281,9 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 		updated += vmware_service_hv_disks_parse_info(doc, dss, disks_info);
 	}
 
+	if (NULL == vsan_uuid)
+		goto out;
+
 	zbx_property_collection_free(iter);
 	iter = NULL;
 	zbx_vector_ptr_pair_sort(disks_info, vmware_diskinfo_diskname_compare);
@@ -5288,7 +5299,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	updated_vsan += vmware_service_hv_vsan_parse_info(doc_dinfo, disks_info);
+	updated_vsan += vmware_service_hv_vsan_parse_info(doc_dinfo, vsan_uuid, disks_info);
 
 	while (NULL != iter->token)
 	{
@@ -5298,7 +5309,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 		if (SUCCEED != (ret = zbx_property_collection_next(iter, &doc_dinfo, error)))
 			goto out;
 
-		updated_vsan += vmware_service_hv_vsan_parse_info(doc_dinfo, disks_info);
+		updated_vsan += vmware_service_hv_vsan_parse_info(doc_dinfo, vsan_uuid, disks_info);
 	}
 out:
 	zbx_free(tmp);
@@ -5947,6 +5958,41 @@ clean:
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_hv_vsan_uuid                                              *
+ *                                                                            *
+ * Purpose: search for Datastore uuid with type equal to 'vsan'               *
+ *                                                                            *
+ * Parameters: dss    - [IN] the vector with all Datastores                   *
+ *             hv_dss - [IN] the vector with all Datastores attechad to HV    *
+ *                                                                            *
+ * Return value: pointer to vsan DS uuid or NULL                              *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*vmware_hv_vsan_uuid(zbx_vector_vmware_datastore_t *dss, zbx_vector_str_t *hv_dss)
+{
+	int	i;
+
+	for (i = 0; i < hv_dss->values_num; i++)
+	{
+		int			j;
+		zbx_vmware_datastore_t	*ds, ds_cmp;
+
+		ds_cmp.id = hv_dss->values[i];
+
+		if (FAIL == (j = zbx_vector_vmware_datastore_bsearch(dss, &ds_cmp, vmware_ds_id_compare)))
+			continue;
+
+		ds = dss->values[j];
+
+		if ('v' == *ds->type && 0 == strcmp("vsan", ds->type))	/* only one vsan can be attached to HV */
+			return ds->uuid;
+	}
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: sorting function to sort Resource pool names vector by name       *
  *                                                                            *
  ******************************************************************************/
@@ -5984,11 +6030,11 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		char **error)
 {
 	char				*value, *cq_prop;
+	int				i, j, ret;
 	xmlDoc				*details = NULL, *multipath_data = NULL;
 	zbx_vector_str_t		datastores, vms;
 	zbx_vector_cq_value_t		cqvs;
 	zbx_vector_ptr_pair_t		disks_info;
-	int				i, j, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __func__, id);
 
@@ -6053,8 +6099,11 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	if (SUCCEED != vmware_service_hv_get_multipath_data(service, easyhandle, details, id, &multipath_data, error))
 		goto out;
 
-	if (SUCCEED != vmware_service_hv_disks_get_info(service, easyhandle, details, id, dss, &disks_info, error))
+	if (SUCCEED != vmware_service_hv_disks_get_info(service, easyhandle, details, id, dss,
+			vmware_hv_vsan_uuid(dss, &datastores), &disks_info, error))
+	{
 		goto out;
+	}
 
 	if (SUCCEED != vmware_hv_ds_access_update(service, easyhandle, hv->uuid, hv->id, &datastores, dss, error))
 		goto out;
