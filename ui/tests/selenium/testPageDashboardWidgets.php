@@ -18,10 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 
 /**
  * @backup dashboard, profiles
+ *
+ * @dataSource LoginUsers
  */
 class testPageDashboardWidgets extends CWebTest {
 
@@ -130,7 +133,7 @@ class testPageDashboardWidgets extends CWebTest {
 	 */
 	public function testPageDashboardWidgets_checkProblemHostsWidget() {
 		// Authorize user and open the page with the desired widget.
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=100100');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1000');
 
 		// Find dashboard element.
 		$dashboard = CDashboardElement::find()->one();

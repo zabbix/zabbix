@@ -23,7 +23,6 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @backup usrgrp
- *
  * @dataSource LoginUsers
  */
 class testFormAdministrationUserGroups extends CLegacyWebTest {

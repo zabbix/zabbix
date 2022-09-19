@@ -31,7 +31,6 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  * @onBefore prepareServiceData
  *
  * @dataSource LoginUsers
- *
  */
 class testFormUserRoles extends CWebTest {
 

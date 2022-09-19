@@ -27,7 +27,6 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup role
  * @onBefore prepareRoleData
- *
  * @dataSource LoginUsers
  */
 class testPageUserRoles extends CWebTest {
