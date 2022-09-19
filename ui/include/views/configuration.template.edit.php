@@ -51,7 +51,7 @@ if ($data['templateid'] != 0) {
 $frmHost = (new CForm())
 	->setId('templatesForm')
 	->setName('templatesForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['templateid'] != 0) {
