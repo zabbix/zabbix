@@ -1883,13 +1883,24 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **
 	zbx_vector_table_data_ptr_t	config_tables;
 	int			ret = SUCCEED, full_sync = 0, delete_globalmacros = 0, loglevel;
 	char			tmp[ZBX_MAX_UINT64_LEN + 1];
-	struct zbx_json_parse	jp_data, jp_del_hostids;
+	struct zbx_json_parse	jp_data = {NULL, NULL}, jp_del_hostids = {NULL, NULL},
+				jp_del_macro_hostids = {NULL, NULL};
 	zbx_uint64_t		config_revision;
 	zbx_vector_uint64_t	del_hostids, del_macro_hostids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	loglevel = (1 == jp->end - jp->start ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING);
+	(void)zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data);
+	(void)zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_REMOVED_HOSTIDS, &jp_del_hostids);
+	(void)zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_REMOVED_MACRO_HOSTIDS, &jp_del_macro_hostids);
+
+	if ((NULL == jp_data.start || 1 == jp_data.end - jp_data.start) && NULL == jp_del_hostids.start &&
+			NULL == jp_del_macro_hostids.start)
+	{
+		loglevel = LOG_LEVEL_DEBUG;
+	}
+	else
+		loglevel = LOG_LEVEL_WARNING;
 
 	zabbix_log(loglevel, "received configuration data from server at \"%s\", datalen " ZBX_FS_SIZE_T,
 			addr, jp->end - jp->start + 1);
@@ -1922,7 +1933,7 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **
 	zbx_vector_uint64_create(&del_hostids);
 	zbx_vector_uint64_create(&del_macro_hostids);
 
-	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	if (NULL != jp_data.start)
 	{
 		if (SUCCEED != (ret = proxyconfig_parse_data(&jp_data, &config_tables, error)))
 			goto clean;
@@ -1933,7 +1944,7 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **
 		proxyconfig_add_default_tables(&config_tables);
 	}
 
-	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_REMOVED_HOSTIDS, &jp_del_hostids))
+	if (NULL != jp_del_hostids.start)
 	{
 		const char	*p;
 		zbx_uint64_t	hostid;
@@ -1945,12 +1956,12 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **
 		}
 	}
 
-	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_REMOVED_MACRO_HOSTIDS, &jp_del_hostids))
+	if (NULL != jp_del_macro_hostids.start)
 	{
 		const char	*p;
 		zbx_uint64_t	hostid;
 
-		for (p = 0; NULL != (p = zbx_json_next_value(&jp_del_hostids, p, tmp, sizeof(tmp), NULL));)
+		for (p = 0; NULL != (p = zbx_json_next_value(&jp_del_macro_hostids, p, tmp, sizeof(tmp), NULL));)
 		{
 			if (SUCCEED == zbx_is_uint64(tmp, &hostid))
 			{

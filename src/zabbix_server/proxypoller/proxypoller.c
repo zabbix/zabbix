@@ -255,12 +255,14 @@ out:
  ******************************************************************************/
 static int	proxy_send_configuration(DC_PROXY *proxy)
 {
-	char			*error = NULL, *buffer = NULL;
-	int			ret, flags = ZBX_TCP_PROTOCOL;
-	zbx_socket_t		s;
-	struct zbx_json	j;
-	struct zbx_json_parse	jp;
-	size_t			buffer_size, reserved = 0;
+	char				*error = NULL, *buffer = NULL;
+	int				ret, flags = ZBX_TCP_PROTOCOL, loglevel;
+	zbx_socket_t			s;
+	struct zbx_json			j;
+	struct zbx_json_parse		jp;
+	size_t				buffer_size, reserved = 0;
+	zbx_proxyconfig_status_t	status;
+
 
 	zbx_json_init(&j, 512 * ZBX_KIBIBYTE);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_PROXY_CONFIG, ZBX_JSON_TYPE_STRING);
@@ -287,7 +289,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 
 	zbx_json_clean(&j);
 
-	if (SUCCEED != (ret = zbx_proxyconfig_get_data(proxy, &jp, &j, &error)))
+	if (SUCCEED != (ret = zbx_proxyconfig_get_data(proxy, &jp, &j, &status, &error)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
 				proxy->host, error);
@@ -308,10 +310,11 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 	}
 
+	loglevel = (ZBX_PROXYCONFIG_STATUS_DATA == status ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG);
 
 	if (0 != proxy->auto_compress)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
+		zabbix_log(loglevel, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
 				ZBX_FS_SIZE_T ", bytes " ZBX_FS_SIZE_T " with compression ratio %.1f", proxy->host,
 				s.peer, (zbx_fs_size_t)reserved, (zbx_fs_size_t)buffer_size,
 				(double)reserved / buffer_size);
@@ -321,7 +324,7 @@ static int	proxy_send_configuration(DC_PROXY *proxy)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
+		zabbix_log(loglevel, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
 				ZBX_FS_SIZE_T, proxy->host, s.peer, (zbx_fs_size_t)j.buffer_size);
 
 		ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size, reserved, flags);

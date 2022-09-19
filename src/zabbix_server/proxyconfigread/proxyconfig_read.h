@@ -22,8 +22,14 @@
 
 #include "dbcache.h"
 
+typedef enum {
+	ZBX_PROXYCONFIG_STATUS_EMPTY,
+	ZBX_PROXYCONFIG_STATUS_DATA
+}
+zbx_proxyconfig_status_t;
+
 int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
-		char **error);
+		zbx_proxyconfig_status_t *status, char **error);
 
 void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp);
 

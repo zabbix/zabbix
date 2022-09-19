@@ -829,7 +829,8 @@ out:
 }
 
 static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_config_revision,
-		zbx_dc_revision_t *dc_revision, struct zbx_json *j, char **error)
+		const zbx_dc_revision_t *dc_revision, struct zbx_json *j, zbx_proxyconfig_status_t *status,
+		char **error)
 {
 #define ZBX_PROXYCONFIG_SYNC_HOSTS		0x0001
 #define ZBX_PROXYCONFIG_SYNC_GMACROS		0x0002
@@ -991,6 +992,11 @@ static int	proxyconfig_get_tables(const DC_PROXY *proxy, zbx_uint64_t proxy_conf
 	if (0 != keys_paths.values_num)
 		get_macro_secrets(&keys_paths, j);
 
+	if (0 == flags && 0 == removed_hostids.values_num && 0 == del_macro_hostids.values_num)
+		*status = ZBX_PROXYCONFIG_STATUS_EMPTY;
+	else
+		*status = ZBX_PROXYCONFIG_STATUS_DATA;
+
 	ret = SUCCEED;
 out:
 	if (0 != flags)
@@ -1023,7 +1029,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
-		char **error)
+		zbx_proxyconfig_status_t *status, char **error)
 {
 	int			ret = FAIL;
 	char			*token, tmp[ZBX_MAX_UINT64_LEN + 1];
@@ -1070,8 +1076,11 @@ int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_re
 
 	if (proxy_config_revision != dc_revision.config)
 	{
-		if (SUCCEED != (ret = proxyconfig_get_tables(proxy, proxy_config_revision, &dc_revision, j, error)))
+		if (SUCCEED != (ret = proxyconfig_get_tables(proxy, proxy_config_revision, &dc_revision, j, status,
+				error)))
+		{
 			goto out;
+		}
 
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_CONFIG_REVISION, dc_revision.config);
 
@@ -1095,11 +1104,12 @@ out:
  ******************************************************************************/
 void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
-	char		*error = NULL, *buffer = NULL;
-	struct zbx_json	j;
-	DC_PROXY	proxy;
-	int		ret, flags = ZBX_TCP_PROTOCOL;
-	size_t		buffer_size, reserved = 0;
+	char				*error = NULL, *buffer = NULL;
+	struct zbx_json			j;
+	DC_PROXY			proxy;
+	int				ret, flags = ZBX_TCP_PROTOCOL, loglevel;
+	size_t				buffer_size, reserved = 0;
+	zbx_proxyconfig_status_t	status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1125,13 +1135,15 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED != zbx_proxyconfig_get_data(&proxy, jp, &j, &error))
+	if (SUCCEED != zbx_proxyconfig_get_data(&proxy, jp, &j, &status, &error))
 	{
 		zbx_send_response_ext(sock, FAIL, error, NULL, flags, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",
 				proxy.host, sock->peer, error);
 		goto clean;
 	}
+
+	loglevel = (ZBX_PROXYCONFIG_STATUS_DATA == status ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG);
 
 	if (0 != proxy.auto_compress)
 	{
@@ -1145,7 +1157,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
-		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
+		zabbix_log(loglevel, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
 				ZBX_FS_SIZE_T ", bytes " ZBX_FS_SIZE_T " with compression ratio %.1f", proxy.host,
 				sock->peer, (zbx_fs_size_t)reserved, (zbx_fs_size_t)buffer_size,
 				(double)reserved / (double)buffer_size);
@@ -1155,7 +1167,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
+		zabbix_log(loglevel, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
 				ZBX_FS_SIZE_T, proxy.host, sock->peer, (zbx_fs_size_t)j.buffer_size);
 
 		ret = zbx_tcp_send_ext(sock, j.buffer, strlen(j.buffer), 0, (unsigned char)flags,
