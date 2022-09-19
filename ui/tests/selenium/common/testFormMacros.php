@@ -229,7 +229,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:"^[0-9].*$"}) already exists.'
+					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:"^[0-9].*$"}) already exists.'
 				]
 			]
 		];
@@ -372,7 +372,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description'
 						]
 					],
-					'error'  => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
+					'error' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
 				]
 			],
 			[
@@ -414,7 +414,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{#LLD_MACRO}'
 						]
 					],
-					'error'  => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".'
 				]
 			],
 			[
@@ -437,7 +437,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
+					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
 				]
 			],
 			[
@@ -460,7 +460,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.'
+					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.'
 				]
 			],
 			[
@@ -483,7 +483,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error'  => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:^[0-9].*$}) already exists.'
+					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:^[0-9].*$}) already exists.'
 				]
 			]
 		];
@@ -550,7 +550,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		// Click "Change" button for every macros row in first case for discovered host form.
 		if (CTestArrayHelper::get($data, 'expected_macros')) {
-			for ($i = 0; $i < count($this->getMacros()); $i++)  {
+			for ($i = 0; $i < count($this->getMacros()); $i++) {
 				$form->query('id:macros_'.$i.'_change_state')->one()->waitUntilClickable()->click();
 				$this->assertFalse($form->query('id:macros_'.$i.'_macro')->one()->isEnabled());
 			}
@@ -1386,7 +1386,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$value_field = $this->getValueField($data['macro']);
 
 			if ($discovered) {
-				for ($i = 0; $i < count($this->getMacros()); $i++)  {
+				for ($i = 0; $i < count($this->getMacros()); $i++) {
 					$this->query('id:macros_'.$i.'_change_state')->one()->waitUntilClickable()->click();
 				}
 			}

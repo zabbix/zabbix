@@ -598,7 +598,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	}
 
 	/**
-	 * Check discovered host macros which are inherited from both  host and prototype.
+	 * Check discovered host macros which are inherited from both host and prototype.
 	 */
 	public function testFormMacrosDiscoveredHost_CheckInheritedMacros() {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
@@ -647,7 +647,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 
 		$this->assertEquals($expected_macros, $this->getMacros(true));
 
-		for ($i = 0; $i < count($this->getMacros()); $i++)  {
+		for ($i = 0; $i < count($this->getMacros()); $i++) {
 			// Check that all macros fields are disabled.
 			foreach (['macro', 'value', 'description'] as $field) {
 				$this->assertFalse($form->query('id:macros_'.$i.'_'.$field)->one()->isEnabled());
