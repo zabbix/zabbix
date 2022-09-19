@@ -1902,7 +1902,7 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **
 	else
 		loglevel = LOG_LEVEL_WARNING;
 
-	zabbix_log(loglevel, "received configuration data from server at \"%s\", datalen " ZBX_FS_SIZE_T,
+	zabbix_log(loglevel, "received configuration data from server at \"%s\", datalen " ZBX_FS_SSIZE_T,
 			addr, jp->end - jp->start + 1);
 
 	if (1 == jp->end - jp->start)
