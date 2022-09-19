@@ -670,90 +670,6 @@ class testDashboardItemValueWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Name' => 'Item Widget with threshold',
-						'Refresh interval' => '30 seconds',
-						'Advanced configuration' => true,
-					],
-					'colors' => [
-						'id:lbl_thresholds_0_color' => 'AABBCC'
-					],
-					'thresholds' => [
-						'id:thresholds_0_threshold' => '1'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Name' => 'Item Widget with max number',
-						'Refresh interval' => '10 seconds',
-						'Advanced configuration' => true,
-					],
-					'thresholds' => [
-						'id:thresholds_0_threshold' => '999999999999999'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Name' => 'Item Widget with threshold with fractional digits',
-						'Refresh interval' => '10 minutes',
-						'Advanced configuration' => true,
-					],
-					'thresholds' => [
-						'id:thresholds_0_threshold' => '0.9999'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Name' => 'Item Widget with thresholds with suffix',
-						'Refresh interval' => '15 minutes',
-						'Advanced configuration' => true,
-					],
-					'thresholds' => [
-						'id:thresholds_0_threshold' => '1K',
-						'id:thresholds_1_threshold' => '1024'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Name' => 'Item Widget with thresholds with suffixes',
-						'Refresh interval' => '15 minutes',
-						'Advanced configuration' => true,
-					],
-					'colors' => [
-						'id:lbl_thresholds_0_color' => '26C6DA',
-						'id:lbl_thresholds_1_color' => 'FFEB3B'
-					],
-					'thresholds' => [
-						'id:thresholds_0_threshold' => '1K',
-						'id:thresholds_1_threshold' => '5G'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Type' => 'Item value',
 						'Item' => [
 							'values' => 'Available memory',
 							'context' => [
@@ -933,6 +849,90 @@ class testDashboardItemValueWidget extends CWebTest {
 						'id:lbl_bg_color' => 'FFAAAA'
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Name' => 'Item Widget with threshold',
+						'Refresh interval' => '15 minutes',
+						'Advanced configuration' => true,
+					],
+					'colors' => [
+						'id:lbl_thresholds_0_color' => 'AABBCC'
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '1'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Name' => 'Item Widget with max number',
+						'Refresh interval' => 'No refresh',
+						'Advanced configuration' => true,
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '999999999999999'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Name' => 'Item Widget with threshold with fractional digits',
+						'Refresh interval' => '10 seconds',
+						'Advanced configuration' => true,
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '0.9999'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Name' => 'Item Widget with thresholds with suffix',
+						'Refresh interval' => '30 seconds',
+						'Advanced configuration' => true,
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '1K',
+						'id:thresholds_1_threshold' => '1024'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Type' => 'Item value',
+						'Item' => 'Available memory in %',
+						'Name' => 'Item Widget with thresholds with suffixes',
+						'Refresh interval' => '2 minutes',
+						'Advanced configuration' => true,
+					],
+					'colors' => [
+						'id:lbl_thresholds_0_color' => '26C6DA',
+						'id:lbl_thresholds_1_color' => 'FFEB3B'
+					],
+					'thresholds' => [
+						'id:thresholds_0_threshold' => '1K',
+						'id:thresholds_1_threshold' => '5G'
+					]
+				]
 			]
 		];
 	}
@@ -977,12 +977,11 @@ class testDashboardItemValueWidget extends CWebTest {
 		}
 
 		if (array_key_exists('thresholds', $data)) {
+			$count = 0;
 			foreach ($data['thresholds'] as $fieldid => $threshold) {
 				$form->query('button:Add')->one()->click();
 				$form->query($fieldid)->one()->fill($threshold);
-			}
-			if ($update === true && $data['expected']=== TEST_GOOD) {
-				return;
+				$count++;
 			}
 		}
 
@@ -990,6 +989,18 @@ class testDashboardItemValueWidget extends CWebTest {
 			foreach ($data['colors'] as $fieldid => $color) {
 				$form->query($fieldid)->one()->click()->waitUntilReady();
 				$this->query('xpath://div[@class="overlay-dialogue color-picker-dialogue"]')->asColorPicker()->one()->fill($color);
+			}
+		}
+
+		// Remove threshold fields for update test.
+		if ($update === true && $data['expected']=== TEST_GOOD) {
+			try {
+				for ($count; $count > 0; $count--) {
+					$form->query('id:thresholds_'.$count.'_remove')->one()->click();
+				}
+			}
+			catch (Exception $ignore) {
+				// Do nothing
 			}
 		}
 
