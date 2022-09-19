@@ -136,13 +136,9 @@ static void	DCdump_hosts(void)
 					host->httptests.values[j]->httptestid);
 		}
 
-		zabbix_log(LOG_LEVEL_TRACE, "  active items:");
-		for (j = 0; j < host->active_items.values_num; j++)
-		{
-			ZBX_DC_ITEM	*item = host->active_items.values[j];
-
-			zabbix_log(LOG_LEVEL_TRACE, "    itemid:" ZBX_FS_UI64, item->itemid);
-		}
+		zabbix_log(LOG_LEVEL_TRACE, "  items:");
+		for (j = 0; j < host->items.values_num; j++)
+			zabbix_log(LOG_LEVEL_TRACE, "    itemid:" ZBX_FS_UI64, host->items.values[j]->itemid);
 	}
 
 	zbx_vector_ptr_destroy(&index);
@@ -586,7 +582,6 @@ static void	DCdump_items(void)
 		{&config->simpleitems, (zbx_dc_dump_func_t)DCdump_simpleitem},
 		{&config->jmxitems, (zbx_dc_dump_func_t)DCdump_jmxitem},
 		{&config->calcitems, (zbx_dc_dump_func_t)DCdump_calcitem},
-		{&config->masteritems, (zbx_dc_dump_func_t)DCdump_masteritem},
 		{&config->preprocitems, (zbx_dc_dump_func_t)DCdump_preprocitem},
 		{&config->httpitems, (zbx_dc_dump_func_t)DCdump_httpitem},
 		{&config->scriptitems, (zbx_dc_dump_func_t)DCdump_scriptitem},
@@ -625,6 +620,9 @@ static void	DCdump_items(void)
 			if (NULL != (ptr = zbx_hashset_search(trace_items[j].hashset, &item->itemid)))
 				trace_items[j].dump_func(ptr);
 		}
+
+		if (NULL != item->master_item)
+			DCdump_masteritem(item->master_item);
 
 		if (0 != item->tags.values_num)
 			DCdump_item_tags(item);
@@ -727,41 +725,6 @@ static void	DCdump_item_discovery(void)
 		item_discovery = (ZBX_DC_ITEM_DISCOVERY *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " parent_itemid:" ZBX_FS_UI64,
 				item_discovery->itemid, item_discovery->parent_itemid);
-	}
-
-	zbx_vector_ptr_destroy(&index);
-
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
-}
-
-static void	DCdump_master_items(void)
-{
-	ZBX_DC_MASTERITEM	*master_item;
-	zbx_hashset_iter_t	iter;
-	int			i, j;
-	zbx_vector_ptr_t	index;
-
-	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
-
-	zbx_vector_ptr_create(&index);
-	zbx_hashset_iter_reset(&config->masteritems, &iter);
-
-	while (NULL != (master_item = (ZBX_DC_MASTERITEM *)zbx_hashset_iter_next(&iter)))
-		zbx_vector_ptr_append(&index, master_item);
-
-	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	for (i = 0; i < index.values_num; i++)
-	{
-		master_item = (ZBX_DC_MASTERITEM *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "master itemid:" ZBX_FS_UI64, master_item->itemid);
-
-		for (j = 0; j < master_item->dep_itemids.values_num; j++)
-		{
-			zabbix_log(LOG_LEVEL_TRACE, "  itemid:" ZBX_FS_UI64 " flags:" ZBX_FS_UI64,
-					master_item->dep_itemids.values[j].first,
-					master_item->dep_itemids.values[j].second);
-		}
 	}
 
 	zbx_vector_ptr_destroy(&index);
@@ -1460,7 +1423,6 @@ void	DCdump_configuration(void)
 	DCdump_item_discovery();
 	DCdump_interface_snmpitems();
 	DCdump_template_items();
-	DCdump_master_items();
 	DCdump_prototype_items();
 	DCdump_triggers();
 	DCdump_trigdeps();

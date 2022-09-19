@@ -2394,10 +2394,14 @@ static void	dc_interface_snmpitems_remove(ZBX_DC_ITEM *item)
 static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_t dep_itemid)
 {
 	ZBX_DC_MASTERITEM	*masteritem;
+	ZBX_DC_ITEM		*item;
 	int			index;
 	zbx_uint64_pair_t	pair;
 
-	if (NULL == (masteritem = (ZBX_DC_MASTERITEM *)zbx_hashset_search(&config->masteritems, &master_itemid)))
+	if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &master_itemid)))
+		return;
+
+	if (NULL == (masteritem = item->master_item))
 		return;
 
 	pair.first = dep_itemid;
@@ -2412,7 +2416,8 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
 	if (0 == masteritem->dep_itemids.values_num)
 	{
 		zbx_vector_uint64_pair_destroy(&masteritem->dep_itemids);
-		zbx_hashset_remove_direct(&config->masteritems, masteritem);
+		__config_shmem_free_func(item->master_item);
+		item->master_item = NULL;
 	}
 }
 
@@ -2606,6 +2611,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 					__config_shmem_free_func);
 
 			zbx_vector_dc_item_ptr_append(&host->items, item);
+
+			item->preproc_item = NULL;
+			item->master_item = NULL;
 		}
 		else
 		{
@@ -3059,21 +3067,22 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 		depitem = (ZBX_DC_DEPENDENTITEM *)dep_items.values[i];
 		dc_masteritem_remove_depitem(depitem->last_master_itemid, depitem->itemid);
+
+		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &depitem->master_itemid)))
+			continue;
+
 		pair.first = depitem->itemid;
 		pair.second = depitem->flags;
 
-		/* append item to dependent item vector of master item */
-		if (NULL == (master = (ZBX_DC_MASTERITEM *)zbx_hashset_search(&config->masteritems,
-				&depitem->master_itemid)))
+		if (NULL == (master = item->master_item))
 		{
-			ZBX_DC_MASTERITEM	master_local;
-
-			master_local.itemid = depitem->master_itemid;
-			master = (ZBX_DC_MASTERITEM *)zbx_hashset_insert(&config->masteritems, &master_local,
-					sizeof(master_local));
+			master = (ZBX_DC_MASTERITEM *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_MASTERITEM));
+			master->itemid = depitem->master_itemid;
 
 			zbx_vector_uint64_pair_create_ext(&master->dep_itemids, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
+
+			item->master_item = master;
 		}
 
 		zbx_vector_uint64_pair_append(&master->dep_itemids, pair);
@@ -5357,9 +5366,13 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision, int t
 		{
 			zbx_vector_ptr_destroy(&preprocitem->preproc_ops);
 			zbx_hashset_remove_direct(&config->preprocitems, preprocitem);
+			item->preproc_item = NULL;
 		}
 		else
+		{
 			zbx_vector_ptr_sort(&preprocitem->preproc_ops, dc_compare_preprocops_by_step);
+			item->preproc_item = preprocitem;
+		}
 	}
 
 	zbx_vector_ptr_destroy(&items);
@@ -7749,7 +7762,6 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->simpleitems, 0);
 	CREATE_HASHSET(config->jmxitems, 0);
 	CREATE_HASHSET(config->calcitems, 0);
-	CREATE_HASHSET(config->masteritems, 0);
 	CREATE_HASHSET(config->preprocitems, 0);
 	CREATE_HASHSET(config->httpitems, 0);
 	CREATE_HASHSET(config->scriptitems, 0);
@@ -9333,7 +9345,6 @@ static int	dc_preproc_item_init(zbx_preproc_item_t *item, zbx_uint64_t itemid)
 void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 {
 	const ZBX_DC_PREPROCITEM	*dc_preprocitem;
-	const ZBX_DC_MASTERITEM		*dc_masteritem;
 	const ZBX_DC_ITEM		*dc_item;
 	const zbx_dc_preproc_op_t	*dc_op;
 	zbx_preproc_item_t		*item, item_local;
@@ -9406,6 +9417,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 		zbx_hashset_insert(&ids, &item->itemid, sizeof(item->itemid));
 	}
 
+#ifdef WDN
 	zbx_hashset_iter_reset(&config->masteritems, &iter);
 	while (NULL != (dc_masteritem = (const ZBX_DC_MASTERITEM *)zbx_hashset_iter_next(&iter)))
 	{
@@ -9446,6 +9458,8 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp)
 			item->dep_itemids[item->dep_itemids_num++] = dc_masteritem->dep_itemids.values[i];
 		}
 	}
+#endif
+
 
 	zbx_hashset_iter_reset(&config->items, &iter);
 	while (NULL != (dc_item = (const ZBX_DC_ITEM *)zbx_hashset_iter_next(&iter)))
