@@ -9498,7 +9498,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 			{
 				zbx_hashset_insert(&pp_itemids, &dc_item->itemid, sizeof(zbx_uint64_t));
 
-				if (*revision < global_revision || *revision < dc_item->revision)
+				if (*revision < global_revision || *revision < dc_host->revision)
 					zbx_vector_dc_item_ptr_append(&items_sync, dc_item);
 				else
 					zbx_vector_dc_item_ptr_append(&items_check, dc_item);
@@ -9535,7 +9535,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 		if (NULL != zbx_hashset_search(&pp_itemids, &pp_item->itemid))
 			continue;
 
-		zbx_hashset_remove_direct(items, pp_item);
+		zbx_hashset_iter_remove(&iter);
 	}
 
 	*revision = config->revision.config;
