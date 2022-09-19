@@ -1,0 +1,1 @@
+........S. [ZBX-21664] fixed Zabbix server crashing during database upgrade when converting service times and there is downtime inside uptime (vso)
