@@ -254,20 +254,40 @@ class CAudit {
 		self::RESOURCE_ITEM => [
 			[
 				'paths' => ['item.password'],
-				'conditions_on_add' => ['type' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-					ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT
-				]]
+				'conditions' => [
+					[
+						'type' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+							ITEM_TYPE_JMX
+						]
+					],
+					[
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'authtype' => [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
+							HTTPTEST_AUTH_DIGEST
+						]
+					]
+				]
 			],
-			['paths' => ['item.ssl_key_password'], 'conditions_on_add' => ['type' => ITEM_TYPE_HTTPAGENT]]
+			['paths' => ['item.ssl_key_password'], 'conditions' => ['type' => ITEM_TYPE_HTTPAGENT]]
 		],
 		self::RESOURCE_ITEM_PROTOTYPE => [
 			[
 				'paths' => ['itemprototype.password'],
-				'conditions_on_add' => ['type' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-					ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT
-				]]
+				'conditions' => [
+					[
+						'type' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+							ITEM_TYPE_JMX
+						]
+					],
+					[
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'authtype' => [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
+							HTTPTEST_AUTH_DIGEST
+						]
+					]
+				]
 			],
-			['paths' => ['itemprototype.ssl_key_password'], 'conditions_on_add' => ['type' => ITEM_TYPE_HTTPAGENT]]
+			['paths' => ['itemprototype.ssl_key_password'], 'conditions' => ['type' => ITEM_TYPE_HTTPAGENT]]
 		],
 		self::RESOURCE_MACRO => [
 			'paths' => ['usermacro.value'],
@@ -666,11 +686,10 @@ class CAudit {
 	 * @param int    $resource
 	 * @param string $path
 	 * @param array  $object
-	 * @param string $action
 	 *
 	 * @return bool
 	 */
-	private static function isValueToMask(int $resource, string $path, array $object, string $action): bool {
+	private static function isValueToMask(int $resource, string $path, array $object): bool {
 		if (!array_key_exists($resource, self::MASKED_PATHS)) {
 			return false;
 		}
@@ -678,55 +697,56 @@ class CAudit {
 		$object_path = self::getLastObjectPath($path);
 		$abstract_path = self::getAbstractPath($path);
 
-		if (array_key_exists('paths', self::MASKED_PATHS[$resource])) {
-			$rules = self::MASKED_PATHS[$resource];
+		$rules = [];
 
-			if (!in_array(self::getAbstractPath($path), self::MASKED_PATHS[$resource]['paths'])) {
-				return false;
+		if (array_key_exists('paths', self::MASKED_PATHS[$resource])) {
+			if (in_array($abstract_path, self::MASKED_PATHS[$resource]['paths'])) {
+				$rules = self::MASKED_PATHS[$resource];
 			}
 		}
 		else {
-			$rules = [];
-
 			foreach (self::MASKED_PATHS[$resource] as $_rules) {
 				if (in_array($abstract_path, $_rules['paths'])) {
 					$rules = $_rules;
 					break;
 				}
 			}
-
-			if (!$rules) {
-				return false;
-			}
 		}
 
-		if ($action === self::DETAILS_ACTION_ADD && array_key_exists('conditions_on_add', $rules)) {
-			$conditions = $rules['conditions_on_add'];
-		}
-		else {
-			if (!array_key_exists('conditions', $rules)) {
-				return true;
-			}
-
-			$conditions = $rules['conditions'];
+		if (!$rules) {
+			return false;
 		}
 
-		$all_conditions = count($conditions);
-		$true_conditions = 0;
+		if (!array_key_exists('conditions', $rules)) {
+			return true;
+		}
 
-		foreach ($conditions as $condition_key => $value) {
-			$condition_path = $object_path.'.'.$condition_key;
+		$or_conditions = $rules['conditions'];
 
-			if (array_key_exists($condition_path, $object)) {
-				$values = is_array($value) ? $value : [$value];
+		if (!array_key_exists(0, $or_conditions)) {
+			$or_conditions = [$or_conditions];
+		}
 
-				if (in_array($object[$condition_path], $values)) {
-					$true_conditions++;
+		foreach ($or_conditions as $and_conditions) {
+			$all_conditions = count($and_conditions);
+			$true_conditions = 0;
+
+			foreach ($and_conditions as $condition_key => $value) {
+				$condition_path = $object_path.'.'.$condition_key;
+
+				if (array_key_exists($condition_path, $object)) {
+					$values = is_array($value) ? $value : [$value];
+
+					if (in_array($object[$condition_path], $values)) {
+						$true_conditions++;
+					}
 				}
 			}
+
+			return ($true_conditions == $all_conditions);
 		}
 
-		return ($true_conditions == $all_conditions);
+		return false;
 	}
 
 	/**
@@ -895,7 +915,7 @@ class CAudit {
 				$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_ADD];
 			}
 
-			if (self::isValueToMask($resource, $path, $object, self::DETAILS_ACTION_ADD)) {
+			if (self::isValueToMask($resource, $path, $object)) {
 				$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
 				continue;
 			}
@@ -953,10 +973,11 @@ class CAudit {
 		}
 
 		foreach ($object as $path => $value) {
+			$is_value_to_mask = self::isValueToMask($resource, $path, $object);
 			$db_value = array_key_exists($path, $db_object) ? $db_object[$path] : null;
 
 			if ($db_value === null) {
-				$is_value_to_mask = self::isValueToMask($resource, $path, $object, self::DETAILS_ACTION_ADD);
+				$is_value_to_mask = self::isValueToMask($resource, $path, $object);
 
 				if ($is_value_to_mask) {
 					$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
@@ -975,8 +996,7 @@ class CAudit {
 				$result[$path] = [self::DETAILS_ACTION_ADD, $value];
 			}
 			else {
-				$is_value_to_mask = self::isValueToMask($resource, $path, $object, self::DETAILS_ACTION_UPDATE);
-				$is_db_value_to_mask = self::isValueToMask($resource, $path, $db_object, self::DETAILS_ACTION_UPDATE);
+				$is_db_value_to_mask = self::isValueToMask($resource, $path, $db_object);
 
 				if ($value != $db_value || $is_value_to_mask || $is_db_value_to_mask) {
 					if (self::isNestedObjectProperty($path)) {
