@@ -26,7 +26,6 @@
 // create form
 $form = (new CForm())
 	->setId('massupdate-form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'popup.massupdate.host')
 	->addVar('hostids', $data['hostids'], 'ids')
 	->addVar('tls_accept', HOST_ENCRYPTION_NONE)
@@ -197,7 +196,7 @@ $tags_tab->addRow(
 			->addStyle('margin-bottom: 10px;'),
 		renderTagTable([['tag' => '', 'value' => '']])
 			->setHeader([_('Name'), _('Value'), _('Action')])
-			->setId('tags-table')
+			->addClass('tags-table')
 	]))->setId('tags-div')
 );
 

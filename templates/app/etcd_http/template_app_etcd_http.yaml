@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-13T21:49:37Z'
+  date: '2022-07-21T12:27:36Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1353,7 +1353,7 @@ zabbix_export:
                   value: '{#ETCD.PEER}'
             -
               uuid: 2521ccfc16fc43069001883b85aa0243
-              name: 'Etcd: Etcd peer {#ETCD.PEER}: Receive failures failures'
+              name: 'Etcd: Etcd peer {#ETCD.PEER}: Receive failures'
               type: DEPENDENT
               key: 'etcd.received.fail.rate[{#ETCD.PEER}]'
               delay: '0'

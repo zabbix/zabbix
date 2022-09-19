@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-07-22 13:16+0000\n"
+"PO-Revision-Date: 2022-09-09 18:00+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -11059,6 +11059,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "L"
 
+#: include/func.inc.php:592 jsLoader.php:223
+msgctxt "month short"
+msgid "M"
+msgstr "M"
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
 msgstr "Adresse MAC A"
@@ -13821,6 +13826,10 @@ msgstr "Règles de découverte parentes"
 #: include/views/configuration.graph.edit.php:66
 msgid "Parent graphs"
 msgstr "Graphique parent"
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
+msgstr "Valeur de l'hôte parent"
 
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
@@ -22609,6 +22618,11 @@ msgstr "varsamp() - Variance de l'échantillon"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "via"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr "S"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

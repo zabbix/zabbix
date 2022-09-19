@@ -10950,6 +10950,11 @@ msgctxt "Monday short"
 msgid "M"
 msgstr "M"
 
+#: include/func.inc.php:592 jsLoader.php:223
+msgctxt "month short"
+msgid "M"
+msgstr ""
+
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
 msgstr "Alamat MAC A"
@@ -13703,6 +13708,10 @@ msgstr "Aturan discovery induk"
 
 #: include/views/configuration.graph.edit.php:66
 msgid "Parent graphs"
+msgstr ""
+
+#: app/partials/hostmacros.inherited.list.html.php:52
+msgid "Parent host value"
 msgstr ""
 
 #: include/views/configuration.item.edit.php:55
@@ -22463,6 +22472,11 @@ msgstr ""
 #: include/actions.inc.php:605 include/actions.inc.php:623
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
+msgstr ""
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
 msgstr ""
 
 #: include/classes/api/services/CTask.php:443

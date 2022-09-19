@@ -53,7 +53,7 @@ class testFormTabIndicators extends CWebTest {
 									'tag' => 'tag2'
 								]
 							],
-							'table_selector' => 'id:tags-table',
+							'table_selector' => 'class:tags-table',
 							'field_type' => 'multifield_table',
 							'count' => 3
 						],
@@ -110,7 +110,7 @@ class testFormTabIndicators extends CWebTest {
 									'tag' => ' '
 								]
 							],
-							'table_selector' => 'id:tags-table',
+							'table_selector' => 'class:tags-table',
 							'field_type' => 'multifield_table',
 							'count' => 4
 						],
@@ -180,7 +180,7 @@ class testFormTabIndicators extends CWebTest {
 									'tag' => ' '
 								]
 							],
-							'table_selector' => 'id:tags-table',
+							'table_selector' => 'class:tags-table',
 							'field_type' => 'multifield_table',
 							'count' => 2
 						],
@@ -281,7 +281,7 @@ class testFormTabIndicators extends CWebTest {
 									'tag' => ' '
 								]
 							],
-							'table_selector' => 'id:tags-table',
+							'table_selector' => 'class:tags-table',
 							'field_type' => 'multifield_table',
 							'count' => 2
 						],
@@ -318,7 +318,7 @@ class testFormTabIndicators extends CWebTest {
 									'tag' => ' '
 								]
 							],
-							'table_selector' => 'id:tags-table',
+							'table_selector' => 'class:tags-table',
 							'field_type' => 'multifield_table',
 							'count' => 3
 						],
@@ -569,9 +569,9 @@ class testFormTabIndicators extends CWebTest {
 							],
 							'field_type' => 'general_field'
 						],
+						// There is no tab indicator if the default values are set.
 						[
 							'name' => 'Legend',
-							'set by default' => true,
 							'entries' => [
 								'selector' => 'id:legend',
 								'value' => false,
@@ -674,13 +674,12 @@ class testFormTabIndicators extends CWebTest {
 			$form->selectTab($tab['name']);
 
 			if (array_key_exists('count', $tab)) {
-				$data_indicator = 'count';
 				$new_value = $tab['count'];
 				$old_value = CTestArrayHelper::get($tab, 'initial_count', 0);
 			}
 			else {
-				$data_indicator = 'mark';
-				$old_value = CTestArrayHelper::get($tab, 'set by default', false);
+				// There is no tab indicator if the default values are set.
+				$old_value = false;
 				$new_value = !$old_value;
 			}
 
@@ -839,11 +838,11 @@ class testFormTabIndicators extends CWebTest {
 				'tag' => 'tag2'
 			]
 		];
-		$form->query('id:tags-table')->asMultifieldTable()->one()->fill($tags);
+		$form->query('class:tags-table')->asMultifieldTable()->one()->fill($tags);
 		$this->assertTabIndicator($tab_selector, 3);
 
 		// Remove the tags and check count indicator.
-		$form->query('id:tags-table')->one()->query('button:Remove')->all()->click();
+		$form->query('class:tags-table')->one()->query('button:Remove')->all()->click();
 		$this->assertTabIndicator($tab_selector, 0);
 	}
 
