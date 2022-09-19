@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-09-14 06:54+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-09-15 07:34+0000\n"
+"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
@@ -89,8 +89,8 @@ msgstr "%1$d znakov prekračuje maximálnu dĺžku %2$d znakov"
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] "%1$d dni"
-msgstr[1] "%1$d dní"
+msgstr[0] "%1$d deň"
+msgstr[1] "%1$d dni"
 msgstr[2] "%1$d dní"
 
 #: jsLoader.php:347
@@ -2818,7 +2818,7 @@ msgstr "Nedá sa vyhodnotiť výraz"
 
 #: include/classes/api/services/CScript.php:1064
 msgid "Cannot execute URL type script."
-msgstr ""
+msgstr "Nedá sa spustiť skript typu URL."
 
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
@@ -13863,7 +13863,7 @@ msgstr "Len spúšťače priradené k monitorovaným hostom alebo závislé na m
 
 #: app/views/administration.script.edit.php:193
 msgid "Open in a new window"
-msgstr ""
+msgstr "Otvoriť v novom okne"
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -23708,7 +23708,7 @@ msgstr "cez"
 #: include/func.inc.php:659
 msgctxt "week short"
 msgid "w"
-msgstr ""
+msgstr "w"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"
