@@ -1717,6 +1717,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 			const char	*d = "";
 
 			tag = item->item_tags.values[j];
+
 			if (0 == tag->tagid)
 			{
 				zbx_db_insert_add_values(&db_insert, new_tagid, item->itemid, tag->tag, tag->value);
