@@ -1870,6 +1870,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 			const char	*d = "";
 
 			param = item->item_params.values[j];
+
 			if (0 == param->item_parameterid)
 			{
 				zbx_db_insert_add_values(&db_insert, item_parameter_id, item->itemid, param->name,
