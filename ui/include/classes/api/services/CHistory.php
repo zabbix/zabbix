@@ -174,10 +174,10 @@ class CHistory extends CApiService {
 
 			default:
 				$config = select_config();
-				$hk_history = $config['hk_history_global'] == 1 ? timeUnitToSeconds($config['hk_history']) : 0;
-
-				if ($hk_history != 0) {
-					$options['time_from'] = max($options['time_from'], time() - $hk_history);
+				if ($config['hk_history_global'] == 1) {
+					$options['time_from'] = max($options['time_from'],
+						time() - timeUnitToSeconds($config['hk_history'])
+					);
 				}
 
 				return $this->getFromSql($options);
