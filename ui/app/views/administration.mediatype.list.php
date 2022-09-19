@@ -173,7 +173,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 	$mediaTypeTable->addRow([
 		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', $mediaType['mediatypeid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		media_type2str($mediaType['typeid']),
+		CMediatypeHelper::getMediaTypes($mediaType['typeid']),
 		$status,
 		$actionColumn,
 		$details,
