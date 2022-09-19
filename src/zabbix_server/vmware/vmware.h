@@ -152,6 +152,7 @@ typedef struct
 	char				*uuid;
 	char				*name;
 	char				*id;
+	char				*type;
 	zbx_uint64_t			capacity;
 	zbx_uint64_t			free_space;
 	zbx_uint64_t			uncommitted;

@@ -1194,6 +1194,7 @@ static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 	vmware_shared_strfree(datastore->name);
 	vmware_shared_strfree(datastore->id);
 	vmware_shared_strfree(datastore->uuid);
+	vmware_shared_strfree(datastore->type);
 
 	vmware_vector_str_uint64_pair_shared_clean(&datastore->hv_uuids_access);
 	zbx_vector_str_uint64_pair_destroy(&datastore->hv_uuids_access);
@@ -1806,6 +1807,7 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 	datastore->uuid = vmware_shared_strdup(src->uuid);
 	datastore->name = vmware_shared_strdup(src->name);
 	datastore->id = vmware_shared_strdup(src->id);
+	datastore->type = vmware_shared_strdup(src->type);
 	VMWARE_VECTOR_CREATE(&datastore->hv_uuids_access, str_uint64_pair);
 	zbx_vector_str_uint64_pair_reserve(&datastore->hv_uuids_access, (size_t)src->hv_uuids_access.values_num);
 	VMWARE_VECTOR_CREATE(&datastore->diskextents, vmware_diskextent);
@@ -2350,6 +2352,7 @@ static void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
 	zbx_free(datastore->name);
 	zbx_free(datastore->uuid);
 	zbx_free(datastore->id);
+	zbx_free(datastore->type);
 	zbx_free(datastore);
 }
 
@@ -4602,6 +4605,7 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 	datastore->name = (NULL != name) ? name : zbx_strdup(NULL, id);
 	datastore->uuid = uuid;
 	datastore->id = zbx_strdup(NULL, id);
+	datastore->type = zbx_xml_doc_read_value(doc, ZBX_XPATH_DATASTORE_SUMMARY("type"));
 	datastore->capacity = capacity;
 	datastore->free_space = free_space;
 	datastore->uncommitted = uncommitted;

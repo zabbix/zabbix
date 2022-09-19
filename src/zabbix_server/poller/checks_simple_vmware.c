@@ -2426,22 +2426,23 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 		zbx_vmware_datastore_t	*datastore;
 		int			j, total = 0;
 
-		for (j = 0; j < dsname->hvdisks.values_num; j++)
-			total += dsname->hvdisks.values[j].multipath_total;
-
-		zbx_json_addobject(&json_data, NULL);
-		zbx_json_addstring(&json_data, "{#DATASTORE}", dsname->name, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", dsname->uuid, ZBX_JSON_TYPE_STRING);
-		zbx_json_adduint64(&json_data, "{#MULTIPATH.COUNT}", (unsigned int)total);
-		zbx_json_adduint64(&json_data, "{#MULTIPATH.PARTITION.COUNT}",
-				(unsigned int)dsname->hvdisks.values_num);
-
 		if (NULL == (datastore = ds_get(&service->data->datastores, dsname->uuid)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
 			goto unlock;
 		}
 
+		for (j = 0; j < dsname->hvdisks.values_num; j++)
+			total += dsname->hvdisks.values[j].multipath_total;
+
+		zbx_json_addobject(&json_data, NULL);
+		zbx_json_addstring(&json_data, "{#DATASTORE}", dsname->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", dsname->uuid, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#DATASTORE.TYPE}", ZBX_NULL2EMPTY_STR(datastore->type),
+				ZBX_JSON_TYPE_STRING);
+		zbx_json_adduint64(&json_data, "{#MULTIPATH.COUNT}", (unsigned int)total);
+		zbx_json_adduint64(&json_data, "{#MULTIPATH.PARTITION.COUNT}",
+				(unsigned int)dsname->hvdisks.values_num);
 		zbx_json_addarray(&json_data, "datastore_extent");
 
 		for (j = 0; j < datastore->diskextents.values_num; j++)
@@ -3548,6 +3549,8 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATASTORE}", datastore->name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", datastore->uuid, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#DATASTORE.TYPE}", ZBX_NULL2EMPTY_STR(datastore->type),
+				ZBX_JSON_TYPE_STRING);
 		zbx_json_addarray(&json_data, "datastore_extent");
 
 		for (j = 0; j < datastore->diskextents.values_num; j++)
