@@ -2,7 +2,6 @@
 
 SUBDIRS = \
 	diag \
-	heart \
 	housekeeper \
 	proxyconfig \
 	datasender \
@@ -26,7 +25,6 @@ zabbix_proxy_SOURCES = proxy.c
 
 zabbix_proxy_LDADD = \
 	diag/libzbxdiag_proxy.a \
-	heart/libzbxheart.a \
 	$(top_builddir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	housekeeper/libzbxhousekeeper.a \

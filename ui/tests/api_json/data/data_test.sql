@@ -239,21 +239,6 @@ INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (1501
 INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150158, 15016, 150158, 1);
 INSERT INTO httpstepitem (httpstepitemid, httpstepid, itemid, type) VALUES (150159, 15016, 150159, 0);
 
--- proxy
-INSERT INTO hosts (hostid, host, status, description) VALUES (99000, 'Api active proxy for delete0', 5, '');
-INSERT INTO hosts (hostid, host, status, description) VALUES (99001, 'Api active proxy for delete1', 5, '');
-INSERT INTO hosts (hostid, host, status, description) VALUES (99002, 'Api passive proxy for delete', 6, '');
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (99002, 99002,1, 0, 1, '127.0.0.1', 'localhost', 10051);
-INSERT INTO hosts (hostid, host, status, description) VALUES (99003, 'Api active proxy in action', 5, '');
-INSERT INTO hosts (hostid, host, status, description) VALUES (99004, 'Api active proxy with host', 5, '');
-INSERT INTO hosts (hostid, proxy_hostid, host, name, status, description) VALUES (99005, 99004,'API Host monitored with proxy', 'API Host monitored with proxy', 0, '');
-INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (99003,99005,1,1,1,'127.0.0.1','','10050');
-INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (90, 'API action with proxy', 1, 0, 0, '1h');
-INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (90, 90, 0, 0, 1, 1, 0);
-INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (90, 0, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
-INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (90, 90, 7);
-INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (90,90,20,0,99003,'');
-
 -- sysmaps
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (10001, 'A', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
 INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (10002, 'B', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 1);
@@ -267,6 +252,14 @@ INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, icon
 -- interfaces
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (99004,10084,1,2,1,'127.0.0.1','','161');
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (99004, 2, 1, '{$SNMP_COMMUNITY}');
+
+-- discovery action
+INSERT INTO hosts (hostid, host, status, description) VALUES (99000, 'API active proxy for discovery action', 5, '');
+INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (90, 'API action with proxy', 1, 0, 0, '1h');
+INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (90, 90, 0, 0, 1, 1, 0);
+INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (90, 0, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
+INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (90, 90, 7);
+INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (90,90,20,0,99000,'');
 
 -- autoregistration action
 INSERT INTO usrgrp (usrgrpid, name) VALUES (47, 'User group for action delete');

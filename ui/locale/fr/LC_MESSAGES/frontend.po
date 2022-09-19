@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-09-02 18:47+0000\n"
+"PO-Revision-Date: 2022-09-14 18:35+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -2745,7 +2745,7 @@ msgstr "Impossible d'évaluer l'expression"
 
 #: include/classes/api/services/CScript.php:1064
 msgid "Cannot execute URL type script."
-msgstr ""
+msgstr "Impossible d'exécuter le script de type URL."
 
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
@@ -13745,7 +13745,7 @@ msgstr "Seuls les déclencheurs assignés à des hôtes activés et dépendant d
 
 #: app/views/administration.script.edit.php:193
 msgid "Open in a new window"
-msgstr ""
+msgstr "Ouvrir dans une nouvelle fenêtre"
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -23563,7 +23563,7 @@ msgstr "via"
 #: include/func.inc.php:659
 msgctxt "week short"
 msgid "w"
-msgstr ""
+msgstr "s"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

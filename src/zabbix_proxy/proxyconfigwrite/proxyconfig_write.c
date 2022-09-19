@@ -690,7 +690,7 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, char **error)
 	}
 
 	zbx_vector_uint64_create(&updateids);
-	zbx_vector_uint64_reserve(&updateids, td->updates.values_num);
+	zbx_vector_uint64_reserve(&updateids, (size_t)td->updates.values_num);
 
 	for (i = 0; i < td->updates.values_num; i++)
 	{
@@ -2028,17 +2028,19 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)zbx_dc_get_received_revision());
 
-	if (SUCCEED != (ret = zbx_tcp_send_ext(sock, j.buffer, j.buffer_size, 0, sock->protocol, CONFIG_TIMEOUT)))
+	if (SUCCEED != (ret = zbx_tcp_send_ext(sock, j.buffer, j.buffer_size, 0, (unsigned char)sock->protocol,
+			CONFIG_TIMEOUT)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy configuration information to sever at \"%s\": %s",
 				sock->peer, zbx_json_strerror());
 		goto out;
 	}
 
-	if (FAIL == (ret = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
+	if (FAIL == zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot receive proxy configuration data from server at \"%s\": %s",
 				sock->peer, zbx_json_strerror());
+		ret = FAIL;
 		goto out;
 	}
 

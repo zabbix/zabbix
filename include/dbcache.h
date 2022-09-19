@@ -25,6 +25,7 @@
 #include "zbxshmem.h"
 #include "zbxeval.h"
 #include "zbxavailability.h"
+#include "zbxversion.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -293,35 +294,37 @@ zbx_trigger_items_t;
 
 typedef struct
 {
-	zbx_uint64_t	hostid;
-	char		host[ZBX_HOSTNAME_BUF_LEN];
-	int		proxy_config_nextcheck;
-	int		proxy_data_nextcheck;
-	int		proxy_tasks_nextcheck;
-	int		last_cfg_error_time;	/* time when passive proxy misconfiguration error was seen */
-						/* or 0 if no error */
-	int		version;
-	int		lastaccess;
-	char		addr_orig[ZBX_INTERFACE_ADDR_LEN_MAX];
-	char		port_orig[ZBX_INTERFACE_PORT_LEN_MAX];
-	char		*addr;
-	unsigned short	port;
+	zbx_uint64_t			hostid;
+	char				host[ZBX_HOSTNAME_BUF_LEN];
+	int				proxy_config_nextcheck;
+	int				proxy_data_nextcheck;
+	int				proxy_tasks_nextcheck;
+	int				last_cfg_error_time;	/* time when passive proxy misconfiguration error was */
+								/* seen or 0 if no error */
+	char				version_str[ZBX_VERSION_BUF_LEN];
+	int				version_int;
+	zbx_proxy_compatibility_t	compatibility;
+	int				lastaccess;
+	char				addr_orig[ZBX_INTERFACE_ADDR_LEN_MAX];
+	char				port_orig[ZBX_INTERFACE_PORT_LEN_MAX];
+	char				*addr;
+	unsigned short			port;
 
-	unsigned char	auto_compress;
-	unsigned char	tls_connect;
-	unsigned char	tls_accept;
+	unsigned char			auto_compress;
+	unsigned char			tls_connect;
+	unsigned char			tls_accept;
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	char		tls_issuer[HOST_TLS_ISSUER_LEN_MAX];
-	char		tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
-	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
-	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
+	char				tls_issuer[HOST_TLS_ISSUER_LEN_MAX];
+	char				tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
+	char				tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
+	char				tls_psk[HOST_TLS_PSK_LEN_MAX];
 #endif
-	char		proxy_address[HOST_PROXY_ADDRESS_LEN_MAX];
-	int		last_version_error_time;
+					zbx_uint64_t	revision;
+					zbx_uint64_t	macro_revision;
 
-	zbx_uint64_t	revision;
-	zbx_uint64_t	macro_revision;
+	char				proxy_address[HOST_PROXY_ADDRESS_LEN_MAX];
+	int				last_version_error_time;
 }
 DC_PROXY;
 
@@ -886,6 +889,7 @@ void	DCget_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx_hash
 int	DCget_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodata_win, int *lastaccess);
 int	DCget_proxy_delay_by_name(const char *name, int *delay, char **error);
 int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **error);
+int	zbx_proxy_discovery_get(char **data, char **error);
 
 unsigned int	DCget_internal_action_count(void);
 unsigned int	DCget_auto_registration_action_count(void);
@@ -1099,7 +1103,7 @@ typedef struct
 	zbx_uint64_t		hostid;
 	zbx_uint32_t		type;
 	unsigned char		lock;		/* 1 if the timer has locked trigger, 0 otherwise */
-	zbx_uint32_t		revision;	/* revision */
+	zbx_uint64_t		revision;	/* revision */
 	time_t			lastcheck;
 	zbx_timespec_t		eval_ts;	/* the history time for which trigger must be recalculated */
 	zbx_timespec_t		check_ts;	/* time when timer must be checked */
@@ -1162,6 +1166,7 @@ zbx_cached_proxy_t;
 ZBX_PTR_VECTOR_DECL(cached_proxy_ptr, zbx_cached_proxy_t *)
 
 void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_ptr_t *proxies);
+void	zbx_cached_proxy_free(zbx_cached_proxy_t *proxy);
 
 int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name);
 

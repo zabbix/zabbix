@@ -2787,6 +2787,11 @@ return [
 				'default' => NULL,
 				'ref_table' => 'userdirectory',
 				'ref_field' => 'userdirectoryid'
+			],
+			'server_status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => ''
 			]
 		]
 	],
@@ -8920,6 +8925,18 @@ return [
 				'default' => '0'
 			],
 			'lastaccess' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'version' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'compatibility' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

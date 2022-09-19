@@ -474,7 +474,7 @@ static zbx_proxyconfig_dep_item_t	*proxyconfig_dep_item_create(zbx_uint64_t item
 	item->itemid = itemid;
 	item->master_itemid = master_itemid;
 	item->cols_num = cols_num;
-	item->row = (DB_ROW)zbx_malloc(NULL, sizeof(DB_ROW) * cols_num);
+	item->row = (DB_ROW)zbx_malloc(NULL, sizeof(DB_ROW) * (size_t)cols_num);
 
 	for (i = 0; i < cols_num; i++)
 	{
@@ -567,7 +567,10 @@ static int	proxyconfig_get_item_data(const zbx_vector_uint64_t *hostids, zbx_vec
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			if (SUCCEED == is_item_processed_by_server(atoi(row[fld_type]), row[fld_key]))
+			unsigned char	type;
+
+			ZBX_STR2UCHAR(type, row[fld_type]);
+			if (SUCCEED == is_item_processed_by_server(type, row[fld_key]))
 					continue;
 
 			ZBX_DBROW2UINT64(itemid, row[0]);
@@ -1104,10 +1107,10 @@ out:
  ******************************************************************************/
 void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 {
-	char				*error = NULL, *buffer = NULL;
+	char				*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json			j;
 	DC_PROXY			proxy;
-	int				ret, flags = ZBX_TCP_PROTOCOL, loglevel;
+	int				ret, flags = ZBX_TCP_PROTOCOL, loglevel, version_int;
 	size_t				buffer_size, reserved = 0;
 	zbx_proxyconfig_status_t	status;
 
@@ -1127,17 +1130,29 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	zbx_update_proxy_data(&proxy, zbx_get_proxy_protocol_version(jp), (int)time(NULL),
-			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG);
+	version_str = zbx_get_proxy_protocol_version_str(jp);
+	version_int = zbx_get_proxy_protocol_version_int(version_str);
+
+	zbx_update_proxy_data(&proxy, version_str, version_int, (int)time(NULL),
+				(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG);
 
 	if (0 != proxy.auto_compress)
 		flags |= ZBX_TCP_COMPRESS;
+
+	if (ZBX_PROXY_VERSION_CURRENT != proxy.compatibility)
+	{
+		error = zbx_strdup(error, "proxy and server major versions do not match");
+		(void)zbx_send_response_ext(sock, NOTSUPPORTED, error, ZABBIX_VERSION, flags, CONFIG_TIMEOUT);
+		zabbix_log(LOG_LEVEL_WARNING, "configuration update is disabled for this version of proxy \"%s\" at"
+				" \"%s\": %s", proxy.host, sock->peer, error);
+		goto out;
+	}
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	if (SUCCEED != zbx_proxyconfig_get_data(&proxy, jp, &j, &status, &error))
 	{
-		zbx_send_response_ext(sock, FAIL, error, NULL, flags, CONFIG_TIMEOUT);
+		(void)zbx_send_response_ext(sock, FAIL, error, NULL, flags, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",
 				proxy.host, sock->peer, error);
 		goto clean;
@@ -1184,7 +1199,7 @@ clean:
 out:
 	zbx_free(error);
 	zbx_free(buffer);
+	zbx_free(version_str);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-

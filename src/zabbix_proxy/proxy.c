@@ -43,7 +43,6 @@
 #include "../zabbix_server/snmptrapper/snmptrapper.h"
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
-#include "heart/heart.h"
 #include "taskmanager/taskmanager.h"
 #include "../zabbix_server/selfmon/selfmon.h"
 #include "../zabbix_server/vmware/vmware.h"
@@ -103,9 +102,9 @@ const char	*help_message[] = {
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
 	"                                 (configuration syncer, data sender, discoverer,",
-	"                                 heartbeat sender, history syncer, housekeeper,",
-	"                                 http poller, icmp pinger, ipmi manager,",
-	"                                 ipmi poller, java poller, poller,",
+	"                                 history syncer, housekeeper, http poller,",
+	"                                 icmp pinger, ipmi manager, ipmi poller,",
+	"                                 java poller, poller,",
 	"                                 self-monitoring, snmp trapper, task manager,",
 	"                                 trapper, unreachable poller, vmware collector,"
 	"                                 availability manager, odbc poller)",
@@ -175,7 +174,6 @@ int	CONFIG_PROXYPOLLER_FORKS	= 0;
 int	CONFIG_ESCALATOR_FORKS		= 0;
 int	CONFIG_ALERTER_FORKS		= 0;
 int	CONFIG_TIMER_FORKS		= 0;
-int	CONFIG_HEARTBEAT_FORKS		= 1;
 int	CONFIG_COLLECTOR_FORKS		= 0;
 int	CONFIG_PASSIVE_FORKS		= 0;
 int	CONFIG_ACTIVE_FORKS		= 0;
@@ -202,7 +200,7 @@ int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_PROXY_LOCAL_BUFFER	= 0;
 int	CONFIG_PROXY_OFFLINE_BUFFER	= 1;
 
-int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
+int	CONFIG_HEARTBEAT_FREQUENCY	= -1;
 
 /* how often active Zabbix proxy requests configuration data from server, in seconds */
 int	CONFIG_PROXYCONFIG_FREQUENCY	= 0;	/* will be set to default 5 seconds if not configured */
@@ -336,11 +334,6 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		/* data collection processes might utilize CPU fully, start manager and worker processes beforehand */
 		*local_process_type = ZBX_PROCESS_TYPE_PREPROCESSOR;
 		*local_process_num = local_server_num - server_count + CONFIG_PREPROCESSOR_FORKS;
-	}
-	else if (local_server_num <= (server_count += CONFIG_HEARTBEAT_FORKS))
-	{
-		*local_process_type = ZBX_PROCESS_TYPE_HEARTBEAT;
-		*local_process_num = local_server_num - server_count + CONFIG_HEARTBEAT_FORKS;
 	}
 	else if (local_server_num <= (server_count += CONFIG_DATASENDER_FORKS))
 	{
@@ -505,9 +498,6 @@ static void	zbx_set_defaults(void)
 	if (NULL == CONFIG_SSL_KEY_LOCATION)
 		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DEFAULT_SSL_KEY_LOCATION);
 #endif
-	if (ZBX_PROXYMODE_ACTIVE != CONFIG_PROXYMODE || 0 == CONFIG_HEARTBEAT_FREQUENCY)
-		CONFIG_HEARTBEAT_FORKS = 0;
-
 	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
 	{
 		CONFIG_DATASENDER_FORKS = 0;
@@ -525,6 +515,9 @@ static void	zbx_set_defaults(void)
 
 	if (NULL == CONFIG_VAULTURL)
 		CONFIG_VAULTURL = zbx_strdup(CONFIG_VAULTURL, "https://127.0.0.1:8200");
+
+	if (-1 != CONFIG_HEARTBEAT_FREQUENCY)
+		zabbix_log(LOG_LEVEL_WARNING, "HeartbeatFrequency parameter is deprecated, and has no effect");
 
 	if (0 == CONFIG_SERVER_PORT)
 	{
@@ -1207,14 +1200,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t			rtc;
 	zbx_timespec_t			rtc_timeout = {1, 0};
 
+	zbx_config_comms_args_t		zbx_config = {zbx_config_tls, NULL, 0};
 	zbx_thread_args_t		thread_args;
-	zbx_thread_poller_args		poller_args = {zbx_config_tls, get_program_type, ZBX_NO_POLLER};
-	zbx_thread_heart_args		heart_args = {zbx_config_tls, get_program_type};
+	zbx_thread_poller_args		poller_args = {&zbx_config, get_program_type, ZBX_NO_POLLER};
 	zbx_thread_proxyconfig_args	proxyconfig_args = {zbx_config_tls, get_program_type};
 	zbx_thread_datasender_args	datasender_args = {zbx_config_tls, get_program_type};
-	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_tls, get_program_type};
+	zbx_thread_taskmanager_args	taskmanager_args = {&zbx_config, get_program_type};
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
-	zbx_thread_trapper_args		trapper_args = {zbx_config_tls, get_program_type, &listen_sock};
+	zbx_thread_trapper_args		trapper_args = {&zbx_config, get_program_type, &listen_sock};
+
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1384,7 +1378,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	change_proxy_history_count(proxy_get_history_count());
 
-	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
+	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
 			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS
 			+ CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS + CONFIG_IPMIPOLLER_FORKS
@@ -1409,7 +1403,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
-	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext);
+	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get);
 	zbx_diag_init(diag_add_section_info);
 
 	for (i = 0; i < threads_num; i++)
@@ -1434,10 +1428,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_TRAPPER:
 				thread_args.args = &trapper_args;
 				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
-				break;
-			case ZBX_PROCESS_TYPE_HEARTBEAT:
-				thread_args.args = &heart_args;
-				zbx_thread_start(heart_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
 				thread_args.args = &datasender_args;
