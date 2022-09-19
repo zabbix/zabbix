@@ -593,13 +593,9 @@ typedef struct
 	unsigned char	type;
 	unsigned char	error_handler;
 	char		*params;
-	char		*params_orig;
 	char		*error_handler_params;
 }
 zbx_preproc_op_t;
-
-#define ZBX_PREPROC_MACRO_UPDATE_TRUE	1
-#define ZBX_PREPROC_MACRO_UPDATE_FALSE	0
 
 typedef struct
 {
@@ -610,8 +606,8 @@ typedef struct
 
 	int			dep_itemids_num;
 	int			preproc_ops_num;
-	int			update_time;
-	int			macro_update;
+	zbx_uint64_t		revision;
+	zbx_uint64_t		preproc_revision;
 
 	zbx_uint64_pair_t	*dep_itemids;
 	zbx_preproc_op_t	*preproc_ops;
@@ -761,7 +757,7 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 		unsigned int mode);
 int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid);
 void	DCconfig_get_active_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, int *errcodes, size_t num);
-void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp);
+void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revision);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);

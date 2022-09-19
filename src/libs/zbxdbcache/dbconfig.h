@@ -101,7 +101,6 @@ ZBX_DC_MASTERITEM;
 typedef struct
 {
 	zbx_uint64_t		itemid;
-	int			update_time;
 	zbx_vector_ptr_t	preproc_ops;
 }
 ZBX_DC_PREPROCITEM;
