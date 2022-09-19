@@ -1498,7 +1498,7 @@ done:
 
 			zbx_vector_dc_httptest_ptr_create_ext(&host->httptests, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
-			zbx_vector_dc_item_ptr_create_ext(&host->active_items, __config_shmem_malloc_func,
+			zbx_vector_dc_item_ptr_create_ext(&host->items, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
 		}
 		else
@@ -1741,7 +1741,7 @@ done:
 		}
 #endif
 		zbx_vector_ptr_destroy(&host->interfaces_v);
-		zbx_vector_dc_item_ptr_destroy(&host->active_items);
+		zbx_vector_dc_item_ptr_destroy(&host->items);
 		zbx_hashset_remove_direct(&config->hosts, host);
 
 		zbx_vector_dc_httptest_ptr_destroy(&host->httptests);
@@ -2565,24 +2565,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				update_index = 1;
 		}
 
-		if (0 == found || item->type != type)
-		{
-			if (1 == found)
-			{
-				if (ITEM_TYPE_ZABBIX_ACTIVE == item->type)
-				{
-					if (FAIL != (i = zbx_vector_dc_item_ptr_search(&host->active_items, item,
-							ZBX_DEFAULT_PTR_COMPARE_FUNC)))
-					{
-						zbx_vector_dc_item_ptr_remove(&host->active_items, i);
-					}
-				}
-			}
-
-			if (ITEM_TYPE_ZABBIX_ACTIVE == type)
-				zbx_vector_dc_item_ptr_append(&host->active_items, item);
-		}
-
 		/* store new information in item structure */
 
 		item->hostid = hostid;
@@ -2622,6 +2604,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 			zbx_vector_ptr_create_ext(&item->tags, __config_shmem_malloc_func, __config_shmem_realloc_func,
 					__config_shmem_free_func);
+
+			zbx_vector_dc_item_ptr_append(&host->items, item);
 		}
 		else
 		{
@@ -3107,13 +3091,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		{
 			dc_host_update_revision(host, revision);
 
-			if (ITEM_TYPE_ZABBIX_ACTIVE == item->type)
+			if (FAIL != (i = zbx_vector_dc_item_ptr_search(&host->items, item,
+					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
-				if (FAIL != (i = zbx_vector_dc_item_ptr_search(&host->active_items, item,
-						ZBX_DEFAULT_PTR_COMPARE_FUNC)))
-				{
-					zbx_vector_dc_item_ptr_remove(&host->active_items, i);
-				}
+				zbx_vector_dc_item_ptr_remove(&host->items, i);
 			}
 		}
 
@@ -9122,12 +9103,21 @@ void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, 
 int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid)
 {
 	const ZBX_DC_HOST	*dc_host;
-	int			num = 0;
+	int			i, num = 0;
 
 	RDLOCK_CACHE;
+
 	if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
-		num = dc_host->active_items.values_num;
+	{
+		for (i = 0; i < dc_host->items.values_num; i++)
+		{
+			if (ITEM_TYPE_ZABBIX_ACTIVE == dc_host->items.values[i]->type)
+				num++;
+		}
+	}
+
 	UNLOCK_CACHE;
+
 
 	return num;
 }
@@ -9135,33 +9125,39 @@ int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid)
 void	DCconfig_get_active_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, int *errcodes, size_t num)
 {
 	const ZBX_DC_HOST	*dc_host;
-	size_t			i = 0;
+	size_t			i, j = 0;
 
 	RDLOCK_CACHE;
 
 	if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)) &&
-			0 != dc_host->active_items.values_num)
+			0 != dc_host->items.values_num)
 	{
-		DCget_host(&items[0].host, dc_host, ZBX_ITEM_GET_ALL);
-
-		for (; i < MIN((size_t)dc_host->active_items.values_num, num); i++)
+		for (i = 0; i < (size_t)dc_host->items.values_num && j < num; i++)
 		{
 			const ZBX_DC_ITEM	*dc_item;
 
-			dc_item = dc_host->active_items.values[i];
+			dc_item = dc_host->items.values[i];
 
-			if (0 != i)
+			if (ITEM_TYPE_ZABBIX_ACTIVE != dc_item->type)
+				continue;
+
+			DCget_item(&items[j], dc_item, ZBX_ITEM_GET_DEFAULT);
+			errcodes[j++] = SUCCEED;
+		}
+
+		if (0 != j)
+		{
+			DCget_host(&items[0].host, dc_host, ZBX_ITEM_GET_ALL);
+
+			for (i = 1; i < j; i++)
 				items[i].host = items[0].host;
-
-			DCget_item(&items[i], dc_item, ZBX_ITEM_GET_DEFAULT);
-			errcodes[i] = SUCCEED;
 		}
 	}
 
 	UNLOCK_CACHE;
 
-	for (; i < num; i++)
-		errcodes[i] = FAIL;
+	for (; j < num; j++)
+		errcodes[j] = FAIL;
 }
 
 /******************************************************************************

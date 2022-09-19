@@ -391,7 +391,7 @@ typedef struct
 						/* 'config->interfaces' hashset */
 
 	zbx_vector_dc_httptest_ptr_t	httptests;
-	zbx_vector_dc_item_ptr_t	active_items;
+	zbx_vector_dc_item_ptr_t	items;
 }
 ZBX_DC_HOST;
 
