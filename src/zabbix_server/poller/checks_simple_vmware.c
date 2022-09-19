@@ -3104,7 +3104,7 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 	}
 
 	/* FAIL is returned if counter already exists */
-	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "ClusterComputeResource", cluster->id,
+	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, ZBX_VMWARE_SOAP_CLUSTER, cluster->id,
 			counterid, ZBX_VMWARE_PERF_QUERY_ALL))
 	{
 		ret = SYSINFO_RET_OK;
@@ -3112,7 +3112,7 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 	}
 
 	/* the performance counter is already being monitored, try to get the results from statistics */
-	ret = vmware_service_get_counter_value_by_id(service, "ClusterComputeResource", cluster->id, counterid,
+	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_CLUSTER, cluster->id, counterid,
 			instance, 1, unit, result);
 unlock:
 	zbx_vmware_unlock();
@@ -3165,7 +3165,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 	}
 
 	/* FAIL is returned if counter already exists */
-	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "HostSystem", hv->id, counterid,
+	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, ZBX_VMWARE_SOAP_HV, hv->id, counterid,
 			ZBX_VMWARE_PERF_QUERY_ALL))
 	{
 		ret = SYSINFO_RET_OK;
@@ -3173,7 +3173,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 	}
 
 	/* the performance counter is already being monitored, try to get the results from statistics */
-	ret = vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id, counterid, instance, 1, unit,
+	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_HV, hv->id, counterid, instance, 1, unit,
 			result);
 unlock:
 	zbx_vmware_unlock();
@@ -3406,6 +3406,67 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 	SET_TEXT_RESULT(result, hv_list);
 
 	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_datastore_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	const char		*instance, *url, *uuid, *path;
+	zbx_vmware_service_t	*service;
+	zbx_vmware_datastore_t	*ds;
+	zbx_uint64_t		counterid;
+	int			unit, ret = SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (3 > request->nparam || request->nparam > 4)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	path = get_rparam(request, 2);
+	instance = get_rparam(request, 3);
+
+	if (NULL == instance)
+		instance = "";
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (ds = ds_get(&service->data->datastores, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
+		goto unlock;
+	}
+
+	if (FAIL == zbx_vmware_service_get_counterid(service, path, &counterid, &unit))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
+		goto unlock;
+	}
+
+	/* FAIL is returned if counter already exists */
+	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, ZBX_VMWARE_SOAP_DS, ds->id, counterid,
+			ZBX_VMWARE_PERF_QUERY_ALL))
+	{
+		ret = SYSINFO_RET_OK;
+		goto unlock;
+	}
+
+	/* the performance counter is already being monitored, try to get the results from statistics */
+	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_DS, ds->id, counterid, instance, 1, unit,
+			result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -5162,7 +5223,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 	}
 
 	/* FAIL is returned if counter already exists */
-	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, "VirtualMachine", vm->id, counterid,
+	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, ZBX_VMWARE_SOAP_VM, vm->id, counterid,
 			ZBX_VMWARE_PERF_QUERY_ALL))
 	{
 		ret = SYSINFO_RET_OK;
@@ -5170,7 +5231,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 	}
 
 	/* the performance counter is already being monitored, try to get the results from statistics */
-	ret = vmware_service_get_counter_value_by_id(service, "VirtualMachine", vm->id, counterid, instance, 1, unit,
+	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_VM, vm->id, counterid, instance, 1, unit,
 			result);
 unlock:
 	zbx_vmware_unlock();

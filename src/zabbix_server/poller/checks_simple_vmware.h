@@ -52,6 +52,8 @@ int	check_vcenter_datastore_tags_get(AGENT_REQUEST *request, const char *usernam
 		AGENT_RESULT *result);
 int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_datastore_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_datastore_property(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,
