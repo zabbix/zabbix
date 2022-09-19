@@ -1,3 +1,9 @@
+Changes for 6.0.9rc2
+
+Bug fixes:
+........S. [ZBX-21664] fixed Zabbix server crashing during database upgrade when converting service times and there is downtime inside uptime (vso)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.9rc1
 
 New features:
