@@ -346,6 +346,8 @@ class CControllerProblemView extends CControllerProblem {
 			$refresh_curl->setArgument($refresh_url_arguments[$key], $value);
 		}
 
+		$refresh_curl->setArgument('filter_show_tags', $data['filter']['show_tags']);
+
 		if ($data['filter']['age_state'] == 1) {
 			$refresh_curl
 				->setArgument('filter_age_state', $data['filter']['age_state'])
