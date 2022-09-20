@@ -113,6 +113,14 @@ const char	*zbx_db_last_strerr(void);
 int	zbx_dbms_get_version(void);
 int	zbx_tsdb_get_version(void);
 #define ZBX_DB_TSDB_V1	(20000 > zbx_tsdb_get_version())
+int	zbx_tsdb_table_has_compressed_chunks(const char *table_names);
+
+#define ZBX_TSDB1_HISTORY_TABLES	"'history_uint'::regclass,'history_log'::regclass,'history_str'::regclass," \
+		"'history_text'::regclass,'history'::regclass"
+
+#define ZBX_TSDB2_HISTORY_TABLES	"'history_uint','history_log','history_str','history_text','history'"
+#define ZBX_TSDB1_TRENDS_TABLES		"'trends'::regclass,'trends_uint'::regclass"
+#define ZBX_TSDB2_TRENDS_TABLES		"'trends','trends_uint'"
 #endif
 
 #ifdef HAVE_ORACLE
