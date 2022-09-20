@@ -156,6 +156,7 @@ static zbx_dc_um_handle_t	*dc_um_handle = NULL;
  *           | Zabbix internal  | zabbix[host,,items_unsupported]      |      *
  *           | Zabbix internal  | zabbix[host,discovery,interfaces]    |      *
  *           | Zabbix internal  | zabbix[host,,maintenance]            |      *
+ *           | Zabbix internal  | zabbix[proxy,discovery]              |      *
  *           | Zabbix internal  | zabbix[proxy,<proxyname>,lastaccess] |      *
  *           | Zabbix internal  | zabbix[proxy,<proxyname>,delay]      |      *
  *           | Zabbix aggregate | *                                    |      *
@@ -181,11 +182,23 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 
 				init_request(&request);
 
-				if (SUCCEED != parse_item_key(key, &request) || 3 != request.nparam)
+				if (SUCCEED != parse_item_key(key, &request) || 2 > request.nparam ||
+						3 < request.nparam)
+				{
 					goto clean;
+				}
 
 				arg1 = get_rparam(&request, 0);
 				arg2 = get_rparam(&request, 1);
+
+				if (2 == request.nparam)
+				{
+					if (0 == strcmp(arg1, "proxy") && 0 == strcmp(arg2, "discovery"))
+						ret = SUCCEED;
+
+					goto clean;
+				}
+
 				arg3 = get_rparam(&request, 2);
 
 				if (0 == strcmp(arg1, "host"))
@@ -201,9 +214,11 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 					else if (0 == strcmp(arg2, "discovery") && 0 == strcmp(arg3, "interfaces"))
 						ret = SUCCEED;
 				}
-				else if (0 == strcmp(arg1, "proxy") &&
-						(0 == strcmp(arg3, "lastaccess") || 0 == strcmp(arg3, "delay")))
+				else if (0 == strcmp(arg1, "proxy") && (0 == strcmp(arg3, "lastaccess") ||
+						0 == strcmp(arg3, "delay")))
+				{
 					ret = SUCCEED;
+				}
 clean:
 				free_request(&request);
 			}
@@ -987,6 +1002,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	}
 
 	dc_strpool_release(proxy->proxy_address);
+	dc_strpool_release(proxy->version_str);
 	zbx_hashset_remove_direct(&config->proxies, proxy);
 }
 
@@ -1409,7 +1425,9 @@ done:
 			if (0 == found)
 			{
 				proxy->location = ZBX_LOC_NOWHERE;
-				proxy->version = 0;
+				proxy->version_int = ZBX_COMPONENT_VERSION_UNDEFINED;
+				proxy->version_str = dc_strpool_intern(ZBX_VERSION_UNDEFINED_STR);
+				proxy->compatibility = ZBX_PROXY_VERSION_UNDEFINED;
 				proxy->lastaccess = atoi(row[12]);
 				proxy->last_cfg_error_time = 0;
 				proxy->proxy_delay = 0;
@@ -10739,7 +10757,9 @@ static void	DCget_proxy(DC_PROXY *dst_proxy, const ZBX_DC_PROXY *src_proxy)
 	dst_proxy->proxy_data_nextcheck = src_proxy->proxy_data_nextcheck;
 	dst_proxy->proxy_tasks_nextcheck = src_proxy->proxy_tasks_nextcheck;
 	dst_proxy->last_cfg_error_time = src_proxy->last_cfg_error_time;
-	dst_proxy->version = src_proxy->version;
+	zbx_strlcpy(dst_proxy->version_str, src_proxy->version_str, sizeof(dst_proxy->version_str));
+	dst_proxy->version_int = src_proxy->version_int;
+	dst_proxy->compatibility = src_proxy->compatibility;
 	dst_proxy->lastaccess = src_proxy->lastaccess;
 	dst_proxy->auto_compress = src_proxy->auto_compress;
 	dst_proxy->last_version_error_time = src_proxy->last_version_error_time;
@@ -11970,6 +11990,8 @@ void	zbx_config_clean(zbx_config_t *cfg)
  ********************************************************************************/
 int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 {
+#define ZBX_INTERFACE_MOVE_TOLERANCE_INTERVAL	(10 * SEC_PER_MIN)
+
 	ZBX_DC_HOST			*host;
 	ZBX_DC_INTERFACE		*interface;
 	zbx_hashset_iter_t		iter;
@@ -12004,7 +12026,7 @@ int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 			if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
 			{
 				/* SEC_PER_MIN is a tolerance interval, it was chosen arbitrarily */
-				if (ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX + SEC_PER_MIN >= now - proxy->lastaccess)
+				if (ZBX_INTERFACE_MOVE_TOLERANCE_INTERVAL >= now - proxy->lastaccess)
 					continue;
 			}
 
@@ -12044,6 +12066,7 @@ int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() interfaces:%d", __func__, interfaces->values_num);
 
 	return 0 == interfaces->values_num ? FAIL : SUCCEED;
+#undef ZBX_INTERFACE_MOVE_TOLERANCE_INTERVAL
 }
 
 /*******************************************************************************
@@ -12858,6 +12881,12 @@ void	zbx_dc_get_all_proxies(zbx_vector_cached_proxy_t *proxies)
 	UNLOCK_CACHE;
 }
 
+void	zbx_cached_proxy_free(zbx_cached_proxy_t *proxy)
+{
+	zbx_free(proxy->name);
+	zbx_free(proxy);
+}
+
 int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name)
 {
 	int		ret = SUCCEED;
@@ -13344,8 +13373,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 		{
 			int	lost = 0;	/* communication lost */
 
-			if (0 != (diff->flags &
-					(ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT | ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG)))
+			if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG))
 			{
 				int	delay = diff->lastaccess - proxy->lastaccess;
 
@@ -13363,8 +13391,14 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 
 		if (0 != (diff->flags & ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION))
 		{
-			if (proxy->version != diff->version)
-				proxy->version = diff->version;
+			if (0 != strcmp(proxy->version_str, diff->version_str))
+				dc_strpool_replace(1, &proxy->version_str, diff->version_str);
+
+			if (proxy->version_int != diff->version_int)
+			{
+				proxy->version_int = diff->version_int;
+				proxy->compatibility = diff->compatibility;
+			}
 			else
 				diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION);
 		}
@@ -13823,6 +13857,138 @@ int	DCget_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **err
 	}
 
 	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get data of all proxies from configuration cache and pack into    *
+ *          JSON for LLD                                                      *
+ *                                                                            *
+ * Parameter: data   - [OUT] JSON with proxy data                             *
+ *            error  - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - interface data in JSON, 'data' is allocated        *
+ *               FAIL    - proxy not found, 'error' message is allocated      *
+ *                                                                            *
+ * Comments: Allocates memory.                                                *
+ *           If there are no proxies, an empty JSON {"data":[]} is returned.  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_proxy_discovery_get(char **data, char **error)
+{
+	int				i, ret = SUCCEED;
+	zbx_vector_cached_proxy_t	proxies;
+	struct zbx_json			json;
+
+	WRLOCK_CACHE;
+
+	dc_status_update();
+
+	UNLOCK_CACHE;
+
+	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_vector_cached_proxy_create(&proxies);
+	zbx_dc_get_all_proxies(&proxies);
+
+	RDLOCK_CACHE;
+
+	for (i = 0; i < proxies.values_num; i++)
+	{
+		zbx_cached_proxy_t	*proxy;
+		const ZBX_DC_HOST	*dc_host;
+		const ZBX_DC_PROXY	*dc_proxy;
+
+		proxy = proxies.values[i];
+
+		zbx_json_addobject(&json, NULL);
+
+		zbx_json_addstring(&json, "name", proxy->name, ZBX_JSON_TYPE_STRING);
+
+		if (HOST_STATUS_PROXY_PASSIVE == proxy->status)
+			zbx_json_addstring(&json, "passive", "true", ZBX_JSON_TYPE_INT);
+		else
+			zbx_json_addstring(&json, "passive", "false", ZBX_JSON_TYPE_INT);
+
+		dc_host = DCfind_proxy(proxy->name);
+
+		if (NULL == dc_host)
+		{
+			*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", proxy->name);
+			ret = FAIL;
+			goto clean;
+		}
+		else
+		{
+			unsigned int	encryption;
+
+			if (HOST_STATUS_PROXY_PASSIVE == proxy->status)
+				encryption = dc_host->tls_connect;
+			else
+				encryption = dc_host->tls_accept;
+
+			if (0 < (encryption & ZBX_TCP_SEC_UNENCRYPTED))
+				zbx_json_addstring(&json, "unencrypted", "true", ZBX_JSON_TYPE_INT);
+			else
+				zbx_json_addstring(&json, "unencrypted", "false", ZBX_JSON_TYPE_INT);
+
+			if (0 < (encryption & ZBX_TCP_SEC_TLS_PSK))
+				zbx_json_addstring(&json, "psk", "true", ZBX_JSON_TYPE_INT);
+			else
+				zbx_json_addstring(&json, "psk", "false", ZBX_JSON_TYPE_INT);
+
+			if (0 < (encryption & ZBX_TCP_SEC_TLS_CERT))
+				zbx_json_addstring(&json, "cert", "true", ZBX_JSON_TYPE_INT);
+			else
+				zbx_json_addstring(&json, "cert", "false", ZBX_JSON_TYPE_INT);
+
+			zbx_json_adduint64(&json, "items", dc_host->items_active_normal +
+					dc_host->items_active_notsupported);
+
+			if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
+					&dc_host->hostid)))
+			{
+				if (1 == dc_proxy->auto_compress)
+					zbx_json_addstring(&json, "compression", "true", ZBX_JSON_TYPE_INT);
+				else
+					zbx_json_addstring(&json, "compression", "false", ZBX_JSON_TYPE_INT);
+
+				zbx_json_addstring(&json, "version", dc_proxy->version_str, ZBX_JSON_TYPE_STRING);
+
+				zbx_json_adduint64(&json, "compatibility", dc_proxy->compatibility);
+
+				if (0 < dc_proxy->lastaccess)
+					zbx_json_addint64(&json, "last_seen", time(NULL) - dc_proxy->lastaccess);
+				else
+					zbx_json_addint64(&json, "last_seen", -1);
+
+				zbx_json_adduint64(&json, "hosts", dc_proxy->hosts_monitored);
+
+				zbx_json_addfloat(&json, "requiredperformance", dc_proxy->required_performance);
+			}
+			else
+			{
+				*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.",
+					proxy->name);
+				ret = FAIL;
+				goto clean;
+			}
+		}
+		zbx_json_close(&json);
+	}
+clean:
+	UNLOCK_CACHE;
+
+	if (SUCCEED == ret)
+	{
+		zbx_json_close(&json);
+		*data = zbx_strdup(NULL, json.buffer);
+	}
+
+	zbx_json_free(&json);
+	zbx_vector_cached_proxy_clear_ext(&proxies, zbx_cached_proxy_free);
+	zbx_vector_cached_proxy_destroy(&proxies);
 
 	return ret;
 }
