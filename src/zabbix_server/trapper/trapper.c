@@ -172,19 +172,18 @@ static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	char		*error = NULL;
-	int		ret;
 	DC_PROXY	proxy;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (ret = get_active_proxy_from_request(jp, &proxy, &error)))
+	if (SUCCEED != get_active_proxy_from_request(jp, &proxy, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse heartbeat from active proxy at \"%s\": %s",
 				sock->peer, error);
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_proxy_check_permissions(&proxy, sock, &error)))
+	if (SUCCEED != zbx_proxy_check_permissions(&proxy, sock, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\", allowed address:"
 				" \"%s\": %s", proxy.host, sock->peer, proxy.proxy_address, error);
