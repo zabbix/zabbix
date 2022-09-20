@@ -7,4 +7,3 @@ libzbxdbconfig_a_SOURCES = \
 	dbconfig.h
 
 libzbxdbconfig_a_CFLAGS = -I$(top_srcdir)/src/libs/zbxdbcache
-
