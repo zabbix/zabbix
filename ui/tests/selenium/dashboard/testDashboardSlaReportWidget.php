@@ -259,98 +259,70 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				[
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'Show periods' => '0.5'
+						'Show periods' => '-5'
 					],
 					'expected' => TEST_BAD,
 					'error' => 'Invalid parameter "Show periods": value must be one of 1-100.'
 				]
 			],
-			// String type From date.
+			// String type From and To dates.
 			[
 				[
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'From' => 'yesterday'
-					],
-					'expected' => TEST_BAD,
-					'error' => 'Invalid parameter "From": a date is expected.'
-				]
-			],
-			// Wrong From date format.
-			[
-				[
-					'fields' => [
-						'SLA' => 'SLA Daily',
-						'From' => '2022/01/01'
-					],
-					'expected' => TEST_BAD,
-					'error' => 'Invalid parameter "From": a date is expected.'
-				]
-			],
-			// From date too far in the past.
-			[
-				[
-					'fields' => [
-						'SLA' => 'SLA Daily',
-						'From' => '1968-01-01'
-					],
-					'expected' => TEST_BAD,
-					'error' => 'Incorrect value for field "From": a date is expected.'
-				]
-			],
-			// From date too far in the future.
-			[
-				[
-					'fields' => [
-						'SLA' => 'SLA Daily',
-						'From' => '2050-01-01'
-					],
-					'expected' => TEST_BAD,
-					'error' => 'Incorrect value for field "From": a date is expected.'
-				]
-			],
-			// String type To date.
-			[
-				[
-					'fields' => [
-						'SLA' => 'SLA Daily',
+						'From' => 'yesterday',
 						'To' => 'today + 1 day'
 					],
 					'expected' => TEST_BAD,
-					'error' => 'Invalid parameter "To": a date is expected.'
+					'error' => [
+						'Invalid parameter "From": a date is expected.',
+						'Invalid parameter "To": a date is expected.'
+					]
 				]
 			],
-			// Wrong To date format.
+			// Wrong From date and TO date format.
 			[
 				[
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'To' => '2022/01/01'
+						'From' => '2022/01/01',
+						'To' => '2022/02/01'
 					],
 					'expected' => TEST_BAD,
-					'error' => 'Invalid parameter "To": a date is expected.'
+					'error' => [
+						'Invalid parameter "From": a date is expected.',
+						'Invalid parameter "To": a date is expected.'
+					]
 				]
 			],
-			// To date too far in the past.
+			// From date and To date too far in the past.
 			[
 				[
 					'fields' => [
 						'SLA' => 'SLA Daily',
+						'From' => '1968-01-01',
 						'To' => '1969-10-10'
 					],
 					'expected' => TEST_BAD,
-					'error' => 'Incorrect value for field "To": a date is expected.'
+					'error' => [
+						'Incorrect value for field "From": a date is expected.',
+						'Incorrect value for field "To": a date is expected.'
+					]
 				]
 			],
-			// From date too far in the future.
+			// From date and To date too far in the future.
 			[
 				[
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'To' => '2040-10-10'
+						'From' => '2040-01-01',
+						'To' => '2050-10-10'
 					],
 					'expected' => TEST_BAD,
-					'error' => 'Incorrect value for field "To": a date is expected.'
+					'error' => [
+						'Incorrect value for field "From": a date is expected.',
+						'Incorrect value for field "To": a date is expected.'
+					]
 				]
 			],
 			// SLA report for disabled SLA without Service.
@@ -520,7 +492,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		// Confirm that widget is not present on dashboard.
 		$this->assertFalse($dashboard->getWidget(self::$delete_widget, false)->isValid());
-		$widget_sql = 'SELECT null FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
+		$widget_sql = 'SELECT NULL FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
 				' WHERE w.name='.zbx_dbstr(self::$delete_widget);
 		$this->assertEquals(0, CDBHelper::getCount($widget_sql));
 	}
@@ -1162,7 +1134,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'Service' => 'Simple actions service',
 						'From' => '2020-01-01',
 						'To' => '2020-02-29'
-
 					],
 					'reporting_period' => 'Monthly',
 					'expected_periods' => [
@@ -1177,7 +1148,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'SLA' => 'SLA Monthly',
 						'Service' => 'Simple actions service',
 						'From' => '2020-01-01'
-
 					],
 					'reporting_period' => 'Monthly',
 					'expected_periods' => [
@@ -1211,7 +1181,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 						'Service' => 'Simple actions service',
 						'From' => '2020-01-01',
 						'Show periods' => 3
-
 					],
 					'reporting_period' => 'Monthly',
 					'expected_periods' => [
@@ -1302,7 +1271,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'expected_periods' => [
 						'2020-01',
 						'2020-02'
-
 					]
 				]
 			],
@@ -2352,7 +2320,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		else {
 			$to_date = 'today';
 		}
-
 
 		switch ($data['reporting_period']) {
 			case 'Daily':

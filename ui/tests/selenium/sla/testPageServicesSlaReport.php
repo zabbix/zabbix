@@ -1281,136 +1281,94 @@ class testPageServicesSlaReport extends testSlaReport {
 					'error' => '"From" date must be less than "To" date.'
 				]
 			],
-			// Non existing date in From field.
+			// Non existing date in "From" and "To" fields.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'From' => '2022-06-32'
+						'From' => '2022-06-32',
+						'To' => '2022-07-32'
 					],
-					'error' => 'Incorrect value for field "From": a date is expected.'
+					'error' => [
+						'Incorrect value for field "From": a date is expected.',
+						'Incorrect value for field "To": a date is expected.'
+					]
 				]
 			],
-			// Non existing date in To field.
+			// Trailing and leading spaces in "From" and "To" fields.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'To' => '2022-06-32'
-					],
-					'error' => 'Incorrect value for field "To": a date is expected.'
-				]
-			],
-			// Leading space in To field.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'SLA' => 'SLA Daily',
+						'From' => '2022-06 ',
 						'To' => ' 2022-06-13'
 					],
-					'error' => 'Incorrect value for field "To": a date is expected.'
+					'error' => [
+						'Incorrect value for field "From": a date is expected.',
+						'Incorrect value for field "To": a date is expected.'
+					]
 				]
 			],
-			// Trailing space in To field.
+			// Wrong value format in "From" and "To" fields.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'From' => '2022-06 '
-					],
-					'error' => 'Incorrect value for field "From": a date is expected.'
-				]
-			],
-			// Wrong value format in "From" field.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'SLA' => 'SLA Daily',
-						'From' => '13-12-2022'
-					],
-					'error' => 'Incorrect value for field "From": a date is expected.'
-				]
-			],
-			// Wrong value format in "To" field.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'SLA' => 'SLA Daily',
+						'From' => '13-12-2022',
 						'To' => '12/31/2022'
 					],
-					'error' => 'Incorrect value for field "To": a date is expected.'
+					'error' => [
+						'Incorrect value for field "From": a date is expected.',
+						'Incorrect value for field "To": a date is expected.'
+					]
 				]
 			],
-			// Unix time in "From" field.
+			// Unix time in "From" and "To" fields.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'From' => '1641340800'
+						'From' => '1641340800',
+						'To' => '1641340801'
 					],
-					'error' => 'Incorrect value for field "From": a date is expected.'
+					'error' => [
+						'Incorrect value for field "From": a date is expected.',
+						'Incorrect value for field "To": a date is expected.'
+					]
 				]
 			],
-			// Unix time in "To" field.
+			// Fields "From" and "To" too far in the past.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'To' => '1641340800'
-					],
-					'error' => 'Incorrect value for field "To": a date is expected.'
-				]
-			],
-			// Field "From" too far in the past.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'SLA' => 'SLA Daily',
-						'From' => '1969-12-31'
-					],
-					'error' => 'Incorrect value for field "From": a date is expected.'
-				]
-			],
-			// Field "From" too far in the future.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'SLA' => 'SLA Daily',
-						'From' => '2039-01-01'
-					],
-					'error' => 'Incorrect value for field "From": a date is expected.'
-				]
-			],
-			// Field "To" too far in the past.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'SLA' => 'SLA Daily',
+						'From' => '1969-12-30',
 						'To' => '1969-12-31'
 					],
-					'error' => 'Incorrect value for field "To": a date is expected.'
+					'error' => [
+						'Incorrect value for field "From": a date is expected.',
+						'Incorrect value for field "To": a date is expected.'
+					]
 				]
 			],
-			// Field "To" too far in the future.
+			// Fields "From" and "To" too far in the future.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'To' => '2039-01-01'
+						'From' => '2039-01-01',
+						'To' => '2039-01-02'
 					],
-					'error' => 'Incorrect value for field "To": a date is expected.'
+					'error' => [
+						'Incorrect value for field "From": a date is expected.',
+						'Incorrect value for field "To": a date is expected.'
+					]
 				]
 			]
 		];

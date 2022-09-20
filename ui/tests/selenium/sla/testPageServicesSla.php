@@ -22,6 +22,7 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../traits/TagTrait.php';
 
 /**
  * @backup sla, profiles
@@ -31,6 +32,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 class testPageServicesSla extends CWebTest {
 
 	use TableTrait;
+	use TagTrait;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -508,14 +510,10 @@ class testPageServicesSla extends CWebTest {
 			[
 				[
 					'Tags' => [
-						'tags' => [
-							[
-								'index' => 0,
-								'action' => USER_ACTION_UPDATE,
-								'tag' => 'old_tag_1',
-								'operator' => 'Equals',
-								'value' => 'old_value_1'
-							]
+						[
+							'name' => 'old_tag_1',
+							'operator' => 'Equals',
+							'value' => 'old_value_1'
 						]
 					],
 					'expected' => [
@@ -530,14 +528,10 @@ class testPageServicesSla extends CWebTest {
 			[
 				[
 					'Tags' => [
-						'tags' => [
-							[
-								'index' => 0,
-								'action' => USER_ACTION_UPDATE,
-								'tag' => 'old_tag_1',
-								'operator' => 'Contains',
-								'value' => 'old_value_1'
-							]
+						[
+							'name' => 'old_tag_1',
+							'operator' => 'Contains',
+							'value' => 'old_value_1'
 						]
 					],
 					'expected' => [
@@ -553,13 +547,9 @@ class testPageServicesSla extends CWebTest {
 			[
 				[
 					'Tags' => [
-						'tags' => [
-							[
-								'index' => 0,
-								'action' => USER_ACTION_UPDATE,
-								'tag' => 'Unique TAG',
-								'operator' => 'Exists'
-							]
+						[
+							'name' => 'Unique TAG',
+							'operator' => 'Exists'
 						]
 					],
 					'expected' => [
@@ -571,13 +561,9 @@ class testPageServicesSla extends CWebTest {
 			[
 				[
 					'Tags' => [
-						'tags' => [
-							[
-								'index' => 0,
-								'action' => USER_ACTION_UPDATE,
-								'tag' => 'old_tag_1',
-								'operator' => 'Does not exist'
-							]
+						[
+							'name' => 'old_tag_1',
+							'operator' => 'Does not exist'
 						]
 					],
 					'expected' => [
@@ -593,14 +579,10 @@ class testPageServicesSla extends CWebTest {
 			[
 				[
 					'Tags' => [
-						'tags' => [
-							[
-								'index' => 0,
-								'action' => USER_ACTION_UPDATE,
-								'tag' => 'old_tag_1',
-								'operator' => 'Does not equal',
-								'value' => 'old_value_1'
-							]
+						[
+							'name' => 'old_tag_1',
+							'operator' => 'Does not equal',
+							'value' => 'old_value_1'
 						]
 					],
 					'expected' => [
@@ -617,14 +599,10 @@ class testPageServicesSla extends CWebTest {
 			[
 				[
 					'Tags' => [
-						'tags' => [
-							[
-								'index' => 0,
-								'action' => USER_ACTION_UPDATE,
-								'tag' => 'old_tag_1',
-								'operator' => 'Does not contain',
-								'value' => 'new'
-							]
+						[
+							'name' => 'old_tag_1',
+							'operator' => 'Does not contain',
+							'value' => 'new'
 						]
 					],
 					'expected' => [
@@ -644,13 +622,9 @@ class testPageServicesSla extends CWebTest {
 			[
 				[
 					'Tags' => [
-						'tags' => [
-							[
-								'index' => 0,
-								'action' => USER_ACTION_UPDATE,
-								'tag' => 'Unique Tag',
-								'operator' => 'Exists'
-							]
+						[
+							'name' => 'Unique Tag',
+							'operator' => 'Exists'
 						]
 					]
 				]
@@ -658,20 +632,18 @@ class testPageServicesSla extends CWebTest {
 			// Tags evaluation: And/Or.
 			[
 				[
+					'filter' => [
+						'id:filter_evaltype' => 'And/Or'
+					],
 					'Tags' => [
-						'Evaluation' => 'And/Or',
-						'tags' => [
-							[
-								'index' => 0,
-								'action' => USER_ACTION_UPDATE,
-								'tag' => 'old_tag_1',
-								'operator' => 'Does not contain',
-								'value' => 'new'
-							],
-							[
-								'tag' => 'sla',
-								'operator' => 'Exists'
-							]
+						[
+							'name' => 'old_tag_1',
+							'operator' => 'Does not contain',
+							'value' => 'new'
+						],
+						[
+							'name' => 'sla',
+							'operator' => 'Exists'
 						]
 					],
 					'expected' => [
@@ -682,20 +654,18 @@ class testPageServicesSla extends CWebTest {
 			// Tags evaluation: Or.
 			[
 				[
+					'filter' => [
+						'id:filter_evaltype' => 'Or'
+					],
 					'Tags' => [
-						'Evaluation' => 'Or',
-						'tags' => [
-							[
-								'index' => 0,
-								'action' => USER_ACTION_UPDATE,
-								'tag' => 'old_tag_1',
-								'operator' => 'Does not contain',
-								'value' => 'new'
-							],
-							[
-								'tag' => 'sla',
-								'operator' => 'Exists'
-							]
+						[
+							'name' => 'old_tag_1',
+							'operator' => 'Does not contain',
+							'value' => 'new'
+						],
+						[
+							'name' => 'sla',
+							'operator' => 'Exists'
 						]
 					],
 					'expected' => [
@@ -716,22 +686,18 @@ class testPageServicesSla extends CWebTest {
 				[
 					'filter' => [
 						'Name' => ' SLA',
-						'Status' => 'Enabled'
+						'Status' => 'Enabled',
+						'id:filter_evaltype' => 'Or'
 					],
 					'Tags' => [
-						'Evaluation' => 'Or',
-						'tags' => [
-							[
-								'index' => 0,
-								'action' => USER_ACTION_UPDATE,
-								'tag' => 'old_tag_1',
-								'operator' => 'Does not contain',
-								'value' => 'new'
-							],
-							[
-								'tag' => 'sla',
-								'operator' => 'Exists'
-							]
+						[
+							'name' => 'old_tag_1',
+							'operator' => 'Does not contain',
+							'value' => 'new'
+						],
+						[
+							'name' => 'sla',
+							'operator' => 'Exists'
 						]
 					],
 					'expected' => [
@@ -754,10 +720,7 @@ class testPageServicesSla extends CWebTest {
 
 		// Fill in tags filtering information.
 		if (CTestArrayHelper::get($data, 'Tags')) {
-			if (CTestArrayHelper::get($data['Tags'], 'Evaluation')) {
-				$form->getField('id:filter_evaltype')->asSegmentedRadio()->fill($data['Tags']['Evaluation']);
-			}
-			$form->getField('id:filter-tags')->asMultifieldTable()->fill(CTestArrayHelper::get($data, 'Tags.tags'));
+			$this->setTags($data['Tags']);
 		}
 		$form->submit();
 		$this->page->waitUntilReady();

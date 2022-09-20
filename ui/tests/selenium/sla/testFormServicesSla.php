@@ -61,21 +61,21 @@ class testFormServicesSla extends CWebTest {
 		$this->assertEquals(json_encode(['SLA', 'Excluded downtimes']), json_encode($form->getTabs()));
 
 		// Check fields in SLA tab.
-		$sla_tab_labels = [
-			'Name',
-			'SLO',
-			'Reporting period',
-			'Time zone',
-			'Schedule',
-			'Effective date',
-			'Service tags',
-			'Description',
-			'Enabled'
+		$default_values = [
+			'Name' => '',
+			'SLO' => '',
+			'Reporting period' => 'Weekly',
+			'Time zone' => 'System default: (UTC+03:00) Europe/Riga',
+			'Schedule' => '24x7',
+			'Effective date' => date('Y-m-d'),
+			'Description' => '',
+			'Enabled' => true,
+			'name:service_tags[0][operator]' => 'Equals'
 		];
+		$form->checkValue($default_values);
 
-		$this->assertEquals(array_merge($sla_tab_labels, ['Excluded downtimes']), $form->getLabels()->asText());
-
-		$form->getLabels()->filter(new CElementFilter(CElementFilter::VISIBLE))->asText();
+		// Check that all locales are present in the dropdown.
+		$this->assertEquals(426, count($form->getField('Time zone')->getOptions()->asText()));
 
 		// Check that mandatory fields are marked accordingly.
 		foreach (['Name', 'SLO', 'Effective date', 'Service tags'] as $sla_label) {
@@ -86,19 +86,16 @@ class testFormServicesSla extends CWebTest {
 		$radio_buttons = [
 			[
 				'name' => 'Reporting period',
-				'values' => ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Annually'],
-				'default' => 'Weekly'
+				'values' => ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Annually']
 			],
 			[
 				'name' => 'Schedule',
-				'values' => ['24x7', 'Custom'],
-				'default' => '24x7'
+				'values' => ['24x7', 'Custom']
 			]
 		];
 
 		foreach ($radio_buttons as $radio_params) {
 			$radio_element = $form->getField($radio_params['name']);
-			$this->assertEquals($radio_params['default'], $radio_element->getText());
 			$this->assertEquals($radio_params['values'], $radio_element->getLabels()->asText());
 		}
 
@@ -110,12 +107,7 @@ class testFormServicesSla extends CWebTest {
 		$form->getField('Schedule')->fill('Custom');
 		$this->assertTrue($schedule_table->isVisible());
 
-		// Check that schedule table contains rows for each day and their order.
-		$this->assertEquals(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-				$schedule_table->query("xpath:.//label")->all()->asText()
-		);
-
-		// Check checkboxes default values.
+		// Check custom schedule checkboxes default values.
 		$days = [
 			'Sunday' => false,
 			'Monday' => true,
@@ -213,18 +205,8 @@ class testFormServicesSla extends CWebTest {
 		// Check that date picker is present.
 		$this->assertTrue($form->query('id:effective_date_calendar')->one()->isVisible());
 
-		$dropdowns = [
-			'Time zone' => [
-				'count' => 426,
-				'default' => 'System default: (UTC+03:00) Europe/Riga'
-			],
-			'name:service_tags[0][operator]' => [
-				'values' => ['Equals', 'Contains'],
-				'default' => 'Equals'
-			]
-		];
-
-		$this->checkDropdowns($dropdowns, $form);
+		// Check available tag operations.
+		$this->assertSame(['Equals', 'Contains'], $form->getField('name:service_tags[0][operator]')->getOptions()->asText());
 
 		$tags_table_elements = [
 			'headers' => ['Name', 'Operation', 'Value', 'Action'],
@@ -255,6 +237,15 @@ class testFormServicesSla extends CWebTest {
 		$downtime_labels = ['Name', 'Start time', 'Duration'];
 		$this->assertEquals($downtime_labels, $downtimes_form->getLabels()->asText());
 
+		$downtime_default_values = [
+			'Name' => '',
+			'Start time' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00',
+			'id:duration_days' => '0',
+			'name:duration_hours' => '1',
+			'name:duration_minutes' => '0'
+		];
+		$downtimes_form->checkValue($downtime_default_values);
+
 		// Check that all three fields are marked as mandatory.
 		foreach ($downtime_labels as $downtime_label) {
 			$this->assertEquals('form-label-asterisk', $downtimes_form->getLabel($downtime_label)->getAttribute('class'));
@@ -265,17 +256,10 @@ class testFormServicesSla extends CWebTest {
 			$this->assertStringContainsString($string, $duration_field->getText());
 		}
 
-		$downtime_dropdowns = [
-			'name:duration_hours' => [
-				'count' => 24,
-				'default' => '1'
-			],
-			'name:duration_minutes' => [
-				'count' => 60,
-				'default' => '0'
-			]
-		];
-		$this->checkDropdowns($downtime_dropdowns, $downtimes_form);
+		// Check that count of available options in  dropdowns is correct.
+		foreach (['name:duration_hours' => 24, 'name:duration_minutes' => 60] as $dropdown => $options_count) {
+			$this->assertEquals($options_count, count($downtimes_form->getField($dropdown)->getOptions()->asText()));
+		}
 
 		// Check downtime dialog input fields maxlength, placeholders and default values.
 		$downtime_inputs = [
@@ -920,7 +904,7 @@ class testFormServicesSla extends CWebTest {
 
 		// Check that the records associated with the deleted SLA are not present in all SLA related tables.
 		foreach (['sla', 'sla_excluded_downtime', 'sla_schedule', 'sla_service_tag'] as $table) {
-			$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM '.$table.' WHERE slaid='.$id_to_delete));
+			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM '.$table.' WHERE slaid='.$id_to_delete));
 		}
 	}
 
@@ -991,7 +975,7 @@ class testFormServicesSla extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'SLA created');
 		// Check that there are 2 SLAs whose name contain the name of the original SLA (the clone has prefix "Clone:").
-		$this->assertEquals(2, CDBHelper::getCount('SELECT null FROM sla WHERE name LIKE ('.zbx_dbstr('%'.self::$sla_with_downtimes).')'));
+		$this->assertEquals(2, CDBHelper::getCount('SELECT NULL FROM sla WHERE name LIKE ('.zbx_dbstr('%'.self::$sla_with_downtimes).')'));
 
 		// Check cloned sla saved form.
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
@@ -1189,29 +1173,5 @@ class testFormServicesSla extends CWebTest {
 		$this->assertEquals($data['count'], $table->query('button', $data['buttons'])->all()
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 		);
-	}
-
-	/**
-	 * Check all possible options (or their count) and the default option for the provided dropdown element.
-	 *
-	 * @param array			$dropdowns		reference array with dropdown data
-	 * @param CFormElement	$form			$form element that contains the dropdowns to be checked
-	 */
-	private function checkDropdowns($dropdowns, $form) {
-		foreach ($dropdowns as $field => $parameters) {
-			$dropdown = $form->getField($field);
-
-			// Check default dropdown value.
-			$this->assertEquals($parameters['default'], $dropdown->getText());
-
-			// Check available options or their count.
-			if (array_key_exists('count', $parameters)) {
-				$timezones = $dropdown->getOptions()->asText();
-				$this->assertEquals($parameters['count'], count($timezones));
-			}
-			else {
-				$this->assertSame($parameters['values'], $dropdown->getOptions()->asText());
-			}
-		}
 	}
 }

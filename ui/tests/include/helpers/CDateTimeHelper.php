@@ -88,7 +88,7 @@ class CDateTimeHelper {
 	 * @return int
 	 */
 	public static function countMonthsBetweenDates($from, $to = 'now') {
-		foreach ([$from, $to] as &$moment) {
+		foreach ([&$from, &$to] as &$moment) {
 			if (is_string($moment)) {
 				$moment = strtotime($moment);
 			}
