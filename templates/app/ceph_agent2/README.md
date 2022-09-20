@@ -59,7 +59,7 @@ There are no template links in this template.
 |Ceph |Ceph: Minimum Mon release version |<p>min_mon_release_name</p> |DEPENDENT |ceph.min_mon_release_name<p>**Preprocessing**:</p><p>- JSONPATH: `$.min_mon_release_name`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Ceph |Ceph: Ceph Read bandwidth |<p>Global read Bytes per second</p> |DEPENDENT |ceph.rd_bytes.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.rd_bytes`</p><p>- CHANGE_PER_SECOND</p> |
 |Ceph |Ceph: Ceph Write bandwidth |<p>Global write Bytes per second</p> |DEPENDENT |ceph.wr_bytes.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.wr_bytes`</p><p>- CHANGE_PER_SECOND</p> |
-|Ceph |Ceph: Ceph Read operations per sec |<p>Global read operations per second</p> |DEPENDENT |ceph.rd_ops.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.rd_ops`</p> |
+|Ceph |Ceph: Ceph Read operations per sec |<p>Global read operations per second</p> |DEPENDENT |ceph.rd_ops.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.rd_ops`</p><p>- CHANGE_PER_SECOND</p> |
 |Ceph |Ceph: Ceph Write operations per sec |<p>Global write operations per second</p> |DEPENDENT |ceph.wr_ops.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.wr_ops`</p><p>- CHANGE_PER_SECOND</p> |
 |Ceph |Ceph: Total bytes available |<p>Total bytes available in Ceph cluster</p> |DEPENDENT |ceph.total_avail_bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.total_avail_bytes`</p> |
 |Ceph |Ceph: Total bytes |<p>Total (RAW) capacity of Ceph cluster in bytes</p> |DEPENDENT |ceph.total_bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.total_bytes`</p> |
