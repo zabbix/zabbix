@@ -1035,18 +1035,13 @@ int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_re
 		zbx_proxyconfig_status_t *status, char **error)
 {
 	int			ret = FAIL;
-	char			*token, tmp[ZBX_MAX_UINT64_LEN + 1];
+	char			token[ZBX_SESSION_TOKEN_SIZE + 1], tmp[ZBX_MAX_UINT64_LEN + 1];
 	zbx_uint64_t		proxy_config_revision;
 	zbx_dc_revision_t	dc_revision;
-	size_t			token_len;
-
-	token_len = zbx_get_token_len() + 1;
-
-	token = (char *)zbx_malloc(NULL, token_len);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxy_hostid:" ZBX_FS_UI64, __func__, proxy->hostid);
 
-	if (SUCCEED != zbx_json_value_by_name(jp_request, ZBX_PROTO_TAG_SESSION, token, token_len, NULL))
+	if (SUCCEED != zbx_json_value_by_name(jp_request, ZBX_PROTO_TAG_SESSION, token, sizeof(token), NULL))
 	{
 		*error = zbx_strdup(NULL, "cannot get session from proxy configuration request");
 		goto out;
@@ -1095,8 +1090,6 @@ int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_re
 		ret = SUCCEED;
 	}
 out:
-	zbx_free(token);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
