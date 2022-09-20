@@ -147,8 +147,7 @@ class testSystemInformation extends CWebTest {
 			'Active node' => self::$active_lastaccess,
 			'Unavailable node' => self::$unavailable_lastaccess,
 			'Stopped node' => self::$stopped_lastaccess,
-			'Standby node' => self::$standby_lastaccess,
-			'<standalone server>' => self::$standalone_lastaccess
+			'Standby node' => self::$standby_lastaccess
 		];
 
 		/**
