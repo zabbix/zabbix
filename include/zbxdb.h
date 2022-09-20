@@ -203,6 +203,8 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 #define ZBX_TIMESCALE_LICENSE_APACHE_FRIENDLY			"TimescaleDB Apache 2 Edition"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY		"TimescaleDB Community Edition"
+#define ZBX_TIMESCALE_COMPRESSED_CHUNKS_HISTORY			"compressed_chunks_history"
+#define ZBX_TIMESCALE_COMPRESSED_CHUNKS_TRENDS			"compressed_chunks_trends"
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
