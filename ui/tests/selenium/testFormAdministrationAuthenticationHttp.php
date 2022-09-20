@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 /**
  * @onBefore removeGuestFromDisabledGroup
  * @onAfter addGuestToDisabledGroup
+ * @dataSource LoginUsers
  */
 class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
