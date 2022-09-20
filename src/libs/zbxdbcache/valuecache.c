@@ -84,8 +84,6 @@ ZBX_SHMEM_FUNC_IMPL(__vc, vc_mem)
 /* the range synchronization period in hours */
 #define ZBX_VC_RANGE_SYNC_PERIOD	24
 
-#define ZBX_VC_RANGE_SYNC_PERIOD_SEC	(ZBX_VC_RANGE_SYNC_PERIOD * SEC_PER_HOUR)
-
 #define ZBX_VC_ITEM_EXPIRE_PERIOD	SEC_PER_DAY
 
 /* the data chunk used to store data fragment */
