@@ -118,6 +118,7 @@ void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode);
 void	zbx_dbsync_clear(zbx_dbsync_t *sync);
 int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsigned char *tag);
 
+
 int	zbx_dbsync_compare_config(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_autoreg_host(zbx_dbsync_t *sync);
@@ -129,6 +130,7 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_item_discovery(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_items(zbx_dbsync_t *sync);
+void	zbx_dbsync_get_deleted_itemids(zbx_vector_uint64_t *itemids);
 int	zbx_dbsync_compare_template_items(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_prototype_items(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync);

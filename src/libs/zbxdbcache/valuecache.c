@@ -84,6 +84,8 @@ ZBX_SHMEM_FUNC_IMPL(__vc, vc_mem)
 /* the range synchronization period in hours */
 #define ZBX_VC_RANGE_SYNC_PERIOD	24
 
+#define ZBX_VC_RANGE_SYNC_PERIOD_SEC	(ZBX_VC_RANGE_SYNC_PERIOD * SEC_PER_HOUR)
+
 #define ZBX_VC_ITEM_EXPIRE_PERIOD	SEC_PER_DAY
 
 /* the data chunk used to store data fragment */
@@ -797,25 +799,6 @@ static size_t	vc_release_unused_items(const zbx_vc_item_t *source_item)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: release unused items from value cache                             *
- *                                                                            *
- * Comments: If unused items are not cleared from value cache periodically    *
- *           then they will only be cleared when value cache is full, see     *
- *           vc_release_space().                                              *
- *                                                                            *
- ******************************************************************************/
-void	zbx_vc_housekeeping_value_cache(void)
-{
-	if (ZBX_VC_DISABLED == vc_state)
-		return;
-
-	WRLOCK_CACHE;
-	vc_release_unused_items(NULL);
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: frees space in cache to store the specified number of bytes by    *
  *          dropping the least accessed items                                 *
  *                                                                            *
@@ -1189,6 +1172,36 @@ static void	vc_remove_item_by_id(zbx_uint64_t itemid)
 	vch_item_free_cache(item);
 	zbx_hashset_remove_direct(&vc_cache->items, item);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: removes items from cache and frees resources allocated for them   *
+ *                                                                            *
+ * Parameters: itemids - [IN] the item identifiers                            *
+ *                                                                            *
+ * Comments: If unused items are not cleared from value cache periodically    *
+ *           then they will only be cleared when value cache is full, see     *
+ *           vc_release_space(). Cleared items can be cached again.           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vc_remove_items_by_ids(zbx_vector_uint64_t *itemids)
+{
+	int	i;
+
+	if (ZBX_VC_DISABLED == vc_state)
+		return;
+
+	if (0 == itemids->values_num)
+		return;
+
+	WRLOCK_CACHE;
+
+	for (i = 0; i < itemids->values_num; i++)
+		vc_remove_item_by_id(itemids->values[i]);
+
+	UNLOCK_CACHE;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: updates the timestamp from which the item is being cached         *
@@ -1256,7 +1269,7 @@ static void	vc_item_update_db_cached_from(zbx_vc_item_t *item, int timestamp)
  ******************************************************************************/
 static void	vch_item_update_range(zbx_vc_item_t *item, int range, int now)
 {
-	int	hour, diff;
+	int	hour, diff, last_value_timestamp;
 
 	if (VC_MIN_RANGE > range)
 		range = VC_MIN_RANGE;
@@ -1269,7 +1282,13 @@ static void	vch_item_update_range(zbx_vc_item_t *item, int range, int now)
 	if (0 > (diff = hour - item->range_sync_hour))
 		diff += 0xff;
 
-	if (item->active_range < item->daily_range || ZBX_VC_RANGE_SYNC_PERIOD < diff)
+	if (NULL != item->head)
+		last_value_timestamp = item->head->slots[item->head->last_value].timestamp.sec;
+	else
+		last_value_timestamp = now;
+
+	if (item->active_range < item->daily_range || (ZBX_VC_RANGE_SYNC_PERIOD < diff &&
+			(now - last_value_timestamp) / SEC_PER_HOUR < ZBX_VC_RANGE_SYNC_PERIOD))
 	{
 		item->active_range = item->daily_range;
 		item->daily_range = range;
@@ -1637,7 +1656,10 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 		zbx_vc_chunk_t	*chunk = tail;
 		int		timestamp;
 
-		timestamp = time(NULL) - item->active_range;
+		if (NULL == chunk)
+			return;
+
+		timestamp = item->head->slots[item->head->last_value].timestamp.sec - item->active_range;
 
 		/* try to remove chunks with all history values older than maximum request range */
 		while (NULL != chunk && chunk->slots[chunk->last_value].timestamp.sec < timestamp &&
@@ -2494,15 +2516,12 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 	zbx_vc_item_t		*item;
 	int			i;
 	ZBX_DC_HISTORY		*h;
-	time_t			expire_timestamp;
 
 	if (SUCCEED != zbx_history_add_values(history, ret_flush))
 		return FAIL;
 
 	if (ZBX_VC_DISABLED == vc_state)
 		return SUCCEED;
-
-	expire_timestamp = time(NULL) - ZBX_VC_ITEM_EXPIRE_PERIOD;
 
 	WRLOCK_CACHE;
 
@@ -2521,8 +2540,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 			/* Also remove item if the value adding failed. In this case we             */
 			/* won't have the latest data in cache - so the requests must go directly   */
 			/* to the database.                                                         */
-			if (item->value_type != h->value_type || item->last_accessed < expire_timestamp ||
-					FAIL == vch_item_add_value_at_head(item, &record))
+			if (item->value_type != h->value_type || FAIL == vch_item_add_value_at_head(item, &record))
 			{
 				vc_remove_item(item);
 				continue;
@@ -2531,7 +2549,6 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 			/* try to remove old (unused) chunks if a new chunk was added */
 			if (head != item->head)
 				vch_item_clean_cache(item);
-
 		}
 	}
 

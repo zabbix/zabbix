@@ -5685,7 +5685,7 @@ static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
+void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zbx_vector_uint64_t *deleted_itemids)
 {
 	static int	sync_status = ZBX_DBSYNC_STATUS_UNKNOWN;
 
@@ -6483,6 +6483,9 @@ out:
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reschedule : " ZBX_FS_DBL " sec.", __func__, queues_sec);
 	}
 clean:
+	if (NULL != deleted_itemids)
+		zbx_dbsync_get_deleted_itemids(deleted_itemids);
+
 	zbx_dbsync_clear(&config_sync);
 	zbx_dbsync_clear(&autoreg_config_sync);
 	zbx_dbsync_clear(&autoreg_host_sync);

@@ -123,7 +123,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 
 	if (SUCCEED == process_proxyconfig(&jp, &jp_kvs_paths))
 	{
-		DCsync_configuration(ZBX_DBSYNC_UPDATE, *synced);
+		DCsync_configuration(ZBX_DBSYNC_UPDATE, *synced, NULL);
 		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
 
 		if (NULL != jp_kvs_paths.start)
@@ -177,7 +177,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
-	DCsync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO);
+	DCsync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL);
 
 	zbx_rtc_notify_config_sync(&rtc);
 
@@ -208,7 +208,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 			{
 				zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-				DCsync_configuration(ZBX_DBSYNC_UPDATE, synced);
+				DCsync_configuration(ZBX_DBSYNC_UPDATE, synced, NULL);
 				synced = ZBX_SYNCED_NEW_CONFIG_YES;
 				DCupdate_interfaces_availability();
 				zbx_rtc_notify_config_sync(&rtc);

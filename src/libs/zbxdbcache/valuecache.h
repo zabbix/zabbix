@@ -110,8 +110,7 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush);
 
 int	zbx_vc_get_statistics(zbx_vc_stats_t *stats);
-
-void	zbx_vc_housekeeping_value_cache(void);
+void	zbx_vc_remove_items_by_ids(zbx_vector_uint64_t *itemids);
 
 void	zbx_vc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, int *mode);
 void	zbx_vc_get_mem_stats(zbx_shmem_stats_t *mem);
