@@ -4,15 +4,14 @@
 ## Overview
 
 For Zabbix version: 6.0 and higher  
-The template to monitor PHP-FPM by Zabbix that work without any external scripts.
+This template to monitor PHP-FPM by Zabbix agent works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `PHP-FPM by Zabbix agent` collects metrics by polling PHP-FPM status-page locally with Zabbix agent:
+Template `PHP-FPM by Zabbix agent` collects metrics by polling the PHP-FPM status-page locally using Zabbix agent.
 
-Note that this template doesn't support https and redirects (limitations of web.page.get).
+Note that this template doesn't support redirects (limitation of web.page.get).
 
-It also uses Zabbix agent to collect `php-fpm` Linux process stats like CPU usage, memory usage and whether process is running or not.
-
+It also uses Zabbix agent to collect `php-fpm` Linux process stats, for example, CPU usage, memory usage, and also to find out whether the process is running or not.
 
 
 
@@ -24,16 +23,16 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
-1. Open the php-fpm configuration file and enable the status page as shown.
+1. Open the PHP-FPM configuration file and enable the status page as shown.
     ```
     pm.status_path = /status
     ping.path = /ping
     ```
-2. Validate the syntax is fine before we reload the service
+2. Validate the syntax is fine before we reload the service.
     ```
     $ php-fpm7 -t
     ```
-3. Reload the php-fpm service to make the change active
+3. Reload the php-fpm service to make the change active.
     ```
     $ systemctl reload php-fpm
     ```
@@ -66,9 +65,11 @@ This template was tested on:
 7. Verify
   ```curl -L 127.0.0.1/status```
 
-If you use another location of status/ping page, don't forget to change {$PHP_FPM.STATUS.PAGE}/{$PHP_FPM.PING.PAGE} macro.
+Note that depending on your OS distribution, the PHP-FPM process name may vary. Please, check the actual name in the line "Name" from /proc/\<pid\>/status file (https://www.zabbix.com/documentation/6.0/manual/appendix/items/proc_mem_num_notes) and change {$PHP_FPM.PROCESS_NAME} macro if needed.
 
-If you use an atypical location for PHP-FPM status-page don't forget to change the macros {$PHP_FPM.PORT}.
+If you use another location of the status/ping page, don't forget to change {$PHP_FPM.STATUS.PAGE}/{$PHP_FPM.PING.PAGE} macro.
+
+If you use an atypical location for the PHP-FPM status-page, don't forget to change the macros {$PHP_FPM.PORT}.
 
 
 
@@ -86,7 +87,7 @@ No specific Zabbix configuration is required.
 |{$PHP_FPM.PING.PAGE} |<p>The path of PHP-FPM ping page.</p> |`ping` |
 |{$PHP_FPM.PING.REPLY} |<p>Expected reply to the ping.</p> |`pong` |
 |{$PHP_FPM.PORT} |<p>The port of PHP-FPM status host or container.</p> |`80` |
-|{$PHP_FPM.PROCESS_NAME} |<p>PHP-FPM process name</p> |`php-fpm` |
+|{$PHP_FPM.PROCESS_NAME} |<p>PHP-FPM process name. May vary depending on your OS distribution.</p> |`php-fpm` |
 |{$PHP_FPM.QUEUE.WARN.MAX} |<p>The maximum PHP-FPM queue usage percent for trigger expression.</p> |`80` |
 |{$PHP_FPM.STATUS.PAGE} |<p>The path of PHP-FPM status page.</p> |`status` |
 
@@ -105,7 +106,7 @@ There are no template links in this template.
 |PHP-FPM |PHP-FPM: Memory usage, % |<p>Memory used percentage relative to total memory available.</p> |ZABBIX_PASSIVE |proc.mem["{$PHP_FPM.PROCESS_NAME}",,,,pmem] |
 |PHP-FPM |PHP-FPM: CPU utilization |<p>Process CPU utilization percentage.</p> |ZABBIX_PASSIVE |proc.cpu.util["{$PHP_FPM.PROCESS_NAME}"] |
 |PHP-FPM |PHP-FPM: Number of processes running |<p>-</p> |ZABBIX_PASSIVE |proc.num["{$PHP_FPM.PROCESS_NAME}"] |
-|PHP-FPM |PHP-FPM: Ping |<p>-</p> |DEPENDENT |php-fpm.ping<p>**Preprocessing**:</p><p>- REGEX: `{$PHP_FPM.PING.REPLY}($|\n) 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
+|PHP-FPM |PHP-FPM: Ping |<p>-</p> |DEPENDENT |php-fpm.ping<p>**Preprocessing**:</p><p>- REGEX: `{$PHP_FPM.PING.REPLY}($|\r?\n) 1`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
 |PHP-FPM |PHP-FPM: Processes, active |<p>The total number of active processes.</p> |DEPENDENT |php-fpm.processes_active<p>**Preprocessing**:</p><p>- JSONPATH: `$.['active processes']`</p> |
 |PHP-FPM |PHP-FPM: Version |<p>Current version PHP. Get from HTTP-Header "X-Powered-By" and may not work if you change default HTTP-headers.</p> |DEPENDENT |php-fpm.version<p>**Preprocessing**:</p><p>- REGEX: `^[.\s\S]*X-Powered-By: PHP/([.\d]{1,}) \1`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |PHP-FPM |PHP-FPM: Pool name |<p>The name of current pool.</p> |DEPENDENT |php-fpm.name<p>**Preprocessing**:</p><p>- JSONPATH: `$.pool`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
@@ -133,7 +134,7 @@ There are no template links in this template.
 |PHP-FPM: Service is down |<p>-</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.ping)=0 or nodata(/PHP-FPM by Zabbix agent/php-fpm.ping,3m)=1` |HIGH |<p>Manual close: YES</p><p>**Depends on**:</p><p>- PHP-FPM: Process is not running</p> |
 |PHP-FPM: Version has changed |<p>PHP-FPM version has changed. Ack to close.</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.version,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.version,#2) and length(last(/PHP-FPM by Zabbix agent/php-fpm.version))>0` |INFO |<p>Manual close: YES</p> |
 |PHP-FPM: Failed to fetch info data |<p>Zabbix has not received data for items for the last 30 minutes</p> |`nodata(/PHP-FPM by Zabbix agent/php-fpm.uptime,30m)=1` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- PHP-FPM: Process is not running</p> |
-|PHP-FPM: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|PHP-FPM: Pool has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |PHP-FPM: Queue utilization is high |<p>The queue for this pool reached {$PHP_FPM.QUEUE.WARN.MAX}% of its maximum capacity. Items in queue represent the current number of connections that have been initiated on this pool, but not yet accepted.</p> |`min(/PHP-FPM by Zabbix agent/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}` |WARNING | |
 |PHP-FPM: Manager  changed |<p>PHP-FPM manager changed. Ack to close.</p> |`last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#2)` |INFO |<p>Manual close: YES</p> |
 |PHP-FPM: Detected slow requests |<p>PHP-FPM detected slow request. A slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p> |`min(/PHP-FPM by Zabbix agent/php-fpm.slow_requests,#3)>0` |WARNING | |
