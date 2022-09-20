@@ -1297,4 +1297,56 @@ class testDashboardItemValueWidget extends CWebTest {
 			$this->assertFalse($form->query($info)->one()->isVisible());
 		}
 	}
+
+	public function testDashboardItemValueWidget_CheckBackgroundColor() {
+		$data = [
+			'fields' => [
+				'Type' => 'Item value',
+				'Item' => 'Available memory in %',
+				'Name' => 'Item Widget with threshold',
+				'Advanced configuration' => true
+			],
+			'colors' => [
+				'id:lbl_thresholds_0_color' => 'AABBCC',
+				'id:lbl_thresholds_1_color' => 'CCDDAA'
+			],
+			'thresholds' => [
+				'id:thresholds_0_threshold' => '1',
+				'id:thresholds_1_threshold' => '2'
+			]
+		];
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->edit()->addWidget()->asForm();
+		$form->fill($data['fields']);
+
+		foreach ($data['thresholds'] as $fieldid => $threshold) {
+			$form->query('button:Add')->one()->click();
+			$form->query($fieldid)->one()->fill($threshold);
+		}
+
+		foreach ($data['colors'] as $fieldid => $color) {
+			$form->query($fieldid)->one()->click()->waitUntilReady();
+			$this->query('xpath://div[@class="overlay-dialogue color-picker-dialogue"]')->asColorPicker()->one()->fill($color);
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+		$dashboard->save();
+		$this->assertMessage('Dashboard updated');
+
+		// value for threshold trigger.
+		$index = 1;
+
+		foreach ($data['colors'] as $fieldid => $color) {
+		// Insert item data.
+		CDataHelper::addItemData(42244,$index,time()+$index);
+		$this->page->refresh();
+		$rgb = implode(', ', sscanf($color, "%02x%02x%02x"));
+		$this->assertEquals('background-color: rgb('.$rgb.');', $dashboard->getWidget($data['fields']['Name'])->getContent()
+				->query('class:dashboard-widget-item')->one()->getAttribute('style'));
+		$index++;
+		}
+	}
 }
