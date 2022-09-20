@@ -217,17 +217,7 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'step-symbols☺æų""\\//!@#$%^&*()_+',
 							'url' => 'http://zabbix.com',
-							'no' => 0,
-							'headers' => [
-								[
-									'name' => 'First-Header',
-									'value' => 'with value'
-								],
-								[
-									'name' => 'Second-header',
-									'value' => ''
-								]
-							]
+							'no' => 0
 						]
 					]
 				]],

@@ -578,23 +578,6 @@ class testFormWebStep extends CLegacyWebTest {
 					]
 				]
 			],
-			// Headers -without value
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Headers -without value',
-					'step_name' => 'Step headers -without value',
-					'url' => 'http://www.zabbix.com',
-					'headers' => [
-						['name' => 'test']
-					],
-					'error_webform' => true,
-					'error_msg' => 'Cannot add web scenario',
-					'errors' => [
-						'Invalid parameter "/1/steps/1/headers/1": the parameter "value" is missing.'
-					]
-				]
-			],
 			// Headers -empty value
 			[
 				[
@@ -604,23 +587,6 @@ class testFormWebStep extends CLegacyWebTest {
 					'url' => 'http://www.zabbix.com',
 					'headers' => [
 						['name' => 'test', 'value' => '']
-					]
-				]
-			],
-			// Headers -without name
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Headers -without name',
-					'step_name' => 'Step headers -without name',
-					'url' => 'http://www.zabbix.com',
-					'headers' => [
-						['value' => 'test']
-					],
-					'error_webform' => true,
-					'error_msg' => 'Cannot add web scenario',
-					'errors' => [
-						'Invalid parameter "/1/steps/1/headers/1": the parameter "name" is missing.'
 					]
 				]
 			],
