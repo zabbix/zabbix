@@ -22747,6 +22747,11 @@ msgstr ""
 msgid "via"
 msgstr "caur"
 
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
+
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"
 msgstr ""

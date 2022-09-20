@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-09-05 15:37+0000\n"
+"PO-Revision-Date: 2022-09-06 07:52+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -5034,7 +5034,7 @@ msgstr "День недели"
 #: app/views/popup.maintenance.period.php:165
 #: app/views/popup.sla.excludeddowntime.edit.php:63
 msgid "Days"
-msgstr "Дни"
+msgstr "Дней"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:391
 msgid "Debug"
@@ -14639,7 +14639,7 @@ msgstr "Квартал"
 
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
-msgstr "Ежеквартальный"
+msgstr "Ежеквартально"
 
 #: app/views/popup.httpstep.php:64
 #: include/views/configuration.host.discovery.edit.php:181
@@ -22758,6 +22758,11 @@ msgstr "varsamp() - Выборочная дисперсия"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "через"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"
