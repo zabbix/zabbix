@@ -39,6 +39,7 @@
 #include "zbxxml.h"
 #include "base64.h"
 #include "zbxtime.h"
+#include "zbxstats.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
@@ -1312,7 +1313,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			get_program_type_string(trapper_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	memcpy(&s, trapper_args_in->listen_sock, sizeof(zbx_socket_t));
 
@@ -1339,7 +1340,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
 				get_process_type_string(process_type), process_num, sec);
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 		/* Trapper has to accept all types of connections it can accept with the specified configuration. */
 		/* Only after receiving data it is known who has sent them and one can decide to accept or discard */
@@ -1354,7 +1355,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			/* get connection timestamp */
 			zbx_timespec(&ts);
 
-			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+			zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 			zbx_setproctitle("%s #%d [processing data]", get_process_type_string(process_type),
 					process_num);

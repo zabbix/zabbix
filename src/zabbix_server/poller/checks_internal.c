@@ -533,7 +533,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 				goto out;
 			}
 
-			get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
+			zbx_get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
 
 			SET_DBL_RESULT(result, value);
 		}

@@ -47,11 +47,11 @@ zbx_process_info_t;
 int	get_process_type_forks(unsigned char proc_type);
 
 #ifndef _WINDOWS
-int	init_selfmon_collector(char **error);
-void	free_selfmon_collector(void);
-void	update_selfmon_counter(unsigned char state);
-void	collect_selfmon_stats(void);
-void	get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int proc_num, unsigned char state,
+int	zbx_init_selfmon_collector(char **error);
+void	zbx_free_selfmon_collector(void);
+void	zbx_update_selfmon_counter(unsigned char state);
+void	zbx_collect_selfmon_stats(void);
+void	zbx_get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int proc_num, unsigned char state,
 		double *value);
 int	zbx_get_all_process_stats(zbx_process_info_t *stats);
 void	zbx_sleep_loop(int sleeptime);

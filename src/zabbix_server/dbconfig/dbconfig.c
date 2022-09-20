@@ -51,7 +51,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	zbx_rtc_subscribe(&rtc, process_type, process_num);
 

@@ -222,7 +222,7 @@ int	get_process_type_forks(unsigned char proc_type)
  *          for self-monitoring collector                                     *
  *                                                                            *
  ******************************************************************************/
-int	init_selfmon_collector(char **error)
+int	zbx_init_selfmon_collector(char **error)
 {
 	size_t		sz, sz_array, sz_process[ZBX_PROCESS_TYPE_COUNT], sz_total;
 	char		*p;
@@ -290,7 +290,7 @@ out:
  * Purpose: Free memory allocated for self-monitoring collector               *
  *                                                                            *
  ******************************************************************************/
-void	free_selfmon_collector(void)
+void	zbx_free_selfmon_collector(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() collector:%p", __func__, (void *)collector);
 
@@ -314,7 +314,7 @@ void	free_selfmon_collector(void)
  * Parameters: state - [IN] new process state; ZBX_PROCESS_STATE_*            *
  *                                                                            *
  ******************************************************************************/
-void	update_selfmon_counter(unsigned char state)
+void	zbx_update_selfmon_counter(unsigned char state)
 {
 	zbx_stat_process_t	*process;
 	clock_t			ticks;
@@ -376,7 +376,7 @@ void	update_selfmon_counter(unsigned char state)
 	process->cache.ticks = ticks;
 }
 
-void	collect_selfmon_stats(void)
+void	zbx_collect_selfmon_stats(void)
 {
 	zbx_stat_process_t	*process;
 	clock_t			ticks, ticks_done;
@@ -463,7 +463,7 @@ out:
  *                                  requested statistics                      *
  *                                                                            *
  ******************************************************************************/
-void	get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int proc_num, unsigned char state,
+void	zbx_get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int proc_num, unsigned char state,
 		double *value)
 {
 	unsigned int	total = 0, counter = 0;
@@ -660,7 +660,7 @@ void	zbx_sleep_loop(int sleeptime)
 
 	sleep_remains = sleeptime;
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 	do
 	{
@@ -668,7 +668,7 @@ void	zbx_sleep_loop(int sleeptime)
 	}
 	while (0 < --sleep_remains);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 }
 
 void	zbx_wakeup(void)

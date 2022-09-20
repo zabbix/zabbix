@@ -1393,7 +1393,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
