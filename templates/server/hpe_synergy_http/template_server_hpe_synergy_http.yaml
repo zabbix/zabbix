@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-07-05T06:29:44Z'
+  date: '2022-09-20T06:35:23Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -26,72 +26,10 @@ zabbix_export:
           name: 'Templates/Server hardware'
       items:
         -
-          uuid: 6a12ea452d444c8ca5aec2698709d979
-          name: 'HPE Synergy: Get enclosures'
-          type: DEPENDENT
-          key: hpe.synergy.data.enclosures
-          delay: '0'
-          history: 0d
-          trends: '0'
-          value_type: TEXT
-          description: 'A list of enclosures.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.enclosures.members.[0]'
-          master_item:
-            key: hpe.synergy.data.get
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: c0049d63dffe4cdaafa806796051e06b
-          name: 'HPE Synergy: Get errors'
-          type: DEPENDENT
-          key: hpe.synergy.data.errors
-          delay: '0'
-          history: 7d
-          trends: '0'
-          value_type: TEXT
-          description: 'A list of errors from API requests.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.errors
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          master_item:
-            key: hpe.synergy.data.get
-          tags:
-            -
-              tag: component
-              value: raw
-          triggers:
-            -
-              uuid: dba8cff13328403dae2cbda8f106b384
-              expression: 'length(last(/HPE Synergy by HTTP/hpe.synergy.data.errors))>0'
-              name: 'HPE Synergy: There are errors in requests to API'
-              opdata: '{ITEM.LASTVALUE1}'
-              priority: AVERAGE
-              description: 'Zabbix has received errors in requests to API.'
-              dependencies:
-                -
-                  name: 'HPE Synergy: Service is unavailable'
-                  expression: 'max(/HPE Synergy by HTTP/net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{HOST.CONN}","{$HPE.SYNERGY.API.PORT}"],5m)=0'
-              tags:
-                -
-                  tag: scope
-                  value: availability
-        -
           uuid: 2f9816e8a60149f4aafdf7ffb0632224
           name: 'HPE Synergy: Get data'
           type: SCRIPT
-          key: hpe.synergy.data.get
+          key: hpe.synergy.get.data
           history: 0d
           trends: '0'
           value_type: TEXT
@@ -320,6 +258,355 @@ zabbix_export:
               tag: component
               value: raw
         -
+          uuid: 03389ced2251456a98f56418f1fbc6c5
+          name: 'HPE Synergy: Get datacenters data'
+          type: DEPENDENT
+          key: hpe.synergy.get.datacenters
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'Datacenters data.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.datacenters
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 6a12ea452d444c8ca5aec2698709d979
+          name: 'HPE Synergy: Get enclosures data'
+          type: DEPENDENT
+          key: hpe.synergy.get.enclosures
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'A list of enclosures.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.enclosures
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: c0049d63dffe4cdaafa806796051e06b
+          name: 'HPE Synergy: Get errors'
+          type: DEPENDENT
+          key: hpe.synergy.get.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'A list of errors from API requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.errors
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+          triggers:
+            -
+              uuid: dba8cff13328403dae2cbda8f106b384
+              expression: 'length(last(/HPE Synergy by HTTP/hpe.synergy.get.errors))>0'
+              name: 'HPE Synergy: There are errors in requests to API'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in requests to API.'
+              dependencies:
+                -
+                  name: 'HPE Synergy: Service is unavailable'
+                  expression: 'max(/HPE Synergy by HTTP/net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{HOST.CONN}","{$HPE.SYNERGY.API.PORT}"],5m)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 11b7e2c9c3ba4c71a2a5b165eea2c105
+          name: 'HPE Synergy: Get ethernet networks data'
+          type: DEPENDENT
+          key: hpe.synergy.get.ethernet_networks
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'Ethernet networks data.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.["ethernet-networks"]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: d6d0a7fb1f0e47a792cd5197e2aa99b2
+          name: 'HPE Synergy: Get fabrics data'
+          type: DEPENDENT
+          key: hpe.synergy.get.fabrics
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'Fabrics data.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.fabrics
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 789012febb2c44af8cf01b83315f6e99
+          name: 'HPE Synergy: Get FC networks data'
+          type: DEPENDENT
+          key: hpe.synergy.get.fc_networks
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'FC networks data.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.["fc-networks"]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 1b903d33f7ef481687db5f94a94123f5
+          name: 'HPE Synergy: Get hypervisor managers data'
+          type: DEPENDENT
+          key: hpe.synergy.get.hypervisor_managers
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'Hypervisor managers data.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.["hypervisor-managers"]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 9724a596f61241f297f5fa8fbd538ea0
+          name: 'HPE Synergy: Get interconnects data'
+          type: DEPENDENT
+          key: hpe.synergy.get.interconnects
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'Interconnects data.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.interconnects
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: bff37f5e7576433e85991ca474aae7c8
+          name: 'HPE Synergy: Get logical enclosures data'
+          type: DEPENDENT
+          key: hpe.synergy.get.logical_enclosures
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'Logical enclosures data.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.["logical-enclosures"]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 5f44e9a2434e4773ab9d8c5664535a91
+          name: 'HPE Synergy: Get racks data'
+          type: DEPENDENT
+          key: hpe.synergy.get.racks
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'Racks data.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.racks
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 066eacd86e784308a0b3ed53c7fd2482
+          name: 'HPE Synergy: Get server hardware data'
+          type: DEPENDENT
+          key: hpe.synergy.get.server_hardware
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'Server hardware data.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.["server-hardware"]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 249afb5967c146799340487196206e01
+          name: 'HPE Synergy: Get storage pools data'
+          type: DEPENDENT
+          key: hpe.synergy.get.storage_pools
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'Storage pools data.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.["storage-pools"]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: bab0584a38fb4e9ba3270c2882e9cef1
+          name: 'HPE Synergy: Get storage systems data'
+          type: DEPENDENT
+          key: hpe.synergy.get.storage_systems
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'Storage systems data.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.["storage-systems"]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: f232ebaf34eb474d9596cfe573e7b3fb
+          name: 'HPE Synergy: Get storage volumes data'
+          type: DEPENDENT
+          key: hpe.synergy.get.storage_volumes
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'Storage volumes data.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.["storage-volumes"]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: d8e6a2b490ab472cb15814c19ed71e16
+          name: 'HPE Synergy: Get uplink sets data'
+          type: DEPENDENT
+          key: hpe.synergy.get.uplink_sets
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'Uplink sets data.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.["uplink-sets"]'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: hpe.synergy.get.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
           uuid: 86da94cecaa1424e9a22479d556d7b12
           name: 'HPE Synergy: Service ping'
           type: SIMPLE
@@ -380,7 +667,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].applianceBays[?(@.bayNumber == "{#BAY_NUMBER}")].bayPowerState.first()'
+                    - $.bayPowerState
                 -
                   type: STR_REPLACE
                   parameters:
@@ -409,7 +696,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -417,6 +704,36 @@ zabbix_export:
                 -
                   tag: component
                   value: appliance
+                -
+                  tag: enclosure
+                  value: '{#ENCLOSURE_NAME}'
+            -
+              uuid: 76d81ddf977f4d3481af82f8a9031b50
+              name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#ENCLOSURE_NAME}")].applianceBays[?(@.bayNumber == "{#BAY_NUMBER}")].first()'
+              master_item:
+                key: hpe.synergy.get.enclosures
+              tags:
+                -
+                  tag: bay-number
+                  value: '{#BAY_NUMBER}'
+                -
+                  tag: component
+                  value: appliance
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
@@ -434,13 +751,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].applianceBays[?(@.bayNumber == "{#BAY_NUMBER}")].model.first()'
+                    - $.model
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -465,13 +782,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].applianceBays[?(@.bayNumber == "{#BAY_NUMBER}")].partNumber.first()'
+                    - $.partNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -496,7 +813,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].applianceBays[?(@.bayNumber == "{#BAY_NUMBER}")].poweredOn.first()'
+                    - $.poweredOn
                 -
                   type: BOOL_TO_DECIMAL
                   parameters:
@@ -506,7 +823,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -538,7 +855,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].applianceBays[?(@.bayNumber == "{#BAY_NUMBER}")].devicePresence.first()'
+                    - $.devicePresence
                 -
                   type: STR_REPLACE
                   parameters:
@@ -576,7 +893,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -601,13 +918,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].applianceBays[?(@.bayNumber == "{#BAY_NUMBER}")].serialNumber.first()'
+                    - $.serialNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -632,13 +949,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].applianceBays[?(@.bayNumber == "{#BAY_NUMBER}")].sparePartNumber.first()'
+                    - $.sparePartNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -670,7 +987,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].applianceBays[?(@.bayNumber == "{#BAY_NUMBER}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -708,7 +1025,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -751,7 +1068,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.enclosures
+            key: hpe.synergy.get.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#BAY_NUMBER}'
@@ -763,7 +1080,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.applianceBays
+                - '$.members.[0].applianceBays'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -776,6 +1093,36 @@ zabbix_export:
           delay: '0'
           description: 'SDX cross fabric module connects to all compute devices installed in the system enclosure and brings in the capability of hard partitioning. Crossbar details are relevant only for enclosures with type "SDX".'
           item_prototypes:
+            -
+              uuid: cedc8d60b7c647efbd148d020432861d
+              name: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#ENCLOSURE_NAME}")].crossbars[?(@.bayNumber == "{#BAY_NUMBER}")].first()'
+              master_item:
+                key: hpe.synergy.get.enclosures
+              tags:
+                -
+                  tag: bay-number
+                  value: '{#BAY_NUMBER}'
+                -
+                  tag: component
+                  value: crossbar
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: enclosure
+                  value: '{#ENCLOSURE_NAME}'
             -
               uuid: c64e3a01454f473b888e57496ec642d3
               name: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: HW version'
@@ -790,13 +1137,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].crossBars[?(@.bayNumber == "{#BAY_NUMBER}")].hwVersion.first()'
+                    - $.hwVersion
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -821,13 +1168,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].crossBars[?(@.bayNumber == "{#BAY_NUMBER}")].partNumber.first()'
+                    - $.partNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -859,7 +1206,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].crossBars[?(@.bayNumber == "{#BAY_NUMBER}")].presence.first()'
+                    - $.presence
                 -
                   type: STR_REPLACE
                   parameters:
@@ -897,7 +1244,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -933,13 +1280,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].crossBars[?(@.bayNumber == "{#BAY_NUMBER}")].serialNumber.first()'
+                    - $.serialNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -971,7 +1318,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].crossBars[?(@.bayNumber == "{#BAY_NUMBER}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1009,7 +1356,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -1052,7 +1399,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.enclosures
+            key: hpe.synergy.get.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#BAY_NUMBER}'
@@ -1064,7 +1411,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.crossBars
+                - '$.members.[0].crossBars'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1077,6 +1424,33 @@ zabbix_export:
           delay: '0'
           description: 'A list of the datacenters.'
           item_prototypes:
+            -
+              uuid: 08830efa6eb64d7291eaa15bbfc0b851
+              name: 'Datacenter [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.datacenter["{#NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Datacenter [{#NAME}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#NAME}")].first()'
+              master_item:
+                key: hpe.synergy.get.datacenters
+              tags:
+                -
+                  tag: component
+                  value: datacenter
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: datacenter
+                  value: '{#NAME}'
             -
               uuid: d37c1e2376ba4da5822041ad8ff37c8a
               name: 'Datacenter [{#NAME}]: State'
@@ -1091,7 +1465,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.datacenters.members[?(@.name == "{#NAME}")].state.first()'
+                    - $.state
                 -
                   type: STR_REPLACE
                   parameters:
@@ -1145,7 +1519,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '9'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.datacenter["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1215,7 +1589,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.datacenters.members[?(@.name == "{#NAME}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1253,7 +1627,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.datacenter["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1293,7 +1667,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.get.datacenters
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -1302,7 +1676,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.datacenters.members
+                - $.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1315,6 +1689,36 @@ zabbix_export:
           delay: '0'
           description: 'A list of device bays in the enclosure.'
           item_prototypes:
+            -
+              uuid: 5c7b1315b123482e908229882b6e57c1
+              name: 'Device [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.device["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Device [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#ENCLOSURE_NAME}")].deviceBays[?(@.bayNumber == "{#BAY_NUMBER}")].first()'
+              master_item:
+                key: hpe.synergy.get.enclosures
+              tags:
+                -
+                  tag: bay-number
+                  value: '{#BAY_NUMBER}'
+                -
+                  tag: component
+                  value: device
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: enclosure
+                  value: '{#ENCLOSURE_NAME}'
             -
               uuid: 38ecff044b1d4ff88f8e99b21998181a
               name: 'Device [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Model'
@@ -1329,13 +1733,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].deviceBays[?(@.bayNumber == "{#BAY_NUMBER}")].model.first()'
+                    - $.model
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.device["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -1359,13 +1763,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].deviceBays[?(@.bayNumber == "{#BAY_NUMBER}")].powerAllocationWatts.first()'
+                    - $.powerAllocationWatts
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.device["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -1397,7 +1801,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].deviceBays[?(@.bayNumber == "{#BAY_NUMBER}")].devicePresence.first()'
+                    - $.devicePresence
                 -
                   type: STR_REPLACE
                   parameters:
@@ -1435,7 +1839,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.device["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -1471,14 +1875,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].deviceBays[?(@.bayNumber == "{#BAY_NUMBER}")].serialNumber.first()'
+                    - $.serialNumber
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.device["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -1490,7 +1894,7 @@ zabbix_export:
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
           master_item:
-            key: hpe.synergy.data.enclosures
+            key: hpe.synergy.get.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#BAY_NUMBER}'
@@ -1502,7 +1906,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.deviceBays
+                - '$.members.[0].deviceBays'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1527,13 +1931,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].applianceBayCount.first()'
+                    - $.applianceBayCount
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1541,6 +1945,33 @@ zabbix_export:
                 -
                   tag: component
                   value: enclosure
+                -
+                  tag: enclosure
+                  value: '{#NAME}'
+            -
+              uuid: 2bdee9f0f6fa49928b4cef48b9900859
+              name: 'Enclosure [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.enclosure["{#NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Enclosure [{#NAME}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#NAME}")].first()'
+              master_item:
+                key: hpe.synergy.get.enclosures
+              tags:
+                -
+                  tag: component
+                  value: enclosure
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: enclosure
                   value: '{#NAME}'
@@ -1556,13 +1987,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].deviceBayCount.first()'
+                    - $.deviceBayCount
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1586,9 +2017,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].deviceBayWatts.first()'
+                    - $.deviceBayWatts
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1612,9 +2043,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].fansAndManagementDevicesWatts.first()'
+                    - $.fansAndManagementDevicesWatts
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1643,13 +2074,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].fanBayCount.first()'
+                    - $.fanBayCount
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1674,13 +2105,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].fwBaselineName.first()'
+                    - $.fwBaselineName
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1700,13 +2131,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].interconnectBayCount.first()'
+                    - $.interconnectBayCount
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1730,9 +2161,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].interconnectBayWatts.first()'
+                    - $.interconnectBayWatts
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1755,13 +2186,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].minimumPowerSupplies.first()'
+                    - $.minimumPowerSupplies
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1784,13 +2215,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].minimumPowerSuppliesForRedundantPowerFeed.first()'
+                    - $.minimumPowerSuppliesForRedundantPowerFeed
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1815,13 +2246,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].enclosureModel.first()'
+                    - $.enclosureModel
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1843,13 +2274,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].partNumber.first()'
+                    - $.partNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1870,9 +2301,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].powerCapacityWatts.first()'
+                    - $.powerCapacityWatts
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1896,9 +2327,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].powerAllocatedWatts.first()'
+                    - $.powerAllocatedWatts
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1922,9 +2353,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].powerAvailableWatts.first()'
+                    - $.powerAvailableWatts
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1947,13 +2378,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].powerSupplyBayCount.first()'
+                    - $.powerSupplyBayCount
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -1978,13 +2409,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].serialNumber.first()'
+                    - $.serialNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2018,7 +2449,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].state.first()'
+                    - $.state
                 -
                   type: STR_REPLACE
                   parameters:
@@ -2077,7 +2508,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '10'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2109,7 +2540,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].stateReason.first()'
+                    - $.stateReason
                 -
                   type: STR_REPLACE
                   parameters:
@@ -2158,7 +2589,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '8'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2209,7 +2640,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2247,7 +2678,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2300,13 +2731,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#NAME}")].enclosureType.first()'
+                    - $.enclosureType
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2389,7 +2820,7 @@ zabbix_export:
                     host: 'HPE Synergy by HTTP'
                     key: 'hpe.synergy.enclosure["{#NAME}",interconnect_bay_watts]'
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.get.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -2398,7 +2829,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.enclosures.members
+                - $.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2411,6 +2842,33 @@ zabbix_export:
           delay: '0'
           description: 'A list of the ethernet networks.'
           item_prototypes:
+            -
+              uuid: 0176e96b210b4a778b0b4b9b6fabdf3b
+              name: 'Ethernet network [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.ethernet.network["{#NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Ethernet network [{#NAME}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#NAME}")].first()'
+              master_item:
+                key: hpe.synergy.get.ethernet_networks
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: network
+                  value: '{#NAME}'
             -
               uuid: 9b69d74467d6440eb98fc6c69c2f6779
               name: 'Ethernet network [{#NAME}]: State'
@@ -2425,13 +2883,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["ethernet-networks"].members[?(@.name == "{#NAME}")].state.first()'
+                    - $.state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.ethernet.network["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2460,7 +2918,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["ethernet-networks"].members[?(@.name == "{#NAME}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2498,7 +2956,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.ethernet.network["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2538,7 +2996,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.get.ethernet_networks
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -2547,7 +3005,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.["ethernet-networks"].members'
+                - $.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2560,6 +3018,33 @@ zabbix_export:
           delay: '0'
           description: 'A list of the fabrics.'
           item_prototypes:
+            -
+              uuid: 26e6e32676d74347abd8dbf92c649113
+              name: 'Fabric [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.fabric["{#NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Fabric [{#NAME}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#NAME}")].first()'
+              master_item:
+                key: hpe.synergy.get.fabrics
+              tags:
+                -
+                  tag: component
+                  value: fabric
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: fabric
+                  value: '{#NAME}'
             -
               uuid: 9f38d17239ee45d4a22e8f08dde37910
               name: 'Fabric [{#NAME}]: State'
@@ -2574,13 +3059,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.fabrics.members[?(@.name == "{#NAME}")].state.first()'
+                    - $.state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.fabric["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2609,7 +3094,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.fabrics.members[?(@.name == "{#NAME}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2647,7 +3132,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.fabric["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -2687,7 +3172,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.get.fabrics
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -2696,7 +3181,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.fabrics.members
+                - $.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2709,6 +3194,36 @@ zabbix_export:
           delay: '0'
           description: 'A list of the fan bays in the enclosure.'
           item_prototypes:
+            -
+              uuid: 1ee7ddcfd9734abbaef8dc345f9eb85d
+              name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#ENCLOSURE_NAME}")].fanBays[?(@.bayNumber == "{#BAY_NUMBER}")].first()'
+              master_item:
+                key: hpe.synergy.get.enclosures
+              tags:
+                -
+                  tag: bay-number
+                  value: '{#BAY_NUMBER}'
+                -
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: enclosure
+                  value: '{#ENCLOSURE_NAME}'
             -
               uuid: 8449918637ab4f98932ca75d859546b2
               name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Model'
@@ -2723,13 +3238,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].fanBays[?(@.bayNumber == "{#BAY_NUMBER}")].model.first()'
+                    - $.model
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -2754,13 +3269,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].fanBays[?(@.bayNumber == "{#BAY_NUMBER}")].partNumber.first()'
+                    - $.partNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -2792,7 +3307,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].fanBays[?(@.bayNumber == "{#BAY_NUMBER}")].devicePresence.first()'
+                    - $.devicePresence
                 -
                   type: STR_REPLACE
                   parameters:
@@ -2830,7 +3345,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -2855,7 +3370,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].fanBays[?(@.bayNumber == "{#BAY_NUMBER}")].deviceRequired.first()'
+                    - $.deviceRequired
                 -
                   type: BOOL_TO_DECIMAL
                   parameters:
@@ -2865,7 +3380,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -2890,13 +3405,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].fanBays[?(@.bayNumber == "{#BAY_NUMBER}")].serialNumber.first()'
+                    - $.serialNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -2921,13 +3436,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].fanBays[?(@.bayNumber == "{#BAY_NUMBER}")].sparePartNumber.first()'
+                    - $.sparePartNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -2960,7 +3475,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].fanBays[?(@.bayNumber == "{#BAY_NUMBER}")].state.first()'
+                    - $.state
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '5'
                 -
@@ -2996,7 +3511,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '5'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -3069,7 +3584,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].fanBays[?(@.bayNumber == "{#BAY_NUMBER}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3107,7 +3622,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -3150,7 +3665,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.enclosures
+            key: hpe.synergy.get.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#BAY_NUMBER}'
@@ -3162,7 +3677,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.fanBays
+                - '$.members.[0].fanBays'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -3175,6 +3690,33 @@ zabbix_export:
           delay: '0'
           description: 'A list of the FC networks.'
           item_prototypes:
+            -
+              uuid: 75ca293f7deb4d7faa669f141478f1d7
+              name: 'FC network [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.fc.network["{#NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'FC network [{#NAME}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#NAME}")].first()'
+              master_item:
+                key: hpe.synergy.get.fc_networks
+              tags:
+                -
+                  tag: component
+                  value: fc-network
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: fc-network
+                  value: '{#NAME}'
             -
               uuid: 1defd79827204bbcaffe79cd7a9df059
               name: 'FC network [{#NAME}]: State'
@@ -3189,13 +3731,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["fc-networks"].members[?(@.name == "{#NAME}")].state.first()'
+                    - $.state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.fc.network["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3224,7 +3766,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["fc-networks"].members[?(@.name == "{#NAME}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3262,7 +3804,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.fc.network["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -3302,7 +3844,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.get.fc_networks
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -3311,7 +3853,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.["fc-networks"].members'
+                - $.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -3324,6 +3866,36 @@ zabbix_export:
           delay: '0'
           description: 'A list of the Synergy Frame Link Module bays.'
           item_prototypes:
+            -
+              uuid: 53c899a616a24fc4990363d3f2942417
+              name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].first()'
+              master_item:
+                key: hpe.synergy.get.enclosures
+              tags:
+                -
+                  tag: bay-number
+                  value: '{#BAY_NUMBER}'
+                -
+                  tag: component
+                  value: manager
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: enclosure
+                  value: '{#ENCLOSURE_NAME}'
             -
               uuid: 64e7f977edf34338aa74e8acc88d98fd
               name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Firmware version'
@@ -3338,13 +3910,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].fwVersion.first()'
+                    - $.fwVersion
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -3374,7 +3946,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].linkPortState.first()'
+                    - $.linkPortState
                 -
                   type: STR_REPLACE
                   parameters:
@@ -3402,7 +3974,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -3434,7 +4006,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].linkPortStatus.first()'
+                    - $.linkPortStatus
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3472,7 +4044,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -3542,7 +4114,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].mgmtPortState.first()'
+                    - $.mgmtPortState
                 -
                   type: STR_REPLACE
                   parameters:
@@ -3585,7 +4157,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -3617,7 +4189,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].mgmtPortStatus.first()'
+                    - $.mgmtPortStatus
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3655,7 +4227,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -3711,13 +4283,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].model.first()'
+                    - $.model
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -3742,13 +4314,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].partNumber.first()'
+                    - $.partNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -3780,7 +4352,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].devicePresence.first()'
+                    - $.devicePresence
                 -
                   type: STR_REPLACE
                   parameters:
@@ -3818,7 +4390,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -3854,13 +4426,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].serialNumber.first()'
+                    - $.serialNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -3885,13 +4457,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].sparePartNumber.first()'
+                    - $.sparePartNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -3923,7 +4495,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3961,7 +4533,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -4004,7 +4576,7 @@ zabbix_export:
                       tag: scope
                       value: notice
           master_item:
-            key: hpe.synergy.data.enclosures
+            key: hpe.synergy.get.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#BAY_NUMBER}'
@@ -4016,7 +4588,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.managerBays
+                - '$.members.[0].managerBays'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -4029,6 +4601,33 @@ zabbix_export:
           delay: '0'
           description: 'A list of the hypervisor managers.'
           item_prototypes:
+            -
+              uuid: c6ba70270a424762bb8baf9531f44ed9
+              name: 'Hypervisor manager [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.hypervisor_manager["{#NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Hypervisor manager [{#NAME}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#NAME}")].first()'
+              master_item:
+                key: hpe.synergy.get.hypervisor_managers
+              tags:
+                -
+                  tag: component
+                  value: hypervisor-manager
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: hypervisor-manager
+                  value: '{#NAME}'
             -
               uuid: a60a72ddc0de4a9c9b0b7be53542089c
               name: 'Hypervisor manager [{#NAME}]: State'
@@ -4043,7 +4642,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["hypervisor-managers"].members[?(@.displayName == "{#NAME}")].state.first()'
+                    - $.state
                 -
                   type: STR_REPLACE
                   parameters:
@@ -4072,7 +4671,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.hypervisor_manager["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4094,13 +4693,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["hypervisor-managers"].members[?(@.displayName == "{#NAME}")].stateReason.first()'
+                    - $.stateReason
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.hypervisor_manager["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4129,7 +4728,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["hypervisor-managers"].members[?(@.displayName == "{#NAME}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -4167,7 +4766,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.hypervisor_manager["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4219,7 +4818,7 @@ zabbix_export:
                   tag: scope
                   value: availability
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.get.hypervisor_managers
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -4228,7 +4827,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.["hypervisor-managers"].members'
+                - $.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -4241,6 +4840,33 @@ zabbix_export:
           delay: '0'
           description: 'Interconnects are centrally managed by their containing logical interconnect. The interconnect provides a physical view of detailed downlink and uplink port state and configuration, including the current link state, speed, port role (uplink, downlink, or stacking), current pluggable media, power state, and immediate connected neighbor.'
           item_prototypes:
+            -
+              uuid: 5c504f8c744244febae87002cd520cbd
+              name: 'Interconnect [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.interconnect["{#NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Interconnect [{#NAME}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#NAME}")].first()'
+              master_item:
+                key: hpe.synergy.get.interconnects
+              tags:
+                -
+                  tag: component
+                  value: interconnect
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: interconnect
+                  value: '{#NAME}'
             -
               uuid: dc4822f158da4577a47ec4cf920b9b90
               name: 'Interconnect [{#NAME}]: Hardware health'
@@ -4255,13 +4881,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.interconnects.members[?(@.name == "{#NAME}")].interconnectHardwareHealth.first()'
+                    - $.interconnectHardwareHealth
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.interconnect["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4286,13 +4912,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.interconnects.members[?(@.name == "{#NAME}")].model.first()'
+                    - $.model
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.interconnect["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4314,13 +4940,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.interconnects.members[?(@.name == "{#NAME}")].partNumber.first()'
+                    - $.partNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.interconnect["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4340,13 +4966,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.interconnects.members[?(@.name == "{#NAME}")].portCount.first()'
+                    - $.portCount
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.interconnect["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4368,13 +4994,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.interconnects.members[?(@.name == "{#NAME}")].serialNumber.first()'
+                    - $.serialNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.interconnect["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4396,13 +5022,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.interconnects.members[?(@.name == "{#NAME}")].sparePartNumber.first()'
+                    - $.sparePartNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.interconnect["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4424,13 +5050,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.interconnects.members[?(@.name == "{#NAME}")].state.first()'
+                    - $.state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.interconnect["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4459,7 +5085,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.interconnects.members[?(@.name == "{#NAME}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -4497,7 +5123,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.interconnect["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4537,7 +5163,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.get.interconnects
           lld_macro_paths:
             -
               lld_macro: '{#ENCLOSURE_NAME}'
@@ -4549,7 +5175,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.interconnects.members
+                - $.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -4562,6 +5188,33 @@ zabbix_export:
           delay: '0'
           description: 'A list of the logical enclosures.'
           item_prototypes:
+            -
+              uuid: 96e5588599854754b9c7513c6786d9a6
+              name: 'Logical enclosure [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.logical_enclosure["{#NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Logical enclosure [{#NAME}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#NAME}")].first()'
+              master_item:
+                key: hpe.synergy.get.logical_enclosures
+              tags:
+                -
+                  tag: component
+                  value: logical-enclosure
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: logical-enclosure
+                  value: '{#NAME}'
             -
               uuid: 785f3a94e8614810b7ccc84be779ad1d
               name: 'Logical enclosure [{#NAME}]: State'
@@ -4584,7 +5237,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["logical-enclosures"].members[?(@.name == "{#NAME}")].state.first()'
+                    - $.state
                 -
                   type: STR_REPLACE
                   parameters:
@@ -4623,7 +5276,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '6'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.logical_enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4673,7 +5326,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["logical-enclosures"].members[?(@.name == "{#NAME}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -4711,7 +5364,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.logical_enclosure["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4751,7 +5404,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.get.logical_enclosures
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -4760,7 +5413,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.["logical-enclosures"].members'
+                - $.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -4774,6 +5427,36 @@ zabbix_export:
           description: 'Electrically isolated hardware partition (nPar). Partition details are relevant only for enclosures with type "SDX".'
           item_prototypes:
             -
+              uuid: 440aa83c441d490491b12ef31675428e
+              name: 'Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#ENCLOSURE_NAME}")].partitions[?(@.partitionID == "{#PARTITION_ID}")].first()'
+              master_item:
+                key: hpe.synergy.get.enclosures
+              tags:
+                -
+                  tag: component
+                  value: partition
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: enclosure
+                  value: '{#ENCLOSURE_NAME}'
+                -
+                  tag: partition
+                  value: '{#PARTITION_ID}'
+            -
               uuid: 8ee334ce899341a8b1292dd84d7b0af4
               name: 'Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Devices count'
               type: DEPENDENT
@@ -4785,13 +5468,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].partitions[?(@.partitionID == "{#PARTITION_ID}")].deviceCount.first()'
+                    - $.deviceCount
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4822,7 +5505,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].partitions[?(@.partitionID == "{#PARTITION_ID}")].partitionHealth.first()'
+                    - $.partitionHealth
                 -
                   type: STR_REPLACE
                   parameters:
@@ -4851,7 +5534,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4899,7 +5582,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].partitions[?(@.partitionID == "{#PARTITION_ID}")].memoryMb.first()'
+                    - $.memoryMb
                 -
                   type: MULTIPLIER
                   parameters:
@@ -4909,7 +5592,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4935,13 +5618,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].partitions[?(@.partitionID == "{#PARTITION_ID}")].processorCount.first()'
+                    - $.processorCount
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: component
@@ -4978,7 +5661,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].partitions[?(@.partitionID == "{#PARTITION_ID}")].partitionStatus.first()'
+                    - $.partitionStatus
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -5026,7 +5709,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '6'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: component
@@ -5049,7 +5732,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.enclosures
+            key: hpe.synergy.get.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#ENCLOSURE_NAME}'
@@ -5061,7 +5744,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.partitions
+                - '$.members.[0].partitions'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -5074,6 +5757,36 @@ zabbix_export:
           delay: '0'
           description: 'List of power supply bays in the enclosure.'
           item_prototypes:
+            -
+              uuid: 92d8618ee81742f6bb1cfdd63b51f3ea
+              name: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#ENCLOSURE_NAME}")].powerSupplyBays[?(@.bayNumber == "{#BAY_NUMBER}")].first()'
+              master_item:
+                key: hpe.synergy.get.enclosures
+              tags:
+                -
+                  tag: bay-number
+                  value: '{#BAY_NUMBER}'
+                -
+                  tag: component
+                  value: power
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: enclosure
+                  value: '{#ENCLOSURE_NAME}'
             -
               uuid: e748215b1d4a404ca0269909d321cdc6
               name: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Model'
@@ -5088,13 +5801,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].powerSupplyBays[?(@.bayNumber == "{#BAY_NUMBER}")].model.first()'
+                    - $.model
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -5118,13 +5831,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].powerSupplyBays[?(@.bayNumber == "{#BAY_NUMBER}")].outputCapacityWatts.first()'
+                    - $.outputCapacityWatts
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -5149,13 +5862,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].powerSupplyBays[?(@.bayNumber == "{#BAY_NUMBER}")].partNumber.first()'
+                    - $.partNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -5187,7 +5900,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].powerSupplyBays[?(@.bayNumber == "{#BAY_NUMBER}")].devicePresence.first()'
+                    - $.devicePresence
                 -
                   type: STR_REPLACE
                   parameters:
@@ -5225,7 +5938,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -5250,13 +5963,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].powerSupplyBays[?(@.bayNumber == "{#BAY_NUMBER}")].serialNumber.first()'
+                    - $.serialNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -5281,13 +5994,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].powerSupplyBays[?(@.bayNumber == "{#BAY_NUMBER}")].sparePartNumber.first()'
+                    - $.sparePartNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -5319,7 +6032,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].powerSupplyBays[?(@.bayNumber == "{#BAY_NUMBER}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -5357,7 +6070,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               tags:
                 -
                   tag: bay-number
@@ -5400,7 +6113,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.enclosures
+            key: hpe.synergy.get.enclosures
           lld_macro_paths:
             -
               lld_macro: '{#BAY_NUMBER}'
@@ -5412,7 +6125,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.powerSupplyBays
+                - '$.members.[0].powerSupplyBays'
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -5425,6 +6138,33 @@ zabbix_export:
           delay: '0'
           description: 'A list of the racks.'
           item_prototypes:
+            -
+              uuid: 8a68ba795abd445bb6832f8fb6fa5416
+              name: 'Rack [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.rack["{#NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Rack [{#NAME}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#NAME}")].first()'
+              master_item:
+                key: hpe.synergy.get.racks
+              tags:
+                -
+                  tag: component
+                  value: rack
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: rack
+                  value: '{#NAME}'
             -
               uuid: 921fa76608e4437d961af2409dddde0b
               name: 'Rack [{#NAME}]: State'
@@ -5439,7 +6179,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.racks.members[?(@.name == "{#NAME}")].state.first()'
+                    - $.state
                 -
                   type: STR_REPLACE
                   parameters:
@@ -5493,7 +6233,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '9'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.rack["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -5566,7 +6306,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.racks.members[?(@.name == "{#NAME}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -5604,7 +6344,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.rack["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -5644,7 +6384,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.get.racks
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -5653,7 +6393,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.racks.members
+                - $.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -5678,13 +6418,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorCoreCount.first()'
+                    - $.processorCoreCount
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -5710,13 +6450,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorCount.first()'
+                    - $.processorCount
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -5743,13 +6483,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorSpeedMhz.first()'
+                    - $.processorSpeedMhz
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -5777,13 +6517,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorType.first()'
+                    - $.processorType
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -5811,7 +6551,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].maintenanceState.first()'
+                    - $.maintenanceState
                   error_handler: DISCARD_VALUE
                 -
                   type: STR_REPLACE
@@ -5831,7 +6571,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '2'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -5856,14 +6596,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].maintenanceStateReason.first()'
+                    - $.maintenanceStateReason
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -5887,7 +6627,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].memoryMb.first()'
+                    - $.memoryMb
                 -
                   type: MULTIPLIER
                   parameters:
@@ -5897,7 +6637,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -5930,7 +6670,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].migrationState.first()'
+                    - $.migrationState
                   error_handler: DISCARD_VALUE
                 -
                   type: STR_REPLACE
@@ -5955,7 +6695,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '2'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -5980,13 +6720,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].model.first()'
+                    - $.model
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -6011,13 +6751,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].partNumber.first()'
+                    - $.partNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -6042,7 +6782,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].powerState.first()'
+                    - $.powerState
                 -
                   type: STR_REPLACE
                   parameters:
@@ -6081,7 +6821,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -6109,13 +6849,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].serialNumber.first()'
+                    - $.serialNumber
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -6156,7 +6896,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].state.first()'
+                    - $.state
                 -
                   type: STR_REPLACE
                   parameters:
@@ -6235,7 +6975,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -6312,13 +7052,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].stateReason.first()'
+                    - $.stateReason
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -6350,7 +7090,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -6388,7 +7128,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -6430,6 +7170,36 @@ zabbix_export:
                     -
                       tag: scope
                       value: availability
+            -
+              uuid: ee38861bdb044352a8937fe0d13d2e45
+              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Server [{#SERVER_NAME}:{#LOCATION}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#NAME}")].first()'
+              master_item:
+                key: hpe.synergy.get.server_hardware
+              tags:
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: server
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+                -
+                  tag: server
+                  value: '{#SERVER_NAME}'
           trigger_prototypes:
             -
               uuid: cd1156d4df6e411690f94a2857beab16
@@ -6454,7 +7224,7 @@ zabbix_export:
                   tag: scope
                   value: notice
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.get.server_hardware
           lld_macro_paths:
             -
               lld_macro: '{#LOCATION}'
@@ -6466,7 +7236,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.["server-hardware"].members'
+                - $.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -6492,9 +7262,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-pools"].members[?(@.name == "{#NAME}")].allocatedCapacity.first()'
+                    - $.allocatedCapacity
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.pools["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -6515,9 +7285,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-pools"].members[?(@.name == "{#NAME}")].freeCapacity.first()'
+                    - $.freeCapacity
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.pools["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -6538,9 +7308,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-pools"].members[?(@.name == "{#NAME}")].deviceSpecificAttributes.allocatedCapacity.snapshotAllocatedCapacity.first()'
+                    - $.deviceSpecificAttributes.allocatedCapacity.snapshotAllocatedCapacity
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.pools["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -6561,10 +7331,37 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-pools"].members[?(@.name == "{#NAME}")].totalCapacity.first()'
+                    - $.totalCapacity
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.pools["{#NAME}",data]'
               tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#NAME}'
+            -
+              uuid: ee254d7b254641c7a5f762cbdd2dabf2
+              name: 'Storage pool [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.storage.pools["{#NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Storage pool [{#NAME}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#NAME}")].first()'
+              master_item:
+                key: hpe.synergy.get.storage_pools
+              tags:
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: component
                   value: storage
@@ -6601,7 +7398,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-pools"].members[?(@.name == "{#NAME}")].state.first()'
+                    - $.state
                 -
                   type: STR_REPLACE
                   parameters:
@@ -6680,7 +7477,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '14'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.pools["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -6756,7 +7553,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-pools"].members[?(@.name == "{#NAME}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -6794,7 +7591,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.pools["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -6862,7 +7659,7 @@ zabbix_export:
                     host: 'HPE Synergy by HTTP'
                     key: 'hpe.synergy.storage.pools.capacity["{#NAME}",snapshot]'
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.get.storage_pools
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -6871,7 +7668,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.["storage-pools"].members'
+                - $.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -6897,9 +7694,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-systems"].members[?(@.name == "{#NAME}")].allocatedCapacity.first()'
+                    - $.allocatedCapacity
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.system["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -6920,9 +7717,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-systems"].members[?(@.name == "{#NAME}")].freeCapacity.first()'
+                    - $.freeCapacity
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.system["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -6943,10 +7740,37 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-systems"].members[?(@.name == "{#NAME}")].totalCapacity.first()'
+                    - $.totalCapacity
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.system["{#NAME}",data]'
               tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: system
+                  value: '{#NAME}'
+            -
+              uuid: 2f9bf8f7699945488201922c76f51675
+              name: 'Storage system [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.storage.system["{#NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Storage system [{#NAME}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#NAME}")].first()'
+              master_item:
+                key: hpe.synergy.get.storage_systems
+              tags:
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: component
                   value: storage
@@ -6983,7 +7807,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-systems"].members[?(@.name == "{#NAME}")].state.first()'
+                    - $.state
                 -
                   type: STR_REPLACE
                   parameters:
@@ -7062,7 +7886,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '14'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.system["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -7138,7 +7962,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-systems"].members[?(@.name == "{#NAME}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -7176,7 +8000,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.system["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -7244,7 +8068,7 @@ zabbix_export:
                     host: 'HPE Synergy by HTTP'
                     key: 'hpe.synergy.storage.system.capacity["{#NAME}",total]'
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.get.storage_systems
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -7253,7 +8077,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.["storage-systems"].members'
+                - $.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -7279,9 +8103,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-volumes"].members[?(@.name == "{#NAME}")].allocatedCapacity.first()'
+                    - $.allocatedCapacity
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.volumes["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -7302,10 +8126,37 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-volumes"].members[?(@.name == "{#NAME}")].provisionedCapacity.first()'
+                    - $.provisionedCapacity
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.volumes["{#NAME}",data]'
               tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: e02b8e2f502b4bfb8fa9fd17d2d4e416
+              name: 'Storage volume [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.storage.volumes["{#NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Storage volume [{#NAME}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#NAME}")].first()'
+              master_item:
+                key: hpe.synergy.get.storage_volumes
+              tags:
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: component
                   value: storage
@@ -7342,7 +8193,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-volumes"].members[?(@.name == "{#NAME}")].state.first()'
+                    - $.state
                 -
                   type: STR_REPLACE
                   parameters:
@@ -7421,7 +8272,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '14'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.volumes["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -7497,7 +8348,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["storage-volumes"].members[?(@.name == "{#NAME}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -7535,7 +8386,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.storage.volumes["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -7600,7 +8451,7 @@ zabbix_export:
                     host: 'HPE Synergy by HTTP'
                     key: 'hpe.synergy.storage.volumes.capacity["{#NAME}",provisioned]'
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.get.storage_volumes
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -7609,7 +8460,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.["storage-volumes"].members'
+                - $.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -7622,6 +8473,36 @@ zabbix_export:
           delay: '0'
           description: 'A list of the uplink sets.'
           item_prototypes:
+            -
+              uuid: 1469992463264badb3a80839414e9f2e
+              name: 'Uplink set [{#NAME}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.uplink_set["{#NAME}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Uplink set [{#NAME}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#NAME}")].first()'
+              master_item:
+                key: hpe.synergy.get.uplink_sets
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: uplink-set
+                -
+                  tag: uplink-set
+                  value: '{#NAME}'
             -
               uuid: be09b2f2848d4143a396a9b0cb945ecc
               name: 'Uplink set [{#NAME}]: State'
@@ -7636,13 +8517,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["uplink-sets"].members[?(@.name == "{#NAME}")].state.first()'
+                    - $.state
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.uplink_set["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -7674,7 +8555,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["uplink-sets"].members[?(@.name == "{#NAME}")].status.first()'
+                    - $.status
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -7712,7 +8593,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: hpe.synergy.data.get
+                key: 'hpe.synergy.uplink_set["{#NAME}",data]'
               tags:
                 -
                   tag: component
@@ -7755,7 +8636,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.synergy.data.get
+            key: hpe.synergy.get.uplink_sets
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -7764,7 +8645,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.["uplink-sets"].members'
+                - $.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
