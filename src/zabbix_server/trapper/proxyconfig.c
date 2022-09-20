@@ -24,6 +24,8 @@
 #include "proxy.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
+#include "version.h"
+#include "zbxversion.h"
 
 #include "zbxcompress.h"
 
@@ -35,10 +37,10 @@
  ******************************************************************************/
 void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
-	char		*error = NULL, *buffer = NULL;
+	char		*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json	j;
 	DC_PROXY	proxy;
-	int		ret, flags = ZBX_TCP_PROTOCOL;
+	int		ret, flags = ZBX_TCP_PROTOCOL, version_int, unused;
 	size_t		buffer_size, reserved = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -57,17 +59,31 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	zbx_update_proxy_data(&proxy, zbx_get_proxy_protocol_version(jp), (int)time(NULL),
-			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG);
+	version_str = zbx_get_proxy_protocol_version_str(jp);
+	version_int = zbx_get_proxy_protocol_version_int(version_str);
+
+	zbx_update_proxy_data(&proxy, version_str, version_int, (int)time(NULL),
+				(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG);
 
 	if (0 != proxy.auto_compress)
 		flags |= ZBX_TCP_COMPRESS;
+
+	if (ZBX_PROXY_VERSION_CURRENT != proxy.compatibility)
+	{
+		error = zbx_strdup(error, "proxy and server major versions do not match");
+		unused = zbx_send_response_ext(sock, NOTSUPPORTED, error, ZABBIX_VERSION, flags, CONFIG_TIMEOUT);
+		ZBX_UNUSED(unused);
+		zabbix_log(LOG_LEVEL_WARNING, "configuration update is disabled for this version of proxy \"%s\" at"
+				" \"%s\": %s", proxy.host, sock->peer, error);
+		goto out;
+	}
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	if (SUCCEED != get_proxyconfig_data(proxy.hostid, &j, &error))
 	{
-		zbx_send_response_ext(sock, FAIL, error, NULL, flags, CONFIG_TIMEOUT);
+		unused = zbx_send_response_ext(sock, FAIL, error, NULL, flags, CONFIG_TIMEOUT);
+		ZBX_UNUSED(unused);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",
 				proxy.host, sock->peer, error);
 		goto clean;
@@ -114,6 +130,7 @@ clean:
 out:
 	zbx_free(error);
 	zbx_free(buffer);
+	zbx_free(version_str);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

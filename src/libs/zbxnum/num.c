@@ -42,7 +42,7 @@
 int	zbx_is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
 {
 	zbx_uint64_t		value_uint64 = 0, c;
-	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
+	const zbx_uint64_t	max_uint64 = ~__UINT64_C(0);
 
 	if ('\0' == *str || 0 == n || sizeof(zbx_uint64_t) < size || (0 == size && NULL != value))
 		return FAIL;
@@ -100,7 +100,7 @@ int	zbx_is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx
 int	zbx_is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
 {
 	zbx_uint64_t		value_uint64 = 0, c;
-	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
+	const zbx_uint64_t	max_uint64 = ~__UINT64_C(0);
 	int			len = 0;
 
 	if ('\0' == *str || 0 == n || sizeof(zbx_uint64_t) < size || (0 == size && NULL != value))
@@ -141,7 +141,13 @@ int	zbx_is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_
 	return SUCCEED;
 }
 
+static double	ZBX_FLOAT_EPSILON = 0.0001;
 static double	ZBX_DOUBLE_EPSILON = 2.22e-16;
+
+double	zbx_get_float_epsilon(void)
+{
+	return ZBX_FLOAT_EPSILON;
+}
 
 double	zbx_get_double_epsilon(void)
 {

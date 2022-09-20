@@ -21,7 +21,7 @@
 #include "zbxmockdata.h"
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 const char *request_parameter_type_to_str(zbx_request_parameter_type_t type);
 
