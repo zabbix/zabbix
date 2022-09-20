@@ -20,7 +20,7 @@
 #include "logfiles.h"
 
 #include "log.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "cfg.h"
 #include "zbxregexp.h"
 #include "zbxstr.h"

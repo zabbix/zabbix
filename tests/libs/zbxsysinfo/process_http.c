@@ -21,7 +21,7 @@
 #include "zbxmockdata.h"
 
 #include "zbxdbhigh.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 

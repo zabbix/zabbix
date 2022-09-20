@@ -23,7 +23,7 @@
 #include "zbxtime.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-#	include "sysinfo.h"
+#	include "zbxsysinfo.h"
 #	include "perfmon.h"
 #	pragma comment(lib, "user32.lib")
 #endif

@@ -24,6 +24,7 @@
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "user_macro.h"
+#include "zbxversion.h"
 
 #define ZBX_MAINTENANCE_IDLE		0
 #define ZBX_MAINTENANCE_RUNNING		1
@@ -388,24 +389,26 @@ ZBX_DC_HOST_H;
 
 typedef struct
 {
-	zbx_uint64_t		hostid;
-	zbx_uint64_t		hosts_monitored;	/* number of enabled hosts assigned to proxy */
-	zbx_uint64_t		hosts_not_monitored;	/* number of disabled hosts assigned to proxy */
-	double			required_performance;
-	int			proxy_config_nextcheck;
-	int			proxy_data_nextcheck;
-	int			proxy_tasks_nextcheck;
-	int			nextcheck;
-	int			lastaccess;
-	int			proxy_delay;
-	zbx_proxy_suppress_t	nodata_win;
-	int			last_cfg_error_time;	/* time when passive proxy misconfiguration error was seen */
-							/* or 0 if no error */
-	int			version;
-	unsigned char		location;
-	unsigned char		auto_compress;
-	const char		*proxy_address;
-	int			last_version_error_time;
+	zbx_uint64_t			hostid;
+	zbx_uint64_t			hosts_monitored;	/* number of enabled hosts assigned to proxy */
+	zbx_uint64_t			hosts_not_monitored;	/* number of disabled hosts assigned to proxy */
+	double				required_performance;
+	int				proxy_config_nextcheck;
+	int				proxy_data_nextcheck;
+	int				proxy_tasks_nextcheck;
+	int				nextcheck;
+	int				lastaccess;
+	int				proxy_delay;
+	zbx_proxy_suppress_t		nodata_win;
+	int				last_cfg_error_time;	/* time when passive proxy misconfiguration error was */
+								/* seen or 0 if no error */
+	const char			*version_str;
+	int				version_int;
+	zbx_proxy_compatibility_t	compatibility;
+	unsigned char			location;
+	unsigned char			auto_compress;
+	const char			*proxy_address;
+	int				last_version_error_time;
 }
 ZBX_DC_PROXY;
 

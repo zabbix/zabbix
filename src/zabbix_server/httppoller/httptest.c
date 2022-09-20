@@ -27,6 +27,7 @@
 #include "zbxhttp.h"
 #include "httpmacro.h"
 #include "zbxnum.h"
+#include "zbxsysinfo.h"
 
 typedef struct
 {
@@ -979,7 +980,7 @@ httptest_error:
 	if (0 > lastfailedstep)	/* update interval is invalid, delay is uninitialized */
 	{
 		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
-				0 > ts.sec ? ZBX_JAN_2038 : ts.sec, httptest->httptest.httptestid);
+				0 > ts.sec ? ZBX_JAN_2038 : ts.sec + SEC_PER_MIN, httptest->httptest.httptestid);
 	}
 	else if (0 > ts.sec + delay)
 	{

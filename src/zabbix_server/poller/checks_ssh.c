@@ -21,6 +21,9 @@
 #include "ssh_run.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
+
+#include "zbxsysinfo.h"
+
 int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;

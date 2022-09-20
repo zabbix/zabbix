@@ -17,8 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "../common/zbxsysinfo_common.h"
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
@@ -147,7 +146,7 @@ clean:
 	return ret;
 }
 
-int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*mode;
 	int	ret = SYSINFO_RET_FAIL;

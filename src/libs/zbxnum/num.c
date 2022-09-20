@@ -141,7 +141,13 @@ int	zbx_is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_
 	return SUCCEED;
 }
 
+static double	ZBX_FLOAT_EPSILON = 0.0001;
 static double	ZBX_DOUBLE_EPSILON = 2.22e-16;
+
+double	zbx_get_float_epsilon(void)
+{
+	return ZBX_FLOAT_EPSILON;
+}
 
 double	zbx_get_double_epsilon(void)
 {

@@ -21,6 +21,8 @@
 
 #include "../../../src/zabbix_server/poller/checks_telnet.h"
 
+#include "zbxsysinfo.h"
+
 int	__wrap_telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding);
 
 int	zbx_get_value_telnet_test_run(DC_ITEM *item, char **error)

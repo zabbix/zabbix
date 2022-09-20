@@ -20,7 +20,7 @@
 #include "listener.h"
 
 #include "zbxconf.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "log.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
@@ -52,9 +52,9 @@ static void	process_listener(zbx_socket_t *s)
 
 		init_result(&result);
 
-		if (SUCCEED == process(s->buffer, PROCESS_WITH_ALIAS, &result))
+		if (SUCCEED == process(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result))
 		{
-			if (NULL != (value = GET_TEXT_RESULT(&result)))
+			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
 				ret = zbx_tcp_send_to(s, *value, CONFIG_TIMEOUT);
@@ -62,7 +62,7 @@ static void	process_listener(zbx_socket_t *s)
 		}
 		else
 		{
-			value = GET_MSG_RESULT(&result);
+			value = ZBX_GET_MSG_RESULT(&result);
 
 			if (NULL != value)
 			{
