@@ -9439,6 +9439,32 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 	pp_item->revision = revision;
 }
 
+static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr_t *items_sync,
+		zbx_hashset_t *pp_itemids)
+{
+	zbx_hashset_insert(pp_itemids, &dc_item->itemid, sizeof(zbx_uint64_t));
+
+	zbx_vector_dc_item_ptr_append(items_sync, dc_item);
+
+	if (NULL != dc_item->master_item)
+	{
+		int	i;
+
+		for (i = 0; i < dc_item->master_item->dep_itemids.values_num; i++)
+		{
+			ZBX_DC_ITEM	*dep_item;
+
+			if (NULL == (dep_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
+					&dc_item->master_item->dep_itemids.values[i].first)))
+			{
+				continue;
+			}
+
+			dc_preproc_add_item_rec(dep_item, items_sync, pp_itemids);
+		}
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get preprocessable items:                                         *
@@ -9457,14 +9483,13 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 	zbx_hashset_iter_t		iter;
 	int				i;
 	zbx_uint64_t			global_revision = *revision;
-	zbx_vector_dc_item_ptr_t	items_sync, items_check;
+	zbx_vector_dc_item_ptr_t	items_sync;
 	zbx_hashset_t			pp_itemids;
 
 	zbx_hashset_create(&pp_itemids, config->items.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_dc_item_ptr_create(&items_sync);
-	zbx_vector_dc_item_ptr_create(&items_check);
 
 	RDLOCK_CACHE;
 
@@ -9484,11 +9509,11 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 		{
 			ZBX_DC_ITEM	*dc_item = dc_host->items.values[i];
 
-			if (ITEM_STATUS_ACTIVE != dc_item->status)
+			if (ITEM_STATUS_ACTIVE != dc_item->status || ITEM_TYPE_DEPENDENT == dc_item->type)
 				continue;
 
 			if (NULL == dc_item->preproc_item && NULL == dc_item->master_item &&
-					ITEM_TYPE_DEPENDENT != dc_item->type && ITEM_TYPE_INTERNAL != dc_item->type)
+					ITEM_TYPE_INTERNAL != dc_item->type)
 			{
 				continue;
 			}
@@ -9496,24 +9521,18 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 			if (0 == dc_host->proxy_hostid || ITEM_TYPE_DEPENDENT == dc_item->type ||
 					SUCCEED == is_item_processed_by_server(dc_item->type, dc_item->key))
 			{
-				zbx_hashset_insert(&pp_itemids, &dc_item->itemid, sizeof(zbx_uint64_t));
-
-				if (*revision < global_revision || *revision < dc_host->revision)
-					zbx_vector_dc_item_ptr_append(&items_sync, dc_item);
-				else
-					zbx_vector_dc_item_ptr_append(&items_check, dc_item);
+				dc_preproc_add_item_rec(dc_item, &items_sync, &pp_itemids);
 			}
 		}
 
-		if (0 != items_check.values_num)
+		if (*revision >= global_revision && *revision >= dc_host->revision)
 		{
 			zbx_uint64_t	macro_revision = *revision;
 
 			if (SUCCEED == um_cache_get_host_revision(config->um_cache, dc_host->hostid, &macro_revision) &&
-					*revision < macro_revision)
+					*revision >= macro_revision)
 			{
-				for (i = 0; i < items_check.values_num; i++)
-					dc_preproc_sync_item(items, items_check.values[i], *revision);
+				zbx_vector_dc_item_ptr_clear(&items_sync);
 			}
 		}
 
@@ -9521,7 +9540,6 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 			dc_preproc_sync_item(items, items_sync.values[i], *revision);
 
 		zbx_vector_dc_item_ptr_clear(&items_sync);
-		zbx_vector_dc_item_ptr_clear(&items_check);
 	}
 
 	/* remove items without preprocessing */
@@ -9545,7 +9563,6 @@ out:
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		dc_preproc_dump(items);
 
-	zbx_vector_dc_item_ptr_destroy(&items_check);
 	zbx_vector_dc_item_ptr_destroy(&items_sync);
 
 	zbx_hashset_destroy(&pp_itemids);
