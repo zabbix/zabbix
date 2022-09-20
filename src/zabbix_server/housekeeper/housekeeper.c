@@ -576,7 +576,6 @@ static void	hk_update_dbversion_status(void)
 
 	zbx_tsdb_update_dbversion_info(&db_version_info);
 
-
 	zbx_db_version_json_create(&db_version_json, &db_version_info);
 	zbx_db_flush_version_requirements(db_version_json.buffer);
 
