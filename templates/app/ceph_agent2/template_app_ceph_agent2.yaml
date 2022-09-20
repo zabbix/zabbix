@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:27:02Z'
+  date: '2022-09-20T13:03:06Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1023,6 +1023,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.rd_ops
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
