@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-15T06:33:18Z'
+  date: '2022-09-20T10:56:08Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -1278,7 +1278,7 @@ zabbix_export:
           description: 'Response timeout for API.'
         -
           macro: '{$AZURE.DB.ABORTED_CONN.MAX.WARN}'
-          value: '10'
+          value: '25'
           description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
@@ -2078,7 +2078,7 @@ zabbix_export:
           description: 'The critical threshold of the CPU utilization in %.'
         -
           macro: '{$AZURE.DB.FAILED_CONN.MAX.WARN}'
-          value: '10'
+          value: '25'
           description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'

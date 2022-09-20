@@ -222,7 +222,7 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`60s` |
-|{$AZURE.DB.ABORTED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p> |`10` |
+|{$AZURE.DB.ABORTED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p> |`25` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
 |{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization in %.</p> |`90` |
@@ -315,7 +315,7 @@ No specific Zabbix configuration is required.
 |{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`60s` |
 |{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
-|{$AZURE.DB.FAILED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p> |`10` |
+|{$AZURE.DB.FAILED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p> |`25` |
 |{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization in %.</p> |`90` |
 |{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization in %.</p> |`80` |
