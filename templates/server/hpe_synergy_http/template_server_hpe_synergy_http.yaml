@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-09-20T06:51:08Z'
+  date: '2022-09-20T11:54:20Z'
   template_groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -4615,7 +4615,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.members[?(@.name == "{#NAME}")].first()'
+                    - '$.members[?(@.displayName == "{#NAME}")].first()'
               master_item:
                 key: hpe.synergy.get.hypervisor_managers
               tags:
@@ -6424,7 +6424,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -6456,7 +6456,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -6489,7 +6489,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -6523,11 +6523,41 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
                   value: cpu
+                -
+                  tag: component
+                  value: server
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+                -
+                  tag: server
+                  value: '{#SERVER_NAME}'
+            -
+              uuid: ee38861bdb044352a8937fe0d13d2e45
+              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Get data'
+              type: DEPENDENT
+              key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Server [{#SERVER_NAME}:{#LOCATION}] data'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.members[?(@.name == "{#LOCATION}")].first()'
+              master_item:
+                key: hpe.synergy.get.server_hardware
+              tags:
+                -
+                  tag: component
+                  value: raw
                 -
                   tag: component
                   value: server
@@ -6571,7 +6601,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '2'
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -6603,7 +6633,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -6637,7 +6667,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -6695,7 +6725,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '2'
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -6726,7 +6756,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -6757,7 +6787,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -6821,7 +6851,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -6855,7 +6885,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -6975,7 +7005,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -7058,7 +7088,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -7128,7 +7158,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
               master_item:
-                key: 'hpe.synergy.server_hardware["{#NAME}",data]'
+                key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               tags:
                 -
                   tag: component
@@ -7170,36 +7200,6 @@ zabbix_export:
                     -
                       tag: scope
                       value: availability
-            -
-              uuid: ee38861bdb044352a8937fe0d13d2e45
-              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Get data'
-              type: DEPENDENT
-              key: 'hpe.synergy.server_hardware["{#NAME}",data]'
-              delay: '0'
-              history: 0d
-              trends: '0'
-              value_type: TEXT
-              description: 'Server [{#SERVER_NAME}:{#LOCATION}] data'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.members[?(@.name == "{#NAME}")].first()'
-              master_item:
-                key: hpe.synergy.get.server_hardware
-              tags:
-                -
-                  tag: component
-                  value: raw
-                -
-                  tag: component
-                  value: server
-                -
-                  tag: location
-                  value: '{#LOCATION}'
-                -
-                  tag: server
-                  value: '{#SERVER_NAME}'
           trigger_prototypes:
             -
               uuid: cd1156d4df6e411690f94a2857beab16
