@@ -285,7 +285,7 @@ static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, 
 static size_t	vch_item_free_cache(zbx_vc_item_t *item);
 static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk);
 static int	vch_item_add_values_at_tail(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num);
-static void	vch_item_clean_cache(zbx_vc_item_t *item);
+static void	vch_item_clean_cache(zbx_vc_item_t *item, int last_value_timestamp);
 
 /*********************************************************************************
  *                                                                               *
@@ -1644,23 +1644,18 @@ static void	vch_item_remove_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk)
  * Parameters:  item   - [IN] the target item                                 *
  *                                                                            *
  ******************************************************************************/
-static void	vch_item_clean_cache(zbx_vc_item_t *item)
+static void	vch_item_clean_cache(zbx_vc_item_t *item, int last_value_timestamp)
 {
 	zbx_vc_chunk_t	*next;
 
 	if (0 != item->active_range)
 	{
 		zbx_vc_chunk_t	*tail = item->tail;
-		zbx_vc_chunk_t	*chunk = tail;
-		int		timestamp;
+		zbx_vc_chunk_t	*chunk = tail
 
-		if (NULL == chunk)
-			return;
-
-		timestamp = item->head->slots[item->head->last_value].timestamp.sec - item->active_range;
-
+		last_value_timestamp -= item->active_range;
 		/* try to remove chunks with all history values older than maximum request range */
-		while (NULL != chunk && chunk->slots[chunk->last_value].timestamp.sec < timestamp &&
+		while (NULL != chunk && chunk->slots[chunk->last_value].timestamp.sec < last_value_timestamp &&
 				chunk->slots[chunk->last_value].timestamp.sec !=
 						item->head->slots[item->head->last_value].timestamp.sec)
 		{
@@ -2531,6 +2526,12 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 		{
 			zbx_history_record_t	record = {h->ts, h->value};
 			zbx_vc_chunk_t		*head = item->head;
+			int			last_value_timestamp;
+
+			if (NULL != head)
+				last_value_timestamp = head->slots[head->last_value].timestamp.sec;
+			else
+				last_value_timestamp = time(NULL);
 
 			/* If the new value type does not match the item's type in cache remove it, */
 			/* so it's cached with the correct type from correct tables when accessed   */
@@ -2546,7 +2547,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 
 			/* try to remove old (unused) chunks if a new chunk was added */
 			if (head != item->head)
-				vch_item_clean_cache(item);
+				vch_item_clean_cache(item, last_value_timestamp);
 		}
 	}
 
