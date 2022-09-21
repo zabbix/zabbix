@@ -1408,7 +1408,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @throws APIException
 	 */
 	protected static function checkHostInterfaces(array $items, array $db_items = null): void {
-		foreach ($items as $i => $item) {
+		foreach ($items as $i => &$item) {
 			$interface_type = itemTypeInterface($item['type']);
 
 			if (!in_array($item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
@@ -1486,6 +1486,7 @@ abstract class CItemGeneral extends CApiService {
 				unset($items[$i]);
 			}
 		}
+		unset($item);
 
 		if (!$items) {
 			return;
