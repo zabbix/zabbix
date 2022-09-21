@@ -413,8 +413,6 @@ static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "%s() REST offset:%d alloc:%d", __func__, (int)page->offset, (int)page->alloc);
-
 	if (0 == page->offset)
 	{
 		*error = zbx_strdup(*error, "Authentication fail, receive empty response.");
