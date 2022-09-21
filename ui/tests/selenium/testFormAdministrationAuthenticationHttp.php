@@ -354,7 +354,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 			[
 				[
 					'user' => 'local.com\\test-user',
-					'password' => 'zabbix',
+					'password' => 'zabbix12345',
 					'file' => 'htaccess',
 					'http_authentication' => [
 						'Enable HTTP authentication' => true,
