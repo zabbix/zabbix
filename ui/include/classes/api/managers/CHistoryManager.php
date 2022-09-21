@@ -24,17 +24,38 @@
  */
 class CHistoryManager {
 
-	private $primary_keys_enabled = false;
+	/**
+	 * Array of options.
+	 *
+	 * Supported options:
+	 *   'history_period' => 0            Max history display period in seconds.
+	 *   'hk_history_global' => 0         Override item history period. 0 - do not override, 1 - override.
+	 *   'hk_history' => 0                Global history data storage period in seconds.
+	 *   'hk_trends_global' => 0          Override item trends period. 0 - do not override, 1 - override.
+	 *   'hk_trends' => 0                 Global trends data storage period in seconds.
+	 *   'primary_keys_enabled' => false  Enable optimizations that make use of PRIMARY KEY (itemid, clock, ns)
+	 *                                    on the history tables.
+	 *
+	 * @var array
+	 */
+	private array $options = [
+		'history_period' => SEC_PER_DAY,
+		'hk_history_global' => 0,
+		'hk_history' => 0,
+		'hk_trends_global' => 0,
+		'hk_trends' => 0,
+		'primary_keys_enabled' => false
+	];
 
 	/**
-	 * Whether to enable optimizations that make use of PRIMARY KEY (itemid, clock, ns) on the history tables.
+	 * Set options.
 	 *
-	 * @param bool $enabled
+	 * @param array $options
 	 *
 	 * @return CHistoryManager
 	 */
-	public function setPrimaryKeysEnabled(bool $enabled = true) {
-		$this->primary_keys_enabled = $enabled;
+	public function setOptions(array $options = []): CHistoryManager {
+		$this->options = $options + $this->options;
 
 		return $this;
 	}
@@ -72,7 +93,11 @@ class CHistoryManager {
 	private function getItemsHavingValuesFromSql(array $items, $period = null) {
 		$results = [];
 
-		if ($period) {
+		if ($this->options['hk_history_global'] == 1) {
+			$period = $period !== null ? min($period, $this->options['hk_history']) : $this->options['hk_history'];
+		}
+
+		if ($period !== null) {
 			$period = time() - $period;
 		}
 
@@ -89,7 +114,7 @@ class CHistoryManager {
 				'SELECT itemid'.
 				' FROM '.self::getTableName($type).
 				' WHERE '.dbConditionInt('itemid', $type_itemids).
-					($period ? ' AND clock>'.$period : '').
+					($period !== null ? ' AND clock>'.$period : '').
 				' GROUP BY itemid'
 			), 'itemid');
 
@@ -119,7 +144,7 @@ class CHistoryManager {
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
-			if ($this->primary_keys_enabled) {
+			if ($this->options['primary_keys_enabled']) {
 				$results += $this->getLastValuesFromSqlWithPk($grouped_items[ZBX_HISTORY_SOURCE_SQL], $limit, $period);
 			}
 			else {
@@ -216,12 +241,17 @@ class CHistoryManager {
 	 * SQL specific implementation of getLastValues that makes use of primary key existence in history tables.
 	 *
 	 * @see CHistoryManager::getLastValues
+	 *
 	 * @return array  Of itemid => [up to $limit values].
 	 */
 	private function getLastValuesFromSqlWithPk(array $items, int $limit, ?int $period): array {
 		$results = [];
 
-		if ($period) {
+		if ($this->options['hk_history_global'] == 1) {
+			$period = $period !== null ? min($period, $this->options['hk_history']) : $this->options['hk_history'];
+		}
+
+		if ($period !== null) {
 			$period = time() - $period;
 		}
 
@@ -246,7 +276,7 @@ class CHistoryManager {
 					'SELECT h.itemid, MAX(h.clock) AS clock'.
 					' FROM '.$history_table.' h'.
 					' WHERE '.dbConditionId('h.itemid', array_column($items, 'itemid')).
-						($period ? ' AND h.clock > '.$period : '').
+						($period !== null ? ' AND h.clock>'.$period : '').
 					' GROUP BY h.itemid'
 				);
 
@@ -274,7 +304,7 @@ class CHistoryManager {
 					$db_values = DBselect('SELECT *'.
 						' FROM '.$history_table.' h'.
 						' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-							($period ? ' AND h.clock > '.$period : '').
+							($period !== null ? ' AND h.clock>'.$period : '').
 						' ORDER BY h.clock DESC, h.ns DESC',
 						$limit
 					);
@@ -303,7 +333,11 @@ class CHistoryManager {
 	private function getLastValuesFromSql($items, $limit, $period) {
 		$results = [];
 
-		if ($period) {
+		if ($this->options['hk_history_global'] == 1) {
+			$period = $period !== null ? min($period, $this->options['hk_history']) : $this->options['hk_history'];
+		}
+
+		if ($period !== null) {
 			$period = time() - $period;
 		}
 
@@ -315,7 +349,7 @@ class CHistoryManager {
 					'SELECT MAX(h.clock)'.
 					' FROM '.self::getTableName($item['value_type']).' h'.
 					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-						($period ? ' AND h.clock>'.$period : '')
+						($period !== null ? ' AND h.clock>'.$period : '')
 				), false);
 
 				if ($clock_max) {
@@ -345,7 +379,7 @@ class CHistoryManager {
 					'SELECT *'.
 					' FROM '.self::getTableName($item['value_type']).' h'.
 					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-						($period ? ' AND h.clock>'.$period : '').
+						($period !== null ? ' AND h.clock>'.$period : '').
 					' ORDER BY h.clock DESC',
 					$limit + 1
 				));
@@ -418,7 +452,7 @@ class CHistoryManager {
 				return $this->getValueAtFromElasticsearch($item, $clock, $ns);
 
 			default:
-				return $this->primary_keys_enabled
+				return $this->options['primary_keys_enabled']
 					? $this->getValueAtFromSqlWithPk($item, $clock, $ns)
 					: $this->getValueAtFromSql($item, $clock, $ns);
 		}
@@ -438,7 +472,6 @@ class CHistoryManager {
 			'size' => 1
 		];
 
-		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		$filters = [
 			[
 				[
@@ -469,7 +502,9 @@ class CHistoryManager {
 					'range' => [
 						'clock' => [
 							'lt' => $clock
-						] + ($history_period ? ['gte' => $clock - $history_period] : [])
+						] + (
+							$this->options['history_period'] ? ['gte' => $clock - $this->options['history_period']] : []
+						)
 					]
 				]
 			]
@@ -505,6 +540,10 @@ class CHistoryManager {
 	 * @return array|null  Item data at specified time of first data before specified time. null if data is not found.
 	 */
 	private function getValueAtFromSqlWithPk(array $item, $clock, $ns): ?array {
+		if ($this->options['hk_history_global'] == 1 && $clock <= time() - $this->options['hk_history']) {
+			return null;
+		}
+
 		$history_table = self::getTableName($item['value_type']);
 
 		$sql = 'SELECT *'.
@@ -518,12 +557,17 @@ class CHistoryManager {
 			return $row;
 		}
 
-		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+		$time_from = $this->options['history_period'] ? $clock - $this->options['history_period'] : null;
+
+		if ($this->options['hk_history_global'] == 1) {
+			$time_from = max($time_from, time() - $this->options['hk_history'] + 1);
+		}
+
 		$sql = 'SELECT *'.
 			' FROM '.$history_table.
 			' WHERE itemid='.zbx_dbstr($item['itemid']).
 				' AND clock<'.zbx_dbstr($clock).
-				($history_period ? ' AND clock >= '.zbx_dbstr($clock - $history_period) : '').
+				($time_from !== null ? ' AND clock>='.zbx_dbstr($time_from) : '').
 			' ORDER BY clock DESC, ns DESC';
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
@@ -539,6 +583,10 @@ class CHistoryManager {
 	 * @see CHistoryManager::getValueAt
 	 */
 	private function getValueAtFromSql(array $item, $clock, $ns) {
+		if ($this->options['hk_history_global'] == 1 && $clock <= time() - $this->options['hk_history']) {
+			return null;
+		}
+
 		$result = null;
 		$table = self::getTableName($item['value_type']);
 
@@ -568,12 +616,17 @@ class CHistoryManager {
 		}
 
 		if ($max_clock == 0) {
-			$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+			$time_from = $this->options['history_period'] ? $clock - $this->options['history_period'] : null;
+
+			if ($this->options['hk_history_global'] == 1) {
+				$time_from = max($time_from, time() - $this->options['hk_history'] + 1);
+			}
+
 			$sql = 'SELECT MAX(clock) AS clock'.
 					' FROM '.$table.
 					' WHERE itemid='.zbx_dbstr($item['itemid']).
 						' AND clock<'.zbx_dbstr($clock).
-						($history_period ? ' AND clock>='.zbx_dbstr($clock - $history_period) : '');
+						($time_from !== null ? ' AND clock>='.zbx_dbstr($time_from) : '');
 
 			if (($row = DBfetch(DBselect($sql))) !== false) {
 				$max_clock = $row['clock'];
@@ -806,6 +859,10 @@ class CHistoryManager {
 							break;
 					}
 					$sql_from = ($value_type == ITEM_VALUE_TYPE_UINT64) ? 'history_uint' : 'history';
+
+					$_time_from = $this->options['hk_history_global'] == 1
+						? max($time_from, time() - $this->options['hk_history'] + 1)
+						: $time_from;
 				}
 				else {
 					switch ($function) {
@@ -833,13 +890,17 @@ class CHistoryManager {
 							break;
 					}
 					$sql_from = ($value_type == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
+
+					$_time_from = $this->options['hk_trends_global'] == 1
+						? max($time_from, time() - $this->options['hk_trends'] + 1)
+						: $time_from;
 				}
 
 				$sql = 'SELECT '.implode(', ', $sql_select).
 					' FROM '.$sql_from.
 					' WHERE '.dbConditionInt('itemid', $itemids).
-					' AND clock >= '.zbx_dbstr($time_from).
-					' AND clock <= '.zbx_dbstr($time_to).
+					' AND clock>='.zbx_dbstr($_time_from).
+					' AND clock<='.zbx_dbstr($time_to).
 					' GROUP BY '.implode(', ', $sql_group_by);
 
 				if ($function == AGGREGATE_FIRST || $function == AGGREGATE_LAST) {
@@ -1084,17 +1145,25 @@ class CHistoryManager {
 			if ($item['source'] === 'history') {
 				$sql_select = 'COUNT(*) AS count,AVG(value) AS avg,MIN(value) AS min,MAX(value) AS max';
 				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'history_uint' : 'history';
+
+				$_time_from = $this->options['hk_history_global'] == 1
+					? max($time_from, time() - $this->options['hk_history'] + 1)
+					: $time_from;
 			}
 			else {
 				$sql_select = 'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,MAX(value_max) AS max';
 				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
+
+				$_time_from = $this->options['hk_trends_global'] == 1
+					? max($time_from, time() - $this->options['hk_trends'] + 1)
+					: $time_from;
 			}
 
 			$result = DBselect(
 				'SELECT itemid,'.$sql_select.$sql_select_extra.',MAX(clock) AS clock'.
 				' FROM '.$sql_from.
 				' WHERE itemid='.zbx_dbstr($item['itemid']).
-					' AND clock>='.zbx_dbstr($time_from).
+					' AND clock>='.zbx_dbstr($_time_from).
 					' AND clock<='.zbx_dbstr($time_to).
 				' GROUP BY '.$group_by
 			);
@@ -1187,6 +1256,10 @@ class CHistoryManager {
 	 * @see CHistoryManager::getAggregatedValue
 	 */
 	private function getAggregatedValueFromSql(array $item, $aggregation, $time_from) {
+		if ($this->options['hk_history_global'] == 1) {
+			$time_from = max($time_from, time() - $this->options['hk_history']);
+		}
+
 		$result = DBselect(
 			'SELECT '.$aggregation.'(value) AS value'.
 			' FROM '.self::getTableName($item['value_type']).

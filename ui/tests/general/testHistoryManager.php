@@ -156,13 +156,13 @@ class testHistoryManager extends CTest {
 		API::setApiServiceFactory(new CApiServiceFactory());
 
 		$values = Manager::History()
-			->setPrimaryKeysEnabled(false)
+			->setOptions(['primary_keys_enabled' => false])
 			->getLastValues($items, $limit);
 
 		$this->assertSame($expected_result, $values, 'Item history values are same via non-PK queries');
 
 		$values = Manager::History()
-			->setPrimaryKeysEnabled()
+			->setOptions(['primary_keys_enabled' => true])
 			->getLastValues($items, $limit);
 
 		$this->assertSame($expected_result, $values, 'Item history values are same via with-PK queries');
