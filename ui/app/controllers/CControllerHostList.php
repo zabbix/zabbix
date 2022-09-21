@@ -235,11 +235,21 @@ class CControllerHostList extends CController {
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectDiscoveryRule' => ['itemid', 'name'],
-			'selectHostDiscovery' => ['ts_delete'],
+			'selectHostDiscovery' => ['parent_hostid', 'ts_delete'],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => array_column($hosts, 'hostid'),
 			'preservekeys' => true
 		]);
+
+		foreach ($hosts as &$host) {
+			$host['is_discovery_rule_editable'] = $host['discoveryRule']
+				&& API::DiscoveryRule()->get([
+					'output' => [],
+					'itemids' => $host['discoveryRule']['itemid'],
+					'editable' => true
+				]);
+		}
+		unset($host);
 
 		order_result($hosts, $sort_field, $sort_order);
 
