@@ -254,7 +254,7 @@ class LoginUsers {
 		);
 
 		return [
-			'userids' => $userids
+			'userids' => $userids, 'usrgrpids' => $usergrpids
 		];
 	}
 }

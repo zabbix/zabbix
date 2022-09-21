@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -143,8 +144,8 @@ class testPageUserRoles extends CWebTest {
 			],
 			[
 				'Name' => 'Admin role',
-				'#' => 'Users 4',
-				'Users' => 'admin-zabbix, admin user for testFormScheduledReport, http-auth-admin, user-recipient of the report'
+				'#' => 'Users 2',
+				'Users' => 'admin-zabbix, http-auth-admin'
 			],
 			[
 				'Name' => 'Guest role',

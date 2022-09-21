@@ -1360,16 +1360,6 @@ INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, de
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description, flags, posts, headers) VALUES (15091, 15003, 15005, 0, 2, 'item_testPageHistory_CheckLayout_Eventlog'        , 'eventlog[item_testpagehistory_checklayout]'        , '30s', '90d',      0,           '', 'https://zabbix.com', 0, '', '');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history,         status,                    params, description, flags, posts, headers) VALUES (15092, 15003, 15005, 0, 2, 'item_testPageHistory_CheckLayout_Eventlog_2'      , 'eventlog[item_testpagehistory_checklayout, 2]'     , '30s', '90d',      0,           '', 'The following url should be clickable: https://zabbix.com', 0, '', '');
 
--- -- testPageUsers, testFormLogin
--- INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (3, 'test-user', '$2y$10$rHT2NCiJY3ly7ORLdqWbceGrDZ3YsR6gHSb5KAZAtc4QNbs6rFAaC', 0, 0, 'en_US', 30, 1, 'default', 0, 0, 50);
--- INSERT INTO users_groups (id, usrgrpid, userid) VALUES (5, 8, 3);
--- INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (6, 'user-for-blocking', '$2y$10$XuoeDz5QsPSjhZm9Ht.J8ujgX5en.X5QNSzLa3aYn04l9u6bu1p2u', 0, 0, 'en_US', 30, 1, 'default', 0, 0, 50);
--- INSERT INTO users_groups (id, usrgrpid, userid) VALUES (8, 8, 6);
--- INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (7, 'disabled-user', '$2y$10$7BRRzklg43VciDKXPsLq7uUqFehlgdTGzr/WfQXDFtACVYWFiRjjO', 0, 0, 'en_US', 30, 1, 'default', 0, 0, 50);
--- INSERT INTO users_groups (id, usrgrpid, userid) VALUES (9, 9, 7);
--- INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'no-access-to-the-frontend', '$2y$10$cExfysPEJsHzIoCkoUVH..XM0OSIwIQPE1sob2UgXDcH1Iyw8Wtny', 0, 0, 'en_US', 30, 1, 'default', 0, 0, 50);
--- INSERT INTO users_groups (id, usrgrpid, userid) VALUES (10, 12, 8);
-
 -- testFormFilterProblems, testFormFilterHosts
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (92, 'filter-create', '$2y$10$nA7hh4cZ5oHM.GgXPqzZ/e/vaD1LYcOi.3ZfulCjZV/9H4PFtIKnK', 0, 0, 'default', 30, 3, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (106, 7, 92);
