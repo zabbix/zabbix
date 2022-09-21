@@ -24,7 +24,7 @@ class CWidgetFieldMsSla extends CWidgetFieldMs {
 	/**
 	 * @var string  (nullable) ID for Multiselect element.
 	 */
-	public $filter_preselect_host_group;
+	public $filter_preselect_host_group_field;
 
 	/**
 	 * Create widget field for SLA selection
