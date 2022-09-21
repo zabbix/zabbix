@@ -39,6 +39,9 @@ class CLdap {
 	const ERR_BIND_DNSTRING_UNAVAILABLE = 14;
 	const ERR_QUERY_FAILED = 15;
 
+	const DEFAULT_FILTER_USER = '(%{attr}=%{user})';
+	const DEFAULT_FILTER_GROUP = '(&(%{groupattr}=%{userdn})(objectClass=groupOfNames))';
+
 	/**
 	 * Type of binding made to LDAP server. One of static::BIND_ constant value.
 	 *
@@ -104,11 +107,11 @@ class CLdap {
 		}
 
 		if ($this->cnf['search_filter'] === '') {
-			$this->cnf['search_filter'] = '(%{attr}=%{user})';
+			$this->cnf['search_filter'] = static::DEFAULT_FILTER_USER;
 		}
 
 		if ($this->cnf['group_filter'] === '') {
-			$this->cnf['group_filter'] = '(&(%{groupattr}=%{userdn})(objectClass=groupOfNames))';
+			$this->cnf['group_filter'] = static::DEFAULT_FILTER_GROUP;
 		}
 
 		$this->initBindAttributes();
@@ -246,6 +249,14 @@ class CLdap {
 			return false;
 		}
 
+		if (!$this->bind($user, $pass)) {
+			if ($this->bind_type == static::BIND_DNSTRING) {
+				$this->serror = static::ERR_USER_NOT_FOUND;
+			}
+
+			return false;
+		}
+
 		if ($this->bound == static::BIND_ANONYMOUS || $this->bound == static::BIND_CONFIG_CREDENTIALS) {
 			// No need for user default attributes, only 'dn'.
 			$users = $this->search($this->cnf['base_dn'], $this->cnf['search_filter'], ['%{user}' => $user], ['dn']);
@@ -258,7 +269,7 @@ class CLdap {
 			}
 
 			if (!array_key_exists('dn', $users[0]) || !@ldap_bind($this->ds, $users[0]['dn'], $pass)) {
-				$this->error = static::ERR_BIND_FAILED;
+				$this->error = static::ERR_USER_NOT_FOUND;
 
 				return false;
 			}
@@ -277,7 +288,7 @@ class CLdap {
 	 * @return array Array of arrays of matched group.
 	 */
 	public function getGroupAttributes(array $attributes, string $user, $password = null): array {
-		if (!$this->bind($user, $password)) {
+		if (!$this->bind($user, $password) || $attributes == []) {
 			return [];
 		}
 
@@ -287,22 +298,22 @@ class CLdap {
 			'%{groupattr}'	=> $this->cnf['group_member']
 		];
 		$results = $this->search($this->cnf['group_basedn'], $this->cnf['group_filter'], $placeholders, $attributes);
-
 		$groups = [];
-		$group_keys = array_fill_keys($attributes, '');
-		unset($results['count']);
 
-		foreach ($results as $result) {
-			$group = array_intersect_key($this->getFormattedResult($result, $attributes), $group_keys);
+		for ($j = 0; $j < $results['count']; $j++) {
+			$result = $results[$j];
+			$result_attributes = array_intersect_key($result, array_flip($attributes));
 
-			if ($group) {
-				foreach ($group as &$value) {
-					$value = is_array($value) ? $value[0] : $value;
-				}
-				unset($value);
-
-				$groups[] = $group;
+			if (!$result_attributes) {
+				continue;
 			}
+
+			foreach ($result_attributes as &$value) {
+				$value = $value[0];
+			}
+			unset($value);
+
+			$groups[] = $result_attributes;
 		}
 
 		return $groups;
@@ -310,6 +321,7 @@ class CLdap {
 
 	/**
 	 * Get user data with specified attributes. Is not available for bind type BIND_DNSTRING if password is not supplied.
+	 * Mapping attribute names will be set in lower case.
 	 *
 	 * @param array  $attributes  Array of LDAP tree attributes names to be returned.
 	 * @param string $user        User to search attributes for.
@@ -318,14 +330,40 @@ class CLdap {
 	 * @param array Associative array of user attributes.
 	 */
 	public function getUserAttributes(array $attributes, string $user, $password = null): array {
-		if (!$this->bind($user, $password)) {
+		if (!$this->bind($user, $password) || $attributes == []) {
 			return [];
 		}
 
 		$placeholders = ['%{user}' => $user];
 		$results = $this->search($this->cnf['base_dn'], $this->cnf['search_filter'], $placeholders, $attributes);
+		$user = [];
 
-		return $this->getFormattedResult($results[0], $attributes);
+		if ($results) {
+			$count = $results[0]['count'];
+
+			for ($i = 0; $i < $count; $i++) {
+				$key = strtolower($results[0][$i]);
+				$value = $results[0][$key];
+
+				if ($key === strtolower($this->cnf['group_membership'])) {
+					$groups = [];
+					unset($value['count']);
+
+					foreach ($value as $group_dn) {
+						[$group_name] = explode(',', $group_dn, 2);
+						[, $group_name] = explode('=', $group_name, 2);
+						$groups[] = $group_name;
+					}
+
+					$user[$key] = $groups;
+				}
+				else {
+					$user[$key] = $value[0];
+				}
+			}
+		}
+
+		return $user;
 	}
 
 	/**
@@ -338,7 +376,7 @@ class CLdap {
 			$this->bind_type = static::BIND_CONFIG_CREDENTIALS;
 			$this->bind_dn = $this->cnf['bind_dn'];
 		}
-		elseif ($this->cnf['bind_dn'] !== '' && $this->cnf['search_filter'] !== '(%{attr}=%{user})') {
+		elseif ($this->cnf['bind_dn'] !== '' && $this->cnf['search_filter'] !== static::DEFAULT_FILTER_USER) {
 			$this->bind_type = static::BIND_DNSTRING;
 			$this->bind_dn = $this->cnf['bind_dn'];
 		}
@@ -346,33 +384,6 @@ class CLdap {
 			$this->bind_type = static::BIND_DNSTRING;
 			$this->bind_dn = $this->cnf['base_dn'];
 		}
-	}
-
-	/**
-	 * Get associative array of desired attributes from ldap_search response entry.
-	 * Only existing attributes will be defined in resulting array.
-	 *
-	 * @param array $search_result  Single array from arrays returned by ldap_search.
-	 * @param array $attributes     Desired attributes list.
-	 *
-	 * @return array Associative array with only desired $attributes.
-	 */
-	protected function getFormattedResult(array $search_result, array $attributes): array {
-		$result = [];
-
-		foreach ($attributes as $key) {
-			if (!array_key_exists($key, $search_result)) {
-				continue;
-			}
-
-			if (is_array($search_result[$key])) {
-				unset($search_result[$key]['count']);
-			}
-
-			$result[$key] = $search_result[$key];
-		}
-
-		return $result;
 	}
 
 	/**

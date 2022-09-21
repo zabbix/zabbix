@@ -177,24 +177,7 @@ window.ldap_edit_popup = new class {
 
 	openTestPopup() {
 		const fields = this.preprocessFormFields(getFormFields(this.form));
-
-		const popup_params = {
-			host: fields.host,
-			port: fields.port,
-			base_dn: fields.base_dn,
-			bind_dn: fields.bind_dn,
-			search_attribute: fields.search_attribute
-		};
-
-		const optional_fields = ['userdirectoryid', 'bind_password', 'start_tls', 'search_filter'];// TODO - update list
-
-		for (const field of optional_fields) {
-			if (fields[field] !== undefined) {
-				popup_params[field] = fields[field];
-			}
-		}
-
-		const test_overlay = PopUp('popup.ldap.test.edit', popup_params, {dialogueid: 'ldap_test_edit'});
+		const test_overlay = PopUp('popup.ldap.test.edit', fields, {dialogueid: 'ldap_test_edit'});
 		test_overlay.xhr.then(() => this.overlay.unsetLoading());
 	}
 

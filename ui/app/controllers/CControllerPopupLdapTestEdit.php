@@ -31,7 +31,17 @@ class CControllerPopupLdapTestEdit extends CController {
 			'bind_password' =>		'db userdirectory_ldap.bind_password',
 			'search_attribute' =>	'required|db userdirectory_ldap.search_attribute|not_empty',
 			'start_tls' =>			'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
-			'search_filter' =>		'db userdirectory_ldap.search_filter'
+			'search_filter' =>		'db userdirectory_ldap.search_filter',
+			'provision_status' =>	'db userdirectory.provision_status|in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
+			'group_basedn' =>		'db userdirectory_ldap.group_basedn',
+			'group_name' =>			'db userdirectory_ldap.group_name',
+			'group_member' =>		'db userdirectory_ldap.group_member',
+			'group_filter' =>		'db userdirectory_ldap.group_filter',
+			'group_membership' =>	'db userdirectory_ldap.group_membership',
+			'provision_media' =>	'array',
+			'provision_groups' =>	'array',
+			'user_username' =>		'db userdirectory_ldap.user_username',
+			'user_lastname' =>		'db userdirectory_ldap.user_lastname'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -66,7 +76,9 @@ class CControllerPopupLdapTestEdit extends CController {
 		];
 
 		$this->getInputs($data['ldap_config'], ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn',
-			'bind_password', 'search_attribute', 'start_tls', 'search_filter','test_username', 'test_password'
+			'bind_password', 'search_attribute', 'start_tls', 'search_filter','test_username', 'test_password',
+			'provision_status', 'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership',
+			'user_username', 'user_lastname', 'provision_media', 'provision_groups'
 		]);
 
 		$this->setResponse(new CControllerResponseData($data));

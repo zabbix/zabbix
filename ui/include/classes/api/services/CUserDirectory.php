@@ -971,10 +971,19 @@ class CUserDirectory extends CApiService {
 			);
 		}
 
-		// if ($userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
-			// TODO: add methods to get user groups and user media and all other provisioned fields.
-			$ldap_data = $ldap->getUserData(['memberof', 'cn'], $user['username'], $user['password']);
-		// }
+		if ($userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
+			$provisioning = new CProvisioning($userdirectory);
+			$user_attributes = $provisioning->getUserIdpAttributes();
+			$idp_user = $ldap->getUserAttributes($user_attributes, $user['username'], $user['password']);
+			$user = array_merge($user, $provisioning->getUser($idp_user));
+
+			if (!array_key_exists('usrgrps', $user)) {
+				$group_attributes = $provisioning->getGroupIdpAttributes();
+				$ldap_groups = $ldap->getGroupAttributes($group_attributes, $user['username'], $user['password']);
+				$ldap_groups = array_column($ldap_groups, $userdirectory['group_name']);
+				$user = array_merge($user, $provisioning->getUserGroupsAndRole($ldap_groups));
+			}
+		}
 
 		return $user;
 	}
@@ -997,6 +1006,28 @@ class CUserDirectory extends CApiService {
 			'search_attribute' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'search_attribute')],
 			'start_tls' =>			['type' => API_INT32, 'in' => ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON, 'default' => ZBX_AUTH_START_TLS_OFF],
 			'search_filter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'search_filter'), 'default' => ''],
+			'provision_status' =>	['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED]), 'default' => JIT_PROVISIONING_DISABLED],
+			'group_basedn' =>		['type' => API_STRING_UTF8],
+			'group_name' =>			['type' => API_STRING_UTF8],
+			'group_member' =>		['type' => API_STRING_UTF8],
+			'group_filter' =>		['type' => API_STRING_UTF8],
+			'group_membership' =>	['type' => API_STRING_UTF8],
+			'user_username' =>		['type' => API_STRING_UTF8],
+			'user_lastname' =>		['type' => API_STRING_UTF8],
+			'provision_media' =>	['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+				'mediatypeid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
+				'attribute' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+			]],
+			'provision_groups' =>	['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+				'is_fallback' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_REGULAR, GROUP_MAPPING_FALLBACK])],
+				'fallback_status' =>	['type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_FALLBACK_OFF, GROUP_MAPPING_FALLBACK_ON])],
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+				'roleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+				'user_groups' =>		['type' => API_OBJECTS, 'fields' => [
+					'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+				]]
+			]],
 			'test_username' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'test_password' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 		]];
@@ -1011,9 +1042,7 @@ class CUserDirectory extends CApiService {
 					'search_filter', 'provision_status'
 				],
 				'userdirectoryids' => $userdirectory['userdirectoryid'],
-				'filter' => [
-					'idp_type' => IDP_TYPE_LDAP
-				]
+				'filter' => ['idp_type' => IDP_TYPE_LDAP]
 			]);
 			$db_userdirectory = reset($db_userdirectory);
 
@@ -1024,7 +1053,21 @@ class CUserDirectory extends CApiService {
 			}
 
 			$userdirectory += $db_userdirectory;
+
+			if ($userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
+				[$db_userdirectory] = $this->get([
+					'output' => ['group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership',
+						'user_username', 'user_lastname'
+					],
+					'userdirectoryids' => $userdirectory['userdirectoryid'],
+					'selectProvisionMedia' => API_OUTPUT_EXTEND,
+					'selectProvisionGroups' => API_OUTPUT_EXTEND
+				]);
+				$userdirectory += $db_userdirectory;
+			}
 		}
+
+		$userdirectory['idp_type'] = IDP_TYPE_LDAP;
 	}
 
 	/**
