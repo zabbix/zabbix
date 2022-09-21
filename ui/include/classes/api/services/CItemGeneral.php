@@ -2418,11 +2418,11 @@ abstract class CItemGeneral extends CApiService {
 		$templateids = array_keys($db_items);
 
 		do {
-			$result = DBselect(
-				'SELECT i.itemid,i.name'.
-				' FROM items i'.
-				' WHERE '.dbConditionId('i.templateid', $templateids)
-			);
+			$options = [
+				'output' => ['itemid', 'name'],
+				'filter' => ['templateid' => $templateids],
+			];
+			$result = DBselect(DB::makeSql('items', $options));
 
 			$templateids = [];
 

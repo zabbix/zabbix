@@ -966,7 +966,7 @@ class CApiInputValidator {
 		return true;
 	}
 
-	public static function isInRange($data, $in) {
+	private static function isInRange($data, $in) {
 		$valid = false;
 
 		foreach (explode(',', $in) as $in) {
