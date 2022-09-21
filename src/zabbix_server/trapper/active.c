@@ -528,7 +528,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	{
 		size_t	token_len;
 
-		if (zbx_get_token_len() != (token_len = strlen(tmp)))
+		if (ZBX_SESSION_TOKEN_SIZE != (token_len = strlen(tmp)))
 		{
 			zbx_snprintf(error, MAX_STRING_LEN, "invalid session token length %d", (int)token_len);
 			goto error;

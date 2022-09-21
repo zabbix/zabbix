@@ -659,31 +659,6 @@ class CHttpTest extends CApiService {
 	}
 
 	/**
-	 * @param array $db_items
-	 */
-	private static function addInheritedItems(array &$db_items): void {
-		$templateids = array_keys($db_items);
-
-		do {
-			$options = [
-				'output' => ['itemid'],
-				'filter' => ['templateid' => $templateids]
-			];
-			$result = DBselect(DB::makeSql('items', $options));
-
-			$templateids = [];
-
-			while ($row = DBfetch($result)) {
-				if (!array_key_exists($row['itemid'], $db_items)) {
-					$templateids[] = $row['itemid'];
-
-					$db_items[$row['itemid']] = $row;
-				}
-			}
-		} while ($templateids);
-	}
-
-	/**
 	 * @param array $del_httptestids
 	 */
 	private static function deleteAffectedItems(array $del_httptestids): void {
@@ -694,11 +669,7 @@ class CHttpTest extends CApiService {
 				' AND '.dbConditionId('hti.httptestid', $del_httptestids)
 		), 'itemid');
 
-		self::addInheritedItems($db_items);
-
-		$del_itemids = array_keys($db_items);
-		DB::delete('httptestitem', ['itemid' => $del_itemids]);
-		CItemManager::delete($del_itemids);
+		CItemManager::delete(array_keys($db_items));
 	}
 
 	/**
@@ -727,11 +698,7 @@ class CHttpTest extends CApiService {
 				' AND '.dbConditionId('hsi.httpstepid', $del_stepids)
 		), 'itemid');
 
-		self::addInheritedItems($db_items);
-
-		$del_itemids = array_keys($db_items);
-		DB::delete('httpstepitem', ['itemid' => $del_itemids]);
-		CItemManager::delete($del_itemids);
+		CItemManager::delete(array_keys($db_items));
 	}
 
 	/**
