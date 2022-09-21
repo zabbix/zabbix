@@ -413,7 +413,14 @@ static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	if ('"' != page->data[0] && FAIL == vmware_rest_response_open(page->data, NULL, error))
+	zabbix_log(LOG_LEVEL_WARNING, "%s() REST offset:%d alloc:%d", __func__, (int)page->offset, (int)page->alloc);
+
+	if (0 == page->offset)
+	{
+		*error = zbx_strdup(*error, "Authentication fail, receive empty response.");
+		goto out;
+	}
+	else if ('"' != page->data[0] && FAIL == vmware_rest_response_open(page->data, NULL, error))
 	{
 		*error = zbx_dsprintf(*error, "Authentication fail, %s.", *error);
 		goto out;
@@ -508,6 +515,11 @@ static int	vmware_http_request(const char *fn_parent, CURL *easyhandle, const ch
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
 		*error = zbx_strdup(*error, curl_easy_strerror(err));
+		return FAIL;
+	}
+	else if (0 == page->offset)
+	{
+		*error = zbx_dsprintf(*error, "%s() Receive empty response.", ZBX_NULL2EMPTY_STR(fn_parent));
 		return FAIL;
 	}
 
