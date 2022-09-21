@@ -1651,7 +1651,7 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item, int last_value_timestamp)
 	if (0 != item->active_range)
 	{
 		zbx_vc_chunk_t	*tail = item->tail;
-		zbx_vc_chunk_t	*chunk = tail
+		zbx_vc_chunk_t	*chunk = tail;
 
 		last_value_timestamp -= item->active_range;
 		/* try to remove chunks with all history values older than maximum request range */
