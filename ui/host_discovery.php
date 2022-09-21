@@ -238,11 +238,6 @@ $fields = [
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 
-if (getRequest('interfaceid') == INTERFACE_TYPE_OPT) {
-	unset($fields['interfaceid']);
-	unset($_REQUEST['interfaceid']);
-}
-
 check_fields($fields);
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
@@ -391,16 +386,6 @@ $filter_hostids = array_keys($filter['hosts']);
 sort($filter_hostids);
 
 $checkbox_hash = crc32(implode('', $filter_hostids));
-
-// Convert CR+LF to LF in preprocessing script.
-if (hasRequest('preprocessing')) {
-	foreach ($_REQUEST['preprocessing'] as &$step) {
-		if ($step['type'] == ZBX_PREPROC_SCRIPT) {
-			$step['params'][0] = CRLFtoLF($step['params'][0]);
-		}
-	}
-	unset($step);
-}
 
 /*
  * Actions

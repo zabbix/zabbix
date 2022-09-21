@@ -344,7 +344,6 @@ function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
  */
 function interfaceType2str($type) {
 	$interfaceGroupLabels = [
-		INTERFACE_TYPE_OPT => _('None'),
 		INTERFACE_TYPE_AGENT => _('Agent'),
 		INTERFACE_TYPE_SNMP => _('SNMP'),
 		INTERFACE_TYPE_JMX => _('JMX'),
@@ -1374,7 +1373,7 @@ function getInterfaceSelect(array $interfaces): CSelect {
 	/** @var CSelectOption[] $options_by_type */
 	$options_by_type = [];
 
-	$interface_select->addOption(new CSelectOption(INTERFACE_TYPE_OPT, interfaceType2str(INTERFACE_TYPE_OPT)));
+	$interface_select->addOption(new CSelectOption(0, _('None')));
 
 	foreach ($interfaces as $interface) {
 		$option = new CSelectOption($interface['interfaceid'], getHostInterface($interface));
@@ -2240,10 +2239,6 @@ function validateDelay(CUpdateIntervalParser $parser, $field_name, $value, &$err
  */
 function normalizeItemPreprocessingSteps(array $preprocessing): array {
 	foreach ($preprocessing as &$step) {
-		if (array_key_exists('params', $step) && !is_array($step['params'])) {
-			$step['params'] = explode("\n", CRLFtoLF($step['params']));
-		}
-
 		switch ($step['type']) {
 			case ZBX_PREPROC_MULTIPLIER:
 			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
@@ -2260,8 +2255,11 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			case ZBX_PREPROC_ERROR_FIELD_JSON:
 			case ZBX_PREPROC_ERROR_FIELD_XML:
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-			case ZBX_PREPROC_SCRIPT:
 				$step['params'] = $step['params'][0];
+				break;
+
+			case ZBX_PREPROC_SCRIPT:
+				$step['params'] = CRLFtoLF($step['params'][0]);
 				break;
 
 			case ZBX_PREPROC_VALIDATE_RANGE:
@@ -2305,18 +2303,6 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 				$step['params'] = implode("\n", $step['params']);
 				break;
 
-			// Preprocessing types without params.
-			case ZBX_PREPROC_BOOL2DEC:
-			case ZBX_PREPROC_OCT2DEC:
-			case ZBX_PREPROC_HEX2DEC:
-			case ZBX_PREPROC_DELTA_VALUE:
-			case ZBX_PREPROC_DELTA_SPEED:
-			case ZBX_PREPROC_THROTTLE_VALUE:
-			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
-			case ZBX_PREPROC_XML_TO_JSON:
-				unset($step['params']);
-				break;
-
 			default:
 				$step['params'] = '';
 		}
@@ -2335,75 +2321,85 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 }
 
 /**
- * Check that given custom intervals are in proper format and supplement the $delay parameter with valid intervals.
+ * Check the format of the given custom intervals. Unset the custom intervals with empty values.
  *
- * @param int    $type
- * @param string $key
  * @param array  $delay_flex
  * @param bool   $lldmacros
- * @param string $delay
  */
-function isValidCustomIntervals(int $type, string $key, array $delay_flex, bool $lldmacros,
-		string &$delay): bool {
-	if (!in_array($type, [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP])
-			&& ($type != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($key, 'mqtt.get', 8) != 0)) {
-		$intervals = [];
+function isValidCustomIntervals(array &$delay_flex, bool $lldmacros = false): bool {
+	if (!$delay_flex) {
+		return true;
+	}
 
-		$simple_interval_parser = new CSimpleIntervalParser([
-			'usermacros' => true,
-			'lldmacros' => $lldmacros
-		]);
+	$simple_interval_parser = new CSimpleIntervalParser([
+		'usermacros' => true,
+		'lldmacros' => $lldmacros
+	]);
 
-		$time_period_parser = new CTimePeriodParser([
-			'usermacros' => true,
-			'lldmacros' => $lldmacros
-		]);
+	$time_period_parser = new CTimePeriodParser([
+		'usermacros' => true,
+		'lldmacros' => $lldmacros
+	]);
 
-		$scheduling_interval_parser = new CSchedulingIntervalParser([
-			'usermacros' => true,
-			'lldmacros' => $lldmacros
-		]);
+	$scheduling_interval_parser = new CSchedulingIntervalParser([
+		'usermacros' => true,
+		'lldmacros' => $lldmacros
+	]);
 
-		foreach ($delay_flex as $interval) {
-			if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
-				if ($interval['delay'] === '' && $interval['period'] === '') {
-					continue;
-				}
-
-				if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
-					error(_s('Invalid interval "%1$s".', $interval['delay']));
-
-					return false;
-				}
-				elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
-					error(_s('Invalid interval "%1$s".', $interval['period']));
-
-					return false;
-				}
-
-				$intervals[] = $interval['delay'].'/'.$interval['period'];
+	foreach ($delay_flex as $i => $interval) {
+		if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
+			if ($interval['delay'] === '' && $interval['period'] === '') {
+				unset($delay_flex[$i]);
+				continue;
 			}
-			else {
-				if ($interval['schedule'] === '') {
-					continue;
-				}
 
-				if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
-					error(_s('Invalid interval "%1$s".', $interval['schedule']));
+			if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
+				error(_s('Invalid interval "%1$s".', $interval['delay']));
 
-					return false;
-				}
+				return false;
+			}
+			elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
+				error(_s('Invalid interval "%1$s".', $interval['period']));
 
-				$intervals[] = $interval['schedule'];
+				return false;
 			}
 		}
+		else {
+			if ($interval['schedule'] === '') {
+				unset($delay_flex[$i]);
+				continue;
+			}
 
-		if ($intervals) {
-			$delay .= ';'.implode(';', $intervals);
+			if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
+				error(_s('Invalid interval "%1$s".', $interval['schedule']));
+
+				return false;
+			}
 		}
 	}
 
 	return true;
+}
+
+/**
+ * Get all given delay intervals as string in API format.
+ *
+ * @param string $delay
+ * @param array  $delay_flex
+ *
+ * @return string
+ */
+function getDelayWithCustomIntervals(string $delay, array $delay_flex): string {
+	foreach ($delay_flex as $interval) {
+		if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
+			$delay .= ';'.$interval['delay'].'/'.$interval['period'];
+		}
+		else {
+			$delay .= ';'.$interval['schedule'];
+		}
+	}
+
+	return $delay;
 }
 
 /**
@@ -2464,29 +2460,19 @@ function prepareItemQueryFields(array $query_fields): array {
  * @return array
  */
 function prepareItemHeaders(array $headers): array {
-	if ($headers) {
-		$tmp_headers = [];
+	$result = [];
 
-		foreach ($headers['name'] as $index => $name) {
-			$value = $headers['value'][$index];
-			$sortorder = $headers['sortorder'][$index];
+	foreach ($headers['name'] as $i => $name) {
+		$value = $headers['value'][$i];
 
-			if ($name !== '' || $value !== '') {
-				$tmp_headers[$sortorder] = [$name => $value];
-			}
+		if ($name === '' && $value === '') {
+			continue;
 		}
 
-		ksort($tmp_headers);
-		$_headers = [];
-
-		foreach ($tmp_headers as $name_value) {
-			$_headers[key($name_value)] = reset($name_value);
-		}
-
-		$headers = $_headers;
+		$result[$name] = $value;
 	}
 
-	return $headers;
+	return $result;
 }
 
 /**
@@ -2518,54 +2504,74 @@ function prepareItemParameters(array $parameters): array {
 /**
  * Get sanitized item fields of given input.
  *
- * @param int    $flags
- * @param string $templateid
- * @param int    $type
  * @param array  $input
+ * @param int    $input['type']
+ * @param string $input['key_']
+ * @param int    $input['value_type']
+ * @param string $input['templateid']
+ * @param int    $input['flags']
+ * @param int    $input['authtype']
+ * @param int    $input['allow_traps']
+ * @param int    $input['hosts'][0]['status']
+ *
+ * @return array
  */
-function getSanitizedItemFields(int $flags, string $templateid, int $type, array $input): array {
-	switch ($flags) {
+function getSanitizedItemFields(array $input): array {
+	$field_names = getMainItemFieldNames($input);
+
+	if ($input['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+		$field_names = array_merge($field_names, getTypeItemFieldNames($input));
+		$field_names = getConditionalItemFieldNames($field_names, $input);
+	}
+
+	return array_intersect_key($input, array_flip($field_names));
+}
+
+/**
+ * Get main item fields of given input.
+ *
+ * @param array  $input
+ * @param string $input['templateid']
+ * @param int    $input['flags']
+ *
+ * @return array
+ */
+function getMainItemFieldNames(array $input): array {
+	switch ($input['flags']) {
 		case ZBX_FLAG_DISCOVERY_NORMAL:
-			if ($templateid == 0) {
-				$field_names = ['name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
+			if ($input['templateid'] == 0) {
+				return ['name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
 					'inventory_link', 'logtimefmt', 'description', 'status', 'tags', 'preprocessing'
 				];
 			}
 			else {
-				$field_names = ['history', 'trends', 'inventory_link', 'description', 'status', 'tags'];
+				return ['history', 'trends', 'inventory_link', 'description', 'status', 'tags'];
 			}
 
-			$field_names = array_merge($field_names, getItemTypeFieldNames($templateid, $type));
-
-			return array_intersect_key($input, array_flip($field_names));
-
 		case ZBX_FLAG_DISCOVERY_PROTOTYPE:
-			if ($templateid == 0) {
-				$field_names = ['name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid',
-					'logtimefmt', 'description', 'status', 'discover', 'tags', 'preprocessing'
+			if ($input['templateid'] == 0) {
+				return ['name', 'type', 'key_', 'value_type', 'units', 'history', 'trends', 'valuemapid', 'logtimefmt',
+					'description', 'status', 'discover', 'tags', 'preprocessing'
 				];
 			}
 			else {
-				$field_names = ['history', 'trends', 'description', 'status', 'discover', 'tags'];
+				return ['history', 'trends', 'description', 'status', 'discover', 'tags'];
 			}
 
-			$field_names = array_merge($field_names, getItemTypeFieldNames($templateid, $type));
-
-			return array_intersect_key($input, array_flip($field_names));
-
 		case ZBX_FLAG_DISCOVERY_CREATED:
-			return array_intersect_key($input, array_flip(['status']));
+			return ['status'];
 	}
 }
 
 /**
  * Get item field names of the given type and template ID.
  *
- * @param string $templateid
- * @param int    $type
+ * @param array  $input
+ * @param int    $input['type']
+ * @param string $input['templateid']
  */
-function getItemTypeFieldNames(string $templateid, int $type): array {
-	switch ($type) {
+function getTypeItemFieldNames(array $input): array {
+	switch ($input['type']) {
 		case ITEM_TYPE_ZABBIX:
 			return ['interfaceid', 'delay'];
 
@@ -2588,7 +2594,7 @@ function getItemTypeFieldNames(string $templateid, int $type): array {
 			return ['username', 'password', 'params', 'delay'];
 
 		case ITEM_TYPE_IPMI:
-			if ($templateid == 0) {
+			if ($input['templateid'] == 0) {
 				return ['interfaceid', 'ipmi_sensor', 'delay'];
 			}
 			else {
@@ -2605,7 +2611,7 @@ function getItemTypeFieldNames(string $templateid, int $type): array {
 			return ['params', 'delay'];
 
 		case ITEM_TYPE_JMX:
-			if ($templateid == 0) {
+			if ($input['templateid'] == 0) {
 				return ['interfaceid', 'jmx_endpoint', 'username', 'password', 'delay'];
 			}
 			else {
@@ -2619,7 +2625,7 @@ function getItemTypeFieldNames(string $templateid, int $type): array {
 			return ['master_itemid'];
 
 		case ITEM_TYPE_HTTPAGENT:
-			if ($templateid == 0) {
+			if ($input['templateid'] == 0) {
 				return ['url', 'query_fields', 'request_method', 'post_type', 'posts', 'headers', 'status_codes',
 					'follow_redirects', 'retrieve_mode', 'output_format', 'http_proxy', 'interfaceid', 'authtype',
 					'username', 'password', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file',
@@ -2631,7 +2637,7 @@ function getItemTypeFieldNames(string $templateid, int $type): array {
 			}
 
 		case ITEM_TYPE_SNMP:
-			if ($templateid == 0) {
+			if ($input['templateid'] == 0) {
 				return ['interfaceid', 'snmp_oid', 'delay'];
 			}
 			else {
@@ -2639,11 +2645,69 @@ function getItemTypeFieldNames(string $templateid, int $type): array {
 			}
 
 		case ITEM_TYPE_SCRIPT:
-			if ($templateid == 0) {
+			if ($input['templateid'] == 0) {
 				return ['parameters', 'params', 'timeout', 'delay'];
 			}
 			else {
 				return ['delay'];
 			}
 	}
+}
+
+/**
+ * Get item field names excluding those that don't match a specific conditions.
+ *
+ * @param array  $field_names
+ * @param array  $input
+ * @param int    $input['type']
+ * @param string $input['key_']
+ * @param int    $input['value_type']
+ * @param int    $input['authtype']
+ * @param int    $input['allow_traps']
+ * @param int    $input['hosts'][0]['status']
+ *
+ * @return array
+ */
+function getConditionalItemFieldNames(array $field_names, array $input): array {
+	return array_filter($field_names, static function ($field_name) use ($input): bool {
+		switch ($field_name) {
+			case 'units':
+			case 'trends':
+				return in_array($input['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
+
+			case 'valuemapid':
+				return in_array($input['value_type'],
+					[ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64]
+				);
+
+			case 'inventory_link':
+				return in_array($input['value_type'],
+					[ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT]
+				);
+
+			case 'logtimefmt':
+				return $input['value_type'] == ITEM_VALUE_TYPE_LOG;
+
+			case 'interfaceid':
+				return in_array($input['hosts'][0]['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
+
+			case 'username':
+			case 'password':
+				return $input['type'] != ITEM_TYPE_HTTPAGENT || in_array($input['authtype'],
+					[HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST]
+				);
+
+			case 'delay':
+				return $input['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($input['key_'], 'mqtt.get', 8) != 0;
+
+			case 'trapper_hosts':
+				return $input['type'] != ITEM_TYPE_HTTPAGENT || $input['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON;
+
+			case 'publickey':
+			case 'privatekey':
+				return $input['authtype'] == ITEM_AUTHTYPE_PUBLICKEY;
+		}
+
+		return true;
+	});
 }
