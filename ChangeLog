@@ -1,3 +1,14 @@
+Changes for 6.0.9
+
+6.0.9rc2 was released as 6.0.9 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.9rc2
+
+Bug fixes:
+........S. [ZBX-21664] fixed Zabbix server crashing during database upgrade when converting service times and there is downtime inside uptime (vso)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.9rc1
 
 New features:
@@ -2114,6 +2125,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.29rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.28
+
+5.0.28rc1 was released as 5.0.28 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.28rc1
@@ -4717,6 +4740,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.45rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.44
+
+4.0.44rc1 was released as 4.0.44 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.44rc1
