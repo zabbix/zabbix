@@ -2546,13 +2546,6 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 	zbx_json_addint64(json, "flag", info->flag);
 
-#if defined(HAVE_POSTGRESQL)
-	if (ZBX_TSDB_VERSION > 0)
-	{
-		zbx_json_addint64(json, ZBX_TIMESCALE_COMPRESSED_CHUNKS_HISTORY, info->history_compressed_chunks);
-		zbx_json_addint64(json, ZBX_TIMESCALE_COMPRESSED_CHUNKS_TRENDS, info->trends_compressed_chunks);
-	}
-#endif
 	zbx_json_close(json);
 
 	if (NULL != info->extension)
@@ -2584,6 +2577,9 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 			{
 				zbx_json_addstring(json, "compression_availability", "false", ZBX_JSON_TYPE_INT);
 			}
+
+			zbx_json_addint64(json, ZBX_TIMESCALE_COMPRESSED_CHUNKS_HISTORY, info->history_compressed_chunks);
+			zbx_json_addint64(json, ZBX_TIMESCALE_COMPRESSED_CHUNKS_TRENDS, info->trends_compressed_chunks);
 		}
 #endif
 		zbx_json_close(json);
