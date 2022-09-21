@@ -103,7 +103,7 @@ window.ldap_test_edit_popup = new class {
 		}
 		else {
 			span = document.createElement('span');
-			span.innerText = <?= json_encode(_('No match')) ?>;
+			span.innerText = <?= json_encode(_('No value')) ?>;
 			span.classList.add(<?= json_encode(ZBX_STYLE_DISABLED) ?>);
 			parent.appendChild(span);
 		}
