@@ -522,12 +522,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if ($db_item['templateid'] != 0) {
 				$allowed_fields = array_fill_keys([
 					'itemid', 'delay', 'delay_flex', 'history', 'trends', 'history_mode', 'trends_mode', 'allow_traps',
-					'description', 'status', 'discover', 'tags', 'interfaceid'
+					'description', 'status', 'discover', 'tags'
 				], true);
 
 				if ($db_item['type'] != ITEM_TYPE_HTTPAGENT) {
 					$allowed_fields += array_fill_keys([
-						'authtype', 'username', 'password', 'params', 'publickey', 'privatekey'
+						'authtype', 'username', 'password', 'params', 'publickey', 'privatekey', 'interfaceid'
 					], true);
 				}
 
