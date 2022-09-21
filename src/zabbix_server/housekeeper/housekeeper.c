@@ -568,6 +568,7 @@ out:
 #endif
 }
 
+#if defined(HAVE_POSTGRESQL)
 static void	hk_update_dbversion_status(void)
 {
 	struct zbx_json	db_version_json;
@@ -581,6 +582,7 @@ static void	hk_update_dbversion_status(void)
 
 	zbx_json_free(&db_version_json);
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
