@@ -27,7 +27,7 @@ class CWidgetFieldMsHost extends CWidgetFieldMs {
 	 *
 	 * @var string  (nullable) ID for Multiselect element.
 	 */
-	public $filter_preselect_host_group_field;
+	public $filter_preselect_host_group;
 
 	/**
 	 * Create widget field for Host selection
@@ -39,5 +39,10 @@ class CWidgetFieldMsHost extends CWidgetFieldMs {
 		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_HOST);
+	}
+
+	public function setFilterPreselectHostGroup($id) {
+		$this->filter_preselect_host_group = $id;
+		return $this;
 	}
 }
