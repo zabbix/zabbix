@@ -5836,6 +5836,7 @@ static int	vmware_hv_ds_access_update(zbx_vmware_service_t *service, CURL *easyh
 		ZBX_POST_VSPHERE_FOOTER
 
 	char				*hvid_esc, tmp[MAX_STRING_LEN];
+	const char			*pcollector = vmware_service_objects[service->type].property_collector;
 	int				ret = FAIL, updated = 0;
 	xmlDoc				*doc = NULL;
 	zbx_property_collection_iter	*iter = NULL;
@@ -5844,11 +5845,10 @@ static int	vmware_hv_ds_access_update(zbx_vmware_service_t *service, CURL *easyh
 			dss->values_num);
 
 	hvid_esc = zbx_xml_escape_dyn(hv_id);
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DS_ACCESS, vmware_service_objects[service->type].property_collector,
-			hvid_esc, hvid_esc, hvid_esc, hvid_esc);
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_HV_DS_ACCESS, pcollector, hvid_esc, hvid_esc, hvid_esc, hvid_esc);
 	zbx_free(hvid_esc);
 
-	if (SUCCEED != zbx_property_collection_init(easyhandle, tmp, "propertyCollector", &iter, &doc, error))
+	if (SUCCEED != zbx_property_collection_init(easyhandle, tmp, pcollector, &iter, &doc, error))
 		goto out;
 
 	updated += vmware_hv_ds_access_parse(doc, hv_dss, hv_uuid, hv_id, dss);
@@ -6575,6 +6575,7 @@ static int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *serv
 		ZBX_XPATH_PROP_NAME_NODE("triggeredAlarmState")
 
 	char				tmp[MAX_STRING_LEN * 2];
+	const char			*pcollector = vmware_service_objects[service->type].property_collector;
 	int				ret = FAIL;
 	xmlDoc				*doc = NULL;
 	xmlNode				*vc_alarms;
@@ -6582,14 +6583,11 @@ static int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *serv
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_HV_DS_LIST,
-			vmware_service_objects[service->type].property_collector,
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VCENTER_HV_DS_LIST, pcollector,
 			vmware_service_objects[service->type].root_folder);
 
-	if (SUCCEED != zbx_property_collection_init(easyhandle, tmp, "propertyCollector", &iter, &doc, error))
-	{
+	if (SUCCEED != zbx_property_collection_init(easyhandle, tmp, pcollector, &iter, &doc, error))
 		goto out;
-	}
 
 	if (ZBX_VMWARE_TYPE_VCENTER == service->type)
 		zbx_xml_read_values(doc, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_HV) , hvs);
