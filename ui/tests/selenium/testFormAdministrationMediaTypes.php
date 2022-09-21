@@ -96,15 +96,15 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Create media type');
 
 		$this->zbxTestCheckHeader('Media types');
-		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'SMTP helo', 'SMTP email',
-			'Connection security', 'Authentication', 'Message format']);
+		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'Email' , 'SMTP helo',
+			'Connection security', 'Authentication', 'Message format', 'Description', 'Enabled']);
 
 		$this->zbxTestAssertElementPresentId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", 100);
 
 		$this->zbxTestAssertElementPresentId('type');
 		$this->zbxTestDropdownAssertSelected('type', 'Email');
-		$this->zbxTestDropdownHasOptions('type', ['Email', 'Script', 'SMS']);
+		$this->zbxTestDropdownHasOptions('type', ['Email', 'Script', 'SMS', 'Webhook']);
 
 		$this->zbxTestAssertNotVisibleId('exec_path');
 		$this->zbxTestAssertNotVisibleId('exec_params_table');

@@ -80,14 +80,14 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Status' => 'Disabled'
 					],
-					'result' => ['Test script']
+					'get_db_result' => true
 				]
 			],
 			// Filter by name and status.
 			[
 				[
 					'filter' => [
-						'Name' => 'Email',
+						'Name' => 'Reference webhook',
 						'Status' => 'Disabled'
 					]
 				]
@@ -96,7 +96,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				[
 					'filter' => [
 						'Name' => 'Email',
-						'Status' => 'Enabled'
+						'Status' => 'Disabled'
 					],
 					'result' => ['Email', 'Email (HTML)']
 				]
@@ -119,7 +119,11 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'get_db_result', false)) {
-			foreach (CDBHelper::getAll('SELECT name FROM media_type WHERE status='.MEDIA_STATUS_ACTIVE.
+			$db_status = (CTestArrayHelper::get($data['filter'], 'Status') === 'Enabled')
+					? MEDIA_TYPE_STATUS_ACTIVE
+					: MEDIA_TYPE_STATUS_DISABLED;
+
+			foreach (CDBHelper::getAll('SELECT name FROM media_type WHERE status='.$db_status.
 					' ORDER BY LOWER(name) ASC') as $name) {
 				$data['result'][] = $name['name'];
 			}
@@ -163,35 +167,33 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 
 		// Get row by column Name.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$row = $table->findRow('Name', $media_name);
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $media_name);
+		$status_link = $row->getColumn('Status')->query('xpath:./a')->one();
+		$test_button = $row->query('button:Test')->one();
 
-		// Disable media type.
-		$row->query('link:Enabled')->one()->click();
-		$this->page->waitUntilReady();
-		// Check result on fronted.
-		$message = CMessageElement::find()->one();
-		$this->assertTrue($message->isGood());
-		$this->assertEquals('Media type disabled', $message->getTitle());
-		// Check that Test link is disabled.
-		$this->AssertTrue($row->query('button:Test')->one()->isEnabled(false));
-		// Check result in DB.
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.MEDIA_TYPE_STATUS_DISABLED.
-				' AND name='.CDBHelper::escape($media_name)
-		));
+		// Check that Media type and Test link are disabled by default.
+		$this->assertEquals('Disabled', $status_link->getText());
+		$this->assertTrue($test_button->isEnabled(false));
 
-		// Enable media type.
-		$row->query('link:Disabled')->one()->click();
-		$this->page->waitUntilReady();
-		// Check result on fronted.
-		$this->assertTrue($message->isGood());
-		$this->assertEquals('Media type enabled', $message->getTitle());
-		// Check that Test link is enabled.
-		$this->AssertTrue($row->query('button:Test')->one()->isEnabled());
-		// Check result in DB.
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.MEDIA_TYPE_STATUS_ACTIVE.
-				' AND name='.CDBHelper::escape($media_name)
-		));
+		// Check media type status change.
+		foreach (['enabled' => true, 'disabled' => false] as $new_status => $enabled) {
+			$status_link->click();
+			$this->page->waitUntilReady();
+
+			// Check result on frontend.
+			$message = CMessageElement::find()->one();
+			$this->assertTrue($message->isGood());
+			$this->assertEquals('Media type '.$new_status, $message->getTitle());
+
+			// Check that Test link changed status.
+			$this->assertTrue($test_button->isEnabled($enabled));
+
+			// Check result in DB.
+			$db_status = ($enabled) ? MEDIA_TYPE_STATUS_ACTIVE : MEDIA_TYPE_STATUS_DISABLED;
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.$db_status.' AND name='
+					.CDBHelper::escape($media_name)
+			));
+		}
 	}
 
 	public static function getSelectedMediaTypeData() {
