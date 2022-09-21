@@ -670,14 +670,4 @@ void	zbx_sleep_loop(int sleeptime)
 
 	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 }
-
-void	zbx_wakeup(void)
-{
-	sleep_remains = 0;
-}
-
-int	zbx_sleep_get_remainder(void)
-{
-	return sleep_remains;
-}
 #endif
