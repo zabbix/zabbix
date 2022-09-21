@@ -295,6 +295,9 @@ struct zbx_db_version_info_t
 
 	char			*ext_lic;
 	zbx_db_ext_err_code_t	ext_err_code;
+
+	int			history_compressed_chunks;
+	int			trends_compressed_chunks;
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
@@ -302,6 +305,7 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_set_compression_availability(int compression_availabile);
 int	zbx_tsdb_get_compression_availability(void);
+void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info);
 #endif
 
 #ifdef HAVE_MYSQL
