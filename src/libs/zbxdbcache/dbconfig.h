@@ -880,7 +880,6 @@ typedef struct
 	zbx_hashset_t		simpleitems;
 	zbx_hashset_t		jmxitems;
 	zbx_hashset_t		calcitems;
-	zbx_hashset_t		preprocitems;
 	zbx_hashset_t		httpitems;
 	zbx_hashset_t		scriptitems;
 	zbx_hashset_t		functions;

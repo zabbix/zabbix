@@ -581,7 +581,6 @@ static void	DCdump_items(void)
 		{&config->simpleitems, (zbx_dc_dump_func_t)DCdump_simpleitem},
 		{&config->jmxitems, (zbx_dc_dump_func_t)DCdump_jmxitem},
 		{&config->calcitems, (zbx_dc_dump_func_t)DCdump_calcitem},
-		{&config->preprocitems, (zbx_dc_dump_func_t)DCdump_preprocitem},
 		{&config->httpitems, (zbx_dc_dump_func_t)DCdump_httpitem},
 		{&config->scriptitems, (zbx_dc_dump_func_t)DCdump_scriptitem},
 	};
@@ -622,6 +621,9 @@ static void	DCdump_items(void)
 
 		if (NULL != item->master_item)
 			DCdump_masteritem(item->master_item);
+
+		if (NULL != item->preproc_item)
+			DCdump_preprocitem(item->preproc_item);
 
 		if (0 != item->tags.values_num)
 			DCdump_item_tags(item);

@@ -2472,6 +2472,12 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 	return dst;
 }
 
+static void	dc_preprocitem_free(ZBX_DC_PREPROCITEM *preprocitem)
+{
+	zbx_vector_ptr_destroy(&preprocitem->preproc_ops);
+	__config_shmem_free_func(preprocitem);
+}
+
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced)
 {
 	char			**row;
@@ -3321,12 +3327,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 		zbx_vector_ptr_destroy(&item->tags);
 
-		if (NULL != (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems,
-				&item->itemid)))
-		{
-			zbx_vector_ptr_destroy(&preprocitem->preproc_ops);
-			zbx_hashset_remove_direct(&config->preprocitems, preprocitem);
-		}
+		if (NULL != (preprocitem = item->preproc_item))
+			dc_preprocitem_free(preprocitem);
 
 		zbx_hashset_remove_direct(&config->items, item);
 	}
@@ -5265,19 +5267,19 @@ static int	dc_compare_preprocops_by_step(const void *d1, const void *d2)
  ******************************************************************************/
 static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
-	char			**row;
-	zbx_uint64_t		rowid;
-	unsigned char		tag;
-	zbx_uint64_t		item_preprocid, itemid;
-	int			found, ret, i, index;
-	ZBX_DC_PREPROCITEM	*preprocitem = NULL;
-	zbx_dc_preproc_op_t	*op;
-	zbx_vector_ptr_t	items;
-	ZBX_DC_ITEM		*item;
+	char				**row;
+	zbx_uint64_t			rowid;
+	unsigned char			tag;
+	zbx_uint64_t			item_preprocid, itemid;
+	int				found, ret, i, index;
+	ZBX_DC_PREPROCITEM		*preprocitem = NULL;
+	zbx_dc_preproc_op_t		*op;
+	ZBX_DC_ITEM			*item;
+	zbx_vector_dc_item_ptr_t	items;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&items);
+	zbx_vector_dc_item_ptr_create(&items);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -5287,24 +5289,19 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		ZBX_STR2UINT64(itemid, row[1]);
 
-		if (NULL == preprocitem || itemid != preprocitem->itemid)
+		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
+			continue;
+
+		if (NULL == (preprocitem = item->preproc_item))
 		{
-			if (NULL == (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems,
-					&itemid)))
-			{
-				ZBX_DC_PREPROCITEM	preprocitem_local;
+			preprocitem = (ZBX_DC_PREPROCITEM *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_PREPROCITEM));
+			preprocitem->itemid = itemid;
+			zbx_vector_ptr_create_ext(&preprocitem->preproc_ops, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
 
-				preprocitem_local.itemid = itemid;
-
-				zbx_vector_ptr_create_ext(&preprocitem_local.preproc_ops, __config_shmem_malloc_func,
-						__config_shmem_realloc_func, __config_shmem_free_func);
-
-				preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_insert(&config->preprocitems,
-						&preprocitem_local, sizeof(preprocitem_local));
-			}
-
-			zbx_vector_ptr_append(&items, preprocitem);
+			item->preproc_item = preprocitem;
 		}
+		zbx_vector_dc_item_ptr_append(&items, item);
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
 
@@ -5331,14 +5328,14 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		if (NULL == (op = (zbx_dc_preproc_op_t *)zbx_hashset_search(&config->preprocops, &rowid)))
 			continue;
 
-		if (NULL != (preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_search(&config->preprocitems,
-				&op->itemid)))
+		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &op->itemid)) &&
+				NULL != (preprocitem = item->preproc_item))
 		{
 			if (FAIL != (index = zbx_vector_ptr_search(&preprocitem->preproc_ops, op,
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
 				zbx_vector_ptr_remove_noorder(&preprocitem->preproc_ops, index);
-				zbx_vector_ptr_append(&items, preprocitem);
+				zbx_vector_dc_item_ptr_append(&items, item);
 			}
 		}
 
@@ -5349,34 +5346,26 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	/* sort item preprocessing operations by step */
 
-	zbx_vector_ptr_sort(&items, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-	zbx_vector_ptr_uniq(&items, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_vector_dc_item_ptr_sort(&items, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_vector_dc_item_ptr_uniq(&items, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
 	for (i = 0; i < items.values_num; i++)
 	{
-		preprocitem = (ZBX_DC_PREPROCITEM *)items.values[i];
+		if (NULL == (preprocitem = items.values[i]->preproc_item))
+			continue;
 
-		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &preprocitem->itemid)))
-			dc_item_update_revision(item, revision);
+		dc_item_update_revision(item, revision);
 
 		if (0 == preprocitem->preproc_ops.values_num)
 		{
-			zbx_vector_ptr_destroy(&preprocitem->preproc_ops);
-			zbx_hashset_remove_direct(&config->preprocitems, preprocitem);
-
-			if (NULL != item)
-				item->preproc_item = NULL;
+			dc_preprocitem_free(preprocitem);
+			items.values[i]->preproc_item = NULL;
 		}
 		else
-		{
 			zbx_vector_ptr_sort(&preprocitem->preproc_ops, dc_compare_preprocops_by_step);
-
-			if (NULL != item)
-				item->preproc_item = preprocitem;
-		}
 	}
 
-	zbx_vector_ptr_destroy(&items);
+	zbx_vector_dc_item_ptr_destroy(&items);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -7206,8 +7195,6 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() numitems   : %d (%d slots)", __func__,
 				config->numitems.num_data, config->numitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocitems: %d (%d slots)", __func__,
-				config->preprocitems.num_data, config->preprocitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocops : %d (%d slots)", __func__,
 				config->preprocops.num_data, config->preprocops.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmpitems  : %d (%d slots)", __func__,
 				config->snmpitems.num_data, config->snmpitems.num_slots);
@@ -7763,7 +7750,6 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->simpleitems, 0);
 	CREATE_HASHSET(config->jmxitems, 0);
 	CREATE_HASHSET(config->calcitems, 0);
-	CREATE_HASHSET(config->preprocitems, 0);
 	CREATE_HASHSET(config->httpitems, 0);
 	CREATE_HASHSET(config->scriptitems, 0);
 	CREATE_HASHSET(config->itemscript_params, 0);
