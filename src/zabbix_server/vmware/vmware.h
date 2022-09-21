@@ -498,6 +498,7 @@ typedef struct
 	/* the vmware service instance version numeric */
 	unsigned short			major_version;
 	unsigned short			minor_version;
+	unsigned short			patch_version;
 
 	/* the vmware service instance fullname */
 	char				*fullname;

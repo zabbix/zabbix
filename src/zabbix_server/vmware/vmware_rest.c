@@ -797,9 +797,9 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vc version:%s", __func__, service->version);
 
-	if (65 > service->major_version * 10 + service->minor_version)
+	if (702 > service->major_version * 100 + service->minor_version * 10 + service->patch_version)
 	{
-		error = zbx_strdup(error, "Tags are supported since vmware version 6.5.");
+		error = zbx_strdup(error, "Tags are supported since vmware version 7.0.2");
 		goto out;
 	}
 
