@@ -495,7 +495,6 @@
 	 */
 	function getFilterPreselect($obj, action) {
 		const ms = $obj.data('multiSelect');
-
 		const options_key = action == MS_ACTION_AUTOSUGGEST ? 'autosuggest' : 'popup';
 
 		if (!(options_key in ms.options) || !('filter_preselect' in ms.options[options_key])) {
@@ -503,7 +502,6 @@
 		}
 
 		const filter_preselect = ms.options[options_key].filter_preselect;
-
 		const data = $('#' + filter_preselect.id).multiSelect('getData');
 
 		if (data.length === 0) {

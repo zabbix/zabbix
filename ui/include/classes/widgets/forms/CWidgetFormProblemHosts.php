@@ -49,7 +49,7 @@ class CWidgetFormProblemHosts extends CWidgetForm {
 
 		// Hosts field.
 		$field_hosts = new CWidgetFieldMsHost('hostids', _('Hosts'));
-		$field_hosts->setFilterPreselectHostGroup('groupids_');
+		$field_hosts->setFilterPreselect('groupids_');
 
 		if (array_key_exists('hostids', $this->data)) {
 			$field_hosts->setValue($this->data['hostids']);

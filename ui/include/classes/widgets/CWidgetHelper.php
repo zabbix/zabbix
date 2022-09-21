@@ -307,8 +307,8 @@ class CWidgetHelper {
 			'add_post_js' => false
 		];
 
-		if ($field instanceof CWidgetFieldMsHost && $field->filter_preselect_host_group) {
-			$options['popup']['filter_preselect']['id'] = $field->filter_preselect_host_group;
+		if ($field instanceof CWidgetFieldMsHost && $field->getFilterPreselect()) {
+			$options['popup']['filter_preselect']['id'] = $field->getFilterPreselect();
 			$options['popup']['filter_preselect']['submit_as'] = 'groupid';
 		}
 

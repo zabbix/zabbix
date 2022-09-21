@@ -661,11 +661,8 @@ switch ($data['method']) {
 				if (array_key_exists('host_pattern', $data)) {
 					$host_pattern_multiple = array_key_exists('host_pattern_multiple', $data)
 						&& $data['host_pattern_multiple'] == 1;
-
 					$host_patterns = $host_pattern_multiple ? $data['host_pattern'] : [$data['host_pattern']];
-
 					$host_pattern_wildcard_enabled = array_key_exists('host_pattern_wildcard_allowed', $data)
-						&& $data['host_pattern_wildcard_allowed'] == 1
 						&& !in_array('*', $host_patterns, true);
 
 					$hosts = API::Host()->get([
@@ -715,7 +712,7 @@ switch ($data['method']) {
 		];
 
 		if ($db_result) {
-			$db_result = array_flip(zbx_objectValues($db_result, 'name'));
+			$db_result = array_flip(array_column($db_result, 'name'));
 
 			if (array_key_exists($search, $db_result)) {
 				unset($db_result[$search]);

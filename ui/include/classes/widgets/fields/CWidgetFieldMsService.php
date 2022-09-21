@@ -22,11 +22,6 @@
 class CWidgetFieldMsService extends CWidgetFieldMs {
 
 	/**
-	 * @var string  (nullable) ID for Multiselect element.
-	 */
-	public $filter_preselect_host_group;
-
-	/**
 	 * Create widget field for Service selection
 	 *
 	 * @param string      $name     field name in form
@@ -36,10 +31,5 @@ class CWidgetFieldMsService extends CWidgetFieldMs {
 		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_SERVICE);
-	}
-
-	public function setFilterPreselectHostGroup($id) {
-		$this->filter_preselect_host_group = $id;
-		return $this;
 	}
 }

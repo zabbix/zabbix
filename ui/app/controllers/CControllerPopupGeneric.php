@@ -990,11 +990,9 @@ class CControllerPopupGeneric extends CController {
 		}
 		elseif ($this->hasInput('host_pattern')) {
 			$host_pattern_multiple = $this->hasInput('host_pattern_multiple');
-
 			$host_patterns = $host_pattern_multiple
 				? $this->getInput('host_pattern')
 				: [$this->getInput('host_pattern')];
-
 			$host_pattern_wildcard_enabled = $this->hasInput('host_pattern_wildcard_allowed')
 				&& !in_array('*', $host_patterns, true);
 
