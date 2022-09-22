@@ -50,15 +50,34 @@ class CControllerMediatypeEnable extends CController {
 	}
 
 	protected function doAction() {
-		$mediatypes = [];
+		$mediatypeids = $this->getInput('mediatypeids');
 
-		foreach ($this->getInput('mediatypeids') as $mediatypeid) {
+		$email_providers = API::MediaType()->get([
+			'output' => ['name', 'passwd'],
+			'mediatypeids' => $mediatypeids,
+			'filter' => [
+				'type' => MEDIA_TYPE_EMAIL,
+				'provider' => [CMediatypeHelper::EMAIL_PROVIDER_GMAIL, CMediatypeHelper::EMAIL_PROVIDER_OFFICE365],
+				'status' => MEDIA_STATUS_DISABLED
+			],
+			'preservekeys' => true
+		]);
+
+		$mediatypes = [];
+		$incomplete_configurations = [];
+
+		foreach ($mediatypeids as $mediatypeid) {
+			if (array_key_exists($mediatypeid, $email_providers) && $email_providers[$mediatypeid]['passwd'] == '') {
+				$incomplete_configurations[] = $email_providers[$mediatypeid]['name'];
+				continue;
+			}
 			$mediatypes[] = [
 				'mediatypeid' => $mediatypeid,
 				'status' => MEDIA_TYPE_STATUS_ACTIVE
 			];
 		}
-		$result = API::Mediatype()->update($mediatypes);
+
+		$result = $mediatypes ? API::Mediatype()->update($mediatypes) : null;
 
 		$updated = count($mediatypes);
 
@@ -74,6 +93,11 @@ class CControllerMediatypeEnable extends CController {
 		else {
 			CMessageHelper::setErrorTitle(_n('Cannot enable media type', 'Cannot enable media types', $updated));
 		}
+
+		if ($incomplete_configurations) {
+			info(_s('%1$s: %2$s', 'Incomplete configuration', implode(',', $incomplete_configurations)));
+		}
+
 		$this->setResponse($response);
 	}
 }
