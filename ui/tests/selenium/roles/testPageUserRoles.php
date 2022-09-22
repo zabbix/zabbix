@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup role
  * @onBefore prepareRoleData
- * @dataSource LoginUsers
+ * @dataSource LoginUsers, ExecuteNowAction
  */
 class testPageUserRoles extends CWebTest {
 
@@ -178,6 +178,16 @@ class testPageUserRoles extends CWebTest {
 				'Users' => 'Admin (Zabbix Administrator), filter-create, filter-delete, filter-update, LDAP user, test-timezone'
 			],
 			[
+				'Name' => 'UR1-executenow-on',
+				'#' => 'Users 1',
+				'Users' => 'U1-r-on'
+			],
+			[
+				'Name' => 'UR2-executenow-off',
+				'#' => 'Users 2',
+				'Users' => 'U2-r-off, U3-rw-off'
+			],
+			[
 				'Name' => 'User role',
 				'#' => 'Users 6',
 				'Users' => 'disabled-user, no-access-to-the-frontend, Tag-user, test-user, user-for-blocking, user-zabbix'
@@ -236,6 +246,8 @@ class testPageUserRoles extends CWebTest {
 						'Remove_role_3',
 						'role_with_min end',
 						'Super admin role',
+						'UR1-executenow-on',
+						'UR2-executenow-off',
 						'User role'
 					]
 				]
