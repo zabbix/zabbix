@@ -22,7 +22,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxcomms.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "../../../../src/libs/zbxsysinfo/common/http.h"
 
 #ifndef HAVE_LIBCURL
@@ -89,12 +89,12 @@ void	zbx_mock_test_entry(void **state)
 	if (SYSINFO_RET_FAIL == expected_result)
 	{
 		buffer = zbx_mock_get_parameter_string("out.error");
-		rvalue = (NULL != GET_MSG_RESULT(&param_result)) ? *GET_MSG_RESULT(&param_result) : NULL;
+		rvalue = (NULL != ZBX_GET_MSG_RESULT(&param_result)) ? *ZBX_GET_MSG_RESULT(&param_result) : NULL;
 	}
 	else
 	{
 		buffer = zbx_mock_get_parameter_string(STR_FIELD_OUT);
-		rvalue = (NULL != GET_TEXT_RESULT(&param_result)) ? *GET_TEXT_RESULT(&param_result) : NULL;
+		rvalue = (NULL != ZBX_GET_TEXT_RESULT(&param_result)) ? *ZBX_GET_TEXT_RESULT(&param_result) : NULL;
 	}
 
 	if (NULL == rvalue)

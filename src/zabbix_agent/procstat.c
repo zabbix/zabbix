@@ -159,7 +159,7 @@ typedef struct
 	int				next;
 
 	/* the cpu utilization history data (ring buffer) */
-	zbx_procstat_data_t		h_data[MAX_COLLECTOR_HISTORY];
+	zbx_procstat_data_t		h_data[ZBX_MAX_COLLECTOR_HISTORY];
 }
 zbx_procstat_query_t;
 
@@ -879,21 +879,21 @@ static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runi
 		/* find the next history data slot */
 		if (0 < query->h_count)
 		{
-			if (MAX_COLLECTOR_HISTORY <= (index = query->h_first + query->h_count - 1))
-				index -= MAX_COLLECTOR_HISTORY;
+			if (ZBX_MAX_COLLECTOR_HISTORY <= (index = query->h_first + query->h_count - 1))
+				index -= ZBX_MAX_COLLECTOR_HISTORY;
 
 			qdata->utime += query->h_data[index].utime;
 			qdata->stime += query->h_data[index].stime;
 
-			if (MAX_COLLECTOR_HISTORY <= ++index)
-				index -= MAX_COLLECTOR_HISTORY;
+			if (ZBX_MAX_COLLECTOR_HISTORY <= ++index)
+				index -= ZBX_MAX_COLLECTOR_HISTORY;
 		}
 		else
 			index = 0;
 
-		if (MAX_COLLECTOR_HISTORY == query->h_count)
+		if (ZBX_MAX_COLLECTOR_HISTORY == query->h_count)
 		{
-			if (MAX_COLLECTOR_HISTORY <= ++query->h_first)
+			if (ZBX_MAX_COLLECTOR_HISTORY <= ++query->h_first)
 				query->h_first = 0;
 		}
 		else
@@ -1026,11 +1026,11 @@ int	zbx_procstat_get_util(const char *procname, const char *username, const char
 	if (period >= query->h_count)
 		period = query->h_count - 1;
 
-	if (MAX_COLLECTOR_HISTORY <= (current = query->h_first + query->h_count - 1))
-		current -= MAX_COLLECTOR_HISTORY;
+	if (ZBX_MAX_COLLECTOR_HISTORY <= (current = query->h_first + query->h_count - 1))
+		current -= ZBX_MAX_COLLECTOR_HISTORY;
 
 	if (0 > (start = current - period))
-		start += MAX_COLLECTOR_HISTORY;
+		start += ZBX_MAX_COLLECTOR_HISTORY;
 
 	if (0 != (type & ZBX_PROCSTAT_CPU_USER))
 		ticks_diff += query->h_data[current].utime - query->h_data[start].utime;

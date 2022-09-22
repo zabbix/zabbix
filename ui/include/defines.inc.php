@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.4.0alpha1');
+define('ZABBIX_VERSION',		'6.4.0alpha2');
 define('ZABBIX_API_VERSION',	'6.4.0');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6030000);
+define('ZABBIX_DB_VERSION',		6030057);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -101,6 +101,10 @@ define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);
 define('ZBX_SCRIPT_TYPE_TELNET',		3);
 define('ZBX_SCRIPT_TYPE_WEBHOOK',		5);
+define('ZBX_SCRIPT_TYPE_URL',			6);
+
+define('ZBX_SCRIPT_URL_NEW_WINDOW_NO',	0);
+define('ZBX_SCRIPT_URL_NEW_WINDOW_YES',	1);
 
 define('ZBX_SCRIPT_SCOPE_ACTION', 0x1);
 define('ZBX_SCRIPT_SCOPE_HOST', 0x2);
@@ -112,6 +116,12 @@ define('ZBX_SEARCH_TYPE_PATTERN',	1);
 define('ZBX_SCRIPT_EXECUTE_ON_AGENT',	0);
 define('ZBX_SCRIPT_EXECUTE_ON_SERVER',	1);
 define('ZBX_SCRIPT_EXECUTE_ON_PROXY',	2);
+
+define('ZBX_PROXY_VERSION_UNDEFINED', 0);
+define('ZBX_PROXY_VERSION_CURRENT', 1);
+define('ZBX_PROXY_VERSION_OUTDATED', 2);
+define('ZBX_PROXY_VERSION_UNSUPPORTED', 3);
+define('ZBX_PROXY_VERSION_ALL_OUTDATED', 4);
 
 define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0);
 define('ZBX_FLAG_DISCOVERY_RULE',		0x1);

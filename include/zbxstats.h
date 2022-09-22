@@ -17,22 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_HEART_H
-#define ZABBIX_HEART_H
-
-#include "zbxthreads.h"
+#ifndef ZABBIX_STATS_H
+#define ZABBIX_STATS_H
 
 #include "zbxcomms.h"
+#include "zbxjson.h"
 
-extern int	CONFIG_HEARTBEAT_FREQUENCY;
+typedef void (*zbx_zabbix_stats_ext_get_func_t)(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config);
 
-typedef struct
-{
-	zbx_config_tls_t	*zbx_config_tls;
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
-}
-zbx_thread_heart_args;
-
-ZBX_THREAD_ENTRY(heart_thread, args);
+void	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get_func_t cb);
+void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config);
 
 #endif

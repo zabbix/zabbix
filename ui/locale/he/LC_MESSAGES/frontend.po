@@ -2742,6 +2742,10 @@ msgstr[1] "לא ניתן להפעיל תרחישי רשת"
 msgid "Cannot evaluate expression"
 msgstr "לא ניתן להעריך ביטוי"
 
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr ""
+
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
 msgid "Cannot execute operation"
@@ -13738,6 +13742,10 @@ msgstr "רק מנהלי על יכולים להגדיר בעלות על דוח."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "רק הקפצות שמוקצות למארחים מופעלים שתלויות בפריטים פעילים נספרות"
 
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -23550,6 +23558,11 @@ msgstr "varsamp()‎ - סטיית דגימה"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "דרך"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"
