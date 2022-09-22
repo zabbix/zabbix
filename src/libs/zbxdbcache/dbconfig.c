@@ -14517,8 +14517,7 @@ int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token,
 
 	WRLOCK_CACHE;
 	session_local.token = dc_strdup(token);
-	session = (zbx_session_t *)zbx_hashset_insert(&config->sessions[ZBX_SESSION_TYPE_CONFIG], &session_local,
-			sizeof(session_local));
+	zbx_hashset_insert(&config->sessions[ZBX_SESSION_TYPE_CONFIG], &session_local, sizeof(session_local));
 	UNLOCK_CACHE;
 
 	return 1;	/* a session was created */

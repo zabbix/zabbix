@@ -762,7 +762,7 @@ out:
 static int	proxyconfig_get_expression_data(struct zbx_json *j, char **error)
 {
 	zbx_vector_uint64_t	regexpids;
-	int			ret;
+	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -798,7 +798,7 @@ out:
 static int	proxyconfig_get_httptest_data(const zbx_vector_uint64_t *httptestids, struct zbx_json *j, char **error)
 {
 	zbx_vector_uint64_t	httpstepids;
-	int			ret;
+	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
