@@ -18,14 +18,13 @@ require (
 	github.com/goburrow/serial v0.1.0 // indirect
 	github.com/godbus/dbus v4.1.0+incompatible
 	github.com/godror/godror v0.20.1
-	github.com/jackc/pgx/v4 v4.8.2-0.20200910143026-040df1ccef85
 	github.com/mattn/go-sqlite3 v1.14.8
 	github.com/mediocregopher/radix/v3 v3.5.0
 	github.com/memcachier/mc/v3 v3.0.1
 	github.com/miekg/dns v1.1.43
 	github.com/natefinch/npipe v0.0.0-20160621034901-c1b8fa8bdcce
 	github.com/omeid/go-yarn v0.0.1
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/stretchr/testify v1.5.1 // indirect
 	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
