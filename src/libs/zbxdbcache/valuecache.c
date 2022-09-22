@@ -285,7 +285,7 @@ static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, 
 static size_t	vch_item_free_cache(zbx_vc_item_t *item);
 static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk);
 static int	vch_item_add_values_at_tail(zbx_vc_item_t *item, const zbx_history_record_t *values, int values_num);
-static void	vch_item_clean_cache(zbx_vc_item_t *item, int last_value_timestamp);
+static void	vch_item_clean_cache(zbx_vc_item_t *item, int timestamp);
 
 /*********************************************************************************
  *                                                                               *
@@ -1641,10 +1641,11 @@ static void	vch_item_remove_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk)
  * Purpose: removes item history data that are outside (older) the maximum    *
  *          request range                                                     *
  *                                                                            *
- * Parameters:  item   - [IN] the target item                                 *
+ * Parameters:  item      - [IN] the target item                              *
+ *              timestamp - [IN] last timestamp in active range               *
  *                                                                            *
  ******************************************************************************/
-static void	vch_item_clean_cache(zbx_vc_item_t *item, int last_value_timestamp)
+static void	vch_item_clean_cache(zbx_vc_item_t *item, int timestamp)
 {
 	zbx_vc_chunk_t	*next;
 
@@ -1653,9 +1654,12 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item, int last_value_timestamp)
 		zbx_vc_chunk_t	*tail = item->tail;
 		zbx_vc_chunk_t	*chunk = tail;
 
-		last_value_timestamp -= item->active_range;
-		/* try to remove chunks with all history values older than maximum request range */
-		while (NULL != chunk && chunk->slots[chunk->last_value].timestamp.sec < last_value_timestamp &&
+		timestamp -= item->active_range;
+
+		/* Try to remove chunks with all history values older than maximum request range, maximum */
+		/* request range should be calculated from last received value with which active range    */
+		/* was calculated to avoid dropping of chunks that might be still used in count request.  */
+		while (NULL != chunk && chunk->slots[chunk->last_value].timestamp.sec < timestamp &&
 				chunk->slots[chunk->last_value].timestamp.sec !=
 						item->head->slots[item->head->last_value].timestamp.sec)
 		{
