@@ -102,10 +102,11 @@ void	zbx_vc_enable(void);
 
 void	zbx_vc_disable(void);
 
-int	zbx_vc_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_history_record_t *values, int seconds,
-		int count, const zbx_timespec_t *ts);
+int	zbx_vc_get_values(zbx_uint64_t itemid, unsigned char value_type, zbx_vector_history_record_t *values,
+		int seconds, int count, const zbx_timespec_t *ts);
 
-int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_history_record_t *value);
+int	zbx_vc_get_value(zbx_uint64_t itemid, unsigned char value_type, const zbx_timespec_t *ts,
+		zbx_history_record_t *value);
 
 int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush);
 

@@ -541,12 +541,12 @@ static int	vc_db_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_hist
 
 static zbx_hash_t	vc_strpool_hash_func(const void *data)
 {
-	return ZBX_DEFAULT_STRING_HASH_FUNC((char *)data + REFCOUNT_FIELD_SIZE);
+	return ZBX_DEFAULT_STRING_HASH_FUNC((const char *)data + REFCOUNT_FIELD_SIZE);
 }
 
 static int	vc_strpool_compare_func(const void *d1, const void *d2)
 {
-	return strcmp((char *)d1 + REFCOUNT_FIELD_SIZE, (char *)d2 + REFCOUNT_FIELD_SIZE);
+	return strcmp((const char *)d1 + REFCOUNT_FIELD_SIZE, (const char *)d2 + REFCOUNT_FIELD_SIZE);
 }
 
 /******************************************************************************
@@ -649,7 +649,7 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses, int 
 	{
 		int	hour;
 
-		item->hits += hits;
+		item->hits += (zbx_uint64_t)hits;
 		item->last_accessed = now;
 
 		hour = item->last_accessed / SEC_PER_HOUR;
@@ -666,8 +666,8 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses, int 
 
 	if (ZBX_VC_ENABLED == vc_state)
 	{
-		vc_cache->hits += hits;
-		vc_cache->misses += misses;
+		vc_cache->hits += (zbx_uint64_t)hits;
+		vc_cache->misses += (zbx_uint64_t)misses;
 	}
 }
 
@@ -678,8 +678,8 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses, int 
  ******************************************************************************/
 static int	vc_compare_items_by_total_values(const void *d1, const void *d2)
 {
-	zbx_vc_item_t	*c1 = *(zbx_vc_item_t **)d1;
-	zbx_vc_item_t	*c2 = *(zbx_vc_item_t **)d2;
+	const zbx_vc_item_t	*c1 = *(const zbx_vc_item_t * const *)d1;
+	const zbx_vc_item_t	*c2 = *(const zbx_vc_item_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(c2->values_total, c1->values_total);
 
@@ -738,7 +738,7 @@ static void	vc_warn_low_memory(void)
 {
 	int	now;
 
-	now = time(NULL);
+	now = (int)time(NULL);
 
 	if (now - vc_cache->mode_time > ZBX_VC_LOW_MEMORY_RESET_PERIOD)
 	{
@@ -779,7 +779,7 @@ static size_t	vc_release_unused_items(const zbx_vc_item_t *source_item)
 	if (NULL == vc_cache)
 		return freed;
 
-	timestamp = time(NULL) - ZBX_VC_ITEM_EXPIRE_PERIOD;
+	timestamp = (int)time(NULL) - ZBX_VC_ITEM_EXPIRE_PERIOD;
 
 	zbx_hashset_iter_reset(&vc_cache->items, &iter);
 
@@ -828,7 +828,7 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 
 	/* failed to free enough space by removing old items, entering low memory mode */
 	vc_cache->mode = ZBX_VC_MODE_LOWMEM;
-	vc_cache->mode_time = time(NULL);
+	vc_cache->mode_time = (int)time(NULL);
 
 	vc_warn_low_memory();
 
@@ -1267,7 +1267,8 @@ static void	vc_item_update_db_cached_from(zbx_vc_item_t *item, int timestamp)
  ******************************************************************************/
 static void	vch_item_update_range(zbx_vc_item_t *item, int range, int now)
 {
-	int	hour, diff, last_value_timestamp;
+	int		diff, last_value_timestamp;
+	unsigned char	hour;
 
 	if (VC_MIN_RANGE > range)
 		range = VC_MIN_RANGE;
@@ -1275,7 +1276,7 @@ static void	vch_item_update_range(zbx_vc_item_t *item, int range, int now)
 	if (item->daily_range < range)
 		item->daily_range = range;
 
-	hour = (now / SEC_PER_HOUR) & 0xff;
+	hour = (unsigned char)((now / SEC_PER_HOUR) & 0xff);
 
 	if (0 > (diff = hour - item->range_sync_hour))
 		diff += 0xff;
@@ -1316,7 +1317,7 @@ static int	vch_item_chunk_slot_count(zbx_vc_item_t *item, int values_new)
 
 	values = item->values_total + values_new;
 
-	nslots = zbx_isqrt32(values);
+	nslots = (int)zbx_isqrt32((unsigned int)values);
 
 	if ((values + nslots - 1) / nslots + 1 > 32)
 		nslots = values / 32;
@@ -1347,9 +1348,9 @@ static int	vch_item_chunk_slot_count(zbx_vc_item_t *item, int values_new)
 static int	vch_item_add_chunk(zbx_vc_item_t *item, int nslots, zbx_vc_chunk_t *insert_before)
 {
 	zbx_vc_chunk_t	*chunk;
-	int		chunk_size;
+	size_t		chunk_size;
 
-	chunk_size = sizeof(zbx_vc_chunk_t) + sizeof(zbx_history_record_t) * (nslots - 1);
+	chunk_size =sizeof(zbx_vc_chunk_t) + sizeof(zbx_history_record_t) * (size_t)(nslots - 1);
 
 	if (NULL == (chunk = (zbx_vc_chunk_t *)vc_item_malloc(item, chunk_size)))
 		return FAIL;
@@ -1579,7 +1580,7 @@ static int	vch_item_copy_values_at_tail(zbx_vc_item_t *item, const zbx_history_r
 			break;
 		default:
 			memcpy(&item->tail->slots[item->tail->first_value - values_num], values,
-					values_num * sizeof(zbx_history_record_t));
+					(size_t)values_num * sizeof(zbx_history_record_t));
 			item->tail->first_value -= values_num;
 			ret = SUCCEED;
 	}
@@ -1603,7 +1604,7 @@ static size_t	vch_item_free_chunk(zbx_vc_item_t *item, zbx_vc_chunk_t *chunk)
 {
 	size_t	freed;
 
-	freed = sizeof(zbx_vc_chunk_t) + (chunk->slots_num - 1) * sizeof(zbx_history_record_t);
+	freed = sizeof(zbx_vc_chunk_t) + (size_t)(chunk->slots_num - 1) * sizeof(zbx_history_record_t);
 	freed += vc_item_free_values(item, chunk->slots, chunk->first_value, chunk->last_value);
 
 	__vc_shmem_free_func(chunk);
@@ -2147,7 +2148,7 @@ static void	vch_item_get_values_by_time(const zbx_vc_item_t *item, zbx_vector_hi
 	/* range which might be greater than the current request range.        */
 	if (0 != item->active_range || ZBX_ITEM_STATUS_CACHED_ALL != item->status)
 	{
-		now = time(NULL);
+		now = (int)time(NULL);
 		/* add another second to include nanosecond shifts */
 		vc_cache_item_update(item->itemid, ZBX_VC_UPDATE_RANGE, seconds + now - ts->sec + 1, now);
 	}
@@ -2246,7 +2247,7 @@ out:
 		range_timestamp = values->values[values->values_num - 1].timestamp.sec - 1;
 	}
 
-	now = time(NULL);
+	now = (int)time(NULL);
 	vc_cache_item_update(item->itemid, ZBX_VC_UPDATE_RANGE, now - range_timestamp, now);
 }
 
@@ -2535,7 +2536,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 			if (NULL != head)
 				last_value_timestamp = head->slots[head->last_value].timestamp.sec;
 			else
-				last_value_timestamp = time(NULL);
+				last_value_timestamp = (int)time(NULL);
 
 			/* If the new value type does not match the item's type in cache remove it, */
 			/* so it's cached with the correct type from correct tables when accessed   */
@@ -2583,8 +2584,8 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
  *           seconds before <timestamp>.                                      *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_history_record_t *values, int seconds,
-		int count, const zbx_timespec_t *ts)
+int	zbx_vc_get_values(zbx_uint64_t itemid, unsigned char value_type, zbx_vector_history_record_t *values,
+		int seconds, int count, const zbx_timespec_t *ts)
 {
 	zbx_vc_item_t	*item, new_item;
 	int 		ret = FAIL, cache_used = 1;
@@ -2627,7 +2628,7 @@ out:
 			vc_remove_item_by_id(itemid);
 
 		if (SUCCEED == ret)
-			vc_update_statistics(NULL, 0, values->values_num, time(NULL));
+			vc_update_statistics(NULL, 0, values->values_num, (int)time(NULL));
 	}
 
 	UNLOCK_CACHE;
@@ -2656,7 +2657,8 @@ out:
  *           function.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *ts, zbx_history_record_t *value)
+int	zbx_vc_get_value(zbx_uint64_t itemid, unsigned char value_type, const zbx_timespec_t *ts,
+		zbx_history_record_t *value)
 {
 	zbx_vector_history_record_t	values;
 	int				ret = FAIL;
@@ -2750,12 +2752,12 @@ void	zbx_vc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, in
 
 	RDLOCK_CACHE;
 
-	*items_num = vc_cache->items.num_data;
+	*items_num = (zbx_uint64_t)vc_cache->items.num_data;
 	*mode = vc_cache->mode;
 
 	zbx_hashset_iter_reset(&vc_cache->items, &iter);
 	while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
-		*values_num += item->values_total;
+		*values_num += (zbx_uint64_t)item->values_total;
 
 	UNLOCK_CACHE;
 }
@@ -2794,7 +2796,7 @@ void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats)
 
 	RDLOCK_CACHE;
 
-	zbx_vector_ptr_reserve(stats, vc_cache->items.num_data);
+	zbx_vector_ptr_reserve(stats, (size_t)vc_cache->items.num_data);
 
 	zbx_hashset_iter_reset(&vc_cache->items, &iter);
 	while (NULL != (item = (zbx_vc_item_t *)zbx_hashset_iter_next(&iter)))
@@ -2825,7 +2827,7 @@ void	zbx_vc_flush_stats(void)
 
 	zbx_vector_vc_itemupdate_sort(&vc_itemupdates, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	now = time(NULL);
+	now = (int)time(NULL);
 
 	WRLOCK_CACHE;
 
