@@ -158,7 +158,7 @@ int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
  * Purpose: registers a new item key as local into the system                 *
  *                                                                            *
  ******************************************************************************/
-int	zbx_add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len)
+static int	add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len)
 {
 	return add_to_metrics(&commands_local, metric, error, max_error_len);
 }
@@ -297,7 +297,7 @@ void	zbx_init_metrics(void)
 
 	for (i = 0; NULL != parameters_common_local[i].key; i++)
 	{
-		if (SUCCEED != zbx_add_metric_local(&parameters_common_local[i], error, sizeof(error)))
+		if (SUCCEED != add_metric_local(&parameters_common_local[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);

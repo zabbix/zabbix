@@ -187,7 +187,6 @@ zbx_key_access_rule_type_t;
 
 void	zbx_init_metrics(void);
 int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
-int	zbx_add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len);
 void	zbx_free_metrics_ext(ZBX_METRIC **metrics);
 void	zbx_free_metrics(void);
 
@@ -206,7 +205,6 @@ int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size
 void	zbx_remove_user_parameters(void);
 void	zbx_get_metrics_copy(ZBX_METRIC **metrics);
 void	zbx_set_metrics(ZBX_METRIC *metrics);
-int	zbx_add_user_module(const char *key, int (*function)(void));
 void	zbx_test_parameters(void);
 void	zbx_test_parameter(const char *key);
 
