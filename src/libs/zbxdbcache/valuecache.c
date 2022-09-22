@@ -1255,7 +1255,7 @@ static void	vc_item_update_db_cached_from(zbx_vc_item_t *item, int timestamp)
  * After adding a new chunk, the older chunks (outside the largest request
  * range) are automatically removed from cache.
  */
-
+#include "log.h"
 /******************************************************************************
  *                                                                            *
  * Purpose: updates item range with current request range                     *
@@ -1286,6 +1286,9 @@ static void	vch_item_update_range(zbx_vc_item_t *item, int range, int now)
 	else
 		last_value_timestamp = now;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "(now - last_value_timestamp) / SEC_PER_HOUR:%d", (now - last_value_timestamp) / SEC_PER_HOUR);
+	zabbix_log(LOG_LEVEL_INFORMATION, "diff:%d", diff);
+	zabbix_log(LOG_LEVEL_INFORMATION, "item->daily_range:%d", item->daily_range);
 	if (item->active_range < item->daily_range || (ZBX_VC_RANGE_SYNC_PERIOD < diff &&
 			(now - last_value_timestamp) / SEC_PER_HOUR < ZBX_VC_RANGE_SYNC_PERIOD))
 	{
