@@ -1,8 +1,12 @@
 Changes for 6.4.0alpha2
 
 New features:
+.......PS. [ZBXNEXT-7931] removed heartbeats support from Zabbix proxy (jxl)
+A.F.I..PST [ZBXNEXT-2557] added support of Zabbix proxies with legacy version (abakaldin, esekace, mprihodko)
 
 Bug fixes:
+........S. [ZBX-21664] fixed Zabbix server crashing during database upgrade when converting service times and there is downtime inside uptime (vso)
+...G...... [ZBX-21466] fixed race condition in Zabbix agent 2 leading to permanently stuck mount reads (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0alpha1
@@ -17,6 +21,24 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....... [ZBXNEXT-7832] renamed setting "Dynamic item" to "Enable host selection" for URL, Plain text, Graph prototype, Item value, Graph classic widgets (agavriluks)
 .D.G...PS. [ZBXNEXT-7852] added incremental active check refresh for active agents (vso)
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
+
+--------------------------------------------------------------------------------
+Changes for 6.2.4rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.2.3
+
+6.2.3rc2 was released as 6.2.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.2.3rc2
+
+Bug fixes:
+........S. [ZBX-21664] fixed Zabbix server crashing during database upgrade when converting service times and there is downtime inside uptime (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.3rc1
@@ -381,6 +403,24 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.10rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.9
+
+6.0.9rc2 was released as 6.0.9 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.9rc2
+
+Bug fixes:
+........S. [ZBX-21664] fixed Zabbix server crashing during database upgrade when converting service times and there is downtime inside uptime (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.9rc1
@@ -2499,6 +2539,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.29rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.28
+
+5.0.28rc1 was released as 5.0.28 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.28rc1
@@ -5102,6 +5154,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.45rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.44
+
+4.0.44rc1 was released as 4.0.44 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.44rc1
