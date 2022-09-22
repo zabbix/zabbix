@@ -35,7 +35,7 @@ FIELD		|username	|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|name		|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|surname	|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|passwd		|t_varchar(60)	|''	|NOT NULL	|0
-FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|autologin	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|autologout	|t_varchar(32)	|'15m'	|NOT NULL	|0
 FIELD		|lang		|t_varchar(7)	|'default'|NOT NULL	|ZBX_NODATA
@@ -1979,4 +1979,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6030009	|6030009
+ROW		|1		|6030010	|6030010

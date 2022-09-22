@@ -184,6 +184,13 @@ static int	DBpatch_6030009(void)
 	return DBadd_field("host_rtdata", &field);
 }
 
+static int	DBpatch_6030010(void)
+{
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("users", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -200,5 +207,6 @@ DBPATCH_ADD(6030006, 0, 1)
 DBPATCH_ADD(6030007, 0, 1)
 DBPATCH_ADD(6030008, 0, 1)
 DBPATCH_ADD(6030009, 0, 1)
+DBPATCH_ADD(6030010, 0, 1)
 
 DBPATCH_END()
