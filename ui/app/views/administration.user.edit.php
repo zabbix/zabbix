@@ -386,23 +386,12 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		);
 	}
 
-	$has_enabled_media_types = array_search(MEDIA_TYPE_STATUS_ACTIVE, array_column($data['mediatypes'], 'status'));
-
-	if ($has_enabled_media_types === false) {
-		$add_button = (new CButton(null, _('Add')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass(ZBX_STYLE_RED);
-	}
-	else {
-		$add_button = (new CButton(null, _('Add')))
-			->onClick('PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
-			->addClass(ZBX_STYLE_BTN_LINK);
-	}
-
 	$media_form_list->addRow(_('Media'),
 		(new CDiv([
 			$media_table_info,
-			$add_button
+			(new CButton(null, _('Add')))
+				->onClick('PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
+				->addClass(ZBX_STYLE_BTN_LINK)
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
