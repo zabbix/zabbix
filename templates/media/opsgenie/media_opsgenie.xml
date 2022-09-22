@@ -93,7 +93,7 @@
                 </parameter>
                 <parameter>
                     <name>status_counter</name>
-                    <value>15</value>
+                    <value>25</value>
                 </parameter>
                 <parameter>
                     <name>trigger_id</name>
