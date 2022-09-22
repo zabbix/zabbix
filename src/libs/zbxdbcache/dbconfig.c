@@ -15636,7 +15636,7 @@ int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck
 				continue;
 
 			if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
-					MAINTENANCE_TYPE_NODATA == dc_host->maintenance_status)
+					MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type)
 			{
 				httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, httptest->delay, now);
 				dc_httptest_queue(httptest);
