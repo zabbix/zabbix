@@ -3085,4 +3085,74 @@ out:
     mode: ZBX_VC_MODE_NORMAL
     hits: 0
     misses: 2
+---
+# Test if the active range is not reduced to the daily range each day if there are no new values that day
+test case: Active range change in next few days
+include: &include zbx_vc_get_values.inc.yaml
+in:
+  history: [*include]
+  precache:
+  - time: 2017-01-10 10:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 600
+    count: 0
+    end: 2017-01-10 10:00:01.999999999 +00:00
+  - time: 2017-01-11 11:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 100
+    count: 0
+    end: 2017-01-11 11:10:00.999999999 +00:00
+  test:
+    time: 2017-01-12 12:10:00.000000000 +00:00
+    itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 100
+    count: 0
+    end: 2017-01-12 12:10:00.999999999 +00:00
+out:
+  values: []
+  cache:
+    items:
+      - itemid: 1
+        value type: ITEM_VALUE_TYPE_STR
+        data:
+        - value: value 1.2
+          ts: 2017-01-10 10:00:01.200000000 +00:00
+        - value: value 1.5
+          ts: 2017-01-10 10:00:01.500000000 +00:00
+        - value: value 1.7
+          ts: 2017-01-10 10:00:01.700000000 +00:00
+        - value: value 2.2
+          ts: 2017-01-10 10:00:02.200000000 +00:00
+        - value: value 2.5
+          ts: 2017-01-10 10:00:02.500000000 +00:00
+        - value: value 2.7
+          ts: 2017-01-10 10:00:02.700000000 +00:00
+        - value: value 3.2
+          ts: 2017-01-10 10:00:03.200000000 +00:00
+        - value: value 3.5
+          ts: 2017-01-10 10:00:03.500000000 +00:00
+        - value: value 3.7
+          ts: 2017-01-10 10:00:03.700000000 +00:00
+        - value: value 4.2
+          ts: 2017-01-10 10:00:04.200000000 +00:00
+        - value: value 4.5
+          ts: 2017-01-10 10:00:04.500000000 +00:00
+        - value: value 4.7
+          ts: 2017-01-10 10:00:04.700000000 +00:00
+        - value: value 5.2
+          ts: 2017-01-10 10:00:05.200000000 +00:00
+        - value: value 5.5
+          ts: 2017-01-10 10:00:05.500000000 +00:00
+        - value: value 5.7
+          ts: 2017-01-10 10:00:05.700000000 +00:00
+        status:
+        active_range: 1200
+        values_total: 15
+        db_cached_from: 2017-01-10 09:50:01.000000000 +00:00
+    mode: ZBX_VC_MODE_NORMAL
+    hits: 0
+    misses: 0
 ...
