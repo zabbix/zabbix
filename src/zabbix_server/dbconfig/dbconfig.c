@@ -124,7 +124,6 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			nextcheck = (int)time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
 
 			zbx_vc_remove_items_by_ids(&deleted_itemids);
-			zbx_vector_uint64_clear(&deleted_itemids);
 			zbx_vector_uint64_destroy(&deleted_itemids);
 		}
 		else
