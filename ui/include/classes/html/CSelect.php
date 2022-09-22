@@ -65,6 +65,13 @@ class CSelect extends CTag {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function hasOptions(): bool {
+		return $this->options ? true : false;
+	}
+
+	/**
 	 * @param CSelectOptionGroup $option_group
 	 *
 	 * @return self
