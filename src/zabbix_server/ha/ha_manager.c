@@ -900,7 +900,9 @@ static void	ha_db_register_node(zbx_ha_info_t *info, zbx_ha_config_t *ha_config)
 
 	if (0 != is_ha_cluster(ha_config->ha_node_name) && ZBX_NODE_STATUS_ERROR != info->ha_status &&
 			ZBX_NODE_STATUS_ACTIVE == ha_status)
+	{
 		ha_db_check_unavailable_nodes(info, &nodes, db_time);
+	}
 
 	ha_flush_audit(info);
 
