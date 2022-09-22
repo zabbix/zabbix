@@ -81,7 +81,7 @@ $mediatype_formlist = (new CFormList())
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('SMTP helo'), 'smtp_helo')),
-		(new CTextBox('smtp_helo'))
+		(new CTextBox('smtp_helo', $data['smtp_helo']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(new CLabel(_('Connection security'), 'smtp_security'),
