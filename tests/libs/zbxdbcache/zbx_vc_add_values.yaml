@@ -985,7 +985,7 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC17
-# Test that adding values to item not accessed for a day causes item to be dropped
+# Test that adding values to item not accessed for a day does not cause item to be dropped
 test case: Add values after item was not accessed for a day
 in:
   history:
@@ -1030,5 +1030,18 @@ out:
   cache:
     items:
     - itemid: 1
+      value type: ITEM_VALUE_TYPE_STR
+      data:
+      - *row42
+      - *row45
+      - *row47
+      - *row52
+      - *row55
+      - *row57
+      - *new1
+      status:
+      active_range: 601
+      values_total: 7
+      db_cached_from: 2017-01-10 10:00:00.000000000 +00:00
     mode: ZBX_VC_MODE_NORMAL
 ...
