@@ -2252,7 +2252,8 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 	return dst;
 }
 
-static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint32_t revision, int flags, zbx_synced_new_config_t synced)
+static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint32_t revision, int flags, zbx_synced_new_config_t synced,
+		zbx_vector_uint64_t *deleted_itemids)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -2882,9 +2883,15 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint32_t revision, int flags, z
 
 	zbx_vector_ptr_destroy(&dep_items);
 
+	if (NULL != deleted_itemids)
+		zbx_vector_uint64_reserve(deleted_itemids, sync->remove_num);
+
 	/* remove deleted items from cache */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
+		if (NULL != deleted_itemids)
+			zbx_vector_uint64_append(deleted_itemids, rowid);
+
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &rowid)))
 			continue;
 
@@ -5974,7 +5981,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
-	DCsync_items(&items_sync, new_revision, flags, synced);
+	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6483,9 +6490,6 @@ out:
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reschedule : " ZBX_FS_DBL " sec.", __func__, queues_sec);
 	}
 clean:
-	if (NULL != deleted_itemids)
-		zbx_dbsync_get_deleted_itemids(deleted_itemids);
-
 	zbx_dbsync_clear(&config_sync);
 	zbx_dbsync_clear(&autoreg_config_sync);
 	zbx_dbsync_clear(&autoreg_host_sync);

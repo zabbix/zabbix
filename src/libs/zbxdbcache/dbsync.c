@@ -1738,16 +1738,6 @@ out:
 	return ret;
 }
 
-void	zbx_dbsync_get_deleted_itemids(zbx_vector_uint64_t *itemids)
-{
-	if (0 == dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM)].deletes.values_num)
-		return;
-
-	zbx_vector_uint64_append_array(itemids,
-			dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM)].deletes.values,
-			dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM)].deletes.values_num);
-}
-
 static int	dbsync_compare_item_discovery(const ZBX_DC_ITEM_DISCOVERY *item_discovery, const DB_ROW dbrow)
 {
 	return dbsync_compare_uint64(dbrow[1], item_discovery->parent_itemid);
