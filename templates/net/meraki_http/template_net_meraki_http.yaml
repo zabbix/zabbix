@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-09-14T20:31:09Z'
+  date: '2022-09-22T22:38:56Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -120,7 +120,7 @@ zabbix_export:
           description: 'This macro is used in organizations discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$MERAKI.TOKEN}'
-          value: 1602d56388ae3a7b76d272a7887542a1cf86019c
+          value: ''
           description: 'Cisco Meraki Dashboard API Token.'
     -
       uuid: 39e2f742d0b24ea489b7f61d27a5df1c
@@ -158,7 +158,7 @@ zabbix_export:
           name: 'Meraki: Get list of configuration changes'
           type: HTTP_AGENT
           key: meraki.get.configuration.changes
-          delay: 20m
+          delay: '{$MERAKI.CONFIG.CHANGE.TIMESPAN}'
           history: 7d
           trends: '0'
           value_type: TEXT
@@ -169,7 +169,7 @@ zabbix_export:
               parameters:
                 - 2h
           timeout: 30s
-          url: 'https://{$MERAKI.API.URL}/organizations/{$ID}/configurationChanges?timespan=1200'
+          url: 'https://{$MERAKI.API.URL}/organizations/{$ID}/configurationChanges?timespan={$MERAKI.CONFIG.CHANGE.TIMESPAN}'
           headers:
             -
               name: X-Cisco-Meraki-API-Key
@@ -224,7 +224,7 @@ zabbix_export:
             
                 if (request.getStatus() !== 200) {
                     if (response.errors) {
-                        throw response.errors;
+                        throw response.errors.join(', ');
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
                     }
@@ -251,13 +251,15 @@ zabbix_export:
                     params.url += '/';
                 }
             
-                devices = getHttpData(params.url + '/organizations/' + params.organizationId + '/devices/statuses');
-                uplinksLL = getHttpData(params.url + '/organizations/' + params.organizationId + '/devices/uplinksLossAndLatency?timespan=60');
+                devices = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/devices/statuses');
+                uplinksLL = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/devices/uplinksLossAndLatency?timespan=60');
             
                 for (i in uplinksLL) {
                     device = devices.filter(function (x) { return x.serial == uplinksLL[i].serial; });
             
-                    uplinksLL[i].deviceName = device[0].name;
+                    if (Array.isArray(device)){
+                        uplinksLL[i].deviceName = device[0].name;
+                    }
                 }
             
             } catch (error) {
@@ -376,7 +378,7 @@ zabbix_export:
             
                 if (request.getStatus() !== 200) {
                     if (response.errors) {
-                        throw response.errors;
+                        throw response.errors.join(', ');
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
                     }
@@ -403,9 +405,9 @@ zabbix_export:
                     params.url += '/';
                 }
             
-                networks = getHttpData(params.url + '/organizations/' + params.organizationId + '/networks');
+                networks = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/networks');
             
-                responseUplinks = getHttpData(params.url + '/organizations/' + params.organizationId + '/appliance/uplink/statuses');
+                responseUplinks = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/appliance/uplink/statuses');
             
                 for (var i in responseUplinks) {
                     network = networks.filter(function (x) { return x.id == responseUplinks[i].networkId; });
@@ -516,7 +518,7 @@ zabbix_export:
             
                 if (request.getStatus() !== 200) {
                     if (response.errors) {
-                        throw response.errors;
+                        throw response.errors.join(', ');
                     } else {
                         throw 'Failed to receive data: invalid response status code.';
                     }
@@ -543,7 +545,7 @@ zabbix_export:
                     params.url += '/';
                 }
             
-                vpnStats = getHttpData(params.url + '/organizations/' + params.organizationId + '/appliance/vpn/stats');
+                vpnStats = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/appliance/vpn/stats');
             
                 for (i in vpnStats) {
                     for (u in vpnStats[i].merakiVpnPeers) {
@@ -1533,6 +1535,10 @@ zabbix_export:
           value: api.meraki.com/api/v1
           description: 'Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1'
         -
+          macro: '{$MERAKI.CONFIG.CHANGE.TIMESPAN}'
+          value: '1200'
+          description: 'Timespan for gathering config change log. Used in metric config and in URL query.'
+        -
           macro: '{$MERAKI.DEVICE.LATENCY}'
           value: '150'
           description: 'Devices uplink latency threshold in ms.'
@@ -1546,7 +1552,7 @@ zabbix_export:
           description: 'Time in seconds for license to expire.'
         -
           macro: '{$MERAKI.TOKEN}'
-          value: 1602d56388ae3a7b76d272a7887542a1cf86019c
+          value: ''
           description: 'Cisco Meraki Dashboard API Token.'
       valuemaps:
         -

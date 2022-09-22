@@ -4,7 +4,7 @@
 ## Overview
 
 For Zabbix version: 6.0 and higher  
-The template to monitor Cisco Meraki dashboard by Zabbix that work without any external scripts.
+The template to monitor Cisco Meraki dashboard by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.  
 
 
@@ -35,7 +35,7 @@ No specific Zabbix configuration is required.
 |{$MERAKI.API.URL} |<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p> |`api.meraki.com/api/v1` |
 |{$MERAKI.ORGANIZATION.NAME.MATCHES} |<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p> |`.+` |
 |{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES} |<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p> |`CHANGE_IF_NEEDED` |
-|{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`1602d56388ae3a7b76d272a7887542a1cf86019c` |
+|{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`` |
 
 ## Template links
 
@@ -83,10 +83,11 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$MERAKI.API.URL} |<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p> |`api.meraki.com/api/v1` |
+|{$MERAKI.CONFIG.CHANGE.TIMESPAN} |<p>Timespan for gathering config change log. Used in metric config and in URL query.</p> |`1200` |
 |{$MERAKI.DEVICE.LATENCY} |<p>Devices uplink latency threshold in ms.</p> |`150` |
 |{$MERAKI.DEVICE.LOSS} |<p>Devices uplink loss threshold in percents.</p> |`15` |
 |{$MERAKI.LICENSE.EXPIRE} |<p>Time in seconds for license to expire.</p> |`86400` |
-|{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`1602d56388ae3a7b76d272a7887542a1cf86019c` |
+|{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`` |
 
 ## Template links
 
