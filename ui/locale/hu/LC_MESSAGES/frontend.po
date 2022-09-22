@@ -1,32 +1,33 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2013-01-09 22:10+0300\n"
-"Last-Translator: Robert <szenasy.robert@gmail.com>\n"
+"PO-Revision-Date: 2022-09-19 09:57+0000\n"
+"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1357762227.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr ""
+msgstr "\"%1$s\" dátumnak korábbinak kell lenni a \"%2$s\" dátumnál."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" helyett \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:323
 #: include/classes/import/validators/C10XmlValidator.php:341
@@ -44,125 +45,125 @@ msgstr ""
 #: include/classes/import/validators/C62XmlValidator.php:2050
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "\"%1$s\" várható"
 
 #: include/classes/api/services/CReport.php:229
 #: include/classes/api/services/CReport.php:636
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "A „%1$s” üresnek kell lennie, vagy nagyobbnak kell lennie, mint „%2$s”."
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "Az „%1$s” értékének kisebbnek vagy egyenlőnek kell lennie, „%2$s” értékkel"
 
 #: include/classes/import/validators/C10XmlValidator.php:360
 #: include/classes/import/validators/C10XmlValidator.php:383
 #: include/classes/import/validators/C10XmlValidator.php:405
 msgid "\"host:key\" pair is expected"
-msgstr ""
+msgstr "\"host:key\" pár várható"
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
-msgstr ""
+msgstr "A függő elem és a fő elem \"hostid\"-jének meg kell egyeznie"
 
 #: include/classes/api/services/CItemGeneral.php:2306
 msgid "\"ruleid\" of dependent item and master item should match"
-msgstr ""
+msgstr "A függő elem és a törzselem \"ruleid\"-ének meg kell egyeznie"
 
 #: include/forms.inc.php:1334
 #: include/views/configuration.host.discovery.edit.php:901
 #: include/views/js/configuration.host.discovery.edit.js.php:86
 #: include/views/js/item.preprocessing.js.php:171
 msgid "$.path.to.node"
-msgstr ""
+msgstr "$.path.to.node"
 
 #: include/classes/api/services/CDRule.php:556
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
-msgstr ""
+msgstr "A %1$d karakter meghaladja a maximális %2$d karaktert"
 
 #: include/func.inc.php:488
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d nap"
+msgstr[1] "%1$d nap"
 
 #: jsLoader.php:347
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "%1$d egyezés található a következőre: %2$s"
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d/%3$d%2$s probléma látható"
+msgstr[1] "%1$d/%3$d%2$s probléma látható"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d probléma kiválasztva."
 
 #: chart4.php:94
 #, c-format
 msgid "%1$s (year %2$s)"
-msgstr ""
+msgstr "%1$s (%2$s év)"
 
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s – a következő helyen található modul dobta: %2$s."
 
 #: include/classes/api/services/CItemGeneral.php:2654
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [Sor: %2$s | Oszlop: %3$s]"
 
 #: include/actions.inc.php:1893
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s művelet"
+msgstr[1] "%1$s műveletek"
 
 #: jsLoader.php:328
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s karakterek"
 
 #: jsLoader.php:329
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s karakter maradt"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s esemény"
+msgstr[1] "%1$s események"
 
 #: include/maps.inc.php:410
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s hoszt karbantartás alatt"
+msgstr[1] "%1$s hoszt karbantartás alatt"
 
 #: include/func.inc.php:2549
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s óra"
+msgstr[1] "%1$s órák"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:126
 #: app/controllers/CControllerWidgetPlainTextView.php:127
@@ -170,16 +171,16 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s elem"
+msgstr[1] "%1$s elemek"
 
 #: include/actions.inc.php:1731
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s üzenet"
+msgstr[1] "%1$s üzenetek"
 
 #: include/classes/widgets/CWidgetConfig.php:308
 #: include/classes/widgets/CWidgetConfig.php:309
@@ -189,41 +190,41 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s perc"
+msgstr[1] "%1$s percek"
 
 #: include/classes/helpers/CMapHelper.php:316
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s/%2$s elem problémás állapotban"
+msgstr[1] "%1$s/%2$s elem problémás állapotban"
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$s percentile: %2$s"
-msgstr ""
+msgstr "%1$s százalékos: %2$s"
 
 #: jsLoader.php:348
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr ""
+msgstr "%1$s előre kiválasztva, használja a le, fel nyílbillentyűket és az Enter billentyűt a kiválasztáshoz"
 
 #: include/maps.inc.php:340 include/maps.inc.php:344 include/maps.inc.php:351
 #: include/maps.inc.php:400
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s probléma"
+msgstr[1] "%1$s problémák"
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Összesen %1$s probléma"
+msgstr[1] "Összesen %1$s probléma"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
 #: include/actions.inc.php:2172
@@ -231,8 +232,8 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s újrapróbálkozás maradt"
+msgstr[1] "%1$s újrapróbálkozás maradt"
 
 #: app/views/administration.user.edit.php:671
 #: include/classes/widgets/CWidgetConfig.php:306
@@ -241,82 +242,82 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s másodperc"
+msgstr[1] "%1$s másodpercek"
 
 #: include/maps.inc.php:368 include/maps.inc.php:371 include/maps.inc.php:378
 #: include/maps.inc.php:383
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s nyugtázatlan probléma"
+msgstr[1] "%1$s nyugtázatlan probléma"
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
 #: app/views/monitoring.widget.problems.view.php:207
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
-msgstr ""
+msgstr "%1$s, súlyosság, %2$s"
 
 #: jsLoader.php:342
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
-msgstr ""
+msgstr "%1$s, csak olvasható"
 
 #: jsLoader.php:388
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, kiválasztva"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "%1$s. százalékos: %2$s"
 
 #: include/func.inc.php:1947
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%4$s sikertelen bejelentkezési kísérlet naplózva. Az utolsó sikertelen próbálkozás %1$s-tól indult, %2$s, %3$s."
+msgstr[1] "%4$s sikertelen bejelentkezési kísérlet naplózva. Az utolsó sikertelen próbálkozás %1$s-tól indult, %2$s, %3$s."
 
 #: include/classes/screens/CScreenDiscovery.php:213
 #, c-format
 msgid "%d device"
 msgid_plural "%d devices"
 msgstr[0] "%d eszköz"
-msgstr[1] "%d eszköz"
+msgstr[1] "%d eszközök"
 
 #: include/users.inc.php:143
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: app/partials/popup.operations.php:56
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - végtelen)"
 
 #: app/partials/popup.operations.php:67
 msgid "(0 - use action default)"
-msgstr ""
+msgstr "(0 - alapértelmezett művelet használata)"
 
 #: include/views/configuration.hostgroups.list.php:37
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Csak kiemelt rendszergazdák hozhatnak létre csoportokat)"
 
 #: app/partials/configuration.tags.tab.php:84
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(Automatikus felderítés által létrehozva)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
-msgstr ""
+msgstr "(Automatikus felderítés által összekapcsolva)"
 
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
@@ -327,7 +328,7 @@ msgstr "(nincs proxy)"
 
 #: include/classes/setup/CSetupWizard.php:494
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - alapértelmezett port használata"
 
 #: include/triggers.inc.php:1594
 msgid "0 or 1"
@@ -345,19 +346,19 @@ msgstr "10 másodperc"
 
 #: include/views/reports.toptriggers.php:118 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr ""
+msgstr "100 legforgalmasabb trigger"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:184
 msgid "12-hour"
-msgstr ""
+msgstr "12 órás"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:183
 msgid "24-hour"
-msgstr ""
+msgstr "24 óra"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
-msgstr ""
+msgstr "24x7"
 
 #: app/views/administration.queue.overview.php:49
 #: app/views/administration.queue.overview.proxy.php:49
@@ -385,84 +386,84 @@ msgstr "500 legfrissebb érték"
 #: app/views/js/popup.itemtestedit.view.js.php:37
 #: app/views/js/popup.itemtestedit.view.js.php:44
 msgid "<empty string>"
-msgstr ""
+msgstr "<üres szöveg>"
 
 #: include/forms.inc.php:1406 include/views/js/item.preprocessing.js.php:220
 msgid "<label name>"
-msgstr ""
+msgstr "<címke neve>"
 
 #: include/views/monitoring.sysmap.edit.php:129
 msgid "<manual>"
-msgstr ""
+msgstr "<kézi>"
 
 #: include/forms.inc.php:1389 include/forms.inc.php:1414
 #: include/views/js/item.preprocessing.js.php:218
 #: include/views/js/item.preprocessing.js.php:227
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
-msgstr ""
+msgstr "<metrika neve>{<címkenév>=\"<címkeérték>\", ...} == <érték>"
 
 #: app/views/administration.script.edit.php:111
 msgid "<sub-menu/sub-menu/...>"
-msgstr ""
+msgstr "<almenü/almenü/...>"
 
 #: jsLoader.php:185
 msgctxt "abbreviation of severity level"
 msgid "A"
-msgstr ""
+msgstr "A"
 
 #: include/classes/widgets/CWidgetHelper.php:952
 msgid "ADD OVERRIDE"
-msgstr ""
+msgstr "FELÜLVIZSGÁLAT HOZZÁADÁSA"
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
-msgstr ""
+msgstr "API hozzáférés"
 
 #: app/controllers/CControllerPopupGeneric.php:333
 #: app/views/administration.userrole.edit.php:287
 msgid "API methods"
-msgstr ""
+msgstr "API módszerek"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "API token"
-msgstr ""
+msgstr "API token"
 
 #: include/classes/api/services/CToken.php:299
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr ""
+msgstr "A „%1$s” API-token már létezik a „%2$s” felhasználói azonosítóhoz."
 
 #: app/controllers/CControllerTokenCreate.php:109
 #: app/controllers/CControllerTokenCreate.php:131
 msgid "API token added"
-msgstr ""
+msgstr "API token hozzáadva"
 
 #: app/controllers/CControllerTokenDelete.php:67
 msgid "API token deleted"
 msgid_plural "API tokens deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "API token törölve"
+msgstr[1] "API token törölve"
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "API token letiltva"
+msgstr[1] "API tokenek letiltva"
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "API token engedélyezve"
+msgstr[1] "API tokenek engedélyezve"
 
 #: include/classes/api/clients/CLocalApiClient.php:198
 msgid "API token expired."
-msgstr ""
+msgstr "API token lejárt."
 
 #: app/controllers/CControllerTokenUpdate.php:107
 #: app/controllers/CControllerTokenUpdate.php:138
 msgid "API token updated"
-msgstr ""
+msgstr "API token frissítve"
 
 #: app/controllers/CControllerPopupTokenEdit.php:114
 #: app/controllers/CControllerPopupTokenView.php:74
@@ -474,19 +475,19 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:396 include/html.inc.php:820
 #: include/html.inc.php:900
 msgid "API tokens"
-msgstr ""
+msgstr "API tokenek"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:251
 msgid "Above value"
-msgstr ""
+msgstr "Érték felett"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
-msgstr ""
+msgstr "Abszcissza"
 
 #: include/func.inc.php:1578
 msgid "Access denied"
-msgstr ""
+msgstr "Hozzáférés megtagadva"
 
 #: sysmap.php:81
 msgid "Access denied!"
@@ -495,27 +496,27 @@ msgstr "Hozzáférés megtagadva!"
 #: app/views/administration.user.edit.php:603
 #: app/views/administration.userrole.edit.php:273
 msgid "Access to API"
-msgstr ""
+msgstr "Hozzáférés az API-hoz"
 
 #: app/views/administration.user.edit.php:456
 #: app/views/administration.userrole.edit.php:83
 msgid "Access to UI elements"
-msgstr ""
+msgstr "Hozzáférés a felhasználói felület elemeihez"
 
 #: app/views/administration.user.edit.php:632
 #: app/views/administration.userrole.edit.php:322
 msgid "Access to actions"
-msgstr ""
+msgstr "Hozzáférés a műveletekhez"
 
 #: app/views/administration.user.edit.php:574
 #: app/views/administration.userrole.edit.php:224
 msgid "Access to modules"
-msgstr ""
+msgstr "Hozzáférés a modulokhoz"
 
 #: app/views/administration.user.edit.php:478
 #: app/views/administration.userrole.edit.php:136
 msgid "Access to services"
-msgstr ""
+msgstr "Hozzáférés a szolgáltatásokhoz"
 
 #: app/views/hintbox.eventlist.php:76
 #: app/views/monitoring.widget.problems.view.php:66 include/actions.inc.php:161
@@ -532,11 +533,11 @@ msgstr "Nyugtázom"
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
-msgstr "Visszaigazolás"
+msgstr "Nyugtázás"
 
 #: include/classes/helpers/CRoleHelper.php:463
 msgid "Acknowledge problems"
-msgstr ""
+msgstr "Nyugtázott problémák"
 
 #: app/views/popup.condition.common.php:684 include/actions.inc.php:2075
 #: include/events.inc.php:196
@@ -545,11 +546,11 @@ msgstr "Nyugtázva"
 
 #: app/views/administration.trigdisplay.edit.php:53
 msgid "Acknowledged PROBLEM events"
-msgstr "Nyugtázott PROBLEM események"
+msgstr "Nyugtázott probléma események"
 
 #: app/views/administration.trigdisplay.edit.php:77
 msgid "Acknowledged RESOLVED events"
-msgstr ""
+msgstr "Nyugtázva megoldott események"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -621,31 +622,31 @@ msgstr ""
 #: include/views/monitoring.sysmap.edit.php:324
 #: include/views/monitoring.sysmap.edit.php:361
 msgid "Action"
-msgstr "Eljárás"
+msgstr "Művelet"
 
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr "Eljárás"
+msgstr "Művelet"
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "A \"%1$s\" művelet már létezik."
 
 #: include/classes/api/services/CRole.php:761
 #, c-format
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "A „%2$s” művelet nem érhető el a „%1$s” felhasználói szerepkörhöz."
 
 #: actionconf.php:301
 msgid "Action added"
-msgstr "Eljárás hozzáadva"
+msgstr "Művelet hozzáadva"
 
 #: include/classes/core/ZBase.php:500
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "A(z) %1$s művelet osztálynak ki kell terjesztenie a(z) %2$s osztályt."
 
 #: actionconf.php:323
 msgid "Action deleted"
@@ -654,31 +655,31 @@ msgstr "Eljárás törölve"
 #: actionconf.php:491
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Művelet letiltva"
+msgstr[1] "Műveletek letiltva"
 
 #: actionconf.php:490
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Művelet engedélyezve"
+msgstr[1] "Műveletek engedélyezve"
 
 #: auditacts.php:27 include/classes/helpers/CMenuHelper.php:151
 #: include/classes/helpers/CRoleHelper.php:383
 #: include/classes/widgets/CWidgetConfig.php:52
 #: include/views/administration.auditacts.list.php:27
 msgid "Action log"
-msgstr ""
+msgstr "Műveletnapló"
 
 #: app/views/administration.script.edit.php:102
 #: app/views/administration.script.list.php:52
 #: app/views/administration.script.list.php:91
 msgid "Action operation"
-msgstr ""
+msgstr "Műveletek"
 
 #: actionconf.php:293
 msgid "Action updated"
-msgstr "Eljárás frissítve"
+msgstr "Művelet frissítve"
 
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
@@ -695,12 +696,12 @@ msgstr "Eljárás frissítve"
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
 msgid "Actions"
-msgstr "Eljárások"
+msgstr "Műveletek"
 
 #: app/views/monitoring.widget.problems.view.php:79
 msgctxt "compact table header"
 msgid "Actions"
-msgstr "Eljárások"
+msgstr "Műveletek"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -717,12 +718,12 @@ msgstr "Aktív"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "Aktív ellenőrzések"
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
 msgid "Active since"
-msgstr "Aktív ettől"
+msgstr "óta aktív"
 
 #: include/views/configuration.maintenance.edit.php:119
 #: include/views/configuration.maintenance.list.php:92 maintenance.php:47
@@ -882,76 +883,76 @@ msgstr "Hozzáadás"
 
 #: app/views/js/administration.mediatype.edit.js.php:133
 msgid "Add (message type limit reached)"
-msgstr ""
+msgstr "Hozzáadás (elérte az üzenettípusok korlátját)"
 
 #: jsLoader.php:149
 msgid "Add a new widget"
-msgstr ""
+msgstr "Új WIDGET hozzáadása"
 
 #: jsLoader.php:204
 msgid "Add child element"
-msgstr ""
+msgstr "Kapcsolódó elem hozzáadása"
 
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
-msgstr ""
+msgstr "Kapcsolódó szolgáltatás hozzáadása"
 
 #: app/views/js/popup.service.edit.js.php:401
 msgid "Add child services"
-msgstr ""
+msgstr "Kapcsolódó szolgáltatások hozzáadása"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
-msgstr ""
+msgstr "Hozzáadás innen"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
-msgstr "Új hoszt"
+msgstr "Hoszt hozzáadása"
 
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
 msgid "Add host trigger"
-msgstr ""
+msgstr "Hoszt trigger hozzáadása"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr ""
+msgstr "Tételoszlop hozzáadása"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
 msgid "Add missing"
-msgstr ""
+msgstr "Hiányzó hozzáadása"
 
 #: jsLoader.php:205
 msgid "Add multiple maps"
-msgstr ""
+msgstr "Több térkép hozzáadása"
 
 #: include/classes/widgets/CWidgetHelper.php:1378
 msgid "Add new data set"
-msgstr ""
+msgstr "Új adatkészlet hozzáadása"
 
 #: app/partials/configuration.host.edit.html.php:256
 #: include/views/configuration.host.prototype.edit.php:267
 msgid "Add new interface"
-msgstr ""
+msgstr "Új felület hozzáadása"
 
 #: include/classes/widgets/CWidgetHelper.php:906
 msgid "Add new override"
-msgstr ""
+msgstr "Új felülírás hozzáadása"
 
 #: app/views/js/configuration.dashboard.edit.js.php:202
 #: app/views/js/monitoring.dashboard.view.js.php:290
 msgid "Add page"
-msgstr ""
+msgstr "Oldal hozzáadása"
 
 #: app/views/js/popup.service.edit.js.php:431
 msgid "Add parent services"
-msgstr ""
+msgstr "Kapcsolódó szolgáltatások hozzáadása"
 
 #: include/classes/helpers/CRoleHelper.php:461
 msgid "Add problem comments"
-msgstr ""
+msgstr "Megjegyzések hozzáadása a problémához"
 
 #: app/views/popup.massupdate.trigger.php:101
 #: include/views/configuration.graph.edit.php:410
@@ -961,64 +962,64 @@ msgstr "Prototípus hozzáadása"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:127
 msgid "Add scheduled report"
-msgstr ""
+msgstr "Ütemezett jelentés hozzáadása"
 
 #: app/views/js/administration.userrole.edit.js.php:210
 msgid "Add services"
-msgstr ""
+msgstr "Szolgáltatások hozzáadása"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:68
 msgid "Add submaps"
-msgstr ""
+msgstr "Altérképek hozzáadása"
 
 #: app/controllers/CControllerFavouriteDelete.php:69 include/html.inc.php:153
 msgid "Add to favorites"
-msgstr ""
+msgstr "Hozzáadás a kedvencekhez"
 
 #: include/actions.inc.php:1033
 msgid "Add to host group"
-msgstr ""
+msgstr "Hozzáadás csoporthoz"
 
 #: include/actions.inc.php:714
 msgid "Add to host groups"
-msgstr ""
+msgstr "Hozzáadás csoportokhoz"
 
 #: app/partials/scheduledreport.subscription.php:42
 msgid "Add user"
-msgstr ""
+msgstr "Felhasználó hozzáadása"
 
 #: app/partials/scheduledreport.subscription.php:46
 msgid "Add user group"
-msgstr ""
+msgstr "Felhasználói csoport hozzáadása"
 
 #: app/views/js/configuration.dashboard.edit.js.php:198
 #: app/views/js/monitoring.dashboard.view.js.php:286
 #: app/views/monitoring.dashboard.widget.edit.php:35
 msgid "Add widget"
-msgstr ""
+msgstr "Widget hozzáadása"
 
 #: app/controllers/CControllerAuditLogList.php:356
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
-msgstr ""
+msgstr "Hozzáadva"
 
 #: jsLoader.php:340
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
-msgstr ""
+msgstr "Hozzáadva, %1$s"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "Additional rule"
-msgstr ""
+msgstr "Kiegészítő szabály"
 
 #: app/views/popup.service.edit.php:182
 msgid "Additional rules"
-msgstr ""
+msgstr "Kiegészítő szabályok"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Address"
-msgstr ""
+msgstr "Cím"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1032,15 +1033,15 @@ msgstr "Adminisztráció"
 #: app/views/popup.service.edit.php:158
 #: include/classes/widgets/forms/CWidgetFormItem.php:69
 msgid "Advanced configuration"
-msgstr ""
+msgstr "Speciális konfiguráció"
 
 #: include/views/monitoring.sysmap.edit.php:160
 msgid "Advanced labels"
-msgstr ""
+msgstr "Speciális címkék"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
-msgstr ""
+msgstr "Érték után"
 
 #: include/events.inc.php:288
 msgid "Age"
@@ -1048,7 +1049,7 @@ msgstr "Kor"
 
 #: app/partials/monitoring.problem.filter.php:116
 msgid "Age less than"
-msgstr ""
+msgstr "Életkor kevesebb, mint"
 
 #: app/views/administration.script.list.php:164 include/hosts.inc.php:1191
 #: include/items.inc.php:347 include/views/configuration.httpconf.edit.php:98
@@ -1058,19 +1059,19 @@ msgstr "Ügynök"
 
 #: include/classes/data/CItemData.php:818
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
-msgstr ""
+msgstr "Ügynök rendelkezésre állás ellenőrzése. Semmit nem ad vissza – nem elérhető; 1 - elérhető"
 
 #: app/views/configuration.host.list.php:197
 msgid "Agent encryption"
-msgstr ""
+msgstr "Ügynök titkosítás"
 
 #: include/classes/data/CItemData.php:810
 msgid "Agent host metadata. Returns string"
-msgstr ""
+msgstr "Ügynök hoszt metaadatai. A karakterláncot adja vissza"
 
 #: include/classes/data/CItemData.php:814
 msgid "Agent host name. Returns string"
-msgstr ""
+msgstr "Ügynök hoszt neve. A karakterláncot adja vissza"
 
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
@@ -1078,33 +1079,33 @@ msgstr "Ügynök interface"
 
 #: include/classes/data/CItemData.php:822
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Ügynökváltozat ellenőrzése. 1-et ad vissza - Zabbix ügynök esetén; 2 - Zabbix ügynök 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1317
 msgid "Aggregate"
-msgstr ""
+msgstr "Összesített"
 
 #: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
-msgstr ""
+msgstr "Összesített függvények"
 
 #: app/views/popup.tophosts.column.edit.php:120
 #: include/classes/widgets/CWidgetHelper.php:1289
 msgid "Aggregation function"
-msgstr ""
+msgstr "Aggregációs függvény"
 
 #: app/views/popup.tophosts.column.edit.php:139
 #: include/classes/widgets/CWidgetHelper.php:1308
 msgid "Aggregation interval"
-msgstr ""
+msgstr "Összesítési intervallum"
 
 #: include/actions.inc.php:2106
 msgid "Alert message"
-msgstr ""
+msgstr "Figyelmeztető üzenet"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
-msgstr ""
+msgstr "Algoritmus"
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -1112,7 +1113,7 @@ msgstr "Másodlagos név"
 
 #: include/views/monitoring.sysmap.constructor.php:75
 msgid "Align map elements"
-msgstr ""
+msgstr "A térképelemek igazítása"
 
 #: app/controllers/CControllerAuditLogList.php:172
 #: app/controllers/CControllerAuditLogList.php:173
@@ -1131,65 +1132,65 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:178
 #: include/views/monitoring.sysmap.edit.php:263 jsLoader.php:413
 msgid "All"
-msgstr "Mind"
+msgstr "Összes"
 
 #: app/views/monitoring.dashboard.view.php:186
 msgid "All dashboards"
-msgstr ""
+msgstr "Minden műszerfal"
 
 #: app/views/monitoring.charts.view.php:83
 msgid "All graphs"
-msgstr ""
+msgstr "Minden grafikon"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
 #: app/views/administration.user.edit.php:429
 #: app/views/administration.user.edit.php:435
 msgid "All groups"
-msgstr ""
+msgstr "Minden csoport"
 
 #: app/views/monitoring.host.dashboard.view.php:120 include/html.inc.php:305
 msgid "All hosts"
-msgstr ""
+msgstr "Minden hoszt"
 
 #: jsLoader.php:284
 msgid "All links should have \"Name\" and \"URL\" specified"
-msgstr ""
+msgstr "Minden linknél meg kell adni a „Név” és az „URL” kifejezést"
 
 #: include/html.inc.php:516
 msgid "All maps"
-msgstr ""
+msgstr "Minden térkép"
 
 #: include/views/configuration.trigger.prototype.edit.php:514
 #: include/views/configuration.triggers.edit.php:543
 msgid "All problems"
-msgstr ""
+msgstr "Minden probléma"
 
 #: include/views/configuration.trigger.prototype.edit.php:515
 #: include/views/configuration.triggers.edit.php:544
 msgid "All problems if tag values match"
-msgstr ""
+msgstr "Minden probléma, ha a címkeértékek egyeznek"
 
 #: app/controllers/CControllerServiceListGeneral.php:150
 msgid "All services"
-msgstr ""
+msgstr "Minden szolgáltatás"
 
 #: app/partials/administration.usergroup.tagfilters.html.php:47
 msgid "All tags"
-msgstr ""
+msgstr "Minden címke"
 
 #: include/html.inc.php:267
 msgid "All templates"
-msgstr ""
+msgstr "Minden sablon"
 
 #: app/views/administration.userrole.edit.php:291
 msgid "Allow list"
-msgstr ""
+msgstr "Engedélyezési lista"
 
 #: app/views/popup.massupdate.trigger.php:60 include/triggers.inc.php:991
 #: include/views/configuration.trigger.prototype.edit.php:527
 #: include/views/configuration.triggers.edit.php:556
 msgid "Allow manual close"
-msgstr ""
+msgstr "Kézi zárás engedélyezése"
 
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
@@ -1200,23 +1201,23 @@ msgstr "Engedélyezett hosztok"
 
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
-msgstr ""
+msgstr "Engedélyezett módszerek"
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
-msgstr ""
+msgstr "Alternatív megoldásként manuálisan is telepítheti:"
 
 #: include/classes/data/CItemData.php:1442
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "A fizikai memória mennyisége a SWAP-be került, <url> - VMware szolgáltatás URL-je, <uuid> - VMware virtuális gép gazdagép neve"
 
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "A vendég fizikai memóriaoldalainak biztonsági mentéséhez felhasznált gazdagép fizikai memória mennyisége, <url> - VMware szolgáltatás URL-je, <uuid> - VMware virtuális gép gazdagép neve"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
-msgstr ""
+msgstr "Analóg"
 
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:119
@@ -1228,7 +1229,7 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:183
 #: include/views/configuration.triggers.edit.php:383
 msgid "And"
-msgstr ""
+msgstr "És"
 
 #: app/partials/monitoring.host.filter.php:32
 #: app/partials/monitoring.latest.filter.php:93
@@ -1251,11 +1252,11 @@ msgstr ""
 #: include/views/configuration.maintenance.edit.php:143
 #: include/views/js/monitoring.sysmaps.js.php:242
 msgid "And/Or"
-msgstr ""
+msgstr "És/Vagy"
 
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
-msgstr ""
+msgstr "Évente"
 
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:60
@@ -1275,7 +1276,7 @@ msgstr ""
 #: include/triggers.inc.php:1593 include/views/configuration.action.list.php:82
 #: include/views/configuration.maintenance.list.php:69
 msgid "Any"
-msgstr "Bármely"
+msgstr "Bármi"
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -1304,21 +1305,21 @@ msgstr "Alkalmaz"
 
 #: include/views/configuration.hostgroups.edit.php:48
 msgid "Apply permissions and tag filters to all subgroups"
-msgstr ""
+msgstr "Alkalmazzon engedélyeket és címkeszűrőket az összes alcsoportra"
 
 #: app/partials/configuration.templategroup.edit.html.php:47
 msgid "Apply permissions to all subgroups"
-msgstr ""
+msgstr "Engedélyek alkalmazása az összes alcsoportra"
 
 #: include/views/configuration.maintenance.list.php:71
 #: include/views/configuration.maintenance.list.php:105
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr ""
+msgstr "Közeledik"
 
 #: include/classes/widgets/CWidgetHelper.php:1443
 msgid "Approximation"
-msgstr ""
+msgstr "Közelítés"
 
 #: include/func.inc.php:239
 msgid "Apr"
@@ -1330,15 +1331,15 @@ msgstr "Április"
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
-msgstr ""
+msgstr "Biztosan törli ezt a szűrőt?"
 
 #: app/views/js/administration.macros.edit.js.php:86
 msgid "Are you sure you want to delete?"
-msgstr ""
+msgstr "Biztos vagy benne, hogy törölni szeretnéd?"
 
 #: include/classes/html/CButtonQMessage.php:52
 msgid "Are you sure you want to perform this action?"
-msgstr ""
+msgstr "Biztosan végrehajtja ezt a műveletet?"
 
 #: include/views/js/monitoring.sysmaps.js.php:122
 msgid "Area size"
@@ -1350,12 +1351,12 @@ msgstr "Terület típusa"
 
 #: include/items.inc.php:1835
 msgid "Arithmetic"
-msgstr ""
+msgstr "Számtan"
 
 #: app/views/popup.tophosts.column.edit.php:150
 #: include/classes/helpers/CServiceHelper.php:148
 msgid "As is"
-msgstr ""
+msgstr "Amint az"
 
 #: include/views/monitoring.history.php:102
 msgid "As plain text"
@@ -1364,122 +1365,124 @@ msgstr "Szövegként"
 #: app/views/administration.authentication.edit.php:275
 #: app/views/administration.authentication.edit.php:309
 msgid "Assertions"
-msgstr ""
+msgstr "Állítások"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
-msgstr ""
+msgstr "Eszközcímke"
 
 #: include/maintenances.inc.php:70
 #, c-format
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
-msgstr[0] ""
+msgstr[0] "Minden héten %1$s:%2$s %3$s"
+msgstr[1] "Minden %4$s héten %1$s:%2$s %3$s"
 
 #: include/maintenances.inc.php:50
 #, c-format
 msgid "At %1$s:%2$s every day"
 msgid_plural "At %1$s:%2$s every %3$s days"
-msgstr[0] ""
+msgstr[0] "Minden nap %1$s:%2$s"
+msgstr[1] "Minden %3$s nap %1$s:%2$s"
 
 #: include/maintenances.inc.php:112
 #, c-format
 msgid "At %1$s:%2$s on %3$s %4$s of every %5$s"
-msgstr ""
+msgstr "%1$s:%2$s, %3$s %4$s, minden %5$s"
 
 #: include/maintenances.inc.php:121
 #, c-format
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
-msgstr ""
+msgstr "Minden %4$s %3$s. napján %1$s:%2$s"
 
 #: app/views/popup.maintenance.period.php:154
 msgid "At (hour:minute)"
-msgstr ""
+msgstr "(óra:perc)"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:125
 msgid "At least one LDAP server must exist."
-msgstr ""
+msgstr "Legalább egy LDAP-kiszolgálónak léteznie kell."
 
 #: app/views/administration.userrole.edit.php:117
 msgid "At least one UI element must be checked."
-msgstr ""
+msgstr "Legalább egy felhasználói felület elemet ellenőrizni kell."
 
 #: include/classes/api/services/CRole.php:487
 #, c-format
 msgid "At least one UI element must be enabled for user role \"%1$s\"."
-msgstr ""
+msgstr "Legalább egy felhasználói felület elemet engedélyezni kell a „%1$s” felhasználói szerepkörhöz."
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "Legalább egy művelet kötelező."
 
 #: include/classes/api/services/CUser.php:614
 #: include/classes/api/services/CUser.php:1286
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
-msgstr ""
+msgstr "Legalább egy aktív felhasználónak léteznie kell „%1$s” szerepkörrel."
 
 #: include/classes/api/services/CMaintenance.php:683
 msgid "At least one day of the week or day of the month must be specified."
-msgstr ""
+msgstr "A hét legalább egy napját vagy a hónap egy napját meg kell adni."
 
 #: include/classes/api/services/CMaintenance.php:382
 #: include/classes/api/services/CMaintenance.php:574
 #: include/views/configuration.maintenance.edit.php:247
 msgid "At least one host group or host must be selected."
-msgstr ""
+msgstr "Legalább egy hoszt csoportot vagy hosztot ki kell választani."
 
 #: include/classes/api/services/CHostGroup.php:1111
 #: include/classes/api/services/CHostGroup.php:1268
 msgid "At least one host or template must be specified."
-msgstr ""
+msgstr "Legalább egy hosztot vagy sablont meg kell adni."
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr ""
+msgstr "A MySQL, PostgreSQL vagy Oracle közül legalább az egyiket támogatni kell."
 
 #: app/views/configuration.correlation.edit.php:161
 msgid "At least one operation must be selected."
-msgstr ""
+msgstr "Legalább egy műveletet ki kell választani."
 
 #: include/views/configuration.action.edit.php:522
 msgid "At least one operation must exist."
-msgstr ""
+msgstr "Legalább egy műveletnek léteznie kell."
 
 #: include/classes/api/services/CHostGroup.php:1594
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
-msgstr ""
+msgstr "Legalább egy \"%1$s\" vagy \"%2$s\" paramétert engedélyezni kell."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
-msgstr ""
+msgstr "Legalább egy frissítési művelet vagy üzenet kötelező"
 
 #: app/views/popup.acknowledge.edit.php:105
 msgid "At least one update operation or message must exist."
-msgstr ""
+msgstr "Legalább egy frissítési műveletnek vagy üzenetnek léteznie kell."
 
 #: app/partials/popup.operations.php:75
 msgid "At least one user or user group must be selected."
-msgstr ""
+msgstr "Legalább egy felhasználót vagy felhasználói csoportot ki kell választani."
 
 #: include/classes/api/services/CReport.php:343
 msgid "At least one user or user group must be specified."
-msgstr ""
+msgstr "Legalább egy felhasználót vagy felhasználói csoportot meg kell adni."
 
 #: app/views/administration.mediatype.edit.php:342
 msgid "Attempt interval"
-msgstr ""
+msgstr "Kísérleti intervallum"
 
 #: app/views/administration.mediatype.edit.php:337 httpconf.php:43
 #: include/views/configuration.httpconf.edit.php:78
 #: include/views/configuration.httpconf.list.php:141
 msgid "Attempts"
-msgstr ""
+msgstr "Kísérletek"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
-msgstr ""
+msgstr "Attribútum"
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1493,11 +1496,11 @@ msgstr "Audit"
 #: app/views/reports.auditlog.list.php:78
 #: include/classes/helpers/CMenuHelper.php:253 include/html.inc.php:892
 msgid "Audit log"
-msgstr ""
+msgstr "Ellenőrzési napló"
 
 #: app/views/administration.housekeeping.edit.php:180
 msgid "Audit settings"
-msgstr ""
+msgstr "Ellenőrzési beállítások"
 
 #: include/func.inc.php:243
 msgid "Aug"
@@ -1509,11 +1512,11 @@ msgstr "Augusztus"
 
 #: app/views/popup.token.view.php:46
 msgid "Auth token"
-msgstr ""
+msgstr "Auth token"
 
 #: app/views/administration.authentication.edit.php:281
 msgid "AuthN requests"
-msgstr ""
+msgstr "AuthN kérések"
 
 #: app/controllers/CControllerAuditLogList.php:211
 #: app/views/administration.authentication.edit.php:323
@@ -1535,7 +1538,7 @@ msgstr "Autentikációs algoritmus"
 #: include/classes/api/services/CUser.php:2022
 #, c-format
 msgid "Authentication failed: %1$s."
-msgstr ""
+msgstr "A hitelesítés sikertelen: %1$s."
 
 #: app/views/administration.script.edit.php:131
 #: app/views/popup.massupdate.item.php:169
@@ -1549,38 +1552,38 @@ msgstr "Autentikációs mód"
 #: app/views/popup.discovery.check.php:103
 #: app/views/popup.itemtestedit.view.php:202
 msgid "Authentication passphrase"
-msgstr ""
+msgstr "Hitelesítési jelszó"
 
 #: app/partials/configuration.host.interface.row.php:143
 #: app/views/popup.discovery.check.php:96
 #: app/views/popup.itemtestedit.view.php:191
 msgid "Authentication protocol"
-msgstr ""
+msgstr "Hitelesítési protokoll"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:395
 #: app/controllers/CControllerAuthenticationUpdate.php:403
 msgid "Authentication settings updated"
-msgstr ""
+msgstr "A hitelesítési beállítások frissítve"
 
 #: app/views/administration.module.edit.php:40
 #: app/views/administration.module.list.php:77
 msgid "Author"
-msgstr ""
+msgstr "Szerző"
 
 #: app/views/administration.miscconfig.edit.php:87
 msgid "Authorization"
-msgstr ""
+msgstr "Engedélyezés"
 
 #: app/views/popup.tophosts.column.edit.php:162
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:154
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:226
 msgctxt "history source selection method"
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 #: app/views/administration.user.edit.php:261
 msgid "Auto-login"
@@ -1588,11 +1591,11 @@ msgstr "Automatikus belépés"
 
 #: include/classes/api/services/CUser.php:1012
 msgid "Auto-login and auto-logout options cannot be enabled together."
-msgstr ""
+msgstr "Az automatikus bejelentkezés és az automatikus kijelentkezés opciói nem engedélyezhetők együtt."
 
 #: app/views/administration.user.edit.php:266
 msgid "Auto-logout"
-msgstr ""
+msgstr "Automatikus kijelentkezés"
 
 #: app/partials/configuration.host.edit.html.php:360
 #: app/partials/popup.operations.php:228
@@ -1605,12 +1608,12 @@ msgstr "Automatikus"
 
 #: include/views/monitoring.sysmap.edit.php:140
 msgid "Automatic icon mapping"
-msgstr ""
+msgstr "Automatikus ikonhozzárendelés"
 
 #: include/views/js/monitoring.sysmaps.js.php:260
 #: include/views/js/monitoring.sysmaps.js.php:693
 msgid "Automatic icon selection"
-msgstr ""
+msgstr "Automatikus ikonválasztás"
 
 #: app/controllers/CControllerAuditLogList.php:212
 #: app/controllers/CControllerAutoregEdit.php:67
@@ -1620,16 +1623,16 @@ msgstr ""
 #: include/classes/helpers/CMediatypeHelper.php:189
 #: include/classes/helpers/CMenuHelper.php:249 include/html.inc.php:890
 msgid "Autoregistration"
-msgstr ""
+msgstr "Automatikus regisztráció"
 
 #: include/classes/helpers/CMenuHelper.php:209
 #: include/views/configuration.action.list.php:36
 msgid "Autoregistration actions"
-msgstr ""
+msgstr "Automatikus regisztrációs műveletek"
 
 #: app/views/administration.housekeeping.edit.php:87
 msgid "Autoregistration data storage period"
-msgstr ""
+msgstr "Automatikus regisztrációs adattárolási időszak"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:196
@@ -1659,24 +1662,24 @@ msgstr "Átlagos"
 
 #: include/classes/data/CItemData.php:1522
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "A virtuális lemezre küldött olvasási kérések átlagos száma a gyűjtési intervallum alatt , <url> - VMware szolgáltatás URL-je, <uuid> - VMware virtuális gép gazdagép neve, <példány> - lemezeszköz példány"
 
 #: include/classes/data/CItemData.php:1542
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "A virtuális lemezre intézett függőben lévő írási kérelmek átlagos száma a gyűjtési intervallum alatt, <url> - VMware szolgáltatás URL-je, <uuid> - VMware virtuális gép gazdagép neve, <példány> - lemezeszköz példány"
 
 #: app/views/administration.authentication.edit.php:93
 msgid "Avoid easy-to-guess passwords"
-msgstr ""
+msgstr "Kerülje a könnyen kitalálható jelszavakat"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:307
 msgid "Axes"
-msgstr ""
+msgstr "Axes"
 
 #: include/classes/setup/CSetupWizard.php:334
 #: include/classes/setup/CSetupWizard.php:755
 msgid "Back"
-msgstr ""
+msgstr "Vissza"
 
 #: app/views/administration.image.edit.php:74
 #: app/views/administration.image.list.php:52
@@ -1687,7 +1690,7 @@ msgstr "Háttér"
 #: include/classes/widgets/forms/CWidgetFormItem.php:384
 #: include/views/js/monitoring.sysmaps.js.php:582
 msgid "Background color"
-msgstr ""
+msgstr "Háttérszín"
 
 #: include/views/monitoring.sysmap.edit.php:123
 msgid "Background image"
@@ -1698,7 +1701,7 @@ msgstr "Háttérkép"
 #: include/classes/widgets/CWidgetHelper.php:971
 #: include/classes/widgets/CWidgetHelper.php:1219
 msgid "Bar"
-msgstr ""
+msgstr "Sáv"
 
 #: app/views/administration.authentication.edit.php:175
 msgid "Base DN"
@@ -1708,19 +1711,19 @@ msgstr "Base DN"
 #: include/classes/widgets/CWidgetHelper.php:954
 #: include/classes/widgets/CWidgetHelper.php:1210
 msgid "Base color"
-msgstr ""
+msgstr "Alapszín"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
-msgstr ""
+msgstr "Alapvető"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
-msgstr ""
+msgstr "Érték előtt"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
-msgstr ""
+msgstr "Érték alatt"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1728,16 +1731,16 @@ msgstr "Bind DN"
 
 #: app/views/administration.authentication.edit.php:198
 msgid "Bind password"
-msgstr ""
+msgstr "Összekötési jelszó"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:428
 #: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
-msgstr ""
+msgstr "Bitek a váltáshoz"
 
 #: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
-msgstr ""
+msgstr "Bitenkénti függvények"
 
 #: app/views/administration.user.list.php:144
 msgid "Blocked"
@@ -1745,28 +1748,28 @@ msgstr "Zárolva"
 
 #: include/classes/core/ZBase.php:358
 msgid "Blue"
-msgstr ""
+msgstr "Kék"
 
 #: app/views/popup.httpstep.php:160
 #: include/views/configuration.host.discovery.edit.php:400
 #: include/views/configuration.item.edit.php:458
 #: include/views/configuration.item.prototype.edit.php:436
 msgid "Body"
-msgstr ""
+msgstr "Törzs"
 
 #: app/views/popup.httpstep.php:162
 #: include/views/configuration.host.discovery.edit.php:402
 #: include/views/configuration.item.edit.php:460
 #: include/views/configuration.item.prototype.edit.php:438
 msgid "Body and headers"
-msgstr ""
+msgstr "Törzs és fejlécek"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:131
 #: include/classes/widgets/forms/CWidgetFormItem.php:212
 #: include/classes/widgets/forms/CWidgetFormItem.php:275
 #: include/classes/widgets/forms/CWidgetFormItem.php:335
 msgid "Bold"
-msgstr ""
+msgstr "Vastagított"
 
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:804
 #: include/views/js/monitoring.sysmaps.js.php:894
@@ -1775,27 +1778,27 @@ msgstr "Vastag vonal"
 
 #: include/items.inc.php:1848
 msgid "Boolean to decimal"
-msgstr ""
+msgstr "Logikaitól decimálisig"
 
 #: include/views/js/monitoring.sysmaps.js.php:421
 msgid "Border"
-msgstr ""
+msgstr "Szegély"
 
 #: include/views/js/monitoring.sysmaps.js.php:613
 msgid "Border color"
-msgstr ""
+msgstr "Szegély színe"
 
 #: include/views/js/monitoring.sysmaps.js.php:591
 msgid "Border type"
-msgstr ""
+msgstr "Szegély típusa"
 
 #: include/views/js/monitoring.sysmaps.js.php:603
 msgid "Border width"
-msgstr ""
+msgstr "Szegély szélessége"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
-msgstr ""
+msgstr "Mindkét jelszónak egyeznie kell."
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:108
 #: include/classes/widgets/forms/CWidgetFormItem.php:189
@@ -1809,19 +1812,19 @@ msgstr "Alúl"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr ""
+msgstr "Alul N"
 
 #: jsLoader.php:276
 msgid "Bring forward"
-msgstr ""
+msgstr "Terjesszen elő"
 
 #: jsLoader.php:275
 msgid "Bring to front"
-msgstr ""
+msgstr "Előre hoz"
 
 #: include/locales.inc.php:34
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "bolgár (bg_BG)"
 
 #: report2.php:195
 msgid "By host"
@@ -1837,7 +1840,7 @@ msgstr "Trigger mintánként"
 #: app/views/configuration.host.list.php:405
 #: app/views/configuration.host.list.php:408
 msgid "CERT"
-msgstr ""
+msgstr "Tanúsítvány"
 
 #: app/views/hintbox.eventlist.php:116
 #: app/views/monitoring.widget.problems.view.php:109
@@ -1845,52 +1848,52 @@ msgstr ""
 #: include/classes/screens/CScreenProblem.php:969
 #: include/classes/screens/CScreenProblem.php:1180 include/events.inc.php:376
 msgid "CLOSING"
-msgstr ""
+msgstr "ZÁRÓ"
 
 #: include/classes/data/CItemData.php:1066
 msgid "CPU information. Returns string or integer"
-msgstr ""
+msgstr "CPU információ. Karakterláncot vagy egész számot ad vissza"
 
 #: include/classes/data/CItemData.php:1042
 msgid "CPU load. Returns float"
-msgstr ""
+msgstr "CPU terhelés. Visszatérési érték float"
 
 #: include/classes/data/CItemData.php:1422
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
-msgstr ""
+msgstr "CPU várakozik a SWAP-re, <url> - VMware szolgáltatás URL-je, <uuid> - VMware virtuális gép gazdagép neve, <példány> - CPU példány"
 
 #: include/classes/data/CItemData.php:1274
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "A CPU-használat százalékos aránya az intervallum alatt az energiagazdálkodástól vagy a HT-tól függ, <url> - VMware szolgáltatás URL-je, <uuid> - VMware hypervisor gazdagép neve"
 
 #: include/classes/data/CItemData.php:1266
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "CPU-használat százalékban az intervallum alatt, <url> - VMware szolgáltatás URL-je, <uuid> - VMware hypervisor gazdagép neve"
 
 #: include/classes/data/CItemData.php:1426
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "CPU-használat százalékban az intervallum alatt, <url> - VMware szolgáltatás URL-je, <uuid> - VMware virtuális gép gazdagép neve"
 
 #: include/classes/data/CItemData.php:1429
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
-msgstr ""
+msgstr "CPU-használat hertzben a VMware-erőforráskészlet időtartama alatt, <url> - VMware szolgáltatás URL-je, <rpid> - VMware erőforráskészlet-azonosító"
 
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
-msgstr ""
+msgstr "CPU kihasználtsági százalék. Visszatérési érték float"
 
 #: app/views/popup.itemtestedit.view.php:300
 msgid "CRLF"
-msgstr ""
+msgstr "CRLF"
 
 #: include/items.inc.php:1828
 msgid "CSV to JSON"
-msgstr ""
+msgstr "CSV-ből JSON-ba"
 
 #: include/classes/validators/CApiInputValidator.php:2717
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
-msgstr ""
+msgstr "CUID várható"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:179
 #: include/views/configuration.graph.edit.php:254
@@ -1899,7 +1902,7 @@ msgstr "Kalkulált"
 
 #: jsLoader.php:232
 msgid "Calendar"
-msgstr ""
+msgstr "Naptár"
 
 #: include/hosts.inc.php:60
 msgid "Callback"
@@ -1942,20 +1945,20 @@ msgstr "Mégsem"
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:140
 msgid "Cannot add API token"
-msgstr ""
+msgstr "API-token nem adható hozzá"
 
 #: include/classes/api/services/CGraph.php:517
 #: include/classes/api/services/CGraph.php:531
 #: include/classes/api/services/CGraph.php:545
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr ""
+msgstr "Nem numerikus „%1$s” elem nem adható hozzá a „%2$s” diagramhoz."
 
 #: include/classes/api/services/CGraphPrototype.php:471
 #: include/classes/api/services/CGraphPrototype.php:535
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr ""
+msgstr "Nem adható hozzá nem numerikus „%1$s” elem a „%2$s” grafikon prototípusához."
 
 #: actionconf.php:302
 msgid "Cannot add action"
@@ -1963,23 +1966,23 @@ msgstr "Az eljárást nem lehet felvenni"
 
 #: app/controllers/CControllerCorrelationCreate.php:115
 msgid "Cannot add correlation"
-msgstr ""
+msgstr "Nem lehet korrelációt hozzáadni"
 
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr ""
+msgstr "Az irányítópult-oldal nem adható hozzá: legfeljebb %1$d irányítópult-oldal került hozzáadásra."
 
 #: include/classes/api/services/CTrigger.php:979
 #: include/classes/api/services/CTriggerPrototype.php:788
 msgid "Cannot add dependency from a host to a template."
-msgstr ""
+msgstr "Nem lehet függőséget hozzáadni egy hoszttól a sablonhoz."
 
 #: include/classes/api/services/CDiscoveryRule.php:889
 #: include/triggers.inc.php:371
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "Nem lehet függőséget hozzáadni a(z) „%1$s:%2$s” triggertől a nem létező „%3$s:%4$s” aktiválóhoz."
 
 #: host_discovery.php:726
 msgid "Cannot add discovery rule"
@@ -1991,7 +1994,7 @@ msgstr "Grafikon hozzáadása nem sikerült"
 
 #: graphs.php:227
 msgid "Cannot add graph prototype"
-msgstr ""
+msgstr "Nem lehet hozzáadni a grafikon prototípusát"
 
 #: hostgroups.php:114
 msgid "Cannot add group"
@@ -2005,11 +2008,11 @@ msgstr "Hoszt felvétele sikertelen"
 #: app/controllers/CControllerHostGroupCreate.php:40
 #: app/controllers/CControllerHostGroupCreate.php:70
 msgid "Cannot add host group"
-msgstr ""
+msgstr "Hoszt felvétele sikertelen a csoportba"
 
 #: host_prototypes.php:304
 msgid "Cannot add host prototype"
-msgstr ""
+msgstr "Nem lehet hozzáadni a hoszt prototípusát"
 
 #: app/controllers/CControllerImageCreate.php:41
 #: app/controllers/CControllerImageCreate.php:101
@@ -2023,7 +2026,7 @@ msgstr "Elem felvétele sikertelen"
 
 #: disc_prototypes.php:553
 msgid "Cannot add item prototype"
-msgstr ""
+msgstr "A cikk prototípusa nem adható hozzá"
 
 #: maintenance.php:123
 msgid "Cannot add maintenance"
@@ -2032,29 +2035,29 @@ msgstr "Karbantartás hozzáadása sikertelen"
 #: include/classes/api/services/CMap.php:1559
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "A \"%1$s\" térkép térképeleme nem adható hozzá körkörös hivatkozás miatt."
 
 #: app/controllers/CControllerMediatypeCreate.php:76
 #: app/controllers/CControllerMediatypeCreate.php:165
 msgid "Cannot add media type"
-msgstr ""
+msgstr "Nem lehet médiatípust hozzáadni"
 
 #: app/controllers/CControllerModuleScan.php:103
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Nem lehet hozzáadni a következő modult: %1$s."
+msgstr[1] "Nem lehet hozzáadni a következő modulokat: %1$s."
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr "Nem adható hozzá egynél több „Grafikon összege” típusú elem a „%1$s” grafikonhoz."
 
 #: include/classes/api/services/CGraphPrototype.php:40
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Nem adható hozzá egynél több „Grafikon összege” típusú elem a „%1$s” grafikon prototípusához."
 
 #: sysmaps.php:214
 msgid "Cannot add network map"
@@ -2072,7 +2075,7 @@ msgstr "Reguláris kifejezés hozzáadása nem sikerült"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr ""
+msgstr "Nem lehet ütemezett jelentést hozzáadni"
 
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
@@ -2081,7 +2084,7 @@ msgstr "Script felvétele sikertelen"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:63
 msgid "Cannot add submaps. Max depth reached."
-msgstr ""
+msgstr "Nem lehet résztérképeket hozzáadni. Elérte a maximális mélységet."
 
 #: templates.php:205
 msgid "Cannot add template"
@@ -2090,7 +2093,7 @@ msgstr "A mintát nem lehet létrehozni"
 #: app/controllers/CControllerTemplateGroupCreate.php:40
 #: app/controllers/CControllerTemplateGroupCreate.php:70
 msgid "Cannot add template group"
-msgstr ""
+msgstr "Nem lehet sabloncsoportot hozzáadni"
 
 #: triggers.php:306
 msgid "Cannot add trigger"
@@ -2098,7 +2101,7 @@ msgstr "Triggerek létrehozása sikertelen"
 
 #: trigger_prototypes.php:257
 msgid "Cannot add trigger prototype"
-msgstr ""
+msgstr "Nem adható hozzá trigger prototípus"
 
 #: app/controllers/CControllerUserCreate.php:63
 #: app/controllers/CControllerUserCreate.php:119
@@ -2108,39 +2111,39 @@ msgstr "Felhasználó létrehozása sikertelen"
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:101
 msgid "Cannot add user group"
-msgstr ""
+msgstr "Felhasználói csoport nem adható hozzá"
 
 #: httpconf.php:198
 msgid "Cannot add web scenario"
-msgstr ""
+msgstr "Nem adható hozzá webes forgatókönyv"
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "Nem lehet modult hozzáadni: nincs elég szabad hely az irányítópulton."
 
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "Nem távolítható el"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
-msgstr ""
+msgstr "Nem lehet névtelenül kapcsolódni az LDAP szerverhez."
 
 #: include/classes/validators/CLdapAuthValidator.php:78
 msgid "Cannot bind to LDAP server."
-msgstr ""
+msgstr "Nem lehet kapcsolódni az LDAP szerverhez."
 
 #: include/forms.inc.php:1932 include/forms.inc.php:1939
 #: include/forms.inc.php:1949 include/forms.inc.php:1983
 #: include/forms.inc.php:1990 include/forms.inc.php:2000
 #, c-format
 msgid "Cannot build expression tree: %1$s."
-msgstr ""
+msgstr "Nem hozható létre kifejezésfa: %1$s."
 
 #: include/classes/api/services/CRole.php:792
 msgid "Cannot change the user type of own role."
-msgstr ""
+msgstr "A saját szerepkör felhasználói típusa nem módosítható."
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
@@ -2148,52 +2151,52 @@ msgstr "Előzmények törlése sikertelen"
 
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
-msgstr ""
+msgstr "Nem lehet klónozni a gráf prototípusait."
 
 #: include/classes/api/services/CDiscoveryRule.php:2317
 #: include/classes/api/services/CDiscoveryRule.php:2373
 #: include/classes/api/services/CDiscoveryRule.php:2391
 msgid "Cannot clone item prototypes."
-msgstr ""
+msgstr "Az elemek prototípusait nem lehet klónozni."
 
 #: include/classes/api/services/CDiscoveryRule.php:802
 msgid "Cannot clone trigger prototypes."
-msgstr ""
+msgstr "A prototípusokat nem lehet klónozni."
 
 #: include/classes/api/services/CEvent.php:848
 #, c-format
 msgid "Cannot close problem: %1$s."
-msgstr ""
+msgstr "A következő probléma nem zárható le: %1$s."
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Cannot connect to LDAP server."
-msgstr ""
+msgstr "Nem lehet csatlakozni az LDAP szerverhez."
 
 #: include/classes/setup/CSetupWizard.php:593
 msgid "Cannot connect to the database."
-msgstr ""
+msgstr "Nem lehet csatlakozni az adatbázishoz."
 
 #: include/views/js/configuration.httpconf.edit.js.php:182
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "A POST-adatok nem konvertálhatók:"
 
 #: graphs.php:390
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "A grafikont nem lehet másolni"
+msgstr[1] "A grafikonokat nem lehet másolni"
 
 #: items.php:965
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Az elem nem másolható"
+msgstr[1] "Az elemek nem másolhatóak"
 
 #: triggers.php:538
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "A trigger nem másolható"
+msgstr[1] "A triggerek nem másolhatóak"
 
 #: include/triggers.inc.php:246
 #, c-format
@@ -2318,7 +2321,6 @@ msgid "Cannot delete dependency"
 msgstr "Függőség nem törölhető"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Nem lehet törölni a felderítési szabályt"
@@ -2345,7 +2347,6 @@ msgid "Cannot delete graphs"
 msgstr "A grafikonok törlése nem sikerült"
 
 #: hostgroups.php:134 hostgroups.php:156
-#, fuzzy
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "Csoport törlése sikertelen"
@@ -2454,7 +2455,6 @@ msgid "Cannot delete readonly user role \"%1$s\"."
 msgstr ""
 
 #: app/controllers/CControllerRegExDelete.php:55
-#, fuzzy
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "Reguláris kifejezés törlése nem sikerült"
@@ -2482,7 +2482,6 @@ msgid "Cannot delete selected actions"
 msgstr ""
 
 #: app/controllers/CControllerServiceDelete.php:78
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "Szolgáltatás törlése sikertelen"
@@ -6083,7 +6082,6 @@ msgid "Discovery rule created"
 msgstr ""
 
 #: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:416
-#, fuzzy
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
 msgstr[0] "Felderítési szabály törölve"
@@ -6821,9 +6819,8 @@ msgid "Event ID"
 msgstr "Esemény azonosító"
 
 #: include/actions.inc.php:61
-#, fuzzy
 msgid "Event acknowledged"
-msgstr "Esemény visszaigazolva"
+msgstr "Esemény nyugtázása"
 
 #: app/controllers/CControllerAuditLogList.php:213
 #: app/views/configuration.correlation.list.php:31
@@ -7865,11 +7862,10 @@ msgid "Group added"
 msgstr "Csoport létrehozva"
 
 #: hostgroups.php:134 hostgroups.php:155
-#, fuzzy
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "Csoport törölve"
-msgstr[1] "Csoport törölve"
+msgstr[1] "Csoportok törölve"
 
 #: app/views/administration.miscconfig.edit.php:40
 msgid "Group for discovered hosts"
@@ -15259,11 +15255,10 @@ msgid "Regular expression added"
 msgstr "Reguláris kifejezés hozzáadva"
 
 #: app/controllers/CControllerRegExDelete.php:50
-#, fuzzy
 msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] "Reguláris kifejezés törölve"
-msgstr[1] "Reguláris kifejezés törölve"
+msgstr[1] "Reguláris kifejezések törölve"
 
 #: app/controllers/CControllerRegExTest.php:72
 msgid "Regular expression must be a string"
@@ -16681,11 +16676,10 @@ msgid "Service data storage period"
 msgstr ""
 
 #: app/controllers/CControllerServiceDelete.php:63
-#, fuzzy
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Szolgáltatás törölve"
-msgstr[1] "Szolgáltatás törölve"
+msgstr[1] "Szolgáltatások törölve"
 
 #: app/views/administration.userrole.edit.php:146
 #: app/views/administration.userrole.edit.php:187
@@ -23522,6 +23516,11 @@ msgstr ""
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "keresztűl"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

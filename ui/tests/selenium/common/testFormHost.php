@@ -1702,6 +1702,7 @@ class testFormHost extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected')) {
 			$this->assertMessage(TEST_ERROR, null, $data['error']);
+			CMessageElement::find()->one()->close();
 		}
 
 		$cloned_form->submit();
