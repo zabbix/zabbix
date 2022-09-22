@@ -17,27 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXCRYPTO_H
-#define ZABBIX_ZBXCRYPTO_H
+#ifndef ZABBIX_PROXYCONFIG_READ_H
+#define ZABBIX_PROXYCONFIG_READ_H
 
-#include "zbxtypes.h"
-#include "zbxhash.h"
+#include "dbcache.h"
 
-int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
-int	zbx_bin2hex(const unsigned char *bin, size_t bin_len, char *out, size_t out_len);
-
-#define ZBX_SESSION_TOKEN_SIZE	(ZBX_MD5_DIGEST_SIZE * 2)
-
-char	*zbx_create_token(zbx_uint64_t seed);
-char	*zbx_gen_uuid4(const char *seed);
-
-typedef enum
-{
-	ZBX_HASH_MD5,
-	ZBX_HASH_SHA256
+typedef enum {
+	ZBX_PROXYCONFIG_STATUS_EMPTY,
+	ZBX_PROXYCONFIG_STATUS_DATA
 }
-zbx_crypto_hash_t;
+zbx_proxyconfig_status_t;
 
-int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const char *text, size_t text_len,
-		char **out);
-#endif /* ZABBIX_ZBXCRYPTO_H */
+int	zbx_proxyconfig_get_data(DC_PROXY *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
+		zbx_proxyconfig_status_t *status, char **error);
+
+void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp);
+
+#endif

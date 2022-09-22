@@ -6,7 +6,8 @@ SUBDIRS = \
 	proxyconfig \
 	datasender \
 	stats \
-	taskmanager
+	taskmanager \
+	proxyconfigwrite
 
 sbin_PROGRAMS = zabbix_proxy
 
@@ -37,6 +38,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
 	$(top_builddir)/src/zabbix_server/odbc/libzbxodbc.a \
 	datasender/libzbxdatasender.a \
+	proxyconfigwrite/libzbxproxyconfigwrite.a \
 	$(top_builddir)/src/zabbix_server/preprocessor/libpreprocessor.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \

@@ -19,7 +19,6 @@
 
 #include "zbxcrypto.h"
 
-#include "zbxhash.h"
 #include "zbxtime.h"
 
 /******************************************************************************
@@ -112,7 +111,7 @@ int    zbx_bin2hex(const unsigned char *bin, size_t bin_len, char *out, size_t o
  * Return value: Hexadecimal token string, must be freed by caller            *
  *                                                                            *
  * Comments: if you change token creation algorithm do not forget to adjust   *
- *           zbx_get_token_len() function                                     *
+ *           ZBX_SESSION_TOKEN_SIZE macro                                     *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_create_token(zbx_uint64_t seed)
@@ -124,7 +123,7 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	int		i;
 	char		*token, *ptr;
 
-	ptr = token = (char *)zbx_malloc(NULL, zbx_get_token_len() + 1);
+	ptr = token = (char *)zbx_malloc(NULL, ZBX_SESSION_TOKEN_SIZE + 1);
 
 	zbx_timespec(&ts);
 
@@ -142,21 +141,6 @@ char	*zbx_create_token(zbx_uint64_t seed)
 	*ptr = '\0';
 
 	return token;
-}
-
-/******************************************************************************
- *                                                                            *
- * Return value: number of characters in a token created by                   *
- *               zbx_create_token()                                           *
- *                                                                            *
- * Comments: terminating '\0' byte is not included in the result              *
- *                                                                            *
- ******************************************************************************/
-size_t	zbx_get_token_len(void)
-{
-#define ZBX_DATA_SESSION_TOKEN_SIZE	(ZBX_MD5_DIGEST_SIZE * 2)
-	return ZBX_DATA_SESSION_TOKEN_SIZE;
-#undef ZBX_DATA_SESSION_TOKEN_SIZE
 }
 
 /******************************************************************************

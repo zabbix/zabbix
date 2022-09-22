@@ -173,7 +173,7 @@ out:
  ******************************************************************************/
 static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, zbx_uint64_t *hostid,
-		zbx_uint32_t *revision, char *error)
+		zbx_uint64_t *revision, char *error)
 {
 #define PROXY_AUTO_REGISTRATION_HEARTBEAT	120
 	char	*ch_error;
@@ -257,8 +257,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 	char			*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN];
 	size_t			buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
 	int			ret = FAIL, i, num = 0;
-	zbx_uint64_t		hostid;
-	zbx_uint32_t		revision;
+	zbx_uint64_t		hostid, revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -437,8 +436,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL, *buffer = NULL;
 	struct zbx_json		json;
 	int			ret = FAIL, i, version, num = 0;
-	zbx_uint64_t		hostid;
-	zbx_uint32_t		revision, agent_config_revision;
+	zbx_uint64_t		hostid, revision, agent_config_revision;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminated string */
 	size_t			interface_alloc = 1;		/* for at least NUL-terminated string */
 	size_t			buffer_size, reserved = 0;
@@ -511,17 +509,14 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	{
 		agent_config_revision = 0;
 	}
-	else if (FAIL == zbx_is_uint32(tmp, &agent_config_revision))
+	else if (FAIL == zbx_is_uint64(tmp, &agent_config_revision))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "\"%s\" is not a valid revision", tmp);
 		goto error;
 	}
 
-	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, &hostid, &revision,
-			error))
-	{
+	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, flag, interface, &hostid, &revision, error))
 		goto error;
-	}
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_VERSION, tmp, sizeof(tmp), NULL) ||
 			FAIL == (version = zbx_get_component_version_without_patch(tmp)))
@@ -533,7 +528,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	{
 		size_t	token_len;
 
-		if (zbx_get_token_len() != (token_len = strlen(tmp)))
+		if (ZBX_SESSION_TOKEN_SIZE != (token_len = strlen(tmp)))
 		{
 			zbx_snprintf(error, MAX_STRING_LEN, "invalid session token length %d", (int)token_len);
 			goto error;

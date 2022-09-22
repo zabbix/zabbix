@@ -37,8 +37,6 @@ typedef struct
 }
 zbx_httpstat_t;
 
-extern int	CONFIG_HTTPPOLLER_FORKS;
-
 #ifdef HAVE_LIBCURL
 
 typedef struct
@@ -609,14 +607,13 @@ out:
  * Purpose: process single scenario of http test                              *
  *                                                                            *
  ******************************************************************************/
-static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
+static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest, int *delay)
 {
 	DB_RESULT	result;
 	DB_HTTPSTEP	db_httpstep;
 	char		*err_str = NULL, *buffer = NULL;
 	int		lastfailedstep = 0;
 	zbx_timespec_t	ts;
-	int		delay;
 	double		speed_download = 0;
 	int		speed_download_num = 0;
 #ifdef HAVE_LIBCURL
@@ -640,17 +637,18 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 	buffer = zbx_strdup(buffer, httptest->httptest.delay);
 	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&buffer, MACRO_TYPE_COMMON, NULL, 0);
+				&buffer, MACRO_TYPE_COMMON, NULL, 0);
 
 	/* Avoid the potential usage of uninitialized values when: */
 	/* 1) compile without libCURL support */
 	/* 2) update interval is invalid */
 	db_httpstep.name = NULL;
 
-	if (SUCCEED != zbx_is_time_suffix(buffer, &delay, ZBX_LENGTH_UNLIMITED))
+	if (SUCCEED != zbx_is_time_suffix(buffer, delay, ZBX_LENGTH_UNLIMITED))
 	{
 		err_str = zbx_dsprintf(err_str, "update interval \"%s\" is invalid", buffer);
 		lastfailedstep = -1;
+		*delay = ZBX_DEFAULT_INTERVAL;
 		goto httptest_error;
 	}
 
@@ -977,24 +975,6 @@ clean:
 httptest_error:
 	zbx_timespec(&ts);
 
-	if (0 > lastfailedstep)	/* update interval is invalid, delay is uninitialized */
-	{
-		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
-				0 > ts.sec ? ZBX_JAN_2038 : ts.sec + SEC_PER_MIN, httptest->httptest.httptestid);
-	}
-	else if (0 > ts.sec + delay)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "nextcheck update causes overflow for web scenario \"%s\" on host \"%s\"",
-				httptest->httptest.name, host->name);
-		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
-				ZBX_JAN_2038, httptest->httptest.httptestid);
-	}
-	else
-	{
-		DBexecute("update httptest set nextcheck=%d where httptestid=" ZBX_FS_UI64,
-				ts.sec + delay, httptest->httptest.httptestid);
-	}
-
 	if (NULL != err_str)
 	{
 		if (0 >= lastfailedstep)
@@ -1036,10 +1016,11 @@ httptest_error:
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-int	process_httptests(int httppoller_num, int now)
+int	process_httptests(int now, time_t *nextcheck)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
+	zbx_uint64_t		httptestid;
 	zbx_httptest_t		httptest;
 	DC_HOST			host;
 	int			httptests_count = 0;
@@ -1047,120 +1028,125 @@ int	process_httptests(int httppoller_num, int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	if (SUCCEED != zbx_dc_httptest_next(now, &httptestid, nextcheck))
+		goto out;
+
 	um_handle = zbx_dc_open_user_macros();
 
 	/* create macro cache to use in http tests */
 	zbx_vector_ptr_pair_create(&httptest.macros);
 
-	result = DBselect(
-			"select h.hostid,h.host,h.name,t.httptestid,t.name,t.agent,"
-				"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries,t.ssl_cert_file,"
-				"t.ssl_key_file,t.ssl_key_password,t.verify_peer,t.verify_host,t.delay"
-			" from httptest t,hosts h"
-			" where t.hostid=h.hostid"
-				" and t.nextcheck<=%d"
-				" and " ZBX_SQL_MOD(t.httptestid,%d) "=%d"
-				" and t.status=%d"
-				" and h.proxy_hostid is null"
-				" and h.status=%d"
-				" and (h.maintenance_status=%d or h.maintenance_type=%d)",
-			now,
-			CONFIG_HTTPPOLLER_FORKS, httppoller_num - 1,
-			HTTPTEST_STATUS_MONITORED,
-			HOST_STATUS_MONITORED,
-			HOST_MAINTENANCE_STATUS_OFF, MAINTENANCE_TYPE_NORMAL);
-
-	while (NULL != (row = DBfetch(result)) && ZBX_IS_RUNNING())
+	do
 	{
-		ZBX_STR2UINT64(host.hostid, row[0]);
-		zbx_strscpy(host.host, row[1]);
-		zbx_strlcpy_utf8(host.name, row[2], sizeof(host.name));
+		int	delay = 0;
 
-		ZBX_STR2UINT64(httptest.httptest.httptestid, row[3]);
-		httptest.httptest.name = row[4];
+		result = DBselect(
+				"select h.hostid,h.host,h.name,t.httptestid,t.name,t.agent,"
+					"t.authentication,t.http_user,t.http_password,t.http_proxy,t.retries,t.ssl_cert_file,"
+					"t.ssl_key_file,t.ssl_key_password,t.verify_peer,t.verify_host,t.delay"
+				" from httptest t,hosts h"
+				" where t.hostid=h.hostid"
+					" and t.httptestid=" ZBX_FS_UI64,
+				httptestid);
 
-		if (SUCCEED != httptest_load_pairs(&host, &httptest))
+		if (NULL != (row = DBfetch(result)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot process web scenario \"%s\" on host \"%s\": "
-					"cannot load web scenario data", httptest.httptest.name, host.name);
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
+			ZBX_STR2UINT64(host.hostid, row[0]);
+			zbx_strscpy(host.host, row[1]);
+			zbx_strlcpy_utf8(host.name, row[2], sizeof(host.name));
 
-		httptest.httptest.agent = zbx_strdup(NULL, row[5]);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL, NULL, NULL,
-				NULL, &httptest.httptest.agent, MACRO_TYPE_COMMON, NULL, 0);
+			ZBX_STR2UINT64(httptest.httptest.httptestid, row[3]);
+			httptest.httptest.name = row[4];
 
-		if (HTTPTEST_AUTH_NONE != (httptest.httptest.authentication = atoi(row[6])))
-		{
-			httptest.httptest.http_user = zbx_strdup(NULL, row[7]);
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL,
-					NULL, NULL, NULL, &httptest.httptest.http_user, MACRO_TYPE_COMMON, NULL, 0);
+			if (SUCCEED != httptest_load_pairs(&host, &httptest))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot process web scenario \"%s\" on host \"%s\": "
+						"cannot load web scenario data", httptest.httptest.name, host.name);
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
 
-			httptest.httptest.http_password = zbx_strdup(NULL, row[8]);
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL,
-					NULL, NULL, NULL, &httptest.httptest.http_password, MACRO_TYPE_COMMON, NULL, 0);
-		}
-
-		if ('\0' != *row[9])
-		{
-			httptest.httptest.http_proxy = zbx_strdup(NULL, row[9]);
+			httptest.httptest.agent = zbx_strdup(NULL, row[5]);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, &httptest.httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
+					NULL, NULL, &httptest.httptest.agent, MACRO_TYPE_COMMON, NULL, 0);
+
+			if (HTTPTEST_AUTH_NONE != (httptest.httptest.authentication = atoi(row[6])))
+			{
+				httptest.httptest.http_user = zbx_strdup(NULL, row[7]);
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &httptest.httptest.http_user,
+						MACRO_TYPE_COMMON, NULL, 0);
+
+				httptest.httptest.http_password = zbx_strdup(NULL, row[8]);
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &httptest.httptest.http_password,
+						MACRO_TYPE_COMMON, NULL, 0);
+			}
+
+			if ('\0' != *row[9])
+			{
+				httptest.httptest.http_proxy = zbx_strdup(NULL, row[9]);
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL,
+						NULL, NULL, NULL, NULL, &httptest.httptest.http_proxy,
+						MACRO_TYPE_COMMON, NULL, 0);
+			}
+			else
+				httptest.httptest.http_proxy = NULL;
+
+			httptest.httptest.retries = atoi(row[10]);
+
+			httptest.httptest.ssl_cert_file = zbx_strdup(NULL, row[11]);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
+					NULL, &httptest.httptest.ssl_cert_file, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+			httptest.httptest.ssl_key_file = zbx_strdup(NULL, row[12]);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
+					NULL, &httptest.httptest.ssl_key_file, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
+
+			httptest.httptest.ssl_key_password = zbx_strdup(NULL, row[13]);
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL,
+					NULL, NULL, NULL, NULL, &httptest.httptest.ssl_key_password, MACRO_TYPE_COMMON,
+					NULL, 0);
+
+			httptest.httptest.verify_peer = atoi(row[14]);
+			httptest.httptest.verify_host = atoi(row[15]);
+
+			httptest.httptest.delay = row[16];
+
+			/* add httptest variables to the current test macro cache */
+			http_process_variables(&httptest, &httptest.variables, NULL, NULL);
+
+			process_httptest(&host, &httptest, &delay);
+			zbx_dc_httptest_queue(now, httptestid, delay);
+
+			zbx_free(httptest.httptest.ssl_key_password);
+			zbx_free(httptest.httptest.ssl_key_file);
+			zbx_free(httptest.httptest.ssl_cert_file);
+			zbx_free(httptest.httptest.http_proxy);
+
+			if (HTTPTEST_AUTH_NONE != httptest.httptest.authentication)
+			{
+				zbx_free(httptest.httptest.http_password);
+				zbx_free(httptest.httptest.http_user);
+			}
+			zbx_free(httptest.httptest.agent);
+			zbx_free(httptest.headers);
+			httppairs_free(&httptest.variables);
+
+			/* clear the macro cache used in this http test */
+			httptest_remove_macros(&httptest);
+
+			httptests_count++;	/* performance metric */
 		}
-		else
-			httptest.httptest.http_proxy = NULL;
-
-		httptest.httptest.retries = atoi(row[10]);
-
-		httptest.httptest.ssl_cert_file = zbx_strdup(NULL, row[11]);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL, NULL,
-				&httptest.httptest.ssl_cert_file, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
-
-		httptest.httptest.ssl_key_file = zbx_strdup(NULL, row[12]);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL, NULL,
-				&httptest.httptest.ssl_key_file, MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
-
-		httptest.httptest.ssl_key_password = zbx_strdup(NULL, row[13]);
-		zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &httptest.httptest.ssl_key_password, MACRO_TYPE_COMMON, NULL, 0);
-
-		httptest.httptest.verify_peer = atoi(row[14]);
-		httptest.httptest.verify_host = atoi(row[15]);
-
-		httptest.httptest.delay = row[16];
-
-		/* add httptest variables to the current test macro cache */
-		http_process_variables(&httptest, &httptest.variables, NULL, NULL);
-
-		process_httptest(&host, &httptest);
-
-		zbx_free(httptest.httptest.ssl_key_password);
-		zbx_free(httptest.httptest.ssl_key_file);
-		zbx_free(httptest.httptest.ssl_cert_file);
-		zbx_free(httptest.httptest.http_proxy);
-
-		if (HTTPTEST_AUTH_NONE != httptest.httptest.authentication)
-		{
-			zbx_free(httptest.httptest.http_password);
-			zbx_free(httptest.httptest.http_user);
-		}
-		zbx_free(httptest.httptest.agent);
-		zbx_free(httptest.headers);
-		httppairs_free(&httptest.variables);
-
-		/* clear the macro cache used in this http test */
-		httptest_remove_macros(&httptest);
-
-		httptests_count++;	/* performance metric */
+		DBfree_result(result);
 	}
+	while (ZBX_IS_RUNNING() && SUCCEED == zbx_dc_httptest_next(now, &httptestid, nextcheck));
+
 	/* destroy the macro cache used in http tests */
 	zbx_vector_ptr_pair_destroy(&httptest.macros);
 
-	DBfree_result(result);
-
 	zbx_dc_close_user_macros(um_handle);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return httptests_count;
