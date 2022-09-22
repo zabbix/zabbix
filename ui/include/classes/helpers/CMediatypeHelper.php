@@ -65,7 +65,7 @@ class CMediatypeHelper {
 			self::EMAIL_PROVIDER_GMAIL => [
 				'name' => 'Gmail',
 				'smtp_server' => 'smtp.gmail.com',
-				'smtp_email' => 'zabbix_example_admin@gmail.com',
+				'smtp_email' => 'zabbix@example.com',
 				'smtp_helo' => 'gmail.com',
 				'smtp_port' => 587,
 				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
@@ -75,19 +75,19 @@ class CMediatypeHelper {
 			],
 			self::EMAIL_PROVIDER_GMAIL_RELAY => [
 				'name' => 'Gmail relay',
-				'smtp_server' => 'relay-smtp.gmail.com',
-				'smtp_email' => 'zabbix_example_admin@gmail.com',
+				'smtp_server' => 'smtp-relay.gmail.com',
+				'smtp_email' => 'zabbix@example.com',
 				'smtp_helo' => 'gmail.com',
 				'smtp_port' => 587,
 				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
-				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
+				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
 				'smtp_verify_host' => HTTPTEST_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF
 			],
 			self::EMAIL_PROVIDER_OFFICE365 => [
 				'name' => 'Office365',
 				'smtp_server' => 'smtp.office365.com',
-				'smtp_email' => 'zabbix_example_admin@office365.com',
+				'smtp_email' => 'zabbix@example.com',
 				'smtp_helo' => 'office365.com',
 				'smtp_port' => 587,
 				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
@@ -97,12 +97,12 @@ class CMediatypeHelper {
 			],
 			self::EMAIL_PROVIDER_OFFICE365_RELAY => [
 				'name' => 'Office365 relay',
-				'smtp_server' => 'example-com.mail.protection.outlook.com',
-				'smtp_email' => 'zabbix_example_admin@office365.com',
+				'smtp_server' => '-com.mail.protection.outlook.com',
+				'smtp_email' => 'zabbix@example.com',
 				'smtp_helo' => 'office365.com',
 				'smtp_port' => 25,
 				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
-				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
+				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
 				'smtp_verify_host' => HTTPTEST_VERIFY_HOST_OFF,
 				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF
 			]

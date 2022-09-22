@@ -115,12 +115,25 @@ class CControllerMediatypeUpdate extends CController {
 					'smtp_authentication', 'passwd', 'content_type', 'provider'
 				]);
 
-				if ($this->hasInput('smtp_username')) {
-					$mediatype['username'] = $this->getInput('smtp_username');
+				if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL) {
+					if ($mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_GMAIL
+							|| $mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_OFFICE365) {
+						$mediatype['username'] = $this->getInput('smtp_email');
+					}
+					else {
+						if ($this->hasInput('smtp_username')) {
+							$mediatype['username'] = $this->getInput('smtp_username');
+						}
+					}
 				}
 
-				if ($mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
-					$mediatype['username'] = $this->getInput('smtp_email');
+				if ($mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY) {
+					$domain_start = strrpos($mediatype['smtp_email'], '@') + 1;
+					$domain_end = strrpos($mediatype['smtp_email'], '.');
+					$domain =  substr($mediatype['smtp_email'], $domain_start, $domain_end - $domain_start);
+
+					$data = CMediatypeHelper::getEmailProviders(CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY);
+					$mediatype['smtp_server'] = $domain.$data['smtp_server'];
 				}
 
 				$mediatype['smtp_verify_peer'] = $this->getInput('smtp_verify_peer', 0);

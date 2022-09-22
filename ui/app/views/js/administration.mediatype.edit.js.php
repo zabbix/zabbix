@@ -374,6 +374,20 @@
 				toggleSecurityOptions();
 				toggleAuthenticationOptions();
 			}
+			else if (provider == '<?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>') {
+				$('input[name=passwd]').attr('aria-required', 'false');
+				$('label[for=passwd]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+
+				$('#smtp_authentication, #provider, #smtp_email, #content_type').closest('li').show();
+
+				toggleAuthenticationOptions()
+			}
+			else if (provider == '<?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>') {
+				$('input[name=passwd]').attr('aria-required', 'false');
+				$('label[for=passwd]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+
+				$('#provider, #smtp_email, #content_type').closest('li').show();
+			}
 			else {
 				$('input[name=passwd]').attr('aria-required', 'true');
 				$('label[for=passwd]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
