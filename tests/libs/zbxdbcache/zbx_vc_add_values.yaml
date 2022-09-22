@@ -991,8 +991,9 @@ out:
     mode: ZBX_VC_MODE_NORMAL
 ---
 # TC17
-# Test that adding single value after long period does not cause old data to be dropped.
-test case: Adding single value after long period does not cause old data to be dropped
+# Test that adding single value after long period does not cause old data to be dropped as request range should be 
+# calculated from last received value with which active range was calculated
+test case: Test that adding single value does not cause old data to be dropped (previous value is used for active range).
 in:
   history:
   - itemid: 1
