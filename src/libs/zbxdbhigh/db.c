@@ -935,13 +935,13 @@ int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
 	int		ret;
 
 	if (1 == ZBX_DB_TSDB_V1) {
-		result = DBselect("select null from timescaledb_information.compressed_chunk_stats where hypertable_name in (%s) and "
-			"compression_status='Compressed'", table_names);
+		result = DBselect("select null from timescaledb_information.compressed_chunk_stats where "
+				"hypertable_name in (%s) and compression_status='Compressed'", table_names);
 	}
 	else
 	{
-		result = DBselect("select hypertable_name from timescaledb_information.chunks where hypertable_name in (%s) and "
-			"is_compressed='t'", table_names);
+		result = DBselect("select hypertable_name from timescaledb_information.chunks where hypertable_name "
+			"in (%s) and is_compressed='t'", table_names);
 	}
 
 	if (NULL != DBfetch(result))
