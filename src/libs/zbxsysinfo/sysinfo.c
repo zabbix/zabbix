@@ -1123,14 +1123,15 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 
 	zbx_init_agent_request(&request);
 
-	if (SUCCEED != zbx_parse_item_key((0 == (flags & ZBX_PROCESS_WITH_ALIAS) ? in_command : zbx_alias_get(in_command)),
-			&request))
+	if (SUCCEED != zbx_parse_item_key((0 == (flags & ZBX_PROCESS_WITH_ALIAS) ? in_command :
+			zbx_alias_get(in_command)), &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto notsupported;
 	}
 
-	if (0 == (flags & ZBX_PROCESS_LOCAL_COMMAND) && ZBX_KEY_ACCESS_ALLOW != zbx_check_request_access_rules(&request))
+	if (0 == (flags & ZBX_PROCESS_LOCAL_COMMAND) && ZBX_KEY_ACCESS_ALLOW !=
+			zbx_check_request_access_rules(&request))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Key access denied: \"%s\"", in_command);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key."));

@@ -279,7 +279,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_free_result_ptr(AGENT_RESULT *result)
+void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 {
 	zbx_free_agent_result(result);
 	zbx_free(result);
@@ -929,7 +929,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zbx_preprocessor_flush();
 	zbx_clean_items(items, num, results);
 	DCconfig_clean_items(items, NULL, num);
-	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_result_ptr);
+	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_agent_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
 
 	if (NULL != data)

@@ -302,7 +302,7 @@ static void	ipmi_poller_schedule_request(zbx_ipmi_poller_t *poller, zbx_ipmi_req
  * Parameters: poller  - [IN] the IPMI poller                                 *
  *                                                                            *
  ******************************************************************************/
-static void	ipmi_poller_zbx_free_agent_request(zbx_ipmi_poller_t *poller)
+static void	ipmi_poller_free_request(zbx_ipmi_poller_t *poller)
 {
 	ipmi_request_free(poller->request);
 	poller->request = NULL;
@@ -841,7 +841,7 @@ static void	ipmi_manager_process_client_result(zbx_ipmi_manager_t *manager, zbx_
 		zbx_ipc_client_release(poller->request->client);
 	}
 
-	ipmi_poller_zbx_free_agent_request(poller);
+	ipmi_poller_free_request(poller);
 	ipmi_manager_process_poller_queue(manager, poller, now);
 }
 
@@ -935,7 +935,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 	/* put back the item in configuration cache IPMI poller queue */
 	DCrequeue_items(&itemid, &ts.sec, &errcode, 1);
 
-	ipmi_poller_zbx_free_agent_request(poller);
+	ipmi_poller_free_request(poller);
 	ipmi_manager_process_poller_queue(manager, poller, now);
 }
 
