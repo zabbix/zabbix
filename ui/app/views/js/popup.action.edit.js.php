@@ -103,18 +103,20 @@ window.action_edit_popup = new class {
 	}
 
 	_createOperationsRow(input) {
+		const operation_data = input.detail.operation;
+		console.log(operation_data);
 		this.operation_table = document.getElementById('op-table');
 		this.operation_row_count = this.operation_table.rows.length - 2;
 		this.operation_row = document.createElement('tr');
 
-		this.operation_row.append(this._steps(input.detail.operation));
-		this.operation_row.append(this._details(input.detail));
-		this.operation_row.append(this._startIn(input));
-		this.operation_row.append(this._duration(input));
+		this.operation_row.append(this._addColumn(operation_data.steps));
+		this.operation_row.append(this._addColumn(operation_data.details));
+		this.operation_row.append(this._addColumn(operation_data.start_in));
+		this.operation_row.append(this._addColumn(operation_data.duration));
 
 		this.addOperationsData(input);
 
-		this.operation_row.append(this._createRemoveCell());
+		this.operation_row.append(this._createActionCell());
 		$('#op-table tr:last').before(this.operation_row);
 
 	}
@@ -176,41 +178,10 @@ window.action_edit_popup = new class {
 	}
 
 
-	_steps(input) {
-		// todo : check if are the same
-		// todo : check if 'to' is not smaller than 'from' - validator?
-
+	_addColumn(input) {
 		const cell = document.createElement('td');
-		// const esc_step_text = (input.esc_step_from === input.esc_step_to)
-		//	? input.esc_step_from
-		//	: input.esc_step_from + ' - ' +input.esc_step_to;
-		const esc_step_text =input.esc_step_from;
 
-		cell.append(esc_step_text);
-		return cell;
-	}
-
-	_details(input) {
-		// todo : function for creating details or recieve data from validation controller
-
-		const cell = document.createElement('td');
-		cell.append('here will be details');
-		return cell;
-	}
-
-	_startIn() {
-		// todo : function for start in column or recieve data from validation controller
-
-		const cell = document.createElement('td');
-		cell.append('start in');
-		return cell;
-	}
-
-	_duration() {
-		// todo : function for duration column or recieve data from validation controller
-
-		const cell = document.createElement('td');
-		cell.append('duration');
+		cell.append(input);
 		return cell;
 	}
 
@@ -329,6 +300,37 @@ window.action_edit_popup = new class {
 		btn.addEventListener('click', () => btn.closest('tr').remove());
 
 		cell.appendChild(btn);
+		return cell;
+	}
+
+	_createActionCell() {
+	//->addClass('js-edit-button')
+	//->setAttribute('data-operation', json_encode([
+	//		'operationid' => $operationid,
+	//		'actionid' => $data['actionid'],
+	//		'eventsource' => $data['eventsource'],
+	//		'operationtype' => ACTION_RECOVERY_OPERATION
+	//])),
+
+		const cell = document.createElement('td');
+		const remove_btn = document.createElement('button');
+		const edit_btn = document.createElement('button');
+
+		remove_btn.type = 'button';
+		remove_btn.classList.add('btn-link', 'element-table-remove');
+		remove_btn.textContent = <?= json_encode(_('Remove')) ?>;
+		remove_btn.addEventListener('click', () => remove_btn.closest('tr').remove());
+
+		// todo : pass data to edit popup
+		edit_btn.type = 'button';
+		edit_btn.classList.add('btn-link', 'js-edit-button');
+		edit_btn.textContent = <?= json_encode(_('Edit')) ?>;
+
+		cell.appendChild(edit_btn);
+		// todo: check how to add space between buttons differently
+		cell.append(' ');
+		cell.appendChild(remove_btn);
+
 		return cell;
 	}
 

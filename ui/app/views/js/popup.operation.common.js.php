@@ -230,6 +230,7 @@ window.operation_popup = new class {
 		let curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', 'action.operation.validate');
 		const fields = getFormFields(this.form);
+		// todo : pass recovery type info for operation validation controller
 
 		this._post(curl.getUrl(), fields);
 	}
@@ -247,10 +248,7 @@ window.operation_popup = new class {
 				}
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				console.log(response);
-				// todo : change data to response :
-
-				this.dialogue.dispatchEvent(new CustomEvent('operation.submit', {detail: data}));
+				this.dialogue.dispatchEvent(new CustomEvent('operation.submit', {detail: response}));
 			})
 			.then(success_callback)
 			.catch((exception) => {

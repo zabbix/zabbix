@@ -90,9 +90,9 @@ class CControllerPopupActionOperationsEdit extends CController {
 		}
 
 		$media_types = $this->popupConfigOperationMessage($operation, $eventsource)['mediatypes'];
+		// todo : fix mediatype 0 !!!
+		$media_type[] = '- '._('All').' -';
 		foreach($media_types as $type) {
-			$media_type[] = '- All -';
-			// todo : fix mediatype 0 !!!
 			$media_type[$type['mediatypeid']] = $type['name'];
 		}
 

@@ -218,10 +218,45 @@ class CControllerActionOperationValidate extends CController {
 			'esc_period' => $operation['esc_period'],
 			'operation-message-mediatype-only' => $operation['operation-message-mediatype-only'],
 			'opmessage_grp' => $operation['opmessage_grp'],
+			'opmessage' =>  $operation['esc_period'],
+			'evaltype' => $operation['evaltype'],
+			'condition' => $operation['condition'] ? : [],
+			'steps' => $this->createStepsColumn($operation),
+			// todo: add function for details column. create new version of getActionOperationDescriptions function?
+			'details' => 'here the details',
+			'start_in' => 'start in column',
+			'duration' => $this->createDurationColumn($operation['esc_period'])
 		];
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data, JSON_THROW_ON_ERROR)]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
+	}
 
-		//$this->setResponse(new CControllerResponseData(['main_block' => json_encode([])]));
+	protected function createStepsColumn($operation):string {
+		$steps = '';
+		$step_from = $operation['esc_step_from'];
+		if ($operation['esc_step_from'] < 1) {
+			$step_from = 1;
+		}
+		// todo : should add in increasing order (by steps)
+		if (($step_from === $operation['esc_step_to']) || $operation['esc_step_to'] == 0) {
+			$steps = $step_from;
+		}
+		if ($step_from < $operation['esc_step_to']) {
+			$steps = $step_from.' - '.$operation['esc_step_to'];
+		}
+
+		return $steps;
+	}
+
+	protected function createDetailsColumn($operation):string {
+		$details = '';
+
+		return $details;
+	}
+
+	protected function createDurationColumn($step_duration):string {
+		return $step_duration === '0'
+			? 'Default'
+			: $step_duration;
 	}
 }
