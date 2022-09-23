@@ -93,7 +93,7 @@ class CControllerMediatypeEnable extends CController {
 				CMessageHelper::setSuccessTitle(_s('%1$s. %2$s: %3$s. %4$s.',
 					_n('Media type enabled', 'Media types enabled', $updated),
 					_('Not enabled'),
-					implode(',', $incomplete_configurations),
+					implode(', ', $incomplete_configurations),
 					_('Incomplete configuration')
 				));
 			}
