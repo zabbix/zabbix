@@ -2072,11 +2072,8 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			case ZBX_PREPROC_ERROR_FIELD_JSON:
 			case ZBX_PREPROC_ERROR_FIELD_XML:
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-				$step['params'] = $step['params'][0];
-				break;
-
 			case ZBX_PREPROC_SCRIPT:
-				$step['params'] = CRLFtoLF($step['params'][0]);
+				$step['params'] = $step['params'][0];
 				break;
 
 			case ZBX_PREPROC_VALIDATE_RANGE:
