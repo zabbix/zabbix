@@ -1,1 +1,1 @@
-...G...... [ZBX-21456] fixed net.tcp.socket.count problem on agent2 when ipv6 is disabled (dgoloscapov)
+[ZBX-21456] fixed net.tcp.socket.count and net.udp.socket.count problem on agent2 when ipv6 is disabled (dgoloscapov)
