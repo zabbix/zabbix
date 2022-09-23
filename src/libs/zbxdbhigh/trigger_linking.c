@@ -1209,8 +1209,8 @@ static int	get_funcs_for_insert(zbx_uint64_t hostid, zbx_vector_uint64_t *insert
 				zbx_vector_uint64_append(&(found->itemids), itemid);
 				zbx_vector_str_append(&(found->functionids), zbx_strdup(NULL, row[1]));
 				zbx_vector_str_append(&(found->itemkeys), zbx_strdup(NULL, row[4]));
-				zbx_vector_str_append(&(found->names), DBdyn_escape_string(row[2]));
-				zbx_vector_str_append(&(found->parameters), DBdyn_escape_string(row[3]));
+				zbx_vector_str_append(&(found->names), zbx_strdup(NULL, row[2]));
+				zbx_vector_str_append(&(found->parameters), zbx_strdup(NULL, row[3]));
 			}
 			else
 			{
@@ -1225,8 +1225,8 @@ static int	get_funcs_for_insert(zbx_uint64_t hostid, zbx_vector_uint64_t *insert
 				zbx_vector_uint64_append(&(local_temp_t.itemids), itemid);
 				zbx_vector_str_append(&(local_temp_t.functionids), zbx_strdup(NULL, row[1]));
 				zbx_vector_str_append(&(local_temp_t.itemkeys), zbx_strdup(NULL, row[4]));
-				zbx_vector_str_append(&(local_temp_t.names), DBdyn_escape_string(row[2]));
-				zbx_vector_str_append(&(local_temp_t.parameters), DBdyn_escape_string(row[3]));
+				zbx_vector_str_append(&(local_temp_t.names),zbx_strdup(NULL, row[2]));
+				zbx_vector_str_append(&(local_temp_t.parameters), zbx_strdup(NULL, row[3]));
 
 				local_temp_t.triggerid = temp_t.triggerid;
 
