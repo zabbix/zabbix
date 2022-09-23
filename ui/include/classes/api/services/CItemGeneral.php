@@ -2083,51 +2083,51 @@ abstract class CItemGeneral extends CApiService {
 		if ($flags == ZBX_FLAG_DISCOVERY_NORMAL) {
 			if ($is_update) {
 				return $is_template
-					? _('Cannot update the dependent item "%1$s" with reference to the master item "%2$s" on the template "%3$s": %4$s.')
-					: _('Cannot update the dependent item "%1$s" with reference to the master item "%2$s" on the host "%3$s": %4$s.');
+					? _('Cannot update the dependent item with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
+					: _('Cannot update the dependent item with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
 			}
 			else {
 				return $is_template
-					? _('Cannot create the dependent item "%1$s" with reference to the master item "%2$s" on the template "%3$s": %4$s.')
-					: _('Cannot create the dependent item "%1$s" with reference to the master item "%2$s" on the host "%3$s": %4$s.');
+					? _('Cannot create the dependent item with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
+					: _('Cannot create the dependent item with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
 			}
 		}
 		elseif ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			if ($is_update) {
 				if ($master_flags == ZBX_FLAG_DISCOVERY_NORMAL) {
 					return $is_template
-						? _('Cannot update the dependent item prototype "%1$s" with reference to the master item "%2$s" on the template "%3$s": %4$s.')
-						: _('Cannot update the dependent item prototype "%1$s" with reference to the master item "%2$s" on the host "%3$s": %4$s.');
+						? _('Cannot update the dependent item prototype with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
+						: _('Cannot update the dependent item prototype with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
 				}
 				else {
 					return $is_template
-						? _('Cannot update the dependent item prototype "%1$s" with reference to the master item prototype "%2$s" on the template "%3$s": %4$s.')
-						: _('Cannot update the dependent item prototype "%1$s" with reference to the master item prototype "%2$s" on the host "%3$s": %4$s.');
+						? _('Cannot update the dependent item prototype with key "%1$s" with reference to the master item prototype with key "%2$s" on the template "%3$s": %4$s.')
+						: _('Cannot update the dependent item prototype with key "%1$s" with reference to the master item prototype with key "%2$s" on the host "%3$s": %4$s.');
 				}
 			}
 			else {
 				if ($master_flags == ZBX_FLAG_DISCOVERY_NORMAL) {
 					return $is_template
-						? _('Cannot create the dependent item prototype "%1$s" with reference to the master item "%2$s" on the template "%3$s": %4$s.')
-						: _('Cannot create the dependent item prototype "%1$s" with reference to the master item "%2$s" on the host "%3$s": %4$s.');
+						? _('Cannot create the dependent item prototype with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
+						: _('Cannot create the dependent item prototype with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
 				}
 				else {
 					return $is_template
-						? _('Cannot create the dependent item prototype "%1$s" with reference to the master item prototype "%2$s" on the template "%3$s": %4$s.')
-						: _('Cannot create the dependent item prototype "%1$s" with reference to the master item prototype "%2$s" on the host "%3$s": %4$s.');
+						? _('Cannot create the dependent item prototype with key "%1$s" with reference to the master item prototype with key "%2$s" on the template "%3$s": %4$s.')
+						: _('Cannot create the dependent item prototype with key "%1$s" with reference to the master item prototype with key "%2$s" on the host "%3$s": %4$s.');
 				}
 			}
 		}
 		elseif ($flags == ZBX_FLAG_DISCOVERY_RULE) {
 			if ($is_update) {
 				return $is_template
-					? _('Cannot update the dependent LLD rule "%1$s" with reference to the master item "%2$s" on the template "%3$s": %4$s.')
-					: _('Cannot update the dependent LLD rule "%1$s" with reference to the master item "%2$s" on the host "%3$s": %4$s.');
+					? _('Cannot update the dependent LLD rule with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
+					: _('Cannot update the dependent LLD rule with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
 			}
 			else {
 				return $is_template
-					? _('Cannot create the dependent LLD rule "%1$s" with reference to the master item "%2$s" on the template "%3$s": %4$s.')
-					: _('Cannot create the dependent LLD rule "%1$s" with reference to the master item "%2$s" on the host "%3$s": %4$s.');
+					? _('Cannot create the dependent LLD rule with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
+					: _('Cannot create the dependent LLD rule with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
 			}
 		}
 	}
