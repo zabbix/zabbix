@@ -3807,8 +3807,13 @@ class CApiInputValidator {
 
 		$params = [];
 
-		foreach (explode("\n", $data) as $i => $param) {
-			$params[$i + 1] = $param;
+		if ($preproc_type == ZBX_PREPROC_SCRIPT) {
+			$params[1] = $data;
+		}
+		else {
+			foreach (explode("\n", $data) as $i => $param) {
+				$params[$i + 1] = $param;
+			}
 		}
 
 		switch ($preproc_type) {
