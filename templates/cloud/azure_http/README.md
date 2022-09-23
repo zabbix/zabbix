@@ -30,15 +30,19 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`15s` |
+|{$AZURE.MYSQL.DB.LOCATION.MATCHES} |<p>This macro used in MySQL servers discovery rules.</p> |`.*` |
+|{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES} |<p>This macro used in MySQL servers discovery rules.</p> |`CHANGE_IF_NEEDED` |
+|{$AZURE.MYSQL.DB.NAME.MATCHES} |<p>This macro used in MySQL servers discovery rules.</p> |`.*` |
+|{$AZURE.MYSQL.DB.NAME.NOT_MATCHES} |<p>This macro used in MySQL servers discovery rules.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
+|{$AZURE.RESOURCE_GROUP.MATCHES} |<p>This macro used in discovery rules.</p> |`.*` |
+|{$AZURE.RESOURCE_GROUP.NOT_MATCHES} |<p>This macro used in discovery rules.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
 |{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
 |{$AZURE.VM.LOCATION.MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`.*` |
 |{$AZURE.VM.LOCATION.NOT_MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
 |{$AZURE.VM.NAME.MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`.*` |
 |{$AZURE.VM.NAME.NOT_MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
-|{$AZURE.VM.RESOURCE_GROUP.MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`.*` |
-|{$AZURE.VM.RESOURCE_GROUP.NOT_MATCHES} |<p>This macro used in virtual machines discovery rule.</p> |`CHANGE_IF_NEEDED` |
 
 ## Template links
 
@@ -48,7 +52,8 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Virtual machines discovery |<p>A list of the virtual machines in the subscription.</p> |DEPENDENT |azure.vm.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.Compute/virtualMachines$`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.VM.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.VM.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.VM.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.VM.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.VM.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.VM.RESOURCE_GROUP.NOT_MATCHES}`</p> |
+|MySQL servers discovery |<p>A list of the MySQL servers in the subscription.</p> |DEPENDENT |azure.mysql.servers.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.DBforMySQL`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.MYSQL.DB.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.MYSQL.DB.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Flexible server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforMySQL/flexibleServers`<br>  - HOST_PROTOTYPE REGEXP ``</p><p>Single server<br> - {#TYPE} MATCHES_REGEX `Microsoft.DBforMySQL/servers`<br>  - HOST_PROTOTYPE REGEXP ``</p> |
+|Virtual machines discovery |<p>A list of the virtual machines in the subscription.</p> |DEPENDENT |azure.vm.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.resources.value`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} MATCHES_REGEX `^Microsoft.Compute/virtualMachines$`</p><p>- {#NAME} MATCHES_REGEX `{$AZURE.VM.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$AZURE.VM.NAME.NOT_MATCHES}`</p><p>- {#LOCATION} MATCHES_REGEX `{$AZURE.VM.LOCATION.MATCHES}`</p><p>- {#LOCATION} NOT_MATCHES_REGEX `{$AZURE.VM.LOCATION.NOT_MATCHES}`</p><p>- {#GROUP} MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.MATCHES}`</p><p>- {#GROUP} NOT_MATCHES_REGEX `{$AZURE.RESOURCE_GROUP.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -88,7 +93,7 @@ It works without any external scripts and uses the script item.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID} and {$AZURE.SUBSCRIPTION_ID}.
+3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
 
 ## Zabbix configuration
 
@@ -179,6 +184,190 @@ There are no template links in this template.
 |Azure: Virtual machine is degraded |<p>The resource is in degraded state.</p> |`last(/Azure virtual machine by HTTP/azure.vm.availability.state)=1` |AVERAGE | |
 |Azure: Virtual machine is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure virtual machine by HTTP/azure.vm.availability.state)=3` |WARNING | |
 |Azure: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure virtual machine by HTTP/azure.vm.cpu.percentage,5m)>{$AZURE.VM.CPU.UTIL.CRIT}` |HIGH | |
+
+## Feedback
+
+Please report any issues with the template at https://support.zabbix.com
+
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+
+# Azure MySQL flexible server by HTTP
+
+## Overview
+
+For Zabbix version: 6.4 and higher  
+The template to monitor Microsoft Azure MySQL flexible servers by HTTP.
+It works without any external scripts and uses the script item.
+
+## Setup
+
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+
+1. Create an Azure service principal via Azure CLI for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+      See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
+3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
+|{$AZURE.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`60s` |
+|{$AZURE.DB.ABORTED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p> |`25` |
+|{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
+|{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization in %.</p> |`80` |
+|{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
+|{$AZURE.RESOURCE_ID} |<p>Microsoft Azure virtual machine ID.</p> |`` |
+|{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
+|{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
+
+## Template links
+
+There are no template links in this template.
+
+## Discovery rules
+
+
+## Items collected
+
+|Group|Name|Description|Type|Key and additional info|
+|-----|----|-----------|----|---------------------|
+|Azure |Azure MySQL: Get data |<p>The JSON with result of API requests.</p> |SCRIPT |azure.db.mysql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure MySQL: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.db.mysql.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure MySQL: Availability state |<p>Availability status of the resource.</p> |DEPENDENT |azure.db.mysql.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure MySQL: Availability status detailed |<p>Summary description of the availability status.</p> |DEPENDENT |azure.db.mysql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure MySQL: Percentage CPU |<p>Host CPU percent.</p> |DEPENDENT |azure.db.mysql.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_percent.maximum`</p> |
+|Azure |Azure MySQL: Memory utilization |<p>Host memory percent.</p> |DEPENDENT |azure.db.mysql.memory.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.memory_percent.maximum`</p> |
+|Azure |Azure MySQL: Network out |<p>Host network egress in bytes.</p> |DEPENDENT |azure.db.mysql.network.egress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_egress.total`</p><p>- MULTIPLIER: `0.0088`</p> |
+|Azure |Azure MySQL: Network in |<p>Host network ingress in bytes.</p> |DEPENDENT |azure.db.mysql.network.ingress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_ingress.total`</p><p>- MULTIPLIER: `0.0088`</p> |
+|Azure |Azure MySQL: Connections active |<p>Active connections count.</p> |DEPENDENT |azure.db.mysql.connections.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.active_connections.maximum`</p> |
+|Azure |Azure MySQL: Connections total |<p>Total connections count.</p> |DEPENDENT |azure.db.mysql.connections.total<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.total_connections.total`</p> |
+|Azure |Azure MySQL: Connections aborted |<p>Aborted connections count.</p> |DEPENDENT |azure.db.mysql.connections.aborted<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.aborted_connections.total`</p> |
+|Azure |Azure MySQL: Queries |<p>Queries count.</p> |DEPENDENT |azure.db.mysql.queries<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Queries.total`</p> |
+|Azure |Azure MySQL: IO consumption percent |<p>IO Percent.</p> |DEPENDENT |azure.db.mysql.io.consumption.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.io_consumption_percent.maximum`</p> |
+|Azure |Azure MySQL: Storage percent |<p>Storage utilization in %.</p> |DEPENDENT |azure.db.mysql.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.maximum`</p> |
+|Azure |Azure MySQL: Storage used |<p>Used storage space in bytes.</p> |DEPENDENT |azure.db.mysql.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.maximum`</p> |
+|Azure |Azure MySQL: Storage limit |<p>Storage limit in bytes.</p> |DEPENDENT |azure.db.mysql.storage.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_limit.maximum`</p> |
+|Azure |Azure MySQL: Backup storage used |<p>Backup storage used in bytes.</p> |DEPENDENT |azure.db.mysql.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.maximum`</p> |
+|Azure |Azure MySQL: Replication lag |<p>Replication lag in seconds.</p> |DEPENDENT |azure.db.mysql.replication.lag<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.replication_lag.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure MySQL: CPU credits remaining |<p>CPU credits remaining.</p> |DEPENDENT |azure.db.mysql.cpu.credits.remaining<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_credits_remaining.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure MySQL: CPU credits consumed |<p>CPU credits consumed.</p> |DEPENDENT |azure.db.mysql.cpu.credits.consumed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_credits_consumed.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+
+## Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----|----|----|
+|Azure MySQL: There are errors in requests to API |<p>Zabbix has received errors in requests to API.</p> |`length(last(/Azure MySQL flexible server by HTTP/azure.db.mysql.data.errors))>0` |AVERAGE | |
+|Azure MySQL: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=2` |HIGH | |
+|Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
+|Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
+|Azure MySQL: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL flexible server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure MySQL: Server has aborted connections |<p>The number of failed attempts to connect to MySQL server is more than {$AZURE.DB.ABORTED_CONN.MAX.WARN}.</p> |`min(/Azure MySQL flexible server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED_CONN.MAX.WARN}` |AVERAGE | |
+|Azure MySQL: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
+|Azure MySQL: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
+
+## Feedback
+
+Please report any issues with the template at https://support.zabbix.com
+
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+
+# Azure MySQL single server by HTTP
+
+## Overview
+
+For Zabbix version: 6.4 and higher  
+The template to monitor Microsoft Azure MySQL single servers by HTTP.
+It works without any external scripts and uses the script item.
+
+## Setup
+
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/http) for basic instructions.
+
+1. Create an Azure service principal via Azure CLI for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+      See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
+3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
+|{$AZURE.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`60s` |
+|{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
+|{$AZURE.DB.FAILED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p> |`25` |
+|{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization in %.</p> |`80` |
+|{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
+|{$AZURE.RESOURCE_ID} |<p>Microsoft Azure virtual machine ID.</p> |`` |
+|{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
+|{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
+
+## Template links
+
+There are no template links in this template.
+
+## Discovery rules
+
+
+## Items collected
+
+|Group|Name|Description|Type|Key and additional info|
+|-----|----|-----------|----|---------------------|
+|Azure |Azure MySQL: Get data |<p>The JSON with result of API requests.</p> |SCRIPT |azure.db.mysql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure MySQL: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.db.mysql.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure MySQL: Availability state |<p>Availability status of the resource.</p> |DEPENDENT |azure.db.mysql.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure MySQL: Availability status detailed |<p>Summary description of the availability status.</p> |DEPENDENT |azure.db.mysql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Azure |Azure MySQL: Percentage CPU |<p>Host CPU percent.</p> |DEPENDENT |azure.db.mysql.cpu.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_percent.average`</p> |
+|Azure |Azure MySQL: Memory utilization |<p>Host memory percent.</p> |DEPENDENT |azure.db.mysql.memory.percentage<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.memory_percent.average`</p> |
+|Azure |Azure MySQL: Network out |<p>Network out across active connections.</p> |DEPENDENT |azure.db.mysql.network.egress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_egress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.0088`</p> |
+|Azure |Azure MySQL: Network in |<p>Network in across active connections.</p> |DEPENDENT |azure.db.mysql.network.ingress<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.network_bytes_ingress.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- MULTIPLIER: `0.0088`</p> |
+|Azure |Azure MySQL: Connections active |<p>Active connections count.</p> |DEPENDENT |azure.db.mysql.connections.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.active_connections.average`</p> |
+|Azure |Azure MySQL: Connections failed |<p>Failed connections count.</p> |DEPENDENT |azure.db.mysql.connections.failed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connections_failed.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure MySQL: IO consumption percent |<p>IO Percent.</p> |DEPENDENT |azure.db.mysql.io.consumption.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.io_consumption_percent.average`</p> |
+|Azure |Azure MySQL: Storage percent |<p>Storage utilization in %.</p> |DEPENDENT |azure.db.mysql.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.average`</p> |
+|Azure |Azure MySQL: Storage used |<p>Used storage space in bytes.</p> |DEPENDENT |azure.db.mysql.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.average`</p> |
+|Azure |Azure MySQL: Storage limit |<p>Storage limit in bytes.</p> |DEPENDENT |azure.db.mysql.storage.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_limit.maximum`</p> |
+|Azure |Azure MySQL: Backup storage used |<p>Backup storage used in bytes.</p> |DEPENDENT |azure.db.mysql.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.average`</p> |
+|Azure |Azure MySQL: Replication lag |<p>Replication lag in seconds.</p> |DEPENDENT |azure.db.mysql.replication.lag<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.seconds_behind_master.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure MySQL: Server log storage percent |<p>Server log storage utilization in %.</p> |DEPENDENT |azure.db.mysql.storage.server.log.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_percent.average`</p> |
+|Azure |Azure MySQL: Server log storage used |<p>Used server log storage space in bytes.</p> |DEPENDENT |azure.db.mysql.storage.server.log.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_usage.average`</p> |
+|Azure |Azure MySQL: Server log storage limit |<p>Server log storage limit in bytes.</p> |DEPENDENT |azure.db.mysql.storage.server.log.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_limit.maximum`</p> |
+
+## Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----|----|----|
+|Azure MySQL: There are errors in requests to API |<p>Zabbix has received errors in requests to API.</p> |`length(last(/Azure MySQL single server by HTTP/azure.db.mysql.data.errors))>0` |AVERAGE | |
+|Azure MySQL: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=2` |HIGH | |
+|Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
+|Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
+|Azure MySQL: High CPU utilization |<p>CPU utilization is too high. the system might be slow to respond.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure MySQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
+|Azure MySQL: Server has failed connections |<p>The number of failed attempts to connect to MySQL server is more than {$AZURE.DB.FAILED_CONN.MAX.WARN}.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED_CONN.MAX.WARN}` |AVERAGE | |
+|Azure MySQL: Storage space is critically low |<p>Critical storage space utilization.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
+|Azure MySQL: Storage space is low |<p>High storage space utilization.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
 
 ## Feedback
 
