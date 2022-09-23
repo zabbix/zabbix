@@ -92,9 +92,9 @@ class CControllerMediatypeEnable extends CController {
 			if ($incomplete_configurations) {
 				CMessageHelper::setSuccessTitle(_s('%1$s. %2$s: %3$s. %4$s.',
 					_n('Media type enabled', 'Media types enabled', $updated),
-					'Not enabled',
+					_('Not enabled'),
 					implode(',', $incomplete_configurations),
-					'Incomplete configuration'
+					_('Incomplete configuration')
 				));
 			}
 			else {
@@ -105,7 +105,7 @@ class CControllerMediatypeEnable extends CController {
 			CMessageHelper::setErrorTitle(_n('Cannot enable media type', 'Cannot enable media types', $updated));
 
 			if ($incomplete_configurations) {
-				info(_s('%1$s: %2$s', 'Incomplete configuration', implode(',', $incomplete_configurations)));
+				info(_s('%1$s: %2$s', _('Incomplete configuration'), implode(',', $incomplete_configurations)));
 			}
 		}
 

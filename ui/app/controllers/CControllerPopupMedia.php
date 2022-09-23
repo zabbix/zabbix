@@ -94,7 +94,7 @@ class CControllerPopupMedia extends CController {
 
 				$page_options['sendto_emails'] = array_values(array_filter($page_options['sendto_emails']));
 				if (!$page_options['sendto_emails']) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto_emails', _('cannot be empty')));
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Type'), _('cannot be empty')));
 				}
 
 				foreach ($page_options['sendto_emails'] as $email) {
