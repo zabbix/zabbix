@@ -1062,6 +1062,7 @@ int	process_httptests(int now, time_t *nextcheck)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot process web scenario \"%s\" on host \"%s\": "
 						"cannot load web scenario data", httptest.httptest.name, host.name);
+				DBfree_result(result);
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}

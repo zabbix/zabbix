@@ -1180,32 +1180,35 @@ static void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxy_hostid,
 static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_uint64_t *active_avail_diff,
 		zbx_hashset_t *activated_hosts)
 {
-	char		**row;
-	zbx_uint64_t	rowid;
-	unsigned char	tag;
+	char				**row;
+	zbx_uint64_t			rowid;
+	unsigned char			tag;
 
-	ZBX_DC_HOST	*host;
-	ZBX_DC_IPMIHOST	*ipmihost;
-	ZBX_DC_PROXY	*proxy;
-	ZBX_DC_HOST_H	*host_h, host_h_local, *host_p, host_p_local;
+	ZBX_DC_HOST			*host;
+	ZBX_DC_IPMIHOST			*ipmihost;
+	ZBX_DC_PROXY			*proxy;
+	ZBX_DC_HOST_H			*host_h, host_h_local, *host_p, host_p_local;
 
-	int		found;
-	int		update_index_h, update_index_p, ret;
-	zbx_uint64_t	hostid, proxy_hostid;
-	unsigned char	status;
-	time_t		now;
-	signed char	ipmi_authtype;
-	unsigned char	ipmi_privilege;
+	int				i, found;
+	int				update_index_h, update_index_p, ret;
+	zbx_uint64_t			hostid, proxy_hostid;
+	unsigned char			status;
+	time_t				now;
+	signed char			ipmi_authtype;
+	unsigned char			ipmi_privilege;
+	zbx_vector_dc_host_ptr_t	proxy_hosts;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	ZBX_DC_PSK	*psk_i, psk_i_local;
-	zbx_ptr_pair_t	*psk_owner, psk_owner_local;
-	zbx_hashset_t	psk_owners;
+	ZBX_DC_PSK			*psk_i, psk_i_local;
+	zbx_ptr_pair_t			*psk_owner, psk_owner_local;
+	zbx_hashset_t			psk_owners;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_create(&psk_owners, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 #endif
+	zbx_vector_dc_host_ptr_create(&proxy_hosts);
+
 	now = time(NULL);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
@@ -1526,7 +1529,6 @@ done:
 
 			if (0 != reset_availability)
 			{
-				int			i;
 				ZBX_DC_INTERFACE	*interface;
 
 				for (i = 0; i < host->interfaces_v.values_num; i++)
@@ -1551,11 +1553,12 @@ done:
 			{
 				dc_host_deregister_proxy(host, host->proxy_hostid, revision);
 			}
-			else if (0 != proxy_hostid)
+
+			if (0 != proxy_hostid)
 			{
 				if (0 == found || host->proxy_hostid != proxy_hostid)
 				{
-					dc_host_register_proxy(host, proxy_hostid, revision);
+					zbx_vector_dc_host_ptr_append(&proxy_hosts, host);
 				}
 				else
 				{
@@ -1666,6 +1669,9 @@ done:
 		host->status = status;
 	}
 
+	for (i = 0; i < proxy_hosts.values_num; i++)
+		dc_host_register_proxy(proxy_hosts.values[i], proxy_hosts.values[i]->proxy_hostid, revision);
+
 	/* remove deleted hosts from buffer */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
@@ -1750,6 +1756,7 @@ done:
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_destroy(&psk_owners);
 #endif
+	zbx_vector_dc_host_ptr_destroy(&proxy_hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -14517,8 +14524,7 @@ int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token,
 
 	WRLOCK_CACHE;
 	session_local.token = dc_strdup(token);
-	session = (zbx_session_t *)zbx_hashset_insert(&config->sessions[ZBX_SESSION_TYPE_CONFIG], &session_local,
-			sizeof(session_local));
+	zbx_hashset_insert(&config->sessions[ZBX_SESSION_TYPE_CONFIG], &session_local, sizeof(session_local));
 	UNLOCK_CACHE;
 
 	return 1;	/* a session was created */
@@ -15636,7 +15642,7 @@ int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck
 				continue;
 
 			if (HOST_MAINTENANCE_STATUS_ON == dc_host->maintenance_status &&
-					MAINTENANCE_TYPE_NODATA == dc_host->maintenance_status)
+					MAINTENANCE_TYPE_NODATA == dc_host->maintenance_type)
 			{
 				httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, httptest->delay, now);
 				dc_httptest_queue(httptest);
