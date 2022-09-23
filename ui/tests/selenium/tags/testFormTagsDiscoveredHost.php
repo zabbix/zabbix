@@ -62,6 +62,33 @@ class testFormTagsDiscoveredHost extends testFormTags {
 	public function testFormTagsDiscoveredHost_RemoveTags() {
 		$this->clearTags('host');
 	}
-}
 
+	/**
+	 * Test of Discovered Host inherited tag.
+	 */
+	public function testFormTagsDiscoveredHost_DiscoveryTag() {
+		$this->page->login()->open($this->link);
+		$this->query('link', $this->update_name.'1')->waitUntilClickable()->one()->click();
+		$form = COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
+		$form->selectTab('Tags');
+		$tags_table = $this->query('class:tags-table')->asMultifieldTable()->one();
+
+		foreach (['Name' => 'discovered', 'Value' => 'true', '' => '(created by host discovery)'] as $field => $value) {
+
+			if ($field !== '') {
+				$this->assertFalse($tags_table->findRow('Name', 'discovered')->getColumn($field)->children()->one()
+						->detect()->isEnabled()
+				);
+			}
+
+			$this->assertEquals($value, $tags_table->findRow('Name', 'discovered')->getColumn($field)->children()->one()
+					->detect()->getText()
+			);
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Host updated');
+	}
+}
 

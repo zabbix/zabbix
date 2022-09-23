@@ -513,8 +513,8 @@ class testFormTags extends CWebTest {
 		else {
 			$tags_table = 'id:problem_tags';
 		}
-		$this->query($tags_table)->asMultifieldTable()->waitUntilPresent()->one()->fill($data['tags']);
 
+		$this->query($tags_table)->asMultifieldTable()->waitUntilPresent()->one()->fill($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -627,16 +627,13 @@ class testFormTags extends CWebTest {
 				break;
 
 			case 'host':
-				$form = $this->query('name:host-form')->asForm()->waitUntilPresent()->one();
-				$form->fill(['Host name' => $new_name]);
-				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
-				$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
-				break;
-
 			case 'host prototype':
+			case 'discovered host':
 				$form_name = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:host-form';
 				$form = $this->query($form_name)->asForm()->waitUntilPresent()->one();
-				$form->fill(['Host name' => $new_name]);
+				if ($object !== 'discovered host') {
+					$form->fill(['Host name' => $new_name]);
+				}
 				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
 				break;
@@ -662,11 +659,6 @@ class testFormTags extends CWebTest {
 				$sql_new_name = 'SELECT NULL FROM services WHERE name='.zbx_dbstr($new_name);
 				break;
 
-			case 'discovered host':
-				$form = $this->query('name:host-form')->asForm()->waitUntilPresent()->one();
-				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
-				$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
-				break;
 		}
 
 		if (!$this->problem_tags) {
