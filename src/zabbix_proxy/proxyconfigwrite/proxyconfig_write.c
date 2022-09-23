@@ -2045,7 +2045,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse empty proxy configuration data received from server at"
 				" \"%s\"", sock->peer);
-		zbx_send_proxy_response(sock, ret, "cannot parse empty data", CONFIG_TIMEOUT);
+		zbx_send_proxy_response(sock, FAIL, "cannot parse empty data", CONFIG_TIMEOUT);
 		goto out;
 	}
 
