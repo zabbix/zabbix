@@ -295,7 +295,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->assertTrue($message->isGood());
 		$message_text = (array_key_exists('rows', $data) && count($data['rows']) === 1)
 				? 'Media type enabled'
-				: 'Media types enabled';
+				: 'Media types enabled. Not enabled: Gmail, Office365. Incomplete configuration.';
 		$this->assertEquals($message_text, $message->getTitle());
 
 		// Check the results in DB.
@@ -308,7 +308,8 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			));
 		}
 		else {
-			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.MEDIA_TYPE_STATUS_DISABLED));
+			// Gmail and Office365 media types cannot be mass updated as they have an empty mandatory password by default.
+			$this->assertEquals(2, CDBHelper::getCount('SELECT NULL FROM media_type WHERE status='.MEDIA_TYPE_STATUS_DISABLED));
 		}
 	}
 
