@@ -36,161 +36,173 @@ class CProxy extends CApiService {
 	protected $sortColumns = ['hostid', 'host', 'status'];
 
 	/**
-	 * Get proxy data.
+	 * @param array $options
 	 *
-	 * @param array  $options
-	 * @param array  $options['proxyids']
-	 * @param bool   $options['editable']	only with read-write permission. Ignored for SuperAdmins
-	 * @param int    $options['count']		returns value in rowscount
-	 * @param string $options['pattern']
-	 * @param int    $options['limit']
-	 * @param string $options['sortfield']
-	 * @param string $options['sortorder']
+	 * @throws APIException
 	 *
-	 * @return array
+	 * @return array|string
 	 */
-	public function get($options = []) {
-		$result = [];
+	public function get(array $options = []) {
+		$output_fields = ['proxyid', 'host', 'status', 'description', 'lastaccess', 'tls_connect', 'tls_accept',
+			'tls_issuer', 'tls_subject', 'proxy_address', 'auto_compress', 'version', 'compatibility'
+		];
 
-		$sqlParts = [
+		/*
+		 * For internal calls, it is possible to get the write-only fields if they were specified in output.
+		 * Specify write-only fields in output only if they will not appear in debug mode.
+		 */
+		if (APP::getMode() !== APP::EXEC_MODE_API) {
+			$output_fields[] = 'tls_psk_identity';
+			$output_fields[] = 'tls_psk';
+		}
+
+		$host_fields = ['hostid', 'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+			'ipmi_password', 'maintenanceid', 'maintenance_status', 'maintenance_type', 'maintenance_from', 'name',
+			'flags', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'inventory_mode',
+			'active_available'
+		];
+		$interface_fields = ['interfaceid', 'hostid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'available',
+			'error', 'errors_from', 'disable_until'
+		];
+
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'proxyids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE])],
+				'lastaccess' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => '0:'.ZBX_MAX_DATE],
+				'version' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'compatibility' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_PROXY_VERSION_UNDEFINED, ZBX_PROXY_VERSION_CURRENT, ZBX_PROXY_VERSION_OUTDATED, ZBX_PROXY_VERSION_UNSUPPORTED])]
+			]],
+			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+				'description' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
+			]],
+			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
+			// output
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
+			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_fields), 'default' => null],
+			'selectInterface' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $interface_fields), 'default' => null],
+			// sort and limit
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
+			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			// flags
+			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
+			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false],
+			'nopermissions' =>			['type' => API_BOOLEAN, 'default' => false]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$sql_parts = [
 			'select'	=> ['hostid' => 'h.hostid'],
 			'from'		=> ['hosts' => 'hosts h'],
-			'where'		=> ['h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'],
-			'order'		=> [],
-			'limit'		=> null
+			'where'		=> [],
+			'order'		=> []
 		];
-
-		$defOptions = [
-			'proxyids'					=> null,
-			'editable'					=> false,
-			'nopermissions'				=> null,
-			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> false,
-			'excludeSearch'				=> false,
-			'searchWildcardsEnabled'	=> null,
-			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'countOutput'				=> false,
-			'preservekeys'				=> false,
-			'selectHosts'				=> null,
-			'selectInterface'			=> null,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null
-		];
-		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+
 			if ($permission == PERM_READ_WRITE) {
-				return [];
+				return $options['countOutput'] ? '0' : [];
 			}
+		}
+
+		$count_output = $options['countOutput'];
+
+		if ($count_output) {
+			$options['output'] = ['proxyid'];
+			$options['countOutput'] = false;
+		}
+		elseif ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = $output_fields;
 		}
 
 		// proxyids
-		if (!is_null($options['proxyids'])) {
-			zbx_value2array($options['proxyids']);
-			$sqlParts['where'][] = dbConditionInt('h.hostid', $options['proxyids']);
+		if ($options['proxyids'] !== null) {
+			$sql_parts['where'][] = dbConditionInt('h.hostid', $options['proxyids']);
 		}
 
 		// filter
-		if (is_array($options['filter'])) {
-			$this->dbFilter('hosts h', $options, $sqlParts);
+		if ($options['filter'] === null) {
+			$options['filter'] = [];
+		}
 
-			$rt_filter = array_intersect_key($options['filter'], ['lastaccess' => '']);
+		if (!array_key_exists('status', $options['filter']) || $options['filter']['status'] === null) {
+			$options['filter']['status'] = [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE];
+		}
 
-			if ($rt_filter && $rt_filter['lastaccess'] !== null) {
-				$this->dbFilter('host_rtdata hr', ['filter' => $rt_filter] + $options,
-					$sqlParts
-				);
+		$this->dbFilter('hosts h', $options, $sql_parts);
+
+		$rt_filter = [];
+		foreach (['lastaccess', 'version', 'compatibility'] as $field) {
+			if (array_key_exists($field, $options['filter']) && $options['filter'][$field] !== null) {
+				$rt_filter[$field] = $options['filter'][$field];
 			}
+		}
+
+		if ($rt_filter) {
+			$this->dbFilter('host_rtdata hr', ['filter' => $rt_filter] + $options, $sql_parts);
 		}
 
 		// search
-		if (is_array($options['search'])) {
-			zbx_db_search('hosts h', $options, $sqlParts);
+		if ($options['search'] !== null) {
+			zbx_db_search('hosts h', $options, $sql_parts);
 		}
 
-		// output
-		$fields = [
-			'proxyid', 'host', 'status', 'description', 'lastaccess', 'tls_connect', 'tls_accept', 'tls_issuer',
-			'tls_subject', 'proxy_address', 'auto_compress'
-		];
-		$options['output'] = ($options['output'] === API_OUTPUT_EXTEND) ? $fields : (array) $options['output'];
+		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$resource = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
-		/*
-		 * For internal calls of API method, is possible to get the write-only fields if they were specified in output.
-		 * Specify write-only fields in output only if they will not appear in debug mode.
-		 */
-		if (APP::getMode() !== APP::EXEC_MODE_API) {
-			$fields[] = 'tls_psk_identity';
-			$fields[] = 'tls_psk';
+		$db_proxies = [];
+
+		while ($row = DBfetch($resource)) {
+			$row['proxyid'] = $row['hostid'];
+			unset($row['hostid']);
+
+			$db_proxies[$row['proxyid']] = $row;
 		}
 
-		$options['output'] = array_intersect($options['output'], $fields);
-
-		// countOutput
-		if ($options['countOutput']) {
-			$options['sortfield'] = '';
-			$sqlParts['select'] = ['COUNT(DISTINCT h.hostid) AS rowscount'];
+		if ($count_output) {
+			return (string) count($db_proxies);
 		}
 
-		// limit
-		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sqlParts['limit'] = $options['limit'];
-		}
+		if ($db_proxies) {
+			$db_proxies = $this->addRelatedObjects($options, $db_proxies);
+			$db_proxies = $this->unsetExtraFields($db_proxies, ['proxyid'], $options['output']);
 
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-		while ($proxy = DBfetch($res)) {
-			if ($options['countOutput']) {
-				$result = $proxy['rowscount'];
-			}
-			else {
-				$proxy['proxyid'] = $proxy['hostid'];
-				unset($proxy['hostid']);
-
-				$result[$proxy['proxyid']] = $proxy;
+			if (!$options['preservekeys']) {
+				$db_proxies = array_values($db_proxies);
 			}
 		}
 
-		if ($options['countOutput']) {
-			return $result;
-		}
-
-		if ($result) {
-			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
-		}
-
-		// removing keys (hash -> array)
-		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
-		}
-
-		return $result;
+		return $db_proxies;
 	}
 
 	/**
-	 * Create proxy.
-	 *
 	 * @param array $proxies
+	 *
+	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	public function create(array $proxies) {
+	public function create(array $proxies): array {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'proxy', __FUNCTION__)
 			);
 		}
 
-		$this->validateCreate($proxies);
+		self::validateCreate($proxies);
 
 		$proxyids = DB::insert('hosts', $proxies);
 		$host_rtdata = [];
@@ -202,8 +214,8 @@ class CProxy extends CApiService {
 		unset($proxy);
 
 		DB::insert('host_rtdata', $host_rtdata, false);
-		self::updateInterfaces($proxies, __FUNCTION__);
-		self::updateHosts($proxies, __FUNCTION__);
+		self::updateInterfaces($proxies);
+		self::updateHosts($proxies);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_PROXY, $proxies);
 
@@ -211,13 +223,13 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Update proxy.
-	 *
 	 * @param array $proxies
+	 *
+	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	public function update(array $proxies) {
+	public function update(array $proxies): array {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'proxy', __FUNCTION__)
@@ -243,8 +255,8 @@ class CProxy extends CApiService {
 			DB::update('hosts', $upd_proxies);
 		}
 
-		self::updateInterfaces($proxies, __FUNCTION__, $db_proxies);
-		self::updateHosts($proxies, __FUNCTION__, $db_proxies);
+		self::updateInterfaces($proxies, $db_proxies);
+		self::updateHosts($proxies, $db_proxies);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_PROXY, $proxies, $db_proxies);
 
@@ -252,15 +264,10 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Update table "interface".
-	 *
-	 * @static
-	 *
 	 * @param array      $proxies
-	 * @param string     $method
-	 * @param null|array $db_proxies
+	 * @param array|null $db_proxies
 	 */
-	private static function updateInterfaces(array &$proxies, string $method, array $db_proxies = null): void {
+	private static function updateInterfaces(array &$proxies, array $db_proxies = null): void {
 		$ins_interfaces = [];
 		$upd_interfaces = [];
 		$del_interfaceids = [];
@@ -270,7 +277,7 @@ class CProxy extends CApiService {
 				continue;
 			}
 
-			$db_interface = ($method == 'update') ? $db_proxies[$proxy['proxyid']]['interface'] : [];
+			$db_interface = $db_proxies !== null ? $db_proxies[$proxy['proxyid']]['interface'] : [];
 
 			if ($proxy['interface']) {
 				if ($db_interface) {
@@ -319,15 +326,10 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Update table "hosts".
-	 *
-	 * @static
-	 *
 	 * @param array      $proxies
-	 * @param string     $method
-	 * @param null|array $db_proxies
+	 * @param array|null $db_proxies
 	 */
-	private static function updateHosts(array &$proxies, string $method, array $db_proxies = null): void {
+	private static function updateHosts(array &$proxies, array $db_proxies = null): void {
 		$upd_hosts = [];
 
 		foreach ($proxies as &$proxy) {
@@ -335,7 +337,7 @@ class CProxy extends CApiService {
 				continue;
 			}
 
-			$db_hosts = ($method == 'update') ? $db_proxies[$proxy['proxyid']]['hosts'] : [];
+			$db_hosts = $db_proxies !== null ? $db_proxies[$proxy['proxyid']]['hosts'] : [];
 
 			foreach ($proxy['hosts'] as $host) {
 				if (!array_key_exists($host['hostid'], $db_hosts)) {
@@ -366,11 +368,11 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * @param array	$proxyids
+	 * @param array $proxyids
 	 *
 	 * @return array
 	 */
-	public function delete(array $proxyids) {
+	public function delete(array $proxyids): array {
 		$this->validateDelete($proxyids, $db_proxies);
 
 		DB::delete('host_rtdata', ['hostid' => $proxyids]);
@@ -383,12 +385,12 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * @param array $proxyids
-	 * @param array $db_proxies
+	 * @param array      $proxyids
+	 * @param array|null $db_proxies
 	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException
 	 */
-	private function validateDelete(array &$proxyids, array &$db_proxies = null) {
+	private function validateDelete(array &$proxyids, ?array &$db_proxies): void {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'proxy', __FUNCTION__)
@@ -412,9 +414,9 @@ class CProxy extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$this->checkUsedInDiscovery($db_proxies);
-		$this->checkUsedInHosts($db_proxies);
-		$this->checkUsedInActions($db_proxies);
+		self::checkUsedInDiscovery($db_proxies);
+		self::checkUsedInHosts($db_proxies);
+		self::checkUsedInActions($db_proxies);
 	}
 
 	/**
@@ -422,8 +424,10 @@ class CProxy extends CApiService {
 	 *
 	 * @param array  $proxies
 	 * @param string $proxies[<proxyid>]['host']
+	 *
+	 * @throws APIException
 	 */
-	private function checkUsedInDiscovery(array $proxies) {
+	private static function checkUsedInDiscovery(array $proxies): void {
 		$db_drules = DB::select('drules', [
 			'output' => ['proxy_hostid', 'name'],
 			'filter' => ['proxy_hostid' => array_keys($proxies)],
@@ -442,8 +446,10 @@ class CProxy extends CApiService {
 	 *
 	 * @param array  $proxies
 	 * @param string $proxies[<proxyid>]['host']
+	 *
+	 * @throws APIException
 	 */
-	protected function checkUsedInHosts(array $proxies) {
+	private static function checkUsedInHosts(array $proxies): void {
 		$db_hosts = DB::select('hosts', [
 			'output' => ['proxy_hostid', 'name'],
 			'filter' => ['proxy_hostid' => array_keys($proxies)],
@@ -462,8 +468,10 @@ class CProxy extends CApiService {
 	 *
 	 * @param array  $proxies
 	 * @param string $proxies[<proxyid>]['host']
+	 *
+	 * @throws APIException
 	 */
-	private function checkUsedInActions(array $proxies) {
+	private static function checkUsedInActions(array $proxies): void {
 		$db_actions = DBfetchArray(DBselect(
 			'SELECT a.name,c.value AS proxy_hostid'.
 			' FROM actions a,conditions c'.
@@ -483,18 +491,27 @@ class CProxy extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if (!$options['countOutput'] && $options['selectInterface'] !== null) {
-			$sqlParts = $this->addQuerySelect('h.hostid', $sqlParts);
-		}
+		if (!$options['countOutput']) {
+			if ($options['selectInterface'] !== null) {
+				$sqlParts = $this->addQuerySelect('h.hostid', $sqlParts);
+			}
 
-		if ((!$options['countOutput'] && $this->outputIsRequested('lastaccess', $options['output'])
-				|| (is_array($options['filter']) && array_key_exists('lastaccess', $options['filter'])))) {
-			$sqlParts['left_join'][] = ['alias' => 'hr', 'table' => 'host_rtdata', 'using' => 'hostid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-		}
+			$host_rtdata = false;
+			foreach (['lastaccess', 'version', 'compatibility'] as $field) {
+				if ($this->outputIsRequested($field, $options['output'])) {
+					$sqlParts = $this->addQuerySelect('hr.'.$field, $sqlParts);
+					$host_rtdata = true;
+				}
 
-		if (!$options['countOutput'] && $this->outputIsRequested('lastaccess', $options['output'])) {
-			$sqlParts = $this->addQuerySelect('hr.lastaccess', $sqlParts);
+				if (is_array($options['filter']) && array_key_exists($field, $options['filter'])) {
+					$host_rtdata = true;
+				}
+			}
+
+			if ($host_rtdata) {
+				$sqlParts['left_join'][] = ['alias' => 'hr', 'table' => 'host_rtdata', 'using' => 'hostid'];
+				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+			}
 		}
 
 		return $sqlParts;
@@ -542,13 +559,11 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the create() method.
-	 *
 	 * @param array $proxies
 	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException
 	 */
-	protected function validateCreate(array &$proxies) {
+	private static function validateCreate(array &$proxies): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['host']], 'fields' => [
 			'host' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hosts', 'host')],
 			'status' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE])],
@@ -624,16 +639,12 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Check for unique proxy names.
-	 *
-	 * @static
-	 *
 	 * @param array      $proxies
 	 * @param array|null $db_proxies
 	 *
-	 * @throws APIException if proxy names are not unique.
+	 * @throws APIException
 	 */
-	protected static function checkDuplicates(array $proxies, array $db_proxies = null): void {
+	private static function checkDuplicates(array $proxies, array $db_proxies = null): void {
 		$names = [];
 
 		foreach ($proxies as $proxy) {
@@ -665,16 +676,12 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Check for valid hosts.
-	 *
-	 * @static
-	 *
 	 * @param array      $proxies
 	 * @param array|null $db_proxies
 	 *
-	 * @throws APIException if hosts are not valid.
+	 * @throws APIException
 	 */
-	protected static function checkHosts(array $proxies, array $db_proxies = null): void {
+	private static function checkHosts(array $proxies, array $db_proxies = null): void {
 		$hostids = [];
 
 		foreach ($proxies as $proxy) {
@@ -683,7 +690,7 @@ class CProxy extends CApiService {
 			}
 
 			$proxy_hostids = array_column($proxy['hosts'], null, 'hostid');
-			$db_proxy_hostids = ($db_proxies !== null)
+			$db_proxy_hostids = $db_proxies !== null
 				? array_column($db_proxies[$proxy['proxyid']]['hosts'], null, 'hostid')
 				: [];
 
@@ -694,7 +701,6 @@ class CProxy extends CApiService {
 			return;
 		}
 
-		// Check if host exists.
 		$db_hosts = API::Host()->get([
 			'output' => ['hostid', 'host', 'flags'],
 			'hostids' => array_keys($hostids),
@@ -715,15 +721,11 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Check for valid proxy address field.
-	 *
-	 * @static
-	 *
 	 * @param array $proxies
 	 *
-	 * @throws APIException if proxy addresses are not valid.
+	 * @throws APIException
 	 */
-	protected static function checkProxyAddress(array &$proxies): void {
+	private static function checkProxyAddress(array &$proxies): void {
 		foreach ($proxies as $i => &$proxy) {
 			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
 				$proxy += ['proxy_address' => ''];
@@ -739,16 +741,12 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Check for valid interface.
-	 *
-	 * @static
-	 *
 	 * @param array  $proxies
 	 * @param string $method
 	 *
-	 * @throws APIException if proxy interface is not valid.
+	 * @throws APIException
 	 */
-	protected static function checkInterface(array &$proxies, string $method): void {
+	private static function checkInterface(array &$proxies, string $method): void {
 		foreach ($proxies as $i => &$proxy) {
 			if ($proxy['status'] == HOST_STATUS_PROXY_ACTIVE) {
 				$proxy += ['interface' => []];
@@ -793,14 +791,12 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Validates the input parameters for the update() method.
-	 *
 	 * @param array      $proxies
 	 * @param array|null $db_proxies
 	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException
 	 */
-	protected function validateUpdate(array &$proxies, array &$db_proxies = null) {
+	private function validateUpdate(array &$proxies, ?array &$db_proxies): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['proxyid']], 'fields' => [
 			'proxyid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'status' =>				['type' => API_INT32, 'in' => implode(',', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE])],
@@ -954,10 +950,6 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Add the existing hosts and host interfaces to $db_proxies whether these are affected by the update.
-	 *
-	 * @static
-	 *
 	 * @param array $proxies
 	 * @param array $db_proxies
 	 */

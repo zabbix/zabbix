@@ -41,7 +41,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 ZBX_THREAD_ENTRY(dbconfig_thread, args)
 {
 	double			sec = 0.0;
-	int			nextcheck = 0, sleeptime, secrets_reload = 0;
+	int			nextcheck = 0, sleeptime, secrets_reload = 0, cache_reload = 0;
 	zbx_ipc_async_socket_t	rtc;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
@@ -81,10 +81,10 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		{
 			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
 			{
-				if (0 != nextcheck)
+				if (0 == cache_reload)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
-					nextcheck = 0;
+					cache_reload = 1;
 				}
 				else
 					zabbix_log(LOG_LEVEL_WARNING, "configuration cache reloading is already in progress");
@@ -117,11 +117,18 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			DCsync_kvs_paths(NULL);
 			DCupdate_interfaces_availability();
 			nextcheck = (int)time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
+
+			if (0 != cache_reload)
+			{
+				cache_reload = 0;
+				zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the configuration cache");
+			}
 		}
 		else
 		{
 			DCsync_kvs_paths(NULL);
 			secrets_reload = 0;
+			zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the secrets");
 		}
 
 		sec = zbx_time() - sec;

@@ -17,8 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 static int	read_uint64_from_procfs(const char *path, int first_num, zbx_uint64_t *value)
 {
@@ -60,6 +59,7 @@ int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	SET_UI64_RESULT(result, value);
+
 	return SYSINFO_RET_OK;
 }
 
@@ -76,6 +76,7 @@ int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	SET_UI64_RESULT(result, value);
+
 	return SYSINFO_RET_OK;
 }
 
@@ -92,5 +93,6 @@ int	KERNEL_OPENFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	SET_UI64_RESULT(result, value);
+
 	return SYSINFO_RET_OK;
 }

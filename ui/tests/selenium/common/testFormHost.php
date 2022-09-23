@@ -178,7 +178,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test update functionality in host form and interfaces',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => 20001,
+				'proxy_hostid' => 20000,
 				'status' => HOST_STATUS_MONITORED
 			],
 			[
@@ -186,7 +186,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test clone functionality in host form and interfaces 😀',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => 20001,
+				'proxy_hostid' => 20000,
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
 					[
@@ -734,7 +734,7 @@ class testFormHost extends CWebTest {
 						'Visible name' => 'Host with all interfaces visible name',
 						'Host groups' => 'Zabbix servers',
 						'Description' => 'Added description for host with all interfaces',
-						'Monitored by proxy' => 'Active proxy 1',
+						'Monitored by proxy' => 'Proxy for Discovery rule',
 						'Enabled' => false
 					],
 					'interfaces' => [
@@ -1440,7 +1440,7 @@ class testFormHost extends CWebTest {
 				'Visible name' => 'testFormHost_Update Visible name',
 				'Host groups' => 'Zabbix servers',
 				'Description' => 'Created host via API to test update functionality in host form and interfaces',
-				'Monitored by proxy' => 'Active proxy 2',
+				'Monitored by proxy' => 'Proxy for Discovery rule',
 				'Enabled' => true
 			],
 			'interfaces' => [
@@ -1703,6 +1703,7 @@ class testFormHost extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected')) {
 			$this->assertMessage(TEST_ERROR, null, $data['error']);
+			CMessageElement::find()->one()->close();
 		}
 
 		$cloned_form->submit();

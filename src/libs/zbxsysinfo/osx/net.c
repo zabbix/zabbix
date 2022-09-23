@@ -18,7 +18,7 @@
 **/
 
 #include "../common/zbxsysinfo_common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 #include "zbxnum.h"
 #include "log.h"
@@ -211,7 +211,7 @@ int     NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*port_str, command[64];
 	unsigned short	port;
@@ -242,7 +242,7 @@ int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int     NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *error;
 

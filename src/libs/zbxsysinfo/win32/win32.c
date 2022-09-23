@@ -17,10 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxwinservice.h"
+#include "zbxsysinfo.h"
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxwinservice.h"
 
 ZBX_METRIC	parameters_specific[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
@@ -68,8 +67,10 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"__UserPerfCounter",	CF_HAVEPARAMS,	USER_PERF_COUNTER,	""},
 
-	{"wmi.get",		CF_HAVEPARAMS,	WMI_GET,		"root\\cimv2,select Caption from Win32_OperatingSystem"},
-	{"wmi.getall",		CF_HAVEPARAMS,	WMI_GETALL,		"root\\cimv2,select * from Win32_OperatingSystem"},
+	{"wmi.get",		CF_HAVEPARAMS,	WMI_GET,
+							"root\\cimv2,select Caption from Win32_OperatingSystem"},
+	{"wmi.getall",		CF_HAVEPARAMS,	WMI_GETALL,
+							"root\\cimv2,select * from Win32_OperatingSystem"},
 
 	{"registry.data",		CF_HAVEPARAMS,	REGISTRY_DATA,		NULL},
 	{"registry.get",		CF_HAVEPARAMS,	REGISTRY_GET,		NULL},
