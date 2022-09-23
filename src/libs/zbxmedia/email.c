@@ -37,11 +37,6 @@
 /* separator for multipart mixed messages */
 #define ZBX_MULTIPART_MIXED_BOUNDARY	"MULTIPART-MIXED-BOUNDARY"
 
-#define OK_220	"220"
-#define OK_250	"250"
-#define OK_251	"251"
-#define OK_354	"354"
-
 extern char	*CONFIG_SSL_CA_LOCATION;
 
 /******************************************************************************
@@ -459,7 +454,7 @@ static char	*smtp_get_helo_from_addr(const char *addr)
 
 	addr_len = strlen(domain + 1);
 
-	if (addr_len == 1 && *(domain + 1) == '>')
+	if (1 == addr_len && '>' == *(domain + 1))
 		return NULL;
 
 	helo_addr = zbx_strdup(NULL, domain + 1);
@@ -468,7 +463,8 @@ static char	*smtp_get_helo_from_addr(const char *addr)
 	return helo_addr;
 }
 
-static int	send_smtp_helo_plain(const char *addr, const char *helo, zbx_socket_t *s, char **error, size_t max_error_len)
+static int	send_smtp_helo_plain(const char *addr, const char *helo, zbx_socket_t *s, char **error,
+		size_t max_error_len)
 {
 	char		cmd[MAX_STRING_LEN], *helo_parsed = NULL;
 	const char	*response;
@@ -482,8 +478,8 @@ static int	send_smtp_helo_plain(const char *addr, const char *helo, zbx_socket_t
 	{
 		if (NULL == (helo_parsed = smtp_get_helo_from_addr(addr)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() HELO is not specified and failed to parse HELO from email address, "
-					"trying to form HELO command using system's hostname", __func__);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() HELO is not specified and failed to parse HELO from email "
+					"address, trying to form HELO command using system's hostname", __func__);
 
 			if (NULL == (helo_parsed = smtp_get_helo_from_system()))
 			{
@@ -522,6 +518,7 @@ static int	send_smtp_helo_plain(const char *addr, const char *helo, zbx_socket_t
 	}
 out:
 	zbx_free(helo_parsed);
+
 	return ret;
 }
 
@@ -530,6 +527,10 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 		const char *mailsubject, const char *mailbody, unsigned char content_type, int timeout, char *error,
 		size_t max_error_len)
 {
+#define OK_220	"220"
+#define OK_250	"250"
+#define OK_251	"251"
+#define OK_354	"354"
 	zbx_socket_t	s;
 	int		err, ret = FAIL, i;
 	char		cmd[MAX_STRING_LEN], *cmdp = NULL, *helo_addr = NULL;
@@ -612,7 +613,8 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 		}
 
 		/* May return 251 as well: User not local; will forward to <forward-path>. See RFC825. */
-		if (0 != strncmp(response, OK_250, ZBX_CONST_STRLEN(OK_250)) && 0 != strncmp(response, OK_251, ZBX_CONST_STRLEN(OK_251)))
+		if (0 != strncmp(response, OK_250, ZBX_CONST_STRLEN(OK_250)) &&
+				0 != strncmp(response, OK_251, ZBX_CONST_STRLEN(OK_251)))
 		{
 			zbx_snprintf(error, max_error_len, "wrong answer on RCPT TO \"%s\"", response);
 			goto close;
@@ -691,6 +693,10 @@ out:
 	zbx_alarm_off();
 
 	return ret;
+#undef OK_220
+#undef OK_250
+#undef OK_251
+#undef OK_354
 }
 
 static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
@@ -734,12 +740,12 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 
 		if (0 != from_mails->values_num)
 		{
-			if (NULL == (helo_domain = smtp_get_helo_from_addr(((zbx_mailaddr_t *)from_mails->values[0])->addr)))
+			if (NULL == (helo_domain =
+					smtp_get_helo_from_addr(((zbx_mailaddr_t *)from_mails->values[0])->addr)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() HELO is not specified and failed to parse HELO "
-						"from email address, trying to form HELO command using system's hostname",
-						__func__);
-
+						"from email address, trying to form HELO command using system's "
+						"hostname", __func__);
 			}
 		}
 
@@ -754,7 +760,6 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 
 		zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "/%s", helo_domain);
 		zbx_free(helo_domain);
-
 	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)))
