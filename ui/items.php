@@ -733,41 +733,52 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('copy')
 		&& hasRequest('group_itemid')) {
 	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
-		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$hostids = getRequest('copy_targetids');
-		}
-		elseif (getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE_GROUP) {
+		if (in_array(getRequest('copy_type'), [COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP])) {
+			$options = getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE
+				? ['templateids' => getRequest('copy_targetids')]
+				: ['groupids' => getRequest('copy_targetids')];
+
 			$hostids = array_keys(API::Template()->get([
 				'output' => [],
-				'groupids' => getRequest('copy_targetids'),
 				'editable' => true,
 				'preservekeys' => true
-			]));
+			] + $options));
+
+			$dst_is_template = true;
 		}
-		else {
+
+		if (in_array(getRequest('copy_type'), [COPY_TYPE_TO_HOST, COPY_TYPE_TO_HOST_GROUP])) {
+			$options = getRequest('copy_type') == COPY_TYPE_TO_HOST
+				? ['hostids' => getRequest('copy_targetids')]
+				: ['groupids' => getRequest('copy_targetids')];
+
 			$hostids = array_keys(API::Host()->get([
 				'output' => [],
-				'groupids' => getRequest('copy_targetids'),
 				'editable' => true,
 				'preservekeys' => true
-			]));
+			] + $options));
+
+			$dst_is_template = false;
 		}
 
-		DBstart();
+		$result = true;
 
-		$result = copyItemsToHosts(getRequest('group_itemid'), $hostids);
-		$result = DBend($result);
+		if ($hostids) {
+			DBstart();
+			$result = copyItemsToHosts('itemids', getRequest('group_itemid'), $dst_is_template, $hostids);
+			DBend($result);
+		}
 
 		$items_count = count(getRequest('group_itemid'));
+
+		show_messages($result, _n('Item copied', 'Items copied', $items_count),
+			_n('Cannot copy item', 'Cannot copy items', $items_count)
+		);
 
 		if ($result) {
 			uncheckTableRows(getRequest('checkbox_hash'));
 			unset($_REQUEST['group_itemid']);
 		}
-		show_messages($result,
-			_n('Item copied', 'Items copied', $items_count),
-			_n('Cannot copy item', 'Cannot copy items', $items_count)
-		);
 	}
 	else {
 		show_error_message(_('No target selected.'));
