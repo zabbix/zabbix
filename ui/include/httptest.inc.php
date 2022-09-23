@@ -106,14 +106,7 @@ function deleteHistoryByHttpTestIds(array $httptestids): bool {
 		$result = (bool) API::History()->clear($itemids);
 	}
 
-	$result = ($result && DB::update('httptest', [
-		'values' => ['nextcheck' => 0],
-		'where' => ['httptestid' => $httptestids]
-	]));
-
-	$result = DBend($result);
-
-	return $result;
+	return DBend($result);
 }
 
 function get_httptest_by_httptestid($httptestid) {

@@ -3325,10 +3325,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			int	updated = 0, revision;
 
 			if (1 == service_cache_reload_requested)
-			{
 				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the service manager cache");
-				service_cache_reload_requested = 0;
-			}
 
 			do
 			{
@@ -3354,6 +3351,13 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 
 			if (0 != updated)
 				recalculate_services(&service_manager);
+
+			if (1 == service_cache_reload_requested)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the service manager cache");
+				service_cache_reload_requested = 0;
+			}
+
 
 			service_update_num += updated;
 			time_flush = time_now;
