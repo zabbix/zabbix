@@ -485,7 +485,7 @@ abstract class CItemType {
 			'query_fields' =>		['type' => API_OBJECTS, 'length' => 0],
 			'request_method' =>		['type' => API_INT32, 'in' => DB::getDefault('items', 'request_method')],
 			'post_type' =>			['type' => API_INT32, 'in' => DB::getDefault('items', 'post_type')],
-			'posts' =>				['type' => API_INT32, 'in' => DB::getDefault('items', 'posts')],
+			'posts' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'posts')],
 			'headers' =>			['type' => API_OBJECT, 'fields' => []],
 			'status_codes' =>		['type' => API_INT32_RANGES, 'in' => DB::getDefault('items', 'status_codes')],
 			'follow_redirects' =>	['type' => API_INT32, 'in' => DB::getDefault('items', 'follow_redirects')],
