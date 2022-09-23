@@ -34,9 +34,16 @@
 #define ZBX_DBSYNC_OBJ_TRIGGER_TAG	6
 #define ZBX_DBSYNC_OBJ_FUNCTION		7
 #define ZBX_DBSYNC_OBJ_ITEM_PREPROC	8
-
+#define ZBX_DBSYNC_OBJ_DRULE		9
+#define ZBX_DBSYNC_OBJ_DCHECK		10
+#define ZBX_DBSYNC_OBJ_HTTPTEST		11
+#define ZBX_DBSYNC_OBJ_HTTPTEST_FIELD	12
+#define ZBX_DBSYNC_OBJ_HTTPTESTITEM	13
+#define ZBX_DBSYNC_OBJ_HTTPSTEP		14
+#define ZBX_DBSYNC_OBJ_HTTPSTEP_FIELD	15
+#define ZBX_DBSYNC_OBJ_HTTPSTEP_ITEM	16
 /* number of dbsync objects - keep in sync with above defines */
-#define ZBX_DBSYNC_OBJ_COUNT		8
+#define ZBX_DBSYNC_OBJ_COUNT		16
 
 #define ZBX_DBSYNC_JOURNAL(X)		(X - 1)
 
@@ -511,8 +518,8 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 
 static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal)
 {
-	zbx_vector_uint64_t	objectids;
-	int			i, j, objects_num;
+	zbx_hashset_t	objectids;
+	int		i, j, objects_num;
 
 	if (0 == journal->changelog.values_num)
 		return;
@@ -522,8 +529,8 @@ static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal)
 	for (i = 0; i < journal->syncs.values_num; i++)
 		objects_num += journal->syncs.values[i]->rows.values_num;
 
-	zbx_vector_uint64_create(&objectids);
-	zbx_vector_uint64_reserve(&objectids, (size_t)objects_num);
+	zbx_hashset_create(&objectids, (size_t)objects_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (j = 0; j < journal->syncs.values_num; j++)
 	{
@@ -531,29 +538,26 @@ static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal)
 		{
 			zbx_dbsync_row_t	*row = (zbx_dbsync_row_t *)journal->syncs.values[j]->rows.values[i];
 
-			zbx_vector_uint64_append(&objectids, row->rowid);
+			zbx_hashset_insert(&objectids, &row->rowid, sizeof(row->rowid));
 		}
 	}
 
-	if (0 != journal->inserts.values_num)
-		zbx_vector_uint64_append_array(&objectids, journal->inserts.values, journal->inserts.values_num);
+	for (i = 0; i < journal->inserts.values_num; i++)
+		zbx_hashset_insert(&objectids, &journal->inserts.values[i], sizeof(journal->inserts.values[i]));
 
-	if (0 != journal->updates.values_num)
-		zbx_vector_uint64_append_array(&objectids, journal->updates.values, journal->updates.values_num);
-
-	zbx_vector_uint64_sort(&objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	for (i = 0; i < journal->updates.values_num; i++)
+		zbx_hashset_insert(&objectids, &journal->updates.values[i], sizeof(journal->updates.values[i]));
 
 	for (i = 0; i < journal->changelog.values_num; i++)
 	{
-		if (FAIL != zbx_vector_uint64_bsearch(&objectids, journal->changelog.values[i].objectid,
-				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (NULL != zbx_hashset_search(&objectids, &journal->changelog.values[i].objectid))
 		{
 			zbx_hashset_insert(&dbsync_env.changelog, &journal->changelog.values[i].changelog,
 					sizeof(zbx_dbsync_changelog_t));
 		}
 	}
 
-	zbx_vector_uint64_destroy(&objectids);
+	zbx_hashset_destroy(&objectids);
 }
 
 void	zbx_dbsync_env_flush_changelog(void)
@@ -592,7 +596,7 @@ int	zbx_dbsync_env_changelog_num(void)
  *                                                                            *
  ******************************************************************************/
 static int	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *field, zbx_vector_uint64_t *ids, unsigned char tag)
+		const char *field, const char *order_field, zbx_vector_uint64_t *ids, unsigned char tag)
 {
 	DB_ROW			dbrow;
 	DB_RESULT		result;
@@ -609,6 +613,8 @@ static int	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, si
 	{
 		batch_size = MIN(ZBX_DBSYNC_BATCH_SIZE, ids->values + ids->values_num - batch);
 		DBadd_condition_alloc(sql, sql_alloc, sql_offset, field, batch, batch_size);
+		if (NULL != order_field)
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " order by %s", order_field);
 
 		if (NULL == (result = DBselect("%s", *sql)))
 			return FAIL;
@@ -640,7 +646,7 @@ static int	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, si
  *                                                                            *
  ******************************************************************************/
 static int	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *field, const char *keyword, zbx_dbsync_journal_t *journal)
+		const char *field, const char *keyword, const char *order_field, zbx_dbsync_journal_t *journal)
 {
 	int	i, inserts_num, updates_num;
 
@@ -656,8 +662,8 @@ static int	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc
 
 		if (0 != journal->inserts.values_num)
 		{
-			if (FAIL == dbsync_get_rows(sync, sql, sql_alloc, sql_offset, field, &journal->inserts,
-					ZBX_DBSYNC_ROW_ADD))
+			if (FAIL == dbsync_get_rows(sync, sql, sql_alloc, sql_offset, field, order_field,
+					&journal->inserts, ZBX_DBSYNC_ROW_ADD))
 			{
 				return FAIL;
 			}
@@ -665,8 +671,8 @@ static int	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc
 
 		if (0 != journal->updates.values_num)
 		{
-			if (FAIL == dbsync_get_rows(sync, sql, sql_alloc, sql_offset, field, &journal->updates,
-					ZBX_DBSYNC_ROW_UPDATE))
+			if (FAIL == dbsync_get_rows(sync, sql, sql_alloc, sql_offset, field, order_field,
+					&journal->updates, ZBX_DBSYNC_ROW_UPDATE))
 			{
 				return FAIL;
 			}
@@ -925,11 +931,7 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
 
-		if ('\0' == dbsync_env.cache->autoreg_psk_identity[0])	/* no autoregistration PSK in cache */
-		{
-			tag = ZBX_DBSYNC_ROW_ADD;
-		}
-		else if (FAIL == dbsync_compare_str(dbrow[0], dbsync_env.cache->autoreg_psk_identity) ||
+		if (FAIL == dbsync_compare_str(dbrow[0], dbsync_env.cache->autoreg_psk_identity) ||
 				FAIL == dbsync_compare_str(dbrow[1], dbsync_env.cache->autoreg_psk))
 		{
 			tag = ZBX_DBSYNC_ROW_UPDATE;
@@ -1030,12 +1032,14 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by h.proxy_hostid");
 		if (NULL == (sync->dbresult = DBselect("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
 
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "h.hostid", "and",
+	/* sort by h.proxy_hostid to ensure that proxies are synced before hosts assigned to them */
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "h.hostid", "and", "h.proxy_hostid",
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)]);
 out:
 	zbx_free(sql);
@@ -1730,7 +1734,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "i.itemid", "and",
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "i.itemid", "and", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM)]);
 out:
 	zbx_free(sql);
@@ -1918,7 +1922,7 @@ int	zbx_dbsync_compare_prototype_items(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "i.itemid", "and",
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "i.itemid", "and", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM)]);
 out:
 	zbx_free(sql);
@@ -2030,7 +2034,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "triggerid", "where",
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "triggerid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_TRIGGER)]);
 out:
 	zbx_free(sql);
@@ -2169,7 +2173,7 @@ int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "functionid", "where",
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "functionid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_FUNCTION)]);
 out:
 	zbx_free(sql);
@@ -2598,7 +2602,7 @@ int	zbx_dbsync_compare_trigger_tags(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "triggertagid", "where",
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "triggertagid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_TRIGGER_TAG)]);
 out:
 	zbx_free(sql);
@@ -2633,7 +2637,7 @@ int	zbx_dbsync_compare_item_tags(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "itemtagid", "where",
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "itemtagid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM_TAG)]);
 out:
 	zbx_free(sql);
@@ -2668,7 +2672,7 @@ int	zbx_dbsync_compare_host_tags(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "hosttagid", "where",
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "hosttagid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST_TAG)]);
 out:
 	zbx_free(sql);
@@ -3114,7 +3118,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "item_preprocid", "where",
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "item_preprocid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM_PREPROC)]);
 out:
 	zbx_free(sql);
@@ -3762,4 +3766,222 @@ int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync)
 	zbx_hashset_destroy(&groups);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare dbsync object for drules table                            *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_prepare_drules(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select druleid,proxy_hostid,delay,status from drules");
+
+	dbsync_prepare(sync, 4, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "druleid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_DRULE)]);
+out:
+	zbx_free(sql);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare dbsync object for dchecks tabkle                          *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_prepare_dchecks(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select dcheckid,druleid from dchecks");
+
+	dbsync_prepare(sync, 2, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "dcheckid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_DCHECK)]);
+out:
+	zbx_free(sql);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare dbsync object for httptest table                          *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_prepare_httptests(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select httptestid,hostid,delay,status from httptest");
+
+	dbsync_prepare(sync, 4, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "httptestid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HTTPTEST)]);
+out:
+	zbx_free(sql);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare dbsync object for httptest_field table                    *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_prepare_httptest_fields(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select httptest_fieldid,httptestid from httptest_field");
+
+	dbsync_prepare(sync, 2, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "httptest_fieldid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HTTPTEST_FIELD)]);
+out:
+	zbx_free(sql);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare dbsync object for httpstep table                          *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_prepare_httpsteps(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select httpstepid,httptestid from httpstep");
+	dbsync_prepare(sync, 2, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "httpstepid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HTTPSTEP)]);
+out:
+	zbx_free(sql);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare dbsync object for httpstep_field table                    *
+ *                                                                            *
+ * Parameter: sync - [OUT] the changeset                                      *
+ *                                                                            *
+ * Return value: SUCCEED - the changeset was successfully calculated          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_prepare_httpstep_fields(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select httpstep_fieldid,httpstepid from httpstep_field");
+	dbsync_prepare(sync, 2, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "httpstep_fieldid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HTTPSTEP_FIELD)]);
+out:
+	zbx_free(sql);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove deleted hosts/templates from user macro cache              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dbsync_clear_user_macros(void)
+{
+	um_cache_remove_hosts(config->um_cache, &dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)].deletes);
 }

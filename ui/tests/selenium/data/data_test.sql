@@ -290,7 +290,7 @@ INSERT INTO items (itemid, name, type, hostid, description, key_, delay, history
 INSERT INTO items (itemid, name, type, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags, interfaceid, inventory_link, posts, headers) VALUES (23101, 'Item_populating_filed_Type', 0, 10053, 'i am populating filed Type', 'key.test.pop.type', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 0, 10021, 1, '', '');
 
 -- test discovery rule
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (3, NULL, 'External network', '192.168.3.1-255', 600, 0, 0);
+INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (3, NULL, 'External network', '192.168.3.1-255', 600, 0);
 
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (6, 3, 9, 'system.uname', '', '10050', '', 0, '', '', 0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (7, 3, 3, '', '', '21,1021', '', 0, '', '', 0);
@@ -310,11 +310,11 @@ INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (21, 3, 15, '', '', '23', '', 0, '', '', 0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (22, 3, 9, 'agent.uname', '', '10050', '', 0, '', '', 0);
 
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (4, 20000, 'Discovery rule for update', '192.14.3.1-255', 600, 0, 0);
+INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (4, 20000, 'Discovery rule for update', '192.14.3.1-255', 600, 0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (23, 4, 12, '', '', '0', '', 0, '', '', 0);
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (5, 20000, 'Disabled discovery rule for update', '192.15.3.1-255', 600, 0, 1);
+INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (5, 20000, 'Disabled discovery rule for update', '192.15.3.1-255', 600, 1);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (24, 5, 12, '', '', '0', '', 0, '', '', 0);
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, nextcheck, status) VALUES (6, 20000, 'Discovery rule to check delete', '192.16.3.1-255', 600, 0, 1);
+INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (6, 20000, 'Discovery rule to check delete', '192.16.3.1-255', 600, 1);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (25, 6, 12, '', '', '0', '', 0, '', '', 0);
 
 -- Global macros
