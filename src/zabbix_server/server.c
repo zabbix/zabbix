@@ -1291,6 +1291,10 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
 	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, 0, &db_version_info};
 
+#ifdef HAVE_POSTGRESQL
+	housekeeper_args.tsdb_version = ZBX_TSDB_VERSION;
+#endif
+
 	if (SUCCEED != init_database_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
