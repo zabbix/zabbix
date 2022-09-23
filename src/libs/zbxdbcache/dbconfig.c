@@ -1670,7 +1670,7 @@ done:
 	}
 
 	for (i = 0; i < proxy_hosts.values_num; i++)
-		dc_host_register_proxy( proxy_hosts.values[i],  proxy_hosts.values[i]->proxy_hostid, revision);
+		dc_host_register_proxy(proxy_hosts.values[i], proxy_hosts.values[i]->proxy_hostid, revision);
 
 	/* remove deleted hosts from buffer */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
