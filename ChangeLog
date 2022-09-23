@@ -1,10 +1,20 @@
 Changes for 6.4.0alpha2
 
 New features:
+A......PS. [ZBXNEXT-3290] added incremental proxy configuration sync (acikuns, wiper)
+A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 .......PS. [ZBXNEXT-7931] removed heartbeats support from Zabbix proxy (jxl)
 A.F.I..PST [ZBXNEXT-2557] added support of Zabbix proxies with legacy version (abakaldin, esekace, mprihodko)
 
 Bug fixes:
+.........T [ZBX-21580] optimized HPE MSA 2060 Storage by HTTP template to spread the load across preprocessing workers (drasihov)
+..F....... [ZBXNEXT-5535] implemented preselected host pattern filter for autosuggest used in items pattern field in graph widget (dpetra)
+.........T [ZBX-21579] optimized HPE MSA 2040 Storage by HTTP template to spread the load across preprocessing workers (drasihov)
+.........T [ZBX-21421] fixed variable spelling in Kubernetes cluster state by HTTP template (atocko)
+..F....... [ZBX-21544] fixed value of query field being truncated to the first "=" sign when pressing parse button (agriscenko)
+.........T [ZBX-21581] optimized HPE Primera template to spread the load across preprocessing workers (vkhaliev)
+...G...... [ZBX-21456] fixed net.tcp.socket.count problem on agent2 when ipv6 is disabled (dgoloscapov)
+........S. [ZBX-21009] fixed double escaping in trigger function upon host autoregistration (kprutkovs)
 ........S. [ZBX-21664] fixed Zabbix server crashing during database upgrade when converting service times and there is downtime inside uptime (vso)
 ...G...... [ZBX-21466] fixed race condition in Zabbix agent 2 leading to permanently stuck mount reads (arimdjonoks)
 
