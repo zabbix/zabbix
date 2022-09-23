@@ -123,7 +123,7 @@ class CControllerMediatypeEdit extends CController {
 			'name' => '',
 			'smtp_server' => $email_defaults['smtp_server'],
 			'smtp_port' => $email_defaults['smtp_port'],
-			'smtp_helo' => $email_defaults['smtp_helo'],
+			'smtp_helo' => $db_defaults['smtp_helo'],
 			'smtp_email' => $email_defaults['smtp_email'],
 			'smtp_security' => $email_defaults['smtp_security'],
 			'smtp_verify_peer' => $email_defaults['smtp_verify_peer'],

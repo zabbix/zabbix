@@ -117,6 +117,11 @@ class CControllerMediatypeCreate extends CController {
 					}
 				}
 
+				if ($mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
+					$domain_start_pos = strrpos($mediatype['smtp_email'], '@') + 1;
+					$mediatype['smtp_helo'] = substr($mediatype['smtp_email'], $domain_start_pos);
+				}
+
 				if ($mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY) {
 					$domain_start = strrpos($mediatype['smtp_email'], '@') + 1;
 					$domain_end = strrpos($mediatype['smtp_email'], '.');

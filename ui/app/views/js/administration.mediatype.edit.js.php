@@ -400,7 +400,6 @@
 			$('input[name=smtp_port]').val(providers[provider]['smtp_port']);
 			$('input[name=smtp_email]').val(providers[provider]['smtp_email']);
 			$('input[name=smtp_server]').val(providers[provider]['smtp_server']);
-			$('input[name=smtp_helo]').val(providers[provider]['smtp_helo']);
 			$('input[name=smtp_security]:checked').prop("checked", false);
 			$('input[value=' + providers[provider]['smtp_security'] + ']').prop("checked", true);
 			$('input[name=smtp_verify_host]').val(providers[provider]['smtp_verify_host']);
