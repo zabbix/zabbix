@@ -82,13 +82,6 @@ typedef struct
 }
 zbx_history_table_t;
 
-typedef struct
-{
-	zbx_uint64_t	id;
-	size_t		offset;
-}
-zbx_id_offset_t;
-
 typedef int	(*zbx_client_item_validator_t)(DC_ITEM *item, zbx_socket_t *sock, void *args, char **error);
 
 typedef struct
@@ -127,13 +120,6 @@ static zbx_history_table_t	areg = {
 		{NULL}
 		}
 };
-
-typedef struct
-{
-	char		*path;
-	zbx_hashset_t	keys;
-}
-zbx_keys_path_t;
 
 /******************************************************************************
  *                                                                            *
