@@ -4845,6 +4845,10 @@ msgstr ""
 msgid "Critical"
 msgstr "Критична"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr ""
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "Поточний вузел мережі"
@@ -11399,6 +11403,10 @@ msgstr ""
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr ""
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
@@ -14072,6 +14080,10 @@ msgstr "Інші параметри"
 msgid "Others"
 msgstr "Інші"
 
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr ""
+
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr "Статистика вихідного трафіку на мережевому інтерфейсі. Повертає ціле число"
@@ -15112,6 +15124,16 @@ msgstr "Ім'я проксі"
 msgid "Proxy updated"
 msgstr "Проксі оновлено"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr ""
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -15766,6 +15788,10 @@ msgstr "Необхідні коди статусу"
 #: app/views/popup.httpstep.php:170
 msgid "Required string"
 msgstr "Необхідна строка"
+
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr ""
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
