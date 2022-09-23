@@ -19,7 +19,7 @@
 
 #include "zbxsysinfo.h"
 #include "../common/zbxsysinfo_common.h"
-#include "kstat.h"
+#include "zbx_sysinfo_kstat.h"
 
 #include "zbxjson.h"
 #include "log.h"
