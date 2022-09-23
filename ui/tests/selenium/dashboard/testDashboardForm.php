@@ -825,7 +825,7 @@ class testDashboardForm extends CWebTest {
 					$result[0] = 'Admin (Zabbix Administrator)';
 				}
 
-				$this->assertTableDataColumn($result, $list, $selector, false);
+				$this->assertTableHasDataColumn($result, $list, $selector);
 
 				return;
 			}
