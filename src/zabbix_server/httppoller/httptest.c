@@ -164,7 +164,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 				continue;
 			}
 
-			init_result(&value);
+			zbx_init_agent_result(&value);
 
 			switch (types[i])
 			{
@@ -183,7 +183,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type, 0, &value,
 					ts, items[i].state, NULL);
 
-			free_result(&value);
+			zbx_free_agent_result(&value);
 		}
 
 		DCconfig_clean_items(items, errcodes, num);
@@ -303,7 +303,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 				continue;
 			}
 
-			init_result(&value);
+			zbx_init_agent_result(&value);
 
 			switch (types[i])
 			{
@@ -322,7 +322,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type, 0, &value,
 					ts, items[i].state, NULL);
 
-			free_result(&value);
+			zbx_free_agent_result(&value);
 		}
 
 		DCconfig_clean_items(items, errcodes, num);

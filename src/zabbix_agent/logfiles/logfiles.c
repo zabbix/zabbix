@@ -3850,7 +3850,7 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, 
 	else
 		is_count_item = 0;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
 	/* Expected parameters by item: */
 	/* log        [file,       <regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>,<persistent_dir>] 9 params */
@@ -3858,7 +3858,7 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, 
 	/* logrt      [file_regexp,<regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>,<persistent_dir>] 9 params */
 	/* logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>, <options>,<persistent_dir>] 8 params */
 
-	if (SUCCEED != parse_item_key(metric->key, &request))
+	if (SUCCEED != zbx_parse_item_key(metric->key, &request))
 	{
 		*error = zbx_strdup(*error, "Invalid item key format.");
 		goto out;
@@ -4146,7 +4146,7 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, 
 	}
 out:
 	zbx_free(encoding_uc);
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

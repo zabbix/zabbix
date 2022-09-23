@@ -17,9 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxsysinfo.h"
+#include "zbxtypes.h"
 
-int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
-{
-	return FAIL;
-}
+#ifdef HAVE_KSTAT_H
+zbx_uint64_t    get_kstat_numeric_value(const kstat_named_t *kn);
+#endif /* HAVE_KSTAT_H */
