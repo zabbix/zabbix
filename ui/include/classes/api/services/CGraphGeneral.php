@@ -798,6 +798,17 @@ abstract class CGraphGeneral extends CApiService {
 					$graphNames[$graph['name']][$id] = true;
 				}
 			}
+
+			// checks that the graph name is not empty
+			foreach ($graphs as $gname) {
+				if(isset($gname['name'])) {
+					if($gname['name'] === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_($this->getErrorMsg(self::ERROR_MISSING_GRAPH_NAME))
+						);
+					}
+				}
+			}
 		}
 	}
 }
