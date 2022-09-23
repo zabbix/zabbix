@@ -82,19 +82,23 @@ class CControllerPopupMedia extends CController {
 		if ($this->hasInput('add')) {
 			$output = [];
 
+			if ($page_options['mediatypeid'] == 0) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'mediatypeid', _('cannot be empty')));
+			}
+
 			$db_mediatypes = API::MediaType()->get([
 				'output' => ['type'],
 				'mediatypeids' => $page_options['mediatypeid']
 			]);
 
-			$type = $db_mediatypes ? $db_mediatypes[0]['type'] : 0;
+			$type = $db_mediatypes ? $db_mediatypes[0]['type'] : null;
 
-			if ($type == MEDIA_TYPE_EMAIL) {
+			if ($type === MEDIA_TYPE_EMAIL) {
 				$email_validator = new CEmailValidator();
 
 				$page_options['sendto_emails'] = array_values(array_filter($page_options['sendto_emails']));
 				if (!$page_options['sendto_emails']) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Type'), _('cannot be empty')));
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto_emails', _('cannot be empty')));
 				}
 
 				foreach ($page_options['sendto_emails'] as $email) {
