@@ -1032,14 +1032,13 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by h.proxy_hostid");
 		if (NULL == (sync->dbresult = DBselect("%s", sql)))
 			ret = FAIL;
 		goto out;
 	}
 
 	/* sort by h.proxy_hostid to ensure that proxies are synced before hosts assigned to them */
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "h.hostid", "and", "h.proxy_hostid",
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "h.hostid", "and", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)]);
 out:
 	zbx_free(sql);
