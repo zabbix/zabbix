@@ -68,7 +68,7 @@ static VOID WINAPI	ServiceCtrlHandler(DWORD ctrlCode)
 			zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent received shutdown request.");
 			break;
 		default:
-			zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent received request:%u.", ctrlCode);
+			zabbix_log(LOG_LEVEL_DEBUG, "Zabbix Agent received request:%u.", ctrlCode);
 			break;
 	}
 
