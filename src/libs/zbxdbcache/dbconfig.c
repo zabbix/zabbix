@@ -14489,13 +14489,13 @@ zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *tok
  *            token  - [IN] the session token (not NULL)                      *
  *            session_config_revision - [IN] the session configuration        *
  *                          revision                                          *
- *            config_revision - [OUT] - the cached configuration revision     *
+ *            dc_revision - [OUT] - the cached configuration revision         *
  *                                                                            *
  * Return value: The number of created sessions                               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token,
-		zbx_uint64_t session_config_revision, zbx_dc_revision_t *dc_revision)
+int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_uint64_t session_config_revision,
+		zbx_dc_revision_t *dc_revision)
 {
 	zbx_session_t	*session, session_local;
 	time_t		now;

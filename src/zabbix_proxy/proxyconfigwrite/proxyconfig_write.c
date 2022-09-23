@@ -1254,6 +1254,36 @@ static int	proxyconfig_sync_regexps(zbx_vector_table_data_ptr_t *config_tables, 
 	return proxyconfig_update_rows(expressions, error);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: force proxy to re-send host availability data if server and proxy *
+ *          interface availability value is different                         *
+ *                                                                            *
+ * Parameters: td - [IN] the interface table data                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	proxyconfig_check_interface_availability(zbx_table_data_t *td)
+{
+	zbx_vector_uint64_t	interfaceids;
+	int			i, index;
+
+	if (-1 == (index = table_data_get_field_index(td, "available")))
+		return;
+
+	zbx_vector_uint64_create(&interfaceids);
+
+	for (i = 0; i < td->updates.values_num; i++)
+	{
+		if (SUCCEED == zbx_flags128_isset(&td->updates.values[i]->flags, index))
+			zbx_vector_uint64_append(&interfaceids, td->updates.values[i]->recid);
+	}
+
+	if (0 != interfaceids.values_num)
+		DCtouch_interfaces_availability(&interfaceids);
+
+	zbx_vector_uint64_destroy(&interfaceids);
+}
+
 #define ZBX_PROXYCONFIG_GET_TABLE(table)					\
 	if (NULL == (table = proxyconfig_get_table(config_tables, #table)))	\
 	{									\
@@ -1386,6 +1416,8 @@ static int	proxyconfig_sync_hosts(zbx_vector_table_data_ptr_t *config_tables, in
 		if (SUCCEED != proxyconfig_update_rows(host_tables.values[i], error))
 			goto out;
 	}
+
+	proxyconfig_check_interface_availability(interface);
 
 	ret = SUCCEED;
 out:

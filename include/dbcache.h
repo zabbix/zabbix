@@ -1018,8 +1018,10 @@ zbx_dc_revision_t;
 
 const char	*zbx_dc_get_session_token(void);
 zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *token, zbx_session_type_t session_type);
+
 int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_uint64_t session_config_revision,
-		zbx_dc_revision_t *config_revision);
+		zbx_dc_revision_t *dc_revision);
+
 void		zbx_dc_cleanup_sessions(void);
 
 void		zbx_dc_cleanup_autoreg_host(void);
