@@ -2321,6 +2321,26 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 }
 
 /**
+ * Check that the given key is not equal to the example value presented for a specific type.
+ *
+ * @param int    $type
+ * @param string $key
+ *
+ * @return bool
+ */
+function isValidItemKey(int $type, string $key): bool {
+	if (($type == ITEM_TYPE_DB_MONITOR && $key === ZBX_DEFAULT_KEY_DB_MONITOR)
+			|| ($type == ITEM_TYPE_SSH && $key === ZBX_DEFAULT_KEY_SSH)
+			|| ($type == ITEM_TYPE_TELNET && $key === ZBX_DEFAULT_KEY_TELNET)) {
+		error(_('Check the key, please. Default example was passed.'));
+
+		return false;
+	}
+
+	return true;
+}
+
+/**
  * Check the format of the given custom intervals. Unset the custom intervals with empty values.
  *
  * @param array  $delay_flex

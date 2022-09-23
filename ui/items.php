@@ -513,13 +513,19 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	try {
+		$type = (int) getRequest('type', DB::getDefault('items', 'type'));
+		$key = getRequest('key', DB::getDefault('items', 'key_'));
+
+		if (!isValidItemKey($type, $key)) {
+			throw new Exception();
+		}
+
 		$delay_flex = getRequest('delay_flex', []);
 
 		if (!isValidCustomIntervals($delay_flex)) {
 			throw new Exception();
 		}
 
-		$type = (int) getRequest('type', DB::getDefault('items', 'type'));
 		$value_type = (int) getRequest('value_type', DB::getDefault('items', 'value_type'));
 		$trends_default = in_array($value_type, [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
 			? DB::getDefault('items', 'trends')
@@ -528,7 +534,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$input = [
 			'name' => getRequest('name', DB::getDefault('items', 'name')),
 			'type' => $type,
-			'key_' => getRequest('key', DB::getDefault('items', 'key_')),
+			'key_' => $key,
 			'value_type' => $value_type,
 			'units' => getRequest('units', DB::getDefault('items', 'units')),
 			'history' => getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF
