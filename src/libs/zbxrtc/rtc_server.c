@@ -90,7 +90,7 @@ int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char 
 
 		if ('=' == *param)
 		{
-			if (SUCCEED == is_time_suffix(param + 1, &delay, ZBX_LENGTH_UNLIMITED))
+			if (SUCCEED == zbx_is_time_suffix(param + 1, &delay, ZBX_LENGTH_UNLIMITED))
 			{
 				struct zbx_json	j;
 

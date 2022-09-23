@@ -21,7 +21,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxnum.h"
 
 void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func)
@@ -57,8 +57,11 @@ void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func)
 				zbx_mock_error_string(error));
 	}
 
-	if (FAIL == is_uint64(expected_param_value_string, &expected_param_value) && SYSINFO_RET_OK == expected_result)
+	if (FAIL == zbx_is_uint64(expected_param_value_string, &expected_param_value) &&
+			SYSINFO_RET_OK == expected_result)
+	{
 		fail_msg("Cannot get expected numeric parameter from test case data: %s", expected_param_value_string);
+	}
 
 	init_request(&request);
 	init_result(&param_result);
@@ -78,24 +81,24 @@ void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func)
 
 	if (SYSINFO_RET_OK == expected_result)
 	{
-		if (NULL == GET_UI64_RESULT(&param_result))
+		if (NULL == ZBX_GET_UI64_RESULT(&param_result))
 			fail_msg("Got 'NULL' instead of '%s' as a value.", expected_param_value_string);
 
-		if (expected_param_value != *GET_UI64_RESULT(&param_result))
+		if (expected_param_value != *ZBX_GET_UI64_RESULT(&param_result))
 		{
-			fail_msg("Got '" ZBX_FS_UI64 "' instead of '%s' as a value.", *GET_UI64_RESULT(&param_result),
+			fail_msg("Got '" ZBX_FS_UI64 "' instead of '%s' as a value.", *ZBX_GET_UI64_RESULT(&param_result),
 					expected_param_value_string);
 		}
 	}
 
 	if (SYSINFO_RET_FAIL == expected_result)
 	{
-		if (NULL == GET_MSG_RESULT(&param_result) || 0 != strcmp(expected_param_value_string,
-				*GET_MSG_RESULT(&param_result)))
+		if (NULL == ZBX_GET_MSG_RESULT(&param_result) || 0 != strcmp(expected_param_value_string,
+				*ZBX_GET_MSG_RESULT(&param_result)))
 		{
 			fail_msg("Got '%s' instead of '%s' as a value.",
-					(NULL != GET_MSG_RESULT(&param_result) ?
-						*GET_MSG_RESULT(&param_result) : "NULL"),
+					(NULL != ZBX_GET_MSG_RESULT(&param_result) ?
+						*ZBX_GET_MSG_RESULT(&param_result) : "NULL"),
 					expected_param_value_string);
 		}
 	}

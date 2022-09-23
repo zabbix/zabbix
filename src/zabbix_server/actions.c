@@ -1426,11 +1426,11 @@ static int	check_dhost_ip_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 			switch (condition->op)
 			{
 				case CONDITION_OPERATOR_EQUAL:
-					if (SUCCEED == ip_in_list(condition->value, row[1]))
+					if (SUCCEED == zbx_ip_in_list(condition->value, row[1]))
 						add_condition_match(esc_events, condition, objectid, objects[i]);
 					break;
 				case CONDITION_OPERATOR_NOT_EQUAL:
-					if (SUCCEED != ip_in_list(condition->value, row[1]))
+					if (SUCCEED != zbx_ip_in_list(condition->value, row[1]))
 						add_condition_match(esc_events, condition, objectid, objects[i]);
 					break;
 			}
@@ -1713,11 +1713,11 @@ static int	check_dservice_port_condition(const zbx_vector_ptr_t *esc_events, zbx
 			switch (condition->op)
 			{
 				case CONDITION_OPERATOR_EQUAL:
-					if (SUCCEED == int_in_list(condition->value, atoi(row[1])))
+					if (SUCCEED == zbx_int_in_list(condition->value, atoi(row[1])))
 						add_condition_match(esc_events, condition, objectid, object);
 					break;
 				case CONDITION_OPERATOR_NOT_EQUAL:
-					if (SUCCEED != int_in_list(condition->value, atoi(row[1])))
+					if (SUCCEED != zbx_int_in_list(condition->value, atoi(row[1])))
 						add_condition_match(esc_events, condition, objectid, object);
 					break;
 			}
@@ -3053,7 +3053,7 @@ static void	prepare_actions_conditions_eval(zbx_vector_ptr_t *actions, zbx_hashs
 							uniq_condition->conditionid);
 
 					old_formula = action->formula;
-					action->formula = string_replace(action->formula, search, replace);
+					action->formula = zbx_string_replace(action->formula, search, replace);
 					zbx_free(old_formula);
 				}
 
@@ -3500,7 +3500,7 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 		tmp = zbx_strdup(NULL, row[4]);
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp,
 				MACRO_TYPE_COMMON, NULL, 0);
-		if (SUCCEED != is_time_suffix(tmp, &action->esc_period, ZBX_LENGTH_UNLIMITED))
+		if (SUCCEED != zbx_is_time_suffix(tmp, &action->esc_period, ZBX_LENGTH_UNLIMITED))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid default operation step duration \"%s\" for action"
 					" \"%s\", using default value of 1 hour", tmp, row[1]);

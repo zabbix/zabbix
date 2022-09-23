@@ -261,7 +261,6 @@ int	CONFIG_JAVAPOLLER_FORKS		= 0;
 int	CONFIG_ESCALATOR_FORKS		= 0;
 int	CONFIG_SELFMON_FORKS		= 0;
 int	CONFIG_DATASENDER_FORKS		= 0;
-int	CONFIG_HEARTBEAT_FORKS		= 0;
 int	CONFIG_PROXYPOLLER_FORKS	= 0;
 int	CONFIG_HISTSYNCER_FORKS		= 0;
 int	CONFIG_CONFSYNCER_FORKS		= 0;
@@ -556,8 +555,8 @@ static void	set_defaults(void)
 
 		init_result(&result);
 
-		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result) &&
-				NULL != (value = GET_STR_RESULT(&result)))
+		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS,
+				&result) && NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
 			assert(*value);
 			zbx_trim_str_list(*value, ',');
@@ -654,13 +653,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		}
 	}
 
-	if (NULL != CONFIG_HOST_METADATA && HOST_METADATA_LEN < zbx_strlen_utf8(CONFIG_HOST_METADATA))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostMetadata\" configuration parameter cannot be longer than"
-				" %d characters", HOST_METADATA_LEN);
-		err = 1;
-	}
-
 	if (NULL != CONFIG_HOST_INTERFACE && HOST_INTERFACE_LEN < zbx_strlen_utf8(CONFIG_HOST_INTERFACE))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostInterface\" configuration parameter cannot be longer"
@@ -675,7 +667,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (NULL != CONFIG_SOURCE_IP && SUCCEED != is_supported_ip(CONFIG_SOURCE_IP))
+	if (NULL != CONFIG_SOURCE_IP && SUCCEED != zbx_is_supported_ip(CONFIG_SOURCE_IP))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
 		err = 1;

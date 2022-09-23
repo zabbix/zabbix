@@ -30,7 +30,7 @@ $this->includeJsFile('administration.mediatype.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Media types'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MEDIATYPE_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_EDIT));
 
 $tabs = new CTabView();
 
@@ -45,7 +45,7 @@ $mediaTypeForm = (new CForm())
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem((new CVar('status', MEDIA_TYPE_STATUS_DISABLED))->removeId())
 	->disablePasswordAutofill()
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 // Create form list.
 $mediatype_formlist = (new CFormList())

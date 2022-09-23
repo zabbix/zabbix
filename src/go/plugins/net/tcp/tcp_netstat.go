@@ -25,6 +25,7 @@ package tcpudp
 import (
 	"errors"
 	"net"
+	"os"
 	"strconv"
 
 	"github.com/cakturk/go-netstat/netstat"
@@ -178,7 +179,8 @@ func netStatTcpCount(laddres net.IP, lNet *net.IPNet, lport int, raddres net.IP,
 		count++
 		return false
 	})
-	if err != nil {
+
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return 0, err
 	}
 

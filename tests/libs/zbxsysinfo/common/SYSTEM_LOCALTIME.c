@@ -20,7 +20,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxnum.h"
 #include "../../../../src/libs/zbxsysinfo/common/system.h"
 
@@ -93,7 +93,7 @@ static void	zbx_mock_time(void)
 	else
 	{
 		/* Fallback to numeric timestamp format */
-		if (FAIL == is_uint32(timestamp, &timespec.sec))
+		if (FAIL == zbx_is_uint32(timestamp, &timespec.sec))
 			fail_msg("Cannot convert 'timestamp' parameter value to numeric: %s", timestamp);
 	}
 
@@ -156,9 +156,9 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	if (SYSINFO_RET_OK == expected_result)
-		value = (NULL != GET_TEXT_RESULT(&param_result)) ? *GET_TEXT_RESULT(&param_result) : NULL;
+		value = (NULL != ZBX_GET_TEXT_RESULT(&param_result)) ? *ZBX_GET_TEXT_RESULT(&param_result) : NULL;
 	else
-		value = (NULL != GET_MSG_RESULT(&param_result)) ? *GET_MSG_RESULT(&param_result) : NULL;
+		value = (NULL != ZBX_GET_MSG_RESULT(&param_result)) ? *ZBX_GET_MSG_RESULT(&param_result) : NULL;
 
 	if (NULL == value || 0 != strcmp(expected_value_string, value))
 	{

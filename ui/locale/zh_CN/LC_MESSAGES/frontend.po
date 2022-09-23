@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-08-19 11:09+0000\n"
+"PO-Revision-Date: 2022-09-16 02:58+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -2674,6 +2674,10 @@ msgstr[0] "无法启用Web场景"
 msgid "Cannot evaluate expression"
 msgstr "无法计算表达式"
 
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr "无法执行 URL 类型脚本。"
+
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
 msgid "Cannot execute operation"
@@ -4686,6 +4690,10 @@ msgstr "由用户创建"
 msgid "Critical"
 msgstr "严重"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr ""
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "当前主机"
@@ -6480,6 +6488,14 @@ msgstr "启用所选用户群组的调试模式?"
 #: include/actions.inc.php:694 include/actions.inc.php:1031
 msgid "Enable host"
 msgstr "启用主机"
+
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr "启用选择主机"
 
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
@@ -11184,6 +11200,10 @@ msgstr "操作系统进程及属性列表。返回 JSON 数组"
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr "位于给定键的 Windows 注册表值或键的列表。返回 JSON。"
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "块设备列表及其类型。返回 JSON"
@@ -13618,6 +13638,10 @@ msgstr "只允许超级管理员可以设置报告所有者。"
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "只计算指派给启用的主机的和相依于启用的项目的触发器"
 
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr "在新窗口中打开"
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -13832,6 +13856,10 @@ msgstr "其他参数"
 #: include/views/configuration.httpconf.edit.php:90
 msgid "Others"
 msgstr "其它"
+
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr ""
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -14871,6 +14899,16 @@ msgstr "agent代理程序名称"
 msgid "Proxy updated"
 msgstr "agent代理程序已添加"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr ""
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -15523,6 +15561,10 @@ msgstr "要求的状态码"
 #: app/views/popup.httpstep.php:170
 msgid "Required string"
 msgstr "要求的字串"
+
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr ""
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
@@ -18208,6 +18250,10 @@ msgstr "本月"
 msgid "This month so far"
 msgstr "这个月到目前为止"
 
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
+msgstr "此设置仅适用于数值类型。"
+
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "此设置仅适用于数值数据。非数字数据将始终取自历史记录。"
@@ -20284,7 +20330,7 @@ msgstr "验证"
 #: include/views/monitoring.history.php:293
 #, c-format
 msgid "Value"
-msgstr "ֵ值"
+msgstr "值"
 
 #: app/views/monitoring.widget.plaintext.view.php:51
 msgctxt "compact table header"
@@ -23399,6 +23445,11 @@ msgstr "varsamp() - 样本方差"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "通过"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr "周"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

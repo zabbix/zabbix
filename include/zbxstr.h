@@ -22,9 +22,9 @@
 
 #include "zbxcommon.h"
 
-char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
+char	*zbx_string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
-int	is_ascii_string(const char *str);
+int	zbx_is_ascii_string(const char *str);
 
 int	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(char *str, const char *charlist);
@@ -32,16 +32,16 @@ void	zbx_lrtrim(char *str, const char *charlist);
 void	zbx_remove_chars(char *str, const char *charlist);
 char	*zbx_str_printable_dyn(const char *text);
 #define ZBX_WHITESPACE			" \t\r\n"
-void	del_zeros(char *s);
+void	zbx_del_zeros(char *s);
 
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
 char	*zbx_dyn_escape_string(const char *src, const char *charlist);
 int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charlist);
 
-int	str_in_list(const char *list, const char *value, char delimiter);
-int	str_n_in_list(const char *list, const char *value, size_t len, char delimiter);
+int	zbx_str_in_list(const char *list, const char *value, char delimiter);
+int	zbx_str_n_in_list(const char *list, const char *value, size_t len, char delimiter);
 
-char	*str_linefeed(const char *src, size_t maxline, const char *delim);
+char	*zbx_str_linefeed(const char *src, size_t maxline, const char *delim);
 void	zbx_strarr_init(char ***arr);
 void	zbx_strarr_add(char ***arr, const char *entry);
 void	zbx_strarr_free(char ***arr);
@@ -55,8 +55,8 @@ void	zbx_strsplit_first(const char *src, char delimiter, char **left, char **rig
 void	zbx_strsplit_last(const char *src, char delimiter, char **left, char **right);
 
 /* secure string copy */
-#define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
-#define strscat(x, y)	zbx_strlcat(x, y, sizeof(x))
+#define zbx_strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
+#define zbx_strscat(x, y)	zbx_strlcat(x, y, sizeof(x))
 void	zbx_strlcat(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcpy_utf8(char *dst, const char *src, size_t size);
 
@@ -81,7 +81,7 @@ void	zbx_strlower(char *str);
 void	zbx_strupper(char *str);
 
 #if defined(_WINDOWS) || defined(__MINGW32__) || defined(HAVE_ICONV)
-char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
+char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
 
 #define ZBX_MAX_BYTES_IN_UTF8_CHAR	4
@@ -94,7 +94,7 @@ size_t	zbx_charcount_utf8_nbytes(const char *text, size_t maxlen);
 int	zbx_is_utf8(const char *text);
 void	zbx_replace_invalid_utf8(char *text);
 
-void	dos2unix(char *str);
+void	zbx_dos2unix(char *str);
 
 int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_t offset, size_t sz_to,
 		const char *from, size_t sz_from);

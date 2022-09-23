@@ -1,3 +1,6 @@
+//go:build !windows
+// +build !windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,22 +20,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_HEART_H
-#define ZABBIX_HEART_H
+package zbxcomms
 
-#include "zbxthreads.h"
+import (
+	"fmt"
+	"net"
 
-#include "zbxcomms.h"
+	"zabbix.com/pkg/tls"
+)
 
-extern int	CONFIG_HEARTBEAT_FREQUENCY;
+func Listen(address string, args ...interface{}) (c *Listener, err error) {
+	var tlsconfig *tls.Config
 
-typedef struct
-{
-	zbx_config_tls_t	*zbx_config_tls;
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+	if len(args) > 0 {
+		var ok bool
+		if tlsconfig, ok = args[0].(*tls.Config); !ok {
+			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
+		}
+	}
+	l, tmperr := net.Listen("tcp", address)
+	if tmperr != nil {
+		return nil, fmt.Errorf("Listen failed: %s", tmperr.Error())
+	}
+	c = &Listener{listener: l.(*net.TCPListener), tlsconfig: tlsconfig}
+
+	return
 }
-zbx_thread_heart_args;
-
-ZBX_THREAD_ENTRY(heart_thread, args);
-
-#endif

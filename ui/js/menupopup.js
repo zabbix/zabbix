@@ -256,8 +256,8 @@ function getMenuPopupHost(options, trigger_element) {
 	// urls
 	if (typeof options.urls !== 'undefined') {
 		sections.push({
-			label: t('URLs'),
-			items: options.urls
+			label: t('Links'),
+			items: getMenuPopupURLData(options.urls, trigger_element)
 		});
 	}
 
@@ -321,7 +321,7 @@ function getMenuPopupMapElementSubmap(options) {
 	// urls
 	if (typeof options.urls !== 'undefined') {
 		sections.push({
-			label: t('URLs'),
+			label: t('Links'),
 			items: options.urls
 		});
 	}
@@ -379,7 +379,7 @@ function getMenuPopupMapElementGroup(options) {
 	// urls
 	if (typeof options.urls !== 'undefined') {
 		sections.push({
-			label: t('URLs'),
+			label: t('Links'),
 			items: options.urls
 		});
 	}
@@ -428,7 +428,7 @@ function getMenuPopupMapElementTrigger(options) {
 	// urls
 	if (typeof options.urls !== 'undefined') {
 		sections.push({
-			label: t('URLs'),
+			label: t('Links'),
 			items: options.urls
 		});
 	}
@@ -449,7 +449,7 @@ function getMenuPopupMapElementImage(options) {
 	// urls
 	if (typeof options.urls !== 'undefined') {
 		return [{
-			label: t('URLs'),
+			label: t('Links'),
 			items: options.urls
 		}];
 	}
@@ -641,7 +641,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 	if ('urls' in options) {
 		sections[sections.length] = {
 			label: t('Links'),
-			items: options.urls
+			items: getMenuPopupURLData(options.urls, trigger_element)
 		};
 	}
 
@@ -1090,44 +1090,22 @@ function getMenuPopupTriggerMacro(options) {
 /**
  * Build script menu tree.
  *
- * @param array scripts           Script names amd nenu paths.
- * @param {Node} trigger_element  UI element which triggered opening of overlay dialogue.
- * @param array hostid            Host ID.
- * @param array eventid           Event ID.
+ * @param {array} scripts          Script names and nenu paths.
+ * @param {Node}  trigger_element  UI element which triggered opening of overlay dialogue.
+ * @param {array} hostid           Host ID.
+ * @param {array} eventid          Event ID.
  *
- * @returns array
+ * @return {array}
  */
 function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid) {
-	var tree = {};
+	let tree = {};
 
-	var appendTreeItem = function(tree, name, items, params) {
-		if (items.length > 0) {
-			var item = items.shift();
-
-			if (typeof tree[item] === 'undefined') {
-				tree[item] = {
-					name: item,
-					items: {}
-				};
-			}
-
-			appendTreeItem(tree[item].items, name, items, params);
-		}
-		else {
-			tree['/' + name] = {
-				name: name,
-				params: params,
-				items: {}
-			};
-		}
-	};
-
-	// parse scripts and create tree
-	for (var key in scripts) {
-		var script = scripts[key];
+	// Parse scripts and create tree.
+	for (let key in scripts) {
+		const script = scripts[key];
 
 		if (typeof script.scriptid !== 'undefined') {
-			var items = (script.menu_path.length > 0) ? splitPath(script.menu_path) : [];
+			const items = (script.menu_path.length > 0) ? splitPath(script.menu_path) : [];
 
 			appendTreeItem(tree, script.name, items, {
 				scriptid: script.scriptid,
@@ -1138,38 +1116,143 @@ function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid) {
 		}
 	}
 
-	// Build menu items from tree.
-	var getMenuPopupScriptItems = function(tree, trigger_elm) {
-		var items = [];
+	return getMenuPopupScriptItems(tree, trigger_element);
+}
 
-		if (objectSize(tree) > 0) {
-			jQuery.each(tree, function(key, data) {
-				var item = {label: data.name};
+/**
+ * Build URL menu tree.
+ *
+ * @param {array} urls             URL names and nenu paths.
+ * @param {Node}  trigger_element  UI element which triggered opening of overlay dialogue.
+ *
+ * @return {array}
+ */
+function getMenuPopupURLData(urls, trigger_element) {
+	let tree = {};
 
-				if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
-					item.items = getMenuPopupScriptItems(data.items, trigger_elm);
-				}
+	// Parse URLs and create tree.
+	for (let key in urls) {
+		const url = urls[key];
 
-				if (typeof data.params !== 'undefined' && typeof data.params.scriptid !== 'undefined') {
-					item.clickCallback = function(e) {
-						jQuery(this)
-							.closest('.menu-popup-top')
-							.menuPopup('close', trigger_elm, false);
-						executeScript(data.params.scriptid, data.params.confirmation, trigger_elm, data.params.hostid,
-							data.params.eventid
-						);
-						cancelEvent(e);
-					};
-				}
+		if (typeof url.menu_path !== 'undefined') {
+			const items = (url.menu_path.length > 0) ? splitPath(url.menu_path) : [];
 
-				items[items.length] = item;
+			appendTreeItem(tree, url.label, items, {
+				url: url.url,
+				target: url.target,
+				confirmation: url.confirmation,
+				rel: url.rel,
 			});
 		}
+	}
 
-		return items;
-	};
+	return getMenuPopupURLItems(tree, trigger_element);
+}
 
-	return getMenuPopupScriptItems(tree, trigger_element);
+/**
+ * Add a menu item to tree.
+ *
+ * @param {object} tree   Menu tree object to where menu items will be added.
+ * @param {string} name   Menu element label (name).
+ * @param {array}  items  List of menu items to add.
+ * @param {object} params Additional menu item parameters like URL, target, clickcallback etc.
+ */
+function appendTreeItem(tree, name, items, params) {
+	if (items.length > 0) {
+		const item = items.shift();
+
+		if (typeof tree[item] === 'undefined') {
+			tree[item] = {
+				name: item,
+				items: {}
+			};
+		}
+
+		appendTreeItem(tree[item].items, name, items, params);
+	}
+	else {
+		tree['/' + name] = {
+			name: name,
+			params: params,
+			items: {}
+		};
+	}
+}
+
+/**
+ * Build URL menu items from tree.
+ *
+ * @param {object} tree        Menu tree object to where menu items are.
+ * @param {Node}   trigger_elm UI element which triggered opening of overlay dialogue.
+ *
+ * @return {array}
+ */
+function getMenuPopupURLItems(tree, trigger_elm) {
+	let items = [];
+
+	if (objectSize(tree) > 0) {
+		Object.values(tree).map((data) => {
+			const item = {label: data.name};
+
+			if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
+				item.items = getMenuPopupURLItems(data.items, trigger_elm);
+			}
+
+			if (typeof data.params !== 'undefined') {
+				item.url = data.params.url;
+				item.target = data.params.target;
+				item.rel = data.params.rel;
+
+				if (data.params.confirmation !== '') {
+					item.clickCallback = function(e) {
+						return confirm(data.params.confirmation);
+					}
+				}
+			}
+
+			items[items.length] = item;
+		});
+	}
+
+	return items;
+}
+
+/**
+ * Build script menu items from tree.
+ *
+ * @param {object} tree        Menu tree object to where menu items are.
+ * @param {Node}   trigger_elm UI element which triggered opening of overlay dialogue.
+ *
+ * @return {array}
+ */
+function getMenuPopupScriptItems(tree, trigger_elm) {
+	let items = [];
+
+	if (objectSize(tree) > 0) {
+		Object.values(tree).map((data) => {
+			const item = {label: data.name};
+
+			if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
+				item.items = getMenuPopupScriptItems(data.items, trigger_elm);
+			}
+
+			if (typeof data.params !== 'undefined' && typeof data.params.scriptid !== 'undefined') {
+				item.clickCallback = function(e) {
+					jQuery(this)
+						.closest('.menu-popup-top')
+						.menuPopup('close', trigger_elm, false);
+					executeScript(data.params.scriptid, data.params.confirmation, trigger_elm, data.params.hostid,
+						data.params.eventid
+					);
+					cancelEvent(e);
+				};
+			}
+
+			items[items.length] = item;
+		});
+	}
+
+	return items;
 }
 
 jQuery(function($) {
@@ -1619,7 +1702,7 @@ jQuery(function($) {
 			link.attr({
 				'aria-haspopup': 'true',
 				'aria-expanded': 'false',
-				'area-hidden': 'true'
+				'aria-hidden': 'true'
 			});
 			link.on('click', function(e) {
 				e.stopPropagation();

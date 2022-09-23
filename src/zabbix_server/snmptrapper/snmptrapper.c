@@ -28,6 +28,7 @@
 #include "preproc.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxsysinfo.h"
 
 static int	trap_fd = -1;
 static off_t	trap_lastsize;

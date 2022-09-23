@@ -17,12 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 #include "log.h"
 #include "zbxstr.h"
-
-#define ZBX_DEV_PFX	"/dev/"
 
 typedef struct
 {
@@ -48,7 +46,7 @@ static int	get_perfstat_io(const char *devname, zbx_perfstat_t *zp, char **error
 		perfstat_id_t	name;
 		perfstat_disk_t	data;
 
-		strscpy(name.name, devname);
+		zbx_strscpy(name.name, devname);
 
 		if (0 < (err = perfstat_disk(&name, &data, sizeof(data), 1)))
 		{
@@ -83,6 +81,7 @@ static int	get_perfstat_io(const char *devname, zbx_perfstat_t *zp, char **error
 	return SYSINFO_RET_FAIL;
 #else
 	*error = zbx_strdup(NULL, "Agent was compiled without support for Perfstat API.");
+
 	return SYSINFO_RET_FAIL;
 #endif
 }
@@ -151,6 +150,8 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+#define ZBX_DEV_PFX	"/dev/"
+
 int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*devname, *type;
@@ -216,3 +217,4 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	return ret;
 }
+#undef ZBX_DEV_PFX

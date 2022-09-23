@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-08-03 20:09+0000\n"
+"PO-Revision-Date: 2022-09-02 18:29+0000\n"
 "Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -544,7 +544,7 @@ msgstr "Potwierdzone"
 #: app/views/monitoring.widget.problems.view.php:81
 msgctxt "compact table header"
 msgid "Ack"
-msgstr ""
+msgstr "Potwierdzone"
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
@@ -1123,7 +1123,7 @@ msgstr "Wiadomość ostrzegawcza"
 #: include/classes/helpers/CMenuHelper.php:283
 #: include/classes/helpers/CRoleHelper.php:338
 msgid "Alerts"
-msgstr ""
+msgstr "Alerty"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
@@ -2814,6 +2814,10 @@ msgstr[2] "Nie można włączyć scenariuszy sieci www"
 #: app/controllers/CControllerPopupTestTriggerExpr.php:199
 msgid "Cannot evaluate expression"
 msgstr "Nie można ocenić wyrażenia"
+
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
@@ -4849,6 +4853,10 @@ msgstr "Stworzone przez użytkowników"
 msgid "Critical"
 msgstr "Krytyczny"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr ""
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "Bieżący host"
@@ -5068,7 +5076,7 @@ msgstr "Data"
 #: include/classes/helpers/CMenuHelper.php:215
 #: include/classes/helpers/CRoleHelper.php:337
 msgid "Data collection"
-msgstr ""
+msgstr "Zbieranie danych"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
@@ -5820,7 +5828,7 @@ msgstr "Szczegóły scenariusza sieci www"
 
 #: app/views/administration.housekeeping.edit.php:195
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "Wykryta licencja TimescaleDB nie obsługuje kompresji. Kompresja jest obsługiwana w TimescaleDB Community Edition."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -6378,7 +6386,7 @@ msgstr "Czas przerwy w pracy"
 #: app/views/monitoring.widget.slareport.view.php:100
 msgctxt "compact table header"
 msgid "Downtime"
-msgstr ""
+msgstr "Czas przerwy w pracy"
 
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
@@ -6651,6 +6659,14 @@ msgstr "Włączyć tryb debugowania w wybranych grupach?"
 #: include/actions.inc.php:694 include/actions.inc.php:1031
 msgid "Enable host"
 msgstr "Włącz hosta"
+
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr "Włącz wybór hosta"
 
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
@@ -7033,7 +7049,7 @@ msgstr "Wyłączone czasy przestoju"
 #: app/views/monitoring.widget.slareport.view.php:102
 msgctxt "compact table header"
 msgid "Excluded downtimes"
-msgstr ""
+msgstr "Wyłączone czasy przestoju"
 
 #: app/controllers/CControllerAuditLogList.php:197 jsLoader.php:219
 msgid "Execute"
@@ -8309,7 +8325,7 @@ msgstr[2] "Hosty"
 #: app/views/monitoring.widget.problems.view.php:67
 msgctxt "compact table header"
 msgid "Host"
-msgstr ""
+msgstr "Host"
 
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
@@ -10006,7 +10022,7 @@ msgstr "Info"
 #: app/views/monitoring.widget.problems.view.php:64
 msgctxt "compact table header"
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -11394,6 +11410,10 @@ msgstr "Lista procesów systemu operacyjnego wraz z atrybutami. Zwraca tablicę 
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr "Lista wartości lub kluczy rejestru systemu Windows znajdujących się pod danym kluczem. Zwraca JSON."
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Lista urządzeń blokowych i ich typów. Zwraca JSON"
@@ -11574,7 +11594,7 @@ msgstr "P"
 #: include/func.inc.php:592 jsLoader.php:226
 msgctxt "month short"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
@@ -12295,7 +12315,7 @@ msgid "Module added: %1$s."
 msgid_plural "Modules added: %1$s."
 msgstr[0] "Dodany moduł: %1$s."
 msgstr[1] "Dodane moduły: %1$s."
-msgstr[2] "Dodanych modułów: %1$s."
+msgstr[2] "Dodane moduły: %1$s."
 
 #: app/controllers/CControllerModuleScan.php:113
 #, c-format
@@ -12303,7 +12323,7 @@ msgid "Module deleted: %1$s."
 msgid_plural "Modules deleted: %1$s."
 msgstr[0] "Usunięty moduł: %1$s."
 msgstr[1] "Usunięte moduły: %1$s."
-msgstr[2] "Usuniętych modułów: %1$s."
+msgstr[2] "Usunięte moduły: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
@@ -12311,15 +12331,15 @@ msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
 msgstr[0] "Wyłączony moduł: %1$s."
 msgstr[1] "Wyłączone moduły: %1$s."
-msgstr[2] "Wyłączonych modułów: %1$s."
+msgstr[2] "Wyłączone moduły: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Włączony moduł: %1$s."
-msgstr[1] "Wyłączony moduł: %1$s."
-msgstr[2] "Wyłączonych modułów: %1$s."
+msgstr[1] "Włączone moduły: %1$s."
+msgstr[2] "Włączone moduły: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -13750,7 +13770,7 @@ msgstr "Ok"
 #: app/views/monitoring.widget.web.view.php:33
 msgctxt "compact table header"
 msgid "Ok"
-msgstr ""
+msgstr "Ok"
 
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
@@ -13847,6 +13867,10 @@ msgstr "Tylko super administratorzy mogą ustawić właściciela raportu."
 #: app/partials/administration.system.info.php:68
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Liczone są tylko wyzwalacze przypisane do włączonych hostów w zależności od włączonych pozycji"
+
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr ""
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -14062,6 +14086,10 @@ msgstr "Inne parametry"
 #: include/views/configuration.httpconf.edit.php:90
 msgid "Others"
 msgstr "Inni"
+
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr ""
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -14403,7 +14431,7 @@ msgstr "Nadrzędne wykresy"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
-msgstr ""
+msgstr "Wartość nadrzędnego hosta"
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -14898,7 +14926,7 @@ msgstr "Problem"
 #: app/views/monitoring.widget.problems.view.php:71
 msgctxt "compact table header"
 msgid "Problem"
-msgstr ""
+msgstr "Problem"
 
 #: include/actions.inc.php:2059
 msgid "Problem created"
@@ -15102,6 +15130,16 @@ msgstr "Nazwa proxy"
 #: app/controllers/CControllerProxyUpdate.php:109
 msgid "Proxy updated"
 msgstr "Zaktualizowano proxy"
+
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr ""
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr ""
 
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
@@ -15758,6 +15796,10 @@ msgstr "Wymagane kody stanu"
 msgid "Required string"
 msgstr "Wymagany ciąg znaków"
 
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr ""
+
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
 msgid "Reset"
@@ -16147,7 +16189,7 @@ msgstr "SLI"
 #: app/views/monitoring.widget.slareport.view.php:98
 msgctxt "compact table header"
 msgid "SLI"
-msgstr ""
+msgstr "SLI"
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
@@ -16161,7 +16203,7 @@ msgstr "SLO"
 #: app/views/monitoring.widget.slareport.view.php:97
 msgctxt "compact table header"
 msgid "SLO"
-msgstr ""
+msgstr "SLO"
 
 #: app/views/administration.authentication.edit.php:236
 msgid "SLO service URL"
@@ -17557,7 +17599,7 @@ msgstr "Stan"
 #: app/views/monitoring.widget.problems.view.php:62
 msgctxt "compact table header"
 msgid "Status"
-msgstr ""
+msgstr "Stan"
 
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
@@ -18464,6 +18506,10 @@ msgstr "Bieżący miesiąc"
 msgid "This month so far"
 msgstr "Ten miesiąc jak dotąd"
 
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
+msgstr "To ustawienie dotyczy tylko danych liczbowych."
+
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "To ustawienie dotyczy jedynie danych liczbowych. Dane nieliczbowe będą zawsze pobierane z historii."
@@ -18623,7 +18669,7 @@ msgstr "Odcisk czasowy"
 #: app/views/monitoring.widget.plaintext.view.php:33
 msgctxt "compact table header"
 msgid "Timestamp"
-msgstr ""
+msgstr "Odcisk czasowy"
 
 #: app/views/sla.list.php:91
 msgid "Timezone"
@@ -19472,7 +19518,7 @@ msgstr "Nieznany"
 #: app/views/monitoring.widget.web.view.php:35
 msgctxt "compact table header"
 msgid "Unknown"
-msgstr ""
+msgstr "Nieznany"
 
 #: app/views/reports.auditlog.list.php:119
 msgid "Unknown action"
@@ -20158,7 +20204,7 @@ msgstr "Statystyki cache'a VMware. Poprawne tryby to: total, free, pfree, used i
 
 #: include/classes/data/CItemData.php:1252
 msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "Dane alarmów klastra VMware, zwraca JSON, <url> - adres URL usługi VMware, <id> - identyfikator klastra VMware"
 
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
@@ -20166,7 +20212,7 @@ msgstr "Licznik wydajności klastra VMware, <url> - URL usługi VMware, <id> - i
 
 #: include/classes/data/CItemData.php:1264
 msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
-msgstr ""
+msgstr "Właściwość klastra VMware, <url> - adres URL usługi VMware, <id> - identyfikator klastra VMware, <prop> - ścieżka właściwości"
 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
@@ -20174,15 +20220,15 @@ msgstr "Stan klastra VMware, <url> - URL usługi VMware, <uuid> - nazwa klastra 
 
 #: include/classes/data/CItemData.php:1264
 msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "Tablica tagów klastra VMware, <url> - adres URL usługi VMware, <id> - identyfikator klastra VMware"
 
 #: include/classes/data/CItemData.php:1296
 msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
-msgstr ""
+msgstr "Dane alarmów centrum danych VMware, zwraca JSON, <url> - adres URL usługi VMware, <id> - identyfikator centrum danych VMware"
 
 #: include/classes/data/CItemData.php:1304
 msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
-msgstr ""
+msgstr "Tablica tagów centrum danych VMware, <url> - adres URL usługi VMware, <id> - identyfikator centrum danych VMware. Zwraca JSON"
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -20194,7 +20240,7 @@ msgstr "Centra danych VMware i ich ID. Zwraca JSON."
 
 #: include/classes/data/CItemData.php:1268
 msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
-msgstr ""
+msgstr "Dane alarmów magazynu danych VMware, zwraca JSON, <url> - adres URL usługi VMware, <uuid> - nazwa magazynu danych VMware"
 
 #: include/classes/data/CItemData.php:1242
 #: include/classes/data/CItemData.php:1298
@@ -20207,7 +20253,7 @@ msgstr "Lista hipernadzorców magazynu danych VMware, <url> - URL usługi VMware
 
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
-msgstr ""
+msgstr "Właściwość magazynu danych VMware, <url> - adres URL usługi VMware, <uuid> - nazwa magazynu danych, <prop> - ścieżka właściwości"
 
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -20215,7 +20261,7 @@ msgstr "Statysyki odczytu magazynu danych VMware, <url> - URL usługi VMware, <d
 
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
-msgstr ""
+msgstr "Tablica tagów magazynu danych VMware, <url> - adres URL usługi VMware, <uuid> - identyfikator uuid magazynu danych VMware. Zwraca JSON"
 
 #: include/classes/data/CItemData.php:1246
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -20235,7 +20281,7 @@ msgstr "Stan czujników sprzętowych hipernadzorcy Vmware, <url> - adres usługi
 
 #: include/classes/data/CItemData.php:1324
 msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Dane alarmów hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware"
 
 #: include/classes/data/CItemData.php:1350
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20307,7 +20353,7 @@ msgstr "Użycie procesora hipernadzorcy VMware w Hz, <url> - URL usługi VMware,
 
 #: include/classes/data/CItemData.php:1472
 msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
-msgstr ""
+msgstr "Właściwość hipernadzorcy VMware, <url> - adres URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware, <prop> - ścieżka właściwości"
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -20323,7 +20369,7 @@ msgstr "Stan hipernadzorcy VMware, <url> - URL usługi VMware, <uuid> - nazwa ho
 
 #: include/classes/data/CItemData.php:1472
 msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "Tablica tagów hipernadzorcy VMware, <url> - adres URL usługi VMware, <uuid> - nazwa hosta hipernadzorcy VMware. Zwraca JSON"
 
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20355,11 +20401,11 @@ msgstr "Wersja serwisu VMware, <url> - URL serwisu VMware"
 
 #: include/classes/data/CItemData.php:1244
 msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
-msgstr ""
+msgstr "Dane alarmów wirtualnego centrum VMware, zwraca JSON, <url> - adres URL usługi VMware"
 
 #: include/classes/data/CItemData.php:1500
 msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
-msgstr ""
+msgstr "Dane alarmów maszyny wirtualnej VMware, zwraca JSON, <url> - adres URL usługi VMware, <uuid> - nazwa maszyny wirtualnej VMware"
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20443,7 +20489,7 @@ msgstr "Użycie procesora maszyny wirtualnej VMware w Hz, <url> - URL usługi VM
 
 #: include/classes/data/CItemData.php:1644
 msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
-msgstr ""
+msgstr "Właściwość maszyny wirtualnej VMware, <url> - adres URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware, <prop> - ścieżka właściwości"
 
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20463,7 +20509,7 @@ msgstr "Rozmiar pamięci swapowanej maszyny wirtualnej VMware, <url> - URL usłu
 
 #: include/classes/data/CItemData.php:1664
 msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "Tablica tagów maszyny wirtualnej VMware, <url> - adres URL usługi VMware, <uuid> - nazwa hosta maszyny wirtualnej VMware. Zwraca JSON"
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
@@ -20565,7 +20611,7 @@ msgstr "Wartość"
 #: app/views/monitoring.widget.plaintext.view.php:51
 msgctxt "compact table header"
 msgid "Value"
-msgstr ""
+msgstr "Wartość"
 
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
@@ -20828,12 +20874,12 @@ msgstr "Wiadomość ostrzegająca"
 
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
-msgstr ""
+msgstr "Uwaga! Nie można ustalić wersji bazy danych."
 
 #: app/partials/administration.system.info.php:166
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
-msgstr ""
+msgstr "Uwaga! Wersja serwera bazodanowego %1$s nie jest wspierana. Powinna być nie mniejsza niż %2$s."
 
 #: app/partials/administration.system.info.php:167
 #, c-format
@@ -20843,7 +20889,7 @@ msgstr "Uwaga! Wersja serwera bazodanowego %1$s nie jest wspierana. Powinna być
 #: app/partials/administration.system.info.php:179
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
-msgstr ""
+msgstr "Uwaga! Wersja serwera bazodanowego %1$s nie jest wspierana. Powinna być nie większa niż %2$s."
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -23683,6 +23729,11 @@ msgstr "varsamp() - Wariancja próby"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "przez"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

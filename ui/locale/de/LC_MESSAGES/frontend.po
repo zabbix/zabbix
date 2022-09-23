@@ -2747,6 +2747,10 @@ msgstr[1] "Kann Webszenarios nicht aktivieren"
 msgid "Cannot evaluate expression"
 msgstr "Ausdruck kann nicht ausgewertet werden"
 
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr ""
+
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
 msgid "Cannot execute operation"
@@ -4772,6 +4776,10 @@ msgstr "Erzeugt durch Benutzer"
 msgid "Critical"
 msgstr "Kritisch"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr ""
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "Aktueller Host"
@@ -6577,6 +6585,14 @@ msgstr "Debug-Modus für ausgewählten Gruppen aktivieren?"
 #: include/actions.inc.php:694 include/actions.inc.php:1031
 msgid "Enable host"
 msgstr "Aktiviere Host"
+
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr ""
 
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
@@ -11307,6 +11323,10 @@ msgstr "Liste der OS-Prozesse mit Attributen. Gibt ein JSON-Array zurück"
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr "Liste der Windows-Registrierungswerte oder Schlüssel, die sich unter dem angegebenen Schlüssel befinden. Gibt JSON zurück."
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Liste der Blockgeräte und ihres Typs. Rückgabe JSON"
@@ -13754,6 +13774,10 @@ msgstr "Nur Superadmins können den Berichtseigentümer festlegen."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Nur Auslöser, die mit aktiven Hosts und aktiven Datenpunkten verbunden sind, werden gezählt"
 
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr ""
+
 # Der Browser
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -13971,6 +13995,10 @@ msgstr "Weitere Einstellungen"
 #: include/views/configuration.httpconf.edit.php:90
 msgid "Others"
 msgstr "Andere"
+
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr ""
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -15013,6 +15041,16 @@ msgstr "Name des Proxys"
 msgid "Proxy updated"
 msgstr "Proxy geändert"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr ""
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -15666,6 +15704,10 @@ msgstr "Geforderter HTTP-Statuscode"
 #: app/views/popup.httpstep.php:170
 msgid "Required string"
 msgstr "Geforderte Zeichenkette"
+
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr ""
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
@@ -18371,6 +18413,10 @@ msgstr "Diesen Monat"
 #: include/func.inc.php:2477
 msgid "This month so far"
 msgstr "Dieser Monat bis jetzt"
+
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
+msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
@@ -23580,6 +23626,11 @@ msgstr "varsamp() - Stichprobenvarianz"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "per"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

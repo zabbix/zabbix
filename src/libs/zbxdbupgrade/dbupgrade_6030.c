@@ -20,6 +20,7 @@
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
+#include "zbxdbschema.h"
 
 extern unsigned char	program_type;
 
@@ -110,12 +111,351 @@ static int	DBpatch_6030000(void)
 
 static int	DBpatch_6030001(void)
 {
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("group_discovery", &field, NULL);
+}
+
+static int	DBpatch_6030002(void)
+{
+	if (ZBX_DB_OK > DBexecute(
+			"update group_discovery gd"
+			" set name=("
+				"select gp.name"
+				" from group_prototype gp"
+				" where gd.parent_group_prototypeid=gp.group_prototypeid"
+			")"
+			" where " ZBX_DB_CHAR_LENGTH(gd.name) "=64"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6030003(void)
+{
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_6030004(void)
+{
+	const ZBX_FIELD	field = {"new_window", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("scripts", &field);
+}
+
+static int	DBpatch_6030005(void)
+{
+	const ZBX_FIELD	old_field = {"host_metadata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"host_metadata", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("autoreg_host", &field, &old_field);
+}
+
+static int	DBpatch_6030006(void)
+{
+	const ZBX_FIELD	old_field = {"host_metadata", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"host_metadata", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("proxy_autoreg_host", &field, &old_field);
+}
+
+static int	DBpatch_6030007(void)
+{
+	const ZBX_FIELD	field = {"server_status", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6030008(void)
+{
+	const ZBX_FIELD	field = {"version", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("host_rtdata", &field);
+}
+
+static int	DBpatch_6030009(void)
+{
+	const ZBX_FIELD	field = {"compatibility", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("host_rtdata", &field);
+}
+
+static int	DBpatch_6030010(void)
+{
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("users", &field, NULL);
+}
+
+static int	DBpatch_6030011(void)
+{
+	return DBcreate_changelog_insert_trigger("drules", "druleid");
+}
+
+static int	DBpatch_6030012(void)
+{
+	return DBcreate_changelog_update_trigger("drules", "druleid");
+}
+
+static int	DBpatch_6030013(void)
+{
+	return DBcreate_changelog_delete_trigger("drules", "druleid");
+}
+
+static int	DBpatch_6030014(void)
+{
+	return DBcreate_changelog_insert_trigger("dchecks", "dcheckid");
+}
+
+static int	DBpatch_6030015(void)
+{
+	return DBcreate_changelog_update_trigger("dchecks", "dcheckid");
+}
+
+static int	DBpatch_6030016(void)
+{
+	return DBcreate_changelog_delete_trigger("dchecks", "dcheckid");
+}
+
+static int	DBpatch_6030017(void)
+{
+	return DBcreate_changelog_insert_trigger("httptest", "httptestid");
+}
+
+static int	DBpatch_6030018(void)
+{
+	return DBcreate_changelog_update_trigger("httptest", "httptestid");
+}
+
+static int	DBpatch_6030019(void)
+{
+	return DBcreate_changelog_delete_trigger("httptest", "httptestid");
+}
+
+static int	DBpatch_6030020(void)
+{
+	return DBcreate_changelog_insert_trigger("httptest_field", "httptest_fieldid");
+}
+
+static int	DBpatch_6030021(void)
+{
+	return DBcreate_changelog_update_trigger("httptest_field", "httptest_fieldid");
+}
+
+static int	DBpatch_6030022(void)
+{
+	return DBcreate_changelog_delete_trigger("httptest_field", "httptest_fieldid");
+}
+
+static int	DBpatch_6030023(void)
+{
+	return DBcreate_changelog_insert_trigger("httptestitem", "httptestitemid");
+}
+
+static int	DBpatch_6030024(void)
+{
+	return DBcreate_changelog_update_trigger("httptestitem", "httptestitemid");
+}
+
+static int	DBpatch_6030025(void)
+{
+	return DBcreate_changelog_delete_trigger("httptestitem", "httptestitemid");
+}
+
+static int	DBpatch_6030026(void)
+{
+	return DBcreate_changelog_insert_trigger("httpstep", "httpstepid");
+}
+
+static int	DBpatch_6030027(void)
+{
+	return DBcreate_changelog_update_trigger("httpstep", "httpstepid");
+}
+
+static int	DBpatch_6030028(void)
+{
+	return DBcreate_changelog_delete_trigger("httpstep", "httpstepid");
+}
+
+static int	DBpatch_6030029(void)
+{
+	return DBcreate_changelog_insert_trigger("httpstep_field", "httpstep_fieldid");
+}
+
+static int	DBpatch_6030030(void)
+{
+	return DBcreate_changelog_update_trigger("httpstep_field", "httpstep_fieldid");
+}
+
+static int	DBpatch_6030031(void)
+{
+	return DBcreate_changelog_delete_trigger("httpstep_field", "httpstep_fieldid");
+}
+
+static int	DBpatch_6030032(void)
+{
+	return DBcreate_changelog_insert_trigger("httpstepitem", "httpstepitemid");
+}
+
+static int	DBpatch_6030033(void)
+{
+	return DBcreate_changelog_update_trigger("httpstepitem", "httpstepitemid");
+}
+
+static int	DBpatch_6030034(void)
+{
+	return DBcreate_changelog_delete_trigger("httpstepitem", "httpstepitemid");
+}
+
+static int	DBpatch_6030035(void)
+{
+	return DBdrop_field("drules", "nextcheck");
+}
+
+static int	DBpatch_6030036(void)
+{
+	return DBdrop_field("httptest", "nextcheck");
+}
+
+static int	DBpatch_6030037(void)
+{
+	const ZBX_FIELD field = {"discovery_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("config", &field);
+}
+
+static int	DBpatch_6030038(void)
+{
+	return DBdrop_foreign_key("dchecks", 1);
+}
+
+static int	DBpatch_6030039(void)
+{
+	const ZBX_FIELD	field = {"druleid", NULL, "drules", "druleid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("dchecks", 1, &field);
+}
+
+static int	DBpatch_6030040(void)
+{
+	return DBdrop_foreign_key("httptest", 2);
+}
+
+static int	DBpatch_6030041(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httptest", 2, &field);
+}
+
+static int	DBpatch_6030042(void)
+{
+	return DBdrop_foreign_key("httptest", 3);
+}
+
+static int	DBpatch_6030043(void)
+{
+	const ZBX_FIELD	field = {"templateid", NULL, "httptest", "httptestid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httptest", 3, &field);
+}
+
+static int	DBpatch_6030044(void)
+{
+	return DBdrop_foreign_key("httpstep", 1);
+}
+
+static int	DBpatch_6030045(void)
+{
+	const ZBX_FIELD	field = {"httptestid", NULL, "httptest", "httptestid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httpstep", 1, &field);
+}
+
+static int	DBpatch_6030046(void)
+{
+	return DBdrop_foreign_key("httptestitem", 1);
+}
+
+static int	DBpatch_6030047(void)
+{
+	const ZBX_FIELD	field = {"httptestid", NULL, "httptest", "httptestid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httptestitem", 1, &field);
+}
+
+static int	DBpatch_6030048(void)
+{
+	return DBdrop_foreign_key("httptestitem", 2);
+}
+
+static int	DBpatch_6030049(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httptestitem", 2, &field);
+}
+
+static int	DBpatch_6030050(void)
+{
+	return DBdrop_foreign_key("httpstepitem", 1);
+}
+
+static int	DBpatch_6030051(void)
+{
+	const ZBX_FIELD	field = {"httpstepid", NULL, "httpstep", "httpstepid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httpstepitem", 1, &field);
+}
+
+static int	DBpatch_6030052(void)
+{
+	return DBdrop_foreign_key("httpstepitem", 2);
+}
+
+static int	DBpatch_6030053(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httpstepitem", 2, &field);
+}
+
+static int	DBpatch_6030054(void)
+{
+	return DBdrop_foreign_key("httptest_field", 1);
+}
+
+static int	DBpatch_6030055(void)
+{
+	const ZBX_FIELD	field = {"httptestid", NULL, "httptest", "httptestid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httptest_field", 1, &field);
+}
+
+static int	DBpatch_6030056(void)
+{
+	return DBdrop_foreign_key("httpstep_field", 1);
+}
+
+static int	DBpatch_6030057(void)
+{
+	const ZBX_FIELD	field = {"httpstepid", NULL, "httpstep", "httpstepid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("httpstep_field", 1, &field);
+}
+
+static int	DBpatch_6030058(void)
+{
 	const ZBX_FIELD field = {"provider", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
-static int	DBpatch_6030002(void)
+static int	DBpatch_6030059(void)
 {
 	const ZBX_FIELD field = {"status", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -128,8 +468,62 @@ DBPATCH_START(6030)
 
 /* version, duplicates flag, mandatory flag */
 
-DBPATCH_ADD(6030000, 0, 1)
-DBPATCH_ADD(6030001, 0, 1)
-DBPATCH_ADD(6030002, 0, 1)
+DBPATCH_ADD(6030003, 0, 1)
+DBPATCH_ADD(6030004, 0, 1)
+DBPATCH_ADD(6030005, 0, 1)
+DBPATCH_ADD(6030006, 0, 1)
+DBPATCH_ADD(6030007, 0, 1)
+DBPATCH_ADD(6030008, 0, 1)
+DBPATCH_ADD(6030009, 0, 1)
+DBPATCH_ADD(6030010, 0, 1)
+DBPATCH_ADD(6030011, 0, 1)
+DBPATCH_ADD(6030012, 0, 1)
+DBPATCH_ADD(6030013, 0, 1)
+DBPATCH_ADD(6030014, 0, 1)
+DBPATCH_ADD(6030015, 0, 1)
+DBPATCH_ADD(6030016, 0, 1)
+DBPATCH_ADD(6030017, 0, 1)
+DBPATCH_ADD(6030018, 0, 1)
+DBPATCH_ADD(6030019, 0, 1)
+DBPATCH_ADD(6030020, 0, 1)
+DBPATCH_ADD(6030021, 0, 1)
+DBPATCH_ADD(6030022, 0, 1)
+DBPATCH_ADD(6030023, 0, 1)
+DBPATCH_ADD(6030024, 0, 1)
+DBPATCH_ADD(6030025, 0, 1)
+DBPATCH_ADD(6030026, 0, 1)
+DBPATCH_ADD(6030027, 0, 1)
+DBPATCH_ADD(6030028, 0, 1)
+DBPATCH_ADD(6030029, 0, 1)
+DBPATCH_ADD(6030030, 0, 1)
+DBPATCH_ADD(6030031, 0, 1)
+DBPATCH_ADD(6030032, 0, 1)
+DBPATCH_ADD(6030033, 0, 1)
+DBPATCH_ADD(6030034, 0, 1)
+DBPATCH_ADD(6030035, 0, 1)
+DBPATCH_ADD(6030036, 0, 1)
+DBPATCH_ADD(6030037, 0, 1)
+DBPATCH_ADD(6030038, 0, 1)
+DBPATCH_ADD(6030039, 0, 1)
+DBPATCH_ADD(6030040, 0, 1)
+DBPATCH_ADD(6030041, 0, 1)
+DBPATCH_ADD(6030042, 0, 1)
+DBPATCH_ADD(6030043, 0, 1)
+DBPATCH_ADD(6030044, 0, 1)
+DBPATCH_ADD(6030045, 0, 1)
+DBPATCH_ADD(6030046, 0, 1)
+DBPATCH_ADD(6030047, 0, 1)
+DBPATCH_ADD(6030048, 0, 1)
+DBPATCH_ADD(6030049, 0, 1)
+DBPATCH_ADD(6030050, 0, 1)
+DBPATCH_ADD(6030051, 0, 1)
+DBPATCH_ADD(6030052, 0, 1)
+DBPATCH_ADD(6030053, 0, 1)
+DBPATCH_ADD(6030054, 0, 1)
+DBPATCH_ADD(6030055, 0, 1)
+DBPATCH_ADD(6030056, 0, 1)
+DBPATCH_ADD(6030057, 0, 1)
+DBPATCH_ADD(6030058, 0, 1)
+DBPATCH_ADD(6030059, 0, 1)
 
 DBPATCH_END()

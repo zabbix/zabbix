@@ -2817,6 +2817,10 @@ msgstr[2] "Не вдалося активувати веб сценарії"
 msgid "Cannot evaluate expression"
 msgstr ""
 
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr ""
+
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
 msgid "Cannot execute operation"
@@ -4841,6 +4845,10 @@ msgstr ""
 msgid "Critical"
 msgstr "Критична"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr ""
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "Поточний вузел мережі"
@@ -6644,6 +6652,14 @@ msgstr "Активувати діагностичний режим для виб
 #: include/actions.inc.php:694 include/actions.inc.php:1031
 msgid "Enable host"
 msgstr "Активувати вузел мережі"
+
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr ""
 
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
@@ -11387,6 +11403,10 @@ msgstr ""
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr ""
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
@@ -13841,6 +13861,10 @@ msgstr ""
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Підраховуються тригери тільки у вузлів мережі під спостереженням та які залежать від активних елементів даних"
 
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -14055,6 +14079,10 @@ msgstr "Інші параметри"
 #: include/views/configuration.httpconf.edit.php:90
 msgid "Others"
 msgstr "Інші"
+
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr ""
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -15096,6 +15124,16 @@ msgstr "Ім'я проксі"
 msgid "Proxy updated"
 msgstr "Проксі оновлено"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr ""
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -15750,6 +15788,10 @@ msgstr "Необхідні коди статусу"
 #: app/views/popup.httpstep.php:170
 msgid "Required string"
 msgstr "Необхідна строка"
+
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr ""
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
@@ -18457,6 +18499,10 @@ msgstr "Цей місяць"
 #: include/func.inc.php:2477
 msgid "This month so far"
 msgstr "Цей місяць по нині"
+
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
+msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
@@ -23674,6 +23720,11 @@ msgstr ""
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "через"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

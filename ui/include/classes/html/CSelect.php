@@ -34,7 +34,7 @@ class CSelect extends CTag {
 	/**
 	 * @param string $name  Input field name.
 	 */
-	public function __construct(string $name) {
+	public function __construct(string $name = null) {
 		parent::__construct('z-select', true);
 
 		$this->name = $name;

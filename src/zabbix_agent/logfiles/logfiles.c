@@ -20,7 +20,7 @@
 #include "logfiles.h"
 
 #include "log.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "cfg.h"
 #include "zbxregexp.h"
 #include "zbxstr.h"
@@ -2116,7 +2116,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					buf[BUF_SIZE] = '\0';
 
 					if ('\0' != *encoding)
-						value = convert_to_utf8(buf, (size_t)BUF_SIZE, encoding);
+						value = zbx_convert_to_utf8(buf, (size_t)BUF_SIZE, encoding);
 					else
 						value = buf;
 
@@ -2238,7 +2238,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					*p_nl = '\0';
 
 					if ('\0' != *encoding)
-						value = convert_to_utf8(p_start, (size_t)(p_nl - p_start), encoding);
+						value = zbx_convert_to_utf8(p_start, (size_t)(p_nl - p_start), encoding);
 					else
 						value = p_start;
 
@@ -3801,7 +3801,7 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
 
 	/* set up directory for persistent file */
 
-	if (SUCCEED != is_ascii_string(persistent_dir))		/* reject non-ASCII directory name */
+	if (SUCCEED != zbx_is_ascii_string(persistent_dir))		/* reject non-ASCII directory name */
 	{
 		*error = zbx_dsprintf(*error, "Invalid %s parameter. It contains non-ASCII characters.",
 				(8 == persistent_dir_param_nr) ? "ninth" : "eighth");

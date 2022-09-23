@@ -655,6 +655,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 			continue;
 		}
 
+		item = (zbx_lld_item_t *)items->values[index];
 		item_param = zbx_item_param_create(row[2], row[3]);
 		ZBX_STR2UINT64(item_param->item_parameterid, row[0]);
 		zbx_vector_item_param_ptr_append(&item->item_params, item_param);
@@ -798,8 +799,8 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 				if (SUCCEED == is_user_macro(*field))
 					return;
 
-				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED) && (0 == value ||
-						(ZBX_HK_HISTORY_MIN <= value && ZBX_HK_PERIOD_MAX >= value)))
+				if (SUCCEED == zbx_is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED) && (0 ==
+						value || (ZBX_HK_HISTORY_MIN <= value && ZBX_HK_PERIOD_MAX >= value)))
 				{
 					return;
 				}
@@ -811,8 +812,8 @@ static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **f
 				if (SUCCEED == is_user_macro(*field))
 					return;
 
-				if (SUCCEED == is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED) && (0 == value ||
-						(ZBX_HK_TRENDS_MIN <= value && ZBX_HK_PERIOD_MAX >= value)))
+				if (SUCCEED == zbx_is_time_suffix(*field, &value, ZBX_LENGTH_UNLIMITED) && (0 ==
+						value || (ZBX_HK_TRENDS_MIN <= value && ZBX_HK_PERIOD_MAX >= value)))
 				{
 					return;
 				}
@@ -1267,7 +1268,7 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 			}
 			break;
 		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-			if (SUCCEED != str2uint64(pp->params, "smhdw", &value_ui64) || 0 == value_ui64)
+			if (SUCCEED != zbx_str2uint64(pp->params, "smhdw", &value_ui64) || 0 == value_ui64)
 			{
 				zbx_snprintf(err, sizeof(err), "invalid time interval: %s", pp->params);
 				ret = FAIL;
@@ -3653,7 +3654,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 
 		for (j = 0; j < item->item_params.values_num; j++)
 		{
-			item_param = (zbx_item_param_t *)item->item_params.values[j];
+			item_param = item->item_params.values[j];
 
 			if (0 != (item_param->flags & ZBX_FLAG_ITEM_PARAM_DELETE))
 			{
@@ -3714,7 +3715,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 		{
 			char	delim = ' ';
 
-			item_param = (zbx_item_param_t *)item->item_params.values[j];
+			item_param = item->item_params.values[j];
 
 			if (0 == item_param->item_parameterid)
 			{

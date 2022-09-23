@@ -120,7 +120,7 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 		{
 			int	delay;
 
-			if ('-' != *ptr || FAIL == is_time_suffix(ptr + 1, &delay, strlen(ptr + 1)))
+			if ('-' != *ptr || FAIL == zbx_is_time_suffix(ptr + 1, &delay, strlen(ptr + 1)))
 			{
 				*error = zbx_dsprintf(NULL, "invalid history value timestamp: %s", buffer);
 				goto out;

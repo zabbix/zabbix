@@ -33,7 +33,7 @@ $widget = new CWidget();
 
 if ($data['action'] === 'user.edit') {
 	$widget_name = _('Users');
-	$doc_url = CDocHelper::ADMINISTRATION_USER_EDIT;
+	$doc_url = CDocHelper::USERS_USER_EDIT;
 }
 else {
 	$widget_name = _('User profile').NAME_DELIMITER;
@@ -41,7 +41,7 @@ else {
 		? $data['name'].' '.$data['surname']
 		: $data['username'];
 	$widget->setTitleSubmenu(getUserSettingsSubmenu());
-	$doc_url = CDocHelper::ADMINISTRATION_USERPROFILE_EDIT;
+	$doc_url = CDocHelper::USERS_USERPROFILE_EDIT;
 }
 
 $widget
@@ -57,7 +57,7 @@ if ($data['form_refresh'] == 0) {
 $user_form = (new CForm())
 	->setId('user-form')
 	->setName('user_form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
 	->addVar('userid', $data['userid']);
 
@@ -284,7 +284,9 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
-		(new CTextBox('url', $data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('url', $data['url']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('users', 'url'))
 	);
 
 $tabs->addTab('userTab', _('User'), $user_form_list);

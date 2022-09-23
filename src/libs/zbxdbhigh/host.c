@@ -1456,6 +1456,7 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids)
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_vector_uint64_t	itemids;
+	zbx_vector_uint64_t	httpstepids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, httptestids->values_num);
 
@@ -1464,6 +1465,7 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids)
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 	zbx_vector_uint64_create(&itemids);
+	zbx_vector_uint64_create(&httpstepids);
 
 	/* httpstepitem, httptestitem */
 	sql_offset = 0;
@@ -1485,6 +1487,45 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids)
 	if (FAIL == zbx_audit_DBselect_delete_for_item(sql, &itemids))
 		goto clean;
 
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select httpstepid from httpstep where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
+			httptestids->values, httptestids->values_num);
+	DBselect_uint64(sql, &httpstepids);
+
+	sql_offset = 0;
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httptest_field where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
+			httptestids->values, httptestids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httptestitem where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httptestid",
+			httptestids->values, httptestids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httpstep_field where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httpstepid",
+			httpstepids.values, httpstepids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httpstepitem where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httpstepid",
+			httpstepids.values, httpstepids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from httpstep where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "httpstepid",
+			httpstepids.values, httpstepids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	DBexecute("%s", sql);
+
 	DBdelete_items(&itemids);
 
 	sql_offset = 0;
@@ -1493,6 +1534,7 @@ static void	DBdelete_httptests(const zbx_vector_uint64_t *httptestids)
 			httptestids->values, httptestids->values_num);
 	DBexecute("%s", sql);
 clean:
+	zbx_vector_uint64_destroy(&httpstepids);
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_free(sql);
 out:
@@ -6001,7 +6043,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 			tmp = strdup(row[4]);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
-			if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
+			if (FAIL == zbx_is_ushort(tmp, &db_port) || db_port != port)
 				continue;
 
 			ZBX_STR2UINT64(interfaceid, row[0]);
@@ -6042,7 +6084,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 				zbx_audit_host_update_json_update_interface_dns(hostid, interfaceid, db_dns, dns);
 			}
 
-			if (FAIL == is_ushort(row[4], &db_port) || db_port != port)
+			if (FAIL == zbx_is_ushort(row[4], &db_port) || db_port != port)
 			{
 				zbx_snprintf_alloc(&update, &update_alloc, &update_offset, "%cport=%u", delim, port);
 				zbx_audit_host_update_json_update_interface_port(hostid, interfaceid, db_port, port);

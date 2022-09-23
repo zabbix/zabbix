@@ -21,7 +21,7 @@
 
 #include "zbxconf.h"
 #include "log.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "logfiles/logfiles.h"
 #include "zbxcommshigh.h"
 #include "zbxthreads.h"
@@ -348,7 +348,7 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 	{
 		config_revision = 0;
 	}
-	else if (FAIL == is_uint32(tmp, &config_revision))
+	else if (FAIL == zbx_is_uint32(tmp, &config_revision))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "\"%s\" is not a valid revision", tmp);
 		goto out;
@@ -400,7 +400,7 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 		delay = atoi(tmp);
 
 		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, tmp, sizeof(tmp), NULL) ||
-				SUCCEED != is_uint64(tmp, &lastlogsize))
+				SUCCEED != zbx_is_uint64(tmp, &lastlogsize))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"", ZBX_PROTO_TAG_LASTLOGSIZE);
 			continue;
@@ -561,8 +561,8 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
 
 	init_result(&result);
 
-	if (SUCCEED == process(config, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result) &&
-			NULL != (value = GET_STR_RESULT(&result)) && NULL != *value)
+	if (SUCCEED == process(config, ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, &result) &&
+			NULL != (value = ZBX_GET_STR_RESULT(&result)) && NULL != *value)
 	{
 		if (SUCCEED != zbx_is_utf8(*value))
 		{
@@ -1163,12 +1163,12 @@ static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metr
 
 	if (SUCCEED != (ret = process(metric->key, 0, &result)))
 	{
-		if (NULL != (pvalue = GET_MSG_RESULT(&result)))
+		if (NULL != (pvalue = ZBX_GET_MSG_RESULT(&result)))
 			*error = zbx_strdup(*error, *pvalue);
 		goto out;
 	}
 
-	if (NULL != (pvalue = GET_TEXT_RESULT(&result)))
+	if (NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", metric->key, *pvalue);
 

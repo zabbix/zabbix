@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-08-11 00:25+0000\n"
+"PO-Revision-Date: 2022-09-03 10:22+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -307,7 +307,7 @@ msgstr "(Só super-administradores podem criar grupos)"
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(criado pela descoberta do host)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
@@ -1100,7 +1100,7 @@ msgstr "Algoritmo"
 #: include/classes/helpers/CMenuHelper.php:283
 #: include/classes/helpers/CRoleHelper.php:338
 msgid "Alerts"
-msgstr ""
+msgstr "Alertas"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
@@ -1451,7 +1451,7 @@ msgstr "Pelo menos uma operação deve existir."
 #: include/classes/api/services/CHostGroup.php:1594
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
-msgstr ""
+msgstr "Pelo menos um dos parâmetros \"%1$s\" ou \"%2$s\" deve estar habilitado."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
@@ -2378,7 +2378,7 @@ msgstr[1] "Não é possível excluir os grupos de servidores %1$s porque a manut
 #: app/controllers/CControllerHostGroupDelete.php:39
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
-msgstr ""
+msgstr "Não é possível eliminar os grupos de hosts"
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2499,7 +2499,7 @@ msgstr "Não foi possível eliminar template"
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
-msgstr[0] ""
+msgstr[0] "Não é possível eliminar o grupo do template"
 msgstr[1] ""
 
 #: include/classes/api/services/CGraphPrototype.php:374
@@ -2741,6 +2741,10 @@ msgstr[1] "Não foi possível activar os cenários web"
 #: app/controllers/CControllerPopupTestTriggerExpr.php:199
 msgid "Cannot evaluate expression"
 msgstr "Não é possível avaliar a expressão"
+
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
@@ -4754,6 +4758,10 @@ msgstr ""
 msgid "Critical"
 msgstr "Crítico"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr ""
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "Host actual"
@@ -6553,6 +6561,14 @@ msgstr "Activar modo de debug para os grupos seleccionados?"
 #: include/actions.inc.php:694 include/actions.inc.php:1031
 msgid "Enable host"
 msgstr "Activar host"
+
+#: include/classes/widgets/forms/CWidgetFormGraph.php:88
+#: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:88
+#: include/classes/widgets/forms/CWidgetFormItem.php:395
+#: include/classes/widgets/forms/CWidgetFormPlainText.php:78
+#: include/classes/widgets/forms/CWidgetFormUrl.php:42
+msgid "Enable host selection"
+msgstr ""
 
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
@@ -11277,6 +11293,10 @@ msgstr ""
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr ""
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
@@ -13721,6 +13741,10 @@ msgstr ""
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Apenas são contabilizados triggers associados a hosts activos e que dependam de items activos"
 
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -13935,6 +13959,10 @@ msgstr "Outros parâmetros"
 #: include/views/configuration.httpconf.edit.php:90
 msgid "Others"
 msgstr "Outros"
+
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr ""
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -14975,6 +15003,16 @@ msgstr "Nome do proxy"
 msgid "Proxy updated"
 msgstr "Proxy actualizado"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr ""
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -15628,6 +15666,10 @@ msgstr "Códigos de estado necessários"
 #: app/views/popup.httpstep.php:170
 msgid "Required string"
 msgstr "String obrigatória"
+
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr ""
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
@@ -18322,6 +18364,10 @@ msgstr "Este mês"
 
 #: include/func.inc.php:2477
 msgid "This month so far"
+msgstr ""
+
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
 msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:172
@@ -23527,6 +23573,11 @@ msgstr ""
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "via"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

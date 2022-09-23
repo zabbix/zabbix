@@ -22,7 +22,7 @@
 #include "log.h"
 
 #ifdef _WINDOWS
-#	include "sysinfo.h"
+#	include "zbxsysinfo.h"
 #else
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 typedef struct

@@ -22,7 +22,7 @@
 #include "zbxmockutil.h"
 
 #include "../../../src/libs/zbxsysinfo/simple/simple.h"
-#include "../../../include/sysinfo.h"
+#include "../../../include/zbxsysinfo.h"
 
 int	__wrap_tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)
