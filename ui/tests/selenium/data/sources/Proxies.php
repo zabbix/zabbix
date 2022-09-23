@@ -255,13 +255,5 @@ class Proxies {
 		DBexecute('UPDATE host_rtdata SET version=0, compatibility=0 WHERE hostid='.zbx_dbstr($active_proxyids['active_unknown']));
 		DBexecute('UPDATE host_rtdata SET version=50401, compatibility=3 WHERE hostid='.zbx_dbstr($passive_proxyids['passive_unsupported']));
 		DBexecute('UPDATE config SET server_status='.zbx_dbstr('{"version": "6.4.0alpha1"}'));
-
-		// TODO: add prepare data to testFormNetworkDiscovery test.
-		DBexecute("INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (4, ".zbx_dbstr($passive_proxyids['Passive proxy 1']).", 'Discovery rule for update', '192.14.3.1-255', 600, 0)");
-		DBexecute("INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (23, 4, 12, '', '', '0', '', 0, '', '', 0)");
-		DBexecute("INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (5, ".zbx_dbstr($passive_proxyids['Passive proxy 1']).", 'Disabled discovery rule for update', '192.15.3.1-255', 600, 1)");
-		DBexecute("INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (24, 5, 12, '', '', '0', '', 0, '', '', 0)");
-		DBexecute("INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (6, ".zbx_dbstr($passive_proxyids['Passive proxy 1']).", 'Discovery rule to check delete', '192.16.3.1-255', 600, 1)");
-		DBexecute("INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (25, 6, 12, '', '', '0', '', 0, '', '', 0)");
 	}
 }
