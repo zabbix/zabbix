@@ -865,84 +865,6 @@ class testProxy extends CAPITest {
 				'expected_error' => 'Invalid parameter "/filter": unexpected parameter "proxy_address".'
 			],
 
-			'Test proxy.get: invalid "status" (string) in "filter"' => [
-				'request' => [
-					'filter' => [
-						'status' => 'abc'
-					]
-				],
-				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/filter/status": an array is expected.'
-			],
-			'Test proxy.get: invalid "status" in "filter"' => [
-				'request' => [
-					'filter' => [
-						'status' => 999999
-					]
-				],
-				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/filter/status/1": value must be one of '.
-					implode(', ', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]).'.'
-			],
-			'Test proxy.get: invalid "lastaccess" (string) in "filter"' => [
-				'request' => [
-					'filter' => [
-						'lastaccess' => 'abc'
-					]
-				],
-				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/filter/lastaccess": an array is expected.'
-			],
-			'Test proxy.get: invalid "lastaccess" (array with string) in "filter"' => [
-				'request' => [
-					'filter' => [
-						'lastaccess' => ['abc']
-					]
-				],
-				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/filter/lastaccess/1": an integer is expected.'
-			],
-			'Test proxy.get: invalid "lastaccess" (not in range) in "filter"' => [
-				'request' => [
-					'filter' => [
-						'lastaccess' => [-1]
-					]
-				],
-				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/filter/lastaccess/1": value must be one of 0-'.ZBX_MAX_DATE.'.'
-			],
-			'Test proxy.get: invalid "lastaccess" (too large) in "filter"' => [
-				'request' => [
-					'filter' => [
-						'lastaccess' => [ZBX_MAX_DATE + 1]
-					]
-				],
-				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/filter/lastaccess/1": a number is too large.'
-			],
-			'Test proxy.get: invalid "compatibility" (string) for "filter"' => [
-				'request' => [
-					'filter' => [
-						'compatibility' => 'abc'
-					]
-				],
-				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/filter/compatibility": an array is expected.'
-			],
-			'Test proxy.get: invalid "compatibility" (not in range) for "filter"' => [
-				'request' => [
-					'filter' => [
-						'compatibility' => 999999
-					]
-				],
-				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/filter/compatibility/1": value must be one of '.
-					implode(', ', [
-						ZBX_PROXY_VERSION_UNDEFINED, ZBX_PROXY_VERSION_CURRENT, ZBX_PROXY_VERSION_OUTDATED,
-						ZBX_PROXY_VERSION_UNSUPPORTED
-					]).'.'
-			],
-
 			// Check "search" option.
 			'Test proxy.get: invalid "search" (string)' => [
 				'request' => [
@@ -1223,6 +1145,80 @@ class testProxy extends CAPITest {
 				'expected_result' => [
 					['host' => 'API test proxy.get - active']
 				],
+				'expected_error' => null
+			],
+
+			// Filtering by incorrect data types.
+			'Test proxy.get: invalid "status" (string) in "filter"' => [
+				'request' => [
+					'filter' => [
+						'status' => 'abc'
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => null
+			],
+			'Test proxy.get: invalid "status" in "filter"' => [
+				'request' => [
+					'filter' => [
+						'status' => 999999
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => null
+			],
+			'Test proxy.get: invalid "lastaccess" (string) in "filter"' => [
+				'request' => [
+					'filter' => [
+						'lastaccess' => 'abc'
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => null
+			],
+			'Test proxy.get: invalid "lastaccess" (array with string) in "filter"' => [
+				'request' => [
+					'filter' => [
+						'lastaccess' => ['abc']
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => null
+			],
+			'Test proxy.get: invalid "lastaccess" (not in range) in "filter"' => [
+				'request' => [
+					'filter' => [
+						'lastaccess' => [-1]
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => null
+			],
+			'Test proxy.get: invalid "lastaccess" (too large) in "filter"' => [
+				'request' => [
+					'filter' => [
+						'lastaccess' => [ZBX_MAX_DATE + 1]
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => null
+			],
+			'Test proxy.get: invalid "compatibility" (string) for "filter"' => [
+				'request' => [
+					'filter' => [
+						'compatibility' => 'abc'
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => null
+			],
+			'Test proxy.get: invalid "compatibility" (not in range) for "filter"' => [
+				'request' => [
+					'filter' => [
+						'compatibility' => 999999
+					]
+				],
+				'expected_result' => [],
 				'expected_error' => null
 			]
 		];
