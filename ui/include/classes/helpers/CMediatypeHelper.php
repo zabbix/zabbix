@@ -93,7 +93,7 @@ class CMediatypeHelper {
 			],
 			self::EMAIL_PROVIDER_OFFICE365_RELAY => [
 				'name' => 'Office365 relay',
-				'smtp_server' => '-com.mail.protection.outlook.com',
+				'smtp_server' => '.mail.protection.outlook.com',
 				'smtp_email' => 'zabbix@example.com',
 				'smtp_port' => 25,
 				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,

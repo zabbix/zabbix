@@ -122,15 +122,6 @@ class CControllerMediatypeCreate extends CController {
 					$mediatype['smtp_helo'] = substr($mediatype['smtp_email'], $domain_start_pos);
 				}
 
-				if ($mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY) {
-					$domain_start = strrpos($mediatype['smtp_email'], '@') + 1;
-					$domain_end = strrpos($mediatype['smtp_email'], '.');
-					$domain =  substr($mediatype['smtp_email'], $domain_start, $domain_end - $domain_start);
-
-					$data = CMediatypeHelper::getEmailProviders(CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY);
-					$mediatype['smtp_server'] = $domain.$data['smtp_server'];
-				}
-
 				break;
 
 			case MEDIA_TYPE_EXEC:

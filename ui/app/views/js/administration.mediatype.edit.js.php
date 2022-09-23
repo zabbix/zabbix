@@ -231,12 +231,19 @@
 			}
 		});
 
-	$('#provider').change(function() {
-		const provider = $('#provider').val();
+		$('#provider').change(function() {
+			const provider = $('#provider').val();
 
-		adjustDataByProvider(provider);
-		showFormByProvider(provider);
-	});
+			adjustDataByProvider(provider);
+			showFormByProvider(provider);
+		});
+
+		$('#smtp_email').change(function() {
+			if ($('#type').val() == <?= json_encode(MEDIA_TYPE_EMAIL) ?>
+				&& $('#provider').val() == '<?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>') {
+				generateOffice365RelaySmtpServer();
+			}
+		});
 
 		// clone button
 		$('#clone').click(function() {
@@ -386,7 +393,9 @@
 				$('input[name=passwd]').attr('aria-required', 'false');
 				$('label[for=passwd]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
 
-				$('#provider, #smtp_email, #content_type').closest('li').show();
+				$('#smtp_server, #provider, #smtp_email, #content_type').closest('li').show();
+
+				generateOffice365RelaySmtpServer();
 			}
 			else {
 				$('input[name=passwd]').attr('aria-required', 'true');
@@ -406,6 +415,22 @@
 			$('input[name=smtp_verify_peer]').val(providers[provider]['smtp_verify_peer']);
 			$('input[name=smtp_authentication]:checked').prop("checked", false);
 			$('input[value=' + providers[provider]['smtp_authentication'] + ']').prop("checked", true);
+		}
+
+		function generateOffice365RelaySmtpServer() {
+			const provider = $('#provider').val();
+			const email = $('#smtp_email').val();
+
+			const tld_start_pos = email.lastIndexOf('.');
+			const domain_start_pos = email.indexOf('@') + 1;
+
+			if (domain_start_pos != 0 && tld_start_pos != -1) {
+				const formatted_email = email.substring(0, tld_start_pos) + '-' + email.substring(tld_start_pos + 1);
+				const formatted_email_domain = formatted_email.substring(domain_start_pos);
+				const smtp_server = formatted_email_domain + providers[provider]['smtp_server'];
+				$('input[name=smtp_server]').val(smtp_server);
+			}
+
 		}
 
 		$('#exec_params_table').dynamicRows({ template: '#exec_params_row' });
