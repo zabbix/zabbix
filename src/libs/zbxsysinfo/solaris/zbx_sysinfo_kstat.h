@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -18,18 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxtypes.h"
 
-class CWidgetFieldMsSla extends CWidgetFieldMs {
-
-	/**
-	 * Create widget field for SLA selection
-	 *
-	 * @param string      $name     field name in form
-	 * @param string      $label    label for the field in form
-	 */
-	public function __construct($name, $label) {
-		parent::__construct($name, $label);
-
-		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_SLA);
-	}
-}
+#ifdef HAVE_KSTAT_H
+zbx_uint64_t    get_kstat_numeric_value(const kstat_named_t *kn);
+#endif /* HAVE_KSTAT_H */

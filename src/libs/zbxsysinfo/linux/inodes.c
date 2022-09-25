@@ -19,6 +19,7 @@
 
 #include "inodes.h"
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "log.h"
 

@@ -241,7 +241,7 @@ out:
  ******************************************************************************/
 static int	proxyconfig_parse_table_rows(zbx_table_data_t *td, struct zbx_json_parse *jp_table, char **error)
 {
-	const char		*p, *pf;
+	const char		*p;
 	int			ret = FAIL;
 	struct zbx_json_parse	jp, jp_row;
 	char			*buf;
@@ -261,7 +261,7 @@ static int	proxyconfig_parse_table_rows(zbx_table_data_t *td, struct zbx_json_pa
 		zbx_table_row_t	*row, row_local;
 
 		if (FAIL == zbx_json_brackets_open(p, &jp_row) ||
-				NULL == (pf = zbx_json_next_value_dyn(&jp_row, NULL, &buf, &buf_alloc, NULL)))
+				NULL == zbx_json_next_value_dyn(&jp_row, NULL, &buf, &buf_alloc, NULL))
 		{
 			*error = zbx_strdup(*error, zbx_json_strerror());
 			goto out;
@@ -1520,7 +1520,7 @@ static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, zbx_tab
 
 		pf = zbx_json_next(&row->columns, NULL);
 
-		if (NULL != (pf = zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL)) &&
+		if (NULL != zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL) &&
 				SUCCEED == zbx_is_uint64(buf, &templateid))
 		{
 			zbx_vector_uint64_append(&templateids, templateid);
@@ -1816,7 +1816,7 @@ static int	proxyconfig_delete_hostmacros(const zbx_vector_uint64_t *hostids, cha
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
-	int	ret;
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1914,14 +1914,12 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **
 	if (SUCCEED != (ret = zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CONFIG_REVISION, tmp, sizeof(tmp), NULL)))
 	{
 		*error = zbx_strdup(NULL, "no config_revision tag in proxy configuration response");
-		ret = FAIL;
 		goto out;
 	}
 
 	if (SUCCEED != (ret = zbx_is_uint64(tmp, &config_revision)))
 	{
 		*error = zbx_strdup(NULL, "invalid config_revision value in proxy configuration response");
-		ret = FAIL;
 		goto out;
 	}
 
@@ -2028,8 +2026,8 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)zbx_dc_get_received_revision());
 
-	if (SUCCEED != (ret = zbx_tcp_send_ext(sock, j.buffer, j.buffer_size, 0, (unsigned char)sock->protocol,
-			CONFIG_TIMEOUT)))
+	if (SUCCEED != zbx_tcp_send_ext(sock, j.buffer, j.buffer_size, 0, (unsigned char)sock->protocol,
+			CONFIG_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy configuration information to sever at \"%s\": %s",
 				sock->peer, zbx_json_strerror());
@@ -2040,11 +2038,18 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot receive proxy configuration data from server at \"%s\": %s",
 				sock->peer, zbx_json_strerror());
-		ret = FAIL;
 		goto out;
 	}
 
-	if (NULL != sock->buffer && SUCCEED != (ret = zbx_json_open(sock->buffer, &jp_config)))
+	if (NULL == sock->buffer)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse empty proxy configuration data received from server at"
+				" \"%s\"", sock->peer);
+		zbx_send_proxy_response(sock, FAIL, "cannot parse empty data", CONFIG_TIMEOUT);
+		goto out;
+	}
+
+	if (SUCCEED != (ret = zbx_json_open(sock->buffer, &jp_config)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data received from server at"
 				" \"%s\": %s", sock->peer, zbx_json_strerror());

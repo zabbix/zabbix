@@ -56,9 +56,9 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED != zbx_is_uint32(flags_string, &flags_uint32))
 		fail_msg("Cannot convert flags to unsigned 32 bit integer.");
 
-	init_metrics();
+	zbx_init_metrics();
 
-	process(in_command_string, flags_uint32, &result);
+	zbx_execute_agent_check(in_command_string, flags_uint32, &result);
 
 	if (NULL != (p = strchr(in_command_string, '[')))
 		zbx_strlcpy(key, in_command_string, p - in_command_string + 1);

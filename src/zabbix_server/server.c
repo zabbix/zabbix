@@ -1029,7 +1029,7 @@ static void	zbx_on_exit(int ret)
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
-		free_metrics();
+		zbx_free_metrics();
 		zbx_ipc_service_free_env();
 		free_configuration_cache();
 
@@ -1150,7 +1150,7 @@ int	main(int argc, char **argv)
 		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 
 	/* required for simple checks */
-	init_metrics();
+	zbx_init_metrics();
 	zbx_load_config(&t);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)

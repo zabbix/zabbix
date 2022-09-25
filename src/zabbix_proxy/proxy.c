@@ -443,9 +443,9 @@ static void	zbx_set_defaults(void)
 		if (NULL == CONFIG_HOSTNAME_ITEM)
 			CONFIG_HOSTNAME_ITEM = zbx_strdup(CONFIG_HOSTNAME_ITEM, "system.hostname");
 
-		init_result(&result);
+		zbx_init_agent_result(&result);
 
-		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, ZBX_PROCESS_LOCAL_COMMAND, &result) &&
+		if (SUCCEED == zbx_execute_agent_check(CONFIG_HOSTNAME_ITEM, ZBX_PROCESS_LOCAL_COMMAND, &result) &&
 				NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
 			assert(*value);
@@ -461,7 +461,7 @@ static void	zbx_set_defaults(void)
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "failed to get proxy name from [%s])", CONFIG_HOSTNAME_ITEM);
 
-		free_result(&result);
+		zbx_free_agent_result(&result);
 	}
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
 	{
@@ -971,7 +971,7 @@ static void	zbx_on_exit(int ret)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_disable();
 #endif
-	free_metrics();
+	zbx_free_metrics();
 	zbx_ipc_service_free_env();
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
@@ -1094,7 +1094,7 @@ int	main(int argc, char **argv)
 		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 
 	/* required for simple checks */
-	init_metrics();
+	zbx_init_metrics();
 
 	zbx_load_config(&t);
 
