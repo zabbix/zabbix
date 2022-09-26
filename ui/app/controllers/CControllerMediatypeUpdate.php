@@ -70,6 +70,16 @@ class CControllerMediatypeUpdate extends CController {
 			}
 		}
 
+		if ($ret && $this->getInput('type') == MEDIA_TYPE_EMAIL) {
+			$email_validator = new CEmailValidator();
+
+			if (!$email_validator->validate($this->getInput('smtp_email'))) {
+				error($email_validator->getError());
+				$error = self::VALIDATION_ERROR;
+				$ret = false;
+			}
+		}
+
 		if (!$ret) {
 			switch ($error) {
 				case self::VALIDATION_ERROR:
