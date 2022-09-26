@@ -458,17 +458,17 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 	}
 
 	$operations_table->setFooter(
-			(new CSimpleButton(_('Add')))
-			->setAttribute('data-actionid', $data['actionid'])
-			->setAttribute('data-eventsource', $data['eventsource'])
+		(new CSimpleButton(_('Add')))
+		->setAttribute('data-actionid', $data['actionid'])
+		->setAttribute('data-eventsource', $data['eventsource'])
 //			->onClick('
 //			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,
 //					'.ACTION_UPDATE_OPERATION.'
 //				);
 //			')
-			->addClass('js-update-operations-create')
-				// TODO : fix the input to action edit popup open!!!
-			->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('js-update-operations-create')
+			// TODO : fix the input to action edit popup open!!!
+		->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
 	$operations_tab->addItem([
