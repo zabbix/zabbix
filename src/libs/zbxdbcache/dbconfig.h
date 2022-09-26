@@ -93,7 +93,6 @@ ZBX_DC_FUNCTION;
 
 typedef struct
 {
-	zbx_uint64_t			itemid;
 	zbx_vector_uint64_pair_t	dep_itemids;
 }
 ZBX_DC_MASTERITEM;

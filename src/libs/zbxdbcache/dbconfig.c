@@ -2500,7 +2500,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 	ZBX_DC_JMXITEM		*jmxitem;
 	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
-	ZBX_DC_MASTERITEM	*master;
 	ZBX_DC_PREPROCITEM	*preprocitem;
 	ZBX_DC_HTTPITEM		*httpitem;
 	ZBX_DC_SCRIPTITEM	*scriptitem;
@@ -3080,18 +3079,16 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		pair.first = depitem->itemid;
 		pair.second = depitem->flags;
 
-		if (NULL == (master = item->master_item))
+		if (NULL == item->master_item)
 		{
-			master = (ZBX_DC_MASTERITEM *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_MASTERITEM));
-			master->itemid = depitem->master_itemid;
+			item->master_item = (ZBX_DC_MASTERITEM *)__config_shmem_malloc_func(NULL,
+					sizeof(ZBX_DC_MASTERITEM));
 
-			zbx_vector_uint64_pair_create_ext(&master->dep_itemids, __config_shmem_malloc_func,
+			zbx_vector_uint64_pair_create_ext(&item->master_item->dep_itemids, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
-
-			item->master_item = master;
 		}
 
-		zbx_vector_uint64_pair_append(&master->dep_itemids, pair);
+		zbx_vector_uint64_pair_append(&item->master_item->dep_itemids, pair);
 	}
 
 	zbx_vector_ptr_destroy(&dep_items);
