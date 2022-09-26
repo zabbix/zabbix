@@ -20293,6 +20293,10 @@ msgstr "論理値で指定してください"
 msgid "a character string is expected"
 msgstr "文字列で指定してください"
 
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "日付はYYYY-MM-DDフォーマットで指定してください。"
