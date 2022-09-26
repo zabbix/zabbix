@@ -385,6 +385,9 @@ Changes for 6.0.10rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-21388] fixed Zabbix agent 2 plugin read error and updated plugin support dependency for Zabbix agent 2 (esneiders)
+...G...PS. [ZBX-20864] fixed format specifier definitions on AIX (jxl)
+..F....... [ZBX-21605] fixed possible PHP runtime errors in several modal popup dialogs (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.9
