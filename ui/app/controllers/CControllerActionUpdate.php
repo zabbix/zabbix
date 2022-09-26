@@ -28,8 +28,8 @@ class CControllerActionUpdate extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'eventsource' => 'required|in '.implode(',', [
-					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTOREGISTRATION,
-					EVENT_SOURCE_INTERNAL,EVENT_SOURCE_SERVICE
+				EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTOREGISTRATION,
+				EVENT_SOURCE_INTERNAL,EVENT_SOURCE_SERVICE
 			]),
 			'name' => 'string|required|not_empty',
 			'actionid' => 'id',
@@ -103,6 +103,39 @@ class CControllerActionUpdate extends CController {
 			'recovery_operations' => $this->getInput('recovery_operations', []),
 			'update_operations' => $this->getInput('update_operations', [])
 		];
+		$filter = [
+			'conditions' => $this->getInput('conditions', []),
+			'evaltype' => $this->getInput('evaltype')
+		];
+
+		if ($filter['conditions']) {
+			if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				if (count($filter['conditions']) > 1) {
+					$filter['formula'] = $this->getInput('formula');
+				}
+				else {
+					// If only one or no conditions are left, reset the evaltype to "and/or".
+					$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+				}
+			}
+
+			foreach ($filter['conditions'] as &$condition) {
+				if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					unset($condition['formulaid']);
+				}
+
+				if ($condition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
+					unset($condition['value']);
+				}
+
+				if ($condition['conditiontype'] != CONDITION_TYPE_EVENT_TAG_VALUE) {
+					unset($condition['value2']);
+				}
+			}
+			unset($condition);
+
+			$action['filter'] = $filter;
+		}
 
 		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
 			foreach ($action[$operation_group] as &$operation) {
@@ -128,6 +161,7 @@ class CControllerActionUpdate extends CController {
 					}
 				}
 				elseif ($operation_group === 'recovery_operations') {
+					unset($operation['evaltype'], $operation_group);
 					if ($operation['operationtype'] != OPERATION_TYPE_MESSAGE) {
 						unset($operation['opmessage']['mediatypeid']);
 					}
@@ -135,6 +169,9 @@ class CControllerActionUpdate extends CController {
 					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
 						unset($operation['opmessage']);
 					}
+				}
+				elseif ($operation_group === 'update_operations') {
+					unset($operation['evaltype'], $operation_group);
 				}
 
 				if (array_key_exists('opmessage', $operation)) {
@@ -187,46 +224,6 @@ class CControllerActionUpdate extends CController {
 			}
 			unset($operation);
 		}
-
-		$filter = [
-			'conditions' => $this->getInput('conditions', []),
-			'evaltype' => $this->getInput('evaltype')
-		];
-
-		if ($filter['conditions']) {
-			if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				if (count($filter['conditions']) > 1) {
-					$filter['formula'] = $this->getInput('formula');
-				}
-				else {
-					// If only one or no conditions are left, reset the evaltype to "and/or".
-					$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
-				}
-			}
-
-			foreach ($filter['conditions'] as &$condition) {
-				if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-					unset($condition['formulaid']);
-				}
-
-				if ($condition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
-					unset($condition['value']);
-				}
-
-				if ($condition['conditiontype'] != CONDITION_TYPE_EVENT_TAG_VALUE) {
-					unset($condition['value2']);
-				}
-			}
-			unset($condition);
-		}
-		else {
-			$filter = [
-				'conditions' => [],
-				'evaltype' => $this->getInput('evaltype')
-			];
-		}
-
-		$action['filter'] = $filter;
 
 		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 			$action['esc_period'] = $this->getInput('esc_period', DB::getDefault('actions', 'esc_period'));

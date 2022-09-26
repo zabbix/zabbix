@@ -40,9 +40,9 @@ class CControllerActionCreate extends CController {
 			'filter' => 'array',
 			'conditions' => 'array',
 			'evaltype' => 'in '.implode(',', [
-					CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
-					CONDITION_EVAL_TYPE_EXPRESSION
-				]),
+				CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
+				CONDITION_EVAL_TYPE_EXPRESSION
+			]),
 			'formula' => 'string'
 		];
 
@@ -96,7 +96,7 @@ class CControllerActionCreate extends CController {
 		$action = [
 			'name' => $this->getInput('name'),
 			'status' => $this->hasInput('status') ? ACTION_STATUS_ENABLED : ACTION_STATUS_DISABLED,
-			'eventsource' => $this->getInput('eventsource'),
+			'eventsource' => $eventsource,
 			'operations' => $this->getInput('operations', []),
 			'recovery_operations' => $this->getInput('recovery_operations', []),
 			'update_operations' => $this->getInput('update_operations', [])
