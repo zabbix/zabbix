@@ -67,17 +67,20 @@ foreach ($data['db_mediatypes'] as $mediatypeid => $value) {
 	}
 }
 
-$disabled_media_types_error = null;
+$disabled_media_types_msg = null;
 
-if (!$type_select->hasOptions()) {
-	$disabled_media_types_error = (makeErrorIcon(_('Media types disabled by Administration')))
-		->addStyle('margin-left: 5px;')
-		->addStyle('top: 3px');
+if (!array_search(MEDIA_TYPE_STATUS_ACTIVE, array_column($data['db_mediatypes'], 'status'))) {
+	$type_select->addStyle('display: none;');
+
+	$disabled_media_types_msg = (new CDiv(_('Media types disabled by Administration.')))
+		->setId('media_types_disabled')
+		->addClass(ZBX_STYLE_RED)
+		->addStyle('margin:1px 0 0 5px;');
 }
 
 // Create media form.
 $media_form = (new CFormList(_('Media')))
-	->addRow(new CLabel(_('Type'), $type_select->getFocusableElementId()), [$type_select, $disabled_media_types_error])
+	->addRow(new CLabel(_('Type'), $type_select->getFocusableElementId()), [$type_select, $disabled_media_types_msg])
 	->addRow(
 		(new CLabel(_('Send to'), 'sendto'))->setAsteriskMark(),
 		(new CTextBox('sendto', $options['sendto'], false, 1024))
