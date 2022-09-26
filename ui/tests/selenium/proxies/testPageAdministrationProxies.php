@@ -78,12 +78,37 @@ class testPageAdministrationProxies extends CWebTest {
 				'Required vps', 'Hosts'], $table->getHeadersText()
 		);
 
-		// Check that sortable headers are clickable.
-		$this->assertTrue($table->query('link:Name')->one()->isClickable());
-		$this->assertTrue($table->query('link:Mode')->one()->isClickable());
-		$this->assertTrue($table->query('link:Encryption')->one()->isClickable());
-		$this->assertTrue($table->query('link:Version')->one()->isClickable());
-		$this->assertTrue($table->query('link:Last seen (age)')->one()->isClickable());
+		// Check that sortable headers are clickable and sorting works.
+		foreach (['Name', 'Mode', 'Encryption', 'Version', 'Last seen (age)'] as $column) {
+			$content = $this->getTableColumnData($column);
+
+			$sorted_asc = $content;
+			$sorted_desc = $content;
+
+			// Sort column contents ascending.
+			usort($sorted_asc, function($a, $b) {
+				return strcasecmp($a, $b);
+			});
+
+			// Sort column contents descending.
+			usort($sorted_desc, function($a, $b) {
+				return strcasecmp($b, $a);
+			});
+
+			// Click twice on every header.
+			for ($i = 0; $i < 2; $i++) {
+				$order_link = $table->query('link', $column)->one()->getAttribute('href');
+				$table->query('link', $column)->waitUntilClickable()->one()->click();
+				$table->waitUntilReloaded();
+
+				if (strpos($order_link, 'sortorder=ASC') ) {
+					$this->assertTableDataColumn($sorted_asc, $column);
+				}
+				else {
+					$this->assertTableDataColumn($sorted_desc, $column);
+				}
+			}
+		}
 
 		// Check versions and hints.
 		$versions = [
