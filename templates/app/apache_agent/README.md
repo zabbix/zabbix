@@ -129,12 +129,13 @@ There are no template links in this template.
 |Apache |Apache: Workers slot with no current process |<p>Number of slots with no current process</p> |DEPENDENT |apache.workers.slot<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.slot`</p> |
 |Apache |Apache: Workers starting up |<p>Number of workers in starting state</p> |DEPENDENT |apache.workers.starting<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.starting`</p> |
 |Apache |Apache: Workers waiting for connection |<p>Number of workers in waiting state</p> |DEPENDENT |apache.workers.waiting<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.waiting`</p> |
-|Apache |Apache: Get process summary |<p>-</p> |ZABBIX_PASSIVE |proc.get[,,,summary] |
+|Apache |Apache: Get processes summary |<p>-</p> |ZABBIX_PASSIVE |proc.get[,,,summary] |
 |Apache |Apache: CPU utilization |<p>Process CPU utilization percentage.</p> |ZABBIX_PASSIVE |proc.cpu.util[{#NAME}] |
-|Apache |Apache: Get process apache |<p>-</p> |DEPENDENT |apache.proc.get[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@["name"]=="{#NAME}")]`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Apache |Apache: Memory usage (rss) |<p>Resident set size memory used by process in bytes.</p> |DEPENDENT |apache.proc.rss[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..rss.first()`</p> |
-|Apache |Apache: Memory usage (vsize) |<p>Virtual memory size used by process in bytes.</p> |DEPENDENT |apache.proc.vmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..vsize.first()`</p> |
-|Apache |Apache: Number of processes running |<p>-</p> |DEPENDENT |apache.proc.num[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..processes.first()`</p> |
+|Apache |Apache: Get process data |<p>-</p> |DEPENDENT |apache.proc.get[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@["name"]=="{#NAME}")].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Apache |Apache: Memory usage (rss) |<p>Resident set size memory used by process in bytes.</p> |DEPENDENT |apache.proc.rss[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.rss`</p> |
+|Apache |Apache: Memory usage (vsize) |<p>Virtual memory size used by process in bytes.</p> |DEPENDENT |apache.proc.vmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.vsize`</p> |
+|Apache |Apache: Memory usage, % |<p>Percentage of real memory used by process {#NAME}.</p> |DEPENDENT |apache.proc.pmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pmem`</p> |
+|Apache |Apache: Number of running processes |<p>-</p> |DEPENDENT |apache.proc.num[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.processes`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Apache |Apache: Connections async closing |<p>Number of async connections in closing state (only applicable to event MPM)</p> |DEPENDENT |apache.connections[async_closing{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsAsyncClosing`</p> |
 |Apache |Apache: Connections async keep alive |<p>Number of async connections in keep-alive state (only applicable to event MPM)</p> |DEPENDENT |apache.connections[async_keep_alive{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsAsyncKeepAlive`</p> |
 |Apache |Apache: Connections async writing |<p>Number of async connections in writing state (only applicable to event MPM)</p> |DEPENDENT |apache.connections[async_writing{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsAsyncWriting`</p> |

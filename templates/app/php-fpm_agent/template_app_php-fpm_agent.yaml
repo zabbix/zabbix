@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-15T13:17:23Z'
+  date: '2022-09-26T10:57:01Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -439,7 +439,7 @@ zabbix_export:
                   value: notice
         -
           uuid: 71ea0957d99a4d48b18e73a21494c849
-          name: 'PHP-FPM: Get process summary'
+          name: 'PHP-FPM: Get processes summary'
           key: 'proc.get[,,,summary]'
           history: 0d
           trends: '0'
@@ -494,7 +494,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 985005cdf7b44332a59a5f7da7528d88
-              name: 'PHP-FPM: Get process php-fpm'
+              name: 'PHP-FPM: Get process data'
               type: DEPENDENT
               key: 'php-fpm.proc.get[{#NAME}]'
               delay: '0'
@@ -505,7 +505,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@["name"]=="{#NAME}")]'
+                    - '$.[?(@["name"]=="{#NAME}")].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -518,7 +518,7 @@ zabbix_export:
                   value: raw
             -
               uuid: ab8dc0d1ce344fe8ae6a22716a168fbd
-              name: 'PHP-FPM: Number of processes running'
+              name: 'PHP-FPM: Number of running processes'
               type: DEPENDENT
               key: 'php-fpm.proc.num[{#NAME}]'
               delay: '0'
@@ -527,8 +527,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..processes.first()
-                  error_handler: DISCARD_VALUE
+                    - $.processes
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'php-fpm.proc.get[{#NAME}]'
               tags:
@@ -559,8 +562,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..pmem.first()
-                  error_handler: DISCARD_VALUE
+                    - $.pmem
               master_item:
                 key: 'php-fpm.proc.get[{#NAME}]'
               tags:
@@ -581,8 +583,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..rss.first()
-                  error_handler: DISCARD_VALUE
+                    - $.rss
               master_item:
                 key: 'php-fpm.proc.get[{#NAME}]'
               tags:
@@ -603,8 +604,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..vsize.first()
-                  error_handler: DISCARD_VALUE
+                    - $.vsize
               master_item:
                 key: 'php-fpm.proc.get[{#NAME}]'
               tags:

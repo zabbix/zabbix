@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-15T13:38:47Z'
+  date: '2022-09-26T10:44:16Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -298,7 +298,7 @@ zabbix_export:
                   value: notice
         -
           uuid: d43b4b99b6084076a4feb1fde51ecc40
-          name: 'Nginx: Get process summary'
+          name: 'Nginx: Get processes summary'
           key: 'proc.get[,,,summary]'
           history: 0d
           trends: '0'
@@ -349,7 +349,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 632e441011674f04886096475180dcbb
-              name: 'Nginx: Get process nginx'
+              name: 'Nginx: Get process data'
               type: DEPENDENT
               key: 'nginx.proc.get[{#NAME}]'
               delay: '0'
@@ -360,7 +360,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@["name"]=="{#NAME}")]'
+                    - '$.[?(@["name"]=="{#NAME}")].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -373,7 +373,7 @@ zabbix_export:
                   value: raw
             -
               uuid: ba3da6baccee4b31947bf20d3cae0e5f
-              name: 'Nginx: Number of processes running'
+              name: 'Nginx: Number of running processes'
               type: DEPENDENT
               key: 'nginx.proc.num[{#NAME}]'
               delay: '0'
@@ -382,7 +382,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..processes.first()
+                    - $.processes
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'nginx.proc.get[{#NAME}]'
               tags:
@@ -400,6 +404,27 @@ zabbix_export:
                       tag: scope
                       value: availability
             -
+              uuid: 5887d0062bed4233a03d4f408fac7163
+              name: 'Nginx: Memory usage, %'
+              type: DEPENDENT
+              key: 'nginx.proc.pmem[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Percentage of real memory used by process {#NAME}.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.pmem
+              master_item:
+                key: 'nginx.proc.get[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+            -
               uuid: 64d208475c034bae953a64cde1833ebb
               name: 'Nginx: Memory usage (rss)'
               type: DEPENDENT
@@ -412,7 +437,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..rss.first()
+                    - $.rss
               master_item:
                 key: 'nginx.proc.get[{#NAME}]'
               tags:
@@ -432,7 +457,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..vsize.first()
+                    - $.vsize
               master_item:
                 key: 'nginx.proc.get[{#NAME}]'
               tags:

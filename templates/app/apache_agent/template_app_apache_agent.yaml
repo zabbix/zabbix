@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-15T13:04:08Z'
+  date: '2022-09-26T10:41:25Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -475,7 +475,7 @@ zabbix_export:
               value: health
         -
           uuid: 99b1a38ed45b4212974b0bea72b076d2
-          name: 'Apache: Get process summary'
+          name: 'Apache: Get processes summary'
           key: 'proc.get[,,,summary]'
           history: 0d
           trends: '0'
@@ -739,8 +739,8 @@ zabbix_export:
           description: 'Discovery of summary process Apache.'
           item_prototypes:
             -
-              uuid: 2e9b31e2b47741f4b35c5d15f33378ea
-              name: 'Apache: Get process apache'
+              uuid: 458bfecc83f64540838e3ffc3a7f3cb1
+              name: 'Apache: Get process data'
               type: DEPENDENT
               key: 'apache.proc.get[{#NAME}]'
               delay: '0'
@@ -751,7 +751,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@["name"]=="{#NAME}")]'
+                    - '$.[?(@["name"]=="{#NAME}")].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -764,7 +764,7 @@ zabbix_export:
                   value: raw
             -
               uuid: 233b5466014640e4b990ffd81fa19fa1
-              name: 'Apache: Number of processes running'
+              name: 'Apache: Number of running processes'
               type: DEPENDENT
               key: 'apache.proc.num[{#NAME}]'
               delay: '0'
@@ -773,7 +773,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..processes.first()
+                    - $.processes
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'proc.get[,,,summary]'
               tags:
@@ -791,6 +795,27 @@ zabbix_export:
                       tag: scope
                       value: availability
             -
+              uuid: 683d4489dbb549f3bb5b45d3c2696c4f
+              name: 'Apache: Memory usage, %'
+              type: DEPENDENT
+              key: 'apache.proc.pmem[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Percentage of real memory used by process {#NAME}.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.pmem
+              master_item:
+                key: 'apache.proc.get[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+            -
               uuid: 384bf197e6a241b3b63bb89d009bba6b
               name: 'Apache: Memory usage (rss)'
               type: DEPENDENT
@@ -803,7 +828,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..rss.first()
+                    - $.rss
               master_item:
                 key: 'apache.proc.get[{#NAME}]'
               tags:
@@ -823,7 +848,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..vsize.first()
+                    - $.vsize
               master_item:
                 key: 'apache.proc.get[{#NAME}]'
               tags:

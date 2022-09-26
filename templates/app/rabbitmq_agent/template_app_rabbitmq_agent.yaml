@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-15T13:19:57Z'
+  date: '2022-09-26T11:16:56Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1340,7 +1340,7 @@ zabbix_export:
               value: network
         -
           uuid: 8201cc537b124d9292fcf692922ee0ad
-          name: 'RabbitMQ: Get process summary'
+          name: 'RabbitMQ: Get processes summary'
           key: 'proc.get[,,,summary]'
           history: 0d
           trends: '0'
@@ -2161,7 +2161,7 @@ zabbix_export:
                   value: cpu
             -
               uuid: 882cf9cfecb448f3af17e12bf9aa7bef
-              name: 'RabbitMQ: Get process apache'
+              name: 'RabbitMQ: Get process data'
               type: DEPENDENT
               key: 'rabbitmq.proc.get[{#NAME}]'
               delay: '0'
@@ -2172,7 +2172,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@["name"]=="{#NAME}")]'
+                    - '$.[?(@["name"]=="{#NAME}")].first'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2185,7 +2185,7 @@ zabbix_export:
                   value: raw
             -
               uuid: 8f1c8d2449c44ab590842184d9deb3a6
-              name: 'RabbitMQ: Number of processes running'
+              name: 'RabbitMQ: Number of running processes'
               type: DEPENDENT
               key: 'rabbitmq.proc.num[{#NAME}]'
               delay: '0'
@@ -2194,7 +2194,11 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..processes.first()
+                    - $.processes
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'rabbitmq.proc.get[{#NAME}]'
               tags:
@@ -2212,6 +2216,27 @@ zabbix_export:
                       tag: scope
                       value: availability
             -
+              uuid: 875ab477c06943d7881ee896936ee8a2
+              name: 'RabbitMQ: Memory usage, %'
+              type: DEPENDENT
+              key: 'rabbitmq.proc.pmem[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Percentage of real memory used by process {#NAME}.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.pmem
+              master_item:
+                key: 'rabbitmq.proc.get[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+            -
               uuid: 6f13f672d8ce4c9592e0f3f5ec3b0ec4
               name: 'RabbitMQ: Memory usage (rss)'
               type: DEPENDENT
@@ -2224,7 +2249,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..rss.first()
+                    - $.rss
               master_item:
                 key: 'rabbitmq.proc.get[{#NAME}]'
               tags:
@@ -2244,7 +2269,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..vsize.first()
+                    - $.vsize
               master_item:
                 key: 'rabbitmq.proc.get[{#NAME}]'
               tags:
