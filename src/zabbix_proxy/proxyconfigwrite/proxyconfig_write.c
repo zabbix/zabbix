@@ -76,6 +76,11 @@ static void	zbx_flags128_set(zbx_flags128_t *flags, int bit)
 	flags->blocks[bit >> 6] |= (__UINT64_C(1) << (bit & 0x3f));
 }
 
+static void	zbx_flags128_clear(zbx_flags128_t *flags, int bit)
+{
+	flags->blocks[bit >> 6] &= ~(__UINT64_C(1) << (bit & 0x3f));
+}
+
 static void	zbx_flags128_init(zbx_flags128_t *flags)
 {
 	memset(flags->blocks, 0, sizeof(zbx_uint64_t) * (128 / 64));
@@ -100,7 +105,6 @@ static int	zbx_flags128_isclear(zbx_flags128_t *flags)
 ZBX_PTR_VECTOR_DECL(table_row_ptr, struct zbx_table_row *)
 
 /* bit defines for proxyconfig row flags, lower bits are reserved for field update flags */
-#define PROXYCONFIG_ROW_UPDATE		126
 #define PROXYCONFIG_ROW_EXISTS		127
 
 typedef struct zbx_table_row
@@ -547,8 +551,8 @@ static void	proxyconfig_dump_data(const zbx_vector_table_data_ptr_t *config_tabl
  *               FAIl - the rows doesn't match                                *
  *                                                                            *
  * Comments: The checked rows will be flagged as 'exists'. Also update flag   *
- *           will be set for each unmatching column. Finally global row       *
- *           uppdate flag will be set if at last one match failed.            *
+ *           will be set for each not matching column. Finally global row     *
+ *           update flag will be set if at last one match failed.             *
  *                                                                            *
  ******************************************************************************/
 static int	proxyconfig_compare_row(zbx_table_row_t *row, DB_ROW dbrow, char **buf, size_t *buf_alloc)
@@ -574,10 +578,7 @@ static int	proxyconfig_compare_row(zbx_table_row_t *row, DB_ROW dbrow, char **bu
 	}
 
 	if (SUCCEED != zbx_flags128_isclear(&row->flags))
-	{
-		zbx_flags128_set(&row->flags, PROXYCONFIG_ROW_UPDATE);
 		ret = FAIL;
-	}
 
 	zbx_flags128_set(&row->flags, PROXYCONFIG_ROW_EXISTS);
 
@@ -1257,7 +1258,8 @@ static int	proxyconfig_sync_regexps(zbx_vector_table_data_ptr_t *config_tables, 
 /******************************************************************************
  *                                                                            *
  * Purpose: force proxy to re-send host availability data if server and proxy *
- *          interface availability value is different                         *
+ *          interface availability value is different and block proxy from    *
+ *          updating interface availability in database                       *
  *                                                                            *
  * Parameters: td - [IN] the interface table data                             *
  *                                                                            *
@@ -1272,10 +1274,25 @@ static void	proxyconfig_check_interface_availability(zbx_table_data_t *td)
 
 	zbx_vector_uint64_create(&interfaceids);
 
-	for (i = 0; i < td->updates.values_num; i++)
+	for (i = 0; i < td->updates.values_num; )
 	{
 		if (SUCCEED == zbx_flags128_isset(&td->updates.values[i]->flags, index))
+		{
+			zbx_flags128_t	flags;
+
 			zbx_vector_uint64_append(&interfaceids, td->updates.values[i]->recid);
+			zbx_flags128_clear(&td->updates.values[i]->flags, index);
+
+			flags = td->updates.values[i]->flags;
+			zbx_flags128_clear(&flags, PROXYCONFIG_ROW_EXISTS);
+			if (SUCCEED == zbx_flags128_isclear(&flags))
+			{
+				zbx_vector_table_row_ptr_remove(&td->updates, i);
+				continue;
+			}
+			else
+				i++;
+		}
 	}
 
 	if (0 != interfaceids.values_num)
@@ -1398,6 +1415,9 @@ static int	proxyconfig_sync_hosts(zbx_vector_table_data_ptr_t *config_tables, in
 	/* item_rtdata must be only inserted/removed and never updated */
 	zbx_vector_table_row_ptr_clear(&item_rtdata->updates);
 
+	/* interface availability changes are never updated in database, but must be marked in cache */
+	proxyconfig_check_interface_availability(interface);
+
 	/* remove rows in reverse order to avoid depending on cascaded deletes */
 	for (i = host_tables.values_num - 1; 0 <= i; i--)
 	{
@@ -1416,8 +1436,6 @@ static int	proxyconfig_sync_hosts(zbx_vector_table_data_ptr_t *config_tables, in
 		if (SUCCEED != proxyconfig_update_rows(host_tables.values[i], error))
 			goto out;
 	}
-
-	proxyconfig_check_interface_availability(interface);
 
 	ret = SUCCEED;
 out:
