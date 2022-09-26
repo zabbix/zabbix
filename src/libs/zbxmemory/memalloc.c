@@ -548,8 +548,8 @@ int	zbx_mem_create(zbx_mem_info_t **info, zbx_uint64_t size, const char *descr, 
 
 	if (!(MEM_MIN_SIZE <= size && size <= MEM_MAX_SIZE))
 	{
-		*error = zbx_dsprintf(*error, "requested size " ZBX_FS_SIZE_T " not within bounds [" ZBX_FS_UI64
-				" <= size <= " ZBX_FS_UI64 "]", (zbx_fs_size_t)size, MEM_MIN_SIZE, MEM_MAX_SIZE);
+		*error = zbx_dsprintf(*error, "requested size " ZBX_FS_UI64 " not within bounds [" ZBX_FS_UI64
+				" <= size <= " ZBX_FS_UI64 "]", size, MEM_MIN_SIZE, MEM_MAX_SIZE);
 		goto out;
 	}
 

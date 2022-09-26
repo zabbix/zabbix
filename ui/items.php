@@ -804,18 +804,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				}
 			}
 
-			if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
-				$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
-			}
-
-			if ($db_item['username'] !== getRequest('username', '')) {
-				$item['username'] = getRequest('username', '');
-			}
-
-			if ($db_item['password'] !== getRequest('password', '')) {
-				$item['password'] = getRequest('password', '');
-			}
-
 			if ($db_item['publickey'] !== getRequest('publickey', '')) {
 				$item['publickey'] = getRequest('publickey', '');
 			}
