@@ -1449,7 +1449,7 @@ return [
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => ''
 			],
-			'subtype' => [
+			'provider' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

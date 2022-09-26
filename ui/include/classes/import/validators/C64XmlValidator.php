@@ -283,6 +283,14 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK
 	];
 
+	private $MEDIA_PROVIDER = [
+		CXmlConstantValue::GENERIC_SMTP => CXmlConstantName::GENERIC_SMTP,
+		CXmlConstantValue::GMAIL => CXmlConstantName::GMAIL,
+		CXmlConstantValue::GMAIL_RELAY => CXmlConstantName::GMAIL_RELAY,
+		CXmlConstantValue::OFFICE365 => CXmlConstantName::OFFICE365,
+		CXmlConstantValue::OFFICE365_RELAY => CXmlConstantName::OFFICE365_RELAY
+	];
+
 	private $SMTP_AUTHENTICATION = [
 		CXmlConstantValue::SMTP_AUTHENTICATION_NONE => CXmlConstantName::SMTP_AUTHENTICATION_NONE,
 		CXmlConstantValue::SMTP_AUTHENTICATION_PASSWORD => CXmlConstantName::SMTP_AUTHENTICATION_PASSWORD
@@ -2019,7 +2027,8 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 							'subject' =>				['type' => XML_STRING, 'default' => ''],
 							'message' =>				['type' => XML_STRING, 'default' => '']
 						]]
-					]]
+					]],
+					'provider' =>				['type' => XML_STRING, 'in' => $this->MEDIA_PROVIDER]
 				]]
 			]]
 		]];

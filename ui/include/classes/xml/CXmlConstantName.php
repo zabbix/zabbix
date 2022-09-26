@@ -292,6 +292,12 @@ class CXmlConstantName {
 	const SMS = 'SMS';
 	const WEBHOOK = 'WEBHOOK';
 
+	const GENERIC_SMTP = 'GENERIC SMTP';
+	const GMAIL = 'GMAIL';
+	const GMAIL_RELAY = 'GMAIL RELAY';
+	const OFFICE365 = 'OFFICE 365';
+	const OFFICE365_RELAY = 'OFFICE 365 RELAY';
+
 	// const NONE = 'NONE'; // Duplicate.
 	const STARTTLS = 'STARTTLS';
 	const SSL_OR_TLS = 'SSL_OR_TLS';
