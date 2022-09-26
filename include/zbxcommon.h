@@ -855,6 +855,8 @@ zbx_script_t;
 
 #define HOUSEKEEPER_STARTUP_DELAY	30	/* in minutes */
 
+#define ZBX_DEFAULT_INTERVAL	SEC_PER_MIN
+
 #define	GET_SENDER_TIMEOUT	60
 
 #ifndef MAX

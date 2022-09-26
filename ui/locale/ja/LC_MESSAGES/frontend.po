@@ -4687,6 +4687,10 @@ msgstr "作成者"
 msgid "Critical"
 msgstr "クリティカル"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr ""
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "現在のホスト"
@@ -11192,6 +11196,10 @@ msgstr "OS上の属性情報付きのプロセスのリスト。JSONで返す"
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr "キーで指定されたWindowsのレジストリの値またはキーのリスト。JSONで返す。"
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "ブロックデバイスとそのタイプのリスト。JSONで返す"
@@ -13845,6 +13853,10 @@ msgstr "その他のパラメータ"
 msgid "Others"
 msgstr "その他"
 
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr ""
+
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr "ネットワークインターフェースの送信統計。整数値を返す。"
@@ -14883,6 +14895,16 @@ msgstr "プロキシ名"
 msgid "Proxy updated"
 msgstr "プロキシを更新しました"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr ""
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -15535,6 +15557,10 @@ msgstr "要求ステータスコード"
 #: app/views/popup.httpstep.php:170
 msgid "Required string"
 msgstr "要求文字列"
+
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr ""
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102

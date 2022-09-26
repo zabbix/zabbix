@@ -331,7 +331,7 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
  *               configured in passive mode or access denied)                 *
  *                                                                            *
  ******************************************************************************/
-int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, char **error)
+int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *proxy, char **error)
 {
 	char	*ch_error, host[ZBX_HOSTNAME_BUF_LEN];
 
@@ -2855,7 +2855,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
 	{
 		AGENT_RESULT	result;
 
-		init_result(&result);
+		zbx_init_agent_result(&result);
 
 		if (NULL != value->value)
 		{
@@ -2889,11 +2889,11 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
 				SET_LOG_RESULT(&result, log);
 			}
 			else
-				set_result_type(&result, ITEM_VALUE_TYPE_TEXT, value->value);
+				zbx_set_agent_result_type(&result, ITEM_VALUE_TYPE_TEXT, value->value);
 		}
 
 		if (0 != value->meta)
-			set_result_meta(&result, value->lastlogsize, value->mtime);
+			zbx_set_agent_result_meta(&result, value->lastlogsize, value->mtime);
 
 		if (0 != ZBX_ISSET_VALUE(&result) || 0 != ZBX_ISSET_META(&result))
 		{
@@ -2901,7 +2901,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
 			process_item_value(item, &result, &value->ts, h_num, NULL);
 		}
 
-		free_result(&result);
+		zbx_free_agent_result(&result);
 	}
 
 	return SUCCEED;
@@ -3740,7 +3740,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 	{
 		size_t	token_len;
 
-		if (zbx_get_token_len() != (token_len = strlen(token)))
+		if (ZBX_SESSION_TOKEN_SIZE != (token_len = strlen(token)))
 		{
 			*info = zbx_dsprintf(*info, "invalid session token length %d", (int)token_len);
 			ret = FAIL;
@@ -4551,7 +4551,7 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		{
 			size_t	token_len;
 
-			if (zbx_get_token_len() != (token_len = strlen(value)))
+			if (ZBX_SESSION_TOKEN_SIZE != (token_len = strlen(value)))
 			{
 				*error = zbx_dsprintf(*error, "invalid session token length %d", (int)token_len);
 				ret = FAIL;

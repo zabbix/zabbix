@@ -4690,6 +4690,10 @@ msgstr "由用户创建"
 msgid "Critical"
 msgstr "严重"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr ""
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "当前主机"
@@ -11196,6 +11200,10 @@ msgstr "操作系统进程及属性列表。返回 JSON 数组"
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr "位于给定键的 Windows 注册表值或键的列表。返回 JSON。"
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "块设备列表及其类型。返回 JSON"
@@ -13849,6 +13857,10 @@ msgstr "其他参数"
 msgid "Others"
 msgstr "其它"
 
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr ""
+
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
 msgstr "上行流量统计。返回整数"
@@ -14887,6 +14899,16 @@ msgstr "agent代理程序名称"
 msgid "Proxy updated"
 msgstr "agent代理程序已添加"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr ""
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -15539,6 +15561,10 @@ msgstr "要求的状态码"
 #: app/views/popup.httpstep.php:170
 msgid "Required string"
 msgstr "要求的字串"
+
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr ""
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102

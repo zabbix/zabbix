@@ -238,7 +238,7 @@ int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field v
 int	CONFIG_HISTSYNCER_FORKS		= 4;
 int	CONFIG_HISTSYNCER_FREQUENCY	= 1;
 int	CONFIG_CONFSYNCER_FORKS		= 1;
-int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
+int	CONFIG_CONFSYNCER_FREQUENCY	= 10;
 
 int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
 
@@ -305,7 +305,7 @@ int	CONFIG_SERVER_STARTUP_TIME	= 0;	/* zabbix server startup time */
 int	CONFIG_PROXYPOLLER_FORKS	= 1;	/* parameters for passive proxies */
 
 /* how often Zabbix server sends configuration data to passive proxy, in seconds */
-int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_MIN * 5;
+int	CONFIG_PROXYCONFIG_FREQUENCY	= 10;
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
@@ -1029,7 +1029,7 @@ static void	zbx_on_exit(int ret)
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
-		free_metrics();
+		zbx_free_metrics();
 		zbx_ipc_service_free_env();
 		free_configuration_cache();
 
@@ -1150,7 +1150,7 @@ int	main(int argc, char **argv)
 		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 
 	/* required for simple checks */
-	init_metrics();
+	zbx_init_metrics();
 	zbx_load_config(&t);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
