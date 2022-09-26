@@ -1274,7 +1274,7 @@ static void	proxyconfig_check_interface_availability(zbx_table_data_t *td)
 
 	zbx_vector_uint64_create(&interfaceids);
 
-	for (i = 0; i < td->updates.values_num; )
+	for (i = 0; i < td->updates.values_num;)
 	{
 		if (SUCCEED == zbx_flags128_isset(&td->updates.values[i]->flags, index))
 		{
@@ -1290,9 +1290,9 @@ static void	proxyconfig_check_interface_availability(zbx_table_data_t *td)
 				zbx_vector_table_row_ptr_remove(&td->updates, i);
 				continue;
 			}
-			else
-				i++;
 		}
+
+		i++;
 	}
 
 	if (0 != interfaceids.values_num)
