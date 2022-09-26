@@ -7,6 +7,10 @@ A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field 
 A.F.I..PST [ZBXNEXT-2557] added support of Zabbix proxies with legacy version (abakaldin, esekace, mprihodko)
 
 Bug fixes:
+...G...... [ZBX-21388] fixed Zabbix agent 2 plugin read error and updated plugin support dependency for Zabbix agent 2 (esneiders)
+...G...PS. [ZBX-20864] fixed format specifier definitions on AIX (jxl)
+..F....... [ZBX-21605] fixed possible PHP runtime errors in several modal popup dialogs (Sasha)
+A.F....... [ZBX-21097] fixed filtering by "Resource ID" and "Recordset ID" fields for "Audit log" page (Sasha)
 .........T [ZBX-21580] optimized HPE MSA 2060 Storage by HTTP template to spread the load across preprocessing workers (drasihov)
 ..F....... [ZBXNEXT-5535] implemented preselected host pattern filter for autosuggest used in items pattern field in graph widget (dpetra)
 .........T [ZBX-21579] optimized HPE MSA 2040 Storage by HTTP template to spread the load across preprocessing workers (drasihov)
