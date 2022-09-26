@@ -60,9 +60,6 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 		}
 	}
 
-	fsStatCaller.close()
-	fsInodeCaller.close()
-
 	allData, err = p.getFsInfo()
 	if err != nil {
 		return nil, err
