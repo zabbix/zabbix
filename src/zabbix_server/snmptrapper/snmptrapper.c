@@ -600,7 +600,7 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trapfile:'%s'", __func__, CONFIG_SNMPTRAP_FILE);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
