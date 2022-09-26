@@ -1679,7 +1679,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 
 		for (j = 0; j < item->item_tags.values_num; j++)
 		{
-			tag = (zbx_db_tag_t *)item->item_tags.values[j];
+			tag = item->item_tags.values[j];
 
 			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_REMOVE))
 			{
@@ -1718,7 +1718,8 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 		{
 			const char	*d = "";
 
-			tag = (zbx_db_tag_t *)item->item_tags.values[j];
+			tag = item->item_tags.values[j];
+
 			if (0 == tag->tagid)
 			{
 				zbx_db_insert_add_values(&db_insert, new_tagid, item->itemid, tag->tag, tag->value);
@@ -1831,7 +1832,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 
 		for (j = 0; j < item->item_params.values_num; j++)
 		{
-			param = (zbx_item_param_t *)item->item_params.values[j];
+			param = item->item_params.values[j];
 
 			if (0 != (param->flags & ZBX_FLAG_ITEM_PARAM_DELETE))
 			{
@@ -1871,7 +1872,8 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 		{
 			const char	*d = "";
 
-			param = (zbx_item_param_t *)item->item_params.values[j];
+			param = item->item_params.values[j];
+
 			if (0 == param->item_parameterid)
 			{
 				zbx_db_insert_add_values(&db_insert, item_parameter_id, item->itemid, param->name,

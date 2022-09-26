@@ -25,6 +25,7 @@
 #include "zbxdbschema.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxversion.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;
@@ -182,6 +183,12 @@ zbx_host_template_link_type;
 #	endif
 #	define	ZBX_SQL_STRVAL_EQ(str)	"=", str
 #	define	ZBX_SQL_STRVAL_NE(str)	"<>", str
+#endif
+
+#ifdef HAVE_MYSQL
+#	define ZBX_SQL_CONCAT()		"concat(%s,%s)"
+#else
+#	define ZBX_SQL_CONCAT()		"%s||%s"
 #endif
 
 #define ZBX_SQL_NULLCMP(f1, f2)	"((" f1 " is null and " f2 " is null) or " f1 "=" f2 ")"
@@ -685,14 +692,16 @@ void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
 
 typedef struct
 {
-	zbx_uint64_t		hostid;
-	unsigned char		compress;
-	int			version;
-	int			lastaccess;
-	int			last_version_error_time;
-	int			proxy_delay;
-	int			more_data;
-	zbx_proxy_suppress_t	nodata_win;
+	zbx_uint64_t			hostid;
+	unsigned char			compress;
+	char				*version_str;
+	int				version_int;
+	zbx_proxy_compatibility_t	compatibility;
+	int				lastaccess;
+	int				last_version_error_time;
+	int				proxy_delay;
+	int				more_data;
+	zbx_proxy_suppress_t		nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)
@@ -701,13 +710,12 @@ typedef struct
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR			__UINT64_C(0x0008)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY			__UINT64_C(0x0010)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN		__UINT64_C(0x0020)
-#define ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT			__UINT64_C(0x0040)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG			__UINT64_C(0x0080)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
-	zbx_uint64_t	flags;
+	zbx_uint64_t			flags;
 }
 zbx_proxy_diff_t;
 

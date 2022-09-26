@@ -21,7 +21,7 @@
 #include "zbxmockdata.h"
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -52,10 +52,10 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("Parameters \"result\" and \"error\" cannot be both present in test case data.");
 	}
 
-	init_request(&request);
-	init_result(&result);
+	zbx_init_agent_request(&request);
+	zbx_init_agent_result(&result);
 
-	if (SUCCEED != parse_item_key("system.boottime", &request))
+	if (SUCCEED != zbx_parse_item_key("system.boottime", &request))
 		fail_msg("Parsing of \"system.boottime\" key failed.");
 
 	switch (ret = SYSTEM_BOOTTIME(&request, &result))
@@ -63,7 +63,7 @@ void	zbx_mock_test_entry(void **state)
 		case SYSINFO_RET_OK:
 			if (NULL == expected_result)
 				fail_msg("SYSTEM_BOOTTIME() was not expected to succeed.");
-			if (NULL == (actual_result = GET_TEXT_RESULT(&result)))
+			if (NULL == (actual_result = ZBX_GET_TEXT_RESULT(&result)))
 				fail_msg("Result is not set.");
 			if (0 != strcmp(*actual_result, expected_result))
 				fail_msg("Expected result \"%s\" instead of \"%s\".", expected_result, *actual_result);
@@ -71,7 +71,7 @@ void	zbx_mock_test_entry(void **state)
 		case SYSINFO_RET_FAIL:
 			if (NULL == expected_error)
 				fail_msg("SYSTEM_BOOTTIME() was not expected to fail.");
-			if (NULL == (actual_error = GET_MSG_RESULT(&result)))
+			if (NULL == (actual_error = ZBX_GET_MSG_RESULT(&result)))
 				fail_msg("Error message is not set.");
 			if (0 != strcmp(*actual_error, expected_error))
 				fail_msg("Expected error \"%s\" instead of \"%s\".", expected_error, *actual_error);
@@ -80,6 +80,6 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("Unexpected return of SYSTEM_BOOTTIME(): %d (%s).", ret, zbx_sysinfo_ret_string(ret));
 	}
 
-	free_request(&request);
-	free_result(&result);
+	zbx_free_agent_request(&request);
+	zbx_free_agent_result(&result);
 }

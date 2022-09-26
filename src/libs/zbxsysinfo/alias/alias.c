@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "alias.h"
 
 #include "zbxstr.h"
@@ -31,7 +31,7 @@ void	test_aliases(void)
 	ALIAS	*alias;
 
 	for (alias = aliasList; NULL != alias; alias = alias->next)
-		test_parameter(alias->name);
+		zbx_test_parameter(alias->name);
 }
 
 void	zbx_add_alias(const char *name, const char *value)

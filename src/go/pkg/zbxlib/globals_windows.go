@@ -21,7 +21,7 @@ package zbxlib
 
 /*
 #include "zbxstr.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "perfmon.h"
 #include "../src/zabbix_agent/metrics.h"

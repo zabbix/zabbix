@@ -30,6 +30,7 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "zbxparam.h"
+#include "zbxsysinfo.h"
 
 /*
  * SNMP Dynamic Index Cache
@@ -781,7 +782,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *re
 		}
 		else
 		{
-			set_result_type(result, ITEM_VALUE_TYPE_TEXT, strval_dyn);
+			zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, strval_dyn);
 			zbx_free(strval_dyn);
 		}
 	}
@@ -814,7 +815,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *re
 
 		zbx_snprintf(buffer, sizeof(buffer), "%ld", *var->val.integer);
 
-		set_result_type(result, ITEM_VALUE_TYPE_TEXT, buffer);
+		zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, buffer);
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
 	else if (ASN_OPAQUE_FLOAT == var->type)
@@ -1257,21 +1258,21 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 				}
 
 				str_res = NULL;
-				init_result(&snmp_result);
+				zbx_init_agent_result(&snmp_result);
 
 				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result, &val_type))
 				{
-					if (ISSET_TEXT(&snmp_result) && ZBX_SNMP_STR_HEX == val_type)
+					if (ZBX_ISSET_TEXT(&snmp_result) && ZBX_SNMP_STR_HEX == val_type)
 						zbx_remove_chars(snmp_result.text, "\r\n");
 
-					str_res = GET_STR_RESULT(&snmp_result);
+					str_res = ZBX_GET_STR_RESULT(&snmp_result);
 				}
 
 				if (NULL == str_res)
 				{
 					char	**msg;
 
-					msg = GET_MSG_RESULT(&snmp_result);
+					msg = ZBX_GET_MSG_RESULT(&snmp_result);
 
 					zabbix_log(LOG_LEVEL_DEBUG, "cannot get index '%s' string value: %s",
 							oid_index, NULL != msg && NULL != *msg ? *msg : "(null)");
@@ -1279,7 +1280,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 				else
 					walk_cb_func(walk_cb_arg, snmp_oid, oid_index, snmp_result.str);
 
-				free_result(&snmp_result);
+				zbx_free_agent_result(&snmp_result);
 
 				/* go to next variable */
 				memcpy((char *)anOID, (char *)var->name, var->name_length * sizeof(oid));
@@ -1452,7 +1453,7 @@ retry:
 			else
 				errcodes[j] = zbx_snmp_set_result(var, &results[j], &val_type);
 
-			if (ISSET_TEXT(&results[j]) && ZBX_SNMP_STR_HEX == val_type)
+			if (ZBX_ISSET_TEXT(&results[j]) && ZBX_SNMP_STR_HEX == val_type)
 				zbx_remove_chars(results[j].text, "\r\n");
 		}
 
@@ -1708,9 +1709,9 @@ static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *er
 {
 	int	i, j, ret = CONFIG_ERROR;
 
-	init_request(&data->request);
+	zbx_init_agent_request(&data->request);
 
-	if (SUCCEED != parse_item_key(key, &data->request))
+	if (SUCCEED != zbx_parse_item_key(key, &data->request))
 	{
 		zbx_strlcpy(error, "Invalid SNMP OID: cannot parse expression.", max_error_len);
 		goto out;
@@ -1756,7 +1757,7 @@ static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *er
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
-		free_request(&data->request);
+		zbx_free_agent_request(&data->request);
 
 	return ret;
 }
@@ -1788,7 +1789,7 @@ static void	zbx_snmp_ddata_clean(zbx_snmp_ddata_t *data)
 
 	zbx_hashset_destroy(&data->objects);
 
-	free_request(&data->request);
+	zbx_free_agent_request(&data->request);
 }
 
 static void	zbx_snmp_walk_discovery_cb(void *arg, const char *snmp_oid, const char *index, const char *value)
@@ -1960,7 +1961,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 			if (SUCCEED != errcodes[j])
 				continue;
 
-			if (NULL == GET_STR_RESULT(&results[j]) || 0 != strcmp(results[j].str, index_values[j]))
+			if (NULL == ZBX_GET_STR_RESULT(&results[j]) || 0 != strcmp(results[j].str, index_values[j]))
 			{
 				to_walk[to_walk_num++] = j;
 			}
@@ -1981,7 +1982,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 				zbx_strlcat(oids_translated[j], to_verify_oids[j] + len, sizeof(oids_translated[j]));
 			}
 
-			free_result(&results[j]);
+			zbx_free_agent_result(&results[j]);
 		}
 	}
 

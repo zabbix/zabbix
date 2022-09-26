@@ -27,6 +27,7 @@
 #include "preproc_history.h"
 #include "preproc_manager.h"
 #include "zbxtime.h"
+#include "zbxsysinfo.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -241,15 +242,15 @@ static void	preprocessor_sync_configuration(zbx_preprocessing_manager_t *manager
 
 static void	preprocessing_ar_to_variant(AGENT_RESULT *ar, zbx_variant_t *value)
 {
-	if (ISSET_LOG(ar))
+	if (ZBX_ISSET_LOG(ar))
 		zbx_variant_set_str(value,ar->log->value);
-	else if (ISSET_UI64(ar))
+	else if (ZBX_ISSET_UI64(ar))
 		zbx_variant_set_ui64(value, ar->ui64);
-	else if (ISSET_DBL(ar))
+	else if (ZBX_ISSET_DBL(ar))
 		zbx_variant_set_dbl(value, ar->dbl);
-	else if (ISSET_STR(ar))
+	else if (ZBX_ISSET_STR(ar))
 		zbx_variant_set_str(value, ar->str);
-	else if (ISSET_TEXT(ar))
+	else if (ZBX_ISSET_TEXT(ar))
 		zbx_variant_set_str(value, ar->text);
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -640,7 +641,7 @@ static void	preproc_item_value_clear(zbx_preproc_item_value_t *value)
 
 	if (NULL != value->result)
 	{
-		free_result(value->result);
+		zbx_free_agent_result(value->result);
 		zbx_free(value->result);
 	}
 }
@@ -923,7 +924,7 @@ static void	preprocessor_enqueue(zbx_preprocessing_manager_t *manager, zbx_prepr
 		priority = ZBX_PREPROC_PRIORITY_FIRST;
 
 	if (NULL == item || 0 == item->preproc_ops_num || (ITEM_STATE_NOTSUPPORTED != value->state &&
-			(NULL == value->result || 0 == ISSET_VALUE(value->result))))
+			(NULL == value->result || 0 == ZBX_ISSET_VALUE(value->result))))
 	{
 		state = REQUEST_STATE_DONE;
 
@@ -1041,7 +1042,7 @@ static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid: " ZBX_FS_UI64, __func__, itemid);
 
-	if (ISSET_VALUE(ar))
+	if (ZBX_ISSET_VALUE(ar))
 	{
 		item_local.itemid = itemid;
 		if (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_search(&manager->item_config, &item_local)) &&
@@ -1172,7 +1173,7 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 	if (ZBX_VARIANT_NONE == value->type)
 	{
 		if (NULL != request->value.result)
-			free_result(request->value.result);
+			zbx_free_agent_result(request->value.result);
 
 		zbx_free(request->value.error);
 
@@ -1202,13 +1203,13 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 		if (NULL == request->value.result)
 		{
 			request->value.result = (AGENT_RESULT *)zbx_malloc(NULL, sizeof(AGENT_RESULT));
-			init_result(request->value.result);
+			zbx_init_agent_result(request->value.result);
 		}
 		else
 		{
 			/* preserve eventlog related information */
 			if (ITEM_VALUE_TYPE_LOG != request->value_type)
-				free_result(request->value.result);
+				zbx_free_agent_result(request->value.result);
 		}
 
 		if (ITEM_STATE_NOTSUPPORTED == request->value.state)
@@ -1223,9 +1224,9 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 				SET_STR_RESULT(request->value.result, value->data.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				if (ISSET_LOG(request->value.result))
+				if (ZBX_ISSET_LOG(request->value.result))
 				{
-					log = GET_LOG_RESULT(request->value.result);
+					log = ZBX_GET_LOG_RESULT(request->value.result);
 					zbx_free(log->value);
 				}
 				else

@@ -18,7 +18,7 @@
 **/
 
 #include "zbxsysinfo_common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 #include "log.h"
 #include "file.h"
@@ -96,7 +96,7 @@ ZBX_METRIC	parameters_common[] =
 
 static const char	*user_parameter_dir = NULL;
 
-void	set_user_parameter_dir(const char *path)
+void	zbx_set_user_parameter_dir(const char *path)
 {
 	user_parameter_dir = path;
 }
@@ -157,14 +157,14 @@ int	EXECUTE_DBL(const char *command, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK != EXECUTE_STR(command, result))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == GET_DBL_RESULT(result))
+	if (NULL == ZBX_GET_DBL_RESULT(result))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not double", command);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid result. Double is expected."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	UNSET_RESULT_EXCLUDING(result, AR_DOUBLE);
+	ZBX_UNSET_RESULT_EXCLUDING(result, AR_DOUBLE);
 
 	return SYSINFO_RET_OK;
 }
@@ -174,14 +174,14 @@ int	EXECUTE_INT(const char *command, AGENT_RESULT *result)
 	if (SYSINFO_RET_OK != EXECUTE_STR(command, result))
 		return SYSINFO_RET_FAIL;
 
-	if (NULL == GET_UI64_RESULT(result))
+	if (NULL == ZBX_GET_UI64_RESULT(result))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not unsigned integer", command);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid result. Unsigned integer is expected."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	UNSET_RESULT_EXCLUDING(result, AR_UINT64);
+	ZBX_UNSET_RESULT_EXCLUDING(result, AR_UINT64);
 
 	return SYSINFO_RET_OK;
 }

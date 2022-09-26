@@ -17,8 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 /* Solaris. */
 #if !defined(HAVE_SYSINFO_FREESWAP)
@@ -130,7 +129,7 @@ static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
 static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_FREESWAP
-	struct sysinfo info;
+	struct sysinfo	info;
 
 	if (0 == sysinfo(&info))
 	{
@@ -169,7 +168,7 @@ static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
 static int	SYSTEM_SWAP_TOTAL(AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_TOTALSWAP
-	struct sysinfo info;
+	struct sysinfo	info;
 
 	if (0 == sysinfo(&info))
 	{
@@ -203,7 +202,7 @@ static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
 	zbx_uint64_t	tot_val = 0;
 	zbx_uint64_t	free_val = 0;
 
-	init_result(&result_tmp);
+	zbx_init_agent_result(&result_tmp);
 
 	if (SYSINFO_RET_OK != SYSTEM_SWAP_TOTAL(&result_tmp) || !(result_tmp.type & AR_UINT64))
 		return SYSINFO_RET_FAIL;
@@ -212,7 +211,7 @@ static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
 	/* Check for division by zero */
 	if (0 == tot_val)
 	{
-		free_result(&result_tmp);
+		zbx_free_agent_result(&result_tmp);
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -220,7 +219,7 @@ static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	free_val = result_tmp.ui64;
 
-	free_result(&result_tmp);
+	zbx_free_agent_result(&result_tmp);
 
 	SET_DBL_RESULT(result, (100.0 * (double)free_val) / (double)tot_val);
 
@@ -233,7 +232,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 	zbx_uint64_t	tot_val = 0;
 	zbx_uint64_t	free_val = 0;
 
-	init_result(&result_tmp);
+	zbx_init_agent_result(&result_tmp);
 
 	if (SYSINFO_RET_OK != SYSTEM_SWAP_TOTAL(&result_tmp) || !(result_tmp.type & AR_UINT64))
 		return SYSINFO_RET_FAIL;
@@ -242,7 +241,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 	/* Check for division by zero */
 	if (0 == tot_val)
 	{
-		free_result(&result_tmp);
+		zbx_free_agent_result(&result_tmp);
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -250,7 +249,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	free_val = result_tmp.ui64;
 
-	free_result(&result_tmp);
+	zbx_free_agent_result(&result_tmp);
 
 	SET_DBL_RESULT(result, 100.0 - (100.0 * (double)free_val) / (double)tot_val);
 

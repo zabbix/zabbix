@@ -129,19 +129,19 @@ class testPageLatestData extends CWebTest {
 			);
 		}
 
-		// With data/Without data subfilter shows only when some host is filtered.
-		foreach ([false, true] as $status) {
-			$this->assertEquals($status, $this->query('link:With data')->one(false)->isValid());
-			$this->assertEquals($status, $this->query('link:Without data')->one(false)->isValid());
+		// With data/Without data subfilter is always present.
+		$subfilter_queries = ['xpath:.//h3[text()="Data"]', 'link:With data', 'link:Without data'];
 
-			if (!$status) {
-				$form->fill(['Hosts' => self::HOSTNAME]);
-				$form->submit();
-				$subfilter->waitUntilReloaded();
-			}
-			else {
-				$this->assertTrue($subfilter->query('xpath:.//h3[text()="Data"]')->one()->isValid());
-			}
+		foreach ($subfilter_queries as $query) {
+			$this->assertTrue($subfilter->query($query)->one()->isValid());
+		}
+
+		$form->fill(['Hosts' => self::HOSTNAME]);
+		$form->submit();
+		$subfilter->waitUntilReloaded();
+
+		foreach ($subfilter_queries as $query) {
+			$this->assertTrue($subfilter->query($query)->one()->isValid());
 		}
 
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();

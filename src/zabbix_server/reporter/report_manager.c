@@ -25,7 +25,6 @@
 #include "zbxnix.h"
 #include "base64.h"
 #include "../zbxreport.h"
-#include "zbxhash.h"
 #include "zbxcrypto.h"
 #include "zbxalert.h"
 #include "report_protocol.h"

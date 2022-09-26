@@ -28,6 +28,7 @@
 #include "zbxcompress.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
+#include "proxyconfigwrite/proxyconfig_write.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 
@@ -47,6 +48,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	char			value[16], *error = NULL, *buffer = NULL;
 	size_t			buffer_size, reserved;
 	struct zbx_json		j;
+	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -57,6 +59,8 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	zbx_json_addstring(&j, "request", ZBX_PROTO_VALUE_PROXY_CONFIG, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, "host", CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, zbx_dc_get_received_revision());
 
 	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
 	{
@@ -118,27 +122,110 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 		goto error;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server at \"%s\", datalen " ZBX_FS_SIZE_T,
-			sock.peer, (zbx_fs_size_t)*data_size);
-
-	if (SUCCEED == process_proxyconfig(&jp, &jp_kvs_paths))
+	if (SUCCEED == (ret = zbx_proxyconfig_process(sock.peer, &jp, &error)))
 	{
 		DCsync_configuration(ZBX_DBSYNC_UPDATE, *synced);
 		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
 
-		if (NULL != jp_kvs_paths.start)
+		if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
 			DCsync_kvs_paths(&jp_kvs_paths);
 
 		DCupdate_interfaces_availability();
 	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process received configuration data from server at \"%s\": %s",
+				sock.peer, error);
+		zbx_free(error);
+	}
 error:
 	zbx_disconnect_from_server(&sock);
+	if (SUCCEED != ret)
+	{
+		/* reset received config_revision to force full resync after data transfer failure */
+		zbx_dc_update_received_revision(0);
+	}
+
 out:
 	zbx_free(error);
 	zbx_free(buffer);
 	zbx_json_free(&j);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	proxyconfig_remove_unused_templates(void)
+{
+	zbx_vector_uint64_t	hostids, templateids;
+	zbx_hashset_t		templates;
+	int			removed_num;
+	DB_ROW			row;
+	DB_RESULT		result;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_create(&templateids);
+	zbx_hashset_create(&templates, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	result = DBselect("select hostid,status from hosts");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	hostid;
+		unsigned char	status;
+
+		ZBX_STR2UINT64(hostid, row[0]);
+		ZBX_STR2UCHAR(status, row[1]);
+
+		if (HOST_STATUS_TEMPLATE == status)
+			zbx_hashset_insert(&templates, &hostid, sizeof(hostid));
+		else
+			zbx_vector_uint64_append(&hostids, hostid);
+	}
+	DBfree_result(result);
+
+	zbx_dc_get_unused_macro_templates(&templates, &hostids, &templateids);
+
+	if (0 != templateids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		DBbegin();
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts_templates where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
+				templateids.values_num);
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto fail;
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hostmacro where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
+				templateids.values_num);
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto fail;
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", templateids.values,
+				templateids.values_num);
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto fail;
+fail:
+		DBcommit();
+
+		zbx_free(sql);
+	}
+
+	removed_num = templateids.values_num;
+
+	zbx_hashset_destroy(&templates);
+	zbx_vector_uint64_destroy(&templateids);
+	zbx_vector_uint64_destroy(&hostids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() removed:%d", __func__, removed_num);
 }
 
 /******************************************************************************
@@ -153,7 +240,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_thread_proxyconfig_args	*proxyconfig_args_in = (zbx_thread_proxyconfig_args *)
 							(((zbx_thread_args_t *)args)->args);
 	size_t				data_size;
-	double				sec;
+	double				sec, last_template_cleanup_sec = 0, interval;
 	zbx_ipc_async_socket_t		rtc;
 	int				sleeptime;
 	zbx_synced_new_config_t		synced = ZBX_SYNCED_NEW_CONFIG_NO;
@@ -213,6 +300,12 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 				DCupdate_interfaces_availability();
 				zbx_rtc_notify_config_sync(&rtc);
 
+				if (SEC_PER_HOUR < sec - last_template_cleanup_sec)
+				{
+					proxyconfig_remove_unused_templates();
+					last_template_cleanup_sec = sec;
+				}
+
 				zbx_setproctitle("%s [synced config in " ZBX_FS_DBL " sec]",
 						get_process_type_string(process_type), zbx_time() - sec);
 			}
@@ -227,11 +320,17 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
 		process_configuration_sync(&data_size, &synced, proxyconfig_args_in->zbx_config_tls);
-		sec = zbx_time() - sec;
+		interval = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), (zbx_fs_size_t)data_size, sec,
+				get_process_type_string(process_type), (zbx_fs_size_t)data_size, interval,
 				CONFIG_PROXYCONFIG_FREQUENCY);
+
+		if (SEC_PER_HOUR < sec - last_template_cleanup_sec)
+		{
+			proxyconfig_remove_unused_templates();
+			last_template_cleanup_sec = sec;
+		}
 
 		sleeptime = CONFIG_PROXYCONFIG_FREQUENCY;
 	}
