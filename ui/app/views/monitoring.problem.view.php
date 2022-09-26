@@ -324,9 +324,6 @@ if ($data['action'] === 'problem.view') {
 	// Activate blinking.
 	(new CScriptTag('jqBlink.blink();'))->show();
 
-	// Disable page refresh after changing time selector.
-	(new CScriptTag('timeControl.refreshPage = false;'))->show();
-
 	// Initialize page refresh.
 	(new CScriptTag('problems_page.start();'))
 		->setOnDocumentReady()
