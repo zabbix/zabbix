@@ -237,6 +237,13 @@ static int	DBpatch_6000006(void)
 #undef HTTPSTEP_ITEM_TYPE_LASTSTEP
 #undef HTTPSTEP_ITEM_TYPE_LASTERROR
 
+static int	DBpatch_6000007(void)
+{
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("users", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(6000)
@@ -250,5 +257,6 @@ DBPATCH_ADD(6000003, 0, 0)
 DBPATCH_ADD(6000004, 0, 0)
 DBPATCH_ADD(6000005, 0, 0)
 DBPATCH_ADD(6000006, 0, 0)
+DBPATCH_ADD(6000007, 0, 0)
 
 DBPATCH_END()
