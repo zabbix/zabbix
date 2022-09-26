@@ -21,7 +21,7 @@
 
 #include "zbxdbhigh.h"
 #include "log.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
 #include "version.h"

@@ -29,7 +29,7 @@
 #include "log.h"
 #include "zbxdiag.h"
 #include "zbxrtc.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 #include "dbcache.h"
 #include "zbxnum.h"
 #include "zbxtime.h"

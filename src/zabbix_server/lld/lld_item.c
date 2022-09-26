@@ -26,6 +26,7 @@
 #include "zbxprometheus.h"
 #include "zbxxml.h"
 #include "zbxnum.h"
+#include "zbxdbwrap.h"
 
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"

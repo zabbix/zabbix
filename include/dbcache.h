@@ -1156,4 +1156,39 @@ void	zbx_cached_proxy_free(zbx_cached_proxy_t *proxy);
 
 int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name);
 
+void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_diff);
+
+typedef struct
+{
+	zbx_uint32_t		init;
+	zbx_uint32_t		done;
+	zbx_eval_context_t	eval_ctx;
+	zbx_eval_context_t	eval_ctx_r;
+	zbx_vector_uint64_t	hostids;
+}
+zbx_trigger_cache_t;
+
+/* related trigger data caching states */
+typedef enum
+{
+	ZBX_TRIGGER_CACHE_EVAL_CTX,
+	ZBX_TRIGGER_CACHE_EVAL_CTX_R,
+	ZBX_TRIGGER_CACHE_EVAL_CTX_MACROS,
+	ZBX_TRIGGER_CACHE_EVAL_CTX_R_MACROS,
+	ZBX_TRIGGER_CACHE_HOSTIDS,
+}
+zbx_trigger_cache_state_t;
+
+zbx_trigger_cache_t	*db_trigger_get_cache(const ZBX_DB_TRIGGER *trigger, zbx_trigger_cache_state_t state);
+void	zbx_db_trigger_get_all_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+int	zbx_db_trigger_get_constant(const ZBX_DB_TRIGGER *trigger, int index, char **out);
+void	zbx_db_trigger_get_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_get_recovery_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
+
+void	zbx_db_trigger_get_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+int	zbx_db_trigger_get_all_hostids(const ZBX_DB_TRIGGER *trigger, const zbx_vector_uint64_t **hostids);
+int	zbx_db_trigger_get_itemid(const ZBX_DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
+void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
+
 #endif

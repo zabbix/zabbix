@@ -26,6 +26,7 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
 #include "zbxnum.h"
+#include "zbxdbwrap.h"
 
 /* host macro discovery state */
 #define ZBX_USERMACRO_MANUAL	0

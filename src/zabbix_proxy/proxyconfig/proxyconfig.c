@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "zbxnix.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 #include "zbxself.h"
 #include "zbxtime.h"
 

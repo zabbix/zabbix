@@ -19,7 +19,7 @@
 
 #include "proxypoller.h"
 #include "zbxserver.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 
 #include "zbxnix.h"
 #include "zbxself.h"

@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxdbhigh.h"
+#include "template.h"
+#include "zbxdbwrap.h"
 
 #include "log.h"
 #include "dbcache.h"
@@ -68,7 +69,7 @@ static int	zbx_ids_names_compare_func(const void *d1, const void *d2)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names)
+static int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names)
 {
 	int		i, ret = FAIL;
 	DB_RESULT	result;
@@ -6067,7 +6068,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 	ip_esc = DBdyn_escape_field("interface", "ip", ip);
 	dns_esc = DBdyn_escape_field("interface", "dns", dns);
 
-	interfaceid = DBget_maxid("interface");
+	interfaceid = DBget_maxid_num("interface", 1);
 
 	DBexecute("insert into interface"
 			" (interfaceid,hostid,main,type,useip,ip,dns,port)"

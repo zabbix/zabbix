@@ -19,7 +19,7 @@
 
 #include "trapper.h"
 #include "zbxserver.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 
 #include "log.h"
 #include "zbxself.h"

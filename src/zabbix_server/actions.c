@@ -26,6 +26,7 @@
 #include "audit/zbxaudit.h"
 #include "zbxnum.h"
 #include "zbxip.h"
+#include "zbxdbwrap.h"
 
 /******************************************************************************
  *                                                                            *

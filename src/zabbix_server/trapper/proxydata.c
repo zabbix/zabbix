@@ -18,7 +18,7 @@
 **/
 
 #include "proxydata.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 
 #include "zbxdbhigh.h"
 #include "log.h"

@@ -20,7 +20,7 @@
 #include "rtc.h"
 
 #include "zbxtypes.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 
 extern int	CONFIG_PROXYMODE;
 

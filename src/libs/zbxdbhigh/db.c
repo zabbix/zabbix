@@ -44,6 +44,8 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 static int	connection_failure;
 extern unsigned char	program_type;
 
+static zbx_dc_get_nextid_func_t				zbx_cb_nextid;
+
 void	DBclose(void)
 {
 	zbx_db_close();
@@ -194,8 +196,10 @@ int	DBconnect(int flag)
 	return err;
 }
 
-int	DBinit(char **error)
+int	DBinit(zbx_dc_get_nextid_func_t cb_nextid, char **error)
 {
+	zbx_cb_nextid = cb_nextid;
+
 	return zbx_db_init(CONFIG_DBNAME, db_schema, error);
 }
 
@@ -723,7 +727,7 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "autoreg_host") ||
 			0 == strcmp(tablename, "event_suppress") ||
 			0 == strcmp(tablename, "trigger_queue"))
-		return DCget_nextid(tablename, num);
+		return zbx_cb_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
 }
@@ -2071,16 +2075,6 @@ const char	*DBget_inventory_field(unsigned char inventory_link)
 		return NULL;
 
 	return inventory_fields[inventory_link - 1];
-}
-
-int	DBtxn_status(void)
-{
-	return 0 == zbx_db_txn_error() ? SUCCEED : FAIL;
-}
-
-int	DBtxn_ongoing(void)
-{
-	return 0 == zbx_db_txn_level() ? FAIL : SUCCEED;
 }
 
 int	DBtable_exists(const char *table_name)

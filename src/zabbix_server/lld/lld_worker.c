@@ -18,15 +18,17 @@
 **/
 
 #include "lld_worker.h"
+#include "lld.h"
 
 #include "zbxnix.h"
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 #include "../events.h"
 #include "lld_protocol.h"
 #include "zbxtime.h"
+#include "zbxdbwrap.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
