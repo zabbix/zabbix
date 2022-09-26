@@ -80,12 +80,13 @@ if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EV
 
 // Message recipient is required notice row.
 $form_grid->addItem(
-	new CFormField((new CLabel(_('At least one user or user group must be selected.')))->setAsteriskMark(),
-	'operation-message-notice'
+	new CFormField((new CLabel(_('At least one user or user group must be selected.')))
+		->setAsteriskMark()
+		->setId('operation-message-notice')
 ));
 
 $form_grid->addItem([
-	new CLabel(_('Send to user groups')),
+	(new CLabel(_('Send to user groups')))->setId('operation-message-user-groups-label'),
 	(new CFormField(
 		(new CTable())
 			->addStyle('width: 100%;')
@@ -100,14 +101,14 @@ $form_grid->addItem([
 				))->setId('operation-message-user-groups-footer')
 			)
 	))
-	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-	//'operation-message-user-groups'
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setId('operation-message-user-groups')
 ]);
 
 // Message recipient (users) row.
 $form_grid->addItem([
-	new CLabel(_('Send to users')),
+	(new CLabel(_('Send to users')))->setId('operation-message-users-label'),
 	(new CFormField(
 	(new CTable())
 		->addStyle('width: 100%;')
@@ -123,8 +124,8 @@ $form_grid->addItem([
 		)
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-//	'operation-message-users'
+		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setId('operation-message-users')
 ]);
 
 // Operation message media type row.
@@ -145,7 +146,7 @@ $select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
 
 
 $form_grid->addItem([
-	new CLabel(_('Send only to'), $select_opmessage_mediatype->getFocusableElementId()),
+	(new CLabel(_('Send only to'), $select_opmessage_mediatype->getFocusableElementId()))->setId('operation-message-mediatype-only-label'),
 	(new CFormField($select_opmessage_mediatype))
 		->setId('operation-message-mediatype-only')
 		->setName('operation[opmessage][default_msg]')
@@ -153,9 +154,8 @@ $form_grid->addItem([
 
 // Operation custom message checkbox row.
 $form_grid->addItem([
-	new CLabel(_('Custom message'), 'operation_opmessage_default_msg'),
+	(new CLabel(_('Custom message'), 'operation_opmessage_default_msg'))->setId('operation-message-custom-label'),
 	(new CFormField(new CCheckBox('operation[opmessage][default_msg]', 0)))->setId('operation-message-custom')
-	// new CCheckBox('', 0)
 ]);
 
 // Operation custom message subject row.
@@ -173,78 +173,80 @@ $form_grid->addItem([
 ]);
 // todo: til here
 
-
-// todo show when operation type = ping ?? (and other??)
 // todo add ms buttons
 // Command execution targets row.
-//$form_grid->addItem([
-//	(new CLabel(_('Target list')))->setAsteriskMark(),
-//	(new CFormField(
-//		(new CFormGrid())
-//			->cleanItems()
-//			->addItem([
-//				new CLabel(_('Current host')),
-//				new CFormField((new CCheckBox('operation[opcommand_hst][][hostid]', '0'))->setId('operation-command-chst'))
-//			])
-//			->addItem([
-//				new CLabel(_('Host')),
-//				(new CMultiSelect([
-//					'name' => 'operation[opcommand_hst][][hostid]',
-//					'object_name' => 'hosts',
-//					'add_post_js' => false
-//				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-//			])
-//			->addItem([
-//				(new CLabel(_('Host group'))),
-//				(new CMultiSelect([
-//					'name' => 'operation[opcommand_grp][][groupid]',
-//					'object_name' => 'hostGroup',
-//					'add_post_js' => false
-//				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-//			])
-//	))
-//		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-//		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-//	//'operation-command-targets'
-//]);
+$form_grid->addItem([
+	(new CLabel(_('Target list')))
+		->setAsteriskMark()
+		->setId('operation-command-targets-label'),
+	(new CFormField(
+		(new CFormGrid())
+			->cleanItems()
+			->addItem([
+				new CLabel(_('Current host')),
+				new CFormField((new CCheckBox('operation[opcommand_hst][][hostid]', '0'))->setId('operation-command-chst'))
+			])
+			->addItem([
+				new CLabel(_('Host')),
+				(new CMultiSelect([
+					'name' => 'operation[opcommand_hst][][hostid]',
+					'object_name' => 'hosts',
+					'add_post_js' => false
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			])
+			->addItem([
+				(new CLabel(_('Host group'))),
+				(new CMultiSelect([
+					'name' => 'operation[opcommand_grp][][groupid]',
+					'object_name' => 'hostGroup',
+					'add_post_js' => false
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			])
+	))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setId('operation-command-targets')
+]);
 
-//// todo: show these when Discovery options and operation type = add/remove from host group or link/unlink from template
-//// Add / remove host group attribute row.
-// $form_grid->addItem([
-//	(new CLabel(_('Host groups')))->setAsteriskMark(),
-//	new CFormGrid((new CMultiSelect([
-//		'name' => 'operation[opgroup][][groupid]',
-//		'object_name' => 'hostGroup',
-//		'add_post_js' => false
-//	]))
-//		->setAriaRequired()
-//		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
-//	//'operation-attr-hostgroups'
-//]);
+// Add / remove host group attribute row.
+$form_grid->addItem([
+	(new CLabel(_('Host groups'),'operation-attr-hostgroups'))
+		->setId('operation-attr-hostgroups-label')
+		->setAsteriskMark(),
+	(new CFormGrid((new CMultiSelect([
+		'name' => 'operation[opgroup][][groupid]',
+		'object_name' => 'hostGroup',
+		'add_post_js' => false
+	]))
+		->setAriaRequired()
+		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
+	)->setId('operation-attr-hostgroups')
+]);
 
-//// Link / unlink templates attribute row.
-// $form_grid->addItem([
-//	(new CLabel(_('Templates')))->setAsteriskMark(),
-//	new CFormField((new CMultiSelect([
-//		'name' => 'operation[optemplate][][templateid]',
-//		'object_name' => 'templates',
-//		'add_post_js' => false
-//	]))
-//		->setAriaRequired()
-//		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
-////	'operation-attr-templates'
-//]);
+// Link / unlink templates attribute row.
+$form_grid->addItem([
+	(new CLabel(_('Templates')))
+		->setAsteriskMark()
+		->setId('operation-attr-templates-label'),
+	(new CFormField((new CMultiSelect([
+		'name' => 'operation[optemplate][][templateid]',
+		'object_name' => 'templates',
+		'add_post_js' => false
+	]))
+		->setAriaRequired()
+		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
+	)->setId('operation-attr-templates')
+]);
 
-//// todo : show when discovery action and operation type = set host inventory mode (on change)
-//// Host inventory mode attribute row.
-// $form_grid->addItem([
-//	new CLabel(_('Inventory mode'), 'operation_opinventory_inventory_mode'),
-//	(new CRadioButtonList('operation[opinventory][inventory_mode]', HOST_INVENTORY_MANUAL))
-//		->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
-//		->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-//		->setModern(true),
-//	// 'operation-attr-inventory'
-//]);
+// Host inventory mode attribute row.
+$form_grid->addItem([
+	(new CLabel(_('Inventory mode'), 'operation_opinventory_inventory_mode'))->setId('operation-attr-inventory-label'),
+	(new CRadioButtonList('operation[opinventory][inventory_mode]', HOST_INVENTORY_MANUAL))
+		->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
+		->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
+		->setModern(true)
+		->setId('operation-attr-inventory')
+]);
 
 // Conditions type of calculation row.
 $select_operation_evaltype = (new CSelect('operation[evaltype]'))

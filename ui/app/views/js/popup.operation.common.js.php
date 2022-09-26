@@ -34,10 +34,45 @@ window.operation_popup = new class {
 	}
 
 	_loadViews() {
+		this._removeAllFields();
+		this._sendMessageFields();
 		this._addCustomMessageFields();
 
 		jQuery('#operation-type-select').on('change', (e) => {
-			// todo : add functions that change popup view based on operation type
+			// todo : rewrite!
+			this._removeAllFields();
+
+			const operation_type = document.getElementById('operation-type-select').value;
+			if (operation_type == 'cmd[0]') {
+				this._sendMessageFields();
+			}
+			else if (operation_type == 'cmd[2]') {
+				// todo : add hidden input - ?
+			}
+			else if (operation_type == 'cmd[3]') {
+				// todo : add hidden input - ?
+			}
+			else if (operation_type == 'cmd[4]' || operation_type == 'cmd[5]') {
+				this._hostGroupFields();
+			}
+			else if (operation_type == 'cmd[6]') {
+				this._templateFields();
+			}
+			else if (operation_type == 'cmd[7]') {
+				this._templateFields();
+			}
+			else if (operation_type == 'cmd[8]') {
+				// todo : add hidden input - ?
+			}
+			else if (operation_type == 'cmd[9]') {
+				// todo : add hidden input - ?
+			}
+			else if (operation_type == 'cmd[10]') {
+				this._hostInventoryFields();
+			}
+			else {
+				this._addScriptFields();
+			}
 		});
 
 		this.dialogue.addEventListener('click', (e) => {
@@ -53,6 +88,141 @@ window.operation_popup = new class {
 			else if (e.target.classList.contains('element-table-remove')) {
 				this.row_count--;
 				this._processTypeOfCalculation();
+			}
+		});
+	}
+
+	_hostGroupFields() {
+		jQuery('#operation-attr-hostgroups').toggle(true);
+		jQuery('#operation-attr-hostgroups-label').toggle(true);
+
+		this.hostgroups_ms = jQuery('#operation_opgroup__groupid');
+
+		const ms_groups_url = new Curl('jsrpc.php', false);
+		ms_groups_url.setArgument('method', 'multiselect.get');
+		ms_groups_url.setArgument('object_name', 'hostGroup');
+		ms_groups_url.setArgument('editable', '1');
+		ms_groups_url.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
+
+		this.hostgroups_ms.multiSelect({
+			url: ms_groups_url.getUrl(),
+			name: 'operation[opgroup][][groupid]',
+			popup: {
+				parameters: {
+					multiselect: '1',
+					srctbl: 'host_groups',
+					srcfld1: 'groupid',
+					dstfrm: 'action.edit',
+					dstfld1: 'operation_opgroup__groupid',
+					editable: '1'
+				}
+			}
+		});
+	}
+
+	_templateFields() {
+		jQuery('#operation-attr-templates').toggle(true)
+		jQuery('#operation-attr-templates-label').toggle(true)
+
+		this.templates_ms = jQuery('#operation_optemplate__templateid');
+
+		const ms_templates_url = new Curl('jsrpc.php', false);
+		ms_templates_url.setArgument('method', 'multiselect.get');
+		ms_templates_url.setArgument('object_name', 'templates');
+		ms_templates_url.setArgument('editable', '1');
+		ms_templates_url.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
+
+		this.templates_ms.multiSelect({
+			url: ms_templates_url.getUrl(),
+			name: 'operation[optemplate][][templateid]',
+			popup: {
+				parameters: {
+					multiselect: '1',
+					srctbl: 'templates',
+					srcfld1: 'hostid',
+					dstfrm: 'action.edit',
+					dstfld1: 'operation_optemplate__templateid',
+					editable: '1'
+				}
+			}
+		});
+	}
+
+	_removeAllFields() {
+		// todo : rewrite this?
+		const fields = [
+			'operation-message-notice', 'operation-message-custom-label', 'operation-message-user-groups-label',
+			'operation-message-user-groups', 'operation-message-users', 'operation-message-users-label',
+			'operation-message-mediatype-only', 'operation-message-mediatype-only-label', 'operation-message-custom',
+			'operation-message-custom-label', 'operation-attr-hostgroups', 'operation-attr-hostgroups-label',
+			'operation-attr-templates', 'operation-attr-templates-label', 'operation-attr-inventory',
+			'operation-attr-inventory-label', 'operation-command-targets-label', 'operation-command-targets'
+		]
+		fields.forEach(value => jQuery(`#${value}`).toggle(false))
+	}
+
+	_sendMessageFields() {
+		// todo : rewrite
+		const fields = [
+			'operation-message-notice', 'operation-message-custom-label', 'operation-message-user-groups-label',
+			'operation-message-user-groups', 'operation-message-users', 'operation-message-users-label',
+			'operation-message-mediatype-only', 'operation-message-mediatype-only-label', 'operation-message-custom',
+			'operation-message-custom-label'
+		]
+		fields.forEach(value => jQuery(`#${value}`).toggle(true))
+	}
+
+	_hostInventoryFields() {
+		jQuery('#operation-attr-inventory').toggle(true);
+		jQuery('#operation-attr-inventory-label').toggle(true);
+	}
+
+	_addScriptFields() {
+		jQuery('#operation-command-targets').toggle(true);
+		jQuery('#operation-command-targets-label').toggle(true);
+
+		this.targets_hosts_ms = jQuery('#operation_opcommand_hst__hostid');
+
+		const ms_hosts_url = new Curl('jsrpc.php', false);
+		ms_hosts_url.setArgument('method', 'multiselect.get');
+		ms_hosts_url.setArgument('object_name', 'hosts');
+		ms_hosts_url.setArgument('editable', '1');
+		ms_hosts_url.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
+
+		this.targets_hosts_ms.multiSelect({
+			url: ms_hosts_url.getUrl(),
+			name: 'operation[opcommand_hst][][hostid]',
+			popup: {
+				parameters: {
+					multiselect: '1',
+					srctbl: 'hosts',
+					srcfld1: 'hostid',
+					dstfrm: 'action.edit',
+					dstfld1: 'operation-command-target-hosts',
+					editable: '1'
+				}
+			}
+		});
+
+		const ms_groups_url = new Curl('jsrpc.php', false);
+		ms_groups_url.setArgument('method', 'multiselect.get');
+		ms_groups_url.setArgument('object_name', 'hostGroup');
+		ms_groups_url.setArgument('editable', '1');
+		ms_groups_url.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
+
+		this.targets_groups_ms = jQuery('#operation_opcommand_grp__groupid');
+		this.targets_groups_ms.multiSelect({
+			url: ms_groups_url.getUrl(),
+			name: 'operation[opcommand_grp][][groupid]',
+			popup: {
+				parameters: {
+					multiselect: '1',
+					srctbl: 'host_groups',
+					srcfld1: 'groupid',
+					dstfrm: 'action.edit',
+					dstfld1: 'operation-command-target-groups',
+					editable: '1'
+				}
 			}
 		});
 	}

@@ -231,9 +231,9 @@ class CControllerActionOperationValidate extends CController {
 			];
 
 			if ($operation['recovery'] == ACTION_OPERATION &&
-					($operation['eventsource'] === EVENT_SOURCE_TRIGGERS
-					|| $operation['eventsource'] === EVENT_SOURCE_INTERNAL
-					|| $operation['eventsource'] === EVENT_SOURCE_SERVICE)) {
+					($operation['eventsource'] == EVENT_SOURCE_TRIGGERS
+					|| $operation['eventsource'] == EVENT_SOURCE_INTERNAL
+					|| $operation['eventsource'] == EVENT_SOURCE_SERVICE)) {
 				$data['operation']['duration'] = $this->createDurationColumn($operation['esc_period']);
 				$data['operation']['steps'] = $this->createStepsColumn($operation);
 			}
@@ -245,8 +245,9 @@ class CControllerActionOperationValidate extends CController {
 				'recovery' => $operation['recovery'],
 				'operationtype' => $operation['operationtype'],
 				'operation-message-mediatype-only' => $operation['operation-message-mediatype-only'],
-				'opmessage_grp' => $operation['opmessage_grp'],
-				'opmessage' =>  $operation['esc_period'],
+				//'opmessage_grp' => $operation['opmessage_grp'],
+				'opmessage' =>  $operation['opmessage'],
+				'opcommand' => $operation['opcommand'],
 				'evaltype' => $operation['evaltype'],
 				'opmessage_usr' => $operation['opmessage_usr'],
 				'details' => $this->createDetailsColumn($operation)

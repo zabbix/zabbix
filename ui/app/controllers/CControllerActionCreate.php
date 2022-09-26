@@ -179,8 +179,6 @@ class CControllerActionCreate extends CController {
 						unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
 					}
 				}
-				// todo : this else is for testing only! remove after action form inputs are corrected
-				else $operation['opmessage'] =[];
 
 				if (array_key_exists('opmessage_grp', $operation) || array_key_exists('opmessage_usr', $operation)) {
 					if (!array_key_exists('opmessage_grp', $operation)) {
