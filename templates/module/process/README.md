@@ -34,8 +34,8 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$PROC.SUM.NAME.MATCHES} |<p>This macro is used in summary process discovery. Can be overridden on the host or linked template level.</p> |`<CHANGE VALUE>` |
-|{$PROC.SUM.NAME.NOT_MATCHES} |<p>This macro is used in summary process discovery. Can be overridden on the host or linked template level.</p> |`<CHANGE VALUE>` |
+|{$PROC.SUM.NAME.MATCHES} |<p>This macro is used in processes discovery. Can be overridden on the host or linked template level.</p> |`<CHANGE VALUE>` |
+|{$PROC.SUM.NAME.NOT_MATCHES} |<p>This macro is used in processes discovery. Can be overridden on the host or linked template level.</p> |`<CHANGE VALUE>` |
 
 ## Template links
 
@@ -45,27 +45,29 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Summary of processes discovery |<p>Discovery of summary process OS.</p> |DEPENDENT |custom.proc.sum.discovery<p>**Filter**:</p>AND <p>- {#VMEM} NOT_MATCHES_REGEX `-1`</p><p>- {#NAME} MATCHES_REGEX `{$PROC.SUM.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$PROC.SUM.NAME.NOT_MATCHES}`</p> |
+|Processes discovery |<p>Discovery of summary process OS.</p> |DEPENDENT |custom.proc.discovery<p>**Filter**:</p>AND <p>- {#VMEM} NOT_MATCHES_REGEX `-1`</p><p>- {#NAME} MATCHES_REGEX `{$PROC.SUM.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$PROC.SUM.NAME.NOT_MATCHES}`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|OS |OS: Get process: {#NAME} |<p>-</p> |DEPENDENT |custom.proc.get[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@["name"]=="{#NAME}")]`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|OS |OS: Summary of resident memory size: {#NAME} |<p>Summary resident set size memory used by process {#NAME} in bytes.</p> |DEPENDENT |custom.proc.rss[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..rss.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|OS |OS: Summary of virtual memory size: {#NAME} |<p>Summary virtual memory used by process {#NAME} in bytes.</p> |DEPENDENT |custom.proc.vmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..vsize.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|OS |OS: Percentage of real memory: {#NAME} |<p>Percentage of real memory used by process {#NAME}.</p> |DEPENDENT |custom.proc.pmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..pmem.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|OS |OS: Number of processes: {#NAME} |<p>Count process {#NAME}</p> |DEPENDENT |custom.proc.numb[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..processes.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|OS |OS: Number of threads: {#NAME} |<p>Number threads {#NAME}</p> |DEPENDENT |custom.proc.thread[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..threads.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|OS |OS: Number of page faults: {#NAME} |<p>Number page faults {#NAME}</p> |DEPENDENT |custom.proc.page[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..page_faults.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|OS |OS: Size of locked memory: {#NAME} |<p>Size of locked memory {#NAME}</p> |DEPENDENT |custom.proc.lck[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..lck.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|OS |OS: Size of swap space used: {#NAME} |<p>Size of swap space used {#NAME}</p> |DEPENDENT |custom.proc.swap[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..swap.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Zabbix raw items |OS: Get process summary |<p>Get all summary procces metrics</p> |ZABBIX_PASSIVE |proc.get[,,,summary] |
+|OS |Process [{#NAME}]: Get data |<p>Summary metrics by process {#NAME}.</p> |DEPENDENT |custom.proc.get[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@["name"]=="{#NAME}")]`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> no data`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|OS |Process [{#NAME}]: Error |<p>Check raw process {#NAME}.</p> |DEPENDENT |custom.proc.error[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p> |
+|OS |Process [{#NAME}]: Summary of resident memory size |<p>Summary resident set size memory used by process {#NAME} in bytes.</p> |DEPENDENT |custom.proc.rss[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.value..rss.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|OS |Process [{#NAME}]: Summary of virtual memory size |<p>Summary virtual memory used by process {#NAME} in bytes.</p> |DEPENDENT |custom.proc.vmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.value..vsize.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|OS |Process [{#NAME}]: Percentage of real memory |<p>Percentage of real memory used by process {#NAME}.</p> |DEPENDENT |custom.proc.pmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.value..pmem.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|OS |Process [{#NAME}]: Number of processes |<p>Count process {#NAME}</p> |DEPENDENT |custom.proc.num[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.value..processes.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|OS |Process [{#NAME}]: Number of threads |<p>Number of threads {#NAME}.</p> |DEPENDENT |custom.proc.thread[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.value..threads.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|OS |Process [{#NAME}]: Number of page faults |<p>Number of page faults {#NAME}.</p> |DEPENDENT |custom.proc.page[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.value..page_faults.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|OS |Process [{#NAME}]: Size of locked memory |<p>Size of locked memory {#NAME}.</p> |DEPENDENT |custom.proc.mem.locked[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.value..lck.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|OS |Process [{#NAME}]: Swap space used |<p>Size of swap space used {#NAME}.</p> |DEPENDENT |custom.proc.swap[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.value..swap.first()`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Zabbix raw items |OS: Get process summary |<p>Summary metrics data for all processes.</p> |ZABBIX_PASSIVE |proc.get[,,,summary] |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
+|Process [{#NAME}]: down |<p>-</p> |`length(last(/OS processes by Zabbix agent/custom.proc.error[{#NAME}]))>0` |AVERAGE | |
 
 ## Feedback
 

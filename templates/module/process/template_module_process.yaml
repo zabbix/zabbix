@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-22T10:40:34Z'
+  date: '2022-09-23T15:56:00Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -27,7 +27,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Get all summary procces metrics'
+          description: 'Summary metrics data for all processes.'
           tags:
             -
               tag: component
@@ -35,9 +35,9 @@ zabbix_export:
       discovery_rules:
         -
           uuid: 7c0e8b719d0e464f92ee42a3da75b682
-          name: 'Summary of processes discovery'
+          name: 'Processes discovery'
           type: DEPENDENT
-          key: custom.proc.sum.discovery
+          key: custom.proc.discovery
           delay: '0'
           filter:
             evaltype: AND
@@ -59,44 +59,94 @@ zabbix_export:
           description: 'Discovery of summary process OS.'
           item_prototypes:
             -
+              uuid: 10997fb0354744939e8ee034c6d26065
+              name: 'Process [{#NAME}]: Error'
+              type: DEPENDENT
+              key: 'custom.proc.error[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'Check raw process {#NAME}.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.error
+              master_item:
+                key: 'custom.proc.get[{#NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: process
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 915df5dbf24a436e892b1ec9ae0f4cb9
+                  expression: 'length(last(/OS processes by Zabbix agent/custom.proc.error[{#NAME}]))>0'
+                  name: 'Process [{#NAME}]: down'
+                  priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
               uuid: 2e9b31e2b47741f4b35c5d15f33378ea
-              name: 'OS: Get process: {#NAME}'
+              name: 'Process [{#NAME}]: Get data'
               type: DEPENDENT
               key: 'custom.proc.get[{#NAME}]'
               delay: '0'
               history: 0d
               trends: '0'
               value_type: TEXT
+              description: 'Summary metrics by process {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
                     - '$.[?(@["name"]=="{#NAME}")]'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: 'no data'
                 -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  type: JAVASCRIPT
                   parameters:
-                    - 1h
+                    - |
+                      var data = {};
+                      try {
+                         data.value = JSON.parse(value)
+                         data.error = ''
+                       }
+                      catch (error) {
+                         data.error = 'no data'
+                         data.value = ''
+                       }
+                      return JSON.stringify(data);
               master_item:
                 key: 'proc.get[,,,summary]'
               tags:
                 -
                   tag: component
                   value: raw
+                -
+                  tag: process
+                  value: '{#NAME}'
             -
               uuid: 822ffda22eb042b89fc50b212aab133f
-              name: 'OS: Size of locked memory: {#NAME}'
+              name: 'Process [{#NAME}]: Size of locked memory'
               type: DEPENDENT
-              key: 'custom.proc.lck[{#NAME}]'
+              key: 'custom.proc.mem.locked[{#NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Size of locked memory {#NAME}'
+              description: 'Size of locked memory {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..lck.first()
+                    - $.value..lck.first()
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
@@ -104,11 +154,14 @@ zabbix_export:
                 -
                   tag: component
                   value: memory
+                -
+                  tag: process
+                  value: '{#NAME}'
             -
               uuid: 0bb7d924b8814c42a494d8a3baf48a59
-              name: 'OS: Number of processes: {#NAME}'
+              name: 'Process [{#NAME}]: Number of processes'
               type: DEPENDENT
-              key: 'custom.proc.numb[{#NAME}]'
+              key: 'custom.proc.num[{#NAME}]'
               delay: '0'
               history: 7d
               description: 'Count process {#NAME}'
@@ -116,7 +169,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..processes.first()
+                    - $.value..processes.first()
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
@@ -124,19 +177,22 @@ zabbix_export:
                 -
                   tag: component
                   value: system
+                -
+                  tag: process
+                  value: '{#NAME}'
             -
               uuid: abccdac17c7e4b549fcfe70ceeedeb9b
-              name: 'OS: Number of page faults: {#NAME}'
+              name: 'Process [{#NAME}]: Number of page faults'
               type: DEPENDENT
               key: 'custom.proc.page[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'Number page faults {#NAME}'
+              description: 'Number of page faults {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..page_faults.first()
+                    - $.value..page_faults.first()
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
@@ -144,9 +200,12 @@ zabbix_export:
                 -
                   tag: component
                   value: system
+                -
+                  tag: process
+                  value: '{#NAME}'
             -
               uuid: 4ffd202fb6044b819f6f28dc866ca8f1
-              name: 'OS: Percentage of real memory: {#NAME}'
+              name: 'Process [{#NAME}]: Percentage of real memory'
               type: DEPENDENT
               key: 'custom.proc.pmem[{#NAME}]'
               delay: '0'
@@ -158,7 +217,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..pmem.first()
+                    - $.value..pmem.first()
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
@@ -166,9 +225,12 @@ zabbix_export:
                 -
                   tag: component
                   value: memory
+                -
+                  tag: process
+                  value: '{#NAME}'
             -
               uuid: 7e573e38bce04167bc37712c0a3e2194
-              name: 'OS: Summary of resident memory size: {#NAME}'
+              name: 'Process [{#NAME}]: Summary of resident memory size'
               type: DEPENDENT
               key: 'custom.proc.rss[{#NAME}]'
               delay: '0'
@@ -180,7 +242,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..rss.first()
+                    - $.value..rss.first()
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
@@ -188,21 +250,24 @@ zabbix_export:
                 -
                   tag: component
                   value: memory
+                -
+                  tag: process
+                  value: '{#NAME}'
             -
               uuid: 12370d3b25024d2189cddba8d3b23938
-              name: 'OS: Size of swap space used: {#NAME}'
+              name: 'Process [{#NAME}]: Swap space used'
               type: DEPENDENT
               key: 'custom.proc.swap[{#NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Size of swap space used {#NAME}'
+              description: 'Size of swap space used {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..swap.first()
+                    - $.value..swap.first()
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
@@ -210,19 +275,22 @@ zabbix_export:
                 -
                   tag: component
                   value: memory
+                -
+                  tag: process
+                  value: '{#NAME}'
             -
               uuid: a7265ca1b1d2463294e26d80fe075639
-              name: 'OS: Number of threads: {#NAME}'
+              name: 'Process [{#NAME}]: Number of threads'
               type: DEPENDENT
               key: 'custom.proc.thread[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'Number threads {#NAME}'
+              description: 'Number of threads {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..threads.first()
+                    - $.value..threads.first()
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
@@ -230,9 +298,12 @@ zabbix_export:
                 -
                   tag: component
                   value: system
+                -
+                  tag: process
+                  value: '{#NAME}'
             -
               uuid: c1b9b1d8f28947589e46041690899100
-              name: 'OS: Summary of virtual memory size: {#NAME}'
+              name: 'Process [{#NAME}]: Summary of virtual memory size'
               type: DEPENDENT
               key: 'custom.proc.vmem[{#NAME}]'
               delay: '0'
@@ -244,7 +315,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $..vsize.first()
+                    - $.value..vsize.first()
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
@@ -252,6 +323,27 @@ zabbix_export:
                 -
                   tag: component
                   value: memory
+                -
+                  tag: process
+                  value: '{#NAME}'
+          graph_prototypes:
+            -
+              uuid: b8f5b539152445fdbadbfba92adad1bf
+              name: 'Process [{#NAME}]: Memory usage[{#NAME}]'
+              graph_items:
+                -
+                  drawtype: BOLD_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'OS processes by Zabbix agent'
+                    key: 'custom.proc.vmem[{#NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: BOLD_LINE
+                  color: 2774A4
+                  item:
+                    host: 'OS processes by Zabbix agent'
+                    key: 'custom.proc.rss[{#NAME}]'
           master_item:
             key: 'proc.get[,,,summary]'
           lld_macro_paths:
@@ -261,19 +353,12 @@ zabbix_export:
             -
               lld_macro: '{#VMEM}'
               path: $.vsize
-      tags:
-        -
-          tag: class
-          value: service
-        -
-          tag: target
-          value: process
       macros:
         -
           macro: '{$PROC.SUM.NAME.MATCHES}'
           value: '<CHANGE VALUE>'
-          description: 'This macro is used in summary process discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in processes discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$PROC.SUM.NAME.NOT_MATCHES}'
           value: '<CHANGE VALUE>'
-          description: 'This macro is used in summary process discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in processes discovery. Can be overridden on the host or linked template level.'
