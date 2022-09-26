@@ -296,7 +296,7 @@ class CXmlConstantName {
 	const GMAIL = 'GMAIL';
 	const GMAIL_RELAY = 'GMAIL_RELAY';
 	const OFFICE365 = 'OFFICE365';
-	const OFFICE365_RELAY = 'OFFICE_365_RELAY';
+	const OFFICE365_RELAY = 'OFFICE365_RELAY';
 
 	// const NONE = 'NONE'; // Duplicate.
 	const STARTTLS = 'STARTTLS';
