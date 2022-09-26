@@ -402,7 +402,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		ticks *= 1e12
 		ticks /= uint64(tail.timestamp.Sub(head.timestamp))
 
-		log.Critf("Calling C function \"sysconf()\"")
+		log.Tracef("Calling C function \"sysconf()\"")
 		return math.Round(float64(ticks)/float64(C.sysconf(C._SC_CLK_TCK))) / 10, nil
 	}
 	stats := &cpuUtilStats{accessed: now, history: make([]cpuUtilData, maxHistory)}

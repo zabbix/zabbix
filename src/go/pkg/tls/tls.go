@@ -956,7 +956,7 @@ func SupportedErrMsg() string {
 }
 
 func init() {
-	log.Critf("Calling C function \"tls_init()\"")
+	log.Tracef("Calling C function \"tls_init()\"")
 	supported = C.tls_init() != -1
 
 	if !supported {
@@ -966,10 +966,10 @@ func init() {
 
 func describeCiphersuites(context unsafe.Pointer) (desc string) {
 	var cDesc *C.char
-	log.Critf("Calling C function \"tls_describe_ciphersuites()\"")
+	log.Tracef("Calling C function \"tls_describe_ciphersuites()\"")
 	C.tls_describe_ciphersuites(C.SSL_CTX_LP(context), &cDesc)
 	desc = C.GoString(cDesc)
-	log.Critf("Calling C function \"free()\"")
+	log.Tracef("Calling C function \"free()\"")
 	C.free(unsafe.Pointer(cDesc))
 	return
 }
@@ -985,10 +985,10 @@ type tlsConn struct {
 func (c *tlsConn) Error() (err error) {
 	var cBuf *C.char
 	var errmsg string
-	log.Critf("Calling C function \"tls_error()\"")
+	log.Tracef("Calling C function \"tls_error()\"")
 	if c.tls != nil && 0 != C.tls_error((*C.tls_t)(c.tls), &cBuf) {
 		errmsg = C.GoString(cBuf)
-		log.Critf("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free()\"")
 		C.free(unsafe.Pointer(cBuf))
 	} else {
 		errmsg = "unknown openssl error"
@@ -997,14 +997,14 @@ func (c *tlsConn) Error() (err error) {
 }
 
 func (c *tlsConn) ready() bool {
-	log.Critf("Calling C function \"tls_ready()\"")
+	log.Tracef("Calling C function \"tls_ready()\"")
 	return C.tls_ready((*C.tls_t)(c.tls)) == 1
 }
 
 // Note, don't use flushTLS() and recvTLS() concurrently
 func (c *tlsConn) flushTLS() (err error) {
 	for {
-		log.Critf("Calling C function \"tls_recv()\"")
+		log.Tracef("Calling C function \"tls_recv()\"")
 		if cn := C.tls_recv((*C.tls_t)(c.tls), (*C.char)(unsafe.Pointer(&c.buf[0])), C.int(len(c.buf))); cn > 0 {
 			if c.shiftDeadline {
 				if err = c.conn.SetWriteDeadline(time.Now().Add(c.timeout)); err != nil {
@@ -1032,7 +1032,7 @@ func (c *tlsConn) recvTLS() (err error) {
 	if n, err = c.conn.Read(c.buf); err != nil {
 		return
 	}
-	log.Critf("Calling C function \"tls_send()\"")
+	log.Tracef("Calling C function \"tls_send()\"")
 	C.tls_send((*C.tls_t)(c.tls), (*C.char)(unsafe.Pointer(&c.buf[0])), C.int(n))
 	return
 }
@@ -1058,11 +1058,11 @@ func (c *tlsConn) SetWriteDeadline(t time.Time) error {
 }
 
 func (c *tlsConn) Close() (err error) {
-	log.Critf("Calling C function \"tls_close()\"")
+	log.Tracef("Calling C function \"tls_close()\"")
 	cr := C.tls_close((*C.tls_t)(c.tls))
 	c.conn.Close()
 
-	log.Critf("Calling C function \"tls_free()\"")
+	log.Tracef("Calling C function \"tls_free()\"")
 	C.tls_free((*C.tls_t)(c.tls))
 	c.tls = nil
 
@@ -1077,15 +1077,15 @@ func (c *tlsConn) verifyIssuerSubject(cfg *Config) (err error) {
 		var cSubject, cIssuer *C.char
 		if cfg.ServerCertIssuer != "" {
 			cIssuer = C.CString(cfg.ServerCertIssuer)
-			log.Critf("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free()\"")
 			defer C.free(unsafe.Pointer(cSubject))
 		}
 		if cfg.ServerCertSubject != "" {
 			cSubject = C.CString(cfg.ServerCertSubject)
-			log.Critf("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free()\"")
 			defer C.free(unsafe.Pointer(cSubject))
 		}
-		log.Critf("Calling C function \"tls_validate_issuer_and_subject()\"")
+		log.Tracef("Calling C function \"tls_validate_issuer_and_subject()\"")
 		if 0 != C.tls_validate_issuer_and_subject((*C.tls_t)(c.tls), cIssuer, cSubject) {
 			return c.Error()
 		}
@@ -1095,10 +1095,10 @@ func (c *tlsConn) verifyIssuerSubject(cfg *Config) (err error) {
 
 func (c *tlsConn) String() (desc string) {
 	var cDesc *C.char
-	log.Critf("Calling C function \"tls_description()\"")
+	log.Tracef("Calling C function \"tls_description()\"")
 	C.tls_description((*C.tls_t)(c.tls), &cDesc)
 	desc = C.GoString(cDesc)
-	log.Critf("Calling C function \"free()\"")
+	log.Tracef("Calling C function \"free()\"")
 	C.free(unsafe.Pointer(cDesc))
 	return
 }
@@ -1109,13 +1109,13 @@ type Client struct {
 }
 
 func (c *Client) checkConnection() (err error) {
-	log.Critf("Calling C function \"tls_connected()\"")
+	log.Tracef("Calling C function \"tls_connected()\"")
 	if C.tls_connected((*C.tls_t)(c.tls)) == C.int(1) {
 		return
 	}
-	log.Critf("Calling C function \"tls_connected()\"")
+	log.Tracef("Calling C function \"tls_connected()\"")
 	for C.tls_connected((*C.tls_t)(c.tls)) != C.int(1) {
-		log.Critf("Calling C function \"tls_handshake()\"")
+		log.Tracef("Calling C function \"tls_handshake()\"")
 		cRet := C.tls_handshake((*C.tls_t)(c.tls))
 		if cRet == 0 {
 			break
@@ -1138,7 +1138,7 @@ func (c *Client) Write(b []byte) (n int, err error) {
 	if err = c.checkConnection(); err != nil {
 		return
 	}
-	log.Critf("Calling C function \"tls_write()\"")
+	log.Tracef("Calling C function \"tls_write()\"")
 	cRet := C.tls_write((*C.tls_t)(c.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
 	if cRet <= 0 {
 		return 0, c.Error()
@@ -1154,7 +1154,7 @@ func (c *Client) Read(b []byte) (n int, err error) {
 		if err = c.checkConnection(); err != nil {
 			return
 		}
-		log.Critf("Calling C function \"tls_read()\"")
+		log.Tracef("Calling C function \"tls_read()\"")
 		cRet := C.tls_read((*C.tls_t)(c.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
 		if cRet > 0 {
 			return int(cRet), nil
@@ -1184,16 +1184,16 @@ func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bo
 		cSecret = C.CString(cfg.PSKKey)
 
 		defer func() {
-			log.Critf("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free()\"")
 			C.free(unsafe.Pointer(cUser))
-			log.Critf("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free()\"")
 			C.free(unsafe.Pointer(cSecret))
 		}()
 		context = pskContext
 	}
 
 	// for TLS we overwrite the timeoutMode and force it to move on every read or write
-	log.Critf("Calling C function \"tls_new_client()\"")
+	log.Tracef("Calling C function \"tls_new_client()\"")
 	c := &Client{
 		tlsConn: tlsConn{
 			conn:          nc,
@@ -1203,7 +1203,7 @@ func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bo
 			shiftDeadline: shiftDeadline,
 		},
 	}
-	log.Critf("Calling C function \"tls_free()\"")
+	log.Tracef("Calling C function \"tls_free()\"")
 	runtime.SetFinalizer(c, func(c *Client) { C.tls_free((*C.tls_t)(c.tls)) })
 
 	if !c.ready() {
@@ -1229,12 +1229,12 @@ type Server struct {
 }
 
 func (s *Server) checkConnection() (err error) {
-	log.Critf("Calling C function \"tls_connected()\"")
+	log.Tracef("Calling C function \"tls_connected()\"")
 	if C.tls_connected((*C.tls_t)(s.tls)) == C.int(1) {
 		return
 	}
 	for {
-		log.Critf("Calling C function \"tls_accept()\"")
+		log.Tracef("Calling C function \"tls_accept()\"")
 		cRet := C.tls_accept((*C.tls_t)(s.tls))
 		if cRet == 0 {
 			break
@@ -1257,7 +1257,7 @@ func (s *Server) Write(b []byte) (n int, err error) {
 	if err = s.checkConnection(); err != nil {
 		return
 	}
-	log.Critf("Calling C function \"tls_write()\"")
+	log.Tracef("Calling C function \"tls_write()\"")
 	cRet := C.tls_write((*C.tls_t)(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
 	if cRet <= 0 {
 		return 0, s.Error()
@@ -1271,7 +1271,7 @@ func (s *Server) Read(b []byte) (n int, err error) {
 		if err = s.checkConnection(); err != nil {
 			return
 		}
-		log.Critf("Calling C function \"tls_read()\"")
+		log.Tracef("Calling C function \"tls_read()\"")
 		cRet := C.tls_read((*C.tls_t)(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
 		if cRet > 0 {
 			return int(cRet), nil
@@ -1296,9 +1296,9 @@ func NewServer(nc net.Conn, cfg *Config, b []byte, timeout time.Duration, shiftD
 		cSecret = C.CString(cfg.PSKKey)
 
 		defer func() {
-			log.Critf("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free()\"")
 			C.free(unsafe.Pointer(cUser))
-			log.Critf("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free()\"")
 			C.free(unsafe.Pointer(cSecret))
 		}()
 	}
@@ -1309,7 +1309,7 @@ func NewServer(nc net.Conn, cfg *Config, b []byte, timeout time.Duration, shiftD
 	}
 
 	// for TLS we overwrite the timeoutMode and force it to move on every read or write
-	log.Critf("Calling C function \"tls_new_server()\"")
+	log.Tracef("Calling C function \"tls_new_server()\"")
 	s := &Server{
 		tlsConn: tlsConn{
 			conn:          nc,
@@ -1319,14 +1319,14 @@ func NewServer(nc net.Conn, cfg *Config, b []byte, timeout time.Duration, shiftD
 			shiftDeadline: shiftDeadline,
 		},
 	}
-	log.Critf("Calling C function \"tls_free()\"")
+	log.Tracef("Calling C function \"tls_free()\"")
 	runtime.SetFinalizer(s, func(s *Server) { C.tls_free((*C.tls_t)(s.tls)) })
 
 	if !s.ready() {
 		return nil, s.Error()
 	}
 
-	log.Critf("Calling C function \"tls_send()\"")
+	log.Tracef("Calling C function \"tls_send()\"")
 	C.tls_send((*C.tls_t)(s.tls), (*C.char)(unsafe.Pointer(&b[0])), C.int(len(b)))
 
 	if err = s.checkConnection(); err != nil {
@@ -1365,13 +1365,13 @@ type Config struct {
 }
 
 func CopyrightMessage() (message string) {
-	log.Critf("Calling C function \"tls_version()\"")
+	log.Tracef("Calling C function \"tls_version()\"")
 	version := C.tls_version()
 	if version == nil {
 		return ""
 	}
 
-	log.Critf("Calling C function \"tls_version_static()\"")
+	log.Tracef("Calling C function \"tls_version_static()\"")
 	return fmt.Sprintf("\n\nThis product includes software developed by the OpenSSL Project\n"+
 		"for use in the OpenSSL Toolkit (http://www.openssl.org/).\n\n"+
 		"Compiled with %s\nRunning with %s\n", C.GoString(C.tls_version_static()), C.GoString(version))
@@ -1382,11 +1382,11 @@ func Init(config *Config) (err error) {
 		return errors.New(SupportedErrMsg())
 	}
 	if pskContext != nil {
-		log.Critf("Calling C function \"tls_free_context()\"")
+		log.Tracef("Calling C function \"tls_free_context()\"")
 		C.tls_free_context(C.SSL_CTX_LP(pskContext))
 	}
 	if defaultContext != nil {
-		log.Critf("Calling C function \"tls_free_context()\"")
+		log.Tracef("Calling C function \"tls_free_context()\"")
 		C.tls_free_context(C.SSL_CTX_LP(defaultContext))
 	}
 
@@ -1395,36 +1395,36 @@ func Init(config *Config) (err error) {
 		cCaFile = C.CString(config.CAFile)
 		cCertFile = C.CString(config.CertFile)
 		cKeyFile = C.CString(config.KeyFile)
-		log.Critf("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free()\"")
 		defer C.free(unsafe.Pointer(cCaFile))
-		log.Critf("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free()\"")
 		defer C.free(unsafe.Pointer(cCertFile))
-		log.Critf("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free()\"")
 		defer C.free(unsafe.Pointer(cKeyFile))
 
 		if config.CRLFile != "" {
 			cCrlFile = C.CString(config.CRLFile)
-			log.Critf("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free()\"")
 			defer C.free(unsafe.Pointer(cCrlFile))
 		}
 	}
 
-	log.Critf("Calling C function \"tls_new_context()\"")
+	log.Tracef("Calling C function \"tls_new_context()\"")
 	if defaultContext = unsafe.Pointer(C.tls_new_context(cCaFile, cCrlFile, cCertFile, cKeyFile, &cErr)); defaultContext == nil {
 		err = fmt.Errorf("cannot initialize default TLS context: %s", C.GoString(cErr))
-		log.Critf("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free()\"")
 		C.free(unsafe.Pointer(cErr))
 		return
 	}
 
-	log.Critf("Calling C function \"tls_new_context()\"")
+	log.Tracef("Calling C function \"tls_new_context()\"")
 	if pskContext = unsafe.Pointer(C.tls_new_context(cNULL, cNULL, cNULL, cNULL, &cErr)); pskContext == nil {
 		err = fmt.Errorf("cannot initialize PSK TLS context: %s", C.GoString(cErr))
-		log.Critf("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free()\"")
 		C.free(unsafe.Pointer(cErr))
 		return
 	}
-	log.Critf("Calling C function \"tls_version()\"")
+	log.Tracef("Calling C function \"tls_version()\"")
 	log.Infof("OpenSSL library (%s) initialized", C.GoString(C.tls_version()))
 	log.Debugf("default context ciphersuites:%s", describeCiphersuites(defaultContext))
 	log.Debugf("psk context ciphersuites:%s", describeCiphersuites(pskContext))
