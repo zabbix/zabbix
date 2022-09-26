@@ -329,7 +329,7 @@
 				};
 			}
 
-			popup_params.idp_type = <?= IDP_TYPE_SAML?>;
+			popup_params.idp_type = <?= IDP_TYPE_SAML ?>;
 
 			const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
 

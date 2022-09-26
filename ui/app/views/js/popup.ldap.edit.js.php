@@ -311,7 +311,7 @@ window.ldap_edit_popup = new class {
 			}
 		}
 
-		popup_params.idp_type = <?= IDP_TYPE_LDAP?>;
+		popup_params.idp_type = <?= IDP_TYPE_LDAP ?>;
 
 		const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
 
