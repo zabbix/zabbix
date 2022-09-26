@@ -417,7 +417,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'selectTags' => ['tag', 'value'],
 				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 				'itemids' => $itemid
-			] + $options);
+			]);
 
 			$db_item = $db_items[0];
 
@@ -461,7 +461,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			if ($upd_item) {
-				$response = API::Item()->update(['itemid' => $itemid] + $upd_item);
+				$response = API::ItemPrototype()->update(['itemid' => $itemid] + $upd_item);
 
 				if ($response === false) {
 					throw new Exception();

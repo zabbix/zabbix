@@ -396,7 +396,7 @@ function interfaceIdsByType(array $interfaces) {
 }
 
 /**
- * Create copies of the items from the given sources to the given destination hosts or templates.
+ * Create copies of items from the given sources to the given destination hosts or templates.
  *
  * If source type is 'templateids' or 'hostids', only non-inherited items are copied.
  *
@@ -410,8 +410,10 @@ function interfaceIdsByType(array $interfaces) {
  * @return bool
  */
 function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_template, array $dst_hostids): bool {
+	$options = in_array($src_type, ['templateids', 'hostids']) ? ['inherited' => false] : [];
+
 	$src_items = API::Item()->get([
-		'output' => ['itemid', 'templateid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
+		'output' => ['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 			'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status',
 
 			// Type fields.
@@ -445,28 +447,25 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 		'selectTags' => ['tag', 'value'],
 		$src_type => $src_ids,
 		'preservekeys' => true
-	]);
+	] + $options);
 
 	if (!$src_items) {
 		return true;
 	}
 
 	$src_itemids = array_fill_keys(array_keys($src_items), true);
-	$src_dep_items = [];
 	$src_valuemapids = [];
+	$src_interfaceids = [];
+	$src_dep_items = [];
 	$dep_itemids = [];
 
 	foreach ($src_items as $itemid => &$item) {
-		if (in_array($src_type, ['templateids', 'hostids']) && $item['templateid'] != 0) {
-			unset($src_items[$itemid]);
-			unset($src_itemids[$itemid]);
-		}
-		else {
-			unset($item['templateid']);
-		}
-
 		if ($item['valuemapid'] != 0) {
 			$src_valuemapids[$item['valuemapid']] = true;
+		}
+
+		if ($item['interfaceid'] != 0) {
+			$src_interfaceids[$item['interfaceid']] = true;
 		}
 
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
@@ -511,19 +510,46 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 		}
 	}
 
+	$interface_links = [];
 	$dst_interfaceids = [];
 
-	if (!$dst_is_template) {
+	if ($src_interfaceids && !$dst_is_template) {
+		$src_interfaces = [];
+
+		$src_hosts = API::Host()->get([
+			'output' => [],
+			'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
+			$src_type => $src_ids
+		]);
+
+		foreach ($src_hosts as $src_host) {
+			foreach ($src_host['interfaces'] as $src_interface) {
+				if (array_key_exists($src_interface['interfaceid'], $src_interfaceids)) {
+					$src_interfaces[$src_interface['interfaceid']] =
+						array_diff_key($src_interface, array_flip(['interfaceid']));
+				}
+			}
+		}
+
 		$dst_hosts = API::Host()->get([
 			'output' => ['hostid'],
-			'selectInterfaces' => ['interfaceid', 'type', 'main'],
+			'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
 			'hostids' => $dst_hostids
 		]);
 
 		foreach ($dst_hosts as $dst_host) {
-			foreach ($dst_host['interfaces'] as $interface) {
-				if ($interface['main'] == INTERFACE_PRIMARY) {
-					$dst_interfaceids[$dst_host['hostid']][$interface['type']] = $interface['interfaceid'];
+			foreach ($dst_host['interfaces'] as $dst_interface) {
+				$dst_interfaceid = $dst_interface['interfaceid'];
+				unset($dst_interface['interfaceid']);
+
+				foreach ($src_interfaces as $src_interfaceid => $src_interface) {
+					if ($src_interface == $dst_interface) {
+						$interface_links[$src_interfaceid][$dst_host['hostid']] = $dst_interfaceid;
+					}
+				}
+
+				if ($dst_interface['main'] == INTERFACE_PRIMARY) {
+					$dst_interfaceids[$dst_host['hostid']][$dst_interface['type']] = $dst_interfaceid;
 				}
 			}
 		}
@@ -538,6 +564,7 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 		]);
 
 		$options = $dst_is_template ? ['templateids' => $dst_hostids] : ['hostids' => $dst_hostids];
+
 		$dst_master_items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'key_'],
 			'filter' => ['key_' => array_unique(array_column($master_items, 'key_'))]
@@ -553,8 +580,7 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 			foreach ($dst_hostids as $dst_hostid) {
 				if (array_key_exists($dst_hostid, $dst_master_itemids)
 						&& array_key_exists($item['key_'], $dst_master_itemids[$dst_hostid])) {
-					$master_item_links[$item['itemid']][$dst_hostid] =
-						$dst_master_itemids[$dst_hostid][$item['key_']];
+					$master_item_links[$item['itemid']][$dst_hostid] = $dst_master_itemids[$dst_hostid][$item['key_']];
 				}
 				else {
 					$src_itemid = reset($dep_itemids[$item['itemid']]);
@@ -586,39 +612,36 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 					}
 				}
 
-				$type = itemTypeInterface($src_item['type']);
+				$dst_item['interfaceid'] = 0;
 
-				if (!$dst_is_template && $type !== false) {
-					$dst_item['interfaceid'] = 0;
-
-					if (in_array($type,
-						[INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI]
-					)) {
-						$supported_types = [$type];
+				if (!$dst_is_template) {
+					if (array_key_exists($src_item['interfaceid'], $interface_links)
+							&& array_key_exists($dst_hostid, $interface_links[$src_item['interfaceid']])) {
+						$dst_item['interfaceid'] = $interface_links[$src_item['interfaceid']][$dst_hostid];
 					}
 					else {
-						$supported_types = CItem::INTERFACE_TYPES_BY_PRIORITY;
-					}
+						$type = itemTypeInterface($src_item['type']);
 
-					foreach ($supported_types as $_type) {
-						if (array_key_exists($dst_hostid, $dst_interfaceids)
-								&& array_key_exists($_type, $dst_interfaceids[$dst_hostid])) {
-							$dst_item['interfaceid'] = $dst_interfaceids[$dst_hostid][$_type];
-							break;
+						if (in_array($type,
+							[INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI]
+						)) {
+							if (array_key_exists($dst_hostid, $dst_interfaceids)
+									&& array_key_exists($type, $dst_interfaceids[$dst_hostid])) {
+								$dst_item['interfaceid'] = $dst_interfaceids[$dst_hostid][$type];
+							}
+							else {
+								$hosts = API::Host()->get([
+									'output' => ['host'],
+									'hostids' => $dst_hostid
+								]);
+
+								error(_s('Cannot find host interface on "%1$s" for item with key "%2$s".',
+									$hosts[0]['host'], $src_item['key_']
+								));
+
+								return false;
+							}
 						}
-					}
-
-					if ($dst_item['interfaceid'] == 0 && $type != INTERFACE_TYPE_OPT) {
-						$hosts = API::Host()->get([
-							'output' => ['name'],
-							'hostids' => $dst_hostid
-						]);
-
-						error(_s('Cannot find host interface on "%1$s" for item with key "%2$s".', $hosts['host'],
-							$src_item['key_']
-						));
-
-						return false;
 					}
 				}
 
