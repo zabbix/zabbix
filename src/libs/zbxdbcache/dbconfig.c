@@ -5292,7 +5292,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		if (NULL == (preprocitem = item->preproc_item))
 		{
 			preprocitem = (ZBX_DC_PREPROCITEM *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_PREPROCITEM));
-			preprocitem->itemid = itemid;
+
 			zbx_vector_ptr_create_ext(&preprocitem->preproc_ops, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
 
@@ -9113,7 +9113,6 @@ int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid)
 	}
 
 	UNLOCK_CACHE;
-
 
 	return num;
 }
