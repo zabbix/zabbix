@@ -59,7 +59,8 @@ class CMediatypeHelper {
 				'smtp_security' => SMTP_CONNECTION_SECURITY_NONE,
 				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
 				'smtp_verify_host' => HTTPTEST_VERIFY_HOST_OFF,
-				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF
+				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
+				'content_type' => SMTP_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_GMAIL => [
 				'name' => 'Gmail',
@@ -69,7 +70,8 @@ class CMediatypeHelper {
 				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
 				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
 				'smtp_verify_host' => HTTPTEST_VERIFY_HOST_OFF,
-				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF
+				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
+				'content_type' => SMTP_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_GMAIL_RELAY => [
 				'name' => 'Gmail relay',
@@ -79,7 +81,8 @@ class CMediatypeHelper {
 				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
 				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
 				'smtp_verify_host' => HTTPTEST_VERIFY_HOST_OFF,
-				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF
+				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
+				'content_type' => SMTP_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_OFFICE365 => [
 				'name' => 'Office365',
@@ -89,7 +92,8 @@ class CMediatypeHelper {
 				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
 				'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL,
 				'smtp_verify_host' => HTTPTEST_VERIFY_HOST_OFF,
-				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF
+				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
+				'content_type' => SMTP_MESSAGE_FORMAT_HTML
 			],
 			self::EMAIL_PROVIDER_OFFICE365_RELAY => [
 				'name' => 'Office365 relay',
@@ -99,7 +103,8 @@ class CMediatypeHelper {
 				'smtp_security' => SMTP_CONNECTION_SECURITY_STARTTLS,
 				'smtp_authentication' => SMTP_AUTHENTICATION_NONE,
 				'smtp_verify_host' => HTTPTEST_VERIFY_HOST_OFF,
-				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF
+				'smtp_verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
+				'content_type' => SMTP_MESSAGE_FORMAT_HTML
 			]
 		];
 

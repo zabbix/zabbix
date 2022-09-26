@@ -240,7 +240,7 @@
 
 		$('#smtp_email').change(function() {
 			if ($('#type').val() == <?= json_encode(MEDIA_TYPE_EMAIL) ?>
-				&& $('#provider').val() == '<?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>') {
+					&& $('#provider').val() == '<?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>') {
 				generateOffice365RelaySmtpServer();
 			}
 		});
@@ -410,11 +410,14 @@
 			$('input[name=smtp_email]').val(providers[provider]['smtp_email']);
 			$('input[name=smtp_server]').val(providers[provider]['smtp_server']);
 			$('input[name=smtp_security]:checked').prop("checked", false);
-			$('input[value=' + providers[provider]['smtp_security'] + ']').prop("checked", true);
+			$('input[name=smtp_security][value=' + providers[provider]['smtp_security'] + ']').prop("checked", true);
 			$('input[name=smtp_verify_host]').val(providers[provider]['smtp_verify_host']);
 			$('input[name=smtp_verify_peer]').val(providers[provider]['smtp_verify_peer']);
 			$('input[name=smtp_authentication]:checked').prop("checked", false);
-			$('input[value=' + providers[provider]['smtp_authentication'] + ']').prop("checked", true);
+			$('input[name=smtp_authentication][value=' + providers[provider]['smtp_authentication'] + ']')
+				.prop("checked", true);
+			$('input[name=content_type]:checked').prop("checked", false);
+			$('input[name=content_type][value=' + providers[provider]['content_type'] + ']').prop("checked", true);
 		}
 
 		function generateOffice365RelaySmtpServer() {
