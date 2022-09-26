@@ -129,14 +129,15 @@ $form_grid->addItem([
 ]);
 
 // Operation message media type row.
-// todo: show only when ????
-// $select_opmessage_mediatype_default = (new CSelect('operation[opmessage][mediatypeid]'))
-//	->setFocusableElementId('operation-opmessage-mediatypeid');
+$select_opmessage_mediatype_default = (new CSelect('operation[opmessage][mediatypeid]'))
+	->addOptions(CSelect::createOptionsFromArray($data['media_types']))
+	->setFocusableElementId('operation-opmessage-mediatypeid');
 
-// $form_grid->addItem([
-//	new CLabel(_('Default media type'), $select_opmessage_mediatype_default->getFocusableElementId()),
-//	(new CFormField($select_opmessage_mediatype_default))->setId('operation-message-mediatype-default')
-// ]);
+$form_grid->addItem([
+	(new CLabel(_('Default media type'), $select_opmessage_mediatype_default->getFocusableElementId()))
+		->setId('operation-message-mediatype-default-label'),
+	(new CFormField($select_opmessage_mediatype_default))->setId('operation-message-mediatype-default')
+]);
 
 // Operation message media type row (explicit).
 $select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))

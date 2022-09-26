@@ -70,6 +70,14 @@ window.operation_popup = new class {
 			else if (operation_type == 'cmd[10]') {
 				this._hostInventoryFields();
 			}
+			else if (operation_type == 'cmd[11]') {
+				this._hostInventoryFields();
+				this._allInvolvedFields();
+			}
+			else if (operation_type == 'cmd[12]') {
+				this._hostInventoryFields();
+				this._allInvolvedFieldsUpdate();
+			}
 			else {
 				this._addScriptFields();
 			}
@@ -90,6 +98,27 @@ window.operation_popup = new class {
 				this._processTypeOfCalculation();
 			}
 		});
+	}
+
+	_allInvolvedFields() {
+		// todo : check why still shows after removeAllFields
+		const remove = ['operation-attr-inventory', 'operation-attr-inventory-label'];
+		remove.forEach(value => jQuery(`#${value}`).toggle(false))
+
+		const fields = ['operation-message-custom-label', 'operation-message-custom']
+		fields.forEach(value => jQuery(`#${value}`).toggle(true))
+	}
+
+	_allInvolvedFieldsUpdate() {
+		// todo : check why still shows after removeAllFields
+		const remove = ['operation-attr-inventory', 'operation-attr-inventory-label'];
+		remove.forEach(value => jQuery(`#${value}`).toggle(false))
+
+		const fields = [
+			'operation-message-custom-label', 'operation-message-custom', 'operation-message-mediatype-default-label',
+			'operation-message-mediatype-default'
+		]
+		fields.forEach(value => jQuery(`#${value}`).toggle(true))
 	}
 
 	_hostGroupFields() {
@@ -156,7 +185,8 @@ window.operation_popup = new class {
 			'operation-message-mediatype-only', 'operation-message-mediatype-only-label', 'operation-message-custom',
 			'operation-message-custom-label', 'operation-attr-hostgroups', 'operation-attr-hostgroups-label',
 			'operation-attr-templates', 'operation-attr-templates-label', 'operation-attr-inventory',
-			'operation-attr-inventory-label', 'operation-command-targets-label', 'operation-command-targets'
+			'operation-attr-inventory-label', 'operation-command-targets-label', 'operation-command-targets',
+			'operation-message-mediatype-default-label', 'operation-message-mediatype-default'
 		]
 		fields.forEach(value => jQuery(`#${value}`).toggle(false))
 	}
@@ -178,31 +208,34 @@ window.operation_popup = new class {
 	}
 
 	_addScriptFields() {
-		jQuery('#operation-command-targets').toggle(true);
-		jQuery('#operation-command-targets-label').toggle(true);
+		if (this.eventsource === <?=EVENT_SOURCE_TRIGGERS?> || this.eventsource === <?=EVENT_SOURCE_DISCOVERY?> ||
+			this.eventsource === <?=EVENT_SOURCE_AUTOREGISTRATION?>) {
+			jQuery('#operation-command-targets').toggle(true);
+			jQuery('#operation-command-targets-label').toggle(true);
 
-		this.targets_hosts_ms = jQuery('#operation_opcommand_hst__hostid');
+			this.targets_hosts_ms = jQuery('#operation_opcommand_hst__hostid');
 
-		const ms_hosts_url = new Curl('jsrpc.php', false);
-		ms_hosts_url.setArgument('method', 'multiselect.get');
-		ms_hosts_url.setArgument('object_name', 'hosts');
-		ms_hosts_url.setArgument('editable', '1');
-		ms_hosts_url.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
+			const ms_hosts_url = new Curl('jsrpc.php', false);
+			ms_hosts_url.setArgument('method', 'multiselect.get');
+			ms_hosts_url.setArgument('object_name', 'hosts');
+			ms_hosts_url.setArgument('editable', '1');
+			ms_hosts_url.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 
-		this.targets_hosts_ms.multiSelect({
-			url: ms_hosts_url.getUrl(),
-			name: 'operation[opcommand_hst][][hostid]',
-			popup: {
-				parameters: {
-					multiselect: '1',
-					srctbl: 'hosts',
-					srcfld1: 'hostid',
-					dstfrm: 'action.edit',
-					dstfld1: 'operation-command-target-hosts',
-					editable: '1'
+			this.targets_hosts_ms.multiSelect({
+				url: ms_hosts_url.getUrl(),
+				name: 'operation[opcommand_hst][][hostid]',
+				popup: {
+					parameters: {
+						multiselect: '1',
+						srctbl: 'hosts',
+						srcfld1: 'hostid',
+						dstfrm: 'action.edit',
+						dstfld1: 'operation-command-target-hosts',
+						editable: '1'
+					}
 				}
-			}
-		});
+			});
+		}
 
 		const ms_groups_url = new Curl('jsrpc.php', false);
 		ms_groups_url.setArgument('method', 'multiselect.get');
