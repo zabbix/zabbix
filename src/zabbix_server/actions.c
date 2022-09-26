@@ -2593,8 +2593,8 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 	{
 		condition = (zbx_condition_t *)action->conditions.values[i];
 
-		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype && old_type == condition->conditiontype &&
-				SUCCEED == ret)
+		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype &&
+				old_type == condition->conditiontype && SUCCEED == ret)
 		{
 			continue;	/* short-circuit true OR condition block to the next AND condition */
 		}
@@ -2609,7 +2609,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 		switch (action->evaltype)
 		{
 			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR:
-				if (old_type == condition->conditiontype)	/* assume conditions are sorted by type */
+				if (old_type == condition->conditiontype) /* assume conditions are sorted by type */
 				{
 					if (SUCCEED == condition_result)
 						ret = SUCCEED;
