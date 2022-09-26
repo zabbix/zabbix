@@ -2521,6 +2521,7 @@ Changes for 5.0.29rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-21605] fixed possible PHP runtime errors in several modal popup dialogs (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.28
