@@ -600,7 +600,7 @@ class testDashboardForm extends CWebTest {
 		$query_id = [
 			'dashboardid' => 'SELECT dashboardid FROM dashboard WHERE name=',
 			'pageid' => 'SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid=',
-			'widgetid' => 'SELECT widgetid FROM widget WHERE dashboard_pageid=',
+			'widgetid' => 'SELECT widgetid FROM widget WHERE dashboard_pageid='
 		];
 
 		foreach ($query_id as $id => $hash) {
