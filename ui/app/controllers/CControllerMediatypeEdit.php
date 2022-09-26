@@ -154,7 +154,7 @@ class CControllerMediatypeEdit extends CController {
 			],
 			'description' => '',
 			'form_refresh' => 0,
-			'content_type' => $db_defaults['content_type'],
+			'content_type' => $email_defaults['content_type'],
 			'message_templates' => [],
 			'providers' => CMediatypeHelper::getEmailProviders()
 		];
