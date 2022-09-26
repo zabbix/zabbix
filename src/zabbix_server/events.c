@@ -866,19 +866,19 @@ static int	correlation_has_old_event_operation(const zbx_correlation_t *correlat
 	return FAIL;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: adds sql statement to match tag according to the defined          *
- *          matching operation                                                *
- *                                                                            *
- * Parameters: sql         - [IN/OUT]                                         *
- *             sql_alloc   - [IN/OUT]                                         *
- *             sql_offset  - [IN/OUT]                                         *
- *             tag         - [IN] the tag to match                            *
- *             value       - [IN] the tag value to match                      *
- *             op          - [IN] the matching operation (ZBX_CONDITION_OPERATOR_)*
- *                                                                            *
- ******************************************************************************/
+/***********************************************************************************
+ *                                                                                 *
+ * Purpose: adds sql statement to match tag according to the defined               *
+ *          matching operation                                                     *
+ *                                                                                 *
+ * Parameters: sql         - [IN/OUT]                                              *
+ *             sql_alloc   - [IN/OUT]                                              *
+ *             sql_offset  - [IN/OUT]                                              *
+ *             tag         - [IN] the tag to match                                 *
+ *             value       - [IN] the tag value to match                           *
+ *             op          - [IN] the matching operation (ZBX_CONDITION_OPERATOR_) *
+ *                                                                                 *
+ ***********************************************************************************/
 static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *tag,
 		const char *value, unsigned char op)
 {

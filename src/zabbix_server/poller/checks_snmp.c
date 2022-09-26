@@ -404,7 +404,6 @@ static int	zbx_snmpv3_set_auth_protocol(const DC_ITEM *item, struct snmp_session
 #undef ITEM_SNMPV3_AUTHPROTOCOL_SHA256
 #undef ITEM_SNMPV3_AUTHPROTOCOL_SHA384
 #undef ITEM_SNMPV3_AUTHPROTOCOL_SHA512
-#undef ITEM_SNMPV3_AUTHPROTOCOL_SHA512
 }
 
 static char	*zbx_get_snmp_type_error(u_char type)

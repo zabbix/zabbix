@@ -86,8 +86,8 @@ int	zbx_is_discovery_macro(const char *name)
  *                       character before the ending '}' character)           *
  *                       0 if macro does not have context specified.          *
  *     context_op - [OUT] the context matching operator (optional):           *
- *                          ZBX_CONDITION_OPERATOR_EQUAL                          *
- *                          ZBX_CONDITION_OPERATOR_REGEXP                         *
+ *                          ZBX_CONDITION_OPERATOR_EQUAL                      *
+ *                          ZBX_CONDITION_OPERATOR_REGEXP                     *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - the macro was parsed successfully.                           *
@@ -189,14 +189,14 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
  *     strings                                                                *
  *                                                                            *
  * Parameters:                                                                *
- *     macro   - [IN] the macro to parse                                      *
- *     name    - [OUT] the macro name without context                         *
- *     context - [OUT] the unquoted macro context, NULL for macros without    *
+ *     macro      - [IN] the macro to parse                                   *
+ *     name       - [OUT] the macro name without context                      *
+ *     context    - [OUT] the unquoted macro context, NULL for macros without *
  *                     context                                                *
- *     length  - [OUT] the length of parsed macro (optional)                  *
+ *     length     - [OUT] the length of parsed macro (optional)               *
  *     context_op - [OUT] the context matching operator (optional):           *
- *                          ZBX_CONDITION_OPERATOR_EQUAL                          *
- *                          ZBX_CONDITION_OPERATOR_REGEXP                         *
+ *                          ZBX_CONDITION_OPERATOR_EQUAL                      *
+ *                          ZBX_CONDITION_OPERATOR_REGEXP                     *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - the macro was parsed successfully                            *

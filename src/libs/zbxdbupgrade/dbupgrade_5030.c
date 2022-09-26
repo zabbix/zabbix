@@ -3858,7 +3858,7 @@ static int	DBpatch_5030123(void)
 
 static int	DBpatch_5030127(void)
 {
-#define ZBX_CONDITION_TYPE_APPLICATION	15
+#define ZBX_CONDITION_TYPE_APPLICATION	15 /* deprecated */
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
