@@ -269,6 +269,7 @@ class CControllerActionOperationValidate extends CController {
 			];
 		}
 
+
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
 
@@ -297,7 +298,7 @@ class CControllerActionOperationValidate extends CController {
 		$details = '';
 
 		foreach ($operation['opmessage_grp'] as $user_group) {
-			$this->getActionOperationDescription($operation);
+		//	$this->getActionOperationDescription($operation);
 			sdff($user_group['usrgrpid']);
 		}
 
