@@ -84,6 +84,6 @@ func SetLogLevel(level int) {
 }
 
 func init() {
-	log.Debugf("Calling C function \"getpid\"")
+	log.Critf("Calling C function \"getpid\"")
 	C.zbx_agent_pid = C.getpid()
 }

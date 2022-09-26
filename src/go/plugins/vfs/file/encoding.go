@@ -50,13 +50,13 @@ func decode(encoder string, inbuf []byte) (outbuf []byte) {
 	}
 
 	tocode := C.CString("UTF-8")
-	log.Debugf("Calling C function \"free\"")
+	log.Critf("Calling C function \"free\"")
 	defer C.free(unsafe.Pointer(tocode))
 	fromcode := C.CString(encoder)
-	log.Debugf("Calling C function \"free\"")
+	log.Critf("Calling C function \"free\"")
 	defer C.free(unsafe.Pointer(fromcode))
 
-	log.Debugf("Calling C function \"iconv_open\"")
+	log.Critf("Calling C function \"iconv_open\"")
 	cd, err := C.iconv_open(tocode, fromcode)
 
 	if err != nil {
@@ -70,7 +70,7 @@ func decode(encoder string, inbuf []byte) (outbuf []byte) {
 	for {
 		inptr := (*C.char)(unsafe.Pointer(&inbuf[len(inbuf)-int(inbytes)]))
 		outptr := (*C.char)(unsafe.Pointer(&outbuf[len(outbuf)-int(outbytes)]))
-		log.Debugf("Calling C function \"call_iconv\"")
+		log.Critf("Calling C function \"call_iconv\"")
 		_, err := C.call_iconv(cd, inptr, &inbytes, outptr, &outbytes)
 		if err == nil || err.(syscall.Errno) != syscall.E2BIG {
 			break
@@ -81,7 +81,7 @@ func decode(encoder string, inbuf []byte) (outbuf []byte) {
 		outbuf = tmp
 	}
 	outbuf = outbuf[:len(outbuf)-int(outbytes)]
-	log.Debugf("Calling C function \"iconv_close\"")
+	log.Critf("Calling C function \"iconv_close\"")
 	C.iconv_close(cd)
 	if len(outbuf) > 3 && 0xef == outbuf[0] && 0xbb == outbuf[1] && 0xbf == outbuf[2] {
 		outbuf = outbuf[3:]
