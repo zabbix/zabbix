@@ -1188,7 +1188,7 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 /* special item key used for ICMP ping latency */
 #define ZBX_SERVER_ICMPPINGSEC_KEY	"icmppingsec"
 /* special item key used for ICMP ping loss packages */
-#define SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
+#define ZBX_SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
 
 int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck);
 void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);

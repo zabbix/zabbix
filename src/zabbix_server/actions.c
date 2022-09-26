@@ -2586,14 +2586,14 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " eventsource:%d", __func__,
 			action->actionid, (int)action->eventsource);
 
-	if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
+	if (ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 		expression = zbx_strdup(expression, action->formula);
 
 	for (i = 0; i < action->conditions.values_num; i++)
 	{
 		condition = (zbx_condition_t *)action->conditions.values[i];
 
-		if (ZBX_ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype && old_type == condition->conditiontype &&
+		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype && old_type == condition->conditiontype &&
 				SUCCEED == ret)
 		{
 			continue;	/* short-circuit true OR condition block to the next AND condition */
@@ -2608,7 +2608,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 
 		switch (action->evaltype)
 		{
-			case ZBX_ZBX_CONDITION_EVAL_TYPE_AND_OR:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR:
 				if (old_type == condition->conditiontype)	/* assume conditions are sorted by type */
 				{
 					if (SUCCEED == condition_result)
@@ -2624,7 +2624,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 				}
 
 				break;
-			case ZBX_CONDITION_EVAL_TYPE_AND:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND:
 				if (FAIL == condition_result)	/* break if any AND condition is FALSE */
 				{
 					ret = FAIL;
@@ -2632,7 +2632,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 				}
 
 				break;
-			case ZBX_CONDITION_EVAL_TYPE_OR:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_OR:
 				if (SUCCEED == condition_result)	/* break if any OR condition is TRUE */
 				{
 					ret = SUCCEED;
@@ -2641,7 +2641,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 				ret = FAIL;
 
 				break;
-			case ZBX_CONDITION_EVAL_TYPE_EXPRESSION:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION:
 				zbx_snprintf(tmp, sizeof(tmp), "{" ZBX_FS_UI64 "}", condition->conditionid);
 				id_len = strlen(tmp);
 
@@ -2658,7 +2658,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 		}
 	}
 
-	if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
+	if (ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 	{
 		if (SUCCEED == zbx_evaluate(&eval_result, expression, error, sizeof(error), NULL))
 			ret = (SUCCEED != zbx_double_compare(eval_result, 0) ? SUCCEED : FAIL);
@@ -3052,7 +3052,7 @@ static void	prepare_actions_conditions_eval(zbx_vector_ptr_t *actions, zbx_hashs
 			}
 			else
 			{
-				if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
+				if (ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 				{
 					char	search[ZBX_MAX_UINT64_LEN + 2];
 					char	replace[ZBX_MAX_UINT64_LEN + 2];

@@ -1801,7 +1801,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 	DB_ROW		row;
 	zbx_condition_t	condition;
 
-	int		ret = SUCCEED; /* SUCCEED required for ZBX_ZBX_CONDITION_EVAL_TYPE_AND_OR */
+	int		ret = SUCCEED; /* SUCCEED required for ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR */
 	int		cond, exit = 0;
 	unsigned char	old_type = 0xff;
 
@@ -1827,7 +1827,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 
 		switch (evaltype)
 		{
-			case ZBX_ZBX_CONDITION_EVAL_TYPE_AND_OR:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR:
 				if (old_type == condition.conditiontype)	/* OR conditions */
 				{
 					if (SUCCEED == check_action_condition(event, &condition))
@@ -1843,7 +1843,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 				}
 				old_type = condition.conditiontype;
 				break;
-			case ZBX_CONDITION_EVAL_TYPE_AND:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND:
 				cond = check_action_condition(event, &condition);
 				/* Break if any of AND conditions is FALSE */
 				if (cond == FAIL)
@@ -1854,7 +1854,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 				else
 					ret = SUCCEED;
 				break;
-			case ZBX_CONDITION_EVAL_TYPE_OR:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_OR:
 				cond = check_action_condition(event, &condition);
 				/* Break if any of OR conditions is TRUE */
 				if (cond == SUCCEED)

@@ -201,7 +201,7 @@ static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping
 	{
 		*icmpping = ICMPPING;
 	}
-	else if (0 == strcmp(get_rkey(&request), SERVER_ICMPPINGLOSS_KEY))
+	else if (0 == strcmp(get_rkey(&request), ZBX_SERVER_ICMPPINGLOSS_KEY))
 	{
 		*icmpping = ICMPPINGLOSS;
 	}
