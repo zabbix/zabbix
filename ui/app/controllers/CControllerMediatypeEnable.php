@@ -79,7 +79,7 @@ class CControllerMediatypeEnable extends CController {
 
 		$result = $mediatypes ? API::Mediatype()->update($mediatypes) : null;
 
-		$updated = count($mediatypes);
+		$updated = $result ? count($mediatypes) : count($mediatypeids);
 
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'mediatype.list')
