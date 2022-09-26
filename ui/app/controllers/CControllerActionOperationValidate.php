@@ -207,7 +207,9 @@ class CControllerActionOperationValidate extends CController {
 
 	protected function doAction() {
 		$operation = $this->getInput('operation');
+
 		// todo : check what is the same and remove unnecessary code
+		// todo : fix - fields based on eventsource
 
 		if ($operation['recovery'] == ACTION_OPERATION) {
 			// todo: add all data and pass correct fields for operation table based on operation recovery type
@@ -224,12 +226,17 @@ class CControllerActionOperationValidate extends CController {
 				'opmessage' =>  $operation['esc_period'],
 				'evaltype' => $operation['evaltype'],
 				'condition' => $operation['condition'] ? : [],
-				'steps' => $this->createStepsColumn($operation),
-				// todo: add function for details column. create new version of getActionOperationDescriptions function?
 				'details' => $this->createDetailsColumn($operation),
 				'start_in' => 'start in column',
-				'duration' => $this->createDurationColumn($operation['esc_period'])
 			];
+
+			if ($operation['recovery'] == ACTION_OPERATION &&
+					($operation['eventsource'] === EVENT_SOURCE_TRIGGERS
+					|| $operation['eventsource'] === EVENT_SOURCE_INTERNAL
+					|| $operation['eventsource'] === EVENT_SOURCE_SERVICE)) {
+				$data['operation']['duration'] = $this->createDurationColumn($operation['esc_period']);
+				$data['operation']['steps'] = $this->createStepsColumn($operation);
+			}
 		}
 		else if ($operation['recovery'] == ACTION_RECOVERY_OPERATION) {
 			// todo: check what data needs to be added here
@@ -242,7 +249,6 @@ class CControllerActionOperationValidate extends CController {
 				'opmessage' =>  $operation['esc_period'],
 				'evaltype' => $operation['evaltype'],
 				'opmessage_usr' => $operation['opmessage_usr'],
-				// todo: add function for details column. create new version of getActionOperationDescriptions function?
 				'details' => $this->createDetailsColumn($operation)
 			];
 		}
@@ -258,7 +264,6 @@ class CControllerActionOperationValidate extends CController {
 				'opmessage' =>  $operation['esc_period'],
 				'evaltype' => $operation['evaltype'],
 				'condition' => $operation['condition'] ? : [],
-				// todo: add function for details column. create new version of getActionOperationDescriptions function?
 				'details' => $this->createDetailsColumn($operation)
 			];
 		}
@@ -284,9 +289,17 @@ class CControllerActionOperationValidate extends CController {
 	}
 
 	protected function createDetailsColumn($operation):string {
+		// todo: add function for details column. create new version of getActionOperationDescriptions function?
 		// todo : add all the options here
 		// todo : add the data (user group names, user names etc.
+
 		$details = '';
+
+		foreach ($operation['opmessage_grp'] as $user_group) {
+			$this->getActionOperationDescription($operation);
+			sdff($user_group['usrgrpid']);
+		}
+
 		if (array_key_exists('opmessage_grp', $operation)) {
 			$details = 'Send message to user groups: ';
 		}
