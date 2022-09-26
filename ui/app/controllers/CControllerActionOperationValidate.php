@@ -207,26 +207,61 @@ class CControllerActionOperationValidate extends CController {
 
 	protected function doAction() {
 		$operation = $this->getInput('operation');
+		// todo : check what is the same and remove unnecessary code
 
-		// todo: add all data and pass correct fields for operation table based on operation recovery type
-		$data['operation'] = [
-			'eventsource' => $operation['eventsource'],
-			'recovery' => $operation['recovery'],
-			'operationtype' => $operation['operationtype'],
-			'esc_step_from' => $operation['esc_step_from'],
-			'esc_step_to' => $operation['esc_step_to'],
-			'esc_period' => $operation['esc_period'],
-			'operation-message-mediatype-only' => $operation['operation-message-mediatype-only'],
-			'opmessage_grp' => $operation['opmessage_grp'],
-			'opmessage' =>  $operation['esc_period'],
-			'evaltype' => $operation['evaltype'],
-			'condition' => $operation['condition'] ? : [],
-			'steps' => $this->createStepsColumn($operation),
-			// todo: add function for details column. create new version of getActionOperationDescriptions function?
-			'details' => 'here the details',
-			'start_in' => 'start in column',
-			'duration' => $this->createDurationColumn($operation['esc_period'])
-		];
+		if ($operation['recovery'] == ACTION_OPERATION) {
+			// todo: add all data and pass correct fields for operation table based on operation recovery type
+			$data['operation'] = [
+				'eventsource' => $operation['eventsource'],
+				'recovery' => $operation['recovery'],
+				'operationtype' => $operation['operationtype'],
+				'esc_step_from' => $operation['esc_step_from'],
+				'esc_step_to' => $operation['esc_step_to'],
+				'esc_period' => $operation['esc_period'],
+				'operation-message-mediatype-only' => $operation['operation-message-mediatype-only'],
+				'opmessage_grp' => $operation['opmessage_grp'],
+				'opmessage_usr' => $operation['opmessage_usr'],
+				'opmessage' =>  $operation['esc_period'],
+				'evaltype' => $operation['evaltype'],
+				'condition' => $operation['condition'] ? : [],
+				'steps' => $this->createStepsColumn($operation),
+				// todo: add function for details column. create new version of getActionOperationDescriptions function?
+				'details' => $this->createDetailsColumn($operation),
+				'start_in' => 'start in column',
+				'duration' => $this->createDurationColumn($operation['esc_period'])
+			];
+		}
+		else if ($operation['recovery'] == ACTION_RECOVERY_OPERATION) {
+			// todo: check what data needs to be added here
+			$data['operation'] = [
+				'eventsource' => $operation['eventsource'],
+				'recovery' => $operation['recovery'],
+				'operationtype' => $operation['operationtype'],
+				'operation-message-mediatype-only' => $operation['operation-message-mediatype-only'],
+				'opmessage_grp' => $operation['opmessage_grp'],
+				'opmessage' =>  $operation['esc_period'],
+				'evaltype' => $operation['evaltype'],
+				'opmessage_usr' => $operation['opmessage_usr'],
+				// todo: add function for details column. create new version of getActionOperationDescriptions function?
+				'details' => $this->createDetailsColumn($operation)
+			];
+		}
+		else if ($operation['recovery'] == ACTION_UPDATE_OPERATION) {
+			// todo: check what data needs to be added here
+			$data['operation'] = [
+				'eventsource' => $operation['eventsource'],
+				'recovery' => $operation['recovery'],
+				'operationtype' => $operation['operationtype'],
+				'operation-message-mediatype-only' => $operation['operation-message-mediatype-only'],
+				'opmessage_grp' => $operation['opmessage_grp'],
+				'opmessage_usr' => $operation['opmessage_usr'],
+				'opmessage' =>  $operation['esc_period'],
+				'evaltype' => $operation['evaltype'],
+				'condition' => $operation['condition'] ? : [],
+				// todo: add function for details column. create new version of getActionOperationDescriptions function?
+				'details' => $this->createDetailsColumn($operation)
+			];
+		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
@@ -249,7 +284,15 @@ class CControllerActionOperationValidate extends CController {
 	}
 
 	protected function createDetailsColumn($operation):string {
+		// todo : add all the options here
+		// todo : add the data (user group names, user names etc.
 		$details = '';
+		if (array_key_exists('opmessage_grp', $operation)) {
+			$details = 'Send message to user groups: ';
+		}
+		elseif (array_key_exists('opmessage_usr', $operation)) {
+			$details = 'Send message to users: ';
+		}
 
 		return $details;
 	}

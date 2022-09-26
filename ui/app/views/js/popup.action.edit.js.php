@@ -85,6 +85,7 @@ window.action_edit_popup = new class {
 	}
 
 	_openOperationPopup(eventsource, recovery_phase, actionid) {
+		this.recovery = recovery_phase;
 		const parameters = {
 			eventsource: eventsource,
 			recovery: recovery_phase,
@@ -104,35 +105,71 @@ window.action_edit_popup = new class {
 
 	_createOperationsRow(input) {
 		const operation_data = input.detail.operation;
-		console.log(operation_data);
-		this.operation_table = document.getElementById('op-table');
-		this.operation_row_count = this.operation_table.rows.length - 2;
-		this.operation_row = document.createElement('tr');
+		if (this.recovery == <?= ACTION_OPERATION ?>) {
+			this.operation_table = document.getElementById('op-table');
+			this.operation_row_count = this.operation_table.rows.length - 2;
+			this.operation_row = document.createElement('tr');
 
-		this.operation_row.append(this._addColumn(operation_data.steps));
-		this.operation_row.append(this._addColumn(operation_data.details));
-		this.operation_row.append(this._addColumn(operation_data.start_in));
-		this.operation_row.append(this._addColumn(operation_data.duration));
+			this.operation_row.append(this._addColumn(operation_data.steps));
+			this.operation_row.append(this._addDetailsColumn(operation_data.details));
+			this.operation_row.append(this._addColumn(operation_data.start_in));
+			this.operation_row.append(this._addColumn(operation_data.duration));
 
-		this.addOperationsData(input);
+			this.addOperationsData(input);
+			this.operation_row.append(this._createActionCell());
+			$('#op-table tr:last').before(this.operation_row);
+		}
 
-		this.operation_row.append(this._createActionCell());
-		$('#op-table tr:last').before(this.operation_row);
+		else if (this.recovery == <?= ACTION_RECOVERY_OPERATION ?>) {
+			this.operation_table = document.getElementById('rec-table');
+			this.operation_row_count = this.operation_table.rows.length - 2;
+			this.operation_row = document.createElement('tr');
 
+			this.operation_row.append(this._addDetailsColumn(operation_data.details));
+			this.addOperationsData(input);
+
+			this.operation_row.append(this._createActionCell());
+			$('#rec-table tr:last').before(this.operation_row);
+		}
+
+		else if (this.recovery == <?= ACTION_UPDATE_OPERATION ?>) {
+			this.operation_table = document.getElementById('upd-table');
+			this.operation_row_count = this.operation_table.rows.length - 2;
+			this.operation_row = document.createElement('tr');
+
+			this.operation_row.append(this._addDetailsColumn(operation_data.details));
+			this.addOperationsData(input);
+
+			this.operation_row.append(this._createActionCell());
+			$('#upd-table tr:last').before(this.operation_row);
+		}
+	}
+
+	_addDetailsColumn(input) {
+		const cell = document.createElement('b');
+
+		cell.append(input);
+		return cell;
 	}
 
 	addOperationsData(input) {
 		// todo : REWRITE THIS
 		// add operation data as hidden input to action form
-		const recovery_prefix = '';
+		this.recovery_prefix = '';
+
+		if (this.recovery === <?= ACTION_RECOVERY_OPERATION ?>) {
+			this.recovery_prefix = 'recovery_'
+		}
+		else if (this.recovery === <?= ACTION_UPDATE_OPERATION ?>) {
+			this.recovery_prefix = 'update_'
+		}
+
 		const form = document.forms['action.edit'];
 		const operation_input = document.createElement('input');
 		operation_input.setAttribute('type', 'hidden');
-		operation_input.setAttribute('name', `add_${recovery_prefix}operation`);
+		operation_input.setAttribute('name', `add_${this.recovery_prefix}operation`);
 		operation_input.setAttribute('value', '1');
 		form.appendChild(operation_input);
-
-		// todo : remove usrgrp and usrid from here, because now the data repeats
 
 		for (const [name, value] of Object.entries(input.detail.operation)) {
 			const operation_input = document.createElement('operation_input');
@@ -143,16 +180,17 @@ window.action_edit_popup = new class {
 			form.appendChild(operation_input);
 		}
 
-		if (input.detail.operation.opmessage_grp !== undefined) {
+		if (input.detail.operation.opmessage_grp) {
 			for (const [index, value] of Object.entries(input.detail.operation.opmessage_grp)) {
 				this.operation_row.append(this._addUserFields(index, 'usrgrpid',value.usrgrpid, 'opmessage_grp'));
 			}
 		}
-		if (input.detail.operation.opmessage_usr !== undefined) {
+		else if (input.detail.operation.opmessage_usr) {
 			for (const [index, value] of Object.entries(input.detail.operation.opmessage_usr)) {
 				this.operation_row.append(this._addUserFields(index, 'userid', value.userid, 'opmessage_usr'));
 			}
 		}
+
 		this.operation_row.append(this._addHiddenOperationsFields('operationtype', 0));
 
 	}
@@ -160,18 +198,28 @@ window.action_edit_popup = new class {
 	_addHiddenOperationsFields(name, value) {
 		const input = document.createElement('input');
 		input.type = 'hidden';
-		input.id = `operations_${this.row_count}_${name}`;
-		input.name = `operations[${this.row_count}][${name}]`;
+		input.id = `${this.recovery_prefix}operations_${this.row_count}_${name}`;
+		input.name = `${this.recovery_prefix}operations[${this.row_count}][${name}]`;
 		input.value = value;
 
 		return input;
 	}
 
 	_addUserFields(index, name, value, group) {
+		if (this.recovery == <?=ACTION_OPERATION?>) {
+			this.prefix = ''
+		}
+		else if (this.recovery == <?=ACTION_RECOVERY_OPERATION?>) {
+			this.prefix = 'recovery_'
+		}
+		else if (this.recovery == <?=ACTION_UPDATE_OPERATION?>) {
+			this.prefix = 'update_'
+		}
+
 		const input = document.createElement('input');
 		input.type = 'hidden';
-		input.id = `operations_${this.row_count}_${group}_${index}_${name}`;
-		input.name = `operations[${this.row_count}][${group}][${index}][${name}]`;
+		input.id = `${this.prefix}operations_${this.row_count}_${group}_${index}_${name}`;
+		input.name = `${this.prefix}operations[${this.row_count}][${group}][${index}][${name}]`;
 		input.value = value;
 
 		return input;

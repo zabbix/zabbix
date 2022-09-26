@@ -136,14 +136,14 @@ window.operation_popup = new class {
 	}
 
 	_addUser(values) {
+		// todo : fix bug
 		values.forEach((value, index) => {
 			const row = document.createElement('tr');
 			row.append(value.name)
 			row.append(this._createRemoveCell())
-			row.append(this._createHiddenInput(`operation[opmessage_usr][${index}][userid]`, value.id))
+			row.append(this._createHiddenInput(`operation[opmessage_usr][][userid]`, value.id))
 
-			document.getElementById('operation-message-users-footer')
-				.before(row);
+			document.getElementById('operation-message-users-footer').before(row);
 		});
 	}
 
@@ -179,10 +179,10 @@ window.operation_popup = new class {
 		row.append(this._createName(input));
 		row.append(this._createRemoveCell());
 
-		row.appendChild(this._createHiddenInput('operation[condition][formulaid]',this.label));
-		row.appendChild(this._createHiddenInput('operation[condition][conditiontype]',input.conditiontype));
-		row.appendChild(this._createHiddenInput('operation[condition][operator]',input.operator));
-		row.appendChild(this._createHiddenInput('operation[condition][value]',input.value));
+		row.appendChild(this._createHiddenInput('operation[condition][formulaid]', this.label));
+		row.appendChild(this._createHiddenInput('operation[condition][conditiontype]', input.conditiontype));
+		row.appendChild(this._createHiddenInput('operation[condition][operator]', input.operator));
+		row.appendChild(this._createHiddenInput('operation[condition][value]', input.value));
 
 		this.table = document.getElementById('operation-condition-list');
 		this.row_count = this.table.rows.length -1;
