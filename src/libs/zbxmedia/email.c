@@ -37,10 +37,7 @@
 /* separator for multipart mixed messages */
 #define ZBX_MULTIPART_MIXED_BOUNDARY	"MULTIPART-MIXED-BOUNDARY"
 
-#define OK_220	"220"
 #define OK_250	"250"
-#define OK_251	"251"
-#define OK_354	"354"
 
 extern char	*CONFIG_SSL_CA_LOCATION;
 
@@ -532,6 +529,9 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 		const char *mailsubject, const char *mailbody, unsigned char content_type, int timeout, char *error,
 		size_t max_error_len)
 {
+#define OK_220	"220"
+#define OK_251	"251"
+#define OK_354	"354"
 	zbx_socket_t	s;
 	int		err, ret = FAIL, i;
 	char		cmd[MAX_STRING_LEN], *cmdp = NULL, *helo_addr = NULL;
@@ -694,6 +694,9 @@ out:
 	zbx_alarm_off();
 
 	return ret;
+#undef OK_220
+#undef OK_251
+#undef OK_354
 }
 
 static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
