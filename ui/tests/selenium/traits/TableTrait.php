@@ -80,9 +80,9 @@ trait TableTrait {
 	}
 
 	/**
-	 * Check if values in table rows has data from data provider.
+	 * Check if values in table rows have data from data provider.
 	 *
-	 * @param array   $data        data array to be match with result in table
+	 * @param array   $data        data array to be matched with result in table
 	 * @param string  $selector    table selector
 	 *
 	 * @throws Exception
@@ -105,9 +105,8 @@ trait TableTrait {
 
 				foreach ($data_row as $key => $value) {
 					if (!isset($table_row[$key]) || $table_row[$key] != $data_row[$key]) {
-					$match = false;
-
-					break;
+						$match = false;
+						break;
 					}
 				}
 
@@ -139,9 +138,9 @@ trait TableTrait {
 	}
 
 	/**
-	 * Check if values in table column has data from data provider.
+	 * Check if values in table column have data from data provider.
 	 *
-	 * @param array   $rows        data array to be match with result in table
+	 * @param array   $rows        data array to be matched with result in table
 	 * @param string  $field       table column name
 	 */
 	public function assertTableHasDataColumn($rows = [], $field = 'Name', $selector = 'class:list-table') {
