@@ -45,6 +45,9 @@ class testPageAdministrationProxies extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
+	/**
+	 * @backup profiles
+	 */
 	public function testPageAdministrationProxies_Layout() {
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
 		$this->page->assertTitle('Configuration of proxies');
@@ -100,13 +103,7 @@ class testPageAdministrationProxies extends CWebTest {
 				$order_link = $table->query('link', $column)->one()->getAttribute('href');
 				$table->query('link', $column)->waitUntilClickable()->one()->click();
 				$table->waitUntilReloaded();
-
-				if (strpos($order_link, 'sortorder=ASC') ) {
-					$this->assertTableDataColumn($sorted_asc, $column);
-				}
-				else {
-					$this->assertTableDataColumn($sorted_desc, $column);
-				}
+				$this->assertTableDataColumn((strpos($order_link, 'sortorder=ASC') ? $sorted_asc : $sorted_desc), $column);
 			}
 		}
 
