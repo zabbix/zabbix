@@ -103,8 +103,8 @@ class testDashboardFavoriteGraphsWidget extends CWebTest {
 
 		foreach ($favorite_graphs as $graph) {
 			// Added variable due to External Hook.
-			$xpath = './/button[@data-itemid='.CXPathHelper::escapeQuotes($graph['value_id']);
-			$remove_item = $widget->query('xpath', $xpath.' and contains(@onclick, "rm4favorites")]')->waituntilClickable()->one();
+			$xpath = ".//button[@onclick=\"rm4favorites('itemid','".$graph['value_id'];
+			$remove_item = $widget->query('xpath', $xpath."')\"]")->waituntilClickable()->one();
 			$remove_item->click();
 			$remove_item->waitUntilNotVisible();
 		}

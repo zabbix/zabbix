@@ -346,7 +346,7 @@ class testDashboardForm extends CWebTest {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if (CTestArrayHelper::get($data, 'save_dashboard')) {
 				$this->query('button:Save changes')->one()->click();
-				$this->assertMessage(TEST_BAD, 'Failed to '.$action.' dashboard', $data['error_message']);
+				$this->assertMessage(TEST_BAD, null, $data['error_message']);
 			}
 			else {
 				$this->assertMessage(TEST_BAD, null, $data['error_message']);
