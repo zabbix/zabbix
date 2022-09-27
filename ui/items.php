@@ -531,6 +531,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			? DB::getDefault('items', 'trends')
 			: 0;
 
+		$request_method = getRequest('request_method', DB::getDefault('items', 'request_method'));
+		$retrieve_mode_default = $request_method == HTTPCHECK_REQUEST_HEAD
+			? HTTPTEST_STEP_RETRIEVE_MODE_HEADERS
+			: DB::getDefault('items', 'retrieve_mode');
+
 		$input = [
 			'name' => getRequest('name', DB::getDefault('items', 'name')),
 			'type' => $type,
@@ -574,13 +579,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			// HTTP Agent item type specific fields.
 			'url' => getRequest('url', DB::getDefault('items', 'url')),
 			'query_fields' => prepareItemQueryFields(getRequest('query_fields', [])),
-			'request_method' => getRequest('request_method', DB::getDefault('items', 'request_method')),
+			'request_method' => $request_method,
 			'post_type' => getRequest('post_type', DB::getDefault('items', 'post_type')),
 			'posts' => getRequest('posts', DB::getDefault('items', 'posts')),
 			'headers' => prepareItemHeaders(getRequest('headers', [])),
 			'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
 			'follow_redirects' => getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
-			'retrieve_mode' => getRequest('retrieve_mode', DB::getDefault('items', 'retrieve_mode')),
+			'retrieve_mode' => getRequest('retrieve_mode', $retrieve_mode_default),
 			'output_format' => getRequest('output_format', DB::getDefault('items', 'output_format')),
 			'http_proxy' => getRequest('http_proxy', DB::getDefault('items', 'http_proxy')),
 			'verify_peer' => getRequest('verify_peer', DB::getDefault('items', 'verify_peer')),
