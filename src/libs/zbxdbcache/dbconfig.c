@@ -9513,7 +9513,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 			}
 		}
 
-		/* don't check host macro revision if all host items are monitored by Zabbix proxy */
+		/* don't check host macro revision if the host does not have locally pre-processable items */
 		if (0 == items_sync.values_num)
 			continue;
 
