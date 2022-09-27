@@ -44,12 +44,14 @@ class testAuditlogToken extends testAuditlogCommon {
 
 		$resourceid = $create['result']['tokenids'][0];
 
-		$created = "{\"token.name\":[\"add\",\"Audit token\"],".
-				"\"token.userid\":[\"add\",\"1\"],".
-				"\"token.expires_at\":[\"add\",\"1611238072\"],".
-				"\"token.description\":[\"add\",\"Audit description\"],".
-				"\"token.status\":[\"add\",\"1\"],".
-				"\"token.tokenid\":[\"add\",\"".$resourceid."\"]}";
+		$created = json_encode([
+			'token.name' => ['add', 'Audit token'],
+			'token.userid' => ['add', '1'],
+			'token.expires_at' => ['add', '1611238072'],
+			'token.description' => ['add', 'Audit description'],
+			'token.status' => ['add', '1'],
+			'token.tokenid' => ['add', $resourceid]
+		]);
 
 		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
@@ -65,10 +67,12 @@ class testAuditlogToken extends testAuditlogCommon {
 			]
 		]);
 
-		$updated = "{\"token.name\":[\"update\",\"Updated audit token\",\"test-token\"],".
-				"\"token.expires_at\":[\"update\",\"1611238090\",\"0\"],".
-				"\"token.description\":[\"update\",\"Updated description\",\"\"],".
-				"\"token.status\":[\"update\",\"1\",\"0\"]}";
+		$updated = json_encode([
+			'token.name' => ['update', 'Updated audit token', 'test-token'],
+			'token.expires_at' => ['update', '1611238090', '0'],
+			'token.description' => ['update', 'Updated description', ''],
+			'token.status' => ['update', '1', '0']
+		]);
 
 		$this->getAuditDetails('details', $this->update_actionid, $updated, self::TOKENID);
 	}

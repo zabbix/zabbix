@@ -98,52 +98,55 @@ class testAuditlogDashboard extends testAuditlogCommon {
 				zbx_dbstr($resourceid)
 		);
 
-		$created = "{\"dashboard.name\":[\"add\",\"Audit dashboard\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid']."]\":[\"add\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid']."].type\":[\"add\",\"problems\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid']."].width\":[\"add\",\"12\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid']."].height\":[\"add\",\"5\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].fields[".$fieldid[0]['widget_fieldid']."]\":[\"add\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].fields[".$fieldid[0]['widget_fieldid']."].type\":[\"add\",\"1\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].fields[".$fieldid[0]['widget_fieldid']."].name\":[\"add\",\"tags.tag.0\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].fields[".$fieldid[0]['widget_fieldid']."].value\":[\"add\",\"service\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].fields[".$fieldid[0]['widget_fieldid']."].widget_fieldid\":[\"add\",\"".$fieldid[0]['widget_fieldid']."\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].fields[".$fieldid[1]['widget_fieldid']."]\":[\"add\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].fields[".$fieldid[1]['widget_fieldid']."].name\":[\"add\",\"tags.operator.0\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].fields[".$fieldid[1]['widget_fieldid']."].value\":[\"add\",\"1\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].fields[".$fieldid[1]['widget_fieldid']."].widget_fieldid\":[\"add\",\"".$fieldid[1]['widget_fieldid']."\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].fields[".$fieldid[2]['widget_fieldid']."]\":[\"add\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].fields[".$fieldid[2]['widget_fieldid']."].type\":[\"add\",\"1\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].fields[".$fieldid[2]['widget_fieldid']."].name\":[\"add\",\"tags.value.0\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].fields[".$fieldid[2]['widget_fieldid']."].value\":[\"add\",\"zabbix_server\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].fields[".$fieldid[2]['widget_fieldid']."].widget_fieldid\":[\"add\",\"".$fieldid[2]['widget_fieldid']."\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].widgetid\":[\"add\",\"".$widgetid['widgetid']."\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."]\":[\"add\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].dashboard_pageid\":[\"add\",\"".$pageid['dashboard_pageid']."\"],".
-				"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."]\":[\"add\"],".
-				"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."].usrgrpid\":[\"add\",\"7\"],".
-				"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."].dashboard_usrgrpid\":[\"add\",\""
-				.$dashboard_usrgrpid['dashboard_usrgrpid']."\"],".
-				"\"dashboard.users[".$dashboard_userid['dashboard_userid']."]\":[\"add\"],".
-				"\"dashboard.users[".$dashboard_userid['dashboard_userid']."].userid\":[\"add\",\"1\"],".
-				"\"dashboard.users[".$dashboard_userid['dashboard_userid']."].dashboard_userid\":[\"add\",\""
-				.$dashboard_userid['dashboard_userid']."\"],\"dashboard.userid\":[\"add\",\"1\"],".
-				"\"dashboard.dashboardid\":[\"add\",\"".$resourceid."\"]}";
+		$created = json_encode([
+			'dashboard.name' => ['add', 'Audit dashboard'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].']' => ['add'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].type' => ['add', 'problems'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].width' => ['add', '12'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].height' => ['add', '5'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'fields['.$fieldid[0]['widget_fieldid'].']' => ['add'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'fields['.$fieldid[0]['widget_fieldid'].'].type' => ['add', '1'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'fields['.$fieldid[0]['widget_fieldid'].'].name' => ['add', 'tags.tag.0'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'fields['.$fieldid[0]['widget_fieldid'].'].value' => ['add', 'service'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'fields['.$fieldid[0]['widget_fieldid'].'].widget_fieldid' => ['add', $fieldid[0]['widget_fieldid']],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'fields['.$fieldid[1]['widget_fieldid'].']' => ['add'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'fields['.$fieldid[1]['widget_fieldid'].'].name' => ['add', 'tags.operator.0'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'fields['.$fieldid[1]['widget_fieldid'].'].value' => ['add', '1'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'fields['.$fieldid[1]['widget_fieldid'].'].widget_fieldid' => ['add', $fieldid[1]['widget_fieldid']],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'fields['.$fieldid[2]['widget_fieldid'].']' => ['add'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'fields['.$fieldid[2]['widget_fieldid'].'].type' => ['add', '1'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'fields['.$fieldid[2]['widget_fieldid'].'].name' => ['add', 'tags.value.0'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'fields['.$fieldid[2]['widget_fieldid'].'].value' => ['add', 'zabbix_server'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'fields['.$fieldid[2]['widget_fieldid'].'].widget_fieldid' => ['add', $fieldid[2]['widget_fieldid']],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].'.
+				'widgetid' => ['add', $widgetid['widgetid']],
+			'dashboard.pages['.$pageid['dashboard_pageid'].']' => ['add'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].dashboard_pageid' => ['add', $pageid['dashboard_pageid']],
+			'dashboard.userGroups['.$dashboard_usrgrpid['dashboard_usrgrpid'].']' => ['add'],
+			'dashboard.userGroups['.$dashboard_usrgrpid['dashboard_usrgrpid'].'].usrgrpid' => ['add', '7'],
+			'dashboard.userGroups['.$dashboard_usrgrpid['dashboard_usrgrpid'].'].dashboard_usrgrpid'
+				=> ['add', $dashboard_usrgrpid['dashboard_usrgrpid']],
+			'dashboard.users['.$dashboard_userid['dashboard_userid'].']' => ['add'],
+			'dashboard.users['.$dashboard_userid['dashboard_userid'].'].userid' => ['add', '1'],
+			'dashboard.users['.$dashboard_userid['dashboard_userid'].'].dashboard_userid'
+				=> ['add', $dashboard_userid['dashboard_userid']],
+			'dashboard.userid' => ['add', '1'],
+			'dashboard.dashboardid' => ['add', $resourceid]
+		]);
 
 		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
@@ -187,27 +190,25 @@ class testAuditlogDashboard extends testAuditlogCommon {
 				zbx_dbstr(self::DASHBOARDID)
 		);
 
-		$updated = "{\"dashboard.pages[1]\":[\"delete\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid']."]\":[\"add\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."]\":[\"add\"],".
-				"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."]\":[\"add\"],".
-				"\"dashboard.name\":[\"update\",\"Updated dashboard name\",\"Global view\"],".
-				"\"dashboard.display_period\":[\"update\",\"60\",\"30\"],".
-				"\"dashboard.auto_start\":[\"update\",\"0\",\"1\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].type\":[\"add\",\"clock\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].width\":[\"add\",\"4\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].height\":[\"add\",\"3\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].widgets[".$widgetid['widgetid'].
-				"].widgetid\":[\"add\",\"".$widgetid['widgetid']."\"],".
-				"\"dashboard.pages[".$pageid['dashboard_pageid']."].dashboard_pageid\":[\"add\",\"".
-				$pageid['dashboard_pageid']."\"],".
-				"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."].usrgrpid\":[\"add\",\"7\"],".
-				"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."].permission\":[\"add\",\"3\"],".
-				"\"dashboard.userGroups[".$dashboard_usrgrpid['dashboard_usrgrpid']."].dashboard_usrgrpid\":[\"add\",\""
-				.$dashboard_usrgrpid['dashboard_usrgrpid']."\"]}";
+		$updated = json_encode([
+			'dashboard.pages[1]' => ['delete'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].']' => ['add'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].']' => ['add'],
+			'dashboard.userGroups['.$dashboard_usrgrpid['dashboard_usrgrpid'].']' => ['add'],
+			'dashboard.name' => ['update', 'Updated dashboard name', 'Global view'],
+			'dashboard.display_period' => ['update', '60', '30'],
+			'dashboard.auto_start' => ['update', '0', '1'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].type' => ['add', 'clock'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].width' => ['add', '4'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].height' => ['add', '3'],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].widgets['.$widgetid['widgetid'].'].widgetid'
+				=> ['add', $widgetid['widgetid']],
+			'dashboard.pages['.$pageid['dashboard_pageid'].'].dashboard_pageid' => ['add', $pageid['dashboard_pageid']],
+			'dashboard.userGroups['.$dashboard_usrgrpid['dashboard_usrgrpid'].'].usrgrpid' => ['add', '7'],
+			'dashboard.userGroups['.$dashboard_usrgrpid['dashboard_usrgrpid'].'].permission' => ['add', '3'],
+			'dashboard.userGroups['.$dashboard_usrgrpid['dashboard_usrgrpid'].'].dashboard_usrgrpid'
+				=> ['add', $dashboard_usrgrpid['dashboard_usrgrpid']]
+		]);
 
 		$this->getAuditDetails('details', $this->update_actionid, $updated, self::DASHBOARDID);
 	}

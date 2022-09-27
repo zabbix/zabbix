@@ -46,25 +46,29 @@ class testAuditlogProxy extends testAuditlogCommon {
 
 		$resourceid = $create['result']['proxyids'][0];
 
-		$created = "{\"proxy.host\":[\"add\",\"Audit proxy\"],".
-				"\"proxy.status\":[\"add\",\"5\"],".
-				"\"proxy.description\":[\"add\",\"Proxy audit description\"],".
-				"\"proxy.tls_accept\":[\"add\",\"2\"],".
-				"\"proxy.proxy_address\":[\"add\",\"localhost\"],".
-				"\"proxy.tls_psk_identity\":[\"add\",\"******\"],".
-				"\"proxy.tls_psk\":[\"add\",\"******\"],".
-				"\"proxy.proxyid\":[\"add\",\"".$resourceid."\"]}";
+		$created = json_encode([
+			'proxy.host' => ['add', 'Audit proxy'],
+			'proxy.status' => ['add', '5'],
+			'proxy.description' => ['add', 'Proxy audit description'],
+			'proxy.tls_accept' => ['add', '2'],
+			'proxy.proxy_address' => ['add', 'localhost'],
+			'proxy.tls_psk_identity' => ['add', '******'],
+			'proxy.tls_psk' => ['add', '******'],
+			'proxy.proxyid' => ['add', $resourceid]
+		]);
 
 		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
 
 	public function testAuditlogProxy_Update() {
-		$updated = "{\"proxy.host\":[\"update\",\"Updated Audit proxy\",\"Api active proxy for delete0\"],".
-				"\"proxy.description\":[\"update\",\"Update proxy audit description\",\"\"],".
-				"\"proxy.tls_accept\":[\"update\",\"2\",\"1\"],".
-				"\"proxy.proxy_address\":[\"update\",\"updated_address\",\"\"],".
-				"\"proxy.tls_psk_identity\":[\"update\",\"******\",\"******\"],".
-				"\"proxy.tls_psk\":[\"update\",\"******\",\"******\"]}";
+		$updated = json_encode([
+			'proxy.host' => ['update', 'Updated Audit proxy', 'Api active proxy for delete0'],
+			'proxy.description' => ['update', 'Update proxy audit description', ''],
+			'proxy.tls_accept' => ['update', '2', '1'],
+			'proxy.proxy_address' => ['update', 'updated_address', ''],
+			'proxy.tls_psk_identity' => ['update', '******', '******'],
+			'proxy.tls_psk' => ['update', '******', '******']
+		]);
 
 		$this->call('proxy.update', [
 			[

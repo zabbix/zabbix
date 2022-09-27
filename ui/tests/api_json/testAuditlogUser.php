@@ -72,19 +72,21 @@ class testAuditlogUser extends testAuditlogCommon {
 		self::$before_usrgroup = CDBHelper::getRow('SELECT id FROM users_groups WHERE userid='.zbx_dbstr(self::$resourceid));
 		self::$before_media = CDBHelper::getRow('SELECT mediaid FROM media WHERE userid='.zbx_dbstr(self::$resourceid));
 
-		$created = "{\"user.username\":[\"add\",\"Audit\"],".
-				"\"user.passwd\":[\"add\",\"******\"],".
-				"\"user.name\":[\"add\",\"Audit_name\"],".
-				"\"user.surname\":[\"add\",\"Audit_surname\"],".
-				"\"user.roleid\":[\"add\",\"3\"],".
-				"\"user.usrgrps[".self::$before_usrgroup['id']."]\":[\"add\"],".
-				"\"user.usrgrps[".self::$before_usrgroup['id']."].usrgrpid\":[\"add\",\"7\"],".
-				"\"user.usrgrps[".self::$before_usrgroup['id']."].id\":[\"add\",\"".self::$before_usrgroup['id']."\"],".
-				"\"user.medias[".self::$before_media['mediaid']."]\":[\"add\"],".
-				"\"user.medias[".self::$before_media['mediaid']."].mediatypeid\":[\"add\",\"1\"],".
-				"\"user.medias[".self::$before_media['mediaid']."].sendto\":[\"add\",\"audit@audit.com\"],".
-				"\"user.medias[".self::$before_media['mediaid']."].mediaid\":[\"add\",\"".self::$before_media['mediaid']."\"],".
-				"\"user.userid\":[\"add\",\"".self::$resourceid."\"]}";
+		$created = json_encode([
+			'user.username' => ['add', 'Audit'],
+			'user.passwd' => ['add', '******'],
+			'user.name' => ['add', 'Audit_name'],
+			'user.surname' => ['add', 'Audit_surname'],
+			'user.roleid' => ['add', '3'],
+			'user.usrgrps['.self::$before_usrgroup['id'].']' => ['add'],
+			'user.usrgrps['.self::$before_usrgroup['id'].'].usrgrpid' => ['add', '7'],
+			'user.usrgrps['.self::$before_usrgroup['id'].'].id' => ['add', self::$before_usrgroup['id']],
+			'user.medias['.self::$before_media['mediaid'].']' => ['add'],
+			'user.medias['.self::$before_media['mediaid'].'].mediatypeid' => ['add', '1'],
+			'user.medias['.self::$before_media['mediaid'].'].sendto' => ['add', 'audit@audit.com'],
+			'user.medias['.self::$before_media['mediaid'].'].mediaid' => ['add', self::$before_media['mediaid']],
+			'user.userid' => ['add', self::$resourceid]
+		]);
 
 		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid);
 	}
@@ -121,19 +123,21 @@ class testAuditlogUser extends testAuditlogCommon {
 		$after_usrgroup = CDBHelper::getRow('SELECT id FROM users_groups WHERE userid='.zbx_dbstr(self::$resourceid));
 		$after_media = CDBHelper::getRow('SELECT mediaid FROM media WHERE userid='.zbx_dbstr(self::$resourceid));
 
-		$updated = "{\"user.usrgrps[".self::$before_usrgroup['id']."]\":[\"delete\"],".
-				"\"user.medias[".self::$before_media['mediaid']."]\":[\"delete\"],".
-				"\"user.usrgrps[".$after_usrgroup['id']."]\":[\"add\"],".
-				"\"user.medias[".$after_media['mediaid']."]\":[\"add\"],".
-				"\"user.username\":[\"update\",\"updated_Audit\",\"Audit\"],".
-				"\"user.passwd\":[\"update\",\"******\",\"******\"],".
-				"\"user.name\":[\"update\",\"Updated_Audit_name\",\"Audit_name\"],".
-				"\"user.surname\":[\"update\",\"Updated_Audit_surname\",\"Audit_surname\"],".
-				"\"user.usrgrps[".$after_usrgroup['id']."].usrgrpid\":[\"add\",\"11\"],".
-				"\"user.usrgrps[".$after_usrgroup['id']."].id\":[\"add\",\"".$after_usrgroup['id']."\"],".
-				"\"user.medias[".$after_media['mediaid']."].mediatypeid\":[\"add\",\"1\"],".
-				"\"user.medias[".$after_media['mediaid']."].sendto\":[\"add\",\"update_audit@audit.com\"],".
-				"\"user.medias[".$after_media['mediaid']."].mediaid\":[\"add\",\"".$after_media['mediaid']."\"]}";
+		$updated = json_encode([
+			'user.usrgrps['.self::$before_usrgroup['id'].']' => ['delete'],
+			'user.medias['.self::$before_media['mediaid'].']' => ['delete'],
+			'user.usrgrps['.$after_usrgroup['id'].']' => ['add'],
+			'user.medias['.$after_media['mediaid'].']' => ['add'],
+			'user.username' => ['update', 'updated_Audit', 'Audit'],
+			'user.passwd' => ['update', '******', '******'],
+			'user.name' => ['update', 'Updated_Audit_name', 'Audit_name'],
+			'user.surname' => ['update', 'Updated_Audit_surname', 'Audit_surname'],
+			'user.usrgrps['.$after_usrgroup['id'].'].usrgrpid' => ['add', '11'],
+			'user.usrgrps['.$after_usrgroup['id'].'].id' => ['add', $after_usrgroup['id']],
+			'user.medias['.$after_media['mediaid'].'].mediatypeid' => ['add', '1'],
+			'user.medias['.$after_media['mediaid'].'].sendto' => ['add', 'update_audit@audit.com'],
+			'user.medias['.$after_media['mediaid'].'].mediaid' => ['add', $after_media['mediaid']]
+		]);
 
 		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid);
 	}

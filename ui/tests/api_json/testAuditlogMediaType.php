@@ -60,22 +60,24 @@ class testAuditlogMediaType extends testAuditlogCommon {
 				zbx_dbstr($resourceid)
 		);
 
-		$created = "{\"mediatype.name\":[\"add\",\"email_media\"],".
-				"\"mediatype.smtp_server\":[\"add\",\"test.test.com\"],".
-				"\"mediatype.smtp_helo\":[\"add\",\"test.com\"],".
-				"\"mediatype.smtp_email\":[\"add\",\"test@test.com\"],".
-				"\"mediatype.smtp_port\":[\"add\",\"587\"],".
-				"\"mediatype.message_templates[".$message['mediatype_messageid']."]\":[\"add\"],".
-				"\"mediatype.message_templates[".$message['mediatype_messageid']."].eventsource\":[\"add\",\"0\"],".
-				"\"mediatype.message_templates[".$message['mediatype_messageid']."].recovery\":[\"add\",\"0\"],".
-				"\"mediatype.message_templates[".$message['mediatype_messageid']."].subject\":[\"add\",\"Subject message\"],".
-				"\"mediatype.message_templates[".$message['mediatype_messageid']."].message\":[\"add\",\"Main message\"],".
-				"\"mediatype.message_templates[".$message['mediatype_messageid']."].mediatype_messageid\":[\"add\",\"".
-				$message['mediatype_messageid']."\"],".
-				"\"mediatype.maxsessions\":[\"add\",\"50\"],".
-				"\"mediatype.maxattempts\":[\"add\",\"5\"],".
-				"\"mediatype.attempt_interval\":[\"add\",\"50s\"],".
-				"\"mediatype.mediatypeid\":[\"add\",\"".$resourceid."\"]}";
+		$created = json_encode([
+			'mediatype.name' => ['add', 'email_media'],
+			'mediatype.smtp_server' => ['add', 'test.test.com'],
+			'mediatype.smtp_helo' => ['add', 'test.com'],
+			'mediatype.smtp_email' => ['add', 'test@test.com'],
+			'mediatype.smtp_port' => ['add', '587'],
+			'mediatype.message_templates['.$message['mediatype_messageid'].']' => ['add'],
+			'mediatype.message_templates['.$message['mediatype_messageid'].'].eventsource' => ['add', '0'],
+			'mediatype.message_templates['.$message['mediatype_messageid'].'].recovery' => ['add', '0'],
+			'mediatype.message_templates['.$message['mediatype_messageid'].'].subject' => ['add', 'Subject message'],
+			'mediatype.message_templates['.$message['mediatype_messageid'].'].message' => ['add', 'Main message'],
+			'mediatype.message_templates['.$message['mediatype_messageid'].'].mediatype_messageid'
+				=> ['add', $message['mediatype_messageid']],
+			'mediatype.maxsessions' => ['add', '50'],
+			'mediatype.maxattempts' => ['add', '5'],
+			'mediatype.attempt_interval' => ['add', '50s'],
+			'mediatype.mediatypeid' => ['add', $resourceid]
+		]);
 
 		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
@@ -105,28 +107,30 @@ class testAuditlogMediaType extends testAuditlogCommon {
 			]
 		]);
 
-		$updated = "{\"mediatype.message_templates[1]\":[\"delete\"],".
-				"\"mediatype.message_templates[2]\":[\"delete\"],".
-				"\"mediatype.message_templates[3]\":[\"delete\"],".
-				"\"mediatype.message_templates[5]\":[\"delete\"],".
-				"\"mediatype.status\":[\"update\",\"1\",\"0\"],".
-				"\"mediatype.name\":[\"update\",\"updated_email_media\",\"Email\"],".
-				"\"mediatype.smtp_server\":[\"update\",\"updated_test.test.com\",\"mail.example.com\"],".
-				"\"mediatype.smtp_helo\":[\"update\",\"updated_test.com\",\"example.com\"],".
-				"\"mediatype.smtp_email\":[\"update\",\"updated_test@test.com\",\"zabbix@example.com\"],".
-				"\"mediatype.smtp_port\":[\"update\",\"589\",\"25\"],".
-				"\"mediatype.message_templates[4]\":[\"update\"],".
-				"\"mediatype.message_templates[4].subject\":[\"update\",\"Updated subject message\",".
-				"\"Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}\"],".
-				"\"mediatype.message_templates[4].message\":[\"update\",\"Updated main message\",".
-				"\"Discovery rule: {DISCOVERY.RULE.NAME}\\r\\n\\r\\nDevice IP: ".
-				"{DISCOVERY.DEVICE.IPADDRESS}\\r\\nDevice DNS: {DISCOVERY.DEVICE.DNS}\\r\\nDevice status: ".
-				"{DISCOVERY.DEVICE.STATUS}\\r\\nDevice uptime: {DISCOVERY.DEVICE.UPTIME}\\r\\n\\r\\nDevice service name: ".
-				"{DISCOVERY.SERVICE.NAME}\\r\\nDevice service port: {DISCOVERY.SERVICE.PORT}\\r\\nDevice service status: ".
-				"{DISCOVERY.SERVICE.STATUS}\\r\\nDevice service uptime: {DISCOVERY.SERVICE.UPTIME}\"],".
-				"\"mediatype.maxsessions\":[\"update\",\"40\",\"1\"],".
-				"\"mediatype.maxattempts\":[\"update\",\"10\",\"3\"],".
-				"\"mediatype.attempt_interval\":[\"update\",\"30s\",\"10s\"]}";
+		$updated = json_encode([
+			'mediatype.message_templates[1]' => ['delete'],
+			'mediatype.message_templates[2]' => ['delete'],
+			'mediatype.message_templates[3]' => ['delete'],
+			'mediatype.message_templates[5]' => ['delete'],
+			'mediatype.status' => ['update', '1', '0'],
+			'mediatype.name' => ['update', 'updated_email_media', 'Email'],
+			'mediatype.smtp_server' => ['update', 'updated_test.test.com', 'mail.example.com'],
+			'mediatype.smtp_helo' => ['update', 'updated_test.com', 'example.com'],
+			'mediatype.smtp_email' => ['update', 'updated_test@test.com', 'zabbix@example.com'],
+			'mediatype.smtp_port' => ['update', '589', '25'],
+			'mediatype.message_templates[4]' => ['update'],
+			'mediatype.message_templates[4].subject' => ['update', 'Updated subject message', 'Discovery: '.
+				'{DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'],
+			'mediatype.message_templates[4].message' => ['update', 'Updated main message', "Discovery rule: ".
+				"{DISCOVERY.RULE.NAME}\r\n\r\nDevice IP: ".
+				"{DISCOVERY.DEVICE.IPADDRESS}\r\nDevice DNS: {DISCOVERY.DEVICE.DNS}\r\nDevice status: ".
+				"{DISCOVERY.DEVICE.STATUS}\r\nDevice uptime: {DISCOVERY.DEVICE.UPTIME}\r\n\r\nDevice service name: ".
+				"{DISCOVERY.SERVICE.NAME}\r\nDevice service port: {DISCOVERY.SERVICE.PORT}\r\nDevice service status: ".
+				"{DISCOVERY.SERVICE.STATUS}\r\nDevice service uptime: {DISCOVERY.SERVICE.UPTIME}"],
+			'mediatype.maxsessions' => ['update', '40', '1'],
+			'mediatype.maxattempts' => ['update', '10', '3'],
+			'mediatype.attempt_interval' => ['update', '30s', '10s']
+		]);
 
 		$this->getAuditDetails('details', $this->update_actionid, $updated, self::MEDIATYPEID);
 	}

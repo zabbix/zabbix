@@ -49,14 +49,16 @@ class testAuditlogIconMap extends testAuditlogCommon {
 		$resourceid = $create['result']['iconmapids'][0];
 		$icon_map = CDBHelper::getRow('SELECT iconmappingid FROM icon_mapping WHERE iconmapid='.zbx_dbstr($resourceid));
 
-		$created = "{\"iconmap.name\":[\"add\",\"icon_mapping\"],".
-				"\"iconmap.default_iconid\":[\"add\",\"5\"],".
-				"\"iconmap.mappings[".$icon_map['iconmappingid']."]\":[\"add\"],".
-				"\"iconmap.mappings[".$icon_map['iconmappingid']."].inventory_link\":[\"add\",\"1\"],".
-				"\"iconmap.mappings[".$icon_map['iconmappingid']."].expression\":[\"add\",\"created_mapping\"],".
-				"\"iconmap.mappings[".$icon_map['iconmappingid']."].iconid\":[\"add\",\"2\"],".
-				"\"iconmap.mappings[".$icon_map['iconmappingid']."].iconmappingid\":[\"add\",\"".$icon_map['iconmappingid'].
-				"\"],\"iconmap.iconmapid\":[\"add\",\"".$resourceid."\"]}";
+		$created = json_encode([
+			'iconmap.name' => ['add', 'icon_mapping'],
+			'iconmap.default_iconid' => ['add', '5'],
+			'iconmap.mappings['.$icon_map['iconmappingid'].']' => ['add'],
+			'iconmap.mappings['.$icon_map['iconmappingid'].'].inventory_link' => ['add', '1'],
+			'iconmap.mappings['.$icon_map['iconmappingid'].'].expression' => ['add', 'created_mapping'],
+			'iconmap.mappings['.$icon_map['iconmappingid'].'].iconid' => ['add', '2'],
+			'iconmap.mappings['.$icon_map['iconmappingid'].'].iconmappingid' => ['add', $icon_map['iconmappingid']],
+			'iconmap.iconmapid' => ['add', $resourceid]
+		]);
 
 		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
@@ -79,14 +81,16 @@ class testAuditlogIconMap extends testAuditlogCommon {
 
 		$icon_map = CDBHelper::getRow('SELECT iconmappingid FROM icon_mapping WHERE iconmapid='.zbx_dbstr(self::ICONMAPID));
 
-		$updated = "{\"iconmap.mappings[1]\":[\"delete\"],".
-				"\"iconmap.mappings[".$icon_map['iconmappingid']."]\":[\"add\"],".
-				"\"iconmap.name\":[\"update\",\"updated_icon_mapping\",\"API icon map\"],".
-				"\"iconmap.default_iconid\":[\"update\",\"4\",\"2\"],".
-				"\"iconmap.mappings[".$icon_map['iconmappingid']."].inventory_link\":[\"add\",\"2\"],".
-				"\"iconmap.mappings[".$icon_map['iconmappingid']."].expression\":[\"add\",\"updated_created_mapping\"],".
-				"\"iconmap.mappings[".$icon_map['iconmappingid']."].iconid\":[\"add\",\"3\"],".
-				"\"iconmap.mappings[".$icon_map['iconmappingid']."].iconmappingid\":[\"add\",\"".$icon_map['iconmappingid']."\"]}";
+		$updated = json_encode([
+			'iconmap.mappings[1]' => ['delete'],
+			'iconmap.mappings['.$icon_map['iconmappingid'].']' => ['add'],
+			'iconmap.name' => ['update', 'updated_icon_mapping', 'API icon map'],
+			'iconmap.default_iconid' => ['update', '4', '2'],
+			'iconmap.mappings['.$icon_map['iconmappingid'].'].inventory_link' => ['add', '2'],
+			'iconmap.mappings['.$icon_map['iconmappingid'].'].expression' => ['add', 'updated_created_mapping'],
+			'iconmap.mappings['.$icon_map['iconmappingid'].'].iconid' => ['add', '3'],
+			'iconmap.mappings['.$icon_map['iconmappingid'].'].iconmappingid' => ['add', $icon_map['iconmappingid']]
+		]);
 
 		$this->getAuditDetails('details', $this->update_actionid, $updated, self::ICONMAPID);
 	}

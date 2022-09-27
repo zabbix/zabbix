@@ -110,9 +110,10 @@ class testAuditlogAction extends testAuditlogCommon {
 			'action.operations['.$operationid[0]['operationid'].'].esc_period' => ['add', '0s'],
 			'action.operations['.$operationid[0]['operationid'].'].esc_step_to' => ['add', '2'],
 			'action.operations['.$operationid[0]['operationid'].'].opmessage_grp['.$op_group['opmessage_grpid'].']' => ['add'],
-			'action.operations['.$operationid[0]['operationid'].'].opmessage_grp['.$op_group['opmessage_grpid'].'].usrgrpid' => ['add', '7'],
+			'action.operations['.$operationid[0]['operationid'].'].opmessage_grp['.$op_group['opmessage_grpid'].'].usrgrpid'
+				=> ['add', '7'],
 			'action.operations['.$operationid[0]['operationid'].'].opmessage_grp['.$op_group['opmessage_grpid'].'].opmessage_grpid'
-			=> ['add', $op_group['opmessage_grpid']],
+				=> ['add', $op_group['opmessage_grpid']],
 			'action.operations['.$operationid[0]['operationid'].'].opmessage' => ['add'],
 			'action.operations['.$operationid[0]['operationid'].'].opmessage.mediatypeid' => ['add', '1'],
 			'action.operations['.$operationid[0]['operationid'].'].operationid' => ['add', $operationid[0]['operationid']],
@@ -125,8 +126,10 @@ class testAuditlogAction extends testAuditlogCommon {
 			'action.update_operations['.$operationid[2]['operationid'].'].operationtype' => ['add', '12'],
 			'action.update_operations['.$operationid[2]['operationid'].'].opmessage' => ['add'],
 			'action.update_operations['.$operationid[2]['operationid'].'].opmessage.default_msg' => ['add', '0'],
-			'action.update_operations['.$operationid[2]['operationid'].'].opmessage.message' => ['add', 'Custom update operation message body'],
-			'action.update_operations['.$operationid[2]['operationid'].'].opmessage.subject' => ['add', 'Custom update operation message subject'],
+			'action.update_operations['.$operationid[2]['operationid'].'].opmessage.message'
+				=> ['add', 'Custom update operation message body'],
+			'action.update_operations['.$operationid[2]['operationid'].'].opmessage.subject'
+				=> ['add', 'Custom update operation message subject'],
 			'action.update_operations['.$operationid[2]['operationid'].'].recovery' => ['add', '2'],
 			'action.update_operations['.$operationid[2]['operationid'].'].operationid' => ['add', $operationid[2]['operationid']],
 			'action.pause_suppressed' => ['add', '0'],
@@ -202,9 +205,10 @@ class testAuditlogAction extends testAuditlogCommon {
 			'action.operations['.$operationid['operationid'].'].esc_period' => ['update', '1000', '0'],
 			'action.operations['.$operationid['operationid'].'].esc_step_to' => ['update', '2', '1'],
 			'action.operations['.$operationid['operationid'].'].evaltype' => ['update', '1', '0'],
-			'action.operations['.$operationid['operationid'].'].opmessage_grp['.$op_group['opmessage_grpid'].'].usrgrpid' => ['add', '9'],
+			'action.operations['.$operationid['operationid'].'].opmessage_grp['.$op_group['opmessage_grpid'].'].usrgrpid'
+				=> ['add', '9'],
 			'action.operations['.$operationid['operationid'].'].opmessage_grp['.$op_group['opmessage_grpid'].'].opmessage_grpid'
-			=> ['add', $op_group['opmessage_grpid']],
+				=> ['add', $op_group['opmessage_grpid']],
 			'action.operations['.$operationid['operationid'].'].opmessage' => ['update'],
 			'action.operations['.$operationid['operationid'].'].opmessage.default_msg' => ['update', '0', '1'],
 			'action.operations['.$operationid['operationid'].'].opmessage.message' => ['update', 'Updated audit message', ''],

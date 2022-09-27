@@ -49,14 +49,16 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 		$rights = CDBHelper::getRow('SELECT rightid FROM rights WHERE groupid='.zbx_dbstr($resourceid));
 		$id = CDBHelper::getRow('SELECT id FROM users_groups WHERE usrgrpid='.zbx_dbstr($resourceid));
 
-		$created = "{\"usergroup.name\":[\"add\",\"Audit user groups\"],".
-				"\"usergroup.rights[".$rights['rightid']."]\":[\"add\"],".
-				"\"usergroup.rights[".$rights['rightid']."].id\":[\"add\",\"2\"],".
-				"\"usergroup.rights[".$rights['rightid']."].rightid\":[\"add\",\"".$rights['rightid']."\"],".
-				"\"usergroup.users[".$id['id']."]\":[\"add\"],".
-				"\"usergroup.users[".$id['id']."].userid\":[\"add\",\"2\"],".
-				"\"usergroup.users[".$id['id']."].id\":[\"add\",\"".$id['id']."\"],".
-				"\"usergroup.usrgrpid\":[\"add\",\"".$resourceid."\"]}";
+		$created = json_encode([
+			'usergroup.name' => ['add', 'Audit user groups'],
+			'usergroup.rights['.$rights['rightid'].']' => ['add'],
+			'usergroup.rights['.$rights['rightid'].'].id' => ['add', '2'],
+			'usergroup.rights['.$rights['rightid'].'].rightid' => ['add', $rights['rightid']],
+			'usergroup.users['.$id['id'].']' => ['add'],
+			'usergroup.users['.$id['id'].'].userid' => ['add', '2'],
+			'usergroup.users['.$id['id'].'].id' => ['add', $id['id']],
+			'usergroup.usrgrpid' => ['add', $resourceid]
+		]);
 
 		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
@@ -71,9 +73,11 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 			]
 		]);
 
-		$updated = "{\"usergroup.users_status\":[\"update\",\"1\",\"0\"],".
-				"\"usergroup.debug_mode\":[\"update\",\"1\",\"0\"],".
-				"\"usergroup.name\":[\"update\",\"Updated user group name\",\"No access to the frontend\"]}";
+		$updated = json_encode([
+			'usergroup.users_status' => ['update', '1', '0'],
+			'usergroup.debug_mode' => ['update', '1', '0'],
+			'usergroup.name' => ['update', 'Updated user group name', 'No access to the frontend']
+		]);
 
 		$this->getAuditDetails('details', $this->update_actionid, $updated, self::USRGRPID);
 	}

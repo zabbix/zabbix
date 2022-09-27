@@ -81,29 +81,31 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 				zbx_dbstr(self::$resourceid)
 		);
 
-		$created = "{\"report.userid\":[\"add\",\"1\"],".
-				"\"report.name\":[\"add\",\"Report for audit\"],".
-				"\"report.dashboardid\":[\"add\",\"1\"],".
-				"\"report.period\":[\"add\",\"1\"],".
-				"\"report.cycle\":[\"add\",\"1\"],".
-				"\"report.start_time\":[\"add\",\"43200\"],".
-				"\"report.weekdays\":[\"add\",\"31\"],".
-				"\"report.active_since\":[\"add\",\"1617235200\"],".
-				"\"report.active_till\":[\"add\",\"1630454399\"],".
-				"\"report.subject\":[\"add\",\"Weekly report\"],".
-				"\"report.message\":[\"add\",\"Report accompanying text\"],".
-				"\"report.status\":[\"add\",\"1\"],".
-				"\"report.description\":[\"add\",\"Report description\"],".
-				"\"report.users[".self::$before_user['reportuserid']."]\":[\"add\"],".
-				"\"report.users[".self::$before_user['reportuserid']."].userid\":[\"add\",\"1\"],".
-				"\"report.users[".self::$before_user['reportuserid']."].access_userid\":[\"add\",\"1\"],".
-				"\"report.users[".self::$before_user['reportuserid']."].reportuserid\":[\"add\",\"".self::$before_user['reportuserid']."\"],".
-				"\"report.user_groups[".self::$before_usrgrp['reportusrgrpid']."]\":[\"add\"],".
-				"\"report.user_groups[".self::$before_usrgrp['reportusrgrpid']."].usrgrpid\":[\"add\",\"7\"],".
-				"\"report.user_groups[".self::$before_usrgrp['reportusrgrpid']."].access_userid\":[\"add\",\"0\"],".
-				"\"report.user_groups[".self::$before_usrgrp['reportusrgrpid']."].reportusrgrpid\":[\"add\",\""
-				.self::$before_usrgrp['reportusrgrpid']."\"],".
-				"\"report.reportid\":[\"add\",\"". self::$resourceid."\"]}";
+		$created = json_encode([
+			'report.userid' => ['add', '1'],
+			'report.name' => ['add', 'Report for audit'],
+			'report.dashboardid' => ['add', '1'],
+			'report.period' => ['add', '1'],
+			'report.cycle' => ['add', '1'],
+			'report.start_time' => ['add', '43200'],
+			'report.weekdays' => ['add', '31'],
+			'report.active_since' => ['add', '1617235200'],
+			'report.active_till' => ['add', '1630454399'],
+			'report.subject' => ['add', 'Weekly report'],
+			'report.message' => ['add', 'Report accompanying text'],
+			'report.status' => ['add', '1'],
+			'report.description' => ['add', 'Report description'],
+			'report.users['.self::$before_user['reportuserid'].']' => ['add'],
+			'report.users['.self::$before_user['reportuserid'].'].userid' => ['add', '1'],
+			'report.users['.self::$before_user['reportuserid'].'].access_userid' => ['add', '1'],
+			'report.users['.self::$before_user['reportuserid'].'].reportuserid' => ['add', self::$before_user['reportuserid']],
+			'report.user_groups['.self::$before_usrgrp['reportusrgrpid'].']' => ['add'],
+			'report.user_groups['.self::$before_usrgrp['reportusrgrpid'].'].usrgrpid' => ['add', '7'],
+			'report.user_groups['.self::$before_usrgrp['reportusrgrpid'].'].access_userid' => ['add', '0'],
+			'report.user_groups['.self::$before_usrgrp['reportusrgrpid'].'].reportusrgrpid'
+				=> ['add', self::$before_usrgrp['reportusrgrpid']],
+			'report.reportid' => ['add', self::$resourceid]
+		]);
 
 		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid);
 	}
@@ -147,30 +149,31 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 		$usrgrp = CDBHelper::getRow('SELECT reportusrgrpid FROM report_usrgrp WHERE reportid='.zbx_dbstr(self::$resourceid));
 		$user = CDBHelper::getRow('SELECT reportuserid FROM report_user WHERE reportid='.zbx_dbstr(self::$resourceid));
 
-		$updated = "{\"report.users[".self::$before_user['reportuserid']."]\":[\"delete\"],".
-				"\"report.user_groups[".self::$before_usrgrp['reportusrgrpid']."]\":[\"delete\"],".
-				"\"report.users[".$user['reportuserid']."]\":[\"add\"],".
-				"\"report.user_groups[".$usrgrp['reportusrgrpid']."]\":[\"add\"],".
-				"\"report.name\":[\"update\",\"Updated report for audit\",\"Report for audit\"],".
-				"\"report.dashboardid\":[\"update\",\"2\",\"1\"],".
-				"\"report.period\":[\"update\",\"3\",\"1\"],".
-				"\"report.cycle\":[\"update\",\"2\",\"1\"],".
-				"\"report.start_time\":[\"update\",\"44200\",\"43200\"],".
-				"\"report.weekdays\":[\"update\",\"0\",\"31\"],".
-				"\"report.active_since\":[\"update\",\"1640995200\",\"1617235200\"],".
-				"\"report.active_till\":[\"update\",\"1648771199\",\"1630454399\"],".
-				"\"report.subject\":[\"update\",\"Updated subject\",\"Weekly report\"],".
-				"\"report.message\":[\"update\",\"Updated message\",\"Report accompanying text\"],".
-				"\"report.status\":[\"update\",\"0\",\"1\"],".
-				"\"report.description\":[\"update\",\"Updated description\",\"Report description\"],".
-				"\"report.users[".$user['reportuserid']."].userid\":[\"add\",\"2\"],".
-				"\"report.users[".$user['reportuserid']."].access_userid\":[\"add\",\"0\"],".
-				"\"report.users[".$user['reportuserid']."].exclude\":[\"add\",\"1\"],".
-				"\"report.users[".$user['reportuserid']."].reportuserid\":[\"add\",\"".$user['reportuserid']."\"],".
-				"\"report.user_groups[".$usrgrp['reportusrgrpid']."].usrgrpid\":[\"add\",\"8\"],".
-				"\"report.user_groups[".$usrgrp['reportusrgrpid']."].access_userid\":[\"add\",\"1\"],".
-				"\"report.user_groups[".$usrgrp['reportusrgrpid']."].reportusrgrpid\":[\"add\",\""
-				.$usrgrp['reportusrgrpid']."\"]}";
+		$updated = json_encode([
+			'report.users['.self::$before_user['reportuserid'].']' => ['delete'],
+			'report.user_groups['.self::$before_usrgrp['reportusrgrpid'].']' => ['delete'],
+			'report.users['.$user['reportuserid'].']' => ['add'],
+			'report.user_groups['.$usrgrp['reportusrgrpid'].']' => ['add'],
+			'report.name' => ['update', 'Updated report for audit', 'Report for audit'],
+			'report.dashboardid' => ['update', '2', '1'],
+			'report.period' => ['update', '3', '1'],
+			'report.cycle' => ['update', '2', '1'],
+			'report.start_time' => ['update', '44200', '43200'],
+			'report.weekdays' => ['update', '0', '31'],
+			'report.active_since' => ['update', '1640995200', '1617235200'],
+			'report.active_till' => ['update', '1648771199', '1630454399'],
+			'report.subject' => ['update', 'Updated subject', 'Weekly report'],
+			'report.message' => ['update', 'Updated message', 'Report accompanying text'],
+			'report.status' => ['update', '0', '1'],
+			'report.description' => ['update', 'Updated description', 'Report description'],
+			'report.users['.$user['reportuserid'].'].userid' => ['add', '2'],
+			'report.users['.$user['reportuserid'].'].access_userid' => ['add', '0'],
+			'report.users['.$user['reportuserid'].'].exclude' => ['add', '1'],
+			'report.users['.$user['reportuserid'].'].reportuserid' => ['add', $user['reportuserid']],
+			'report.user_groups['.$usrgrp['reportusrgrpid'].'].usrgrpid' => ['add', '8'],
+			'report.user_groups['.$usrgrp['reportusrgrpid'].'].access_userid' => ['add', '1'],
+			'report.user_groups['.$usrgrp['reportusrgrpid'].'].reportusrgrpid' => ['add', $usrgrp['reportusrgrpid']]
+		]);
 
 		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid);
 	}

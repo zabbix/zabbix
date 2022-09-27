@@ -67,26 +67,27 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 		$timeperiod = CDBHelper::getRow('SELECT timeperiodid FROM timeperiods ORDER BY timeperiodid DESC');
 		$tags = CDBHelper::getRow('SELECT maintenancetagid FROM maintenance_tag WHERE maintenanceid='.zbx_dbstr($resourceid));
 
-		$created = "{\"maintenance.name\":[\"add\",\"audit_maintenance\"],".
-				"\"maintenance.active_since\":[\"add\",\"1358844540\"],".
-				"\"maintenance.active_till\":[\"add\",\"1390466940\"],".
-				"\"maintenance.groups[".$groupid['maintenance_groupid']."]\":[\"add\"],".
-				"\"maintenance.groups[".$groupid['maintenance_groupid']."].groupid\":[\"add\",\"2\"],".
-				"\"maintenance.groups[".$groupid['maintenance_groupid']."].maintenance_groupid\":[\"add\",\"".
-				$groupid['maintenance_groupid']."\"],".
-				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."]\":[\"add\"],".
-				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].period\":[\"add\",\"3600\"],".
-				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].timeperiod_type\":[\"add\",\"3\"],".
-				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].start_time\":[\"add\",\"64800\"],".
-				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].dayofweek\":[\"add\",\"64\"],".
-				"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].timeperiodid\":[\"add\",\"".
-				$timeperiod['timeperiodid']."\"],".
-				"\"maintenance.tags[".$tags['maintenancetagid']."]\":[\"add\"],".
-				"\"maintenance.tags[".$tags['maintenancetagid']."].tag\":[\"add\",\"audit\"],".
-				"\"maintenance.tags[".$tags['maintenancetagid']."].operator\":[\"add\",\"0\"],".
-				"\"maintenance.tags[".$tags['maintenancetagid']."].value\":[\"add\",\"details\"],".
-				"\"maintenance.tags[".$tags['maintenancetagid']."].maintenancetagid\":[\"add\",\"".$tags['maintenancetagid']."\"],".
-				"\"maintenance.maintenanceid\":[\"add\",\"".$resourceid."\"]}";
+		$created = json_encode([
+			'maintenance.name' => ['add', 'audit_maintenance'],
+			'maintenance.active_since' => ['add', '1358844540'],
+			'maintenance.active_till' => ['add', '1390466940'],
+			'maintenance.groups['.$groupid['maintenance_groupid'].']' => ['add'],
+			'maintenance.groups['.$groupid['maintenance_groupid'].'].groupid' => ['add', '2'],
+			'maintenance.groups['.$groupid['maintenance_groupid'].'].maintenance_groupid'
+				=> ['add', $groupid['maintenance_groupid']],
+			'maintenance.timeperiods['.$timeperiod['timeperiodid'].']' => ['add'],
+			'maintenance.timeperiods['.$timeperiod['timeperiodid'].'].period' => ['add', '3600'],
+			'maintenance.timeperiods['.$timeperiod['timeperiodid'].'].timeperiod_type' => ['add', '3'],
+			'maintenance.timeperiods['.$timeperiod['timeperiodid'].'].start_time' => ['add', '64800'],
+			'maintenance.timeperiods['.$timeperiod['timeperiodid'].'].dayofweek' => ['add', '64'],
+			'maintenance.timeperiods['.$timeperiod['timeperiodid'].'].timeperiodid' => ['add', $timeperiod['timeperiodid']],
+			'maintenance.tags['.$tags['maintenancetagid'].']' => ['add'],
+			'maintenance.tags['.$tags['maintenancetagid'].'].tag' => ['add', 'audit'],
+			'maintenance.tags['.$tags['maintenancetagid'].'].operator' => ['add', '0'],
+			'maintenance.tags['.$tags['maintenancetagid'].'].value' => ['add', 'details'],
+			'maintenance.tags['.$tags['maintenancetagid'].'].maintenancetagid' => ['add', $tags['maintenancetagid']],
+			'maintenance.maintenanceid' => ['add', $resourceid]
+		]);
 
 		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
@@ -130,28 +131,30 @@ class testAuditlogMaintenance extends testAuditlogCommon {
 				zbx_dbstr(self::MAINTENANCEID)
 		);
 
-		$updated = "{\"maintenance.groups[1]\":[\"delete\"],".
-			"\"maintenance.timeperiods[2]\":[\"delete\"],".
-			"\"maintenance.groups[".$groupid['maintenance_groupid']."]\":[\"add\"],".
-			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."]\":[\"add\"],".
-			"\"maintenance.tags[".$tags['maintenancetagid']."]\":[\"add\"],".
-			"\"maintenance.name\":[\"update\",\"updated_maintenance\",\"maintenance_has_only_group\"],".
-			"\"maintenance.active_since\":[\"update\",\"1458844500\",\"1539723600\"],".
-			"\"maintenance.active_till\":[\"update\",\"1490466900\",\"1539810000\"],".
-			"\"maintenance.groups[".$groupid['maintenance_groupid']."].groupid\":[\"add\",\"2\"],".
-			"\"maintenance.groups[".$groupid['maintenance_groupid']."].maintenance_groupid\":[\"add\",\"".
-			$groupid['maintenance_groupid']."\"],".
-			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].period\":[\"add\",\"7200\"],".
-			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].timeperiod_type\":[\"add\",\"4\"],".
-			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].start_time\":[\"add\",\"68760\"],".
-			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].every\":[\"add\",\"3\"],".
-			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].day\":[\"add\",\"4\"],".
-			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].month\":[\"add\",\"5\"],".
-			"\"maintenance.timeperiods[".$timeperiod['timeperiodid']."].timeperiodid\":[\"add\",\"".$timeperiod['timeperiodid']."\"],".
-			"\"maintenance.tags[".$tags['maintenancetagid']."].tag\":[\"add\",\"updated_audit\"],".
-			"\"maintenance.tags[".$tags['maintenancetagid']."].operator\":[\"add\",\"0\"],".
-			"\"maintenance.tags[".$tags['maintenancetagid']."].value\":[\"add\",\"updated_details\"],".
-			"\"maintenance.tags[".$tags['maintenancetagid']."].maintenancetagid\":[\"add\",\"".$tags['maintenancetagid']."\"]}";
+		$updated = json_encode([
+			'maintenance.groups[1]' => ['delete'],
+			'maintenance.timeperiods[2]' => ['delete'],
+			'maintenance.groups['.$groupid['maintenance_groupid'].']' => ['add'],
+			'maintenance.timeperiods['.$timeperiod['timeperiodid'].']' => ['add'],
+			'maintenance.tags['.$tags['maintenancetagid'].']' => ['add'],
+			'maintenance.name' => ['update', 'updated_maintenance', 'maintenance_has_only_group'],
+			'maintenance.active_since' => ['update', '1458844500', '1539723600'],
+			'maintenance.active_till' => ['update', '1490466900', '1539810000'],
+			'maintenance.groups['.$groupid['maintenance_groupid'].'].groupid' => ['add', '2'],
+			'maintenance.groups['.$groupid['maintenance_groupid'].'].maintenance_groupid'
+				=> ['add', $groupid['maintenance_groupid']],
+			'maintenance.timeperiods['.$timeperiod['timeperiodid'].'].period' => ['add', '7200'],
+			'maintenance.timeperiods['.$timeperiod['timeperiodid'].'].timeperiod_type' => ['add', '4'],
+			'maintenance.timeperiods['.$timeperiod['timeperiodid'].'].start_time' => ['add', '68760'],
+			'maintenance.timeperiods['.$timeperiod['timeperiodid'].'].every' => ['add', '3'],
+			'maintenance.timeperiods['.$timeperiod['timeperiodid'].'].day' => ['add', '4'],
+			'maintenance.timeperiods['.$timeperiod['timeperiodid'].'].month' => ['add', '5'],
+			'maintenance.timeperiods['.$timeperiod['timeperiodid'].'].timeperiodid' => ['add', $timeperiod['timeperiodid']],
+			'maintenance.tags['.$tags['maintenancetagid'].'].tag' => ['add', 'updated_audit'],
+			'maintenance.tags['.$tags['maintenancetagid'].'].operator' => ['add', '0'],
+			'maintenance.tags['.$tags['maintenancetagid'].'].value' => ['add', 'updated_details'],
+			'maintenance.tags['.$tags['maintenancetagid'].'].maintenancetagid' => ['add', $tags['maintenancetagid']]
+		]);
 
 		$this->getAuditDetails('details', $this->update_actionid, $updated, self::MAINTENANCEID);
 	}
