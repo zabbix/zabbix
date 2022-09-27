@@ -20,7 +20,6 @@
 #ifndef ZABBIX_DBHIGH_H
 #define ZABBIX_DBHIGH_H
 
-#include "zbxcomms.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxdbschema.h"
@@ -792,9 +791,6 @@ int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsu
 
 #define ZBX_PROXY_DATA_DONE	0
 #define ZBX_PROXY_DATA_MORE	1
-
-int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		const zbx_config_tls_t *zbx_config_tls);
 
 void	calc_timestamp(const char *line, int *timestamp, const char *format);
 
