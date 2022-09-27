@@ -20,13 +20,13 @@
 #ifndef ZABBIX_DBHIGH_H
 #define ZABBIX_DBHIGH_H
 
+#include "zbxcomms.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxdbschema.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxversion.h"
-#include "zbxcomms.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;

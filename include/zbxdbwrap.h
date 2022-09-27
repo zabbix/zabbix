@@ -20,12 +20,6 @@
 #ifndef ZABBIX_DBWRAP_H
 #define ZABBIX_DBWRAP_H
 
-/*#include "zbxalgo.h"
-#include "zbxdb.h"
-#include "zbxdbschema.h"
-#include "zbxstr.h"
-#include "zbxnum.h"
-#include "zbxversion.h"*/
 #include "zbxdbhigh.h"
 #include "dbcache.h"
 
