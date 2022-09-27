@@ -2383,6 +2383,12 @@ static void	dc_interface_snmpitems_remove(ZBX_DC_ITEM *item)
 	}
 }
 
+static void	dc_masteritem_free(ZBX_DC_MASTERITEM *masteritem)
+{
+	zbx_vector_uint64_pair_destroy(&masteritem->dep_itemids);
+	__config_shmem_free_func(masteritem);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: remove itemid from master item dependent itemid vector            *
@@ -2415,8 +2421,7 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
 
 	if (0 == masteritem->dep_itemids.values_num)
 	{
-		zbx_vector_uint64_pair_destroy(&masteritem->dep_itemids);
-		__config_shmem_free_func(item->master_item);
+		dc_masteritem_free(item->master_item);
 		item->master_item = NULL;
 	}
 }
@@ -2500,7 +2505,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 	ZBX_DC_JMXITEM		*jmxitem;
 	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
-	ZBX_DC_PREPROCITEM	*preprocitem;
 	ZBX_DC_HTTPITEM		*httpitem;
 	ZBX_DC_SCRIPTITEM	*scriptitem;
 	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
@@ -3324,8 +3328,11 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 		zbx_vector_ptr_destroy(&item->tags);
 
-		if (NULL != (preprocitem = item->preproc_item))
-			dc_preprocitem_free(preprocitem);
+		if (NULL != item->preproc_item)
+			dc_preprocitem_free(item->preproc_item);
+
+		if (NULL != item->master_item)
+			dc_masteritem_free(item->master_item);
 
 		zbx_hashset_remove_direct(&config->items, item);
 	}
