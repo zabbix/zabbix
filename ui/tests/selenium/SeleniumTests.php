@@ -108,8 +108,8 @@ require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingLowLevelDisc
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
 
 // Proxies.
-require_once dirname(__FILE__).'/proxies/testFormAdministrationGeneralProxies.php';
-require_once dirname(__FILE__).'/proxies/testPageAdministrationGeneralProxies.php';
+require_once dirname(__FILE__).'/proxies/testFormAdministrationProxies.php';
+require_once dirname(__FILE__).'/proxies/testPageAdministrationProxies.php';
 
 // Reports.
 require_once dirname(__FILE__).'/reports/testFormScheduledReport.php';
