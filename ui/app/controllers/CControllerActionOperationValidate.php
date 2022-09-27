@@ -209,7 +209,6 @@ class CControllerActionOperationValidate extends CController {
 
 	protected function doAction() {
 		$operation = $this->getInput('operation');
-
 		// todo : check what is the same and remove unnecessary code
 		// todo : fix - fields based on eventsource
 
@@ -222,14 +221,14 @@ class CControllerActionOperationValidate extends CController {
 				'esc_step_from' => $operation['esc_step_from'],
 				'esc_step_to' => $operation['esc_step_to'],
 				'esc_period' => $operation['esc_period'],
-				'operation-message-mediatype-only' => $operation['operation-message-mediatype-only'],
+				'mediatypeid' => $operation['operation-message-mediatype-only'],
 				'opmessage_grp' => $operation['opmessage_grp'],
 				'opmessage_usr' => $operation['opmessage_usr'],
 				'opmessage' =>  $operation['opmessage'],
 				'evaltype' => $operation['evaltype'],
 				'condition' => $operation['condition'] ? : [],
-				'details' => $this->createDetailsColumn($operation),
-				'start_in' => 'start in column',
+				'details' => $this->getActionOperationDescription($operation),
+				'start_in' => 'start in column'
 			];
 
 			if ($operation['recovery'] == ACTION_OPERATION &&
@@ -246,13 +245,13 @@ class CControllerActionOperationValidate extends CController {
 				'eventsource' => $operation['eventsource'],
 				'recovery' => $operation['recovery'],
 				'operationtype' => $operation['operationtype'],
-				'operation-message-mediatype-only' => $operation['operation-message-mediatype-only'],
+				'mediatypeid' => $operation['operation-message-mediatype-only'],
 				//'opmessage_grp' => $operation['opmessage_grp'],
 				//'opmessage' =>  $operation['opmessage'],
 				'opcommand' => $operation['opcommand'],
 				'evaltype' => $operation['evaltype'],
 				'opmessage_usr' => $operation['opmessage_usr'],
-				'details' => $this->createDetailsColumn($operation)
+				'details' => $this->getActionOperationDescription($operation)
 			];
 		}
 		else if ($operation['recovery'] == ACTION_UPDATE_OPERATION) {
@@ -261,16 +260,15 @@ class CControllerActionOperationValidate extends CController {
 				'eventsource' => $operation['eventsource'],
 				'recovery' => $operation['recovery'],
 				'operationtype' => $operation['operationtype'],
-				'operation-message-mediatype-only' => $operation['operation-message-mediatype-only'],
+				'mediatypeid' => $operation['operation-message-mediatype-only'],
 				'opmessage_grp' => $operation['opmessage_grp'],
 				'opmessage_usr' => $operation['opmessage_usr'],
 				'opmessage' =>  $operation['esc_period'],
 				'evaltype' => $operation['evaltype'],
 				'condition' => $operation['condition'] ? : [],
-				'details' => $this->createDetailsColumn($operation)
+				'details' => $this->getActionOperationDescription($operation)
 			];
 		}
-
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
@@ -292,11 +290,6 @@ class CControllerActionOperationValidate extends CController {
 		return $steps;
 	}
 
-	protected function createDetailsColumn($operation):array {
-		// todo: fix the small bugs, add script data
-		return $this->getActionOperationDescription($operation);
-	}
-
 	protected function createDurationColumn($step_duration):string {
 		return $step_duration === '0'
 			? 'Default'
@@ -315,13 +308,13 @@ class CControllerActionOperationValidate extends CController {
 		$scriptids = [];
 
 		$type = $operation['recovery'];
+		$operationtype = preg_replace('[\D]', '', $operation['operationtype']);
 
 		if ($type == ACTION_OPERATION) {
-			$operationtype = preg_replace('[\D]', '', $operation['operationtype']);
-
 			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
-					$media_typeid = $operation['opmessage']['mediatypeid'];
+					// todo : rename to mediatypeid
+					$media_typeid = $operation['operation-message-mediatype-only'];
 
 					if ($media_typeid != 0) {
 						$media_typeids[$media_typeid] = $media_typeid;
@@ -376,7 +369,8 @@ class CControllerActionOperationValidate extends CController {
 		else {
 			switch ($operation['operationtype']) {
 				case OPERATION_TYPE_MESSAGE:
-					$media_typeid = $operation['opmessage']['mediatypeid'];
+					// todo : rename to mediatypeid
+					$media_typeid = $operation['operation-message-mediatype-only'];
 
 					if ($media_typeid != 0) {
 						$media_typeids[$media_typeid] = $media_typeid;
@@ -489,7 +483,8 @@ class CControllerActionOperationValidate extends CController {
 			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
 					$media_type = _('all media');
-					$media_typeid = $operation['opmessage']['mediatypeid'];
+					// todo : rename to mediatypeid
+					$media_typeid = $operation['operation-message-mediatype-only'];
 
 					if ($media_typeid != 0 && isset($media_types[$media_typeid])) {
 						$media_type = $media_types[$media_typeid]['name'];
@@ -651,9 +646,9 @@ class CControllerActionOperationValidate extends CController {
 		else {
 			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
-					// todo : fix mediatype. always '0' -> 'all'
 					$media_type = _('all media');
-					$media_typeid = $operation['opmessage']['mediatypeid'];
+					// todo : rename to mediatypeid
+					$media_typeid = $operation['operation-message-mediatype-only'];
 
 					if ($media_typeid != 0 && isset($media_types[$media_typeid])) {
 						$media_type = $media_types[$media_typeid]['name'];
@@ -745,7 +740,6 @@ class CControllerActionOperationValidate extends CController {
 //					}
 //					break;
 
-			// todo : fix this:
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
 				case OPERATION_TYPE_UPDATE_MESSAGE:
 					$result['type'] =_('Notify all involved');
