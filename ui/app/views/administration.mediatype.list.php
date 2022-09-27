@@ -93,14 +93,14 @@ foreach ($data['mediatypes'] as $mediaType) {
 		case MEDIA_TYPE_EMAIL:
 			if ($mediaType['provider'] == CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
 				$details =
-					_('SMTP server') . NAME_DELIMITER . '"' . $mediaType['smtp_server'] . '", '.
-					_('SMTP helo') . NAME_DELIMITER . '"' . $mediaType['smtp_helo'] . '", '.
-					_('email') . NAME_DELIMITER . '"' . $mediaType['smtp_email'] . '"';
+					_('SMTP server').NAME_DELIMITER.'"'.$mediaType['smtp_server'].'", '.
+					_('SMTP helo').NAME_DELIMITER.'"'.$mediaType['smtp_helo'].'", '.
+					_('email').NAME_DELIMITER.'"'.$mediaType['smtp_email'].'"';
 			}
 			else {
 				$details =
-					_('SMTP server') . NAME_DELIMITER . '"' . $mediaType['smtp_server'] . '", '.
-					_('email') . NAME_DELIMITER . '"' . $mediaType['smtp_email'] . '"';
+					_('SMTP server').NAME_DELIMITER.'"'.$mediaType['smtp_server'].'", '.
+					_('email').NAME_DELIMITER.'"'.$mediaType['smtp_email'] . '"';
 			}
 			break;
 
