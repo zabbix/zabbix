@@ -73,5 +73,7 @@ int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
 #else
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for \"kern.maxproc\" system"
 			" parameter."));
+
+	return SYSINFO_RET_FAIL;
 #endif
 }
