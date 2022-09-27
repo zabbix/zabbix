@@ -1512,6 +1512,11 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 		move_out = 1;
 		move_field_nr = find_field_by_name(fields, fields_count, "macro");
 	}
+	else if (0 == strcmp("hstgrp", table->table))
+	{
+		move_out = 1;
+		move_field_nr = find_field_by_name(fields, fields_count, "name");
+	}
 	else if (0 == strcmp("items", table->table))
 	{
 		move_out = 1;
