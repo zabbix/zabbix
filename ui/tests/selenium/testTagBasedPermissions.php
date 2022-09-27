@@ -189,7 +189,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen('zabbix.php?action=problem.view');
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
+		$result_form = $this->query('xpath://form[@name="problem"]')->one();
 		$this->zbxTestTextNotPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
 
@@ -203,13 +203,12 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			COverlayDialogElement::ensureNotPresent();
 			// Apply filter
 			$this->query('name:filter_apply')->one()->click();
-			$table->waitUntilReloaded();
+			$result_form->waitUntilReloaded();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
 			//Reset filter
 			$this->zbxTestClickButtonText('Reset');
-			$this->zbxTestWaitForPageToLoad();
-			$table->waitUntilReloaded();
+			$result_form->waitUntilReloaded();
 		}
 		$this->zbxTestTextNotPresent($data['trigger_names']);
 	}
