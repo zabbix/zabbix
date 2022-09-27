@@ -48,7 +48,6 @@ require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.
 require_once dirname(__FILE__).'/dashboard/testDashboardTopHostsWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardViewMode.php';
 require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
-require_once dirname(__FILE__).'/dashboard/testPageDashboard.php';
 require_once dirname(__FILE__).'/dashboard/testPageDashboardList.php';
 require_once dirname(__FILE__).'/dashboard/testPageDashboardWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
@@ -280,7 +279,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardTopHostsWidget');
 		$suite->addTestSuite('testDashboardViewMode');
 		$suite->addTestSuite('testFormTemplateDashboards');
-		$suite->addTestSuite('testPageDashboard');
 		$suite->addTestSuite('testPageDashboardList');
 		$suite->addTestSuite('testPageDashboardWidgets');
 		$suite->addTestSuite('testPageTemplateDashboards');
