@@ -1031,26 +1031,8 @@ class testInitialConfSync extends CIntegrationTest
 
 	private function getStringPoolCount() {
 		$log = file_get_contents(self::getLogPath(self::COMPONENT_SERVER));
-		$data = explode("\n", $log);
-
-		$stringpool_lines = preg_grep('/DCsync_configuration\(\)\s+strings/', $data);
-		$stringpool_lines1 = preg_replace(
-			[
-				"/^[0-9]+:[0-9]+:[0-9]+\.[0-9]+\s*DCsync_configuration\(\) /",
-				"/\s+/",
-				'/\([0-9]+slots\)/'
-			],
-			"",
-			$stringpool_lines
-		);
-
-		$stringpool_lines1 = explode(":", array_key_first($stringpool_lines1));
-
-		if (is_null($stringpool_lines1) || count($stringpool_lines1) < 1) {
-			throw new Exception('Failed to retrieve stringpool data from the log file');
-		}
-
-		return $stringpool_lines1[0];
+		preg_match('/DCsync_configuration\(\)\s+strings\s+:\s*(\d+)/', $log, $result);
+		return $result[1];
 	}
 
 	private function purgeHostGroups()
