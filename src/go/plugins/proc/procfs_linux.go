@@ -182,7 +182,9 @@ func getProcessCpuTimes(pid string, proc *procStatus) () {
 		return
 	}
 
+	log.Tracef("Calling C function \"sysconf()\"")
 	proc.CpuTimeUser = float64(stat.utime) / float64(C.sysconf(C._SC_CLK_TCK))
+	log.Tracef("Calling C function \"sysconf()\"")
 	proc.CpuTimeSystem = float64(stat.stime) / float64(C.sysconf(C._SC_CLK_TCK))
 	proc.PageFaults = stat.pageFaults
 }
