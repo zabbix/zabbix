@@ -27,9 +27,11 @@ require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 class testAuditlogAutoregistration extends testAuditlogCommon {
 
 	public function testAuditlogAutoregistration_Update() {
-		$updated = "{\"autoregistration.tls_accept\":[\"update\",\"3\",\"1\"],".
-				"\"autoregistration.tls_psk_identity\":[\"update\",\"******\",\"******\"],".
-				"\"autoregistration.tls_psk\":[\"update\",\"******\",\"******\"]}";
+		$updated = ([
+			'autoregistration.tls_accept' => ['update', '3', '1'],
+			'autoregistration.tls_psk_identity' => ['update', '******', '******'],
+			'autoregistration.tls_psk' => ['update', '******', '******']
+		]);
 
 		$this->call('autoregistration.update', [
 			'tls_accept' => 3,

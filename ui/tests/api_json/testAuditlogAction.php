@@ -98,46 +98,41 @@ class testAuditlogAction extends testAuditlogCommon {
 				zbx_dbstr($operationid[0]['operationid'])
 		);
 
-		$created = "{\"action.name\":[\"add\",\"Audit action\"],\"action.esc_period\":[\"add\",\"2m\"],".
-				"\"action.filter\":[\"add\"],".
-				"\"action.filter.conditions[".$conditiodid['conditionid']."]\":[\"add\"],".
-				"\"action.filter.conditions[".$conditiodid['conditionid']."].conditiontype\":[\"add\",\"1\"],".
-				"\"action.filter.conditions[".$conditiodid['conditionid']."].value\":[\"add\",\"10084\"],".
-				"\"action.filter.conditions[".$conditiodid['conditionid']."].conditionid\":[\"add\",\"".
-				$conditiodid['conditionid']."\"],".
-				"\"action.operations[".$operationid[0]['operationid']."]\":[\"add\"],".
-				"\"action.operations[".$operationid[0]['operationid']."].esc_period\":[\"add\",\"0s\"],".
-				"\"action.operations[".$operationid[0]['operationid']."].esc_step_to\":[\"add\",\"2\"],".
-				"\"action.operations[".$operationid[0]['operationid']."].opmessage_grp[".
-				$op_group['opmessage_grpid']."]\":[\"add\"],".
-				"\"action.operations[".$operationid[0]['operationid']."].opmessage_grp[".$op_group['opmessage_grpid'].
-				"].usrgrpid\":[\"add\",\"7\"],".
-				"\"action.operations[".$operationid[0]['operationid']."].opmessage_grp[".$op_group['opmessage_grpid'].
-				"].opmessage_grpid\":[\"add\",\"".$op_group['opmessage_grpid']."\"],".
-				"\"action.operations[".$operationid[0]['operationid']."].opmessage\":[\"add\"],".
-				"\"action.operations[".$operationid[0]['operationid']."].opmessage.mediatypeid\":[\"add\",\"1\"],".
-				"\"action.operations[".$operationid[0]['operationid']."].operationid\":[\"add\",\"".
-				$operationid[0]['operationid']."\"],".
-				"\"action.recovery_operations[".$operationid[1]['operationid']."]\":[\"add\"],".
-				"\"action.recovery_operations[".$operationid[1]['operationid']."].operationtype\":[\"add\",\"11\"],".
-				"\"action.recovery_operations[".$operationid[1]['operationid']."].opmessage\":[\"add\"],".
-				"\"action.recovery_operations[".$operationid[1]['operationid']."].recovery\":[\"add\",\"1\"],".
-				"\"action.recovery_operations[".$operationid[1]['operationid']."].operationid\":[\"add\",\"".
-				$operationid[1]['operationid']."\"],".
-				"\"action.update_operations[".$operationid[2]['operationid']."]\":[\"add\"],".
-				"\"action.update_operations[".$operationid[2]['operationid']."].operationtype\":[\"add\",\"12\"],".
-				"\"action.update_operations[".$operationid[2]['operationid']."].opmessage\":[\"add\"],".
-				"\"action.update_operations[".$operationid[2]['operationid']."].opmessage.default_msg\":[\"add\",\"0\"],".
-				"\"action.update_operations[".$operationid[2]['operationid']."].opmessage.message\":[\"add\",".
-				"\"Custom update operation message body\"],".
-				"\"action.update_operations[".$operationid[2]['operationid']."].opmessage.subject\":[\"add\",".
-				"\"Custom update operation message subject\"],".
-				"\"action.update_operations[".$operationid[2]['operationid']."].recovery\":[\"add\",\"2\"],".
-				"\"action.update_operations[".$operationid[2]['operationid']."].operationid\":[\"add\",\"".
-				$operationid[2]['operationid']."\"],".
-				"\"action.pause_suppressed\":[\"add\",\"0\"],".
-				"\"action.notify_if_canceled\":[\"add\",\"0\"],".
-				"\"action.actionid\":[\"add\",\"".$resourceid."\"]}";
+		$created = json_encode([
+			'action.name' => ['add', 'Audit action'],
+			'action.esc_period' => ['add', '2m'],
+			'action.filter' => ['add'],
+			'action.filter.conditions['.$conditiodid['conditionid'].']' => ['add'],
+			'action.filter.conditions['.$conditiodid['conditionid'].'].conditiontype' => ['add', '1'],
+			'action.filter.conditions['.$conditiodid['conditionid'].'].value' => ['add', '10084'],
+			'action.filter.conditions['.$conditiodid['conditionid'].'].conditionid' => ['add', $conditiodid['conditionid']],
+			'action.operations['.$operationid[0]['operationid'].']' => ['add'],
+			'action.operations['.$operationid[0]['operationid'].'].esc_period' => ['add', '0s'],
+			'action.operations['.$operationid[0]['operationid'].'].esc_step_to' => ['add', '2'],
+			'action.operations['.$operationid[0]['operationid'].'].opmessage_grp['.$op_group['opmessage_grpid'].']' => ['add'],
+			'action.operations['.$operationid[0]['operationid'].'].opmessage_grp['.$op_group['opmessage_grpid'].'].usrgrpid' => ['add', '7'],
+			'action.operations['.$operationid[0]['operationid'].'].opmessage_grp['.$op_group['opmessage_grpid'].'].opmessage_grpid'
+			=> ['add', $op_group['opmessage_grpid']],
+			'action.operations['.$operationid[0]['operationid'].'].opmessage' => ['add'],
+			'action.operations['.$operationid[0]['operationid'].'].opmessage.mediatypeid' => ['add', '1'],
+			'action.operations['.$operationid[0]['operationid'].'].operationid' => ['add', $operationid[0]['operationid']],
+			'action.recovery_operations['.$operationid[1]['operationid'].']' => ['add'],
+			'action.recovery_operations['.$operationid[1]['operationid'].'].operationtype' => ['add', '11'],
+			'action.recovery_operations['.$operationid[1]['operationid'].'].opmessage' => ['add'],
+			'action.recovery_operations['.$operationid[1]['operationid'].'].recovery' => ['add', '1'],
+			'action.recovery_operations['.$operationid[1]['operationid'].'].operationid' => ['add', $operationid[1]['operationid']],
+			'action.update_operations['.$operationid[2]['operationid'].']' => ['add'],
+			'action.update_operations['.$operationid[2]['operationid'].'].operationtype' => ['add', '12'],
+			'action.update_operations['.$operationid[2]['operationid'].'].opmessage' => ['add'],
+			'action.update_operations['.$operationid[2]['operationid'].'].opmessage.default_msg' => ['add', '0'],
+			'action.update_operations['.$operationid[2]['operationid'].'].opmessage.message' => ['add', 'Custom update operation message body'],
+			'action.update_operations['.$operationid[2]['operationid'].'].opmessage.subject' => ['add', 'Custom update operation message subject'],
+			'action.update_operations['.$operationid[2]['operationid'].'].recovery' => ['add', '2'],
+			'action.update_operations['.$operationid[2]['operationid'].'].operationid' => ['add', $operationid[2]['operationid']],
+			'action.pause_suppressed' => ['add', '0'],
+			'action.notify_if_canceled' => ['add', '0'],
+			'action.actionid' => ['add', $resourceid]
+		]);
 
 		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
 	}
@@ -191,30 +186,30 @@ class testAuditlogAction extends testAuditlogCommon {
 				zbx_dbstr($operationid['operationid'])
 		);
 
-		$updated = "{\"action.operations[".$operationid['operationid']."].opmessage_grp[1]\":[\"delete\"],".
-				"\"action.filter.conditions[".$conditiodid['conditionid']."]\":[\"add\"],".
-				"\"action.operations[".$operationid['operationid']."].opmessage_grp[".$op_group['opmessage_grpid']."]\":[\"add\"],".
-				"\"action.name\":[\"update\",\"Updated action audit\",\"Report problems to Zabbix administrators\"],".
-				"\"action.esc_period\":[\"update\",\"15m\",\"1h\"],".
-				"\"action.filter\":[\"update\"],".
-				"\"action.filter.evaltype\":[\"update\",\"2\",\"0\"],".
-				"\"action.filter.conditions[".$conditiodid['conditionid']."].conditiontype\":[\"add\",\"3\"],".
-				"\"action.filter.conditions[".$conditiodid['conditionid']."].operator\":[\"add\",\"2\"],".
-				"\"action.filter.conditions[".$conditiodid['conditionid']."].value\":[\"add\",\"Trigger name\"],".
-				"\"action.filter.conditions[".$conditiodid['conditionid']."].conditionid\":[\"add\",\"".
-				$conditiodid['conditionid']."\"],".
-				"\"action.operations[".$operationid['operationid']."]\":[\"update\"],".
-				"\"action.operations[".$operationid['operationid']."].esc_period\":[\"update\",\"1000\",\"0\"],".
-				"\"action.operations[".$operationid['operationid']."].esc_step_to\":[\"update\",\"2\",\"1\"],".
-				"\"action.operations[".$operationid['operationid']."].evaltype\":[\"update\",\"1\",\"0\"],".
-				"\"action.operations[".$operationid['operationid']."].opmessage_grp[".$op_group['opmessage_grpid'].
-				"].usrgrpid\":[\"add\",\"9\"],".
-				"\"action.operations[".$operationid['operationid']."].opmessage_grp[".$op_group['opmessage_grpid'].
-				"].opmessage_grpid\":[\"add\",\"".$op_group['opmessage_grpid']."\"],".
-				"\"action.operations[".$operationid['operationid']."].opmessage\":[\"update\"],".
-				"\"action.operations[".$operationid['operationid']."].opmessage.default_msg\":[\"update\",\"0\",\"1\"],".
-				"\"action.operations[".$operationid['operationid']."].opmessage.message\":[\"update\",\"Updated audit message\",\"\"],".
-				"\"action.operations[".$operationid['operationid']."].opmessage.subject\":[\"update\",\"Updated audit message\",\"\"]}";
+		$updated = json_encode([
+			'action.operations['.$operationid['operationid'].'].opmessage_grp[1]' => ['delete'],
+			'action.filter.conditions['.$conditiodid['conditionid'].']' => ['add'],
+			'action.operations['.$operationid['operationid'].'].opmessage_grp['.$op_group['opmessage_grpid'].']' => ['add'],
+			'action.name' => ['update', 'Updated action audit', 'Report problems to Zabbix administrators'],
+			'action.esc_period' => ['update', '15m', '1h'],
+			'action.filter' => ['update'],
+			'action.filter.evaltype' => ['update', '2', '0'],
+			'action.filter.conditions['.$conditiodid['conditionid'].'].conditiontype' => ['add', '3'],
+			'action.filter.conditions['.$conditiodid['conditionid'].'].operator' => ['add', '2'],
+			'action.filter.conditions['.$conditiodid['conditionid'].'].value' => ['add', 'Trigger name'],
+			'action.filter.conditions['.$conditiodid['conditionid'].'].conditionid' => ['add', $conditiodid['conditionid']],
+			'action.operations['.$operationid['operationid'].']' => ['update'],
+			'action.operations['.$operationid['operationid'].'].esc_period' => ['update', '1000', '0'],
+			'action.operations['.$operationid['operationid'].'].esc_step_to' => ['update', '2', '1'],
+			'action.operations['.$operationid['operationid'].'].evaltype' => ['update', '1', '0'],
+			'action.operations['.$operationid['operationid'].'].opmessage_grp['.$op_group['opmessage_grpid'].'].usrgrpid' => ['add', '9'],
+			'action.operations['.$operationid['operationid'].'].opmessage_grp['.$op_group['opmessage_grpid'].'].opmessage_grpid'
+			=> ['add', $op_group['opmessage_grpid']],
+			'action.operations['.$operationid['operationid'].'].opmessage' => ['update'],
+			'action.operations['.$operationid['operationid'].'].opmessage.default_msg' => ['update', '0', '1'],
+			'action.operations['.$operationid['operationid'].'].opmessage.message' => ['update', 'Updated audit message', ''],
+			'action.operations['.$operationid['operationid'].'].opmessage.subject' => ['update', 'Updated audit message', '']
+		]);
 
 		$this->getAuditDetails('details', $this->update_actionid, $updated, self::ACTIONID);
 	}
