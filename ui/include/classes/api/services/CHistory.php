@@ -88,9 +88,6 @@ class CHistory extends CApiService {
 		$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
 			ITEM_VALUE_TYPE_TEXT
 		];
-		$common_value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64,
-			ITEM_VALUE_TYPE_TEXT
-		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
@@ -100,42 +97,14 @@ class CHistory extends CApiService {
 			'time_from' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'time_till' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'filter' =>					['type' => API_MULTIPLE, 'default' => null, 'rules' => [
-											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-					'itemid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'timestamp' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'source' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'severity' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'logeventid' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'ns' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-				]],
-											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-					'itemid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'ns' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-				]],
-											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_UINT64])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-					'itemid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'ns' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'value' =>					['type' => API_UINTS64, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-				]],
-											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-					'itemid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'clock' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'ns' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'value' =>					['type' => API_FLOATS, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-				]]
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['itemid', 'clock', 'timestamp', 'source', 'severity', 'logeventid', 'ns']],
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])], 'type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['itemid', 'clock', 'ns']],
+											['else' => true, 'type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['itemid', 'clock', 'ns', 'value']]
 			]],
 			'search' =>					['type' => API_MULTIPLE, 'default' => null, 'rules' => [
-											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-					'source' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-					'value' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-				]],
-											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-					'value' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-				]],
-											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => []]
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['source', 'value']],
+											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_TEXT])], 'type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['value']],
+											['else' => true, 'type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => []]
 			]],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -144,7 +113,7 @@ class CHistory extends CApiService {
 			// output
 			'output' =>					['type' => API_MULTIPLE, 'default' => API_OUTPUT_EXTEND, 'rules' => [
 											['if' => ['field' => 'history', 'in' => implode(',', [ITEM_VALUE_TYPE_LOG])], 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'timestamp', 'source', 'severity', 'value', 'logeventid', 'ns'])],
-											['if' => ['field' => 'history', 'in' => implode(',', $common_value_types)], 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'value', 'ns'])]
+											['else' => true, 'type' => API_OUTPUT, 'in' => implode(',', ['itemid', 'clock', 'value', 'ns'])]
 			]],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			// sort and limit

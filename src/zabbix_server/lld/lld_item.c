@@ -3653,7 +3653,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 
 		for (j = 0; j < item->item_params.values_num; j++)
 		{
-			item_param = (zbx_item_param_t *)item->item_params.values[j];
+			item_param = item->item_params.values[j];
 
 			if (0 != (item_param->flags & ZBX_FLAG_ITEM_PARAM_DELETE))
 			{
@@ -3714,7 +3714,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 		{
 			char	delim = ' ';
 
-			item_param = (zbx_item_param_t *)item->item_params.values[j];
+			item_param = item->item_params.values[j];
 
 			if (0 == item_param->item_parameterid)
 			{
