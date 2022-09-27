@@ -607,9 +607,6 @@ static void	zbx_set_defaults(void)
 
 	if (0 != CONFIG_REPORTWRITER_FORKS)
 		CONFIG_REPORTMANAGER_FORKS = 1;
-
-	if (NULL == CONFIG_NODE_ADDRESS)
-		CONFIG_NODE_ADDRESS = zbx_strdup(CONFIG_NODE_ADDRESS, "localhost");
 }
 
 /******************************************************************************
@@ -669,8 +666,9 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (FAIL == parse_serveractive_element(CONFIG_NODE_ADDRESS, &address, &port, 10051) ||
-			(FAIL == is_supported_ip(address) && FAIL == zbx_validate_hostname(address)))
+	if (NULL != CONFIG_NODE_ADDRESS &&
+			(FAIL == parse_serveractive_element(CONFIG_NODE_ADDRESS, &address, &port, 0) ||
+			(FAIL == is_supported_ip(address) && FAIL == zbx_validate_hostname(address))))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"NodeAddress\" configuration parameter: address \"%s\""
 				" is invalid", CONFIG_NODE_ADDRESS);
