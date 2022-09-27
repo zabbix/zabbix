@@ -9509,7 +9509,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 				continue;
 			}
 
-			if (0 == dc_host->proxy_hostid || ITEM_TYPE_DEPENDENT == dc_item->type ||
+			if (0 == dc_host->proxy_hostid ||
 					SUCCEED == is_item_processed_by_server(dc_item->type, dc_item->key))
 			{
 				dc_preproc_add_item_rec(dc_item, &items_sync, &pp_itemids);
