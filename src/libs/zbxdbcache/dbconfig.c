@@ -9466,7 +9466,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 	zbx_preproc_item_t		*pp_item;
 	zbx_hashset_iter_t		iter;
 	int				i;
-	zbx_uint64_t			global_revision = *revision, config_revision;
+	zbx_uint64_t			global_revision = *revision;
 	zbx_vector_dc_item_ptr_t	items_sync;
 	zbx_hashset_t			pp_itemids;
 
@@ -9475,15 +9475,10 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 
 	zbx_vector_dc_item_ptr_create(&items_sync);
 
-	RDLOCK_CACHE;
-
-	config_revision = config->revision.config;
-
-	if (config_revision <= *revision)
-	{
-		UNLOCK_CACHE;
+	if (config->revision.config == *revision)
 		goto out;
-	}
+
+	RDLOCK_CACHE;
 
 	if (SUCCEED != um_cache_get_host_revision(config->um_cache, 0, &global_revision))
 		global_revision = 0;
@@ -9530,10 +9525,12 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 		}
 
 		for (i = 0; i < items_sync.values_num; i++)
-			dc_preproc_sync_item(items, items_sync.values[i], config_revision);
+			dc_preproc_sync_item(items, items_sync.values[i], config->revision.config);
 
 		zbx_vector_dc_item_ptr_clear(&items_sync);
 	}
+
+	*revision = config->revision.config;
 
 	UNLOCK_CACHE;
 
@@ -9550,8 +9547,6 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 
 		zbx_hashset_iter_remove(&iter);
 	}
-
-	*revision = config_revision;
 out:
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		dc_preproc_dump(items);
