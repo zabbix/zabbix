@@ -9509,7 +9509,11 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 			}
 		}
 
-		if (*revision >= global_revision && *revision >= dc_host->revision && 0 != items_sync.values_num)
+		/* don't check host macro revision if all host items are monitored by Zabbix proxy */
+		if (0 == items_sync.values_num)
+			continue;
+
+		if (*revision >= global_revision && *revision >= dc_host->revision)
 		{
 			zbx_uint64_t	macro_revision = *revision;
 
