@@ -69,7 +69,7 @@ foreach ($data['db_mediatypes'] as $mediatypeid => $value) {
 
 $disabled_media_types_msg = null;
 
-if (!array_search(MEDIA_TYPE_STATUS_ACTIVE, array_column($data['db_mediatypes'], 'status'))) {
+if (!in_array(MEDIA_TYPE_STATUS_ACTIVE, array_column($data['db_mediatypes'], 'status'))) {
 	$type_select->addStyle('display: none;');
 
 	$disabled_media_types_msg = (new CDiv(_('Media types disabled by Administration.')))
