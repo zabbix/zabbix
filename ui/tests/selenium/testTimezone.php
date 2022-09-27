@@ -24,8 +24,6 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup users, config
- *
- * @dataSource LoginUsers
  */
 class testTimezone extends CWebTest {
 
@@ -105,7 +103,7 @@ class testTimezone extends CWebTest {
 		$this->page->logout();
 
 		// User timezone change.
-		$this->page->userLogin('test-timezone', 'zabbix12345');
+		$this->page->userLogin('test-timezone', 'zabbix');
 		$this->setTimezone($data['user_timezone'], 'userprofile');
 		date_modify($system_time, $data['time_diff']);
 

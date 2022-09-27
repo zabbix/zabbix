@@ -27,8 +27,6 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
  * Base class for Macros tests.
- *
- * @dataSource LoginUsers
  */
 abstract class testFormMacros extends CLegacyWebTest {
 

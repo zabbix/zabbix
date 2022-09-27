@@ -41,7 +41,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		$dropdowns = [
 			'media_type' => array_merge(['all'], $all_media),
 			'period' => ['Daily', 'Weekly', 'Monthly', 'Yearly'],
-			'year' => ['2016', '2017', '2018', '2019', '2020', '2021', '2022']
+			'year' => ['2012', '2013', '2014', '2015','2016', '2017', '2018', '2019', '2020', '2021', '2022']
 		];
 		$default_selected = [
 			'media_type' => 'all',
@@ -129,11 +129,11 @@ class testPageReportsNotifications extends CLegacyWebTest {
 					'users' => [
 						[
 							'username' => 'admin-zabbix',
-							'notifications' => [ '', '16', '', '', '', '', '']
+							'notifications' => [ '', '', '', '', '', '16', '']
 						],
 						[
 							'username' => 'disabled-user',
-							'notifications' => [ '15', '7', '', '', '', '', '']
+							'notifications' => [ '', '', '', '', '15', '7', '']
 						]
 					]
 				]
@@ -150,11 +150,11 @@ class testPageReportsNotifications extends CLegacyWebTest {
 						],
 						[
 							'username' => 'admin-zabbix',
-							'notifications' => [ '', '8', '', '', '', '', '']
+							'notifications' => [ '', '', '', '', '', '8', '']
 						],
 						[
 							'username' => 'disabled-user',
-							'notifications' => [ '6', '3', '', '', '', '', '']
+							'notifications' => [ '', '', '', '', '6', '3', '']
 						]
 					]
 				]

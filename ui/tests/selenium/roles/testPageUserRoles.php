@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -92,10 +93,10 @@ class testPageUserRoles extends CWebTest {
 		}
 
 		// Check roles list sort order.
-		$before_listing = $this->getTableColumnData('Name');
+		$before_listing = $this->getTableResult('Name');
 		$name_header = $this->query('xpath://a[text()="Name"]')->one();
 		$name_header->click();
-		$after_listing = $this->getTableColumnData('Name');
+		$after_listing = $this->getTableResult('Name');
 		$this->assertEquals($after_listing, array_reverse($before_listing));
 		$name_header->click();
 
@@ -349,7 +350,7 @@ class testPageUserRoles extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=userrole.list');
 		$this->query('button:Reset')->one()->click();
-		$before_delete = $this->getTableColumnData('Name');
+		$before_delete = $this->getTableResult('Name');
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		foreach ($data['roles'] as $role) {

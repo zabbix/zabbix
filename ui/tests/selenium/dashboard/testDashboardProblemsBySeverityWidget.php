@@ -25,8 +25,6 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup widget, profiles
- *
- * @dataSource LoginUsers
  */
 class testDashboardProblemsBySeverityWidget extends CWebTest {
 

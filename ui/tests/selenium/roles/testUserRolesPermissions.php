@@ -28,8 +28,6 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  * @backup role, module, users, report, services
  *
  * @onBefore prepareUserData, prepareReportData, prepareServiceData
- *
- * @dataSource LoginUsers
  */
 class testUserRolesPermissions extends CWebTest {
 

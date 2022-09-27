@@ -21,9 +21,6 @@
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
-/**
- * @dataSource LoginUsers
- */
 class testPageUsers extends CLegacyWebTest {
 	public $userAlias = 'Admin';
 	public $userName = 'Zabbix';

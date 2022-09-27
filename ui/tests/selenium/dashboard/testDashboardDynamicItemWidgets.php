@@ -24,7 +24,6 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 /**
  * @backup profiles
  *
- * @dataSource LoginUsers
  */
 class testDashboardDynamicItemWidgets extends CWebTest {
 

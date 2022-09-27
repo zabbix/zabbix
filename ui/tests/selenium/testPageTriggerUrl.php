@@ -24,10 +24,7 @@ require_once dirname(__FILE__) . '/../include/CWebTest.php';
 /**
  * Test checks link from trigger URL field on different pages.
  *
- * @backup profiles
- * @backup problem
- *
- * @dataSource LoginUsers
+ * @backup profiles, problem
  */
 class testPageTriggerUrl extends CWebTest {
 

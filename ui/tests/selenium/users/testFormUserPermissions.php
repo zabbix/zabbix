@@ -27,8 +27,6 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup role, users, usrgrp, module
  * @onBefore prepareUserData
- *
- * @dataSource LoginUsers
  */
 class testFormUserPermissions extends CWebTest {
 

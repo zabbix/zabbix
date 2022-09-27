@@ -129,7 +129,6 @@ class LoginUsers {
 		]);
 		$userids = CDataHelper::getIds('username');
 
-
 		// Adding test data to the 'alerts' table for testing Reports-> Notifications.
 		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES".
 				"(8, 12, 1, 1, 1483275171, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.01.01 12:52:51', 1, 0, '', 1, 0, ''),".

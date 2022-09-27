@@ -25,8 +25,6 @@ use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup icon_map
- *
- * @dataSource LoginUsers
  */
 class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 

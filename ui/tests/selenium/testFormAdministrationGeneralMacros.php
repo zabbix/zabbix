@@ -28,8 +28,6 @@ use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup globalmacro
- *
- * @dataSource LoginUsers
  */
 class testFormAdministrationGeneralMacros extends testFormMacros {
 

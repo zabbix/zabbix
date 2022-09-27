@@ -25,8 +25,6 @@ use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup users
- *
- * @dataSource LoginUsers
  */
 class testFormUserProfile extends CLegacyWebTest {
 

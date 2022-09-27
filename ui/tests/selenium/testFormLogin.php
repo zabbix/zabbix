@@ -27,21 +27,6 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testFormLogin extends CWebTest {
 
-	public function prepareLdapUserData() {
-		CDataHelper::call('user.create', [
-			[
-				'username' => 'LDAP user',
-				'passwd' => 'zabbix12345',
-				'roleid' => 3,
-				'usrgrps' => [
-					[
-						'usrgrpid' => 16
-					]
-				]
-			]
-		]);
-	}
-
 	public static function getLoginLogoutData() {
 		return [
 			[
@@ -49,13 +34,13 @@ class testFormLogin extends CWebTest {
 					'login' => 'LDAP user',
 					'password' => 'zabbix12345',
 					'expected' => TEST_BAD,
-					'error_message' => 'LDAP authentication is disabled.'
+					'error_message' => 'Cannot bind anonymously to LDAP server.'
 				]
 			],
 			[
 				[
 					'login' => 'disabled-user',
-					'password' => 'zabbix',
+					'password' => 'zabbix12345',
 					'expected' => TEST_BAD,
 					'error_message' => 'No permissions for system access.'
 				]

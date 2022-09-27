@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 /**
  * @onBefore removeGuestFromDisabledGroup
  * @onAfter addGuestToDisabledGroup
- *
  * @dataSource LoginUsers
  */
 class testUrlUserPermissions extends CLegacyWebTest {
@@ -626,16 +625,16 @@ class testUrlUserPermissions extends CLegacyWebTest {
 	 * @dataProvider getUrlUserPermissiondata
 	 */
 	public function testUrlUserPermissions_Users($data) {
-		$adminzid = CDataHelper::get('LoginUsers.userids.admin-zabbix');
-		$userzid = CDataHelper::get('LoginUsers.userids.user-zabbix');
+		//$adminzid = CDataHelper::get('LoginUsers.userids.admin-zabbix');
+		//$userzid = CDataHelper::get('LoginUsers.userids.user-zabbix');
 
 		foreach ($data['users'] as $alias => $user) {
 			switch ($alias) {
 				case 'admin-zabbix' :
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c' , $adminzid);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c',4);
 					break;
 				case 'user-zabbix' :
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d' , $userzid);
+					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d',5);
 					break;
 			}
 			if ($user && !array_key_exists('no_permissions_to_object', $data)) {

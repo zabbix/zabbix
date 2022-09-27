@@ -21,9 +21,6 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-/**
- * @dataSource LoginUsers
- */
 class testFormMap extends CLegacyWebTest {
 	/**
 	 * Possible combinations of grid settings

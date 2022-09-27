@@ -23,8 +23,6 @@ require_once dirname(__FILE__).'/../common/testFormFilter.php';
 
 /**
  * @backup profiles
- *
- * @dataSource LoginUsers
  */
 class testFormFilterHosts extends testFormFilter {
 
@@ -142,7 +140,7 @@ class testFormFilterHosts extends testFormFilter {
 	 * @dataProvider getCheckCreatedFilterData
 	 */
 	public function testFormFilterHosts_CheckCreatedFilter($data) {
-		$this->createFilter($data, 'filter-create', 'zabbix12345');
+		$this->createFilter($data, 'filter-create', 'zabbix');
 		$this->checkFilters($data, $this->table_selector);
 	}
 
@@ -150,20 +148,20 @@ class testFormFilterHosts extends testFormFilter {
 	 * Delete created filter.
 	 */
 	public function testFormFilterHosts_Delete() {
-		$this->deleteFilter('filter-delete', 'zabbix12345');
+		$this->deleteFilter('filter-delete', 'zabbix');
 	}
 
 	/**
 	 * Updating filter form.
 	 */
 	public function testFormFilterHosts_UpdateForm() {
-		$this->updateFilterForm('filter-update', 'zabbix12345', $this->table_selector);
+		$this->updateFilterForm('filter-update', 'zabbix', $this->table_selector);
 	}
 
 	/**
 	 * Updating saved filter properties.
 	 */
 	public function testFormFilterHosts_UpdateProperties() {
-		$this->updateFilterProperties('filter-update', 'zabbix12345');
+		$this->updateFilterProperties('filter-update', 'zabbix');
 	}
 }

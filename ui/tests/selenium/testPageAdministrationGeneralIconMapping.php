@@ -21,9 +21,6 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-/**
- * @dataSource LoginUsers
- */
 class testPageAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 	public function testPageAdministrationGeneralIconMapping_CheckLayout(){
