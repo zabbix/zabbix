@@ -57,25 +57,15 @@ class Manager extends CRegistryFactory {
 		if ($instance === null) {
 			$instance = self::getInstance()->getObject('history');
 
-			$options = [
-				'history_period' => timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)),
-				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL),
-				'hk_history' => timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY)),
-				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
-				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
-			];
-
 			$dbversion_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
 
 			if ($dbversion_status !== '') {
 				$dbversion_status = json_decode($dbversion_status, true);
 				if ($dbversion_status !== null && array_key_exists('history_pk', $dbversion_status)
 						&& $dbversion_status['history_pk'] == 1) {
-					$options['primary_keys_enabled'] = true;
+					$instance->setPrimaryKeysEnabled();
 				}
 			}
-
-			$instance->setOptions($options);
 		}
 
 		return $instance;
