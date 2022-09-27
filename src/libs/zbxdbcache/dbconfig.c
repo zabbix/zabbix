@@ -9412,6 +9412,7 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 		pp_item->type = dc_item->type;
 		pp_item->hostid = dc_item->hostid;
 		pp_item->value_type = dc_item->value_type;
+		pp_item->preproc_revision = revision;
 	}
 
 	dc_preproc_sync_masteritem(pp_item, dc_item->master_item);
@@ -9529,7 +9530,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 		}
 
 		for (i = 0; i < items_sync.values_num; i++)
-			dc_preproc_sync_item(items, items_sync.values[i], *revision);
+			dc_preproc_sync_item(items, items_sync.values[i], config_revision);
 
 		zbx_vector_dc_item_ptr_clear(&items_sync);
 	}
