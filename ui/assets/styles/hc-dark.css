@@ -4525,7 +4525,7 @@ button {
 button[disabled], button[disabled]:hover, button[disabled]:active {
   color: #7d7d7d !important;
   background-color: transparent;
-  border-color: #7d7d7d;
+  border-color: #7d7d7d !important;
   cursor: default; }
   button.icon-cal[disabled] {
     opacity: .3;

@@ -53,6 +53,13 @@
 			if (document.getElementById('scim-token-btn') !== null) {
 				document.getElementById('scim-token-btn').addEventListener('click', this.showPasswordField);
 			}
+
+			if (document.getElementById('saml_auth_enabled') !== null
+					&& !document.getElementById('saml_auth_enabled').checked) {
+				$(this.saml_provision_groups_table).sortable('disable');
+				this.disableTable(this.saml_provision_groups_table);
+				this.disableTable(this.saml_media_type_mapping_table);
+			}
 		}
 
 		_addEventListeners() {
@@ -106,33 +113,13 @@
 
 					if (e.target.checked) {
 						$(this.saml_provision_groups_table).sortable('enable');
-						this.saml_provision_groups_table.querySelectorAll('a, .drag-icon').forEach(element => {
-							element.classList.remove('<?= ZBX_STYLE_DISABLED ?>');
-						});
-						this.saml_provision_groups_table.querySelectorAll('button').forEach(button => {
-							button.disabled = false;
-						});
-						this.saml_media_type_mapping_table.querySelectorAll('a').forEach(element => {
-							element.classList.remove('<?= ZBX_STYLE_DISABLED ?>');
-						});
-						this.saml_media_type_mapping_table.querySelectorAll('button').forEach(button => {
-							button.disabled = false;
-						});
+						this.enableTable(this.saml_provision_groups_table);
+						this.enableTable(this.saml_media_type_mapping_table);
 					}
 					else {
 						$(this.saml_provision_groups_table).sortable('disable');
-						this.saml_provision_groups_table.querySelectorAll('a, .drag-icon').forEach(element => {
-							element.classList.add('<?= ZBX_STYLE_DISABLED ?>');
-						});
-						this.saml_provision_groups_table.querySelectorAll('button').forEach(button => {
-							button.disabled = true;
-						});
-						this.saml_media_type_mapping_table.querySelectorAll('a').forEach(element => {
-							element.classList.add('<?= ZBX_STYLE_DISABLED ?>');
-						});
-						this.saml_media_type_mapping_table.querySelectorAll('button').forEach(button => {
-							button.disabled = true;
-						});
+						this.disableTable(this.saml_provision_groups_table);
+						this.disableTable(this.saml_media_type_mapping_table);
 					}
 				});
 			}
@@ -182,6 +169,24 @@
 				if (!this._authFormSubmit()) {
 					e.preventDefault();
 				}
+			});
+		}
+
+		enableTable(table) {
+			table.querySelectorAll('a, .drag-icon').forEach(element => {
+				element.classList.remove('<?= ZBX_STYLE_DISABLED ?>');
+			});
+			table.querySelectorAll('button').forEach(button => {
+				button.disabled = false;
+			});
+		}
+
+		disableTable(table) {
+			table.querySelectorAll('a, .drag-icon').forEach(element => {
+				element.classList.add('<?= ZBX_STYLE_DISABLED ?>');
+			});
+			table.querySelectorAll('button').forEach(button => {
+				button.disabled = true;
 			});
 		}
 
