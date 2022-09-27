@@ -22,11 +22,20 @@
 #include "threads.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
+int	zbx_win_exception_filter(unsigned int code, struct _EXCEPTION_POINTERS *ep);
+
 static ZBX_THREAD_ENTRY(zbx_win_thread_entry, args)
 {
-	zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
+	__try
+	{
+		zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
 
-	return thread_args->entry(thread_args);
+		return thread_args->entry(thread_args);
+	}
+	__except(zbx_win_exception_filter(GetExceptionCode(), GetExceptionInformation()))
+	{
+		zbx_thread_exit(EXIT_SUCCESS);
+	}
 }
 
 void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)

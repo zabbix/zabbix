@@ -231,10 +231,10 @@ static void	print_backtrace(CONTEXT *pctx)
 	zbx_free(pSym);
 }
 
-int	zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep)
+int	zbx_win_exception_filter(unsigned int code, struct _EXCEPTION_POINTERS *ep)
 {
-	zabbix_log(LOG_LEVEL_CRIT, "Unhandled exception %x detected at 0x%p. Crashing ...",
-			ep->ExceptionRecord->ExceptionCode, ep->ExceptionRecord->ExceptionAddress);
+	zabbix_log(LOG_LEVEL_CRIT, "Unhandled exception %x detected at 0x%p. Crashing ...", code,
+			ep->ExceptionRecord->ExceptionAddress);
 
 	print_fatal_info(ep->ContextRecord);
 	print_backtrace(ep->ContextRecord);
