@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-26T10:57:01Z'
+  date: '2022-09-27T15:52:28Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -444,6 +444,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
+          description: 'Summary metrics data for all processes.'
           tags:
             -
               tag: component
@@ -490,7 +491,7 @@ zabbix_export:
                 macro: '{#NAME}'
                 value: '{$PHP_FPM.PROCESS_NAME}'
                 formulaid: A
-          description: 'Discovery of summary process PHP-FPM.'
+          description: 'Discovery for summary process PHP-FPM.'
           item_prototypes:
             -
               uuid: 985005cdf7b44332a59a5f7da7528d88
@@ -501,15 +502,14 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
+              description: 'Summary metrics by process {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
                     - '$.[?(@["name"]=="{#NAME}")].first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: 'Failed to retrieve process {#NAME} data'
               master_item:
                 key: 'proc.get[,,,summary]'
               tags:
@@ -523,11 +523,14 @@ zabbix_export:
               key: 'php-fpm.proc.num[{#NAME}]'
               delay: '0'
               history: 7d
+              description: 'Number of running processes {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
                     - $.processes
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -563,6 +566,7 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - $.pmem
+                  error_handler: DISCARD_VALUE
               master_item:
                 key: 'php-fpm.proc.get[{#NAME}]'
               tags:
@@ -576,14 +580,14 @@ zabbix_export:
               key: 'php-fpm.proc.rss[{#NAME}]'
               delay: '0'
               history: 7d
-              value_type: FLOAT
               units: B
-              description: 'Resident set size memory used by process {#NAME} in bytes.'
+              description: 'Summary of resident set size memory used by process {#NAME} in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
                     - $.rss
+                  error_handler: DISCARD_VALUE
               master_item:
                 key: 'php-fpm.proc.get[{#NAME}]'
               tags:
@@ -597,14 +601,14 @@ zabbix_export:
               key: 'php-fpm.proc.vmem[{#NAME}]'
               delay: '0'
               history: 7d
-              value_type: FLOAT
               units: B
-              description: 'Virtual memory used by process {#NAME} in bytes.'
+              description: 'Summary of virtual memory used by process {#NAME} in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
                     - $.vsize
+                  error_handler: DISCARD_VALUE
               master_item:
                 key: 'php-fpm.proc.get[{#NAME}]'
               tags:
@@ -618,7 +622,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'Process CPU utilization percentage.'
+              description: 'Process {#NAME} CPU utilization percentage.'
               tags:
                 -
                   tag: component
