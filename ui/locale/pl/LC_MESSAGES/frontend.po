@@ -20569,6 +20569,10 @@ msgstr "spodziewano się wartości logicznej"
 msgid "a character string is expected"
 msgstr "oczekiwano ciągu znaków"
 
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "spodziewano się daty w formacie RRRR-MM-DD"
