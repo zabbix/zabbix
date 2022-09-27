@@ -126,15 +126,15 @@ class CControllerMediatypeUpdate extends CController {
 				]);
 
 				if ($mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
-					$domain_start_pos = strrpos($mediatype['smtp_email'], '@') + 1;
-					$domain = substr($mediatype['smtp_email'], $domain_start_pos);
+					preg_match('/.*<(?<email>.*[^>])>$/i', $this->getInput('smtp_email'), $match);
+					$clean_email = $match ? $match['email'] : $this->getInput('smtp_email');
+
+					$domain = substr($clean_email, strrpos($clean_email, '@') + 1);
 
 					$mediatype['smtp_helo'] = $domain;
 
 					if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL) {
-						preg_match('/.*<(?<email>.*[^>])>$/i', $this->getInput('smtp_email'), $match);
-
-						$mediatype['username'] = $match ? $match['email'] : $this->getInput('smtp_email');
+						$mediatype['username'] = $clean_email;
 					}
 
 					if ($mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY) {
