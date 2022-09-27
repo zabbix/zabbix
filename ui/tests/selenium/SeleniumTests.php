@@ -339,8 +339,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormPreprocessingTest');
 
 		// Proxies.
-		$suite->addTestSuite('testFormAdministrationGeneralProxies');
-		$suite->addTestSuite('testPageAdministrationGeneralProxies');
+		$suite->addTestSuite('testFormAdministrationProxies');
+		$suite->addTestSuite('testPageAdministrationProxies');
 
 		// Reports.
 		$suite->addTestSuite('testFormScheduledReport');
