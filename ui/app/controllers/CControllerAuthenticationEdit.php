@@ -125,7 +125,7 @@ class CControllerAuthenticationEdit extends CController {
 		}
 
 		if ($this->hasInput('form_refresh')) {
-			$this->getInputs($data, [
+			$fields = [
 				'form_refresh',
 				'authentication_type',
 				'http_auth_enabled',
@@ -159,7 +159,9 @@ class CControllerAuthenticationEdit extends CController {
 				'scim_token',
 				'passwd_min_length',
 				'passwd_check_rules'
-			]);
+			];
+			$this->getInputs($data, $fields);
+			$data += array_fill_keys($fields, '');
 
 			$data['saml_provision_status'] = $this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED);
 			$data['saml_provision_groups'] = $this->getInput('saml_provision_groups', []);
