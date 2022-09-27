@@ -32,7 +32,7 @@ class CEmailValidator extends CStringValidator {
 	 * @return bool
 	 */
 	public function validate($value) {
-		preg_match('/^[^\s@]+@[^\s@]+\.[^\s@]+$/', $value, $match);
+		preg_match('/^[^\s@]+@[^\s@]+\.[^\s@]+[^.]$/', $value, $match);
 
 		if (!$match) {
 			$this->setError(_s('Invalid email address "%1$s".', $value));
