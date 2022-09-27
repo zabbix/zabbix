@@ -55,28 +55,18 @@ window.operation_popup = new class {
 			else if (operation_type == 'cmd[4]' || operation_type == 'cmd[5]') {
 				this._hostGroupFields();
 			}
-			else if (operation_type == 'cmd[6]') {
+			else if (operation_type == 'cmd[6]' || operation_type == 'cmd[7]') {
 				this._templateFields();
 			}
-			else if (operation_type == 'cmd[7]') {
-				this._templateFields();
-			}
-			else if (operation_type == 'cmd[8]') {
-				// todo : add hidden input - ?
-			}
-			else if (operation_type == 'cmd[9]') {
+			else if (operation_type == 'cmd[8]' || operation_type == 'cmd[9]') {
 				// todo : add hidden input - ?
 			}
 			else if (operation_type == 'cmd[10]') {
 				this._hostInventoryFields();
 			}
-			else if (operation_type == 'cmd[11]') {
+			else if (operation_type == 'cmd[11]' || operation_type == 'cmd[12]') {
 				this._hostInventoryFields();
 				this._allInvolvedFields();
-			}
-			else if (operation_type == 'cmd[12]') {
-				this._hostInventoryFields();
-				this._allInvolvedFieldsUpdate();
 			}
 			else {
 				this._addScriptFields();

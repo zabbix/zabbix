@@ -61,8 +61,10 @@ class CControllerActionOperationValidate extends CController {
 
 		$eventsource = $operation['eventsource'];
 		$recovery = $operation['recovery'];
-		$operationtype = $operation['operationtype'];
+		$optype = $operation['operationtype'];
+		$operationtype = preg_replace('[\D]', '', $optype);
 		$allowed_operations = getAllowedOperations($eventsource);
+		// todo - fix bug, where operationtype = 1, if script!!!
 
 		if (!array_key_exists($recovery, $allowed_operations)
 				|| !in_array($operationtype, $allowed_operations[$recovery])) {
@@ -290,30 +292,467 @@ class CControllerActionOperationValidate extends CController {
 		return $steps;
 	}
 
-	protected function createDetailsColumn($operation):string {
-		// todo: add function for details column. create new version of getActionOperationDescriptions function?
-		// todo : add all the options here
-		// todo : add the data (user group names, user names etc.
-
-		$details = '';
-
-		foreach ($operation['opmessage_grp'] as $user_group) {
-		//	$this->getActionOperationDescription($operation);
-		}
-
-		if (array_key_exists('opmessage_grp', $operation)) {
-			$details = 'Send message to user groups: ';
-		}
-		elseif (array_key_exists('opmessage_usr', $operation)) {
-			$details = 'Send message to users: ';
-		}
-
-		return $details;
+	protected function createDetailsColumn($operation):array {
+		// todo: fix the small bugs, add script data
+		return $this->getActionOperationDescription($operation);
 	}
 
 	protected function createDurationColumn($step_duration):string {
 		return $step_duration === '0'
 			? 'Default'
 			: $step_duration;
+	}
+
+	function getActionOperationDescription(array $operation): array {
+		$result = [];
+
+		$media_typeids = [];
+		$userids = [];
+		$usr_grpids = [];
+		$hostids = [];
+		$groupids = [];
+		$templateids = [];
+		$scriptids = [];
+
+		$type = $operation['recovery'];
+
+		if ($type == ACTION_OPERATION) {
+			$operationtype = preg_replace('[\D]', '', $operation['operationtype']);
+
+			switch ($operationtype) {
+				case OPERATION_TYPE_MESSAGE:
+					$media_typeid = $operation['opmessage']['mediatypeid'];
+
+					if ($media_typeid != 0) {
+						$media_typeids[$media_typeid] = $media_typeid;
+					}
+
+					if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
+						foreach ($operation['opmessage_usr'] as $users) {
+							$userids[$users['userid']] = $users['userid'];
+						}
+					}
+
+					if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
+						foreach ($operation['opmessage_grp'] as $user_groups) {
+							$usr_grpids[$user_groups['usrgrpid']] = $user_groups['usrgrpid'];
+						}
+					}
+					break;
+
+				case OPERATION_TYPE_COMMAND:
+					if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
+						foreach ($operation['opcommand_hst'] as $host) {
+							if ($host['hostid'] != 0) {
+								$hostids[$host['hostid']] = $host['hostid'];
+							}
+						}
+					}
+
+					if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
+						foreach ($operation['opcommand_grp'] as $host_group) {
+							$groupids[$host_group['groupid']] = true;
+						}
+					}
+
+					$scriptids[$operation['opcommand']['scriptid']] = true;
+					break;
+
+				case OPERATION_TYPE_GROUP_ADD:
+				case OPERATION_TYPE_GROUP_REMOVE:
+					foreach ($operation['opgroup'] as $groupid) {
+						$groupids[$groupid['groupid']] = true;
+					}
+					break;
+
+				case OPERATION_TYPE_TEMPLATE_ADD:
+				case OPERATION_TYPE_TEMPLATE_REMOVE:
+					foreach ($operation['optemplate'] as $templateid) {
+						$templateids[$templateid['templateid']] = true;
+					}
+					break;
+			}
+		}
+		else {
+			switch ($operation['operationtype']) {
+				case OPERATION_TYPE_MESSAGE:
+					$media_typeid = $operation['opmessage']['mediatypeid'];
+
+					if ($media_typeid != 0) {
+						$media_typeids[$media_typeid] = $media_typeid;
+					}
+
+					if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
+						foreach ($operation['opmessage_usr'] as $users) {
+							$userids[$users['userid']] = $users['userid'];
+						}
+					}
+
+					if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
+						foreach ($operation['opmessage_grp'] as $user_groups) {
+							$usr_grpids[$user_groups['usrgrpid']] = $user_groups['usrgrpid'];
+						}
+					}
+					break;
+
+				case OPERATION_TYPE_COMMAND:
+					if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
+						foreach ($operation['opcommand_hst'] as $host) {
+							if ($host['hostid'] != 0) {
+								$hostids[$host['hostid']] = $host['hostid'];
+							}
+						}
+					}
+
+					if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
+						foreach ($operation['opcommand_grp'] as $host_group) {
+							$groupids[$host_group['groupid']] = true;
+						}
+					}
+
+					$scriptids[$operation['opcommand']['scriptid']] = true;
+					break;
+			}
+		}
+
+		$media_types = [];
+		$user_groups = [];
+		$hosts = [];
+		$host_groups = [];
+		$templates = [];
+		$scripts = [];
+
+		if ($media_typeids) {
+			$media_types = API::Mediatype()->get([
+				'output' => ['name'],
+				'mediatypeids' => $media_typeids,
+				'preservekeys' => true
+			]);
+		}
+
+		if ($userids) {
+			$fullnames = [];
+
+			$users = API::User()->get([
+				'output' => ['userid', 'username', 'name', 'surname'],
+				'userids' => $userids
+			]);
+
+			foreach ($users as $user) {
+				$fullnames[$user['userid']] = getUserFullname($user);
+			}
+		}
+
+		if ($usr_grpids) {
+			$user_groups = API::UserGroup()->get([
+				'output' => ['name'],
+				'usrgrpids' => $usr_grpids,
+				'preservekeys' => true
+			]);
+		}
+
+		if ($hostids) {
+			$hosts = API::Host()->get([
+				'output' => ['name'],
+				'hostids' => $hostids,
+				'preservekeys' => true
+			]);
+		}
+
+		if ($groupids) {
+			$host_groups = API::HostGroup()->get([
+				'output' => ['name'],
+				'groupids' => array_keys($groupids),
+				'preservekeys' => true
+			]);
+		}
+
+		if ($templateids) {
+			$templates = API::Template()->get([
+				'output' => ['name'],
+				'templateids' => array_keys($templateids),
+				'preservekeys' => true
+			]);
+		}
+
+		if ($scriptids) {
+			$scripts = API::Script()->get([
+				'output' => ['name'],
+				'scriptids' => array_keys($scriptids),
+				'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
+				'preservekeys' => true
+			]);
+		}
+
+		// Format the output.
+		if ($type == ACTION_OPERATION) {
+			switch ($operationtype) {
+				case OPERATION_TYPE_MESSAGE:
+					$media_type = _('all media');
+					$media_typeid = $operation['opmessage']['mediatypeid'];
+
+					if ($media_typeid != 0 && isset($media_types[$media_typeid])) {
+						$media_type = $media_types[$media_typeid]['name'];
+					}
+
+					if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
+						$user_names_list = [];
+
+						foreach ($operation['opmessage_usr'] as $user) {
+							if (isset($fullnames[$user['userid']])) {
+								$user_names_list[] = $fullnames[$user['userid']];
+							}
+						}
+
+						order_result($user_names_list);
+
+						$result['type'] = (_('Send message to users').': ');
+						$result['data'] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $media_type];
+					}
+
+					if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
+						$user_groups_list = [];
+
+						foreach ($operation['opmessage_grp'] as $userGroup) {
+							if (isset($user_groups[$userGroup['usrgrpid']])) {
+								$user_groups_list[] = $user_groups[$userGroup['usrgrpid']]['name'];
+							}
+						}
+
+						order_result($user_groups_list);
+
+						$result['type'] = _('Send message to user groups').': ';
+						$result['data'] = [implode(', ', $user_groups_list), _('via'), $media_type];
+					}
+					break;
+
+//				case OPERATION_TYPE_COMMAND:
+//					$scriptid = $operation['opcommand']['scriptid'];
+
+//					if ($eventsource == EVENT_SOURCE_SERVICE) {
+//						$result[$i][$j][] = [
+//							bold(_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])),
+//							BR()
+//						];
+
+//						break;
+//					}
+
+//					if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
+//						$host_list = [];
+
+//						foreach ($operation['opcommand_hst'] as $host) {
+//							if ($host['hostid'] == 0) {
+//								$result[$i][$j][] = [
+//									bold(_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])),
+//									BR()
+//								];
+//							}
+//							elseif (isset($hosts[$host['hostid']])) {
+//								$host_list[] = $hosts[$host['hostid']]['name'];
+//							}
+//						}
+
+//						if ($host_list) {
+//							order_result($host_list);
+
+//							$result[$i][$j][] = bold(
+//								_s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': '
+//							);
+//							$result[$i][$j][] = [implode(', ', $host_list), BR()];
+//						}
+//					}
+
+//					if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
+//						$host_group_list = [];
+
+//						foreach ($operation['opcommand_grp'] as $host_group) {
+//							if (isset($host_groups[$host_group['groupid']])) {
+//								$host_group_list[] = $host_groups[$host_group['groupid']]['name'];
+//							}
+//						}
+
+//						order_result($host_group_list);
+
+//						$result[$i][$j][] = bold(
+//							_s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': '
+//						);
+//						$result[$i][$j][] = [implode(', ', $host_group_list), BR()];
+//					}
+//					break;
+
+				case OPERATION_TYPE_HOST_ADD:
+					$result['type'] = (_('Add host'));
+					break;
+
+				case OPERATION_TYPE_HOST_REMOVE:
+					$result['type'] = (_('Remove host'));
+					break;
+
+				case OPERATION_TYPE_HOST_ENABLE:
+					$result['type'] = (_('Enable host'));
+					break;
+
+				case OPERATION_TYPE_HOST_DISABLE:
+					$result['type'] = (_('Disable host'));
+					break;
+
+				case OPERATION_TYPE_GROUP_ADD:
+				case OPERATION_TYPE_GROUP_REMOVE:
+					$host_group_list = [];
+
+					foreach ($operation['opgroup'] as $groupid) {
+						if (array_key_exists($groupid['groupid'], $host_groups)) {
+							$host_group_list[] = $host_groups[$groupid['groupid']]['name'];
+						}
+					}
+
+					order_result($host_group_list);
+
+					if ($operationtype == OPERATION_TYPE_GROUP_ADD) {
+						$result['type'] = _('Add to host groups').': ';
+					}
+					else {
+						$result['type'] = _('Remove from host groups').': ';
+					}
+
+					$result['data'] = [implode(', ', $host_group_list)];
+					break;
+
+				case OPERATION_TYPE_TEMPLATE_ADD:
+				case OPERATION_TYPE_TEMPLATE_REMOVE:
+					$template_list = [];
+
+					foreach ($operation['optemplate'] as $templateid) {
+						if (array_key_exists($templateid['templateid'], $templates)) {
+							$template_list[] = $templates[$templateid['templateid']]['name'];
+						}
+					}
+
+					order_result($template_list);
+
+					if ($operationtype == OPERATION_TYPE_TEMPLATE_ADD) {
+						$result['type'] = _('Link to templates').': ';
+					}
+					else {
+						$result['type'] = _('Unlink from templates').': ';
+					}
+
+					$result['data'] = [implode(', ', $template_list)];
+					break;
+
+				case OPERATION_TYPE_HOST_INVENTORY:
+					$host_inventory_modes = getHostInventoryModes();
+					$result['type'] = operation_type2str(OPERATION_TYPE_HOST_INVENTORY).': ';
+					$result['data'] = [$host_inventory_modes[$operation['opinventory']['inventory_mode']]];
+					break;
+			}
+		}
+		else {
+			switch ($operationtype) {
+				case OPERATION_TYPE_MESSAGE:
+					// todo : fix mediatype. always '0' -> 'all'
+					$media_type = _('all media');
+					$media_typeid = $operation['opmessage']['mediatypeid'];
+
+					if ($media_typeid != 0 && isset($media_types[$media_typeid])) {
+						$media_type = $media_types[$media_typeid]['name'];
+					}
+
+					if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
+						$user_names_list = [];
+
+						foreach ($operation['opmessage_usr'] as $user) {
+							if (isset($fullnames[$user['userid']])) {
+								$user_names_list[] = $fullnames[$user['userid']];
+							}
+						}
+
+						order_result($user_names_list);
+
+						$result['type'] = _('Send message to users').': ';
+						$result['data'] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $media_type];
+					}
+
+					if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
+						$user_groups_list = [];
+
+						foreach ($operation['opmessage_grp'] as $userGroup) {
+							if (isset($user_groups[$userGroup['usrgrpid']])) {
+								$user_groups_list[] = $user_groups[$userGroup['usrgrpid']]['name'];
+							}
+						}
+
+						order_result($user_groups_list);
+
+						$result['type'] = _('Send message to user groups').': ';
+						$result['data'] = [implode(', ', $user_groups_list), ' ', _('via'), ' ', $media_type];
+					}
+					break;
+
+//				case OPERATION_TYPE_COMMAND:
+//					$scriptid = $operation['opcommand']['scriptid'];
+
+//					if ($eventsource == EVENT_SOURCE_SERVICE) {
+//						$result[$i][$j][] = [
+//							bold(_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])),
+//							BR()
+//						];
+
+//						break;
+//					}
+
+//					if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
+//						$host_list = [];
+
+//						foreach ($operation['opcommand_hst'] as $host) {
+//							if ($host['hostid'] == 0) {
+//								$result[$i][$j][] = [
+//									bold(_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])),
+//									BR()
+//								];
+//							}
+//							elseif (isset($hosts[$host['hostid']])) {
+//								$host_list[] = $hosts[$host['hostid']]['name'];
+//							}
+//						}
+
+//						if ($host_list) {
+//							order_result($host_list);
+
+//							$result[$i][$j][] = bold(
+//								_s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': '
+//							);
+//							$result[$i][$j][] = [implode(', ', $host_list), BR()];
+//						}
+//					}
+
+//					if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
+//						$host_group_list = [];
+
+//						foreach ($operation['opcommand_grp'] as $host_group) {
+//							if (isset($host_groups[$host_group['groupid']])) {
+//								$host_group_list[] = $host_groups[$host_group['groupid']]['name'];
+//							}
+//						}
+
+//						order_result($host_group_list);
+
+//						$result[$i][$j][] = bold(
+//							_s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': '
+//						);
+//						$result[$i][$j][] = [implode(', ', $host_group_list), BR()];
+//					}
+//					break;
+
+			// todo : fix this:
+				case OPERATION_TYPE_RECOVERY_MESSAGE:
+				case OPERATION_TYPE_UPDATE_MESSAGE:
+					$result['type'] =_('Notify all involved');
+					break;
+			}
+		}
+
+		return $result;
 	}
 }

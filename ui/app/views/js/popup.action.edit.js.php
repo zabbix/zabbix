@@ -105,7 +105,12 @@ window.action_edit_popup = new class {
 
 	_createOperationsRow(input) {
 		const operation_data = input.detail.operation;
-		if (this.recovery == <?= ACTION_OPERATION ?>) {
+
+		// todo : rewrite to switch statement?
+
+		if (this.recovery == <?= ACTION_OPERATION ?> && (
+				this.eventsource == <?=EVENT_SOURCE_TRIGGERS?> || this.eventsource == <?=EVENT_SOURCE_INTERNAL?>
+				|| this.eventsource == <?=EVENT_SOURCE_SERVICE?>)) {
 			this.operation_table = document.getElementById('op-table');
 			this.operation_row_count = this.operation_table.rows.length - 2;
 			this.operation_row = document.createElement('tr');
@@ -114,6 +119,19 @@ window.action_edit_popup = new class {
 			this.operation_row.append(this._addDetailsColumn(operation_data.details));
 			this.operation_row.append(this._addColumn(operation_data.start_in));
 			this.operation_row.append(this._addColumn(operation_data.duration));
+
+			this.addOperationsData(input);
+			this.operation_row.append(this._createActionCell());
+			$('#op-table tr:last').before(this.operation_row);
+		}
+
+		if (this.recovery == <?= ACTION_OPERATION ?> && (
+				this.eventsource == <?=EVENT_SOURCE_DISCOVERY?> || this.eventsource == <?=EVENT_SOURCE_AUTOREGISTRATION?>)) {
+			this.operation_table = document.getElementById('op-table');
+			this.operation_row_count = this.operation_table.rows.length - 2;
+			this.operation_row = document.createElement('tr');
+
+			this.operation_row.append(this._addDetailsColumn(operation_data.details));
 
 			this.addOperationsData(input);
 			this.operation_row.append(this._createActionCell());
@@ -146,10 +164,18 @@ window.action_edit_popup = new class {
 	}
 
 	_addDetailsColumn(input) {
-		const cell = document.createElement('b');
+		const details = document.createElement('td');
+		const type_cell = document.createElement('b');
 
-		cell.append(input);
-		return cell;
+		type_cell.append(input.type);
+		if (input.data) {
+			details.append(type_cell, input.data.join(' '));
+		}
+		else {
+			details.append(type_cell);
+		}
+
+		return details;
 	}
 
 	addOperationsData(input) {
