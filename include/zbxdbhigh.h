@@ -26,7 +26,6 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxversion.h"
-#include "zbxeval.h"
 #include "zbxcomms.h"
 
 extern char	*CONFIG_DBHOST;
