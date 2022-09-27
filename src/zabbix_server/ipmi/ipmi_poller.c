@@ -187,7 +187,7 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	if (FAIL == zbx_ipc_async_socket_open(&ipmi_socket, ZBX_IPC_SERVICE_IPMI, SEC_PER_MIN, &error))
 	{
@@ -221,7 +221,7 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 			polled_num = 0;
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 		while (ZBX_IS_RUNNING())
 		{
@@ -240,7 +240,7 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 			zbx_perform_all_openipmi_ops(ipmi_timeout);
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		if (NULL == message)
 			break;

@@ -17,16 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROXYCFG_H
-#define ZABBIX_PROXYCFG_H
+#include "zbxtypes.h"
 
-#include "zbxcomms.h"
-#include "zbxjson.h"
-
-extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_TRAPPER_TIMEOUT;
-
-void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp);
-void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_config_tls_t *zbx_config_tls);
-
-#endif
+#ifdef HAVE_KSTAT_H
+zbx_uint64_t    get_kstat_numeric_value(const kstat_named_t *kn);
+#endif /* HAVE_KSTAT_H */

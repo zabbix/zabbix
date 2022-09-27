@@ -279,9 +279,9 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_free_result_ptr(AGENT_RESULT *result)
+void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 {
-	free_result(result);
+	zbx_free_agent_result(result);
 	zbx_free(result);
 }
 
@@ -447,7 +447,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 
 	for (i = 0; i < num; i++)
 	{
-		init_result(&results[i]);
+		zbx_init_agent_result(&results[i]);
 		errcodes[i] = SUCCEED;
 
 		if (MACRO_EXPAND_YES == expand_macros)
@@ -789,7 +789,7 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
 				break;
 		}
 
-		free_result(&results[i]);
+		zbx_free_agent_result(&results[i]);
 	}
 }
 
@@ -929,7 +929,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zbx_preprocessor_flush();
 	zbx_clean_items(items, num, results);
 	DCconfig_clean_items(items, NULL, num);
-	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_result_ptr);
+	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_agent_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
 
 	if (NULL != data)
@@ -968,7 +968,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			get_program_type_string(poller_args_in->zbx_get_program_type_cb_arg()), server_num,
 			get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	scriptitem_es_engine_init();
 

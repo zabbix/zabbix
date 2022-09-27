@@ -1204,10 +1204,10 @@ static void	tm_remove_old_tasks(int now)
 static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 {
 	int				i, notify_proxypollers = 0;
-	zbx_vector_cached_proxy_t	proxies;
+	zbx_vector_cached_proxy_ptr_t	proxies;
 	zbx_vector_ptr_t		tasks_active;
 
-	zbx_vector_cached_proxy_create(&proxies);
+	zbx_vector_cached_proxy_ptr_create(&proxies);
 
 	zbx_vector_ptr_create(&tasks_active);
 
@@ -1259,8 +1259,8 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 	zbx_vector_ptr_destroy(&tasks_active);
 
-	zbx_vector_cached_proxy_clear_ext(&proxies, zbx_cached_proxy_free);
-	zbx_vector_cached_proxy_destroy(&proxies);
+	zbx_vector_cached_proxy_ptr_clear_ext(&proxies, zbx_cached_proxy_free);
+	zbx_vector_cached_proxy_ptr_destroy(&proxies);
 }
 
 /******************************************************************************
@@ -1393,7 +1393,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	DBconnect(ZBX_DB_CONNECT_NORMAL);

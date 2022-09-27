@@ -42,8 +42,8 @@ typedef struct
 	const unsigned char	*expression_bin;
 	const unsigned char	*recovery_expression_bin;
 	int			lastchange;
-	zbx_uint32_t		revision;
-	zbx_uint32_t		timer_revision;
+	zbx_uint64_t		revision;
+	zbx_uint64_t		timer_revision;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -85,8 +85,8 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*function;
 	const char	*parameter;
-	zbx_uint32_t	revision;
-	zbx_uint32_t	timer_revision;
+	zbx_uint64_t	revision;
+	zbx_uint64_t	timer_revision;
 	unsigned char	type;
 }
 ZBX_DC_FUNCTION;
@@ -108,7 +108,7 @@ typedef struct
 	int			nextcheck;
 	int			mtime;
 	int			data_expected_from;
-	zbx_uint32_t		revision;
+	zbx_uint64_t		revision;
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		poller_type;
@@ -322,6 +322,42 @@ ZBX_PTR_VECTOR_DECL(dc_item_ptr, ZBX_DC_ITEM *)
 
 typedef struct
 {
+	zbx_uint64_t	httptestid;
+	zbx_uint64_t	hostid;
+	time_t		nextcheck;
+	int		delay;
+	unsigned char	status;
+	unsigned char	location;
+	zbx_uint64_t	revision;
+}
+zbx_dc_httptest_t;
+
+typedef struct
+{
+	zbx_uint64_t	httptest_fieldid;
+	zbx_uint64_t	httptestid;
+}
+zbx_dc_httptest_field_t;
+
+typedef struct
+{
+	zbx_uint64_t	httpstepid;
+	zbx_uint64_t	httptestid;
+	zbx_uint64_t	revision;
+}
+zbx_dc_httpstep_t;
+
+typedef struct
+{
+	zbx_uint64_t	httpstep_fieldid;
+	zbx_uint64_t	httpstepid;
+}
+zbx_dc_httpstep_field_t;
+
+ZBX_PTR_VECTOR_DECL(dc_httptest_ptr, zbx_dc_httptest_t *)
+
+typedef struct
+{
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxy_hostid;
 	zbx_uint64_t	items_active_normal;		/* On enabled hosts these two fields store number of enabled */
@@ -336,14 +372,11 @@ typedef struct
 	const char	*name;
 	int		maintenance_from;
 	int		data_expected_from;
-	zbx_uint32_t	revision;
+	zbx_uint64_t	revision;
 
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	unsigned char	status;
-
-	/* flag to force update for all items */
-	unsigned char	update_items;
 
 	/* 'tls_connect' and 'tls_accept' must be respected even if encryption support is not compiled in */
 	unsigned char	tls_connect;
@@ -356,9 +389,13 @@ typedef struct
 
 	zbx_vector_ptr_t		interfaces_v;	/* for quick finding of all host interfaces in */
 						/* 'config->interfaces' hashset */
+
+	zbx_vector_dc_httptest_ptr_t	httptests;
 	zbx_vector_dc_item_ptr_t	active_items;
 }
 ZBX_DC_HOST;
+
+ZBX_PTR_VECTOR_DECL(dc_host_ptr, ZBX_DC_HOST *)
 
 typedef struct
 {
@@ -389,6 +426,15 @@ ZBX_DC_HOST_H;
 
 typedef struct
 {
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	revision;
+}
+zbx_host_rev_t;
+
+ZBX_VECTOR_DECL(host_rev, zbx_host_rev_t)
+
+typedef struct
+{
 	zbx_uint64_t			hostid;
 	zbx_uint64_t			hosts_monitored;	/* number of enabled hosts assigned to proxy */
 	zbx_uint64_t			hosts_not_monitored;	/* number of disabled hosts assigned to proxy */
@@ -400,8 +446,8 @@ typedef struct
 	int				lastaccess;
 	int				proxy_delay;
 	zbx_proxy_suppress_t		nodata_win;
-	int				last_cfg_error_time;	/* time when passive proxy misconfiguration error was */
-								/* seen or 0 if no error */
+	int				last_cfg_error_time;	/* time when passive proxy misconfiguration error was seen */
+								/* or 0 if no error */
 	const char			*version_str;
 	int				version_int;
 	zbx_proxy_compatibility_t	compatibility;
@@ -409,6 +455,10 @@ typedef struct
 	unsigned char			auto_compress;
 	const char			*proxy_address;
 	int				last_version_error_time;
+	zbx_uint64_t			revision;
+
+	zbx_vector_dc_host_ptr_t	hosts;
+	zbx_vector_host_rev_t		removed_hosts;
 }
 ZBX_DC_PROXY;
 
@@ -774,6 +824,25 @@ zbx_dc_macro_kv_t;
 
 typedef struct
 {
+	zbx_uint64_t	druleid;
+	zbx_uint64_t	proxy_hostid;
+	time_t		nextcheck;
+	int		delay;
+	unsigned char	status;
+	unsigned char	location;
+	zbx_uint64_t	revision;
+}
+zbx_dc_drule_t;
+
+typedef struct
+{
+	zbx_uint64_t	dcheckid;
+	zbx_uint64_t	druleid;
+}
+zbx_dc_dcheck_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
@@ -783,8 +852,7 @@ typedef struct
 	unsigned int		internal_actions;		/* number of enabled internal actions */
 	unsigned int		auto_registration_actions;	/* number of enabled auto resistration actions */
 
-	zbx_uint32_t		revision;
-	zbx_uint32_t		expression_revision;
+	zbx_dc_revision_t	revision;
 
 	/* maintenance processing management */
 	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */
@@ -861,10 +929,19 @@ typedef struct
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
 #endif
+	zbx_hashset_t		data_sessions;
+	zbx_hashset_t		drules;
+	zbx_hashset_t		dchecks;
+	zbx_hashset_t		httptests;
+	zbx_hashset_t		httptest_fields;
+	zbx_hashset_t		httpsteps;
+	zbx_hashset_t		httpstep_fields;
 	zbx_hashset_t		sessions[ZBX_SESSION_TYPE_COUNT];
 	zbx_binary_heap_t	queues[ZBX_POLLER_TYPE_COUNT];
 	zbx_binary_heap_t	pqueue;
 	zbx_binary_heap_t	trigger_queue;
+	zbx_binary_heap_t	drule_queue;
+	zbx_binary_heap_t	httptest_queue;		/* web scenario queue */
 	ZBX_DC_CONFIG_TABLE	*config;
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;
@@ -930,8 +1007,7 @@ char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int h
 #define ZBX_TRIGGER_TIMER_FUNCTION_TREND	0x0004
 #define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
 
-
-zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache,  zbx_uint32_t revision, zbx_dbsync_t *gmacros,
+zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_dbsync_t *gmacros,
 		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls);
 
 #endif
