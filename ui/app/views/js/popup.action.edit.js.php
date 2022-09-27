@@ -191,7 +191,7 @@ window.action_edit_popup = new class {
 			}
 		}
 
-		this.operation_row.append(this._addHiddenOperationsFields('operationtype', 0));
+		this.operation_row.append(this._addHiddenOperationsFields('operationtype', this.recovery));
 
 	}
 

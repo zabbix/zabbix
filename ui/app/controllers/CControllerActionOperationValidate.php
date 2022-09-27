@@ -223,7 +223,7 @@ class CControllerActionOperationValidate extends CController {
 				'operation-message-mediatype-only' => $operation['operation-message-mediatype-only'],
 				'opmessage_grp' => $operation['opmessage_grp'],
 				'opmessage_usr' => $operation['opmessage_usr'],
-				'opmessage' =>  $operation['esc_period'],
+				'opmessage' =>  $operation['opmessage'],
 				'evaltype' => $operation['evaltype'],
 				'condition' => $operation['condition'] ? : [],
 				'details' => $this->createDetailsColumn($operation),
@@ -246,7 +246,7 @@ class CControllerActionOperationValidate extends CController {
 				'operationtype' => $operation['operationtype'],
 				'operation-message-mediatype-only' => $operation['operation-message-mediatype-only'],
 				//'opmessage_grp' => $operation['opmessage_grp'],
-				'opmessage' =>  $operation['opmessage'],
+				//'opmessage' =>  $operation['opmessage'],
 				'opcommand' => $operation['opcommand'],
 				'evaltype' => $operation['evaltype'],
 				'opmessage_usr' => $operation['opmessage_usr'],
@@ -299,7 +299,6 @@ class CControllerActionOperationValidate extends CController {
 
 		foreach ($operation['opmessage_grp'] as $user_group) {
 		//	$this->getActionOperationDescription($operation);
-			sdff($user_group['usrgrpid']);
 		}
 
 		if (array_key_exists('opmessage_grp', $operation)) {
