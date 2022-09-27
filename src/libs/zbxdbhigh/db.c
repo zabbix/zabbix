@@ -196,11 +196,14 @@ int	DBconnect(int flag)
 	return err;
 }
 
-int	DBinit(zbx_dc_get_nextid_func_t cb_nextid, char **error)
+int	DBinit(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char **error)
 {
 	zbx_cb_nextid = cb_nextid;
 
-	return zbx_db_init(CONFIG_DBNAME, db_schema, error);
+	if (ZBX_PROGRAM_TYPE_SERVER != program)
+		return zbx_db_init(CONFIG_DBNAME, db_schema, error);
+
+	return SUCCEED;
 }
 
 void	DBdeinit(void)

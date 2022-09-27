@@ -1144,7 +1144,7 @@ static void	proxy_db_init(void)
 	zbx_stat_t	db_stat;
 #endif
 
-	if (SUCCEED != DBinit(DCget_nextid, &error))
+	if (SUCCEED != DBinit(DCget_nextid, program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);

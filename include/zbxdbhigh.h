@@ -416,7 +416,7 @@ typedef struct
 }
 zbx_service_alarm_t;
 
-int	DBinit(zbx_dc_get_nextid_func_t cb_nextid, char **error);
+int	DBinit(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char **error);
 void	DBdeinit(void);
 
 void	DBinit_autoincrement_options(void);
