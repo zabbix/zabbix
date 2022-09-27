@@ -1,3 +1,41 @@
+Changes for 5.0.29rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-21605] fixed possible PHP runtime errors in several modal popup dialogs (Sasha)
+...G...... [ZBX-21466] fixed race condition in Zabbix agent 2 leading to permanently stuck mount reads (arimdjonoks)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.28
+
+5.0.28rc1 was released as 5.0.28 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.28rc1
+
+New features:
+...G...PS. [ZBXNEXT-7868] backported support of OpenSSL 3.0 (asestakovs)
+...G...... [ZBXNEXT-6666] added listen socket security fix for Agent 2 on Windows (ssimonenko)
+
+Bug fixes:
+........S. [ZBX-21558] fixed possible crash in value cache when a new item is being added in low memory situation (wiper)
+....I..PS. [ZBX-20943] fixed long hostgroup names in LLD hostgroup prototypes fails 2nd and consequent runs (mprihodko, Sasha)
+.D.......T [ZBX-21519] added note about php-fpm process name in documentation of PHP-FPM by Zabbix agent template (drasihov)
+A......... [ZBX-21332] fixed runtime errors when linking items from two templates that populate same inventory field (Ivo)
+A.F....... [ZBX-21070] fixed missing discovery rule for a discovered host group and updated links to host prototype (dpetra)
+.........T [ZBX-21304] fixed ping item preprocessing regex in PHP-FPM templates to be compatible with Zabbix agent 2 (drasihov)
+..F....... [ZBX-41474] fixed shortened tag names with multibyte symbols (dpetra)
+.......PS. [ZBX-21454] added blocking of rtc signals during script execution (dgoloscapov)
+..F....... [ZBX-21449] fixed accessibility attributes (Sasha)
+..F....... [ZBX-18838] removed non-existent value 'failed' in script.execute response property (dpetra)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.27
+
+5.0.27rc1 was released as 5.0.27 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.27rc1
 
 New features:
@@ -2577,11 +2615,23 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.44rc1
+Changes for 4.0.45rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.44
+
+4.0.44rc1 was released as 4.0.44 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.44rc1
+
+Bug fixes:
+........S. [ZBX-21416] fixed check now not working on calculated items, aggregate checks and some internal items (wiper)
+..F....... [ZBX-21449] fixed accessibility attributes (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.43
