@@ -513,20 +513,22 @@ function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_templat
 	$interface_links = [];
 	$dst_interfaceids = [];
 
-	if ($src_interfaceids && !$dst_is_template) {
+	if (!$dst_is_template) {
 		$src_interfaces = [];
 
-		$src_hosts = API::Host()->get([
-			'output' => [],
-			'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
-			$src_type => $src_ids
-		]);
+		if ($src_interfaceids) {
+			$src_hosts = API::Host()->get([
+				'output' => [],
+				'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
+				$src_type => $src_ids
+			]);
 
-		foreach ($src_hosts as $src_host) {
-			foreach ($src_host['interfaces'] as $src_interface) {
-				if (array_key_exists($src_interface['interfaceid'], $src_interfaceids)) {
-					$src_interfaces[$src_interface['interfaceid']] =
-						array_diff_key($src_interface, array_flip(['interfaceid']));
+			foreach ($src_hosts as $src_host) {
+				foreach ($src_host['interfaces'] as $src_interface) {
+					if (array_key_exists($src_interface['interfaceid'], $src_interfaceids)) {
+						$src_interfaces[$src_interface['interfaceid']] =
+							array_diff_key($src_interface, array_flip(['interfaceid']));
+					}
 				}
 			}
 		}
