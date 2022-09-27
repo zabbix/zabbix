@@ -208,6 +208,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
 			//Reset filter
 			$this->zbxTestClickButtonText('Reset');
+			$this->zbxTestWaitForPageToLoad();
 			$table->waitUntilReloaded();
 		}
 		$this->zbxTestTextNotPresent($data['trigger_names']);
@@ -316,6 +317,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
 			//Reset filter
 			$this->zbxTestClickButtonText('Reset');
+			$this->zbxTestWaitForPageToLoad();
 			$table->waitUntilReloaded();
 		}
 
@@ -419,6 +421,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
 			//Reset filter
 			$this->zbxTestClickButtonText('Reset');
+			$this->zbxTestWaitForPageToLoad();
 			$table->waitUntilReloaded();
 		}
 
