@@ -1315,6 +1315,40 @@ static void	DCdump_maintenances(void)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
+static int	strpool_compare(const void *v1, const void *v2)
+{
+	const char	*s1 = *(const char * const *)v1 + sizeof(zbx_uint32_t);
+	const char	*s2 = *(const char * const *)v2 + sizeof(zbx_uint32_t);
+
+	return strcmp(s1, s2);
+}
+
+static void	DCdump_strpool()
+{
+	zbx_hashset_iter_t	iter;
+	zbx_vector_ptr_t	records;
+	char			*record;
+	int			i;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_vector_ptr_create(&records);
+	zbx_hashset_iter_reset(&config->strpool, &iter);
+
+	while (NULL != (record = (char *)zbx_hashset_iter_next(&iter)))
+		zbx_vector_ptr_append(&records, record);
+
+	zbx_vector_ptr_sort(&records, strpool_compare);
+
+	for (i = 0; i < records.values_num; i++)
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "  %s: %u", (char *)records.values[i] + sizeof(zbx_uint32_t),
+				*(zbx_uint32_t *)records.values[i]);
+	}
+
+	zbx_vector_ptr_destroy(&records);
+}
+
 void	DCdump_configuration(void)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "=== Configuration cache contents (revision:%u) ===", config->revision);
@@ -1344,4 +1378,5 @@ void	DCdump_configuration(void)
 	DCdump_host_group_index();
 	DCdump_maintenances();
 	DCdump_autoreg_hosts();
+	DCdump_strpool();
 }
