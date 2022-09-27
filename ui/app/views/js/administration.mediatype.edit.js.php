@@ -318,7 +318,16 @@
 		 */
 		function toggleAuthenticationOptions() {
 			if ($('input[name=smtp_authentication]:checked').val() == <?= SMTP_AUTHENTICATION_NORMAL ?>) {
-				$('#smtp_username, #passwd').closest('li').show();
+				if ($('#provider').val() == <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?>) {
+					$('input[name=passwd]').attr('aria-required', 'false');
+					$('label[for=passwd]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+					$('#smtp_username, #passwd').closest('li').show();
+				}
+				else {
+					$('input[name=passwd]').attr('aria-required', 'true');
+					$('label[for=passwd]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+					$('#passwd').closest('li').show();
+				}
 			}
 			else {
 				$('#smtp_username, #passwd').val('').closest('li').hide();
@@ -381,27 +390,16 @@
 				toggleSecurityOptions();
 				toggleAuthenticationOptions();
 			}
-			else if (provider == '<?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>') {
-				$('input[name=passwd]').attr('aria-required', 'false');
-				$('label[for=passwd]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+			else if (provider == '<?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>'
+						|| provider == '<?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>') {
+				$('#provider, #smtp_email, #smtp_authentication, #content_type').closest('li').show();
 
-				$('#smtp_authentication, #provider, #smtp_email, #content_type').closest('li').show();
-
-				toggleAuthenticationOptions()
-			}
-			else if (provider == '<?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>') {
-				$('input[name=passwd]').attr('aria-required', 'false');
-				$('label[for=passwd]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
-
-				$('#smtp_server, #provider, #smtp_email, #content_type').closest('li').show();
-
-				generateOffice365RelaySmtpServer();
+				toggleAuthenticationOptions();
 			}
 			else {
-				$('input[name=passwd]').attr('aria-required', 'true');
-				$('label[for=passwd]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+				$('#provider, #smtp_email, #content_type').closest('li').show();
 
-				$('#provider, #smtp_email, #content_type, #passwd').closest('li').show();
+				toggleAuthenticationOptions();
 			}
 		}
 
@@ -418,22 +416,6 @@
 				.prop("checked", true);
 			$('input[name=content_type]:checked').prop("checked", false);
 			$('input[name=content_type][value=' + providers[provider]['content_type'] + ']').prop("checked", true);
-		}
-
-		function generateOffice365RelaySmtpServer() {
-			const provider = $('#provider').val();
-			const email = $('#smtp_email').val();
-
-			const tld_start_pos = email.lastIndexOf('.');
-			const domain_start_pos = email.indexOf('@') + 1;
-
-			if (domain_start_pos != 0 && tld_start_pos != -1) {
-				const formatted_email = email.substring(0, tld_start_pos) + '-' + email.substring(tld_start_pos + 1);
-				const formatted_email_domain = formatted_email.substring(domain_start_pos);
-				const smtp_server = formatted_email_domain + providers[provider]['smtp_server'];
-				$('input[name=smtp_server]').val(smtp_server);
-			}
-
 		}
 
 		$('#exec_params_table').dynamicRows({ template: '#exec_params_row' });
