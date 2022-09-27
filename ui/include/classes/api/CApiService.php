@@ -921,21 +921,78 @@ class CApiService {
 				continue;
 			}
 
-			zbx_value2array($value);
+			$values = [];
+
+			switch ($tableSchema['fields'][$field]['type']) {
+				case DB::FIELD_TYPE_INT:
+					foreach ((array) $value as $val) {
+						if (!is_int($val) && (!is_string($val) || !preg_match('/^'.ZBX_PREG_INT.'$/', $val))) {
+							continue;
+						}
+
+						if ($val < ZBX_MIN_INT32 || $val > ZBX_MAX_INT32) {
+							continue;
+						}
+
+						$values[] = $val;
+					}
+					break;
+
+				case DB::FIELD_TYPE_ID:
+					foreach ((array) $value as $val) {
+						if (!is_int($val) && (!is_string($val) || !ctype_digit($val))) {
+							continue;
+						}
+
+						if ($val < 0 || bccomp((string) $val, ZBX_DB_MAX_ID) > 0) {
+							continue;
+						}
+
+						$values[] = $val;
+					}
+					break;
+
+				case DB::FIELD_TYPE_UINT:
+					foreach ((array) $value as $val) {
+						if (!is_int($val) && (!is_string($val) || !ctype_digit($val))) {
+							continue;
+						}
+
+						if (bccomp((string) $val, ZBX_MIN_INT64) < 0 || bccomp((string) $val, ZBX_MAX_INT64) > 0) {
+							continue;
+						}
+
+						$values[] = $val;
+					}
+					break;
+
+				case DB::FIELD_TYPE_FLOAT:
+					foreach ((array) $value as $val) {
+						if (!is_numeric($val)) {
+							continue;
+						}
+
+						$values[] = $val;
+					}
+					break;
+
+				default:
+					$values = (array) $value;
+			}
 
 			$fieldName = $this->fieldId($field, $tableShort);
 			switch ($tableSchema['fields'][$field]['type']) {
 				case DB::FIELD_TYPE_ID:
-					$filter[$field] = dbConditionId($fieldName, $value);
+					$filter[$field] = dbConditionId($fieldName, $values);
 					break;
 
 				case DB::FIELD_TYPE_INT:
 				case DB::FIELD_TYPE_UINT:
-					$filter[$field] = dbConditionInt($fieldName, $value);
+					$filter[$field] = dbConditionInt($fieldName, $values);
 					break;
 
 				default:
-					$filter[$field] = dbConditionString($fieldName, $value);
+					$filter[$field] = dbConditionString($fieldName, $values);
 			}
 		}
 
