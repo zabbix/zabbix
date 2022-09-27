@@ -5402,6 +5402,30 @@ class CApiInputValidatorTest extends TestCase {
 				],
 				'/',
 				'Invalid parameter "/active_till": cannot be less than or equal to the value of parameter "/active_since".'
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => '3', 'name2' => '2', 'value' => ['1', '2', '3', '4', '1']],
+				'/',
+				'Invalid parameter "/": unexpected parameter "name2".'
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => '3', 'name' => null, 'value' => ['1', '2', '3', '4', '1']],
+				'/',
+				['type' => ['3'], 'name' => null, 'value' => ['1', '2', '3', '4', '1']]
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => '3', 'name' => '2', 'value' => ['1', '2', '3', null, '1']],
+				'/',
+				'Invalid parameter "/value/4": a character string, integer or floating point value is expected.'
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => 3, 'name' => 2, 'value' => ['1', 2.5, '3', '4', '1']],
+				'/',
+				['type' => [3], 'name' => [2], 'value' => ['1', 2.5, '3', '4', '1']]
 			]
 		];
 	}

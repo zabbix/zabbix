@@ -1,8 +1,20 @@
 Changes for 6.0.10rc1
 
 New features:
+A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 
 Bug fixes:
+...G...... [ZBX-21388] fixed Zabbix agent 2 plugin read error and updated plugin support dependency for Zabbix agent 2 (esneiders)
+...G...PS. [ZBX-20864] fixed format specifier definitions on AIX (jxl)
+..F....... [ZBX-21605] fixed possible PHP runtime errors in several modal popup dialogs (Sasha)
+.........T [ZBX-21580] optimized HPE MSA 2060 Storage by HTTP template to spread the load across preprocessing workers (drasihov)
+.........T [ZBX-21579] optimized HPE MSA 2040 Storage by HTTP template to spread the load across preprocessing workers (drasihov)
+.........T [ZBX-21421] fixed variable spelling in Kubernetes cluster state by HTTP template (atocko)
+...G...... [ZBX-21466] fixed race condition in Zabbix agent 2 leading to permanently stuck mount reads (arimdjonoks)
+A.F....... [ZBX-21097] fixed filtering by "Resource ID" and "Recordset ID" fields for "Audit log" page (Sasha)
+..F....... [ZBX-21544] fixed value of query field being truncated to the first "=" sign when pressing parse button (agriscenko)
+.........T [ZBX-21581] optimized HPE Primera template to spread the load across preprocessing workers (vkhaliev)
+........S. [ZBX-21009] fixed double escaping in trigger function upon host autoregistration (kprutkovs)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.9
@@ -2139,6 +2151,8 @@ Changes for 5.0.29rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-21605] fixed possible PHP runtime errors in several modal popup dialogs (Sasha)
+...G...... [ZBX-21466] fixed race condition in Zabbix agent 2 leading to permanently stuck mount reads (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.28
