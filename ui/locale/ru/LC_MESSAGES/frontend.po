@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-03-25 14:20+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-09-23 08:34+0000\n"
+"Last-Translator: sergejs.maklakovs <sergejs.maklakovs@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -362,7 +362,7 @@ msgstr "100 наиболее загруженных триггеров"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:184
 msgid "12-hour"
-msgstr ""
+msgstr "12-часов"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:183
 msgid "24-hour"
@@ -2229,7 +2229,7 @@ msgstr[2] "Не удалось скопировать триггеры"
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Не удалось скопировать триггер \"%1$s\", потому что он содержит несколько узлов сети в выражении."
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2814,6 +2814,10 @@ msgstr[2] "Не удалось активировать веб-сценарии"
 #: app/controllers/CControllerPopupTestTriggerExpr.php:199
 msgid "Cannot evaluate expression"
 msgstr "Не удалось раскрыть выражение"
+
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
@@ -4848,6 +4852,10 @@ msgstr "Создано пользователями"
 #: include/items.inc.php:41
 msgid "Critical"
 msgstr "Критичная"
+
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr ""
 
 #: app/partials/popup.operations.php:172
 msgid "Current host"
@@ -11402,6 +11410,10 @@ msgstr ""
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr ""
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Список блочных устройств и их типы. Возвращает JSON"
@@ -13856,6 +13868,10 @@ msgstr "Только супер администраторы могут зада
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Подсчитываются только триггеры у активированных узлов сети и которые зависят от активных элементов данных"
 
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -14070,6 +14086,10 @@ msgstr "Прочие параметры"
 #: include/views/configuration.httpconf.edit.php:90
 msgid "Others"
 msgstr "Другие"
+
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr ""
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -15111,6 +15131,16 @@ msgstr "Имя прокси"
 msgid "Proxy updated"
 msgstr "Прокси обновлен"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr ""
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -15765,6 +15795,10 @@ msgstr "Требуемые коды состояния"
 #: app/views/popup.httpstep.php:170
 msgid "Required string"
 msgstr "Требуемая строка"
+
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr ""
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
@@ -23695,6 +23729,11 @@ msgstr "varsamp() - Выборочная дисперсия"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "через"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

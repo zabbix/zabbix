@@ -191,7 +191,7 @@ class testHistory extends CAPITest {
 					'output' => ['value', 'clock'],
 					'history' => 0,
 					'filter' => [
-						'value' => ["1.5", 1.0001, -1, -1.5]
+						'value' => ['1.5', 1.0001, -1, -1.5, 'abc']
 					]
 				],
 				'expected_result' => [
@@ -228,7 +228,7 @@ class testHistory extends CAPITest {
 					]
 				],
 				'expected_result' => null,
-				'expected_error' => 'Invalid parameter "/filter/value/1": a floating point value is expected.'
+				'expected_error' => 'Invalid parameter "/filter/value/1": a character string, integer or floating point value is expected.'
 			]
 		];
 	}
@@ -240,10 +240,10 @@ class testHistory extends CAPITest {
 		$result = $this->call('history.get', $api_request, $expected_error);
 
 		if ($expected_error === false) {
-			$this->assertSame($result['result'], $expected_result);
+			$this->assertSame($expected_result, $result['result']);
 		}
 		else {
-			$this->assertSame($result['error']['data'], $expected_error);
+			$this->assertSame($expected_error, $result['error']['data']);
 		}
 	}
 }

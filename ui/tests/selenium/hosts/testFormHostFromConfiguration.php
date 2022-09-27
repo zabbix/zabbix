@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/../common/testFormHost.php';
 
 /**
- * @dataSource DiscoveredHosts
+ * @dataSource DiscoveredHosts, Proxies
  *
  * @backup hosts
  *

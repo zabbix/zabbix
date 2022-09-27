@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -18,20 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_STATS_H
+#define ZABBIX_STATS_H
 
-function media_type2str($type = null) {
-	$types = [
-		MEDIA_TYPE_EMAIL => _('Email'),
-		MEDIA_TYPE_EXEC => _('Script'),
-		MEDIA_TYPE_SMS => _('SMS'),
-		MEDIA_TYPE_WEBHOOK => _('Webhook')
-	];
+#include "zbxcomms.h"
+#include "zbxjson.h"
 
-	if ($type === null) {
-		natsort($types);
+typedef void (*zbx_zabbix_stats_ext_get_func_t)(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config);
 
-		return $types;
-	}
+void	zbx_zabbix_stats_init(zbx_zabbix_stats_ext_get_func_t cb);
+void	zbx_zabbix_stats_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config);
 
-	return $types[$type];
-}
+#endif

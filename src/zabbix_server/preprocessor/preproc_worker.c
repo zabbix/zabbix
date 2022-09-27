@@ -607,7 +607,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	memset(&dep_request, 0, sizeof(dep_request));
 	zbx_variant_set_none(&dep_request.value);
@@ -616,7 +616,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != zbx_ipc_socket_read(&socket, &message))
 		{
@@ -624,7 +624,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 			exit(EXIT_FAILURE);
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		zbx_update_env(zbx_time());
 
 		switch (message.code)

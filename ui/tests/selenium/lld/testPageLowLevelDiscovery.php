@@ -231,7 +231,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	}
 
 	/**
-	 * @backup items
+	 * @backupOnce items
 	 *
 	 * @dataProvider getCheckNowData
 	 */

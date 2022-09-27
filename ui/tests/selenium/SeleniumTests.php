@@ -33,16 +33,20 @@ require_once dirname(__FILE__).'/apiTokens/testFormApiTokensUserSettings.php';
 
 // Dashboards.
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardGeomapWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardFavoriteGraphsWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardFavoriteMapsWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardForm.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardGeomapWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardItemValueWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardTopHostsWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardViewMode.php';
 require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageDashboard.php';
 require_once dirname(__FILE__).'/dashboard/testPageDashboardList.php';
@@ -132,7 +136,6 @@ require_once dirname(__FILE__).'/services/testPageServicesServicesMassUpdate.php
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
-
 require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
 require_once dirname(__FILE__).'/testPageProblems.php';
@@ -262,9 +265,12 @@ class SeleniumTests {
 
 		// Dashboards.
 		$suite->addTestSuite('testDashboardCopyWidgets');
-		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
-		$suite->addTestSuite('testDashboardGeomapWidget');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
+		$suite->addTestSuite('testDashboardFavoriteGraphsWidget');
+		$suite->addTestSuite('testDashboardFavoriteMapsWidget');
+		$suite->addTestSuite('testDashboardForm');
+		$suite->addTestSuite('testDashboardGeomapWidget');
+		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
@@ -272,6 +278,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 		$suite->addTestSuite('testDashboardSystemInformationWidget');
 		$suite->addTestSuite('testDashboardTopHostsWidget');
+		$suite->addTestSuite('testDashboardViewMode');
 		$suite->addTestSuite('testFormTemplateDashboards');
 		$suite->addTestSuite('testPageDashboard');
 		$suite->addTestSuite('testPageDashboardList');
