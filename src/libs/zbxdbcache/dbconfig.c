@@ -9477,12 +9477,12 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 	if (1024 > (index_size = config->items.num_data / 4))
 		index_size = 1024;
 
+	RDLOCK_CACHE;
+
 	zbx_hashset_create(&pp_itemids, index_size, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_dc_item_ptr_create(&items_sync);
-
-	RDLOCK_CACHE;
 
 	if (SUCCEED != um_cache_get_host_revision(config->um_cache, 0, &global_revision))
 		global_revision = 0;
