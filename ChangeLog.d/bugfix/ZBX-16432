@@ -1,1 +1,1 @@
-..F....... [ZBX-16432] fixed wrong possibility to import graph with empty name and added proper max-length to graph name field (kkuzmina)
+..F....... [ZBX-16432] removed ability to import graph with empty name and added graph name length validation up to 128 characters (kkuzmina)
