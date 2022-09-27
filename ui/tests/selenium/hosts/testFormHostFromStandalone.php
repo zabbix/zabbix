@@ -103,7 +103,7 @@ class testFormHostFromStandalone extends testFormHost {
 		$this->checkDelete($data);
 	}
 
-	public function testFormHostStandalone_DiscoveredHostLayout() {
+	public function testFormHostFromStandalone_DiscoveredHostLayout() {
 		$this->checkDiscoveredHostLayout();
 	}
 
@@ -111,7 +111,7 @@ class testFormHostFromStandalone extends testFormHost {
 	 * Test for checking templated objects that are linked to a discovered host and for checking their unlinkage.
 	 * This test is implemented only for Standalone scenario.
 	 */
-	public function testFormHostStandalone_DiscoveredHostLinkedTemplates() {
+	public function testFormHostFromStandalone_DiscoveredHostLinkedTemplates() {
 		$filtered_results = [
 			[
 				'type' => 'items',

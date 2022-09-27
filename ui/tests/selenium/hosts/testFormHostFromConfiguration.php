@@ -100,7 +100,7 @@ class testFormHostFromConfiguration extends testFormHost {
 		$this->checkDelete($data);
 	}
 
-	public function testFormHostConfiguration_DiscoveredHostLayout() {
+	public function testFormHostFromConfiguration_DiscoveredHostLayout() {
 		$this->checkDiscoveredHostLayout();
 	}
 }
