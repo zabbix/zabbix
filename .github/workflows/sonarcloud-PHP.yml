@@ -1,4 +1,4 @@
-name: SonarCloud Others Build
+name: SonarCloud Build
 
 on:
   push:
