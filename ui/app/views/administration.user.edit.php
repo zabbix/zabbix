@@ -324,7 +324,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				(new CSpan([
 					' ',
 					makeWarningIcon(
-						_('Media disabled by Administration.')
+						_('Media type disabled by Administration.')
 					)
 				]))
 			]);
