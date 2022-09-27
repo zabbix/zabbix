@@ -9469,14 +9469,18 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 	zbx_uint64_t			global_revision = *revision;
 	zbx_vector_dc_item_ptr_t	items_sync;
 	zbx_hashset_t			pp_itemids;
-
-	zbx_hashset_create(&pp_itemids, config->items.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zbx_vector_dc_item_ptr_create(&items_sync);
+	size_t				index_size = 0;
 
 	if (config->revision.config == *revision)
 		goto out;
+
+	if (1024 > (index_size = config->items.num_data / 4))
+		index_size = 1024;
+
+	zbx_hashset_create(&pp_itemids, index_size, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_vector_dc_item_ptr_create(&items_sync);
 
 	RDLOCK_CACHE;
 
@@ -9547,12 +9551,12 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 
 		zbx_hashset_iter_remove(&iter);
 	}
-out:
-	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
-		dc_preproc_dump(items);
 
 	zbx_vector_dc_item_ptr_destroy(&items_sync);
 	zbx_hashset_destroy(&pp_itemids);
+out:
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+		dc_preproc_dump(items);
 }
 
 void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num)
