@@ -198,8 +198,9 @@ window.action_edit_popup = new class {
 		form.appendChild(operation_input);
 
 		const some = ['details', 'start_in', 'steps', 'duration'];
+
 		this.createHiddenInputFromObject(input.detail.operation, `operations[${this.operation_row_count}]`, `operations_${this.operation_row_count}`, some);
-		this.operation_row.append(this._addHiddenOperationsFields('operationtype', this.recovery));
+		this.operation_row.append(this._addHiddenOperationsFields('operationtype', input.detail.operation.operationtype));
 
 	}
 

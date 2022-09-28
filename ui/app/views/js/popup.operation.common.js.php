@@ -36,20 +36,18 @@ window.operation_popup = new class {
 	_loadViews() {
 		this._removeAllFields();
 		this._sendMessageFields();
-		this._addCustomMessageFields();
+		//this._addCustomMessageFields();
 
 		jQuery('#operation-type-select').on('change', (e) => {
 			// todo : rewrite!
 			this._removeAllFields();
 
 			const operation_type = document.getElementById('operation-type-select').value;
+
 			if (operation_type == 'cmd[0]') {
 				this._sendMessageFields();
 			}
-			else if (operation_type == 'cmd[2]') {
-				// todo : add hidden input - ?
-			}
-			else if (operation_type == 'cmd[3]') {
+			else if (operation_type == 'cmd[2]' || operation_type == 'cmd[3]') {
 				// todo : add hidden input - ?
 			}
 			else if (operation_type == 'cmd[4]' || operation_type == 'cmd[5]') {
@@ -91,6 +89,8 @@ window.operation_popup = new class {
 	}
 
 	_allInvolvedFields() {
+		// todo : fix - add new function to show and undisable necessary fields!!!
+
 		// todo : check why still shows after removeAllFields
 		const remove = ['operation-attr-inventory', 'operation-attr-inventory-label'];
 		remove.forEach(value => jQuery(`#${value}`).toggle(false))
@@ -168,33 +168,100 @@ window.operation_popup = new class {
 	}
 
 	_removeAllFields() {
-		// todo : rewrite this?
-		const fields = [
-			'operation-message-notice', 'operation-message-custom-label', 'operation-message-user-groups-label',
-			'operation-message-user-groups', 'operation-message-users', 'operation-message-users-label',
-			'operation-message-mediatype-only', 'operation-message-mediatype-only-label', 'operation-message-custom',
-			'operation-message-custom-label', 'operation-attr-hostgroups', 'operation-attr-hostgroups-label',
-			'operation-attr-templates', 'operation-attr-templates-label', 'operation-attr-inventory',
-			'operation-attr-inventory-label', 'operation-command-targets-label', 'operation-command-targets',
-			'operation-message-mediatype-default-label', 'operation-message-mediatype-default'
-		]
-		fields.forEach(value => jQuery(`#${value}`).toggle(false))
+		for (let field of this.form.getElementsByClassName('form-field')) {
+			if (field.id === 'operation-type') {
+				continue;
+			}
+			field.style.display = 'none';
+			field.getElementsByTagName('input')
+		}
+
+		for (let label of this.form.getElementsByTagName('label')) {
+			if (label.id === 'operation-type-label') {
+				continue;
+			}
+			label.style.display = 'none';
+		}
+
+		for (let input of this.form.querySelectorAll('input, textarea')) {
+			if (['operation_eventsource', 'operation_recovery', 'submit'].includes(input.id)) {
+				continue;
+			}
+			if (input.name === 'operation[operationtype]') {
+				continue;
+			}
+			input.setAttribute('disabled', true)
+		}
 	}
 
 	_sendMessageFields() {
-		// todo : rewrite
-		const fields = [
-			'operation-message-notice', 'operation-message-custom-label', 'operation-message-user-groups-label',
-			'operation-message-user-groups', 'operation-message-users', 'operation-message-users-label',
-			'operation-message-mediatype-only', 'operation-message-mediatype-only-label', 'operation-message-custom',
-			'operation-message-custom-label'
-		]
-		fields.forEach(value => jQuery(`#${value}`).toggle(true))
+		switch (this.eventsource) {
+			case <?= EVENT_SOURCE_TRIGGERS ?>:
+			case <?= EVENT_SOURCE_INTERNAL ?>:
+			case <?= EVENT_SOURCE_SERVICE?>:
+				this.fields = [
+					'step-from', 'operation-step-range', 'operation-step-duration', 'operation-message-notice',
+					'operation-message-user-groups', 'operation-message-notice', 'operation-message-users',
+					'operation-message-mediatype-only', 'operation-message-custom', 'operation_esc_period',
+					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
+					'operation-message-subject', 'operation-message-body'
+				]
+				break;
+			case <?= EVENT_SOURCE_DISCOVERY ?>:
+			case <?= EVENT_SOURCE_AUTOREGISTRATION ?>:
+				this.fields = [
+					'operation-message-notice', 'operation-message-user-groups', 'operation-message-users',
+					'operation-message-mediatype-only', 'operation-message-custom', 'operation_esc_period',
+					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
+					'operation-message-subject', 'operation-message-body', 'operation-message-notice'
+				]
+				break;
+		}
+
+		this._enableFormFields(this.fields);
+		this._addCustomMessageFields();
+	}
+
+	_enableFormFields(fields = []) {
+		for (let field of this.form.getElementsByClassName('form-field')) {
+			if (fields.includes(field.id)) {
+				field.style.display = 'block';
+
+				for (let input of field.querySelectorAll('input, textarea')) {
+					input.removeAttribute('disabled')
+				}
+				for (let label of field.querySelectorAll('label')) {
+					label.style.display = 'block';
+				}
+			}
+
+
+		}
+
+		for (let label of this.form.getElementsByTagName('label')) {
+			if (fields.includes(label.id.replace('-label', ''))) {
+				label.style.display = 'block';
+			}
+			if (fields.includes(label.htmlFor)) {
+				label.style.display = 'block';
+			}
+		}
 	}
 
 	_hostInventoryFields() {
-		jQuery('#operation-attr-inventory').toggle(true);
-		jQuery('#operation-attr-inventory-label').toggle(true);
+		const fields = [
+			'operation-attr-inventory'
+		]
+		this._enableFormFields(fields);
+
+		//jQuery('#operation-attr-inventory').toggle(true);
+		//jQuery('#operation-attr-inventory-label').toggle(true);
+
+		//jQuery('#operation-attr-inventory').show();
+		//jQuery('#operation-attr-inventory-label').show();
+
+		//jQuery('#operation-attr-inventory').prop( "disabled", false);
+		//jQuery('#operation_opinventory_inventory_mode_0').prop( "disabled", false);
 	}
 
 	_addScriptFields() {
@@ -249,18 +316,6 @@ window.operation_popup = new class {
 			}
 		});
 	}
-
-	// addPopupValues() {
-	//	if (sourceid === 'operation-message-user-groups-footer') {
-	//		overlay.$dialogue[0].dispatchEvent(new CustomEvent('submit-usergroups-popup', {detail:values}));
-	//	}
-	// else if (sourceid === 'operation-command-target-hosts') {
-	//	operation_popup.view.operation_command.$targets_hosts_ms.multiSelect('addData', values);
-	// }
-	// else if (sourceid === 'operation-command-target-groups') {
-	//	operation_popup.view.operation_command.$targets_groups_ms.multiSelect('addData', values);
-	// }
-	//}
 
 	_openUserGroupPopup(trigger_element) {
 		const parameters = {
@@ -423,7 +478,6 @@ window.operation_popup = new class {
 		let curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', 'action.operation.validate');
 		const fields = getFormFields(this.form);
-		// todo : pass recovery type info for operation validation controller
 
 		this._post(curl.getUrl(), fields);
 	}
@@ -477,8 +531,8 @@ window.operation_popup = new class {
 		$('#operation_opmessage_default_msg')
 			.change(function() {
 				if($('#operation_opmessage_default_msg')[0].checked) {
-					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').show();
-					$('[id="operation-message-body"],[id="operation-message-label"]').show();
+					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').show().attr('disabled', false);
+					$('[id="operation-message-body"],[id="operation-message-label"]').show().attr('disabled', false);
 				}
 				else {
 					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
@@ -522,73 +576,3 @@ window.operation_popup = new class {
 		});
 	}
 }
-
-
-// function submitOperationPopup(response) {
-//	var form_param = response.form.param,
-//		input_name = response.form.input_name,
-//		inputs = response.inputs;
-
-//	var input_keys = {
-//		opmessage_grp: 'usrgrpid',
-//		opmessage_usr: 'userid',
-//		opcommand_grp: 'groupid',
-//		opcommand_hst: 'hostid',
-//		opgroup: 'groupid',
-//		optemplate: 'templateid'
-//	};
-
-//	for (var i in inputs) {
-//		if (inputs.hasOwnProperty(i) && inputs[i] !== null) {
-//			if (i === 'opmessage' || i === 'opcommand' || i === 'opinventory') {
-//				for (var j in inputs[i]) {
-//					if (inputs[i].hasOwnProperty(j)) {
-//						create_var('action.edit', input_name + '[' + i + ']' + '[' + j + ']', inputs[i][j], false);
-//					}
-//				}
-//			}
-//			else if (i === 'opconditions') {
-//				for (var j in inputs[i]) {
-//					if (inputs[i].hasOwnProperty(j)) {
-//						create_var(
-//							'action.edit',
-//							input_name + '[' + i + ']' + '[' + j + '][conditiontype]',
-//							inputs[i][j]['conditiontype'],
-//							false
-//						);
-//						create_var(
-//							'action.edit',
-//							input_name + '[' + i + ']' + '[' + j + '][operator]',
-//							inputs[i][j]['operator'],
-//							false
-//						);
-//						create_var(
-//							'action.edit',
-//							input_name + '[' + i + ']' + '[' + j + '][value]',
-//							inputs[i][j]['value'],
-//							false
-//						);
-//					}
-//				}
-//			}
-//			else if (['opmessage_grp', 'opmessage_usr', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'optemplate']
-//					.indexOf(i) !== -1) {
-//				for (var j in inputs[i]) {
-//					if (inputs[i].hasOwnProperty(j)) {
-//						create_var(
-//							'action.edit',
-//							input_name + '[' + i + ']' + '[' + j + ']' + '[' + input_keys[i] + ']',
-//							inputs[i][j][input_keys[i]],
-//							false
-//						);
-//					}
-//				}
-//			}
-//			else {
-//				create_var('action.edit', input_name + '[' + i + ']', inputs[i], false);
-//			}
-//		}
-//	}
-
-//	submitFormWithParam('action.edit', form_param, '1');
-//}

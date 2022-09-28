@@ -183,8 +183,6 @@ class CControllerActionUpdate extends CController {
 						unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
 					}
 				}
-				// todo : remove this. this is just while testing
-				else $operation['opmessage'] = [];
 
 				if (array_key_exists('opmessage_grp', $operation) || array_key_exists('opmessage_usr', $operation)) {
 					if (!array_key_exists('opmessage_grp', $operation)) {

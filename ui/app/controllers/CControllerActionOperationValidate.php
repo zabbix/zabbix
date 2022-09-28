@@ -233,24 +233,12 @@ class CControllerActionOperationValidate extends CController {
 
 		if ($operation['recovery'] == ACTION_OPERATION) {
 			// todo: add all data and pass correct fields for operation table based on operation recovery type
-			$data['operation'] = [
-				'eventsource' => $operation['eventsource'],
-				'recovery' => $operation['recovery'],
-
-				// todo : fix this so can remove regex
-				'operationtype' => $operationtype,
-
-				'esc_step_from' => $operation['esc_step_from'],
-				'esc_step_to' => $operation['esc_step_to'],
-				'esc_period' => $operation['esc_period'],
-				'opmessage_grp' => $operation['opmessage_grp'],
-				'opmessage_usr' => $operation['opmessage_usr'],
-				'opmessage' =>  $operation['opmessage'],
-				'evaltype' => $operation['evaltype'],
+			$data['operation'] = $operation;
 				//'condition' => $operation['condition'] ? : [],
-				'details' => $this->getActionOperationDescription($operation),
-				'start_in' => 'start in column'
-			];
+
+			$data['operation']['operationtype'] = $operationtype;
+			$data['operation']['details'] = $this->getActionOperationDescription($operation);
+			$data['operation']['start_in'] = 'start in column';
 
 			if ($operation['recovery'] == ACTION_OPERATION &&
 					($operation['eventsource'] == EVENT_SOURCE_TRIGGERS
@@ -262,31 +250,15 @@ class CControllerActionOperationValidate extends CController {
 		}
 		else if ($operation['recovery'] == ACTION_RECOVERY_OPERATION) {
 			// todo: check what data needs to be added here
-			$data['operation'] = [
-				'eventsource' => $operation['eventsource'],
-				'recovery' => $operation['recovery'],
-				'operationtype' => $operationtype,
-				'mediatypeid' => $operation['operation-message-mediatype-only'],
-				'opmessage_grp' => $operation['opmessage_grp'],
-				'opmessage' =>  $operation['opmessage'],
-				'opcommand' => $operation['opcommand'],
-				'opmessage_usr' => $operation['opmessage_usr'],
-				'details' => $this->getActionOperationDescription($operation)
-			];
+			$data['operation'] = $operation;
+			$data['operation']['operationtype'] = $operationtype;
+			$data['operation']['details'] = $this->getActionOperationDescription($operation);
 		}
 		else if ($operation['recovery'] == ACTION_UPDATE_OPERATION) {
 			// todo: check what data needs to be added here
-			$data['operation'] = [
-				'eventsource' => $operation['eventsource'],
-				'recovery' => $operation['recovery'],
-				'operationtype' => $operationtype,
-				'mediatypeid' => $operation['operation-message-mediatype-only'],
-				'opmessage_grp' => $operation['opmessage_grp'],
-				'opmessage_usr' => $operation['opmessage_usr'],
-				'opmessage' =>  $operation['opmessage'],
-				'condition' => $operation['condition'] ? : [],
-				'details' => $this->getActionOperationDescription($operation)
-			];
+			$data['operation'] = $operation;
+			$data['operation']['operationtype'] = $operationtype;
+			$data['operation']['details'] = $this->getActionOperationDescription($operation);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
@@ -328,6 +300,10 @@ class CControllerActionOperationValidate extends CController {
 
 		$type = $operation['recovery'];
 		$operationtype = preg_replace('[\D]', '', $operation['operationtype']);
+
+		if (preg_match('/\bscriptid\b/', $operation['operationtype'])){
+			$operationtype = OPERATION_TYPE_COMMAND;
+		}
 
 		if ($type == ACTION_OPERATION) {
 			switch ($operationtype) {
@@ -499,6 +475,7 @@ class CControllerActionOperationValidate extends CController {
 
 		// Format the output.
 		if ($type == ACTION_OPERATION) {
+
 			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
 					$media_type = _('all media');

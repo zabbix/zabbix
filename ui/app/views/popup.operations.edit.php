@@ -42,7 +42,7 @@ $select_operationtype = (new CSelect(''))
 	->setName('operation[operationtype]');
 
 $form_grid->addItem([
-	new CLabel(_('Operation'), $select_operationtype->getFocusableElementId()),
+	(new CLabel(_('Operation'), $select_operationtype->getFocusableElementId()))->setId('operation-type-label'),
 	(new CFormField($select_operationtype))
 		->setId('operation-type')
 	]);
@@ -56,7 +56,7 @@ $step_from->onChange($step_from->getAttribute('onchange').' if (this.value < 1) 
 if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL ||
 		$data['eventsource'] == EVENT_SOURCE_SERVICE) && $data['recovery'] == ACTION_OPERATION) {
 	$form_grid->addItem([
-		new CLabel(_('Steps'), 'step-from'),
+		(new CLabel(_('Steps'), 'step-from'))->setId('operation-step-range-label'),
 		(new CFormField([
 			$step_from->setId('step-from'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), '-', (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -69,21 +69,21 @@ if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EV
 
 // Operation steps duration row.
 	$form_grid->addItem([
-		new CLabel(_('Step duration'), 'step-duration'),
-		new CFormField([
+		(new CLabel(_('Step duration'), 'step-duration'))->setId('operation-step-duration-label'),
+		(new CFormField([
 			(new CTextBox('operation[esc_period]', 0))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setId('step-duration'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			_('(0 - use action default)')
-		]),
-	])->setId('operation-step-duration');
+		]))->setId('operation-step-duration'),
+	]);
 }
 
 // Message recipient is required notice row.
 $form_grid->addItem(
-	new CFormField((new CLabel(_('At least one user or user group must be selected.')))
+	(new CFormField((new CLabel(_('At least one user or user group must be selected.')))
 		->setAsteriskMark()
-		->setId('operation-message-notice')
-));
+	))->setId('operation-message-notice')
+);
 
 $form_grid->addItem([
 	(new CLabel(_('Send to user groups')))->setId('operation-message-user-groups-label'),
@@ -155,8 +155,10 @@ $form_grid->addItem([
 
 // Operation custom message checkbox row.
 $form_grid->addItem([
-	(new CLabel(_('Custom message'), 'operation_opmessage_default_msg'))->setId('operation-message-custom-label'),
-	(new CFormField(new CCheckBox('operation[opmessage][default_msg]', 0)))->setId('operation-message-custom')
+	(new CLabel(_('Custom message'), 'operation[opmessage][default_msg]'))->setId('operation-message-custom-label'),
+	(new CFormField
+	(new CCheckBox('operation[opmessage][default_msg]', 0)))
+		->setId('operation-message-custom')
 ]);
 
 // Operation custom message subject row.
@@ -214,7 +216,7 @@ $form_grid->addItem([
 	(new CLabel(_('Host groups'),'operation-attr-hostgroups'))
 		->setId('operation-attr-hostgroups-label')
 		->setAsteriskMark(),
-	(new CFormGrid((new CMultiSelect([
+	(new CFormField((new CMultiSelect([
 		'name' => 'operation[opgroup][][groupid]',
 		'object_name' => 'hostGroup',
 		'add_post_js' => false
@@ -246,6 +248,7 @@ $form_grid->addItem([
 		->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 		->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
 		->setModern(true)
+		->addClass('form-field')
 		->setId('operation-attr-inventory')
 ]);
 
