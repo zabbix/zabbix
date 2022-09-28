@@ -890,7 +890,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		$db_userdirectories = API::UserDirectory()->get([
-			'output' => ['userdirectoryid', 'name'],
+			'output' => ['userdirectoryid', 'idp_type', 'name'],
 			'userdirectoryids' => $userdirectoryids,
 			'preservekeys' => true
 		]);
@@ -899,13 +899,22 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$userdirectories_left = API::UserDirectory()->get(['countOutput' => true]) - count($userdirectoryids);
+		$ldap_userdirectories_delete = array_filter($db_userdirectories, function ($userdirectory) {
+			return $userdirectory['idp_type'] == IDP_TYPE_LDAP;
+		});
+
+		$ldap_userdirectories_left = API::UserDirectory()->get([
+			'countOutput' => true,
+			'filter' => ['idp_type' => IDP_TYPE_LDAP]
+		]);
+		$ldap_userdirectories_left -= count($ldap_userdirectories_delete);
+
 		$auth = API::Authentication()->get([
 			'output' => ['ldap_userdirectoryid', 'authentication_type', 'ldap_auth_enabled']
 		]);
 
 		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)
-				&& ($auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED || $userdirectories_left > 0)) {
+				&& ($auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED || $ldap_userdirectories_left > 0)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default user directory.'));
 		}
 
