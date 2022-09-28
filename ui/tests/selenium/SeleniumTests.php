@@ -133,16 +133,16 @@ require_once dirname(__FILE__).'/services/testPageServicesServices.php';
 require_once dirname(__FILE__).'/services/testPageServicesServicesMassUpdate.php';
 
 // Tags.
-//require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
-//require_once dirname(__FILE__).'/tags/testFormTagsHostPrototype.php';
-//require_once dirname(__FILE__).'/tags/testFormTagsServices.php';
-//require_once dirname(__FILE__).'/tags/testFormTagsServicesProblemTags.php';
-//require_once dirname(__FILE__).'/tags/testFormTagsItem.php';
-//require_once dirname(__FILE__).'/tags/testFormTagsItemPrototype.php';
-//require_once dirname(__FILE__).'/tags/testFormTagsTemplate.php';
-//require_once dirname(__FILE__).'/tags/testFormTagsTrigger.php';
-//require_once dirname(__FILE__).'/tags/testFormTagsTriggerPrototype.php';
-//require_once dirname(__FILE__).'/tags/testFormTagsWeb.php';
+require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
+require_once dirname(__FILE__).'/tags/testFormTagsHostPrototype.php';
+require_once dirname(__FILE__).'/tags/testFormTagsServices.php';
+require_once dirname(__FILE__).'/tags/testFormTagsServicesProblemTags.php';
+require_once dirname(__FILE__).'/tags/testFormTagsItem.php';
+require_once dirname(__FILE__).'/tags/testFormTagsItemPrototype.php';
+require_once dirname(__FILE__).'/tags/testFormTagsTemplate.php';
+require_once dirname(__FILE__).'/tags/testFormTagsTrigger.php';
+require_once dirname(__FILE__).'/tags/testFormTagsTriggerPrototype.php';
+require_once dirname(__FILE__).'/tags/testFormTagsWeb.php';
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
@@ -249,7 +249,7 @@ use PHPUnit\Framework\TestSuite;
 class SeleniumTests {
 	public static function suite() {
 		$suite = new TestSuite('selenium');
-/*
+
 		$suite->addTestSuite('testDocumentationLinks');
 		$suite->addTestSuite('testGeneric');
 
@@ -342,7 +342,7 @@ class SeleniumTests {
 		// Proxies.
 		$suite->addTestSuite('testFormAdministrationProxies');
 		$suite->addTestSuite('testPageAdministrationProxies');
-*/
+
 		// Reports.
 		$suite->addTestSuite('testFormScheduledReport');
 		$suite->addTestSuite('testPageAvailabilityReport');
@@ -360,23 +360,23 @@ class SeleniumTests {
 		$suite->addTestSuite('testUserRolesPermissions');
 
 		// Services.
-//		$suite->addTestSuite('testFormServicesServices');
-//		$suite->addTestSuite('testPageServicesServices');
-//		$suite->addTestSuite('testPageServicesServicesMassUpdate');
+		$suite->addTestSuite('testFormServicesServices');
+		$suite->addTestSuite('testPageServicesServices');
+		$suite->addTestSuite('testPageServicesServicesMassUpdate');
 
 		// Tags.
-//		$suite->addTestSuite('testFormTagsHost');
-//		$suite->addTestSuite('testFormTagsHostPrototype');
-//		$suite->addTestSuite('testFormTagsServices');
-//		$suite->addTestSuite('testFormTagsServicesProblemTags');
-//		$suite->addTestSuite('testFormTagsItem');
-//		$suite->addTestSuite('testFormTagsItemPrototype');
-//		$suite->addTestSuite('testFormTagsTemplate');
-//		$suite->addTestSuite('testFormTagsTrigger');
-//		$suite->addTestSuite('testFormTagsTriggerPrototype');
-//		$suite->addTestSuite('testFormTagsWeb');
+		$suite->addTestSuite('testFormTagsHost');
+		$suite->addTestSuite('testFormTagsHostPrototype');
+		$suite->addTestSuite('testFormTagsServices');
+		$suite->addTestSuite('testFormTagsServicesProblemTags');
+		$suite->addTestSuite('testFormTagsItem');
+		$suite->addTestSuite('testFormTagsItemPrototype');
+		$suite->addTestSuite('testFormTagsTemplate');
+		$suite->addTestSuite('testFormTagsTrigger');
+		$suite->addTestSuite('testFormTagsTriggerPrototype');
+		$suite->addTestSuite('testFormTagsWeb');
 
-/*
+
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
 
@@ -409,7 +409,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageQueueOverview');
 		$suite->addTestSuite('testPageQueueOverviewByProxy');
 */
-/*		$suite->addTestSuite('testPageSearch');
+		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageTemplates');
 		$suite->addTestSuite('testPageUserGroups');
@@ -478,7 +478,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageScheduledReport');
 		$suite->addTestSuite('testScheduledReportPermissions');
 		$suite->addTestSuite('testSID');
-*/
+
 		return $suite;
 	}
 }
