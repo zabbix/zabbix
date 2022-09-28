@@ -249,19 +249,19 @@ class SeleniumTests {
 	public static function suite() {
 		$suite = new TestSuite('selenium');
 
-		$suite->addTestSuite('testDocumentationLinks');
+/*		$suite->addTestSuite('testDocumentationLinks');
 		$suite->addTestSuite('testGeneric');
 
 		// Actions.
 		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testPageActions');
-/*
+
 		// Api tokens.
 		$suite->addTestSuite('testFormApiTokensAdministrationGeneral');
 		$suite->addTestSuite('testFormApiTokensUserSettings');
 		$suite->addTestSuite('testPageApiTokensAdministrationGeneral');
 		$suite->addTestSuite('testPageApiTokensUserSettings');
-
+*/
 		// Dashboards.
 		$suite->addTestSuite('testDashboardCopyWidgets');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
@@ -282,7 +282,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageDashboardList');
 		$suite->addTestSuite('testPageDashboardWidgets');
 		$suite->addTestSuite('testPageTemplateDashboards');
-
+/*
 		// Filter tabs.
 		$suite->addTestSuite('testFormFilterHosts');
 		$suite->addTestSuite('testFormFilterLatestData');
