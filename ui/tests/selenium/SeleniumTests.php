@@ -261,7 +261,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormApiTokensUserSettings');
 		$suite->addTestSuite('testPageApiTokensAdministrationGeneral');
 		$suite->addTestSuite('testPageApiTokensUserSettings');
-*/
+
 		// Dashboards.
 		$suite->addTestSuite('testDashboardCopyWidgets');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
@@ -282,7 +282,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageDashboardList');
 		$suite->addTestSuite('testPageDashboardWidgets');
 		$suite->addTestSuite('testPageTemplateDashboards');
-/*
+
 		// Filter tabs.
 		$suite->addTestSuite('testFormFilterHosts');
 		$suite->addTestSuite('testFormFilterLatestData');
@@ -337,7 +337,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormPreprocessingItemPrototype');
 		$suite->addTestSuite('testFormPreprocessingLowLevelDiscovery');
 		$suite->addTestSuite('testFormPreprocessingTest');
-
+*/
 		// Proxies.
 		$suite->addTestSuite('testFormAdministrationProxies');
 		$suite->addTestSuite('testPageAdministrationProxies');
@@ -357,7 +357,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserRoles');
 		$suite->addTestSuite('testPageUserRoles');
 		$suite->addTestSuite('testUserRolesPermissions');
-*/
+
 		// Services.
 		$suite->addTestSuite('testFormServicesServices');
 		$suite->addTestSuite('testPageServicesServices');
