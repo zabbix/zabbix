@@ -75,10 +75,10 @@ void	zbx_mock_test_entry_NET_IF_COMMON(void **state, int net_if_func)
 		}
 	}
 
-	init_request(&request);
-	init_result(&param_result);
+	zbx_init_agent_request(&request);
+	zbx_init_agent_result(&param_result);
 
-	if (SUCCEED != parse_item_key(init_param, &request))
+	if (SUCCEED != zbx_parse_item_key(init_param, &request))
 		fail_msg("Cannot parse item key: %s", init_param);
 
 	if (ZABBIX_MOCK_NET_IF_IN == net_if_func)
@@ -122,6 +122,6 @@ void	zbx_mock_test_entry_NET_IF_COMMON(void **state, int net_if_func)
 		}
 	}
 
-	free_request(&request);
-	free_result(&param_result);
+	zbx_free_agent_request(&request);
+	zbx_free_agent_result(&param_result);
 }

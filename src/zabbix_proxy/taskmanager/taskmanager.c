@@ -79,7 +79,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 	if (NULL == (row = DBfetch(result)))
 		goto finish;
 
-	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, zbx_time(), 0, 0);
 
 	ZBX_STR2UINT64(parent_taskid, row[9]);
 
@@ -196,7 +196,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	DBfree_result(result);
 
 	if (0 != (processed_num = itemids.values_num))
-		zbx_dc_reschedule_items(&itemids, time(NULL), NULL);
+		zbx_dc_reschedule_items(&itemids, zbx_time(), NULL);
 
 	if (0 != taskids->values_num)
 	{
@@ -224,7 +224,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	tm_execute_data_json(int type, const char *data, char **info)
+static int	tm_execute_data_json(int type, const char *data, char **info, const zbx_config_comms_args_t *zbx_config)
 {
 	struct zbx_json_parse	jp_data;
 
@@ -237,7 +237,7 @@ static int	tm_execute_data_json(int type, const char *data, char **info)
 	switch (type)
 	{
 		case ZBX_TM_DATA_TYPE_TEST_ITEM:
-			return zbx_trapper_item_test_run(&jp_data, 0, info);
+			return zbx_trapper_item_test_run(&jp_data, 0, info, zbx_config);
 		case ZBX_TM_DATA_TYPE_DIAGINFO:
 			return zbx_diag_get_info(&jp_data, info);
 	}
@@ -256,7 +256,8 @@ static int	tm_execute_data_json(int type, const char *data, char **info)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int clock, int ttl, int now)
+static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int clock, int ttl, int now,
+		const zbx_config_comms_args_t *zbx_config)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -273,7 +274,7 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 	if (NULL == (row = DBfetch(result)))
 		goto finish;
 
-	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, time(NULL), 0, 0);
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, zbx_time(), 0, 0);
 	ZBX_STR2UINT64(parent_taskid, row[0]);
 
 	if (0 != ttl && clock + ttl < now)
@@ -286,7 +287,7 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 	{
 		case ZBX_TM_DATA_TYPE_TEST_ITEM:
 		case ZBX_TM_DATA_TYPE_DIAGINFO:
-			ret = tm_execute_data_json(data_type, row[1], &info);
+			ret = tm_execute_data_json(data_type, row[1], &info, zbx_config);
 			break;
 		case ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD:
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
@@ -325,7 +326,7 @@ finish:
  * Return value: The number of successfully processed tasks                   *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
+static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_config_comms_args_t *zbx_config)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -360,7 +361,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 				zbx_vector_uint64_append(&check_now_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_DATA:
-				if (SUCCEED == tm_execute_data(rtc, taskid, clock, ttl, now))
+				if (SUCCEED == tm_execute_data(rtc, taskid, clock, ttl, now, zbx_config))
 					processed_num++;
 				break;
 			default:
@@ -441,10 +442,11 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 			get_program_type_string(taskmanager_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(taskmanager_args_in->zbx_config_tls, taskmanager_args_in->zbx_get_program_type_cb_arg);
+	zbx_tls_init_child(taskmanager_args_in->zbx_config->zbx_config_tls,
+			taskmanager_args_in->zbx_get_program_type_cb_arg);
 #endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -482,7 +484,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 
-		tasks_num = tm_process_tasks(&rtc, (int)sec1);
+		tasks_num = tm_process_tasks(&rtc, (int)sec1, taskmanager_args_in->zbx_config);
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
 			tm_remove_old_tasks((int)sec1);

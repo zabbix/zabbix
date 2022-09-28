@@ -28,7 +28,8 @@ SUBDIRS = \
 	reporter \
 	service \
 	rtc \
-	ha
+	ha \
+	proxyconfigread
 
 sbin_PROGRAMS = zabbix_server
 
@@ -70,6 +71,7 @@ zabbix_server_LDADD = \
 	httppoller/libzbxhttppoller.a \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
+	proxyconfigread/libzbxproxyconfigread.a \
 	selfmon/libzbxselfmon.a \
 	vmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager.a \

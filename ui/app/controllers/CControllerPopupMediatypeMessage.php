@@ -37,7 +37,7 @@ class CControllerPopupMediatypeMessage extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' =>				'in '.implode(',', array_keys(media_type2str())),
+			'type' =>				'in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
 			'content_type' =>		'in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
 			'message_type' =>		'in -1,'.implode(',', $this->message_types),
 			'old_message_type' =>	'in -1,'.implode(',', $this->message_types),

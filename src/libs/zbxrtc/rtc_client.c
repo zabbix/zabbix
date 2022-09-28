@@ -232,12 +232,12 @@ int	zbx_rtc_wait(zbx_ipc_async_socket_t *rtc, zbx_uint32_t *cmd, unsigned char *
 	int			ret;
 
 	if (0 != timeout)
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 	ret = zbx_ipc_async_socket_recv(rtc, timeout, &message);
 
 	if (0 != timeout)
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	if (FAIL == ret)
 		return FAIL;

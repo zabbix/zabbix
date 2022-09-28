@@ -18,22 +18,47 @@
 **/
 
 #include "zabbix_stats.h"
-
-#include "zbxcommon.h"
+#include "proxy.h"
+#include "zbxcomms.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
 
 /******************************************************************************
  *                                                                            *
  * Purpose: get program type (proxy) specific internal statistics             *
  *                                                                            *
- * Parameters: json - [IN/OUT] the json data                                  *
+ * Parameters: json       - [OUT] the json data                               *
+ *             zbx_config - [IN] proxy config                                 *
  *                                                                            *
  * Comments: This function is used to gather proxy specific internal          *
  *           statistics.                                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_get_zabbix_stats_ext(struct zbx_json *json)
+void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config)
 {
-	ZBX_UNUSED(json);
+	unsigned int	encryption;
+
+	zbx_json_addstring(json, "name", ZBX_NULL2EMPTY_STR(zbx_config->hostname), ZBX_JSON_TYPE_STRING);
+
+	if (ZBX_PROXYMODE_PASSIVE == zbx_config->proxymode)
+	{
+		zbx_json_addstring(json, "passive", "true", ZBX_JSON_TYPE_INT);
+		encryption = zbx_config->zbx_config_tls->accept_modes;
+	}
+	else
+	{
+		zbx_json_addstring(json, "passive", "false", ZBX_JSON_TYPE_INT);
+		encryption = zbx_config->zbx_config_tls->connect_mode;
+	}
+
+	zbx_json_addstring(json, ZBX_TCP_SEC_UNENCRYPTED_TXT,
+			0 < (encryption & ZBX_TCP_SEC_UNENCRYPTED) ? "true" : "false", ZBX_JSON_TYPE_INT);
+
+	zbx_json_addstring(json, ZBX_TCP_SEC_TLS_PSK_TXT,
+			0 < (encryption & ZBX_TCP_SEC_TLS_PSK) ? "true" : "false", ZBX_JSON_TYPE_INT);
+
+	zbx_json_addstring(json, ZBX_TCP_SEC_TLS_CERT_TXT,
+			0 < (encryption & ZBX_TCP_SEC_TLS_CERT) ? "true" : "false", ZBX_JSON_TYPE_INT);
 
 	return;
 }
