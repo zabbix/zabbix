@@ -105,7 +105,6 @@ window.action_edit_popup = new class {
 
 	_createOperationsRow(input) {
 		const operation_data = input.detail.operation;
-
 		// todo : rewrite to switch statement?
 
 		if (this.recovery == <?= ACTION_OPERATION ?> && (
@@ -192,33 +191,89 @@ window.action_edit_popup = new class {
 
 		const form = document.forms['action.edit'];
 		const operation_input = document.createElement('input');
+
 		operation_input.setAttribute('type', 'hidden');
 		operation_input.setAttribute('name', `add_${this.recovery_prefix}operation`);
 		operation_input.setAttribute('value', '1');
 		form.appendChild(operation_input);
 
-		for (const [name, value] of Object.entries(input.detail.operation)) {
-			const operation_input = document.createElement('operation_input');
-			operation_input.setAttribute('type', 'hidden');
-			operation_input.setAttribute('name', `operations[${this.operation_row_count}][${name}]`);
-			operation_input.setAttribute('id', `operations_${this.operation_row_count}_${name}`);
-			operation_input.setAttribute('value', value);
-			form.appendChild(operation_input);
-		}
+		const some = ['details', 'start_in', 'steps', 'duration'];
+		this.createHiddenInputFromObject(input.detail.operation, `operations[${this.operation_row_count}]`, `operations_${this.operation_row_count}`, some);
 
-		if (input.detail.operation.opmessage_grp) {
-			for (const [index, value] of Object.entries(input.detail.operation.opmessage_grp)) {
-				this.operation_row.append(this._addUserFields(index, 'usrgrpid',value.usrgrpid, 'opmessage_grp'));
-			}
-		}
-		else if (input.detail.operation.opmessage_usr) {
-			for (const [index, value] of Object.entries(input.detail.operation.opmessage_usr)) {
-				this.operation_row.append(this._addUserFields(index, 'userid', value.userid, 'opmessage_usr'));
-			}
-		}
+		// for (const [name, value] of Object.entries(input.detail.operation)) {
+		//	const operation_input = document.createElement('input');
+		//	operation_input.setAttribute('type', 'hidden');
+		//	operation_input.setAttribute('name', `operations[${this.operation_row_count}][${name}]`);
+		//	operation_input.setAttribute('id', `operations_${this.operation_row_count}_${name}`);
+		//	operation_input.setAttribute('value', value);
+
+		//	form.appendChild(operation_input);
+		//}
+
+		// if (input.detail.operation.opmessage_grp) {
+		//	for (const [index, value] of Object.entries(input.detail.operation.opmessage_grp)) {
+		//		this.operation_row.append(this._addUserFields(index, 'usrgrpid',value.usrgrpid, 'opmessage_grp'));
+		//	}
+		//}
+		// else if (input.detail.operation.opmessage_usr) {
+		//	for (const [index, value] of Object.entries(input.detail.operation.opmessage_usr)) {
+		//		this.operation_row.append(this._addUserFields(index, 'userid', value.userid, 'opmessage_usr'));
+		//	}
+		//}
+
+		// Object.keys(input.detail.operation?.opmessage).map(key => {
+		//	const operation_input = document.createElement('input');
+		//	operation_input.setAttribute('type', 'hidden');
+		//	operation_input.setAttribute('name', `operations[${this.operation_row_count}][opmessage][${key}]`);
+		//	operation_input.setAttribute('id', `operations_${this.operation_row_count}_opmessage_${key}`);
+		//	operation_input.setAttribute('value', input.detail.operation.opmessage[key]);
+		//	form.appendChild(operation_input);
+		//})
 
 		this.operation_row.append(this._addHiddenOperationsFields('operationtype', this.recovery));
 
+	}
+
+	createHiddenInputFromObject(obj, namePrefix, idPrefix, exceptKeys = []) {
+		if (!obj || typeof obj !== 'object') {
+			return;
+		}
+
+		Object.keys(obj).map((key, index) => {
+
+			if (exceptKeys.includes(key)) {
+				return;
+			}
+
+
+
+			if (typeof obj[key] === 'object') {
+				this.createHiddenInputFromObject(obj[key], `${namePrefix}[${key}]`, `${idPrefix}_${key}`);
+				return;
+			}
+
+			//namePrefix = `${namePrefix}[${operationsRowCount}]`;
+			//idPrefix = `${idPrefix}_${operationsRowCount}`;
+
+			//namePrefix = `${namePrefix}[${operationsRowCount}]`;
+			//idPrefix = `${idPrefix}_${operationsRowCount}`;
+
+			const input = document.createElement('input');
+			input.setAttribute('type', 'hidden');
+			//input.setAttribute('name', `operations[${this.operation_row_count}][opmessage][${key}]`);
+			//input.setAttribute('id', `operations_${this.operation_row_count}_opmessage_${key}`);
+
+			input.setAttribute('name', namePrefix ? `${namePrefix}[${key}]` : key);
+			input.setAttribute('id', idPrefix ? `${idPrefix}_${key}` : key);
+
+			//input.setAttribute('name', namePrefix ? `${namePrefix}[${key}]` : key);
+			//input.setAttribute('id', idPrefix ? `${idPrefix}_${key}` : key);
+
+			input.setAttribute('value', obj[key]);
+
+			const form = document.forms['action.edit'];
+			form.appendChild(input);
+		})
 	}
 
 	_addHiddenOperationsFields(name, value) {
@@ -410,6 +465,7 @@ window.action_edit_popup = new class {
 
 	submit() {
 		const fields = getFormFields(this.form);
+
 		fields.name = fields.name.trim();
 		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', this.actionid !== 0 ? 'action.update' : 'action.create');

@@ -62,9 +62,18 @@ class CControllerActionOperationValidate extends CController {
 		$eventsource = $operation['eventsource'];
 		$recovery = $operation['recovery'];
 		$optype = $operation['operationtype'];
+
+		// todo : fix this so can remove regex
 		$operationtype = preg_replace('[\D]', '', $optype);
 		$allowed_operations = getAllowedOperations($eventsource);
-		// todo - fix bug, where operationtype = 1, if script!!!
+
+		if (preg_match('/\bscriptid\b/', $optype)){
+			$operationtype = OPERATION_TYPE_COMMAND;
+		}
+
+		// todo : add default operation object?? see defaultOperationObject()
+		// todo : get data from ActionOperationGet ??
+
 
 		if (!array_key_exists($recovery, $allowed_operations)
 				|| !in_array($operationtype, $allowed_operations[$recovery])) {
@@ -133,6 +142,10 @@ class CControllerActionOperationValidate extends CController {
 				break;
 
 			case OPERATION_TYPE_COMMAND:
+				// todo : find how to add this!!!
+				// todo : remove. just for testing
+				$operation['opcommand'] = ['scriptid' => 4];
+
 				if (!array_key_exists('scriptid', $operation['opcommand']) || !$operation['opcommand']['scriptid']) {
 					error(_('No script specified for action operation command.'));
 
@@ -209,6 +222,12 @@ class CControllerActionOperationValidate extends CController {
 
 	protected function doAction() {
 		$operation = $this->getInput('operation');
+
+		$operationtype = preg_replace('[\D]', '', $operation['operationtype']);
+
+		if (preg_match('/\bscriptid\b/', $operation['operationtype'])){
+			$operationtype = OPERATION_TYPE_COMMAND;
+		}
 		// todo : check what is the same and remove unnecessary code
 		// todo : fix - fields based on eventsource
 
@@ -217,11 +236,13 @@ class CControllerActionOperationValidate extends CController {
 			$data['operation'] = [
 				'eventsource' => $operation['eventsource'],
 				'recovery' => $operation['recovery'],
-				'operationtype' => $operation['operationtype'],
+
+				// todo : fix this so can remove regex
+				'operationtype' => $operationtype,
+
 				'esc_step_from' => $operation['esc_step_from'],
 				'esc_step_to' => $operation['esc_step_to'],
 				'esc_period' => $operation['esc_period'],
-				'mediatypeid' => $operation['operation-message-mediatype-only'],
 				'opmessage_grp' => $operation['opmessage_grp'],
 				'opmessage_usr' => $operation['opmessage_usr'],
 				'opmessage' =>  $operation['opmessage'],
@@ -230,6 +251,9 @@ class CControllerActionOperationValidate extends CController {
 				'details' => $this->getActionOperationDescription($operation),
 				'start_in' => 'start in column'
 			];
+
+			sdff('validate pass operation');
+			sdff($operation);
 
 			if ($operation['recovery'] == ACTION_OPERATION &&
 					($operation['eventsource'] == EVENT_SOURCE_TRIGGERS
@@ -244,10 +268,10 @@ class CControllerActionOperationValidate extends CController {
 			$data['operation'] = [
 				'eventsource' => $operation['eventsource'],
 				'recovery' => $operation['recovery'],
-				'operationtype' => $operation['operationtype'],
+				'operationtype' => $operationtype,
 				'mediatypeid' => $operation['operation-message-mediatype-only'],
 				//'opmessage_grp' => $operation['opmessage_grp'],
-				//'opmessage' =>  $operation['opmessage'],
+				'opmessage' =>  $operation['opmessage'],
 				'opcommand' => $operation['opcommand'],
 				'evaltype' => $operation['evaltype'],
 				'opmessage_usr' => $operation['opmessage_usr'],
@@ -259,7 +283,7 @@ class CControllerActionOperationValidate extends CController {
 			$data['operation'] = [
 				'eventsource' => $operation['eventsource'],
 				'recovery' => $operation['recovery'],
-				'operationtype' => $operation['operationtype'],
+				'operationtype' => $operationtype,
 				'mediatypeid' => $operation['operation-message-mediatype-only'],
 				'opmessage_grp' => $operation['opmessage_grp'],
 				'opmessage_usr' => $operation['opmessage_usr'],
@@ -313,8 +337,7 @@ class CControllerActionOperationValidate extends CController {
 		if ($type == ACTION_OPERATION) {
 			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
-					// todo : rename to mediatypeid
-					$media_typeid = $operation['operation-message-mediatype-only'];
+					$media_typeid = $operation['opmessage']['mediatypeid'];
 
 					if ($media_typeid != 0) {
 						$media_typeids[$media_typeid] = $media_typeid;
@@ -334,6 +357,8 @@ class CControllerActionOperationValidate extends CController {
 					break;
 
 				case OPERATION_TYPE_COMMAND:
+					// todo : add opcommand_hst or opcommand_grp!!!
+
 					if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
 						foreach ($operation['opcommand_hst'] as $host) {
 							if ($host['hostid'] != 0) {
@@ -369,8 +394,7 @@ class CControllerActionOperationValidate extends CController {
 		else {
 			switch ($operation['operationtype']) {
 				case OPERATION_TYPE_MESSAGE:
-					// todo : rename to mediatypeid
-					$media_typeid = $operation['operation-message-mediatype-only'];
+					$media_typeid = $operation['opmessage']['mediatypeid'];
 
 					if ($media_typeid != 0) {
 						$media_typeids[$media_typeid] = $media_typeid;
@@ -483,8 +507,7 @@ class CControllerActionOperationValidate extends CController {
 			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
 					$media_type = _('all media');
-					// todo : rename to mediatypeid
-					$media_typeid = $operation['operation-message-mediatype-only'];
+					$media_typeid = $operation['opmessage']['mediatypeid'];
 
 					if ($media_typeid != 0 && isset($media_types[$media_typeid])) {
 						$media_type = $media_types[$media_typeid]['name'];
@@ -521,60 +544,50 @@ class CControllerActionOperationValidate extends CController {
 					}
 					break;
 
-//				case OPERATION_TYPE_COMMAND:
-//					$scriptid = $operation['opcommand']['scriptid'];
+				case OPERATION_TYPE_COMMAND:
+					$scriptid = $operation['opcommand']['scriptid'];
 
-//					if ($eventsource == EVENT_SOURCE_SERVICE) {
-//						$result[$i][$j][] = [
-//							bold(_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])),
-//							BR()
-//						];
+					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
+						$result['type'] = [_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])];
 
-//						break;
-//					}
+						break;
+					}
 
-//					if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
-//						$host_list = [];
+					if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
+						$host_list = [];
 
-//						foreach ($operation['opcommand_hst'] as $host) {
-//							if ($host['hostid'] == 0) {
-//								$result[$i][$j][] = [
-//									bold(_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])),
-//									BR()
-//								];
-//							}
-//							elseif (isset($hosts[$host['hostid']])) {
-//								$host_list[] = $hosts[$host['hostid']]['name'];
-//							}
-//						}
+						foreach ($operation['opcommand_hst'] as $host) {
+							if ($host['hostid'] == 0) {
+								$result['type'] = [_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])];
+							}
+							elseif (isset($hosts[$host['hostid']])) {
+								$host_list[] = $hosts[$host['hostid']]['name'];
+							}
+						}
 
-//						if ($host_list) {
-//							order_result($host_list);
+						if ($host_list) {
+							order_result($host_list);
 
-//							$result[$i][$j][] = bold(
-//								_s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': '
-//							);
-//							$result[$i][$j][] = [implode(', ', $host_list), BR()];
-//						}
-//					}
+							$result['type'] = _s('Run script "%1$s" on hosts', $scripts[$scriptid]['name'].': ');
+							$result['data'] = [implode(', ', $host_list)];
+						}
+					}
 
-//					if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
-//						$host_group_list = [];
+					if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
+						$host_group_list = [];
 
-//						foreach ($operation['opcommand_grp'] as $host_group) {
-//							if (isset($host_groups[$host_group['groupid']])) {
-//								$host_group_list[] = $host_groups[$host_group['groupid']]['name'];
-//							}
-//						}
+						foreach ($operation['opcommand_grp'] as $host_group) {
+							if (isset($host_groups[$host_group['groupid']])) {
+								$host_group_list[] = $host_groups[$host_group['groupid']]['name'];
+							}
+						}
 
-//						order_result($host_group_list);
+						order_result($host_group_list);
 
-//						$result[$i][$j][] = bold(
-//							_s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': '
-//						);
-//						$result[$i][$j][] = [implode(', ', $host_group_list), BR()];
-//					}
-//					break;
+						$result['type'] = _s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': ';
+						$result['data'] = [implode(', ', $host_group_list)];
+					}
+					break;
 
 				case OPERATION_TYPE_HOST_ADD:
 					$result['type'] = (_('Add host'));
@@ -647,8 +660,7 @@ class CControllerActionOperationValidate extends CController {
 			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
 					$media_type = _('all media');
-					// todo : rename to mediatypeid
-					$media_typeid = $operation['operation-message-mediatype-only'];
+					$media_typeid = $operation['opmessage']['mediatypeid'];
 
 					if ($media_typeid != 0 && isset($media_types[$media_typeid])) {
 						$media_type = $media_types[$media_typeid]['name'];
@@ -685,60 +697,50 @@ class CControllerActionOperationValidate extends CController {
 					}
 					break;
 
-//				case OPERATION_TYPE_COMMAND:
-//					$scriptid = $operation['opcommand']['scriptid'];
+				case OPERATION_TYPE_COMMAND:
+					$scriptid = $operation['opcommand']['scriptid'];
 
-//					if ($eventsource == EVENT_SOURCE_SERVICE) {
-//						$result[$i][$j][] = [
-//							bold(_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])),
-//							BR()
-//						];
+					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
+						$result['type'] = [_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])];
 
-//						break;
-//					}
+						break;
+					}
 
-//					if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
-//						$host_list = [];
+					if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
+						$host_list = [];
 
-//						foreach ($operation['opcommand_hst'] as $host) {
-//							if ($host['hostid'] == 0) {
-//								$result[$i][$j][] = [
-//									bold(_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])),
-//									BR()
-//								];
-//							}
-//							elseif (isset($hosts[$host['hostid']])) {
-//								$host_list[] = $hosts[$host['hostid']]['name'];
-//							}
-//						}
+						foreach ($operation['opcommand_hst'] as $host) {
+							if ($host['hostid'] == 0) {
+								$result['type'] = [_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])];
+							}
+							elseif (isset($hosts[$host['hostid']])) {
+								$host_list[] = $hosts[$host['hostid']]['name'];
+							}
+						}
 
-//						if ($host_list) {
-//							order_result($host_list);
+						if ($host_list) {
+							order_result($host_list);
 
-//							$result[$i][$j][] = bold(
-//								_s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': '
-//							);
-//							$result[$i][$j][] = [implode(', ', $host_list), BR()];
-//						}
-//					}
+							$result['type'] = _s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': ';
+							$result['data'] = [implode(', ', $host_list)];
+						}
+					}
 
-//					if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
-//						$host_group_list = [];
+					if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
+						$host_group_list = [];
 
-//						foreach ($operation['opcommand_grp'] as $host_group) {
-//							if (isset($host_groups[$host_group['groupid']])) {
-//								$host_group_list[] = $host_groups[$host_group['groupid']]['name'];
-//							}
-//						}
+						foreach ($operation['opcommand_grp'] as $host_group) {
+							if (isset($host_groups[$host_group['groupid']])) {
+								$host_group_list[] = $host_groups[$host_group['groupid']]['name'];
+							}
+						}
 
-//						order_result($host_group_list);
+						order_result($host_group_list);
 
-//						$result[$i][$j][] = bold(
-//							_s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': '
-//						);
-//						$result[$i][$j][] = [implode(', ', $host_group_list), BR()];
-//					}
-//					break;
+						$result['type'] = _s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': ';
+						$result['data'] = [implode(', ', $host_group_list)];
+					}
+					break;
 
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
 				case OPERATION_TYPE_UPDATE_MESSAGE:
