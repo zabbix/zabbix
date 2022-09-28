@@ -31,6 +31,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 	use TableTrait;
 
+	/**
+	 * Created graphs ids.
+	 */
+	protected static $graphs;
+
 	public function prepareGraphsData() {
 		$hosts = CDataHelper::call('host.create', [
 			[
@@ -170,8 +175,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	 * Check graph page layout.
 	 */
 	public function testPageMonitoringHostsGraph_Layout() {
-		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to'.
-				'=now&filter_search_type=0&filter_set=1');
+		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&filter_search_type=0&filter_set=1');
 		$this->page->assertHeader('Graphs');
 		$this->page->assertTitle('Custom graphs');
 
@@ -464,9 +468,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 		// Check result amount.
 		if (array_key_exists('graphs_amount', $data)) {
-			$graphs_count = $this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count();
-			$this->assertEquals($data['graphs_amount'], $graphs_count);
-			$this->assertTableStats($data['graphs_amount']);
+			$this->checkGraphs($data['graphs_amount']);
 		}
 		else {
 			$this->assertEquals('No data found.', $this->query('class:nothing-to-show')->one()->getText());
@@ -601,7 +603,31 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'graphs_amount' => 3
 				]
 			],
-			// #12 Show graphs without Hosts.
+			// #12 Show graphs without Hosts - all graphs.
+			[
+				[
+					'filter' => [
+						'Show' => 'All graphs'
+					]
+				]
+			],
+			// #13 Show graphs without Hosts - host graphs.
+			[
+				[
+					'filter' => [
+						'Show' => 'Host graphs'
+					]
+				]
+			],
+			// #14 Show graphs without Hosts - simple graphs.
+			[
+				[
+					'filter' => [
+						'Show' => 'Simple graphs'
+					]
+				]
+			],
+			// #15 Show graphs with correct graph name and without Hosts - all graphs.
 			[
 				[
 					'filter' => [
@@ -610,7 +636,25 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					]
 				]
 			],
-			// #13 Two hosts with several items and graphs. Show all graphs.
+			// #16 Show graphs with correct graph name and without Hosts - host graphs.
+			[
+				[
+					'filter' => [
+						'Name' => 'Graph_2',
+						'Show' => 'Host graphs'
+					]
+				]
+			],
+			// #17 Show graphs with correct graph name and  without Hosts - simple graphs.
+			[
+				[
+					'filter' => [
+						'Name' => 'Graph_2',
+						'Show' => 'Simple graphs'
+					]
+				]
+			],
+			// #18 Two hosts with several items and graphs. Show all graphs.
 			[
 				[
 					'filter' => [
@@ -623,7 +667,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'graphs_amount' => 8
 				]
 			],
-			// #14 One host with several items and graphs. Show Host graphs.
+			// #19 One host with several items and graphs. Show Host graphs.
 			[
 				[
 					'filter' => [
@@ -636,7 +680,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					'graphs_amount' => 4
 				]
 			],
-			// #15 One host with several items and graphs. Show Simple graphs.
+			// #20 One host with several items and graphs. Show Simple graphs.
 			[
 				[
 					'filter' => [
@@ -667,9 +711,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 		// Check result amount.
 		if (array_key_exists('graphs_amount', $data)) {
-			$graphs_count = $this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count();
-			$this->assertEquals($data['graphs_amount'], $graphs_count);
-			$this->assertTableStats($data['graphs_amount']);
+			$this->checkGraphs($data['graphs_amount']);
 		}
 		else {
 			$message = (array_key_exists('Hosts', $data['filter'])) ? 'No data found.' : 'Specify host to see the graphs.';
@@ -699,5 +741,16 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		// Check that Header and Filter are visible again.
 		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
 		$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
+	}
+
+	/**
+	 * Check that correct amount of graphs displayed in table result and in table stats.
+	 *
+	 * @param integer $graphs_amount	how many graphs should be displayed after filtering.
+	 */
+	private function checkGraphs($graphs_amount) {
+		$graphs_count = $this->query('xpath://tbody/tr/div[@class="flickerfreescreen"]')->all()->count();
+		$this->assertEquals($graphs_amount, $graphs_count);
+		$this->assertTableStats($graphs_amount);
 	}
 }
