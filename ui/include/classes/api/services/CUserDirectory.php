@@ -45,9 +45,8 @@ class CUserDirectory extends CApiService {
 	 * @var array
 	 */
 	protected $ldap_output_fields = [
-		'host', 'port', 'base_dn', 'search_attribute', 'bind_dn', 'bind_password', 'start_tls', 'search_filter',
-		'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username',
-		'user_lastname'
+		'host', 'port', 'base_dn', 'search_attribute', 'bind_dn', 'start_tls', 'search_filter', 'group_basedn',
+		'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username', 'user_lastname'
 	];
 
 	/**
@@ -618,8 +617,12 @@ class CUserDirectory extends CApiService {
 			}
 
 			if ($db_userdirectory['idp_type'] == IDP_TYPE_LDAP) {
-				$upd_fields = DB::getUpdatedValues( 'userdirectory_ldap',
-					array_intersect_key($userdirectory, array_flip($this->ldap_output_fields)),
+				$new_userdirectory_fields = array_intersect_key($userdirectory,
+					array_flip($this->ldap_output_fields) + ['bind_password' => '']
+				);
+
+				$upd_fields = DB::getUpdatedValues('userdirectory_ldap',
+					$new_userdirectory_fields,
 					$db_userdirectories[$userdirectoryid]
 				);
 			}
@@ -1023,7 +1026,7 @@ class CUserDirectory extends CApiService {
 
 		if ($userdirectory['userdirectoryid'] != 0) {
 			$db_userdirectory = $this->get([
-				'output' => ['host', 'port', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute', 'start_tls',
+				'output' => ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls',
 					'search_filter', 'provision_status'
 				],
 				'userdirectoryids' => $userdirectory['userdirectoryid'],
@@ -1037,7 +1040,12 @@ class CUserDirectory extends CApiService {
 				);
 			}
 
-			$userdirectory += $db_userdirectory;
+			$db_bind_password = DB::select('userdirectory_ldap', [
+				'output' => ['bind_password'],
+				'filter' => ['userdirectoryid' => $db_userdirectory['userdirectoryid']]
+			]);
+
+			$userdirectory += $db_userdirectory + ['bind_password' => $db_bind_password[0]['bind_password']];
 
 			if ($userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
 				[$db_userdirectory] = $this->get([

@@ -89,7 +89,7 @@ $form = (new CForm('post', $form_action))
 			new CFormField($data['add_ldap_server'] == 0
 				? [
 					array_key_exists('bind_password', $data)
-						? new CVar('bind_password', $data['bind_password'])
+						? (new CVar('bind_password', $data['bind_password']))->removeId()
 						: null,
 					(new CSimpleButton(_('Change password')))
 						->addClass(ZBX_STYLE_BTN_GREY)
