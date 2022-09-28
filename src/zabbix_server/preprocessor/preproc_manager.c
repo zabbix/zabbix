@@ -639,7 +639,7 @@ static void	preproc_item_value_clear(zbx_preproc_item_value_t *value)
 
 	if (NULL != value->result)
 	{
-		free_result(value->result);
+		zbx_free_agent_result(value->result);
 		zbx_free(value->result);
 	}
 }
@@ -1171,7 +1171,7 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 	if (ZBX_VARIANT_NONE == value->type)
 	{
 		if (NULL != request->value.result)
-			free_result(request->value.result);
+			zbx_free_agent_result(request->value.result);
 
 		zbx_free(request->value.error);
 
@@ -1201,13 +1201,13 @@ static int	preprocessor_set_variant_result(zbx_preprocessing_request_t *request,
 		if (NULL == request->value.result)
 		{
 			request->value.result = (AGENT_RESULT *)zbx_malloc(NULL, sizeof(AGENT_RESULT));
-			init_result(request->value.result);
+			zbx_init_agent_result(request->value.result);
 		}
 		else
 		{
 			/* preserve eventlog related information */
 			if (ITEM_VALUE_TYPE_LOG != request->value_type)
-				free_result(request->value.result);
+				zbx_free_agent_result(request->value.result);
 		}
 
 		if (ITEM_STATE_NOTSUPPORTED == request->value.state)
@@ -1972,7 +1972,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_PREPROCESSING, &error))
 	{
@@ -2005,9 +2005,9 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 			manager.processed_num = 0;
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
 		zbx_update_env(sec);
 

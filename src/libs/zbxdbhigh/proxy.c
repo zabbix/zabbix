@@ -1312,7 +1312,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
 	{
 		AGENT_RESULT	result;
 
-		init_result(&result);
+		zbx_init_agent_result(&result);
 
 		if (NULL != value->value)
 		{
@@ -1346,11 +1346,11 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
 				SET_LOG_RESULT(&result, log);
 			}
 			else
-				set_result_type(&result, ITEM_VALUE_TYPE_TEXT, value->value);
+				zbx_set_agent_result_type(&result, ITEM_VALUE_TYPE_TEXT, value->value);
 		}
 
 		if (0 != value->meta)
-			set_result_meta(&result, value->lastlogsize, value->mtime);
+			zbx_set_agent_result_meta(&result, value->lastlogsize, value->mtime);
 
 		if (0 != ZBX_ISSET_VALUE(&result) || 0 != ZBX_ISSET_META(&result))
 		{
@@ -1358,7 +1358,7 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
 			process_item_value(item, &result, &value->ts, h_num, NULL);
 		}
 
-		free_result(&result);
+		zbx_free_agent_result(&result);
 	}
 
 	return SUCCEED;
@@ -2693,7 +2693,6 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminating string */
 	zbx_vector_ptr_t	autoreg_hosts;
-	zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2709,7 +2708,8 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
-		unsigned int	connection_type;
+		unsigned int		connection_type;
+		zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
 
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;

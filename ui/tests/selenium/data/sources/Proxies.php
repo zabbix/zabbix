@@ -210,7 +210,7 @@ class Proxies {
 				]
 			],
 			[
-				'proxyid' =>  $active_proxyids['active_proxy4'],
+				'proxyid' => $active_proxyids['active_proxy4'],
 				'hosts' => [
 					['hostid' => $enabled_hostids['enabled_host6']],
 					['hostid' => $disabled_hostids['disabled_host6']]

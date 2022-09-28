@@ -1029,7 +1029,7 @@ static void	zbx_on_exit(int ret)
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
-		free_metrics();
+		zbx_free_metrics();
 		zbx_ipc_service_free_env();
 		free_configuration_cache();
 
@@ -1039,7 +1039,7 @@ static void	zbx_on_exit(int ret)
 		/* free vmware support */
 		zbx_vmware_destroy();
 
-		free_selfmon_collector();
+		zbx_free_selfmon_collector();
 	}
 
 	zbx_uninitialize_events();
@@ -1150,7 +1150,7 @@ int	main(int argc, char **argv)
 		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 
 	/* required for simple checks */
-	init_metrics();
+	zbx_init_metrics();
 	zbx_load_config(&t);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
@@ -1297,7 +1297,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
-	if (SUCCEED != init_selfmon_collector(&error))
+	if (SUCCEED != zbx_init_selfmon_collector(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
 		zbx_free(error);
@@ -1605,7 +1605,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_tfc_destroy();
 	zbx_vc_destroy();
 	zbx_vmware_destroy();
-	free_selfmon_collector();
+	zbx_free_selfmon_collector();
 	free_configuration_cache();
 	free_database_cache(ZBX_SYNC_NONE);
 
