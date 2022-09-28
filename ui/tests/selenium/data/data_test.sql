@@ -1228,9 +1228,9 @@ INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (95,95,'Service','Or
 INSERT INTO problem (eventid,source,object,objectid,clock,ns,name) VALUES (95,0,0,100028,1603466728,128786843,'Trigger for tag permissions Oracle');
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (95,95,'Service','Oracle');
 
--- -- Tag based permissions: Read-write permissions to host group
--- INSERT INTO rights (rightid,groupid,permission,id) VALUES (1,90,3,50004);
--- INSERT INTO rights (rightid,groupid,permission,id) VALUES (2,91,3,50004);
+-- Tag based permissions: Read-write permissions to host group
+INSERT INTO rights (rightid,groupid,permission,id) VALUES (1,90,3,50004);
+INSERT INTO rights (rightid,groupid,permission,id) VALUES (2,91,3,50004);
 
 
 -- event correlation
