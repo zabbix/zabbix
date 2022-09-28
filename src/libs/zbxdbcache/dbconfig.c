@@ -9484,6 +9484,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 	zbx_hashset_create(&pp_itemids, MAX(items->num_data, 100), ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_dc_item_ptr_create(&items_sync);
+	zbx_vector_dc_item_ptr_reserve(&items_sync, 100);
 
 	RDLOCK_CACHE;
 
