@@ -255,15 +255,9 @@ class CControllerAuthenticationUpdate extends CController {
 		try {
 			DBstart();
 
-			$result = $this->hasInput('ldap_removed_userdirectoryids')
-				? (bool) API::UserDirectory()->delete($this->getInput('ldap_removed_userdirectoryids'))
+			$result = $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED
+				? $this->processSamlConfiguration()
 				: true;
-
-			if ($result) {
-				$result = $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED
-					? $this->processSamlConfiguration()
-					: true;
-			}
 
 			$ldap_userdirectoryid = 0;
 			if ($result) {
@@ -288,6 +282,10 @@ class CControllerAuthenticationUpdate extends CController {
 
 			if ($result) {
 				$result = $this->processGeneralAuthenticationSettings($ldap_userdirectoryid);
+			}
+
+			if ($result && $this->hasInput('ldap_removed_userdirectoryids')) {
+				$result = (bool) API::UserDirectory()->delete($this->getInput('ldap_removed_userdirectoryids'));
 			}
 
 			if (!$result) {
