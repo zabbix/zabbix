@@ -337,7 +337,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormPreprocessingItemPrototype');
 		$suite->addTestSuite('testFormPreprocessingLowLevelDiscovery');
 		$suite->addTestSuite('testFormPreprocessingTest');
-*/
+
 		// Proxies.
 		$suite->addTestSuite('testFormAdministrationProxies');
 		$suite->addTestSuite('testPageAdministrationProxies');
@@ -352,7 +352,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageReportsTriggerTop');
 		$suite->addTestSuite('testPageScheduledReport');
 		$suite->addTestSuite('testScheduledReportPermissions');
-
+*/
 		// Roles.
 		$suite->addTestSuite('testFormUserRoles');
 		$suite->addTestSuite('testPageUserRoles');
