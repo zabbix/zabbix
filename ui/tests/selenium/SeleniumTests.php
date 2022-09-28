@@ -132,6 +132,17 @@ require_once dirname(__FILE__).'/services/testFormServicesServices.php';
 require_once dirname(__FILE__).'/services/testPageServicesServices.php';
 require_once dirname(__FILE__).'/services/testPageServicesServicesMassUpdate.php';
 
+// Tags.
+//require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
+//require_once dirname(__FILE__).'/tags/testFormTagsHostPrototype.php';
+//require_once dirname(__FILE__).'/tags/testFormTagsServices.php';
+//require_once dirname(__FILE__).'/tags/testFormTagsServicesProblemTags.php';
+//require_once dirname(__FILE__).'/tags/testFormTagsItem.php';
+//require_once dirname(__FILE__).'/tags/testFormTagsItemPrototype.php';
+//require_once dirname(__FILE__).'/tags/testFormTagsTemplate.php';
+//require_once dirname(__FILE__).'/tags/testFormTagsTrigger.php';
+//require_once dirname(__FILE__).'/tags/testFormTagsTriggerPrototype.php';
+//require_once dirname(__FILE__).'/tags/testFormTagsWeb.php';
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
@@ -201,16 +212,6 @@ require_once dirname(__FILE__).'/testFormNetworkDiscovery.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
-require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
-require_once dirname(__FILE__).'/tags/testFormTagsHostPrototype.php';
-require_once dirname(__FILE__).'/tags/testFormTagsServices.php';
-require_once dirname(__FILE__).'/tags/testFormTagsServicesProblemTags.php';
-require_once dirname(__FILE__).'/tags/testFormTagsItem.php';
-require_once dirname(__FILE__).'/tags/testFormTagsItemPrototype.php';
-require_once dirname(__FILE__).'/tags/testFormTagsTemplate.php';
-require_once dirname(__FILE__).'/tags/testFormTagsTrigger.php';
-require_once dirname(__FILE__).'/tags/testFormTagsTriggerPrototype.php';
-require_once dirname(__FILE__).'/tags/testFormTagsWeb.php';
 require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
@@ -248,8 +249,8 @@ use PHPUnit\Framework\TestSuite;
 class SeleniumTests {
 	public static function suite() {
 		$suite = new TestSuite('selenium');
-
-/*		$suite->addTestSuite('testDocumentationLinks');
+/*
+		$suite->addTestSuite('testDocumentationLinks');
 		$suite->addTestSuite('testGeneric');
 
 		// Actions.
@@ -316,14 +317,14 @@ class SeleniumTests {
 		$suite->addTestSuite('testItemTypeSelection');
 		$suite->addTestSuite('testPageItemPrototypes');
 		$suite->addTestSuite('testPageItems');
-*/
+
 		// LLD.
 		$suite->addTestSuite('testFormLowLevelDiscovery');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormTestLowLevelDiscovery');
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
 		$suite->addTestSuite('testPageLowLevelDiscovery');
-/*
+
 		// Macros.
 		$suite->addTestSuite('testFormMacrosAdministrationGeneral');
 		$suite->addTestSuite('testFormMacrosHost');
@@ -357,13 +358,25 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserRoles');
 		$suite->addTestSuite('testPageUserRoles');
 		$suite->addTestSuite('testUserRolesPermissions');
-/*
+
 		// Services.
-		$suite->addTestSuite('testFormServicesServices');
-		$suite->addTestSuite('testPageServicesServices');
-		$suite->addTestSuite('testPageServicesServicesMassUpdate');
+//		$suite->addTestSuite('testFormServicesServices');
+//		$suite->addTestSuite('testPageServicesServices');
+//		$suite->addTestSuite('testPageServicesServicesMassUpdate');
 
+		// Tags.
+//		$suite->addTestSuite('testFormTagsHost');
+//		$suite->addTestSuite('testFormTagsHostPrototype');
+//		$suite->addTestSuite('testFormTagsServices');
+//		$suite->addTestSuite('testFormTagsServicesProblemTags');
+//		$suite->addTestSuite('testFormTagsItem');
+//		$suite->addTestSuite('testFormTagsItemPrototype');
+//		$suite->addTestSuite('testFormTagsTemplate');
+//		$suite->addTestSuite('testFormTagsTrigger');
+//		$suite->addTestSuite('testFormTagsTriggerPrototype');
+//		$suite->addTestSuite('testFormTagsWeb');
 
+/*
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
 
@@ -431,16 +444,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTabIndicators');
-		$suite->addTestSuite('testFormTagsHost');
-		$suite->addTestSuite('testFormTagsHostPrototype');
-		$suite->addTestSuite('testFormTagsServices');
-		$suite->addTestSuite('testFormTagsServicesProblemTags');
-		$suite->addTestSuite('testFormTagsItem');
-		$suite->addTestSuite('testFormTagsItemPrototype');
-		$suite->addTestSuite('testFormTagsTemplate');
-		$suite->addTestSuite('testFormTagsTrigger');
-		$suite->addTestSuite('testFormTagsTriggerPrototype');
-		$suite->addTestSuite('testFormTagsWeb');
 		$suite->addTestSuite('testFormTemplate');
 		$suite->addTestSuite('testFormTrigger');
 		$suite->addTestSuite('testFormTriggerPrototype');

@@ -18,13 +18,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
+ * @dataSource ScheduledReports
+ *
  * @backup role
+ *
  * @onBefore prepareRoleData
  */
 class testPageUserRoles extends CWebTest {
@@ -142,8 +146,8 @@ class testPageUserRoles extends CWebTest {
 			],
 			[
 				'Name' => 'Admin role',
-				'#' => 'Users 2',
-				'Users' => 'admin-zabbix, http-auth-admin'
+				'#' => 'Users 4',
+				'Users' => 'admin-zabbix, admin user for testFormScheduledReport, http-auth-admin, user-recipient of the report'
 			],
 			[
 				'Name' => 'Guest role',
@@ -174,16 +178,6 @@ class testPageUserRoles extends CWebTest {
 				'Name' => 'Super admin role',
 				'#' => 'Users 5',
 				'Users' => 'Admin (Zabbix Administrator), filter-create, filter-delete, filter-update, test-timezone'
-			],
-			[
-				'Name' => 'UR1-executenow-on',
-				'#' => 'Users 1',
-				'Users' => 'U1-r-on'
-			],
-			[
-				'Name' => 'UR2-executenow-off',
-				'#' => 'Users 2',
-				'Users' => 'U2-r-off, U3-rw-off'
 			],
 			[
 				'Name' => 'User role',
