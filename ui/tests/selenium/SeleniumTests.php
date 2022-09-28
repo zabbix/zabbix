@@ -291,7 +291,7 @@ class SeleniumTests {
 		// Geomaps.
 		$suite->addTestSuite('testFormAdministrationGeneralGeomaps');
 		$suite->addTestSuite('testGeomapWidgetScreenshots');
-
+*/
 		// Hosts.
 		$suite->addTestSuite('testFormHostFromConfiguration');
 		$suite->addTestSuite('testFormHostFromMonitoring');
@@ -352,18 +352,18 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageReportsTriggerTop');
 		$suite->addTestSuite('testPageScheduledReport');
 		$suite->addTestSuite('testScheduledReportPermissions');
-*/
+
 		// Roles.
 		$suite->addTestSuite('testFormUserRoles');
 		$suite->addTestSuite('testPageUserRoles');
 		$suite->addTestSuite('testUserRolesPermissions');
-
+/*
 		// Services.
 		$suite->addTestSuite('testFormServicesServices');
 		$suite->addTestSuite('testPageServicesServices');
 		$suite->addTestSuite('testPageServicesServicesMassUpdate');
 
-/*
+
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
 
