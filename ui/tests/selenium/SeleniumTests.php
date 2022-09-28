@@ -255,13 +255,13 @@ class SeleniumTests {
 		// Actions.
 		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testPageActions');
-
+/*
 		// Api tokens.
 		$suite->addTestSuite('testFormApiTokensAdministrationGeneral');
 		$suite->addTestSuite('testFormApiTokensUserSettings');
 		$suite->addTestSuite('testPageApiTokensAdministrationGeneral');
 		$suite->addTestSuite('testPageApiTokensUserSettings');
-/*
+
 		// Dashboards.
 		$suite->addTestSuite('testDashboardCopyWidgets');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
@@ -357,13 +357,13 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserRoles');
 		$suite->addTestSuite('testPageUserRoles');
 		$suite->addTestSuite('testUserRolesPermissions');
-
+*/
 		// Services.
 		$suite->addTestSuite('testFormServicesServices');
 		$suite->addTestSuite('testPageServicesServices');
 		$suite->addTestSuite('testPageServicesServicesMassUpdate');
 
-
+/*
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
 
