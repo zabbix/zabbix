@@ -141,13 +141,6 @@ class testEscalations extends CIntegrationTest {
 
 		// Enable mediatypes
 		$response = $this->call('mediatype.update', [
-			'mediatypeid' => 0,
-			'status' => 0
-		]);
-		$this->assertArrayHasKey('mediatypeids', $response['result']);
-		$this->assertEquals(1, count($response['result']['mediatypeids']));
-
-		$response = $this->call('mediatype.update', [
 			'mediatypeid' => 1,
 			'status' => 0
 		]);
@@ -659,7 +652,8 @@ HEREDOC;
 					'value' => '{EVENT.SOURCE}'
 				]
 			],
-			'content_type' => 1
+			'content_type' => 1,
+			'status' => 0
 		]);
 		$this->assertArrayHasKey('mediatypeids', $response['result']);
 		$this->assertEquals(1, count($response['result']['mediatypeids']));
