@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 
 /**
@@ -36,11 +37,16 @@ class testPageTriggerUrl extends CWebTest {
 					'trigger' => '1_trigger_High',
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100035',
-						'Configuration' => 'triggers.php?form=update&triggerid=100035',
+						'1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086',
+						'Trigger' => 'triggers.php?form=update&triggerid=100035&context=host',
 						'Trigger URL' => 'tr_events.php?triggerid=100035&eventid=9003',
 						'Unique webhook url' => 'zabbix.php?action=mediatype.list&ddreset=1',
-						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101',
-						'1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'
+						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101'
+						],
+					'item_link' => [
+						'Item' => [
+							'1_item' => 'items.php?form=update&itemid=99086&context=host'
+							]
 					],
 					'background' => "high-bg"
 				]
@@ -50,10 +56,15 @@ class testPageTriggerUrl extends CWebTest {
 					'trigger' => '1_trigger_Not_classified',
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100032',
-						'Configuration' => 'triggers.php?form=update&triggerid=100032',
+						'1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086',
+						'Trigger' => 'triggers.php?form=update&triggerid=100032&context=host',
 						'Trigger URL' => 'tr_events.php?triggerid=100032&eventid=9000',
-						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101',
-						'1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'
+						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101'
+					],
+					'item_link' => [
+						'Item' => [
+							'1_item' => 'items.php?form=update&itemid=99086&context=host'
+							]
 					],
 					'background' => 'na-bg'
 				]
@@ -130,8 +141,8 @@ class testPageTriggerUrl extends CWebTest {
 		if ($popup_menu) {
 			// Check trigger popup menu.
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-			$this->assertTrue($popup->hasTitles(['TRIGGER', 'LINKS', 'HISTORY']));
-			// Check Url of each link.
+			$this->assertTrue($popup->hasTitles(['VIEW', 'CONFIGURATION', 'LINKS']));
+			// Check Url for main links.
 			foreach ($data['links'] as $link => $url) {
 				$this->assertTrue($popup->hasItems($link));
 				$this->assertStringContainsString($url, $popup->getItem($link)->getAttribute('href'));
@@ -139,11 +150,11 @@ class testPageTriggerUrl extends CWebTest {
 			if ($trigger_overview) {
 				$this->assertTrue($popup->hasItems('Acknowledge'));
 				// Check that only the links from data provider plus Acknowledge link persist in the popup.
-				$this->assertEquals(count($data['links'])+1, $popup->getItems()->count());
+				$this->assertEquals(count($data['links']) + count($data['item_link']) +1, $popup->getItems()->count());
 			}
 			else {
 				// Check that only the expected links ar present in the popup.
-				$this->assertEquals(count($data['links']), $popup->getItems()->count());
+				$this->assertEquals(count($data['links']) + count($data['item_link']), $popup->getItems()->count());
 			}
 			// Open trigger link.
 			$popup->fill('Trigger URL');
