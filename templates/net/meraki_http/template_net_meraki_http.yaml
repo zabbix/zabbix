@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-09-22T22:38:56Z'
+  date: '2022-09-28T15:47:47Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -120,7 +120,7 @@ zabbix_export:
           description: 'This macro is used in organizations discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$MERAKI.TOKEN}'
-          value: ''
+          type: SECRET_TEXT
           description: 'Cisco Meraki Dashboard API Token.'
     -
       uuid: 39e2f742d0b24ea489b7f61d27a5df1c
@@ -412,12 +412,14 @@ zabbix_export:
                 for (var i in responseUplinks) {
                     network = networks.filter(function (x) { return x.id == responseUplinks[i].networkId; });
             
-                    for (var p in responseUplinks[i].uplinks) {
-                        responseUplinks[i].uplinks[p].networkName = network[0].name;
-                        responseUplinks[i].uplinks[p].timeZone = network[0].timeZone;
-                        responseUplinks[i].uplinks[p].role = responseUplinks[i].highAvailability.role;
+                    if (typeof responseUplinks[i].uplinks !== 'undefined' && Array.isArray(responseUplinks[i].uplinks)) {
+                        for (var p in responseUplinks[i].uplinks) {
+                            responseUplinks[i].uplinks[p].networkName = network[0].name;
+                            responseUplinks[i].uplinks[p].timeZone = network[0].timeZone;
+                            responseUplinks[i].uplinks[p].role = responseUplinks[i].highAvailability.role;
             
-                        uplinks.push(responseUplinks[i].uplinks[p]);
+                            uplinks.push(responseUplinks[i].uplinks[p]);
+                        }
                     }
                 }
             
@@ -548,23 +550,27 @@ zabbix_export:
                 vpnStats = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/appliance/vpn/stats');
             
                 for (i in vpnStats) {
-                    for (u in vpnStats[i].merakiVpnPeers) {
-                        for (l in vpnStats[i].merakiVpnPeers[u].latencySummaries) {
-                            result = vpnStats[i].merakiVpnPeers[u].latencySummaries.map(function (x) {
+                    if (typeof vpnStats[i].merakiVpnPeers !== 'undefined' && Array.isArray(vpnStats[i].merakiVpnPeers)) {
+                        for (u in vpnStats[i].merakiVpnPeers) {
+                            if (typeof vpnStats[i].merakiVpnPeers[u].latencySummaries !== 'undefined' && Array.isArray(vpnStats[i].merakiVpnPeers[u].latencySummaries)) {
+                                for (l in vpnStats[i].merakiVpnPeers[u].latencySummaries) {
+                                    result = vpnStats[i].merakiVpnPeers[u].latencySummaries.map(function (x) {
             
-                                lps = vpnStats[i].merakiVpnPeers[u].lossPercentageSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
-                                js = vpnStats[i].merakiVpnPeers[u].jitterSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
-                                ms = vpnStats[i].merakiVpnPeers[u].mosSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
-                                Object.assign(x, lps[0], js[0], ms[0]);
+                                        lps = vpnStats[i].merakiVpnPeers[u].lossPercentageSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
+                                        js = vpnStats[i].merakiVpnPeers[u].jitterSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
+                                        ms = vpnStats[i].merakiVpnPeers[u].mosSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
+                                        Object.assign(x, lps[0], js[0], ms[0]);
             
-                                x.networkId = vpnStats[i].networkId;
-                                x.networkName = vpnStats[i].networkName;
+                                        x.networkId = vpnStats[i].networkId;
+                                        x.networkName = vpnStats[i].networkName;
             
-                                x.peerNetworkId = vpnStats[i].merakiVpnPeers[u].networkId;
-                                x.peerNetworkName = vpnStats[i].merakiVpnPeers[u].networkName;
+                                        x.peerNetworkId = vpnStats[i].merakiVpnPeers[u].networkId;
+                                        x.peerNetworkName = vpnStats[i].merakiVpnPeers[u].networkName;
             
-                                return x;
-                            });
+                                        return x;
+                                    });
+                                }
+                            }
                         }
                     }
                 }
@@ -639,8 +645,6 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Meraki license expire time in seconds left.'
-          valuemap:
-            name: 'License status'
           preprocessing:
             -
               type: JSONPATH
@@ -1552,7 +1556,7 @@ zabbix_export:
           description: 'Time in seconds for license to expire.'
         -
           macro: '{$MERAKI.TOKEN}'
-          value: ''
+          type: SECRET_TEXT
           description: 'Cisco Meraki Dashboard API Token.'
       valuemaps:
         -
