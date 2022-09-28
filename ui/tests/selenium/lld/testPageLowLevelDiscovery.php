@@ -428,7 +428,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Linux by Zabbix agent: Network interface discovery',
 						'Test of discovered host 1 template for unlink: Template1 discovery rule',
 						'Test of discovered host 2 template for clear: Template2 discovery rule',
-						'Test of discovered host Template: Template discovery rule'
+						'Test of discovered host Template: Template discovery rule',
+						'Zabbix server health: Zabbix stats proxy: Zabbix proxy discovery'
 					]
 				]
 			],
