@@ -19,8 +19,8 @@
 
 #include "rtc_proxy.h"
 
-#include "zbxtypes.h"
 #include "proxy.h"
+#include "rtc_constants.h"
 
 extern int	CONFIG_PROXYMODE;
 
@@ -56,54 +56,19 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rtc_process(const char *option, char **error)
+int	rtc_process(const char *option, char **error)
 {
-	zbx_uint32_t	code = ZBX_RTC_UNKNOWN, size = 0;
-	char		*data = NULL;
-	unsigned char	*result = NULL;
-	int		ret;
+	zbx_uint32_t	code = ZBX_RTC_UNKNOWN;
+	char			*data = NULL;
 
 	if (SUCCEED != zbx_rtc_parse_options(option, &code, &data, error))
 		return FAIL;
 
 	if (ZBX_RTC_UNKNOWN == code)
 	{
-		if (ZBX_RTC_UNKNOWN == code)
-		{
-			*error = zbx_dsprintf(NULL, "unknown option \"%s\"", option);
-			return FAIL;
-		}
+		*error = zbx_dsprintf(NULL, "unknown option \"%s\"", option);
+		return FAIL;
 	}
 
-#if !defined(HAVE_SIGQUEUE)
-	switch (code)
-	{
-		/* allow only socket based runtime control options */
-		case ZBX_RTC_LOG_LEVEL_DECREASE:
-		case ZBX_RTC_LOG_LEVEL_INCREASE:
-			*error = zbx_dsprintf(NULL, "operation is not supported on the given operating system");
-			return FAIL;
-	}
-#endif
-
-	if (NULL != data)
-		size = (zbx_uint32_t)strlen(data) + 1;
-
-	if (SUCCEED == (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_RTC, code, CONFIG_TIMEOUT, (unsigned char *)data,
-			size, &result, error)))
-	{
-		if (NULL != result)
-		{
-			printf("%s", result);
-			zbx_free(result);
-		}
-		else
-			printf("No response\n");
-
-	}
-
-	zbx_free(data);
-
-	return ret;
+	return zbx_rtc_async_exchange(&data, code, error);
 }
-

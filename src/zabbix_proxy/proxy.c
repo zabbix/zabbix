@@ -1096,7 +1096,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != (ret = zbx_rtc_process(t.opts, &error)))
+		if (SUCCEED != (ret = rtc_process(t.opts, &error)))
 		{
 			zbx_error("Cannot perform runtime control command: %s", error);
 			zbx_free(error);

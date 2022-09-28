@@ -73,4 +73,6 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char
 void	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, zbx_uint32_t code,
 		const unsigned char *data, zbx_uint32_t size);
 
+int	zbx_rtc_async_exchange(char **data, zbx_uint32_t code, char **error);
+
 #endif

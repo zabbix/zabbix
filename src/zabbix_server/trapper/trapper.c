@@ -39,6 +39,7 @@
 #include "zbxxml.h"
 #include "base64.h"
 #include "zbxtime.h"
+#include "rtc_constants.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"

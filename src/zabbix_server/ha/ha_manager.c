@@ -1764,7 +1764,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	if (FAIL == zbx_rtc_open(&rtc_socket, ZBX_HA_SERVICE_TIMEOUT, &error))
+	if (FAIL == rtc_open(&rtc_socket, ZBX_HA_SERVICE_TIMEOUT, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start HA manager service: %s", error);
 		zbx_free(error);

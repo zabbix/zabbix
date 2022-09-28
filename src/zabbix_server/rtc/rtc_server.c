@@ -24,10 +24,9 @@
 #include "zbxtypes.h"
 #include "zbxcommon.h"
 #include "zbxservice.h"
+#include "rtc_constants.h"
 
-extern int	CONFIG_TIMEOUT;
-
-int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
+static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
 {
 	const char	*param;
 
@@ -524,12 +523,10 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rtc_process(const char *option, char **error)
+int	rtc_process(const char *option, char **error)
 {
-	zbx_uint32_t	code = ZBX_RTC_UNKNOWN, size = 0;
+	zbx_uint32_t	code = ZBX_RTC_UNKNOWN;
 	char		*data = NULL;
-	unsigned char	*result = NULL;
-	int		ret;
 
 	if (SUCCEED != zbx_rtc_parse_options(option, &code, &data, error))
 		return FAIL;
@@ -546,36 +543,7 @@ int	zbx_rtc_process(const char *option, char **error)
 		}
 	}
 
-#if !defined(HAVE_SIGQUEUE)
-	switch (code)
-	{
-		/* allow only socket based runtime control options */
-		case ZBX_RTC_LOG_LEVEL_DECREASE:
-		case ZBX_RTC_LOG_LEVEL_INCREASE:
-			*error = zbx_dsprintf(NULL, "operation is not supported on the given operating system");
-			return FAIL;
-	}
-#endif
-
-	if (NULL != data)
-		size = (zbx_uint32_t)strlen(data) + 1;
-
-	if (SUCCEED == (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_RTC, code, CONFIG_TIMEOUT, (unsigned char *)data,
-			size, &result, error)))
-	{
-		if (NULL != result)
-		{
-			printf("%s", result);
-			zbx_free(result);
-		}
-		else
-			printf("No response\n");
-
-	}
-
-	zbx_free(data);
-
-	return ret;
+	return zbx_rtc_async_exchange(&data, code, error);
 }
 
 /******************************************************************************
@@ -583,7 +551,7 @@ int	zbx_rtc_process(const char *option, char **error)
  * Purpose: reset the RTC service state by removing subscriptions and hooks   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_rtc_reset(zbx_rtc_t *rtc)
+void	rtc_reset(zbx_rtc_t *rtc)
 {
 	int	i;
 
@@ -600,7 +568,7 @@ void	zbx_rtc_reset(zbx_rtc_t *rtc)
 	zbx_vector_rtc_hook_clear(&rtc->hooks);
 }
 
-int	zbx_rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error)
+int	rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error)
 {
 	if (FAIL == zbx_ipc_async_socket_open(asocket, ZBX_IPC_SERVICE_RTC, timeout, error))
 		return FAIL;

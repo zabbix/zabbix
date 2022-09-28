@@ -33,6 +33,7 @@
 #include "zbxtime.h"
 #include "zbxip.h"
 #include "zbxsysinfo.h"
+#include "rtc_constants.h"
 
 extern int				CONFIG_DISCOVERER_FORKS;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

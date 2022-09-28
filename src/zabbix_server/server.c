@@ -81,6 +81,7 @@
 #include "diag/diag_server.h"
 #include "zbxip.h"
 #include "zbxsysinfo.h"
+#include "rtc_constants.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -1168,7 +1169,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != (ret = zbx_rtc_process(t.opts, &error)))
+		if (SUCCEED != (ret = rtc_process(t.opts, &error)))
 		{
 			zbx_error("Cannot perform runtime control command: %s", error);
 			zbx_free(error);
@@ -1536,7 +1537,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 
 	zbx_unset_child_signal_handler();
 
-	zbx_rtc_reset(rtc);
+	rtc_reset(rtc);
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	/* Disable locks so main process doesn't hang on logging if a process was              */

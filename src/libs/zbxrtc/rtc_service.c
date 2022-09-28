@@ -18,6 +18,7 @@
 **/
 
 #include "zbxrtc.h"
+#include "rtc_constants.h"
 #include "rtc.h"
 
 #include "zbxserialize.h"

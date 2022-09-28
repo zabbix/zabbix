@@ -28,6 +28,7 @@
 #include "zbxcompress.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
+#include "rtc_constants.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 

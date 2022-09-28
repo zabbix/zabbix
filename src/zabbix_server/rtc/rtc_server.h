@@ -23,9 +23,8 @@
 #include "zbxrtc.h"
 #include "zbxtypes.h"
 
-int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error);
 int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result);
-int	zbx_rtc_process(const char *option, char **error);
-void	zbx_rtc_reset(zbx_rtc_t *rtc);
-int	zbx_rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error);
+int	rtc_process(const char *option, char **error);
+void	rtc_reset(zbx_rtc_t *rtc);
+int	rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error);
 #endif

@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "rtc.h"
 #include "zbxrtc.h"
+#include "rtc_constants.h"
+#include "rtc.h"
 
 #include "zbxcommon.h"
 #include "zbxserialize.h"
@@ -276,4 +277,54 @@ int	zbx_rtc_reload_config_cache(char **error)
 	zbx_free(result);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: exchange RTC data                                                 *
+ *                                                                            *
+ * Parameters: data         - [IN/OUT] the data                               *
+ *             code         - [IN] the message code                           *
+ *             error        - [OUT] the error message                         *
+ *                                                                            *
+ * Return value: SUCCEED - successfully sent message and received response    *
+ *               FAIL    - error occurred                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_rtc_async_exchange(char **data, zbx_uint32_t code, char **error)
+{
+	zbx_uint32_t	size = 0;
+	unsigned char	*result = NULL;
+	int				ret;
+
+#if !defined(HAVE_SIGQUEUE)
+	switch (code)
+	{
+		/* allow only socket based runtime control options */
+		case ZBX_RTC_LOG_LEVEL_DECREASE:
+		case ZBX_RTC_LOG_LEVEL_INCREASE:
+			*error = zbx_dsprintf(NULL, "operation is not supported on the given operating system");
+			return FAIL;
+	}
+#endif
+
+	if (NULL != *data)
+		size = (zbx_uint32_t)strlen(*data) + 1;
+
+	if (SUCCEED == (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_RTC, code, CONFIG_TIMEOUT,
+			(const unsigned char *)*data, size, &result, error)))
+	{
+		if (NULL != result)
+		{
+			printf("%s", result);
+			zbx_free(result);
+		}
+		else
+			printf("No response\n");
+
+	}
+
+	zbx_free(*data);
+
+	return ret;
 }
