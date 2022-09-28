@@ -5362,7 +5362,9 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	for (i = 0; i < items.values_num; i++)
 	{
-		if (NULL == (preprocitem = items.values[i]->preproc_item))
+		item = items.values[i];
+
+		if (NULL == (preprocitem = item->preproc_item))
 			continue;
 
 		dc_item_update_revision(item, revision);
@@ -5370,7 +5372,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		if (0 == preprocitem->preproc_ops.values_num)
 		{
 			dc_preprocitem_free(preprocitem);
-			items.values[i]->preproc_item = NULL;
+			item->preproc_item = NULL;
 		}
 		else
 			zbx_vector_ptr_sort(&preprocitem->preproc_ops, dc_compare_preprocops_by_step);
