@@ -238,8 +238,6 @@ class testPageUserRoles extends CWebTest {
 						'Remove_role_3',
 						'role_with_min end',
 						'Super admin role',
-						'UR1-executenow-on',
-						'UR2-executenow-off',
 						'User role'
 					]
 				]
