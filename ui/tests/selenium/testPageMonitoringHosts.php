@@ -1035,9 +1035,11 @@ class testPageMonitoringHosts extends CWebTest {
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$this->assertEquals(['VIEW', 'CONFIGURATION', 'SCRIPTS'], $popup->getTitles()->asText());
 		$this->assertTrue($popup->hasItems($data['titles']));
+
 		foreach ($data['disabled'] as $disabled) {
 			$this->assertTrue($popup->query('xpath://a[@aria-label="View, '.
-					$disabled.'" and @class="menu-popup-item disabled"]')->one()->isPresent());
+					$disabled.'" and @class="menu-popup-item disabled"]')->one()->isPresent()
+			);
 		}
 	}
 

@@ -24,8 +24,7 @@ require_once dirname(__FILE__) . '/../include/CWebTest.php';
 /**
  * Test checks link from trigger URL field on different pages.
  *
- * @backup profiles
- * @backup problem
+ * @backup profiles, problem
  */
 class testPageTriggerUrl extends CWebTest {
 
@@ -39,14 +38,10 @@ class testPageTriggerUrl extends CWebTest {
 						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100035',
 						'1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086',
 						'Trigger' => 'triggers.php?form=update&triggerid=100035&context=host',
+						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
 						'Trigger URL' => 'tr_events.php?triggerid=100035&eventid=9003',
 						'Unique webhook url' => 'zabbix.php?action=mediatype.list&ddreset=1',
 						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101'
-						],
-					'item_link' => [
-						'Item' => [
-							'1_item' => 'items.php?form=update&itemid=99086&context=host'
-							]
 					],
 					'background' => "high-bg"
 				]
@@ -58,13 +53,9 @@ class testPageTriggerUrl extends CWebTest {
 						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100032',
 						'1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086',
 						'Trigger' => 'triggers.php?form=update&triggerid=100032&context=host',
+						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
 						'Trigger URL' => 'tr_events.php?triggerid=100032&eventid=9000',
 						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101'
-					],
-					'item_link' => [
-						'Item' => [
-							'1_item' => 'items.php?form=update&itemid=99086&context=host'
-							]
 					],
 					'background' => 'na-bg'
 				]
@@ -73,8 +64,9 @@ class testPageTriggerUrl extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getTriggerLinkData
 	 * Check trigger url in Problems widget.
+	 *
+	 * @dataProvider getTriggerLinkData
 	 */
 	public function testPageTriggerUrl_ProblemsWidget($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
@@ -88,31 +80,33 @@ class testPageTriggerUrl extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getTriggerLinkData
 	 * Check trigger url in Trigger overview widget.
+	 *
+	 * @dataProvider getTriggerLinkData
 	 */
 	public function testPageTriggerUrl_TriggerOverviewWidget($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1020');
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget('Group to check Overview');
 
-		$table = $widget->getContent()->asTable();
 		// Get row of trigger "1_trigger_Not_classified".
-		$row = $table->findRow('Triggers', $data['trigger']);
+		$row = $widget->getContent()->asTable()->findRow('Triggers', $data['trigger']);
+
 		// Open trigger context menu.
 		$row->query('xpath://td[contains(@class, "'.$data['background'].'")]')->one()->click();
 		$this->checkTriggerUrl(true, $data);
 	}
 
 	/**
-	 * @dataProvider getTriggerLinkData
 	 * Check trigger url on Problems page.
+	 *
+	 * @dataProvider getTriggerLinkData
 	 */
 	public function testPageTriggerUrl_ProblemsPage($data) {
 		$this->page->login()->open('zabbix.php?action=problem.view');
-		$table = $this->query('class:list-table')->asTable()->one();
+
 		// Open trigger context menu.
-		$table->query('link', $data['trigger'])->one()->click();
+		$this->query('class:list-table')->asTable()->one()->query('link', $data['trigger'])->one()->click();
 		$this->checkTriggerUrl(false, $data);
 	}
 
@@ -121,8 +115,9 @@ class testPageTriggerUrl extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getTriggerLinkData
 	 * Check trigger url on Event details page.
+	 *
+	 * @dataProvider getTriggerLinkData
 	 */
 	public function testPageTriggerUrl_EventDetails($data) {
 		$this->page->login()->open($data['links']['Trigger URL']);
@@ -140,24 +135,40 @@ class testPageTriggerUrl extends CWebTest {
 	private function checkTriggerUrl($trigger_overview, $data, $popup_menu = true) {
 		if ($popup_menu) {
 			// Check trigger popup menu.
-			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-			$this->assertTrue($popup->hasTitles(['VIEW', 'CONFIGURATION', 'LINKS']));
+			$trigger_popup = $this->query('xpath://ul[@role="menu" and @tabindex="0"]')->asPopupMenu()
+					->waitUntilPresent()->one();
+			$this->assertTrue($trigger_popup->hasTitles(['VIEW', 'CONFIGURATION', 'LINKS']));
+
 			// Check Url for main links.
-			foreach ($data['links'] as $link => $url) {
-				$this->assertTrue($popup->hasItems($link));
-				$this->assertStringContainsString($url, $popup->getItem($link)->getAttribute('href'));
-			}
 			if ($trigger_overview) {
-				$this->assertTrue($popup->hasItems('Acknowledge'));
-				// Check that only the links from data provider plus Acknowledge link persist in the popup.
-				$this->assertEquals(count($data['links']) + count($data['item_link']) +1, $popup->getItems()->count());
+				$array = $data['links'];
+				array_shift($array);
+				$data['links'] = ['Problems' => $data['links']['Problems'],	'Acknowledge' => ''] + $array;
 			}
-			else {
-				// Check that only the expected links ar present in the popup.
-				$this->assertEquals(count($data['links']) + count($data['item_link']), $popup->getItems()->count());
+
+			$this->assertEquals(array_keys($data['links']), $trigger_popup->getItems()->asText());
+
+			foreach ($data['links'] as $menu => $links) {
+				// Check 2-level menu links.
+				if (is_array($links)) {
+					$item_popup = $trigger_popup->query('xpath://ul[@class="menu-popup" and @role="menu"]')
+							->asPopupMenu()->waitUntilPresent()->one();
+					$this->assertEquals(array_keys($links), $item_popup->getItems()->asText());
+
+					foreach ($links as $item => $link) {
+						$this->assertStringContainsString($link, $item_popup->getItem($item)->getAttribute('href'));
+					}
+				}
+				// Check 1-level menu links.
+				else {
+					if ($menu !== 'Acknowledge') {
+						$this->assertStringContainsString($links, $trigger_popup->getItem($menu)->getAttribute('href'));
+					}
+				}
 			}
+
 			// Open trigger link.
-			$popup->fill('Trigger URL');
+			$trigger_popup->fill('Trigger URL');
 		}
 		else {
 			// Follow trigger link in overlay dialogue.
