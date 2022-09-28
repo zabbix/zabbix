@@ -462,6 +462,18 @@ static int	DBpatch_6030059(void)
 	return DBset_default("media_type", &field);
 }
 
+static int	DBpatch_6030060(void)
+{
+	const ZBX_FIELD field = {"hosts", "", NULL, NULL, 0, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("name_up", &field);
+}
+
+static int	DBpatch_6030061(void)
+{
+	return DBcreate_index("hosts", "hosts_6", "name_up", 0);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -528,5 +540,7 @@ DBPATCH_ADD(6030056, 0, 1)
 DBPATCH_ADD(6030057, 0, 1)
 DBPATCH_ADD(6030058, 0, 1)
 DBPATCH_ADD(6030059, 0, 1)
+DBPATCH_ADD(6030060, 0, 1)
+DBPATCH_ADD(6030061, 0, 1)
 
 DBPATCH_END()
