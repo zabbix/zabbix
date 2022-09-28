@@ -1,0 +1,1 @@
+........S. [ZBX-21655] fixed vmware datastore discovery to not return the same datastore multiple times (asestakovs)
