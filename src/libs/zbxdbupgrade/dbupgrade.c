@@ -1304,4 +1304,66 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 	return ret;
 }
 
+
+int	zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update(const char *table_name,
+		const char *original_column_name, const char *indexed_column_name, const char *function,
+		const char *idname)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	table_type, ret = FAIL;;
+
+#if defined(HAVE_ORACLE) || defined(HAVE_MYSQL)
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+		"CREATE TRIGGER %s_%s_INSERT AFTER INSERT ON %s FOR EACH ROW\n"
+		"BEGIN\n"
+			"IF NEW.%s <> OLD.%s\n"
+			"THEN\n"
+			"UPDATE %s SET %s=%s(%s)"
+		"END\n;"
+		"CREATE TRIGGER %s_%s_UPDATE AFTER UPDATE ON %s FOR EACH ROW\n"
+		"BEGIN\n"
+			"IF NEW.%s <> OLD.%s\n"
+			"THEN\n"
+			"UPDATE %s SET %s=%s(%s)"
+		"END\n",
+
+		table_name, indexed_column_name, table_name, original_column_name, original_column_name, table_name,
+		indexed_column_name, function, original_column_name,
+		table_name, indexed_column_name, table_name, original_column_name, original_column_name, table_name,
+		indexed_column_name, function, original_column_name);
+
+#elif defined(HAVE_POSTGRESQL)
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"CREATE OR REPLACE FUNCTION %s_%s_%s() RETURNS TRIGGER LANGUAGE PLPGSQL AS $func$  \n"
+			"BEGIN\n"
+				"UPDATE %s SET %s=%s(%s) WHERE %s=NEW.%s;\n"
+				"RETURN NULL;\n"
+			"END $func$;\n"
+
+
+			"CREATE TRIGGER %s_%s_INSERT AFTER INSERT OF %s ON %s\n"
+				"FOR EACH ROW\n"
+					"EXECUTE PROCEDURE %s_%s_%s();"
+
+			"CREATE TRIGGER %s_%s_UPDATE AFTER UPDATE OF %s ON %s\n"
+				"FOR EACH ROW\n"
+					"EXECUTE PROCEDURE %s_%s_%s();",
+
+				table_name, indexed_column_name, function, table_name, indexed_column_name, function,
+				original_column_name, idname, idname, table_name, indexed_column_name,
+				original_column_name, table_name, table_name, indexed_column_name, function,
+				table_name, indexed_column_name, original_column_name, table_name, table_name,
+				indexed_column_name, function);
+#endif
+
+	if (ZBX_DB_OK <= DBexecute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+
 #endif

@@ -474,6 +474,13 @@ static int	DBpatch_6030061(void)
 	return DBcreate_index("hosts", "hosts_6", "name_up", 0);
 }
 
+
+static int	DBpatch_6030062(void)
+{
+	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("hosts", "name", "name_up", "UPPER",
+			"hostid");
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -542,5 +549,6 @@ DBPATCH_ADD(6030058, 0, 1)
 DBPATCH_ADD(6030059, 0, 1)
 DBPATCH_ADD(6030060, 0, 1)
 DBPATCH_ADD(6030061, 0, 1)
+DBPATCH_ADD(6030062, 0, 1)
 
 DBPATCH_END()
