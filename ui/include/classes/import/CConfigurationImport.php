@@ -831,8 +831,6 @@ class CConfigurationImport {
 				}
 				unset($preprocessing_step);
 
-				$item['preprocessing'] = normalizeItemPreprocessingSteps($item['preprocessing']);
-
 				$itemid = array_key_exists('uuid', $item)
 					? $this->referencer->findItemidByUuid($item['uuid'])
 					: $this->referencer->findItemidByKey($hostid, $item['key_']);
@@ -840,17 +838,9 @@ class CConfigurationImport {
 				if ($itemid !== null) {
 					$item['itemid'] = $itemid;
 
-					if (!array_key_exists($level, $items_to_update)) {
-						$items_to_update[$level] = [];
-					}
-
 					$items_to_update[$level][] = $item;
 				}
 				else {
-					if (!array_key_exists($level, $items_to_create)) {
-						$items_to_create[$level] = [];
-					}
-
 					$items_to_create[$level][] = $item;
 				}
 			}
@@ -933,14 +923,13 @@ class CConfigurationImport {
 					}
 					unset($item[$master_item_key]);
 				}
+
+				unset($item['uuid']);
+				unset($item['hostid']);
 			}
 			unset($item);
 
-			$updated_items = $api_service->update(array_map(function(array $item): array {
-				unset($item['uuid']);
-				unset($item['hostid']);
-				return $item;
-			}, $items_to_update));
+			$updated_items = $api_service->update($items_to_update);
 
 			foreach ($items_to_update as $index => $item) {
 				$this->referencer->setDbItem($updated_items['itemids'][$index], $item);
@@ -1225,99 +1214,15 @@ class CConfigurationImport {
 						? $this->referencer->findItemidByUuid($item_prototype['uuid'])
 						: $this->referencer->findItemidByKey($hostid, $item_prototype['key_']);
 
-					$item_prototype['ruleid'] = $itemid;
-
-					if (!$item_prototype['preprocessing']) {
-						unset($item_prototype['preprocessing']);
-					}
-					else {
-						foreach ($item_prototype['preprocessing'] as &$preprocessing_step) {
-							$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
-							unset($preprocessing_step['parameters']);
-						}
-						unset($preprocessing_step);
-
-						$item_prototype['preprocessing'] = normalizeItemPreprocessingSteps(
-							$item_prototype['preprocessing']
-						);
+					if ($item_prototypeid === null) {
+						$item_prototype['ruleid'] = $itemid;
 					}
 
-					unset($item_prototype['trigger_prototypes']);
-
-					if ($item_prototype['type'] != ITEM_TYPE_HTTPAGENT) {
-						unset($item_prototype['allow_traps']);
-						unset($item_prototype['url']);
-						unset($item_prototype['query_fields']);
-						unset($item_prototype['post_type']);
-						unset($item_prototype['posts']);
-						unset($item_prototype['status_codes']);
-						unset($item_prototype['follow_redirects']);
-						unset($item_prototype['http_proxy']);
-						unset($item_prototype['headers']);
-						unset($item_prototype['retrieve_mode']);
-						unset($item_prototype['request_method']);
-						unset($item_prototype['output_format']);
-						unset($item_prototype['ssl_cert_file']);
-						unset($item_prototype['ssl_key_file']);
-						unset($item_prototype['ssl_key_password']);
-						unset($item_prototype['verify_peer']);
-						unset($item_prototype['verify_host']);
+					foreach ($item_prototype['preprocessing'] as &$preprocessing_step) {
+						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+						unset($preprocessing_step['parameters']);
 					}
-
-					if ($item_prototype['type'] != ITEM_TYPE_SNMP) {
-						unset($item_prototype['snmp_oid']);
-					}
-
-					if ($item_prototype['type'] != ITEM_TYPE_IPMI) {
-						unset($item_prototype['ipmi_sensor']);
-					}
-
-					if ($item_prototype['type'] != ITEM_TYPE_JMX) {
-						unset($item_prototype['jmx_endpoint']);
-					}
-
-					if ($item_prototype['type'] != ITEM_TYPE_SSH) {
-						unset($item_prototype['publickey']);
-						unset($item_prototype['privatekey']);
-					}
-
-					if ($item_prototype['type'] != ITEM_TYPE_SCRIPT) {
-						unset($item_prototype['parameters']);
-					}
-
-					if ($item_prototype['value_type'] != ITEM_VALUE_TYPE_LOG) {
-						unset($item_prototype['logtimefmt']);
-					}
-
-					if (!in_array($item_prototype['type'], [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-								ITEM_TYPE_SCRIPT, ITEM_TYPE_CALCULATED
-							])) {
-						unset($item_prototype['params']);
-					}
-
-					if (!in_array($item_prototype['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
-						unset($item_prototype['trends']);
-						unset($item_prototype['units']);
-					}
-
-					if ($item_prototype['type'] != ITEM_TYPE_HTTPAGENT && $item_prototype['type'] != ITEM_TYPE_TRAPPER) {
-						unset($item_prototype['trapper_hosts']);
-					}
-
-					if ($item_prototype['type'] != ITEM_TYPE_HTTPAGENT && $item_prototype['type'] != ITEM_TYPE_SSH) {
-						unset($item_prototype['authtype']);
-					}
-
-					if ($item_prototype['type'] != ITEM_TYPE_HTTPAGENT && $item_prototype['type'] != ITEM_TYPE_SCRIPT) {
-						unset($item_prototype['timeout']);
-					}
-
-					if (!in_array($item_prototype['type'], [ITEM_TYPE_SIMPLE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-								ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT
-							])) {
-						unset($item_prototype['password']);
-						unset($item_prototype['username']);
-					}
+					unset($preprocessing_step);
 
 					if ($item_prototypeid !== null) {
 						if (!array_key_exists($level, $item_prototypes_to_update)) {
@@ -2788,23 +2693,17 @@ class CConfigurationImport {
 		$parent_item_keys = [];
 		$resolved_masters_cache = [];
 
-		$host_name_to_hostid = array_fill_keys(array_keys($items_by_hosts), null);
-
-		foreach ($host_name_to_hostid as $host_name => &$hostid) {
-			$hostid = $this->referencer->findTemplateidOrHostidByHost($host_name);
-		}
-		unset($hostid);
+		$host_name_to_hostid = [];
 
 		foreach ($items_by_hosts as $host_name => $items) {
-			if (!array_key_exists($host_name, $host_name_to_hostid)) {
-				throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'host',
-					_s('value "%1$s" not found', $host_name)
-				));
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host_name);
+
+			if ($hostid === null) {
+				unset($items_by_hosts[$host_name]);
+				continue;
 			}
 
-			if (!array_key_exists($host_name, $resolved_masters_cache)) {
-				$resolved_masters_cache[$host_name] = [];
-			}
+			$host_name_to_hostid[$host_name] = $hostid;
 
 			// Cache input array entities.
 			foreach ($items as $item) {
@@ -2814,7 +2713,7 @@ class CConfigurationImport {
 				];
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists('key', $item[$master_item_key])) {
-					$parent_item_hostids[$host_name_to_hostid[$host_name]] = true;
+					$parent_item_hostids[$hostid] = true;
 					$parent_item_keys[$item[$master_item_key]['key']] = true;
 				}
 			}
