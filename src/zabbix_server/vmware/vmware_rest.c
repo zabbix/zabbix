@@ -516,10 +516,7 @@ static int	vmware_http_request(const char *fn_parent, CURL *easyhandle, const ch
 		return FAIL;
 	}
 	else if (0 == page->offset)
-	{
-		*error = zbx_dsprintf(*error, "%s() Receive empty response.", ZBX_NULL2EMPTY_STR(fn_parent));
-		return FAIL;
-	}
+		*page->data = '\0';
 
 	if (NULL != fn_parent)
 		zabbix_log(LOG_LEVEL_TRACE, "%s() REST response: %s", fn_parent, page->data);
