@@ -9477,20 +9477,15 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 	zbx_uint64_t			global_revision = *revision;
 	zbx_vector_dc_item_ptr_t	items_sync;
 	zbx_hashset_t			pp_itemids;
-	size_t				index_size = 0;
 
 	if (config->revision.config == *revision)
 		goto out;
 
-	RDLOCK_CACHE;
-
-	if (100 > (index_size = config->items.num_data / 4))
-		index_size = 100;
-
-	zbx_hashset_create(&pp_itemids, index_size, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&pp_itemids, MAX(items->num_data, 100), ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
 	zbx_vector_dc_item_ptr_create(&items_sync);
+
+	RDLOCK_CACHE;
 
 	if (SUCCEED != um_cache_get_host_revision(config->um_cache, 0, &global_revision))
 		global_revision = 0;
