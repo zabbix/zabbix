@@ -143,7 +143,7 @@ $form_grid->addItem([
 $select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
 	->addOptions(CSelect::createOptionsFromArray($data['media_types']))
 	->setFocusableElementId('operation-opmessage-mediatypeid')
-	->setName('operation[operation-message-mediatype-only]');
+	->setName('operation[opmessage][mediatypeid]');
 
 
 $form_grid->addItem([

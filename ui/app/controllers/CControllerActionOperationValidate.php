@@ -247,13 +247,10 @@ class CControllerActionOperationValidate extends CController {
 				'opmessage_usr' => $operation['opmessage_usr'],
 				'opmessage' =>  $operation['opmessage'],
 				'evaltype' => $operation['evaltype'],
-				'condition' => $operation['condition'] ? : [],
+				//'condition' => $operation['condition'] ? : [],
 				'details' => $this->getActionOperationDescription($operation),
 				'start_in' => 'start in column'
 			];
-
-			sdff('validate pass operation');
-			sdff($operation);
 
 			if ($operation['recovery'] == ACTION_OPERATION &&
 					($operation['eventsource'] == EVENT_SOURCE_TRIGGERS
@@ -270,10 +267,9 @@ class CControllerActionOperationValidate extends CController {
 				'recovery' => $operation['recovery'],
 				'operationtype' => $operationtype,
 				'mediatypeid' => $operation['operation-message-mediatype-only'],
-				//'opmessage_grp' => $operation['opmessage_grp'],
+				'opmessage_grp' => $operation['opmessage_grp'],
 				'opmessage' =>  $operation['opmessage'],
 				'opcommand' => $operation['opcommand'],
-				'evaltype' => $operation['evaltype'],
 				'opmessage_usr' => $operation['opmessage_usr'],
 				'details' => $this->getActionOperationDescription($operation)
 			];
@@ -287,8 +283,7 @@ class CControllerActionOperationValidate extends CController {
 				'mediatypeid' => $operation['operation-message-mediatype-only'],
 				'opmessage_grp' => $operation['opmessage_grp'],
 				'opmessage_usr' => $operation['opmessage_usr'],
-				'opmessage' =>  $operation['esc_period'],
-				'evaltype' => $operation['evaltype'],
+				'opmessage' =>  $operation['opmessage'],
 				'condition' => $operation['condition'] ? : [],
 				'details' => $this->getActionOperationDescription($operation)
 			];

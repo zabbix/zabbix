@@ -199,42 +199,20 @@ window.action_edit_popup = new class {
 
 		const some = ['details', 'start_in', 'steps', 'duration'];
 		this.createHiddenInputFromObject(input.detail.operation, `operations[${this.operation_row_count}]`, `operations_${this.operation_row_count}`, some);
-
-		// for (const [name, value] of Object.entries(input.detail.operation)) {
-		//	const operation_input = document.createElement('input');
-		//	operation_input.setAttribute('type', 'hidden');
-		//	operation_input.setAttribute('name', `operations[${this.operation_row_count}][${name}]`);
-		//	operation_input.setAttribute('id', `operations_${this.operation_row_count}_${name}`);
-		//	operation_input.setAttribute('value', value);
-
-		//	form.appendChild(operation_input);
-		//}
-
-		// if (input.detail.operation.opmessage_grp) {
-		//	for (const [index, value] of Object.entries(input.detail.operation.opmessage_grp)) {
-		//		this.operation_row.append(this._addUserFields(index, 'usrgrpid',value.usrgrpid, 'opmessage_grp'));
-		//	}
-		//}
-		// else if (input.detail.operation.opmessage_usr) {
-		//	for (const [index, value] of Object.entries(input.detail.operation.opmessage_usr)) {
-		//		this.operation_row.append(this._addUserFields(index, 'userid', value.userid, 'opmessage_usr'));
-		//	}
-		//}
-
-		// Object.keys(input.detail.operation?.opmessage).map(key => {
-		//	const operation_input = document.createElement('input');
-		//	operation_input.setAttribute('type', 'hidden');
-		//	operation_input.setAttribute('name', `operations[${this.operation_row_count}][opmessage][${key}]`);
-		//	operation_input.setAttribute('id', `operations_${this.operation_row_count}_opmessage_${key}`);
-		//	operation_input.setAttribute('value', input.detail.operation.opmessage[key]);
-		//	form.appendChild(operation_input);
-		//})
-
 		this.operation_row.append(this._addHiddenOperationsFields('operationtype', this.recovery));
 
 	}
 
 	createHiddenInputFromObject(obj, namePrefix, idPrefix, exceptKeys = []) {
+		this.recovery_prefix = '';
+
+		if (this.recovery === <?= ACTION_RECOVERY_OPERATION ?>) {
+			this.recovery_prefix = 'recovery_'
+		}
+		else if (this.recovery === <?= ACTION_UPDATE_OPERATION ?>) {
+			this.recovery_prefix = 'update_'
+		}
+
 		if (!obj || typeof obj !== 'object') {
 			return;
 		}
@@ -245,29 +223,16 @@ window.action_edit_popup = new class {
 				return;
 			}
 
-
-
 			if (typeof obj[key] === 'object') {
 				this.createHiddenInputFromObject(obj[key], `${namePrefix}[${key}]`, `${idPrefix}_${key}`);
 				return;
 			}
 
-			//namePrefix = `${namePrefix}[${operationsRowCount}]`;
-			//idPrefix = `${idPrefix}_${operationsRowCount}`;
-
-			//namePrefix = `${namePrefix}[${operationsRowCount}]`;
-			//idPrefix = `${idPrefix}_${operationsRowCount}`;
-
 			const input = document.createElement('input');
 			input.setAttribute('type', 'hidden');
-			//input.setAttribute('name', `operations[${this.operation_row_count}][opmessage][${key}]`);
-			//input.setAttribute('id', `operations_${this.operation_row_count}_opmessage_${key}`);
 
-			input.setAttribute('name', namePrefix ? `${namePrefix}[${key}]` : key);
-			input.setAttribute('id', idPrefix ? `${idPrefix}_${key}` : key);
-
-			//input.setAttribute('name', namePrefix ? `${namePrefix}[${key}]` : key);
-			//input.setAttribute('id', idPrefix ? `${idPrefix}_${key}` : key);
+			input.setAttribute('name', namePrefix ? `${this.recovery_prefix}${namePrefix}[${key}]` : key);
+			input.setAttribute('id', idPrefix ? `${this.recovery_prefix}${idPrefix}_${key}` : key);
 
 			input.setAttribute('value', obj[key]);
 
