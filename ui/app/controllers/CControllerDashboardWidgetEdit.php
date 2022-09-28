@@ -39,7 +39,9 @@ class CControllerDashboardWidgetEdit extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(['body' => json_encode('')]));
+			$this->setResponse((new CControllerResponseData([
+				'main_block' => json_encode(['messages' => getMessages()->toString()])
+			]))->disableView());
 		}
 
 		return $ret;

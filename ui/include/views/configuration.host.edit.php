@@ -39,7 +39,7 @@ if (!hasRequest('form_refresh')) {
 $frmHost = (new CForm())
 	->setId('hostsForm')
 	->setName('hostsForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->disablePasswordAutofill()
 	->addVar('form', $data['form'])
 	->addVar('clear_templates', $data['clear_templates'])
@@ -58,15 +58,24 @@ $hostList = new CFormList('hostlist');
 
 // LLD rule link
 if ($data['readonly']) {
-	$hostList->addRow(_('Discovered by'), $data['discoveryRule']
-		? new CLink($data['discoveryRule']['name'],
-			(new CUrl('host_prototypes.php'))
-				->setArgument('form', 'update')
-				->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
-				->setArgument('hostid', $data['hostDiscovery']['parent_hostid'])
-		)
-		: (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY)
-	);
+	if ($data['discoveryRule']) {
+		if ($data['is_discovery_rule_editable']) {
+			$discovery_rule = new CLink($data['discoveryRule']['name'],
+				(new CUrl('host_prototypes.php'))
+					->setArgument('form', 'update')
+					->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+					->setArgument('hostid', $data['hostDiscovery']['parent_hostid'])
+			);
+		}
+		else {
+			$discovery_rule = new CSpan($data['discoveryRule']['name']);
+		}
+	}
+	else {
+		$discovery_rule = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
+	}
+
+	$hostList->addRow(_('Discovered by'), $discovery_rule);
 }
 
 $hostList

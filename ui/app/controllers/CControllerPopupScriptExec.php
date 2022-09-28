@@ -88,9 +88,6 @@ class CControllerPopupScriptExec extends CController {
 			if (!$result) {
 				error(_('Cannot execute script'));
 			}
-			elseif ($result['response'] === 'failed') {
-				error($result['value']);
-			}
 			else {
 				$data['message'] = $result['value'];
 			}
