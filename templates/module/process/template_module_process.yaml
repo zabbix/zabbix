@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-26T07:44:32Z'
+  date: '2022-09-28T10:43:32Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -59,40 +59,6 @@ zabbix_export:
           description: 'Discovery of summary process OS.'
           item_prototypes:
             -
-              uuid: 10997fb0354744939e8ee034c6d26065
-              name: 'Process [{#NAME}]: Error'
-              type: DEPENDENT
-              key: 'custom.proc.error[{#NAME}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              value_type: TEXT
-              description: 'Check raw process {#NAME}.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - $.error
-              master_item:
-                key: 'custom.proc.get[{#NAME}]'
-              tags:
-                -
-                  tag: component
-                  value: memory
-                -
-                  tag: process
-                  value: '{#NAME}'
-              trigger_prototypes:
-                -
-                  uuid: 915df5dbf24a436e892b1ec9ae0f4cb9
-                  expression: 'length(last(/OS processes by Zabbix agent/custom.proc.error[{#NAME}]))>0'
-                  name: 'Process [{#NAME}]: down'
-                  priority: AVERAGE
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-            -
               uuid: 2e9b31e2b47741f4b35c5d15f33378ea
               name: 'Process [{#NAME}]: Get data'
               type: DEPENDENT
@@ -106,23 +72,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@["name"]=="{#NAME}")]'
+                    - '$.[?(@["name"]=="{#NAME}")].first()'
                   error_handler: CUSTOM_VALUE
-                  error_handler_params: 'no data'
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - |
-                      var data = {};
-                      try {
-                         data.value = JSON.parse(value)
-                         data.error = ''
-                       }
-                      catch (error) {
-                         data.error = 'no data'
-                         data.value = ''
-                       }
-                      return JSON.stringify(data);
+                  error_handler_params: 'Failed to retrieve process {#NAME} data'
               master_item:
                 key: 'proc.get[,,,summary]'
               tags:
@@ -146,7 +98,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.value..lck.first()
+                    - $.lck
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
@@ -159,18 +111,23 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 0bb7d924b8814c42a494d8a3baf48a59
-              name: 'Process [{#NAME}]: Number of processes'
+              name: 'Process [{#NAME}]: Number of running processes'
               type: DEPENDENT
               key: 'custom.proc.num[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'Count process {#NAME}'
+              description: 'Number of running processes {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.value..processes.first()
-                  error_handler: DISCARD_VALUE
+                    - $.processes
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
               tags:
@@ -180,6 +137,16 @@ zabbix_export:
                 -
                   tag: process
                   value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 66294f983a134a1e81165878f30d3ebc
+                  expression: 'last(/OS processes by Zabbix agent/custom.proc.num[{#NAME}])=0'
+                  name: 'Process [{#NAME}]: is not running'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: abccdac17c7e4b549fcfe70ceeedeb9b
               name: 'Process [{#NAME}]: Number of page faults'
@@ -192,7 +159,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.value..page_faults.first()
+                    - $.page_faults
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
@@ -205,7 +172,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 4ffd202fb6044b819f6f28dc866ca8f1
-              name: 'Process [{#NAME}]: Percentage of real memory'
+              name: 'Process [{#NAME}]: Memory usage, %'
               type: DEPENDENT
               key: 'custom.proc.pmem[{#NAME}]'
               delay: '0'
@@ -217,7 +184,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.value..pmem.first()
+                    - $.pmem
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
@@ -230,19 +197,19 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 7e573e38bce04167bc37712c0a3e2194
-              name: 'Process [{#NAME}]: Summary of resident memory size'
+              name: 'Process [{#NAME}]: Memory usage (rss)'
               type: DEPENDENT
               key: 'custom.proc.rss[{#NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Summary resident set size memory used by process {#NAME} in bytes.'
+              description: 'Summary of resident set size memory used by process {#NAME} in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.value..rss.first()
+                    - $.rss
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
@@ -267,7 +234,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.value..swap.first()
+                    - $.swap
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
@@ -290,7 +257,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.value..threads.first()
+                    - $.threads
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
@@ -303,7 +270,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: c1b9b1d8f28947589e46041690899100
-              name: 'Process [{#NAME}]: Summary of virtual memory size'
+              name: 'Process [{#NAME}]: Memory usage (vsize)'
               type: DEPENDENT
               key: 'custom.proc.vmem[{#NAME}]'
               delay: '0'
@@ -315,7 +282,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - $.value..vsize.first()
+                    - $.vsize
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'custom.proc.get[{#NAME}]'
