@@ -31,11 +31,6 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 	use TableTrait;
 
-	/**
-	 * Created graphs ids.
-	 */
-	protected static $graphs;
-
 	public function prepareGraphsData() {
 		$hosts = CDataHelper::call('host.create', [
 			[
