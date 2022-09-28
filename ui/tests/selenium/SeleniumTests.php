@@ -291,7 +291,7 @@ class SeleniumTests {
 		// Geomaps.
 		$suite->addTestSuite('testFormAdministrationGeneralGeomaps');
 		$suite->addTestSuite('testGeomapWidgetScreenshots');
-*/
+
 		// Hosts.
 		$suite->addTestSuite('testFormHostFromConfiguration');
 		$suite->addTestSuite('testFormHostFromMonitoring');
@@ -316,14 +316,14 @@ class SeleniumTests {
 		$suite->addTestSuite('testItemTypeSelection');
 		$suite->addTestSuite('testPageItemPrototypes');
 		$suite->addTestSuite('testPageItems');
-
+*/
 		// LLD.
 		$suite->addTestSuite('testFormLowLevelDiscovery');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormTestLowLevelDiscovery');
 		$suite->addTestSuite('testInheritanceDiscoveryRule');
 		$suite->addTestSuite('testPageLowLevelDiscovery');
-
+/*
 		// Macros.
 		$suite->addTestSuite('testFormMacrosAdministrationGeneral');
 		$suite->addTestSuite('testFormMacrosHost');
@@ -341,7 +341,7 @@ class SeleniumTests {
 		// Proxies.
 		$suite->addTestSuite('testFormAdministrationProxies');
 		$suite->addTestSuite('testPageAdministrationProxies');
-
+*/
 		// Reports.
 		$suite->addTestSuite('testFormScheduledReport');
 		$suite->addTestSuite('testPageAvailabilityReport');
