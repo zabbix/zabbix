@@ -63,8 +63,8 @@ void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func)
 		fail_msg("Cannot get expected numeric parameter from test case data: %s", expected_param_value_string);
 	}
 
-	init_request(&request);
-	init_result(&param_result);
+	zbx_init_agent_request(&request);
+	zbx_init_agent_result(&param_result);
 
 	if (ZABBIX_MOCK_KERNEL_MAXPROC == kernel_func)
 		actual_result = KERNEL_MAXPROC(&request, &param_result);
@@ -103,6 +103,6 @@ void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func)
 		}
 	}
 
-	free_request(&request);
-	free_result(&param_result);
+	zbx_free_agent_request(&request);
+	zbx_free_agent_result(&param_result);
 }

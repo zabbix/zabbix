@@ -2952,6 +2952,12 @@ z-select,
       background-color: #ffffff;
       border-color: #acbbc2;
       box-shadow: none; }
+    z-select button.focusable.red,
+    .z-select button.focusable.red {
+      color: #e33734; }
+      z-select button.focusable.red:after,
+      .z-select button.focusable.red:after {
+        color: #1f2c33; }
   z-select .list,
   .z-select .list {
     display: none;

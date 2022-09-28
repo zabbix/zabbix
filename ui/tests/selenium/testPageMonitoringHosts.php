@@ -231,7 +231,8 @@ class testPageMonitoringHosts extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Status' => 'Disabled'
+						'Status' => 'Disabled',
+						'Host groups' => ['Zabbix server']
 					],
 					'expected' => [
 						'No data found.'

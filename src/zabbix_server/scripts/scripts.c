@@ -66,7 +66,7 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 	}
 
 	param = zbx_strdup(param, command);
-	if (SUCCEED != (ret = quote_key_param(&param, 0)))
+	if (SUCCEED != (ret = zbx_quote_key_param(&param, 0)))
 	{
 		zbx_snprintf(error, max_error_len, "Invalid param [%s]", param);
 		goto fail;
@@ -75,7 +75,7 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 	item.key = zbx_dsprintf(item.key, "system.run[%s%s]", param, NULL == result ? ",nowait" : "");
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
 
-	init_result(&agent_result);
+	zbx_init_agent_result(&agent_result);
 
 	zbx_alarm_on(CONFIG_TIMEOUT);
 
@@ -90,7 +90,7 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 
 	zbx_alarm_off();
 
-	free_result(&agent_result);
+	zbx_free_agent_result(&agent_result);
 
 	zbx_free(item.key);
 fail:
@@ -167,7 +167,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
 	item.params = zbx_strdup(item.params, script->command);
 
-	init_result(&agent_result);
+	zbx_init_agent_result(&agent_result);
 
 	zbx_alarm_on(CONFIG_TIMEOUT);
 
@@ -182,7 +182,7 @@ static int	zbx_execute_script_on_terminal(const DC_HOST *host, const zbx_script_
 
 	zbx_alarm_off();
 
-	free_result(&agent_result);
+	zbx_free_agent_result(&agent_result);
 
 	zbx_free(item.params);
 	zbx_free(item.key);

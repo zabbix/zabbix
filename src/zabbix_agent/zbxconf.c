@@ -80,7 +80,7 @@ void	load_aliases(char **lines)
  * Return value: SUCCEED - successfully loaded user parameters                *
  *               FAIL    - failed to load user parameters                     *
  *                                                                            *
- * Comments: calls add_user_parameter() for each entry                        *
+ * Comments: calls zbx_add_user_parameter() for each entry                    *
  *                                                                            *
  ******************************************************************************/
 int	load_user_parameters(char **lines, char **err)
@@ -96,7 +96,7 @@ int	load_user_parameters(char **lines, char **err)
 		}
 		*p = '\0';
 
-		if (FAIL == add_user_parameter(*pline, p + 1, error, sizeof(error)))
+		if (FAIL == zbx_add_user_parameter(*pline, p + 1, error, sizeof(error)))
 		{
 			*p = ',';
 			*err = zbx_dsprintf(*err, "user parameter \"%s\": %s", *pline, error);
@@ -130,7 +130,7 @@ int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
 	else
 		return FAIL;
 
-	return add_key_access_rule(cfg->parameter, (char *)value, rule_type);
+	return zbx_add_key_access_rule(cfg->parameter, (char *)value, rule_type);
 }
 
 #ifdef _WINDOWS
@@ -259,19 +259,19 @@ void	reload_user_parameters(unsigned char process_type, int process_num)
 		goto out;
 	}
 
-	get_metrics_copy(&metrics_fallback);
-	remove_user_parameters();
+	zbx_get_metrics_copy(&metrics_fallback);
+	zbx_remove_user_parameters();
 
 	if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
 	{
-		set_metrics(metrics_fallback);
+		zbx_set_metrics(metrics_fallback);
 		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d], %s",
 				get_process_type_string(process_type), process_num, error);
 		zbx_free(error);
 		goto out;
 	}
 
-	free_metrics_ext(&metrics_fallback);
+	zbx_free_metrics_ext(&metrics_fallback);
 	zabbix_log(LOG_LEVEL_INFORMATION, "user parameters reloaded [%s #%d]", get_process_type_string(process_type),
 			process_num);
 out:

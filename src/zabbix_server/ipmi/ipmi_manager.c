@@ -909,12 +909,12 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 			state = ITEM_STATE_NORMAL;
 			if (NULL != value)
 			{
-				init_result(&result);
+				zbx_init_agent_result(&result);
 				SET_TEXT_RESULT(&result, value);
 				value = NULL;
 				zbx_preprocess_item_value(itemid, poller->request->hostid, ITEM_VALUE_TYPE_TEXT, flags,
 						&result, &ts, state, NULL);
-				free_result(&result);
+				zbx_free_agent_result(&result);
 			}
 			break;
 
@@ -963,7 +963,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	if (FAIL == zbx_ipc_service_start(&ipmi_service, ZBX_IPC_SERVICE_IPMI, &error))
 	{
@@ -1010,9 +1010,9 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 		if (ZBX_IPMI_MANAGER_DELAY < timeout.sec)
 			timeout.sec = ZBX_IPMI_MANAGER_DELAY;
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&ipmi_service, &timeout, &client, &message);
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
 		zbx_update_env(sec);
 

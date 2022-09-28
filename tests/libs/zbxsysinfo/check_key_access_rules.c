@@ -52,21 +52,21 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	hrules = zbx_mock_get_parameter_handle("in.rules");
-	init_key_access_rules();
+	zbx_init_key_access_rules();
 
 	while (ZBX_MOCK_SUCCESS == zbx_mock_vector_element(hrules, &hrule))
 	{
 		type = zbx_mock_get_object_member_string(hrule, "type");
 		pattern = zbx_mock_get_object_member_string(hrule, "pattern");
 
-		if (SUCCEED != add_key_access_rule("key", (char *)pattern, zbx_mock_str_to_key_access_type(type)))
+		if (SUCCEED != zbx_add_key_access_rule("key", (char *)pattern, zbx_mock_str_to_key_access_type(type)))
 		{
-			free_key_access_rules();
+			zbx_free_key_access_rules();
 			fail_msg("Bad key access rule definition");
 		}
 	}
 
-	finalize_key_access_rules_configuration();
+	zbx_finalize_key_access_rules_configuration();
 
 	if (ZBX_MOCK_NO_EXIT_CODE != (error = zbx_mock_exit_code(&exit_code)))
 	{
@@ -90,7 +90,7 @@ void	zbx_mock_test_entry(void **state)
 		key = zbx_mock_get_object_member_string(hmetric, "metric");
 		expected_ret = zbx_mock_str_to_key_access_type(zbx_mock_get_object_member_string(hmetric, "result"));
 
-		actual_ret = check_key_access_rules(key);
+		actual_ret = zbx_check_key_access_rules(key);
 
 		if (expected_ret != actual_ret)
 			fail_msg("Unexpected result for metric \"%s\": %s, expected %s", key,
@@ -98,5 +98,5 @@ void	zbx_mock_test_entry(void **state)
 					expected_ret == ZBX_KEY_ACCESS_ALLOW ? "Allow" : "Deny");
 	}
 
-	free_key_access_rules();
+	zbx_free_key_access_rules();
 }
