@@ -9409,17 +9409,18 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 		zbx_preproc_item_t	pp_item_local = {.itemid = dc_item->itemid};
 
 		pp_item = (zbx_preproc_item_t *)zbx_hashset_insert(items, &pp_item_local, sizeof(pp_item_local));
-		pp_item->type = dc_item->type;
 		pp_item->hostid = dc_item->hostid;
-		pp_item->value_type = dc_item->value_type;
 		pp_item->preproc_revision = revision;
 	}
 
+	pp_item->type = dc_item->type;
+	pp_item->value_type = dc_item->value_type;
+	pp_item->revision = revision;
+
 	dc_preproc_sync_masteritem(pp_item, dc_item->master_item);
 	dc_preproc_sync_preprocitem(pp_item, dc_item->preproc_item, revision);
-
-	pp_item->revision = revision;
 }
+
 
 static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr_t *items_sync,
 		zbx_hashset_t *pp_itemids)
