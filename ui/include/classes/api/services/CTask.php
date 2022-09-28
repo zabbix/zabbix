@@ -213,7 +213,7 @@ class CTask extends CApiService {
 				]]
 								]],
 								['if' => ['field' => 'type', 'in' => ZBX_TM_DATA_TYPE_CHECK_NOW], 'type' => API_OBJECT, 'fields' => [
-				'itemid' => ['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+				'itemid' => ['type' => API_ID, 'flags' => API_REQUIRED]
 								]]
 			]],
 			'proxy_hostid' => ['type' => API_ID, 'default' => 0]
