@@ -2363,6 +2363,8 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 -- testFormUserMedia
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (4,1,10,'test@jabber.com',0,16,'1-7,00:00-24:00');
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (5,1,12,'test_account',0,63,'6-7,09:00-18:00');
+INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (91, 'http-auth-admin', '$2y$10$HuvU0X0vGitK8YhwyxILbOVU6oxYNF.BqsOhaieVBvDiGlxgxriay', 0, 0, 'en_US', 30, 2, 'default', 0, 0, 50);
+INSERT INTO users_groups (id, usrgrpid, userid) VALUES (92, 7, 91);
 
 -- Dashboards and widgets for Copy widget tests
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (130, 'Dashboard for Copying widgets', 1, 1);
