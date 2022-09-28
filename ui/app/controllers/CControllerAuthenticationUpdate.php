@@ -198,7 +198,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'sp_entityid'
 		]);
 
-		if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_JIT_STATUS) == JIT_PROVISIONING_ENABLED) {
+		if ($this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
 			$saml_fields['saml_group_name'] = $this->getInput('saml_group_name', '');
 		}
 

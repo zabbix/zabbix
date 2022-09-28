@@ -168,9 +168,9 @@ $ldap_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable JIT provisioning'), 'ldap_jit_status'),
 		new CFormField(
-			(new CCheckBox('ldap_jit_status', ZBX_AUTH_LDAP_ENABLED))
-				->setChecked($data['ldap_jit_status'] == ZBX_AUTH_LDAP_ENABLED)
-				->setUncheckedValue(ZBX_AUTH_LDAP_DISABLED)
+			(new CCheckBox('ldap_jit_status', JIT_PROVISIONING_ENABLED))
+				->setChecked($data['ldap_jit_status'] == JIT_PROVISIONING_ENABLED)
+				->setUncheckedValue(JIT_PROVISIONING_DISABLED)
 		)
 	])
 	->addItem([
@@ -237,9 +237,9 @@ $saml_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable JIT provisioning'), 'saml_jit_status'),
 		new CFormField(
-			(new CCheckBox('saml_jit_status', ZBX_AUTH_SCIM_PROVISIONING_ENABLED))
-				->setChecked($data['saml_jit_status'] == ZBX_AUTH_SCIM_PROVISIONING_ENABLED)
-				->setUncheckedValue(ZBX_AUTH_SCIM_PROVISIONING_DISABLED)
+			(new CCheckBox('saml_jit_status', JIT_PROVISIONING_ENABLED))
+				->setChecked($data['saml_jit_status'] == JIT_PROVISIONING_ENABLED)
+				->setUncheckedValue(JIT_PROVISIONING_DISABLED)
 				->setEnabled($data['saml_enabled'])
 				->addClass('saml-enabled')
 		)
@@ -382,6 +382,7 @@ $saml_tab = (new CFormGrid())
 		new CFormField(
 			(new CCheckBox('saml_provision_status'))
 				->setChecked($data['saml_provision_status'] == JIT_PROVISIONING_ENABLED)
+				->setUncheckedValue(JIT_PROVISIONING_DISABLED)
 				->setEnabled($data['saml_enabled'])
 				->addClass('saml-enabled')
 		)
@@ -424,28 +425,29 @@ $saml_tab = (new CFormGrid())
 	])
 	->addItem([
 		(new CLabel(_('Authorization token'), 'scim_token'))->addClass('saml-provision-status'),
-		(new CFormField($data['saml_provision_status'] == JIT_PROVISIONING_ENABLED && $data['scim_token'] != ''
-			? [
-				(new CSimpleButton(_('Change token')))
-					->addClass(ZBX_STYLE_BTN_GREY)
-					->setEnabled($data['saml_enabled'])
-					->setId('scim-token-btn')
-					->addClass('saml-enabled'),
-				(new CPassBox('scim_token', '', DB::getFieldLength('userdirectory_saml', 'scim_token')))
+		(new CFormField(
+			($data['saml_provision_status'] == JIT_PROVISIONING_ENABLED && $data['scim_token'] !== '')
+				? [
+					(new CSimpleButton(_('Change token')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->setEnabled($data['saml_enabled'])
+						->setId('scim-token-btn')
+						->addClass('saml-enabled'),
+					(new CPassBox('scim_token', '', DB::getFieldLength('userdirectory_saml', 'scim_token')))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						->addStyle('display: none;')
+						->setAttribute('disabled', 'disabled')
+						->addClass('saml-enabled'),
+					$data['token_is_expired']
+						? ['&nbsp;',
+							makeErrorIcon(_('The token has expired. Please update the expiry date to use the token.'))
+						]
+						: null
+				]
+				: (new CPassBox('scim_token', '', DB::getFieldLength('userdirectory_saml', 'scim_token')))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					->addStyle('display: none;')
-					->setAttribute('disabled', 'disabled')
-					->addClass('saml-enabled'),
-				$data['token_is_expired']
-					? ['&nbsp;',
-						makeErrorIcon(_('The token has expired. Please update the expiry date to use the token.'))
-					]
-					: null
-			]
-			: (new CPassBox('scim_token', '', DB::getFieldLength('userdirectory_saml', 'scim_token')))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setEnabled($data['saml_enabled'])
-				->addClass('saml-enabled')
+					->setEnabled($data['saml_enabled'])
+					->addClass('saml-enabled')
 		))->addClass('saml-provision-status')
 	])
 	->addItem([
