@@ -9482,10 +9482,10 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 	if (config->revision.config == *revision)
 		goto out;
 
-	if (1024 > (index_size = config->items.num_data / 4))
-		index_size = 1024;
-
 	RDLOCK_CACHE;
+
+	if (100 > (index_size = config->items.num_data / 4))
+		index_size = 100;
 
 	zbx_hashset_create(&pp_itemids, index_size, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
