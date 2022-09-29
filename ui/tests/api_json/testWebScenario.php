@@ -201,7 +201,7 @@ class testWebScenario extends CAPITest {
 							'value' => 'header_value-symbols☺æų""\\//!@#$%^&*()_+'
 						],
 						[
-							'name' => 'header_name-wihtout-value',
+							'name' => 'header_name-without-value',
 							'value' => ''
 						]
 					],
