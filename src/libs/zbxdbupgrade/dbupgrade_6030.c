@@ -464,9 +464,9 @@ static int	DBpatch_6030059(void)
 
 static int	DBpatch_6030060(void)
 {
-	const ZBX_FIELD field = {"hosts", "", NULL, NULL, 0, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"name_up", "", NULL, NULL, 0, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	return DBadd_field("name_up", &field);
+	return DBadd_field("hosts", &field);
 }
 
 static int	DBpatch_6030061(void)

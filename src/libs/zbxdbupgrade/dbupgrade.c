@@ -1311,9 +1311,11 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update(const char *t
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
-	int	table_type, ret = FAIL;;
+	int	ret = FAIL;;
 
 #if defined(HAVE_ORACLE) || defined(HAVE_MYSQL)
+	ZBX_UNUSED(idname);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 		"CREATE TRIGGER %s_%s_INSERT AFTER INSERT ON %s FOR EACH ROW\n"
 		"BEGIN\n"
@@ -1364,6 +1366,5 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update(const char *t
 
 	return ret;
 }
-
 
 #endif
