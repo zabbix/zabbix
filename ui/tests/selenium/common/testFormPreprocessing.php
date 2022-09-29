@@ -40,107 +40,134 @@ abstract class testFormPreprocessing extends CWebTest {
 		[
 			'type' => '1',
 			'params' => '123',
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '2',
-			'params' => 'abc'
+			'params' => 'abc',
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '3',
-			'params' => 'def'
+			'params' => 'def',
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '4',
-			'params' => '1a2b3c'
+			'params' => '1a2b3c',
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '5',
 			'params' => "regular expression pattern \noutput template",
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '6',
 			'params' => '',
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '7',
 			'params' => '',
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '8',
 			'params' => '',
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '9',
 			'params' => '',
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '11',
 			'params' => '/document/item/value/text()',
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '12',
 			'params' => '$.document.item.value parameter.',
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '13',
 			'params' => "-5\n3",
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '14',
 			'params' => 'regular expression pattern for matching',
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '15',
 			'params' => 'regular expression pattern for not matching',
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '16',
 			'params' => '/json/path',
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '17',
 			'params' => '/xml/path',
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '18',
 			'params' => "regular expression pattern for error matching \ntest output",
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '20',
-			'params' => '7'
+			'params' => '7',
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 						[
 			'type' => '21',
 			'params' => 'test script',
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '23',
 			'params' => 'metric',
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '24',
 			'params' => ".\n/\n1",
-			'error_handler' => 0
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		],
 		[
 			'type' => '25',
-			'params' => "1\n2"
+			'params' => "1\n2",
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		]
 	];
 

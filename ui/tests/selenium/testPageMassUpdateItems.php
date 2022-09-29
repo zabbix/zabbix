@@ -59,7 +59,8 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 				'key_' => 'snmptrap.fallback',
 				'type' => 17,
 				'value_type' => 0,
-				'interfaceid' => self::SNMP2_INTERFACE_ID
+				'interfaceid' => self::SNMP2_INTERFACE_ID,
+				'delay' => '3m'
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -67,7 +68,8 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 				'key_' => 'snmptrap[regexp]',
 				'type' => 17,
 				'value_type' => 1,
-				'interfaceid' => self::SNMP2_INTERFACE_ID
+				'interfaceid' => self::SNMP2_INTERFACE_ID,
+				'delay' => '4m'
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -155,7 +157,7 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 			[
 				'hostid' => self::HOSTID,
 				'name' => '14_DB_Monitor',
-				'key_' => 'db.odbc.select[]',
+				'key_' => 'db.odbc.select',
 				'type' => 11,
 				'value_type' => 0,
 				'delay' => '90s',
@@ -164,7 +166,8 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 					[
 						'type' => '1',
 						'params' => "2",
-						'error_handler' => 0
+						'error_handler' => 0,
+						'error_handler_params' => ''
 					]
 				]
 			],
@@ -239,7 +242,6 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'Update interval' => ['Delay' => '1m'],
 						'Status' => ['id' => 'status', 'value' => 'Disabled']
 					]
 				]
@@ -253,7 +255,6 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'Update interval' => ['Delay' => '1m'],
 						'Status' => ['id' => 'status', 'value' => 'Enabled']
 					]
 				]
@@ -293,11 +294,15 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 				'preprocessing' => [
 					[
 						'type' => '4',
-						'params' => '123'
+						'params' => '123',
+						'error_handler' => 0,
+						'error_handler_params' => ''
 					],
 					[
 						'type' => '25',
-						'params' => "error\nmistake"
+						'params' => "error\nmistake",
+						'error_handler' => 0,
+						'error_handler_params' => ''
 					]
 				]
 			],
