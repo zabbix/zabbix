@@ -127,11 +127,9 @@ window.condition_popup = new class {
 		const overlay = PopUp('popup.services', {title: t('Services')}, {dialogueid: 'services'});
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const data = [];
-
 			for (const service of e.detail) {
 				data.push({id: service.serviceid, name: service.name});
 			}
-
 			$('#service-new-condition').multiSelect('addData', data);
 		});
 	}

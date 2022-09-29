@@ -198,6 +198,13 @@ window.operation_popup = new class {
 	_sendMessageFields() {
 		switch (this.eventsource) {
 			case <?= EVENT_SOURCE_TRIGGERS ?>:
+				this.fields = ['operation-condition-table',
+					'operation-condition-list-label', 'operation-condition-list', 'step-from', 'operation-step-range', 'operation-step-duration', 'operation-message-notice',
+					'operation-message-user-groups', 'operation-message-notice', 'operation-message-users',
+					'operation-message-mediatype-only', 'operation-message-custom', 'operation_esc_period',
+					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
+					'operation-message-subject', 'operation-message-body']
+				break;
 			case <?= EVENT_SOURCE_INTERNAL ?>:
 			case <?= EVENT_SOURCE_SERVICE?>:
 				this.fields = [
@@ -417,13 +424,14 @@ window.operation_popup = new class {
 		row.append(this._createName(input));
 		row.append(this._createRemoveCell());
 
-		row.appendChild(this._createHiddenInput('operation[condition][formulaid]', this.label));
-		row.appendChild(this._createHiddenInput('operation[condition][conditiontype]', input.conditiontype));
-		row.appendChild(this._createHiddenInput('operation[condition][operator]', input.operator));
-		row.appendChild(this._createHiddenInput('operation[condition][value]', input.value));
-
 		this.table = document.getElementById('operation-condition-list');
 		this.row_count = this.table.rows.length -1;
+
+		row.appendChild(this._createHiddenInput(
+			`operation[opconditions][${this.row_count-1}][conditiontype]`, input.conditiontype)
+		);
+		row.appendChild(this._createHiddenInput(`operation[opconditions][${this.row_count-1}][operator]`, input.operator));
+		row.appendChild(this._createHiddenInput(`operation[opconditions][${this.row_count-1}][value]`, input.value));
 
 		$('#operation-condition-list tr:last').before(row);
 	}
@@ -514,6 +522,8 @@ window.operation_popup = new class {
 	}
 
 	_addCustomMessageFields() {
+		// todo : check if these are needed
+
 		$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
 		$('[id="operation-message-body"],[id="operation-message-label"]').hide();
 

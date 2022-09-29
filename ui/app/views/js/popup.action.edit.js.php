@@ -483,7 +483,6 @@ window.action_edit_popup = new class {
 	clone() {
 		this.actionid = 0;
 		const title = <?= json_encode(_('New action')) ?>;
-
 		const buttons = [
 			{
 				title:  <?= json_encode(_('Add')) ?>,
