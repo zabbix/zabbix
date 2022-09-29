@@ -37,7 +37,7 @@ class testPageServicesServices extends CWebTest {
 
 	const EDIT = true;
 
-	const SERVICE_COUNT = 16;
+	const SERVICE_COUNT = 19;
 
 	const LAYOUT_PARENT = 'Server 3';
 	const LAYOUT_CHILD = 'Server 2';
@@ -648,6 +648,8 @@ class testPageServicesServices extends CWebTest {
 						'Status' => 'Any'
 					],
 					'result' => [
+						'Service with tags for cloning',
+						'Service with tags for updating',
 						'Server 8 with child for delete 1',
 						'Server 9 with child for delete 1',
 						'Server with problem'
@@ -662,6 +664,8 @@ class testPageServicesServices extends CWebTest {
 						'Status' => 'OK'
 					],
 					'result' => [
+						'Service with tags for cloning',
+						'Service with tags for updating',
 						'Server 8 with child for delete 1',
 						'Server 9 with child for delete 1'
 					]
@@ -723,6 +727,7 @@ class testPageServicesServices extends CWebTest {
 						]
 					],
 					'result' => [
+						'Service with tags for updating',
 						'Server 3 1',
 						'Server 4',
 						'Server 5'
@@ -793,6 +798,7 @@ class testPageServicesServices extends CWebTest {
 						]
 					],
 					'result' => [
+						'Service with tags for updating',
 						'Server 3 1',
 						'Server 4'
 					]

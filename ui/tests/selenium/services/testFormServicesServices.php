@@ -489,7 +489,7 @@ class testFormServicesServices extends CWebTest {
 		$children_dialog->waitUntilReady();
 
 		// Check possible children count in table.
-		$this->assertEquals(13, $children_dialog->query('class:list-table')->asTable()->one()->getRows()->count());
+		$this->assertEquals(16, $children_dialog->query('class:list-table')->asTable()->one()->getRows()->count());
 
 		foreach (['Add', 'Cancel'] as $button) {
 			$this->assertTrue($dialog->getFooter()->query('button', $button)->one()->isClickable());

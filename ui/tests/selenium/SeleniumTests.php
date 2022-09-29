@@ -152,6 +152,13 @@ require_once dirname(__FILE__).'/tags/testFormTagsWeb.php';
 require_once dirname(__FILE__).'/templates/testFormTemplate.php';
 require_once dirname(__FILE__).'/templates/testPageTemplates.php';
 
+// Users.
+require_once dirname(__FILE__).'/users/testFormUser.php';
+require_once dirname(__FILE__).'/users/testFormUserMedia.php';
+require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
+require_once dirname(__FILE__).'/users/testFormUserProfile.php';
+require_once dirname(__FILE__).'/users/testPageUsers.php';
+
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
@@ -186,7 +193,6 @@ require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
-require_once dirname(__FILE__).'/users/testPageUsers.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationHttp.php';
 require_once dirname(__FILE__).'/testFormAdministrationAuthenticationLdap.php';
@@ -220,10 +226,6 @@ require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
 require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
-require_once dirname(__FILE__).'/users/testFormUser.php';
-require_once dirname(__FILE__).'/users/testFormUserMedia.php';
-require_once dirname(__FILE__).'/users/testFormUserProfile.php';
-require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/testFormValueMappingsHost.php';
 require_once dirname(__FILE__).'/testFormValueMappingsTemplate.php';
 require_once dirname(__FILE__).'/testFormWeb.php';
@@ -388,6 +390,13 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTemplate');
 		$suite->addTestSuite('testPageTemplates');
 
+		// Users.
+		$suite->addTestSuite('testFormUser');
+		$suite->addTestSuite('testFormUserMedia');
+		$suite->addTestSuite('testFormUserPermissions');
+		$suite->addTestSuite('testFormUserProfile');
+		$suite->addTestSuite('testPageUsers');
+
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
 
@@ -412,7 +421,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageMassUpdateItems');
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
-
 		$suite->addTestSuite('testPageNetworkDiscovery');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
@@ -422,7 +430,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageUserGroups');
-		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageWeb');
 		$suite->addTestSuite('testPasswordComplexity');
 		$suite->addTestSuite('testExpandExpressionMacros');
@@ -455,10 +462,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTabIndicators');
 		$suite->addTestSuite('testFormTrigger');
 		$suite->addTestSuite('testFormTriggerPrototype');
-		$suite->addTestSuite('testFormUser');
-		$suite->addTestSuite('testFormUserMedia');
-		$suite->addTestSuite('testFormUserProfile');
-		$suite->addTestSuite('testFormUserPermissions');
 		$suite->addTestSuite('testFormValueMappingsHost');
 		$suite->addTestSuite('testFormValueMappingsTemplate');
 		$suite->addTestSuite('testFormWeb');
