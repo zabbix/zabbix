@@ -1914,6 +1914,7 @@ class CImportDataAdapterTest extends TestCase {
 			[
 				'name' => 'Email',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_EMAIL,
+				'provider' => (string) CXmlConstantValue::GENERIC_SMTP,
 				'smtp_server' => 'mail.example.com',
 				'smtp_helo' => 'example.com',
 				'smtp_email' => 'zabbix@example.com',
