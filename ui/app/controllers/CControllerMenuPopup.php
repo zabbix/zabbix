@@ -23,7 +23,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in history,host,item,item_configuration,item_prototype_configuration,map_element,trigger,trigger_macro',
+			'type' => 'required|in history,host,item,item_prototype,map_element,trigger,trigger_macro',
 			'data' => 'array'
 		];
 
@@ -56,12 +56,12 @@ class CControllerMenuPopup extends CController {
 			case 'history':
 			case 'item':
 				$rules = [
-					'itemid' => 'required|db items.itemid'
+					'itemid' => 'required|db items.itemid',
+					'backurl' => 'required|string'
 				];
 				break;
 
-			case 'item_configuration':
-			case 'item_prototype_configuration':
+			case 'item_prototype':
 				$rules = [
 					'itemid' => 'required|db items.itemid',
 					'backurl' => 'required|string'
@@ -333,6 +333,7 @@ class CControllerMenuPopup extends CController {
 
 			return [
 				'type' => 'item',
+				'backurl' => $data['backurl'],
 				'itemid' => $data['itemid'],
 				'name' => $db_item['name'],
 				'key' => $db_item['key_'],
@@ -344,65 +345,12 @@ class CControllerMenuPopup extends CController {
 				),
 				'history' => $db_item['history'] != 0,
 				'trends' => $db_item['trends'] != 0,
-				'isWriteable' => $is_writable,
+				'isDiscovery' => ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
 				'isExecutable' => $is_executable,
+				'isWriteable' => $is_writable,
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
-				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-				'isDiscovery' => ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
+				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			];
-		}
-
-		error(_('No permissions to referred object or it does not exist!'));
-
-		return null;
-	}
-
-	/**
-	 * Prepare data for item configuration context menu popup.
-	 *
-	 * @param array  $data
-	 * @param string $data['itemid']
-	 * @param string $data['backurl']
-	 *
-	 * @return mixed
-	 */
-	private static function getMenuDataItemConfiguration(array $data) {
-		$db_items = API::Item()->get([
-			'output' => ['hostid', 'key_', 'name', 'flags'],
-			'selectHosts' => ['host'],
-			'itemids' => $data['itemid'],
-			'webitems' => true
-		]);
-
-		if ($db_items) {
-			$db_item = $db_items[0];
-			$menu_data = [
-				'type' => 'item_configuration',
-				'backurl' => $data['backurl'],
-				'itemid' => $data['itemid'],
-				'hostid' => $db_item['hostid'],
-				'host' => $db_item['hosts'][0]['host'],
-				'name' => $db_item['name'],
-				'key' => $db_item['key_'],
-				'create_dependent_item' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
-				'create_dependent_discovery' => ($db_item['flags'] != ZBX_FLAG_DISCOVERY_CREATED),
-				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
-				'triggers' => []
-			];
-
-			$db_triggers = API::Trigger()->get([
-				'output' => ['triggerid', 'description'],
-				'itemids' => $data['itemid']
-			]);
-
-			foreach ($db_triggers as $db_trigger) {
-				$menu_data['triggers'][] = [
-					'triggerid' => $db_trigger['triggerid'],
-					'name' => $db_trigger['description']
-				];
-			}
-
-			return $menu_data;
 		}
 
 		error(_('No permissions to referred object or it does not exist!'));
@@ -419,11 +367,12 @@ class CControllerMenuPopup extends CController {
 	 *
 	 * @return mixed
 	 */
-	private static function getMenuDataItemPrototypeConfiguration(array $data) {
+	private static function getMenuDataItemPrototype(array $data) {
 		$db_item_prototypes = API::ItemPrototype()->get([
 			'output' => ['name', 'key_'],
 			'selectDiscoveryRule' => ['itemid'],
 			'selectHosts' => ['host'],
+			'selectTriggers' => ['triggerid', 'description'],
 			'itemids' => $data['itemid']
 		]);
 
@@ -431,27 +380,16 @@ class CControllerMenuPopup extends CController {
 			$db_item_prototype = $db_item_prototypes[0];
 
 			$menu_data = [
-				'type' => 'item_prototype_configuration',
+				'type' => 'item_prototype',
 				'backurl' => $data['backurl'],
 				'itemid' => $data['itemid'],
 				'name' => $db_item_prototype['name'],
 				'key' => $db_item_prototype['key_'],
 				'host' => $db_item_prototype['hosts'][0]['host'],
 				'parent_discoveryid' => $db_item_prototype['discoveryRule']['itemid'],
-				'trigger_prototypes' => []
+				'trigger_prototypes' => $db_item_prototype['triggers']
 			];
 
-			$db_trigger_prototypes = API::TriggerPrototype()->get([
-				'output' => ['triggerid', 'description'],
-				'itemids' => $data['itemid']
-			]);
-
-			foreach ($db_trigger_prototypes as $db_trigger_prototype) {
-				$menu_data['trigger_prototypes'][] = [
-					'triggerid' => $db_trigger_prototype['triggerid'],
-					'name' => $db_trigger_prototype['description']
-				];
-			}
 			return $menu_data;
 		}
 
@@ -612,11 +550,69 @@ class CControllerMenuPopup extends CController {
 						return self::getMenuDataHost($host_data);
 
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
+						$items = [];
+						$triggers = [];
+						$hosts = [];
+						$show_events = true;
+
+						$db_triggers = API::Trigger()->get([
+							'output' => ['triggerid', 'description'],
+							'selectHosts' => ['hostid', 'name', 'status'],
+							'selectItems' => ['itemid', 'hostid', 'name', 'value_type'],
+							'triggerids' => array_column($selement['elements'], 'triggerid'),
+							'preservekeys' => true
+						]);
+
+						foreach ($db_triggers as $db_trigger) {
+							foreach ($db_trigger['hosts'] as $host) {
+								$hosts[$host['hostid']] = $host['name'];
+							}
+
+							foreach ($db_trigger['items'] as &$item) {
+								$item['hostname'] = $hosts[$item['hostid']];
+
+								if ($host['status'] != HOST_STATUS_MONITORED) {
+									$show_events = false;
+								}
+							}
+							unset($item);
+
+							CArrayHelper::sort($db_trigger['items'], ['name', 'hostname', 'itemid']);
+
+							$with_hostname = count($hosts) > 1;
+
+							foreach ($db_trigger['items'] as $item) {
+								$items[] = [
+									'name' => $with_hostname
+										? $item['hostname'].NAME_DELIMITER.$item['name']
+										: $item['name'],
+									'params' => [
+										'itemid' => $item['itemid'],
+										'action' => in_array(
+											$item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
+										)
+											? HISTORY_GRAPH
+											: HISTORY_VALUES
+									]
+								];
+							}
+
+							$triggers[] = [
+								'triggerid' => $db_trigger['triggerid'],
+								'description' => $db_trigger['description']
+							];
+						}
+
 						$menu_data = [
 							'type' => 'map_element_trigger',
-							'triggerids' => zbx_objectValues($selement['elements'], 'triggerid'),
-							'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
+							'triggers' => $triggers,
+							'items' => $items,
+							'showEvents' => $show_events,
+							'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+							'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+
 						];
+
 						if (array_key_exists('severity_min', $data)) {
 							$menu_data['severities'] = array_column(
 								CSeverityHelper::getSeverities((int) $data['severity_min']),
@@ -626,9 +622,11 @@ class CControllerMenuPopup extends CController {
 						if ($db_map['show_suppressed']) {
 							$menu_data['show_suppressed'] = true;
 						}
+
 						if ($selement['urls']) {
 							$menu_data['urls'] = $selement['urls'];
 						}
+
 						return $menu_data;
 
 					case SYSMAP_ELEMENT_TYPE_IMAGE:
@@ -686,7 +684,6 @@ class CControllerMenuPopup extends CController {
 					$show_events = false;
 				}
 			}
-			unset($db_trigger['hosts']);
 
 			foreach ($db_trigger['items'] as &$item) {
 				$item['hostname'] = $hosts[$item['hostid']];
@@ -930,12 +927,8 @@ class CControllerMenuPopup extends CController {
 				$menu_data = self::getMenuDataItem($data);
 				break;
 
-			case 'item_configuration':
-				$menu_data = self::getMenuDataItemConfiguration($data);
-				break;
-
-			case 'item_prototype_configuration':
-				$menu_data = self::getMenuDataItemPrototypeConfiguration($data);
+			case 'item_prototype':
+				$menu_data = self::getMenuDataItemPrototype($data);
 				break;
 
 			case 'map_element':

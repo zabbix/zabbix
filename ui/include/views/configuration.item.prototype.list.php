@@ -151,7 +151,7 @@ foreach ($data['items'] as $item) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
-	$item_menu = CMenuPopupHelper::getItemPrototypeConfiguration([
+	$item_menu = CMenuPopupHelper::getItemPrototype([
 		'itemid' => $item['itemid'],
 		'context' => $data['context'],
 		'backurl' => (new CUrl('disc_prototypes.php'))

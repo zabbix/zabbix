@@ -471,6 +471,135 @@ function getMenuPopupMapElementTrigger(options) {
 
 	return sections;
 }
+function getMenuPopupMapElementTrigger(options, trigger_element) {
+	const sections = [];
+	const items = [];
+	let url;
+
+	if (options.allowed_ui_problems) {
+		url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'problem.view');
+		url.setArgument('filter_name', '');
+		url.setArgument('triggerids', options.triggers.map((value) => value.triggerid));
+		if (typeof options.severities !== 'undefined') {
+			url.setArgument('severities[]', options.severities);
+		}
+		if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
+			url.setArgument('show_suppressed', '1');
+		}
+
+		items.push({
+			label: t('Problems'),
+			disabled: !options.showEvents,
+			url: url.getUrl()
+		});
+	}
+
+	// items problems
+	if (options.allowed_ui_latest_data && options.items.length) {
+		for (const item of options.items) {
+			url = new Curl('history.php', false);
+			url.setArgument('action', item.params.action);
+			url.setArgument('itemids[]', item.params.itemid);
+
+			items.push({
+				label: item.name,
+				url: url.getUrl()
+			});
+		};
+	}
+
+	if (items.length) {
+		sections.push({
+			label: t('View'),
+			items: items
+		});
+	}
+
+	// configuration
+	if (options.allowed_ui_conf_hosts) {
+		const config_urls = [];
+		const trigger_urls = [];
+		const item_urls = [];
+
+		if (options.triggers.length === 1) {
+			url = new Curl('triggers.php', false);
+			url.setArgument('form', 'update');
+			url.setArgument('triggerid', options.triggers[0].triggerid);
+			url.setArgument('context', 'host');
+
+			config_urls.push({
+				label: t('Trigger'),
+				url: url.getUrl()
+			});
+		}
+		else {
+			for (const value of options.triggers) {
+				url = new Curl('triggers.php', false);
+				url.setArgument('form', 'update');
+				url.setArgument('triggerid', value.triggerid);
+				url.setArgument('context', 'host');
+
+				trigger_urls.push({
+					label: value.description,
+					url: url.getUrl()
+				});
+			}
+
+			config_urls.push({
+				label: t('Triggers'),
+				items: trigger_urls
+			});
+		}
+
+		if (options.items.length) {
+			if (options.items.length === 1) {
+				url = new Curl('items.php', false);
+				url.setArgument('form', 'update');
+				url.setArgument('itemid', options.items[0].params.itemid);
+				url.setArgument('context', 'host');
+
+				config_urls.push({
+					label: t('Item'),
+					url: url.getUrl()
+				});
+			}
+			else {
+				for (const item of options.items) {
+					url = new Curl('items.php', false);
+					url.setArgument('form', 'update');
+					url.setArgument('itemid', item.params.itemid);
+					url.setArgument('context', 'host');
+
+					item_urls.push({
+						label: item.name,
+						url: url.getUrl()
+					});
+				};
+
+				config_urls.push({
+					label: t('Items'),
+					items: item_urls
+				});
+			}
+		}
+
+		sections.push({
+			label: t('Configuration'),
+			items: config_urls
+		});
+	}
+
+	// urls
+	if (typeof options.urls !== 'undefined') {
+		sections.push({
+			label: t('Links'),
+			items: options.urls
+		});
+	}
+
+	return sections;
+}
 
 /**
  * Get menu popup image map element section data.
@@ -683,22 +812,35 @@ function getMenuPopupTrigger(options, trigger_element) {
 		});
 
 		if (options.items.length) {
-			for (const item of options.items) {
+			if (options.items.length === 1) {
 				url = new Curl('items.php', false);
 				url.setArgument('form', 'update');
-				url.setArgument('itemid', item.params.itemid);
+				url.setArgument('itemid', options.items[0].params.itemid);
 				url.setArgument('context', 'host');
 
-				item_urls.push({
-					label: item.name,
+				config_urls.push({
+					label: t('Item'),
 					url: url.getUrl()
 				});
-			};
+			}
+			else {
+				for (const item of options.items) {
+					url = new Curl('items.php', false);
+					url.setArgument('form', 'update');
+					url.setArgument('itemid', item.params.itemid);
+					url.setArgument('context', 'host');
 
-			config_urls.push({
-				label: t('Items'),
-				items: item_urls
-			});
+					item_urls.push({
+						label: item.name,
+						url: url.getUrl()
+					});
+				};
+
+				config_urls.push({
+					label: t('Items'),
+					items: item_urls
+				});
+			}
 		}
 
 		sections.push({
@@ -796,7 +938,7 @@ function getMenuPopupItem(options) {
 
 	if (options.allowed_ui_conf_hosts) {
 		const config_urls = [];
-		const conf_triggers = {
+		const config_triggers = {
 			label: t('Triggers'),
 			disabled: options.triggers.length === 0
 		};
@@ -805,7 +947,8 @@ function getMenuPopupItem(options) {
 		url.setArgument('form', 'update');
 		url.setArgument('hostid', options.hostid);
 		url.setArgument('itemid', options.itemid);
-		url.setArgument('context', 'host');
+		url.setArgument('backurl', options.backurl);
+		url.setArgument('context', options.context);
 
 		if (options.isWriteable) {
 			config_urls.push({
@@ -822,7 +965,8 @@ function getMenuPopupItem(options) {
 				url = new Curl('triggers.php', false);
 				url.setArgument('form', 'update');
 				url.setArgument('triggerid', value.triggerid);
-				url.setArgument('context', 'host');
+				url.setArgument('backurl', options.backurl);
+				url.setArgument('context', options.context);
 
 				trigger_items.push({
 					label: value.description,
@@ -830,17 +974,18 @@ function getMenuPopupItem(options) {
 				});
 			}
 
-			conf_triggers.items = trigger_items;
+			config_triggers.items = trigger_items;
 		}
 
-		config_urls.push(conf_triggers);
+		config_urls.push(config_triggers);
 
 		url = new Curl('triggers.php', false);
 		url.setArgument('form', 'create');
 		url.setArgument('hostid', options.hostid);
 		url.setArgument('description', options.name);
 		url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
-		url.setArgument('context', 'host');
+		url.setArgument('backurl', options.backurl);
+		url.setArgument('context', options.context);
 
 		config_urls.push({
 			label: t('Create trigger'),
@@ -853,7 +998,8 @@ function getMenuPopupItem(options) {
 		url.setArgument('hostid', options.hostid);
 		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
 		url.setArgument('master_itemid', options.itemid);
-		url.setArgument('context', 'host');
+		url.setArgument('backurl', options.backurl);
+		url.setArgument('context', options.context);
 
 		config_urls.push({
 			label: t('Create dependent item'),
@@ -866,7 +1012,8 @@ function getMenuPopupItem(options) {
 		url.setArgument('hostid', options.hostid);
 		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
 		url.setArgument('master_itemid', options.itemid);
-		url.setArgument('context', 'host');
+		url.setArgument('backurl', options.backurl);
+		url.setArgument('context', options.context);
 
 		config_urls.push({
 			label: t('Create dependent discovery rule'),
@@ -904,109 +1051,7 @@ function getMenuPopupItem(options) {
 }
 
 /**
- * Get menu popup item log section data.
- *
- * @param string options['backurl']                   Url from where the popup menu was called.
- * @param string options['itemid']
- * @param string options['hostid']
- * @param string options['host']                      Host name.
- * @param string options['name']
- * @param string options['key']                       Item key.
- * @param array  options['triggers']                  (optional)
- * @param string options['triggers'][n]['triggerid']
- * @param string options['triggers'][n]['name']
- * @param bool   options['allowed_ui_latest_data']    Whether user has access to latest data page.
- * @param string options['context']                   Additional parameter in URL to identify main section.
- *
- * @return array
- */
-function getMenuPopupItemConfiguration(options) {
-	const items = [];
-	let url;
-
-	if (options.context === 'host' && options.allowed_ui_latest_data) {
-		url = new Curl('zabbix.php', false);
-		url.setArgument('action', 'latest.view');
-		url.setArgument('hostids[]', options.hostid);
-		url.setArgument('name', options.name);
-		url.setArgument('filter_name', '');
-
-		items.push({
-			label: t('Latest data'),
-			url: url.getUrl()
-		});
-	}
-
-	url = new Curl('triggers.php', false);
-	url.setArgument('form', 'create');
-	url.setArgument('hostid', options.hostid);
-	url.setArgument('description', options.name);
-	url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
-	url.setArgument('context', options.context);
-	url.setArgument('backurl', options.backurl);
-
-	items.push({
-		label: t('Create trigger'),
-		url: url.getUrl()
-	});
-
-	if (options.triggers.length > 0) {
-		const triggers = [];
-
-		jQuery.each(options.triggers, function (i, trigger) {
-			url = new Curl('triggers.php', false);
-			url.setArgument('form', 'update');
-			url.setArgument('triggerid', trigger.triggerid);
-			url.setArgument('context', options.context);
-			url.setArgument('backurl', options.backurl);
-
-			triggers.push({
-				label: trigger.name,
-				url: url.getUrl()
-			});
-		});
-
-		items.push({
-			label: t('Triggers'),
-			items: triggers
-		})
-	}
-
-	url = new Curl('items.php', false);
-	url.setArgument('form', 'create');
-	url.setArgument('hostid', options.hostid);
-	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
-	url.setArgument('master_itemid', options.itemid);
-	url.setArgument('context', options.context);
-
-	items.push({
-		label: t('Create dependent item'),
-		url: url.getUrl(),
-		disabled: !options.create_dependent_item
-	});
-
-	url = new Curl('host_discovery.php', false);
-	url.setArgument('form', 'create');
-	url.setArgument('hostid', options.hostid);
-	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
-	url.setArgument('master_itemid', options.itemid);
-	url.setArgument('context', options.context);
-	url.setArgument('backurl', options.backurl);
-
-	items.push({
-		label: t('Create dependent discovery rule'),
-		url: url.getUrl(),
-		disabled: !options.create_dependent_discovery
-	});
-
-	return [{
-		label: options.name,
-		items: items
-	}];
-}
-
-/**
- * Get menu structure for item prototypess.
+ * Get menu structure for item prototypes.
  *
  * @param array  options['name']
  * @param string options['backurl']                             Url from where the popup menu was called.
@@ -1021,9 +1066,50 @@ function getMenuPopupItemConfiguration(options) {
  *
  * @return array
  */
-function getMenuPopupItemPrototypeConfiguration(options) {
-	const items = [];
+function getMenuPopupItemPrototype(options) {
+	const sections = [];
+	const config_urls = [];
+	let config_triggers = {
+		label: t('Trigger prototypes'),
+		disabled: true
+	};
+
 	let url;
+
+	url = new Curl('disc_prototypes.php', false);
+	url.setArgument('form', 'update');
+	url.setArgument('parent_discoveryid', options.parent_discoveryid);
+	url.setArgument('itemid', options.itemid);
+	url.setArgument('context', options.context);
+
+	config_urls.push({
+		label: t('Item prototype'),
+		url: url.getUrl()
+	});
+
+	if (options.trigger_prototypes.length) {
+		const trigger_prototypes = [];
+
+		for (const value of options.trigger_prototypes) {
+			url = new Curl('trigger_prototypes.php', false);
+			url.setArgument('form', 'update');
+			url.setArgument('parent_discoveryid', options.parent_discoveryid);
+			url.setArgument('triggerid', value.triggerid)
+			url.setArgument('context', options.context);
+			url.setArgument('backurl', options.backurl);
+
+			trigger_prototypes.push({
+				label: value.description,
+				url: url.getUrl()
+			});
+		}
+
+		if (trigger_prototypes.length) {
+			config_triggers = {...config_triggers, ...{items: trigger_prototypes, disabled: false}};
+		}
+	}
+
+	config_urls.push(config_triggers);
 
 	url = new Curl('trigger_prototypes.php', false);
 	url.setArgument('parent_discoveryid', options.parent_discoveryid);
@@ -1033,33 +1119,10 @@ function getMenuPopupItemPrototypeConfiguration(options) {
 	url.setArgument('context', options.context);
 	url.setArgument('backurl', options.backurl);
 
-	items.push({
+	config_urls.push({
 		label: t('Create trigger prototype'),
 		url: url.getUrl()
 	});
-
-	if (options.trigger_prototypes.length > 0) {
-		const trigger_prototypes = [];
-
-		jQuery.each(options.trigger_prototypes, function (i, trigger) {
-			url = new Curl('trigger_prototypes.php', false);
-			url.setArgument('form', 'update');
-			url.setArgument('parent_discoveryid', options.parent_discoveryid);
-			url.setArgument('triggerid', trigger.triggerid)
-			url.setArgument('context', options.context);
-			url.setArgument('backurl', options.backurl);
-
-			trigger_prototypes.push({
-				label: trigger.name,
-				url: url.getUrl()
-			});
-		});
-
-		items.push({
-			label: t('Trigger prototypes'),
-			items: trigger_prototypes
-		});
-	}
 
 	url = new Curl('disc_prototypes.php', false);
 	url.setArgument('form', 'create');
@@ -1068,15 +1131,17 @@ function getMenuPopupItemPrototypeConfiguration(options) {
 	url.setArgument('master_itemid', options.itemid);
 	url.setArgument('context', options.context);
 
-	items.push({
+	config_urls.push({
 		label: t('Create dependent item'),
 		url: url.getUrl()
 	});
 
-	return [{
-		label: options.name,
-		items: items
-	}];
+	sections.push({
+		label: t('Configuration'),
+		items: config_urls
+	});
+
+	return sections;
 }
 
 /**
