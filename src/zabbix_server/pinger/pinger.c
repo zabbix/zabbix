@@ -26,6 +26,8 @@
 #include "zbxself.h"
 #include "preproc.h"
 #include "zbxtime.h"
+#include "zbxnum.h"
+#include "zbxsysinfo.h"
 
 /* defines for `fping' and `fping6' to successfully process pings */
 #define MIN_COUNT	1
@@ -72,7 +74,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	}
 	else
 	{
-		init_result(&value);
+		zbx_init_agent_result(&value);
 
 		if (NULL != value_ui64)
 			SET_UI64_RESULT(&value, *value_ui64);
@@ -83,7 +85,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 		zbx_preprocess_item_value(item.itemid, item.host.hostid, item.value_type, item.flags, &value, ts,
 				item.state, NULL);
 
-		free_result(&value);
+		zbx_free_agent_result(&value);
 	}
 clean:
 	DCrequeue_items(&item.itemid, &ts->sec, &errcode, 1);
@@ -162,8 +164,8 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 							break;
 					}
 
-					if (0 < value_dbl && ZBX_FLOAT_PRECISION > value_dbl)
-						value_dbl = ZBX_FLOAT_PRECISION;
+					if (0 < value_dbl && zbx_get_float_epsilon() > value_dbl)
+						value_dbl = zbx_get_float_epsilon();
 
 					process_value(item->itemid, NULL, &value_dbl, ts, SUCCEED, NULL);
 					break;
@@ -187,9 +189,9 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	int		ret = NOTSUPPORTED;
 	AGENT_REQUEST	request;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(key, &request))
+	if (SUCCEED != zbx_parse_item_key(key, &request))
 	{
 		zbx_snprintf(error, max_error_len, "Invalid item key format.");
 		goto out;
@@ -301,7 +303,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 
 	ret = SUCCEED;
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }
@@ -548,7 +550,7 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	if (NULL == items)
 		items = (icmpitem_t *)zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);

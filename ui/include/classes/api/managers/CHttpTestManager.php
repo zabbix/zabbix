@@ -147,10 +147,6 @@ class CHttpTestManager {
 		$upd_httptests = [];
 
 		foreach ($httptests as $httptest) {
-			if (array_key_exists('delay', $httptest) && $httptest['delay'] !== $db_httptests[$httptest['httptestid']]) {
-				$httptest['nextcheck'] = 0;
-			}
-
 			$upd_httptest = DB::getUpdatedValues('httptest', $httptest, $db_httptests[$httptest['httptestid']]);
 
 			if ($upd_httptest) {

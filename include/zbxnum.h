@@ -45,9 +45,12 @@
 	zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned int), min, max)
 int	zbx_is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
+int	zbx_is_int(const char *str, int *value);
+
 int	zbx_is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 int	zbx_is_hex_string(const char *str);
 
+double	zbx_get_float_epsilon(void);
 double	zbx_get_double_epsilon(void);
 void	zbx_update_epsilon_to_float_precision(void);
 void	zbx_update_epsilon_to_python_compatible_precision(void);

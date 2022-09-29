@@ -21,7 +21,8 @@
 #define ZABBIX_ZABBIX_STATS_H_
 
 #include "zbxjson.h"
+#include "zbxstats.h"
 
-void	zbx_get_zabbix_stats_ext(struct zbx_json *json);
+void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config);
 
 #endif /* ZABBIX_ZABBIX_STATS_H_ */

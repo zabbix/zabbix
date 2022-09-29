@@ -154,7 +154,6 @@ class ZBase {
 		require_once 'include/items.inc.php';
 		require_once 'include/maintenances.inc.php';
 		require_once 'include/maps.inc.php';
-		require_once 'include/media.inc.php';
 		require_once 'include/sounds.inc.php';
 		require_once 'include/triggers.inc.php';
 	}

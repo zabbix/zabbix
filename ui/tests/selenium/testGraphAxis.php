@@ -152,6 +152,10 @@ class testGraphAxis extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
 		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 
+		/** For Pacific/Chatham timezone on clock change dates (in September and April) there might be one fail
+		 *  for short period at night when info is not updated yet: 2:45 -> 3:45 or 3:45 -> 2:45.
+		 *  Tests need to be run again and fix observed when timezone format is updated.
+		 */
 		if (CTestArrayHelper::get($data, 'settings.Time zone')) {
 			$data['settings']['Time zone'] = CDateTimeHelper::getTimeZoneFormat($data['settings']['Time zone']);
 		}

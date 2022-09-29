@@ -32,6 +32,7 @@
 #include "zbxexpr.h"
 #include "zbxnum.h"
 #include "zbxparam.h"
+#include "zbxsysinfo.h"
 
 typedef struct
 {
@@ -6387,7 +6388,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 	*param = zbx_strdup(NULL, data);
 
 	if (0 != level)
-		unquote_key_param(*param);
+		zbx_unquote_key_param(*param);
 
 	if (NULL == jp_row)
 		substitute_simple_macros_impl(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL, NULL, NULL, NULL,
@@ -6397,7 +6398,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 
 	if (0 != level)
 	{
-		if (FAIL == (ret = quote_key_param(param, quoted)))
+		if (FAIL == (ret = zbx_quote_key_param(param, quoted)))
 			zbx_free(*param);
 	}
 

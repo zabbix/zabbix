@@ -21,6 +21,7 @@
 
 #include "log.h"
 #include "zbxexec.h"
+#include "zbxsysinfo.h"
 
 extern char	*CONFIG_EXTERNALSCRIPTS;
 
@@ -44,9 +45,9 @@ int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key);
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key, &request))
+	if (SUCCEED != zbx_parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
@@ -78,7 +79,7 @@ int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result)
 	{
 		zbx_rtrim(buf, ZBX_WHITESPACE);
 
-		set_result_type(result, ITEM_VALUE_TYPE_TEXT, buf);
+		zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, buf);
 		zbx_free(buf);
 	}
 	else
@@ -91,7 +92,7 @@ int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result)
 out:
 	zbx_free(cmd);
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

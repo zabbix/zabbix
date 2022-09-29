@@ -45,6 +45,7 @@
 #include "zbxcomms.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxsysinfo.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
@@ -278,13 +279,14 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_free_result_ptr(AGENT_RESULT *result)
+void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 {
-	free_result(result);
+	zbx_free_agent_result(result);
 	zbx_free(result);
 }
 
-static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
+static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,
+		const zbx_config_comms_args_t *zbx_config)
 {
 	int	res = FAIL;
 
@@ -302,7 +304,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 			res = get_value_simple(item, result, add_results);
 			break;
 		case ITEM_TYPE_INTERNAL:
-			res = get_value_internal(item, result);
+			res = get_value_internal(item, result, zbx_config);
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 #ifdef HAVE_UNIXODBC
@@ -353,7 +355,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 
 	if (SUCCEED != res)
 	{
-		if (!ISSET_MSG(result))
+		if (!ZBX_ISSET_MSG(result))
 			SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED_MSG));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
@@ -445,7 +447,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 
 	for (i = 0; i < num; i++)
 	{
-		init_result(&results[i]);
+		zbx_init_agent_result(&results[i]);
 		errcodes[i] = SUCCEED;
 
 		if (MACRO_EXPAND_YES == expand_macros)
@@ -696,7 +698,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 }
 
 void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, zbx_vector_ptr_t *add_results,
-		unsigned char poller_type)
+		unsigned char poller_type, const zbx_config_comms_args_t *zbx_config)
 {
 	if (ITEM_TYPE_SNMP == items[0].type)
 	{
@@ -727,7 +729,7 @@ void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *resul
 	else if (1 == num)
 	{
 		if (SUCCEED == errcodes[0])
-			errcodes[0] = get_value(&items[0], &results[0], add_results);
+			errcodes[0] = get_value(&items[0], &results[0], add_results, zbx_config);
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -787,7 +789,7 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
 				break;
 		}
 
-		free_result(&results[i]);
+		zbx_free_agent_result(&results[i]);
 	}
 }
 
@@ -797,6 +799,7 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  *                                                                            *
  * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
  *             nextcheck   - [OUT] item nextcheck                             *
+ *             zbx_config  - [IN] server/proxy config                         *
  *                                                                            *
  * Return value: number of items processed                                    *
  *                                                                            *
@@ -804,7 +807,7 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  *           see DCconfig_get_poller_items()                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_values(unsigned char poller_type, int *nextcheck)
+static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *zbx_config)
 {
 	DC_ITEM			item, *items;
 	AGENT_RESULT		results[MAX_POLLER_ITEMS];
@@ -829,7 +832,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	zbx_vector_ptr_create(&add_results);
 
 	zbx_prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
-	zbx_check_items(items, errcodes, num, results, &add_results, poller_type);
+	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, zbx_config);
 
 	zbx_timespec(&timespec);
 
@@ -888,7 +891,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				{
 					AGENT_RESULT	*add_result = (AGENT_RESULT *)add_results.values[j];
 
-					if (ISSET_MSG(add_result))
+					if (ZBX_ISSET_MSG(add_result))
 					{
 						items[i].state = ITEM_STATE_NOTSUPPORTED;
 						zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid,
@@ -926,7 +929,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	zbx_preprocessor_flush();
 	zbx_clean_items(items, num, results);
 	DCconfig_clean_items(items, NULL, num);
-	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_result_ptr);
+	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_agent_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
 
 	if (NULL != data)
@@ -965,12 +968,12 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			get_program_type_string(poller_args_in->zbx_get_program_type_cb_arg()), server_num,
 			get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	scriptitem_es_engine_init();
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(poller_args_in->zbx_config_tls, poller_args_in->zbx_get_program_type_cb_arg);
+	zbx_tls_init_child(poller_args_in->zbx_config->zbx_config_tls, poller_args_in->zbx_get_program_type_cb_arg);
 #endif
 	if (ZBX_POLLER_TYPE_HISTORY == poller_type)
 	{
@@ -998,7 +1001,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 					old_total_sec);
 		}
 
-		processed += get_values(poller_type, &nextcheck);
+		processed += get_values(poller_type, &nextcheck, poller_args_in->zbx_config);
 		total_sec += zbx_time() - sec;
 
 		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);

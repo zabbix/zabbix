@@ -22,8 +22,7 @@ package zbxlib
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../include
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "log.h"
 #include "../src/zabbix_agent/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"

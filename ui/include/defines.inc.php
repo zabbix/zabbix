@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.4.0alpha1');
+define('ZABBIX_VERSION',		'6.4.0beta1');
 define('ZABBIX_API_VERSION',	'6.4.0');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6030000);
+define('ZABBIX_DB_VERSION',		6030059);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -51,6 +51,8 @@ define('ZBX_MIN_PERIOD',		60); // 1 minute
 
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
+define('ZBX_MIN_INT64',			'-9223372036854775808');
+define('ZBX_MAX_INT64',			'9223372036854775807');
 define('ZBX_MAX_UINT64',		'18446744073709551615');
 
 // Double precision 64-bit float.
@@ -101,6 +103,10 @@ define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);
 define('ZBX_SCRIPT_TYPE_TELNET',		3);
 define('ZBX_SCRIPT_TYPE_WEBHOOK',		5);
+define('ZBX_SCRIPT_TYPE_URL',			6);
+
+define('ZBX_SCRIPT_URL_NEW_WINDOW_NO',	0);
+define('ZBX_SCRIPT_URL_NEW_WINDOW_YES',	1);
 
 define('ZBX_SCRIPT_SCOPE_ACTION', 0x1);
 define('ZBX_SCRIPT_SCOPE_HOST', 0x2);
@@ -112,6 +118,12 @@ define('ZBX_SEARCH_TYPE_PATTERN',	1);
 define('ZBX_SCRIPT_EXECUTE_ON_AGENT',	0);
 define('ZBX_SCRIPT_EXECUTE_ON_SERVER',	1);
 define('ZBX_SCRIPT_EXECUTE_ON_PROXY',	2);
+
+define('ZBX_PROXY_VERSION_UNDEFINED', 0);
+define('ZBX_PROXY_VERSION_CURRENT', 1);
+define('ZBX_PROXY_VERSION_OUTDATED', 2);
+define('ZBX_PROXY_VERSION_UNSUPPORTED', 3);
+define('ZBX_PROXY_VERSION_ALL_OUTDATED', 4);
 
 define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0);
 define('ZBX_FLAG_DISCOVERY_RULE',		0x1);
@@ -1412,6 +1424,7 @@ define('API_BOOLEAN',				4);
 define('API_FLAG',					5);
 define('API_FLOAT',					6);
 define('API_UINT64',				7);
+define('API_FILTER_VALUE',			60);
 // arrays
 define('API_OBJECT',				8);
 define('API_IDS',					9);
@@ -1422,8 +1435,11 @@ define('API_FLOATS',				13);
 define('API_UINTS64',				14);
 define('API_CUIDS',					44);
 define('API_USER_MACROS',			52);
+define('API_FILTER_VALUES',			59);
+
 // any type
-define('API_ANY',					58);
+define('API_ANY',					61);
+
 // specific types
 define('API_HG_NAME',				15);
 define('API_SCRIPT_MENU_PATH',		16);
@@ -1465,13 +1481,14 @@ define('API_LAT_LNG_ZOOM',			54);
 define('API_TIMESTAMP',				55);
 define('API_TG_NAME',				56);
 define('API_COLORS',				57);
-define('API_ITEM_KEY',				59);
-define('API_ITEM_DELAY',			60);
-define('API_JSON',					61);
-define('API_XML',					62);
-define('API_PREPROC_PARAMS',		63);
-define('API_PROMETHEUS_PATTERN',	64);
-define('API_PROMETHEUS_LABEL',		65);
+define('API_FILTER',				58);
+define('API_ITEM_KEY',				62);
+define('API_ITEM_DELAY',			63);
+define('API_JSON',					64);
+define('API_XML',					65);
+define('API_PREPROC_PARAMS',		66);
+define('API_PROMETHEUS_PATTERN',	67);
+define('API_PROMETHEUS_LABEL',		68);
 
 // flags
 define('API_REQUIRED',					0x00001);
