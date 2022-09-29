@@ -18,14 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/TagTrait.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup profiles
  *
- * @dataSource TagFilter
+ * @dataSource TagFilter, EntitiesTags
  */
 class testPageTemplates extends CLegacyWebTest {
 
@@ -179,7 +180,8 @@ class testPageTemplates extends CLegacyWebTest {
 					'expected_templates' => [
 						'Template for tags filtering',
 						'Template for tags filtering - clone',
-						'Template for tags filtering - update'
+						'Template for tags filtering - update',
+						'Template for tags testing'
 					]
 				]
 			],
@@ -193,7 +195,8 @@ class testPageTemplates extends CLegacyWebTest {
 					'expected_templates' => [
 						'Template for tags filtering',
 						'Template for tags filtering - clone',
-						'Template for tags filtering - update'
+						'Template for tags filtering - update',
+						'Template for tags testing'
 					]
 				]
 			],
@@ -204,7 +207,8 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'tag', 'operator' => 'Equals', 'value' => 'TEMPLATE']
 					],
 					'expected_templates' => [
-						'Template for tags filtering'
+						'Template for tags filtering',
+						'Template for tags testing'
 					]
 				]
 			],
@@ -217,7 +221,8 @@ class testPageTemplates extends CLegacyWebTest {
 					'expected_templates' => [
 						'Template for tags filtering',
 						'Template for tags filtering - clone',
-						'Template for tags filtering - update'
+						'Template for tags filtering - update',
+						'Template for tags testing'
 					]
 				]
 			],
@@ -251,7 +256,8 @@ class testPageTemplates extends CLegacyWebTest {
 					'expected_templates' => [
 						'Template for tags filtering',
 						'Template for tags filtering - clone',
-						'Template for tags filtering - update'
+						'Template for tags filtering - update',
+						'Template for tags testing'
 					]
 				]
 			],
@@ -382,7 +388,7 @@ class testPageTemplates extends CLegacyWebTest {
 	 * @dataProvider getFilterByTagsData
 	 */
 	public function testPageTemplates_FilterByTags($data) {
-		$this->page->login()->open('templates.php?filter_name=template&filter_evaltype=0&filter_tags%5B0%5D%5Btag%5D='.
+		$this->page->login()->open('templates.php?filter_name=template+for+tags&filter_evaltype=0&filter_tags%5B0%5D%5Btag%5D='.
 				'&filter_tags%5B0%5D%5Boperator%5D=0&filter_tags%5B0%5D%5Bvalue%5D=&filter_set=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);

@@ -23,8 +23,9 @@ require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
- * @backup services
- * @backup profiles
+ * @dataSource EntitiesTags
+ *
+ * @backup services, profiles
  */
 class testFormTabIndicators extends CWebTest {
 
@@ -843,7 +844,7 @@ class testFormTabIndicators extends CWebTest {
 		$overlay->query('id:serviceid_all')->asCheckbox()->one()->check();
 		$overlay->query('button:Select')->one()->click();
 		$overlay->waitUntilNotVisible();
-		$this->assertTabIndicator($tab_selector, 2);
+		$this->assertTabIndicator($tab_selector, 5);
 
 		// Remove all child services and check count indicator.
 		$child_services_tab->query('button:Remove')->all()->click();

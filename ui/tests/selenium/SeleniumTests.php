@@ -148,6 +148,10 @@ require_once dirname(__FILE__).'/tags/testFormTagsTrigger.php';
 require_once dirname(__FILE__).'/tags/testFormTagsTriggerPrototype.php';
 require_once dirname(__FILE__).'/tags/testFormTagsWeb.php';
 
+// Templates.
+require_once dirname(__FILE__).'/templates/testFormTemplate.php';
+require_once dirname(__FILE__).'/templates/testPageTemplates.php';
+
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
@@ -180,7 +184,6 @@ require_once dirname(__FILE__).'/testPageQueueOverviewByProxy.php';
 */
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
-require_once dirname(__FILE__).'/testPageTemplates.php';
 require_once dirname(__FILE__).'/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/users/testPageUsers.php';
@@ -216,7 +219,6 @@ require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
 require_once dirname(__FILE__).'/testFormTrigger.php';
-require_once dirname(__FILE__).'/testFormTemplate.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/users/testFormUser.php';
 require_once dirname(__FILE__).'/users/testFormUserMedia.php';
@@ -382,6 +384,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTagsTriggerPrototype');
 		$suite->addTestSuite('testFormTagsWeb');
 
+		// Templates.
+		$suite->addTestSuite('testFormTemplate');
+		$suite->addTestSuite('testPageTemplates');
 
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
@@ -416,7 +421,6 @@ class SeleniumTests {
 */
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
-		$suite->addTestSuite('testPageTemplates');
 		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageWeb');
@@ -449,7 +453,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTabIndicators');
-		$suite->addTestSuite('testFormTemplate');
 		$suite->addTestSuite('testFormTrigger');
 		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testFormUser');
