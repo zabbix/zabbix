@@ -7056,10 +7056,9 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 		}
 	}
 
-	/* Build paths for resource pool */
 	for (i = 0; i < resourcepools->values_num; i++)
 	{
-		int				k, path_built = 0;
+		int				k;
 		zbx_vmware_resourcepool_t	rp_parent;
 
 		if (NULL != resourcepools->values[i]->path)
@@ -7079,7 +7078,6 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 				vmware_resourcepool_compare_id)))
 		{
 			zbx_vmware_resourcepool_t	*rpool = resourcepools->values[k];
-			char				*path;
 
 			if (0 == rpool->parent_is_rp)
 			{
@@ -7087,21 +7085,18 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 				break;
 			}
 
-			rp_parent.id = rpool->first_parentid;
-
-			if (0 != path_built)
-				continue;
-
 			if (NULL != rpool->path)
 			{
-				path = rpool->path;
-				path_built = 1;
+				resourcepools->values[i]->path = zbx_dsprintf(resourcepools->values[i]->path, "%s/%s",
+						rpool->path, resourcepools->values[i]->path);
+				resourcepools->values[i]->parentid = zbx_strdup(NULL, rpool->parentid);
+				break;
 			}
-			else
-				path = rpool->name;
 
 			resourcepools->values[i]->path = zbx_dsprintf(resourcepools->values[i]->path, "%s/%s",
-					path, resourcepools->values[i]->path);
+					rpool->name, resourcepools->values[i]->path);
+
+			rp_parent.id = rpool->first_parentid;
 		}
 
 		if (NULL == resourcepools->values[i]->parentid)
