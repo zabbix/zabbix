@@ -85,7 +85,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'globmacros' =>
 			[
-				'insert' => '4',
+				'insert' => '3',
 				'update' => '0',
 				'delete' => '0',
 			],
@@ -424,7 +424,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"6",
 				"update" =>
-				"16",
+				"10",
 				"delete" =>
 				"6",
 			]
@@ -975,7 +975,6 @@ class testInitialConfSync extends CIntegrationTest
 	private function parseSyncResults()
 	{
 		$log = file_get_contents(self::getLogPath(self::COMPONENT_SERVER));
-		var_dump($log);
 		$data = explode("\n", $log);
 
 		$sync_lines = preg_grep('/DCsync_configuration.*\([0-9]+\/[0-9]+\/[0-9]+\)\.$/', $data);
@@ -1055,6 +1054,23 @@ class testInitialConfSync extends CIntegrationTest
 		$response = $this->call('hostgroup.delete', $ids);
 	}
 
+	private function purgeGlobalMacros()
+	{
+		$response = $this->call('usermacro.get', [
+			'output' => 'extend',
+			'globalmacro' => true,
+			'preservekeys' => true
+		]);
+		$this->assertArrayHasKey('result', $response);
+
+		$ids = array_keys($response['result']);
+		if (empty($ids)) {
+			return;
+		}
+
+		$response = $this->call('usermacro.deleteglobal', $ids);
+	}
+
 	private function purgeExisting($method, $field_name)
 	{
 		$params = [
@@ -1074,6 +1090,28 @@ class testInitialConfSync extends CIntegrationTest
 		$response = $this->call($method . '.delete', $ids);
 	}
 
+	private function disableAllHosts()
+	{
+		$response = $this->call('host.get', [
+			'output' => 'hostid',
+			'preservekeys' => true
+		]);
+		$this->assertArrayHasKey('result', $response);
+
+		$ids = array_keys($response['result']);
+
+		if (empty($ids)) {
+			return;
+		}
+
+		foreach ($ids as $hostid) {
+			$response = $this->call('host.update', [
+				'hostid' => $hostid,
+				'status' => 1
+			]);
+		}
+	}
+
 	private function createActions()
 	{
 		$response = $this->call('trigger.get', [
@@ -1090,9 +1128,9 @@ class testInitialConfSync extends CIntegrationTest
 			'filter' => [
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_TRIGGER,
-						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => self::$triggerid
+						'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
+						'operator' => CONDITION_OPERATOR_LIKE,
+						'value' => 'qqq'
 					]
 				],
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR
@@ -1140,9 +1178,9 @@ class testInitialConfSync extends CIntegrationTest
 			'filter' => [
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_TRIGGER,
-						'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-						'value' => self::$triggerid
+						'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
+						'operator' => CONDITION_OPERATOR_NOT_LIKE,
+						'value' => 'qqq'
 					]
 				],
 				'evaltype' => CONDITION_EVAL_TYPE_OR
@@ -1533,29 +1571,15 @@ class testInitialConfSync extends CIntegrationTest
 		]);
 	}
 
-	/**
-	 */
-	public function testInitialConfSync_Insert()
+	public function loadInitialConfiguration()
 	{
-		$this->createGlobalMacros();
-		$this->purgeExisting('host', 'hostids');
-		$this->purgeExisting('template', 'templateids');
-		$this->purgeExisting('item', 'itemids');
-		$this->purgeExisting('trigger', 'triggerids');
-		$this->purgeExisting('regexp', 'extend');
-		$this->purgeHostGroups();
-
 		$this->createProxies();
 		$this->createCorrelation();
 		$this->createRegexp();
-
-		self::stopComponent(self::COMPONENT_SERVER);
-		self::clearLog(self::COMPONENT_SERVER);
-
+		$this->createGlobalMacros();
 		$this->importTemplate('confsync_tmpl.xml');
 
 		$xml = file_get_contents('integration/data/confsync_hosts.xml');
-
 
 		$response = $this->call('configuration.import', [
 			'format' => 'xml',
@@ -1618,6 +1642,27 @@ class testInitialConfSync extends CIntegrationTest
 
 		$this->createActions();
 		$this->createMaintenance();
+	}
+
+	/**
+	 */
+	public function testInitialConfSync_Insert()
+	{
+		$this->purgeExisting('host', 'hostids');
+		$this->purgeExisting('proxy', 'proxyids');
+		$this->purgeExisting('template', 'templateids');
+		$this->purgeExisting('item', 'itemids');
+		$this->purgeExisting('trigger', 'triggerids');
+		$this->purgeExisting('regexp', 'extend');
+		$this->purgeExisting('action', 'actionids');
+		$this->purgeHostGroups();
+		$this->purgeGlobalMacros();
+
+		self::stopComponent(self::COMPONENT_SERVER);
+		self::clearLog(self::COMPONENT_SERVER);
+
+		$this->loadInitialConfiguration();
+		$this->disableAllHosts();
 
 		self::startComponent(self::COMPONENT_SERVER);
 
@@ -1628,14 +1673,38 @@ class testInitialConfSync extends CIntegrationTest
 
 		$stringpool_old = $this->getStringPoolCount();
 
+		$this->purgeExisting('correlation', 'correlationids');
+		$this->purgeExisting('maintenance', 'maintenanceids');
+		$this->purgeExisting('host', 'hostids');
+		$this->purgeExisting('proxy', 'proxyids');
+		$this->purgeExisting('template', 'templateids');
+		$this->purgeExisting('item', 'itemids');
+		$this->purgeExisting('action', 'actionid');
+		$this->purgeExisting('trigger', 'triggerids');
+		$this->purgeExisting('regexp', 'extend');
+		$this->purgeHostGroups();
+		$this->purgeGlobalMacros();
+
+		self::clearLog(self::COMPONENT_SERVER);
+
+		$this->loadInitialConfiguration();
+		$this->disableAllHosts();
+
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+
+		$stringpool_new = $this->getStringPoolCount();
+
 		self::stopComponent(self::COMPONENT_SERVER);
 		self::clearLog(self::COMPONENT_SERVER);
 		self::startComponent(self::COMPONENT_SERVER);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
 
-		$stringpool_new = $this->getStringPoolCount();
 		$this->assertEquals($stringpool_old, $stringpool_new);
+
+		$got = $this->parseSyncResults();
+		$this->assertEquals($this->expected_initial, $got);
 
 		return true;
 	}
@@ -1649,8 +1718,6 @@ class testInitialConfSync extends CIntegrationTest
 
 		$this->importTemplateForUpdate('confsync_tmpl_updated.xml');
 		$xml = file_get_contents('integration/data/confsync_hosts_updated.xml');
-
-		var_dump(CDBHelper::getDataProvider("select * from triggers"));
 
 		$response = $this->call('configuration.import', [
 			'format' => 'xml',
@@ -1711,6 +1778,7 @@ class testInitialConfSync extends CIntegrationTest
 		$this->purgeExisting('template', 'templateids');
 		$this->purgeExisting('correlation', 'correlationids');
 		$this->purgeExisting('regexp', 'extend');
+		$this->purgeExisting('action', 'actionids');
 		$this->purgeExisting('item', 'itemids');
 		$this->purgeHostGroups();
 

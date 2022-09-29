@@ -329,7 +329,7 @@
                             <operations>
                                 <operation>
                                     <operationobject>ITEM_PROTOTYPE</operationobject>
-                                    <value>1</value>
+                                    <value>991</value>
                                     <status>DISABLED</status>
                                     <discover>NO_DISCOVER</discover>
                                 </operation>
@@ -468,8 +468,8 @@
                         <step>
                             <type>STR_REPLACE</type>
                             <parameters>
-                                <parameter>1</parameter>
-                                <parameter>2</parameter>
+                                <parameter>994</parameter>
+                                <parameter>995</parameter>
                             </parameters>
                         </step>
                     </preprocessing>
@@ -552,8 +552,8 @@
                         <step>
                             <type>STR_REPLACE</type>
                             <parameters>
-                                <parameter>1</parameter>
-                                <parameter>2</parameter>
+                                <parameter>992</parameter>
+                                <parameter>993</parameter>
                             </parameters>
                         </step>
                     </preprocessing>
