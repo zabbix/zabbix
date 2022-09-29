@@ -1009,13 +1009,12 @@ class CUserDirectory extends CApiService {
 
 		if ($userdirectory['userdirectoryid'] != 0) {
 			$db_userdirectory = $this->get([
-				'output' => ['host', 'port', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute', 'start_tls',
-					'search_filter', 'provision_status', 'idp_type'
+				'output' => ['host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls', 'search_filter',
+					'provision_status', 'idp_type'
 				],
-				'userdirectoryids' => $userdirectory['userdirectoryid'],
+				'userdirectoryids' => [$userdirectory['userdirectoryid']],
 				'filter' => ['idp_type' => IDP_TYPE_LDAP]
 			]);
-			$db_userdirectory = reset($db_userdirectory);
 
 			if (!$db_userdirectory) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
@@ -1023,18 +1022,21 @@ class CUserDirectory extends CApiService {
 				);
 			}
 
-			$userdirectory += $db_userdirectory;
+			$userdirectory += reset($db_userdirectory);
+			$userdirectory += DB::select('userdirectory_ldap', [
+				'output' => ['bind_password'],
+				'filter' => ['userdirectoryid' => [$userdirectory['userdirectoryid']]]
+			])[0];
 
 			if ($userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
-				[$db_userdirectory] = $this->get([
+				$userdirectory += $this->get([
 					'output' => ['group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership',
 						'user_username', 'user_lastname'
 					],
 					'userdirectoryids' => $userdirectory['userdirectoryid'],
 					'selectProvisionMedia' => API_OUTPUT_EXTEND,
 					'selectProvisionGroups' => API_OUTPUT_EXTEND
-				]);
-				$userdirectory += $db_userdirectory;
+				])[0];
 			}
 		}
 

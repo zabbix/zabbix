@@ -142,4 +142,30 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 
 		return null;
 	}
+
+	/**
+	 * Check is LDAP provisioning enabled for specific userdirectory: frontend default authentication is set to LDAP,
+	 * LDAP JIT provisioning is enabled, LDAP user directory provisioning is configured and enabled.
+	 *
+	 * @return bool
+	 */
+	public static function isLdapProvisionEnabled($userdirectoryid): bool {
+		if (self::get(self::AUTHENTICATION_TYPE) != ZBX_AUTH_LDAP) {
+			return false;
+		}
+
+		if (self::get(self::LDAP_JIT_STATUS) != JIT_PROVISIONING_ENABLED) {
+			return false;
+		}
+
+		if ($userdirectoryid == 0) {
+			return false;
+		}
+
+		return API::UserDirectory()->get([
+			'countOutput' => true,
+			'userdirectoryids' => [$userdirectoryid],
+			'filter' => ['provision_status' => JIT_PROVISIONING_ENABLED, 'idp_type' => IDP_TYPE_LDAP]
+		]) > 0;
+	}
 }

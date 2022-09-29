@@ -147,7 +147,9 @@ class CProvisioning {
 			 * should exist to do not attempt to query LDAP for user groups once again.
 			 */
 			$user['usrgrps'] = [];
-			$user = array_merge($user, $this->getUserGroupsAndRole($idp_user[$this->userdirectory['group_membership']]));
+			$user = array_merge($user,
+				$this->getUserGroupsAndRole($idp_user[$this->userdirectory['group_membership']])
+			);
 		}
 
 		return $user;
