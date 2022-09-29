@@ -18,16 +18,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup history_uint, profiles
  *
  * @onBefore prepareItemTagsData
  */
-class testPageLatestData extends CWebTest {
+class testPageMonitoringLatestData extends CWebTest {
 
 	use TableTrait;
 
@@ -108,7 +109,7 @@ class testPageLatestData extends CWebTest {
 				", ".zbx_dbstr($time).", 1, 0)");
 	}
 
-	public function testPageLatestData_CheckLayout() {
+	public function testPageMonitoringLatestData_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=latest.view&filter_reset=1')->waitUntilReady();
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
@@ -460,7 +461,7 @@ class testPageLatestData extends CWebTest {
 	 *
 	 * @dataProvider getFilterData
 	 */
-	public function testPageLatestData_Filter($data) {
+	public function testPageMonitoringLatestData_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$table = $this->query('xpath://table[contains(@class, "overflow-ellipsis")]')->asTable()->waitUntilPresent()->one();
@@ -558,7 +559,7 @@ class testPageLatestData extends CWebTest {
 	 *
 	 * @dataProvider getSubfilterData
 	 */
-	public function testPageLatestData_Subfilter($data) {
+	public function testPageMonitoringLatestData_Subfilter($data) {
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr(self::HOSTNAME));
 
 		$link = (CTestArrayHelper::get($data['subfilter'], 'Data'))
@@ -586,7 +587,7 @@ class testPageLatestData extends CWebTest {
 	/**
 	 * Test for clicking on particular item tag in table and checking that items are filtered by this tag.
 	 */
-	public function testPageLatestData_ClickTag() {
+	public function testPageMonitoringLatestData_ClickTag() {
 		$tag = ['tag' => 'component: ', 'value' => 'storage'];
 
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('ЗАББИКС Сервер'));
@@ -617,7 +618,7 @@ class testPageLatestData extends CWebTest {
 	/**
 	 * Test that checks if host has visible name, it cannot be found by host name on Latest Data page.
 	 */
-	public function testPageLatestData_NoHostNames() {
+	public function testPageMonitoringLatestData_NoHostNames() {
 		$result = [
 			CDBHelper::getRandom(
 				'SELECT host'.
@@ -756,7 +757,7 @@ class testPageLatestData extends CWebTest {
 	/**
 	 * @dataProvider getItemDescription
 	 */
-	public function testPageLatestData_checkItemDescription($data) {
+	public function testPageMonitoringLatestData_checkItemDescription($data) {
 		// Open Latest data for host 'testPageHistory_CheckLayout'
 		$this->page->login()->open('zabbix.php?&action=latest.view&show_details=0&hostids%5B%5D='.$data['hostid'])
 				->waitUntilReady();
@@ -792,7 +793,7 @@ class testPageLatestData extends CWebTest {
 	/**
 	 * Maintenance icon hintbox.
 	 */
-	public function testPageLatestData_checkMaintenanceIcon() {
+	public function testPageMonitoringLatestData_checkMaintenanceIcon() {
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill(['Hosts' => 'Available host in maintenance']);
@@ -808,7 +809,7 @@ class testPageLatestData extends CWebTest {
 	/**
 	 * Check hint text for Last check and Last value columns
 	 */
-	public function testPageLatestData_checkHints() {
+	public function testPageMonitoringLatestData_checkHints() {
 		$itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr('4_item'));
 		$time = time();
 		$value = '15';

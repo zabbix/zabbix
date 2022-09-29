@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/testDocumentationLinks.php';
 require_once dirname(__FILE__).'/testGeneric.php';
 
@@ -99,6 +100,9 @@ require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
 
+// Monitoring.
+require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
+
 // Preprocessing.
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneHost.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneTemplate.php';
@@ -146,7 +150,6 @@ require_once dirname(__FILE__).'/tags/testFormTagsWeb.php';
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
-require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
 require_once dirname(__FILE__).'/testPageProblems.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
@@ -331,6 +334,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormMacrosHostPrototype');
 		$suite->addTestSuite('testFormMacrosTemplate');
 
+		// Monitoring.
+		$suite->addTestSuite('testPageMonitoringLatestData');
+
 		// Preprocessing.
 		$suite->addTestSuite('testFormPreprocessingCloneHost');
 		$suite->addTestSuite('testFormPreprocessingCloneTemplate');
@@ -397,7 +403,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageTriggerDescription');
 		$suite->addTestSuite('testPageTriggerUrl');
 		$suite->addTestSuite('testPageTriggerPrototypes');
-		$suite->addTestSuite('testPageLatestData');
 		$suite->addTestSuite('testPageMaintenance');
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageMassUpdateItems');
