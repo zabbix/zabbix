@@ -875,7 +875,7 @@ sub process_update_trigger_function($)
 	my $line = shift;
 	my $out;
 
-	my ($original_column_name, $indexed_column_name, $idname, $func_name) = split(/\|/, $line, 3);
+	my ($original_column_name, $indexed_column_name, $idname, $func_name) = split(/\|/, $line, 4);
 
 
 	if ($output{"database"} eq "mysql")
@@ -899,7 +899,7 @@ sub process_update_trigger_function($)
 	elsif ($output{"database"} eq "postgresql")
 	{
 		$out = "";
-		$out .= "create or replace function ${table_name}_${indexed_column_name}_${function}()${eol}\n";
+		$out .= "create or replace function ${table_name}_${indexed_column_name}_${func_name}()${eol}\n";
 		$out .= "returns trigger language plpgsql as \$func\$${eol}\n";
 		$out .= "begin${eol}\n";
 		$out .= "update ${table_name} set ${indexed_column_name}=${func_name}(${original_column_name})${eol}\n";
@@ -909,11 +909,12 @@ sub process_update_trigger_function($)
 
 		$out .= "create trigger ${table_name}_${indexed_column_name}_insert after insert {$eol}\n";
 		$out .= "of ${original_column_name} on ${table_name} ${eol}\n";
-		$out .= "for each row execute procedure ${table_name}_${indexed_column_name}_${function}();${eol}\n";
+		$out .= "for each row execute procedure ${table_name}_${indexed_column_name}_${func_name}();${eol}\n";
 		$out .= "create trigger ${table_name}_${indexed_column_name}_update after update {$eol}\n";
 		$out .= "of ${original_column_name} on ${table_name} ${eol}\n";
 		$out .= "for each row execute procedure ${table_name}_${indexed_column_name}_${function}();${eol}\n";
 	}
+	$triggers .= $out;
 }
 
 sub process()
