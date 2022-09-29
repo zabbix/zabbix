@@ -1380,20 +1380,20 @@ abstract class CItemGeneral extends CApiService {
 				case ZBX_FLAG_DISCOVERY_NORMAL:
 				case ZBX_FLAG_DISCOVERY_CREATED:
 					$error = $target_is_template
-						? _('Item key "%1$s" already exists on template "%2$s".')
-						: _('Item key "%1$s" already exists on host "%2$s".');
+						? _('Item with key "%1$s" already exists on template "%2$s".')
+						: _('Item with key "%1$s" already exists on host "%2$s".');
 					break;
 
 				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 					$error = $target_is_template
-						? _('Item prototype key "%1$s" already exists on template "%2$s".')
-						: _('Item prototype key "%1$s" already exists on host "%2$s".');
+						? _('Item prototype with key "%1$s" already exists on template "%2$s".')
+						: _('Item prototype with key "%1$s" already exists on host "%2$s".');
 					break;
 
 				case ZBX_FLAG_DISCOVERY_RULE:
 					$error = $target_is_template
-						? _('LLD rule key "%1$s" already exists on template "%2$s".')
-						: _('LLD rule key "%1$s" already exists on host "%2$s".');
+						? _('LLD rule with key "%1$s" already exists on template "%2$s".')
+						: _('LLD rule with key "%1$s" already exists on host "%2$s".');
 					break;
 			}
 
