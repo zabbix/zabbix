@@ -794,7 +794,7 @@ int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsu
 
 void	calc_timestamp(const char *line, int *timestamp, const char *format);
 
-char	*zbx_get_proxy_protocol_version_str(struct zbx_json_parse *jp);
+char	*zbx_get_proxy_protocol_version_str(const struct zbx_json_parse *jp);
 int	zbx_get_proxy_protocol_version_int(const char *version_str);
 
 #endif /* ZABBIX_DBHIGH_H */

@@ -122,7 +122,7 @@ void	calc_timestamp(const char *line, int *timestamp, const char *format)
  * Comments: allocates memory                                                 *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_get_proxy_protocol_version_str(struct zbx_json_parse *jp)
+char	*zbx_get_proxy_protocol_version_str(const struct zbx_json_parse *jp)
 {
 	char	value[MAX_STRING_LEN];
 

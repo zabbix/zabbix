@@ -260,4 +260,6 @@ typedef void	(*get_object_info_f)(const void *object, zbx_uint64_t *id, int *dis
 void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_vector_ptr_t *objects,
 		int lifetime, int lastcheck, delete_ids_f cb, get_object_info_f cb_info);
 
+int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error);
+
 #endif
