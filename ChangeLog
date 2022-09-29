@@ -3,6 +3,8 @@ Changes for 5.0.29rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-21610] fixed problem with sysctl() kern.proc.args API bug on FreeBSD <= 8.2 (ssimonenko)
+........S. [ZBX-17060] fixed unexpected interface connection mode change during autoregistration (asestakovs)
 ..F....... [ZBX-21605] fixed possible PHP runtime errors in several modal popup dialogs (Sasha)
 ...G...... [ZBX-21466] fixed race condition in Zabbix agent 2 leading to permanently stuck mount reads (arimdjonoks)
 
