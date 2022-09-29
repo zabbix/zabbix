@@ -9431,14 +9431,10 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 }
 
 
-static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr_t *items_sync,
-		zbx_hashset_t *pp_itemids)
+static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr_t *items_sync)
 {
 	if (NULL != dc_item->master_item || NULL != dc_item->preproc_item || ITEM_TYPE_INTERNAL == dc_item->type)
-	{
-		zbx_hashset_insert(pp_itemids, &dc_item->itemid, sizeof(zbx_uint64_t));
 		zbx_vector_dc_item_ptr_append(items_sync, dc_item);
-	}
 
 	if (NULL != dc_item->master_item)
 	{
@@ -9454,7 +9450,7 @@ static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr
 				continue;
 			}
 
-			dc_preproc_add_item_rec(dep_item, items_sync, pp_itemids);
+			dc_preproc_add_item_rec(dep_item, items_sync);
 		}
 	}
 }
@@ -9478,13 +9474,10 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 	int				i;
 	zbx_uint64_t			global_revision = *revision;
 	zbx_vector_dc_item_ptr_t	items_sync;
-	zbx_hashset_t			pp_itemids;
 
 	if (config->revision.config == *revision)
 		return;
 
-	zbx_hashset_create(&pp_itemids, MAX(items->num_data, 100), ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_dc_item_ptr_create(&items_sync);
 	zbx_vector_dc_item_ptr_reserve(&items_sync, 100);
 
@@ -9515,7 +9508,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 			if (0 == dc_host->proxy_hostid ||
 					SUCCEED == is_item_processed_by_server(dc_item->type, dc_item->key))
 			{
-				dc_preproc_add_item_rec(dc_item, &items_sync, &pp_itemids);
+				dc_preproc_add_item_rec(dc_item, &items_sync);
 			}
 		}
 
@@ -9530,6 +9523,15 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 			if (SUCCEED == um_cache_get_host_revision(config->um_cache, dc_host->hostid, &macro_revision) &&
 					*revision >= macro_revision)
 			{
+				for (i = 0; i < items_sync.values_num; i++)
+				{
+					if (NULL != (pp_item = (zbx_preproc_item_t *)zbx_hashset_search(items,
+							&items_sync.values[i]->itemid)))
+					{
+						pp_item->revision = config->revision.config;
+					}
+
+				}
 				zbx_vector_dc_item_ptr_clear(&items_sync);
 			}
 		}
@@ -9552,14 +9554,10 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 		if (pp_item->revision == *revision)
 			continue;
 
-		if (NULL != zbx_hashset_search(&pp_itemids, &pp_item->itemid))
-			continue;
-
 		zbx_hashset_iter_remove(&iter);
 	}
 
 	zbx_vector_dc_item_ptr_destroy(&items_sync);
-	zbx_hashset_destroy(&pp_itemids);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		dc_preproc_dump(items);
