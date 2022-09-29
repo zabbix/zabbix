@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-09-28T15:47:47Z'
+  date: '2022-09-29T11:34:16Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -37,6 +37,7 @@ zabbix_export:
           description: 'Item for gathering all the organizations from Meraki API"'
           timeout: 30s
           url: 'https://{$MERAKI.API.URL}/organizations'
+          http_proxy: '{$MERAKI.HTTP_PROXY}'
           headers:
             -
               name: X-Cisco-Meraki-API-Key
@@ -111,6 +112,9 @@ zabbix_export:
           value: api.meraki.com/api/v1
           description: 'Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1'
         -
+          macro: '{$MERAKI.HTTP_PROXY}'
+          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/en/manual/config/items/itemtypes/http'
+        -
           macro: '{$MERAKI.ORGANIZATION.NAME.MATCHES}'
           value: .+
           description: 'This macro is used in organizations discovery. Can be overridden on the host or linked template level.'
@@ -145,6 +149,7 @@ zabbix_export:
           description: 'Item for adaptive policy aggregate statistics for an organization.'
           timeout: 30s
           url: 'https://{$MERAKI.API.URL}/organizations/{$ID}/adaptivePolicy/overview'
+          http_proxy: '{$MERAKI.HTTP_PROXY}'
           headers:
             -
               name: X-Cisco-Meraki-API-Key
@@ -170,6 +175,7 @@ zabbix_export:
                 - 2h
           timeout: 30s
           url: 'https://{$MERAKI.API.URL}/organizations/{$ID}/configurationChanges?timespan={$MERAKI.CONFIG.CHANGE.TIMESPAN}'
+          http_proxy: '{$MERAKI.HTTP_PROXY}'
           headers:
             -
               name: X-Cisco-Meraki-API-Key
@@ -251,6 +257,10 @@ zabbix_export:
                     params.url += '/';
                 }
             
+                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !-- '') {
+                    request.setProxy(params.httpproxy);
+                }
+            
                 devices = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/devices/statuses');
                 uplinksLL = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/devices/uplinksLossAndLatency?timespan=60');
             
@@ -283,6 +293,9 @@ zabbix_export:
             -
               name: organizationId
               value: '{$ID}'
+            -
+              name: httpproxy
+              value: '{$MERAKI.HTTP_PROXY}'
           tags:
             -
               tag: component
@@ -334,6 +347,7 @@ zabbix_export:
           description: 'Return an overview of the license state for an organization.'
           timeout: 30s
           url: 'https://{$MERAKI.API.URL}/organizations/{$ID}/licenses/overview'
+          http_proxy: '{$MERAKI.HTTP_PROXY}'
           headers:
             -
               name: X-Cisco-Meraki-API-Key
@@ -405,6 +419,10 @@ zabbix_export:
                     params.url += '/';
                 }
             
+                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !-- '') {
+                    request.setProxy(params.httpproxy);
+                }
+            
                 networks = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/networks');
             
                 responseUplinks = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/appliance/uplink/statuses');
@@ -445,6 +463,9 @@ zabbix_export:
             -
               name: organizationId
               value: '{$ID}'
+            -
+              name: httpproxy
+              value: '{$MERAKI.HTTP_PROXY}'
           tags:
             -
               tag: component
@@ -547,6 +568,10 @@ zabbix_export:
                     params.url += '/';
                 }
             
+                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !-- '') {
+                    request.setProxy(params.httpproxy);
+                }
+            
                 vpnStats = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/appliance/vpn/stats');
             
                 for (i in vpnStats) {
@@ -596,6 +621,9 @@ zabbix_export:
             -
               name: organizationId
               value: '{$ID}'
+            -
+              name: httpproxy
+              value: '{$MERAKI.HTTP_PROXY}'
           tags:
             -
               tag: component
@@ -1550,6 +1578,9 @@ zabbix_export:
           macro: '{$MERAKI.DEVICE.LOSS}'
           value: '15'
           description: 'Devices uplink loss threshold in percents.'
+        -
+          macro: '{$MERAKI.HTTP_PROXY}'
+          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/en/manual/config/items/itemtypes/http'
         -
           macro: '{$MERAKI.LICENSE.EXPIRE}'
           value: '86400'
