@@ -124,6 +124,11 @@ a:active {
 a img {
   border: 0;
   vertical-align: top; }
+a.disabled:active, a.disabled:focus, a.disabled:hover {
+  cursor: default !important;
+  border-bottom: 0;
+  outline: 0;
+  opacity: .35; }
 
 svg a {
   fill: #4796c4;
@@ -4569,7 +4574,7 @@ button {
 button[disabled], button[disabled]:hover, button[disabled]:active {
   color: #525252 !important;
   background-color: transparent;
-  border-color: #3d3d3d;
+  border-color: #3d3d3d !important;
   cursor: default; }
   button.icon-cal[disabled] {
     opacity: .3;

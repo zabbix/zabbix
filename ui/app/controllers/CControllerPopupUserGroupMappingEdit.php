@@ -32,7 +32,7 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 			'roleid' =>				'db users.roleid',
 			'name' =>				'string',
 			'is_fallback' =>		'required|in '.GROUP_MAPPING_REGULAR.','.GROUP_MAPPING_FALLBACK,
-			'idp_type' =>			'in 1,2'
+			'idp_type' =>			'required|in '.IDP_TYPE_LDAP.','.IDP_TYPE_SAML
 		];
 
 		$ret = $this->validateInput($fields);

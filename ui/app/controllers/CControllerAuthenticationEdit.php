@@ -43,7 +43,8 @@ class CControllerAuthenticationEdit extends CController {
 			'ldap_default_row_index' =>			'int32',
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_removed_userdirectoryids' =>	'array_id',
-			'provisioning_period' =>			'db config.jit_provision_interval',
+			'jit_provision_interval' =>			'db config.jit_provision_interval',
+			'ldap_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
 			'saml_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'idp_entityid' =>					'db userdirectory_saml.idp_entityid',
@@ -99,7 +100,7 @@ class CControllerAuthenticationEdit extends CController {
 			'action_passw_change' => 'authentication.edit',
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'saml_error' => ($openssl_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $openssl_status['error'],
-			'form_refresh' => 0
+			'form_refresh' => $this->getInput('form_refresh', 0)
 		];
 
 		$auth_params = [
@@ -125,41 +126,42 @@ class CControllerAuthenticationEdit extends CController {
 		}
 
 		if ($this->hasInput('form_refresh')) {
-			$this->getInputs($data, [
-				'form_refresh',
-				'authentication_type',
-				'http_auth_enabled',
-				'http_login_form',
-				'http_strip_domains',
-				'http_case_sensitive',
-				'ldap_auth_enabled',
-				'ldap_case_sensitive',
-				'jit_provision_interval',
-				'ldap_jit_status',
-				'saml_auth_enabled',
-				'saml_jit_enable',
-				'idp_entityid',
-				'sso_url',
-				'slo_url',
-				'username_attribute',
-				'sp_entityid',
-				'nameid_format',
-				'sign_messages',
-				'sign_assertions',
-				'sign_authn_requests',
-				'sign_logout_requests',
-				'sign_logout_responses',
-				'encrypt_nameid',
-				'encrypt_assertions',
-				'saml_case_sensitive',
-				'saml_group_name',
-				'saml_user_username',
-				'saml_user_lastname',
-				'scim_status',
-				'scim_token',
-				'passwd_min_length',
-				'passwd_check_rules'
-			]);
+			$config_fields = [
+				'authentication_type' => DB::getDefault('config', 'authentication_type'),
+				'http_auth_enabled' => DB::getDefault('config', 'http_auth_enabled'),
+				'http_login_form' => DB::getDefault('config', 'http_login_form'),
+				'http_strip_domains' => DB::getDefault('config', 'http_strip_domains'),
+				'http_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
+				'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
+				'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
+				'jit_provision_interval' => '',
+				'ldap_jit_status' => ZBX_AUTH_LDAP_DISABLED,
+				'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
+				'saml_jit_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED,
+				'idp_entityid' => '',
+				'sso_url' => '',
+				'slo_url' => '',
+				'username_attribute' => '',
+				'sp_entityid' => '',
+				'nameid_format' => '',
+				'sign_messages' => 0,
+				'sign_assertions' => 0,
+				'sign_authn_requests' => 0,
+				'sign_logout_requests' => 0,
+				'sign_logout_responses' => 0,
+				'encrypt_nameid' => 0,
+				'encrypt_assertions' => 0,
+				'saml_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
+				'saml_group_name' => '',
+				'saml_user_username' => '',
+				'saml_user_lastname' => '',
+				'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED,
+				'scim_token' => '',
+				'passwd_min_length' => '',
+				'passwd_check_rules' => 0
+			];
+			$this->getInputs($data, array_keys($config_fields));
+			$data += $config_fields;
 
 			$data['saml_provision_status'] = $this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED);
 			$data['saml_provision_groups'] = $this->getInput('saml_provision_groups', []);

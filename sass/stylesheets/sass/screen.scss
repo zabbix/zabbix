@@ -2540,7 +2540,7 @@ $icon-widget-btn: (
 %btn-disabled {
 	color: $btn-disabled-font-color !important;
 	background-color: $btn-disabled-bg-color;
-	border-color: $btn-disabled-border-color;
+	border-color: $btn-disabled-border-color !important;
 	cursor: default;
 
 	&.icon-cal {
