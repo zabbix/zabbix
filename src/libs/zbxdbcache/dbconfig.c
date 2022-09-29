@@ -9481,7 +9481,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 	zbx_hashset_t			pp_itemids;
 
 	if (config->revision.config == *revision)
-		goto out;
+		return;
 
 	zbx_hashset_create(&pp_itemids, MAX(items->num_data, 100), ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -9560,7 +9560,7 @@ void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revis
 
 	zbx_vector_dc_item_ptr_destroy(&items_sync);
 	zbx_hashset_destroy(&pp_itemids);
-out:
+
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		dc_preproc_dump(items);
 }
