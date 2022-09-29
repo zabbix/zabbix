@@ -22,8 +22,8 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual
 
 Custom processes set in macros:
 
-- {$PROC.SUM.NAME.MATCHES}
-- {$PROC.SUM.NAME.NOT_MATCHES}
+- {$PROC.NAME.MATCHES}
+- {$PROC.NAME.NOT_MATCHES}
 
 
 ## Zabbix configuration
@@ -34,8 +34,8 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$PROC.SUM.NAME.MATCHES} |<p>This macro is used in processes discovery. Can be overridden on the host or linked template level.</p> |`<CHANGE VALUE>` |
-|{$PROC.SUM.NAME.NOT_MATCHES} |<p>This macro is used in processes discovery. Can be overridden on the host or linked template level.</p> |`<CHANGE VALUE>` |
+|{$PROC.NAME.MATCHES} |<p>This macro is used in processes discovery. Can be overridden on the host or linked template level.</p> |`<CHANGE VALUE>` |
+|{$PROC.NAME.NOT_MATCHES} |<p>This macro is used in processes discovery. Can be overridden on the host or linked template level.</p> |`<CHANGE VALUE>` |
 
 ## Template links
 
@@ -45,7 +45,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Processes discovery |<p>Discovery of summary process OS.</p> |DEPENDENT |custom.proc.discovery<p>**Filter**:</p>AND <p>- {#VMEM} NOT_MATCHES_REGEX `-1`</p><p>- {#NAME} MATCHES_REGEX `{$PROC.SUM.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$PROC.SUM.NAME.NOT_MATCHES}`</p> |
+|Processes discovery |<p>Discovery of summary process OS.</p> |DEPENDENT |custom.proc.discovery<p>**Filter**:</p>AND <p>- {#VMEM} NOT_MATCHES_REGEX `-1`</p><p>- {#NAME} MATCHES_REGEX `{$PROC.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$PROC.NAME.NOT_MATCHES}`</p> |
 
 ## Items collected
 
@@ -59,7 +59,7 @@ There are no template links in this template.
 |OS |Process [{#NAME}]: Number of threads |<p>Number of threads {#NAME}.</p> |DEPENDENT |custom.proc.thread[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.threads`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |OS |Process [{#NAME}]: Number of page faults |<p>Number of page faults {#NAME}.</p> |DEPENDENT |custom.proc.page[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.page_faults`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |OS |Process [{#NAME}]: Size of locked memory |<p>Size of locked memory {#NAME}.</p> |DEPENDENT |custom.proc.mem.locked[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.lck`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|OS |Process [{#NAME}]: Swap space used |<p>Size of swap space used {#NAME}.</p> |DEPENDENT |custom.proc.swap[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.swap`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|OS |Process [{#NAME}]: Swap space used |<p>Swap space used by {#NAME}.</p> |DEPENDENT |custom.proc.swap[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.swap`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Zabbix raw items |OS: Get process summary |<p>Summary metrics data for all processes.</p> |ZABBIX_PASSIVE |proc.get[,,,summary] |
 
 ## Triggers

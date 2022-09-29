@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-28T10:43:32Z'
+  date: '2022-09-29T14:16:19Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -49,11 +49,11 @@ zabbix_export:
                 formulaid: C
               -
                 macro: '{#NAME}'
-                value: '{$PROC.SUM.NAME.MATCHES}'
+                value: '{$PROC.NAME.MATCHES}'
                 formulaid: A
               -
                 macro: '{#NAME}'
-                value: '{$PROC.SUM.NAME.NOT_MATCHES}'
+                value: '{$PROC.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'Discovery of summary process OS.'
@@ -229,7 +229,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: B
-              description: 'Size of swap space used {#NAME}.'
+              description: 'Swap space used by {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -322,10 +322,10 @@ zabbix_export:
               path: $.vsize
       macros:
         -
-          macro: '{$PROC.SUM.NAME.MATCHES}'
+          macro: '{$PROC.NAME.MATCHES}'
           value: '<CHANGE VALUE>'
           description: 'This macro is used in processes discovery. Can be overridden on the host or linked template level.'
         -
-          macro: '{$PROC.SUM.NAME.NOT_MATCHES}'
+          macro: '{$PROC.NAME.NOT_MATCHES}'
           value: '<CHANGE VALUE>'
           description: 'This macro is used in processes discovery. Can be overridden on the host or linked template level.'
