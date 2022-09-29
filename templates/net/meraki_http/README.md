@@ -33,7 +33,7 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$MERAKI.API.URL} |<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p> |`api.meraki.com/api/v1` |
-|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. See documentation at https://www.zabbix.com/documentation/6.0/en/manual/config/items/itemtypes/http</p> |`` |
+|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http</p> |`` |
 |{$MERAKI.ORGANIZATION.NAME.MATCHES} |<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p> |`.+` |
 |{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES} |<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p> |`CHANGE_IF_NEEDED` |
 |{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`` |
@@ -87,7 +87,7 @@ No specific Zabbix configuration is required.
 |{$MERAKI.CONFIG.CHANGE.TIMESPAN} |<p>Timespan for gathering config change log. Used in metric config and in URL query.</p> |`1200` |
 |{$MERAKI.DEVICE.LATENCY} |<p>Devices uplink latency threshold in ms.</p> |`150` |
 |{$MERAKI.DEVICE.LOSS} |<p>Devices uplink loss threshold in percents.</p> |`15` |
-|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. See documentation at https://www.zabbix.com/documentation/6.0/en/manual/config/items/itemtypes/http</p> |`` |
+|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http</p> |`` |
 |{$MERAKI.LICENSE.EXPIRE} |<p>Time in seconds for license to expire.</p> |`86400` |
 |{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`` |
 
