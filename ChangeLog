@@ -445,6 +445,8 @@ New features:
 A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 
 Bug fixes:
+...G...... [ZBX-21610] fixed problem with sysctl() kern.proc.args API bug on FreeBSD <= 8.2 (ssimonenko)
+........S. [ZBX-17060] fixed unexpected interface connection mode change during autoregistration (asestakovs)
 ...G...... [ZBX-21388] fixed Zabbix agent 2 plugin read error and updated plugin support dependency for Zabbix agent 2 (esneiders)
 ...G...PS. [ZBX-20864] fixed format specifier definitions on AIX (jxl)
 ..F....... [ZBX-21605] fixed possible PHP runtime errors in several modal popup dialogs (Sasha)
