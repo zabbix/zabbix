@@ -111,20 +111,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'SNMP agent']
 					],
-					'details' => 'Invalid parameter "/1/snmp_oid": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'names' => [
-						'13_DB_Monitor',
-						'14_DB_Monitor'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'TELNET agent']
-					],
-					'details' => 'Invalid parameter "/1": the parameter "username" is missing.'
+					'details' => 'Invalid parameter "/1": the parameter "snmp_oid" is missing.'
 				]
 			],
 			[
@@ -312,7 +299,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'trends', 'value' => '3599']
 						]
 					],
-					'details' => 'Invalid parameter "/1/trends": value must be one of 0, 3600-788400000.'
+					'details' => 'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
 				]
 			],
 			[
@@ -330,26 +317,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'trends', 'value' => '788400001']
 						]
 					],
-					'details' => 'Invalid parameter "/1/trends": value must be one of 0, 3600-788400000.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'names' => [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
-						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
-						'Type of information' =>  ['id' => 'value_type', 'value' => 'Text'],
-						'Trend storage period' => [
-							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
-							'input' => ['id' => 'trends', 'value' => '788400000']
-						]
-					],
-					'details' => 'Invalid parameter "/1": unexpected parameter "trends".'
+					'details' => 'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
 				]
 			],
 			[
@@ -685,7 +653,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Dependent item']
 					],
-					'details' => 'Invalid parameter "/1/master_itemid": cannot be empty.'
+					'details' => 'Invalid parameter "/1": the parameter "master_itemid" is missing.'
 				]
 			],
 			[
@@ -757,6 +725,34 @@ class testMassUpdateItems extends CWebTest{
 				]
 			],
 
+			[
+				[
+					'names' => [
+						'13_DB_Monitor',
+						'14_DB_Monitor'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'TELNET agent']
+					]
+				]
+			],
+			[
+				[
+					'names' => [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
+						'Type of information' =>  ['id' => 'value_type', 'value' => 'Text'],
+						'Trend storage period' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+							'input' => ['id' => 'trends', 'value' => '788400000']
+						]
+					]
+				]
+			],
 			[
 				[
 					'names' => [
@@ -1769,12 +1765,10 @@ class testMassUpdateItems extends CWebTest{
 							]
 						]
 					],
-					'details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'details' => 'Invalid parameter "/1/tags/2/tag": cannot be empty.'
 				]
 			],
-			// TODO: Uncomment this case when ZBX-19263 is fixed.
 			// Equal tags.
-			/*
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1794,10 +1788,9 @@ class testMassUpdateItems extends CWebTest{
 							'value' => 'value'
 						]
 					],
-					'details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.'
+					'details' => 'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.'
 				]
 			],
-			*/
 			[
 				[
 					'names' => [
