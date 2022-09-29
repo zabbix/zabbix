@@ -68,7 +68,7 @@ class CControllerAuthenticationEdit extends CController {
 			'saml_provision_groups' =>			'array',
 			'saml_provision_media' =>			'array',
 			'scim_status' =>					'in '.ZBX_AUTH_SCIM_PROVISIONING_DISABLED.','.ZBX_AUTH_SCIM_PROVISIONING_ENABLED,
-			'scim_token' =>						'db userdirectory_saml.scim_token',
+			'auth_token' =>						'db userdirectory_saml.auth_token',
 			'passwd_min_length' =>				'int32',
 			'passwd_check_rules' =>				'int32|ge 0|le '.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE)
 		];
@@ -156,7 +156,7 @@ class CControllerAuthenticationEdit extends CController {
 				'saml_user_username' => '',
 				'saml_user_lastname' => '',
 				'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED,
-				'scim_token' => '',
+				'auth_token' => '',
 				'passwd_min_length' => '',
 				'passwd_check_rules' => 0
 			];
@@ -179,8 +179,8 @@ class CControllerAuthenticationEdit extends CController {
 			}
 
 			$data['token_is_expired'] = false;
-			if (array_key_exists('scim_token', $data)) {
-				$data['token_is_expired'] = $this->checkTokenExpiration($data['scim_token']);
+			if (array_key_exists('auth_token', $data)) {
+				$data['token_is_expired'] = $this->checkTokenExpiration($data['auth_token']);
 			}
 
 
@@ -222,7 +222,7 @@ class CControllerAuthenticationEdit extends CController {
 				]);
 
 				$saml_configuration['token_is_expired'] = $this->checkTokenExpiration(
-					$saml_configuration['scim_token']
+					$saml_configuration['auth_token']
 				);
 			}
 			else {
@@ -245,7 +245,7 @@ class CControllerAuthenticationEdit extends CController {
 					'saml_user_username' => '',
 					'saml_user_lastname' => '',
 					'scim_status' => '',
-					'scim_token' => '',
+					'auth_token' => '',
 					'saml_provision_groups' => [],
 					'saml_provision_media' => []
 				];

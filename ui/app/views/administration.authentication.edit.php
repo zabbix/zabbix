@@ -424,16 +424,16 @@ $saml_tab = (new CFormGrid())
 		))->addClass('saml-provision-status')
 	])
 	->addItem([
-		(new CLabel(_('Authorization token'), 'scim_token'))->addClass('saml-provision-status'),
+		(new CLabel(_('Authorization token'), 'auth_token'))->addClass('saml-provision-status'),
 		(new CFormField(
-			($data['saml_provision_status'] == JIT_PROVISIONING_ENABLED && $data['scim_token'] !== '')
+			($data['saml_provision_status'] == JIT_PROVISIONING_ENABLED && $data['auth_token'] !== '')
 				? [
 					(new CSimpleButton(_('Change token')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->setEnabled($data['saml_enabled'])
 						->setId('scim-token-btn')
 						->addClass('saml-enabled'),
-					(new CPassBox('scim_token', '', DB::getFieldLength('userdirectory_saml', 'scim_token')))
+					(new CPassBox('auth_token', '', DB::getFieldLength('userdirectory_saml', 'auth_token')))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 						->addStyle('display: none;')
 						->setAttribute('disabled', 'disabled')
@@ -444,7 +444,7 @@ $saml_tab = (new CFormGrid())
 						]
 						: null
 				]
-				: (new CPassBox('scim_token', '', DB::getFieldLength('userdirectory_saml', 'scim_token')))
+				: (new CPassBox('auth_token', '', DB::getFieldLength('userdirectory_saml', 'auth_token')))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 					->setEnabled($data['saml_enabled'])
 					->addClass('saml-enabled')

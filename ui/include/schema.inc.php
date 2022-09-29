@@ -9136,7 +9136,7 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'scim_token' => [
+			'auth_token' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,

@@ -57,7 +57,7 @@ class CUserDirectory extends CApiService {
 	protected $saml_output_fields = [
 		'idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages',
 		'sign_assertions', 'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
-		'encrypt_assertions', 'group_name', 'user_username', 'user_lastname', 'scim_status', 'scim_token'
+		'encrypt_assertions', 'group_name', 'user_username', 'user_lastname', 'scim_status', 'auth_token'
 	];
 
 	/**
@@ -1253,7 +1253,7 @@ class CUserDirectory extends CApiService {
 										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'name'), 'default' => DB::getDefault('userdirectory', 'name')],
 			]],
 			'provision_status' =>	['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED]), 'default' => DB::getDefault('userdirectory', 'provision_status')],
-			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'description'), 'length' => DB::getFieldLength('userdirectory', 'description')],
+			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory', 'description')],
 			'host' =>				['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'host')],
 										['else' => true, 'type' => API_UNEXPECTED]
@@ -1370,8 +1370,8 @@ class CUserDirectory extends CApiService {
 										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_INT32, 'in' => implode(',', ['0', '1']), 'default' => DB::getDefault('userdirectory_saml', 'scim_status')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'scim_token' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'default' => DB::getDefault('userdirectory_saml', 'scim_token')],
+			'auth_token' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_SAML])], 'type' => API_STRING_UTF8, 'default' => DB::getDefault('userdirectory_saml', 'auth_token')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'provision_media' =>	['type' => API_MULTIPLE, 'rules' => [

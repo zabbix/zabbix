@@ -746,8 +746,8 @@
 
 		showPasswordField(e) {
 			const form_field = e.target.parentNode;
-			const password_field = form_field.querySelector('[name="scim_token"][type="password"]');
-			const password_var = form_field.querySelector('[name="scim_token"][type="hidden"]');
+			const password_field = form_field.querySelector('[name="auth_token"][type="password"]');
+			const password_var = form_field.querySelector('[name="auth_token"][type="hidden"]');
 
 			password_field.style.display = '';
 			password_field.disabled = false;
