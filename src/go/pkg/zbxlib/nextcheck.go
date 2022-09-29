@@ -33,6 +33,8 @@ import (
 	"errors"
 	"time"
 	"unsafe"
+
+	"zabbix.com/pkg/log"
 )
 
 func GetNextcheck(itemid uint64, delay string, from time.Time, unsupported bool, refresh_unsupported int) (nextcheck time.Time, err error) {
@@ -47,15 +49,18 @@ func GetNextcheck(itemid uint64, delay string, from time.Time, unsupported bool,
 		state = ItemStateNormal
 	}
 	now := from.Unix()
+	log.Tracef("Calling C function \"zbx_get_agent_item_nextcheck()\"")
 	ret := C.zbx_get_agent_item_nextcheck(C.zbx_uint64_t(itemid), cdelay, C.uchar(state), C.int(now),
 		C.int(refresh_unsupported), &cnextcheck, &cerr)
 
 	if ret != Succeed {
 		err = errors.New(C.GoString(cerr))
+		log.Tracef("Calling C function \"free()\"")
 		C.free(unsafe.Pointer(cerr))
 	} else {
 		nextcheck = time.Unix(int64(cnextcheck), 0)
 	}
+	log.Tracef("Calling C function \"free()\"")
 	C.free(unsafe.Pointer(cdelay))
 
 	return
