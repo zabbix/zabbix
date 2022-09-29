@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-27T15:51:40Z'
+  date: '2022-09-29T08:27:54Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1746,7 +1746,7 @@ zabbix_export:
                   value: notice
         -
           uuid: 61730555a0ae4f798ea740effb82764c
-          name: 'RabbitMQ: Get node overview'
+          name: 'RabbitMQ: Get nodes'
           key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           history: 1h
           trends: '0'
@@ -1760,8 +1760,8 @@ zabbix_export:
                 - \1
           tags:
             -
-              tag: Application
-              value: RabbitMQ
+              tag: component
+              value: raw
         -
           uuid: 1af326f40cdb407a96b34025062b4743
           name: 'RabbitMQ: Get node overview'
