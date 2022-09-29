@@ -22,6 +22,8 @@
 
 #include "zbxthreads.h"
 
+int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error);
+
 ZBX_THREAD_ENTRY(lld_worker_thread, args);
 
 #endif
