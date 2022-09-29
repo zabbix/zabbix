@@ -9274,7 +9274,7 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 	zbx_dc_close_user_macros(um_handle);
 }
 
-void	dc_preproc_dump(zbx_hashset_t *items)
+static void	dc_preproc_dump(zbx_hashset_t *items)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_preproc_item_t	*item;
