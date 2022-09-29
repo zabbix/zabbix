@@ -33,6 +33,9 @@ zbx_perfstat_t;
 
 int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
+	ZBX_UNUSED(devname);
+	ZBX_UNUSED(dstat);
+
 	return FAIL;
 }
 
