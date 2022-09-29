@@ -286,7 +286,7 @@ $fields = [
 	'subfilter_interval' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
 	'subfilter_history' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
 	'subfilter_trends' =>			[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
-	'subfilter_tags' =>				[T_ZBX_STR, O_OPT, P_ONLY_ARRAY,	null,	null],
+	'subfilter_tags' =>				[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,	null],
 	'checkbox_hash' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
 	'sort' =>						[T_ZBX_STR, O_OPT, P_SYS,
 										IN('"delay","history","key_","name","status","trends","type"'),
