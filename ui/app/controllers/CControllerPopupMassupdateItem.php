@@ -315,9 +315,7 @@ class CControllerPopupMassupdateItem extends CController {
 					}
 				}
 
-				if ($tags) {
-					$tags = array_merge($db_item['tags'], $tags);
-				}
+				$tags = array_merge($db_item['tags'], $tags);
 				break;
 
 			case ZBX_ACTION_REPLACE:
@@ -334,7 +332,7 @@ class CControllerPopupMassupdateItem extends CController {
 			case ZBX_ACTION_REMOVE:
 				foreach ($db_item['tags'] as $db_tag) {
 					if (!array_key_exists($db_tag['tag'], $tag_values)
-							&& !in_array($db_tag['value'], $tag_values[$db_tag['tag']])) {
+							|| !in_array($db_tag['value'], $tag_values[$db_tag['tag']])) {
 						$tags[] = ['tag' => $db_tag['tag'], 'value' => $db_tag['value']];
 					}
 				}
