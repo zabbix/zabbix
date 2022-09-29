@@ -1317,13 +1317,13 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update(const char *t
 	ZBX_UNUSED(idname);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-		"CREATE TRIGGER %s_%s_INSERT AFTER INSERT ON %s FOR EACH ROW\n"
+		"CREATE TRIGGER %s_%s_insert AFTER INSERT ON %s FOR EACH ROW\n"
 		"BEGIN\n"
 			"IF NEW.%s <> OLD.%s\n"
 			"THEN\n"
 			"UPDATE %s SET %s=%s(%s)"
 		"END\n;"
-		"CREATE TRIGGER %s_%s_UPDATE AFTER UPDATE ON %s FOR EACH ROW\n"
+		"CREATE TRIGGER %s_%s_update AFTER UPDATE ON %s FOR EACH ROW\n"
 		"BEGIN\n"
 			"IF NEW.%s <> OLD.%s\n"
 			"THEN\n"
@@ -1344,11 +1344,11 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update(const char *t
 			"END $func$;\n"
 
 
-			"CREATE TRIGGER %s_%s_INSERT AFTER INSERT OF %s ON %s\n"
+			"CREATE TRIGGER %s_%s_insert AFTER INSERT OF %s ON %s\n"
 				"FOR EACH ROW\n"
 					"EXECUTE PROCEDURE %s_%s_%s();"
 
-			"CREATE TRIGGER %s_%s_UPDATE AFTER UPDATE OF %s ON %s\n"
+			"CREATE TRIGGER %s_%s_update AFTER UPDATE OF %s ON %s\n"
 				"FOR EACH ROW\n"
 					"EXECUTE PROCEDURE %s_%s_%s();",
 

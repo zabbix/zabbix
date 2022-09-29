@@ -869,6 +869,53 @@ sub process_changelog($)
 	}
 }
 
+sub process_update_trigger_function($)
+{
+
+	my $line = shift;
+	my $out;
+
+	my ($original_column_name, $indexed_column_name, $idname, $func_name) = split(/\|/, $line, 3);
+
+
+	if ($output{"database"} eq "mysql")
+	{
+		$out = "create trigger ${table_name}_${indexed_column_name}_insert${eol}\n";
+		$out .= "after insert on ${table_name} for each row${eol}\n";
+		$out .= "begin${eol}\n";
+		$out .= "if new.${original_column_name} <> old.${original_column_name}${eol}\n";
+		$out .= "then${eol}\n";
+		$out .= "update ${table_name} set ${indexed_column_name}=${func_name}($original_column_name)${eol}\n";
+		$out .= "end${eol}\n"
+
+		$out = "create trigger ${table_name}_${indexed_column_name}_update${eol}\n";
+		$out .= "after update on ${table_name} for each row${eol}\n";
+		$out .= "begin${eol}\n";
+		$out .= "if new.${original_column_name} <> old.${original_column_name}${eol}\n";
+		$out .= "then${eol}\n";
+		$out .= "update ${table_name} set ${indexed_column_name}=${func_name}($original_column_name)${eol}\n";
+		$out .= "end${eol}\n";
+	}
+	elsif ($output{"database"} eq "postgresql")
+	{
+		$out = "";
+		$out .= "create or replace function ${table_name}_${indexed_column_name}_${function}()${eol}\n";
+		$out .= "returns trigger language plpgsql as \$func\$${eol}\n";
+		$out .= "begin${eol}\n";
+		$out .= "update ${table_name} set ${indexed_column_name}=${func_name}(${original_column_name})${eol}\n";
+		$out .= "where ${idname}=new.${idname};${eol}\n";
+		$out .= "return null;${eol}\n";
+		$out .= "end \$func\$;${eol}\n";
+
+		$out .= "create trigger ${table_name}_${indexed_column_name}_insert after insert {$eol}\n";
+		$out .= "of ${original_column_name} on ${table_name} ${eol}\n";
+		$out .= "for each row execute procedure ${table_name}_${indexed_column_name}_${function}();${eol}\n";
+		$out .= "create trigger ${table_name}_${indexed_column_name}_update after update {$eol}\n";
+		$out .= "of ${original_column_name} on ${table_name} ${eol}\n";
+		$out .= "for each row execute procedure ${table_name}_${indexed_column_name}_${function}();${eol}\n";
+	}
+}
+
 sub process()
 {
 	print $output{"before"};
@@ -897,6 +944,10 @@ sub process()
 			elsif ($type eq 'TABLE')				{ process_table($opts); }
 			elsif ($type eq 'UNIQUE')				{ process_index($opts, 1); }
 			elsif ($type eq 'CHANGELOG')				{ process_changelog($opts); }
+			elsif ($type eq 'UPD_TRIG_FUNC')
+			{
+				process_update_trigger_function($opts);
+			}
 			elsif ($type eq 'ROW' && $output{"type"} ne "code")	{ process_row($opts); }
 		}
 	}
