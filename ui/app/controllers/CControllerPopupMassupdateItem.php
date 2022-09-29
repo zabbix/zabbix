@@ -205,27 +205,19 @@ class CControllerPopupMassupdateItem extends CController {
 			$itemids = $this->getInput('ids');
 
 			if ($item_prototypes) {
-				$condition_fields = array_flip(['type', 'key_', 'value_type', 'templateid', 'authtype', 'allow_traps']);
-
 				$db_items = API::ItemPrototype()->get([
-					'output' => array_keys(
-						array_diff_key($input + $condition_fields, array_flip(['tags', 'preprocessing']))
-					),
+					'output' => ['type', 'key_', 'value_type', 'templateid', 'authtype', 'allow_traps'],
 					'selectHosts' => ['status'],
+					'selectTags' => ['tag', 'value'],
 					'itemids' => $itemids,
 					'preservekeys' => true
 				] + $options);
 			}
 			else {
-				$condition_fields = array_flip(['type', 'key_', 'value_type', 'templateid', 'flags', 'authtype',
-					'allow_traps'
-				]);
-
 				$db_items = API::Item()->get([
-					'output' => array_keys(
-						array_diff_key($input + $condition_fields, array_flip(['tags', 'preprocessing']))
-					),
+					'output' => ['type', 'key_', 'value_type', 'templateid', 'flags', 'authtype', 'allow_traps'],
 					'selectHosts' => ['status'],
+					'selectTags' => ['tag', 'value'],
 					'itemids' => $itemids,
 					'preservekeys' => true
 				] + $options);
@@ -240,28 +232,14 @@ class CControllerPopupMassupdateItem extends CController {
 					$db_item['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 				}
 
-				$item = getSanitizedItemFields($input + $db_item);
-
-				$upd_item = DB::getUpdatedValues('items', array_diff_key($item, array_flip(['headers'])), $db_item);
+				$item = array_intersect_key($input, getSanitizedItemFields($input + $db_item));
 
 				if (array_key_exists('tags', $input)) {
-					$tags = $this->getTagsToUpdate($db_item, $tag_values);
-
-					if ($tags !== null) {
-						$upd_item['tags'] = $tags;
-					}
+					$item['tags'] = $this->getTagsToUpdate($db_item, $tag_values);
 				}
 
-				if (array_key_exists('preprocessing', $item) && $item['preprocessing'] != $db_item['preprocessing']) {
-					$upd_item['preprocessing'] = $item['preprocessing'];
-				}
-
-				if (array_key_exists('headers', $item) && $item['headers'] != $db_items[0]['headers']) {
-					$upd_item['headers'] = $item['headers'];
-				}
-
-				if ($upd_item) {
-					$items[] = ['itemid' => $itemid] + $upd_item;
+				if ($item) {
+					$items[] = ['itemid' => $itemid] + $item;
 				}
 			}
 
@@ -311,7 +289,7 @@ class CControllerPopupMassupdateItem extends CController {
 	 * @param array $db_item
 	 * @param array $tag_values
 	 *
-	 * @return array|null
+	 * @return array
 	 */
 	private function getTagsToUpdate(array $db_item, array $tag_values): ?array {
 		$tags = [];
@@ -359,7 +337,7 @@ class CControllerPopupMassupdateItem extends CController {
 				break;
 		}
 
-		return $tags ? $tags : null;
+		return $tags ? $tags : $db_item['tags'];
 	}
 
 	/**
