@@ -968,7 +968,13 @@ class CUserDirectory extends CApiService {
 				$ldap_groups = array_column($ldap_groups, $userdirectory['group_name']);
 				$user = array_merge($user, $provisioning->getUserGroupsAndRole($ldap_groups));
 			}
+
+			if (array_key_exists('userdirectoryid', $userdirectory)) {
+				$user['userdirectoryid'] = $userdirectory['userdirectoryid'];
+			}
 		}
+
+		unset($user['password']);
 
 		return $user;
 	}
@@ -981,40 +987,8 @@ class CUserDirectory extends CApiService {
 	 * @throws APIException
 	 */
 	protected function validateTest(array &$userdirectory): void {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'userdirectoryid' =>	['type' => API_ID, 'default' => 0],
-			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'host')],
-			'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'base_dn' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'base_dn')],
-			'bind_dn' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'bind_dn'), 'default' => ''],
-			'bind_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'bind_password')],
-			'search_attribute' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'search_attribute')],
-			'start_tls' =>			['type' => API_INT32, 'in' => ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON, 'default' => ZBX_AUTH_START_TLS_OFF],
-			'search_filter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'search_filter'), 'default' => ''],
-			'provision_status' =>	['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED]), 'default' => JIT_PROVISIONING_DISABLED],
-			'group_basedn' =>		['type' => API_STRING_UTF8],
-			'group_name' =>			['type' => API_STRING_UTF8],
-			'group_member' =>		['type' => API_STRING_UTF8],
-			'group_filter' =>		['type' => API_STRING_UTF8],
-			'group_membership' =>	['type' => API_STRING_UTF8],
-			'user_username' =>		['type' => API_STRING_UTF8],
-			'user_lastname' =>		['type' => API_STRING_UTF8],
-			'provision_media' =>	['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-				'mediatypeid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
-				'attribute' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
-			]],
-			'provision_groups' =>	['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-				'is_fallback' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_REGULAR, GROUP_MAPPING_FALLBACK])],
-				'fallback_status' =>	['type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_FALLBACK_OFF, GROUP_MAPPING_FALLBACK_ON])],
-				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
-				'roleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-				'user_groups' =>		['type' => API_OBJECTS, 'fields' => [
-					'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
-				]]
-			]],
-			'test_username' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'test_password' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'userdirectoryid' =>	['type' => API_ID, 'default' => 0]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $userdirectory, '/', $error)) {
@@ -1024,7 +998,7 @@ class CUserDirectory extends CApiService {
 		if ($userdirectory['userdirectoryid'] != 0) {
 			$db_userdirectory = $this->get([
 				'output' => ['host', 'port', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute', 'start_tls',
-					'search_filter', 'provision_status'
+					'search_filter', 'provision_status', 'idp_type'
 				],
 				'userdirectoryids' => $userdirectory['userdirectoryid'],
 				'filter' => ['idp_type' => IDP_TYPE_LDAP]
@@ -1052,7 +1026,47 @@ class CUserDirectory extends CApiService {
 			}
 		}
 
-		$userdirectory['idp_type'] = IDP_TYPE_LDAP;
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'userdirectoryid' =>	['type' => API_ID, 'default' => 0],
+			'host' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'host')],
+			'port' =>				['type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'base_dn' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'base_dn')],
+			'bind_dn' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'bind_dn'), 'default' => ''],
+			'bind_password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'bind_password')],
+			'search_attribute' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_ldap', 'search_attribute')],
+			'start_tls' =>			['type' => API_INT32, 'in' => ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON, 'default' => ZBX_AUTH_START_TLS_OFF],
+			'search_filter' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'search_filter'), 'default' => ''],
+			'provision_status' =>	['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED]), 'default' => JIT_PROVISIONING_DISABLED],
+			'group_basedn' =>		['type' => API_STRING_UTF8],
+			'group_name' =>			['type' => API_STRING_UTF8],
+			'group_member' =>		['type' => API_STRING_UTF8],
+			'group_filter' =>		['type' => API_STRING_UTF8],
+			'group_membership' =>	['type' => API_STRING_UTF8],
+			'user_username' =>		['type' => API_STRING_UTF8],
+			'user_lastname' =>		['type' => API_STRING_UTF8],
+			'idp_type' =>			['type' => API_INT32, 'in' => implode(',', [IDP_TYPE_LDAP])],
+			'provision_media' =>	['type' => API_OBJECTS, 'fields' => [
+				'mediatypeid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
+				'attribute' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+			]],
+			'provision_groups' =>	['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+				'is_fallback' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_REGULAR, GROUP_MAPPING_FALLBACK])],
+				'fallback_status' =>	['type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_FALLBACK_OFF, GROUP_MAPPING_FALLBACK_ON])],
+				// TODO: uncomment when is_fallback, fallback_status are removed and name will be set required
+				// 'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+				'roleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+				'user_groups' =>		['type' => API_OBJECTS, 'fields' => [
+					'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+				]]
+			]],
+			'test_username' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'test_password' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $userdirectory, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
