@@ -217,7 +217,9 @@ class CControllerPopupMassupdateItem extends CController {
 				] + $options);
 			}
 			else {
-				$condition_fields = ['type', 'key_', 'value_type', 'templateid', 'flags', 'authtype', 'allow_traps'];
+				$condition_fields = array_flip(['type', 'key_', 'value_type', 'templateid', 'flags', 'authtype',
+					'allow_traps'
+				]);
 
 				$db_items = API::Item()->get([
 					'output' => array_keys(
