@@ -1918,31 +1918,36 @@ class CImportDataAdapterTest extends TestCase {
 				'smtp_server' => 'mail.example.com',
 				'smtp_helo' => 'example.com',
 				'smtp_email' => 'zabbix@example.com',
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
 				'parameters' => []
 			] + $defaults,
 			[
 				'name' => 'Script without parameters',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SCRIPT,
 				'exec_path' => 'script.sh',
-				'exec_params' => ''
+				'exec_params' => '',
+				'status' => MEDIA_TYPE_STATUS_ACTIVE
 			] + $defaults,
 			[
 				'name' => 'Script with parameters',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SCRIPT,
 				'exec_path' => 'script.sh',
-				'exec_params' => "100\n200\n300\n"
+				'exec_params' => "100\n200\n300\n",
+				'status' => MEDIA_TYPE_STATUS_ACTIVE
 			] + $defaults,
 			[
 				'name' => 'SMS',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_SMS,
 				'gsm_modem' => '/dev/ttyS0',
-				'parameters' => []
+				'parameters' => [],
+				'status' => MEDIA_TYPE_STATUS_ACTIVE
 			] + $defaults,
 			[
 				'name' => 'Webhook without parameters',
 				'type' => (string) CXmlConstantValue::MEDIA_TYPE_WEBHOOK,
 				'parameters' => [],
-				'script' => 'return true;'
+				'script' => 'return true;',
+				'status' => MEDIA_TYPE_STATUS_ACTIVE
 			] + $defaults,
 			[
 				'name' => 'Webhook with parameters',
@@ -1965,7 +1970,8 @@ class CImportDataAdapterTest extends TestCase {
 						'value' => '{ALERT.MESSAGE}'
 					]
 				],
-				'script' => 'return true;'
+				'script' => 'return true;',
+				'status' => MEDIA_TYPE_STATUS_ACTIVE
 			] + $defaults
 		]);
 	}

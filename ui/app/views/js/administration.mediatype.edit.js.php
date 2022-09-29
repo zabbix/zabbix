@@ -380,7 +380,7 @@
 			if (provider ==	'<?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?>' ) {
 				$('input[name=passwd]').attr('aria-required', 'false');
 				$('label[for=passwd]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
-				$('label[for=smtp_authentication_1]').text('<?= _('Username and password') ?>');
+				$('label[for=smtp_authentication_1]').text(<?= json_encode(_('Username and password')) ?>);
 
 				$('#smtp_server, #smtp_port, #smtp_helo, #smtp_security, #smtp_authentication, #provider,' +
 					' #smtp_email, #content_type')
@@ -394,7 +394,7 @@
 			else if (provider == '<?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>'
 						|| provider == '<?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>') {
 				$('#provider, #smtp_email, #smtp_authentication, #content_type').closest('li').show();
-				$('label[for=smtp_authentication_1]').text('<?= _('Email and password') ?>');
+				$('label[for=smtp_authentication_1]').text(<?= json_encode(_('Email and password')) ?>);
 
 				toggleAuthenticationOptions();
 			}
