@@ -173,10 +173,20 @@ class CControllerPopupMassupdateItem extends CController {
 			if (array_key_exists('tags', $input)) {
 				$input['tags'] = prepareItemTags($input['tags']);
 
+				$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+					'tag' =>	['type' => API_STRING_UTF8],
+					'value' =>	['type' => API_STRING_UTF8]
+				]];
+
+				if (!CApiInputValidator::validateUniqueness($api_input_rules, $input['tags'], '/tags', $error)) {
+					error($error);
+					throw new Exception();
+				}
+
 				$tag_values = [];
 
 				foreach ($input['tags'] as $tag) {
-					$tag_values[$tag['tag']][$tag['value']] = true;
+					$tag_values[$tag['tag']][] = $tag['value'];
 				}
 
 				$options['selectTags'] = ['tag', 'value'];
@@ -184,8 +194,6 @@ class CControllerPopupMassupdateItem extends CController {
 
 			if (array_key_exists('preprocessing', $input)) {
 				$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
-
-				$options['selectPreprocessing'] = ['type', 'params', 'error_handler', 'error_handler_params'];
 			}
 
 			if (array_key_exists('delay', $input)) {
@@ -208,7 +216,6 @@ class CControllerPopupMassupdateItem extends CController {
 				$db_items = API::ItemPrototype()->get([
 					'output' => ['type', 'key_', 'value_type', 'templateid', 'authtype', 'allow_traps'],
 					'selectHosts' => ['status'],
-					'selectTags' => ['tag', 'value'],
 					'itemids' => $itemids,
 					'preservekeys' => true
 				] + $options);
@@ -217,7 +224,6 @@ class CControllerPopupMassupdateItem extends CController {
 				$db_items = API::Item()->get([
 					'output' => ['type', 'key_', 'value_type', 'templateid', 'flags', 'authtype', 'allow_traps'],
 					'selectHosts' => ['status'],
-					'selectTags' => ['tag', 'value'],
 					'itemids' => $itemids,
 					'preservekeys' => true
 				] + $options);
@@ -298,14 +304,14 @@ class CControllerPopupMassupdateItem extends CController {
 			case ZBX_ACTION_ADD:
 				foreach ($db_item['tags'] as $db_tag) {
 					if (array_key_exists($db_tag['tag'], $tag_values)
-							&& array_key_exists($db_tag['value'], $tag_values[$db_tag['tag']])) {
+							&& in_array($db_tag['value'], $tag_values[$db_tag['tag']])) {
 						unset($tag_values[$db_tag['tag']][$db_tag['value']]);
 					}
 				}
 
 				foreach ($tag_values as $tag => $values) {
 					foreach ($values as $value) {
-						$tags[] = ['tag' => $tag, 'value' => $value];
+						$tags[] = ['tag' => (string) $tag, 'value' => $value];
 					}
 				}
 
@@ -317,27 +323,25 @@ class CControllerPopupMassupdateItem extends CController {
 			case ZBX_ACTION_REPLACE:
 				foreach ($tag_values as $tag => $values) {
 					foreach ($values as $value) {
-						$tags[] = ['tag' => $tag, 'value' => $value];
+						$tags[] = ['tag' => (string) $tag, 'value' => $value];
 					}
 				}
 
 				CArrayHelper::sort($tags, ['tag', 'value']);
 				CArrayHelper::sort($db_item['tags'], ['tag', 'value']);
-
-				$tags = ($tags === $db_item['tags']) ? [] : $tags;
 				break;
 
 			case ZBX_ACTION_REMOVE:
 				foreach ($db_item['tags'] as $db_tag) {
-					if (array_key_exists($db_tag['tag'], $tag_values)
-							&& array_key_exists($db_tag['value'], $tag_values[$db_tag['tag']])) {
+					if (!array_key_exists($db_tag['tag'], $tag_values)
+							&& !in_array($db_tag['value'], $tag_values[$db_tag['tag']])) {
 						$tags[] = ['tag' => $db_tag['tag'], 'value' => $db_tag['value']];
 					}
 				}
 				break;
 		}
 
-		return $tags ? $tags : $db_item['tags'];
+		return $tags;
 	}
 
 	/**
