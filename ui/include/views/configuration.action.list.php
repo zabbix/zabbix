@@ -67,13 +67,12 @@ $widget = (new CWidget())
 	->setTitle($title)
 	->setTitleSubmenu(['main_section' => ['items' => $submenu]])
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_ACTION_LIST))
-	->setControls((new CTag('nav', true,
+	->setControls(
+		(new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()
 			->addItem(new CInput('hidden', 'eventsource', $data['eventsource']))
-			->addItem(
-				(new CSimpleButton(_('Create action')))->addClass('js-action-create')
-			)
+			->addItem((new CSimpleButton(_('Create action')))->addClass('js-action-create'))
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 

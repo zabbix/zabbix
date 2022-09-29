@@ -218,7 +218,7 @@ window.action_edit_popup = new class {
 			return;
 		}
 
-		Object.keys(obj).map((key, index) => {
+		Object.keys(obj).map(key => {
 
 			if (exceptKeys.includes(key)) {
 				return;
@@ -484,18 +484,18 @@ window.action_edit_popup = new class {
 		this.actionid = '';
 		const actionid = document.getElementById('actionid');
 		actionid.parentNode.removeChild(actionid);
-		const title = ('New action');
+		const title = <?= json_encode(_('New action')) ?>;
 
 		const buttons = [
 			{
-				title:  t('Add'),
+				title:  <?= json_encode(_('Add')) ?>,
 				class: '',
 				keepOpen: true,
 				isSubmit: true,
 				action: () => this.submit()
 			},
 			{
-				title: t('Cancel'),
+				title: <?= json_encode(_('Cancel')) ?>,
 				class: 'btn-alt',
 				cancel: true,
 				action: () => ''
@@ -536,8 +536,6 @@ window.action_edit_popup = new class {
 	}
 
 	_processTypeOfCalculation() {
-		// todo E.S.: rewrite jqueries.
-
 		this.show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
 
 		jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");

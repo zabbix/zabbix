@@ -251,6 +251,7 @@ class CControllerActionOperationValidate extends CController {
 	}
 
 	protected function createStartInColumn($operation):string {
+		// todo : pass all the operations that exist for this action, not this operations duration
 		$delays = count_operations_delay([$operation], $operation['esc_period']);
 
 		return ($delays[$operation['esc_step_from']] === null)

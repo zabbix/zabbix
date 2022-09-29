@@ -26,8 +26,6 @@
  * @var array $data
  */
 
-// $this->addJsFile('popup.operation.common.js');
-
 $form = (new CForm())
 	->setName('action.edit')
 	->setId('action-form')

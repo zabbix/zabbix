@@ -67,7 +67,7 @@
 		}
 
 		_massDeleteActions(target) {
-			const confirm_text =<?= json_encode(_('Delete selected actions?')) ?>;
+			const confirm_text = <?= json_encode(_('Delete selected actions?')) ?>;
 			if (!confirm(confirm_text)) {
 				return;
 			}

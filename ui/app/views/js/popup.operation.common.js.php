@@ -37,38 +37,41 @@ window.operation_popup = new class {
 		this._removeAllFields();
 		this._sendMessageFields();
 
-		jQuery('#operation-type-select').on('change', (e) => {
-			// todo : rewrite - switch??!
+		jQuery('#operation-type-select').on('change', () => {
+			// todo : fix operationtype value to num not cmd[]
 			this._removeAllFields();
 
 			const operation_type = document.getElementById('operation-type-select').value;
 
-			if (operation_type == 'cmd[0]') {
-				this._sendMessageFields();
-			}
-			else if (operation_type == 'cmd[2]' || operation_type == 'cmd[3]') {
-				// todo : add hidden input - ?
-			}
-			else if (operation_type == 'cmd[4]' || operation_type == 'cmd[5]') {
-				this._hostGroupFields();
-			}
-			else if (operation_type == 'cmd[6]' || operation_type == 'cmd[7]') {
-				this._templateFields();
-			}
-			else if (operation_type == 'cmd[8]' || operation_type == 'cmd[9]') {
-				// todo : add hidden input - ?
-			}
-			else if (operation_type == 'cmd[10]') {
-				this._hostInventoryFields();
-			}
-			else if (operation_type == 'cmd[11]') {
-				this._allInvolvedFields();
-			}
-			else if (operation_type == 'cmd[12]') {
-				this._allInvolvedFieldsUpdate();
-			}
-			else {
-				this._addScriptFields();
+			switch (operation_type) {
+				case 'cmd[0]':
+					this._sendMessageFields();
+					break;
+				case 'cmd[4]':
+				case 'cmd[5]':
+					this._hostGroupFields();
+					break;
+				case 'cmd[6]':
+				case 'cmd[7]':
+					this._templateFields();
+					break;
+				case 'cmd[10]':
+					this._hostInventoryFields();
+					break;
+				case 'cmd[11]':
+					this._allInvolvedFields();
+					break;
+				case 'cmd[12]':
+					this._allInvolvedFieldsUpdate();
+					break;
+				case 'cmd[2]':
+				case 'cmd[3]':
+				case 'cmd[8]':
+				case 'cmd[9]':
+					break;
+				default:
+					this._addScriptFields();
+					break;
 			}
 		});
 
@@ -253,11 +256,8 @@ window.operation_popup = new class {
 		const fields = ['step-from', 'operation-step-range', 'operation-step-duration',
 			'operation-command-targets-label', 'operation-command-checkbox',
 			'operation-command-chst', 'operation-command-chst-label',
-			'operation-opcommand-hst-label', 'operation-opcommand-grp',
-
-			'operation-opcommand-grp-label', 'operation-command-targets',
-			'operation-command-targets-label', 'operation-condition-list-label', 'operation-condition-list',
-			'operation-condition-table'
+			'operation-opcommand-hst-label', 'operation-opcommand-grp', 'operation-command-targets', 'operation-condition-table',
+			'operation-condition-list-label', 'operation-condition-list'
 		];
 		this._enableFormFields(fields);
 
@@ -514,7 +514,6 @@ window.operation_popup = new class {
 	}
 
 	_addCustomMessageFields() {
-		// todo E.S. : rewrite jqueries:
 		$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
 		$('[id="operation-message-body"],[id="operation-message-label"]').hide();
 
@@ -532,7 +531,6 @@ window.operation_popup = new class {
 	}
 
 	_processTypeOfCalculation() {
-		// todo E.S.: rewrite jqueries.
 		jQuery('#operation-evaltype').toggle(this.row_count > 1);
 		jQuery('#operation-evaltype-label').toggle(this.row_count > 1);
 		jQuery('#operation-condition-row').toggle(this.row_count > 1);
