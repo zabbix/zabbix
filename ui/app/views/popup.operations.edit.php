@@ -174,23 +174,22 @@ $form_grid->addItem([
 	(new CTextArea('operation[opmessage][message]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setId('operation-message-body')
 ]);
-// todo: til here
 
-// todo add ms buttons
 // Command execution targets row.
 $form_grid->addItem([
 	(new CLabel(_('Target list')))
-		->setAsteriskMark()
-		->setId('operation-command-targets-label'),
+		->setId('operation-command-targets-label')
+		->setAsteriskMark(),
 	(new CFormField(
 		(new CFormGrid())
 			->cleanItems()
 			->addItem([
 				new CLabel(_('Current host')),
-				new CFormField((new CCheckBox('operation[opcommand_hst][][hostid]', '0'))->setId('operation-command-chst'))
+				(new CFormField((new CCheckBox('operation[opcommand_hst][][hostid]ch', '0'))))
+					->setId('operation-command-checkbox')
 			])
 			->addItem([
-				new CLabel(_('Host')),
+				(new CLabel(_('Host'))),
 				(new CMultiSelect([
 					'name' => 'operation[opcommand_hst][][hostid]',
 					'object_name' => 'hosts',
@@ -198,7 +197,7 @@ $form_grid->addItem([
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			])
 			->addItem([
-				(new CLabel(_('Host group'))),
+				new CLabel(_('Host group')),
 				(new CMultiSelect([
 					'name' => 'operation[opcommand_grp][][groupid]',
 					'object_name' => 'hostGroup',
@@ -206,9 +205,9 @@ $form_grid->addItem([
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			])
 	))
+		->setId('operation-command-targets')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		->setId('operation-command-targets')
 ]);
 
 // Add / remove host group attribute row.
@@ -275,7 +274,7 @@ $form_grid->addItem([
 // Conditions row.
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS && $data['recovery'] == ACTION_OPERATION) {
 	$form_grid->addItem([
-		new CLabel(_('Conditions')),
+		(new CLabel(_('Conditions')))->setId('operation-condition-list-label'),
 		(new CFormField(
 			(new CTable())
 				->setId('operation-condition-list')
@@ -291,6 +290,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS && $data['recovery'] == ACTION
 					))->setId('operation-condition-list-footer')
 				)
 		))
+			->setId('operation-condition-table')
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 

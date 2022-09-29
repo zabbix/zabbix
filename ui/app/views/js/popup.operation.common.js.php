@@ -36,10 +36,9 @@ window.operation_popup = new class {
 	_loadViews() {
 		this._removeAllFields();
 		this._sendMessageFields();
-		//this._addCustomMessageFields();
 
 		jQuery('#operation-type-select').on('change', (e) => {
-			// todo : rewrite!
+			// todo : rewrite - switch??!
 			this._removeAllFields();
 
 			const operation_type = document.getElementById('operation-type-select').value;
@@ -62,9 +61,11 @@ window.operation_popup = new class {
 			else if (operation_type == 'cmd[10]') {
 				this._hostInventoryFields();
 			}
-			else if (operation_type == 'cmd[11]' || operation_type == 'cmd[12]') {
-				this._hostInventoryFields();
+			else if (operation_type == 'cmd[11]') {
 				this._allInvolvedFields();
+			}
+			else if (operation_type == 'cmd[12]') {
+				this._allInvolvedFieldsUpdate();
 			}
 			else {
 				this._addScriptFields();
@@ -89,26 +90,23 @@ window.operation_popup = new class {
 	}
 
 	_allInvolvedFields() {
-		// todo : fix - add new function to show and undisable necessary fields!!!
+		const fields = [
+			'operation-message-custom-label', 'operation-message-custom', 'operation-message-subject',
+			'operation-message-body', 'opmessage'
+		]
 
-		// todo : check why still shows after removeAllFields
-		const remove = ['operation-attr-inventory', 'operation-attr-inventory-label'];
-		remove.forEach(value => jQuery(`#${value}`).toggle(false))
-
-		const fields = ['operation-message-custom-label', 'operation-message-custom']
-		fields.forEach(value => jQuery(`#${value}`).toggle(true))
+		this._enableFormFields(fields);
+		this._addCustomMessageFields();
 	}
 
 	_allInvolvedFieldsUpdate() {
-		// todo : check why still shows after removeAllFields
-		const remove = ['operation-attr-inventory', 'operation-attr-inventory-label'];
-		remove.forEach(value => jQuery(`#${value}`).toggle(false))
-
 		const fields = [
 			'operation-message-custom-label', 'operation-message-custom', 'operation-message-mediatype-default-label',
 			'operation-message-mediatype-default'
 		]
-		fields.forEach(value => jQuery(`#${value}`).toggle(true))
+
+		this._enableFormFields(fields);
+		this._addCustomMessageFields();
 	}
 
 	_hostGroupFields() {
@@ -234,8 +232,6 @@ window.operation_popup = new class {
 					label.style.display = 'block';
 				}
 			}
-
-
 		}
 
 		for (let label of this.form.getElementsByTagName('label')) {
@@ -249,26 +245,21 @@ window.operation_popup = new class {
 	}
 
 	_hostInventoryFields() {
-		const fields = [
-			'operation-attr-inventory'
-		]
+		const fields = ['operation-attr-inventory']
 		this._enableFormFields(fields);
-
-		//jQuery('#operation-attr-inventory').toggle(true);
-		//jQuery('#operation-attr-inventory-label').toggle(true);
-
-		//jQuery('#operation-attr-inventory').show();
-		//jQuery('#operation-attr-inventory-label').show();
-
-		//jQuery('#operation-attr-inventory').prop( "disabled", false);
-		//jQuery('#operation_opinventory_inventory_mode_0').prop( "disabled", false);
 	}
 
 	_addScriptFields() {
-		if (this.eventsource === <?=EVENT_SOURCE_TRIGGERS?> || this.eventsource === <?=EVENT_SOURCE_DISCOVERY?> ||
-			this.eventsource === <?=EVENT_SOURCE_AUTOREGISTRATION?>) {
-			jQuery('#operation-command-targets').toggle(true);
-			jQuery('#operation-command-targets-label').toggle(true);
+		const fields = ['step-from', 'operation-step-range', 'operation-step-duration',
+			'operation-command-targets-label', 'operation-command-checkbox',
+			'operation-command-chst', 'operation-command-chst-label',
+			'operation-opcommand-hst-label', 'operation-opcommand-grp',
+
+			'operation-opcommand-grp-label', 'operation-command-targets',
+			'operation-command-targets-label', 'operation-condition-list-label', 'operation-condition-list',
+			'operation-condition-table'
+		];
+		this._enableFormFields(fields);
 
 			this.targets_hosts_ms = jQuery('#operation_opcommand_hst__hostid');
 
@@ -292,7 +283,6 @@ window.operation_popup = new class {
 					}
 				}
 			});
-		}
 
 		const ms_groups_url = new Curl('jsrpc.php', false);
 		ms_groups_url.setArgument('method', 'multiselect.get');

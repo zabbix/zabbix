@@ -231,14 +231,12 @@ class CControllerActionOperationValidate extends CController {
 		// todo : check what is the same and remove unnecessary code
 		// todo : fix - fields based on eventsource
 
-		if ($operation['recovery'] == ACTION_OPERATION) {
-			// todo: add all data and pass correct fields for operation table based on operation recovery type
-			$data['operation'] = $operation;
-				//'condition' => $operation['condition'] ? : [],
+		$data['operation'] = $operation;
+		$data['operation']['operationtype'] = $operationtype;
+		$data['operation']['details'] = $this->getActionOperationDescription($operation);
 
-			$data['operation']['operationtype'] = $operationtype;
-			$data['operation']['details'] = $this->getActionOperationDescription($operation);
-			$data['operation']['start_in'] = 'start in column';
+		if ($operation['recovery'] == ACTION_OPERATION) {
+			$data['operation']['start_in'] = $this->createStartInColumn($operation);
 
 			if ($operation['recovery'] == ACTION_OPERATION &&
 					($operation['eventsource'] == EVENT_SOURCE_TRIGGERS
@@ -248,20 +246,19 @@ class CControllerActionOperationValidate extends CController {
 				$data['operation']['steps'] = $this->createStepsColumn($operation);
 			}
 		}
-		else if ($operation['recovery'] == ACTION_RECOVERY_OPERATION) {
-			// todo: check what data needs to be added here
-			$data['operation'] = $operation;
-			$data['operation']['operationtype'] = $operationtype;
-			$data['operation']['details'] = $this->getActionOperationDescription($operation);
-		}
-		else if ($operation['recovery'] == ACTION_UPDATE_OPERATION) {
-			// todo: check what data needs to be added here
-			$data['operation'] = $operation;
-			$data['operation']['operationtype'] = $operationtype;
-			$data['operation']['details'] = $this->getActionOperationDescription($operation);
-		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
+	}
+
+	protected function createStartInColumn($operation):string {
+		$delays = count_operations_delay([$operation], $operation['esc_period']);
+
+		return ($delays[$operation['esc_step_from']] === null)
+			? _('Unknown')
+			: ($delays[$operation['esc_step_from']] != 0
+				? convertUnits(['value' => $delays[$operation['esc_step_from']], 'units' => 'uptime'])
+				: _('Immediately')
+			);
 	}
 
 	protected function createStepsColumn($operation):string {
@@ -270,7 +267,7 @@ class CControllerActionOperationValidate extends CController {
 		if ($operation['esc_step_from'] < 1) {
 			$step_from = 1;
 		}
-		// todo : should add in increasing order (by steps)
+		// todo : should add in increasing order (by steps) from js??
 		if (($step_from === $operation['esc_step_to']) || $operation['esc_step_to'] == 0) {
 			$steps = $step_from;
 		}
