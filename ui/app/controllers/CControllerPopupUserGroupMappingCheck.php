@@ -29,19 +29,11 @@ class CControllerPopupUserGroupMappingCheck extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'roleid' =>				'required|db users.roleid',
-			'name' =>				'string|not_empty',
-			'user_groups' =>		'required|array_id',
-			'is_fallback' =>		'required|in '.GROUP_MAPPING_REGULAR.','.GROUP_MAPPING_FALLBACK,
+			'name' =>				'required|string|not_empty',
+			'user_groups' =>		'required|array_id'
 		];
 
 		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			if ($this->getInput('is_fallback') == GROUP_MAPPING_REGULAR && !$this->hasInput('name')) {
-				error(_s('Field "%1$s" is mandatory.', 'name'));
-				$ret = false;
-			}
-		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -62,7 +54,7 @@ class CControllerPopupUserGroupMappingCheck extends CController {
 	}
 
 	protected function doAction(): void {
-		$this->getInputs($data, ['name', 'is_fallback']);
+		$this->getInputs($data, ['name']);
 
 		$user_groups = API::UserGroup()->get([
 			'output' => ['usrgrpid', 'name'],

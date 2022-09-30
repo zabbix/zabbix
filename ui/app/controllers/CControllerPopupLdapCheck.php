@@ -59,20 +59,23 @@ class CControllerPopupLdapCheck extends CController {
 			foreach (['group_basedn', 'group_member', 'group_filter', 'group_membership'] as $field) {
 				if (!$this->hasInput($field)) {
 					error(_s('Field "%1$s" is mandatory.', $field));
-
 					$ret = false;
 					break;
 				}
 				elseif ($this->getInput($field) === '') {
 					error(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
-
 					$ret = false;
 					break;
 				}
 			}
 
-			if ($ret) {
-				$ret = $this->validateProvisionGroups() && $this->validateProvisionMedia();
+			if ($ret && !$this->validateProvisionGroups()) {
+				error(_('Invalid user group mapping configuration.'));
+				$ret = false;
+			}
+			if ($ret && !$this->validateProvisionMedia()) {
+				error(_('Invalid media type mapping configuration.'));
+				$ret = false;
 			}
 		}
 
@@ -120,6 +123,16 @@ class CControllerPopupLdapCheck extends CController {
 			]
 		];
 
+		foreach ($data['body']['provision_groups'] as $index => $group) {
+			if (array_key_exists('enabled', $group) && $group['enabled'] == 0) {
+				unset($data['body']['provision_groups'][$index]);
+				continue;
+			}
+
+			$group_props = ['name', 'sortorder', 'user_groups', 'roleid'];
+			$data['body']['provision_groups'][$index] = array_intersect_key($group, array_flip($group_props));
+		}
+
 		CArrayHelper::sort($data['body']['provision_groups'], ['sortorder']);
 		$data['body']['provision_groups'] = array_values($data['body']['provision_groups']);
 
@@ -140,39 +153,31 @@ class CControllerPopupLdapCheck extends CController {
 	}
 
 	private function validateProvisionGroups(): bool {
-		if (!$this->hasInput('provision_groups')) {
-			return false;
-		}
+		$groups = $this->getInput('provision_groups', []);
 
-		foreach ($this->getInput('provision_groups') as $group) {
-			if (!is_array($group)
-					|| !array_key_exists('is_fallback', $group)
-					|| !array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
+		foreach ($groups as $index => $group) {
+			if (!is_array($group)) {
+				return false;
+			}
+
+			if (array_key_exists('enabled', $group) && $group['enabled'] == 0) {
+				unset($groups[$index]);
+				continue;
+			}
+
+			if (!array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
 					|| !array_key_exists('roleid', $group) || !ctype_digit($group['roleid'])) {
 				return false;
 			}
 
-			switch ($group['is_fallback']) {
-				case GROUP_MAPPING_REGULAR:
-					if (!array_key_exists('name', $group) || !is_string($group['name']) || $group['name'] === '') {
-						return false;
-					}
-					break;
-
-				case GROUP_MAPPING_FALLBACK:
-					if (!array_key_exists('fallback_status', $group)
-							|| ($group['fallback_status'] != GROUP_MAPPING_FALLBACK_OFF
-								&& $group['fallback_status'] != GROUP_MAPPING_FALLBACK_ON)) {
-						return false;
-					}
-					break;
-
-				default:
-					return false;
+			if (!array_key_exists('enabled', $group)
+					&& (!array_key_exists('name', $group) || $group['name'] === ''
+							|| $group['name'] === USERDIRECTORY_FALLBACK_GROUP_NAME)) {
+				return false;
 			}
 		}
 
-		return true;
+		return (bool) $groups;
 	}
 
 	private function validateProvisionMedia(): bool {

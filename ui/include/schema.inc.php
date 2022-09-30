@@ -9226,16 +9226,6 @@ return [
 				'ref_table' => 'role',
 				'ref_field' => 'roleid'
 			],
-			'is_fallback' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10
-			],
-			'fallback_status' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10
-			],
 			'name' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,

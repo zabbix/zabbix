@@ -30,8 +30,7 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 			'add_group' =>			'in 1',
 			'usrgrpid' =>			'array_id',
 			'roleid' =>				'db users.roleid',
-			'name' =>				'string',
-			'is_fallback' =>		'required|in '.GROUP_MAPPING_REGULAR.','.GROUP_MAPPING_FALLBACK,
+			'name' =>				'required|string',
 			'idp_type' =>			'required|in '.IDP_TYPE_LDAP.','.IDP_TYPE_SAML
 		];
 
@@ -68,7 +67,6 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 			'name' => $this->getInput('name', ''),
 			'add_group' => $this->getInput('add_group', 0),
 			'user' => ['debug_mode' => $this->getDebugMode()],
-			'is_fallback' => $this->getInput('is_fallback'),
 			'idp_type' => $this->getInput('idp_type')
 		];
 

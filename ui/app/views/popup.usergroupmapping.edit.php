@@ -31,7 +31,6 @@ $form_action = (new CUrl('zabbix.php'))
 $form = (new CForm('post', $form_action))
 	->setId('user-group-mapping-edit-form')
 	->setName('user-group-mapping-edit-form')
-	->addVar('is_fallback', $data['is_fallback'])
 	->addItem(
 		(new CInput('submit', 'submit'))
 			->addStyle('display: none;')
@@ -75,11 +74,9 @@ $user_role_multiselect = (new CMultiSelect([
 	->setId('roleid');
 $inline_js .= $user_role_multiselect->getPostJS();
 
-$source = $data['idp_type'] == IDP_TYPE_SAML
-	? _('SAML')
-	: _('LDAP');
+$source = $data['idp_type'] == IDP_TYPE_SAML ? _('SAML') : _('LDAP');
 
-if ($data['is_fallback'] == GROUP_MAPPING_FALLBACK) {
+if ($data['name'] === USERDIRECTORY_FALLBACK_GROUP_NAME) {
 	$name_hint_icon = makeHelpIcon([
 		_('Use fallback group to define user groups and a role for users not covered by group mapping.'),
 	])->addClass(ZBX_STYLE_LIST_DASHED);
@@ -91,20 +88,19 @@ else {
 			_s('group name must match %1$s group name', $source),
 			_("wildcard patterns with '*' may be used")
 		]))->addClass(ZBX_STYLE_LIST_DASHED)
-	])
-		->addClass(ZBX_STYLE_LIST_DASHED);
+	])->addClass(ZBX_STYLE_LIST_DASHED);
 }
 
 $form
 	->addItem((new CFormGrid())
 		->addItem([
 			(new CLabel([_s('%1$s group pattern', $source), $name_hint_icon], 'name'))->setAsteriskMark(),
-			new CFormField($data['is_fallback'] == GROUP_MAPPING_REGULAR
-				? (new CTextBox('name', $data['name']))
+			new CFormField($data['name'] === USERDIRECTORY_FALLBACK_GROUP_NAME
+				? [_('Fallback group'), new CVar('name', USERDIRECTORY_FALLBACK_GROUP_NAME)]
+				: (new CTextBox('name', $data['name']))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
 					->setAriaRequired()
-				: _('Fallback group')
 			)
 		])
 		->addItem([

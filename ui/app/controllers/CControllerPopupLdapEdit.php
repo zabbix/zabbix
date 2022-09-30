@@ -110,48 +110,9 @@ class CControllerPopupLdapEdit extends CController {
 			$data['bind_password'] = $this->getInput('bind_password');
 		}
 
-		$data['advanced_configuration'] = $data['start_tls'] != ZBX_AUTH_START_TLS_OFF || $data['search_filter'] !== '';
-
-		if ($data['add_ldap_server'] == 1
-				|| $data['provision_status'] == JIT_PROVISIONING_DISABLED && !$data['provision_groups']) {
-			$default_role = API::Role()->get([
-				'output' => ['roleid'],
-				'filter' => ['type' => USER_TYPE_ZABBIX_USER],
-				'limit' => 1
-			]);
-
-			$data['provision_groups'] = $default_role
-				? [[
-					'name' => _('Fallback group'),
-					'is_fallback' => GROUP_MAPPING_FALLBACK,
-					'fallback_status' => GROUP_MAPPING_FALLBACK_OFF,
-					'user_groups' => [ 7, 8
-						// TODO: define default user group.
-					],
-					'roleid' => $default_role[0]['roleid']
-				]]
-				: [];
-		}
-
-		if ($data['add_ldap_server'] == 1
-				|| $data['provision_status'] == JIT_PROVISIONING_DISABLED && !$data['provision_media']) {
-			$default_media = API::MediaType()->get([
-				'output' => ['mediatypeid'],
-				'filter' => [
-					'type' => MEDIA_TYPE_EMAIL
-				],
-				'sortfield' => ['mediatypeid'],
-				'limit' => 1
-			]);
-
-			$data['provision_media'] = $default_media
-				? [[
-					'name' => _('Email media type'),
-					'mediatypeid' => $default_media[0]['mediatypeid'],
-					'attribute' => 'userEmail'
-				]]
-				: [];
-		}
+		$data['advanced_configuration'] = ($data['start_tls'] != ZBX_AUTH_START_TLS_OFF
+			|| $data['search_filter'] !== ''
+		);
 
 		self::extendProvisionGroups($data['provision_groups']);
 		self::extendProvisionMedia($data['provision_media']);
@@ -186,7 +147,14 @@ class CControllerPopupLdapEdit extends CController {
 			])
 			: [];
 
+		$has_fallback_group = false;
 		foreach ($provision_groups as &$provision_group) {
+			if (!array_key_exists('name', $provision_group)
+					|| $provision_group['name'] === USERDIRECTORY_FALLBACK_GROUP_NAME) {
+				$provision_group['enabled'] = 1;
+				$has_fallback_group = true;
+			}
+
 			$provision_group['role_name'] = $roles[$provision_group['roleid']]['name'];
 
 			foreach ($provision_group['user_groups'] as &$user_group) {
@@ -198,6 +166,13 @@ class CControllerPopupLdapEdit extends CController {
 			unset($user_group);
 		}
 		unset($provision_group);
+
+		if (!$has_fallback_group) {
+			$provision_groups[] = [
+				'name' => USERDIRECTORY_FALLBACK_GROUP_NAME,
+				'enabled' => 0
+			];
+		}
 	}
 
 	private static function extendProvisionMedia(array &$provision_media): void {
@@ -214,35 +189,15 @@ class CControllerPopupLdapEdit extends CController {
 	}
 
 	private function validateProvisionGroups(): bool {
-		if (!$this->hasInput('provision_groups')) {
+		if ($this->getInput('provision_status', JIT_PROVISIONING_DISABLED) != JIT_PROVISIONING_ENABLED) {
 			return true;
 		}
 
-		foreach ($this->getInput('provision_groups') as $group) {
+		foreach ($this->getInput('provision_groups', []) as $group) {
 			if (!is_array($group)
-					|| !array_key_exists('is_fallback', $group)
 					|| !array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
 					|| !array_key_exists('roleid', $group) || !ctype_digit($group['roleid'])) {
 				return false;
-			}
-
-			switch ($group['is_fallback']) {
-				case GROUP_MAPPING_REGULAR:
-					if (!array_key_exists('name', $group) || !is_string($group['name']) || $group['name'] === '') {
-						return false;
-					}
-					break;
-
-				case GROUP_MAPPING_FALLBACK:
-					if (!array_key_exists('fallback_status', $group)
-							|| ($group['fallback_status'] != GROUP_MAPPING_FALLBACK_OFF
-								&& $group['fallback_status'] != GROUP_MAPPING_FALLBACK_ON)) {
-						return false;
-					}
-					break;
-
-				default:
-					return false;
 			}
 		}
 

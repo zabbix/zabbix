@@ -190,7 +190,10 @@ $form = (new CForm('post', $form_action))
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))->addClass('allow-jit-provisioning')
 		])
-		->addItem([(new CLabel(_('User group mapping')))->addClass('allow-jit-provisioning'),
+		->addItem([
+			(new CLabel(_('User group mapping')))
+				->addClass('allow-jit-provisioning')
+				->setAsteriskMark(),
 			(new CFormField(
 				(new CDiv(
 					(new CTable())

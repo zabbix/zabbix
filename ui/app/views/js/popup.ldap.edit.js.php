@@ -45,10 +45,6 @@ window.ldap_edit_popup = new class {
 		this._renderProvisionGroups(provision_groups);
 		this._renderProvisionMedia(provision_media);
 		this._initSortable();
-
-		if (document.getElementById('bind-password-btn') !== null) {
-			document.getElementById('bind-password-btn').addEventListener('click', this.showPasswordField);
-		}
 	}
 
 	_addEventListeners() {
@@ -71,10 +67,10 @@ window.ldap_edit_popup = new class {
 				e.target.closest('tr').remove();
 			}
 			else if (e.target.classList.contains('js-enabled')) {
-				this.toggleFallbackStatus(<?= GROUP_MAPPING_FALLBACK_OFF ?>);
+				this.toggleFallbackStatus(0);
 			}
 			else if (e.target.classList.contains('js-disabled')) {
-				this.toggleFallbackStatus(<?= GROUP_MAPPING_FALLBACK_ON ?>);
+				this.toggleFallbackStatus(1);
 			}
 		});
 
@@ -91,6 +87,10 @@ window.ldap_edit_popup = new class {
 					e.target.closest('tr').remove()
 				}
 			});
+
+		if (document.getElementById('bind-password-btn') !== null) {
+			document.getElementById('bind-password-btn').addEventListener('click', this.showPasswordField);
+		}
 	}
 
 	toggleAdvancedConfiguration(checked) {
@@ -109,14 +109,14 @@ window.ldap_edit_popup = new class {
 		const row = this.dialogue.querySelector('[data-row_fallback]');
 		const btn = row.querySelector('.btn-link');
 
-		if (status == <?= GROUP_MAPPING_FALLBACK_ON ?>) {
-			row.querySelector('[name$="[fallback_status]"]').value = status;
+		if (status == 1) {
+			row.querySelector('[name$="[enabled]"]').value = status;
 			btn.classList.replace('<?= ZBX_STYLE_RED ?>', '<?= ZBX_STYLE_GREEN ?>');
 			btn.classList.replace('js-disabled', 'js-enabled');
 			btn.innerText = '<?= _('Enabled') ?>';
 		}
 		else {
-			row.querySelector('[name$="[fallback_status]"]').value = status;
+			row.querySelector('[name$="[enabled]"]').value = status;
 			btn.classList.replace('<?= ZBX_STYLE_GREEN ?>', '<?= ZBX_STYLE_RED ?>');
 			btn.classList.replace('js-enabled', 'js-disabled');
 			btn.innerText = '<?= _('Disabled') ?>';
@@ -275,10 +275,9 @@ window.ldap_edit_popup = new class {
 	}
 
 	editProvisionGroup(row = null) {
-		let popup_params;
+		let popup_params = {};
 		let row_index = 0;
 		let sortorder;
-		let status = <?= GROUP_MAPPING_FALLBACK_OFF ?>;
 		const fallback_row = this.dialogue.querySelector('[data-row_fallback]');
 
 		if (row === null) {
@@ -286,28 +285,29 @@ window.ldap_edit_popup = new class {
 				row_index++;
 			}
 
+			sortorder = parseInt(fallback_row.querySelector(`[name^="provision_groups"][name$="[sortorder]"]`).value);
+
 			popup_params = {
 				add_group: 1,
-				is_fallback: <?= GROUP_MAPPING_REGULAR ?>
+				name: ''
 			};
-			sortorder = parseInt(fallback_row.querySelector(`[name^="provision_groups"][name$="[sortorder]"]`).value);
 		}
 		else {
 			row_index = row.dataset.row_index;
-			let is_fallback = row.querySelector(`[name="provision_groups[${row_index}][is_fallback]"`).value;
-			let user_groups = row.querySelectorAll(`[name="provision_groups[${row_index}][user_groups][][usrgrpid]"`);
 			sortorder = parseInt(row.querySelector(`[name="provision_groups[${row_index}][sortorder]"`).value);
 
-			popup_params = {
-				usrgrpid: [...user_groups].map(usrgrp => usrgrp.value),
-				roleid: row.querySelector(`[name="provision_groups[${row_index}][roleid]"`).value,
-				is_fallback: is_fallback
-			};
-			if (is_fallback == <?= GROUP_MAPPING_REGULAR ?>) {
-				popup_params.name = row.querySelector(`[name="provision_groups[${row_index}][name]"`).value;
+			popup_params.name = row.querySelector(`[name="provision_groups[${row_index}][name]"`).value;
+
+			const user_groups = row.querySelectorAll(
+				`[name="provision_groups[${row_index}][user_groups][][usrgrpid]"`
+			);
+			if (user_groups.length) {
+				popup_params.usrgrpid = [...user_groups].map(usrgrp => usrgrp.value);
 			}
-			else {
-				status = row.querySelector(`[name="provision_groups[${row_index}][fallback_status]"`).value;
+
+			const roleid = row.querySelector(`[name="provision_groups[${row_index}][roleid]"`);
+			if (roleid) {
+				popup_params.roleid = roleid.value;
 			}
 		}
 
@@ -316,7 +316,7 @@ window.ldap_edit_popup = new class {
 		const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			const group = {...e.detail, ...{row_index: row_index, fallback_status: status, sortorder: sortorder}};
+			const group = {...e.detail, ...{row_index, sortorder, enabled: 1}};
 
 			if (row === null) {
 				fallback_row.parentNode.insertBefore(this._renderProvisionGroupRow(group), fallback_row);
@@ -369,24 +369,23 @@ window.ldap_edit_popup = new class {
 
 	_renderProvisionGroups(groups) {
 		for (const key in groups) {
-			let order = parseInt(key) + 1
+			let sortorder = parseInt(key) + 1
 			this.provision_groups_table
 				.querySelector('tbody')
-				.appendChild(this._renderProvisionGroupRow({...groups[key], ...{row_index: key, sortorder: order}}));
+				.appendChild(this._renderProvisionGroupRow({...groups[key], ...{row_index: key, sortorder}}));
 		}
 	}
 
 	_renderProvisionGroupRow(group) {
-		const template = document.createElement('template');
-		const template_row = group.is_fallback == <?= GROUP_MAPPING_FALLBACK ?>
-			? new Template(this._templateProvisionFallbackGroupRow())
-			: new Template(this._templateProvisionGroupRow());
+		const is_fallback = group.name === '<?= USERDIRECTORY_FALLBACK_GROUP_NAME ?>';
 		const attributes = {
-			user_group_names: Object.values(group.user_groups).map(user_group => user_group.name).join(', ')
+			user_group_names: ('user_groups' in group)
+				? Object.values(group.user_groups).map(user_group => user_group.name).join(', ')
+				: ''
 		};
 
-		if (group.is_fallback == <?= GROUP_MAPPING_FALLBACK ?>) {
-			if (group.fallback_status == <?= GROUP_MAPPING_FALLBACK_ON ?>) {
+		if (is_fallback) {
+			if (group.enabled == 1) {
 				attributes.action_label = '<?= _('Enabled') ?>';
 				attributes.action_class = 'js-enabled <?= ZBX_STYLE_GREEN ?>';
 			}
@@ -396,13 +395,28 @@ window.ldap_edit_popup = new class {
 			}
 		}
 
+		const template = document.createElement('template');
+		const template_row = is_fallback
+			? new Template(this._templateProvisionFallbackGroupRow())
+			: new Template(this._templateProvisionGroupRow());
 		template.innerHTML = template_row.evaluate({...group, ...attributes}).trim();
 		const row = template.content.firstChild;
 
-		for (const user of Object.values(group.user_groups)) {
+		if ('user_groups' in group) {
+			for (const user of Object.values(group.user_groups)) {
+				const input = document.createElement('input');
+				input.name = 'provision_groups[' + group.row_index + '][user_groups][][usrgrpid]';
+				input.value = user.usrgrpid;
+				input.type = 'hidden';
+
+				row.appendChild(input);
+			}
+		}
+
+		if ('roleid' in group) {
 			const input = document.createElement('input');
-			input.name = 'provision_groups[' + group.row_index + '][user_groups][][usrgrpid]';
-			input.value = user.usrgrpid;
+			input.name = 'provision_groups[' + group.row_index + '][roleid]';
+			input.value = group.roleid;
 			input.type = 'hidden';
 
 			row.appendChild(input);
@@ -417,9 +431,8 @@ window.ldap_edit_popup = new class {
 				<td></td>
 				<td>
 					<a href="javascript:void(0);" class="wordwrap js-edit"><?= _('Fallback group') ?></a>
-					<input type="hidden" name="provision_groups[#{row_index}][roleid]" value="#{roleid}">
-					<input type="hidden" name="provision_groups[#{row_index}][is_fallback]" value="<?= GROUP_MAPPING_FALLBACK ?>">
-					<input type="hidden" name="provision_groups[#{row_index}][fallback_status]" value="#{fallback_status}">
+					<input type="hidden" name="provision_groups[#{row_index}][name]" value="<?= USERDIRECTORY_FALLBACK_GROUP_NAME ?>">
+					<input type="hidden" name="provision_groups[#{row_index}][enabled]" value="#{enabled}">
 					<input type="hidden" name="provision_groups[#{row_index}][sortorder]" value="#{sortorder}">
 				</td>
 				<td class="wordbreak">#{user_group_names}</td>
@@ -440,8 +453,6 @@ window.ldap_edit_popup = new class {
 				<td>
 					<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
 					<input type="hidden" name="provision_groups[#{row_index}][name]" value="#{name}">
-					<input type="hidden" name="provision_groups[#{row_index}][roleid]" value="#{roleid}">
-					<input type="hidden" name="provision_groups[#{row_index}][is_fallback]" value="<?= GROUP_MAPPING_REGULAR ?>">
 					<input type="hidden" name="provision_groups[#{row_index}][sortorder]" value="#{sortorder}">
 				</td>
 				<td class="wordbreak">#{user_group_names}</td>

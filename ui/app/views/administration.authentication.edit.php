@@ -451,7 +451,9 @@ $saml_tab = (new CFormGrid())
 		))->addClass('saml-provision-status')
 	])
 	->addItem([
-		(new CLabel(_('User group mapping')))->addClass('saml-provision-status'),
+		(new CLabel(_('User group mapping')))
+			->addClass('saml-provision-status')
+			->setAsteriskMark(),
 		(new CFormField(
 			(new CDiv(
 				(new CTable())

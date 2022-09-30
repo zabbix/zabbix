@@ -142,10 +142,10 @@
 					e.target.closest('tr').remove()
 				}
 				else if (e.target.classList.contains('js-enabled')) {
-					this.toggleFallbackStatus(<?= GROUP_MAPPING_FALLBACK_OFF ?>);
+					this.toggleFallbackStatus(0);
 				}
 				else if (e.target.classList.contains('js-disabled')) {
-					this.toggleFallbackStatus(<?= GROUP_MAPPING_FALLBACK_ON ?>);
+					this.toggleFallbackStatus(1);
 				}
 			});
 
@@ -194,14 +194,14 @@
 			const row = document.querySelector('[data-row_fallback]');
 			const btn = row.querySelector('.btn-link');
 
-			if (status == <?= GROUP_MAPPING_FALLBACK_ON ?>) {
-				row.querySelector('[name$="[fallback_status]"]').value = status;
+			if (status == 1) {
+				row.querySelector('[name$="[enabled]"]').value = status;
 				btn.classList.replace('<?= ZBX_STYLE_RED ?>', '<?= ZBX_STYLE_GREEN?>');
 				btn.classList.replace('js-disabled', 'js-enabled');
 				btn.innerText = '<?= _('Enabled') ?>';
 			}
 			else {
-				row.querySelector('[name$="[fallback_status]"]').value = status;
+				row.querySelector('[name$="[enabled]"]').value = status;
 				btn.classList.replace('<?= ZBX_STYLE_GREEN ?>', '<?= ZBX_STYLE_RED?>');
 				btn.classList.replace('js-enabled', 'js-disabled');
 				btn.innerText = '<?= _('Disabled') ?>';
@@ -295,31 +295,28 @@
 		}
 
 		editSamlProvisionGroup(row = null) {
-			let popup_params;
+			let popup_params = {};
 			let row_index = 0;
 			let sortorder;
-			let status = <?= GROUP_MAPPING_FALLBACK_OFF ?>;
 			const fallback_row = document.querySelector('[data-row_fallback]');
 
 			if (row !== null) {
 				row_index = row.dataset.row_index;
-				let is_fallback = row.querySelector(`[name="saml_provision_groups[${row_index}][is_fallback]"`).value;
-				let user_groups = row.querySelectorAll(
+				sortorder = row.querySelector(`[name="saml_provision_groups[${row_index}][sortorder]"`).value;
+
+				popup_params.name = row.querySelector(`[name="saml_provision_groups[${row_index}][name]"`).value;
+
+				const user_groups = row.querySelectorAll(
 					`[name="saml_provision_groups[${row_index}][user_groups][][usrgrpid]"`
 				);
+				if (user_groups.length) {
+					popup_params.usrgrpid = [...user_groups].map(usrgrp => usrgrp.value);
+				}
 
-				popup_params = {
-					usrgrpid: [...user_groups].map(usrgrp => usrgrp.value),
-					roleid: row.querySelector(`[name="saml_provision_groups[${row_index}][roleid]"`).value,
-					is_fallback: is_fallback
-				};
-				if (is_fallback == <?= GROUP_MAPPING_REGULAR ?>) {
-					popup_params.name = row.querySelector(`[name="saml_provision_groups[${row_index}][name]"`).value;
+				const roleid = row.querySelector(`[name="saml_provision_groups[${row_index}][roleid]"`);
+				if (roleid) {
+					popup_params.roleid = roleid.value;
 				}
-				else {
-					status = row.querySelector(`[name="saml_provision_groups[${row_index}][fallback_status]"`).value;
-				}
-				sortorder = row.querySelector(`[name="saml_provision_groups[${row_index}][sortorder]"`).value;
 			}
 			else {
 				while (this.saml_provision_groups_table.querySelector(`[data-row_index="${row_index}"]`) !== null) {
@@ -330,7 +327,7 @@
 
 				popup_params = {
 					add_group: 1,
-					is_fallback: <?= GROUP_MAPPING_REGULAR ?>
+					name: ''
 				};
 			}
 
@@ -339,9 +336,7 @@
 			const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				const saml_provision_group = {...e.detail,
-					...{row_index: row_index, fallback_status: status, sortorder: sortorder}
-				};
+				const saml_provision_group = {...e.detail, ...{row_index, sortorder, enabled: 1}};
 
 				if (row === null) {
 					fallback_row.parentNode.insertBefore(this._renderProvisionGroupRow(saml_provision_group),
@@ -402,21 +397,21 @@
 				row_index = row.dataset.row_index;
 
 				const provision_group_indexes = [...row.querySelectorAll(
-					`[name^="ldap_servers[${row_index}][provision_groups]"][name$="[is_fallback]"]`
+					`[name^="ldap_servers[${row_index}][provision_groups]"][name$="[sortorder]"]`
 				)].map((element) => {
 					let start = 33 + row_index.toString().length;
-					let end = element.name.length - 14;
-
+					let end = element.name.length - 12;
 					return element.name.substring(start, end);
 				});
+
 				const provision_groups = provision_group_indexes.map((i) => {
 					let user_groups = row.querySelectorAll(
 						`[name="ldap_servers[${row_index}][provision_groups][${i}][user_groups][][usrgrpid]"`
 					);
+					let group_name = row.querySelector(
+						`[name="ldap_servers[${row_index}][provision_groups][${i}][name]"`
+					);
 					let provision_group = {
-						is_fallback: row.querySelector(
-							`[name="ldap_servers[${row_index}][provision_groups][${i}][is_fallback]"`
-						).value,
 						roleid: row.querySelector(
 							`[name="ldap_servers[${row_index}][provision_groups][${i}][roleid]"`
 						).value,
@@ -426,15 +421,8 @@
 						user_groups: [...user_groups].map(usrgrp => usrgrp.value)
 					}
 
-					if (provision_group.is_fallback == <?= GROUP_MAPPING_FALLBACK ?>) {
-						provision_group.fallback_status = row.querySelector(
-							`[name="ldap_servers[${row_index}][provision_groups][${i}][fallback_status]"`
-						).value;
-					}
-					else {
-						provision_group.name = row.querySelector(
-							`[name="ldap_servers[${row_index}][provision_groups][${i}][name]"`
-						).value;
+					if (group_name) {
+						provision_group.name = group_name.value;
 					}
 
 					return provision_group;
@@ -598,16 +586,13 @@
 		}
 
 		_renderProvisionGroupRow(saml_provision_group) {
-			const template = document.createElement('template');
-			const template_saml_group_row = saml_provision_group.is_fallback == <?= GROUP_MAPPING_FALLBACK ?>
-				? new Template(this._templateProvisionFallbackGroupRow())
-				: new Template(this._templateProvisionGroupRow());
+			const is_fallback = saml_provision_group.name === '<?= USERDIRECTORY_FALLBACK_GROUP_NAME ?>';
+			saml_provision_group.user_group_names = ('user_groups' in saml_provision_group)
+				? Object.values(saml_provision_group.user_groups).map(user_group => user_group.name).join(', ')
+				: '';
 
-			saml_provision_group.user_group_names = Object.values(saml_provision_group.user_groups)
-				.map(user_group => user_group.name).join(', ');
-
-			if (saml_provision_group.is_fallback == <?= GROUP_MAPPING_FALLBACK ?>) {
-				if (saml_provision_group.fallback_status == <?= GROUP_MAPPING_FALLBACK_ON ?>) {
+			if (is_fallback) {
+				if (saml_provision_group.enabled == 1) {
 					saml_provision_group.action_label = '<?= _('Enabled') ?>';
 					saml_provision_group.action_class = 'js-enabled <?= ZBX_STYLE_GREEN ?>';
 				}
@@ -617,13 +602,28 @@
 				}
 			}
 
+			const template = document.createElement('template');
+			const template_saml_group_row = is_fallback
+				? new Template(this._templateProvisionFallbackGroupRow())
+				: new Template(this._templateProvisionGroupRow());
 			template.innerHTML = template_saml_group_row.evaluate(saml_provision_group).trim();
 			const row = template.content.firstChild;
 
-			for (const user_group of Object.values(saml_provision_group.user_groups)) {
+			if ('user_groups' in saml_provision_group) {
+				for (const user_group of Object.values(saml_provision_group.user_groups)) {
+					const input = document.createElement('input');
+					input.name = 'saml_provision_groups[' + saml_provision_group.row_index + '][user_groups][][usrgrpid]';
+					input.value = user_group.usrgrpid;
+					input.type = 'hidden';
+
+					row.appendChild(input);
+				}
+			}
+
+			if ('roleid' in saml_provision_group) {
 				const input = document.createElement('input');
-				input.name = 'saml_provision_groups[' + saml_provision_group.row_index + '][user_groups][][usrgrpid]';
-				input.value = user_group.usrgrpid;
+				input.name = 'saml_provision_groups[' + saml_provision_group.row_index + '][roleid]';
+				input.value = saml_provision_group.roleid;
 				input.type = 'hidden';
 
 				row.appendChild(input);
@@ -684,9 +684,8 @@
 					<td></td>
 					<td>
 						<a href="javascript:void(0);" class="wordwrap js-edit"><?= _('Fallback group') ?></a>
-						<input type="hidden" name="saml_provision_groups[#{row_index}][roleid]" value="#{roleid}">
-						<input type="hidden" name="saml_provision_groups[#{row_index}][is_fallback]" value="<?= GROUP_MAPPING_FALLBACK ?>">
-						<input type="hidden" name="saml_provision_groups[#{row_index}][fallback_status]" value="#{fallback_status}">
+						<input type="hidden" name="saml_provision_groups[#{row_index}][name]" value="<?= USERDIRECTORY_FALLBACK_GROUP_NAME ?>">
+						<input type="hidden" name="saml_provision_groups[#{row_index}][enabled]" value="#{enabled}">
 						<input type="hidden" name="saml_provision_groups[#{row_index}][sortorder]" value="#{sortorder}">
 					</td>
 					<td class="wordbreak">#{user_group_names}</td>
@@ -707,8 +706,6 @@
 					<td>
 						<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
 						<input type="hidden" name="saml_provision_groups[#{row_index}][name]" value="#{name}">
-						<input type="hidden" name="saml_provision_groups[#{row_index}][roleid]" value="#{roleid}">
-						<input type="hidden" name="saml_provision_groups[#{row_index}][is_fallback]" value="<?= GROUP_MAPPING_REGULAR ?>">
 						<input type="hidden" name="saml_provision_groups[#{row_index}][sortorder]" value="#{sortorder}">
 					</td>
 					<td class="wordbreak">#{user_group_names}</td>

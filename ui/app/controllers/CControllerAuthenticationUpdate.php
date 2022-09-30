@@ -135,14 +135,12 @@ class CControllerAuthenticationUpdate extends CController {
 			$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 
 			if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
-				CMessageHelper::setErrorTitle($ldap_status['error']);
-
+				error($ldap_status['error']);
 				return false;
 			}
 
 			if (!$ldap_servers) {
-				CMessageHelper::setErrorTitle(_('At least one LDAP server must exist.'));
-
+				error(_('At least one LDAP server must exist.'));
 				return false;
 			}
 		}
@@ -150,8 +148,7 @@ class CControllerAuthenticationUpdate extends CController {
 		if ($ldap_servers
 				&& (!$this->hasInput('ldap_default_row_index')
 					|| !array_key_exists($this->getInput('ldap_default_row_index'), $ldap_servers))) {
-			CMessageHelper::setErrorTitle(_('Default LDAP server must be specified.'));
-
+			error(_('Default LDAP server must be specified.'));
 			return false;
 		}
 
@@ -163,10 +160,12 @@ class CControllerAuthenticationUpdate extends CController {
 
 			if (!array_key_exists('provision_groups', $ldap_server)
 					|| !$this->validateProvisionGroups($ldap_server['provision_groups'])) {
+				error(_('Invalid LDAP JIT provisioning user group mapping configuration.'));
 				return false;
 			}
 			if (array_key_exists('provision_media', $ldap_server)
 					&& !$this->validateProvisionMedia($ldap_server['provision_media'])) {
+				error(_('Invalid LDAP JIT provisioning media type mapping configuration.'));
 				return false;
 			}
 		}
@@ -186,8 +185,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
 		if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
-			CMessageHelper::setErrorTitle($openssl_status['error']);
-
+			error($openssl_status['error']);
 			return false;
 		}
 
@@ -200,21 +198,22 @@ class CControllerAuthenticationUpdate extends CController {
 
 		if ($this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
 			$saml_fields['saml_group_name'] = $this->getInput('saml_group_name', '');
-		}
 
-		foreach ($saml_fields as $field_name => $field_value) {
-			if ($field_value === '') {
-				CMessageHelper::setErrorTitle(
-					_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty'))
-				);
-
+			if (!$this->validateProvisionGroups($this->getInput('saml_provision_groups', []))) {
+				error(_('Invalid SAML JIT provisioning user group mapping configuration.'));
+				return false;
+			}
+			if (!$this->validateProvisionMedia($this->getInput('saml_provision_media', []))) {
+				error(_('Invalid SAML JIT provisioning media type mapping configuration.'));
 				return false;
 			}
 		}
 
-		if (!$this->validateProvisionGroups($this->getInput('saml_provision_groups', []))
-				|| !$this->validateProvisionMedia($this->getInput('saml_provision_media', []))) {
-			return false;
+		foreach ($saml_fields as $field_name => $field_value) {
+			if ($field_value === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty')));
+				return false;
+			}
 		}
 
 		return true;
@@ -410,9 +409,7 @@ class CControllerAuthenticationUpdate extends CController {
 				$ldap_server['provision_groups'] = array_values($ldap_server['provision_groups']);
 
 				$ldap_server['provision_groups'] = array_map(function ($group) {
-					return array_intersect_key($group,
-						array_flip(['is_fallback', 'fallback_status', 'name', 'roleid', 'user_groups'])
-					);
+					return array_intersect_key($group, array_flip(['name', 'roleid', 'user_groups']));
 				}, $ldap_server['provision_groups']);
 			}
 
@@ -495,25 +492,30 @@ class CControllerAuthenticationUpdate extends CController {
 
 		$saml_data += $saml_fields;
 
-		$db_saml = API::UserDirectory()->get([
-			'output' => ['userdirectoryid'],
-			'filter' => [
-				'idp_type' => IDP_TYPE_SAML
-			]
-		]);
-
-		CArrayHelper::sort($saml_data['provision_groups'], ['sortorder']);
-		$saml_data['provision_groups'] = array_values($saml_data['provision_groups']);
-		$saml_data['provision_groups'] = array_map(function ($group) {
-			return array_intersect_key($group,
-				array_flip(['is_fallback', 'fallback_status', 'name', 'roleid', 'user_groups'])
-			);
-		}, $saml_data['provision_groups']);
-
 		if (!array_key_exists('provision_status', $saml_data)
 				|| $saml_data['provision_status'] != JIT_PROVISIONING_ENABLED) {
 			$saml_data = array_diff_key($saml_data, array_flip(self::PROVISION_ENABLED_FIELDS));
 		}
+
+		if (array_key_exists('provision_groups', $saml_data) && $saml_data['provision_groups']) {
+			CArrayHelper::sort($saml_data['provision_groups'], ['sortorder']);
+			$saml_data['provision_groups'] = array_values($saml_data['provision_groups']);
+
+			foreach ($saml_data['provision_groups'] as $index => $group) {
+				if (array_key_exists('enabled', $group) && $group['enabled'] == 0) {
+					unset($saml_data['provision_groups'][$index]);
+					continue;
+				}
+
+				$group_props = ['name', 'user_groups', 'roleid'];
+				$saml_data['provision_groups'][$index] = array_intersect_key($group, array_flip($group_props));
+			}
+		}
+
+		$db_saml = API::UserDirectory()->get([
+			'output' => ['userdirectoryid'],
+			'filter' => ['idp_type' => IDP_TYPE_SAML]
+		]);
 
 		if ($db_saml) {
 			$result = API::UserDirectory()->update(['userdirectoryid' => $db_saml[0]['userdirectoryid']] + $saml_data);
@@ -561,30 +563,18 @@ class CControllerAuthenticationUpdate extends CController {
 
 	private function validateProvisionGroups(array $provision_group): bool {
 		foreach ($provision_group as $group) {
-			if (!is_array($group)
-					|| !array_key_exists('is_fallback', $group)
-					|| !array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
-					|| !array_key_exists('roleid', $group) || !ctype_digit($group['roleid'])) {
+			if (!is_array($group)) {
 				return false;
 			}
 
-			switch ($group['is_fallback']) {
-				case GROUP_MAPPING_REGULAR:
-					if (!array_key_exists('name', $group) || !is_string($group['name']) || $group['name'] === '') {
-						return false;
-					}
-					break;
+			if (array_key_exists('enabled', $group) && $group['enabled'] == 0) {
+				continue;
+			}
 
-				case GROUP_MAPPING_FALLBACK:
-					if (!array_key_exists('fallback_status', $group)
-							|| ($group['fallback_status'] != GROUP_MAPPING_FALLBACK_OFF
-								&& $group['fallback_status'] != GROUP_MAPPING_FALLBACK_ON)) {
-						return false;
-					}
-					break;
-
-				default:
-					return false;
+			if (!array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
+					|| !array_key_exists('roleid', $group) || !ctype_digit($group['roleid'])
+					|| !array_key_exists('name', $group) || !is_string($group['name']) || $group['name'] === '') {
+				return false;
 			}
 		}
 
@@ -598,10 +588,10 @@ class CControllerAuthenticationUpdate extends CController {
 
 		foreach ($provision_media as $media) {
 			if (!is_array($media)
-				|| !array_key_exists('name', $media) || !is_string($media['name']) || $media['name'] === ''
-				|| !array_key_exists('attribute', $media) || !is_string($media['attribute'])
-				|| $media['attribute'] === ''
-				|| !array_key_exists('mediatypeid', $media) || !ctype_digit($media['mediatypeid'])) {
+					|| !array_key_exists('name', $media) || !is_string($media['name']) || $media['name'] === ''
+					|| !array_key_exists('attribute', $media) || !is_string($media['attribute'])
+					|| $media['attribute'] === ''
+					|| !array_key_exists('mediatypeid', $media) || !ctype_digit($media['mediatypeid'])) {
 				return false;
 			}
 		}

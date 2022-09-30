@@ -234,7 +234,7 @@ class CUserDirectory extends CApiService {
 			'countOutput' =>				['type' => API_FLAG, 'default' => false],
 			'selectUsrgrps' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode']), 'default' => null],
 			'selectProvisionMedia' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['name', 'mediatypeid', 'attribute']), 'default' => null],
-			'selectProvisionGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['is_fallback', 'fallback_status', 'name', 'roleid', 'user_groups']), 'default' => null],
+			'selectProvisionGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['name', 'roleid', 'user_groups']), 'default' => null],
 			// sort and limit
 			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['name']), 'uniq' => true, 'default' => []],
 			'sortorder' =>					['type' => API_SORTORDER, 'default' => []],
@@ -356,7 +356,7 @@ class CUserDirectory extends CApiService {
 		unset($row);
 
 		if ($options['selectProvisionGroups'] === API_OUTPUT_EXTEND) {
-			$options['selectProvisionGroups'] = ['is_fallback', 'fallback_status', 'name', 'roleid', 'user_groups'];
+			$options['selectProvisionGroups'] = ['name', 'roleid', 'user_groups'];
 		}
 
 		$user_groups_index = array_search('user_groups', $options['selectProvisionGroups']);
@@ -452,7 +452,7 @@ class CUserDirectory extends CApiService {
 				foreach ($userdirectory['provision_groups'] as $group) {
 					$userdirectory_idpgroups[] = [
 						'userdirectoryid' => $userdirectory['userdirectoryid'],
-						'sortorder' => $group['is_fallback'] == GROUP_MAPPING_FALLBACK
+						'sortorder' => $group['name'] === USERDIRECTORY_FALLBACK_GROUP_NAME
 							? count($userdirectory['provision_groups'])
 							: $sortorder++
 					] + $group;
@@ -535,7 +535,6 @@ class CUserDirectory extends CApiService {
 
 		self::checkDuplicates($userdirectories);
 		self::checkSamlExists($userdirectories);
-		self::checkFallbackGroup($userdirectories);
 	}
 
 	/**
@@ -564,28 +563,6 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Only one user directory of type "%1$s" can exist.', IDP_TYPE_SAML)
 			);
-		}
-	}
-
-	/**
-	 * Perform all fallback group related checks.
-	 *
-	 * @return void
-	 */
-	private static function checkFallbackGroup(array $userdirectories): void {
-		foreach (array_column($userdirectories, 'provision_groups') as $provision_groups) {
-			if (!$provision_groups) {
-				continue;
-			}
-
-			$fallbacks = array_column($provision_groups, 'is_fallback');
-			$fallbacks = array_keys($fallbacks, GROUP_MAPPING_FALLBACK);
-
-			if (count($fallbacks) != 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('Exactly one fallback group must exist for each user directory.')
-				);
-			}
 		}
 	}
 
@@ -720,7 +697,6 @@ class CUserDirectory extends CApiService {
 		$userdirectories = array_column($userdirectories, null, 'userdirectoryid');
 
 		self::checkDuplicates($userdirectories, $db_userdirectories);
-		self::checkFallbackGroup($userdirectories);
 		self::addAffectedObjects($userdirectories, $db_userdirectories);
 	}
 
@@ -771,9 +747,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		$db_provision_groups = DB::select('userdirectory_idpgroup', [
-			'output' => ['userdirectory_idpgroupid', 'userdirectoryid', 'roleid', 'is_fallback', 'fallback_status',
-				'name', 'sortorder'
-			],
+			'output' => ['userdirectory_idpgroupid', 'userdirectoryid', 'roleid', 'name', 'sortorder'],
 			'filter' => [
 				'userdirectoryid' => $affected_userdirectoryids
 			],
@@ -805,8 +779,6 @@ class CUserDirectory extends CApiService {
 
 			$db_userdirectories[$userdirectoryid]['provision_groups'][] = [
 				'userdirectory_idpgroupid' => $prov_groupid,
-				'is_fallback' => $db_prov_groups['is_fallback'],
-				'fallback_status' => $db_prov_groups['fallback_status'],
 				'name' => $db_prov_groups['name'],
 				'roleid' => $db_prov_groups['roleid'],
 				'sortorder' => $db_prov_groups['sortorder'],
@@ -1064,11 +1036,8 @@ class CUserDirectory extends CApiService {
 				'attribute' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 			]],
-			'provision_groups' =>	['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-				'is_fallback' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_REGULAR, GROUP_MAPPING_FALLBACK])],
-				'fallback_status' =>	['type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_FALLBACK_OFF, GROUP_MAPPING_FALLBACK_ON])],
-				// TODO: uncomment when is_fallback, fallback_status are removed and name will be set required
-				// 'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+			'provision_groups' =>	['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['name']], 'fields' => [
+				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
 				'roleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 				'user_groups' =>		['type' => API_OBJECTS, 'fields' => [
 					'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
@@ -1158,24 +1127,19 @@ class CUserDirectory extends CApiService {
 				$db_group['user_groups'] = array_values($db_group['user_groups']);
 
 				$provision_groups_remove[$userdirectoryid][$db_group['userdirectory_idpgroupid']]
-					= array_intersect_key($db_group,
-						array_flip(['is_fallback', 'fallback_status', 'name', 'roleid','sortorder', 'user_groups'])
-					);
+					= array_intersect_key($db_group, array_flip(['name', 'roleid','sortorder', 'user_groups']));
 			}
 
 			$sortorder = 1;
 			foreach ($userdirectories[$userdirectoryid]['provision_groups'] as $index => &$group) {
-				$group['sortorder'] = $group['is_fallback'] == GROUP_MAPPING_FALLBACK
+				$group['sortorder'] = $group['name'] === USERDIRECTORY_FALLBACK_GROUP_NAME
 					? count($userdirectories[$userdirectoryid]['provision_groups'])
 					: $sortorder++;
 
 				CArrayHelper::sort($group['user_groups'], ['usrgrpid']);
 				$group['user_groups'] = array_values($group['user_groups']);
 
-				$provision_groups_insert[$userdirectoryid][$index] = $group + [
-					'userdirectoryid' => $userdirectoryid,
-					'fallback_status' => JIT_PROVISIONING_DISABLED
-				];
+				$provision_groups_insert[$userdirectoryid][$index] = $group + ['userdirectoryid' => $userdirectoryid];
 			}
 			unset($group);
 		}
@@ -1385,20 +1349,8 @@ class CUserDirectory extends CApiService {
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'provision_groups' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-											'is_fallback' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_REGULAR, GROUP_MAPPING_FALLBACK]), 'default' => GROUP_MAPPING_REGULAR],
-											'fallback_status' =>	['type' => API_MULTIPLE, 'rules' => [
-																		['if' => function (array $provision_group): bool {
-																			return $provision_group['is_fallback'] == GROUP_MAPPING_FALLBACK;
-																		}, 'type' => API_INT32, 'in' => implode(',', [GROUP_MAPPING_FALLBACK_OFF, GROUP_MAPPING_FALLBACK_ON]), 'default' => GROUP_MAPPING_FALLBACK_ON],
-																		['else' => true, 'type' => API_UNEXPECTED]
-																	]],
-											'name' =>				['type' => API_MULTIPLE, 'rules' => [
-																		['if' => function (array $provision_group): bool {
-																			return $provision_group['is_fallback'] == GROUP_MAPPING_REGULAR;
-																		}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_idpgroup', 'name')],
-																		['else' => true, 'type' => API_UNEXPECTED]
-																	]],
+										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+											'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_idpgroup', 'name')],
 											'roleid' =>				['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 											'user_groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
 												'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]

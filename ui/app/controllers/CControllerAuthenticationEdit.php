@@ -168,10 +168,10 @@ class CControllerAuthenticationEdit extends CController {
 			$data['saml_provision_media'] = $this->getInput('saml_provision_media', []);
 
 			if ($data['saml_provision_groups']) {
-				$data['saml_provision_groups'] = $this->extendProvisionGroups($data['saml_provision_groups']);
-
 				CArrayHelper::sort($data['saml_provision_groups'], ['sortorder']);
 				$data['saml_provision_groups'] = array_values($data['saml_provision_groups']);
+
+				self::extendProvisionGroups($data['saml_provision_groups']);
 			}
 
 			if ($data['saml_provision_media']) {
@@ -251,29 +251,9 @@ class CControllerAuthenticationEdit extends CController {
 				];
 			}
 
-			if (!$saml_configuration['saml_provision_groups']) {
-				$default_role = API::Role()->get([
-					'output' => ['roleid'],
-					'filter' => ['type' => USER_TYPE_ZABBIX_USER],
-					'limit' => 1
-				]);
+			self::extendProvisionGroups($saml_configuration['saml_provision_groups']);
+			self::extendProvisionMedia($saml_configuration['saml_provision_media']);
 
-				$saml_configuration['saml_provision_groups'] = $default_role
-					? [[
-						'name' => _('Fallback group'),
-						'is_fallback' => GROUP_MAPPING_FALLBACK,
-						'fallback_status' => GROUP_MAPPING_FALLBACK_OFF,
-						'user_groups' => [
-							['usrgrpid' => 7]
-							// TODO: define default user group.
-						],
-						'roleid' => $default_role[0]['roleid']
-					]]
-					: [];
-			}
-
-			$saml_configuration['saml_provision_groups'] = $this->extendProvisionGroups($saml_configuration['saml_provision_groups']);
-			$saml_configuration['saml_provision_media'] = $this->extendProvisionMedia($saml_configuration['saml_provision_media']);
 			$data += $saml_configuration;
 
 			$data['ldap_default_row_index'] = '';
@@ -283,20 +263,6 @@ class CControllerAuthenticationEdit extends CController {
 					array_column($data['ldap_servers'], 'userdirectoryid')
 				);
 			}
-
-			foreach ($data['ldap_servers'] as &$ldap_server) {
-				$ldap_server['provision_groups'] = array_map(function ($provision_group) {
-					if ($provision_group['is_fallback'] == GROUP_MAPPING_FALLBACK) {
-						unset($provision_group['name']);
-					}
-					else {
-						unset($provision_group['fallback_status']);
-					}
-
-					return $provision_group;
-				}, $ldap_server['provision_groups']);
-			}
-			unset($ldap_server);
 
 			$data['ldap_removed_userdirectoryids'] = [];
 		}
@@ -347,22 +313,20 @@ class CControllerAuthenticationEdit extends CController {
 	 * Adds missing information that is necessary for provision group rendering in the view.
 	 *
 	 * @param array $provision_groups
-	 *
-	 * @return array
 	 */
-	private function extendProvisionGroups(array $provision_groups): array {
-		if (!$provision_groups) {
-			return $provision_groups;
-		}
-
+	private static function extendProvisionGroups(array &$provision_groups): void {
 		$roleids = [];
 		$usrgrpids = [];
 
 		foreach ($provision_groups as $group) {
-			$roleids[$group['roleid']] = $group['roleid'];
+			if (array_key_exists('roleid', $group)) {
+				$roleids[$group['roleid']] = $group['roleid'];
+			}
 
-			foreach ($group['user_groups'] as $user_group) {
-				$usrgrpids[$user_group['usrgrpid']] = $user_group['usrgrpid'];
+			if (array_key_exists('user_groups', $group)) {
+				foreach ($group['user_groups'] as $user_group) {
+					$usrgrpids[$user_group['usrgrpid']] = $user_group['usrgrpid'];
+				}
 			}
 		}
 
@@ -382,17 +346,36 @@ class CControllerAuthenticationEdit extends CController {
 			])
 			: [];
 
+		$has_fallback_group = false;
 		foreach ($provision_groups as &$provision_group) {
-			$provision_group['role_name'] = $roles[$provision_group['roleid']]['name'];
+			if (!array_key_exists('name', $provision_group)
+					|| $provision_group['name'] === USERDIRECTORY_FALLBACK_GROUP_NAME) {
+				$has_fallback_group = true;
 
-			foreach ($provision_group['user_groups'] as &$user_group) {
-				$user_group['name'] = $user_groups[$user_group['usrgrpid']]['name'];
+				if (!array_key_exists('enabled', $provision_group)) {
+					$provision_group['enabled'] = 1;
+				}
 			}
-			unset($user_group);
+
+			if (array_key_exists('roleid', $provision_group)) {
+				$provision_group['role_name'] = $roles[$provision_group['roleid']]['name'];
+			}
+
+			if (array_key_exists('user_groups', $provision_group)) {
+				foreach ($provision_group['user_groups'] as &$user_group) {
+					$user_group['name'] = $user_groups[$user_group['usrgrpid']]['name'];
+				}
+				unset($user_group);
+			}
 		}
 		unset($provision_group);
 
-		return $provision_groups;
+		if (!$has_fallback_group) {
+			$provision_groups[] = [
+				'name' => USERDIRECTORY_FALLBACK_GROUP_NAME,
+				'enabled' => 0
+			];
+		}
 	}
 
 	/**
