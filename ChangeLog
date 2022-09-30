@@ -457,6 +457,9 @@ New features:
 A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 
 Bug fixes:
+........S. [ZBX-21706] fixed double precision update patch for TimescaleDb (akozlovs)
+..F....... [ZBX-19512] fixed debug info block content refresh after changing table content in Monitoring -> Problems page (miks)
+..F....... [ZBX-21682] removed unnecessary horizontal separator from Host interface (kkuzmina)
 ...G...... [ZBX-21610] fixed problem with sysctl() kern.proc.args API bug on FreeBSD <= 8.2 (ssimonenko)
 ........S. [ZBX-17060] fixed unexpected interface connection mode change during autoregistration (asestakovs)
 ...G...... [ZBX-21388] fixed Zabbix agent 2 plugin read error and updated plugin support dependency for Zabbix agent 2 (esneiders)
