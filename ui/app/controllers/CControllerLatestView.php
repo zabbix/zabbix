@@ -121,11 +121,10 @@ class CControllerLatestView extends CControllerLatest {
 		$filter_tabs = [];
 		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
 
-		if ($this->hasInput('filter_reset')) {
+		if ($this->getInputAll()) {
 			$profile->reset();
-		}
-		else {
 			$profile->setInput($this->cleanInput($this->getInputAll()));
+			$profile->update();
 		}
 
 		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
