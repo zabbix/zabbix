@@ -903,7 +903,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Value mapping');
 			$valuemap_field = $this->query('name:itemForm')->asForm()->one()->getField('Value mapping');
 			if (!isset($templateid)) {
-				$this->assertEquals([], $valuemap_field->getValue());
+				$this->assertEquals('', $valuemap_field->getValue());
 
 				$db_valuemap = [];
 				$valuemap_result = DBselect('SELECT name FROM valuemap WHERE hostid='.$host_info['hostid']);
