@@ -21319,6 +21319,10 @@ msgstr "une valeur booléenne est attendue"
 msgid "a character string is expected"
 msgstr "une chaîne de caractères est attendue"
 
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "une date au format AAAA-MM-JJ est attendue"

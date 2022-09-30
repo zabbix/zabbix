@@ -21359,6 +21359,10 @@ msgstr "ein boolescher Wert wird erwartet"
 msgid "a character string is expected"
 msgstr "Zeichenfolge erwartet"
 
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "ein Datum im Format JJJJ-MM-TT wird erwartet"
