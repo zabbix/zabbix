@@ -126,9 +126,13 @@ $html_page = (new CHtmlPage())
 					(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
-						->addItem((new CButton('dashboard-add-widget',
-							[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
-						))->addClass(ZBX_STYLE_BTN_ALT))
+						->addItem(
+							(new CButton('dashboard-add-widget',
+								[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
+							))
+								->addClass(ZBX_STYLE_BTN_ALT)
+								->setEnabled($data['allow_create_widget'])
+						)
 						->addItem(
 							(new CButton('dashboard-add', '&#8203;'))
 								->addClass(ZBX_STYLE_BTN_ALT)
@@ -253,7 +257,8 @@ $html_page
 		'has_time_selector' => $data['has_time_selector'],
 		'time_period' => $data['time_period'],
 		'dynamic' => $data['dynamic'],
-		'web_layout_mode' => $web_layout_mode
+		'web_layout_mode' => $web_layout_mode,
+		'can_create_widget' => $data['allow_create_widget'] // TODO: fix this for template dashboard
 	]).');
 '))
 	->setOnDocumentReady()

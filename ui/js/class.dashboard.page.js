@@ -50,6 +50,7 @@ class CDashboardPage extends CBaseComponent {
 		is_editable,
 		is_edit_mode,
 		can_edit_dashboards,
+		can_create_widget,
 		time_period,
 		dynamic_hostid,
 		unique_id
@@ -79,6 +80,7 @@ class CDashboardPage extends CBaseComponent {
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
 		this._can_edit_dashboards = can_edit_dashboards;
+		this._can_create_widget = can_create_widget;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
 		this._unique_id = unique_id;
@@ -107,7 +109,9 @@ class CDashboardPage extends CBaseComponent {
 			this._initWidgetResizing();
 		}
 
-		this._initWidgetPlaceholder();
+		if (this._can_create_widget) {
+			this._initWidgetPlaceholder();
+		}
 	}
 
 	// Logical state control methods.
@@ -1014,11 +1018,15 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	resetWidgetPlaceholder() {
+		if (!this._can_create_widget) {
+			return;
+		}
+
 		if (this._widget_placeholder_is_active && this._widget_placeholder_is_edit_mode != this._is_edit_mode) {
 			this._deactivateWidgetPlaceholder();
 		}
 
-		if (!this._widget_placeholder_is_active) {
+		if (!this._widget_placeholder_is_active && this._can_create_widget) {
 			this._activateWidgetPlaceholder();
 		}
 
@@ -2010,7 +2018,7 @@ class CDashboardPage extends CBaseComponent {
 
 					this._resizeGrid();
 
-					if (this._is_edit_mode) {
+					if (this._is_edit_mode && this._can_create_widget) {
 						this._widget_placeholder.resize();
 					}
 
