@@ -516,7 +516,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$type = (int) getRequest('type', DB::getDefault('items', 'type'));
 		$key = getRequest('key', DB::getDefault('items', 'key_'));
 
-		if (!isValidItemKey($type, $key)) {
+		if (!isItemExampleKey($type, $key)) {
 			throw new Exception();
 		}
 

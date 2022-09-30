@@ -2167,7 +2167,7 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
  *
  * @return bool
  */
-function isValidItemKey(int $type, string $key): bool {
+function isItemExampleKey(int $type, string $key): bool {
 	if (($type == ITEM_TYPE_DB_MONITOR && $key === ZBX_DEFAULT_KEY_DB_MONITOR)
 			|| ($type == ITEM_TYPE_SSH && $key === ZBX_DEFAULT_KEY_SSH)
 			|| ($type == ITEM_TYPE_TELNET && $key === ZBX_DEFAULT_KEY_TELNET)) {
