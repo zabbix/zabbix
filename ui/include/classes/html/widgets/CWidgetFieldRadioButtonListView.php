@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldRadioButtonList;
+use Zabbix\Widgets\Fields\CWidgetFieldRadioButtonList;
 
 class CWidgetFieldRadioButtonListView extends CWidgetFieldView {
 

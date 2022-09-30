@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldLatLng;
+use Zabbix\Widgets\Fields\CWidgetFieldLatLng;
 
 class CWidgetFieldLatLngView extends CWidgetFieldView {
 

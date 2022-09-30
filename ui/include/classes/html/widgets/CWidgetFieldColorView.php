@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldColor;
+use Zabbix\Widgets\Fields\CWidgetFieldColor;
 
 class CWidgetFieldColorView extends CWidgetFieldView {
 

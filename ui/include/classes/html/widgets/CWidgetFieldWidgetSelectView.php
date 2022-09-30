@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldWidgetSelect;
+use Zabbix\Widgets\Fields\CWidgetFieldWidgetSelect;
 
 class CWidgetFieldWidgetSelectView extends CWidgetFieldView {
 

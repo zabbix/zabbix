@@ -18,28 +18,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-use Widgets\CWidgetConfig;
 
+use Zabbix\Core\CWidget;
+
+use Zabbix\Widgets\CWidgetForm;
 
 /**
  * Class containing methods for operations with widgets.
  */
 abstract class CControllerDashboardWidgetView extends CController {
 
-	/**
-	 * @var int $type  Widget type WIDGET_*.
-	 */
-	private $type;
+	protected ?CWidget $widget;
 
-	/**
-	 * @var array $validation_rules  Validation rules for input parameters.
-	 */
-	private $validation_rules = [];
+	private array $validation_rules = [];
 
-	/**
-	 * @var object $form  CWidgetForm object.
-	 */
-	private $form;
+	private CWidgetForm $form;
 
 	/**
 	 * Initialization function.
@@ -49,53 +42,21 @@ abstract class CControllerDashboardWidgetView extends CController {
 	}
 
 	/**
-	 * Check user permissions.
-	 *
-	 * @return bool
-	 */
-	protected function checkPermissions() {
-		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
-	}
-
-	/**
-	 * Set widget type.
-	 *
-	 * @param int $type  Widget type WIDGET_*.
-	 *
-	 * @return object
-	 */
-	protected function setType($type) {
-		$this->type = $type;
-
-		return $this;
-	}
-
-	protected function getContext(): string {
-		return $this->hasInput('templateid')
-			? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-			: CWidgetConfig::CONTEXT_DASHBOARD;
-	}
-
-	/**
 	 * Set validation rules for input parameters.
 	 *
 	 * @param array $validation_rules  Validation rules for input parameters.
-	 *
-	 * @return object
 	 */
-	protected function setValidationRules(array $validation_rules) {
+	protected function setValidationRules(array $validation_rules): object {
 		$this->validation_rules = $validation_rules;
 
 		return $this;
 	}
 
 	/**
-	 * Returns default widget name.
-	 *
-	 * @return string
+	 * Check user permissions.
 	 */
-	protected function getDefaultName() {
-		return CWidgetConfig::getKnownWidgetTypes($this->getContext())[$this->type];
+	protected function checkPermissions() {
+		return $this->getUserType() >= USER_TYPE_ZABBIX_USER;
 	}
 
 	/**
@@ -104,16 +65,18 @@ abstract class CControllerDashboardWidgetView extends CController {
 	 * @return bool
 	 */
 	protected function checkInput() {
+		$this->widget = APP::ModuleManager()->getModuleByActionName($this->getAction());
+
 		$validation_rules = $this->validation_rules;
 
-		if (CWidgetConfig::isWidgetTypeSupportedInContext($this->type, CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD)) {
+		if ($this->widget->isSupportedInTemplate()) {
 			$validation_rules['templateid'] = 'db dashboard.templateid';
 		}
 
 		$ret = $this->validateInput($validation_rules);
 
 		if ($ret) {
-			$this->form = CWidgetConfig::getForm($this->type, $this->getInput('fields', []),
+			$this->form = $this->widget->getForm($this->getInput('fields', []),
 				$this->hasInput('templateid') ? $this->getInput('templateid') : null
 			);
 
@@ -139,12 +102,7 @@ abstract class CControllerDashboardWidgetView extends CController {
 		return $ret;
 	}
 
-	/**
-	 * Returns form object.
-	 *
-	 * @return object
-	 */
-	protected function getForm() {
+	protected function getForm(): CWidgetForm {
 		return $this->form;
 	}
 }

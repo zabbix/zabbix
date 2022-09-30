@@ -1,0 +1,15 @@
+{
+	"manifest_version": 1.0,
+	"id": "svggraph",
+	"type": "widget",
+	"name": "Graph",
+	"namespace": "SvgGraph",
+	"version": "2.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"js_class": "CWidgetSvgGraph"
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

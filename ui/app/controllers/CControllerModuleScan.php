@@ -61,7 +61,7 @@ class CControllerModuleScan extends CController {
 					continue;
 				}
 
-				$relative_path = $dir->getFilename();
+				$relative_path = $modules_dir.'/'.$dir->getFilename();
 
 				$manifest = $module_manager->addModule($relative_path);
 

@@ -1,0 +1,13 @@
+{
+	"manifest_version": 1.0,
+	"id": "url",
+	"type": "widget",
+	"name": "URL",
+	"namespace": "Url",
+	"version": "2.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"template_dashboard": true,
+		"refresh_rate": 0
+	}
+}

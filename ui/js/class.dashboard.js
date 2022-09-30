@@ -1195,6 +1195,18 @@ class CDashboard extends CBaseComponent {
 				}
 			}
 
+			document.getElementById('type').addEventListener('change', () => this.reloadWidgetProperties());
+
+			form.addEventListener('change', (e) => {
+				const is_trimmable = e.target.matches(
+					'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])'
+				);
+
+				if (is_trimmable) {
+					e.target.value = e.target.value.trim();
+				}
+			}, {capture: true});
+
 			try {
 				new TabIndicators();
 			}

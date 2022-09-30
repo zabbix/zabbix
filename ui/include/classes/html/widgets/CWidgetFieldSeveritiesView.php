@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldSeverities;
+use Zabbix\Widgets\Fields\CWidgetFieldSeverities;
 
 class CWidgetFieldSeveritiesView extends CWidgetFieldView {
 

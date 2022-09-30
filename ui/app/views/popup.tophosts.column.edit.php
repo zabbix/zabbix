@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-use Widgets\Fields\CWidgetFieldColumnsList;
+use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
 $form = (new CForm())
 	->setName('tophosts_column')

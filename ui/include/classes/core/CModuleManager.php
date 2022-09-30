@@ -19,8 +19,12 @@
 **/
 
 
-use Core\CModule;
 use CController as CAction;
+
+use Zabbix\Core\{
+	CModule,
+	CWidget
+};
 
 /**
  * Module manager class for testing and loading user modules.
@@ -30,7 +34,7 @@ final class CModuleManager {
 	/**
 	 * Highest supported manifest version.
 	 */
-	private const MAX_MANIFEST_VERSION = 1;
+	private const MAX_MANIFEST_VERSION = 2;
 
 	/**
 	 * Root path of modules.
@@ -91,6 +95,193 @@ final class CModuleManager {
 		return $manifest;
 	}
 
+	public function initModule($relative_path, $manifest): void {
+		$base_classname = $manifest['type'] === CModule::TYPE_WIDGET ? CWidget::class : CModule::class;
+		$classname = $manifest['type'] === CModule::TYPE_WIDGET ? 'Widget' : 'Module';
+
+		$module_class = $base_classname;
+
+		if (is_file($this->root_path.'/'.$relative_path.'/'.$classname.'.php')) {
+			$module_class = implode('\\', [$manifest['root_namespace'], $manifest['namespace'], $classname]);
+
+			if (!class_exists($module_class)) {
+				$this->errors[] = _s('Wrong %1$s.php class name for module located at %2$s.', $classname,
+					$relative_path
+				);
+
+				return;
+			}
+		}
+
+		try {
+			/** @var CModule $instance */
+			$instance = new $module_class($this->root_path, $relative_path, $manifest);
+
+			if ($instance instanceof $base_classname) {
+				$instance->init();
+
+				$this->modules[$instance->getId()] = $instance;
+			}
+			else {
+				$this->errors[] = _s('%1$s.php class must extend %2$s for module located at %3$s.',
+					$classname, $base_classname, $relative_path
+				);
+			}
+		}
+		catch (Exception $e) {
+			$this->errors[] = _s('%1$s - thrown by module located at %2$s.', $e->getMessage(), $relative_path);
+		}
+	}
+
+	/**
+	 * Get initialized modules.
+	 */
+	public function getModules(): array {
+		return $this->modules;
+	}
+
+	/**
+	 * Get loaded module instance associated with given action name.
+	 *
+	 * @param string $action_name
+	 *
+	 * @return CModule|null
+	 */
+	public function getModuleByActionName(string $action_name): ?CModule {
+		/** @var CModule $module */
+		foreach ($this->modules as $module) {
+			if (array_key_exists($action_name, $module->getActions())) {
+				return $module;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get add initialized modules with type Widget.
+	 */
+	public function getWidgets(bool $for_template_dashboard_only = false): array {
+		$widgets = [];
+
+		/** @var CWidget $widget */
+		foreach ($this->modules as $widget) {
+			if (!($widget instanceof CWidget) || ($for_template_dashboard_only && !$widget->isSupportedInTemplate())) {
+				continue;
+			}
+			$widgets[$widget->getId()] = $widget;
+		}
+
+		return $widgets;
+	}
+
+	public function getWidgetsDefaults(bool $for_template_dashboard_only = false): array {
+		$widget_defaults = [];
+
+		/** @var CWidget $widget */
+		foreach (APP::ModuleManager()->getWidgets($for_template_dashboard_only) as $widget) {
+			$widget_defaults[$widget->getId()] = $widget->getDefaults() + [
+				'iterator' => false,
+				'reference_field' => null,
+				'foreign_reference_fields' => []
+			];
+		}
+
+		return $widget_defaults;
+	}
+
+	public function getWidgetsNames(bool $for_template_dashboard_only = false): array {
+		$names = [];
+
+		foreach ($this->getWidgets($for_template_dashboard_only) as $widget) {
+			$names[$widget->getId()] = $widget->getName();
+		}
+
+		return $names;
+	}
+
+	public function getWidget($module_id): ?CWidget {
+		if (!array_key_exists($module_id, $this->modules)) {
+			return null;
+		}
+
+		$module = $this->modules[$module_id];
+
+		return $module instanceof CWidget ? $module : null;
+	}
+
+	public function getManifests(): array {
+		return $this->manifests;
+	}
+
+	/**
+	 * Get namespaces of all added modules.
+	 */
+	public function getNamespaces(): array {
+		$namespaces = [];
+
+		foreach ($this->manifests as $relative_path => $manifest) {
+			$module_path = $this->root_path.'/'.$relative_path;
+			$namespaces[$manifest['root_namespace'].'\\'.$manifest['namespace']] = [$module_path];
+		}
+
+		return $namespaces;
+	}
+
+	/**
+	 * Get actions of all initialized modules.
+	 */
+	public function getActions(): array {
+		$actions = [];
+
+		/** @var CModule $module */
+		foreach ($this->modules as $module) {
+			foreach ($module->getActions() as $name => $data) {
+				$action_class = implode('\\', [$module->getRootNamespace(), $module->getNamespace(), 'Actions',
+					str_replace('/', '\\', $data['class'])
+				]);
+
+				if (!class_exists($action_class)) {
+					$action_class = $data['class'];
+				}
+
+				$actions[$name] = [
+					'class' => $action_class,
+					'layout' => array_key_exists('layout', $data) ? $data['layout'] : 'layout.htmlpage',
+					'view' => array_key_exists('view', $data) ? $data['view'] : null
+				];
+			}
+		}
+
+		return $actions;
+	}
+
+	public function getAssets(): array {
+		$assets = ['css' => [], 'js' => []];
+
+		/** @var CModule $module */
+		foreach ($this->modules as $module) {
+			$module_assets = $module->getAssets();
+
+			foreach ($module_assets['css'] as $css_file) {
+				$assets['css'][] = $module->getRelativePath().'/assets/css/'.$css_file;
+			}
+
+			foreach ($module_assets['js'] as $js_file) {
+				$assets['js'][] = $module->getRelativePath().'/assets/js/'.$js_file;
+			}
+		}
+
+		return $assets;
+	}
+
+	/**
+	 * Get errors encountered while module initialization.
+	 */
+	public function getErrors(): array {
+		return $this->errors;
+	}
+
 	/**
 	 * Check added modules for conflicts.
 	 *
@@ -141,149 +332,12 @@ final class CModuleManager {
 			$conflicting_manifests = array_merge($conflicting_manifests, $relative_paths);
 		}
 
+		$this->errors = $conflicts;
+
 		return [
 			'conflicts' => $conflicts,
 			'conflicting_manifests' => array_unique($conflicting_manifests)
 		];
-	}
-
-	/**
-	 * Get add initialized modules.
-	 */
-	public function getModules(): array {
-		return $this->modules;
-	}
-
-	/**
-	 * Get loaded module instance associated with given action name.
-	 *
-	 * @param string $action_name
-	 *
-	 * @return CModule|null
-	 */
-	public function getModuleByActionName(string $action_name): ?CModule {
-		/** @var CModule $module */
-		foreach ($this->modules as $module) {
-			if (array_key_exists($action_name, $module->getActions())) {
-				return $module;
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Get namespaces of all added modules.
-	 */
-	public function getNamespaces(): array {
-		$namespaces = [];
-
-		foreach ($this->manifests as $relative_path => $manifest) {
-			$module_path = $this->root_path.'/'.$relative_path;
-			$namespaces['Modules\\'.$manifest['namespace']] = [$module_path];
-		}
-
-		return $namespaces;
-	}
-
-	/**
-	 * Check, instantiate and initialize all added modules.
-	 *
-	 * @return array  List of initialized modules.
-	 */
-	public function initModules(): array {
-		[
-			'conflicts' => $this->errors,
-			'conflicting_manifests' => $conflicting_manifests
-		] = $this->checkConflicts();
-
-		$non_conflicting_manifests = array_diff_key($this->manifests, array_flip($conflicting_manifests));
-
-		foreach ($non_conflicting_manifests as $relative_path => $manifest) {
-			$module_dir = $this->root_path.'/'.$relative_path;
-
-			if (is_file($module_dir.'/Module.php')) {
-				$module_class = implode('\\', ['Modules', $manifest['namespace'], 'Module']);
-
-				if (!class_exists($module_class)) {
-					$this->errors[] = _s('Wrong Module.php class name for module located at %1$s.', $relative_path);
-
-					continue;
-				}
-			}
-			else {
-				$module_class = CModule::class;
-			}
-
-			try {
-				/** @var CModule $instance */
-				$instance = new $module_class($this->root_path, $relative_path, $manifest);
-
-				if ($instance instanceof CModule) {
-					$instance->init();
-
-					$this->modules[$instance->getId()] = $instance;
-				}
-				else {
-					$this->errors[] = _s('Module.php class must extend %1$s for module located at %2$s.',
-						CModule::class, $relative_path
-					);
-				}
-			}
-			catch (Exception $e) {
-				$this->errors[] = _s('%1$s - thrown by module located at %2$s.', $e->getMessage(), $relative_path);
-			}
-		}
-
-		return $this->modules;
-	}
-
-	/**
-	 * Get actions of all initialized modules.
-	 */
-	public function getActions(): array {
-		$actions = [];
-
-		/** @var CModule $module */
-		foreach ($this->modules as $module) {
-			foreach ($module->getActions() as $name => $data) {
-				$actions[$name] = [
-					'class' => implode('\\', ['Modules', $module->getNamespace(), 'Actions',
-						str_replace('/', '\\', $data['class'])
-					]),
-					'layout' => array_key_exists('layout', $data) ? $data['layout'] : 'layout.htmlpage',
-					'view' => array_key_exists('view', $data) ? $data['view'] : null
-				];
-			}
-		}
-
-		return $actions;
-	}
-
-	public function getAssets(): array {
-		$assets = ['css' => [], 'js' => []];
-
-		/** @var CModule $module */
-		foreach ($this->modules as $module) {
-			$module_assets = $module->getAssets();
-
-			foreach ($module_assets['css'] as $css_file) {
-				$assets['css'][] = $module->getRelativePath().'/assets/css/'.$css_file;
-			}
-
-			foreach ($module_assets['js'] as $js_file) {
-				$assets['js'][] = $module->getRelativePath().'/assets/js/'.$js_file;
-			}
-		}
-
-		return $assets;
-	}
-
-	/**
-	 * Get errors encountered while module initialization.
-	 */
-	public function getErrors(): array {
-		return $this->errors;
 	}
 
 	/**
@@ -344,9 +398,12 @@ final class CModuleManager {
 		}
 
 		// Check manifest namespace syntax.
-		if (!preg_match('/^[a-z_]+$/i', $manifest['namespace'])) {
+		if (!preg_match('/^[0-9a-z_]+$/i', $manifest['namespace'])) {
 			return null;
 		}
+
+		[$root_namespace] = explode('/', $relative_path, 2);
+		$manifest['root_namespace'] = ucfirst($root_namespace);
 
 		// Ensure empty defaults.
 		$manifest += [
@@ -359,6 +416,18 @@ final class CModuleManager {
 			'config' => [],
 			'widget' => []
 		];
+
+		if ($manifest['type'] === CModule::TYPE_WIDGET) {
+			$manifest['widget'] += [
+				'name' => '',
+				'form_class' => CWidget::DEFAULT_FORM_CLASS,
+				'js_class' => CWidget::DEFAULT_JS_CLASS,
+				'size' => CWidget::DEFAULT_SIZE,
+				'refresh_rate' => CWidget::DEFAULT_REFRESH_RATE,
+				'template_dashboard' => false,
+				'use_time_selector' => false
+			];
+		}
 
 		return $manifest;
 	}

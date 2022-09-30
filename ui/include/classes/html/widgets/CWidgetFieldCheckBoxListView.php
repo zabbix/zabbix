@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldCheckBoxList;
+use Zabbix\Widgets\Fields\CWidgetFieldCheckBoxList;
 
 class CWidgetFieldCheckBoxListView extends CWidgetFieldView {
 

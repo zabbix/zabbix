@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldDatePicker;
+use Zabbix\Widgets\Fields\CWidgetFieldDatePicker;
 
 class CWidgetFieldDatePickerView extends CWidgetFieldView {
 

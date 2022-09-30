@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldGraphDataSet;
+use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
 
 class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 

@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldMultiSelectGraph;
+use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectGraph;
 
 class CWidgetFieldMultiSelectGraphView extends CWidgetFieldMultiSelectView {
 

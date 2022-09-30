@@ -1,0 +1,16 @@
+{
+	"manifest_version": 1.0,
+	"id": "hostavail",
+	"type": "widget",
+	"name": "Host availability",
+	"namespace": "HostАvail",
+	"version": "2.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"size": {
+			"width": 6,
+			"height": 3
+		},
+		"refresh_rate": 900
+	}
+}

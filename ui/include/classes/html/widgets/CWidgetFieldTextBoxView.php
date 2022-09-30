@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldTextBox;
+use Zabbix\Widgets\Fields\CWidgetFieldTextBox;
 
 class CWidgetFieldTextBoxView extends CWidgetFieldView {
 

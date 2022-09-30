@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldIntegerBox;
+use Zabbix\Widgets\Fields\CWidgetFieldIntegerBox;
 
 class CWidgetFieldIntegerBoxView extends CWidgetFieldView {
 

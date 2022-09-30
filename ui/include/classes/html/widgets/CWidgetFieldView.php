@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\CWidgetField;
+use Zabbix\Widgets\CWidgetField;
 
 abstract class CWidgetFieldView {
 

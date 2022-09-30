@@ -19,11 +19,11 @@
 **/
 
 
-use Widgets\CWidgetConfig;
+use Zabbix\Core\CWidget;
 
 class CControllerDashboardWidgetCheck extends CController {
 
-	private $context;
+	private ?CWidget $widget;
 
 	protected function init() {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -40,11 +40,15 @@ class CControllerDashboardWidgetCheck extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$this->context = $this->hasInput('templateid')
-				? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-				: CWidgetConfig::CONTEXT_DASHBOARD;
+			$this->widget = APP::ModuleManager()->getWidget($this->getInput('type'));
 
-			if (!CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context)) {
+			if ($this->widget === null) {
+				error(_('Not supported widget.'));
+
+				$ret = false;
+			}
+
+			if ($this->hasInput('templateid') && !$this->widget->isSupportedInTemplate()) {
 				error(_('Widget type is not supported in this context.'));
 
 				$ret = false;
@@ -69,8 +73,8 @@ class CControllerDashboardWidgetCheck extends CController {
 	}
 
 	protected function doAction() {
-		$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', []),
-			($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD) ? $this->getInput('templateid') : null
+		$form = $this->widget->getForm($this->getInput('fields', []),
+			$this->hasInput('templateid') ? $this->getInput('templateid') : null
 		);
 
 		$output = [];

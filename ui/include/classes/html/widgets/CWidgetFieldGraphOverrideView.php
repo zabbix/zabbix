@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldGraphOverride;
+use Zabbix\Widgets\Fields\CWidgetFieldGraphOverride;
 
 class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 

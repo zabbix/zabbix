@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldHostPatternSelect;
+use Zabbix\Widgets\Fields\CWidgetFieldHostPatternSelect;
 
 class CWidgetFieldHostPatternSelectView extends CWidgetFieldView {
 

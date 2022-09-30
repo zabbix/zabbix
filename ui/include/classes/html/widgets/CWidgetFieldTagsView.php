@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldTags;
+use Zabbix\Widgets\Fields\CWidgetFieldTags;
 
 class CWidgetFieldTagsView extends CWidgetFieldView {
 

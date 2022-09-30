@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldMultiSelectSla;
+use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectSla;
 
 class CWidgetFieldMultiSelectSlaView extends CWidgetFieldMultiSelectView {
 

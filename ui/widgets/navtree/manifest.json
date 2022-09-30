@@ -1,0 +1,20 @@
+{
+	"manifest_version": 1.0,
+	"id": "navtree",
+	"type": "widget",
+	"name": "Map navigation tree",
+	"namespace": "NavTree",
+	"version": "2.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"size": {
+			"width": 6,
+			"height": 5
+		},
+		"js_class": "CWidgetNavTree",
+		"refresh_rate": 900
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

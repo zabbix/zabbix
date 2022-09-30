@@ -19,7 +19,7 @@
 **/
 
 
-namespace Core;
+namespace Zabbix\Core;
 
 use CController as CAction;
 
@@ -28,13 +28,13 @@ use CController as CAction;
  */
 class CModule {
 
-	public const TYPE_MODULE = 0;
-	public const TYPE_WIDGET = 1;
+	public const TYPE_MODULE = 'module';
+	public const TYPE_WIDGET = 'widget';
 
 	private string $dir;
 	private string $relative_path;
 
-	private array $manifest;
+	protected array $manifest;
 
 	public function __construct(string $modules_dir, string $relative_path, array $manifest) {
 		$this->dir = $modules_dir.'/'.$relative_path;
@@ -43,6 +43,21 @@ class CModule {
 	}
 
 	public function init(): void {
+	}
+
+	public function getAssets(): array {
+		return $this->manifest['assets'] + [
+				'css' => [],
+				'js' => []
+			];
+	}
+
+	public function getActions(): array {
+		return $this->manifest['actions'];
+	}
+
+	final public function getType(): string {
+		return $this->manifest['type'];
 	}
 
 	final public function getDir(): string {
@@ -61,23 +76,16 @@ class CModule {
 		return $this->manifest['id'];
 	}
 
+	final public function getRootNamespace(): string {
+		return $this->manifest['root_namespace'];
+	}
+
 	final public function getNamespace(): string {
 		return $this->manifest['namespace'];
 	}
 
 	final public function getVersion(): string {
 		return $this->manifest['version'];
-	}
-
-	final public function getActions(): array {
-		return $this->manifest['actions'];
-	}
-
-	final public function getAssets(): array {
-		return $this->manifest['assets'] + [
-			'css' => [],
-			'js' => []
-		];
 	}
 
 	final public function getConfig(): array {

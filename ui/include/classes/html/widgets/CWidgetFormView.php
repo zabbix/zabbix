@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\CWidgetField;
+use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFormView {
 
@@ -36,10 +36,7 @@ class CWidgetFormView {
 		$this->data = $data;
 		$this->name = $name;
 
-		$this
-			->makeFormGrid()
-			->includeJsFile('js/widget.form.view.js.php')
-			->addJavaScript('widget_form.init();');
+		$this->makeFormGrid();
 	}
 
 	// TODO AS: phpdoc

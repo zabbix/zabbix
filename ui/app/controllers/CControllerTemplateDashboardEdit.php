@@ -19,8 +19,6 @@
 **/
 
 
-use Widgets\CWidgetConfig;
-
 class CControllerTemplateDashboardEdit extends CController {
 
 	private $dashboard;
@@ -93,11 +91,11 @@ class CControllerTemplateDashboardEdit extends CController {
 			];
 		}
 
-		$widget_known_types = array_keys(CWidgetConfig::getKnownWidgetTypes(CWidgetConfig::CONTEXT_DASHBOARD));
+		$widget_known_types = array_keys(APP::ModuleManager()->getWidgets());
 
 		$data = [
 			'dashboard' => $dashboard,
-			'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD),
+			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(true),
 			'widget_last_type' => CProfile::get('web.dashboard.last_widget_type', $widget_known_types[0]),
 			'time_period' => getTimeSelectorPeriod([]),
 			'page' => CPagerHelper::loadPage('template.dashboard.list', null)

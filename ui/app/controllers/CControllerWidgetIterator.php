@@ -25,9 +25,9 @@
 abstract class CControllerWidgetIterator extends CControllerDashboardWidgetView {
 
 	/**
-	 * @var array $iterator_validation_rules  Validation rules for input parameters of the iterator.
+	 * Validation rules for input parameters of the iterator.
 	 */
-	private static $iterator_validation_rules = [
+	private static array $iterator_validation_rules = [
 		'page' => 'required|ge 1'
 	];
 
@@ -39,32 +39,22 @@ abstract class CControllerWidgetIterator extends CControllerDashboardWidgetView 
 
 	/**
 	 * Set validation rules for input parameters.
-	 *
-	 * @param array $validation_rules  Validation rules for input parameters.
-	 *
-	 * @return object
 	 */
-	protected function setValidationRules(array $validation_rules) {
+	protected function setValidationRules(array $validation_rules): object {
 		return parent::setValidationRules(array_merge(self::$iterator_validation_rules, $validation_rules));
 	}
 
 	/**
 	 * Get realistic page number for given number of child widgets.
-	 *
-	 * @param int $num_widgets  Number of child widgets.
-	 *
-	 * @return int  Page number.
 	 */
-	protected function getIteratorPage($num_widgets) {
+	protected function getIteratorPage(int $num_widgets): int {
 		return max(1, min((int) $this->getInput('page'), $this->getIteratorPageCount($num_widgets)));
 	}
 
 	/**
 	 * Get number of child widgets to show on a single page.
-	 *
-	 * @return int  Number of child widgets.
 	 */
-	protected function getIteratorPageSize() {
+	protected function getIteratorPageSize(): int {
 		$fields_data = $this->getForm()->getFieldsValues();
 
 		return min($fields_data['rows'] * $fields_data['columns'],
@@ -74,12 +64,8 @@ abstract class CControllerWidgetIterator extends CControllerDashboardWidgetView 
 
 	/**
 	 * Get number of pages for given number of child widgets.
-	 *
-	 * @param int $num_widgets  Number of child widgets.
-	 *
-	 * @return int  Number of pages.
 	 */
-	protected function getIteratorPageCount($num_widgets) {
+	protected function getIteratorPageCount(int $num_widgets): int {
 		return (floor(max(0, $num_widgets - 1) / $this->getIteratorPageSize()) + 1);
 	}
 }

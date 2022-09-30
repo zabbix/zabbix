@@ -19,14 +19,14 @@
 **/
 
 
-namespace Widgets\Fields;
+namespace Zabbix\Widgets\Fields;
 
 use CAbsoluteTimeParser,
 	CParser,
 	CRelativeTimeParser,
 	DB;
 
-use Widgets\CWidgetField;
+use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldDatePicker extends CWidgetField {
 

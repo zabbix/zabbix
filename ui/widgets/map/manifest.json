@@ -1,0 +1,20 @@
+{
+	"manifest_version": 1.0,
+	"id": "map",
+	"type": "widget",
+	"name": "Map",
+	"namespace": "Map",
+	"version": "2.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"size": {
+			"width": 18,
+			"height": 5
+		},
+		"js_class": "CWidgetMap",
+		"refresh_rate": 900
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

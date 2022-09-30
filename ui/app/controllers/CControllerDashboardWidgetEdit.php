@@ -19,12 +19,13 @@
 **/
 
 
-use Widgets\{
-	CWidgetConfig,
+use Zabbix\Core\CWidget;
+
+use Zabbix\Widgets\{
 	CWidgetForm
 };
 
-use Widgets\Fields\{
+use Zabbix\Widgets\Fields\{
 	CWidgetFieldMultiSelectGraph,
 	CWidgetFieldMultiSelectGraphPrototype,
 	CWidgetFieldMultiSelectGroup,
@@ -38,7 +39,7 @@ use Widgets\Fields\{
 
 class CControllerDashboardWidgetEdit extends CController {
 
-	private $context;
+	private ?CWidget $widget;
 
 	protected function checkInput() {
 		$fields = [
@@ -54,11 +55,15 @@ class CControllerDashboardWidgetEdit extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$this->context = $this->hasInput('templateid')
-				? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-				: CWidgetConfig::CONTEXT_DASHBOARD;
+			$this->widget = APP::ModuleManager()->getWidget($this->getInput('type'));
 
-			if (!CWidgetConfig::isWidgetTypeSupportedInContext($this->getInput('type'), $this->context)) {
+			if ($this->widget === null) {
+				error(_('Not supported widget.'));
+
+				$ret = false;
+			}
+
+			if ($this->hasInput('templateid') && !$this->widget->isSupportedInTemplate()) {
 				error(_('Widget type is not supported in this context.'));
 
 				$ret = false;
@@ -82,24 +87,31 @@ class CControllerDashboardWidgetEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD)
+		return $this->hasInput('templateid')
 			? ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN)
 			: ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
 	protected function doAction() {
-		$known_types = CWidgetConfig::getKnownWidgetTypes($this->context);
+		$known_types = [];
+		$deprecated_types = [];
+
+		/** @var CWidget $widget */
+		foreach (APP::ModuleManager()->getWidgets($this->hasInput('templateid')) as $widget) {
+			if (!$widget->isDeprecated()) {
+				$known_types[$widget->getId()] = $widget->getDefaultName();
+			}
+			else {
+				$deprecated_types[$widget->getId()] = $widget->getDefaultName();
+			}
+		}
+
 		natsort($known_types);
+		natsort($deprecated_types);
 
-		$deprecated_types = array_intersect_key($known_types,
-			array_flip(CWidgetConfig::DEPRECATED_WIDGETS)
+		$form = $this->widget->getForm($this->getInput('fields', []),
+			$this->hasInput('templateid') ? $this->getInput('templateid') : null
 		);
-
-		$templateid = ($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD)
-			? $this->getInput('templateid')
-			: null;
-
-		$form = CWidgetConfig::getForm($this->getInput('type'), $this->getInput('fields', []), $templateid);
 
 		// Transforms corrupted data to default values.
 		$form->validate();
@@ -107,7 +119,7 @@ class CControllerDashboardWidgetEdit extends CController {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', ''),
 			'type' => $this->getInput('type'),
-			'known_types' => array_diff_key($known_types, $deprecated_types),
+			'known_types' => $known_types,
 			'deprecated_types' => $deprecated_types,
 			'fields' => $form->getFields(),
 			'view_mode' => $this->getInput('view_mode', ZBX_WIDGET_VIEW_MODE_NORMAL),
@@ -124,12 +136,8 @@ class CControllerDashboardWidgetEdit extends CController {
 
 	/**
 	 * Prepares mapped list of names for all required resources.
-	 *
-	 * @param CWidgetForm $form
-	 *
-	 * @return array
 	 */
-	private function getCaptions($form) {
+	private function getCaptions(CWidgetForm $form): array {
 		$captions = ['simple' => [], 'ms' => []];
 
 		foreach ($form->getFields() as $field) {

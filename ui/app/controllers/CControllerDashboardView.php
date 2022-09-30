@@ -19,8 +19,6 @@
 **/
 
 
-use Widgets\CWidgetConfig;
-
 class CControllerDashboardView extends CController {
 
 	protected function init() {
@@ -101,19 +99,21 @@ class CControllerDashboardView extends CController {
 
 		$time_selector_options = [
 			'profileIdx' => 'web.dashboard.filter',
-			'profileIdx2' => ($dashboard['dashboardid'] !== null) ? $dashboard['dashboardid'] : 0,
+			'profileIdx2' => $dashboard['dashboardid'] ?? 0,
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
 		];
 
 		updateTimeSelectorPeriod($time_selector_options);
 
-		$widget_known_types = array_keys(CWidgetConfig::getKnownWidgetTypes(CWidgetConfig::CONTEXT_DASHBOARD));
+		$widget_known_types = array_keys(APP::ModuleManager()->getWidgets());
 
 		$data = [
 			'dashboard' => $dashboard,
-			'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_DASHBOARD),
-			'widget_last_type' => CProfile::get('web.dashboard.last_widget_type', $widget_known_types[0]),
+			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(),
+			'widget_last_type' => CProfile::get('web.dashboard.last_widget_type',
+				$widget_known_types ? $widget_known_types[0] : ''
+			),
 			'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
 			'time_period' => getTimeSelectorPeriod($time_selector_options),
 			'active_tab' => CProfile::get('web.dashboard.filter.active', 1)
@@ -148,10 +148,8 @@ class CControllerDashboardView extends CController {
 
 	/**
 	 * Get dashboard data from API.
-	 *
-	 * @return array
 	 */
-	private function getDashboard() {
+	private function getDashboard(): array {
 		$dashboard = null;
 		$error = null;
 
@@ -271,14 +269,8 @@ class CControllerDashboardView extends CController {
 
 	/**
 	 * Checks, if any of widgets has checked dynamic field.
-	 *
-	 * @param array $grid_pages
-	 *
-	 * @static
-	 *
-	 * @return bool
 	 */
-	private static function hasDynamicWidgets($grid_pages) {
+	private static function hasDynamicWidgets($grid_pages): bool {
 		foreach ($grid_pages as $page) {
 			foreach ($page['widgets'] as $widget) {
 				if (array_key_exists('dynamic', $widget['fields']) && $widget['fields']['dynamic'] == 1) {

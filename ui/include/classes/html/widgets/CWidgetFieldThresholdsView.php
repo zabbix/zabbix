@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldThresholds;
+use Zabbix\Widgets\Fields\CWidgetFieldThresholds;
 
 class CWidgetFieldThresholdsView extends CWidgetFieldView {
 

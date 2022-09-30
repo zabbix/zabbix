@@ -19,7 +19,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/blocks.inc.php';
+// TODO AS: check required
+//require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
 class CControllerDashboardWidgetRfRate extends CController {
 

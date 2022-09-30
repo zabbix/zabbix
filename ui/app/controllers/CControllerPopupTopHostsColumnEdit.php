@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldColumnsList;
+use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
 class CControllerPopupTopHostsColumnEdit extends CController {
 

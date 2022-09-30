@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldUrl;
+use Zabbix\Widgets\Fields\CWidgetFieldUrl;
 
 class CWidgetFieldUrlView extends CWidgetFieldView {
 

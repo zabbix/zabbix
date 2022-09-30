@@ -306,56 +306,57 @@ class CRouter {
 		'web.view'									=> ['CControllerWebView',								'layout.htmlpage',		'monitoring.web.view'],
 
 
-		'widget.actionlog.view'						=> ['CControllerWidgetActionLogView',					'layout.widget',		'monitoring.widget.actionlog.view'],
-		'widget.clock.view'							=> ['CControllerWidgetClockView',						'layout.widget',		'monitoring.widget.clock.view'],
-		'widget.dataover.view'						=> ['CControllerWidgetDataOverView',					'layout.widget',		'monitoring.widget.dataover.view'],
-		'widget.discovery.view'						=> ['CControllerWidgetDiscoveryView',					'layout.widget',		'monitoring.widget.discovery.view'],
-		'widget.favgraphs.view'						=> ['CControllerWidgetFavGraphsView',					'layout.widget',		'monitoring.widget.favgraphs.view'],
-		'widget.favmaps.view'						=> ['CControllerWidgetFavMapsView',						'layout.widget',		'monitoring.widget.favmaps.view'],
-		'widget.geomap.view'						=> ['CControllerWidgetGeoMapView',						'layout.widget',		'monitoring.widget.geomap.view'],
-		'widget.graph.view'							=> ['CControllerWidgetGraphView',						'layout.widget',		'monitoring.widget.graph.view'],
-		'widget.graphprototype.view'				=> ['CControllerWidgetIteratorGraphPrototypeView',		'layout.json',			null],
-		'widget.hostavail.view'						=> ['CControllerWidgetHostAvailView',					'layout.widget',		'monitoring.widget.hostavail.view'],
-		'widget.item.view'							=> ['CControllerWidgetItemView',						'layout.widget',		'monitoring.widget.item.view'],
-		'widget.map.view'							=> ['CControllerWidgetMapView',							'layout.widget',		'monitoring.widget.map.view'],
-		'widget.navtree.view'						=> ['CControllerWidgetNavTreeView',						'layout.widget',		'monitoring.widget.navtree.view'],
-		'widget.plaintext.view'						=> ['CControllerWidgetPlainTextView',					'layout.widget',		'monitoring.widget.plaintext.view'],
-		'widget.problemhosts.view'					=> ['CControllerWidgetProblemHostsView',				'layout.widget',		'monitoring.widget.problemhosts.view'],
-		'widget.problems.view'						=> ['CControllerWidgetProblemsView',					'layout.widget',		'monitoring.widget.problems.view'],
-		'widget.problemsbysv.view'					=> ['CControllerWidgetProblemsBySvView',				'layout.widget',		'monitoring.widget.problemsbysv.view'],
-		'widget.slareport.view'						=> ['CControllerWidgetSlaReportView',					'layout.widget',		'monitoring.widget.slareport.view'],
-		'widget.svggraph.view'						=> ['CControllerWidgetSvgGraphView',					'layout.widget',		'monitoring.widget.svggraph.view'],
-		'widget.systeminfo.view'					=> ['CControllerWidgetSystemInfoView',					'layout.widget',		'monitoring.widget.systeminfo.view'],
-		'widget.tophosts.view'						=> ['CControllerWidgetTopHostsView',					'layout.widget',		'monitoring.widget.tophosts.view'],
-		'widget.trigover.view'						=> ['CControllerWidgetTrigOverView',					'layout.widget',		'monitoring.widget.trigover.view'],
-		'widget.url.view'							=> ['CControllerWidgetUrlView',							'layout.widget',		'monitoring.widget.url.view'],
-		'widget.web.view'							=> ['CControllerWidgetWebView',							'layout.widget',		'monitoring.widget.web.view'],
+//		'widget.actionlog.view'						=> ['CControllerWidgetActionLogView',					'layout.widget',		'monitoring.widget.actionlog.view'],
+//		'widget.clock.view'							=> ['CControllerWidgetClockView',						'layout.widget',		'monitoring.widget.clock.view'],
+//		'widget.dataover.view'						=> ['CControllerWidgetDataOverView',					'layout.widget',		'monitoring.widget.dataover.view'],
+//		'widget.discovery.view'						=> ['CControllerWidgetDiscoveryView',					'layout.widget',		'monitoring.widget.discovery.view'],
+//		'widget.favgraphs.view'						=> ['CControllerWidgetFavGraphsView',					'layout.widget',		'monitoring.widget.favgraphs.view'],
+//		'widget.favmaps.view'						=> ['CControllerWidgetFavMapsView',						'layout.widget',		'monitoring.widget.favmaps.view'],
+//		'widget.geomap.view'						=> ['CControllerWidgetGeoMapView',						'layout.widget',		'monitoring.widget.geomap.view'],
+//		'widget.graph.view'							=> ['CControllerWidgetGraphView',						'layout.widget',		'monitoring.widget.graph.view'],
+//		'widget.graphprototype.view'				=> ['CControllerWidgetIteratorGraphPrototypeView',		'layout.json',			null],
+//		'widget.hostavail.view'						=> ['CControllerWidgetHostAvailView',					'layout.widget',		'monitoring.widget.hostavail.view'],
+//		'widget.item.view'							=> ['CControllerWidgetItemView',						'layout.widget',		'monitoring.widget.item.view'],
+//		'widget.map.view'							=> ['CControllerWidgetMapView',							'layout.widget',		'monitoring.widget.map.view'],
+//		'widget.navtree.view'						=> ['CControllerWidgetNavTreeView',						'layout.widget',		'monitoring.widget.navtree.view'],
+//		'widget.plaintext.view'						=> ['CControllerWidgetPlainTextView',					'layout.widget',		'monitoring.widget.plaintext.view'],
+//		'widget.problemhosts.view'					=> ['CControllerWidgetProblemHostsView',				'layout.widget',		'monitoring.widget.problemhosts.view'],
+//		'widget.problems.view'						=> ['CControllerWidgetProblemsView',					'layout.widget',		'monitoring.widget.problems.view'],
+//		'widget.problemsbysv.view'					=> ['CControllerWidgetProblemsBySvView',				'layout.widget',		'monitoring.widget.problemsbysv.view'],
+//		'widget.slareport.view'						=> ['CControllerWidgetSlaReportView',					'layout.widget',		'monitoring.widget.slareport.view'],
+//		'widget.svggraph.view'						=> ['CControllerWidgetSvgGraphView',					'layout.widget',		'monitoring.widget.svggraph.view'],
+//		'widget.systeminfo.view'					=> ['CControllerWidgetSystemInfoView',					'layout.widget',		'monitoring.widget.systeminfo.view'],
+//		'widget.tophosts.view'						=> ['CControllerWidgetTopHostsView',					'layout.widget',		'monitoring.widget.tophosts.view'],
+//		'widget.trigover.view'						=> ['CControllerWidgetTrigOverView',					'layout.widget',		'monitoring.widget.trigover.view'],
+//		'widget.url.view'							=> ['CControllerWidgetUrlView',							'layout.widget',		'monitoring.widget.url.view'],
+//		'widget.web.view'							=> ['CControllerWidgetWebView',							'layout.widget',		'monitoring.widget.web.view'],
 
-		'widget.actionlog.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.actionlog.edit'],
-		'widget.clock.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.clock.edit'],
-		'widget.dataover.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.dataover.edit'],
-		'widget.discovery.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.discovery.edit'],
-		'widget.favgraphs.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.favgraphs.edit'],
-		'widget.favmaps.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.favmaps.edit'],
-		'widget.geomap.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.geomap.edit'],
-		'widget.graph.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.graph.edit'],
-		'widget.graphprototype.edit'				=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.graphprototype.edit'],
-		'widget.hostavail.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.hostavail.edit'],
-		'widget.item.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.item.edit'],
-		'widget.map.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.map.edit'],
-		'widget.navtree.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.navtree.edit'],
-		'widget.plaintext.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.plaintext.edit'],
-		'widget.problemhosts.edit'					=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.problemhosts.edit'],
-		'widget.problems.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.problems.edit'],
-		'widget.problemsbysv.edit'					=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.problemsbysv.edit'],
-		'widget.slareport.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.slareport.edit'],
-		'widget.svggraph.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.svggraph.edit'],
-		'widget.systeminfo.edit'					=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.systeminfo.edit'],
-		'widget.tophosts.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.tophosts.edit'],
-		'widget.trigover.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.trigover.edit'],
-		'widget.url.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.url.edit'],
-		'widget.web.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.web.edit'],
+//		'widget.actionlog.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.actionlog.edit'],
+//		'widget.clock.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.clock.edit'],
+//		'widget.dataover.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.dataover.edit'],
+//		'widget.discovery.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.discovery.edit'],
+//		'widget.favgraphs.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.favgraphs.edit'],
+//		'widget.favmaps.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.favmaps.edit'],
+//		'widget.geomap.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.geomap.edit'],
+//		'widget.graph.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.graph.edit'],
+//		'widget.graphprototype.edit'				=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.graphprototype.edit'],
+//		'widget.hostavail.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.hostavail.edit'],
+//		'widget.item.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.item.edit'],
+//		'widget.map.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.map.edit'],
+//		'widget.navtree.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.navtree.edit'],
+//		'widget.plaintext.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.plaintext.edit'],
+//		'widget.problemhosts.edit'					=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.problemhosts.edit'],
+//		'widget.problems.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.problems.edit'],
+//		'widget.problemsbysv.edit'					=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.problemsbysv.edit'],
+//		'widget.slareport.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.slareport.edit'],
+//		'widget.svggraph.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.svggraph.edit'],
+//		'widget.systeminfo.edit'					=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.systeminfo.edit'],
+//		'widget.tophosts.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.tophosts.edit'],
+//		'widget.trigover.edit'						=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.trigover.edit'],
+//		'widget.url.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.url.edit'],
+//		'widget.web.edit'							=> ['CControllerDashboardWidgetEdit',					'layout.json',			'monitoring.widget.web.edit'],
 
+	// TODO AS: move to NavTree widget
 		'widget.navtree.item.edit'					=> ['CControllerWidgetNavTreeItemEdit',					'layout.json',			'monitoring.widget.navtreeitem.edit'],
 		'widget.navtree.item.update'				=> ['CControllerWidgetNavTreeItemUpdate',				'layout.json',			null],
 
@@ -396,6 +397,13 @@ class CRouter {
 		'tr_events.php'					=> ['CLegacyAction', null, null],
 		'trigger_prototypes.php'		=> ['CLegacyAction', null, null],
 		'triggers.php'					=> ['CLegacyAction', null, null]
+	];
+
+	private array $dashboard_routes = [
+		'dashboard.print',
+		'dashboard.view',
+		'host.dashboard.view',
+		'template.dashboard.edit'
 	];
 
 	/**
@@ -463,5 +471,9 @@ class CRouter {
 	 */
 	public function getAction(): ?string {
 		return $this->action;
+	}
+
+	public function isDashboardAction(string $action): bool {
+		return in_array($action, $this->dashboard_routes, true);
 	}
 }

@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldMultiSelectGroup;
+use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectGroup;
 
 class CWidgetFieldMultiSelectGroupView extends CWidgetFieldMultiSelectView {
 

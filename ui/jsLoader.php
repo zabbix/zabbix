@@ -36,20 +36,9 @@ $available_js = [
 	'class.dashboard.js' => '',
 	'class.dashboard.page.js' => '',
 	'class.dashboard.widget.placeholder.js' => '',
-	'class.widget.js' => 'widgets/',
-	'class.widget.iterator.js' => 'widgets/',
-	'class.widget.clock.js' => 'widgets/',
-	'class.widget.geomap.js' => 'widgets/',
-	'class.widget.graph.js' => 'widgets/',
-	'class.widget.graph-prototype.js' => 'widgets/',
-	'class.widget.item.js' => 'widgets/',
-	'class.widget.map.js' => 'widgets/',
-	'class.widget.navtree.js' => 'widgets/',
-	'class.widget.paste-placeholder.js' => 'widgets/',
-	'class.widget.problems.js' => 'widgets/',
-	'class.widget.problemsbysv.js' => 'widgets/',
-	'class.widget.svggraph.js' => 'widgets/',
-	'class.widget.trigerover.js' => 'widgets/',
+	'class.widget.js' => '',
+	'class.widget.iterator.js' => '',
+	'class.widget.paste-placeholder.js' => '',
 	'hostinterfacemanager.js' => '',
 	'hostmacrosmanager.js' => '',
 	'menupopup.js' => '',
@@ -172,6 +161,7 @@ $translate_strings = [
 		'Paste' => _s('Paste'),
 		'Refresh interval' => _s('Refresh interval')
 	],
+	// TODO AS: check usage
 	'class.widget.geomap.js' => [
 		'Actions' => _('Actions'),
 		'Set this view as default' => _('Set this view as default'),
@@ -199,10 +189,12 @@ $translate_strings = [
 		'Widget is too small for the specified number of columns and rows.' =>
 			_s('Widget is too small for the specified number of columns and rows.')
 	],
+	// TODO AS: check usage
 	'class.widget.graph.js' => [
 		'Actions' => _s('Actions'),
 		'Download image' => _s('Download image')
 	],
+	// TODO AS: check usage
 	'class.widget.navtree.js' => [
 		'Add' => _s('Add'),
 		'Add child element' => _s('Add child element'),
@@ -213,6 +205,7 @@ $translate_strings = [
 		'Edit tree element' => _s('Edit tree element'),
 		'Remove' => _s('Remove')
 	],
+	// TODO AS: check usage
 	'class.widget.svggraph.js' => [
 		'Actions' => _s('Actions'),
 		'Download image' => _s('Download image')

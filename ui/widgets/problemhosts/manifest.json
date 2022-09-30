@@ -1,0 +1,9 @@
+{
+	"manifest_version": 1.0,
+	"id": "problemhosts",
+	"type": "widget",
+	"name": "Problem hosts",
+	"namespace": "ProblemHosts",
+	"version": "2.0",
+	"author": "Zabbix SIA"
+}

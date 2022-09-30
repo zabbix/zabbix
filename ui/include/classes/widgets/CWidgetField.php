@@ -19,7 +19,7 @@
 **/
 
 
-namespace Widgets;
+namespace Zabbix\Widgets;
 
 use CApiInputValidator;
 

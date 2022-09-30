@@ -19,9 +19,9 @@
 **/
 
 
-namespace Widgets\Fields;
+namespace Zabbix\Widgets\Fields;
 
-use Widgets\CWidgetField;
+use Zabbix\Widgets\CWidgetField;
 
 /**
  * Class for override widget field used in Graph widget configuration overrides tab.

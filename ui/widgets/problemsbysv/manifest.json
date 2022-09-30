@@ -1,0 +1,15 @@
+{
+	"manifest_version": 1.0,
+	"id": "problemsbysv",
+	"type": "widget",
+	"name": "Problems by severity",
+	"namespace": "ProblemsBySv",
+	"version": "2.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"js_class": "CWidgetProblemsBySv"
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

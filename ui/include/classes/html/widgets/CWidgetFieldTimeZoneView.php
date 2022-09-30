@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldTimeZone;
+use Zabbix\Widgets\Fields\CWidgetFieldTimeZone;
 
 class CWidgetFieldTimeZoneView extends CWidgetFieldSelectView {
 

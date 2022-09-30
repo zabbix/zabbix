@@ -19,12 +19,12 @@
 **/
 
 
-namespace Widgets\Fields;
+namespace Zabbix\Widgets\Fields;
 
 use API,
 	CApiInputValidator;
 
-use Widgets\CWidgetField;
+use Zabbix\Widgets\CWidgetField;
 
 /**
  * Class for data set widget field used in Graph widget configuration Data set tab.

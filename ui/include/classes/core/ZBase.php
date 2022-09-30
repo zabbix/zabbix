@@ -19,8 +19,9 @@
 **/
 
 
-use Core\CModule,
+use Zabbix\Core\CModule,
 	CController as CAction;
+use Zabbix\Core\CWidget;
 
 require_once dirname(__FILE__).'/CAutoloader.php';
 
@@ -197,6 +198,7 @@ class ZBase {
 				$this->initComponents();
 				$this->initModuleManager();
 
+				/** @var CRouter $router */
 				$router = $this->component_registry->get('router');
 				$router->addActions($this->module_manager->getActions());
 				$router->setAction($action_name);
@@ -344,7 +346,6 @@ class ZBase {
 			$this->rootDir.'/include/classes/regexp',
 			$this->rootDir.'/include/classes/ldap',
 			$this->rootDir.'/include/classes/pagefilter',
-			$this->rootDir.'/include/classes/widgets/forms',
 			$this->rootDir.'/include/classes/xml',
 			$this->rootDir.'/include/classes/vaults',
 			$this->rootDir.'/local/app/controllers',
@@ -400,9 +401,8 @@ class ZBase {
 		set_include_path(get_include_path().PATH_SEPARATOR.$this->rootDir);
 		$autoloader = new CAutoloader;
 		$autoloader->addNamespace('', $this->getIncludePaths());
-		$autoloader->addNamespace('Core', [$this->rootDir.'/include/classes/core']);
-		$autoloader->addNamespace('Html', [$this->rootDir.'/include/classes/html']);
-		$autoloader->addNamespace('Widgets', [$this->rootDir.'/include/classes/widgets']);
+		$autoloader->addNamespace('Zabbix\\Core', [$this->rootDir.'/include/classes/core']);
+		$autoloader->addNamespace('Zabbix\\Widgets', [$this->rootDir.'/include/classes/widgets']);
 		$autoloader->register();
 		$this->autoloader = $autoloader;
 	}
@@ -576,12 +576,17 @@ class ZBase {
 
 			$action_module = $this->module_manager->getModuleByActionName($action_name);
 
-			if ($action_module) {
+			if ($action_module !== null) {
 				$modules = array_replace([$action_module->getId() => $action_module], $modules);
+
+				if ($action_module->getType() === CModule::TYPE_WIDGET) {
+					CView::registerDirectory($action_module->getDir().'/views');
+					CPartial::registerDirectory($action_module->getDir().'/partials');
+				}
 			}
 
 			foreach (array_reverse($modules) as $module) {
-				if (is_subclass_of($module, CModule::class)) {
+				if ($module->getType() === CModule::TYPE_MODULE) {
 					CView::registerDirectory($module->getDir().'/views');
 					CPartial::registerDirectory($module->getDir().'/partials');
 				}
@@ -795,7 +800,7 @@ class ZBase {
 	/**
 	 * Initialize menu for main navigation. Register instance as component with 'menu.main' key.
 	 */
-	private function initComponents() {
+	private function initComponents(): void {
 		$this->component_registry->register('router', new CRouter());
 		$this->component_registry->register('menu.main', CMenuHelper::getMainMenu());
 		$this->component_registry->register('menu.user', CMenuHelper::getUserMenu());
@@ -804,7 +809,7 @@ class ZBase {
 	/**
 	 * Initialize module manager and load all enabled and allowed modules according to user role settings.
 	 */
-	private function initModuleManager() {
+	private function initModuleManager(): void {
 		$this->module_manager = new CModuleManager(self::getRootDir());
 
 		$db_modules = API::getApiService('module')->get([
@@ -839,7 +844,15 @@ class ZBase {
 			$this->autoloader->addNamespace($namespace, $paths);
 		}
 
-		$this->module_manager->initModules();
+		['conflicting_manifests' => $conflicting_manifests] = $this->module_manager->checkConflicts();
+
+		$non_conflicting_manifests = array_diff_key($this->module_manager->getManifests(),
+			array_flip($conflicting_manifests)
+		);
+
+		foreach ($non_conflicting_manifests as $relative_path => $manifest) {
+			$this->module_manager->initModule($relative_path, $manifest);
+		}
 
 		array_map('error', $this->module_manager->getErrors());
 	}

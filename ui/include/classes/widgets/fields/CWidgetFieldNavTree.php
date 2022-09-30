@@ -19,9 +19,9 @@
 **/
 
 
-namespace Widgets\Fields;
+namespace Zabbix\Widgets\Fields;
 
-use Widgets\CWidgetField;
+use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldNavTree extends CWidgetField {
 

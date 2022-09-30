@@ -18,16 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-use Widgets\CWidgetConfig;
-
 
 /**
  * Controller for sanitizing fields of widgets before pasting previously copied widget.
  */
 class CControllerDashboardWidgetsSanitize extends CController {
 
-	private $context;
-	private $widgets = [];
+	private array $widgets_data = [];
 
 	protected function init() {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -42,10 +39,6 @@ class CControllerDashboardWidgetsSanitize extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$this->context = $this->hasInput('templateid')
-				? CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD
-				: CWidgetConfig::CONTEXT_DASHBOARD;
-
 			foreach ($this->getInput('widgets', []) as $widget) {
 				$validator = new CNewValidator($widget, [
 					'type' =>	'required|string',
@@ -62,9 +55,19 @@ class CControllerDashboardWidgetsSanitize extends CController {
 					break;
 				}
 
-				$widget = $validator->getValidInput();
+				$widget_input = $validator->getValidInput();
 
-				if (!CWidgetConfig::isWidgetTypeSupportedInContext($widget['type'], $this->context)) {
+				$widget = APP::ModuleManager()->getWidget($widget_input['type']);
+
+				if ($widget === null) {
+					error(_('Not supported widget.'));
+
+					$ret = false;
+
+					break;
+				}
+
+				if ($this->hasInput('templateid') && !$widget->isSupportedInTemplate()) {
 					error(_('Widget type is not supported in this context.'));
 
 					$ret = false;
@@ -72,7 +75,12 @@ class CControllerDashboardWidgetsSanitize extends CController {
 					break;
 				}
 
-				$this->widgets[] = $widget;
+				$this->widgets_data[] = [
+					'type' => $widget_input['type'],
+					'form' => $widget->getForm($widget_input['fields'],
+						$this->hasInput('templateid') ? $this->getInput('templateid') : null
+					)
+				];
 			}
 		}
 
@@ -96,15 +104,11 @@ class CControllerDashboardWidgetsSanitize extends CController {
 	protected function doAction() {
 		$widgets = [];
 
-		foreach ($this->widgets as $widget) {
-			$form = CWidgetConfig::getForm($widget['type'], $widget['fields'],
-				($this->context === CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD) ? $this->getInput('templateid') : null
-			);
-
-			$widgets[] = ['fields' => $form->fieldsToApi()];
+		foreach ($this->widgets_data as $widget_data) {
+			$widgets[] = ['fields' => $widget_data['form']->fieldsToApi()];
 		}
 
-		if ($this->context === CWidgetConfig::CONTEXT_DASHBOARD) {
+		if (!$this->hasInput('templateid')) {
 			$widgets = CDashboardHelper::unsetInaccessibleFields([['widgets' => $widgets]]);
 			$widgets = $widgets[0]['widgets'];
 		}

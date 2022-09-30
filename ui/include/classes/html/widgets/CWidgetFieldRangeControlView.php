@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldRangeControl;
+use Zabbix\Widgets\Fields\CWidgetFieldRangeControl;
 
 class CWidgetFieldRangeControlView extends CWidgetFieldView {
 

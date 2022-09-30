@@ -19,20 +19,22 @@
 **/
 
 
-namespace Widgets;
+namespace Zabbix\Widgets;
 
-use Widgets\Fields\CWidgetFieldSelect;
+use Zabbix\Core\CWidget;
+
+use Zabbix\Widgets\Fields\CWidgetFieldSelect;
 
 class CWidgetForm {
 
-	protected string $type;
 	protected ?string $templateid;
 
 	protected array $values;
 	protected array $fields = [];
 
-	public function __construct(string $type, array $values, ?string $templateid) {
-		$this->type = $type;
+	protected int $default_refresh_rate = CWidget::DEFAULT_REFRESH_RATE;
+
+	public function __construct(array $values, ?string $templateid) {
 		$this->templateid = $templateid;
 
 		$this->values = $this->normalizeValues($values);
@@ -66,6 +68,12 @@ class CWidgetForm {
 		}
 
 		return $values;
+	}
+
+	public function setDefaultRefreshRate(int $refresh_rate): self {
+		$this->default_refresh_rate = $refresh_rate;
+
+		return $this;
 	}
 
 	private function setFieldsValues(): void {
@@ -115,19 +123,28 @@ class CWidgetForm {
 
 	protected function addFields(): self {
 		if ($this->templateid === null) {
-			$default_rf_rate = '';
+			$refresh_rates = [
+				0 => _('No refresh'),
+				SEC_PER_MIN / 6 => _n('%1$s second', '%1$s seconds', 10),
+				SEC_PER_MIN / 2 => _n('%1$s second', '%1$s seconds', 30),
+				SEC_PER_MIN => _n('%1$s minute', '%1$s minutes', 1),
+				SEC_PER_MIN * 2 => _n('%1$s minute', '%1$s minutes', 2),
+				SEC_PER_MIN * 10 => _n('%1$s minute', '%1$s minutes', 10),
+				SEC_PER_MIN * 15 => _n('%1$s minute', '%1$s minutes', 15)
+			];
 
-			foreach (CWidgetConfig::getRfRates() as $rf_rate => $label) {
-				if ($rf_rate === CWidgetConfig::getDefaultRfRate($this->type)) {
-					$default_rf_rate = $label;
-					break;
-				}
-			}
+			$default_refresh_rate = array_key_exists('rf_rate', $this->values)
+				? $this->values['rf_rate']
+				: $this->default_refresh_rate;
+// TODO AS: fix default refresh rate if needs
+			$default_refresh_rate_label = array_key_exists($default_refresh_rate, $refresh_rates)
+				? $refresh_rates[$default_refresh_rate]
+				: '';
 
 			$this->addField(
 				new CWidgetFieldSelect('rf_rate', _('Refresh interval'), [
-					CWidgetFieldSelect::DEFAULT_VALUE => _('Default').' ('.$default_rf_rate.')'
-				] + CWidgetConfig::getRfRates())
+					CWidgetFieldSelect::DEFAULT_VALUE => _('Default').' ('.$default_refresh_rate_label.')'
+				] + $refresh_rates)
 			);
 		}
 

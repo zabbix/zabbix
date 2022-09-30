@@ -19,8 +19,6 @@
 **/
 
 
-use Widgets\CWidgetConfig;
-
 class CControllerHostDashboardView extends CController {
 
 	private $host;
@@ -107,7 +105,7 @@ class CControllerHostDashboardView extends CController {
 					'host' => $this->host,
 					'host_dashboards' => $host_dashboards,
 					'dashboard' => $dashboard,
-					'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_TEMPLATE_DASHBOARD),
+					'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(true),
 					'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
 					'time_period' => getTimeSelectorPeriod($time_selector_options),
 					'active_tab' => CProfile::get('web.dashboard.filter.active', 1)

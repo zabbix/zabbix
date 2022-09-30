@@ -19,7 +19,7 @@
 **/
 
 
-namespace Widgets\Fields;
+namespace Zabbix\Widgets\Fields;
 
 class CWidgetFieldMultiSelectService extends CWidgetFieldMultiSelect {
 

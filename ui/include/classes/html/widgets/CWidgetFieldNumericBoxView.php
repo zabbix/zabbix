@@ -19,7 +19,7 @@
 **/
 
 
-use Widgets\Fields\CWidgetFieldNumericBox;
+use Zabbix\Widgets\Fields\CWidgetFieldNumericBox;
 
 class CWidgetFieldNumericBoxView extends CWidgetFieldView {
 

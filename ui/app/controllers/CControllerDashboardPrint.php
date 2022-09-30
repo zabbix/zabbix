@@ -19,8 +19,6 @@
 **/
 
 
-use Widgets\CWidgetConfig;
-
 class CControllerDashboardPrint extends CController {
 
 	protected function init() {
@@ -65,7 +63,7 @@ class CControllerDashboardPrint extends CController {
 
 		$data = [
 			'dashboard' => $dashboard,
-			'widget_defaults' => CWidgetConfig::getDefaults(CWidgetConfig::CONTEXT_DASHBOARD),
+			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(),
 			'time_period' => getTimeSelectorPeriod($time_selector_options)
 		];
 
