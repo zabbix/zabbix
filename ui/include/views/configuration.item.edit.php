@@ -1064,7 +1064,7 @@ if (!hasRequest('form_refresh')) {
 	$item_tabs->setSelected(0);
 }
 
-$cancelButton = $data['backurl'] !== null
+$cancel_button = $data['backurl'] !== null
 	? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
 	: new CButtonCancel(url_params(['hostid', 'context']));
 
@@ -1095,14 +1095,14 @@ if ($data['itemid'] != 0) {
 
 	$buttons[] = (new CButtonDelete(_('Delete item?'), url_params(['form', 'itemid', 'hostid', 'context']), 'context'))
 		->setEnabled(!$data['limited']);
-	$buttons[] = $cancelButton;
+	$buttons[] = $cancel_button;
 
 	$item_tabs->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$item_tabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[(new CSimpleButton(_('Test')))->setId('test_item'), $cancelButton]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), $cancel_button]
 	));
 }
 
