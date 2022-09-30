@@ -864,7 +864,7 @@ zabbix_export:
               macros:
                 -
                   macro: '{$MONGODB.CONNSTRING}'
-                  value: '{#MONGOD_URI}'
+                  value: '{#MONGODB_URI}'
                   description: 'Connection string in the URI format (password is not used).'
         -
           uuid: 61a19fbf4f9f4c2f9ad215b08d41e544
@@ -1388,7 +1388,7 @@ zabbix_export:
               macros:
                 -
                   macro: '{$MONGODB.CONNSTRING}'
-                  value: '{#MONGOD_URI}'
+                  value: '{#MONGODB_URI}'
                   description: 'Connection string in the URI format (password is not used).'
       tags:
         -
