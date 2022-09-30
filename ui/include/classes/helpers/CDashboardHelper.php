@@ -340,7 +340,7 @@ class CDashboardHelper {
 			foreach ($page['widgets'] as $widget_data) {
 				$widget = App::ModuleManager()->getWidget($widget_data['type']);
 
-				if ($widget !== null && $widget->usesTimeSelector()) {
+				if ($widget !== null && $widget->usesTimeSelector($widget_data['fields'])) {
 					return true;
 				}
 			}

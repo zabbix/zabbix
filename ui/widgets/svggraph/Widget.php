@@ -21,6 +21,8 @@
 
 namespace Widgets\SvgGraph;
 
+use Widgets\SvgGraph\Includes\WidgetForm;
+
 use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
@@ -29,8 +31,7 @@ class Widget extends CWidget {
 		return true;
 	}
 
-	// TODO AS: calculated time selector option
-	public function usesTimeSelector(): bool {
-		return (bool) $this->manifest['widget']['use_time_selector'];
+	public function usesTimeSelector(array $values): bool {
+		return !WidgetForm::hasOverrideTime($values);
 	}
 }

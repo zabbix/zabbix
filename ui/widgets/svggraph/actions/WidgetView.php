@@ -28,6 +28,8 @@ use CControllerDashboardWidgetView,
 	CRangeTimeParser,
 	CSvgGraphHelper;
 
+use Widgets\SvgGraph\Includes\WidgetForm;
+
 class WidgetView extends CControllerDashboardWidgetView {
 
 	private const GRAPH_WIDTH_MIN = 1;
@@ -58,7 +60,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);
 		$preview = (bool) $this->getInput('preview', 0); // Configuration preview.
 
-		$dashboard_time = !self::hasOverrideTime($values);
+		$dashboard_time = !WidgetForm::hasOverrideTime($values);
 
 		if ($dashboard_time && !$preview) {
 			$from = $this->getInput('from');
@@ -171,23 +173,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 	/**
 	 * Make widget specific info to show in widget's header.
 	 */
-	private static function makeWidgetInfo(array $fields): array {
+	private static function makeWidgetInfo(array $values): array {
 		$info = [];
 
-		if (self::hasOverrideTime($fields)) {
+		if (WidgetForm::hasOverrideTime($values)) {
 			$info[] = [
 				'icon' => 'btn-info-clock',
-				'hint' => relativeDateToText($fields['time_from'], $fields['time_to'])
+				'hint' => relativeDateToText($values['time_from'], $values['time_to'])
 			];
 		}
 
 		return $info;
-	}
-
-	/**
-	 * Check if widget configuration is set to use overridden time.
-	 */
-	public static function hasOverrideTime(array $values): bool {
-		return array_key_exists('graph_time', $values) && $values['graph_time'] == SVG_GRAPH_CUSTOM_TIME_ON;
 	}
 }
