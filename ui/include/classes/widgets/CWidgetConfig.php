@@ -371,8 +371,8 @@ class CWidgetConfig {
 	/*private static function hasPadding(string $type, array $fields, int $view_mode): bool {
 		if ($view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {     // TODO AS: if has .dashboard-grid-widget-hidden-header
 			switch ($type) {
-				case WIDGET_CLOCK:
-					return $fields['clock_type'] === WIDGET_CLOCK_TYPE_ANALOG; // TODO AS: if has .clock-analog {padding: 0}
+//				case WIDGET_CLOCK:
+//					return $fields['clock_type'] === WIDGET_CLOCK_TYPE_ANALOG; // TODO AS: if has .clock-analog {padding: 0}
 
 				case WIDGET_GRAPH: // TODO AS: moved to Widget.php
 				case WIDGET_MAP: // TODO AS: moved to Widget.php
@@ -385,8 +385,8 @@ class CWidgetConfig {
 		}
 		else {
 			switch ($type) {
-				case WIDGET_CLOCK:
-					return $fields['clock_type'] === WIDGET_CLOCK_TYPE_ANALOG;
+//				case WIDGET_CLOCK:
+//					return $fields['clock_type'] === WIDGET_CLOCK_TYPE_ANALOG;
 
 				case WIDGET_HOST_AVAIL: // TODO AS: moved to Widget.php
 					return (count($fields['interface_type']) != 1);

@@ -17,6 +17,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
+
+use Widgets\Clock\Widget;
+
 ?>
 
 
@@ -69,7 +73,7 @@ window.widget_clock_form = new class {
 	}
 
 	updateForm() {
-		const is_digital = this._clock_type.querySelector('input:checked').value == <?= WIDGET_CLOCK_TYPE_DIGITAL ?>;
+		const is_digital = this._clock_type.querySelector('input:checked').value == <?= Widget::TYPE_DIGITAL ?>;
 
 		const show_date_row = is_digital && this._advanced_configuration.checked && this._show_date.checked;
 		const show_time_row = is_digital && this._advanced_configuration.checked && this._show_time.checked;

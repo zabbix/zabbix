@@ -37,6 +37,8 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldTimeZone
 };
 
+use Widgets\Clock\Widget;
+
 /**
  * Clock widget form.
  */
@@ -70,17 +72,17 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('clock_type', _('Clock type'), [
-					WIDGET_CLOCK_TYPE_ANALOG => _('Analog'),
-					WIDGET_CLOCK_TYPE_DIGITAL => _('Digital')
-				]))->setDefault(WIDGET_CLOCK_TYPE_ANALOG)
+					Widget::TYPE_ANALOG => _('Analog'),
+					Widget::TYPE_DIGITAL => _('Digital')
+				]))->setDefault(Widget::TYPE_ANALOG)
 			)
 			->addField(
 				(new CWidgetFieldCheckBoxList('show', _('Show'), [
-					WIDGET_CLOCK_SHOW_DATE => _('Date'),
-					WIDGET_CLOCK_SHOW_TIME => _('Time'),
-					WIDGET_CLOCK_SHOW_TIMEZONE => _('Time zone')
+					Widget::SHOW_DATE => _('Date'),
+					Widget::SHOW_TIME => _('Time'),
+					Widget::SHOW_TIMEZONE => _('Time zone')
 				]))
-					->setDefault([WIDGET_CLOCK_SHOW_TIME])
+					->setDefault([Widget::SHOW_TIME])
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
@@ -114,9 +116,9 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('time_format', _('Format'), [
-					WIDGET_CLOCK_HOUR_TWENTY_FOUR => _('24-hour'),
-					WIDGET_CLOCK_HOUR_TWELVE => _('12-hour')
-				]))->setDefault(WIDGET_CLOCK_HOUR_TWENTY_FOUR)
+					Widget::HOUR_TWENTY_FOUR => _('24-hour'),
+					Widget::HOUR_TWELVE => _('12-hour')
+				]))->setDefault(Widget::HOUR_TWENTY_FOUR)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('tzone_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
@@ -134,9 +136,9 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('tzone_format', _('Format'), [
-					WIDGET_CLOCK_TIMEZONE_SHORT => _('Short'),
-					WIDGET_CLOCK_TIMEZONE_FULL => _('Full')
-				]))->setDefault(WIDGET_CLOCK_TIMEZONE_SHORT)
+					Widget::TIMEZONE_SHORT => _('Short'),
+					Widget::TIMEZONE_FULL => _('Full')
+				]))->setDefault(Widget::TIMEZONE_SHORT)
 			);
 	}
 }

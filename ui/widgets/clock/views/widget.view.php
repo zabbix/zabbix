@@ -26,6 +26,8 @@
  * @var array $data
  */
 
+use Widgets\Clock\Widget;
+
 if ($data['clock_data']['critical_error'] !== null) {
 	$item = (new CTableInfo())->setNoDataMessage($data['clock_data']['critical_error']);
 
@@ -35,7 +37,7 @@ if ($data['clock_data']['critical_error'] !== null) {
 	];
 }
 else {
-	if ($data['clock_data']['type'] == WIDGET_CLOCK_TYPE_DIGITAL) {
+	if ($data['clock_data']['type'] == Widget::TYPE_DIGITAL) {
 		$clock_data = $data['clock_data'];
 
 		$rows = [];
@@ -45,17 +47,17 @@ else {
 				$div = new CDiv();
 
 				switch ($show) {
-					case WIDGET_CLOCK_SHOW_DATE:
+					case Widget::SHOW_DATE:
 						$div->addClass('clock-date');
 						$styles = $data['styles']['date'];
 						break;
 
-					case WIDGET_CLOCK_SHOW_TIME:
+					case Widget::SHOW_TIME:
 						$div->addClass('clock-time');
 						$styles = $data['styles']['time'];
 						break;
 
-					case WIDGET_CLOCK_SHOW_TIMEZONE:
+					case Widget::SHOW_TIMEZONE:
 						$div->addClass('clock-time-zone');
 						$styles = $data['styles']['timezone'];
 						break;

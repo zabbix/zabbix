@@ -30,6 +30,8 @@ use API,
 	Exception,
 	Manager;
 
+use Widgets\Clock\Widget;
+
 class WidgetView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
@@ -73,7 +75,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		// Pass clock configuration to browser script.
-		if ($values['clock_type'] === WIDGET_CLOCK_TYPE_DIGITAL) {
+		if ($values['clock_type'] === Widget::TYPE_DIGITAL) {
 			$clock_data['show'] = $values['show'];
 			$clock_data['bg_color'] = $values['bg_color'];
 			$clock_data['time_format'] = $values['time_format'];
@@ -99,14 +101,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 *
 	 * @return string  Return time zone name from list or 'local' if time zone must be set via browser.
 	 */
-	private function makeTimeZoneValue(string $time_zone, int $format = WIDGET_CLOCK_TIMEZONE_SHORT): string {
+	private function makeTimeZoneValue(string $time_zone, int $format = Widget::TIMEZONE_SHORT): string {
 		if ($time_zone === TIMEZONE_DEFAULT_LOCAL) {
 			return $time_zone;
 		}
 
 		$zone = $time_zone === ZBX_DEFAULT_TIMEZONE ? CTimezoneHelper::getSystemTimezone() : $time_zone;
 
-		if ($format === WIDGET_CLOCK_TIMEZONE_SHORT) {
+		if ($format === Widget::TIMEZONE_SHORT) {
 			if (($pos = strrpos($zone, '/')) !== false) {
 				$zone = substr($zone, $pos + 1);
 			}
@@ -124,9 +126,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * @return boolean
 	 */
 	private function showDate(array $fields): bool {
-		return ($fields['clock_type'] === WIDGET_CLOCK_TYPE_DIGITAL
-			&& in_array(WIDGET_CLOCK_SHOW_DATE, $fields['show'])
-		);
+		return ($fields['clock_type'] === Widget::TYPE_DIGITAL && in_array(Widget::SHOW_DATE, $fields['show']));
 	}
 
 	/**
@@ -135,9 +135,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * @return boolean
 	 */
 	private function showTime(array $fields): bool {
-		return ($fields['clock_type'] === WIDGET_CLOCK_TYPE_ANALOG
-			|| in_array(WIDGET_CLOCK_SHOW_TIMEZONE, $fields['show'])
-		);
+		return ($fields['clock_type'] === Widget::TYPE_ANALOG || in_array(Widget::SHOW_TIME, $fields['show']));
 	}
 
 	/**
@@ -146,9 +144,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * @return boolean
 	 */
 	private function showTimeZone(array $fields): bool {
-		return ($fields['clock_type'] === WIDGET_CLOCK_TYPE_DIGITAL
-			&& in_array(WIDGET_CLOCK_SHOW_TIMEZONE, $fields['show'])
-		);
+		return ($fields['clock_type'] === Widget::TYPE_DIGITAL && in_array(Widget::SHOW_TIMEZONE, $fields['show']));
 	}
 
 	/**
@@ -311,10 +307,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private static function getFieldStyles(array $fields): array {
 		$cells = [];
 
-		if ($fields['clock_type'] === WIDGET_CLOCK_TYPE_DIGITAL) {
+		if ($fields['clock_type'] === Widget::TYPE_DIGITAL) {
 			$show = $fields['show'];
 
-			if (in_array(WIDGET_CLOCK_SHOW_DATE, $show)) {
+			if (in_array(Widget::SHOW_DATE, $show)) {
 				$cells['date'] = [
 					'size' => $fields['date_size'],
 					'bold' => ($fields['date_bold'] == 1),
@@ -322,7 +318,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				];
 			}
 
-			if (in_array(WIDGET_CLOCK_SHOW_TIME, $show)) {
+			if (in_array(Widget::SHOW_TIME, $show)) {
 				$cells['time'] = [
 					'size' => $fields['time_size'],
 					'bold' => ($fields['time_bold'] == 1),
@@ -330,7 +326,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				];
 			}
 
-			if (in_array(WIDGET_CLOCK_SHOW_TIMEZONE, $show)) {
+			if (in_array(Widget::SHOW_TIMEZONE, $show)) {
 				$cells['timezone'] = [
 					'size' => $fields['tzone_size'],
 					'bold' => ($fields['tzone_bold'] == 1),
