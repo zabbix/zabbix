@@ -2319,19 +2319,23 @@ function prepareItemQueryFields(array $query_fields): array {
  * @return array
  */
 function prepareItemHeaders(array $headers): array {
-	$result = [];
+	if ($headers) {
+		$_headers = [];
 
-	foreach ($headers['name'] as $i => $name) {
-		$value = $headers['value'][$i];
+		foreach ($headers['name'] as $i => $name) {
+			$value = $headers['value'][$i];
 
-		if ($name === '' && $value === '') {
-			continue;
+			if ($name === '' && $value === '') {
+				continue;
+			}
+
+			$_headers[$name] = $value;
 		}
 
-		$result[$name] = $value;
+		$headers = $_headers;
 	}
 
-	return $result;
+	return $headers;
 }
 
 /**
