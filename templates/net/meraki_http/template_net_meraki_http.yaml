@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-09-29T11:52:18Z'
+  date: '2022-09-30T09:07:46Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -257,7 +257,7 @@ zabbix_export:
                     params.url += '/';
                 }
             
-                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !-- '') {
+                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !== '') {
                     request.setProxy(params.httpproxy);
                 }
             
@@ -419,7 +419,7 @@ zabbix_export:
                     params.url += '/';
                 }
             
-                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !-- '') {
+                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !== '') {
                     request.setProxy(params.httpproxy);
                 }
             
@@ -568,7 +568,7 @@ zabbix_export:
                     params.url += '/';
                 }
             
-                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !-- '') {
+                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !== '') {
                     request.setProxy(params.httpproxy);
                 }
             
