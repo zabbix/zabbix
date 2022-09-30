@@ -19,7 +19,6 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -27,8 +26,6 @@ use Facebook\WebDriver\WebDriverBy;
  * Test tag based permissions
  */
 class testTagBasedPermissions extends CLegacyWebTest {
-
-	use TableTrait;
 
 	public $user = 'Tag-user';
 	public $trigger_host = 'Host for tag permissions';
