@@ -32,7 +32,7 @@ import (
 type lldShEntity struct {
 	ID        string `json:"{#ID}"`
 	Hostname  string `json:"{#HOSTNAME}"`
-	MongodURI string `json:"{#MONGODB_URI}"`
+	MongodURI string `json:"{#MONGOD_URI}"`
 	State     string `json:"{#STATE}"`
 }
 

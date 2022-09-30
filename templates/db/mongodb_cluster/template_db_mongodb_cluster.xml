@@ -945,7 +945,7 @@ Secondary nodes send getMore operations as part of the replication process."</de
                      <macros>
                         <macro>
                            <macro>{$MONGODB.CONNSTRING}</macro>
-                           <value>{#MONGODB_URI}</value>
+                           <value>{#MONGOD_URI}</value>
                            <description>Connection string in the URI format (password is not used).</description>
                         </macro>
                      </macros>
@@ -1468,7 +1468,7 @@ Note, depending on the number of DBs this discovery operation may be expensive. 
                      <macros>
                         <macro>
                            <macro>{$MONGODB.CONNSTRING}</macro>
-                           <value>{#MONGODB_URI}</value>
+                           <value>{#MONGOD_URI}</value>
                            <description>Connection string in the URI format (password is not used).</description>
                         </macro>
                      </macros>

@@ -32,7 +32,7 @@ import (
 type lldCfgEntity struct {
 	ReplicaSet string `json:"{#REPLICASET}"`
 	Hostname   string `json:"{#HOSTNAME}"`
-	MongodURI  string `json:"{#MONGODB_URI}"`
+	MongodURI  string `json:"{#MONGOD_URI}"`
 }
 
 type shardMap struct {
