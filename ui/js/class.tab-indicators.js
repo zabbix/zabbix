@@ -448,7 +448,7 @@ class LdapTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const element = document.querySelector('#ldap_configured');
+		const element = document.querySelector('#ldap_auth_enabled');
 
 		if (element !== null) {
 			return element.checked;
@@ -458,7 +458,7 @@ class LdapTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver() {
-		const target_node = document.querySelector('#ldap_configured');
+		const target_node = document.querySelector('#ldap_auth_enabled');
 
 		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
