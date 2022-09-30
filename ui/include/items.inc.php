@@ -2173,10 +2173,10 @@ function isItemExampleKey(int $type, string $key): bool {
 			|| ($type == ITEM_TYPE_TELNET && $key === ZBX_DEFAULT_KEY_TELNET)) {
 		error(_('Check the key, please. Default example was passed.'));
 
-		return false;
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 /**
