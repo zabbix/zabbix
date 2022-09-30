@@ -129,7 +129,6 @@ class CControllerPopupActionEdit extends CController {
 			$data['action']['filter']['conditions'] = CConditionHelper::sortConditionsByFormulaId(
 				$data['action']['filter']['conditions']
 			);
-			sdff($data['action']);
 		}
 		else {
 			$data = [

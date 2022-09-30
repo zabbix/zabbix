@@ -214,8 +214,6 @@ if ($data['action']['operations']) {
 				$operation['esc_step_from'] = 1;
 			}
 
-			//$esc_steps_txt = $operation['esc_step_from'].' - '.$operation['esc_step_to'];
-
 			// display N-N as N
 			$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'])
 				? $operation['esc_step_from']
@@ -247,7 +245,8 @@ if ($data['action']['operations']) {
 								'operationid' => $operationid,
 								'actionid' => $data['actionid'],
 								'eventsource' => $data['eventsource'],
-								'operationtype' => ACTION_OPERATION
+								'operationtype' => ACTION_OPERATION,
+								'data' => $operation
 							])),
 						[
 							(new CButton('remove', _('Remove')))
@@ -275,7 +274,8 @@ if ($data['action']['operations']) {
 								'operationid' => $operationid,
 								'actionid' => $data['actionid'],
 								'eventsource' => $data['eventsource'],
-								'operationtype' => ACTION_OPERATION
+								'operationtype' => ACTION_OPERATION,
+								'data' => $operation
 							])),
 						[
 							(new CButton('remove', _('Remove')))
@@ -383,11 +383,6 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 		(new CSimpleButton(_('Add')))
 			->setAttribute('data-actionid', $data['actionid'])
 			->setAttribute('data-eventsource', $data['eventsource'])
-//			->onClick('
-//					action_edit_popup.openOperationPopup(this, this.dataset.actionid, this.dataset.eventsource,
-//					'.ACTION_RECOVERY_OPERATION.'
-//				);
-//			')
 			->addClass('js-recovery-operations-create')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	);
@@ -459,13 +454,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 		(new CSimpleButton(_('Add')))
 		->setAttribute('data-actionid', $data['actionid'])
 		->setAttribute('data-eventsource', $data['eventsource'])
-//			->onClick('
-//			operation_details.open(this, this.dataset.actionid, this.dataset.eventsource,
-//					'.ACTION_UPDATE_OPERATION.'
-//				);
-//			')
 		->addClass('js-update-operations-create')
-			// TODO : fix the input to action edit popup open!!!
 		->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
@@ -512,7 +501,8 @@ $form
 				'conditions' => $data['action']['filter']['conditions'],
 				'actionid' => $data['actionid'] ?: 0,
 				'eventsource' => $data['eventsource'],
-				'allowed_operations' => $data['allowedOperations']
+				'allowed_operations' => $data['allowedOperations'],
+				'operation_data' => $operation
 			], JSON_THROW_ON_ERROR) .');
 		'))->setOnDocumentReady()
 	);

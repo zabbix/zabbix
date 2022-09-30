@@ -18,12 +18,13 @@
 **/
 
 window.operation_popup = new class {
-	init({eventsource, recovery_phase}) {
+	init({eventsource, recovery_phase, data, actionid}) {
 		this.recovery_phase = recovery_phase;
 		this.eventsource = eventsource;
 		this.overlay = overlays_stack.getById('operations');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.actionid = actionid;
 
 		if (document.getElementById('operation-condition-list')) {
 			this.condition_count = (document.getElementById('operation-condition-list').rows.length - 2);
@@ -31,48 +32,46 @@ window.operation_popup = new class {
 
 		this._loadViews();
 		this._processTypeOfCalculation();
+
+		if (data?.opconditions) {
+			data?.opconditions.map(row => this._createRow(row))
+		}
+		if (data?.opmessage_grp) {
+			console.log($(data['opmessage_grp']).length);
+			console.log(data['opmessage_grp']);
+
+			this._addUserGroup(data?.opmessage_grp, $(data['opmessage_grp']).length);
+		}
+
+		if (data?.opmessage_usr) {
+			this._addUser(data?.opmessage_usr, data['opmessage_usr']);
+		}
+
+		$('#operation_opmessage_default_msg')
+			.change(function() {
+				if($('#operation_opmessage_default_msg')[0].checked) {
+					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').show().attr('disabled', false);
+					$('[id="operation-message-body"],[id="operation-message-label"]').show().attr('disabled', false);
+				}
+				else {
+					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
+					$('[id="operation-message-body"],[id="operation-message-label"]').hide();
+				}
+			}).trigger('change');
+
 	}
 
 	_loadViews() {
 		this._removeAllFields();
-		this._sendMessageFields();
+		const operation_type = document.getElementById('operation-type-select').value;
+		this._changeView(operation_type)
 
 		jQuery('#operation-type-select').on('change', () => {
-			// todo : fix operationtype value to num not cmd[]
-			this._removeAllFields();
-
 			const operation_type = document.getElementById('operation-type-select').value;
 
-			switch (operation_type) {
-				case 'cmd[0]':
-					this._sendMessageFields();
-					break;
-				case 'cmd[4]':
-				case 'cmd[5]':
-					this._hostGroupFields();
-					break;
-				case 'cmd[6]':
-				case 'cmd[7]':
-					this._templateFields();
-					break;
-				case 'cmd[10]':
-					this._hostInventoryFields();
-					break;
-				case 'cmd[11]':
-					this._allInvolvedFields();
-					break;
-				case 'cmd[12]':
-					this._allInvolvedFieldsUpdate();
-					break;
-				case 'cmd[2]':
-				case 'cmd[3]':
-				case 'cmd[8]':
-				case 'cmd[9]':
-					break;
-				default:
-					this._addScriptFields();
-					break;
-			}
+			this._removeAllFields();
+			this._changeView(operation_type)
+
 		});
 
 		this.dialogue.addEventListener('click', (e) => {
@@ -90,6 +89,40 @@ window.operation_popup = new class {
 				this._processTypeOfCalculation();
 			}
 		});
+	}
+
+	_changeView(operation_type) {
+		// todo : fix operationtype value to num not cmd[]
+		switch (operation_type) {
+			case 'cmd[0]':
+				this._sendMessageFields();
+				break;
+			case 'cmd[4]':
+			case 'cmd[5]':
+				this._hostGroupFields();
+				break;
+			case 'cmd[6]':
+			case 'cmd[7]':
+				this._templateFields();
+				break;
+			case 'cmd[10]':
+				this._hostInventoryFields();
+				break;
+			case 'cmd[11]':
+				this._allInvolvedFields();
+				break;
+			case 'cmd[12]':
+				this._allInvolvedFieldsUpdate();
+				break;
+			case 'cmd[2]':
+			case 'cmd[3]':
+			case 'cmd[8]':
+			case 'cmd[9]':
+				break;
+			default:
+				this._addScriptFields();
+				break;
+		}
 	}
 
 	_allInvolvedFields() {
@@ -192,18 +225,20 @@ window.operation_popup = new class {
 				continue;
 			}
 			input.setAttribute('disabled', true)
+			input.style.display = 'none';
 		}
 	}
 
 	_sendMessageFields() {
+		$('#operation_opmessage_default_msg').trigger('change')
+
 		switch (this.eventsource) {
 			case <?= EVENT_SOURCE_TRIGGERS ?>:
 				this.fields = ['operation-condition-table',
 					'operation-condition-list-label', 'operation-condition-list', 'step-from', 'operation-step-range', 'operation-step-duration', 'operation-message-notice',
 					'operation-message-user-groups', 'operation-message-notice', 'operation-message-users',
 					'operation-message-mediatype-only', 'operation-message-custom', 'operation_esc_period',
-					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
-					'operation-message-subject', 'operation-message-body']
+					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type']
 				break;
 			case <?= EVENT_SOURCE_INTERNAL ?>:
 			case <?= EVENT_SOURCE_SERVICE?>:
@@ -221,7 +256,7 @@ window.operation_popup = new class {
 					'operation-message-notice', 'operation-message-user-groups', 'operation-message-users',
 					'operation-message-mediatype-only', 'operation-message-custom', 'operation_esc_period',
 					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
-					'operation-message-subject', 'operation-message-body', 'operation-message-notice'
+					'operation-message-notice'
 				]
 				break;
 		}
@@ -233,23 +268,24 @@ window.operation_popup = new class {
 	_enableFormFields(fields = []) {
 		for (let field of this.form.getElementsByClassName('form-field')) {
 			if (fields.includes(field.id)) {
-				field.style.display = 'block';
+				field.style.display = '';
 
 				for (let input of field.querySelectorAll('input, textarea')) {
-					input.removeAttribute('disabled')
+					input.removeAttribute('disabled');
+					input.style.display = '';
 				}
 				for (let label of field.querySelectorAll('label')) {
-					label.style.display = 'block';
+					label.style.display = '';
 				}
 			}
 		}
 
 		for (let label of this.form.getElementsByTagName('label')) {
 			if (fields.includes(label.id.replace('-label', ''))) {
-				label.style.display = 'block';
+				label.style.display = '';
 			}
 			if (fields.includes(label.htmlFor)) {
-				label.style.display = 'block';
+				label.style.display = '';
 			}
 		}
 	}
@@ -268,28 +304,28 @@ window.operation_popup = new class {
 		];
 		this._enableFormFields(fields);
 
-			this.targets_hosts_ms = jQuery('#operation_opcommand_hst__hostid');
+		this.targets_hosts_ms = jQuery('#operation_opcommand_hst__hostid');
 
-			const ms_hosts_url = new Curl('jsrpc.php', false);
-			ms_hosts_url.setArgument('method', 'multiselect.get');
-			ms_hosts_url.setArgument('object_name', 'hosts');
-			ms_hosts_url.setArgument('editable', '1');
-			ms_hosts_url.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
+		const ms_hosts_url = new Curl('jsrpc.php', false);
+		ms_hosts_url.setArgument('method', 'multiselect.get');
+		ms_hosts_url.setArgument('object_name', 'hosts');
+		ms_hosts_url.setArgument('editable', '1');
+		ms_hosts_url.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 
-			this.targets_hosts_ms.multiSelect({
-				url: ms_hosts_url.getUrl(),
-				name: 'operation[opcommand_hst][][hostid]',
-				popup: {
-					parameters: {
-						multiselect: '1',
-						srctbl: 'hosts',
-						srcfld1: 'hostid',
-						dstfrm: 'action.edit',
-						dstfld1: 'operation-command-target-hosts',
-						editable: '1'
-					}
+		this.targets_hosts_ms.multiSelect({
+			url: ms_hosts_url.getUrl(),
+			name: 'operation[opcommand_hst][][hostid]',
+			popup: {
+				parameters: {
+					multiselect: '1',
+					srctbl: 'hosts',
+					srcfld1: 'hostid',
+					dstfrm: 'action.edit',
+					dstfld1: 'operation-command-target-hosts',
+					editable: '1'
 				}
-			});
+			}
+		});
 
 		const ms_groups_url = new Curl('jsrpc.php', false);
 		ms_groups_url.setArgument('method', 'multiselect.get');
@@ -335,16 +371,19 @@ window.operation_popup = new class {
 		};
 
 		overlay.$dialogue[0].addEventListener('submit-usergroups-popup', (e) => {
+			console.log('gkggku', e.detail);
 			this._addUserGroup(e.detail);
 		})
 	}
 
-	_addUserGroup(values) {
+	_addUserGroup(values, row_count = 0) {
 		values.forEach((value, index) => {
 			const row = document.createElement('tr');
 			row.append(value.name)
 			row.append(this._createRemoveCell())
-			row.appendChild(this._createHiddenInput(`operation[opmessage_grp][${index}][usrgrpid]`,value.usrgrpid));
+			row.appendChild(
+				this._createHiddenInput(`operation[opmessage_grp][${index + row_count}][usrgrpid]`,value.usrgrpid)
+			);
 
 			document.getElementById('operation-message-user-groups-footer').before(row);
 		});
@@ -380,13 +419,14 @@ window.operation_popup = new class {
 		})
 	}
 
-	_addUser(values) {
-		// todo : fix bug
+	_addUser(values, row_count = 0) {
+		const usr_rows = ($(row_count).length);
+
 		values.forEach((value, index) => {
 			const row = document.createElement('tr');
 			row.append(value.name)
 			row.append(this._createRemoveCell())
-			row.append(this._createHiddenInput(`operation[opmessage_usr][][userid]`, value.id))
+			row.append(this._createHiddenInput(`operation[opmessage_usr][${index + usr_rows}][userid]`, value.id))
 
 			document.getElementById('operation-message-users-footer').before(row);
 		});
@@ -473,6 +513,9 @@ window.operation_popup = new class {
 	}
 
 	submit() {
+		const actionid = this._createHiddenInput('actionid', this.actionid)
+		this.form.append(actionid);
+
 		let curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', 'action.operation.validate');
 		const fields = getFormFields(this.form);
@@ -522,22 +565,22 @@ window.operation_popup = new class {
 	}
 
 	_addCustomMessageFields() {
-		// todo : check if these are needed
+		//// todo : check if these are needed
 
-		$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
-		$('[id="operation-message-body"],[id="operation-message-label"]').hide();
+		//$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
+		//$('[id="operation-message-body"],[id="operation-message-label"]').hide();
 
-		$('#operation_opmessage_default_msg')
-			.change(function() {
-				if($('#operation_opmessage_default_msg')[0].checked) {
-					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').show().attr('disabled', false);
-					$('[id="operation-message-body"],[id="operation-message-label"]').show().attr('disabled', false);
-				}
-				else {
-					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
-					$('[id="operation-message-body"],[id="operation-message-label"]').hide();
-				}
-			})
+		//$('#operation_opmessage_default_msg')
+		//	.change(function() {
+		//		if($('#operation_opmessage_default_msg')[0].checked) {
+		//			$('[id="operation-message-subject"],[id="operation-message-subject-label"]').show().attr('disabled', false);
+		//			$('[id="operation-message-body"],[id="operation-message-label"]').show().attr('disabled', false);
+		//		}
+		//		else {
+		//			$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide().attr('disabled', true);
+		//			$('[id="operation-message-body"],[id="operation-message-label"]').hide().attr('disabled', true);
+		//		}
+		//	})
 	}
 
 	_processTypeOfCalculation() {

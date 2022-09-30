@@ -32,25 +32,32 @@ $form = (new CForm())
 	->addVar('operation[recovery]', $data['recovery'])
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
+$operation = $data['operation'];
+
 $form_grid = (new CFormGrid());
 
 // Operation type row.
 $select_operationtype = (new CSelect(''))
 	->setFocusableElementId('operationtype')
 	->addOptions(CSelect::createOptionsFromArray($data['operation_types']))
+	// todo : fix for scriptids!!!!
+	->setAttribute('value', 'cmd['.$operation['operationtype'].']' ?? 0)
 	->setId('operation-type-select')
 	->setName('operation[operationtype]');
 
 $form_grid->addItem([
 	(new CLabel(_('Operation'), $select_operationtype->getFocusableElementId()))->setId('operation-type-label'),
 	(new CFormField($select_operationtype))
+		->setAttribute('value', $operation['operationtype'])
 		->setId('operation-type')
 	]);
 
 /*
  * Operation escalation steps row.
  */
-$step_from = (new CNumericBox('operation[esc_step_from]', 1, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
+$step_from = (new CNumericBox('operation[esc_step_from]', 1, 5))
+	->setAttribute('value', $operation['esc_step_from'] ?? 1)
+	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 $step_from->onChange($step_from->getAttribute('onchange').' if (this.value < 1) this.value = 1;');
 
 if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL ||
@@ -61,6 +68,7 @@ if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EV
 			$step_from->setId('step-from'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), '-', (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CNumericBox('operation[esc_step_to]', 0, 5, false, false, false))
+				->setAttribute('value', $operation['esc_step_to'] ?? 0)
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), _('(0 - infinitely)')
 		]))->setId('operation-step-range')
@@ -71,10 +79,12 @@ if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EV
 	$form_grid->addItem([
 		(new CLabel(_('Step duration'), 'step-duration'))->setId('operation-step-duration-label'),
 		(new CFormField([
-			(new CTextBox('operation[esc_period]', 0))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setId('step-duration'),
+			(new CTextBox('operation[esc_period]', 0))
+				->setAttribute('value', $operation['esc_period'] ?? 0)
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setId('step-duration'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			_('(0 - use action default)')
-		]))->setId('operation-step-duration'),
+		]))->setId('operation-step-duration')
 	]);
 }
 
@@ -85,44 +95,91 @@ $form_grid->addItem(
 	))->setId('operation-message-notice')
 );
 
+$usergroup_table = (new CTable())
+	->addStyle('width: 100%;')
+	->setHeader([_('User group'), _('Action')])
+	->addRow(
+		(new CRow(
+			(new CCol(
+				(new CButton(null, _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('operation-message-user-groups-footer')
+			))->setColSpan(2)
+		))->setId('operation-message-user-groups-footer')
+	);
+
+if ($operation['opmessage_grp']) {
+	$i = 0;
+
+	foreach ($operation['opmessage_grp'] as $opmessage_grp) {
+		$usr_grpids = $opmessage_grp['usrgrpid'];
+
+		$user_groups = API::UserGroup()->get([
+			'output' => ['name'],
+			'usrgrpids' => $usr_grpids,
+			'preservekeys' => true
+		]);
+
+		foreach ($user_groups as $user_group) {
+			foreach ($operation['opmessage_grp'] as $group)
+
+			$operation['opmessage_grp'][$i]['name'] = $user_group['name'];
+			$i++;
+		}
+	}
+}
+
 $form_grid->addItem([
 	(new CLabel(_('Send to user groups')))->setId('operation-message-user-groups-label'),
 	(new CFormField(
-		(new CTable())
-			->addStyle('width: 100%;')
-			->setHeader([_('User group'), _('Action')])
-			->addRow(
-				(new CRow(
-					(new CCol(
-						(new CButton(null, _('Add')))
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('operation-message-user-groups-footer')
-					))->setColSpan(2)
-				))->setId('operation-message-user-groups-footer')
-			)
+		$usergroup_table
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->setId('operation-message-user-groups')
 ]);
 
+$user_table = (new CTable())
+	->addStyle('width: 100%;')
+	->setHeader([_('User'), _('Action')]);
+
+sdff($operation);
+
+if ($operation['opmessage_usr']) {
+	$i = 0;
+	foreach ($operation['opmessage_usr'] as $opmessage_usr) {
+		$userids = $opmessage_usr['userid'];
+
+		$fullnames = [];
+
+		$users = API::User()->get([
+			'output' => ['userid', 'username', 'name', 'surname'],
+			'userids' => $userids
+		]);
+
+		foreach ($users as $user) {
+			$fullnames[$user['userid']] = getUserFullname($user);
+
+			$operation['opmessage_usr'][$i]['name'] = $fullnames[$opmessage_usr['userid']];
+			$i++;
+		}
+	}
+}
+
+$user_table->addRow(
+	(new CRow(
+		(new CCol(
+			(new CButton(null, _('Add')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('operation-message-users-footer')
+		))->setColSpan(2)
+	))->setId('operation-message-users-footer')
+);
+
 // Message recipient (users) row.
 $form_grid->addItem([
 	(new CLabel(_('Send to users')))->setId('operation-message-users-label'),
-	(new CFormField(
-	(new CTable())
-		->addStyle('width: 100%;')
-		->setHeader([_('User'), _('Action')])
-		->addRow(
-			(new CRow(
-				(new CCol(
-					(new CButton(null, _('Add')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('operation-message-users-footer')
-				))->setColSpan(2)
-			))->setId('operation-message-users-footer')
-		)
-	))
+	(new CFormField($user_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->setId('operation-message-users')
@@ -143,7 +200,8 @@ $form_grid->addItem([
 $select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
 	->addOptions(CSelect::createOptionsFromArray($data['media_types']))
 	->setFocusableElementId('operation-opmessage-mediatypeid')
-	->setName('operation[opmessage][mediatypeid]');
+	->setName('operation[opmessage][mediatypeid]')
+	->setValue($operation['opmessage']['mediatypeid'] ?? 0);
 
 
 $form_grid->addItem([
@@ -156,9 +214,11 @@ $form_grid->addItem([
 // Operation custom message checkbox row.
 $form_grid->addItem([
 	(new CLabel(_('Custom message'), 'operation[opmessage][default_msg]'))->setId('operation-message-custom-label'),
-	(new CFormField
-	(new CCheckBox('operation[opmessage][default_msg]', 0)))
-		->setId('operation-message-custom')
+	(new CFormField(
+		(new CCheckBox('operation[opmessage][default_msg]', 0))
+			->setChecked(array_key_exists('default_msg', $operation['opmessage']))
+			->setAttribute('value', array_key_exists('default_msg', $operation['opmessage']) ? 1 : 0)
+	))->setId('operation-message-custom')
 ]);
 
 // Operation custom message subject row.
@@ -271,24 +331,26 @@ $form_grid->addItem([
 	]))->setId('operation-condition-row')
 ]);
 
+$conditions_table = (new CTable())
+	->setId('operation-condition-list')
+	->addStyle('width: 100%;')
+	->setHeader([_('Label'), _('Name'), _('Action')])
+	->addRow(
+		(new CRow(
+			(new CCol(
+				(new CButton(null, _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('operation-condition-list-footer')
+			))->setColSpan(3)
+		))->setId('operation-condition-list-footer')
+	);
+
 // Conditions row.
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS && $data['recovery'] == ACTION_OPERATION) {
 	$form_grid->addItem([
 		(new CLabel(_('Conditions')))->setId('operation-condition-list-label'),
 		(new CFormField(
-			(new CTable())
-				->setId('operation-condition-list')
-				->addStyle('width: 100%;')
-				->setHeader([_('Label'), _('Name'), _('Action')])
-				->addRow(
-					(new CRow(
-						(new CCol(
-							(new CButton(null, _('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('operation-condition-list-footer')
-						))->setColSpan(3)
-					))->setId('operation-condition-list-footer')
-				)
+			$conditions_table
 		))
 			->setId('operation-condition-table')
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -316,10 +378,10 @@ $output = [
 	'script_inline' => getPagePostJs().$this->readJsFile('popup.operation.common.js.php').
 		'operation_popup.init('.json_encode([
 			'eventsource' => $data['eventsource'],
-			'recovery_phase' => $data['recovery']
+			'recovery_phase' => $data['recovery'],
+			'data' => $operation,
+			'actionid' => $data['actionid']
 		]).');',
-	//'script_inline' => getPagePostJs().
-	//	$this->readJsFile('popup.operations.js.php')
 ];
 
 echo json_encode($output);

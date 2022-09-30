@@ -21,7 +21,7 @@
 ?>
 
 window.action_edit_popup = new class {
-	init({condition_operators, condition_types, conditions, actionid, eventsource}) {
+	init({condition_operators, condition_types, conditions, actionid, eventsource, operation_data}) {
 		this.overlay = overlays_stack.getById('action-edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -30,6 +30,7 @@ window.action_edit_popup = new class {
 		this.conditions = conditions;
 		this.actionid = actionid;
 		this.eventsource = eventsource;
+		this.operation_data = operation_data;
 		this.row_count = document.getElementById('conditionTable').rows.length - 2;
 
 		this._initActionButtons();
@@ -58,12 +59,63 @@ window.action_edit_popup = new class {
 				this._processTypeOfCalculation();
 			}
 			else if (e.target.classList.contains('js-edit-button')) {
-				// todo E.S. : pass data to edit form
-				this._openOperationPopup(this.eventsource, <?= ACTION_OPERATION ?>, this.actionid);
+
+				// todo : pass id of the row
+				this._openEditOperationPopup(e, this.operation_data);
 			}
 			else if (e.target.classList.contains('js-remove-button')) {
 				e.target.closest('tr').remove();
 			}
+		});
+	}
+
+	_openEditOperationPopup(e, operation_data) {
+		if (JSON.parse(e.target.getAttribute('data'))) {
+			const data = JSON.parse(e.target.getAttribute('data'))
+
+			// todo : add recovery num, not hardcode
+			this.parameters = {
+				eventsource: this.eventsource,
+				recovery: '0',
+				actionid: this.actionid,
+				data: data
+			}
+		}
+		else {
+			this.parameters = {
+				eventsource: this.eventsource,
+				recovery: '0',
+				actionid: this.actionid,
+				data: operation_data
+			}
+		}
+
+		const overlay = PopUp('popup.action.operations', this.parameters, {
+			dialogueid: 'operations',
+			dialogue_class: 'modal-popup-medium'
+		});
+
+		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
+			this._createOperationsRow(e);
+		});
+	}
+
+
+	_openOperationPopup(eventsource, recovery_phase, actionid) {
+		this.recovery = recovery_phase;
+		const parameters = {
+			eventsource: eventsource,
+			recovery: recovery_phase,
+			actionid: actionid
+		};
+
+		const overlay = PopUp('popup.action.operations', parameters, {
+			dialogueid: 'operations',
+			dialogue_class: 'modal-popup-medium'
+		});
+
+		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
+			this._createOperationsRow(e);
 		});
 	}
 
@@ -84,28 +136,10 @@ window.action_edit_popup = new class {
 		});
 	}
 
-	_openOperationPopup(eventsource, recovery_phase, actionid) {
-		this.recovery = recovery_phase;
-		const parameters = {
-			eventsource: eventsource,
-			recovery: recovery_phase,
-			actionid: actionid
-		};
-
-		const overlay = PopUp('popup.action.operations', parameters, {
-			dialogueid: 'operations',
-			dialogue_class: 'modal-popup-medium'
-		});
-
-		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
-			// todo : add function to create row in operation table
-			this._createOperationsRow(e);
-		});
-	}
-
-	_createOperationsRow(input) {
+	_createOperationsRow(input, row_id) {
 		const operation_data = input.detail.operation;
 		// todo : rewrite to switch statement?
+		// todo : fix if usr_grps and users are added at the same time
 
 		if (this.recovery == <?= ACTION_OPERATION ?> && (
 				this.eventsource == <?=EVENT_SOURCE_TRIGGERS?> || this.eventsource == <?=EVENT_SOURCE_INTERNAL?>
@@ -120,7 +154,7 @@ window.action_edit_popup = new class {
 			this.operation_row.append(this._addColumn(operation_data.duration));
 
 			this.addOperationsData(input);
-			this.operation_row.append(this._createActionCell());
+			this.operation_row.append(this._createActionCell(input));
 			$('#op-table tr:last').before(this.operation_row);
 		}
 
@@ -133,7 +167,7 @@ window.action_edit_popup = new class {
 			this.operation_row.append(this._addDetailsColumn(operation_data.details));
 
 			this.addOperationsData(input);
-			this.operation_row.append(this._createActionCell());
+			this.operation_row.append(this._createActionCell(input));
 			$('#op-table tr:last').before(this.operation_row);
 		}
 
@@ -145,7 +179,7 @@ window.action_edit_popup = new class {
 			this.operation_row.append(this._addDetailsColumn(operation_data.details));
 			this.addOperationsData(input);
 
-			this.operation_row.append(this._createActionCell());
+			this.operation_row.append(this._createActionCell(input));
 			$('#rec-table tr:last').before(this.operation_row);
 		}
 
@@ -157,7 +191,7 @@ window.action_edit_popup = new class {
 			this.operation_row.append(this._addDetailsColumn(operation_data.details));
 			this.addOperationsData(input);
 
-			this.operation_row.append(this._createActionCell());
+			this.operation_row.append(this._createActionCell(input));
 			$('#upd-table tr:last').before(this.operation_row);
 		}
 	}
@@ -178,7 +212,6 @@ window.action_edit_popup = new class {
 	}
 
 	addOperationsData(input) {
-		// todo : REWRITE THIS
 		// add operation data as hidden input to action form
 		this.recovery_prefix = '';
 
@@ -398,15 +431,7 @@ window.action_edit_popup = new class {
 		return cell;
 	}
 
-	_createActionCell() {
-	//->addClass('js-edit-button')
-	//->setAttribute('data-operation', json_encode([
-	//		'operationid' => $operationid,
-	//		'actionid' => $data['actionid'],
-	//		'eventsource' => $data['eventsource'],
-	//		'operationtype' => ACTION_RECOVERY_OPERATION
-	//])),
-
+	_createActionCell(input) {
 		const cell = document.createElement('td');
 		const remove_btn = document.createElement('button');
 		const edit_btn = document.createElement('button');
@@ -416,10 +441,10 @@ window.action_edit_popup = new class {
 		remove_btn.textContent = <?= json_encode(_('Remove')) ?>;
 		remove_btn.addEventListener('click', () => remove_btn.closest('tr').remove());
 
-		// todo : pass data to edit popup
 		edit_btn.type = 'button';
 		edit_btn.classList.add('btn-link', 'js-edit-button');
 		edit_btn.textContent = <?= json_encode(_('Edit')) ?>;
+		edit_btn.setAttribute('data', JSON.stringify(input.detail.operation))
 
 		cell.appendChild(edit_btn);
 		// todo: check how to add space between buttons differently

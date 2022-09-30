@@ -24,13 +24,14 @@
 // */
 
 class CControllerPopupActionOperationsEdit extends CController {
-
 	protected function checkInput(): bool {
 		$fields = [
-			'eventsource' =>	'required|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE]),
-			'recovery' =>		'required|in '.implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION]),
-			'actionid' =>		'db actions.actionid',
-			'operation' =>		'array'
+			'eventsource' => 'required|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE]),
+			'recovery' => 'required|in '.implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION]),
+			'actionid' => 'db actions.actionid',
+			'operation' => 'array',
+			'operationid' => 'string',
+			'data' => 'array'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateInputConstraints();
@@ -99,10 +100,11 @@ class CControllerPopupActionOperationsEdit extends CController {
 			'eventsource' => $eventsource,
 			'actionid' => $this->getInput('actionid', []),
 			'recovery' => $recovery,
-			'operation' => $this->hasInput('operation') ? $this->getInput('operation') : null,
+			'operation' => $this->getInput('data'),
 			'operation_types' => $operation_type,
-			'media_types' => $media_type
+			'media_types' => $media_type,
 		];
+
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

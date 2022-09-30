@@ -228,8 +228,6 @@ class CControllerActionOperationValidate extends CController {
 		if (preg_match('/\bscriptid\b/', $operation['operationtype'])){
 			$operationtype = OPERATION_TYPE_COMMAND;
 		}
-		// todo : check what is the same and remove unnecessary code
-		// todo : fix - fields based on eventsource
 
 		$data['operation'] = $operation;
 		$data['operation']['operationtype'] = $operationtype;
@@ -251,8 +249,20 @@ class CControllerActionOperationValidate extends CController {
 	}
 
 	protected function createStartInColumn($operation):string {
-		// todo : pass all the operations that exist for this action, not this operations duration
-		$delays = count_operations_delay([$operation], $operation['esc_period']);
+		$operation_type = $this->getInput('operation')['recovery'];
+		$previous_operations = [];
+
+		if ($operation_type == ACTION_OPERATION && $this->getInput('actionid')) {
+			$allOperations = API::Action()->get([
+				'selectOperations' => ['operationtype', 'esc_period', 'esc_step_from', 'esc_step_to', 'evaltype'],
+				'actionids' => $this->getInput('actionid')
+			]);
+
+			$previous_operations = $allOperations[0]['operations'];
+		}
+
+		// todo : pass the second (hardcoded 1h) from action popup -> default step duration!!!
+		$delays = count_operations_delay($previous_operations, '1h');
 
 		return ($delays[$operation['esc_step_from']] === null)
 			? _('Unknown')
@@ -268,7 +278,7 @@ class CControllerActionOperationValidate extends CController {
 		if ($operation['esc_step_from'] < 1) {
 			$step_from = 1;
 		}
-		// todo : should add in increasing order (by steps) from js??
+		// todo : should add in increasing order (by steps) from js side??
 		if (($step_from === $operation['esc_step_to']) || $operation['esc_step_to'] == 0) {
 			$steps = $step_from;
 		}

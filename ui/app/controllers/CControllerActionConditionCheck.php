@@ -115,7 +115,6 @@ class CControllerActionConditionCheck extends CController {
 			'value' => $this->hasInput('value') ? $this->getInput('value') : null,
 			'value2' => $this->hasInput('value2') ? $this->getInput('value2') : null,
 			'operator' => $this->getInput('operator'),
-			//'last_type' => $this->getConditionLastType(),
 			'eventsource' => $this->getInput('source'),
 			'allowed_conditions' => get_conditions_by_eventsource($this->getInput('source')),
 			'trigger_context' => $this->getInput('trigger_context', 'host'),
