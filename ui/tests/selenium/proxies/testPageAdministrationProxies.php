@@ -596,7 +596,7 @@ class testPageAdministrationProxies extends CWebTest {
 	 * @backup profiles
 	 */
 	public function testPageAdministrationProxies_SortColumns() {
-		// Open Proxies page with all columns sorted descendingly.
+		// Open Proxies page with proxies sorted descendingly by name.
 		$this->page->login()->open('zabbix.php?action=proxy.list&sort=host&sortorder=DESC')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
 
@@ -616,7 +616,7 @@ class testPageAdministrationProxies extends CWebTest {
 				return strcasecmp($b, $a);
 			});
 
-			// Click twice on every header.
+			// Check ascending and descending sorting in column.
 			foreach ([$sorted_asc, $sorted_desc] as $order) {
 				$table->query('link', $column)->waitUntilClickable()->one()->click();
 				$table->waitUntilReloaded();
