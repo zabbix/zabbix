@@ -22,7 +22,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxcomms.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "../../../../src/libs/zbxsysinfo/common/http.h"
 
 #ifndef HAVE_LIBCURL
@@ -73,11 +73,11 @@ void	zbx_mock_test_entry(void **state)
 
 	expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	init_request(&request);
-	init_result(&param_result);
+	zbx_init_agent_request(&request);
+	zbx_init_agent_result(&param_result);
 	init_param = zbx_mock_get_parameter_string("in.key");
 
-	if (SUCCEED != parse_item_key(init_param, &request))
+	if (SUCCEED != zbx_parse_item_key(init_param, &request))
 		fail_msg("Cannot parse item key: %s", init_param);
 
 	if (expected_result != (actual_result = WEB_PAGE_GET(&request, &param_result)))
@@ -89,12 +89,12 @@ void	zbx_mock_test_entry(void **state)
 	if (SYSINFO_RET_FAIL == expected_result)
 	{
 		buffer = zbx_mock_get_parameter_string("out.error");
-		rvalue = (NULL != GET_MSG_RESULT(&param_result)) ? *GET_MSG_RESULT(&param_result) : NULL;
+		rvalue = (NULL != ZBX_GET_MSG_RESULT(&param_result)) ? *ZBX_GET_MSG_RESULT(&param_result) : NULL;
 	}
 	else
 	{
 		buffer = zbx_mock_get_parameter_string(STR_FIELD_OUT);
-		rvalue = (NULL != GET_TEXT_RESULT(&param_result)) ? *GET_TEXT_RESULT(&param_result) : NULL;
+		rvalue = (NULL != ZBX_GET_TEXT_RESULT(&param_result)) ? *ZBX_GET_TEXT_RESULT(&param_result) : NULL;
 	}
 
 	if (NULL == rvalue)
@@ -108,8 +108,8 @@ void	zbx_mock_test_entry(void **state)
 	if (0 != strcmp(buffer, rvalue))
 		fail_msg("Got '%s' instead of '%s' as a value.", rvalue, buffer);
 
-	free_request(&request);
-	free_result(&param_result);
+	zbx_free_agent_request(&request);
+	zbx_free_agent_result(&param_result);
 }
 
 #ifdef HAVE_LIBCURL

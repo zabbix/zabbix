@@ -1590,6 +1590,7 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 						service_time_new.note = zbx_strdup(NULL, "");
 
 						zbx_vector_services_times_append(services_times, service_time_new);
+						service_time = &services_times->values[j];
 					}
 
 					service_time->to = service_downtime->from;

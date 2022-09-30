@@ -24,8 +24,7 @@ package zbxlib
 /*
 #cgo CFLAGS: -I${SRCDIR}/../../../../../include
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "module.h"
 
 int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result);

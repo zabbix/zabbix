@@ -27,7 +27,7 @@
 #ifdef _WINDOWS
 #	include "messages.h"
 #	include "zbxwinservice.h"
-#	include "sysinfo.h"
+#	include "zbxsysinfo.h"
 static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 #endif
 
@@ -265,7 +265,7 @@ static void	unlock_log(void)
 static void	lock_log(void)
 {
 #ifdef ZABBIX_AGENT
-	if (0 == (ZBX_MUTEX_LOGGING_DENIED & get_thread_global_mutex_flag()))
+	if (0 == (ZBX_MUTEX_LOGGING_DENIED & zbx_get_thread_global_mutex_flag()))
 #endif
 		LOCK_LOG;
 }
@@ -273,7 +273,7 @@ static void	lock_log(void)
 static void	unlock_log(void)
 {
 #ifdef ZABBIX_AGENT
-	if (0 == (ZBX_MUTEX_LOGGING_DENIED & get_thread_global_mutex_flag()))
+	if (0 == (ZBX_MUTEX_LOGGING_DENIED & zbx_get_thread_global_mutex_flag()))
 #endif
 		UNLOCK_LOG;
 }

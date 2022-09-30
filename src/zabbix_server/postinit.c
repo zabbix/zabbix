@@ -24,6 +24,7 @@
 #include "zbxtasks.h"
 #include "log.h"
 #include "zbxnum.h"
+#include "valuecache.h"
 
 #define ZBX_HIST_MACRO_NONE		(-1)
 #define ZBX_HIST_MACRO_ITEM_VALUE	0
@@ -442,6 +443,9 @@ int	zbx_check_postinit_tasks(char **error)
 	DB_ROW		row;
 	int		ret = SUCCEED;
 
+	/* avoid filling value cache with unnecessary data during event name update */
+	zbx_vc_disable();
+
 	result = DBselect("select taskid from task where type=%d and status=%d", ZBX_TM_TASK_UPDATE_EVENTNAMES,
 			ZBX_TM_STATUS_NEW);
 
@@ -462,6 +466,8 @@ int	zbx_check_postinit_tasks(char **error)
 
 	if (SUCCEED != ret)
 		*error = zbx_strdup(*error, "cannot update event names");
+
+	zbx_vc_enable();
 
 	return ret;
 }
