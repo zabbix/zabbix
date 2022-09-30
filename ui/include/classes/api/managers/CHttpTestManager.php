@@ -136,7 +136,7 @@ class CHttpTestManager {
 		$db_httptests = DBfetchArrayAssoc(DBselect(
 			'SELECT ht.httptestid,ht.name,ht.delay,ht.retries,ht.agent,ht.http_proxy,ht.status,ht.authentication,'.
 				'ht.http_user,ht.http_password,ht.verify_peer,ht.verify_host,ht.ssl_cert_file,ht.ssl_key_file,'.
-				'ht.ssl_key_password,ht.hostid,ht.nextcheck,ht.templateid,h.status AS host_status'.
+				'ht.ssl_key_password,ht.hostid,ht.templateid,h.status AS host_status'.
 			' FROM httptest ht,hosts h'.
 			' WHERE ht.hostid=h.hostid'.
 				' AND '.dbConditionId('ht.httptestid', array_column($httptests, 'httptestid'))
