@@ -1064,11 +1064,9 @@ if (!hasRequest('form_refresh')) {
 	$item_tabs->setSelected(0);
 }
 
-
 $cancelButton = $data['backurl'] !== null
 	? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
 	: new CButtonCancel(url_params(['hostid', 'context']));
-
 
 // Append buttons to form.
 if ($data['itemid'] != 0) {
