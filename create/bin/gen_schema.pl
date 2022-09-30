@@ -904,10 +904,10 @@ sub process_update_trigger_function($)
 		$out .= "return null;${eol}\n";
 		$out .= "end \$func\$;${eol}\n";
 
-		$out .= "create trigger ${table_name}_${indexed_column_name}_insert after insert {$eol}\n";
-		$out .= "of ${original_column_name} on ${table_name} ${eol}\n";
+		$out .= "create trigger ${table_name}_${indexed_column_name}_insert after insert ${eol}\n";
+		$out .= "on ${table_name} ${eol}\n";
 		$out .= "for each row execute procedure ${table_name}_${indexed_column_name}_${func_name}();${eol}\n";
-		$out .= "create trigger ${table_name}_${indexed_column_name}_update after update {$eol}\n";
+		$out .= "create trigger ${table_name}_${indexed_column_name}_update after update ${eol}\n";
 		$out .= "of ${original_column_name} on ${table_name} ${eol}\n";
 		$out .= "for each row execute procedure ${table_name}_${indexed_column_name}_${func_name}();${eol}\n";
 	}
