@@ -7011,7 +7011,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
       color: #768d99; }
     .interfaces .interface-container.interface-container-header .interface-cell-action {
       grid-column: span 2; }
-    .interfaces .interface-container:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) .interface-cell:not(.interface-cell-details) {
+    .interfaces .interface-container:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) :first-child .interface-cell:not(.interface-cell-details) {
       padding-top: 10px;
       margin-top: 5px;
       border-top: 1px solid #acbbc2; }
