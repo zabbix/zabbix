@@ -107,13 +107,14 @@ class CControllerDashboardView extends CController {
 		updateTimeSelectorPeriod($time_selector_options);
 
 		$widget_known_types = array_keys(APP::ModuleManager()->getWidgets());
+		$widget_last_type = CProfile::get('web.dashboard.last_widget_type');
 
 		$data = [
 			'dashboard' => $dashboard,
 			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(),
-			'widget_last_type' => CProfile::get('web.dashboard.last_widget_type',
-				$widget_known_types ? $widget_known_types[0] : ''
-			),
+			'widget_last_type' => $widget_last_type && array_key_exists($widget_last_type, $widget_known_types)
+				? $widget_last_type
+				: $widget_known_types[0],
 			'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
 			'time_period' => getTimeSelectorPeriod($time_selector_options),
 			'active_tab' => CProfile::get('web.dashboard.filter.active', 1)
