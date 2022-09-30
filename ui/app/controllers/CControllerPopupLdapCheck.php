@@ -172,7 +172,7 @@ class CControllerPopupLdapCheck extends CController {
 
 			if (!array_key_exists('enabled', $group)
 					&& (!array_key_exists('name', $group) || $group['name'] === ''
-							|| $group['name'] === USERDIRECTORY_FALLBACK_GROUP_NAME)) {
+							|| $group['name'] === CProvisioning::FALLBACK_GROUP_NAME)) {
 				return false;
 			}
 		}

@@ -1174,7 +1174,19 @@ class CUser extends CApiService {
 	 */
 	public function delete(array $userids) {
 		$this->validateDelete($userids, $db_users);
+		self::deleteForce($userids);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);
 
+		return ['userids' => $userids];
+	}
+
+	/**
+	 * Delete data from users table, also delete related rows from tables:
+	 * media, profiles, users_groups, tokens, event_suppress.
+	 *
+	 * @param array $userids  Array of userid.
+	 */
+	public static function deleteForce(array $userids): void {
 		DB::delete('media', ['userid' => $userids]);
 		DB::delete('profiles', ['userid' => $userids]);
 		DB::delete('users_groups', ['userid' => $userids]);
@@ -1195,10 +1207,6 @@ class CUser extends CApiService {
 		CToken::deleteForce(array_keys($tokenids), false);
 
 		DB::delete('users', ['userid' => $userids]);
-
-		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);
-
-		return ['userids' => $userids];
 	}
 
 	/**
@@ -1443,10 +1451,10 @@ class CUser extends CApiService {
 			]);
 
 			if ($idp_user_data['usrgrps']) {
+				self::$userData = CProvisioning::API_USER;
 				$new_user = $this->createProvisionedUser($idp_user_data);
-				self::addAuditLogByUser(null, CWebUser::getIp(), 'System', CAudit::ACTION_ADD, CAudit::RESOURCE_USER,
-					[$new_user]
-				);
+				self::$userData = null;
+
 				$user_data = $this->findAccessibleUser($new_user['username'], true, ZBX_AUTH_LDAP, false);
 			}
 		}
@@ -1512,9 +1520,12 @@ class CUser extends CApiService {
 					]);
 
 					if (CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])) {
+						self::$userData = CProvisioning::API_USER;
 						$upd_user = $this->updateProvisionedUser($db_user['userid'], $idp_user_data);
+						self::$userData = null;
 
 						if (!$upd_user) {
+							$db_user = [];
 							self::exception(ZBX_API_ERROR_PERMISSIONS,
 								_('Incorrect user name or password or account is temporarily blocked.')
 							);
@@ -1541,7 +1552,7 @@ class CUser extends CApiService {
 			}
 		}
 		catch (APIException $e) {
-			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS) {
+			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS && $db_user) {
 				$attempt_failed = $db_user['attempt_failed'] + 1;
 
 				DB::update('users', [
@@ -2189,52 +2200,77 @@ class CUser extends CApiService {
 		$users = [$user];
 		$this->validateCreate($users);
 		$this->createReal($users);
+		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::API_USER['username'], CAudit::ACTION_ADD, CAudit::RESOURCE_USER,
+			$users
+		);
 
-		return $user;
+		return reset($users);
 	}
 
 	/**
 	 * Update provisioned user in database. Will return empty array when user were deleted because
 	 * do not have matching group mappings.
 	 *
-	 * @param int   $userid
+	 * @param int   $db_userid
 	 * @param array $idp_user_data
 	 *
 	 * @return array
 	 */
-	protected function updateProvisionedUser($userid, array $idp_user_data): array {
+	protected function updateProvisionedUser($db_userid, array $idp_user_data): array {
 		$attrs = array_flip(array_merge(self::PROVISIONED_FIELDS, ['userdirectoryid']));
 		unset($attrs['passwd']);
 		$user = array_intersect_key($idp_user_data, $attrs);
 		$user['medias'] = $this->sanitizeUserMedia($user['medias']);
-		$user['userid'] = $userid;
+		$user['userid'] = $db_userid;
+		$users = [$user];
+
+		[$db_user] = DB::select('users', [
+			'output' => ['userid', 'username', 'name', 'surname', 'roleid', 'userdirectoryid'],
+			'userids' => [$db_userid]
+		]);
+		$db_user['usrgrps'] = DB::select('users_groups', [
+			'output' => ['usrgrpid'],
+			'filter' => ['userid' => $db_userid]
+		]);
+		$db_user['medias'] = DB::select('media', [
+			'output' => ['mediatypeid', 'sendto'],
+			'filter' => ['userid' => $db_userid]
+		]);
+		$db_users = [$db_userid => $db_user];
 
 		if ($idp_user_data['usrgrps']) {
-			$db_user = DB::select('users', [
-				'output' => array_diff(array_keys($user), ['usrgrps', 'medias']),
-				'userids' => [$userid]
-			])[0];
-			$db_user['usrgrps'] = DB::select('users_groups', [
-				'output' => ['usrgrpid'],
-				'filter' => ['userid' => $user['userid']]
-			]);
-			$db_user['medias'] = DB::select('media', [
-				'output' => ['mediatypeid', 'sendto'],
-				'filter' => ['userid' => $user['userid']]
-			]);
-
-			$users = [$user];
-			$db_users = [$db_user['userid'] => $db_user];
 			$this->updateReal($users, $db_users);
-			self::addAuditLogByUser(null, CWebUser::getIp(), 'System', CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER,
-				$users, $db_users
+			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::API_USER['username'],
+				CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users
+			);
+
+			return reset($users);
+		}
+
+		try {
+			$userids = [$user['userid']];
+
+			$this->validateDelete($userids, $db_users);
+			self::deleteForce($userids);
+			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::API_USER['username'],
+				CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $users
 			);
 		}
-		else {
-			$this->delete([$userid]);
+		catch (Exception $e) {
+			/**
+			 * TODO: when user cannot be deleted remove groups and role. Maybe do not delete use but assign to disabled group.
+			 */
+			$user['usrgrps'] = [];
+			$user['roleid'] = 0;
+			$users = [$user];
+
+			$this->updateReal($users, $db_users);
+			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::API_USER['username'],
+				CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users
+			);
 		}
 
-		return $user;
+		return [];
 	}
 
 	/**

@@ -377,7 +377,7 @@ window.ldap_edit_popup = new class {
 	}
 
 	_renderProvisionGroupRow(group) {
-		const is_fallback = group.name === '<?= USERDIRECTORY_FALLBACK_GROUP_NAME ?>';
+		const is_fallback = group.name === '<?= CProvisioning::FALLBACK_GROUP_NAME ?>';
 		const attributes = {
 			user_group_names: ('user_groups' in group)
 				? Object.values(group.user_groups).map(user_group => user_group.name).join(', ')
@@ -431,7 +431,7 @@ window.ldap_edit_popup = new class {
 				<td></td>
 				<td>
 					<a href="javascript:void(0);" class="wordwrap js-edit"><?= _('Fallback group') ?></a>
-					<input type="hidden" name="provision_groups[#{row_index}][name]" value="<?= USERDIRECTORY_FALLBACK_GROUP_NAME ?>">
+					<input type="hidden" name="provision_groups[#{row_index}][name]" value="<?= CProvisioning::FALLBACK_GROUP_NAME ?>">
 					<input type="hidden" name="provision_groups[#{row_index}][enabled]" value="#{enabled}">
 					<input type="hidden" name="provision_groups[#{row_index}][sortorder]" value="#{sortorder}">
 				</td>

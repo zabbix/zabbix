@@ -150,7 +150,7 @@ class CControllerPopupLdapEdit extends CController {
 		$has_fallback_group = false;
 		foreach ($provision_groups as &$provision_group) {
 			if (!array_key_exists('name', $provision_group)
-					|| $provision_group['name'] === USERDIRECTORY_FALLBACK_GROUP_NAME) {
+					|| $provision_group['name'] === CProvisioning::FALLBACK_GROUP_NAME) {
 				$provision_group['enabled'] = 1;
 				$has_fallback_group = true;
 			}
@@ -169,7 +169,7 @@ class CControllerPopupLdapEdit extends CController {
 
 		if (!$has_fallback_group) {
 			$provision_groups[] = [
-				'name' => USERDIRECTORY_FALLBACK_GROUP_NAME,
+				'name' => CProvisioning::FALLBACK_GROUP_NAME,
 				'enabled' => 0
 			];
 		}

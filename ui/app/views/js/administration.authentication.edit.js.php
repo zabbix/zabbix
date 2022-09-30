@@ -582,7 +582,7 @@
 		}
 
 		_renderProvisionGroupRow(saml_provision_group) {
-			const is_fallback = saml_provision_group.name === '<?= USERDIRECTORY_FALLBACK_GROUP_NAME ?>';
+			const is_fallback = saml_provision_group.name === '<?= CProvisioning::FALLBACK_GROUP_NAME ?>';
 			saml_provision_group.user_group_names = ('user_groups' in saml_provision_group)
 				? Object.values(saml_provision_group.user_groups).map(user_group => user_group.name).join(', ')
 				: '';
@@ -680,7 +680,7 @@
 					<td></td>
 					<td>
 						<a href="javascript:void(0);" class="wordwrap js-edit"><?= _('Fallback group') ?></a>
-						<input type="hidden" name="saml_provision_groups[#{row_index}][name]" value="<?= USERDIRECTORY_FALLBACK_GROUP_NAME ?>">
+						<input type="hidden" name="saml_provision_groups[#{row_index}][name]" value="<?= CProvisioning::FALLBACK_GROUP_NAME ?>">
 						<input type="hidden" name="saml_provision_groups[#{row_index}][enabled]" value="#{enabled}">
 						<input type="hidden" name="saml_provision_groups[#{row_index}][sortorder]" value="#{sortorder}">
 					</td>

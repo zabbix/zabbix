@@ -76,7 +76,7 @@ $inline_js .= $user_role_multiselect->getPostJS();
 
 $source = $data['idp_type'] == IDP_TYPE_SAML ? _('SAML') : _('LDAP');
 
-if ($data['name'] === USERDIRECTORY_FALLBACK_GROUP_NAME) {
+if ($data['name'] === CProvisioning::FALLBACK_GROUP_NAME) {
 	$name_hint_icon = makeHelpIcon([
 		_('Use fallback group to define user groups and a role for users not covered by group mapping.'),
 	])->addClass(ZBX_STYLE_LIST_DASHED);
@@ -95,8 +95,8 @@ $form
 	->addItem((new CFormGrid())
 		->addItem([
 			(new CLabel([_s('%1$s group pattern', $source), $name_hint_icon], 'name'))->setAsteriskMark(),
-			new CFormField($data['name'] === USERDIRECTORY_FALLBACK_GROUP_NAME
-				? [_('Fallback group'), new CVar('name', USERDIRECTORY_FALLBACK_GROUP_NAME)]
+			new CFormField($data['name'] === CProvisioning::FALLBACK_GROUP_NAME
+				? [_('Fallback group'), new CVar('name', CProvisioning::FALLBACK_GROUP_NAME)]
 				: (new CTextBox('name', $data['name']))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('autofocus', 'autofocus')
