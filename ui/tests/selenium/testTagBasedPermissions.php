@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -26,6 +27,8 @@ use Facebook\WebDriver\WebDriverBy;
  * Test tag based permissions
  */
 class testTagBasedPermissions extends CLegacyWebTest {
+
+	use TableTrait;
 
 	public $user = 'Tag-user';
 	public $trigger_host = 'Host for tag permissions';
@@ -211,8 +214,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$table->waitUntilReloaded();
 		}
 
-		$rows = $table->getRows();
-		$this->assertTrue(($rows->count() === 1 && $rows->asText() === ['No data found.']));
+		$this->assertTableData([]);
 	}
 
 	public static function create() {
