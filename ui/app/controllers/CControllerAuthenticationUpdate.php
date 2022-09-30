@@ -255,7 +255,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 			$result = $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED
 				? $this->processSamlConfiguration()
-				: true;
+				: $this->removeSamlUserDirectory();
 
 			$ldap_userdirectoryid = 0;
 			if ($result) {
@@ -592,5 +592,16 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		return true;
+	}
+
+	private function removeSamlUserDirectory(): bool {
+		$db_saml = API::UserDirectory()->get([
+			'output' => ['userdirectoryid'],
+			'filter' => ['idp_type' => IDP_TYPE_SAML]
+		]);
+
+		return $db_saml
+			? (bool) API::UserDirectory()->delete([$db_saml[0]['userdirectoryid']])
+			: true;
 	}
 }
