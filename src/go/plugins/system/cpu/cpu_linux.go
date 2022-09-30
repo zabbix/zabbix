@@ -32,6 +32,7 @@ import (
 	"strings"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/log"
 )
 
 // Plugin -
