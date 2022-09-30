@@ -37,7 +37,7 @@ static int	mock_um_macro_compare(const void *d1, const void *d2)
 	if (0 != (ret = strcmp(m1->name, m2->name)))
 		return ret;
 
-	/* CONDITION_OPERATOR_EQUAL (0) has higher priority than CONDITION_OPERATOR_REGEXP (8) */
+	/* ZBX_CONDITION_OPERATOR_EQUAL (0) has higher priority than ZBX_CONDITION_OPERATOR_REGEXP (8) */
 	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
 
 	return zbx_strcmp_null(m1->context, m2->context);

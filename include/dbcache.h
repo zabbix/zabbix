@@ -40,7 +40,6 @@
 #define	ZBX_POLLER_TYPE_ODBC		6
 #define	ZBX_POLLER_TYPE_COUNT		7	/* number of poller types */
 
-
 typedef enum
 {
 	ZBX_SESSION_TYPE_DATA = 0,
@@ -1172,6 +1171,27 @@ void	zbx_cached_proxy_free(zbx_cached_proxy_t *proxy);
 
 int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name);
 
+/* item snmpv3 security levels */
+#define ZBX_ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
+#define ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV	1
+#define ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV	2
+
+/* maintenance tag operators */
+#define ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL	0
+#define ZBX_MAINTENANCE_TAG_OPERATOR_LIKE	2
+
+/* maintenance tag evaluation types */
+/* SYNC WITH PHP!                   */
+#define ZBX_MAINTENANCE_TAG_EVAL_TYPE_AND_OR	0
+#define ZBX_MAINTENANCE_TAG_EVAL_TYPE_OR	2
+
+/* special item key used for ICMP pings */
+#define ZBX_SERVER_ICMPPING_KEY	"icmpping"
+/* special item key used for ICMP ping latency */
+#define ZBX_SERVER_ICMPPINGSEC_KEY	"icmppingsec"
+/* special item key used for ICMP ping loss packages */
+#define ZBX_SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
+
 int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck);
 void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
 
@@ -1190,5 +1210,4 @@ void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vect
 		zbx_vector_uint64_t *del_macro_hostids);
 void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *templateids);
-
 #endif

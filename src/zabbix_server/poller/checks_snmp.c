@@ -355,6 +355,14 @@ end:
 
 static int	zbx_snmpv3_set_auth_protocol(const DC_ITEM *item, struct snmp_session *session)
 {
+/* item snmpv3 authentication protocol */
+/* SYNC WITH PHP!                      */
+#define ITEM_SNMPV3_AUTHPROTOCOL_MD5		0
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA1		1
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA224		2
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA256		3
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA384		4
+#define ITEM_SNMPV3_AUTHPROTOCOL_SHA512		5
 	int	ret = SUCCEED;
 
 	switch (item->snmpv3_authprotocol)
@@ -390,6 +398,12 @@ static int	zbx_snmpv3_set_auth_protocol(const DC_ITEM *item, struct snmp_session
 	}
 
 	return ret;
+#undef ITEM_SNMPV3_AUTHPROTOCOL_MD5
+#undef ITEM_SNMPV3_AUTHPROTOCOL_SHA1
+#undef ITEM_SNMPV3_AUTHPROTOCOL_SHA224
+#undef ITEM_SNMPV3_AUTHPROTOCOL_SHA256
+#undef ITEM_SNMPV3_AUTHPROTOCOL_SHA384
+#undef ITEM_SNMPV3_AUTHPROTOCOL_SHA512
 }
 
 static char	*zbx_get_snmp_type_error(u_char type)
@@ -451,6 +465,14 @@ static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const DC_I
 
 static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *error, size_t max_error_len)
 {
+/* item snmpv3 privacy protocol */
+/* SYNC WITH PHP!               */
+#define ITEM_SNMPV3_PRIVPROTOCOL_DES		0
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES128		1
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES192		2
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES256		3
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES192C	4
+#define ITEM_SNMPV3_PRIVPROTOCOL_AES256C	5
 	struct snmp_session	session, *ss = NULL;
 	char			addr[128];
 #ifdef HAVE_IPV6
@@ -531,10 +553,10 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 		/* set the security level to authenticated, but not encrypted */
 		switch (item->snmpv3_securitylevel)
 		{
-			case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
+			case ZBX_ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
 				session.securityLevel = SNMP_SEC_LEVEL_NOAUTH;
 				break;
-			case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
+			case ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
 				session.securityLevel = SNMP_SEC_LEVEL_AUTHNOPRIV;
 
 				if (FAIL == zbx_snmpv3_set_auth_protocol(item, &session))
@@ -556,7 +578,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 					goto end;
 				}
 				break;
-			case ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV:
+			case ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV:
 				session.securityLevel = SNMP_SEC_LEVEL_AUTHPRIV;
 
 				if (FAIL == zbx_snmpv3_set_auth_protocol(item, &session))
@@ -664,6 +686,12 @@ end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ss;
+#undef ITEM_SNMPV3_PRIVPROTOCOL_DES
+#undef ITEM_SNMPV3_PRIVPROTOCOL_AES128
+#undef ITEM_SNMPV3_PRIVPROTOCOL_AES192
+#undef ITEM_SNMPV3_PRIVPROTOCOL_AES256
+#undef ITEM_SNMPV3_PRIVPROTOCOL_AES192C
+#undef ITEM_SNMPV3_PRIVPROTOCOL_AES256C
 }
 
 static void	zbx_snmp_close_session(struct snmp_session *session)
@@ -1696,7 +1724,7 @@ static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *er
 
 	for (i = 0; i < data->request.nparam; i += 2)
 	{
-		if (SUCCEED != is_discovery_macro(data->request.params[i]))
+		if (SUCCEED != zbx_is_discovery_macro(data->request.params[i]))
 		{
 			zbx_snprintf(error, max_error_len, "Invalid SNMP OID: macro \"%s\" is invalid",
 					data->request.params[i]);
