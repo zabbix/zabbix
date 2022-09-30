@@ -17,7 +17,7 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
-1. Setup and configure Zabbix agent 2 compiled with the latest version of MongoDB monitoring plugin.
+1. Setup and configure zabbix-agent2 compiled with the MongoDB monitoring plugin.
 2. Set the {$MONGODB.CONNSTRING} such as <protocol(host:port)> or named session of mongos proxy(router).
 3. Set the user name and password in host macros ({$MONGODB.USER}, {$MONGODB.PASSWORD}) if you want to override parameters from the Zabbix agent configuration file.
 
