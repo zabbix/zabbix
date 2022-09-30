@@ -43,7 +43,9 @@ class CControllerActionCreate extends CController {
 				CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
 				CONDITION_EVAL_TYPE_EXPRESSION
 			]),
-			'formula' => 'string'
+			'formula' => 'string',
+			'notify_if_canceled' => ACTION_NOTIFY_IF_CANCELED_TRUE,
+			'pause_suppressed' => ACTION_PAUSE_SUPPRESSED_TRUE
 		];
 
 		$ret = $this->validateInput($fields);
@@ -92,6 +94,8 @@ class CControllerActionCreate extends CController {
 
 	protected function doAction(): void {
 		$eventsource = $this->getInput('eventsource');
+		$notify_if_cancelled = $this->getInput('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_FALSE);
+		$pause_suppressed = $this->getInput('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
 
 		$action = [
 			'name' => $this->getInput('name'),
@@ -99,7 +103,9 @@ class CControllerActionCreate extends CController {
 			'eventsource' => $eventsource,
 			'operations' => $this->getInput('operations', []),
 			'recovery_operations' => $this->getInput('recovery_operations', []),
-			'update_operations' => $this->getInput('update_operations', [])
+			'update_operations' => $this->getInput('update_operations', []),
+			'notify_if_canceled' => $notify_if_cancelled,
+			'pause_suppressed' => $pause_suppressed
 		];
 
 		$filter = [
