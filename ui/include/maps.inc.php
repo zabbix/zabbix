@@ -726,7 +726,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				$problems_by_trigger[$trigger['triggerid']];
 		}
 	}
-	unset($selement);
 
 	$config = select_config();
 
