@@ -1102,7 +1102,7 @@ if ($data['itemid'] != 0) {
 else {
 	$item_tabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[(new CSimpleButton(_('Test')))->setId('test_item'), new CButtonCancel(url_params(['hostid', 'context']))]
+		[(new CSimpleButton(_('Test')))->setId('test_item'), $cancelButton]
 	));
 }
 
