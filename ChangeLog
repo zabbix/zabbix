@@ -1,8 +1,13 @@
 Changes for 6.4.0beta2
 
 New features:
+........S. [ZBXNEXT-7920] improved value cache not to drop items from cache when no new value has arrived in 24 hours (vso)
 
 Bug fixes:
+........S. [ZBX-21706] fixed double precision update patch for TimescaleDb (akozlovs)
+..F....... [ZBX-19512] fixed debug info block content refresh after changing table content in Monitoring -> Problems page (miks)
+..F....... [ZBX-21682] removed unnecessary horizontal separator from Host interface (kkuzmina)
+...G...... [ZBX-21610] fixed problem with sysctl() kern.proc.args API bug on FreeBSD <= 8.2 (ssimonenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0beta1
