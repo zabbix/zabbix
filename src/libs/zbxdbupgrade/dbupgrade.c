@@ -1317,24 +1317,22 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update(const char *t
 	ZBX_UNUSED(idname);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-		"CREATE TRIGGER %s_%s_insert AFTER INSERT ON %s FOR EACH ROW\n"
+		"CREATE TRIGGER %s_%s_insert BEFORE INSERT ON %s FOR EACH ROW\n"
 		"BEGIN\n"
-			"IF NEW.%s <> OLD.%s\n"
-			"THEN\n"
-			"UPDATE %s SET %s=%s(%s)"
+			"SET NEW.%s=%s(NEW.%s)"
 		"END\n;"
-		"CREATE TRIGGER %s_%s_update AFTER UPDATE ON %s FOR EACH ROW\n"
+		"CREATE TRIGGER %s_%s_update BEFORE UPDATE ON %s FOR EACH ROW\n"
 		"BEGIN\n"
-			"IF NEW.%s <> OLD.%s\n"
+			"IF NEW.%s<>OLD.%s\n"
 			"THEN\n"
-			"UPDATE %s SET %s=%s(%s)"
+			"SET NEW.%s=%s(NEW.%s);\n"
+			"END IF;\n"
 		"END\n",
 
-		table_name, indexed_column_name, table_name, original_column_name, original_column_name, table_name,
-		indexed_column_name, func_name, original_column_name,
+		table_name, indexed_column_name, table_name, table_name, indexed_column_name, func_name,
+		original_column_name,
 		table_name, indexed_column_name, table_name, original_column_name, original_column_name, table_name,
 		indexed_column_name, func_name, original_column_name);
-
 #elif defined(HAVE_POSTGRESQL)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"CREATE OR REPLACE FUNCTION %s_%s_%s() RETURNS TRIGGER LANGUAGE PLPGSQL AS $func$  \n"
