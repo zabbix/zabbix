@@ -252,6 +252,16 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s件選択済"
 
+#: app/controllers/CControllerMediatypeEnable.php:93
+#, c-format
+msgid "%1$s. %2$s: %3$s. %4$s."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeEnable.php:108
+#, c-format
+msgid "%1$s: %2$s"
+msgstr ""
+
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
@@ -6387,6 +6397,14 @@ msgstr "楕円"
 msgid "Email"
 msgstr "メール"
 
+#: app/views/js/administration.mediatype.edit.js.php:397
+msgid "Email and password"
+msgstr ""
+
+#: app/views/administration.mediatype.edit.php:64
+msgid "Email provider"
+msgstr ""
+
 #: app/views/popup.generic.php:50
 msgid "Empty"
 msgstr "空白"
@@ -9004,6 +9022,11 @@ msgstr "ネットワークインターフェースの受信統計。整数値を
 #, c-format
 msgid "Incompatible \"propagation_rule\" and \"propagation_value\" parameters for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のための\"propagation_rule\"と\"propagation_value\"は互換性がありません。"
+
+#: app/controllers/CControllerMediatypeEnable.php:97
+#: app/controllers/CControllerMediatypeEnable.php:108
+msgid "Incomplete configuration"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
@@ -11822,6 +11845,10 @@ msgid "Media type disabled"
 msgid_plural "Media types disabled"
 msgstr[0] "メディアタイプを無効にしました"
 
+#: app/views/administration.user.edit.php:327
+msgid "Media type disabled by Administration."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
@@ -11855,6 +11882,10 @@ msgstr "ID \"%1$s\"のメディアタイプは使用できません。"
 #: include/classes/helpers/CRoleHelper.php:428
 msgid "Media types"
 msgstr "メディアタイプ"
+
+#: app/views/popup.media.php:75
+msgid "Media types disabled by Administration."
+msgstr ""
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -13250,6 +13281,10 @@ msgstr ""
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
 msgid "Not classified"
 msgstr "未分類"
+
+#: app/controllers/CControllerMediatypeEnable.php:95
+msgid "Not enabled"
+msgstr ""
 
 #: include/forms.inc.php:315
 msgid "Not inherited items"
@@ -21232,6 +21267,10 @@ msgstr "論理値で指定してください"
 msgid "a character string is expected"
 msgstr "文字列で指定してください"
 
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "日付はYYYY-MM-DDフォーマットで指定してください。"
@@ -21942,6 +21981,11 @@ msgstr "一致しない"
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr "e() - オイラー数を返す"
+
+#: app/views/administration.mediatype.list.php:98
+#: app/views/administration.mediatype.list.php:103
+msgid "email"
+msgstr ""
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
