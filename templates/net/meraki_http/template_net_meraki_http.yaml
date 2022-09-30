@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-09-30T09:07:46Z'
+  date: '2022-09-30T13:30:31Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -890,6 +890,9 @@ zabbix_export:
                 -
                   tag: model
                   value: '{#MODEL}'
+                -
+                  tag: serial-number
+                  value: '{#SERIAL}'
             -
               uuid: 9c8c48b6f1ae479e81c5e058ea78110e
               name: 'Device [{#NAME}]: status'
@@ -934,6 +937,9 @@ zabbix_export:
                 -
                   tag: model
                   value: '{#MODEL}'
+                -
+                  tag: serial-number
+                  value: '{#SERIAL}'
               trigger_prototypes:
                 -
                   uuid: 1395ba0dc2284090885c88d6e66a2ea1
