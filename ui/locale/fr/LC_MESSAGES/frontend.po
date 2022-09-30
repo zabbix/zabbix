@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-09-09 18:00+0000\n"
+"PO-Revision-Date: 2022-09-23 18:30+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -20433,7 +20433,7 @@ msgstr "une chaîne de caractères est attendue"
 
 #: include/classes/validators/CApiInputValidator.php:854
 msgid "a character string, integer or floating point value is expected"
-msgstr ""
+msgstr "une chaîne de caractères, un entier ou une valeur à virgule flottante est attendu"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
