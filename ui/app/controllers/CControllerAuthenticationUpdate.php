@@ -75,7 +75,6 @@ class CControllerAuthenticationUpdate extends CController {
 			'saml_provision_groups' =>			'array',
 			'saml_provision_media' =>			'array',
 			'scim_status' =>					'in '.ZBX_AUTH_SCIM_PROVISIONING_DISABLED.','.ZBX_AUTH_SCIM_PROVISIONING_ENABLED,
-			'auth_token' =>						'db userdirectory_saml.auth_token',
 			'passwd_min_length' =>				'int32',
 			'passwd_check_rules' =>				'array'
 		];
@@ -470,10 +469,6 @@ class CControllerAuthenticationUpdate extends CController {
 		];
 
 		$this->getInputs($saml_fields, array_keys($saml_fields));
-
-		if ($this->hasInput('auth_token')) {
-			$saml_fields['auth_token'] = $this->getInput('auth_token');
-		}
 
 		$saml_data = [
 			'idp_type' => IDP_TYPE_SAML,

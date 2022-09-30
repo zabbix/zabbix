@@ -50,10 +50,6 @@
 			this.toggleSamlJitProvisioning(this.saml_provision_status.checked);
 			this._initSortable();
 
-			if (document.getElementById('scim-token-btn') !== null) {
-				document.getElementById('scim-token-btn').addEventListener('click', this.showPasswordField);
-			}
-
 			if (document.getElementById('saml_auth_enabled') !== null
 					&& !document.getElementById('saml_auth_enabled').checked) {
 				$(this.saml_provision_groups_table).sortable('disable');
@@ -739,20 +735,6 @@
 			for (const element of this.form.querySelectorAll('.saml-provision-status')) {
 				element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
 			}
-		}
-
-		showPasswordField(e) {
-			const form_field = e.target.parentNode;
-			const password_field = form_field.querySelector('[name="auth_token"][type="password"]');
-			const password_var = form_field.querySelector('[name="auth_token"][type="hidden"]');
-
-			password_field.style.display = '';
-			password_field.disabled = false;
-
-			if (password_var !== null) {
-				form_field.removeChild(password_var);
-			}
-			form_field.removeChild(e.target);
 		}
 	};
 </script>

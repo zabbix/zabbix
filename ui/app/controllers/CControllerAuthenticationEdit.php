@@ -68,7 +68,6 @@ class CControllerAuthenticationEdit extends CController {
 			'saml_provision_groups' =>			'array',
 			'saml_provision_media' =>			'array',
 			'scim_status' =>					'in '.ZBX_AUTH_SCIM_PROVISIONING_DISABLED.','.ZBX_AUTH_SCIM_PROVISIONING_ENABLED,
-			'auth_token' =>						'db userdirectory_saml.auth_token',
 			'passwd_min_length' =>				'int32',
 			'passwd_check_rules' =>				'int32|ge 0|le '.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE)
 		];
@@ -156,7 +155,6 @@ class CControllerAuthenticationEdit extends CController {
 				'saml_user_username' => '',
 				'saml_user_lastname' => '',
 				'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED,
-				'auth_token' => '',
 				'passwd_min_length' => '',
 				'passwd_check_rules' => 0
 			];
@@ -177,12 +175,6 @@ class CControllerAuthenticationEdit extends CController {
 			if ($data['saml_provision_media']) {
 				$data['saml_provision_media'] = $this->extendProvisionMedia($data['saml_provision_media']);
 			}
-
-			$data['token_is_expired'] = false;
-			if (array_key_exists('auth_token', $data)) {
-				$data['token_is_expired'] = $this->checkTokenExpiration($data['auth_token']);
-			}
-
 
 			$data['ldap_servers'] = $this->getLdapServerUserGroupCount($this->getInput('ldap_servers', []));
 			$data['ldap_default_row_index'] = $this->getInput('ldap_default_row_index', 0);
@@ -220,10 +212,6 @@ class CControllerAuthenticationEdit extends CController {
 					'provision_groups' => 'saml_provision_groups',
 					'provision_media' => 'saml_provision_media'
 				]);
-
-				$saml_configuration['token_is_expired'] = $this->checkTokenExpiration(
-					$saml_configuration['auth_token']
-				);
 			}
 			else {
 				$saml_configuration = [
@@ -245,7 +233,6 @@ class CControllerAuthenticationEdit extends CController {
 					'saml_user_username' => '',
 					'saml_user_lastname' => '',
 					'scim_status' => '',
-					'auth_token' => '',
 					'saml_provision_groups' => [],
 					'saml_provision_media' => []
 				];
@@ -401,34 +388,5 @@ class CControllerAuthenticationEdit extends CController {
 		}
 
 		return $provision_media;
-	}
-
-	/**
-	 * Return true if API token is expired.
-	 *
-	 * @param string $token
-	 *
-	 * @return bool
-	 *
-	 */
-	private function checkTokenExpiration(string $token): bool {
-		if ($token == '') {
-			return false;
-		}
-
-		$token_is_expired = false;
-
-		$db_token = API::Token()->get([
-			'output' => ['expires_at'],
-			'token' => $token
-		]);
-
-		if ($db_token) {
-			$token_is_expired = $db_token[0]['expires_at']
-				? time() > $db_token[0]['expires_at']
-				: false;
-		}
-
-		return $token_is_expired;
 	}
 }
