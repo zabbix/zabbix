@@ -25,5 +25,7 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
-	// TODO AS: has padding
+	public function hasPadding(array $values, int $view_mode): bool {
+		return false;
+	}
 }

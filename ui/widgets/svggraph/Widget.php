@@ -25,7 +25,9 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
-	// TODO AS: has padding
+	public function hasPadding(array $values, int $view_mode): bool {
+		return true;
+	}
 
 	// TODO AS: calculated time selector option
 	public function usesTimeSelector(): bool {

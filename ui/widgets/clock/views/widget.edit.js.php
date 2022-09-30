@@ -23,7 +23,6 @@ use Widgets\Clock\Widget;
 
 ?>
 
-
 window.widget_clock_form = new class {
 
 	init() {

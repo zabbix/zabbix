@@ -42,9 +42,7 @@ class Widget extends CWidget {
 	public const SHOW_TIME = 2;
 	public const SHOW_TIMEZONE = 3;
 
-	public function getConfiguration(array $values, int $view_mode): array {
-		return [
-			'padding' => $values['clock_type'] === self::TYPE_ANALOG
-		];
+	protected function hasPadding(array $values, int $view_mode): bool {
+		return $values['clock_type'] === self::TYPE_ANALOG;
 	}
 }

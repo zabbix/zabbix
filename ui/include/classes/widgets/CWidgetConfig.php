@@ -24,13 +24,6 @@ namespace Zabbix\Widgets;
 class CWidgetConfig {
 
 	/**
-	 * Array of deprecated widgets constants.
-	 */
-	/*public const DEPRECATED_WIDGETS = [
-		WIDGET_DATA_OVER // TODO AS: moved to manifest
-	];*/
-
-	/**
 	 * Classifier for non-template dashboards.
 	 */
 //	public const CONTEXT_DASHBOARD = 'dashboard';
@@ -356,69 +349,6 @@ class CWidgetConfig {
 //				return false;
 //		}
 //	}
-
-	/**
-	 * Check if widget has padding or not.
-	 *
-	 * @static
-	 *
-	 * @param string $type       Widget type - 'WIDGET_*' constant.
-	 * @param array  $fields     Widget form fields
-	 * @param int    $view_mode  Widget view mode. ZBX_WIDGET_VIEW_MODE_NORMAL by default
-	 *
-	 * @return bool
-	 */
-	/*private static function hasPadding(string $type, array $fields, int $view_mode): bool {
-		if ($view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {     // TODO AS: if has .dashboard-grid-widget-hidden-header
-			switch ($type) {
-//				case WIDGET_CLOCK:
-//					return $fields['clock_type'] === WIDGET_CLOCK_TYPE_ANALOG; // TODO AS: if has .clock-analog {padding: 0}
-
-				case WIDGET_GRAPH: // TODO AS: moved to Widget.php
-				case WIDGET_MAP: // TODO AS: moved to Widget.php
-				case WIDGET_SVG_GRAPH: // TODO AS: moved to Widget.php
-					return true;
-
-				default:
-					return false;
-			}
-		}
-		else {
-			switch ($type) {
-//				case WIDGET_CLOCK:
-//					return $fields['clock_type'] === WIDGET_CLOCK_TYPE_ANALOG;
-
-				case WIDGET_HOST_AVAIL: // TODO AS: moved to Widget.php
-					return (count($fields['interface_type']) != 1);
-
-				case WIDGET_PROBLEMS_BY_SV: // TODO AS: moved to Widget.php
-					return $fields['show_type'] != WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS;
-
-				case WIDGET_GRAPH_PROTOTYPE: // TODO AS: moved to Widget.php
-				case WIDGET_ITEM: // TODO AS: moved to Widget.php
-				case WIDGET_URL: // TODO AS: moved to Widget.php
-					return false;
-
-				default:
-					return true;
-			}
-		}
-	}*/
-
-	/**
-	 * Get widget configuration based on widget type, fields and current view mode.
-	 *
-	 * @param string $type       Widget type - 'WIDGET_*' constant.
-	 * @param array  $fields     Widget form fields
-	 * @param int    $view_mode  Widget view mode
-	 *
-	 * @return array
-	 */
-	/*public static function getConfiguration(string $type, array $fields, int $view_mode): array {
-		return [
-			'padding' => self::hasPadding($type, $fields, $view_mode)
-		];
-	}*/
 
 	/**
 	 * Get Form object for widget with provided data.
