@@ -710,16 +710,18 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		'recent' => true
 	]);
 
-	$problems_by_trigger = [];
+	$problems_by_trigger = array_fill_keys($triggerids, []);
 	foreach ($problems as $problem) {
 		$problems_by_trigger[$problem['objectid']][] = $problem;
 	}
 
-	foreach ($selements as &$selement) {
+	foreach ($selements as $num => $selement) {
 		foreach ($selement['triggers'] as $trigger) {
-			$filtered_problems = array_key_exists($trigger['triggerid'], $problems_by_trigger)
-				? $problems_by_trigger[$trigger['triggerid']]
-				: [];
+			if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
+				continue;
+			}
+
+			$filtered_problems = $problems_by_trigger[$trigger['triggerid']];
 
 			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
 					|| $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
@@ -728,10 +730,9 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				);
 			}
 
-			$selement['triggers'][$trigger['triggerid']]['problems'] = $filtered_problems;
+			$selements[$num]['triggers'][$trigger['triggerid']]['problems'] = $filtered_problems;
 		}
 	}
-	unset($selement);
 
 	$info = [];
 
