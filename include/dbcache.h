@@ -743,7 +743,7 @@ zbx_synced_new_config_t;
 #define ZBX_TRIGGER_GET_DEFAULT		(~(unsigned int)ZBX_TRIGGER_GET_ITEMIDS)
 #define ZBX_TRIGGER_GET_ALL		(~(unsigned int)0)
 
-void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced);
+void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zbx_vector_uint64_t *deleted_itemids);
 void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
