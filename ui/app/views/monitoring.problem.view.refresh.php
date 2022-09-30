@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,19 +19,22 @@
 **/
 
 
-function media_type2str($type = null) {
-	$types = [
-		MEDIA_TYPE_EMAIL => _('Email'),
-		MEDIA_TYPE_EXEC => _('Script'),
-		MEDIA_TYPE_SMS => _('SMS'),
-		MEDIA_TYPE_WEBHOOK => _('Webhook')
-	];
+/**
+ * @var CView $this
+ * @var array $data
+ */
 
-	if ($type === null) {
-		natsort($types);
+$output = [
+	'body' => (new CPartial('monitoring.problem.view.html', $data))->getOutput()
+];
 
-		return $types;
-	}
-
-	return $types[$type];
+if (($messages = getMessages()) !== null) {
+	$output['messages'] = $messages->toString();
 }
+
+if (CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo json_encode($output);

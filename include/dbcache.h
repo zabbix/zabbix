@@ -742,7 +742,7 @@ zbx_synced_new_config_t;
 #define ZBX_TRIGGER_GET_DEFAULT		(~(unsigned int)ZBX_TRIGGER_GET_ITEMIDS)
 #define ZBX_TRIGGER_GET_ALL		(~(unsigned int)0)
 
-void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced);
+void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zbx_vector_uint64_t *deleted_itemids);
 void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
@@ -1017,8 +1017,10 @@ zbx_dc_revision_t;
 
 const char	*zbx_dc_get_session_token(void);
 zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *token, zbx_session_type_t session_type);
+
 int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_uint64_t session_config_revision,
-		zbx_dc_revision_t *config_revision);
+		zbx_dc_revision_t *dc_revision);
+
 void		zbx_dc_cleanup_sessions(void);
 
 void		zbx_dc_cleanup_autoreg_host(void);

@@ -255,6 +255,16 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, 已选择"
 
+#: app/controllers/CControllerMediatypeEnable.php:93
+#, c-format
+msgid "%1$s. %2$s: %3$s. %4$s."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeEnable.php:108
+#, c-format
+msgid "%1$s: %2$s"
+msgstr ""
+
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
@@ -6390,6 +6400,14 @@ msgstr "椭圆"
 msgid "Email"
 msgstr "电子邮件"
 
+#: app/views/js/administration.mediatype.edit.js.php:397
+msgid "Email and password"
+msgstr ""
+
+#: app/views/administration.mediatype.edit.php:64
+msgid "Email provider"
+msgstr ""
+
 #: app/views/popup.generic.php:50
 msgid "Empty"
 msgstr "空"
@@ -9008,6 +9026,11 @@ msgstr "网络接口上传流量统计。返回 整数"
 #, c-format
 msgid "Incompatible \"propagation_rule\" and \"propagation_value\" parameters for service \"%1$s\"."
 msgstr "服务“%1$s”的“propagation_rule”和“propagation_value”参数不兼容。"
+
+#: app/controllers/CControllerMediatypeEnable.php:97
+#: app/controllers/CControllerMediatypeEnable.php:108
+msgid "Incomplete configuration"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
@@ -11826,6 +11849,10 @@ msgid "Media type disabled"
 msgid_plural "Media types disabled"
 msgstr[0] "消息介质类型已禁用"
 
+#: app/views/administration.user.edit.php:327
+msgid "Media type disabled by Administration."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
@@ -11859,6 +11886,10 @@ msgstr "ID为 \"%1$s\" 的媒体类型不可用。"
 #: include/classes/helpers/CRoleHelper.php:428
 msgid "Media types"
 msgstr "媒介"
+
+#: app/views/popup.media.php:75
+msgid "Media types disabled by Administration."
+msgstr ""
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -13254,6 +13285,10 @@ msgstr "不可用"
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
 msgid "Not classified"
 msgstr "未分类"
+
+#: app/controllers/CControllerMediatypeEnable.php:95
+msgid "Not enabled"
+msgstr ""
 
 #: include/forms.inc.php:315
 msgid "Not inherited items"
@@ -21236,6 +21271,10 @@ msgstr "需用布尔值"
 msgid "a character string is expected"
 msgstr "请在字符串中指定"
 
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "需用 YYYY-MM-DD 格式的日期"
@@ -21946,6 +21985,11 @@ msgstr "不匹配"
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr "e() - 返回自然常数（欧拉数）"
+
+#: app/views/administration.mediatype.list.php:98
+#: app/views/administration.mediatype.list.php:103
+msgid "email"
+msgstr ""
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34

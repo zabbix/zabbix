@@ -82,13 +82,6 @@ typedef struct
 }
 zbx_history_table_t;
 
-typedef struct
-{
-	zbx_uint64_t	id;
-	size_t		offset;
-}
-zbx_id_offset_t;
-
 typedef int	(*zbx_client_item_validator_t)(DC_ITEM *item, zbx_socket_t *sock, void *args, char **error);
 
 typedef struct
@@ -127,13 +120,6 @@ static zbx_history_table_t	areg = {
 		{NULL}
 		}
 };
-
-typedef struct
-{
-	char		*path;
-	zbx_hashset_t	keys;
-}
-zbx_keys_path_t;
 
 /******************************************************************************
  *                                                                            *
@@ -2693,7 +2679,6 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminating string */
 	zbx_vector_ptr_t	autoreg_hosts;
-	zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2709,7 +2694,8 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
-		unsigned int	connection_type;
+		unsigned int		connection_type;
+		zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
 
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;

@@ -2474,7 +2474,8 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 	return dst;
 }
 
-static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced)
+static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced,
+		zbx_vector_uint64_t *deleted_itemids)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -3104,9 +3105,15 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 	zbx_vector_ptr_destroy(&dep_items);
 
+	if (NULL != deleted_itemids)
+		zbx_vector_uint64_reserve(deleted_itemids, sync->remove_num);
+
 	/* remove deleted items from cache */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
+		if (NULL != deleted_itemids)
+			zbx_vector_uint64_append(deleted_itemids, rowid);
+
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &rowid)))
 			continue;
 
@@ -6484,7 +6491,7 @@ static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
  ******************************************************************************/
-void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
+void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zbx_vector_uint64_t *deleted_itemids)
 {
 	static int	sync_status = ZBX_DBSYNC_STATUS_UNKNOWN;
 
@@ -6806,7 +6813,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
-	DCsync_items(&items_sync, new_revision, flags, synced);
+	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -14492,13 +14499,13 @@ zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *tok
  *            token  - [IN] the session token (not NULL)                      *
  *            session_config_revision - [IN] the session configuration        *
  *                          revision                                          *
- *            config_revision - [OUT] - the cached configuration revision     *
+ *            dc_revision - [OUT] - the cached configuration revision         *
  *                                                                            *
  * Return value: The number of created sessions                               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token,
-		zbx_uint64_t session_config_revision, zbx_dc_revision_t *dc_revision)
+int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_uint64_t session_config_revision,
+		zbx_dc_revision_t *dc_revision)
 {
 	zbx_session_t	*session, session_local;
 	time_t		now;
