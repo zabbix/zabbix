@@ -882,9 +882,7 @@ sub process_update_trigger_function($)
 	{
 		$out .= "create trigger ${table_name}_${indexed_column_name}_insert${eol}\n";
 		$out .= "before insert on ${table_name} for each row${eol}\n";
-		$out .= "begin${eol}\n";
-		$out .= 	"set new.${indexed_column_name}=${func_name}(new.${original_column_name});${eol}\n";
-		$out .= "end;\$\$${eol}\n";
+		$out .= "set new.${indexed_column_name}=${func_name}(new.${original_column_name});${eol}\n";
 
 		$out .= "create trigger ${table_name}_${indexed_column_name}_update${eol}\n";
 		$out .= "before update on ${table_name} for each row${eol}\n";
