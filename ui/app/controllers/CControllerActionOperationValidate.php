@@ -71,10 +71,6 @@ class CControllerActionOperationValidate extends CController {
 			$operationtype = OPERATION_TYPE_COMMAND;
 		}
 
-		// todo : add default operation object?? see defaultOperationObject()
-		// todo : get data from ActionOperationGet ??
-
-
 		if (!array_key_exists($recovery, $allowed_operations)
 				|| !in_array($operationtype, $allowed_operations[$recovery])) {
 			error(_s('Incorrect action operation type "%1$s" for event source "%2$s".', $operationtype, $eventsource));

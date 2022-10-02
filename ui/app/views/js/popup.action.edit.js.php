@@ -60,8 +60,9 @@ window.action_edit_popup = new class {
 			}
 			else if (e.target.classList.contains('js-edit-button')) {
 
-				// todo : pass id of the row
-				this._openEditOperationPopup(e, this.operation_data);
+				// console.log('target', $(e.target).closest('tr').attr('id'))
+
+				this._openEditOperationPopup(e, this.operation_data, $(e.target).closest('tr').attr('id'));
 			}
 			else if (e.target.classList.contains('js-remove-button')) {
 				e.target.closest('tr').remove();
@@ -69,7 +70,7 @@ window.action_edit_popup = new class {
 		});
 	}
 
-	_openEditOperationPopup(e, operation_data) {
+	_openEditOperationPopup(e, operation_data, row_id) {
 		if (JSON.parse(e.target.getAttribute('data'))) {
 			const data = JSON.parse(e.target.getAttribute('data'))
 
@@ -96,7 +97,9 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
-			this._createOperationsRow(e);
+			console.log(e);
+			//this._createOperationsRow(e);
+			this._editOperationsRow(e, row_id);
 		});
 	}
 
@@ -136,11 +139,14 @@ window.action_edit_popup = new class {
 		});
 	}
 
-	_createOperationsRow(input, row_id) {
-		console.log(input);
+	_editOperationsRow(input, row_id) {
+		this._createOperationsRow(input, row_id)
+		//this.operation_table = document.getElementById('op-table');
+	}
+
+	_createOperationsRow(input, row_id = null) {
 		const operation_data = input.detail.operation;
 		// todo : rewrite to switch statement?
-		// todo : fix if usr_grps and users are added at the same time
 
 		if (this.recovery == <?= ACTION_OPERATION ?> && (
 				this.eventsource == <?=EVENT_SOURCE_TRIGGERS?> || this.eventsource == <?=EVENT_SOURCE_INTERNAL?>
@@ -148,6 +154,9 @@ window.action_edit_popup = new class {
 			this.operation_table = document.getElementById('op-table');
 			this.operation_row_count = this.operation_table.rows.length - 2;
 			this.operation_row = document.createElement('tr');
+
+
+			// this.operation_row.setAttribute('id', 'operations_'+this.operation_row_count)
 
 			this.operation_row.append(this._addColumn(operation_data.steps));
 			// this.operation_row.append(this._addDetailsColumn(operation_data.details));
@@ -165,9 +174,19 @@ window.action_edit_popup = new class {
 			this.operation_row.append(this._addColumn(operation_data.start_in));
 			this.operation_row.append(this._addColumn(operation_data.duration));
 
+
 			this.addOperationsData(input);
 			this.operation_row.append(this._createActionCell(input));
-			$('#op-table tr:last').before(this.operation_row);
+			this.operation_row.setAttribute('class', 'operation-details-row');
+
+			if (row_id) {
+				$(`#${row_id}`).replaceWith(this.operation_row);
+			} else {
+				$('#op-table tr:last').before(this.operation_row);
+			}
+
+			this._createTableRowIds(this.operation_table, 'operations_');
+
 		}
 
 		if (this.recovery == <?= ACTION_OPERATION ?> && (
@@ -175,6 +194,7 @@ window.action_edit_popup = new class {
 			this.operation_table = document.getElementById('op-table');
 			this.operation_row_count = this.operation_table.rows.length - 2;
 			this.operation_row = document.createElement('tr');
+			this.operation_row.setAttribute('id', 'operations_'+this.operation_row_count)
 
 			const rows = operation_data.details.type.map((type, index) => {
 				return this._addDetailsColumnNew(type, operation_data.details.data ? operation_data.details.data[index] : null);
@@ -196,6 +216,7 @@ window.action_edit_popup = new class {
 			this.operation_table = document.getElementById('rec-table');
 			this.operation_row_count = this.operation_table.rows.length - 2;
 			this.operation_row = document.createElement('tr');
+			this.operation_row.setAttribute('id', 'recovery_operations_'+this.operation_row_count)
 
 		//	this.operation_row.append(this._addDetailsColumn(operation_data.details));
 
@@ -219,6 +240,7 @@ window.action_edit_popup = new class {
 			this.operation_table = document.getElementById('upd-table');
 			this.operation_row_count = this.operation_table.rows.length - 2;
 			this.operation_row = document.createElement('tr');
+			this.operation_row.setAttribute('id', 'update_operations_'+this.operation_table.rows.length - 2)
 
 			const rows = operation_data.details.type.map((type, index) => {
 				return this._addDetailsColumnNew(type, operation_data.details.data[index]);
@@ -235,6 +257,16 @@ window.action_edit_popup = new class {
 			this.operation_row.append(this._createActionCell(input));
 			$('#upd-table tr:last').before(this.operation_row);
 		}
+	}
+
+	_createTableRowIds(table, prefix = '') {
+		const rows = $(table).find('.operation-details-row');
+
+		rows.each(index => {
+			$(rows[index])
+				.attr('id', prefix.concat(index))
+				//.attr('data-id', index)
+		});
 	}
 
 	_addDetailsColumnNew(type, data = null) {
@@ -257,6 +289,8 @@ window.action_edit_popup = new class {
 	// }
 
 	addOperationsData(input) {
+		console.log($(this.operation_table).find('.operations-details-row').length);
+
 		// add operation data as hidden input to action form
 		this.recovery_prefix = '';
 
@@ -303,6 +337,7 @@ window.action_edit_popup = new class {
 			}
 
 			if (typeof obj[key] === 'object') {
+				//return this.createHiddenInputFromObject(obj[key], `${namePrefix}[${key}]`, `${idPrefix}_${key}`);
 				this.createHiddenInputFromObject(obj[key], `${namePrefix}[${key}]`, `${idPrefix}_${key}`);
 				return;
 			}
@@ -315,16 +350,18 @@ window.action_edit_popup = new class {
 
 			input.setAttribute('value', obj[key]);
 
-			const form = document.forms['action.edit'];
-			form.appendChild(input);
+			this.operation_row.append(input);
+			//return input;
+			//const form = document.forms['action.edit'];
+			//form.appendChild(input);
 		})
 	}
 
 	_addHiddenOperationsFields(name, value) {
 		const input = document.createElement('input');
 		input.type = 'hidden';
-		input.id = `${this.recovery_prefix}operations_${this.row_count}_${name}`;
-		input.name = `${this.recovery_prefix}operations[${this.row_count}][${name}]`;
+		input.id = `${this.recovery_prefix}operations_${this.operation_row_count}_${name}`;
+		input.name = `${this.recovery_prefix}operations[${this.operation_row_count}][${name}]`;
 		input.value = value;
 
 		return input;

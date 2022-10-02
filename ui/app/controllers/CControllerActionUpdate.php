@@ -95,8 +95,6 @@ class CControllerActionUpdate extends CController {
 
 	protected function doAction(): void {
 		$eventsource = $this->getInput('eventsource');
-		$notify_if_cancelled = $this->getInput('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_FALSE);
-		$pause_suppressed = $this->getInput('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
 
 		$action = [
 			'name' => $this->getInput('name'),
@@ -105,9 +103,7 @@ class CControllerActionUpdate extends CController {
 			'eventsource' => $eventsource,
 			'operations' => $this->getInput('operations', []),
 			'recovery_operations' => $this->getInput('recovery_operations', []),
-			'update_operations' => $this->getInput('update_operations', []),
-			'notify_if_canceled' => $notify_if_cancelled,
-			'pause_suppressed' => $pause_suppressed
+			'update_operations' => $this->getInput('update_operations', [])
 		];
 		$filter = [
 			'conditions' => $this->getInput('conditions', []),

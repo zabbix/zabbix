@@ -371,7 +371,6 @@ window.operation_popup = new class {
 		};
 
 		overlay.$dialogue[0].addEventListener('submit-usergroups-popup', (e) => {
-			console.log('gkggku', e.detail);
 			this._addUserGroup(e.detail);
 		})
 	}

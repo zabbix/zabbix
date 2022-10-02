@@ -143,8 +143,6 @@ $user_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([_('User'), _('Action')]);
 
-sdff($operation);
-
 if ($operation['opmessage_usr']) {
 	$i = 0;
 	foreach ($operation['opmessage_usr'] as $opmessage_usr) {
@@ -363,7 +361,7 @@ $form->addItem($form_grid);
 
 $buttons = [
 	[
-		'title' => _('Add'),
+		'title' => $data['operation'] ? _('Update') : _('Add'),
 		'class' => 'js-add',
 		'keepOpen' => true,
 		'isSubmit' => true,
