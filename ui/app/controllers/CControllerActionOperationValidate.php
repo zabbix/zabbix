@@ -504,8 +504,8 @@ class CControllerActionOperationValidate extends CController {
 
 						order_result($user_names_list);
 
-						$result['type'] = (_('Send message to users').': ');
-						$result['data'] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $media_type];
+						$result['type'][] = (_('Send message to users').': ');
+						$result['data'][] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $media_type];
 					}
 
 					if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
@@ -519,8 +519,8 @@ class CControllerActionOperationValidate extends CController {
 
 						order_result($user_groups_list);
 
-						$result['type'] = _('Send message to user groups').': ';
-						$result['data'] = [implode(', ', $user_groups_list), _('via'), $media_type];
+						$result['type'][] = _('Send message to user groups').': ';
+						$result['data'][] = [implode(', ', $user_groups_list), _('via'), $media_type];
 					}
 					break;
 
@@ -528,7 +528,7 @@ class CControllerActionOperationValidate extends CController {
 					$scriptid = $operation['opcommand']['scriptid'];
 
 					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
-						$result['type'] = [_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])];
+						$result['type'][] = [_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])];
 
 						break;
 					}
@@ -548,8 +548,8 @@ class CControllerActionOperationValidate extends CController {
 						if ($host_list) {
 							order_result($host_list);
 
-							$result['type'] = _s('Run script "%1$s" on hosts', $scripts[$scriptid]['name'].': ');
-							$result['data'] = [implode(', ', $host_list)];
+							$result['type'][] = _s('Run script "%1$s" on hosts', $scripts[$scriptid]['name'].': ');
+							$result['data'][] = [implode(', ', $host_list)];
 						}
 					}
 
@@ -564,25 +564,25 @@ class CControllerActionOperationValidate extends CController {
 
 						order_result($host_group_list);
 
-						$result['type'] = _s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': ';
-						$result['data'] = [implode(', ', $host_group_list)];
+						$result['type'][] = (_s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': ');
+						$result['data'][] = [implode(', ', $host_group_list)];
 					}
 					break;
 
 				case OPERATION_TYPE_HOST_ADD:
-					$result['type'] = (_('Add host'));
+					$result['type'][] = (_('Add host'));
 					break;
 
 				case OPERATION_TYPE_HOST_REMOVE:
-					$result['type'] = (_('Remove host'));
+					$result['type'][] = (_('Remove host'));
 					break;
 
 				case OPERATION_TYPE_HOST_ENABLE:
-					$result['type'] = (_('Enable host'));
+					$result['type'][] = (_('Enable host'));
 					break;
 
 				case OPERATION_TYPE_HOST_DISABLE:
-					$result['type'] = (_('Disable host'));
+					$result['type'][] = (_('Disable host'));
 					break;
 
 				case OPERATION_TYPE_GROUP_ADD:
@@ -598,14 +598,15 @@ class CControllerActionOperationValidate extends CController {
 					order_result($host_group_list);
 
 					if ($operationtype == OPERATION_TYPE_GROUP_ADD) {
-						$result['type'] = _('Add to host groups').': ';
+						$result['type'][] = _('Add to host groups').': ';
 					}
 					else {
-						$result['type'] = _('Remove from host groups').': ';
+						$result['type'][] = _('Remove from host groups').': ';
 					}
 
-					$result['data'] = [implode(', ', $host_group_list)];
-					break;
+					$result['data'][] = [implode(', ', $host_group_list)];
+
+				break;
 
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
@@ -620,19 +621,19 @@ class CControllerActionOperationValidate extends CController {
 					order_result($template_list);
 
 					if ($operationtype == OPERATION_TYPE_TEMPLATE_ADD) {
-						$result['type'] = _('Link to templates').': ';
+						$result['type'][] = _('Link to templates').': ';
 					}
 					else {
-						$result['type'] = _('Unlink from templates').': ';
+						$result['type'][] = _('Unlink from templates').': ';
 					}
 
-					$result['data'] = [implode(', ', $template_list)];
+					$result['data'][] = [implode(', ', $template_list)];
 					break;
 
 				case OPERATION_TYPE_HOST_INVENTORY:
 					$host_inventory_modes = getHostInventoryModes();
-					$result['type'] = operation_type2str(OPERATION_TYPE_HOST_INVENTORY).': ';
-					$result['data'] = [$host_inventory_modes[$operation['opinventory']['inventory_mode']]];
+					$result['type'][] = operation_type2str(OPERATION_TYPE_HOST_INVENTORY).': ';
+					$result['data'][] = [$host_inventory_modes[$operation['opinventory']['inventory_mode']]];
 					break;
 			}
 		}
@@ -657,8 +658,8 @@ class CControllerActionOperationValidate extends CController {
 
 						order_result($user_names_list);
 
-						$result['type'] = _('Send message to users').': ';
-						$result['data'] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $media_type];
+						$result['type'][] = _('Send message to users').': ';
+						$result['data'][] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $media_type];
 					}
 
 					if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
@@ -672,8 +673,8 @@ class CControllerActionOperationValidate extends CController {
 
 						order_result($user_groups_list);
 
-						$result['type'] = _('Send message to user groups').': ';
-						$result['data'] = [implode(', ', $user_groups_list), ' ', _('via'), ' ', $media_type];
+						$result['type'][] = _('Send message to user groups').': ';
+						$result['data'][] = [implode(', ', $user_groups_list), ' ', _('via'), ' ', $media_type];
 					}
 					break;
 
@@ -681,7 +682,7 @@ class CControllerActionOperationValidate extends CController {
 					$scriptid = $operation['opcommand']['scriptid'];
 
 					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
-						$result['type'] = [_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])];
+						$result['type'][] = [_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])];
 
 						break;
 					}
@@ -691,7 +692,7 @@ class CControllerActionOperationValidate extends CController {
 
 						foreach ($operation['opcommand_hst'] as $host) {
 							if ($host['hostid'] == 0) {
-								$result['type'] = [_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])];
+								$result['type'][] = [_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])];
 							}
 							elseif (isset($hosts[$host['hostid']])) {
 								$host_list[] = $hosts[$host['hostid']]['name'];
@@ -701,8 +702,8 @@ class CControllerActionOperationValidate extends CController {
 						if ($host_list) {
 							order_result($host_list);
 
-							$result['type'] = _s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': ';
-							$result['data'] = [implode(', ', $host_list)];
+							$result['type'][] = _s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': ';
+							$result['data'][] = [implode(', ', $host_list)];
 						}
 					}
 
@@ -717,14 +718,14 @@ class CControllerActionOperationValidate extends CController {
 
 						order_result($host_group_list);
 
-						$result['type'] = _s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': ';
-						$result['data'] = [implode(', ', $host_group_list)];
+						$result['type'][] = _s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': ';
+						$result['data'][] = [implode(', ', $host_group_list)];
 					}
 					break;
 
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
 				case OPERATION_TYPE_UPDATE_MESSAGE:
-					$result['type'] =_('Notify all involved');
+					$result['type'][] =_('Notify all involved');
 					break;
 			}
 		}

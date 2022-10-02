@@ -137,6 +137,7 @@ window.action_edit_popup = new class {
 	}
 
 	_createOperationsRow(input, row_id) {
+		console.log(input);
 		const operation_data = input.detail.operation;
 		// todo : rewrite to switch statement?
 		// todo : fix if usr_grps and users are added at the same time
@@ -149,7 +150,18 @@ window.action_edit_popup = new class {
 			this.operation_row = document.createElement('tr');
 
 			this.operation_row.append(this._addColumn(operation_data.steps));
-			this.operation_row.append(this._addDetailsColumn(operation_data.details));
+			// this.operation_row.append(this._addDetailsColumn(operation_data.details));
+
+			const rows = operation_data.details.type.map((type, index) => {
+				return this._addDetailsColumnNew(type, operation_data.details.data[index]);
+			})
+
+			// this.operation_row.append(this._addDetailsColumn(operation_data.details));
+
+			const details = document.createElement('span');
+			details.innerHTML = rows.join('<br>')
+			this.operation_row.append(details);
+
 			this.operation_row.append(this._addColumn(operation_data.start_in));
 			this.operation_row.append(this._addColumn(operation_data.duration));
 
@@ -164,7 +176,16 @@ window.action_edit_popup = new class {
 			this.operation_row_count = this.operation_table.rows.length - 2;
 			this.operation_row = document.createElement('tr');
 
-			this.operation_row.append(this._addDetailsColumn(operation_data.details));
+			const rows = operation_data.details.type.map((type, index) => {
+				return this._addDetailsColumnNew(type, operation_data.details.data ? operation_data.details.data[index] : null);
+			})
+
+			// this.operation_row.append(this._addDetailsColumn(operation_data.details));
+
+			const details = document.createElement('span');
+			details.innerHTML = rows.join('<br>')
+			this.operation_row.append(details);
+
 
 			this.addOperationsData(input);
 			this.operation_row.append(this._createActionCell(input));
@@ -176,7 +197,18 @@ window.action_edit_popup = new class {
 			this.operation_row_count = this.operation_table.rows.length - 2;
 			this.operation_row = document.createElement('tr');
 
-			this.operation_row.append(this._addDetailsColumn(operation_data.details));
+		//	this.operation_row.append(this._addDetailsColumn(operation_data.details));
+
+			const rows = operation_data.details.type.map((type, index) => {
+				return this._addDetailsColumnNew(type, operation_data.details.data[index]);
+			})
+
+			// this.operation_row.append(this._addDetailsColumn(operation_data.details));
+
+			const details = document.createElement('span');
+			details.innerHTML = rows.join('<br>')
+			this.operation_row.append(details);
+
 			this.addOperationsData(input);
 
 			this.operation_row.append(this._createActionCell(input));
@@ -188,7 +220,16 @@ window.action_edit_popup = new class {
 			this.operation_row_count = this.operation_table.rows.length - 2;
 			this.operation_row = document.createElement('tr');
 
-			this.operation_row.append(this._addDetailsColumn(operation_data.details));
+			const rows = operation_data.details.type.map((type, index) => {
+				return this._addDetailsColumnNew(type, operation_data.details.data[index]);
+			})
+
+			// this.operation_row.append(this._addDetailsColumn(operation_data.details));
+
+			const details = document.createElement('span');
+			details.innerHTML = rows.join('<br>')
+			this.operation_row.append(details);
+
 			this.addOperationsData(input);
 
 			this.operation_row.append(this._createActionCell(input));
@@ -196,20 +237,24 @@ window.action_edit_popup = new class {
 		}
 	}
 
-	_addDetailsColumn(input) {
-		const details = document.createElement('td');
-		const type_cell = document.createElement('b');
-
-		type_cell.append(input.type);
-		if (input.data) {
-			details.append(type_cell, input.data.join(' '));
-		}
-		else {
-			details.append(type_cell);
-		}
-
-		return details;
+	_addDetailsColumnNew(type, data = null) {
+		return `<b>${type}</b> ${data ? data.join(' ') : ''}`;
 	}
+
+	// _addDetailsColumn(input) {
+	//	const details = document.createElement('td');
+	//	const type_cell = document.createElement('b');
+
+	//	type_cell.append(input.type);
+	//	if (input.data) {
+	//		details.append(type_cell, input.data.join(' '));
+	//	}
+	//	else {
+	//		details.append(type_cell);
+	//	}
+
+	//	return details;
+	// }
 
 	addOperationsData(input) {
 		// add operation data as hidden input to action form
