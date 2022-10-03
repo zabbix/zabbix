@@ -22,7 +22,9 @@
 class DiscoveredHosts {
 
 	const DISCOVERED_HOST = 'Discovered host from prototype 1';
+	const DISCOVERED_HOST2 = 'Discovered host from prototype 11';
 	const DISCOVERED_HOSTID = 90000079;
+	const DISCOVERED_HOSTID2 = 90000080;
 	const DISCOVERED_INTERFACEID = 90000080;
 	const DISCOVERED_HOST_GROUPID = 90000081;
 
@@ -86,13 +88,13 @@ class DiscoveredHosts {
 		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID).
 				",".zbx_dbstr(self::DISCOVERED_HOST).",".zbx_dbstr(self::DISCOVERED_HOST).", 0, 4, '')"
 		);
-		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID.'1').
-				",".zbx_dbstr(self::DISCOVERED_HOST.'1').",".zbx_dbstr(self::DISCOVERED_HOST.'1').", 0, 4, '')"
+		DBexecute("INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID2).
+				",".zbx_dbstr(self::DISCOVERED_HOST2).",".zbx_dbstr(self::DISCOVERED_HOST2).", 0, 4, '')"
 		);
 		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID).", ".
 				zbx_dbstr($host_prototypeid).")"
 		);
-		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID.'1').", ".
+		DBexecute("INSERT INTO host_discovery (hostid, parent_hostid) VALUES (".zbx_dbstr(self::DISCOVERED_HOSTID2).", ".
 				zbx_dbstr($host_prototypeid).")"
 		);
 		DBexecute("INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (".
@@ -101,8 +103,8 @@ class DiscoveredHosts {
 		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUPID).
 				", ".zbx_dbstr(self::DISCOVERED_HOSTID).", 4)"
 		);
-		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUPID.'1').
-				", ".zbx_dbstr(self::DISCOVERED_HOSTID.'1').", 4)"
+		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUPID2).
+				", ".zbx_dbstr(self::DISCOVERED_HOSTID2).", 4)"
 		);
 		DBexecute("INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (90000082, ".
 				zbx_dbstr(self::DISCOVERED_HOSTID).", 'action', 'update')"
@@ -114,7 +116,10 @@ class DiscoveredHosts {
 				zbx_dbstr(self::DISCOVERED_HOSTID).", 'test', 'update')"
 		);
 		DBexecute("INSERT INTO host_tag (hosttagid, hostid, tag, value, automatic) VALUES (90000085, ".
-				zbx_dbstr(self::DISCOVERED_HOSTID.'1').", 'discovered', 'true', 1)"
+				zbx_dbstr(self::DISCOVERED_HOSTID2).", 'discovered', 'true', 1)"
+		);
+		DBexecute("INSERT INTO host_tag (hosttagid, hostid, tag, value, automatic) VALUES (90000086, ".
+				zbx_dbstr(self::DISCOVERED_HOSTID2).", 'discovered without tag value', '', 1)"
 		);
 
 		// Create templates.
