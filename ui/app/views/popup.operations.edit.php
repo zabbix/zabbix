@@ -201,7 +201,6 @@ $select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
 	->setName('operation[opmessage][mediatypeid]')
 	->setValue($operation['opmessage']['mediatypeid'] ?? 0);
 
-
 $form_grid->addItem([
 	(new CLabel(_('Send only to'), $select_opmessage_mediatype->getFocusableElementId()))->setId('operation-message-mediatype-only-label'),
 	(new CFormField($select_opmessage_mediatype))
@@ -222,14 +221,18 @@ $form_grid->addItem([
 // Operation custom message subject row.
 $form_grid->addItem([
 	(new CLabel(_('Subject')))->setId('operation-message-subject-label'),
-	(new CTextBox('operation[opmessage][subject]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	(new CTextBox('operation[opmessage][subject]'))
+		->setAttribute('value',  $operation['opmessage']['subject'] ?? '')
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setId('operation-message-subject')
 ]);
 
 // Operation custom message body row.
 $form_grid->addItem([
 	(new CLabel(_('Message')))->setId('operation-message-label'),
-	(new CTextArea('operation[opmessage][message]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	(new CTextArea('operation[opmessage][message]'))
+		->setValue( $operation['opmessage']['message'] ?? '')
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setId('operation-message-body')
 ]);
 
