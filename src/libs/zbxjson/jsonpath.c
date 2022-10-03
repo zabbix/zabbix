@@ -232,6 +232,43 @@ static void	jsonpath_list_free(zbx_jsonpath_list_node_t *list)
 	}
 }
 
+static zbx_jsonpath_t	*jsonpath_create_token_jsonpath(const char *text, size_t len)
+{
+	zbx_jsonpath_t	*path;
+	char		*tmp_text;
+
+	tmp_text = jsonpath_strndup(text, len);
+
+	if ('@' == *tmp_text)
+		*tmp_text = '$';
+
+	path = (zbx_jsonpath_t *)zbx_malloc(NULL, sizeof(zbx_jsonpath_t));
+
+	if (FAIL == zbx_jsonpath_compile(tmp_text, path))
+	{
+		zbx_free(path);
+		goto out;
+	}
+
+	if (1 != path->definite)
+	{
+		zbx_set_json_strerror("only simple path are supported in jsonpath expression: \"%s\"", text);
+		zbx_jsonpath_clear(path);
+		zbx_free(path);
+	}
+
+	if (ZBX_JSONPATH_SEGMENT_FUNCTION == path->segments[path->segments_num - 1].type)
+	{
+		zbx_set_json_strerror("functions are not supported in jsonpath expression: \"%s\"", text);
+		zbx_jsonpath_clear(path);
+		zbx_free(path);
+	}
+out:
+	zbx_free(tmp_text);
+
+	return path;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: jsonpath_create_token                                            *
@@ -255,15 +292,21 @@ static zbx_jsonpath_token_t	*jsonpath_create_token(int type, const char *express
 	switch (token->type)
 	{
 		case ZBX_JSONPATH_TOKEN_CONST_STR:
-			token->data = jsonpath_unquote_dyn(expression + loc->l, loc->r - loc->l + 1);
+			token->data.text = jsonpath_unquote_dyn(expression + loc->l, loc->r - loc->l + 1);
 			break;
 		case ZBX_JSONPATH_TOKEN_PATH_ABSOLUTE:
 		case ZBX_JSONPATH_TOKEN_PATH_RELATIVE:
+			if (NULL == (token->data.path = jsonpath_create_token_jsonpath(expression + loc->l,
+					loc->r - loc->l + 1)))
+			{
+				zbx_free(token);
+			}
+			break;
 		case ZBX_JSONPATH_TOKEN_CONST_NUM:
-			token->data = jsonpath_strndup(expression + loc->l, loc->r - loc->l + 1);
+			token->data.text = jsonpath_strndup(expression + loc->l, loc->r - loc->l + 1);
 			break;
 		default:
-			token->data = NULL;
+			token->data.text = NULL;
 	}
 
 	return token;
@@ -276,7 +319,18 @@ static zbx_jsonpath_token_t	*jsonpath_create_token(int type, const char *express
  ******************************************************************************/
 static void	jsonpath_token_free(zbx_jsonpath_token_t *token)
 {
-	zbx_free(token->data);
+	switch (token->type)
+	{
+		case ZBX_JSONPATH_TOKEN_PATH_ABSOLUTE:
+		case ZBX_JSONPATH_TOKEN_PATH_RELATIVE:
+			zbx_jsonpath_clear(token->data.path);
+			zbx_free(token->data.path);
+			break;
+		default:
+			zbx_free(token->data.text);
+			break;
+	}
+
 	zbx_free(token);
 }
 
@@ -704,7 +758,7 @@ out:
 static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jsonpath, const char **next)
 {
 	int				nesting = 1, ret = FAIL;
-	zbx_jsonpath_token_t		*optoken;
+	zbx_jsonpath_token_t		*optoken, *token;
 	zbx_vector_ptr_t		output, operators;
 	zbx_strloc_t			loc = {0, 0};
 	zbx_jsonpath_token_type_t	token_type;
@@ -751,7 +805,10 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 				goto out;
 			}
 
-			zbx_vector_ptr_append(&output, jsonpath_create_token(token_type, expression, &loc));
+			if (NULL == (token = jsonpath_create_token(token_type, expression, &loc)))
+				goto cleanup;
+
+			zbx_vector_ptr_append(&operators, token);
 			prev_group = jsonpath_token_group(token_type);
 			continue;
 		}
@@ -791,14 +848,20 @@ static int	jsonpath_parse_expression(const char *expression, zbx_jsonpath_t *jso
 				zbx_vector_ptr_append(&output, optoken);
 			}
 
-			zbx_vector_ptr_append(&operators, jsonpath_create_token(token_type, expression, &loc));
+			if (NULL == (token = jsonpath_create_token(token_type, expression, &loc)))
+				goto cleanup;
+
+			zbx_vector_ptr_append(&operators, token);
 			prev_group = jsonpath_token_group(token_type);
 			continue;
 		}
 
 		if (ZBX_JSONPATH_TOKEN_PAREN_LEFT == token_type)
 		{
-			zbx_vector_ptr_append(&operators, jsonpath_create_token(token_type, expression, &loc));
+			if (NULL == (token = jsonpath_create_token(token_type, expression, &loc)))
+				goto cleanup;
+
+			zbx_vector_ptr_append(&operators, token);
 			prev_group = ZBX_JSONPATH_TOKEN_GROUP_NONE;
 			continue;
 		}
@@ -1454,21 +1517,15 @@ static int	jsonpath_match_name(const struct zbx_json_parse *jp_root, const char 
  *                         extract                                            *
  *                                                                            *
  ******************************************************************************/
-static int	jsonpath_extract_value(const struct zbx_json_parse *jp, const char *path, zbx_variant_t *value)
+static int	jsonpath_extract_value(const struct zbx_json_parse *jp, const zbx_jsonpath_t *path,
+		zbx_variant_t *value)
 {
 	struct zbx_json_parse	jp_child;
-	char			*data = NULL, *tmp_path = NULL;
+	char			*data = NULL;
 	size_t			data_alloc = 0;
 	int			ret = FAIL;
 
-	if ('@' == *path)
-	{
-		tmp_path = zbx_strdup(NULL, path);
-		*tmp_path = '$';
-		path = tmp_path;
-	}
-
-	if (FAIL == zbx_json_open_path(jp, path, &jp_child))
+	if (FAIL == json_open_path(jp, path, &jp_child))
 		goto out;
 
 	if (NULL == zbx_json_decodevalue_dyn(jp_child.start, &data, &data_alloc, NULL))
@@ -1482,8 +1539,6 @@ static int	jsonpath_extract_value(const struct zbx_json_parse *jp, const char *p
 	zbx_variant_set_str(value, data);
 	ret = SUCCEED;
 out:
-	zbx_free(tmp_path);
-
 	return ret;
 }
 
@@ -1519,7 +1574,7 @@ static char	*jsonpath_expression_to_str(zbx_jsonpath_expression_t *expression)
 			case ZBX_JSONPATH_TOKEN_PATH_RELATIVE:
 			case ZBX_JSONPATH_TOKEN_CONST_STR:
 			case ZBX_JSONPATH_TOKEN_CONST_NUM:
-				zbx_strcpy_alloc(&str, &str_alloc, &str_offset, token->data);
+				zbx_strcpy_alloc(&str, &str_alloc, &str_offset, token->data.text);
 				break;
 			case ZBX_JSONPATH_TOKEN_PAREN_LEFT:
 				zbx_strcpy_alloc(&str, &str_alloc, &str_offset, "(");
@@ -1848,7 +1903,7 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 		switch (token->type)
 		{
 			case ZBX_JSONPATH_TOKEN_PATH_ABSOLUTE:
-				if (FAIL == jsonpath_extract_value(jp_root, token->data, &value))
+				if (FAIL == jsonpath_extract_value(jp_root, token->data.path, &value))
 					zbx_variant_set_none(&value);
 				zbx_vector_var_append_ptr(&stack, &value);
 				break;
@@ -1857,16 +1912,16 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 				if ('[' != *jp.start && '{' != *jp.start)
 					goto out;
 
-				if (FAIL == jsonpath_extract_value(&jp, token->data, &value))
+				if (FAIL == jsonpath_extract_value(&jp, token->data.path, &value))
 					zbx_variant_set_none(&value);
 				zbx_vector_var_append_ptr(&stack, &value);
 				break;
 			case ZBX_JSONPATH_TOKEN_CONST_STR:
-				zbx_variant_set_str(&value, zbx_strdup(NULL, token->data));
+				zbx_variant_set_str(&value, zbx_strdup(NULL, token->data.text));
 				zbx_vector_var_append_ptr(&stack, &value);
 				break;
 			case ZBX_JSONPATH_TOKEN_CONST_NUM:
-				zbx_variant_set_dbl(&value, atof(token->data));
+				zbx_variant_set_dbl(&value, atof(token->data.text));
 				zbx_vector_var_append_ptr(&stack, &value);
 				break;
 			case ZBX_JSONPATH_TOKEN_OP_NOT:

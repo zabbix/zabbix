@@ -863,7 +863,7 @@ out:
   definite: 0
   segments:
     - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
-      data: "$.a"
+      data: "$.'a'"
 ---
 test case: Compile success $[?(@.b)]
 in:
@@ -873,7 +873,7 @@ out:
   definite: 0
   segments:
     - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
-      data: "@.b"
+      data: "@.'b'"
 ---
 test case: Compile success $[?(!1)]
 in:
@@ -933,7 +933,7 @@ out:
   definite: 0
   segments:
     - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
-      data: "$.a , 2 , + , 3 , =="
+      data: "$.'a' , 2 , + , 3 , =="
 ---
 test case: Compile success $[?((1 + 2) * (3 - 4))]
 in:
@@ -973,7 +973,7 @@ out:
   definite: 0
   segments:
     - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
-      data: "1 , 2 , @.a , * , =="
+      data: "1 , 2 , @.'a' , * , =="
 ---
 test case: Compile success $[?((1)+(2))]
 in:
@@ -1019,7 +1019,7 @@ out:
   definite: 0
   segments:
     - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
-      data: "@.id"
+      data: "@.'id'"
       detached: 1
 ---
 test case: Compile success $['cn=snmp,cn=monitor']['connections']
