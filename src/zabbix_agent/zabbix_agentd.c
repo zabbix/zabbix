@@ -24,6 +24,7 @@
 #include "modbtype.h"
 #include "zbxstr.h"
 #include "zbxip.h"
+#include "zbxexpr.h"
 
 static char	*CONFIG_PID_FILE = NULL;
 
@@ -553,10 +554,10 @@ static void	set_defaults(void)
 		if (NULL == CONFIG_HOSTNAME_ITEM)
 			CONFIG_HOSTNAME_ITEM = zbx_strdup(CONFIG_HOSTNAME_ITEM, "system.hostname");
 
-		init_result(&result);
+		zbx_init_agent_result(&result);
 
-		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS,
-				&result) && NULL != (value = ZBX_GET_STR_RESULT(&result)))
+		if (SUCCEED == zbx_execute_agent_check(CONFIG_HOSTNAME_ITEM, ZBX_PROCESS_LOCAL_COMMAND |
+				ZBX_PROCESS_WITH_ALIAS, &result) && NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
 			assert(*value);
 			zbx_trim_str_list(*value, ',');
@@ -572,7 +573,7 @@ static void	set_defaults(void)
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "failed to get system hostname from [%s])", CONFIG_HOSTNAME_ITEM);
 
-		free_result(&result);
+		zbx_free_agent_result(&result);
 	}
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
 		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAMES);
@@ -799,7 +800,7 @@ static int	load_enable_remote_commands(const char *value, const struct cfg_line 
 	zabbix_log(LOG_LEVEL_WARNING, "EnableRemoteCommands parameter is deprecated,"
 				" use AllowKey=system.run[*] or DenyKey=system.run[*] instead");
 
-	return add_key_access_rule(cfg->parameter, sysrun, rule_type);
+	return zbx_add_key_access_rule(cfg->parameter, sysrun, rule_type);
 }
 
 /******************************************************************************
@@ -954,7 +955,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 #endif
 	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 
-	finalize_key_access_rules_configuration();
+	zbx_finalize_key_access_rules_configuration();
 
 	set_defaults();
 
@@ -1304,7 +1305,7 @@ void	zbx_free_service_resources(int ret)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_disable();
 #endif
-	free_metrics();
+	zbx_free_metrics();
 	zbx_alias_list_free();
 	free_collector_data();
 	zbx_deinit_modbus();
@@ -1360,7 +1361,7 @@ int	main(int argc, char **argv)
 #endif
 
 	/* this is needed to set default hostname in zbx_load_config() */
-	init_metrics();
+	zbx_init_metrics();
 
 	switch (t.task)
 	{
@@ -1403,7 +1404,7 @@ int	main(int argc, char **argv)
 			while (0 == WSACleanup())
 				;
 
-			free_metrics();
+			zbx_free_metrics();
 			exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #endif
@@ -1429,7 +1430,7 @@ int	main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 			}
 #endif
-			set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
+			zbx_set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
 
 			if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
 			{
@@ -1441,9 +1442,9 @@ int	main(int argc, char **argv)
 			load_aliases(CONFIG_ALIASES);
 			zbx_free_config();
 			if (ZBX_TASK_TEST_METRIC == t.task)
-				test_parameter(TEST_METRIC);
+				zbx_test_parameter(TEST_METRIC);
 			else
-				test_parameters();
+				zbx_test_parameters();
 #ifdef _WINDOWS
 			free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
 
@@ -1455,7 +1456,7 @@ int	main(int argc, char **argv)
 #ifndef _WINDOWS
 			zbx_unload_modules();
 #endif
-			free_metrics();
+			zbx_free_metrics();
 			zbx_alias_list_free();
 			exit(EXIT_SUCCESS);
 			break;
@@ -1477,7 +1478,7 @@ int	main(int argc, char **argv)
 			break;
 		default:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
-			set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
+			zbx_set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
 			load_aliases(CONFIG_ALIASES);
 			break;
 	}

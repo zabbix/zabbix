@@ -72,7 +72,7 @@
 				) continue
 #endif
 
-int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
+int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	FILE		*f;
 	char		tmp[MAX_STRING_LEN], name[MAX_STRING_LEN], dev_path[MAX_STRING_LEN];
@@ -211,7 +211,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 			return SYSINFO_RET_FAIL;
 		}
 
-		if (SUCCEED != get_diskstat(devname, dstats))
+		if (SUCCEED != zbx_get_diskstat(devname, dstats))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk information."));
 			return SYSINFO_RET_FAIL;
@@ -263,7 +263,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 
 	if (NULL == (device = collector_diskdevice_get(kernel_devname)))
 	{
-		if (SUCCEED != get_diskstat(kernel_devname, dstats))
+		if (SUCCEED != zbx_get_diskstat(kernel_devname, dstats))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk information."));
 

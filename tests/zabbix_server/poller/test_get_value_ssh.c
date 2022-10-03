@@ -31,7 +31,7 @@ int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error)
 	AGENT_RESULT	result;
 	int		ret;
 
-	init_result(&result);
+	zbx_init_agent_result(&result);
 	ret = get_value_ssh(item, &result);
 
 	if (NULL != result.msg && '\0' != *(result.msg))
@@ -40,7 +40,7 @@ int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error)
 		zbx_strlcpy(*error, result.msg, strlen(result.msg) * sizeof(char));
 	}
 
-	free_result(&result);
+	zbx_free_agent_result(&result);
 
 	return ret;
 }

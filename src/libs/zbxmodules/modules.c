@@ -64,7 +64,7 @@ static int	zbx_register_module_items(ZBX_METRIC *metrics, char *error, size_t ma
 		/* the flag means that the items comes from a loadable module */
 		metrics[i].flags |= CF_MODULE;
 
-		if (SUCCEED != add_metric(&metrics[i], error, max_error_len))
+		if (SUCCEED != zbx_add_metric(&metrics[i], error, max_error_len))
 			return FAIL;
 	}
 

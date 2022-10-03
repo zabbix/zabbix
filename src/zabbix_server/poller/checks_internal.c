@@ -187,9 +187,9 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 	int		ret = NOTSUPPORTED, nparams;
 	const char	*tmp, *tmp1;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key, &request))
+	if (SUCCEED != zbx_parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
@@ -533,7 +533,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 				goto out;
 			}
 
-			get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
+			zbx_get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
 
 			SET_DBL_RESULT(result, value);
 		}
@@ -769,7 +769,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 
 				zbx_json_close(&json);
 
-				set_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
+				zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
 
 				zbx_json_free(&json);
 			}
@@ -815,7 +815,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 					zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE,
 							DCget_item_queue(NULL, from, to));
 
-					set_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
+					zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
 
 					zbx_json_free(&json);
 				}
@@ -930,7 +930,7 @@ out:
 	if (NOTSUPPORTED == ret && !ZBX_ISSET_MSG(result))
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Internal check is not supported."));
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

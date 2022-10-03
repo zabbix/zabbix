@@ -47,7 +47,7 @@ int	CONFIG_SERVICEMAN_SYNC_FREQUENCY = 0;
 pid_t	*threads;
 int	threads_num;
 
-void	update_selfmon_counter(unsigned char state)
+void	zbx_update_selfmon_counter(unsigned char state)
 {
 	ZBX_UNUSED(state);
 }
