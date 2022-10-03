@@ -585,7 +585,7 @@ class CUser extends CApiService {
 		$fields_strings = array_flip(['username', 'name', 'surname', 'autologout', 'passwd', 'refresh', 'url',
 			'lang', 'theme', 'timezone'
 		]);
-		$fields_integers = array_flip(['autologin', 'rows_per_page', 'roleid', 'userdirectoryid']);
+		$fields_integers = array_flip(['autologin', 'rows_per_page', 'roleid', 'userdirectoryid', 'ts_provisioned']);
 
 		foreach ($users as $user) {
 			$db_user = $db_users[$user['userid']];
@@ -1412,7 +1412,12 @@ class CUser extends CApiService {
 
 		self::addAuditLog(CAudit::ACTION_LOGOUT, CAudit::RESOURCE_USER);
 
+		$user_data = self::$userData;
 		self::$userData = null;
+
+		if (CAuthenticationHelper::isLdapProvisionEnabled($user_data['userdirectoryid'])) {
+			$this->provisionLdapUser($user_data);
+		}
 
 		return true;
 	}
@@ -1667,7 +1672,7 @@ class CUser extends CApiService {
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
 				'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid',
-				'userdirectoryid'
+				'userdirectoryid', 'ts_provisioned'
 			],
 			'userids' => $db_session['userid']
 		]);
@@ -1710,6 +1715,11 @@ class CUser extends CApiService {
 		}
 
 		self::$userData = $db_user;
+
+		if (CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])
+				&& CAuthenticationHelper::isTimeToProvision($db_user['ts_provisioned'])) {
+			$this->provisionLdapUser($db_user);
+		}
 
 		return $db_user;
 	}
@@ -2174,6 +2184,55 @@ class CUser extends CApiService {
 	}
 
 	/**
+	 * For user provisioned by IDP_TYPE_LDAP update user provisioned attributes.
+	 *
+	 * @param array  $user_data
+	 * @param int    $user_data['userid']
+	 * @param string $user_data['username']
+	 */
+	protected function provisionLdapUser(array $user_data) {
+		[$userdirectory] = API::UserDirectory()->get([
+			'output' => ['provision_status', 'idp_type'],
+			'userdirectoryids' => [$user_data['userdirectoryid']],
+			'filter' => ['idp_type' => IDP_TYPE_LDAP],
+			'selectProvisionMedia' => API_OUTPUT_EXTEND,
+			'selectProvisionGroups' => API_OUTPUT_EXTEND
+		]);
+
+		if (!$userdirectory) {
+			return;
+		}
+
+		$userdirectory += DB::select('userdirectory_ldap', [
+			'output' => ['host', 'port', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute', 'start_tls',
+				'search_filter', 'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership',
+				'user_username', 'user_lastname'
+			],
+			'filter' => ['userdirectoryid' => $user_data['userdirectoryid']]
+		])[0];
+		$ldap = new CLdap($userdirectory);
+
+		if ($ldap->bind_type != CLdap::BIND_ANONYMOUS && $ldap->bind_type != CLdap::BIND_CONFIG_CREDENTIALS) {
+			return;
+		}
+
+		$idp_user_data = [];
+		$provisioning = new CProvisioning($userdirectory);
+		$user_attributes = $provisioning->getUserIdpAttributes();
+		$idp_user = $ldap->getUserAttributes($user_attributes, $user_data['username']);
+		$idp_user_data = $provisioning->getUser($idp_user);
+
+		if (!array_key_exists('usrgrps', $idp_user_data)) {
+			$group_attributes = $provisioning->getGroupIdpAttributes();
+			$ldap_groups = $ldap->getGroupAttributes($group_attributes, $user_data['username']);
+			$ldap_groups = array_column($ldap_groups, $userdirectory['group_name']);
+			$idp_user_data = array_merge($idp_user_data, $provisioning->getUserGroupsAndRole($ldap_groups));
+		}
+
+		$this->updateProvisionedUser($user_data['userid'], $idp_user_data);
+	}
+
+	/**
 	 * Create user in database from provision data.
 	 * User media are sanitized removing media with malformed or empty 'sendto'.
 	 *
@@ -2199,6 +2258,7 @@ class CUser extends CApiService {
 		$user['medias'] = $this->sanitizeUserMedia($user['medias']);
 		$users = [$user];
 		$this->validateCreate($users);
+		$users[0]['ts_provisioned'] = time();
 		$this->createReal($users);
 		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::API_USER['username'], CAudit::ACTION_ADD, CAudit::RESOURCE_USER,
 			$users
@@ -2222,18 +2282,19 @@ class CUser extends CApiService {
 		$user = array_intersect_key($idp_user_data, $attrs);
 		$user['medias'] = $this->sanitizeUserMedia($user['medias']);
 		$user['userid'] = $db_userid;
+		$user['ts_provisioned'] = time();
 		$users = [$user];
 
 		[$db_user] = DB::select('users', [
-			'output' => ['userid', 'username', 'name', 'surname', 'roleid', 'userdirectoryid'],
+			'output' => ['userid', 'username', 'name', 'surname', 'roleid', 'userdirectoryid', 'ts_provisioned'],
 			'userids' => [$db_userid]
 		]);
 		$db_user['usrgrps'] = DB::select('users_groups', [
-			'output' => ['usrgrpid'],
+			'output' => ['usrgrpid', 'id'],
 			'filter' => ['userid' => $db_userid]
 		]);
 		$db_user['medias'] = DB::select('media', [
-			'output' => ['mediatypeid', 'sendto'],
+			'output' => ['mediatypeid', 'mediaid', 'sendto'],
 			'filter' => ['userid' => $db_userid]
 		]);
 		$db_users = [$db_userid => $db_user];

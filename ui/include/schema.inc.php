@@ -138,6 +138,12 @@ return [
 				'default' => NULL,
 				'ref_table' => 'userdirectory',
 				'ref_field' => 'userdirectoryid'
+			],
+			'ts_provisioned' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
@@ -9263,6 +9269,46 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			]
+		]
+	],
+	'scim_groups' => [
+		'key' => 'scim_groupid',
+		'fields' => [
+			'scim_groupid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'display_name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => ''
+			]
+		]
+	],
+	'users_scim_groups' => [
+		'key' => 'users_scim_groupid',
+		'fields' => [
+			'users_scim_groupid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'userid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid'
+			],
+			'scim_groupid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'scim_groups',
+				'ref_field' => 'scim_groupid'
 			]
 		]
 	],

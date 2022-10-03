@@ -288,7 +288,7 @@ class CLdap {
 	 * @return array Array of arrays of matched group.
 	 */
 	public function getGroupAttributes(array $attributes, string $user, $password = null): array {
-		if (!$this->bind($user, $password) || $attributes == []) {
+		if ($attributes == [] || !$this->connect() || !$this->bind($user, $password)) {
 			return [];
 		}
 
@@ -330,7 +330,7 @@ class CLdap {
 	 * @param array Associative array of user attributes.
 	 */
 	public function getUserAttributes(array $attributes, string $user, $password = null): array {
-		if (!$this->bind($user, $password) || $attributes == []) {
+		if ($attributes == [] || !$this->connect() || !$this->bind($user, $password)) {
 			return [];
 		}
 

@@ -25,6 +25,17 @@
 class CProvisioning {
 
 	/**
+	 * Provision user data to set in API.
+	 */
+	public const API_USER = [
+		'type'		=> USER_TYPE_SUPER_ADMIN,
+		'userid'	=> 0,
+		'username'	=> 'System'
+	];
+
+	public const FALLBACK_GROUP_NAME = '*';
+
+	/**
 	 * User directory data array.
 	 *
 	 * @var string $userdirectory['user_username']
@@ -64,10 +75,7 @@ class CProvisioning {
 		}
 
 		foreach ($provision_groups as &$provision_group) {
-			if (array_key_exists('is_fallback', $provision_group)
-					&& array_key_exists('fallback_status', $provision_group)
-					&& $provision_group['is_fallback'] == GROUP_MAPPING_FALLBACK
-					&& $provision_group['fallback_status'] == GROUP_MAPPING_FALLBACK_ON) {
+			if ($provision_group['name'] == CProvisioning::FALLBACK_GROUP_NAME) {
 				$provision_group['sortorder'] = max(
 					max(array_column($provision_groups, 'sortorder'),
 					count($provision_groups))
@@ -105,7 +113,7 @@ class CProvisioning {
 		$attributes = array_intersect_key($this->userdirectory, array_flip($fields));
 		$attributes = array_merge(array_column($this->userdirectory['provision_media'], 'attribute'), $attributes);
 
-		return array_values(array_filter($attributes, 'strlen'));
+		return array_keys(array_flip(array_filter($attributes, 'strlen')));
 	}
 
 	/**
@@ -227,10 +235,7 @@ class CProvisioning {
 		}
 
 		foreach ($this->userdirectory['provision_groups'] as $provision_group) {
-			if ($provision_group['is_fallback'] == GROUP_MAPPING_FALLBACK) {
-				$match = $provision_group['fallback_status'] == GROUP_MAPPING_FALLBACK_ON;
-			}
-			elseif (strpos($provision_group['name'], '*') === false) {
+			if (strpos($provision_group['name'], '*') === false) {
 				$match = in_array($provision_group['name'], $group_names);
 			}
 			else {

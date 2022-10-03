@@ -168,4 +168,17 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 			'filter' => ['provision_status' => JIT_PROVISIONING_ENABLED, 'idp_type' => IDP_TYPE_LDAP]
 		]) > 0;
 	}
+
+	/**
+	 * Check is the given timestamp require user provisioning according jit_provision_interval.
+	 *
+	 * @param int $timestamp
+	 *
+	 * @return bool Is true when given timestamp require provisioning.
+	 */
+	public static function isTimeToProvision($timestamp): bool {
+		$jit_interval = timeUnitToSeconds(self::get(self::JIT_PROVISION_INTERVAL));
+
+		return ($timestamp + $jit_interval) < time();
+	}
 }

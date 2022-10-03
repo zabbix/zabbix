@@ -48,6 +48,7 @@ FIELD		|rows_per_page	|t_integer	|50	|NOT NULL	|0
 FIELD		|timezone	|t_varchar(50)	|'default'|NOT NULL	|ZBX_NODATA
 FIELD		|roleid		|t_id		|	|NOT NULL	|0			|1|role
 FIELD		|userdirectoryid	|t_id	|NULL	|NULL	|0	|2|userdirectory	|	|RESTRICT
+FIELD		|ts_provisioned		|t_time	|'0'	|NULL	|0
 UNIQUE		|1		|username
 INDEX		|2		|userdirectoryid
 
@@ -2022,6 +2023,17 @@ FIELD		|objectid	|t_id		|	|NOT NULL	|0
 FIELD		|operation	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|clock		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|clock
+
+TABLE|scim_groups|scim_groupid|0
+FIELD		|scim_groupid	|t_id			|	|NOT NULL	|0
+FIELD		|display_name	|t_varchar(64)	|''	|NOT NULL	|0
+
+TABLE|users_scim_groups|users_scim_groupid|0
+FIELD		|users_scim_groupid	|t_id	|	|NOT NULL	|0
+FIELD		|userid				|t_id	|	|NOT NULL	|0	|1|users
+FIELD		|scim_groupid		|t_id	|	|NOT NULL	|0	|2|scim_groups
+INDEX		|1	|userid
+INDEX		|2	|scim_groupid
 
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
