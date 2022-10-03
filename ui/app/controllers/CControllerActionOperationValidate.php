@@ -722,6 +722,7 @@ class CControllerActionOperationValidate extends CController {
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
 				case OPERATION_TYPE_UPDATE_MESSAGE:
 					$result['type'][] =_('Notify all involved');
+					$result['data'][] = [];
 					break;
 			}
 		}

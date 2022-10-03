@@ -1,4 +1,4 @@
-<?php declare(strict_types = 0);
+<?php declare(strict_types=0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,7 +21,7 @@
 ?>
 
 window.action_edit_popup = new class {
-	init({condition_operators, condition_types, conditions, actionid, eventsource, operation_data}) {
+	init({condition_operators, condition_types, conditions, actionid, eventsource}) {
 		this.overlay = overlays_stack.getById('action-edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -30,7 +30,6 @@ window.action_edit_popup = new class {
 		this.conditions = conditions;
 		this.actionid = actionid;
 		this.eventsource = eventsource;
-		this.operation_data = operation_data;
 		this.row_count = document.getElementById('conditionTable').rows.length - 2;
 
 		this._initActionButtons();
@@ -41,9 +40,6 @@ window.action_edit_popup = new class {
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-condition-create')) {
 				this._openConditionPopup();
-			}
-			else if (e.target.classList.contains('condition-remove')) {
-				e.target.closest('tr').remove();
 			}
 			else if (e.target.classList.contains('js-operation-details')) {
 				this._openOperationPopup(this.eventsource, <?= ACTION_OPERATION ?>, this.actionid);
@@ -59,10 +55,7 @@ window.action_edit_popup = new class {
 				this._processTypeOfCalculation();
 			}
 			else if (e.target.classList.contains('js-edit-button')) {
-
-				// console.log('target', $(e.target).closest('tr').attr('id'))
-
-				this._openEditOperationPopup(e, this.operation_data, $(e.target).closest('tr').attr('id'));
+				this._openEditOperationPopup(e, JSON.parse(e.target.getAttribute('data-operation')), $(e.target).closest('tr').attr('id'));
 			}
 			else if (e.target.classList.contains('js-remove-button')) {
 				e.target.closest('tr').remove();
@@ -73,21 +66,18 @@ window.action_edit_popup = new class {
 	_openEditOperationPopup(e, operation_data, row_id) {
 		if (JSON.parse(e.target.getAttribute('data'))) {
 			const data = JSON.parse(e.target.getAttribute('data'))
-
-			// todo : add recovery num, not hardcode
 			this.parameters = {
 				eventsource: this.eventsource,
-				recovery: '0',
+				recovery: this.recovery,
 				actionid: this.actionid,
 				data: data
 			}
-		}
-		else {
+		} else {
 			this.parameters = {
 				eventsource: this.eventsource,
-				recovery: '0',
+				recovery: operation_data.operationtype,
 				actionid: this.actionid,
-				data: operation_data
+				data: operation_data.data
 			}
 		}
 
@@ -97,8 +87,6 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
-			console.log(e);
-			//this._createOperationsRow(e);
 			this._editOperationsRow(e, row_id);
 		});
 	}
@@ -129,7 +117,7 @@ window.action_edit_popup = new class {
 			actionid: this.actionid
 		};
 
-		const overlay =  PopUp('popup.condition.edit', parameters, {
+		const overlay = PopUp('popup.condition.edit', parameters, {
 			dialogueid: 'action-condition',
 			dialogue_class: 'modal-popup-medium'
 		});
@@ -140,32 +128,31 @@ window.action_edit_popup = new class {
 	}
 
 	_editOperationsRow(input, row_id) {
-		this._createOperationsRow(input, row_id)
-		//this.operation_table = document.getElementById('op-table');
+		this._createOperationsRow(input, row_id);
 	}
 
 	_createOperationsRow(input, row_id = null) {
 		const operation_data = input.detail.operation;
-		// todo : rewrite to switch statement?
+		// todo : rewrite
 
+		if (this.recovery == null) {
+			this.recovery = input.detail.operation.operationtype;
+		}
+
+		// Action operation for trigger, internal and service actions
 		if (this.recovery == <?= ACTION_OPERATION ?> && (
-				this.eventsource == <?=EVENT_SOURCE_TRIGGERS?> || this.eventsource == <?=EVENT_SOURCE_INTERNAL?>
-				|| this.eventsource == <?=EVENT_SOURCE_SERVICE?>)) {
+			this.eventsource == <?=EVENT_SOURCE_TRIGGERS?> || this.eventsource == <?=EVENT_SOURCE_INTERNAL?>
+			|| this.eventsource == <?=EVENT_SOURCE_SERVICE?>)) {
+
 			this.operation_table = document.getElementById('op-table');
 			this.operation_row_count = this.operation_table.rows.length - 2;
 			this.operation_row = document.createElement('tr');
 
-
-			// this.operation_row.setAttribute('id', 'operations_'+this.operation_row_count)
-
 			this.operation_row.append(this._addColumn(operation_data.steps));
-			// this.operation_row.append(this._addDetailsColumn(operation_data.details));
 
 			const rows = operation_data.details.type.map((type, index) => {
 				return this._addDetailsColumnNew(type, operation_data.details.data[index]);
 			})
-
-			// this.operation_row.append(this._addDetailsColumn(operation_data.details));
 
 			const details = document.createElement('span');
 			details.innerHTML = rows.join('<br>')
@@ -189,43 +176,47 @@ window.action_edit_popup = new class {
 
 		}
 
+		// Action operation for discovery and autoregistration actions
 		if (this.recovery == <?= ACTION_OPERATION ?> && (
-				this.eventsource == <?=EVENT_SOURCE_DISCOVERY?> || this.eventsource == <?=EVENT_SOURCE_AUTOREGISTRATION?>)) {
+			this.eventsource == <?=EVENT_SOURCE_DISCOVERY?> || this.eventsource == <?=EVENT_SOURCE_AUTOREGISTRATION?>)) {
 			this.operation_table = document.getElementById('op-table');
 			this.operation_row_count = this.operation_table.rows.length - 2;
 			this.operation_row = document.createElement('tr');
-			this.operation_row.setAttribute('id', 'operations_'+this.operation_row_count)
+			this.operation_row.setAttribute('id', 'operations_' + this.operation_row_count)
 
 			const rows = operation_data.details.type.map((type, index) => {
 				return this._addDetailsColumnNew(type, operation_data.details.data ? operation_data.details.data[index] : null);
 			})
 
-			// this.operation_row.append(this._addDetailsColumn(operation_data.details));
-
 			const details = document.createElement('span');
 			details.innerHTML = rows.join('<br>')
 			this.operation_row.append(details);
 
-
 			this.addOperationsData(input);
-			this.operation_row.append(this._createActionCell(input));
-			$('#op-table tr:last').before(this.operation_row);
-		}
 
+			this.operation_row.append(this._createActionCell(input));
+			this.operation_row.setAttribute('class', 'operation-details-row');
+
+			if (row_id) {
+				$(`#${row_id}`).replaceWith(this.operation_row);
+			} else {
+				$('#op-table tr:last').before(this.operation_row);
+			}
+
+			this._createTableRowIds(this.operation_table, 'operations_');
+		}
+		// Action operation for recovery operations
 		else if (this.recovery == <?= ACTION_RECOVERY_OPERATION ?>) {
+
 			this.operation_table = document.getElementById('rec-table');
 			this.operation_row_count = this.operation_table.rows.length - 2;
 			this.operation_row = document.createElement('tr');
-			this.operation_row.setAttribute('id', 'recovery_operations_'+this.operation_row_count)
-
-		//	this.operation_row.append(this._addDetailsColumn(operation_data.details));
+			this.operation_row.setAttribute('id', 'recovery_operations_' + this.operation_row_count)
 
 			const rows = operation_data.details.type.map((type, index) => {
 				return this._addDetailsColumnNew(type, operation_data.details.data[index]);
 			})
 
-			// this.operation_row.append(this._addDetailsColumn(operation_data.details));
-
 			const details = document.createElement('span');
 			details.innerHTML = rows.join('<br>')
 			this.operation_row.append(details);
@@ -233,20 +224,26 @@ window.action_edit_popup = new class {
 			this.addOperationsData(input);
 
 			this.operation_row.append(this._createActionCell(input));
-			$('#rec-table tr:last').before(this.operation_row);
-		}
+			this.operation_row.setAttribute('class', 'operation-details-row');
 
+			if (row_id) {
+				$(`#${row_id}`).replaceWith(this.operation_row);
+			} else {
+				$('#rec-table tr:last').before(this.operation_row);
+			}
+
+			this._createTableRowIds(this.operation_table, 'recovery_operations_');
+		}
+		// Action operation for update operations
 		else if (this.recovery == <?= ACTION_UPDATE_OPERATION ?>) {
 			this.operation_table = document.getElementById('upd-table');
 			this.operation_row_count = this.operation_table.rows.length - 2;
 			this.operation_row = document.createElement('tr');
-			this.operation_row.setAttribute('id', 'update_operations_'+this.operation_table.rows.length - 2)
+			this.operation_row.setAttribute('id', 'update_operations_' + this.operation_table.rows.length - 2)
 
 			const rows = operation_data.details.type.map((type, index) => {
 				return this._addDetailsColumnNew(type, operation_data.details.data[index]);
 			})
-
-			// this.operation_row.append(this._addDetailsColumn(operation_data.details));
 
 			const details = document.createElement('span');
 			details.innerHTML = rows.join('<br>')
@@ -254,8 +251,11 @@ window.action_edit_popup = new class {
 
 			this.addOperationsData(input);
 
-			this.operation_row.append(this._createActionCell(input));
-			$('#upd-table tr:last').before(this.operation_row);
+			if (row_id) {
+				$(`#${row_id}`).replaceWith(this.operation_row);
+			} else {
+				$('#upd-table tr:last').before(this.operation_row);
+			}
 		}
 	}
 
@@ -265,7 +265,7 @@ window.action_edit_popup = new class {
 		rows.each(index => {
 			$(rows[index])
 				.attr('id', prefix.concat(index))
-				//.attr('data-id', index)
+			//.attr('data-id', index)
 		});
 	}
 
@@ -273,31 +273,12 @@ window.action_edit_popup = new class {
 		return `<b>${type}</b> ${data ? data.join(' ') : ''}`;
 	}
 
-	// _addDetailsColumn(input) {
-	//	const details = document.createElement('td');
-	//	const type_cell = document.createElement('b');
-
-	//	type_cell.append(input.type);
-	//	if (input.data) {
-	//		details.append(type_cell, input.data.join(' '));
-	//	}
-	//	else {
-	//		details.append(type_cell);
-	//	}
-
-	//	return details;
-	// }
-
 	addOperationsData(input) {
-		console.log($(this.operation_table).find('.operations-details-row').length);
-
-		// add operation data as hidden input to action form
 		this.recovery_prefix = '';
 
 		if (this.recovery === <?= ACTION_RECOVERY_OPERATION ?>) {
 			this.recovery_prefix = 'recovery_'
-		}
-		else if (this.recovery === <?= ACTION_UPDATE_OPERATION ?>) {
+		} else if (this.recovery === <?= ACTION_UPDATE_OPERATION ?>) {
 			this.recovery_prefix = 'update_'
 		}
 
@@ -313,7 +294,6 @@ window.action_edit_popup = new class {
 
 		this.createHiddenInputFromObject(input.detail.operation, `operations[${this.operation_row_count}]`, `operations_${this.operation_row_count}`, some);
 		this.operation_row.append(this._addHiddenOperationsFields('operationtype', input.detail.operation.operationtype));
-
 	}
 
 	createHiddenInputFromObject(obj, namePrefix, idPrefix, exceptKeys = []) {
@@ -321,8 +301,7 @@ window.action_edit_popup = new class {
 
 		if (this.recovery === <?= ACTION_RECOVERY_OPERATION ?>) {
 			this.recovery_prefix = 'recovery_'
-		}
-		else if (this.recovery === <?= ACTION_UPDATE_OPERATION ?>) {
+		} else if (this.recovery === <?= ACTION_UPDATE_OPERATION ?>) {
 			this.recovery_prefix = 'update_'
 		}
 
@@ -337,7 +316,6 @@ window.action_edit_popup = new class {
 			}
 
 			if (typeof obj[key] === 'object') {
-				//return this.createHiddenInputFromObject(obj[key], `${namePrefix}[${key}]`, `${idPrefix}_${key}`);
 				this.createHiddenInputFromObject(obj[key], `${namePrefix}[${key}]`, `${idPrefix}_${key}`);
 				return;
 			}
@@ -351,9 +329,6 @@ window.action_edit_popup = new class {
 			input.setAttribute('value', obj[key]);
 
 			this.operation_row.append(input);
-			//return input;
-			//const form = document.forms['action.edit'];
-			//form.appendChild(input);
 		})
 	}
 
@@ -370,11 +345,9 @@ window.action_edit_popup = new class {
 	_addUserFields(index, name, value, group) {
 		if (this.recovery == <?=ACTION_OPERATION?>) {
 			this.prefix = ''
-		}
-		else if (this.recovery == <?=ACTION_RECOVERY_OPERATION?>) {
+		} else if (this.recovery == <?=ACTION_RECOVERY_OPERATION?>) {
 			this.prefix = 'recovery_'
-		}
-		else if (this.recovery == <?=ACTION_UPDATE_OPERATION?>) {
+		} else if (this.recovery == <?=ACTION_UPDATE_OPERATION?>) {
 			this.prefix = 'update_'
 		}
 
@@ -397,7 +370,6 @@ window.action_edit_popup = new class {
 
 	_checkRow(input) {
 		// todo: check if condition with the same value already exists in the table.
-
 		// check if identical condition already exists in table
 		const hasRows = [...document.getElementById('conditionTable').getElementsByTagName('tr')].map(it => {
 			const table_row = it.getElementsByTagName('td')[1];
@@ -409,8 +381,7 @@ window.action_edit_popup = new class {
 		const hasRow = [hasRows.some(it => it === true)]
 		if (hasRow[0] === true) {
 			return;
-		}
-		else {
+		} else {
 			this._createRow(input)
 		}
 	}
@@ -422,7 +393,7 @@ window.action_edit_popup = new class {
 		this.row.append(this._createRemoveCell());
 
 		this.table = document.getElementById('conditionTable');
-		this.row_count = this.table.rows.length -1;
+		this.row_count = this.table.rows.length - 1;
 
 		$('#conditionTable tr:last').before(this.row);
 		this._processTypeOfCalculation();
@@ -432,7 +403,7 @@ window.action_edit_popup = new class {
 		// todo E.S. : FIX LABEL WHEN DELETE ROW AND ADD A NEW ONE!!
 		const cell = document.createElement('td');
 
-		this.label = num2letter(document.getElementById('conditionTable').rows.length -2);
+		this.label = num2letter(document.getElementById('conditionTable').rows.length - 2);
 		cell.setAttribute('class', 'label');
 		cell.setAttribute('data-formulaid', this.label);
 		cell.setAttribute('data-conditiontype', input.conditiontype);
@@ -446,12 +417,12 @@ window.action_edit_popup = new class {
 		const value = document.createElement('em');
 		const value2 = document.createElement('em');
 
-		cell.appendChild(this._createHiddenInput('formulaid',this.label));
-		cell.appendChild(this._createHiddenInput('conditiontype',input.conditiontype));
-		cell.appendChild(this._createHiddenInput('operator',input.operator));
-		cell.appendChild(this._createHiddenInput('value',input.value));
+		cell.appendChild(this._createConditionsHiddenInput('formulaid', this.label));
+		cell.appendChild(this._createConditionsHiddenInput('conditiontype', input.conditiontype));
+		cell.appendChild(this._createConditionsHiddenInput('operator', input.operator));
+		cell.appendChild(this._createConditionsHiddenInput('value', input.value));
 		if (input.value2 !== '') {
-			cell.appendChild(this._createHiddenInput('value2',input.value2));
+			cell.appendChild(this._createConditionsHiddenInput('value2', input.value2));
 		}
 
 		if (input.conditiontype == <?= CONDITION_TYPE_EVENT_TAG_VALUE ?>) {
@@ -462,24 +433,19 @@ window.action_edit_popup = new class {
 			span.append(' ' + this.condition_operators[input.operator] + ' ');
 			value.textContent = input.value;
 			span.append(value);
-		}
-		else if (input.conditiontype == <?= CONDITION_TYPE_SUPPRESSED ?>) {
+		} else if (input.conditiontype == <?= CONDITION_TYPE_SUPPRESSED ?>) {
 			if (input.operator == <?= CONDITION_OPERATOR_YES ?>) {
 				span.append(<?= json_encode(_('Problem is suppressed')) ?>);
-			}
-			else {
+			} else {
 				span.append(<?= json_encode(_('Problem is not suppressed')) ?>);
 			}
-		}
-		else if (input.conditiontype == <?= CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
+		} else if (input.conditiontype == <?= CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
 			if (input.value) {
 				span.append(<?= json_encode(_('Event is acknowledged')) ?>);
-			}
-			else {
+			} else {
 				span.append(<?= json_encode(_('Event is not acknowledged')) ?>);
 			}
-		}
-		else {
+		} else {
 			value.textContent = input.name;
 
 			span.append(this.condition_types[input.conditiontype] + ' ' + this.condition_operators[input.operator] + ' ');
@@ -488,16 +454,6 @@ window.action_edit_popup = new class {
 		cell.append(span);
 
 		return cell;
-	}
-
-	_createHiddenInput(name, value) {
-		const input = document.createElement('input');
-		input.type = 'hidden';
-		input.id = `conditions_${this.row_count}_${name}`;
-		input.name = `conditions[${this.row_count}][${name}]`;
-		input.value = value;
-
-		return input;
 	}
 
 	_createRemoveCell() {
@@ -513,15 +469,24 @@ window.action_edit_popup = new class {
 		return cell;
 	}
 
+	_createConditionsHiddenInput(name, value) {
+		const input = document.createElement('input');
+		input.type = 'hidden';
+		input.id = `conditions_${this.row_count}_${name}`;
+		input.name = `conditions[${this.row_count}][${name}]`;
+		input.value = value;
+
+		return input;
+	}
+
 	_createActionCell(input) {
 		const cell = document.createElement('td');
 		const remove_btn = document.createElement('button');
 		const edit_btn = document.createElement('button');
 
 		remove_btn.type = 'button';
-		remove_btn.classList.add('btn-link', 'element-table-remove');
 		remove_btn.textContent = <?= json_encode(_('Remove')) ?>;
-		remove_btn.addEventListener('click', () => remove_btn.closest('tr').remove());
+		remove_btn.classList.add('btn-link', 'js-remove-button');
 
 		edit_btn.type = 'button';
 		edit_btn.classList.add('btn-link', 'js-edit-button');
@@ -529,7 +494,6 @@ window.action_edit_popup = new class {
 		edit_btn.setAttribute('data', JSON.stringify(input.detail.operation))
 
 		cell.appendChild(edit_btn);
-		// todo: check how to add space between buttons differently
 		cell.append(' ');
 		cell.appendChild(remove_btn);
 
@@ -573,8 +537,7 @@ window.action_edit_popup = new class {
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
 					messages = exception.error.messages;
-				}
-				else {
+				} else {
 					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 				}
 
@@ -592,7 +555,7 @@ window.action_edit_popup = new class {
 		const title = <?= json_encode(_('New action')) ?>;
 		const buttons = [
 			{
-				title:  <?= json_encode(_('Add')) ?>,
+				title: <?= json_encode(_('Add')) ?>,
 				class: '',
 				keepOpen: true,
 				isSubmit: true,
@@ -649,7 +612,7 @@ window.action_edit_popup = new class {
 
 		const labels = jQuery('#conditionTable .label');
 		var conditions = [];
-		labels.each(function(index, label) {
+		labels.each(function (index, label) {
 			var label = jQuery(label);
 
 			conditions.push({
@@ -660,7 +623,7 @@ window.action_edit_popup = new class {
 
 		jQuery('#expression').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
 
-		jQuery('#evaltype').change(function() {
+		jQuery('#evaltype').change(function () {
 			this.show_formula = (jQuery(this).val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
 
 			jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");
@@ -669,7 +632,7 @@ window.action_edit_popup = new class {
 			const labels = jQuery('#conditionTable .label');
 			var conditions = [];
 
-			labels.each(function(index, label) {
+			labels.each(function (index, label) {
 				var label = jQuery(label);
 
 				conditions.push({

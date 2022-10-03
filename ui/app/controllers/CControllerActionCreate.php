@@ -94,8 +94,6 @@ class CControllerActionCreate extends CController {
 
 	protected function doAction(): void {
 		$eventsource = $this->getInput('eventsource');
-		//$notify_if_cancelled = $this->getInput('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_FALSE);
-		//$pause_suppressed = $this->getInput('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
 
 		$action = [
 			'name' => $this->getInput('name'),
@@ -104,8 +102,6 @@ class CControllerActionCreate extends CController {
 			'operations' => $this->getInput('operations', []),
 			'recovery_operations' => $this->getInput('recovery_operations', []),
 			'update_operations' => $this->getInput('update_operations', []),
-			//'notify_if_canceled' => $notify_if_cancelled,
-			//'pause_suppressed' => $pause_suppressed
 		];
 
 		$filter = [
@@ -166,13 +162,21 @@ class CControllerActionCreate extends CController {
 						unset($operation['evaltype']);
 					}
 				}
-				elseif ($operation_group === 'recovery_operations') {
+				else if ($operation_group === 'recovery_operations') {
+					if (array_key_exists('evaltype', $operation)) {
+						unset($operation['evaltype']);
+					}
 					if ($operation['operationtype'] != OPERATION_TYPE_MESSAGE) {
 						unset($operation['opmessage']['mediatypeid']);
 					}
 
 					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
 						unset($operation['opmessage']);
+					}
+				}
+				else if ($operation_group === 'update_operations') {
+					if(array_key_exists('evaltype', $operation)) {
+						unset($operation['evaltype']);
 					}
 				}
 

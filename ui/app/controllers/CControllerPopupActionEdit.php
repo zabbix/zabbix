@@ -154,15 +154,6 @@ class CControllerPopupActionEdit extends CController {
 			];
 		}
 
-		if ($data['actionid'] && $this->hasInput('form_refresh')) {
-			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-				$data['action']['pause_suppressed'] = $this->getInput('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
-				$data['action']['notify_if_canceled'] = $this->getInput('notify_if_canceled',
-					ACTION_NOTIFY_IF_CANCELED_FALSE
-				);
-			}
-		}
-//		else {
 //			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 //				$data['action']['pause_suppressed'] = $this->getInput('pause_suppressed',
 //					$this->hasInput('form_refresh') ? ACTION_PAUSE_SUPPRESSED_FALSE : ACTION_PAUSE_SUPPRESSED_TRUE
@@ -171,7 +162,7 @@ class CControllerPopupActionEdit extends CController {
 //					$this->hasInput('form_refresh') ? ACTION_NOTIFY_IF_CANCELED_FALSE : ACTION_NOTIFY_IF_CANCELED_TRUE
 //				);
 //			}
-//		}
+
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

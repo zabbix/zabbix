@@ -84,7 +84,7 @@ if ($data['action']['filter']['conditions']) {
 				(new CCol([
 					(new CButton('remove', _('Remove')))
 						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('condition-remove')
+						->addClass('element-table-remove')
 						->removeId(),
 					new CVar('conditions['.$i.']', $condition)
 				]))
@@ -215,7 +215,7 @@ if ($data['action']['operations']) {
 			}
 
 			// display N-N as N
-			$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'])
+			$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'] || $operation['esc_step_to'] == 0)
 				? $operation['esc_step_from']
 				: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
 
@@ -360,10 +360,11 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 								'operationid' => $operationid,
 								'actionid' => $data['actionid'],
 								'eventsource' => $data['eventsource'],
-								'operationtype' => ACTION_RECOVERY_OPERATION
+								'operationtype' => ACTION_RECOVERY_OPERATION,
+								'data' => $operation
 							])),
 						[
-							(new CButton('remove', _('Remove')))
+							(new CButton('remove', _('Removeee')))
 								->setAttribute('data-operationid', $operationid)
 								->addClass('js-remove-button')
 								->addClass(ZBX_STYLE_BTN_LINK)
@@ -431,7 +432,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 								'operationid' => $operationid,
 								'actionid' => $data['actionid'],
 								'eventsource' => $data['eventsource'],
-								'operationtype' => ACTION_UPDATE_OPERATION
+								'operationtype' => ACTION_UPDATE_OPERATION,
+								'data' => $operation
 							])),
 						[
 							(new CButton('remove', _('Remove')))
@@ -440,9 +442,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
 							new CVar('update_operations['.$operationid.']', $operation),
-							new CVar('operations_for_popup['.ACTION_UPDATE_OPERATION.']['.$operationid.']',
-								json_encode($operation_for_popup)
-							)
+//							new CVar('operations_for_popup['.ACTION_UPDATE_OPERATION.']['.$operationid.']',
+//								json_encode($operation_for_popup)
+//							)
 						]
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
@@ -501,8 +503,7 @@ $form
 				'conditions' => $data['action']['filter']['conditions'],
 				'actionid' => $data['actionid'] ?: 0,
 				'eventsource' => $data['eventsource'],
-				'allowed_operations' => $data['allowedOperations'],
-				'operation_data' => $operation
+				'allowed_operations' => $data['allowedOperations']
 			], JSON_THROW_ON_ERROR) .');
 		'))->setOnDocumentReady()
 	);

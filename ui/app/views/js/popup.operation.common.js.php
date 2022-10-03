@@ -37,9 +37,6 @@ window.operation_popup = new class {
 			data?.opconditions.map(row => this._createRow(row))
 		}
 		if (data?.opmessage_grp) {
-			console.log($(data['opmessage_grp']).length);
-			console.log(data['opmessage_grp']);
-
 			this._addUserGroup(data?.opmessage_grp, $(data['opmessage_grp']).length);
 		}
 
@@ -128,7 +125,8 @@ window.operation_popup = new class {
 	_allInvolvedFields() {
 		const fields = [
 			'operation-message-custom-label', 'operation-message-custom', 'operation-message-subject',
-			'operation-message-body', 'opmessage'
+			'operation-message-body', 'opmessage', 'operation-message-subject-label', 'operation_opmessage_default_msg',
+			'operation-message-mediatype-default'
 		]
 
 		this._enableFormFields(fields);
@@ -138,7 +136,7 @@ window.operation_popup = new class {
 	_allInvolvedFieldsUpdate() {
 		const fields = [
 			'operation-message-custom-label', 'operation-message-custom', 'operation-message-mediatype-default-label',
-			'operation-message-mediatype-default'
+			'operation-message-mediatype-default', 'operation-message-subject', 'operation-message-body'
 		]
 
 		this._enableFormFields(fields);
@@ -235,10 +233,14 @@ window.operation_popup = new class {
 		switch (this.eventsource) {
 			case <?= EVENT_SOURCE_TRIGGERS ?>:
 				this.fields = ['operation-condition-table',
-					'operation-condition-list-label', 'operation-condition-list', 'step-from', 'operation-step-range', 'operation-step-duration', 'operation-message-notice',
-					'operation-message-user-groups', 'operation-message-notice', 'operation-message-users',
-					'operation-message-mediatype-only', 'operation-message-custom', 'operation_esc_period',
-					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type']
+					'operation-condition-list-label', 'operation-condition-list', 'step-from', 'operation-step-range',
+					'operation-step-duration', 'operation-message-notice', 'operation-message-user-groups',
+					'operation-message-notice', 'operation-message-users', 'operation-message-mediatype-only',
+					'operation-message-custom', 'operation_esc_period', 'operation-message-custom-label',
+					'operation_opmessage_default_msg', 'operation-type', 'operation-condition-row',
+					'operation-condition-evaltype-formula', 'operation-evaltype-label', 'operation-evaltype'
+				]
+				this._processTypeOfCalculation();
 				break;
 			case <?= EVENT_SOURCE_INTERNAL ?>:
 			case <?= EVENT_SOURCE_SERVICE?>:

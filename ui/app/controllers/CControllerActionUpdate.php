@@ -114,8 +114,7 @@ class CControllerActionUpdate extends CController {
 			if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 				if (count($filter['conditions']) > 1) {
 					$filter['formula'] = $this->getInput('formula');
-				}
-				else {
+				} else {
 					// If only one or no conditions are left, reset the evaltype to "and/or".
 					$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
 				}
@@ -163,7 +162,9 @@ class CControllerActionUpdate extends CController {
 					}
 				}
 				elseif ($operation_group === 'recovery_operations') {
-					unset($operation['evaltype'], $operation_group);
+					if (array_key_exists('evaltype', $operation)) {
+						unset($operation['evaltype']);
+					}
 					if ($operation['operationtype'] != OPERATION_TYPE_MESSAGE) {
 						unset($operation['opmessage']['mediatypeid']);
 					}
@@ -217,9 +218,9 @@ class CControllerActionUpdate extends CController {
 						$operation['opcommand_hst'] = [];
 					}
 				}
-
-				unset($operation['operationid'], $operation['actionid'], $operation['eventsource'], $operation['recovery'],
-					$operation['id']
+				unset(
+					$operation['operationid'], $operation['actionid'], $operation['eventsource'],
+					$operation['recovery'], $operation['id']
 				);
 			}
 			unset($operation);
