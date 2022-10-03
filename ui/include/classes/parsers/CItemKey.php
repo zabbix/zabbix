@@ -61,7 +61,7 @@ class CItemKey extends CParser {
 
 	/**
 	 * Check if given character is a valid key id char
-	 * this function is a copy of is_key_char() from /src/libs/zbxcommon/misc.c
+	 * this function is a copy of zbx_is_key_char() from src/libs/zbxexpr/expr.c
 	 * don't forget to take look in there before changing anything.
 	 *
 	 * @param string $char

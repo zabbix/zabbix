@@ -106,7 +106,7 @@ static int	token_parse_lld_macro(const char *expression, const char *macro, zbx_
 		if ('\0' == *ptr)
 			return FAIL;
 
-		if (SUCCEED != is_macro_char(*ptr))
+		if (SUCCEED != zbx_is_macro_char(*ptr))
 			return FAIL;
 	}
 
@@ -554,7 +554,7 @@ static int	token_parse_simple_macro_key(const char *expression, const char *macr
 	const char			*ptr = key;
 	zbx_strloc_t			key_loc, func_loc, func_param;
 
-	if (SUCCEED != parse_key(&ptr))
+	if (SUCCEED != zbx_parse_key(&ptr))
 	{
 		zbx_token_t	key_token;
 
@@ -564,7 +564,7 @@ static int	token_parse_simple_macro_key(const char *expression, const char *macr
 		ptr = expression + key_token.loc.r + 1;
 	}
 
-	/* If the key is without parameters, then parse_key() will move cursor past function name - */
+	/* If the key is without parameters, then zbx_parse_key() will move cursor past function name - */
 	/* at the start of its parameters. In this case move cursor back before function.           */
 	if ('(' == *ptr)
 	{
@@ -643,7 +643,7 @@ static int	token_parse_simple_macro(const char *expression, const char *macro, z
 		if ('\0' == *ptr)
 			return FAIL;
 
-		if (SUCCEED != is_hostname_char(*ptr))
+		if (SUCCEED != zbx_is_hostname_char(*ptr))
 			return FAIL;
 	}
 
@@ -865,7 +865,7 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int 
 			if ('\0' == *ptr)
 				return FAIL;
 
-			if (SUCCEED != is_macro_char(*ptr))
+			if (SUCCEED != zbx_is_macro_char(*ptr))
 				return FAIL;
 		}
 
