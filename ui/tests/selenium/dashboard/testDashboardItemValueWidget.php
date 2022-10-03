@@ -153,7 +153,7 @@ class testDashboardItemValueWidget extends CWebTest {
 								'name' => 'Widget with thresholds',
 								'x' => 0,
 								'y' => 6,
-								'width' => 4,
+								'width' => 10,
 								'height' => 3,
 								'fields' => [
 									[
@@ -902,6 +902,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Type' => 'Item value',
 						'Item' => 'Available memory in %',
 						'Name' => 'Item Widget with threshold',
+						'Refresh interval' => '1 minute',
 						'Advanced configuration' => true
 					],
 					'thresholds' => [
@@ -916,6 +917,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Type' => 'Item value',
 						'Item' => 'Available memory in %',
 						'Name' => 'One threshold with color',
+						'Refresh interval' => '2 minutes',
 						'Advanced configuration' => true
 					],
 					'thresholds' => [
@@ -930,6 +932,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Type' => 'Item value',
 						'Item' => 'Available memory in %',
 						'Name' => 'Thresholds',
+						'Refresh interval' => '2 minutes',
 						'Advanced configuration' => true
 					],
 					'thresholds' => [
@@ -961,6 +964,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Item' => 'Available memory in %',
 						'Name' => 'Widget with thresholds - update',
+						'Refresh interval' => '10 minutes',
 						'Advanced configuration' => true
 					],
 					'thresholds' => [
@@ -976,6 +980,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Item' => 'Available memory in %',
 						'Name' => 'Widget with thresholds - remove',
+						'Refresh interval' => '10 minutes',
 						'Advanced configuration' => true
 					],
 					'thresholds' => [
