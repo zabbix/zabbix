@@ -737,7 +737,6 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 //			foreach ($data['graphs_ids'] as $type => $ids) {
 //				foreach ($ids as $id) {
-//
 //				}
 //			}
 		}
