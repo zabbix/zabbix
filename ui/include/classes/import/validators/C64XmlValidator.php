@@ -1995,7 +1995,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 				'media_type' =>				['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
 					'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->MEDIA_TYPE],
-					'provider' =>				['type' => XML_STRING, 'in' => $this->MEDIA_PROVIDER],
+					'provider' =>				['type' => XML_STRING, 'in' => $this->MEDIA_PROVIDER, 'default' => '0'],
 					'smtp_server' =>			['type' => XML_STRING, 'default' => ''],
 					'smtp_port' =>				['type' => XML_STRING, 'default' => '25'],
 					'smtp_helo' =>				['type' => XML_STRING, 'default' => ''],

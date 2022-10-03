@@ -1373,6 +1373,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(service_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
+				zbx_vc_enable();
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
 				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc, rtc_process_request_ex)))
 					goto out;
@@ -1404,8 +1405,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_dc_update_maintenances();
 
 				DBclose();
-
-				zbx_vc_enable();
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_NORMAL;
