@@ -42,9 +42,9 @@ ZBX_VECTOR_DECL(json, zbx_json_element_t)
 ZBX_VECTOR_IMPL(json, zbx_json_element_t)
 
 static int	jsonpath_query_object(const struct zbx_json_parse *jp_root, const struct zbx_json_parse *jp,
-		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_json_t *objects);
+		const zbx_jsonpath_t *jsonpath, int path_depth, unsigned char *done, zbx_vector_json_t *objects);
 static int	jsonpath_query_array(const struct zbx_json_parse *jp_root, const struct zbx_json_parse *jp,
-		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_json_t *objects);
+		const zbx_jsonpath_t *jsonpath, int path_depth, unsigned char *done, zbx_vector_json_t *objects);
 
 typedef struct
 {
@@ -1303,17 +1303,30 @@ static int	jsonpath_parse_dot_segment(const char *start, zbx_jsonpath_t *jsonpat
 		if (')' == *end)
 		{
 			if (ZBX_CONST_STRLEN("min") == ptr - start && 0 == strncmp(start, "min", ptr - start))
+			{
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_MIN;
+			}
 			else if (ZBX_CONST_STRLEN("max") == ptr - start && 0 == strncmp(start, "max", ptr - start))
+			{
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_MAX;
+			}
 			else if (ZBX_CONST_STRLEN("avg") == ptr - start && 0 == strncmp(start, "avg", ptr - start))
+			{
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_AVG;
+			}
 			else if (ZBX_CONST_STRLEN("length") == ptr - start && 0 == strncmp(start, "length", ptr - start))
+			{
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_LENGTH;
+			}
 			else if (ZBX_CONST_STRLEN("first") == ptr - start && 0 == strncmp(start, "first", ptr - start))
+			{
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_FIRST;
+				jsonpath->first_match = 1;
+			}
 			else if (ZBX_CONST_STRLEN("sum") == ptr - start && 0 == strncmp(start, "sum", ptr - start))
+			{
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_SUM;
+			}
 			else
 				return zbx_jsonpath_error(start);
 
@@ -1401,6 +1414,7 @@ static int	jsonpath_pointer_to_jp(const char *pnext, struct zbx_json_parse *jp)
  *             pnext      - [IN] a pointer to object/array/value in json data *
  *             jsonpath   - [IN] the jsonpath                                 *
  *             path_depth - [IN] the jsonpath segment to match                *
+ *             done       - [OUT] set to 1 when the query is finished         *
  *             objects    - [OUT] the matched json elements (name, value)     *
  *                                                                            *
  * Return value: SUCCEED - the data were queried successfully                 *
@@ -1408,7 +1422,7 @@ static int	jsonpath_pointer_to_jp(const char *pnext, struct zbx_json_parse *jp)
  *                                                                            *
  ******************************************************************************/
 static int	jsonpath_query_contents(const struct zbx_json_parse *jp_root, const char *pnext,
-		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_json_t *objects)
+		const zbx_jsonpath_t *jsonpath, int path_depth, unsigned char *done, zbx_vector_json_t *objects)
 {
 	struct zbx_json_parse	jp_child;
 
@@ -1418,12 +1432,12 @@ static int	jsonpath_query_contents(const struct zbx_json_parse *jp_root, const c
 			if (FAIL == zbx_json_brackets_open(pnext, &jp_child))
 				return FAIL;
 
-			return jsonpath_query_object(jp_root, &jp_child, jsonpath, path_depth, objects);
+			return jsonpath_query_object(jp_root, &jp_child, jsonpath, path_depth, done, objects);
 		case '[':
 			if (FAIL == zbx_json_brackets_open(pnext, &jp_child))
 				return FAIL;
 
-			return jsonpath_query_array(jp_root, &jp_child, jsonpath, path_depth, objects);
+			return jsonpath_query_array(jp_root, &jp_child, jsonpath, path_depth, done, objects);
 	}
 	return SUCCEED;
 }
@@ -1439,6 +1453,7 @@ static int	jsonpath_query_contents(const struct zbx_json_parse *jp_root, const c
  *             pnext      - [IN] a pointer to object/array/value in json data *
  *             jsonpath   - [IN] the jsonpath                                 *
  *             path_depth - [IN] the jsonpath segment to match                *
+ *             done       - [OUT] set to 1 when the query is finished         *
  *             objects    - [OUT] the matched json elements (name, value)     *
  *                                                                            *
  * Return value: SUCCEED - the segment was queried successfully               *
@@ -1446,19 +1461,22 @@ static int	jsonpath_query_contents(const struct zbx_json_parse *jp_root, const c
  *                                                                            *
  ******************************************************************************/
 static int	jsonpath_query_next_segment(const struct zbx_json_parse *jp_root, const char *name, const char *pnext,
-		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_json_t *objects)
+		const zbx_jsonpath_t *jsonpath, int path_depth, unsigned char *done, zbx_vector_json_t *objects)
 {
 	/* check if jsonpath end has been reached, so we have found matching data */
 	/* (functions are processed afterwards)                                   */
 	if (++path_depth == jsonpath->segments_num ||
 			ZBX_JSONPATH_SEGMENT_FUNCTION == jsonpath->segments[path_depth].type)
 	{
+		if (1 == jsonpath->first_match)
+			*done = 1;
+
 		zbx_vector_json_add_element(objects, name, pnext);
 		return SUCCEED;
 	}
 
 	/* continue by matching found data against the rest of jsonpath segments */
-	return jsonpath_query_contents(jp_root, pnext, jsonpath, path_depth, objects);
+	return jsonpath_query_contents(jp_root, pnext, jsonpath, path_depth, done, objects);
 }
 
 /******************************************************************************
@@ -1473,6 +1491,7 @@ static int	jsonpath_query_next_segment(const struct zbx_json_parse *jp_root, con
  *                               name                                         *
  *             jsonpath   - [IN] the jsonpath                                 *
  *             path_depth - [IN] the jsonpath segment to match                *
+ *             done       - [OUT] set to 1 when the query is finished         *
  *             objects    - [OUT] the matched json elements (name, value)     *
  *                                                                            *
  * Return value: SUCCEED - no errors, failed match is not an error            *
@@ -1480,7 +1499,7 @@ static int	jsonpath_query_next_segment(const struct zbx_json_parse *jp_root, con
  *                                                                            *
  ******************************************************************************/
 static int	jsonpath_match_name(const struct zbx_json_parse *jp_root, const char *name, const char *pnext,
-		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_json_t *objects)
+		const zbx_jsonpath_t *jsonpath, int path_depth, unsigned char *done, zbx_vector_json_t *objects)
 {
 	const zbx_jsonpath_segment_t	*segment = &jsonpath->segments[path_depth];
 	const zbx_jsonpath_list_node_t	*node;
@@ -1493,8 +1512,11 @@ static int	jsonpath_match_name(const struct zbx_json_parse *jp_root, const char 
 	{
 		if (0 == strcmp(name, node->data))
 		{
-			if (FAIL == jsonpath_query_next_segment(jp_root, name, pnext, jsonpath, path_depth, objects))
+			if (FAIL == jsonpath_query_next_segment(jp_root, name, pnext, jsonpath, path_depth, done,
+					objects))
+			{
 				return FAIL;
+			}
 			break;
 		}
 	}
@@ -1735,6 +1757,7 @@ static int	jsonpath_regexp_match(const char *text, const char *pattern, double *
  *             pnext      - [IN] a pointer to array element/object value      *
  *             jsonpath   - [IN] the jsonpath                                 *
  *             path_depth - [IN] the jsonpath segment to match                *
+ *             done       - [OUT] set to 1 when the query is finished         *
  *             objects    - [OUT] the matched json elements (name, value)     *
  *                                                                            *
  * Return value: SUCCEED - no errors, failed match is not an error            *
@@ -1742,7 +1765,7 @@ static int	jsonpath_regexp_match(const char *text, const char *pattern, double *
  *                                                                            *
  ******************************************************************************/
 static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const char *name, const char *pnext,
-		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_json_t *objects)
+		const zbx_jsonpath_t *jsonpath, int path_depth, unsigned char *done, zbx_vector_json_t *objects)
 {
 	struct zbx_json_parse	jp;
 	zbx_vector_var_t	stack;
@@ -1948,7 +1971,7 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 
 	jsonpath_variant_to_boolean(&stack.values[0]);
 	if (SUCCEED != zbx_double_compare(stack.values[0].data.dbl, 0.0))
-		ret = jsonpath_query_next_segment(jp_root, name, pnext, jsonpath, path_depth, objects);
+		ret = jsonpath_query_next_segment(jp_root, name, pnext, jsonpath, path_depth, done, objects);
 out:
 	for (i = 0; i < stack.values_num; i++)
 		zbx_variant_clear(&stack.values[i]);
@@ -1967,6 +1990,7 @@ out:
  *             jp         - [IN] the json object to query                     *
  *             jsonpath   - [IN] the jsonpath                                 *
  *             path_depth - [IN] the jsonpath segment to match                *
+ *             done       - [OUT] set to 1 when the query is finished         *
  *             objects    - [OUT] the matched json elements (name, value)     *
  *                                                                            *
  * Return value: SUCCEED - the object was queried successfully                *
@@ -1974,7 +1998,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	jsonpath_query_object(const struct zbx_json_parse *jp_root, const struct zbx_json_parse *jp,
-		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_json_t *objects)
+		const zbx_jsonpath_t *jsonpath, int path_depth, unsigned char *done, zbx_vector_json_t *objects)
 {
 	const char			*pnext = NULL;
 	char				name[MAX_STRING_LEN];
@@ -1983,25 +2007,27 @@ static int	jsonpath_query_object(const struct zbx_json_parse *jp_root, const str
 
 	segment = &jsonpath->segments[path_depth];
 
-	while (NULL != (pnext = zbx_json_pair_next(jp, pnext, name, sizeof(name))) && SUCCEED == ret)
+	while (NULL != (pnext = zbx_json_pair_next(jp, pnext, name, sizeof(name))) && SUCCEED == ret && 0 == *done)
 	{
 		switch (segment->type)
 		{
 			case ZBX_JSONPATH_SEGMENT_MATCH_ALL:
-				ret = jsonpath_query_next_segment(jp_root, name, pnext, jsonpath, path_depth, objects);
+				ret = jsonpath_query_next_segment(jp_root, name, pnext, jsonpath, path_depth, done,
+						objects);
 				break;
 			case ZBX_JSONPATH_SEGMENT_MATCH_LIST:
-				ret = jsonpath_match_name(jp_root, name, pnext, jsonpath, path_depth, objects);
+				ret = jsonpath_match_name(jp_root, name, pnext, jsonpath, path_depth, done, objects);
 				break;
 			case ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION:
-				ret = jsonpath_match_expression(jp_root, name, pnext, jsonpath, path_depth, objects);
+				ret = jsonpath_match_expression(jp_root, name, pnext, jsonpath, path_depth, done,
+						objects);
 				break;
 			default:
 				break;
 		}
 
 		if (1 == segment->detached)
-			ret = jsonpath_query_contents(jp_root, pnext, jsonpath, path_depth, objects);
+			ret = jsonpath_query_contents(jp_root, pnext, jsonpath, path_depth, done, objects);
 	}
 
 	return ret;
@@ -2020,6 +2046,7 @@ static int	jsonpath_query_object(const struct zbx_json_parse *jp_root, const str
  *             path_depth   - [IN] the jsonpath segment to match              *
  *             index        - [IN] the array element index                    *
  *             elements_num - [IN] the total number of elements in array      *
+ *             done         - [OUT] set to 1 when the query is finished       *
  *             objects      - [OUT] the matched json elements (name, value)   *
  *                                                                            *
  * Return value: SUCCEED - no errors, failed match is not an error            *
@@ -2027,7 +2054,8 @@ static int	jsonpath_query_object(const struct zbx_json_parse *jp_root, const str
  *                                                                            *
  ******************************************************************************/
 static int	jsonpath_match_index(const struct zbx_json_parse *jp_root, const char *name, const char *pnext,
-		const zbx_jsonpath_t *jsonpath, int path_depth, int index, int elements_num, zbx_vector_json_t *objects)
+		const zbx_jsonpath_t *jsonpath, int path_depth, int index, int elements_num, unsigned char *done,
+		zbx_vector_json_t *objects)
 {
 	const zbx_jsonpath_segment_t	*segment = &jsonpath->segments[path_depth];
 	const zbx_jsonpath_list_node_t	*node;
@@ -2044,8 +2072,11 @@ static int	jsonpath_match_index(const struct zbx_json_parse *jp_root, const char
 
 		if ((query_index >= 0 && index == query_index) || index == elements_num + query_index)
 		{
-			if (FAIL == jsonpath_query_next_segment(jp_root, name, pnext, jsonpath, path_depth, objects))
+			if (FAIL == jsonpath_query_next_segment(jp_root, name, pnext, jsonpath, path_depth, done,
+					objects))
+			{
 				return FAIL;
+			}
 			break;
 		}
 	}
@@ -2066,6 +2097,7 @@ static int	jsonpath_match_index(const struct zbx_json_parse *jp_root, const char
  *             path_depth   - [IN] the jsonpath segment to match              *
  *             index        - [IN] the array element index                    *
  *             elements_num - [IN] the total number of elements in array      *
+ *             done         - [OUT] set to 1 when the query is finished       *
  *             objects      - [OUT] the matched json elements (name, value)   *
  *                                                                            *
  * Return value: SUCCEED - no errors, failed match is not an error            *
@@ -2073,7 +2105,8 @@ static int	jsonpath_match_index(const struct zbx_json_parse *jp_root, const char
  *                                                                            *
  ******************************************************************************/
 static int	jsonpath_match_range(const struct zbx_json_parse *jp_root, const char *name, const char *pnext,
-		const zbx_jsonpath_t *jsonpath, int path_depth, int index, int elements_num, zbx_vector_json_t *objects)
+		const zbx_jsonpath_t *jsonpath, int path_depth, int index, int elements_num, unsigned char *done,
+		zbx_vector_json_t *objects)
 {
 	int				start_index, end_index;
 	const zbx_jsonpath_segment_t	*segment = &jsonpath->segments[path_depth];
@@ -2088,7 +2121,7 @@ static int	jsonpath_match_range(const struct zbx_json_parse *jp_root, const char
 
 	if (start_index <= index && end_index > index)
 	{
-		if (FAIL == jsonpath_query_next_segment(jp_root, name, pnext, jsonpath, path_depth, objects))
+		if (FAIL == jsonpath_query_next_segment(jp_root, name, pnext, jsonpath, path_depth, done, objects))
 			return FAIL;
 	}
 
@@ -2105,6 +2138,7 @@ static int	jsonpath_match_range(const struct zbx_json_parse *jp_root, const char
  *             jp         - [IN] the json array to query                      *
  *             jsonpath   - [IN] the jsonpath                                 *
  *             path_depth - [IN] the jsonpath segment to match                *
+ *             done       - [OUT] set to 1 when the query is finished         *
  *             objects    - [OUT] the matched json elements (name, value)     *
  *                                                                            *
  * Return value: SUCCEED - the array was queried successfully                 *
@@ -2112,7 +2146,7 @@ static int	jsonpath_match_range(const struct zbx_json_parse *jp_root, const char
  *                                                                            *
  ******************************************************************************/
 static int	jsonpath_query_array(const struct zbx_json_parse *jp_root, const struct zbx_json_parse *jp,
-		const zbx_jsonpath_t *jsonpath, int path_depth, zbx_vector_json_t *objects)
+		const zbx_jsonpath_t *jsonpath, int path_depth, unsigned char *done, zbx_vector_json_t *objects)
 {
 	const char		*pnext = NULL;
 	int			index = 0, elements_num = 0, ret = SUCCEED;
@@ -2123,7 +2157,7 @@ static int	jsonpath_query_array(const struct zbx_json_parse *jp_root, const stru
 	while (NULL != (pnext = zbx_json_next(jp, pnext)))
 		elements_num++;
 
-	while (NULL != (pnext = zbx_json_next(jp, pnext)) && SUCCEED == ret)
+	while (NULL != (pnext = zbx_json_next(jp, pnext)) && SUCCEED == ret && 0 == *done)
 	{
 		char	name[MAX_ID_LEN + 1];
 
@@ -2131,25 +2165,27 @@ static int	jsonpath_query_array(const struct zbx_json_parse *jp_root, const stru
 		switch (segment->type)
 		{
 			case ZBX_JSONPATH_SEGMENT_MATCH_ALL:
-				ret = jsonpath_query_next_segment(jp_root, name, pnext, jsonpath, path_depth, objects);
+				ret = jsonpath_query_next_segment(jp_root, name, pnext, jsonpath, path_depth, done,
+						objects);
 				break;
 			case ZBX_JSONPATH_SEGMENT_MATCH_LIST:
 				ret = jsonpath_match_index(jp_root, name, pnext, jsonpath, path_depth, index,
-						elements_num, objects);
+						elements_num, done, objects);
 				break;
 			case ZBX_JSONPATH_SEGMENT_MATCH_RANGE:
 				ret = jsonpath_match_range(jp_root, name, pnext, jsonpath, path_depth, index,
-						elements_num, objects);
+						elements_num, done, objects);
 				break;
 			case ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION:
-				ret = jsonpath_match_expression(jp_root, name, pnext, jsonpath, path_depth, objects);
+				ret = jsonpath_match_expression(jp_root, name, pnext, jsonpath, path_depth, done,
+						objects);
 				break;
 			default:
 				break;
 		}
 
 		if (1 == segment->detached)
-			ret = jsonpath_query_contents(jp_root, pnext, jsonpath, path_depth, objects);
+			ret = jsonpath_query_contents(jp_root, pnext, jsonpath, path_depth, done, objects);
 
 		index++;
 	}
@@ -2535,6 +2571,7 @@ int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath)
 	memset(&jpquery, 0, sizeof(zbx_jsonpath_t));
 	jsonpath_reserve(&jpquery, 4);
 	jpquery.definite = 1;
+	jpquery.first_match = 0;
 
 	for (ptr++; '\0' != *ptr; ptr = next)
 	{
@@ -2602,7 +2639,10 @@ int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath)
 		ret = zbx_jsonpath_error(ptr);
 
 	if (SUCCEED == ret)
+	{
+		jpquery.first_match |= jpquery.definite;
 		*jsonpath = jpquery;
+	}
 	else
 		zbx_jsonpath_clear(&jpquery);
 
@@ -2629,6 +2669,7 @@ int	zbx_jsonpath_query(const struct zbx_json_parse *jp, const char *path, char *
 	zbx_jsonpath_t		jsonpath;
 	int			path_depth = 0, ret = SUCCEED;
 	zbx_vector_json_t	objects;
+	unsigned char		done = 0;
 
 	if (FAIL == zbx_jsonpath_compile(path, &jsonpath))
 		return FAIL;
@@ -2636,9 +2677,9 @@ int	zbx_jsonpath_query(const struct zbx_json_parse *jp, const char *path, char *
 	zbx_vector_json_create(&objects);
 
 	if ('{' == *jp->start)
-		ret = jsonpath_query_object(jp, jp, &jsonpath, path_depth, &objects);
+		ret = jsonpath_query_object(jp, jp, &jsonpath, path_depth, &done, &objects);
 	else if ('[' == *jp->start)
-		ret = jsonpath_query_array(jp, jp, &jsonpath, path_depth, &objects);
+		ret = jsonpath_query_array(jp, jp, &jsonpath, path_depth, &done, &objects);
 
 	if (SUCCEED == ret)
 	{
