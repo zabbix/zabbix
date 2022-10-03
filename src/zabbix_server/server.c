@@ -338,8 +338,6 @@ char	*CONFIG_WEBSERVICE_URL	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
-extern int	ZBX_TSDB_VERSION;
-
 struct zbx_db_version_info_t	db_version_info;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
@@ -1220,8 +1218,10 @@ static void	zbx_check_db(void)
 		}
 
 #if defined(HAVE_POSTGRESQL)
-		if (ZBX_TSDB_VERSION > 0)
+		if (0 == zbx_strcmp_null(db_version_info.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
+		{
 			zbx_tsdb_extract_compressed_chunk_flags(&db_version_info);
+		}
 #endif
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
@@ -1233,13 +1233,13 @@ static void	zbx_check_db(void)
 	}
 
 	DBclose();
-	zbx_free(db_version_info.friendly_current_version);
-	zbx_free(db_version_info.extension);
-	zbx_free(db_version_info.ext_friendly_current_version);
-	zbx_free(db_version_info.ext_lic);
 
 	if (SUCCEED != result)
 	{
+		zbx_free(db_version_info.friendly_current_version);
+		zbx_free(db_version_info.extension);
+		zbx_free(db_version_info.ext_friendly_current_version);
+		zbx_free(db_version_info.ext_lic);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -1289,11 +1289,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
-	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, 0, &db_version_info};
-
-#ifdef HAVE_POSTGRESQL
-	housekeeper_args.tsdb_version = ZBX_TSDB_VERSION;
-#endif
+	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, &db_version_info};
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1995,6 +1991,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zabbix_log(LOG_LEVEL_CRIT, "cannot pause HA manager: %s", error);
 		zbx_free(error);
 	}
+
+	zbx_free(db_version_info.friendly_current_version);
+	zbx_free(db_version_info.extension);
+	zbx_free(db_version_info.ext_friendly_current_version);
+	zbx_free(db_version_info.ext_lic);
 
 	zbx_on_exit(ZBX_EXIT_STATUS());
 

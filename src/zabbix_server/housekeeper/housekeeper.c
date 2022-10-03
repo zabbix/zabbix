@@ -33,7 +33,7 @@ extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static struct zbx_db_version_info_t	*db_version_info;
-static int				tsdb_version;
+static int				tsdb_version = 0;
 
 static int	hk_period;
 
@@ -1206,13 +1206,11 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	zbx_ipc_async_socket_t		rtc;
 	unsigned char			program_type;
 
-
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
 	db_version_info = housekeeper_args_in->db_version_info;
-	tsdb_version = housekeeper_args_in->tsdb_version;
 
 	program_type = housekeeper_args_in->zbx_get_program_type_cb_arg();
 
@@ -1240,6 +1238,10 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	zbx_rtc_subscribe(&rtc, process_type, process_num);
 
 #if defined(HAVE_POSTGRESQL)
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	tsdb_version = zbx_tsdb_get_version();
+	DBclose();
+
 	if (tsdb_version > 0)
 	{
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
