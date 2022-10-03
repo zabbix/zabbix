@@ -31,6 +31,11 @@ class testAuditlogProxy extends testAuditlogCommon {
 	 */
 	private const PROXYID = 99000;
 
+	/**
+	 * Created proxy ID.
+	 */
+	private static $resourceid;
+
 	public function testAuditlogProxy_Create() {
 		$create = $this->call('proxy.create', [
 			[
@@ -44,7 +49,7 @@ class testAuditlogProxy extends testAuditlogCommon {
 			]
 		]);
 
-		$resourceid = $create['result']['proxyids'][0];
+		self::$resourceid = $create['result']['proxyids'][0];
 
 		$created = json_encode([
 			'proxy.host' => ['add', 'Audit proxy'],
@@ -54,15 +59,15 @@ class testAuditlogProxy extends testAuditlogCommon {
 			'proxy.proxy_address' => ['add', 'localhost'],
 			'proxy.tls_psk_identity' => ['add', '******'],
 			'proxy.tls_psk' => ['add', '******'],
-			'proxy.proxyid' => ['add', $resourceid]
+			'proxy.proxyid' => ['add', self::$resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
+		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid);
 	}
 
 	public function testAuditlogProxy_Update() {
 		$updated = json_encode([
-			'proxy.host' => ['update', 'Updated Audit proxy', 'Api active proxy for delete0'],
+			'proxy.host' => ['update', 'Updated Audit proxy', 'API active proxy for discovery action'],
 			'proxy.description' => ['update', 'Update proxy audit description', ''],
 			'proxy.tls_accept' => ['update', '2', '1'],
 			'proxy.proxy_address' => ['update', 'updated_address', ''],
@@ -86,8 +91,11 @@ class testAuditlogProxy extends testAuditlogCommon {
 		$this->getAuditDetails('details', $this->update_actionid, $updated, self::PROXYID);
 	}
 
+	/**
+	 * @depends testAuditlogProxy_Create
+	 */
 	public function testAuditlogProxy_Delete() {
-		$this->call('proxy.delete', [self::PROXYID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated Audit proxy', self::PROXYID);
+		$this->call('proxy.delete', [self::$resourceid]);
+		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Audit proxy', self::$resourceid);
 	}
 }

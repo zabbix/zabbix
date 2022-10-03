@@ -86,7 +86,7 @@ class testAuditlogMediaType extends testAuditlogCommon {
 		$this->call('mediatype.update', [
 			[
 				'mediatypeid' => self::MEDIATYPEID,
-				'status' => 1,
+				'status' => 0,
 				'name' => 'updated_email_media',
 				'smtp_server' => 'updated_test.test.com',
 				'smtp_helo' => 'updated_test.com',
@@ -112,7 +112,7 @@ class testAuditlogMediaType extends testAuditlogCommon {
 			'mediatype.message_templates[2]' => ['delete'],
 			'mediatype.message_templates[3]' => ['delete'],
 			'mediatype.message_templates[5]' => ['delete'],
-			'mediatype.status' => ['update', '1', '0'],
+			'mediatype.status' => ['update', '0', '1'],
 			'mediatype.name' => ['update', 'updated_email_media', 'Email'],
 			'mediatype.smtp_server' => ['update', 'updated_test.test.com', 'mail.example.com'],
 			'mediatype.smtp_helo' => ['update', 'updated_test.com', 'example.com'],
