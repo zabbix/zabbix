@@ -186,12 +186,14 @@ $form_grid->addItem([
 // Operation message media type row.
 $select_opmessage_mediatype_default = (new CSelect('operation[opmessage][mediatypeid]'))
 	->addOptions(CSelect::createOptionsFromArray($data['media_types']))
-	->setFocusableElementId('operation-opmessage-mediatypeid');
+	->setFocusableElementId('operation-opmessage-mediatypeid')
+	->setValue($operation['opmessage']['mediatypeid'] ?? 0);
 
 $form_grid->addItem([
 	(new CLabel(_('Default media type'), $select_opmessage_mediatype_default->getFocusableElementId()))
 		->setId('operation-message-mediatype-default-label'),
-	(new CFormField($select_opmessage_mediatype_default))->setId('operation-message-mediatype-default')
+	(new CFormField($select_opmessage_mediatype_default))
+		->setId('operation-message-mediatype-default')
 ]);
 
 // Operation message media type row (explicit).
@@ -212,9 +214,8 @@ $form_grid->addItem([
 $form_grid->addItem([
 	(new CLabel(_('Custom message'), 'operation[opmessage][default_msg]'))->setId('operation-message-custom-label'),
 	(new CFormField(
-		(new CCheckBox('operation[opmessage][default_msg]', 0))
-			->setChecked(array_key_exists('default_msg', $operation['opmessage']))
-			->setAttribute('value', array_key_exists('default_msg', $operation['opmessage']) ? 1 : 0)
+		(new CCheckBox('operation[opmessage][default_msg]', $operation['opmessage']['default_msg']))
+			->setChecked((bool) $operation['opmessage']['default_msg'])
 	))->setId('operation-message-custom')
 ]);
 

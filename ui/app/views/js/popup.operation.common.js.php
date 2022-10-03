@@ -44,6 +44,10 @@ window.operation_popup = new class {
 			this._addUser(data?.opmessage_usr, data['opmessage_usr']);
 		}
 
+		this._customMessageFields();
+	}
+
+	_customMessageFields() {
 		$('#operation_opmessage_default_msg')
 			.change(function() {
 				if($('#operation_opmessage_default_msg')[0].checked) {
@@ -55,10 +59,10 @@ window.operation_popup = new class {
 					$('[id="operation-message-body"],[id="operation-message-label"]').hide();
 				}
 			}).trigger('change');
-
 	}
 
 	_loadViews() {
+		this._customMessageFields();
 		this._removeAllFields();
 		const operation_type = document.getElementById('operation-type-select').value;
 		this._changeView(operation_type)
@@ -89,7 +93,6 @@ window.operation_popup = new class {
 	}
 
 	_changeView(operation_type) {
-		// todo : fix operationtype value to num not cmd[]
 		switch (operation_type) {
 			case 'cmd[0]':
 				this._sendMessageFields();
@@ -123,24 +126,22 @@ window.operation_popup = new class {
 	}
 
 	_allInvolvedFields() {
+		this._customMessageFields();
 		const fields = [
 			'operation-message-custom-label', 'operation-message-custom', 'operation-message-subject',
-			'operation-message-body', 'opmessage', 'operation-message-subject-label', 'operation_opmessage_default_msg',
-			'operation-message-mediatype-default'
+			'operation-message-body', 'opmessage', 'operation-message-subject-label', 'operation_opmessage_default_msg'
 		]
 
 		this._enableFormFields(fields);
-		this._addCustomMessageFields();
 	}
 
 	_allInvolvedFieldsUpdate() {
 		const fields = [
-			'operation-message-custom-label', 'operation-message-custom', 'operation-message-mediatype-default-label',
-			'operation-message-mediatype-default', 'operation-message-subject', 'operation-message-body'
+			'operation-message-custom-label', 'operation-message-custom', 'operation-message-subject',
+			'operation-message-body', 'operation_opmessage_default_msg', 'operation-message-mediatype-default'
 		]
-
+		this._customMessageFields();
 		this._enableFormFields(fields);
-		this._addCustomMessageFields();
 	}
 
 	_hostGroupFields() {
@@ -232,14 +233,16 @@ window.operation_popup = new class {
 
 		switch (this.eventsource) {
 			case <?= EVENT_SOURCE_TRIGGERS ?>:
-				this.fields = ['operation-condition-table',
-					'operation-condition-list-label', 'operation-condition-list', 'step-from', 'operation-step-range',
-					'operation-step-duration', 'operation-message-notice', 'operation-message-user-groups',
-					'operation-message-notice', 'operation-message-users', 'operation-message-mediatype-only',
-					'operation-message-custom', 'operation_esc_period', 'operation-message-custom-label',
-					'operation_opmessage_default_msg', 'operation-type', 'operation-condition-row',
-					'operation-condition-evaltype-formula', 'operation-evaltype-label', 'operation-evaltype'
+				this.fields = [
+					'operation-condition-table', 'operation-condition-list-label', 'operation-condition-list',
+					'step-from', 'operation-step-range', 'operation-step-duration', 'operation-message-notice',
+					'operation-message-user-groups', 'operation-message-notice', 'operation-message-users',
+					'operation-message-mediatype-only', 'operation-message-custom', 'operation_esc_period',
+					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
+					'operation-condition-row', 'operation-condition-evaltype-formula', 'operation-evaltype-label',
+					'operation-evaltype'
 				]
+				this._customMessageFields();
 				this._processTypeOfCalculation();
 				break;
 			case <?= EVENT_SOURCE_INTERNAL ?>:
@@ -251,6 +254,7 @@ window.operation_popup = new class {
 					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
 					'operation-message-subject', 'operation-message-body'
 				]
+				this._customMessageFields();
 				break;
 			case <?= EVENT_SOURCE_DISCOVERY ?>:
 			case <?= EVENT_SOURCE_AUTOREGISTRATION ?>:
@@ -260,11 +264,11 @@ window.operation_popup = new class {
 					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
 					'operation-message-notice'
 				]
+				this._customMessageFields();
 				break;
 		}
 
 		this._enableFormFields(this.fields);
-		this._addCustomMessageFields();
 	}
 
 	_enableFormFields(fields = []) {
@@ -563,25 +567,6 @@ window.operation_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
-	}
-
-	_addCustomMessageFields() {
-		//// todo : check if these are needed
-
-		//$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
-		//$('[id="operation-message-body"],[id="operation-message-label"]').hide();
-
-		//$('#operation_opmessage_default_msg')
-		//	.change(function() {
-		//		if($('#operation_opmessage_default_msg')[0].checked) {
-		//			$('[id="operation-message-subject"],[id="operation-message-subject-label"]').show().attr('disabled', false);
-		//			$('[id="operation-message-body"],[id="operation-message-label"]').show().attr('disabled', false);
-		//		}
-		//		else {
-		//			$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide().attr('disabled', true);
-		//			$('[id="operation-message-body"],[id="operation-message-label"]').hide().attr('disabled', true);
-		//		}
-		//	})
 	}
 
 	_processTypeOfCalculation() {

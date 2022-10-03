@@ -173,6 +173,12 @@ class CControllerActionCreate extends CController {
 					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
 						unset($operation['opmessage']);
 					}
+
+					if ($operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
+						if (!array_key_exists('default_msg', $operation['opmessage'])) {
+							$operation['opmessage']['default_msg'] = 0;
+						}
+					}
 				}
 				else if ($operation_group === 'update_operations') {
 					if(array_key_exists('evaltype', $operation)) {

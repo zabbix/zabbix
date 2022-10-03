@@ -91,7 +91,6 @@ window.action_edit_popup = new class {
 		});
 	}
 
-
 	_openOperationPopup(eventsource, recovery_phase, actionid) {
 		this.recovery = recovery_phase;
 		const parameters = {
@@ -250,6 +249,7 @@ window.action_edit_popup = new class {
 			this.operation_row.append(details);
 
 			this.addOperationsData(input);
+			this.operation_row.append(this._createActionCell(input));
 
 			if (row_id) {
 				$(`#${row_id}`).replaceWith(this.operation_row);

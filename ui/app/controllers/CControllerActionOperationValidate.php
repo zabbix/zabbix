@@ -140,7 +140,7 @@ class CControllerActionOperationValidate extends CController {
 			case OPERATION_TYPE_COMMAND:
 				// todo : find how to add this!!!
 				// todo : remove. just for testing
-				$operation['opcommand'] = ['scriptid' => 4];
+				$operation['opcommand'] = ['scriptid' => 6];
 
 				if (!array_key_exists('scriptid', $operation['opcommand']) || !$operation['opcommand']['scriptid']) {
 					error(_('No script specified for action operation command.'));
@@ -332,8 +332,6 @@ class CControllerActionOperationValidate extends CController {
 					break;
 
 				case OPERATION_TYPE_COMMAND:
-					// todo : add opcommand_hst or opcommand_grp!!!
-
 					if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
 						foreach ($operation['opcommand_hst'] as $host) {
 							if ($host['hostid'] != 0) {
@@ -403,7 +401,7 @@ class CControllerActionOperationValidate extends CController {
 						}
 					}
 
-					$scriptids[$operation['opcommand']['scriptid']] = true;
+					$scriptids[$operation['operationtype']] = true;
 					break;
 			}
 		}
@@ -521,7 +519,8 @@ class CControllerActionOperationValidate extends CController {
 					break;
 
 				case OPERATION_TYPE_COMMAND:
-					$scriptid = $operation['opcommand']['scriptid'];
+
+					$scriptid = $operation['operationtype'];
 
 					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
 						$result['type'][] = [_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])];
@@ -534,7 +533,7 @@ class CControllerActionOperationValidate extends CController {
 
 						foreach ($operation['opcommand_hst'] as $host) {
 							if ($host['hostid'] == 0) {
-								$result['type'] = [_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])];
+								$result['type'][] = (_s('Run script "%1$s" on current host', $scripts[$scriptid]['name']));
 							}
 							elseif (isset($hosts[$host['hostid']])) {
 								$host_list[] = $hosts[$host['hostid']]['name'];
@@ -543,6 +542,8 @@ class CControllerActionOperationValidate extends CController {
 
 						if ($host_list) {
 							order_result($host_list);
+
+							// todo : pass script name
 
 							$result['type'][] = _s('Run script "%1$s" on hosts', $scripts[$scriptid]['name'].': ');
 							$result['data'][] = [implode(', ', $host_list)];
@@ -694,7 +695,6 @@ class CControllerActionOperationValidate extends CController {
 								$host_list[] = $hosts[$host['hostid']]['name'];
 							}
 						}
-
 						if ($host_list) {
 							order_result($host_list);
 
@@ -713,7 +713,6 @@ class CControllerActionOperationValidate extends CController {
 						}
 
 						order_result($host_group_list);
-
 						$result['type'][] = _s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': ';
 						$result['data'][] = [implode(', ', $host_group_list)];
 					}

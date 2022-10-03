@@ -364,7 +364,7 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 								'data' => $operation
 							])),
 						[
-							(new CButton('remove', _('Removeee')))
+							(new CButton('remove', _('Remove')))
 								->setAttribute('data-operationid', $operationid)
 								->addClass('js-remove-button')
 								->addClass(ZBX_STYLE_BTN_LINK)

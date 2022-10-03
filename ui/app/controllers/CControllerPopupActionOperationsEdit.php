@@ -26,8 +26,13 @@
 class CControllerPopupActionOperationsEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
-			'eventsource' => 'required|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE]),
-			'recovery' => 'required|in '.implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION]),
+			'eventsource' => 'required|in '.implode(',', [
+				EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL,
+				EVENT_SOURCE_SERVICE
+			]),
+			'recovery' => 'required|in '.implode(',', [
+				ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION
+			]),
 			'actionid' => 'db actions.actionid',
 			'operation' => 'array',
 			'operationid' => 'string',
@@ -105,7 +110,6 @@ class CControllerPopupActionOperationsEdit extends CController {
 			'media_types' => $media_type,
 		];
 
-
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
@@ -177,7 +181,6 @@ class CControllerPopupActionOperationsEdit extends CController {
 			]
 		];
 	}
-
 
 	/**
 	 * Returns "operation type" configuration fields for given operation in given source.
