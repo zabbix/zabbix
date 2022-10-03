@@ -6417,7 +6417,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_ITEM_DELAY],
 				-1,
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": value must be one of 0:'.SEC_PER_DAY.'.'
+				'Invalid parameter "/1/item_delay": value must be one of 0-'.SEC_PER_DAY.'.'
 			],
 			[
 				['type' => API_ITEM_DELAY],
@@ -6447,7 +6447,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_ITEM_DELAY],
 				SEC_PER_DAY + 1,
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": value must be one of 0:'.SEC_PER_DAY.'.'
+				'Invalid parameter "/1/item_delay": value must be one of 0-'.SEC_PER_DAY.'.'
 			],
 			[
 				['type' => API_ITEM_DELAY],
