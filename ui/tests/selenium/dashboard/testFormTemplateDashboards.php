@@ -445,8 +445,8 @@ class testFormTemplateDashboards extends CWebTest {
 					break;
 
 				case 'multiselect':
-					$default_value = [];
-					$this->assertEquals($default_value, array_values($field->getValue()));
+					$default_value = '';
+					$this->assertEquals($default_value, $field->getValue());
 					$this->assertEquals('type here to search', $field->query('xpath:.//input')->one()->getAttribute('placeholder'));
 					break;
 
@@ -1159,7 +1159,6 @@ class testFormTemplateDashboards extends CWebTest {
 	 * @param string	$check			Action that should be checked.
 	 */
 	private function checkSettings($data, $old_values, $status = 'created', $check = 'dashboard action') {
-//		$this->setNetworkThrottlingMode(self::NETWORK_THROTTLING_SLOW);
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if (CTestArrayHelper::get($data, 'check_save')) {
 				$this->query('button:Save changes')->one()->click();
