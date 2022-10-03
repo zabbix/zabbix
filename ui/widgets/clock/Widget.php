@@ -34,8 +34,8 @@ class Widget extends CWidget {
 	public const TIMEZONE_FULL = 1;
 
 	// Clock time format.
-	public const HOUR_TWENTY_FOUR = 0;
-	public const HOUR_TWELVE = 1;
+	public const HOUR_24 = 0;
+	public const HOUR_12 = 1;
 
 	// Form blocks.
 	public const SHOW_DATE = 1;

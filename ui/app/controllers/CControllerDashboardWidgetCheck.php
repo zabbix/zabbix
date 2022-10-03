@@ -43,16 +43,16 @@ class CControllerDashboardWidgetCheck extends CController {
 			$this->widget = APP::ModuleManager()->getWidget($this->getInput('type'));
 
 			if ($this->widget === null) {
-				error(_('Not supported widget.'));
+				error(_('Widget not supported.'));
 
 				$ret = false;
 			}
+		}
 
-			if ($this->hasInput('templateid') && !$this->widget->isSupportedInTemplate()) {
-				error(_('Widget type is not supported in this context.'));
+		if ($ret && $this->hasInput('templateid') && !$this->widget->isSupportedInTemplate()) {
+			error(_('Widget type is not supported in this context.'));
 
-				$ret = false;
-			}
+			$ret = false;
 		}
 
 		if (!$ret) {

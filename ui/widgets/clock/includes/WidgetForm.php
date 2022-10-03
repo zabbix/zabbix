@@ -116,9 +116,9 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('time_format', _('Format'), [
-					Widget::HOUR_TWENTY_FOUR => _('24-hour'),
-					Widget::HOUR_TWELVE => _('12-hour')
-				]))->setDefault(Widget::HOUR_TWENTY_FOUR)
+					Widget::HOUR_24 => _('24-hour'),
+					Widget::HOUR_12 => _('12-hour')
+				]))->setDefault(Widget::HOUR_24)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('tzone_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))

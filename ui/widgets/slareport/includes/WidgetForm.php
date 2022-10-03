@@ -21,10 +21,12 @@
 
 namespace Widgets\SlaReport\Includes;
 
-use API;
-use CAbsoluteTimeParser;
-use CParser;
-use CTimezoneHelper;
+use API,
+	CAbsoluteTimeParser,
+	CParser,
+	CTimezoneHelper,
+	DateTimeZone;
+
 use Zabbix\Widgets\{
 	CWidgetField,
 	CWidgetForm
@@ -36,7 +38,6 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldMultiSelectService,
 	CWidgetFieldMultiSelectSla
 };
-use DateTimeZone;
 
 /**
  * SLA report widget form.

@@ -60,7 +60,7 @@ class CControllerDashboardWidgetsSanitize extends CController {
 				$widget = APP::ModuleManager()->getWidget($widget_input['type']);
 
 				if ($widget === null) {
-					error(_('Not supported widget.'));
+					error(_('Widget not supported.'));
 
 					$ret = false;
 

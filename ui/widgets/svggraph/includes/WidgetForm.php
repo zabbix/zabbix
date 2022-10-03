@@ -21,10 +21,10 @@
 
 namespace Widgets\SvgGraph\Includes;
 
-use CNumberParser;
-use CParser;
-use CRangeTimeParser;
-use CSettingsHelper;
+use CNumberParser,
+	CParser,
+	CRangeTimeParser,
+	CSettingsHelper;
 
 use Zabbix\Widgets\{
 	CWidgetField,
