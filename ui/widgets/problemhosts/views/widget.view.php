@@ -127,7 +127,7 @@ foreach ($data['groups'] as $group) {
 
 		case EXTACK_OPTION_BOTH:
 			if ($group['hosts_problematic_count'] != 0) {
-				$unack_span = ($last_unack_count !== null) ? [$last_unack_count, ' '._('of').' '] : null;
+				$unack_span = $last_unack_count !== null ? [$last_unack_count, ' '._('of').' '] : null;
 				$group_row[] = (new CCol([$unack_span, $problematic_count]))
 					->addClass(CSeverityHelper::getStyle((int) $group['highest_severity']));
 			}
@@ -153,18 +153,6 @@ foreach ($data['groups'] as $group) {
 	$table->addRow($group_row);
 }
 
-$output = [
-	'name' => $data['name'],
-	'body' => $table->toString()
-];
-
-if ($messages = get_and_clear_messages()) {
-	$output['messages'] = array_column($messages, 'message');
-}
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output, JSON_THROW_ON_ERROR);
+(new CWidgetView($data))
+	->addItem($table)
+	->show();

@@ -100,18 +100,6 @@ else {
 	} while ($history_item !== null && $table->getNumRows() < $data['show_lines']);
 }
 
-$output = [
-	'name' => $data['name'],
-	'body' => $table->toString()
-];
-
-if ($messages = get_and_clear_messages()) {
-	$output['messages'] = array_column($messages, 'message');
-}
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output, JSON_THROW_ON_ERROR);
+(new CWidgetView($data))
+	->addItem($table)
+	->show();

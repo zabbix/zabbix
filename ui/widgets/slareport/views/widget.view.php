@@ -130,18 +130,6 @@ else {
 	}
 }
 
-$output = [
-	'name' => $data['name'],
-	'body' => (new CDiv($report))->addClass('dashboard-widget-slareport')->toString()
-];
-
-if ($messages = get_and_clear_messages()) {
-	$output['messages'] = array_column($messages, 'message');
-}
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output, JSON_THROW_ON_ERROR);
+(new CWidgetView($data))
+	->addItem((new CDiv($report))->addClass('dashboard-widget-slareport'))
+	->show();

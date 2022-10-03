@@ -148,20 +148,8 @@ foreach ($data['rows'] as $columns) {
 	$table->addRow($row);
 }
 
-$output = [
-	'name' => $data['name'],
-	'body' => (new CDiv($table))
-		->addClass('dashboard-widget-tophosts')
-		->toString()
-];
-
-if ($messages = get_and_clear_messages()) {
-	$output['messages'] = array_column($messages, 'message');
-}
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output, JSON_THROW_ON_ERROR);
+(new CWidgetView($data))
+	->addItem(
+		(new CDiv($table))->addClass('dashboard-widget-tophosts')
+	)
+	->show();

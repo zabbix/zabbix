@@ -26,25 +26,9 @@
  * @var array $data
  */
 
-if ($data['style'] == STYLE_TOP) {
-	$table = (new CPartial('trigoverview.table.top', $data))->getOutput();
-}
-else {
-	$table = (new CPartial('trigoverview.table.left', $data))->getOutput();
-}
-
-$output = [
-	'name' => $data['name'],
-	'body' => $table
-];
-
-if ($messages = get_and_clear_messages()) {
-	$output['messages'] = array_column($messages, 'message');
-}
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output, JSON_THROW_ON_ERROR);
+(new CWidgetView($data))
+	->addItem($data['style'] == STYLE_TOP
+		? (new CPartial('trigoverview.table.top', $data))->getOutput()
+		: (new CPartial('trigoverview.table.left', $data))->getOutput()
+	)
+	->show();

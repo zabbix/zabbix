@@ -26,30 +26,16 @@
  * @var array $data
  */
 
-$output = [
-	'body' => $data['svg']
-];
+$view = (new CWidgetView($data))->addItem($data['svg']);
 
 if (!$data['preview']) {
-	$output += [
-		'name' => $data['name'],
-		'svg_options' => $data['svg_options']
-	];
+	$view
+		->setVar('name', $data['name'])
+		->setVar('svg_options', $data['svg_options']);
 
 	if ($data['info'] !== null) {
-		$output += [
-			'info' => $data['info']
-		];
+		$view->setVar('info', $data['info']);
 	}
 }
 
-if ($messages = get_and_clear_messages()) {
-	$output['messages'] = array_column($messages, 'message');
-}
-
-if (!$data['preview'] && $data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output, JSON_THROW_ON_ERROR);
+$view->show();

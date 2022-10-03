@@ -26,33 +26,24 @@
  * @var array $data
  */
 
-$output = [
-	'name' => $data['name']
-];
+$view = new CWidgetView($data);
 
 if ($data['is_resource_available']) {
-	$link_url = $data['widget']['graph_url'] ?? 'javascript:void(0)';
-
-	$output['body'] = (new CDiv())
-		->addClass('flickerfreescreen')
-		->addItem((new CLink(null, $link_url))->addClass(ZBX_STYLE_DASHBOARD_WIDGET_GRAPH_LINK))
-		->toString();
-
-	$output['async_data'] = $data['widget'];
+	$view
+		->addItem(
+			(new CDiv())
+				->addClass('flickerfreescreen')
+				->addItem(
+					(new CLink(null, $data['widget']['graph_url'] ?? 'javascript:void(0)'))
+					->addClass(ZBX_STYLE_DASHBOARD_WIDGET_GRAPH_LINK)
+				)
+		)
+		->setVar('async_data', $data['widget']);
 }
 else {
-	$output['body'] = (new CTableInfo())
-		->setNoDataMessage(_('No permissions to referred object or it does not exist!'))
-		->toString();
+	$view->addItem(
+		(new CTableInfo())->setNoDataMessage(_('No permissions to referred object or it does not exist!'))
+	);
 }
 
-if ($messages = get_and_clear_messages()) {
-	$output['messages'] = array_column($messages, 'message');
-}
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
-
-echo json_encode($output, JSON_THROW_ON_ERROR);
+$view->show();

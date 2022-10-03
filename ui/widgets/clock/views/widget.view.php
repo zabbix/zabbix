@@ -28,13 +28,10 @@
 
 use Widgets\Clock\Widget;
 
-if ($data['clock_data']['critical_error'] !== null) {
-	$item = (new CTableInfo())->setNoDataMessage($data['clock_data']['critical_error']);
+$view = new CWidgetView($data);
 
-	$output = [
-		'name' => $data['name'],
-		'body' => $item->toString()
-	];
+if ($data['clock_data']['critical_error'] !== null) {
+	$body = (new CTableInfo())->setNoDataMessage($data['clock_data']['critical_error']);
 }
 else {
 	if ($data['clock_data']['type'] == Widget::TYPE_DIGITAL) {
@@ -99,22 +96,9 @@ else {
 		$body = (new CClock())->setEnabled($data['clock_data']['is_enabled']);
 	}
 
-	$output = [
-		'name' => $data['name'],
-		'body' => $body->toString(),
-		'clock_data' => $data['clock_data']
-	];
+	$view->setVar('clock_data', $data['clock_data']);
 }
 
-if ($messages = get_and_clear_messages()) {
-	$output['messages'] = array_column($messages, 'message');
-}
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()
-		->make()
-		->toString();
-}
-
-echo json_encode($output, JSON_THROW_ON_ERROR);
+$view
+	->addItem($body)
+	->show();
