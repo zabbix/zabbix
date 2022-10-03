@@ -51,9 +51,7 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_TIME_SIZE = 30;
 	private const DEFAULT_TIMEZONE_SIZE = 20;
 
-	protected function addFields(): self {
-		parent::addFields();
-
+	public function addFields(): self {
 		$time_type = array_key_exists('time_type', $this->values) ? $this->values['time_type'] : null;
 
 		return $this

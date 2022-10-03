@@ -103,9 +103,7 @@ class WidgetForm extends CWidgetForm {
 		return $errors;
 	}
 
-	protected function addFields(): self {
-		parent::addFields();
-
+	public function addFields(): self {
 		return $this
 			->addField(
 				(new CWidgetFieldMultiSelectSla('slaid', _('SLA')))

@@ -31,7 +31,7 @@ use API,
 	CSettingsHelper,
 	Manager;
 
-use Widgets\TopHosts\Includes\WidgetForm;
+use Widgets\TopHosts\Widget;
 
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
@@ -104,7 +104,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		);
 
-		if ($values['order'] == WidgetForm::ORDER_TOP_N) {
+		if ($values['order'] == Widget::ORDER_TOP_N) {
 			if ($master_items_only_numeric_present) {
 				arsort($master_item_values, SORT_NUMERIC);
 

@@ -25,6 +25,8 @@ use APP,
 	CControllerDashboardWidgetView,
 	CControllerResponseData;
 
+use Widgets\ProblemsBySv\Widget;
+
 require_once APP::getRootDir().'/include/blocks.inc.php';
 
 class WidgetView extends CControllerDashboardWidgetView {
@@ -61,7 +63,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$data = getSystemStatusData($filter);
 
-		if ($filter['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS) {
+		if ($filter['show_type'] == Widget::SHOW_TOTALS) {
 			$data['groups'] = getSystemStatusTotals($data);
 		}
 

@@ -38,9 +38,7 @@ use Zabbix\Widgets\Fields\{
  */
 class WidgetForm extends CWidgetForm {
 
-	protected function addFields(): self {
-		parent::addFields();
-
+	public function addFields(): self {
 		$this->addField(
 			(new CWidgetFieldRadioButtonList('source_type', _('Source'), [
 				ZBX_WIDGET_FIELD_RESOURCE_GRAPH => _('Graph'),

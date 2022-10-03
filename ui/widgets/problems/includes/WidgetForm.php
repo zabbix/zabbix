@@ -55,9 +55,7 @@ class WidgetForm extends CWidgetForm {
 		return $values;
 	}
 
-	protected function addFields(): self {
-		parent::addFields();
-
+	public function addFields(): self {
 		return $this
 			->addField(
 				(new CWidgetFieldRadioButtonList('show', _('Show'), [

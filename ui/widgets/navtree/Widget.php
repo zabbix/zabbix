@@ -25,5 +25,5 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
-	// TODO AS: has padding
+	// TODO AS: reference
 }

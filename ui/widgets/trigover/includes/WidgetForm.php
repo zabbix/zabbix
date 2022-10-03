@@ -37,8 +37,6 @@ use Zabbix\Widgets\Fields\{
 class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
-		parent::addFields();
-
 		return $this
 			->addField(
 				(new CWidgetFieldRadioButtonList('show', _('Show'), [

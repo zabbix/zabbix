@@ -25,8 +25,11 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
+	public const SHOW_GROUPS = 0;
+	public const SHOW_TOTALS = 1;
+
 	public function hasPadding(array $values, int $view_mode): bool {
 		return $view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL
-			&& $values['show_type'] != WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS;
+			&& $values['show_type'] != self::SHOW_TOTALS;
 	}
 }

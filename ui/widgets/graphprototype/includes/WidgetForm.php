@@ -42,9 +42,7 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_COLUMNS_COUNT = 2;
 	private const DEFAULT_ROWS_COUNT = 1;
 
-	protected function addFields(): self {
-		parent::addFields();
-
+	public function addFields(): self {
 		$this->addField(
 			(new CWidgetFieldRadioButtonList('source_type', _('Source'), [
 				ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),

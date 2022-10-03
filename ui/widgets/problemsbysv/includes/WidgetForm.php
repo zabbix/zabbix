@@ -36,14 +36,14 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldTextBox
 };
 
+use Widgets\ProblemsBySv\Widget;
+
 /**
  * Problems by severity widget form.
  */
 class WidgetForm extends CWidgetForm {
 
-	protected function addFields(): self {
-		parent::addFields();
-
+	public function addFields(): self {
 		return $this
 			->addField(
 				new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
@@ -71,9 +71,9 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('show_type', _('Show'), [
-					WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS => _('Host groups'),
-					WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS => _('Totals')
-				]))->setDefault(WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS)
+					Widget::SHOW_GROUPS => _('Host groups'),
+					Widget::SHOW_TOTALS => _('Totals')
+				]))->setDefault(Widget::SHOW_GROUPS)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('layout', _('Layout'), [
@@ -83,7 +83,7 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(STYLE_HORIZONTAL)
 					->setFlags(
 						!array_key_exists('show_type', $this->values)
-							|| !$this->values['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS
+							|| !$this->values['show_type'] == Widget::SHOW_TOTALS
 						? CWidgetField::FLAG_DISABLED
 						: 0x00
 					)
@@ -102,7 +102,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('hide_empty_groups', _('Hide groups without problems')))
 					->setFlags(
 						array_key_exists('show_type', $this->values)
-							&& $this->values['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS
+							&& $this->values['show_type'] == Widget::SHOW_TOTALS
 						? CWidgetField::FLAG_DISABLED
 						: 0x00
 					)

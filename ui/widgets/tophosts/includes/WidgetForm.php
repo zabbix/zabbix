@@ -36,13 +36,12 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldTags
 };
 
+use Widgets\TopHosts\Widget;
+
 /**
  * Top hosts data widget form.
  */
 class WidgetForm extends CWidgetForm {
-
-	public const ORDER_TOP_N = 2;
-	public const ORDER_BOTTOM_N = 3;
 
 	private const DEFAULT_HOSTS_COUNT = 10;
 
@@ -96,9 +95,7 @@ class WidgetForm extends CWidgetForm {
 		return $values;
 	}
 
-	protected function addFields(): self {
-		parent::addFields();
-
+	public function addFields(): self {
 		return $this
 			->addField(
 				new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
@@ -120,9 +117,9 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('order', _('Order'), [
-					self::ORDER_TOP_N => _('Top N'),
-					self::ORDER_BOTTOM_N => _('Bottom N')
-				]))->setDefault(self::ORDER_TOP_N)
+					Widget::ORDER_TOP_N => _('Top N'),
+					Widget::ORDER_BOTTOM_N => _('Bottom N')
+				]))->setDefault(Widget::ORDER_TOP_N)
 			)
 			->addField(
 				(new CWidgetFieldSelect('column', _('Order column'), $this->field_column_values))

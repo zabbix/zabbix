@@ -30,14 +30,13 @@ use Zabbix\Widgets\Fields\CWidgetFieldRadioButtonList;
  */
 class WidgetForm extends CWidgetForm {
 
-	protected function addFields(): self {
-		parent::addFields();
-
-		return $this->addField(
-			(new CWidgetFieldRadioButtonList('info_type', _('Show'), [
-				ZBX_SYSTEM_INFO_SERVER_STATS => _('System stats'),
-				ZBX_SYSTEM_INFO_HAC_STATUS => _('High availability nodes')
-			]))->setDefault(ZBX_SYSTEM_INFO_SERVER_STATS)
-		);
+	public function addFields(): self {
+		return $this
+			->addField(
+				(new CWidgetFieldRadioButtonList('info_type', _('Show'), [
+					ZBX_SYSTEM_INFO_SERVER_STATS => _('System stats'),
+					ZBX_SYSTEM_INFO_HAC_STATUS => _('High availability nodes')
+				]))->setDefault(ZBX_SYSTEM_INFO_SERVER_STATS)
+			);
 	}
 }

@@ -36,9 +36,7 @@ use Zabbix\Widgets\Fields\{
  */
 class WidgetForm extends CWidgetForm {
 
-	protected function addFields(): self {
-		parent::addFields();
-
+	public function addFields(): self {
 		return $this
 			->addField(
 				(new CWidgetFieldUrl('url', _('URL')))

@@ -122,9 +122,6 @@ define('EXTACK_OPTION_ALL',		0);
 define('EXTACK_OPTION_UNACK',	1);
 define('EXTACK_OPTION_BOTH',	2);
 
-define('WIDGET_PROBLEMS_BY_SV_SHOW_GROUPS',	0);
-define('WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS',	1);
-
 define('TRIGGERS_OPTION_RECENT_PROBLEM',	1);
 define('TRIGGERS_OPTION_ALL',				2);
 define('TRIGGERS_OPTION_IN_PROBLEM',		3);
@@ -1617,7 +1614,7 @@ define('WIDGET_ITEM',				'item');
 define('WIDGET_DATA_OVER',			'dataover');
 
 // Item widget object positions.
-define('WIDGET_ITEM_POS_LEFT',		0);
+define('WIDGET_ITEM_POS_LEFT',		0); // TODO AS: move to widget
 define('WIDGET_ITEM_POS_CENTER',	1);
 define('WIDGET_ITEM_POS_RIGHT',		2);
 
@@ -1657,7 +1654,7 @@ define('WIDGET_SIMPLE_ITEM',	0);
 define('WIDGET_DYNAMIC_ITEM',	1);
 
 // item widget blocks
-define('WIDGET_ITEM_SHOW_DESCRIPTION',		1);
+define('WIDGET_ITEM_SHOW_DESCRIPTION',		1); // TODO AS: move to widget
 define('WIDGET_ITEM_SHOW_VALUE',			2);
 define('WIDGET_ITEM_SHOW_TIME',				3);
 define('WIDGET_ITEM_SHOW_CHANGE_INDICATOR',	4);
@@ -1688,7 +1685,7 @@ define('ZBX_WIDGET_VIEW_MODE_NORMAL',			0);
 define('ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER',	1);
 
 // top hosts widget
-define('ZBX_WIDGET_TOP_HOSTS_DEFAULT_FILL',	'#97AAB3');
+define('ZBX_WIDGET_TOP_HOSTS_DEFAULT_FILL',	'#97AAB3'); // TODO AS: move to widget
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");

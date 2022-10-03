@@ -25,6 +25,8 @@ use CControllerDashboardWidgetEdit;
 
 use Zabbix\Widgets\CWidgetForm;
 
+use Zabbix\Widgets\Fields\CWidgetFieldSelect;
+
 /**
  * Base class for user modules. If Module.php is not provided by user module, this class will be instantiated instead.
  */
@@ -44,7 +46,34 @@ class CWidget extends CModule {
 			? implode('\\', [$this->getRootNamespace(), $this->getNamespace(), 'Includes', $form_class])
 			: CWidgetForm::class;
 
-		return new $form_class($values, $templateid);
+		$form = new $form_class($values, $templateid);
+
+		if ($templateid === null) {
+			$refresh_rates = [
+				0 => _('No refresh'),
+				SEC_PER_MIN / 6 => _n('%1$s second', '%1$s seconds', 10),
+				SEC_PER_MIN / 2 => _n('%1$s second', '%1$s seconds', 30),
+				SEC_PER_MIN => _n('%1$s minute', '%1$s minutes', 1),
+				SEC_PER_MIN * 2 => _n('%1$s minute', '%1$s minutes', 2),
+				SEC_PER_MIN * 10 => _n('%1$s minute', '%1$s minutes', 10),
+				SEC_PER_MIN * 15 => _n('%1$s minute', '%1$s minutes', 15)
+			];
+
+			$default_refresh_rate_label = array_key_exists($this->getDefaultRefreshRate(), $refresh_rates)
+				? $refresh_rates[$this->getDefaultRefreshRate()]
+				: $this->getDefaultRefreshRate();
+
+			$form->addField(
+				new CWidgetFieldSelect('rf_rate', _('Refresh interval'), [
+						CWidgetFieldSelect::DEFAULT_VALUE => _('Default').' ('.$default_refresh_rate_label.')'
+					] + $refresh_rates
+				)
+			);
+		}
+
+		return $form
+			->addFields()
+			->setFieldsValues();
 	}
 
 	final public function getActions(): array {

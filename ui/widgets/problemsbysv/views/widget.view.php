@@ -26,7 +26,9 @@
  * @var array $data
  */
 
-if ($data['filter']['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS) {
+use Widgets\ProblemsBySv\Widget;
+
+if ($data['filter']['show_type'] == Widget::SHOW_TOTALS) {
 	$table = makeSeverityTotals($data)
 		->addClass(ZBX_STYLE_BY_SEVERITY_WIDGET)
 		->addClass(ZBX_STYLE_TOTALS_LIST)

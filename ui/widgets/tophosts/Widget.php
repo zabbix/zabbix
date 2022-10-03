@@ -19,27 +19,12 @@
 **/
 
 
-use Widgets\ProblemsBySv\Widget;
+namespace Widgets\TopHosts;
 
-?>
+use Zabbix\Core\CWidget;
 
-window.widget_problemsbysv_form = new class {
+class Widget extends CWidget {
 
-	init() {
-		this._show_type = document.getElementById('show_type');
-		this._show_type.addEventListener('change', () => this.updateForm());
-
-		this.updateForm();
-	}
-
-	updateForm() {
-		const show_type_totals = this._show_type
-			.querySelector('input:checked').value == <?= Widget::SHOW_TOTALS ?>;
-
-		document.getElementById('hide_empty_groups').disabled = !show_type_totals;
-
-		for (const radio of document.querySelectorAll('#layout input')) {
-			radio.disabled = !show_type_totals;
-		}
-	}
-};
+	public const ORDER_TOP_N = 2;
+	public const ORDER_BOTTOM_N = 3;
+}

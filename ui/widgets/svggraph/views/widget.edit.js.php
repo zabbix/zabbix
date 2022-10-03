@@ -20,6 +20,7 @@
 
 
 use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
+
 ?>
 
 window.widget_svggraph_form = new class {
