@@ -77,7 +77,7 @@ class testFormApiTokens extends CWebTest {
 
 		// Check the presence of User field and that it is empty by default if it exists.
 		if ($source === 'administration') {
-			$this->assertEquals([], $form->getField('User')->getValue());
+			$this->assertEquals('', $form->getField('User')->getValue());
 		}
 		else {
 			$this->assertFalse($form->query('xpath://label[text()="User"]')->one(false)->isDisplayed());

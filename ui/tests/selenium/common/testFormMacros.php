@@ -513,7 +513,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
 		if ($update) {
 			if ($host_type === 'host') {
-				$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+				$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 				$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
 				$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
@@ -531,7 +531,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 		else {
 			if ($host_type === 'host') {
-				$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+				$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 				$this->query('button:Create host')->one()->waitUntilClickable()->click();
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
