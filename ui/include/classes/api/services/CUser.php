@@ -1456,10 +1456,7 @@ class CUser extends CApiService {
 			]);
 
 			if ($idp_user_data['usrgrps']) {
-				self::$userData = CProvisioning::API_USER;
 				$new_user = $this->createProvisionedUser($idp_user_data);
-				self::$userData = null;
-
 				$user_data = $this->findAccessibleUser($new_user['username'], true, ZBX_AUTH_LDAP, false);
 			}
 		}
@@ -1525,9 +1522,7 @@ class CUser extends CApiService {
 					]);
 
 					if (CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])) {
-						self::$userData = CProvisioning::API_USER;
 						$upd_user = $this->updateProvisionedUser($db_user['userid'], $idp_user_data);
-						self::$userData = null;
 
 						if (!$upd_user) {
 							$db_user = [];
@@ -1704,7 +1699,7 @@ class CUser extends CApiService {
 				'where' => ['sessionid' => $sessionid]
 			]);
 
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
+			return [];
 		}
 
 		if ($session['extend'] && $time != $db_session['lastaccess']) {
@@ -1718,7 +1713,18 @@ class CUser extends CApiService {
 
 		if (CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])
 				&& CAuthenticationHelper::isTimeToProvision($db_user['ts_provisioned'])) {
-			$this->provisionLdapUser($db_user);
+			if (!$this->provisionLdapUser($db_user)) {
+				DB::delete('sessions', [
+					'status' => ZBX_SESSION_PASSIVE,
+					'userid' => $db_user['userid']
+				]);
+				DB::update('sessions', [
+					'values' => ['status' => ZBX_SESSION_PASSIVE],
+					'where' => ['sessionid' => $sessionid]
+				]);
+
+				return [];
+			}
 		}
 
 		return $db_user;
@@ -2184,13 +2190,15 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * For user provisioned by IDP_TYPE_LDAP update user provisioned attributes.
+	 * For user provisioned by IDP_TYPE_LDAP update user provisioned attributes. Will return empty array
+	 * when user is deprovisioned.
 	 *
 	 * @param array  $user_data
 	 * @param int    $user_data['userid']
 	 * @param string $user_data['username']
+	 * @return array
 	 */
-	protected function provisionLdapUser(array $user_data) {
+	protected function provisionLdapUser(array $user_data): array {
 		[$userdirectory] = API::UserDirectory()->get([
 			'output' => ['provision_status', 'idp_type'],
 			'userdirectoryids' => [$user_data['userdirectoryid']],
@@ -2200,7 +2208,7 @@ class CUser extends CApiService {
 		]);
 
 		if (!$userdirectory) {
-			return;
+			return $user_data;
 		}
 
 		$userdirectory += DB::select('userdirectory_ldap', [
@@ -2213,7 +2221,7 @@ class CUser extends CApiService {
 		$ldap = new CLdap($userdirectory);
 
 		if ($ldap->bind_type != CLdap::BIND_ANONYMOUS && $ldap->bind_type != CLdap::BIND_CONFIG_CREDENTIALS) {
-			return;
+			return $user_data;
 		}
 
 		$idp_user_data = [];
@@ -2229,7 +2237,9 @@ class CUser extends CApiService {
 			$idp_user_data = array_merge($idp_user_data, $provisioning->getUserGroupsAndRole($ldap_groups));
 		}
 
-		$this->updateProvisionedUser($user_data['userid'], $idp_user_data);
+		$idp_user_data['username'] = $user_data['username'];
+
+		return $this->updateProvisionedUser($user_data['userid'], $idp_user_data);
 	}
 
 	/**
@@ -2311,7 +2321,9 @@ class CUser extends CApiService {
 		try {
 			$userids = [$user['userid']];
 
+			self::$userData = CProvisioning::API_USER;
 			$this->validateDelete($userids, $db_users);
+			self::$userData = null;
 			self::deleteForce($userids);
 			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::API_USER['username'],
 				CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $users
