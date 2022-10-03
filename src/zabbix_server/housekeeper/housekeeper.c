@@ -33,7 +33,10 @@ extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static struct zbx_db_version_info_t	*db_version_info;
+
+#if defined(HAVE_POSTGRESQL)
 static int				tsdb_version = 0;
+#endif
 
 static int	hk_period;
 
