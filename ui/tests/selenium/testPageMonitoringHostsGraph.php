@@ -24,146 +24,156 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
  * @backup profiles, hosts, items, graphs
- *
- * @onBefore prepareGraphsData
  */
 class testPageMonitoringHostsGraph extends CWebTest {
 
 	use TableTrait;
 
-	public function prepareGraphsData() {
-		$hosts = CDataHelper::call('host.create', [
-			[
-				'host' => 'Host_for_monitoring_graphs_1',
-				'groups' => [
-					'groupid' => 4
-				],
-				'interfaces' => [
-					'type'=> 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '127.0.0.1',
-					'dns' => '',
-					'port' => '10050'
-				]
-			],
-			[
-				'host' => 'Host_for_monitoring_graphs_2',
-				'groups' => [
-					'groupid' => 4
-				],
-				'interfaces' => [
-					'type'=> 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '127.0.0.1',
-					'dns' => '',
-					'port' => '10050'
-				]
-			]
-		]);
-		$this->assertArrayHasKey('hostids', $hosts);
-		$hostid = CDataHelper::getIds('host');
+	private static $itemids;
 
-		$items = CDataHelper::call('item.create', [
-			[
-				'name' => 'Item_for_graph_1',
-				'key_' => 'trap_1',
-				'hostid' => $hostid['Host_for_monitoring_graphs_1'],
-				'type' => 2,
-				'value_type' => 0,
-				'tags' => [
-					[
-						'tag' => 'tag_name_1',
-						'value' => 'tag_value_1'
-					]
-				]
-			],
-			[
-				'name' => 'Item_for_graph_2',
-				'key_' => 'trap_2',
-				'hostid' => $hostid['Host_for_monitoring_graphs_1'],
-				'type' => 2,
-				'value_type' => 0,
-				'tags' => [
-					[
-						'tag' => 'tag_name_2',
-						'value' => 'tag_value_2'
-					]
-				]
-			],
-			[
-				'name' => 'Item_for_graph_3',
-				'key_' => 'trap_3',
-				'hostid' => $hostid['Host_for_monitoring_graphs_1'],
-				'type' => 2,
-				'value_type' => 0,
-				'tags' => [
-					[
-						'tag' => 'tag_name_3',
-						'value' => 'tag_value_3'
-					]
-				]
-			],
-			[
-				'name' => 'Item_for_graph_4',
-				'key_' => 'trap_4',
-				'hostid' => $hostid['Host_for_monitoring_graphs_2'],
-				'type' => 2,
-				'value_type' => 0
-			]
-		]);
-		$this->assertArrayHasKey('itemids', $items);
-		$itemids = CDataHelper::getIds('name');
+	private static $graphids;
 
-		$graphs = CDataHelper::call('graph.create', [
-			[
-				'name' => 'Graph_1',
-				'gitems' => [
-					[
-						'itemid' => $itemids['Item_for_graph_1'],
-						'color' => '00AA00'
-					]
-				]
-			],
-			[
-				'name' => 'Graph_2',
-				'gitems' => [
-					[
-						'itemid' => $itemids['Item_for_graph_2'],
-						'color' => '00AA00'
+	private static function prepareGraphsData() {
+		static $data = null;
+		if ($data === null) {
+			global $DB;
+			if (!isset($DB['DB'])) {
+				DBconnect($error);
+			}
+
+			CDataHelper::call('host.create', [
+				[
+					'host' => 'Host_for_monitoring_graphs_1',
+					'groups' => [
+						'groupid' => 4
 					],
-					[
-						'itemid' => $itemids['Item_for_graph_2'],
-						'color' => '00AA00'
+					'interfaces' => [
+						'type' => 1,
+						'main' => 1,
+						'useip' => 1,
+						'ip' => '127.0.0.1',
+						'dns' => '',
+						'port' => '10050'
 					]
-				]
-			],
-			[
-				'name' => 'Graph_3',
-				'gitems' => [
-					[
-						'itemid' => $itemids['Item_for_graph_2'],
-						'color' => '00AA00'
+				],
+				[
+					'host' => 'Host_for_monitoring_graphs_2',
+					'groups' => [
+						'groupid' => 4
 					],
-					[
-						'itemid' => $itemids['Item_for_graph_3'],
-						'color' => '00AA00'
+					'interfaces' => [
+						'type' => 1,
+						'main' => 1,
+						'useip' => 1,
+						'ip' => '127.0.0.1',
+						'dns' => '',
+						'port' => '10050'
 					]
+				]
+			]);
+			$hostid = CDataHelper::getIds('host');
 
+			CDataHelper::call('item.create', [
+				[
+					'name' => 'Item_for_graph_1',
+					'key_' => 'trap_1',
+					'hostid' => $hostid['Host_for_monitoring_graphs_1'],
+					'type' => 2,
+					'value_type' => 0,
+					'tags' => [
+						[
+							'tag' => 'tag_name_1',
+							'value' => 'tag_value_1'
+						]
+					]
+				],
+				[
+					'name' => 'Item_for_graph_2',
+					'key_' => 'trap_2',
+					'hostid' => $hostid['Host_for_monitoring_graphs_1'],
+					'type' => 2,
+					'value_type' => 0,
+					'tags' => [
+						[
+							'tag' => 'tag_name_2',
+							'value' => 'tag_value_2'
+						]
+					]
+				],
+				[
+					'name' => 'Item_for_graph_3',
+					'key_' => 'trap_3',
+					'hostid' => $hostid['Host_for_monitoring_graphs_1'],
+					'type' => 2,
+					'value_type' => 0,
+					'tags' => [
+						[
+							'tag' => 'tag_name_3',
+							'value' => 'tag_value_3'
+						]
+					]
+				],
+				[
+					'name' => 'Item_for_graph_4',
+					'key_' => 'trap_4',
+					'hostid' => $hostid['Host_for_monitoring_graphs_2'],
+					'type' => 2,
+					'value_type' => 0
 				]
-			],
-			[
-				'name' => 'Graph_4',
-				'gitems' => [
-					[
-						'itemid' => $itemids['Item_for_graph_4'],
-						'color' => '00AA00'
+			]);
+			self::$itemids = CDataHelper::getIds('name');
+
+			CDataHelper::call('graph.create', [
+				[
+					'name' => 'Graph_1',
+					'gitems' => [
+						[
+							'itemid' => self::$itemids['Item_for_graph_1'],
+							'color' => '00AA00'
+						]
+					]
+				],
+				[
+					'name' => 'Graph_2',
+					'gitems' => [
+						[
+							'itemid' => self::$itemids['Item_for_graph_2'],
+							'color' => '00AA00'
+						],
+						[
+							'itemid' => self::$itemids['Item_for_graph_2'],
+							'color' => '00AA00'
+						]
+					]
+				],
+				[
+					'name' => 'Graph_3',
+					'gitems' => [
+						[
+							'itemid' => self::$itemids['Item_for_graph_2'],
+							'color' => '00AA00'
+						],
+						[
+							'itemid' => self::$itemids['Item_for_graph_3'],
+							'color' => '00AA00'
+						]
+
+					]
+				],
+				[
+					'name' => 'Graph_4',
+					'gitems' => [
+						[
+							'itemid' => self::$itemids['Item_for_graph_4'],
+							'color' => '00AA00'
+						]
 					]
 				]
-			]
-		]);
-		$this->assertArrayHasKey('graphids', $graphs);
+			]);
+			self::$graphids = CDataHelper::getIds('name');
+
+			$data = true;
+		}
 	}
 
 	/**
@@ -209,6 +219,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	}
 
 	public static function getCheckTagFilterData() {
+		self::prepareGraphsData();
+
 		return [
 			// #0 All graphs - filter by Tags.
 			[
@@ -217,7 +229,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Show' => 'All graphs'
 					],
 					'subfilter' => [
-						'Tags' =>[ 'tag_name_2']
+						'Tags' => ['tag_name_2']
 					],
 					'graphs_amount' => 3
 				]
@@ -471,6 +483,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	}
 
 	public static function getCheckFilterData() {
+		self::prepareGraphsData();
+
 		return [
 			// #0 One host with several items and graphs. Show all graphs.
 			[
@@ -479,7 +493,19 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'All graphs'
 					],
-					'graphs_amount' => 6
+					'graphs_amount' => 6,
+					'graphs_ids' => [
+						'graphid' => [
+							self::$graphids['Graph_1'],
+							self::$graphids['Graph_2'],
+							self::$graphids['Graph_3']
+						],
+						'itemid' => [
+							self::$itemids['Item_for_graph_1'],
+							self::$itemids['Item_for_graph_2'],
+							self::$itemids['Item_for_graph_3']
+						]
+					]
 				]
 			],
 			// #1 Show host graphs for host.
@@ -707,6 +733,13 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		// Check result amount.
 		if (array_key_exists('graphs_amount', $data)) {
 			$this->checkGraphs($data['graphs_amount']);
+			var_dump($data['graphs_ids']);
+
+//			foreach ($data['graphs_ids'] as $type => $ids) {
+//				foreach ($ids as $id) {
+//
+//				}
+//			}
 		}
 		else {
 			$message = (array_key_exists('Hosts', $data['filter'])) ? 'No data found.' : 'Specify host to see the graphs.';
