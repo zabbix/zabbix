@@ -87,7 +87,7 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
-			this._editOperationsRow(e, row_id);
+			this._createOperationsRow(e, row_id);
 		});
 	}
 
@@ -126,137 +126,88 @@ window.action_edit_popup = new class {
 		});
 	}
 
-	_editOperationsRow(input, row_id) {
-		this._createOperationsRow(input, row_id);
+	_isActionOperation() {
+		return this.recovery == <?=ACTION_OPERATION?>;
+	}
+
+	_isRecoveryOperation() {
+		return this.recovery == <?=ACTION_RECOVERY_OPERATION?>;
+	}
+
+	_isUpdateOperation() {
+		return this.recovery == <?=ACTION_UPDATE_OPERATION?>;
+	}
+
+	_isTriggerOrInternalOrServiceEventSource() {
+			return this.eventsource == <?=EVENT_SOURCE_TRIGGERS?>
+				|| this.eventsource == <?=EVENT_SOURCE_INTERNAL?>
+				|| this.eventsource == <?=EVENT_SOURCE_SERVICE?>;
 	}
 
 	_createOperationsRow(input, row_id = null) {
 		const operation_data = input.detail.operation;
-		// todo : rewrite
 
 		if (this.recovery == null) {
 			this.recovery = input.detail.operation.operationtype;
 		}
 
-		// Action operation for trigger, internal and service actions
-		if (this.recovery == <?= ACTION_OPERATION ?> && (
-			this.eventsource == <?=EVENT_SOURCE_TRIGGERS?> || this.eventsource == <?=EVENT_SOURCE_INTERNAL?>
-			|| this.eventsource == <?=EVENT_SOURCE_SERVICE?>)) {
+		//this.action_operation = input.detail.operation.operationtype;
 
-			this.operation_table = document.getElementById('op-table');
-			this.operation_row_count = this.operation_table.rows.length - 2;
-			this.operation_row = document.createElement('tr');
+		let table_id, row_id_prefix;
 
+		if (this._isRecoveryOperation()) {
+			table_id = 'rec-table';
+			row_id_prefix = 'recovery_operations_';
+		}
+
+		if (this._isUpdateOperation()) {
+			table_id = 'upd-table';
+			row_id_prefix = 'update_operations_';
+		}
+
+		if (this._isActionOperation()) {
+			table_id = 'op-table';
+			row_id_prefix = 'operations_';
+		}
+
+		this.operation_row = document.createElement('tr');
+
+		const rows = operation_data.details.type.map((type, index) => {
+			const data = operation_data.details.data ? operation_data.details.data[index] : null;
+			return this._addDetailsColumnNew(type, data);
+		})
+
+		const details = document.createElement('span');
+		details.innerHTML = rows.join('<br>')
+
+		if (this._isActionOperation() && this._isTriggerOrInternalOrServiceEventSource()) {
 			this.operation_row.append(this._addColumn(operation_data.steps));
+		}
 
-			const rows = operation_data.details.type.map((type, index) => {
-				return this._addDetailsColumnNew(type, operation_data.details.data[index]);
-			})
+		this.operation_row.append(details);
 
-			const details = document.createElement('span');
-			details.innerHTML = rows.join('<br>')
-			this.operation_row.append(details);
-
+		if (this._isActionOperation() && this._isTriggerOrInternalOrServiceEventSource()) {
 			this.operation_row.append(this._addColumn(operation_data.start_in));
 			this.operation_row.append(this._addColumn(operation_data.duration));
-
-
-			this.addOperationsData(input);
-			this.operation_row.append(this._createActionCell(input));
-			this.operation_row.setAttribute('class', 'operation-details-row');
-
-			if (row_id) {
-				$(`#${row_id}`).replaceWith(this.operation_row);
-			} else {
-				$('#op-table tr:last').before(this.operation_row);
-			}
-
-			this._createTableRowIds(this.operation_table, 'operations_');
-
 		}
 
-		// Action operation for discovery and autoregistration actions
-		if (this.recovery == <?= ACTION_OPERATION ?> && (
-			this.eventsource == <?=EVENT_SOURCE_DISCOVERY?> || this.eventsource == <?=EVENT_SOURCE_AUTOREGISTRATION?>)) {
-			this.operation_table = document.getElementById('op-table');
-			this.operation_row_count = this.operation_table.rows.length - 2;
-			this.operation_row = document.createElement('tr');
-			this.operation_row.setAttribute('id', 'operations_' + this.operation_row_count)
+		this.addOperationsData(input);
 
-			const rows = operation_data.details.type.map((type, index) => {
-				return this._addDetailsColumnNew(type, operation_data.details.data ? operation_data.details.data[index] : null);
-			})
+		this.operation_row.append(this._createActionCell(input));
+		this.operation_row.setAttribute('class', 'operation-details-row');
 
-			const details = document.createElement('span');
-			details.innerHTML = rows.join('<br>')
-			this.operation_row.append(details);
+		this.operation_table = document.getElementById(table_id);
+		this.operation_row_count = this.operation_table.rows.length - 2;
 
-			this.addOperationsData(input);
+		this.operation_row.setAttribute('id', row_id_prefix + this.operation_row_count)
 
-			this.operation_row.append(this._createActionCell(input));
-			this.operation_row.setAttribute('class', 'operation-details-row');
-
-			if (row_id) {
-				$(`#${row_id}`).replaceWith(this.operation_row);
-			} else {
-				$('#op-table tr:last').before(this.operation_row);
-			}
-
-			this._createTableRowIds(this.operation_table, 'operations_');
+		if (row_id) {
+			$(`#${row_id}`).replaceWith(this.operation_row);
+		} else {
+			$(`#${table_id} tr:last`).before(this.operation_row);
 		}
-		// Action operation for recovery operations
-		else if (this.recovery == <?= ACTION_RECOVERY_OPERATION ?>) {
 
-			this.operation_table = document.getElementById('rec-table');
-			this.operation_row_count = this.operation_table.rows.length - 2;
-			this.operation_row = document.createElement('tr');
-			this.operation_row.setAttribute('id', 'recovery_operations_' + this.operation_row_count)
-
-			const rows = operation_data.details.type.map((type, index) => {
-				return this._addDetailsColumnNew(type, operation_data.details.data[index]);
-			})
-
-			const details = document.createElement('span');
-			details.innerHTML = rows.join('<br>')
-			this.operation_row.append(details);
-
-			this.addOperationsData(input);
-
-			this.operation_row.append(this._createActionCell(input));
-			this.operation_row.setAttribute('class', 'operation-details-row');
-
-			if (row_id) {
-				$(`#${row_id}`).replaceWith(this.operation_row);
-			} else {
-				$('#rec-table tr:last').before(this.operation_row);
-			}
-
-			this._createTableRowIds(this.operation_table, 'recovery_operations_');
-		}
-		// Action operation for update operations
-		else if (this.recovery == <?= ACTION_UPDATE_OPERATION ?>) {
-			this.operation_table = document.getElementById('upd-table');
-			this.operation_row_count = this.operation_table.rows.length - 2;
-			this.operation_row = document.createElement('tr');
-			this.operation_row.setAttribute('id', 'update_operations_' + this.operation_table.rows.length - 2)
-
-			const rows = operation_data.details.type.map((type, index) => {
-				return this._addDetailsColumnNew(type, operation_data.details.data[index]);
-			})
-
-			const details = document.createElement('span');
-			details.innerHTML = rows.join('<br>')
-			this.operation_row.append(details);
-
-			this.addOperationsData(input);
-			this.operation_row.append(this._createActionCell(input));
-
-			if (row_id) {
-				$(`#${row_id}`).replaceWith(this.operation_row);
-			} else {
-				$('#upd-table tr:last').before(this.operation_row);
-			}
-		}
+		this._createTableRowIds(this.operation_table, row_id_prefix);
 	}
 
 	_createTableRowIds(table, prefix = '') {

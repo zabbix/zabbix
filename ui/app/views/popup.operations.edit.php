@@ -96,6 +96,7 @@ $form_grid->addItem(
 );
 
 $usergroup_table = (new CTable())
+	->setId('operation-message-user-groups-table')
 	->addStyle('width: 100%;')
 	->setHeader([_('User group'), _('Action')])
 	->addRow(
