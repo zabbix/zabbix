@@ -171,7 +171,7 @@ abstract class CItemType {
 							['if' => static function (array $data): bool {
 								return strncmp($data['key_'], 'mqtt.get', 8) != 0;
 							}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
-							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'delay')]
+							['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'delay')]
 						]];
 
 					default:
@@ -324,7 +324,7 @@ abstract class CItemType {
 							['if' => static function (array $data): bool {
 								return strncmp($data['key_'], 'mqtt.get', 8) !== 0;
 							}, 'type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
-							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'delay')]
+							['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'delay')]
 						]];
 
 					default:
@@ -422,7 +422,7 @@ abstract class CItemType {
 							['if' => static function (array $data): bool {
 								return strncmp($data['key_'], 'mqtt.get', 8) !== 0;
 							}, 'type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
-							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'delay')]
+							['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'delay')]
 						]];
 
 					default:
@@ -474,7 +474,7 @@ abstract class CItemType {
 			'password' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'password')],
 			'params' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'params')],
 			'timeout' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'timeout')],
-			'delay' =>				['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'delay')],
+			'delay' =>				['type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'delay')],
 			'trapper_hosts' =>		['type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'trapper_hosts')],
 
 			// Dependent item type specific fields.
