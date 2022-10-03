@@ -526,13 +526,11 @@ abstract class CItemGeneral extends CApiService {
 					if ($same_hosts) {
 						$same_host = reset($same_hosts);
 
-						$hosts = DBfetchArrayAssoc(DBselect(
-							'SELECT h.hostid,h.host'.
-							' FROM hosts h '.
-							'WHERE '.dbConditionId('h.hostid',
-								[$templateids[$i], $templateids[$j], $same_host['hostid']]
-							)
-						), 'hostid');
+						$hosts = DB::select('hosts', [
+							'output' => ['hostid', 'host'],
+							'hostids' => [$templateids[$i], $templateids[$j], $same_host['hostid']],
+							'preservekeys' => true
+						]);
 
 						$target_is_host = in_array($same_host['status'],
 							[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]

@@ -1007,7 +1007,7 @@ class CItem extends CItemGeneral {
 		$edit_items = array_merge($upd_items, $ins_items);
 
 		self::checkDependentItems($edit_items, $upd_db_items, true);
-		self::checkInventoryLinks($edit_items, $upd_db_items);
+		self::checkInventoryLinks($edit_items, $upd_db_items, true);
 
 		self::addInterfaceIds($upd_items, $upd_db_items, $ins_items);
 
@@ -1342,10 +1342,11 @@ class CItem extends CItemGeneral {
 	/**
 	 * @param array $items
 	 * @param array $db_items
+	 * @param bool  $inherited
 	 *
 	 * @throws APIException
 	 */
-	protected static function checkInventoryLinks(array $items, array $db_items = []): void {
+	private static function checkInventoryLinks(array $items, array $db_items = [], bool $inherited = false): void {
 		$item_indexes = [];
 		$del_links = [];
 
@@ -1392,22 +1393,60 @@ class CItem extends CItemGeneral {
 			return;
 		}
 
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['hostid', 'inventory_link']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['hostid', 'inventory_link']], 'fields' => [
 			'hostid' =>			['type' => API_ANY],
 			'inventory_link' =>	['type' => API_ANY]
 		]];
 
 		if (!CApiInputValidator::validateUniqueness($api_input_rules, $items, '/', $error)) {
+			if ($inherited) {
+				$_item_indexes = [];
+
+				foreach ($items as $i => $item) {
+					if (array_key_exists($item['hostid'], $_item_indexes)
+							&& array_key_exists($item['inventory_link'], $_item_indexes[$item['hostid']])) {
+						$error = $item['host_status'] == HOST_STATUS_TEMPLATE
+							? _('Cannot inherit item with key "%1$s" of template "%2$s" and item with key "%3$s" of template "%4$s" to template "%5$s", because they would populate the same inventory field "%6$s".')
+							: _('Cannot inherit item with key "%1$s" of template "%2$s" and item with key "%3$s" of template "%4$s" to host "%5$s", because they would populate the same inventory field "%6$s".');
+
+						$_item = $items[$_item_indexes[$item['hostid']][$item['inventory_link']]];
+
+						$templates = DBfetchArrayAssoc(DBselect(
+							'SELECT i.itemid,h.host'.
+							' FROM items i,hosts h'.
+							' WHERE i.hostid=h.hostid'.
+								' AND '.dbConditionId('i.itemid', [$_item['templateid'], $item['templateid']])
+						), 'itemid');
+
+						$hosts = DB::select('hosts', [
+							'output' => ['host'],
+							'hostids' => $item['hostid']
+						]);
+
+						$inventory_fields = getHostInventories();
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $_item['key_'],
+							$templates[$_item['templateid']]['host'], $item['key_'],
+							$templates[$item['templateid']]['host'], $hosts[0]['host'],
+							$inventory_fields[$item['inventory_link']]['title']
+						));
+					}
+
+					$_item_indexes[$item['hostid']][$item['inventory_link']] = $i;
+				}
+			}
+
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$result = DBselect(
-			'SELECT i.hostid,i.inventory_link,h.status,h.host,i.key_'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionId('i.hostid', array_unique(array_column($items, 'hostid'))).
-				' AND '.dbConditionInt('i.inventory_link', array_unique(array_column($items, 'inventory_link')))
-		);
+		$options = [
+			'output' => ['hostid', 'inventory_link', 'key_'],
+			'filter' => [
+				'hostid' => array_unique(array_column($items, 'hostid')),
+				'inventory_link' => array_unique(array_column($items, 'inventory_link'))
+			]
+		];
+		$result = DBselect(DB::makeSql('items', $options));
 
 		while ($row = DBfetch($result)) {
 			if (array_key_exists($row['hostid'], $del_links)
@@ -1417,16 +1456,48 @@ class CItem extends CItemGeneral {
 
 			foreach ($item_indexes[$row['hostid']] as $i) {
 				if ($row['inventory_link'] == $items[$i]['inventory_link']) {
-					$error = ($row['status'] == HOST_STATUS_TEMPLATE)
-						? _('Cannot set the host inventory field "%1$s" to the item "%2$s" on the template "%3$s": %4$s.')
-						: _('Cannot set the host inventory field "%1$s" to the item "%2$s" on the host "%3$s": %4$s.');
+					$item = $items[$i];
 
-					$inventory_fields = getHostInventories();
+					if ($inherited) {
+						$error = $item['host_status'] == HOST_STATUS_TEMPLATE
+							? _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because its inventory field "%4$s" is already populated by the item with key "%5$s".')
+							: _('Cannot inherit item with key "%1$s" of template "%2$s" to host "%3$s", because its inventory field "%4$s" is already populated by the item with key "%5$s".');
 
-					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error,
-						$inventory_fields[$row['inventory_link']]['title'], $items[$i]['key_'], $row['host'],
-						_s('it is already set for the item "%1$s"', $row['key_'])
-					));
+						$template = DBfetch(DBselect(
+							'SELECT h.host'.
+							' FROM items i,hosts h'.
+							' WHERE i.hostid=h.hostid'.
+								' AND '.dbConditionId('i.itemid', [$item['templateid']])
+						));
+
+						$hosts = DB::select('hosts', [
+							'output' => ['host'],
+							'hostids' => $item['hostid']
+						]);
+
+						$inventory_fields = getHostInventories();
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $item['key_'], $template['host'],
+							$hosts[0]['host'], $inventory_fields[$item['inventory_link']]['title'], $row['key_']
+						));
+					}
+					else {
+						$error = $item['host_status'] == HOST_STATUS_TEMPLATE
+							? _('Cannot assign the inventory field "%1$s" to the item with key "%2$s" of template "%3$s", because it is already populated by the item with key "%4$s"')
+							: _('Cannot assign the inventory field "%1$s" to the item with key "%2$s" of host "%3$s", because it is already populated by the item with key "%4$s".');
+
+						$inventory_fields = getHostInventories();
+
+						$hosts = DB::select('hosts', [
+							'output' => ['host'],
+							'hostids' => $item['hostid']
+						]);
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error,
+							$inventory_fields[$item['inventory_link']]['title'], $item['key_'], $hosts[0]['host'],
+							$row['key_']
+						));
+					}
 				}
 			}
 		}
