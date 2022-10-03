@@ -26,21 +26,21 @@
  * @var array $data
  */
 
-use Widgets\Item\Actions\WidgetView;
+use Widgets\Item\Widget;
 
 if ($data['error'] !== '') {
 	$body = (new CTableInfo())->setNoDataMessage($data['error']);
 }
 else {
 	$classes_vertical = [
-		WIDGET_ITEM_POS_TOP => 'top',
-		WIDGET_ITEM_POS_MIDDLE => 'middle',
-		WIDGET_ITEM_POS_BOTTOM => 'bottom'
+		Widget::POSITION_TOP => 'top',
+		Widget::POSITION_MIDDLE => 'middle',
+		Widget::POSITION_BOTTOM => 'bottom'
 	];
 	$classes_horizontal = [
-		WIDGET_ITEM_POS_LEFT => 'left',
-		WIDGET_ITEM_POS_CENTER => 'center',
-		WIDGET_ITEM_POS_RIGHT => 'right'
+		Widget::POSITION_LEFT => 'left',
+		Widget::POSITION_CENTER => 'center',
+		Widget::POSITION_RIGHT => 'right'
 	];
 
 	$rows = [];
@@ -141,14 +141,14 @@ function drawValueCell(array $cell_data): array {
 	}
 
 	// Units ABOVE value.
-	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == WIDGET_ITEM_POS_ABOVE) {
+	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == Widget::POSITION_ABOVE) {
 		$item_cell[] = $units_div;
 	}
 
 	$item_content_div = (new CDiv())->addClass('item-value-content');
 
 	// Units BEFORE value.
-	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == WIDGET_ITEM_POS_BEFORE) {
+	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == Widget::POSITION_BEFORE) {
 		$item_content_div->addItem($units_div);
 	}
 
@@ -171,7 +171,7 @@ function drawValueCell(array $cell_data): array {
 	}
 
 	// Units AFTER value.
-	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == WIDGET_ITEM_POS_AFTER) {
+	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == Widget::POSITION_AFTER) {
 		$item_content_div->addItem($units_div);
 	}
 
@@ -185,13 +185,13 @@ function drawValueCell(array $cell_data): array {
 		);
 
 		switch ($change_data['type']) {
-			case WidgetView::CHANGE_INDICATOR_UP:
+			case Widget::CHANGE_INDICATOR_UP:
 				$arrow_data = ['up' => true, 'fill_color' => $change_data['color']];
 				break;
-			case WidgetView::CHANGE_INDICATOR_DOWN:
+			case Widget::CHANGE_INDICATOR_DOWN:
 				$arrow_data = ['down' => true, 'fill_color' => $change_data['color']];
 				break;
-			case WidgetView::CHANGE_INDICATOR_UP_DOWN:
+			case Widget::CHANGE_INDICATOR_UP_DOWN:
 				$arrow_data = ['up' => true, 'down' => true, 'fill_color' => $change_data['color']];
 				break;
 		}
@@ -201,7 +201,7 @@ function drawValueCell(array $cell_data): array {
 	}
 
 	// Units BELOW value.
-	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == WIDGET_ITEM_POS_BELOW) {
+	if (array_key_exists('units', $cell_data['parts']) && $cell_data['units_pos'] == Widget::POSITION_BELOW) {
 		$item_cell[] = $units_div;
 	}
 

@@ -25,6 +25,30 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
+	// Form blocks.
+	public const SHOW_DESCRIPTION = 1;
+	public const SHOW_VALUE = 2;
+	public const SHOW_TIME = 3;
+	public const SHOW_CHANGE_INDICATOR = 4;
+
+	// Objects positions.
+	public const POSITION_LEFT = 0;
+	public const POSITION_CENTER = 1;
+	public const POSITION_RIGHT = 2;
+
+	public const POSITION_TOP = 0;
+	public const POSITION_MIDDLE = 1;
+	public const POSITION_BOTTOM = 2;
+
+	public const POSITION_BEFORE = 0;
+	public const POSITION_ABOVE = 1;
+	public const POSITION_AFTER = 2;
+	public const POSITION_BELOW = 3;
+
+	public const CHANGE_INDICATOR_UP = 1;
+	public const CHANGE_INDICATOR_DOWN = 2;
+	public const CHANGE_INDICATOR_UP_DOWN = 3;
+
 	public function hasPadding(array $values, int $view_mode): bool {
 		return false;
 	}

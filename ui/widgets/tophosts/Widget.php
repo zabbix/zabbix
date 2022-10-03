@@ -25,6 +25,8 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
+	public const DEFAULT_FILL = '#97AAB3';
+
 	public const ORDER_TOP_N = 2;
 	public const ORDER_BOTTOM_N = 3;
 }

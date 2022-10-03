@@ -26,6 +26,8 @@
  * @var array $data
  */
 
+use Widgets\TopHosts\Widget;
+
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
 $header = [];
@@ -112,7 +114,7 @@ foreach ($data['rows'] as $columns) {
 					->setValue($column['value'])
 					->setAttribute('fill', $column_config['base_color'] !== ''
 						? '#'.$column_config['base_color']
-						: ZBX_WIDGET_TOP_HOSTS_DEFAULT_FILL
+						: Widget::DEFAULT_FILL
 					)
 					->setAttribute('min', $column_config['min'])
 					->setAttribute('max', $column_config['max']);

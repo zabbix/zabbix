@@ -1613,20 +1613,6 @@ define('WIDGET_ITEM',				'item');
 // Deprecated widgets
 define('WIDGET_DATA_OVER',			'dataover');
 
-// Item widget object positions.
-define('WIDGET_ITEM_POS_LEFT',		0); // TODO AS: move to widget
-define('WIDGET_ITEM_POS_CENTER',	1);
-define('WIDGET_ITEM_POS_RIGHT',		2);
-
-define('WIDGET_ITEM_POS_TOP',		0);
-define('WIDGET_ITEM_POS_MIDDLE',	1);
-define('WIDGET_ITEM_POS_BOTTOM',	2);
-
-define('WIDGET_ITEM_POS_BEFORE',	0);
-define('WIDGET_ITEM_POS_ABOVE',		1);
-define('WIDGET_ITEM_POS_AFTER',		2);
-define('WIDGET_ITEM_POS_BELOW',		3);
-
 // sysmap widget source types
 define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
 define('WIDGET_SYSMAP_SOURCETYPE_FILTER',	2);
@@ -1653,12 +1639,6 @@ define('SECTION_SEARCH_TEMPLATEGROUP',	'search_templategroup');
 define('WIDGET_SIMPLE_ITEM',	0);
 define('WIDGET_DYNAMIC_ITEM',	1);
 
-// item widget blocks
-define('WIDGET_ITEM_SHOW_DESCRIPTION',		1); // TODO AS: move to widget
-define('WIDGET_ITEM_SHOW_VALUE',			2);
-define('WIDGET_ITEM_SHOW_TIME',				3);
-define('WIDGET_ITEM_SHOW_CHANGE_INDICATOR',	4);
-
 // widget defaults
 define('ZBX_WIDGET_ROWS', 20);
 
@@ -1683,9 +1663,6 @@ define('ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE',	3);
 // widget view modes
 define('ZBX_WIDGET_VIEW_MODE_NORMAL',			0);
 define('ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER',	1);
-
-// top hosts widget
-define('ZBX_WIDGET_TOP_HOSTS_DEFAULT_FILL',	'#97AAB3'); // TODO AS: move to widget
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");

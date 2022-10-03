@@ -39,6 +39,8 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldThresholds
 };
 
+use Widgets\Item\Widget;
+
 /**
  * Single item widget form.
  */
@@ -58,9 +60,9 @@ class WidgetForm extends CWidgetForm {
 
 		// Check if one of the objects (description, value or time) occupies same space.
 		$fields = [
-			['show' => WIDGET_ITEM_SHOW_DESCRIPTION, 'h_pos' => 'desc_h_pos', 'v_pos' => 'desc_v_pos'],
-			['show' => WIDGET_ITEM_SHOW_VALUE, 'h_pos' => 'value_h_pos', 'v_pos' => 'value_v_pos'],
-			['show' => WIDGET_ITEM_SHOW_TIME, 'h_pos' => 'time_h_pos', 'v_pos' => 'time_v_pos']
+			['show' => Widget::SHOW_DESCRIPTION, 'h_pos' => 'desc_h_pos', 'v_pos' => 'desc_v_pos'],
+			['show' => Widget::SHOW_VALUE, 'h_pos' => 'value_h_pos', 'v_pos' => 'value_v_pos'],
+			['show' => Widget::SHOW_TIME, 'h_pos' => 'time_h_pos', 'v_pos' => 'time_v_pos']
 		];
 
 		$fields_count = count($fields);
@@ -101,13 +103,13 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldCheckBoxList('show', _('Show'), [
-					WIDGET_ITEM_SHOW_DESCRIPTION => _('Description'),
-					WIDGET_ITEM_SHOW_VALUE => _('Value'),
-					WIDGET_ITEM_SHOW_TIME => _('Time'),
-					WIDGET_ITEM_SHOW_CHANGE_INDICATOR => _('Change indicator')
+					Widget::SHOW_DESCRIPTION => _('Description'),
+					Widget::SHOW_VALUE => _('Value'),
+					Widget::SHOW_TIME => _('Time'),
+					Widget::SHOW_CHANGE_INDICATOR => _('Change indicator')
 				]))
-					->setDefault([WIDGET_ITEM_SHOW_DESCRIPTION, WIDGET_ITEM_SHOW_VALUE, WIDGET_ITEM_SHOW_TIME,
-						WIDGET_ITEM_SHOW_CHANGE_INDICATOR
+					->setDefault([Widget::SHOW_DESCRIPTION, Widget::SHOW_VALUE, Widget::SHOW_TIME,
+						Widget::SHOW_CHANGE_INDICATOR
 					])
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
@@ -121,17 +123,17 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('desc_h_pos', _('Horizontal position'), [
-					WIDGET_ITEM_POS_LEFT => _('Left'),
-					WIDGET_ITEM_POS_CENTER => _('Center'),
-					WIDGET_ITEM_POS_RIGHT => _('Right')
-				]))->setDefault(WIDGET_ITEM_POS_CENTER)
+					Widget::POSITION_LEFT => _('Left'),
+					Widget::POSITION_CENTER => _('Center'),
+					Widget::POSITION_RIGHT => _('Right')
+				]))->setDefault(Widget::POSITION_CENTER)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('desc_v_pos', _('Vertical position'), [
-					WIDGET_ITEM_POS_TOP => _('Top'),
-					WIDGET_ITEM_POS_MIDDLE => _('Middle'),
-					WIDGET_ITEM_POS_BOTTOM => _('Bottom')
-				]))->setDefault(WIDGET_ITEM_POS_BOTTOM)
+					Widget::POSITION_TOP => _('Top'),
+					Widget::POSITION_MIDDLE => _('Middle'),
+					Widget::POSITION_BOTTOM => _('Bottom')
+				]))->setDefault(Widget::POSITION_BOTTOM)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('desc_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
@@ -152,17 +154,17 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('value_h_pos', _('Horizontal position'), [
-					WIDGET_ITEM_POS_LEFT => _('Left'),
-					WIDGET_ITEM_POS_CENTER => _('Center'),
-					WIDGET_ITEM_POS_RIGHT => _('Right')
-				]))->setDefault(WIDGET_ITEM_POS_CENTER)
+					Widget::POSITION_LEFT => _('Left'),
+					Widget::POSITION_CENTER => _('Center'),
+					Widget::POSITION_RIGHT => _('Right')
+				]))->setDefault(Widget::POSITION_CENTER)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('value_v_pos', _('Vertical position'), [
-					WIDGET_ITEM_POS_TOP => _('Top'),
-					WIDGET_ITEM_POS_MIDDLE => _('Middle'),
-					WIDGET_ITEM_POS_BOTTOM => _('Bottom')
-				]))->setDefault(WIDGET_ITEM_POS_MIDDLE)
+					Widget::POSITION_TOP => _('Top'),
+					Widget::POSITION_MIDDLE => _('Middle'),
+					Widget::POSITION_BOTTOM => _('Bottom')
+				]))->setDefault(Widget::POSITION_MIDDLE)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('value_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
@@ -182,11 +184,11 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldSelect('units_pos', _('Position'), [
-					WIDGET_ITEM_POS_BEFORE => _('Before value'),
-					WIDGET_ITEM_POS_ABOVE => _('Above value'),
-					WIDGET_ITEM_POS_AFTER => _('After value'),
-					WIDGET_ITEM_POS_BELOW => _('Below value')
-				]))->setDefault(WIDGET_ITEM_POS_AFTER)
+					Widget::POSITION_BEFORE => _('Before value'),
+					Widget::POSITION_ABOVE => _('Above value'),
+					Widget::POSITION_AFTER => _('After value'),
+					Widget::POSITION_BELOW => _('Below value')
+				]))->setDefault(Widget::POSITION_AFTER)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('units_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
@@ -200,17 +202,17 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('time_h_pos', _('Horizontal position'), [
-					WIDGET_ITEM_POS_LEFT => _('Left'),
-					WIDGET_ITEM_POS_CENTER => _('Center'),
-					WIDGET_ITEM_POS_RIGHT => _('Right')
-				]))->setDefault(WIDGET_ITEM_POS_CENTER)
+					Widget::POSITION_LEFT => _('Left'),
+					Widget::POSITION_CENTER => _('Center'),
+					Widget::POSITION_RIGHT => _('Right')
+				]))->setDefault(Widget::POSITION_CENTER)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('time_v_pos', _('Vertical position'), [
-					WIDGET_ITEM_POS_TOP => _('Top'),
-					WIDGET_ITEM_POS_MIDDLE => _('Middle'),
-					WIDGET_ITEM_POS_BOTTOM => _('Bottom')
-				]))->setDefault(WIDGET_ITEM_POS_TOP)
+					Widget::POSITION_TOP => _('Top'),
+					Widget::POSITION_MIDDLE => _('Middle'),
+					Widget::POSITION_BOTTOM => _('Bottom')
+				]))->setDefault(Widget::POSITION_TOP)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('time_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))

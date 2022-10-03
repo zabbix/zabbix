@@ -30,11 +30,9 @@ use API,
 	CValueMapHelper,
 	Manager;
 
-class WidgetView extends CControllerDashboardWidgetView {
+use Widgets\Item\Widget;
 
-	public const CHANGE_INDICATOR_UP = 1;
-	public const CHANGE_INDICATOR_DOWN = 2;
-	public const CHANGE_INDICATOR_UP_DOWN = 3;
+class WidgetView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
 		parent::__construct();
@@ -118,11 +116,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		// Add other fields in case current widget is set in dynamic mode, template dashboard or has a specified host.
 		if (($is_dynamic && $tmp_items) || !$is_dynamic) {
 			// If description contains user macros, we need "itemid" and "hostid" to resolve them.
-			if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
+			if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
 				$options['output'] = array_merge($options['output'], ['itemid', 'hostid']);
 			}
 
-			if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && $values['units_show'] == 1) {
+			if (array_key_exists(Widget::SHOW_VALUE, $show) && $values['units_show'] == 1) {
 				$options['output'][] = 'units';
 			}
 		}
@@ -154,7 +152,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$last_value = $history[$itemid][0]['value'];
 
 				// Time can be shown independently.
-				if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
+				if (array_key_exists(Widget::SHOW_TIME, $show)) {
 					$time = date(ZBX_FULL_DATE_TIME, (int) $history[$itemid][0]['clock']);
 				}
 
@@ -162,7 +160,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					case ITEM_VALUE_TYPE_FLOAT:
 					case ITEM_VALUE_TYPE_UINT64:
 						// Override item units if needed.
-						if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show) && $values['units_show'] == 1) {
+						if (array_key_exists(Widget::SHOW_VALUE, $show) && $values['units_show'] == 1) {
 							$units = $values['units'] === '' ? : $values['units'];
 						}
 
@@ -211,12 +209,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 							);
 
 							// Show of hide change indicator for mapped value.
-							if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show)) {
-								$change_indicator = self::CHANGE_INDICATOR_UP_DOWN;
+							if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show)) {
+								$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
 							}
 						}
 						elseif (array_key_exists(1, $history[$itemid])
-								&& array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show)) {
+								&& array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show)) {
 							/*
 							 * If there is no value mapping and there is more than one value, add up or down change
 							 * indicator. Do not show change indicator if value is the same.
@@ -224,10 +222,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 							$prev_value = $history[$itemid][1]['value'];
 
 							if ($last_value > $prev_value) {
-								$change_indicator = self::CHANGE_INDICATOR_UP;
+								$change_indicator = Widget::CHANGE_INDICATOR_UP;
 							}
 							elseif ($last_value < $prev_value) {
-								$change_indicator = self::CHANGE_INDICATOR_DOWN;
+								$change_indicator = Widget::CHANGE_INDICATOR_DOWN;
 							}
 						}
 						break;
@@ -254,11 +252,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 						$value = str_replace("\n", " ", $value);
 
 						if (array_key_exists(1, $history[$itemid])
-								&& array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show)) {
+								&& array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show)) {
 							$prev_value = $history[$itemid][1]['value'];
 
 							if ($last_value !== $prev_value) {
-								$change_indicator = self::CHANGE_INDICATOR_UP_DOWN;
+								$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
 							}
 						}
 						break;
@@ -268,7 +266,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$value_type = ITEM_VALUE_TYPE_TEXT;
 
 				// Since there is no value, we can still show time.
-				if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
+				if (array_key_exists(Widget::SHOW_TIME, $show)) {
 					$time = date(ZBX_FULL_DATE_TIME);
 				}
 			}
@@ -288,7 +286,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			 * It doesn't matter if item has value or not, description can be resolved separately if needed. If item
 			 * will have value, it will resolve, otherwise it will not.
 			 */
-			if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
+			if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
 				// Overwrite item name with the custom description.
 				$items[$itemid]['name'] = $values['description'];
 
@@ -422,7 +420,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$show = array_flip($values['show']);
 
-		if (array_key_exists(WIDGET_ITEM_SHOW_DESCRIPTION, $show)) {
+		if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
 			$cells[$values['desc_v_pos']][$values['desc_h_pos']] = [
 				'item_description' => [
 					'text' => $data['description'],
@@ -433,7 +431,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 		}
 
-		if (array_key_exists(WIDGET_ITEM_SHOW_VALUE, $show)) {
+		if (array_key_exists(Widget::SHOW_VALUE, $show)) {
 			$item_value_cell = [
 				'value_type' => $data['value_type']
 			];
@@ -469,11 +467,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 		}
 
-		if (array_key_exists(WIDGET_ITEM_SHOW_CHANGE_INDICATOR, $show) && $data['change_indicator'] !== null) {
+		if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $data['change_indicator'] !== null) {
 			$colors = [
-				self::CHANGE_INDICATOR_UP => $values['up_color'],
-				self::CHANGE_INDICATOR_DOWN => $values['down_color'],
-				self::CHANGE_INDICATOR_UP_DOWN => $values['updown_color']
+				Widget::CHANGE_INDICATOR_UP => $values['up_color'],
+				Widget::CHANGE_INDICATOR_DOWN => $values['down_color'],
+				Widget::CHANGE_INDICATOR_UP_DOWN => $values['updown_color']
 			];
 
 			// Change indicator can be displayed with or without value.
@@ -486,7 +484,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 		}
 
-		if (array_key_exists(WIDGET_ITEM_SHOW_TIME, $show)) {
+		if (array_key_exists(Widget::SHOW_TIME, $show)) {
 			$cells[$values['time_v_pos']][$values['time_h_pos']] = [
 				'item_time' => [
 					'text' => $data['time'],

@@ -17,18 +17,21 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-?>
 
+
+use Widgets\Item\Widget;
+
+?>
 
 window.widget_item_form = new class {
 
 	init({thresholds_colors}) {
 		this._form = document.getElementById('widget-dialogue-form');
 
-		this._show_description = document.getElementById(`show_${<?= WIDGET_ITEM_SHOW_DESCRIPTION ?>}`);
-		this._show_value = document.getElementById(`show_${<?= WIDGET_ITEM_SHOW_VALUE ?>}`);
-		this._show_time = document.getElementById(`show_${<?= WIDGET_ITEM_SHOW_TIME ?>}`);
-		this._show_change_indicator = document.getElementById(`show_${<?= WIDGET_ITEM_SHOW_CHANGE_INDICATOR ?>}`);
+		this._show_description = document.getElementById(`show_${<?= Widget::SHOW_DESCRIPTION ?>}`);
+		this._show_value = document.getElementById(`show_${<?= Widget::SHOW_VALUE ?>}`);
+		this._show_time = document.getElementById(`show_${<?= Widget::SHOW_TIME ?>}`);
+		this._show_change_indicator = document.getElementById(`show_${<?= Widget::SHOW_CHANGE_INDICATOR ?>}`);
 
 		this._advance_configuration = document.getElementById('adv_conf');
 		this._units_show = document.getElementById('units_show');
