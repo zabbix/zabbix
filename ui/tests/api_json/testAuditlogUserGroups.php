@@ -51,12 +51,12 @@ class testAuditlogUserGroups extends testAuditlogCommon {
 
 		$created = json_encode([
 			'usergroup.name' => ['add', 'Audit user groups'],
-			'usergroup.rights['.$rights['rightid'].']' => ['add'],
-			'usergroup.rights['.$rights['rightid'].'].id' => ['add', '2'],
-			'usergroup.rights['.$rights['rightid'].'].rightid' => ['add', $rights['rightid']],
 			'usergroup.users['.$id['id'].']' => ['add'],
 			'usergroup.users['.$id['id'].'].userid' => ['add', '2'],
 			'usergroup.users['.$id['id'].'].id' => ['add', $id['id']],
+			'usergroup.hostgroup_rights['.$rights['rightid'].']' => ['add'],
+			'usergroup.hostgroup_rights['.$rights['rightid'].'].id' => ['add', '2'],
+			'usergroup.hostgroup_rights['.$rights['rightid'].'].rightid' => ['add', $rights['rightid']],
 			'usergroup.usrgrpid' => ['add', $resourceid]
 		]);
 
