@@ -47,7 +47,7 @@ void	zbx_mock_test_entry(void **state)
 	interface = zbx_mock_get_parameter_string("in.interface");
 	key =  zbx_mock_get_parameter_string("in.key");
 
-	ret = parse_key_params(key, interface, &icmpping, &returned_addr, &count,
+	ret = zbx_parse_key_params(key, interface, &icmpping, &returned_addr, &count,
 			&interval, &size, &timeout, &type, error, MAX_ERR_LEN);
 	if (SUCCEED != ret)
 		printf("zbx_pinger_test error: %s\n", error);

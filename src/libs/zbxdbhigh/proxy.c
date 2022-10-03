@@ -47,6 +47,7 @@ void	calc_timestamp(const char *line, int *timestamp, const char *format)
 	struct tm	tm;
 	time_t		t;
 
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	hh = mm = ss = yyyy = dd = MM = 0;

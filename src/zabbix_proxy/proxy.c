@@ -985,7 +985,7 @@ static void	zbx_on_exit(int ret)
 	/* free vmware support */
 	zbx_vmware_destroy();
 
-	free_selfmon_collector();
+	zbx_free_selfmon_collector();
 	free_proxy_history_lock();
 
 	zbx_unload_modules();
@@ -1341,7 +1341,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != init_selfmon_collector(&error))
+	if (SUCCEED != zbx_init_selfmon_collector(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
 		zbx_free(error);

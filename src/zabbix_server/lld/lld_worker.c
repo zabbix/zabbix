@@ -203,7 +203,7 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -220,13 +220,13 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 			processed_num = 0;
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		if (SUCCEED != zbx_ipc_socket_read(&lld_socket, &message))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot read LLD manager service request");
 			exit(EXIT_FAILURE);
 		}
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		time_read = zbx_time();
 		time_idle += time_read - time_now;

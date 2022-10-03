@@ -6530,7 +6530,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 		{
 			char	*key = NULL, *host = NULL;
 
-			if (SUCCEED != parse_host_key(param, &host, &key) ||
+			if (SUCCEED != zbx_parse_host_key(param, &host, &key) ||
 					SUCCEED != substitute_key_macros_impl(&key, NULL, NULL, jp_row, lld_macro_paths,
 							MACRO_TYPE_ITEM_KEY, NULL, 0))
 			{

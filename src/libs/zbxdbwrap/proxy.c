@@ -69,29 +69,6 @@ zbx_drule_ip_t;
 
 typedef struct
 {
-	zbx_uint64_t	id;
-	size_t		offset;
-}
-zbx_id_offset_t;
-
-typedef int	(*zbx_client_item_validator_t)(DC_ITEM *item, zbx_socket_t *sock, void *args, char **error);
-
-typedef struct
-{
-	zbx_uint64_t	hostid;
-	int		value;
-}
-zbx_host_rights_t;
-
-typedef struct
-{
-	char		*path;
-	zbx_hashset_t	keys;
-}
-zbx_keys_path_t;
-
-typedef struct
-{
 	const char		*field;
 	const char		*tag;
 	zbx_json_type_t		jt;
@@ -105,6 +82,15 @@ typedef struct
 	zbx_history_field_t	fields[ZBX_MAX_FIELDS];
 }
 zbx_history_table_t;
+
+typedef int	(*zbx_client_item_validator_t)(DC_ITEM *item, zbx_socket_t *sock, void *args, char **error);
+
+typedef struct
+{
+	zbx_uint64_t	hostid;
+	int		value;
+}
+zbx_host_rights_t;
 
 static zbx_history_table_t	dht = {
 	"proxy_dhistory", "dhistory_lastid",

@@ -184,20 +184,20 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, time_t 
 		reserved = j.buffer_size;
 		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 		/* retry till have a connection */
 		if (FAIL == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
 				CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING, zbx_config_tls))
 		{
-			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+			zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 			if (*last_conn_time + ZBX_PROXY_ACTIVE_CHECK_AVAIL_TIMEOUT >= time(NULL))
 				zbx_availability_send(ZBX_IPC_AVAILMAN_PROXY_FLUSH_ALL_HOSTS, NULL, 0, NULL);
 			goto clean;
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		upload_state = zbx_put_data_to_server(&sock, &buffer, buffer_size, reserved, &error);
 		get_hist_upload_state(sock.buffer, hist_upload_state);
@@ -306,7 +306,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 			get_program_type_string(datasender_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(datasender_args_in->zbx_config_tls, datasender_args_in->zbx_get_program_type_cb_arg);

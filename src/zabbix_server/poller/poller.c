@@ -968,7 +968,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			get_program_type_string(poller_args_in->zbx_get_program_type_cb_arg()), server_num,
 			get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	scriptitem_es_engine_init();
 

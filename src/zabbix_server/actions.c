@@ -141,7 +141,7 @@ static int	check_host_group_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 	zbx_vector_uint64_t	objectids, groupids;
 	zbx_uint64_t		condition_value;
 
-	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_NOT_EQUAL != condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
 	ZBX_STR2UINT64(condition_value, condition->value);
@@ -173,7 +173,7 @@ static int	check_host_group_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 		zbx_uint64_t	objectid;
 
 		ZBX_STR2UINT64(objectid, row[0]);
-		if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+		if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 		{
 			int	index;
 
@@ -189,7 +189,7 @@ static int	check_host_group_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 	}
 	DBfree_result(result);
 
-	if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+	if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 	{
 		int	i;
 
@@ -331,7 +331,7 @@ static void	check_object_hierarchy(int object, const zbx_vector_ptr_t *esc_event
 
 				if (value == condition_value)
 				{
-					if (CONDITION_OPERATOR_EQUAL != condition->op)
+					if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op)
 					{
 						int	j;
 
@@ -376,7 +376,7 @@ static void	check_object_hierarchy(int object, const zbx_vector_ptr_t *esc_event
 	}
 
 	/* equals are deleted so copy to result those that are left (not equals)  */
-	if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+	if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 	{
 		for (i = 0; i < objectids->values_num; i++)
 			add_condition_match(esc_events, condition, objectids->values[i], object);
@@ -408,7 +408,7 @@ static int	check_host_template_condition(const zbx_vector_ptr_t *esc_events, zbx
 	zbx_vector_uint64_t		objectids;
 	zbx_vector_uint64_pair_t	objectids_pair;
 
-	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_NOT_EQUAL != condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
 	zbx_vector_uint64_create(&objectids);
@@ -471,9 +471,9 @@ static int	check_host_condition(const zbx_vector_ptr_t *esc_events, zbx_conditio
 	zbx_vector_uint64_t	objectids;
 	zbx_uint64_t		condition_value;
 
-	if (CONDITION_OPERATOR_EQUAL == condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL == condition->op)
 		operation = " and";
-	else if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+	else if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 		operation = " and not";
 	else
 		return NOTSUPPORTED;
@@ -531,7 +531,7 @@ static int	check_trigger_id_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 	zbx_vector_uint64_pair_t	objectids_pair;
 	int				i;
 
-	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_NOT_EQUAL != condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
 	ZBX_STR2UINT64(condition_value, condition->value);
@@ -545,7 +545,7 @@ static int	check_trigger_id_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 
 		if (event->objectid == condition_value)
 		{
-			if (CONDITION_OPERATOR_EQUAL == condition->op)
+			if (ZBX_CONDITION_OPERATOR_EQUAL == condition->op)
 				zbx_vector_uint64_append(&condition->eventids, event->eventid);
 		}
 		else
@@ -586,7 +586,7 @@ static int	check_trigger_name_condition(const zbx_vector_ptr_t *esc_events, zbx_
 {
 	int	i;
 
-	if (CONDITION_OPERATOR_LIKE != condition->op && CONDITION_OPERATOR_NOT_LIKE != condition->op)
+	if (ZBX_CONDITION_OPERATOR_LIKE != condition->op && ZBX_CONDITION_OPERATOR_NOT_LIKE != condition->op)
 		return NOTSUPPORTED;
 
 	for (i = 0; i < esc_events->values_num; i++)
@@ -595,11 +595,11 @@ static int	check_trigger_name_condition(const zbx_vector_ptr_t *esc_events, zbx_
 
 		switch (condition->op)
 		{
-			case CONDITION_OPERATOR_LIKE:
+			case ZBX_CONDITION_OPERATOR_LIKE:
 				if (NULL != strstr(event->name, condition->value))
 					zbx_vector_uint64_append(&condition->eventids, event->eventid);
 				break;
-			case CONDITION_OPERATOR_NOT_LIKE:
+			case ZBX_CONDITION_OPERATOR_NOT_LIKE:
 				if (NULL == strstr(event->name, condition->value))
 					zbx_vector_uint64_append(&condition->eventids, event->eventid);
 				break;
@@ -634,19 +634,19 @@ static int	check_trigger_severity_condition(const zbx_vector_ptr_t *esc_events, 
 
 		switch (condition->op)
 		{
-			case CONDITION_OPERATOR_EQUAL:
+			case ZBX_CONDITION_OPERATOR_EQUAL:
 				if (event->trigger.priority == condition_value)
 					zbx_vector_uint64_append(&condition->eventids, event->eventid);
 				break;
-			case CONDITION_OPERATOR_NOT_EQUAL:
+			case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
 				if (event->trigger.priority != condition_value)
 					zbx_vector_uint64_append(&condition->eventids, event->eventid);
 				break;
-			case CONDITION_OPERATOR_MORE_EQUAL:
+			case ZBX_CONDITION_OPERATOR_MORE_EQUAL:
 				if (event->trigger.priority >= condition_value)
 					zbx_vector_uint64_append(&condition->eventids, event->eventid);
 				break;
-			case CONDITION_OPERATOR_LESS_EQUAL:
+			case ZBX_CONDITION_OPERATOR_LESS_EQUAL:
 				if (event->trigger.priority <= condition_value)
 					zbx_vector_uint64_append(&condition->eventids, event->eventid);
 				break;
@@ -675,7 +675,7 @@ static int	check_time_period_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 	char	*period;
 	int	i;
 
-	if (CONDITION_OPERATOR_IN != condition->op && CONDITION_OPERATOR_NOT_IN != condition->op)
+	if (ZBX_CONDITION_OPERATOR_IN != condition->op && ZBX_CONDITION_OPERATOR_NOT_IN != condition->op)
 		return NOTSUPPORTED;
 
 	period = zbx_strdup(NULL, condition->value);
@@ -691,11 +691,11 @@ static int	check_time_period_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 		{
 			switch (condition->op)
 			{
-				case CONDITION_OPERATOR_IN:
+				case ZBX_CONDITION_OPERATOR_IN:
 					if (SUCCEED == res)
 						zbx_vector_uint64_append(&condition->eventids, event->eventid);
 					break;
-				case CONDITION_OPERATOR_NOT_IN:
+				case ZBX_CONDITION_OPERATOR_NOT_IN:
 					if (FAIL == res)
 						zbx_vector_uint64_append(&condition->eventids, event->eventid);
 					break;
@@ -723,11 +723,11 @@ static int	check_suppressed_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 
 		switch (condition->op)
 		{
-			case CONDITION_OPERATOR_YES:
+			case ZBX_CONDITION_OPERATOR_YES:
 				if (ZBX_PROBLEM_SUPPRESSED_TRUE == event->suppressed)
 					zbx_vector_uint64_append(&condition->eventids, event->eventid);
 				break;
-			case CONDITION_OPERATOR_NO:
+			case ZBX_CONDITION_OPERATOR_NO:
 				if (ZBX_PROBLEM_SUPPRESSED_FALSE == event->suppressed)
 					zbx_vector_uint64_append(&condition->eventids, event->eventid);
 				break;
@@ -778,7 +778,7 @@ static int	check_acknowledged_condition(const zbx_vector_ptr_t *esc_events, zbx_
 		ZBX_STR2UINT64(eventid, row[0]);
 		switch (condition->op)
 		{
-			case CONDITION_OPERATOR_EQUAL:
+			case ZBX_CONDITION_OPERATOR_EQUAL:
 				zbx_vector_uint64_append(&condition->eventids, eventid);
 				break;
 			default:
@@ -807,7 +807,7 @@ static void	check_condition_event_tag(const zbx_vector_ptr_t *esc_events, zbx_co
 {
 	int	i, ret, ret_continue;
 
-	if (CONDITION_OPERATOR_NOT_EQUAL == condition->op || CONDITION_OPERATOR_NOT_LIKE == condition->op)
+	if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op || ZBX_CONDITION_OPERATOR_NOT_LIKE == condition->op)
 		ret_continue = SUCCEED;
 	else
 		ret_continue = FAIL;
@@ -844,7 +844,7 @@ static void	check_condition_event_tag_value(const zbx_vector_ptr_t *esc_events, 
 {
 	int	i, ret, ret_continue;
 
-	if (CONDITION_OPERATOR_NOT_EQUAL == condition->op || CONDITION_OPERATOR_NOT_LIKE == condition->op)
+	if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op || ZBX_CONDITION_OPERATOR_NOT_LIKE == condition->op)
 		ret_continue = SUCCEED;
 	else
 		ret_continue = FAIL;
@@ -888,38 +888,38 @@ static void	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 
 	switch (condition->conditiontype)
 	{
-		case CONDITION_TYPE_HOST_GROUP:
+		case ZBX_CONDITION_TYPE_HOST_GROUP:
 			ret = check_host_group_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_HOST_TEMPLATE:
+		case ZBX_CONDITION_TYPE_HOST_TEMPLATE:
 			ret = check_host_template_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_HOST:
+		case ZBX_CONDITION_TYPE_HOST:
 			ret = check_host_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_TRIGGER:
+		case ZBX_CONDITION_TYPE_TRIGGER:
 			ret = check_trigger_id_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_TRIGGER_NAME:
+		case ZBX_CONDITION_TYPE_TRIGGER_NAME:
 			ret = check_trigger_name_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_TRIGGER_SEVERITY:
+		case ZBX_CONDITION_TYPE_TRIGGER_SEVERITY:
 			ret = check_trigger_severity_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_TIME_PERIOD:
+		case ZBX_CONDITION_TYPE_TIME_PERIOD:
 			ret = check_time_period_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_SUPPRESSED:
+		case ZBX_CONDITION_TYPE_SUPPRESSED:
 			ret = check_suppressed_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
+		case ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED:
 			ret = check_acknowledged_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_EVENT_TAG:
+		case ZBX_CONDITION_TYPE_EVENT_TAG:
 			check_condition_event_tag(esc_events, condition);
 			ret = SUCCEED;
 			break;
-		case CONDITION_TYPE_EVENT_TAG_VALUE:
+		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 			check_condition_event_tag_value(esc_events,condition);
 			ret = SUCCEED;
 			break;
@@ -987,12 +987,12 @@ static int	check_drule_condition(const zbx_vector_ptr_t *esc_events, zbx_conditi
 	zbx_vector_uint64_t	objectids[2];
 	zbx_uint64_t		condition_value;
 
-	if (CONDITION_OPERATOR_EQUAL == condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL == condition->op)
 	{
 		operation_and = " and";
 		operation_where = " where";
 	}
-	else if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+	else if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 	{
 		operation_and = " and not";
 		operation_where = " where not";
@@ -1083,9 +1083,9 @@ static int	check_dcheck_condition(const zbx_vector_ptr_t *esc_events, zbx_condit
 	zbx_vector_uint64_t	objectids;
 	zbx_uint64_t		condition_value;
 
-	if (CONDITION_OPERATOR_EQUAL == condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL == condition->op)
 		operation_where = " where";
-	else if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+	else if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 		operation_where = " where not";
 	else
 		return NOTSUPPORTED;
@@ -1150,7 +1150,7 @@ static int	check_dobject_condition(const zbx_vector_ptr_t *esc_events, zbx_condi
 {
 	int	i, condition_value_i = atoi(condition->value);
 
-	if (CONDITION_OPERATOR_EQUAL != condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
 	for (i = 0; i < esc_events->values_num; i++)
@@ -1186,9 +1186,9 @@ static int	check_proxy_condition(const zbx_vector_ptr_t *esc_events, zbx_conditi
 	zbx_vector_uint64_t	objectids[2];
 	zbx_uint64_t		condition_value;
 
-	if (CONDITION_OPERATOR_EQUAL == condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL == condition->op)
 		operation_and = " and";
-	else if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+	else if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 		operation_and = " and not";
 	else
 		return NOTSUPPORTED;
@@ -1280,12 +1280,12 @@ static int	check_dvalue_condition(const zbx_vector_ptr_t *esc_events, zbx_condit
 
 	switch (condition->op)
 	{
-		case CONDITION_OPERATOR_EQUAL:
-		case CONDITION_OPERATOR_NOT_EQUAL:
-		case CONDITION_OPERATOR_MORE_EQUAL:
-		case CONDITION_OPERATOR_LESS_EQUAL:
-		case CONDITION_OPERATOR_LIKE:
-		case CONDITION_OPERATOR_NOT_LIKE:
+		case ZBX_CONDITION_OPERATOR_EQUAL:
+		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
+		case ZBX_CONDITION_OPERATOR_MORE_EQUAL:
+		case ZBX_CONDITION_OPERATOR_LESS_EQUAL:
+		case ZBX_CONDITION_OPERATOR_LIKE:
+		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
 			break;
 		default:
 			return NOTSUPPORTED;
@@ -1322,27 +1322,27 @@ static int	check_dvalue_condition(const zbx_vector_ptr_t *esc_events, zbx_condit
 
 			switch (condition->op)
 			{
-				case CONDITION_OPERATOR_EQUAL:
+				case ZBX_CONDITION_OPERATOR_EQUAL:
 					if (0 == strcmp(condition->value, row[1]))
 						add_condition_match(esc_events, condition, objectid, object);
 					break;
-				case CONDITION_OPERATOR_NOT_EQUAL:
+				case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
 					if (0 != strcmp(condition->value, row[1]))
 						add_condition_match(esc_events, condition, objectid, object);
 					break;
-				case CONDITION_OPERATOR_MORE_EQUAL:
+				case ZBX_CONDITION_OPERATOR_MORE_EQUAL:
 					if (0 <= strcmp(row[1], condition->value))
 						add_condition_match(esc_events, condition, objectid, object);
 					break;
-				case CONDITION_OPERATOR_LESS_EQUAL:
+				case ZBX_CONDITION_OPERATOR_LESS_EQUAL:
 					if (0 >= strcmp(row[1], condition->value))
 						add_condition_match(esc_events, condition, objectid, object);
 					break;
-				case CONDITION_OPERATOR_LIKE:
+				case ZBX_CONDITION_OPERATOR_LIKE:
 					if (NULL != strstr(row[1], condition->value))
 						add_condition_match(esc_events, condition, objectid, object);
 					break;
-				case CONDITION_OPERATOR_NOT_LIKE:
+				case ZBX_CONDITION_OPERATOR_NOT_LIKE:
 					if (NULL == strstr(row[1], condition->value))
 						add_condition_match(esc_events, condition, objectid, object);
 					break;
@@ -1379,7 +1379,7 @@ static int	check_dhost_ip_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 	zbx_vector_uint64_t	objectids[2];
 	zbx_uint64_t		condition_value;
 
-	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_NOT_EQUAL != condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
 	ZBX_STR2UINT64(condition_value, condition->value);
@@ -1426,11 +1426,11 @@ static int	check_dhost_ip_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 			ZBX_STR2UINT64(objectid, row[0]);
 			switch (condition->op)
 			{
-				case CONDITION_OPERATOR_EQUAL:
+				case ZBX_CONDITION_OPERATOR_EQUAL:
 					if (SUCCEED == zbx_ip_in_list(condition->value, row[1]))
 						add_condition_match(esc_events, condition, objectid, objects[i]);
 					break;
-				case CONDITION_OPERATOR_NOT_EQUAL:
+				case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
 					if (SUCCEED != zbx_ip_in_list(condition->value, row[1]))
 						add_condition_match(esc_events, condition, objectid, objects[i]);
 					break;
@@ -1468,7 +1468,7 @@ static int	check_dservice_type_condition(const zbx_vector_ptr_t *esc_events, zbx
 	zbx_vector_uint64_t	objectids;
 	int			i, condition_value_i;
 
-	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_NOT_EQUAL != condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
 	condition_value_i = atoi(condition->value);
@@ -1507,11 +1507,11 @@ static int	check_dservice_type_condition(const zbx_vector_ptr_t *esc_events, zbx
 
 			switch (condition->op)
 			{
-				case CONDITION_OPERATOR_EQUAL:
+				case ZBX_CONDITION_OPERATOR_EQUAL:
 					if (condition_value_i == tmp_int)
 						add_condition_match(esc_events, condition, objectid, object);
 					break;
-				case CONDITION_OPERATOR_NOT_EQUAL:
+				case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
 					if (condition_value_i != tmp_int)
 						add_condition_match(esc_events, condition, objectid, object);
 					break;
@@ -1548,11 +1548,11 @@ static int	check_dstatus_condition(const zbx_vector_ptr_t *esc_events, zbx_condi
 
 		switch (condition->op)
 		{
-			case CONDITION_OPERATOR_EQUAL:
+			case ZBX_CONDITION_OPERATOR_EQUAL:
 				if (condition_value_i == event->value)
 					zbx_vector_uint64_append(&condition->eventids, event->eventid);
 				break;
-			case CONDITION_OPERATOR_NOT_EQUAL:
+			case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
 				if (condition_value_i != event->value)
 					zbx_vector_uint64_append(&condition->eventids, event->eventid);
 				break;
@@ -1586,7 +1586,7 @@ static int	check_duptime_condition(const zbx_vector_ptr_t *esc_events, zbx_condi
 	zbx_vector_uint64_t	objectids[2];
 	int			condition_value_i;
 
-	if (CONDITION_OPERATOR_LESS_EQUAL != condition->op && CONDITION_OPERATOR_MORE_EQUAL != condition->op)
+	if (ZBX_CONDITION_OPERATOR_LESS_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_MORE_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
 	condition_value_i = atoi(condition->value);
@@ -1638,11 +1638,11 @@ static int	check_duptime_condition(const zbx_vector_ptr_t *esc_events, zbx_condi
 
 			switch (condition->op)
 			{
-				case CONDITION_OPERATOR_LESS_EQUAL:
+				case ZBX_CONDITION_OPERATOR_LESS_EQUAL:
 					if (0 != tmp_int && (now - tmp_int) <= condition_value_i)
 						add_condition_match(esc_events, condition, objectid, objects[i]);
 					break;
-				case CONDITION_OPERATOR_MORE_EQUAL:
+				case ZBX_CONDITION_OPERATOR_MORE_EQUAL:
 					if (0 != tmp_int && (now - tmp_int) >= condition_value_i)
 						add_condition_match(esc_events, condition, objectid, objects[i]);
 					break;
@@ -1680,7 +1680,7 @@ static int	check_dservice_port_condition(const zbx_vector_ptr_t *esc_events, zbx
 	zbx_vector_uint64_t	objectids;
 	int			i;
 
-	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_NOT_EQUAL != condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
 	zbx_vector_uint64_create(&objectids);
@@ -1713,11 +1713,11 @@ static int	check_dservice_port_condition(const zbx_vector_ptr_t *esc_events, zbx
 			ZBX_STR2UINT64(objectid, row[0]);
 			switch (condition->op)
 			{
-				case CONDITION_OPERATOR_EQUAL:
+				case ZBX_CONDITION_OPERATOR_EQUAL:
 					if (SUCCEED == zbx_int_in_list(condition->value, atoi(row[1])))
 						add_condition_match(esc_events, condition, objectid, object);
 					break;
-				case CONDITION_OPERATOR_NOT_EQUAL:
+				case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
 					if (SUCCEED != zbx_int_in_list(condition->value, atoi(row[1])))
 						add_condition_match(esc_events, condition, objectid, object);
 					break;
@@ -1751,34 +1751,34 @@ static void	check_discovery_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 
 	switch (condition->conditiontype)
 	{
-		case CONDITION_TYPE_DRULE:
+		case ZBX_CONDITION_TYPE_DRULE:
 			ret = check_drule_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_DCHECK:
+		case ZBX_CONDITION_TYPE_DCHECK:
 			ret = check_dcheck_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_DOBJECT:
+		case ZBX_CONDITION_TYPE_DOBJECT:
 			ret = check_dobject_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_PROXY:
+		case ZBX_CONDITION_TYPE_PROXY:
 			ret = check_proxy_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_DVALUE:
+		case ZBX_CONDITION_TYPE_DVALUE:
 			ret = check_dvalue_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_DHOST_IP:
+		case ZBX_CONDITION_TYPE_DHOST_IP:
 			ret = check_dhost_ip_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_DSERVICE_TYPE:
+		case ZBX_CONDITION_TYPE_DSERVICE_TYPE:
 			ret = check_dservice_type_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_DSTATUS:
+		case ZBX_CONDITION_TYPE_DSTATUS:
 			ret = check_dstatus_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_DUPTIME:
+		case ZBX_CONDITION_TYPE_DUPTIME:
 			ret = check_duptime_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_DSERVICE_PORT:
+		case ZBX_CONDITION_TYPE_DSERVICE_PORT:
 			ret = check_dservice_port_condition(esc_events, condition);
 			break;
 		default:
@@ -1820,16 +1820,16 @@ static int	check_hostname_metadata_condition(const zbx_vector_ptr_t *esc_events,
 
 	switch(condition->op)
 	{
-		case CONDITION_OPERATOR_LIKE:
-		case CONDITION_OPERATOR_NOT_LIKE:
-		case CONDITION_OPERATOR_REGEXP:
-		case CONDITION_OPERATOR_NOT_REGEXP:
+		case ZBX_CONDITION_OPERATOR_LIKE:
+		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
+		case ZBX_CONDITION_OPERATOR_REGEXP:
+		case ZBX_CONDITION_OPERATOR_NOT_REGEXP:
 			break;
 		default:
 			return NOTSUPPORTED;
 	}
 
-	if (CONDITION_TYPE_HOST_NAME == condition->conditiontype)
+	if (ZBX_CONDITION_TYPE_HOST_NAME == condition->conditiontype)
 		condition_field = "host";
 	else
 		condition_field = "host_metadata";
@@ -1855,19 +1855,19 @@ static int	check_hostname_metadata_condition(const zbx_vector_ptr_t *esc_events,
 
 		switch (condition->op)
 		{
-			case CONDITION_OPERATOR_LIKE:
+			case ZBX_CONDITION_OPERATOR_LIKE:
 				if (NULL != strstr(row[1], condition->value))
 					add_condition_match(esc_events, condition, objectid, object);
 				break;
-			case CONDITION_OPERATOR_NOT_LIKE:
+			case ZBX_CONDITION_OPERATOR_NOT_LIKE:
 				if (NULL == strstr(row[1], condition->value))
 					add_condition_match(esc_events, condition, objectid, object);
 				break;
-			case CONDITION_OPERATOR_REGEXP:
+			case ZBX_CONDITION_OPERATOR_REGEXP:
 				if (NULL != zbx_regexp_match(row[1], condition->value, NULL))
 					add_condition_match(esc_events, condition, objectid, object);
 				break;
-			case CONDITION_OPERATOR_NOT_REGEXP:
+			case ZBX_CONDITION_OPERATOR_NOT_REGEXP:
 				if (NULL == zbx_regexp_match(row[1], condition->value, NULL))
 					add_condition_match(esc_events, condition, objectid, object);
 				break;
@@ -1905,7 +1905,7 @@ static int	check_areg_proxy_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_NOT_EQUAL != condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
 	zbx_vector_uint64_create(&objectids);
@@ -1931,11 +1931,11 @@ static int	check_areg_proxy_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 
 		switch (condition->op)
 		{
-			case CONDITION_OPERATOR_EQUAL:
+			case ZBX_CONDITION_OPERATOR_EQUAL:
 				if (id == condition_value)
 					add_condition_match(esc_events, condition, objectid, object);
 				break;
-			case CONDITION_OPERATOR_NOT_EQUAL:
+			case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
 				if (id != condition_value)
 					add_condition_match(esc_events, condition, objectid, object);
 				break;
@@ -1969,11 +1969,11 @@ static void	check_autoregistration_condition(const zbx_vector_ptr_t *esc_events,
 
 	switch (condition->conditiontype)
 	{
-		case CONDITION_TYPE_HOST_NAME:
-		case CONDITION_TYPE_HOST_METADATA:
+		case ZBX_CONDITION_TYPE_HOST_NAME:
+		case ZBX_CONDITION_TYPE_HOST_METADATA:
 			ret = check_hostname_metadata_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_PROXY:
+		case ZBX_CONDITION_TYPE_PROXY:
 			ret = check_areg_proxy_condition(esc_events, condition);
 			break;
 		default:
@@ -2021,6 +2021,14 @@ static int	is_supported_event_object(const ZBX_DB_EVENT *event)
  ******************************************************************************/
 static int	check_intern_event_type_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
+/* event type action condition values */
+/* SYNC WITH PHP!                     */
+#define EVENT_TYPE_ITEM_NOTSUPPORTED		0
+/* #define EVENT_TYPE_ITEM_NORMAL		1	 deprecated */
+#define EVENT_TYPE_LLDRULE_NOTSUPPORTED		2
+/* #define EVENT_TYPE_LLDRULE_NORMAL		3	 deprecated */
+#define EVENT_TYPE_TRIGGER_UNKNOWN		4
+/* #define EVENT_TYPE_TRIGGER_NORMAL		5	 deprecated */
 	int		i;
 	zbx_uint64_t	condition_value;
 
@@ -2057,6 +2065,9 @@ static int	check_intern_event_type_condition(const zbx_vector_ptr_t *esc_events,
 	}
 
 	return SUCCEED;
+#undef EVENT_TYPE_ITEM_NOTSUPPORTED
+#undef EVENT_TYPE_LLDRULE_NOTSUPPORTED
+#undef EVENT_TYPE_TRIGGER_UNKNOWN
 }
 
 /******************************************************************************
@@ -2119,7 +2130,7 @@ static int	check_intern_host_group_condition(const zbx_vector_ptr_t *esc_events,
 	zbx_vector_uint64_t	objectids[3], groupids;
 	zbx_uint64_t		condition_value;
 
-	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_NOT_EQUAL != condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
 	ZBX_STR2UINT64(condition_value, condition->value);
@@ -2177,7 +2188,7 @@ static int	check_intern_host_group_condition(const zbx_vector_ptr_t *esc_events,
 			zbx_uint64_t	objectid;
 
 			ZBX_STR2UINT64(objectid, row[0]);
-			if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+			if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 			{
 				int	index;
 
@@ -2195,7 +2206,7 @@ static int	check_intern_host_group_condition(const zbx_vector_ptr_t *esc_events,
 
 	for (i = 0; i < (int)ARRSIZE(objects); i++)
 	{
-		if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+		if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 		{
 			int	j;
 
@@ -2262,7 +2273,7 @@ static int	check_intern_host_template_condition(const zbx_vector_ptr_t *esc_even
 	zbx_vector_uint64_t		objectids[3];
 	zbx_vector_uint64_pair_t	objectids_pair[3];
 
-	if (CONDITION_OPERATOR_EQUAL != condition->op && CONDITION_OPERATOR_NOT_EQUAL != condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
 	for (i = 0; i < (int)ARRSIZE(objects); i++)
@@ -2353,12 +2364,12 @@ static int	check_intern_host_condition(const zbx_vector_ptr_t *esc_events, zbx_c
 	zbx_vector_uint64_t	objectids[3];
 	zbx_uint64_t		condition_value;
 
-	if (CONDITION_OPERATOR_EQUAL == condition->op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL == condition->op)
 	{
 		operation = " and";
 		operation_item = " where";
 	}
-	else if (CONDITION_OPERATOR_NOT_EQUAL == condition->op)
+	else if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 	{
 		operation = " and not";
 		operation_item = " where not";
@@ -2446,23 +2457,23 @@ static void	check_internal_condition(const zbx_vector_ptr_t *esc_events, zbx_con
 
 	switch (condition->conditiontype)
 	{
-		case CONDITION_TYPE_EVENT_TYPE:
+		case ZBX_CONDITION_TYPE_EVENT_TYPE:
 			ret = check_intern_event_type_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_HOST_GROUP:
+		case ZBX_CONDITION_TYPE_HOST_GROUP:
 			ret = check_intern_host_group_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_HOST_TEMPLATE:
+		case ZBX_CONDITION_TYPE_HOST_TEMPLATE:
 			ret = check_intern_host_template_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_HOST:
+		case ZBX_CONDITION_TYPE_HOST:
 			ret = check_intern_host_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_EVENT_TAG:
+		case ZBX_CONDITION_TYPE_EVENT_TAG:
 			check_condition_event_tag(esc_events, condition);
 			ret = SUCCEED;
 			break;
-		case CONDITION_TYPE_EVENT_TAG_VALUE:
+		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 			check_condition_event_tag_value(esc_events,condition);
 			ret = SUCCEED;
 			break;
@@ -2576,15 +2587,15 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " eventsource:%d", __func__,
 			action->actionid, (int)action->eventsource);
 
-	if (CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
+	if (ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 		expression = zbx_strdup(expression, action->formula);
 
 	for (i = 0; i < action->conditions.values_num; i++)
 	{
 		condition = (zbx_condition_t *)action->conditions.values[i];
 
-		if (CONDITION_EVAL_TYPE_AND_OR == action->evaltype && old_type == condition->conditiontype &&
-				SUCCEED == ret)
+		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype &&
+				old_type == condition->conditiontype && SUCCEED == ret)
 		{
 			continue;	/* short-circuit true OR condition block to the next AND condition */
 		}
@@ -2598,8 +2609,8 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 
 		switch (action->evaltype)
 		{
-			case CONDITION_EVAL_TYPE_AND_OR:
-				if (old_type == condition->conditiontype)	/* assume conditions are sorted by type */
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR:
+				if (old_type == condition->conditiontype) /* assume conditions are sorted by type */
 				{
 					if (SUCCEED == condition_result)
 						ret = SUCCEED;
@@ -2614,7 +2625,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 				}
 
 				break;
-			case CONDITION_EVAL_TYPE_AND:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND:
 				if (FAIL == condition_result)	/* break if any AND condition is FALSE */
 				{
 					ret = FAIL;
@@ -2622,7 +2633,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 				}
 
 				break;
-			case CONDITION_EVAL_TYPE_OR:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_OR:
 				if (SUCCEED == condition_result)	/* break if any OR condition is TRUE */
 				{
 					ret = SUCCEED;
@@ -2631,7 +2642,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 				ret = FAIL;
 
 				break;
-			case CONDITION_EVAL_TYPE_EXPRESSION:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION:
 				zbx_snprintf(tmp, sizeof(tmp), "{" ZBX_FS_UI64 "}", condition->conditionid);
 				id_len = strlen(tmp);
 
@@ -2648,7 +2659,7 @@ static int	check_action_conditions(zbx_uint64_t eventid, const zbx_action_eval_t
 		}
 	}
 
-	if (CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
+	if (ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 	{
 		if (SUCCEED == zbx_evaluate(&eval_result, expression, error, sizeof(error), NULL))
 			ret = (SUCCEED != zbx_double_compare(eval_result, 0) ? SUCCEED : FAIL);
@@ -3042,7 +3053,7 @@ static void	prepare_actions_conditions_eval(zbx_vector_ptr_t *actions, zbx_hashs
 			}
 			else
 			{
-				if (CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
+				if (ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION == action->evaltype)
 				{
 					char	search[ZBX_MAX_UINT64_LEN + 2];
 					char	replace[ZBX_MAX_UINT64_LEN + 2];
