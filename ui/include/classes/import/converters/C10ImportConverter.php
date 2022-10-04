@@ -323,26 +323,22 @@ class C10ImportConverter extends CConverter {
 
 		// map items to new interfaces
 		if (isset($host['items']) && $host['items']) {
-			$item_interface = [
-				ITEM_TYPE_ZABBIX => INTERFACE_TYPE_AGENT,
-				ITEM_TYPE_SNMPV1 => INTERFACE_TYPE_SNMP,
-				ITEM_TYPE_SIMPLE => INTERFACE_TYPE_AGENT,
-				ITEM_TYPE_SNMPV2C => INTERFACE_TYPE_SNMP,
-				ITEM_TYPE_SNMPV3 => INTERFACE_TYPE_SNMP,
-				ITEM_TYPE_EXTERNAL => INTERFACE_TYPE_ANY,
-				ITEM_TYPE_IPMI => INTERFACE_TYPE_IPMI,
-				ITEM_TYPE_SSH => INTERFACE_TYPE_ANY,
-				ITEM_TYPE_TELNET => INTERFACE_TYPE_ANY
-			];
-
 			foreach ($host['items'] as &$item) {
-				if (!array_key_exists('type', $item) || !array_key_exists($item['type'], $item_interface)) {
+				if (!array_key_exists('type', $item)) {
 					continue;
 				}
 
-				switch ($item_interface[$item['type']]) {
+				// 1.8 till 4.4 uses the old item types.
+				if (in_array($item['type'], [ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3])) {
+					$interface_type = INTERFACE_TYPE_SNMP;
+				}
+				else {
+					$interface_type = itemTypeInterface($item['type']);
+				}
+
+				switch ($interface_type) {
 					case INTERFACE_TYPE_AGENT:
-					case INTERFACE_TYPE_ANY:
+					case INTERFACE_TYPE_OPT:
 						$item['interface_ref'] = $agentInterface['interface_ref'];
 						break;
 

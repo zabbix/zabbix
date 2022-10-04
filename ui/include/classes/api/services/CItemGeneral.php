@@ -357,68 +357,6 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Return first main interface matched from list of preferred types, or NULL.
-	 *
-	 * @param array $interfaces  An array of interfaces to choose from.
-	 *
-	 * @return ?array
-	 */
-	public static function findInterfaceByPriority(array $interfaces): ?array {
-		$interface_by_type = [];
-
-		foreach ($interfaces as $interface) {
-			if ($interface['main'] == INTERFACE_PRIMARY) {
-				$interface_by_type[$interface['type']] = $interface;
-			}
-		}
-
-		foreach (self::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
-			if (array_key_exists($interface_type, $interface_by_type)) {
-				return $interface_by_type[$interface_type];
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the interface that best matches the given item.
-	 *
-	 * @param array $item_type  An item type
-	 * @param array $interfaces An array of interfaces to choose from
-	 *
-	 * @return array|boolean    The best matching interface;
-	 *							an empty array of no matching interface was found;
-	 *							false, if the item does not need an interface
-	 */
-	public static function findInterfaceForItem($item_type, array $interfaces) {
-		$type = itemTypeInterface($item_type);
-
-		if ($type == INTERFACE_TYPE_OPT) {
-			return false;
-		}
-		elseif ($type == INTERFACE_TYPE_ANY) {
-			return self::findInterfaceByPriority($interfaces);
-		}
-		// the item uses a specific type of interface
-		elseif ($type !== false) {
-			$interface_by_type = [];
-
-			foreach ($interfaces as $interface) {
-				if ($interface['main'] == INTERFACE_PRIMARY) {
-					$interface_by_type[$interface['type']] = $interface;
-				}
-			}
-
-			return array_key_exists($type, $interface_by_type) ? $interface_by_type[$type] : [];
-		}
-		// the item does not need an interface
-		else {
-			return false;
-		}
-	}
-
-	/**
 	 * @param array      $items
 	 * @param array|null $hostids
 	 *
@@ -1452,7 +1390,7 @@ abstract class CItemGeneral extends CApiService {
 					if (array_key_exists('interfaceid', $item)) {
 						if ($item['interfaceid'] != 0) {
 							if (bccomp($item['interfaceid'], $db_item['interfaceid']) != 0
-									|| ($interface_type != INTERFACE_TYPE_ANY
+									|| ($interface_type != INTERFACE_TYPE_OPT
 										&& $interface_type != $db_interface_type)) {
 								$check = true;
 							}
@@ -1465,7 +1403,7 @@ abstract class CItemGeneral extends CApiService {
 					}
 					else {
 						if ($db_item['interfaceid'] != 0) {
-							if ($interface_type != INTERFACE_TYPE_ANY && $interface_type != $db_interface_type) {
+							if ($interface_type != INTERFACE_TYPE_OPT && $interface_type != $db_interface_type) {
 								$item += ['interfaceid' => $db_item['interfaceid']];
 
 								$check = true;
@@ -1511,7 +1449,7 @@ abstract class CItemGeneral extends CApiService {
 
 			$interface_type = itemTypeInterface($item['type']);
 
-			if (!in_array($interface_type, [INTERFACE_TYPE_ANY, INTERFACE_TYPE_OPT])
+			if ($interface_type != INTERFACE_TYPE_OPT
 					&& $db_interfaces[$item['interfaceid']]['type'] != $interface_type) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 					'/'.($i + 1).'/interfaceid',
