@@ -23,8 +23,6 @@
  * Abstract class for condition popups.
  */
 abstract class CControllerPopupConditionCommon extends CController {
-
-
 	protected function init() {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableSIDvalidation();

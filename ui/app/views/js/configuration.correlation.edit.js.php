@@ -105,7 +105,6 @@
 	}
 
 	function createLabelCell(input) {
-		// todo E.S. : FIX LABEL WHEN DELETE ROW AND ADD A NEW ONE!!
 		const cell = document.createElement('td');
 
 		this.label = num2letter(document.getElementById('condition_table').rows.length -2);

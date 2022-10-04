@@ -42,8 +42,6 @@ window.operation_popup = new class {
 		if (data?.opmessage_usr) {
 			this._addUser(data.opmessage_usr, data.opmessage_usr.length);
 		}
-
-		this._customMessageFields();
 	}
 
 	_loadViews() {
@@ -110,13 +108,13 @@ window.operation_popup = new class {
 	}
 
 	_allInvolvedRecoveryFields() {
-		this._customMessageFields();
 		const fields = [
 			'operation-message-custom-label', 'operation-message-custom', 'operation-message-subject',
 			'operation-message-body', 'opmessage', 'operation-message-subject-label', 'operation_opmessage_default_msg'
 		]
 
 		this._enableFormFields(fields);
+		this._customMessageFields();
 	}
 
 	_allInvolvedFieldsUpdate() {
@@ -124,8 +122,8 @@ window.operation_popup = new class {
 			'operation-message-custom-label', 'operation-message-custom', 'operation-message-subject',
 			'operation-message-body', 'operation_opmessage_default_msg', 'operation-message-mediatype-default'
 		]
-		this._customMessageFields();
 		this._enableFormFields(fields);
+		this._customMessageFields();
 	}
 
 	_hostGroupFields() {
@@ -456,16 +454,9 @@ window.operation_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
-			// this._checkRow(e.detail)
-			// todo : check if row already exists
 			this._createRow(e.detail);
 			this._processTypeOfCalculation();
-
 		});
-	}
-
-	_checkRow(input) {
-	// todo: add function to check if row already exists
 	}
 
 	_createRow(input) {
@@ -614,11 +605,14 @@ window.operation_popup = new class {
 				if($('#operation_opmessage_default_msg')[0].checked) {
 					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').show().attr('disabled', false);
 					$('[id="operation-message-body"],[id="operation-message-label"]').show().attr('disabled', false);
+					$('#operation_opmessage_default_msg').val(1);
 				}
 				else {
 					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
 					$('[id="operation-message-body"],[id="operation-message-label"]').hide();
+					$('#operation_opmessage_default_msg').val(0);
 				}
-			}).trigger('change');
+			})
+			.trigger('change');
 	}
 }

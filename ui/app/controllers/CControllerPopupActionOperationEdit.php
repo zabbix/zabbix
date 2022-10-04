@@ -80,7 +80,7 @@ class CControllerPopupActionOperationEdit extends CController {
 	}
 
 	protected function doAction(): void {
-		$operation = $this->getInput('operation', []) + $this->defaultOperationObject();
+		$operation = $this->getInput('data', []) + $this->defaultOperationObject();
 		$eventsource = (int) $this->getInput('eventsource');
 		$recovery = (int) $this->getInput('recovery');
 		$operation_types = $this->popupConfigOperationTypes($operation, $eventsource, $recovery)['options'];
@@ -99,7 +99,7 @@ class CControllerPopupActionOperationEdit extends CController {
 			'eventsource' => $eventsource,
 			'actionid' => $this->getInput('actionid', []),
 			'recovery' => $recovery,
-			'operation' => $this->getInput('data', []),
+			'operation' => $operation,
 			'operation_types' => $operation_type,
 			'media_types' => $media_type,
 		];
@@ -155,7 +155,7 @@ class CControllerPopupActionOperationEdit extends CController {
 				'subject' => '',
 				'message' => '',
 				'mediatypeid' => '0',
-				'default_msg' => '1'
+				'default_msg' => '0'
 			],
 			'operationtype' => '0',
 			'esc_step_from' => '1',

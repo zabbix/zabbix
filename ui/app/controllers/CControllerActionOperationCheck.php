@@ -234,7 +234,10 @@ class CControllerActionOperationCheck extends CController {
 			}
 		}
 
-		if ($operation['recovery'] == ACTION_OPERATION) {
+		$eventsource = $operation['eventsource'];
+
+		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_SERVICE, EVENT_SOURCE_INTERNAL])
+				&& $operation['recovery'] == ACTION_OPERATION) {
 			$data['operation']['start_in'] = $this->createStartInColumn($operation);
 
 			if ($operation['recovery'] == ACTION_OPERATION &&
@@ -337,7 +340,7 @@ class CControllerActionOperationCheck extends CController {
 				case OPERATION_TYPE_COMMAND:
 					if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
 						foreach ($operation['opcommand_hst'] as $host) {
-							if ($host['hostid'] != 0) {
+							if (!array_key_exists('current_host', $host)) {
 								$hostids[$host['hostid']] = $host['hostid'];
 							}
 						}

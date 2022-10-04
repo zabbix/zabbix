@@ -35,9 +35,13 @@ $form = (new CForm())
 $form_grid = (new CFormGrid());
 $operation = $data['operation'];
 
-$operationtype_value = array_key_exists('opcommand', $operation)
+$operationtype = array_key_exists('operationtype', $operation)
+	? $operation['operationtype']
+	: '0';
+
+$operationtype_value = $operation['opcommand']['scriptid'] !== '0'
 	? 'scriptid['.$operation['opcommand']['scriptid'].']'
-	: 'cmd['.$operation['operationtype'].']';
+	: 'cmd['.$operationtype.']';
 
 // Operation type row.
 $select_operationtype = (new CSelect(''))
@@ -50,7 +54,7 @@ $select_operationtype = (new CSelect(''))
 $form_grid->addItem([
 	(new CLabel(_('Operation'), $select_operationtype->getFocusableElementId()))->setId('operation-type-label'),
 	(new CFormField($select_operationtype))
-		->setAttribute('value', $operation['operationtype'])
+		//->setAttribute('value', $operationtype_value ?? 0)
 		->setId('operation-type')
 	]);
 
@@ -108,7 +112,7 @@ $usergroup_table = (new CTable())
 		))->setId('operation-message-user-groups-footer')
 	);
 
-if ($operation['opmessage_grp']) {
+if (array_key_exists('opmessage_grp', $operation)) {
 	$i = 0;
 
 	foreach ($operation['opmessage_grp'] as $opmessage_grp) {
@@ -143,7 +147,7 @@ $user_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([_('User'), _('Action')]);
 
-if ($operation['opmessage_usr']) {
+if (array_key_exists('opmessage_usr', $operation)) {
 	$i = 0;
 	foreach ($operation['opmessage_usr'] as $opmessage_usr) {
 		$userids = $opmessage_usr['userid'];
@@ -215,7 +219,8 @@ $form_grid->addItem([
 	(new CLabel(_('Custom message'), 'operation[opmessage][default_msg]'))->setId('operation-message-custom-label'),
 	(new CFormField(
 		(new CCheckBox('operation[opmessage][default_msg]', $operation['opmessage']['default_msg']))
-			->setChecked((bool) $operation['opmessage']['default_msg'])
+			->setId('operation_opmessage_default_msg')
+			->setChecked($operation['opmessage']['default_msg'] !== '0')
 	))->setId('operation-message-custom')
 ]);
 
@@ -237,7 +242,9 @@ $form_grid->addItem([
 		->setId('operation-message-body')
 ]);
 
-$opcommand_hst_value = $operation['opcommand_hst'][0]['hostid'];
+$opcommand_hst_value = array_key_exists('0', $operation['opcommand_hst'])
+	? $operation['opcommand_hst']['0']['hostid']
+	: null;
 
 // Command execution targets row.
 $form_grid->addItem([
@@ -258,7 +265,7 @@ $form_grid->addItem([
 				(new CMultiSelect([
 					'name' => 'operation[opcommand_hst][][hostid]',
 					'object_name' => 'hosts',
-					'add_post_js' => false
+					'add_post_js' => false,
 				]))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			])

@@ -46,7 +46,6 @@ class CControllerActionOperationConditionCheck extends CController
 					CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP
 				]),
 			'value' => ''
-			// todo E.S. check if input value is named as value??
 		];
 
 		$ret = $this->validateInput($fields);

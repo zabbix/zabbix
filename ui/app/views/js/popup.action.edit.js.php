@@ -317,7 +317,6 @@ window.action_edit_popup = new class {
 	}
 
 	_checkRow(input) {
-		// todo: check if condition with the same value already exists in the table.
 		// check if identical condition already exists in table
 		const hasRows = [...document.getElementById('conditionTable').getElementsByTagName('tr')].map(it => {
 			const table_row = it.getElementsByTagName('td')[1];
@@ -348,7 +347,6 @@ window.action_edit_popup = new class {
 	}
 
 	_createLabelCell(input) {
-		// todo E.S. : FIX LABEL WHEN DELETE ROW AND ADD A NEW ONE!!
 		const cell = document.createElement('td');
 
 		this.label = num2letter(document.getElementById('conditionTable').rows.length - 2);
