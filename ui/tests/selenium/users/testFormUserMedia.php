@@ -22,10 +22,31 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
- * @backup users
+ * @backup users, media_type
+ *
+ * @onBefore prepareMediaTypeData
+ *
  * @dataSource LoginUsers
  */
 class testFormUserMedia extends CWebTest {
+
+	/**
+	 * Enable media types before test.
+	 */
+	public function prepareMediaTypeData() {
+		$mediatypeids = CDBHelper::getAll("SELECT mediatypeid FROM media_type WHERE name IN ('Email', 'SMS',".
+				"'Test script', 'MS Teams', 'Slack', 'Zendesk')"
+		);
+
+		foreach ($mediatypeids as $mediatype) {
+			CDataHelper::call('mediatype.update', [
+				[
+					'mediatypeid' => $mediatype['mediatypeid'],
+					'status' => 0
+				]
+			]);
+		}
+	}
 
 	public function getMediaData() {
 		return [

@@ -23,6 +23,9 @@ OBJS = \
 	$(OUTPUTDIR)\misc.o \
 	$(OUTPUTDIR)\time.o \
 	$(OUTPUTDIR)\expr.o \
+	$(OUTPUTDIR)\host.o \
+	$(OUTPUTDIR)\macro.o \
+	$(OUTPUTDIR)\function.o \
 	$(OUTPUTDIR)\token.o \
 	$(OUTPUTDIR)\fatal.o \
 	$(OUTPUTDIR)\disk.o \
@@ -129,6 +132,15 @@ $(OUTPUTDIR)\time.o: $(TOPDIR)\src\libs\zbxtime\time.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\expr.o: $(TOPDIR)\src\libs\zbxexpr\expr.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\host.o: $(TOPDIR)\src\libs\zbxexpr\host.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\macro.o: $(TOPDIR)\src\libs\zbxexpr\macro.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\function.o: $(TOPDIR)\src\libs\zbxexpr\function.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\interval.o: $(TOPDIR)\src\libs\zbxexpr\interval.c
