@@ -471,11 +471,19 @@ static int	DBpatch_6030060(void)
 
 static int	DBpatch_6030061(void)
 {
-	return DBcreate_index("hosts", "hosts_6", "name_up", 0);
+	return DBcreate_index("hosts", "hosts_6", "name_upper", 0);
 }
 
-
 static int	DBpatch_6030062(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update hosts set name_upper=UPPER(name)"))
+		return FAIL;
+}
+
+static int	DBpatch_6030063(void)
 {
 	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("hosts", "name", "name_upper", "UPPER",
 			"hostid");
@@ -550,5 +558,6 @@ DBPATCH_ADD(6030059, 0, 1)
 DBPATCH_ADD(6030060, 0, 1)
 DBPATCH_ADD(6030061, 0, 1)
 DBPATCH_ADD(6030062, 0, 1)
+DBPATCH_ADD(6030063, 0, 1)
 
 DBPATCH_END()
