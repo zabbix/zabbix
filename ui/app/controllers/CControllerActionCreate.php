@@ -235,51 +235,6 @@ class CControllerActionCreate extends CController {
 			unset($operation);
 		}
 
-//		$newCondition = getRequest('new_condition');
-
-//		if ($newCondition) {
-//			$conditions = getRequest('conditions', []);
-
-//			// When adding new condition, in order to check for an existing condition, it must have a not null value.
-//			if ($newCondition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
-//				$newCondition['value'] = '';
-//			}
-
-//			// check existing conditions and remove duplicate condition values
-//			foreach ($conditions as $condition) {
-//				if ($newCondition['conditiontype'] == $condition['conditiontype']) {
-//					if (is_array($newCondition['value'])) {
-//						foreach ($newCondition['value'] as $key => $newValue) {
-//							if ($condition['value'] == $newValue) {
-//								unset($newCondition['value'][$key]);
-//							}
-//						}
-//					}
-//					else {
-//						if ($newCondition['value'] == $condition['value'] && (!array_key_exists('value2', $newCondition)
-//								|| $newCondition['value2'] === $condition['value2'])) {
-//							$newCondition['value'] = null;
-//						}
-//					}
-//				}
-//			}
-
-//			$usedFormulaIds = zbx_objectValues($conditions, 'formulaid');
-
-//			if (isset($newCondition['value'])) {
-//				$newConditionValues = zbx_toArray($newCondition['value']);
-//				foreach ($newConditionValues as $newValue) {
-//					$condition = $newCondition;
-//					$condition['value'] = $newValue;
-//					$condition['formulaid'] = CConditionHelper::getNextFormulaId($usedFormulaIds);
-//					$usedFormulaIds[] = $condition['formulaid'];
-//					$conditions[] = $condition;
-//				}
-//			}
-
-//			$_REQUEST['conditions'] = $conditions;
-//		}
-
 		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 			$action['esc_period'] = $this->getInput('esc_period', DB::getDefault('actions', 'esc_period'));
 		}

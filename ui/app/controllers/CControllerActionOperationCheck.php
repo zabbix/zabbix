@@ -264,8 +264,7 @@ class CControllerActionOperationCheck extends CController {
 			$previous_operations = $allOperations[0]['operations'];
 		}
 
-		// todo : pass the second (hardcoded 1h) from action popup -> default step duration!!!
-		$delays = count_operations_delay($previous_operations, '1h');
+		$delays = count_operations_delay($previous_operations, $operation['esc_period']);
 
 		return ($delays[$operation['esc_step_from']] === null)
 			? _('Unknown')
