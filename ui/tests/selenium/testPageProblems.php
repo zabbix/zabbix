@@ -71,7 +71,6 @@ class testPageProblems extends CLegacyWebTest {
 
 		// Check the default tag filter option AND and tag value option Contains
 		$this->zbxTestClickButtonText('Reset');
-		$this->query('id:filter-tags_0')->one()->waitUntilReloaded();
 		$this->assertTrue($this->zbxTestCheckboxSelected('evaltype_00'));
 		$form = $this->query('id:tabfilter_0')->asForm()->waitUntilPresent()->one();
 		$this->zbxTestDropdownAssertSelected('tags_00_operator', 'Contains');
