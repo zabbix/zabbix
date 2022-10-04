@@ -32,16 +32,18 @@ $form = (new CForm())
 	->addVar('operation[recovery]', $data['recovery'])
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
+$form_grid = (new CFormGrid());
 $operation = $data['operation'];
 
-$form_grid = (new CFormGrid());
+$operationtype_value = array_key_exists('opcommand', $operation)
+	? 'scriptid['.$operation['opcommand']['scriptid'].']'
+	: 'cmd['.$operation['operationtype'].']';
 
 // Operation type row.
 $select_operationtype = (new CSelect(''))
 	->setFocusableElementId('operationtype')
 	->addOptions(CSelect::createOptionsFromArray($data['operation_types']))
-	// todo : fix for scriptids!!!!
-	->setAttribute('value', 'cmd['.$operation['operationtype'].']' ?? 0)
+	->setAttribute('value', $operationtype_value ?? 0)
 	->setId('operation-type-select')
 	->setName('operation[operationtype]');
 
@@ -52,9 +54,7 @@ $form_grid->addItem([
 		->setId('operation-type')
 	]);
 
-/*
- * Operation escalation steps row.
- */
+// Operation escalation steps row.
 $step_from = (new CNumericBox('operation[esc_step_from]', 1, 5))
 	->setAttribute('value', $operation['esc_step_from'] ?? 1)
 	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
@@ -66,13 +66,13 @@ if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EV
 		(new CLabel(_('Steps'), 'step-from'))->setId('operation-step-range-label'),
 		(new CFormField([
 			$step_from->setId('step-from'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), '-', (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), '-',
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CNumericBox('operation[esc_step_to]', 0, 5, false, false, false))
 				->setAttribute('value', $operation['esc_step_to'] ?? 0)
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), _('(0 - infinitely)')
 		]))->setId('operation-step-range')
-	//'operation-step-range'
 ]);
 
 // Operation steps duration row.
@@ -82,8 +82,7 @@ if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EV
 			(new CTextBox('operation[esc_period]', 0))
 				->setAttribute('value', $operation['esc_period'] ?? 0)
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setId('step-duration'),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			_('(0 - use action default)')
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), _('(0 - use action default)')
 		]))->setId('operation-step-duration')
 	]);
 }
@@ -238,6 +237,8 @@ $form_grid->addItem([
 		->setId('operation-message-body')
 ]);
 
+$opcommand_hst_value = $operation['opcommand_hst'][0]['hostid'];
+
 // Command execution targets row.
 $form_grid->addItem([
 	(new CLabel(_('Target list')))
@@ -248,8 +249,9 @@ $form_grid->addItem([
 			->cleanItems()
 			->addItem([
 				new CLabel(_('Current host')),
-				(new CFormField((new CCheckBox('operation[opcommand_hst][][hostid]ch', '0'))))
-					->setId('operation-command-checkbox')
+				(new CFormField((new CCheckBox('operation[opcommand_hst][][hostid][current_host]', '0'))
+				->setChecked($opcommand_hst_value == 0 && $opcommand_hst_value !== null)
+				))->setId('operation-command-checkbox')
 			])
 			->addItem([
 				(new CLabel(_('Host'))),
@@ -257,7 +259,8 @@ $form_grid->addItem([
 					'name' => 'operation[opcommand_hst][][hostid]',
 					'object_name' => 'hosts',
 					'add_post_js' => false
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				]))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			])
 			->addItem([
 				new CLabel(_('Host group')),

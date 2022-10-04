@@ -63,7 +63,6 @@ class CControllerActionOperationValidate extends CController {
 		$recovery = $operation['recovery'];
 		$optype = $operation['operationtype'];
 
-		// todo : fix this so can remove regex
 		$operationtype = preg_replace('[\D]', '', $optype);
 		$allowed_operations = getAllowedOperations($eventsource);
 
@@ -85,7 +84,7 @@ class CControllerActionOperationValidate extends CController {
 		if ($recovery == ACTION_OPERATION) {
 			if ((array_key_exists('esc_step_from', $operation) || array_key_exists('esc_step_to', $operation))
 					&& (!array_key_exists('esc_step_from', $operation)
-						|| !array_key_exists('esc_step_to', $operation))) {
+					|| !array_key_exists('esc_step_to', $operation))) {
 				error(_('Parameters "esc_step_from" and "esc_step_to" must be set together.'));
 
 				return false;
@@ -138,9 +137,8 @@ class CControllerActionOperationValidate extends CController {
 				break;
 
 			case OPERATION_TYPE_COMMAND:
-				// todo : find how to add this!!!
-				// todo : remove. just for testing
-				$operation['opcommand'] = ['scriptid' => 6];
+				$scriptid = preg_replace('[\D]', '', $operation['operationtype']);
+				$operation['opcommand'] = ['scriptid' => $scriptid];
 
 				if (!array_key_exists('scriptid', $operation['opcommand']) || !$operation['opcommand']['scriptid']) {
 					error(_('No script specified for action operation command.'));
@@ -218,7 +216,6 @@ class CControllerActionOperationValidate extends CController {
 
 	protected function doAction() {
 		$operation = $this->getInput('operation');
-
 		$operationtype = preg_replace('[\D]', '', $operation['operationtype']);
 
 		if (preg_match('/\bscriptid\b/', $operation['operationtype'])){
@@ -228,6 +225,14 @@ class CControllerActionOperationValidate extends CController {
 		$data['operation'] = $operation;
 		$data['operation']['operationtype'] = $operationtype;
 		$data['operation']['details'] = $this->getActionOperationDescription($operation);
+
+		if ($operationtype == OPERATION_TYPE_COMMAND) {
+			$data['operation']['opcommand']['scriptid'] = preg_replace('[\D]', '', $operation['operationtype']);
+
+			if (array_key_exists('current_host', $data['operation']['opcommand_hst'][0]['hostid'])) {
+				$data['operation']['opcommand_hst'][0]['hostid'] = 0;
+			}
+		}
 
 		if ($operation['recovery'] == ACTION_OPERATION) {
 			$data['operation']['start_in'] = $this->createStartInColumn($operation);
@@ -253,7 +258,6 @@ class CControllerActionOperationValidate extends CController {
 				'selectOperations' => ['operationtype', 'esc_period', 'esc_step_from', 'esc_step_to', 'evaltype'],
 				'actionids' => $this->getInput('actionid')
 			]);
-
 			$previous_operations = $allOperations[0]['operations'];
 		}
 
@@ -274,7 +278,6 @@ class CControllerActionOperationValidate extends CController {
 		if ($operation['esc_step_from'] < 1) {
 			$step_from = 1;
 		}
-		// todo : should add in increasing order (by steps) from js side??
 		if (($step_from === $operation['esc_step_to']) || $operation['esc_step_to'] == 0) {
 			$steps = $step_from;
 		}
@@ -467,9 +470,10 @@ class CControllerActionOperationValidate extends CController {
 		}
 
 		if ($scriptids) {
+			$scriptid = preg_replace('[\D]', '', $operation['operationtype']);
 			$scripts = API::Script()->get([
 				'output' => ['name'],
-				'scriptids' => array_keys($scriptids),
+				'scriptids' => $scriptid,
 				'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
 				'preservekeys' => true
 			]);
@@ -520,11 +524,8 @@ class CControllerActionOperationValidate extends CController {
 
 				case OPERATION_TYPE_COMMAND:
 
-					$scriptid = $operation['operationtype'];
-
 					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
-						$result['type'][] = [_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])];
-
+						$result['type'][] = _s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name']);
 						break;
 					}
 
@@ -532,7 +533,7 @@ class CControllerActionOperationValidate extends CController {
 						$host_list = [];
 
 						foreach ($operation['opcommand_hst'] as $host) {
-							if ($host['hostid'] == 0) {
+							if ($host['hostid']['current_host'] == 0) {
 								$result['type'][] = (_s('Run script "%1$s" on current host', $scripts[$scriptid]['name']));
 							}
 							elseif (isset($hosts[$host['hostid']])) {
@@ -542,8 +543,6 @@ class CControllerActionOperationValidate extends CController {
 
 						if ($host_list) {
 							order_result($host_list);
-
-							// todo : pass script name
 
 							$result['type'][] = _s('Run script "%1$s" on hosts', $scripts[$scriptid]['name'].': ');
 							$result['data'][] = [implode(', ', $host_list)];
@@ -558,7 +557,6 @@ class CControllerActionOperationValidate extends CController {
 								$host_group_list[] = $host_groups[$host_group['groupid']]['name'];
 							}
 						}
-
 						order_result($host_group_list);
 
 						$result['type'][] = (_s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': ');

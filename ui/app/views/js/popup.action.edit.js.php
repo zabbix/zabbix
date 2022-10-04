@@ -151,8 +151,6 @@ window.action_edit_popup = new class {
 			this.recovery = input.detail.operation.operationtype;
 		}
 
-		//this.action_operation = input.detail.operation.operationtype;
-
 		let table_id, row_id_prefix;
 
 		if (this._isRecoveryOperation()) {
@@ -192,7 +190,6 @@ window.action_edit_popup = new class {
 		}
 
 		this.addOperationsData(input);
-
 		this.operation_row.append(this._createActionCell(input));
 		this.operation_row.setAttribute('class', 'operation-details-row');
 

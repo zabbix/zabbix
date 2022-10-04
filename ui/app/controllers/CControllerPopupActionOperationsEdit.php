@@ -19,10 +19,6 @@
 **/
 
 
-///**
-// * Actions new condition popup.
-// */
-
 class CControllerPopupActionOperationsEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
@@ -57,7 +53,6 @@ class CControllerPopupActionOperationsEdit extends CController {
 	protected function validateInputConstraints(): bool {
 		$eventsource = $this->getInput('eventsource');
 		$recovery = $this->getInput('recovery');
-
 		$allowed_operations = getAllowedOperations($eventsource);
 
 		if (!array_key_exists($recovery, $allowed_operations)) {
@@ -86,11 +81,10 @@ class CControllerPopupActionOperationsEdit extends CController {
 
 	protected function doAction(): void {
 		$operation = $this->getInput('operation', []) + $this->defaultOperationObject();
-
 		$eventsource = (int) $this->getInput('eventsource');
 		$recovery = (int) $this->getInput('recovery');
-
 		$operation_types = $this->popupConfigOperationTypes($operation, $eventsource, $recovery)['options'];
+
 		foreach ($operation_types as $type) {
 			$operation_type[$type['value']] = $type['name'];
 		}
