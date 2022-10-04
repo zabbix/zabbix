@@ -151,6 +151,7 @@
                 <httptest>
                     <uuid>14b0dc4f96ac43ceafafa7ef817ef4d6</uuid>
                     <name>WebScenTmpl</name>
+		    <delay>2m</delay>
                     <steps>
                         <step>
                             <name>StepWSTmpl</name>

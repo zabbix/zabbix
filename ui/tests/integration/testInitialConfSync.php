@@ -274,6 +274,22 @@ class testInitialConfSync extends CIntegrationTest
 				'delete' => '0',
 			],
 		],
+		[
+			'drules' =>
+			[
+				'insert' => '1',
+				'update' => '0',
+				'delete' => '0',
+			],
+		],
+		[
+			'httptests' =>
+			[
+				'insert' => '5',
+				'update' => '0',
+				'delete' => '0',
+			],
+		],
 	];
 
 	private $expected_update =
@@ -293,9 +309,9 @@ class testInitialConfSync extends CIntegrationTest
 			"autoreg" =>
 			[
 				"insert" =>
-				"1",
-				"update" =>
 				"0",
+				"update" =>
+				"1",
 				"delete" =>
 				"0",
 			]
@@ -605,6 +621,28 @@ class testInitialConfSync extends CIntegrationTest
 				"0",
 			]
 		],
+		[
+			"drules" =>
+			[
+				"insert" =>
+				"0",
+				"update" =>
+				"0",
+				"delete" =>
+				"0",
+			]
+		],
+		[
+			"httptests" =>
+			[
+				"insert" =>
+				"0",
+				"update" =>
+				"1",
+				"delete" =>
+				"0",
+			]
+		],
 	];
 
 	private $expected_delete = [
@@ -623,7 +661,7 @@ class testInitialConfSync extends CIntegrationTest
 			"autoreg" =>
 			[
 				"insert" =>
-				"1",
+				"0",
 				"update" =>
 				"0",
 				"delete" =>
@@ -935,6 +973,22 @@ class testInitialConfSync extends CIntegrationTest
 				"1",
 			]
 		],
+		[
+			'drules' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0',
+			],
+		],
+		[
+			'httptests' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '5',
+			],
+		]
 	];
 
 	private static $proxyid_active;
@@ -1392,6 +1446,17 @@ class testInitialConfSync extends CIntegrationTest
 		self::$vaultmacroid = $response['result']['globalmacroids'][0];
 	}
 
+	private function updateAutoregistration()
+	{
+		$response = $this->call('autoregistration.update', [
+			'tls_accept' => '3',
+			'tls_psk_identity' => 'PSK 001',
+			'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478'
+		]);
+		$this->assertArrayHasKey('result', $response);
+		$this->assertEquals(true, $response['result']);
+	}
+
 	private function updateGlobalMacro()
 	{
 		$response = $this->call('usermacro.get', [
@@ -1649,7 +1714,7 @@ class testInitialConfSync extends CIntegrationTest
 	public function testInitialConfSync_Insert()
 	{
 		$this->purgeExisting('host', 'hostids');
-		$this->purgeExisting('proxy', 'proxyids');
+		$this->purgeExisting('proxy', 'extend');
 		$this->purgeExisting('template', 'templateids');
 		$this->purgeExisting('item', 'itemids');
 		$this->purgeExisting('trigger', 'triggerids');
@@ -1669,12 +1734,14 @@ class testInitialConfSync extends CIntegrationTest
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
 
 		$got = $this->parseSyncResults();
+		var_dump($this->expected_initial);
+		var_dump($got);
 		$this->assertEquals($this->expected_initial, $got);
 
 		$this->purgeExisting('correlation', 'correlationids');
 		$this->purgeExisting('maintenance', 'maintenanceids');
 		$this->purgeExisting('host', 'hostids');
-		$this->purgeExisting('proxy', 'proxyids');
+		$this->purgeExisting('proxy', 'extend');
 		$this->purgeExisting('template', 'templateids');
 		$this->purgeExisting('item', 'itemids');
 		$this->purgeExisting('action', 'actionid');
@@ -1711,6 +1778,7 @@ class testInitialConfSync extends CIntegrationTest
 		$this->updateCorrelation();
 		$this->updateMaintenance();
 		$this->updateRegexp();
+		$this->updateAutoregistration();
 
 		$this->importTemplateForUpdate('confsync_tmpl_updated.xml');
 		$xml = file_get_contents('integration/data/confsync_hosts_updated.xml');
@@ -1761,6 +1829,8 @@ class testInitialConfSync extends CIntegrationTest
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
 
 		$got = $this->parseSyncResults();
+		var_dump($this->expected_update);
+		var_dump($got);
 		$this->assertEquals($this->expected_update, $got);
 
 		return true;
@@ -1770,7 +1840,7 @@ class testInitialConfSync extends CIntegrationTest
 	{
 		$this->purgeExisting('maintenance', 'maintenanceids');
 		$this->purgeExisting('host', 'hostids');
-		$this->purgeExisting('proxy', 'proxyids');
+		$this->purgeExisting('proxy', 'extend');
 		$this->purgeExisting('template', 'templateids');
 		$this->purgeExisting('correlation', 'correlationids');
 		$this->purgeExisting('regexp', 'extend');
