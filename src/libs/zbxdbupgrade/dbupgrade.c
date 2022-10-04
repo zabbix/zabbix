@@ -1317,62 +1317,59 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update(const char *t
 	ZBX_UNUSED(idname);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-		"CREATE TRIGGER %s_%s_insert BEFORE INSERT ON %s FOR EACH ROW\n"
-
-		"BEGIN\n"
-			":NEW.%s=%s(:NEW.%s);\n"
-		"END\n"
-		"CREATE TRIGGER %s_%s_update BEFORE UPDATE ON %s FOR EACH ROW\n"
-		"BEGIN\n"
-			"IF :NEW.%s<>:OLD.%s\n"
-			"THEN\n"
-			":NEW.%s=%s(:NEW.%s);\n"
-			"END IF;\n"
-		"END\n",
-		table_name, indexed_column_name, table_name, indexed_column_name, func_name,
-		original_column_name,
-		table_name, indexed_column_name, table_name, original_column_name, original_column_name,
-		indexed_column_name, func_name, original_column_name);
+			"CREATE TRIGGER %s_%s_insert\n"
+			"BEFORE INSERT ON %s FOR EACH ROW\n"
+			"BEGIN\n"
+				":NEW.%s=%s(:NEW.%s);\n"
+			"END\n"
+			"CREATE TRIGGER %s_%s_update\n"
+			"BEFORE UPDATE ON %s FOR EACH ROW\n"
+			"BEGIN\n"
+				"IF :NEW.%s<>:OLD.%s\n"
+				"THEN\n"
+					":NEW.%s=%s(:NEW.%s);\n"
+				"END IF;\n"
+			"END\n",
+			table_name, indexed_column_name, table_name, indexed_column_name, func_name,
+			original_column_name, table_name, indexed_column_name, table_name, original_column_name,
+			original_column_name, indexed_column_name, func_name, original_column_name);
 #elif HAVE_MYSQL
 	ZBX_UNUSED(idname);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-		"CREATE TRIGGER %s_%s_insert BEFORE INSERT ON %s FOR EACH ROW\n"
-			"SET NEW.%s=%s(NEW.%s);\n"
-		"CREATE TRIGGER %s_%s_update BEFORE UPDATE ON %s FOR EACH ROW\n"
-		"BEGIN\n"
-			"IF NEW.%s<>OLD.%s\n"
-			"THEN\n"
-			"SET NEW.%s=%s(NEW.%s);\n"
-			"END IF;\n"
-		"END\n",
-
-		table_name, indexed_column_name, table_name, indexed_column_name, func_name,
-		original_column_name,
-		table_name, indexed_column_name, table_name, original_column_name, original_column_name,
-		indexed_column_name, func_name, original_column_name);
+			"CREATE TRIGGER %s_%s_insert\n"
+			"BEFORE INSERT ON %s FOR EACH ROW\n"
+				"SET NEW.%s=%s(NEW.%s);\n"
+			"CREATE TRIGGER %s_%s_update\n"
+			"BEFORE UPDATE ON %s FOR EACH ROW\n"
+			"BEGIN\n"
+				"IF NEW.%s<>OLD.%s\n"
+				"THEN\n"
+					"SET NEW.%s=%s(NEW.%s);\n"
+				"END IF;\n"
+			"END\n",
+			table_name, indexed_column_name, table_name, indexed_column_name, func_name,
+			original_column_name, table_name, indexed_column_name, table_name, original_column_name,
+			original_column_name, indexed_column_name, func_name, original_column_name);
 #elif defined(HAVE_POSTGRESQL)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"CREATE OR REPLACE FUNCTION %s_%s_%s() RETURNS TRIGGER LANGUAGE PLPGSQL AS $func$  \n"
+			"CREATE OR REPLACE FUNCTION %s_%s_%s()\n"
+			"RETURNS TRIGGER LANGUAGE PLPGSQL AS $func$\n"
 			"BEGIN\n"
-				"UPDATE %s SET %s=%s(%s) WHERE %s=NEW.%s;\n"
+				"UPDATE %s SET %s=%s(%s)\n"
+				"WHERE %s=NEW.%s;\n"
 				"RETURN NULL;\n"
 			"END $func$;\n"
 
-
-			"CREATE TRIGGER %s_%s_insert AFTER INSERT OF %s ON %s\n"
-				"FOR EACH ROW\n"
-					"EXECUTE PROCEDURE %s_%s_%s();"
-
+			"CREATE TRIGGER %s_%s_insert AFTER INSERT\n"
+				"ON %s\n"
+				"FOR EACH ROW EXECUTE PROCEDURE %s_%s_%s();"
 			"CREATE TRIGGER %s_%s_update AFTER UPDATE OF %s ON %s\n"
-				"FOR EACH ROW\n"
-					"EXECUTE PROCEDURE %s_%s_%s();",
-
-				table_name, indexed_column_name, func_name, table_name, indexed_column_name, func_name,
-				original_column_name, idname, idname, table_name, indexed_column_name,
-				original_column_name, table_name, table_name, indexed_column_name, func_name,
-				table_name, indexed_column_name, original_column_name, table_name, table_name,
-				indexed_column_name, func_name);
+				"FOR EACH ROW EXECUTE PROCEDURE %s_%s_%s();",
+			table_name, indexed_column_name, func_name, table_name, indexed_column_name, func_name,
+			original_column_name, idname, idname, table_name, indexed_column_name, table_name,
+			table_name, indexed_column_name, func_name, table_name, indexed_column_name,
+			original_column_name, table_name, table_name, indexed_column_name, func_name);
 #endif
 
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
