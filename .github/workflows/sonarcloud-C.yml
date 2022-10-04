@@ -1,4 +1,4 @@
-name: SonarCloud C Build
+name: SonarCloud Build
 
 on:
   schedule:
