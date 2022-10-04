@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupActionOperationsEdit extends CController {
+class CControllerPopupActionOperationEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'eventsource' => 'required|in '.implode(',', [

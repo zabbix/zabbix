@@ -93,7 +93,7 @@ window.operation_popup = new class {
 				this._hostInventoryFields();
 				break;
 			case 'cmd[11]':
-				this._allInvolvedFields();
+				this._allInvolvedRecoveryFields();
 				break;
 			case 'cmd[12]':
 				this._allInvolvedFieldsUpdate();
@@ -109,7 +109,7 @@ window.operation_popup = new class {
 		}
 	}
 
-	_allInvolvedFields() {
+	_allInvolvedRecoveryFields() {
 		this._customMessageFields();
 		const fields = [
 			'operation-message-custom-label', 'operation-message-custom', 'operation-message-subject',
@@ -527,7 +527,7 @@ window.operation_popup = new class {
 		this.form.append(actionid);
 
 		let curl = new Curl('zabbix.php', false);
-		curl.setArgument('action', 'action.operation.validate');
+		curl.setArgument('action', 'action.operation.check');
 		const fields = getFormFields(this.form);
 
 		this._post(curl.getUrl(), fields);

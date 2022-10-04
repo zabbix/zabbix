@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerActionOperationValidate extends CController {
+class CControllerActionOperationCheck extends CController {
 	protected function init(): void
 	{
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);

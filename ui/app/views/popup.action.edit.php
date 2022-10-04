@@ -252,11 +252,7 @@ if ($data['action']['operations']) {
 							(new CButton('remove', _('Remove')))
 								->addClass('js-remove-button')
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->removeId(),
-							new CVar('operations['.$operationid.']', $operation),
-							new CVar('operations_for_popup['.ACTION_OPERATION.']['.$operationid.']',
-								json_encode($operation_for_popup)
-							)
+								->removeId()
 						]
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
@@ -281,11 +277,7 @@ if ($data['action']['operations']) {
 							(new CButton('remove', _('Remove')))
 								->addClass('js-remove-button')
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->removeId(),
-							new CVar('operations['.$operationid.']', $operation),
-							new CVar('operations_for_popup['.ACTION_OPERATION.']['.$operationid.']',
-								json_encode($operation_for_popup)
-							)
+								->removeId()
 						]
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
@@ -368,11 +360,7 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 								->setAttribute('data-operationid', $operationid)
 								->addClass('js-remove-button')
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->removeId(),
-							new CVar('recovery_operations['.$operationid.']', $operation),
-							new CVar('operations_for_popup['.ACTION_RECOVERY_OPERATION.']['.$operationid.']',
-								json_encode($operation_for_popup)
-							)
+								->removeId()
 						]
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
@@ -440,11 +428,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 								->setAttribute('data-operationid', $operationid)
 								->addClass('js-remove-button')
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->removeId(),
-							new CVar('update_operations['.$operationid.']', $operation),
-//							new CVar('operations_for_popup['.ACTION_UPDATE_OPERATION.']['.$operationid.']',
-//								json_encode($operation_for_popup)
-//							)
+								->removeId()
 						]
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
@@ -545,9 +529,7 @@ else {
 	];
 }
 
-// todo E.S.: check with V if this is fine. Add as translatable strings and add to spec.
 $header = $data['actionid'] !== '' ? _('Action') : _('New action');
-
 $output = [
 	'header' => $header,
 	'doc_url' => CDocHelper::getUrl(CDocHelper::ALERTS_ACTION_EDIT),

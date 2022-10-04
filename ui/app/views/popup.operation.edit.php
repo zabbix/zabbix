@@ -284,7 +284,7 @@ $form_grid->addItem([
 	(new CFormField((new CMultiSelect([
 		'name' => 'operation[opgroup][][groupid]',
 		'object_name' => 'hostGroup',
-		'add_post_js' => false
+		'add_post_js' => false,
 	]))
 		->setAriaRequired()
 		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
@@ -381,7 +381,7 @@ $output = [
 	'header' => _('Operation details'),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('popup.operation.common.js.php').
+	'script_inline' => getPagePostJs().$this->readJsFile('popup.operation.edit.js.php').
 		'operation_popup.init('.json_encode([
 			'eventsource' => $data['eventsource'],
 			'recovery_phase' => $data['recovery'],
