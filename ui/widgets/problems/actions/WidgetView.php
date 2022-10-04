@@ -40,28 +40,26 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
-
 		$data = CScreenProblem::getData([
-			'show' => $values['show'],
-			'groupids' => $values['groupids'],
-			'exclude_groupids' => $values['exclude_groupids'],
-			'hostids' => $values['hostids'],
-			'name' => $values['problem'],
-			'severities' => $values['severities'],
-			'evaltype' => $values['evaltype'],
-			'tags' => $values['tags'],
-			'show_suppressed' => $values['show_suppressed'],
-			'unacknowledged' => $values['unacknowledged'],
-			'show_opdata' => $values['show_opdata']
+			'show' => $this->fields_values['show'],
+			'groupids' => $this->fields_values['groupids'],
+			'exclude_groupids' => $this->fields_values['exclude_groupids'],
+			'hostids' => $this->fields_values['hostids'],
+			'name' => $this->fields_values['problem'],
+			'severities' => $this->fields_values['severities'],
+			'evaltype' => $this->fields_values['evaltype'],
+			'tags' => $this->fields_values['tags'],
+			'show_suppressed' => $this->fields_values['show_suppressed'],
+			'unacknowledged' => $this->fields_values['unacknowledged'],
+			'show_opdata' => $this->fields_values['show_opdata']
 		]);
 
-		[$sortfield, $sortorder] = self::getSorting($values['sort_triggers']);
+		[$sortfield, $sortorder] = self::getSorting($this->fields_values['sort_triggers']);
 		$data = CScreenProblem::sortData($data, $sortfield, $sortorder);
 
-		if (count($data['problems']) > $values['show_lines']) {
+		if (count($data['problems']) > $this->fields_values['show_lines']) {
 			$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown',
-				min($values['show_lines'], count($data['problems'])),
+				min($this->fields_values['show_lines'], count($data['problems'])),
 				(count($data['problems']) > CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)) ? '+' : '',
 				min(CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT), count($data['problems']))
 			);
@@ -69,17 +67,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 		else {
 			$info = '';
 		}
-		$data['problems'] = array_slice($data['problems'], 0, $values['show_lines'], true);
+		$data['problems'] = array_slice($data['problems'], 0, $this->fields_values['show_lines'], true);
 
 		$data = CScreenProblem::makeData($data, [
-			'show' => $values['show'],
+			'show' => $this->fields_values['show'],
 			'details' => 0,
-			'show_opdata' => $values['show_opdata']
+			'show_opdata' => $this->fields_values['show_opdata']
 		]);
 
-		if ($values['show_tags']) {
-			$data['tags'] = makeTags($data['problems'], true, 'eventid', $values['show_tags'], $values['tags'], null,
-				$values['tag_name_format'], $values['tag_priority']
+		if ($this->fields_values['show_tags']) {
+			$data['tags'] = makeTags($data['problems'], true, 'eventid', $this->fields_values['show_tags'],
+				$this->fields_values['tags'], null, $this->fields_values['tag_name_format'],
+				$this->fields_values['tag_priority']
 			);
 		}
 
@@ -91,14 +90,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'initial_load' => (bool) $this->getInput('initial_load', 0),
 			'fields' => [
-				'show' => $values['show'],
-				'show_lines' => $values['show_lines'],
-				'show_tags' => $values['show_tags'],
-				'show_timeline' => $values['show_timeline'],
-				'tags' => $values['tags'],
-				'tag_name_format' => $values['tag_name_format'],
-				'tag_priority' => $values['tag_priority'],
-				'show_opdata' => $values['show_opdata']
+				'show' => $this->fields_values['show'],
+				'show_lines' => $this->fields_values['show_lines'],
+				'show_tags' => $this->fields_values['show_tags'],
+				'show_timeline' => $this->fields_values['show_timeline'],
+				'tags' => $this->fields_values['tags'],
+				'tag_name_format' => $this->fields_values['tag_name_format'],
+				'tag_priority' => $this->fields_values['tag_priority'],
+				'show_opdata' => $this->fields_values['show_opdata']
 			],
 			'data' => $data,
 			'info' => $info,

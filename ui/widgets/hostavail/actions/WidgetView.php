@@ -38,16 +38,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
-
 		$interface_types = CItemGeneral::INTERFACE_TYPES_BY_PRIORITY;
 
 		// Sanitize non-existing interface types.
-		$values['interface_type'] = array_values(array_intersect($interface_types, $values['interface_type']));
+		$this->fields_values['interface_type'] = array_values(
+			array_intersect($interface_types, $this->fields_values['interface_type'])
+		);
 
-		$groupids = $values['groupids'] ? getSubGroups($values['groupids']) : null;
+		$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
 
-		$hosts_types = $values['interface_type'] ?: $interface_types;
+		$hosts_types = $this->fields_values['interface_type'] ?: $interface_types;
 
 		$hosts_total = array_fill_keys($interface_types, 0);
 		$hosts_count = array_fill_keys($interface_types, [
@@ -60,10 +60,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'output' => [],
 			'selectInterfaces' => ['type', 'available'],
 			'groupids' => $groupids,
-			'filter' => $values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
+			'filter' => $this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
 				? ['status' => HOST_STATUS_MONITORED, 'maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]
 				: ['status' => HOST_STATUS_MONITORED]
 		]);
+
 		$availability_priority = [INTERFACE_AVAILABLE_FALSE, INTERFACE_AVAILABLE_UNKNOWN, INTERFACE_AVAILABLE_TRUE];
 
 		foreach ($db_hosts as $host) {
@@ -85,7 +86,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'layout' => $values['layout'],
+			'layout' => $this->fields_values['layout'],
 			'hosts_types' => $hosts_types,
 			'hosts_count' => $hosts_count,
 			'hosts_total' => $hosts_total,

@@ -42,8 +42,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
-
 		$previous_map = null;
 		$sysmapid = null;
 		$error = null;
@@ -65,8 +63,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($this->hasInput('current_sysmapid')) {
 			$sysmapid = $this->getInput('current_sysmapid');
 		}
-		elseif (array_key_exists('sysmapid', $values)) {
-			$sysmapid =  $values['sysmapid'];
+		elseif (array_key_exists('sysmapid', $this->fields_values)) {
+			$sysmapid =  $this->fields_values['sysmapid'];
 		}
 
 		$sysmap_data = CMapHelper::get($sysmapid == null ? [] : [$sysmapid],
@@ -90,10 +88,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'sysmap_data' => $sysmap_data ?: [],
 			'widget_settings' => [
 				'current_sysmapid' => $sysmapid,
-				'filter_widget_reference' => array_key_exists('filter_widget_reference', $values)
-					? $values['filter_widget_reference']
+				'filter_widget_reference' => array_key_exists('filter_widget_reference', $this->fields_values)
+					? $this->fields_values['filter_widget_reference']
 					: null,
-				'source_type' => $values['source_type'],
+				'source_type' => $this->fields_values['source_type'],
 				'previous_map' => $previous_map,
 				'initial_load' => $this->getInput('initial_load', 1),
 				'error' => $error

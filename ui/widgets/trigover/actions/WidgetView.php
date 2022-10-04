@@ -37,39 +37,41 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
-
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'initial_load' => (bool) $this->getInput('initial_load', 0),
-			'style' => $values['style'],
+			'style' => $this->fields_values['style'],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
 		$trigger_options = [
-			'skipDependent' => ($values['show'] == TRIGGERS_OPTION_ALL) ? null : true,
-			'only_true' => ($values['show'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
+			'skipDependent' => ($this->fields_values['show'] == TRIGGERS_OPTION_ALL) ? null : true,
+			'only_true' => $this->fields_values['show'] == TRIGGERS_OPTION_RECENT_PROBLEM ? true : null,
 			'filter' => [
-				'value' => ($values['show'] == TRIGGERS_OPTION_IN_PROBLEM) ? TRIGGER_VALUE_TRUE : null
+				'value' => $this->fields_values['show'] == TRIGGERS_OPTION_IN_PROBLEM ? TRIGGER_VALUE_TRUE : null
 			]
 		];
 
 		$problem_options = [
-			'show_suppressed' => $values['show_suppressed'],
-			'show_recent' => ($values['show'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
-			'tags' => (array_key_exists('tags', $values) && $values['tags']) ? $values['tags'] : null,
-			'evaltype' => array_key_exists('evaltype', $values) ? $values['evaltype'] : TAG_EVAL_TYPE_AND_OR
+			'show_suppressed' => $this->fields_values['show_suppressed'],
+			'show_recent' => $this->fields_values['show'] == TRIGGERS_OPTION_RECENT_PROBLEM ? true : null,
+			'tags' => array_key_exists('tags', $this->fields_values) && $this->fields_values['tags']
+				? $this->fields_values['tags']
+				: null,
+			'evaltype' => array_key_exists('evaltype', $this->fields_values)
+				? $this->fields_values['evaltype']
+				: TAG_EVAL_TYPE_AND_OR
 		];
 
 		$host_options = [
-			'hostids' => $values['hostids'] ?: null
+			'hostids' => $this->fields_values['hostids'] ?: null
 		];
 
 		[$data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
 			$data['hosts_by_name'], $data['exceeded_limit']
-		] = getTriggersOverviewData(getSubGroups($values['groupids']), $host_options, $trigger_options, // TODO AS: check getTriggersOverviewData(), getSubGroups() call
+		] = getTriggersOverviewData(getSubGroups($this->fields_values['groupids']), $host_options, $trigger_options, // TODO AS: check getTriggersOverviewData(), getSubGroups() call
 			$problem_options
 		);
 

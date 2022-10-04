@@ -42,23 +42,21 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
-
 		$filter = [
-			'groupids' => getSubGroups($values['groupids']),
-			'exclude_groupids' => getSubGroups($values['exclude_groupids']),
-			'hostids' => $values['hostids'],
-			'problem' => $values['problem'],
-			'severities' => $values['severities'],
-			'show_type' => $values['show_type'],
-			'layout' => $values['layout'],
-			'show_suppressed' => $values['show_suppressed'],
-			'hide_empty_groups' => $values['hide_empty_groups'],
-			'show_opdata' => $values['show_opdata'],
-			'ext_ack' => $values['ext_ack'],
-			'show_timeline' => $values['show_timeline'],
-			'evaltype' => $values['evaltype'],
-			'tags' => $values['tags']
+			'groupids' => getSubGroups($this->fields_values['groupids']),
+			'exclude_groupids' => getSubGroups($this->fields_values['exclude_groupids']),
+			'hostids' => $this->fields_values['hostids'],
+			'problem' => $this->fields_values['problem'],
+			'severities' => $this->fields_values['severities'],
+			'show_type' => $this->fields_values['show_type'],
+			'layout' => $this->fields_values['layout'],
+			'show_suppressed' => $this->fields_values['show_suppressed'],
+			'hide_empty_groups' => $this->fields_values['hide_empty_groups'],
+			'show_opdata' => $this->fields_values['show_opdata'],
+			'ext_ack' => $this->fields_values['ext_ack'],
+			'show_timeline' => $this->fields_values['show_timeline'],
+			'evaltype' => $this->fields_values['evaltype'],
+			'tags' => $this->fields_values['tags']
 		];
 
 		$data = getSystemStatusData($filter);

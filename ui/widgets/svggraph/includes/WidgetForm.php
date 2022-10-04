@@ -421,8 +421,9 @@ class WidgetForm extends CWidgetForm {
 	/**
 	 * Check if widget configuration is set to use overridden time.
 	 */
-	public static function hasOverrideTime(array $values): bool {
-		return array_key_exists('graph_time', $values) && $values['graph_time'] == SVG_GRAPH_CUSTOM_TIME_ON;
+	public static function hasOverrideTime(array $fields_values): bool {
+		return array_key_exists('graph_time', $fields_values)
+			&& $fields_values['graph_time'] == SVG_GRAPH_CUSTOM_TIME_ON;
 	}
 
 	private static function validateTimeSelectorPeriod(string $from, string $to): array {

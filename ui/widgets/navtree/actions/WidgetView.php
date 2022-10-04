@@ -43,13 +43,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
 		$error = null;
 
 		// Get list of sysmapids.
 		$sysmapids = [];
 		$navtree_items = [];
-		foreach ($values['navtree'] as $id => $navtree_item) {
+		foreach ($this->fields_values['navtree'] as $id => $navtree_item) {
 			$sysmapid = array_key_exists('sysmapid', $navtree_item) ? $navtree_item['sysmapid'] : 0;
 			if ($sysmapid != 0) {
 				$sysmapids[$sysmapid] = true;
@@ -112,11 +111,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'navtree' => $values['navtree'],
+			'navtree' => $this->fields_values['navtree'],
 			'navtree_item_selected' => $navtree_item_selected,
 			'navtree_items_opened' => $navtree_items_opened,
 			'problems' => $this->getNumberOfProblemsBySysmap($navtree_items),
-			'show_unavailable' => $values['show_unavailable'],
+			'show_unavailable' => $this->fields_values['show_unavailable'],
 			'maps_accessible' => array_keys($maps_accessible),
 			'severity_config' => $severity_config,
 			'initial_load' => $this->getInput('initial_load', 0),

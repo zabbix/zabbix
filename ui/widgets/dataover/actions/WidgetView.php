@@ -36,18 +36,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
+		$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
+		$hostids = $this->fields_values['hostids'] ?: null;
 
-		$groupids = $values['groupids'] ? getSubGroups($values['groupids']) : null;
-		$hostids = $values['hostids'] ?: null;
-
-		[$items, $hosts, $has_hidden_data] = getDataOverview($groupids, $hostids, $values);
+		[$items, $hosts, $has_hidden_data] = getDataOverview($groupids, $hostids, $this->fields_values);
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'groupids' => getSubGroups($values['groupids']),
-			'show_suppressed' => $values['show_suppressed'],
-			'style' => $values['style'],
+			'groupids' => getSubGroups($this->fields_values['groupids']),
+			'show_suppressed' => $this->fields_values['show_suppressed'],
+			'style' => $this->fields_values['style'],
 			'items' => $items,
 			'hosts' => $hosts,
 			'has_hidden_data' => $has_hidden_data,

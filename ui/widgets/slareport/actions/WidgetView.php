@@ -44,14 +44,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
-
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'has_access' => [
 				CRoleHelper::ACTIONS_MANAGE_SLA => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA)
 			],
-			'has_serviceid' => (bool) $values['serviceid'],
+			'has_serviceid' => (bool) $this->fields_values['serviceid'],
 			'has_permissions_error' => false,
 			'rows_per_page' => CWebUser::$data['rows_per_page'],
 			'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT),
@@ -60,10 +58,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			]
 		];
 
-		$db_slas = $values['slaid']
+		$db_slas = $this->fields_values['slaid']
 			? API::Sla()->get([
 				'output' => ['slaid', 'name', 'period', 'slo', 'timezone', 'status'],
-				'slaids' => $values['slaid']
+				'slaids' => $this->fields_values['slaid']
 			])
 			: [];
 
@@ -73,7 +71,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			if ($data['sla']['status'] == ZBX_SLA_STATUS_ENABLED) {
 				$data['services'] = API::Service()->get([
 					'output' => ['name'],
-					'serviceids' => $values['serviceid'] ?: null,
+					'serviceids' => $this->fields_values['serviceid'] ?: null,
 					'slaids' => $data['sla']['slaid'],
 					'sortfield' => 'name',
 					'sortorder' => ZBX_SORT_UP,
@@ -81,10 +79,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'preservekeys' => true
 				]);
 
-				if ($values['serviceid'] && !$data['services']) {
+				if ($this->fields_values['serviceid'] && !$data['services']) {
 					$service_accessible = API::Service()->get([
 						'output' => [],
-						'serviceids' => $values['serviceid']
+						'serviceids' => $this->fields_values['serviceid']
 					]);
 
 					if (!$service_accessible) {
@@ -100,8 +98,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 					$range_time_parser = new CRangeTimeParser();
 
-					if ($values['date_from'] !== ''
-							&& $range_time_parser->parse($values['date_from']) == CParser::PARSE_SUCCESS) {
+					if ($this->fields_values['date_from'] !== ''
+							&& $range_time_parser->parse($this->fields_values['date_from']) == CParser::PARSE_SUCCESS) {
 						$period_from = $range_time_parser->getDateTime(true, $timezone)->getTimestamp();
 
 						if ($period_from < 0 || $period_from > ZBX_MAX_DATE) {
@@ -114,8 +112,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 						$period_from = null;
 					}
 
-					if ($values['date_to'] !== ''
-							&& $range_time_parser->parse($values['date_to']) == CParser::PARSE_SUCCESS) {
+					if ($this->fields_values['date_to'] !== ''
+							&& $range_time_parser->parse($this->fields_values['date_to']) == CParser::PARSE_SUCCESS) {
 						$period_to = $range_time_parser->getDateTime(false, $timezone)->getTimestamp();
 
 						if ($period_to < 0 || $period_to > ZBX_MAX_DATE) {
@@ -131,7 +129,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$data['sli'] = API::Sla()->getSli([
 						'slaid' => $data['sla']['slaid'],
 						'serviceids' => array_slice(array_keys($data['services']), 0, $data['rows_per_page']),
-						'periods' => $values['show_periods'] !== '' ? $values['show_periods'] : null,
+						'periods' => $this->fields_values['show_periods'] !== '' ? $this->fields_values['show_periods'] : null,
 						'period_from' => $period_from,
 						'period_to' => $period_to
 					]);

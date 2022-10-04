@@ -53,22 +53,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
-
 		$edit_mode = $this->getInput('edit_mode', 0);
 		$width = (int) $this->getInput('content_width', self::GRAPH_WIDTH_MIN);
 		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);
 		$preview = (bool) $this->getInput('preview', 0); // Configuration preview.
 
-		$dashboard_time = !WidgetForm::hasOverrideTime($values);
+		$dashboard_time = !WidgetForm::hasOverrideTime($this->fields_values);
 
 		if ($dashboard_time && !$preview) {
 			$from = $this->getInput('from');
 			$to = $this->getInput('to');
 		}
 		else {
-			$from = $values['time_from'];
-			$to = $values['time_to'];
+			$from = $this->fields_values['time_from'];
+			$to = $this->fields_values['time_to'];
 		}
 
 		$range_time_parser = new CRangeTimeParser();
@@ -81,29 +79,40 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
-		$percentile_left_value = $parser->parse($values['percentile_left_value']) == CParser::PARSE_SUCCESS
+		$percentile_left_value = $parser->parse($this->fields_values['percentile_left_value']) == CParser::PARSE_SUCCESS
 			? $parser->calcValue()
 			: null;
 
-		$percentile_right_value = $parser->parse($values['percentile_right_value']) == CParser::PARSE_SUCCESS
+		$percentile_right_value = $parser->parse($this->fields_values['percentile_right_value']) == CParser::PARSE_SUCCESS
 			? $parser->calcValue()
 			: null;
 
-		$lefty_min = $parser->parse($values['lefty_min']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : null;
-		$lefty_max = $parser->parse($values['lefty_max']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : null;
-		$righty_min = $parser->parse($values['righty_min']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : null;
-		$righty_max = $parser->parse($values['righty_max']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : null;
+		$lefty_min = $parser->parse($this->fields_values['lefty_min']) == CParser::PARSE_SUCCESS
+			? $parser->calcValue()
+			: null;
+
+		$lefty_max = $parser->parse($this->fields_values['lefty_max']) == CParser::PARSE_SUCCESS
+			? $parser->calcValue()
+			: null;
+
+		$righty_min = $parser->parse($this->fields_values['righty_min']) == CParser::PARSE_SUCCESS
+			? $parser->calcValue()
+			: null;
+
+		$righty_max = $parser->parse($this->fields_values['righty_max']) == CParser::PARSE_SUCCESS
+			? $parser->calcValue()
+			: null;
 
 		$graph_data = [
-			'data_sets' => array_values($values['ds']),
-			'data_source' => $values['source'],
+			'data_sets' => array_values($this->fields_values['ds']),
+			'data_source' => $this->fields_values['source'],
 			'dashboard_time' => $dashboard_time,
 			'displaying' => [
-				'show_simple_triggers' => $values['simple_triggers'] == SVG_GRAPH_SIMPLE_TRIGGERS_ON,
-				'show_working_time' => $values['working_time'] == SVG_GRAPH_WORKING_TIME_ON,
-				'show_percentile_left' => $values['percentile_left'] == SVG_GRAPH_PERCENTILE_LEFT_ON,
+				'show_simple_triggers' => $this->fields_values['simple_triggers'] == SVG_GRAPH_SIMPLE_TRIGGERS_ON,
+				'show_working_time' => $this->fields_values['working_time'] == SVG_GRAPH_WORKING_TIME_ON,
+				'show_percentile_left' => $this->fields_values['percentile_left'] == SVG_GRAPH_PERCENTILE_LEFT_ON,
 				'percentile_left_value' => $percentile_left_value,
-				'show_percentile_right' => $values['percentile_right'] == SVG_GRAPH_PERCENTILE_RIGHT_ON,
+				'show_percentile_right' => $this->fields_values['percentile_right'] == SVG_GRAPH_PERCENTILE_RIGHT_ON,
 				'percentile_right_value' => $percentile_right_value
 			],
 			'time_period' => [
@@ -111,36 +120,36 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'time_to' => $time_to
 			],
 			'axes' => [
-				'show_left_y_axis' => $values['lefty'] == SVG_GRAPH_AXIS_ON,
+				'show_left_y_axis' => $this->fields_values['lefty'] == SVG_GRAPH_AXIS_ON,
 				'left_y_min' => $lefty_min,
 				'left_y_max' => $lefty_max,
-				'left_y_units' => $values['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC
-					? $values['lefty_static_units']
+				'left_y_units' => $this->fields_values['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC
+					? $this->fields_values['lefty_static_units']
 					: null,
-				'show_right_y_axis' => $values['righty'] == SVG_GRAPH_AXIS_ON,
+				'show_right_y_axis' => $this->fields_values['righty'] == SVG_GRAPH_AXIS_ON,
 				'right_y_min' => $righty_min,
 				'right_y_max' => $righty_max,
-				'right_y_units' => $values['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC
-					? $values['righty_static_units']
+				'right_y_units' => $this->fields_values['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC
+					? $this->fields_values['righty_static_units']
 					: null,
-				'show_x_axis' => $values['axisx'] == SVG_GRAPH_AXIS_ON
+				'show_x_axis' => $this->fields_values['axisx'] == SVG_GRAPH_AXIS_ON
 			],
 			'legend' => [
-				'show_legend' => $values['legend'] == SVG_GRAPH_LEGEND_ON,
-				'legend_columns' => $values['legend_columns'],
-				'legend_lines' => $values['legend_lines'],
-				'legend_statistic' => $values['legend_statistic']
+				'show_legend' => $this->fields_values['legend'] == SVG_GRAPH_LEGEND_ON,
+				'legend_columns' => $this->fields_values['legend_columns'],
+				'legend_lines' => $this->fields_values['legend_lines'],
+				'legend_statistic' => $this->fields_values['legend_statistic']
 			],
 			'problems' => [
-				'show_problems' => $values['show_problems'] == SVG_GRAPH_PROBLEMS_ON,
-				'graph_item_problems' => $values['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS,
-				'problemhosts' => $values['problemhosts'],
-				'severities' => $values['severities'],
-				'problem_name' => $values['problem_name'],
-				'evaltype' => $values['evaltype'],
-				'tags' => $values['tags']
+				'show_problems' => $this->fields_values['show_problems'] == SVG_GRAPH_PROBLEMS_ON,
+				'graph_item_problems' => $this->fields_values['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS,
+				'problemhosts' => $this->fields_values['problemhosts'],
+				'severities' => $this->fields_values['severities'],
+				'problem_name' => $this->fields_values['problem_name'],
+				'evaltype' => $this->fields_values['evaltype'],
+				'tags' => $this->fields_values['tags']
 			],
-			'overrides' => array_values($values['or'])
+			'overrides' => array_values($this->fields_values['or'])
 		];
 
 		$svg_options = CSvgGraphHelper::get($graph_data, $width, $height);
@@ -163,7 +172,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'svg' => $svg_options['svg'].$svg_options['legend'],
 			'svg_options' => $svg_options,
 			'preview' => $preview,
-			'info' => self::makeWidgetInfo($values),
+			'info' => $this->makeWidgetInfo(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -173,13 +182,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 	/**
 	 * Make widget specific info to show in widget's header.
 	 */
-	private static function makeWidgetInfo(array $values): array {
+	private function makeWidgetInfo(): array {
 		$info = [];
 
-		if (WidgetForm::hasOverrideTime($values)) {
+		if (WidgetForm::hasOverrideTime($this->fields_values)) {
 			$info[] = [
 				'icon' => 'btn-info-clock',
-				'hint' => relativeDateToText($values['time_from'], $values['time_to'])
+				'hint' => relativeDateToText($this->fields_values['time_from'], $this->fields_values['time_to'])
 			];
 		}
 

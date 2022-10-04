@@ -39,17 +39,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
+		$filter_groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
+		$filter_hostids = $this->fields_values['hostids'] ?: null;
+		$filter_problem = $this->fields_values['problem'] !== '' ? $this->fields_values['problem'] : null;
+		$filter_severities = $this->fields_values['severities'] ?: range(TRIGGER_SEVERITY_NOT_CLASSIFIED,
+			TRIGGER_SEVERITY_COUNT - 1
+		);
+		$filter_show_suppressed = $this->fields_values['show_suppressed'];
+		$filter_ext_ack = $this->fields_values['ext_ack'];
 
-		$filter_groupids = $values['groupids'] ? getSubGroups($values['groupids']) : null;
-		$filter_hostids = $values['hostids'] ?: null;
-		$filter_problem = ($values['problem'] !== '') ? $values['problem'] : null;
-		$filter_severities = $values['severities'] ?: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
-		$filter_show_suppressed = $values['show_suppressed'];
-		$filter_ext_ack = $values['ext_ack'];
-
-		if ($values['exclude_groupids']) {
-			$exclude_groupids = getSubGroups($values['exclude_groupids']);
+		if ($this->fields_values['exclude_groupids']) {
+			$exclude_groupids = getSubGroups($this->fields_values['exclude_groupids']);
 
 			if ($filter_hostids === null) {
 				// Get all groups if no selected groups defined.
@@ -146,8 +146,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'name' => $filter_problem
 			],
 			'severities' => $filter_severities,
-			'evaltype' => $values['evaltype'],
-			'tags' => $values['tags'],
+			'evaltype' => $this->fields_values['evaltype'],
+			'tags' => $this->fields_values['tags'],
 			'acknowledged' => ($filter_ext_ack == EXTACK_OPTION_UNACK) ? false : null,
 			'suppressed' => ($filter_show_suppressed == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null
 		]);
@@ -237,12 +237,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'filter' => [
-				'hostids' => $values['hostids'],
-				'problem' => $values['problem'],
+				'hostids' => $this->fields_values['hostids'],
+				'problem' => $this->fields_values['problem'],
 				'severities' => $filter_severities,
-				'show_suppressed' => $values['show_suppressed'],
-				'hide_empty_groups' => $values['hide_empty_groups'],
-				'ext_ack' => $values['ext_ack']
+				'show_suppressed' => $this->fields_values['show_suppressed'],
+				'hide_empty_groups' => $this->fields_values['hide_empty_groups'],
+				'ext_ack' => $this->fields_values['ext_ack']
 			],
 			'hosts_data' => $hosts_data,
 			'groups' => $groups,

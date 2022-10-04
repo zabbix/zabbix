@@ -37,10 +37,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
-
-		[$sortfield, $sortorder] = self::getSorting($values['sort_triggers']);
-		$alerts = $this->getAlerts($sortfield, $sortorder, $values['show_lines']);
+		[$sortfield, $sortorder] = self::getSorting($this->fields_values['sort_triggers']);
+		$alerts = $this->getAlerts($sortfield, $sortorder, $this->fields_values['show_lines']);
 		$db_users = $this->getDbUsers($alerts);
 
 		$actions = API::Action()->get([

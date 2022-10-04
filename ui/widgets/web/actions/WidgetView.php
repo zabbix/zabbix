@@ -41,16 +41,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
+		$filter_groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
+		$filter_hostids = $this->fields_values['hostids'] ?: null;
+		$filter_maintenance = ($this->fields_values['maintenance'] == 0) ? 0 : null;
 
-		$filter_groupids = $values['groupids'] ? getSubGroups($values['groupids']) : null;
-		$filter_hostids = $values['hostids'] ?: null;
-		$filter_maintenance = ($values['maintenance'] == 0) ? 0 : null;
-
-		if ($values['exclude_groupids']) {
-			$exclude_groupids = getSubGroups($values['exclude_groupids']);
+		if ($this->fields_values['exclude_groupids']) {
+			$exclude_groupids = getSubGroups($this->fields_values['exclude_groupids']);
 
 			if ($filter_hostids === null) {
+
 				// Get all groups if no selected groups defined.
 				if ($filter_groupids === null) {
 					$filter_groupids = array_keys(API::HostGroup()->get([
@@ -107,8 +106,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		unset($group);
 
 		// Fetch links between HTTP tests and host groups.
-		$where_tags = (array_key_exists('tags', $values) && $values['tags'])
-			? CApiTagHelper::addWhereCondition($values['tags'], $values['evaltype'], 'ht', 'httptest_tag', 'httptestid')
+		$where_tags = (array_key_exists('tags', $this->fields_values) && $this->fields_values['tags'])
+			? CApiTagHelper::addWhereCondition($this->fields_values['tags'], $this->fields_values['evaltype'], 'ht',
+				'httptest_tag', 'httptestid'
+			)
 			: '';
 
 		$result = DbFetchArray(DBselect(

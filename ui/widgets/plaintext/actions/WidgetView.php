@@ -42,7 +42,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
 		$error = null;
 
 		$dynamic_widget_name = $this->widget->getDefaultName();
@@ -56,14 +55,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		else {
 			$is_template_dashboard = $this->hasInput('templateid');
-			$is_dynamic_item = ($is_template_dashboard || $values['dynamic'] == WIDGET_DYNAMIC_ITEM);
+			$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == WIDGET_DYNAMIC_ITEM);
 
-			if ($values['itemids']) {
+			if ($this->fields_values['itemids']) {
 				$items = API::Item()->get([
 					'output' => ['itemid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
 					'selectHosts' => ['name'],
 					'selectValueMap' => ['mappings'],
-					'itemids' => $values['itemids'],
+					'itemids' => $this->fields_values['itemids'],
 					'webitems' => true,
 					'preservekeys' => true
 				]);
@@ -89,14 +88,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$error = _('No permissions to referred object or it does not exist!');
 			}
 			else {
-				$histories = Manager::History()->getLastValues($items, $values['show_lines']);
+				$histories = Manager::History()->getLastValues($items, $this->fields_values['show_lines']);
 
 				if ($histories) {
 					$histories = array_merge(...$histories);
 
 					foreach ($histories as &$history) {
 						$history['value'] = formatHistoryValue($history['value'], $items[$history['itemid']], false);
-						$history['value'] = $values['show_as_html']
+						$history['value'] = $this->fields_values['show_as_html']
 							? new CJsScript($history['value'])
 							: new CPre($history['value']);
 					}
@@ -139,9 +138,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'name' => $this->getInput('name', $dynamic_widget_name),
 			'items' => $items,
 			'histories' => $histories,
-			'style' => $values['style'],
+			'style' => $this->fields_values['style'],
 			'same_host' => $same_host,
-			'show_lines' => $values['show_lines'],
+			'show_lines' => $this->fields_values['show_lines'],
 			'error' => $error,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

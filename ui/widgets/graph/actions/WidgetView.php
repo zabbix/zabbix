@@ -47,7 +47,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
 		$edit_mode = (int) $this->getInput('edit_mode', 0);
 
 		$width = (int) $this->getInput('content_width', 100);
@@ -60,16 +59,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$is_resource_available = true;
 		$header_name = $this->widget->getDefaultName();
 
-		if ($values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH && $values['graphid']) {
+		if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH && $this->fields_values['graphid']) {
 			$resource_type = SCREEN_RESOURCE_GRAPH;
-			$resourceid = reset($values['graphid']);
+			$resourceid = reset($this->fields_values['graphid']);
 			$graph_dims = getGraphDims($resourceid);
 			$graph_dims['graphHeight'] = $height;
 			$graph_dims['width'] = $width;
 		}
-		elseif ($values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH && $values['itemid']) {
+		elseif ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
+				&& $this->fields_values['itemid']) {
+
 			$resource_type = SCREEN_RESOURCE_SIMPLE_GRAPH;
-			$resourceid = $values['itemid'][0];
+			$resourceid = $this->fields_values['itemid'][0];
 			$graph_dims = getGraphDims();
 			$graph_dims['graphHeight'] = $height;
 			$graph_dims['width'] = $width;
@@ -99,12 +100,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		$is_template_dashboard = $this->hasInput('templateid');
-		$is_dynamic_item = ($is_template_dashboard || $values['dynamic'] == WIDGET_DYNAMIC_ITEM);
+		$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == WIDGET_DYNAMIC_ITEM);
 
 		// Replace graph item by particular host item if dynamic items are used.
 		if ($is_dynamic_item && $dynamic_hostid != 0 && $resourceid) {
 			// Find same simple-graph item in selected $dynamic_hostid host.
-			if ($values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+			if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$src_items = API::Item()->get([
 					'output' => ['key_'],
 					'itemids' => $resourceid,
@@ -130,7 +131,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 			}
 			// Find requested host and change graph details.
-			elseif ($values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+			elseif ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				// get host
 				$hosts = API::Host()->get([
 					'output' => ['hostid', 'host', 'name'],
@@ -210,7 +211,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			if (!$resourceid) {
 				$is_resource_available = false;
 			}
-			elseif ($values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+			elseif ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$items = API::Item()->get([
 					'output' => ['name', 'key_', 'delay', 'hostid'],
 					'selectHosts' => ['name'],
@@ -224,7 +225,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$is_resource_available = false;
 				}
 			}
-			elseif ($values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+			elseif ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				// get graph, used below
 				$graph = API::Graph()->get([
 					'output' => API_OUTPUT_EXTEND,
@@ -242,7 +243,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if ($is_resource_available) {
 			// Build graph action and data source links.
-			if ($values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+			if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				if (!$edit_mode) {
 					$time_control_data['loadSBox'] = 1;
 				}
@@ -252,7 +253,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 						->setArgument('itemids', [$resourceid])
 						->setArgument('width', $width)
 						->setArgument('height', $height)
-						->setArgument('legend', $values['show_legend']);
+						->setArgument('legend', $this->fields_values['show_legend']);
 				}
 				else {
 					$graph_src = new CUrl('chart3.php');
@@ -266,7 +267,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					? $item['name']
 					: $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
 			}
-			elseif ($values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+			elseif ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				$graph_src = '';
 
 				$prepend_host_name = $is_template_dashboard
@@ -330,7 +331,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$graph_src
 					->setArgument('width', $width)
 					->setArgument('height', $height)
-					->setArgument('legend', $values['show_legend'] && $graph['show_legend'] ? 1 : 0)
+					->setArgument('legend', $this->fields_values['show_legend'] && $graph['show_legend'] ? 1 : 0)
 					->setArgument('from')
 					->setArgument('to');
 			}
@@ -350,7 +351,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$graph_url = null;
 			}
 			else {
-				if ($values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+				if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 					$has_host_graph = $is_dynamic_item && $dynamic_hostid != 0
 						? (bool) API::Graph()->get([
 							'output' => [],

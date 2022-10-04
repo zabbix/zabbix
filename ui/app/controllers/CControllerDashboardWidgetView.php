@@ -29,42 +29,26 @@ use Zabbix\Widgets\CWidgetForm;
 abstract class CControllerDashboardWidgetView extends CController {
 
 	protected ?CWidget $widget;
+	protected CWidgetForm $form;
 
-	private array $validation_rules = [];
+	protected array $validation_rules = [];
+	protected array $fields_values = [];
 
-	private CWidgetForm $form;
-
-	/**
-	 * Initialization function.
-	 */
-	protected function init() {
+	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	/**
-	 * Set validation rules for input parameters.
-	 *
-	 * @param array $validation_rules  Validation rules for input parameters.
-	 */
 	protected function setValidationRules(array $validation_rules): object {
 		$this->validation_rules = $validation_rules;
 
 		return $this;
 	}
 
-	/**
-	 * Check user permissions.
-	 */
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->getUserType() >= USER_TYPE_ZABBIX_USER;
 	}
 
-	/**
-	 * Validate input parameters.
-	 *
-	 * @return bool
-	 */
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$this->widget = APP::ModuleManager()->getModuleByActionName($this->getAction());
 
 		$validation_rules = $this->validation_rules;
@@ -79,6 +63,8 @@ abstract class CControllerDashboardWidgetView extends CController {
 			$this->form = $this->widget->getForm($this->getInput('fields', []),
 				$this->hasInput('templateid') ? $this->getInput('templateid') : null
 			);
+
+			$this->fields_values = $this->form->getFieldsValues();
 
 			if ($errors = $this->form->validate()) {
 				foreach ($errors as $error) {
@@ -95,7 +81,7 @@ abstract class CControllerDashboardWidgetView extends CController {
 					'error' => [
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])]))->disableView()
+				], JSON_THROW_ON_ERROR)]))->disableView()
 			);
 		}
 

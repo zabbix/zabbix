@@ -29,9 +29,7 @@
 $view = (new CWidgetView($data))->addItem($data['svg']);
 
 if (!$data['preview']) {
-	$view
-		->setVar('name', $data['name'])
-		->setVar('svg_options', $data['svg_options']);
+	$view->setVar('svg_options', $data['svg_options']);
 
 	if ($data['info'] !== null) {
 		$view->setVar('info', $data['info']);

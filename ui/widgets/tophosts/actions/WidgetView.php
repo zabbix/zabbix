@@ -54,25 +54,25 @@ class WidgetView extends CControllerDashboardWidgetView {
 			]
 		];
 
-		$data += self::getData($this->getForm()->getFieldsValues());
+		$data += $this->getData();
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
-	private static function getData(array $values): array {
-		$configuration = $values['columns'];
+	private function getData(): array {
+		$configuration = $this->fields_values['columns'];
 
 		// TODO AS: check function call getSubGroups
-		$groupids = $values['groupids'] ? getSubGroups($values['groupids']) : null;
-		$hostids = $values['hostids'] ?: null;
+		$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
+		$hostids = $this->fields_values['hostids'] ?: null;
 
-		if (array_key_exists('tags', $values)) {
+		if (array_key_exists('tags', $this->fields_values)) {
 			$hosts = API::Host()->get([
 				'output' => ['name'],
 				'groupids' => $groupids,
 				'hostids' => $hostids,
-				'evaltype' => $values['evaltype'],
-				'tags' => $values['tags'],
+				'evaltype' => $this->fields_values['evaltype'],
+				'tags' => $this->fields_values['tags'],
 				'monitored_hosts' => true,
 				'preservekeys' => true
 			]);
@@ -85,7 +85,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$time_now = time();
 
-		$master_column = $configuration[$values['column']];
+		$master_column = $configuration[$this->fields_values['column']];
 		$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
 
 		$master_items = self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids);
@@ -104,7 +104,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		);
 
-		if ($values['order'] == Widget::ORDER_TOP_N) {
+		if ($this->fields_values['order'] == Widget::ORDER_TOP_N) {
 			if ($master_items_only_numeric_present) {
 				arsort($master_item_values, SORT_NUMERIC);
 
@@ -127,7 +127,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$master_item_values = array_slice($master_item_values, 0, $values['count'], true);
+		$master_item_values = array_slice($master_item_values, 0, $this->fields_values['count'], true);
 		$master_items = array_intersect_key($master_items, $master_item_values);
 
 		$master_hostids = [];
@@ -167,7 +167,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				unset($threshold);
 			}
 
-			if ($column_index == $values['column']) {
+			if ($column_index == $this->fields_values['column']) {
 				$column_items = $master_items;
 				$column_item_values = $master_item_values;
 

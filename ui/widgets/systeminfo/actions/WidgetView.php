@@ -38,12 +38,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
-
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'system_info' => CSystemInfoHelper::getData(),
-			'info_type' => $values['info_type'],
+			'info_type' => $this->fields_values['info_type'],
 			'user_type' => CWebUser::getType(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

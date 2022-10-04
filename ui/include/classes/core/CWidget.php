@@ -91,9 +91,9 @@ class CWidget extends CModule {
 		], parent::getActions());
 	}
 
-	public function getConfiguration(array $values, int $view_mode): array {
+	public function getConfiguration(array $fields_values, int $view_mode): array {
 		return [
-			'padding' => $this->hasPadding($values, $view_mode)
+			'padding' => $this->hasPadding($fields_values, $view_mode)
 		];
 	}
 
@@ -139,7 +139,7 @@ class CWidget extends CModule {
 		return (bool) $this->manifest['widget']['use_time_selector'];
 	}
 
-	protected function hasPadding(array $values, int $view_mode): bool {
+	protected function hasPadding(array $fields_values, int $view_mode): bool {
 		return $view_mode != ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
 	}
 }

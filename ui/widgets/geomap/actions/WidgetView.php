@@ -37,11 +37,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	protected string $widgetid;
 
 	/**
-	 * Widget fields values.
-	 */
-	private array $values;
-
-	/**
 	 * Global geomap configuration.
 	 *
 	 * @param array
@@ -62,7 +57,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	protected function doAction(): void {
 		$this->widgetid = $this->getInput('widgetid', 0);
-		$this->values = $this->getForm()->getFieldsValues();
 
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
@@ -89,15 +83,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 * Get hosts and their properties to show on the map as markers.
 	 */
 	private function getHosts(): array {
-		$filter_groupids = $this->values['groupids'] ? getSubGroups($this->values['groupids']) : null;
+		$filter_groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
 
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name'],
 			'selectInventory' => ['location_lat', 'location_lon'],
 			'groupids' => $filter_groupids,
-			'hostids' => $this->values['hostids'] ?: null,
-			'evaltype' => $this->values['evaltype'],
-			'tags' => $this->values['tags'],
+			'hostids' => $this->fields_values['hostids'] ?: null,
+			'evaltype' => $this->fields_values['evaltype'],
+			'tags' => $this->fields_values['tags'],
 			'filter' => [
 				'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
 			],
@@ -197,9 +191,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$center['zoom'] = min($this->geomap_config['max_zoom'], $center['zoom']);
 		}
 
-		if (array_key_exists('default_view', $this->values)
-				&& $this->values['default_view'] !== ''
-				&& $geoloc_parser->parse($this->values['default_view']) == CParser::PARSE_SUCCESS) {
+		if (array_key_exists('default_view', $this->fields_values)
+				&& $this->fields_values['default_view'] !== ''
+				&& $geoloc_parser->parse($this->fields_values['default_view']) == CParser::PARSE_SUCCESS) {
 			$initial_view = $geoloc_parser->result;
 
 			if (array_key_exists('zoom', $initial_view)) {

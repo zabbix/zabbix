@@ -45,8 +45,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
-
 		$name = $this->widget->getDefaultName();
 		$cells = [];
 		$url = null;
@@ -63,14 +61,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$options = [
 			'output' => ['value_type'],
 			'selectValueMap' => ['mappings'],
-			'itemids' => $values['itemid'],
+			'itemids' => $this->fields_values['itemid'],
 			'webitems' => true,
 			'preservekeys' => true
 		];
 
 		$is_template_dashboard = $this->hasInput('templateid');
 		$is_dynamic = ($this->hasInput('dynamic_hostid')
-			&& ($is_template_dashboard || $values['dynamic'] == WIDGET_DYNAMIC_ITEM)
+			&& ($is_template_dashboard || $this->fields_values['dynamic'] == WIDGET_DYNAMIC_ITEM)
 		);
 
 		$tmp_items = [];
@@ -78,7 +76,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($is_dynamic) {
 			$tmp_items = API::Item()->get([
 				'output' => ['key_'],
-				'itemids' => $values['itemid'],
+				'itemids' => $this->fields_values['itemid'],
 				'webitems' => true
 			]);
 
@@ -96,7 +94,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$show = array_flip($values['show']);
+		$show = array_flip($this->fields_values['show']);
 
 		/*
 		 * Select original item name in several cases: if user is in normal dashboards or in template dashboards when
@@ -120,7 +118,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$options['output'] = array_merge($options['output'], ['itemid', 'hostid']);
 			}
 
-			if (array_key_exists(Widget::SHOW_VALUE, $show) && $values['units_show'] == 1) {
+			if (array_key_exists(Widget::SHOW_VALUE, $show) && $this->fields_values['units_show'] == 1) {
 				$options['output'][] = 'units';
 			}
 		}
@@ -137,8 +135,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		else {
 			$items = API::Item()->get($options);
 
-			if ($values['itemid']) {
-				$itemid = $values['itemid'][0];
+			if ($this->fields_values['itemid']) {
+				$itemid = $this->fields_values['itemid'][0];
 			}
 		}
 
@@ -160,15 +158,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 					case ITEM_VALUE_TYPE_FLOAT:
 					case ITEM_VALUE_TYPE_UINT64:
 						// Override item units if needed.
-						if (array_key_exists(Widget::SHOW_VALUE, $show) && $values['units_show'] == 1) {
-							$units = $values['units'] === '' ? : $values['units'];
+						if (array_key_exists(Widget::SHOW_VALUE, $show) && $this->fields_values['units_show'] == 1) {
+							$units = $this->fields_values['units'] === '' ? : $this->fields_values['units'];
 						}
 
 						// Apply unit conversion always because it will also convert values to scientific notation.
 						$raw_units = convertUnitsRaw([
 							'value' => $last_value,
 							'units' => $units,
-							'decimals' => $values['decimal_places']
+							'decimals' => $this->fields_values['decimal_places']
 						]);
 						// Get the converted value (this is not the final value).
 						$value = $raw_units['value'];
@@ -186,7 +184,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 						 * to 10 (maximum), the value will be converted to 0.0012340000.
 						 */
 						if ($raw_units['is_numeric']) {
-							$value = self::convertNumeric($value, $values['decimal_places'], $value_type);
+							$value = self::convertNumeric($value, $this->fields_values['decimal_places'], $value_type);
 						}
 
 						/*
@@ -288,7 +286,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			 */
 			if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
 				// Overwrite item name with the custom description.
-				$items[$itemid]['name'] = $values['description'];
+				$items[$itemid]['name'] = $this->fields_values['description'];
 
 				// Do not resolve macros if using template dashboard. Template dashboards only have edit mode.
 				if (!$is_template_dashboard || $this->hasInput('dynamic_hostid')) {
@@ -299,7 +297,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$description = $items[$itemid]['name'];
 			}
 
-			$cells = self::arrangeByCells($values, [
+			$cells = self::arrangeByCells($this->fields_values, [
 				'description' => $description,
 				'value_type' => $value_type,
 				'units' => $units,
@@ -325,10 +323,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$error = _('No permissions to referred object or it does not exist!');
 		}
 
-		$bg_color = $values['bg_color'];
+		$bg_color = $this->fields_values['bg_color'];
 
 		if ($last_value !== null) {
-			foreach ($values['thresholds'] as $threshold) {
+			foreach ($this->fields_values['thresholds'] as $threshold) {
 				if ($threshold['threshold_value'] > $last_value) {
 					break;
 				}
@@ -379,54 +377,54 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 *
 	 * @static
 	 *
-	 * @param array       $values  Input fields from the form.
-	 * @param array       $values  ['show']              Flags to show description, value, time and change indicator.
-	 * @param int         $values  ['desc_v_pos']        Vertical position of the description.
-	 * @param int         $values  ['desc_h_pos']        Horizontal position of the description.
-	 * @param int         $values  ['desc_bold']         Font weight of the description (0 - normal, 1 - bold).
-	 * @param int         $values  ['desc_size']         Font size of the description.
-	 * @param string      $values  ['desc_color']        Font color of the description.
-	 * @param int         $values  ['value_v_pos']       Vertical position of the value.
-	 * @param int         $values  ['value_h_pos']       Horizontal position of the value.
-	 * @param int         $values  ['value_bold']        Font weight of the value (0 - normal, 1 - bold).
-	 * @param int         $values  ['value_size']        Font size of the value.
-	 * @param string      $values  ['value_color']       Font color of the value.
-	 * @param int         $values  ['units_show']        Display units or not (0 - hide, 1 - show).
-	 * @param int         $values  ['units_pos']         Position of the units.
-	 * @param int         $values  ['units_bold']        Font weight of the units (0 - normal, 1 - bold).
-	 * @param int         $values  ['units_size']        Font size of the units.
-	 * @param string      $values  ['units_color']       Font color of the units.
-	 * @param int         $values  ['decimal_size']      Font size of the fraction.
-	 * @param int         $values  ['time_v_pos']        Vertical position of the time.
-	 * @param int         $values  ['time_h_pos']        Horizontal position of the time.
-	 * @param int         $values  ['time_bold']         Font weight of the time (0 - normal, 1 - bold).
-	 * @param int         $values  ['time_size']         Font size of the time.
-	 * @param string      $values  ['time_color']        Font color of the time.
-	 * @param array       $data    Array of pre-processed data that needs to be displayed.
-	 * @param string      $data    ['description']       Item description with all macros resolved.
-	 * @param string      $data    ['value_type']        Calculated value type. It can be integer or text.
-	 * @param string      $data    ['units']             Units of the item. Can be empty string if nothing to show.
-	 * @param string|null $data    ['value']             Value of the item or NULL if there is no value.
-	 * @param string|null $data    ['decimals']          Decimal places or NULL if there is no decimals to show.
-	 * @param int|null    $data    ['change_indicator']  Change indicator type or NULL if indicator should not be shown.
-	 * @param string      $data    ['time']              Time when item received the value or current time if no data.
-	 * @param array       $data    ['items']             The original array of items.
-	 * @param string      $data    ['itemid']            Item ID from the host.
+	 * @param array       $fields_values  Input fields from the form.
+	 * @param array       $fields_values  ['show']              Flags to show description, value, time and change indicator.
+	 * @param int         $fields_values  ['desc_v_pos']        Vertical position of the description.
+	 * @param int         $fields_values  ['desc_h_pos']        Horizontal position of the description.
+	 * @param int         $fields_values  ['desc_bold']         Font weight of the description (0 - normal, 1 - bold).
+	 * @param int         $fields_values  ['desc_size']         Font size of the description.
+	 * @param string      $fields_values  ['desc_color']        Font color of the description.
+	 * @param int         $fields_values  ['value_v_pos']       Vertical position of the value.
+	 * @param int         $fields_values  ['value_h_pos']       Horizontal position of the value.
+	 * @param int         $fields_values  ['value_bold']        Font weight of the value (0 - normal, 1 - bold).
+	 * @param int         $fields_values  ['value_size']        Font size of the value.
+	 * @param string      $fields_values  ['value_color']       Font color of the value.
+	 * @param int         $fields_values  ['units_show']        Display units or not (0 - hide, 1 - show).
+	 * @param int         $fields_values  ['units_pos']         Position of the units.
+	 * @param int         $fields_values  ['units_bold']        Font weight of the units (0 - normal, 1 - bold).
+	 * @param int         $fields_values  ['units_size']        Font size of the units.
+	 * @param string      $fields_values  ['units_color']       Font color of the units.
+	 * @param int         $fields_values  ['decimal_size']      Font size of the fraction.
+	 * @param int         $fields_values  ['time_v_pos']        Vertical position of the time.
+	 * @param int         $fields_values  ['time_h_pos']        Horizontal position of the time.
+	 * @param int         $fields_values  ['time_bold']         Font weight of the time (0 - normal, 1 - bold).
+	 * @param int         $fields_values  ['time_size']         Font size of the time.
+	 * @param string      $fields_values  ['time_color']        Font color of the time.
+	 * @param array       $data           Array of pre-processed data that needs to be displayed.
+	 * @param string      $data           ['description']       Item description with all macros resolved.
+	 * @param string      $data           ['value_type']        Calculated value type. It can be integer or text.
+	 * @param string      $data           ['units']             Units of the item. Can be empty string if nothing to show.
+	 * @param string|null $data           ['value']             Value of the item or NULL if there is no value.
+	 * @param string|null $data           ['decimals']          Decimal places or NULL if there is no decimals to show.
+	 * @param int|null    $data           ['change_indicator']  Change indicator type or NULL if indicator should not be shown.
+	 * @param string      $data           ['time']              Time when item received the value or current time if no data.
+	 * @param array       $data           ['items']             The original array of items.
+	 * @param string      $data           ['itemid']            Item ID from the host.
 	 *
 	 * @return array
 	 */
-	private static function arrangeByCells(array $values, array $data): array {
+	private static function arrangeByCells(array $fields_values, array $data): array {
 		$cells = [];
 
-		$show = array_flip($values['show']);
+		$show = array_flip($fields_values['show']);
 
 		if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
-			$cells[$values['desc_v_pos']][$values['desc_h_pos']] = [
+			$cells[$fields_values['desc_v_pos']][$fields_values['desc_h_pos']] = [
 				'item_description' => [
 					'text' => $data['description'],
-					'font_size' => $values['desc_size'],
-					'bold' => ($values['desc_bold'] == 1),
-					'color' => $values['desc_color']
+					'font_size' => $fields_values['desc_size'],
+					'bold' => ($fields_values['desc_bold'] == 1),
+					'color' => $fields_values['desc_color']
 				]
 			];
 		}
@@ -436,61 +434,61 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'value_type' => $data['value_type']
 			];
 
-			if ($values['units_show'] == 1 && $data['units'] !== '') {
+			if ($fields_values['units_show'] == 1 && $data['units'] !== '') {
 				$item_value_cell['parts']['units'] = [
 					'text' => $data['units'],
-					'font_size' => $values['units_size'],
-					'bold' => ($values['units_bold'] == 1),
-					'color' => $values['units_color']
+					'font_size' => $fields_values['units_size'],
+					'bold' => ($fields_values['units_bold'] == 1),
+					'color' => $fields_values['units_color']
 				];
-				$item_value_cell['units_pos'] = $values['units_pos'];
+				$item_value_cell['units_pos'] = $fields_values['units_pos'];
 			}
 
 			$item_value_cell['parts']['value'] = [
 				'text' => $data['value'],
-				'font_size' => $values['value_size'],
-				'bold' => ($values['value_bold'] == 1),
-				'color' => $values['value_color']
+				'font_size' => $fields_values['value_size'],
+				'bold' => ($fields_values['value_bold'] == 1),
+				'color' => $fields_values['value_color']
 			];
 
 			if ($data['decimals'] !== null) {
 				$item_value_cell['parts']['decimals'] = [
 					'text' => $data['decimals'],
-					'font_size' => $values['decimal_size'],
-					'bold' => ($values['value_bold'] == 1),
-					'color' => $values['value_color']
+					'font_size' => $fields_values['decimal_size'],
+					'bold' => ($fields_values['value_bold'] == 1),
+					'color' => $fields_values['value_color']
 				];
 			}
 
-			$cells[$values['value_v_pos']][$values['value_h_pos']] = [
+			$cells[$fields_values['value_v_pos']][$fields_values['value_h_pos']] = [
 				'item_value' => $item_value_cell
 			];
 		}
 
 		if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $data['change_indicator'] !== null) {
 			$colors = [
-				Widget::CHANGE_INDICATOR_UP => $values['up_color'],
-				Widget::CHANGE_INDICATOR_DOWN => $values['down_color'],
-				Widget::CHANGE_INDICATOR_UP_DOWN => $values['updown_color']
+				Widget::CHANGE_INDICATOR_UP => $fields_values['up_color'],
+				Widget::CHANGE_INDICATOR_DOWN => $fields_values['down_color'],
+				Widget::CHANGE_INDICATOR_UP_DOWN => $fields_values['updown_color']
 			];
 
 			// Change indicator can be displayed with or without value.
-			$cells[$values['value_v_pos']][$values['value_h_pos']]['item_value']['parts']['change_indicator'] = [
+			$cells[$fields_values['value_v_pos']][$fields_values['value_h_pos']]['item_value']['parts']['change_indicator'] = [
 				'type' => $data['change_indicator'],
 				'font_size' => ($data['decimals'] !== null)
-					? max($values['value_size'], $values['decimal_size'])
-					: $values['value_size'],
+					? max($fields_values['value_size'], $fields_values['decimal_size'])
+					: $fields_values['value_size'],
 				'color' => $colors[$data['change_indicator']]
 			];
 		}
 
 		if (array_key_exists(Widget::SHOW_TIME, $show)) {
-			$cells[$values['time_v_pos']][$values['time_h_pos']] = [
+			$cells[$fields_values['time_v_pos']][$fields_values['time_h_pos']] = [
 				'item_time' => [
 					'text' => $data['time'],
-					'font_size' => $values['time_size'],
-					'bold' => ($values['time_bold'] == 1),
-					'color' => $values['time_color']
+					'font_size' => $fields_values['time_size'],
+					'bold' => ($fields_values['time_bold'] == 1),
+					'color' => $fields_values['time_color']
 				]
 			];
 		}

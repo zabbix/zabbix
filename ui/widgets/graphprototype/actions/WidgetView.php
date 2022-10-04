@@ -40,13 +40,11 @@ class WidgetView extends CControllerWidgetIterator {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
-
-		if ($values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
-			$data = $this->doGraphPrototype($values);
+		if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
+			$data = $this->doGraphPrototype();
 		}
-		elseif ($values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
-			$data = $this->doSimpleGraphPrototype($values);
+		elseif ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
+			$data = $this->doSimpleGraphPrototype();
 		}
 		else {
 			error(_('Page received incorrect data'));
@@ -64,7 +62,7 @@ class WidgetView extends CControllerWidgetIterator {
 	 *
 	 * @return array  Dashboard response data
 	 */
-	protected function doGraphPrototype(array $values): array {
+	protected function doGraphPrototype(): array {
 		$options = [
 			'output' => ['graphid', 'name'],
 			'selectHosts' => ['hostid', 'name'],
@@ -72,7 +70,7 @@ class WidgetView extends CControllerWidgetIterator {
 		];
 
 		$is_template_dashboard = $this->hasInput('templateid');
-		$is_dynamic_item = ($is_template_dashboard || $values['dynamic'] == WIDGET_DYNAMIC_ITEM);
+		$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == WIDGET_DYNAMIC_ITEM);
 
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
@@ -80,7 +78,7 @@ class WidgetView extends CControllerWidgetIterator {
 			// The key of the actual graph prototype selected on widget's edit form.
 			$graph_prototype = API::GraphPrototype()->get([
 				'output' => ['name'],
-				'graphids' => reset($values['graphid'])
+				'graphids' => reset($this->fields_values['graphid'])
 			]);
 			if ($graph_prototype) {
 				$graph_prototype = reset($graph_prototype);
@@ -95,7 +93,7 @@ class WidgetView extends CControllerWidgetIterator {
 		}
 		else {
 			// Just fetch the item prototype selected on widget's edit form.
-			$options['graphids'] = reset($values['graphid']);
+			$options['graphids'] = reset($this->fields_values['graphid']);
 		}
 
 		// Use this graph prototype as base for collecting created graphs.
@@ -148,7 +146,7 @@ class WidgetView extends CControllerWidgetIterator {
 			$child_fields = [
 				'source_type' => ZBX_WIDGET_FIELD_RESOURCE_GRAPH,
 				'graphid' => $graphid,
-				'show_legend' => $values['show_legend']
+				'show_legend' => $this->fields_values['show_legend']
 			];
 
 			$children[] = [
@@ -156,7 +154,7 @@ class WidgetView extends CControllerWidgetIterator {
 				'type' => WIDGET_GRAPH,
 				'name' => $name,
 				'fields' => $child_fields,
-				'configuration' => $this->widget->getConfiguration($values, $this->getInput('view_mode')),
+				'configuration' => $this->widget->getConfiguration($this->fields_values, $this->getInput('view_mode')),
 				'defaults' => $this->widget->getDefaults()
 			];
 		}
@@ -183,10 +181,8 @@ class WidgetView extends CControllerWidgetIterator {
 
 	/**
 	 * Get graph prototype widget data for simple graph prototype source.
-	 *
-	 * @return array  Dashboard response data
 	 */
-	protected function doSimpleGraphPrototype(array $values): array {
+	protected function doSimpleGraphPrototype(): array {
 		$options = [
 			'output' => ['itemid', 'name'],
 			'selectHosts' => ['name'],
@@ -194,7 +190,7 @@ class WidgetView extends CControllerWidgetIterator {
 		];
 
 		$is_template_dashboard = $this->hasInput('templateid');
-		$is_dynamic_item = ($is_template_dashboard || $values['dynamic'] == WIDGET_DYNAMIC_ITEM);
+		$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == WIDGET_DYNAMIC_ITEM);
 
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
@@ -202,7 +198,7 @@ class WidgetView extends CControllerWidgetIterator {
 			// The key of the actual item prototype selected on widget's edit form.
 			$item_prototype = API::ItemPrototype()->get([
 				'output' => ['key_'],
-				'itemids' => reset($values['itemid'])
+				'itemids' => reset($this->fields_values['itemid'])
 			]);
 			if ($item_prototype) {
 				$item_prototype = reset($item_prototype);
@@ -217,7 +213,7 @@ class WidgetView extends CControllerWidgetIterator {
 		}
 		else {
 			// Just fetch the item prototype selected on widget's edit form.
-			$options['itemids'] = reset($values['itemid']);
+			$options['itemids'] = reset($this->fields_values['itemid']);
 		}
 
 		// Use this item prototype as base for collecting created items.
@@ -268,7 +264,7 @@ class WidgetView extends CControllerWidgetIterator {
 			$child_fields = [
 				'source_type' => ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH,
 				'itemid' => $itemid,
-				'show_legend' => $values['show_legend']
+				'show_legend' => $this->fields_values['show_legend']
 			];
 
 			$children[] = [
@@ -276,7 +272,7 @@ class WidgetView extends CControllerWidgetIterator {
 				'type' => WIDGET_GRAPH,
 				'name' => $name,
 				'fields' => $child_fields,
-				'configuration' => $this->widget->getConfiguration($values, $this->getInput('view_mode')),
+				'configuration' => $this->widget->getConfiguration($this->fields_values, $this->getInput('view_mode')),
 				'defaults' => $this->widget->getDefaults()
 			];
 		}
@@ -300,8 +296,6 @@ class WidgetView extends CControllerWidgetIterator {
 
 	/**
 	 * Get graph prototype widget data for no permission's error.
-	 *
-	 * @return array  Dashboard response data
 	 */
 	protected function inaccessibleError(): array {
 		return [

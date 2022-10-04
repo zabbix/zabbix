@@ -45,11 +45,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$values = $this->getForm()->getFieldsValues();
-
 		$config_defaults = [
 			'name' => $this->widget->getDefaultName(),
-			'type' => $values['clock_type'],
+			'type' => $this->fields_values['clock_type'],
 			'time' => null,
 			'time_zone_offset' => null,
 			'date' => date(ZBX_DATE),
@@ -58,35 +56,35 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'critical_error' => null
 		];
 
-		switch ($values['time_type']) {
+		switch ($this->fields_values['time_type']) {
 			case TIME_TYPE_HOST:
-				$clock_data = $this->configureHostTime($values) + $config_defaults;
+				$clock_data = $this->configureHostTime() + $config_defaults;
 				break;
 
 			case TIME_TYPE_SERVER:
-				$clock_data = $this->configureFields($values) + $config_defaults;
+				$clock_data = $this->configureFields() + $config_defaults;
 				$clock_data['name'] = _('Server');
 				break;
 
 			default:
-				$clock_data = $this->configureFields($values) + $config_defaults;
+				$clock_data = $this->configureFields() + $config_defaults;
 				$clock_data['name'] = _('Local');
 				break;
 		}
 
 		// Pass clock configuration to browser script.
-		if ($values['clock_type'] === Widget::TYPE_DIGITAL) {
-			$clock_data['show'] = $values['show'];
-			$clock_data['bg_color'] = $values['bg_color'];
-			$clock_data['time_format'] = $values['time_format'];
-			$clock_data['seconds'] = ($values['time_sec'] == 1);
-			$clock_data['tzone_format'] = $values['tzone_format'];
+		if ($this->fields_values['clock_type'] === Widget::TYPE_DIGITAL) {
+			$clock_data['show'] = $this->fields_values['show'];
+			$clock_data['bg_color'] = $this->fields_values['bg_color'];
+			$clock_data['time_format'] = $this->fields_values['time_format'];
+			$clock_data['seconds'] = ($this->fields_values['time_sec'] == 1);
+			$clock_data['tzone_format'] = $this->fields_values['tzone_format'];
 		}
 
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $clock_data['name']),
 			'clock_data' => $clock_data,
-			'styles' => self::getFieldStyles($values),
+			'styles' => $this->getFieldStyles(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -120,31 +118,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return str_replace('_', ' ', $zone);
 	}
 
-	/**
-	 * @param array $fields
-	 *
-	 * @return boolean
-	 */
-	private function showDate(array $fields): bool {
-		return ($fields['clock_type'] === Widget::TYPE_DIGITAL && in_array(Widget::SHOW_DATE, $fields['show']));
+	private function showDate(): bool {
+		return $this->fields_values['clock_type'] === Widget::TYPE_DIGITAL
+			&& in_array(Widget::SHOW_DATE, $this->fields_values['show']);
 	}
 
-	/**
-	 * @param array $fields
-	 *
-	 * @return boolean
-	 */
-	private function showTime(array $fields): bool {
-		return ($fields['clock_type'] === Widget::TYPE_ANALOG || in_array(Widget::SHOW_TIME, $fields['show']));
+	private function showTime(): bool {
+		return $this->fields_values['clock_type'] === Widget::TYPE_ANALOG
+			|| in_array(Widget::SHOW_TIME, $this->fields_values['show']);
 	}
 
-	/**
-	 * @param array $fields
-	 *
-	 * @return boolean
-	 */
-	private function showTimeZone(array $fields): bool {
-		return ($fields['clock_type'] === Widget::TYPE_DIGITAL && in_array(Widget::SHOW_TIMEZONE, $fields['show']));
+	private function showTimeZone(): bool {
+		return $this->fields_values['clock_type'] === Widget::TYPE_DIGITAL
+			&& in_array(Widget::SHOW_TIMEZONE, $this->fields_values['show']);
 	}
 
 	/**
@@ -182,41 +168,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $now;
 	}
 
-	/**
-	 * Create required clock field values both for analog and digital clock.
-	 *
-	 * @param array $fields  Saved clock configuration.
-	 *
-	 * @return array  Return prepared clock configuration.
-	 */
-	private function configureFields(array $fields): array {
-		$clock = [];
-
-		$date = $this->makeDateTimeFromTimeZone($fields['tzone_timezone']);
-
-		if ($date !== null) {
-			if ($this->showDate($fields)) {
-				$clock['date'] = $date->format(ZBX_DATE);
-			}
-
-			if ($this->showTime($fields)) {
-				$clock = array_merge($clock, $this->makeTimeFromDateTime($date));
-			}
-		}
-
-		if ($this->showTimeZone($fields)) {
-			$clock['time_zone'] = $this->makeTimeZoneValue($fields['tzone_timezone'], $fields['tzone_format']);
-		}
-
-		return $clock;
-	}
-
-	/**
-	 * @param array $fields  Saved clock configuration.
-	 *
-	 * @return array
-	 */
-	private function configureHostTime(array $fields): array {
+	private function configureHostTime(): array {
 		$items = [];
 		$clock = ['is_enabled' => true];
 
@@ -224,7 +176,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			if ($this->hasInput('dynamic_hostid')) {
 				$template_items = API::Item()->get([
 					'output' => ['key_'],
-					'itemids' => $fields['itemid'],
+					'itemids' => $this->fields_values['itemid'],
 					'webitems' => true
 				]);
 
@@ -249,7 +201,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$items = API::Item()->get([
 				'output' => ['itemid', 'value_type'],
 				'selectHosts' => ['name'],
-				'itemids' => $fields['itemid'],
+				'itemids' => $this->fields_values['itemid'],
 				'webitems' => true
 			]);
 		}
@@ -270,7 +222,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				try {
 					$now = new DateTime($last_value['value']);
 
-					if ($this->showDate($fields)) {
+					if ($this->showDate()) {
 						$clock['date'] = $now->format(ZBX_DATE);
 					}
 
@@ -278,7 +230,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 					$clock['time'] = time() - ($last_value['clock'] - $now->getTimestamp());
 
-					if ($this->showTimeZone($fields)) {
+					if ($this->showTimeZone()) {
 						$clock['time_zone'] = 'UTC'.$now->format('P');
 					}
 				}
@@ -298,39 +250,62 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	/**
-	 * Groups enabled field styles by field name (Date, Time, Time zone).
-	 *
-	 * @param array $fields  Saved clock configuration.
-	 *
-	 * @return array
+	 * Create required clock field values both for analog and digital clock.
 	 */
-	private static function getFieldStyles(array $fields): array {
+	private function configureFields(): array {
+		$clock = [];
+
+		$date = $this->makeDateTimeFromTimeZone($this->fields_values['tzone_timezone']);
+
+		if ($date !== null) {
+			if ($this->showDate()) {
+				$clock['date'] = $date->format(ZBX_DATE);
+			}
+
+			if ($this->showTime()) {
+				$clock = array_merge($clock, $this->makeTimeFromDateTime($date));
+			}
+		}
+
+		if ($this->showTimeZone()) {
+			$clock['time_zone'] = $this->makeTimeZoneValue($this->fields_values['tzone_timezone'],
+				$this->fields_values['tzone_format']
+			);
+		}
+
+		return $clock;
+	}
+
+	/**
+	 * Groups enabled field styles by field name (Date, Time, Time zone).
+	 */
+	private function getFieldStyles(): array {
 		$cells = [];
 
-		if ($fields['clock_type'] === Widget::TYPE_DIGITAL) {
-			$show = $fields['show'];
+		if ($this->fields_values['clock_type'] === Widget::TYPE_DIGITAL) {
+			$show = $this->fields_values['show'];
 
 			if (in_array(Widget::SHOW_DATE, $show)) {
 				$cells['date'] = [
-					'size' => $fields['date_size'],
-					'bold' => ($fields['date_bold'] == 1),
-					'color' => $fields['date_color']
+					'size' => $this->fields_values['date_size'],
+					'bold' => ($this->fields_values['date_bold'] == 1),
+					'color' => $this->fields_values['date_color']
 				];
 			}
 
 			if (in_array(Widget::SHOW_TIME, $show)) {
 				$cells['time'] = [
-					'size' => $fields['time_size'],
-					'bold' => ($fields['time_bold'] == 1),
-					'color' => $fields['time_color']
+					'size' => $this->fields_values['time_size'],
+					'bold' => ($this->fields_values['time_bold'] == 1),
+					'color' => $this->fields_values['time_color']
 				];
 			}
 
 			if (in_array(Widget::SHOW_TIMEZONE, $show)) {
 				$cells['timezone'] = [
-					'size' => $fields['tzone_size'],
-					'bold' => ($fields['tzone_bold'] == 1),
-					'color' => $fields['tzone_color']
+					'size' => $this->fields_values['tzone_size'],
+					'bold' => ($this->fields_values['tzone_bold'] == 1),
+					'color' => $this->fields_values['tzone_color']
 				];
 			}
 		}
