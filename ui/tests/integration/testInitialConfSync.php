@@ -1734,8 +1734,6 @@ class testInitialConfSync extends CIntegrationTest
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
 
 		$got = $this->parseSyncResults();
-		var_dump($this->expected_initial);
-		var_dump($got);
 		$this->assertEquals($this->expected_initial, $got);
 
 		$this->purgeExisting('correlation', 'correlationids');
@@ -1829,8 +1827,6 @@ class testInitialConfSync extends CIntegrationTest
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
 
 		$got = $this->parseSyncResults();
-		var_dump($this->expected_update);
-		var_dump($got);
 		$this->assertEquals($this->expected_update, $got);
 
 		return true;
