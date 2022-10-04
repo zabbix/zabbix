@@ -2025,8 +2025,7 @@ class testFormItem extends CLegacyWebTest {
 		}
 		if (isset($data['formCheck'])) {
 			$this->page->waitUntilReady();
-			$this->query('xpath://form[@name="items"]//a[text()='.CXPathHelper::escapeQuotes($name).']')
-					->waitUntilClickable()->one()->click();
+			$this->zbxTestClickXpath("//form[@name='items']//a[text()='$name']");
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 			$this->zbxTestAssertElementValue('name', $name);
 			$this->zbxTestAssertElementValue('key', $key);
