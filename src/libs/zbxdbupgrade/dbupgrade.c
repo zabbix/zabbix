@@ -1318,7 +1318,10 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update(const char *t
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 		"CREATE TRIGGER %s_%s_insert BEFORE INSERT ON %s FOR EACH ROW\n"
+
+		"BEGIN\n"
 			":NEW.%s=%s(:NEW.%s);\n"
+		"END\n"
 		"CREATE TRIGGER %s_%s_update BEFORE UPDATE ON %s FOR EACH ROW\n"
 		"BEGIN\n"
 			"IF :NEW.%s<>:OLD.%s\n"
@@ -1326,12 +1329,10 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update(const char *t
 			":NEW.%s=%s(:NEW.%s);\n"
 			"END IF;\n"
 		"END\n",
-
 		table_name, indexed_column_name, table_name, indexed_column_name, func_name,
 		original_column_name,
 		table_name, indexed_column_name, table_name, original_column_name, original_column_name,
 		indexed_column_name, func_name, original_column_name);
-
 #elif HAVE_MYSQL
 	ZBX_UNUSED(idname);
 
