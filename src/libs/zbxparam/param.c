@@ -512,7 +512,7 @@ int	zbx_replace_key_params_dyn(char **data, int key_type, zbx_replace_key_param_
 
 	if (ZBX_KEY_TYPE_ITEM == key_type)
 	{
-		for (; SUCCEED == is_key_char((*data)[i]) && '\0' != (*data)[i]; i++)
+		for (; SUCCEED == zbx_is_key_char((*data)[i]) && '\0' != (*data)[i]; i++)
 			;
 
 		if (0 == i)

@@ -252,6 +252,16 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s件選択済"
 
+#: app/controllers/CControllerMediatypeEnable.php:93
+#, c-format
+msgid "%1$s. %2$s: %3$s. %4$s."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeEnable.php:108
+#, c-format
+msgid "%1$s: %2$s"
+msgstr ""
+
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
@@ -2671,6 +2681,10 @@ msgstr[0] "Webシナリオを有効にできません"
 msgid "Cannot evaluate expression"
 msgstr "条件式を評価できません"
 
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr ""
+
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
 msgid "Cannot execute operation"
@@ -4683,6 +4697,10 @@ msgstr "作成者"
 msgid "Critical"
 msgstr "クリティカル"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr ""
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "現在のホスト"
@@ -6378,6 +6396,14 @@ msgstr "楕円"
 #: include/media.inc.php:24
 msgid "Email"
 msgstr "メール"
+
+#: app/views/js/administration.mediatype.edit.js.php:397
+msgid "Email and password"
+msgstr ""
+
+#: app/views/administration.mediatype.edit.php:64
+msgid "Email provider"
+msgstr ""
 
 #: app/views/popup.generic.php:50
 msgid "Empty"
@@ -8997,6 +9023,11 @@ msgstr "ネットワークインターフェースの受信統計。整数値を
 msgid "Incompatible \"propagation_rule\" and \"propagation_value\" parameters for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のための\"propagation_rule\"と\"propagation_value\"は互換性がありません。"
 
+#: app/controllers/CControllerMediatypeEnable.php:97
+#: app/controllers/CControllerMediatypeEnable.php:108
+msgid "Incomplete configuration"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
 #, c-format
@@ -11188,6 +11219,10 @@ msgstr "OS上の属性情報付きのプロセスのリスト。JSONで返す"
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr "キーで指定されたWindowsのレジストリの値またはキーのリスト。JSONで返す。"
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "ブロックデバイスとそのタイプのリスト。JSONで返す"
@@ -11810,6 +11845,10 @@ msgid "Media type disabled"
 msgid_plural "Media types disabled"
 msgstr[0] "メディアタイプを無効にしました"
 
+#: app/views/administration.user.edit.php:327
+msgid "Media type disabled by Administration."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
@@ -11843,6 +11882,10 @@ msgstr "ID \"%1$s\"のメディアタイプは使用できません。"
 #: include/classes/helpers/CRoleHelper.php:428
 msgid "Media types"
 msgstr "メディアタイプ"
+
+#: app/views/popup.media.php:75
+msgid "Media types disabled by Administration."
+msgstr ""
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -13239,6 +13282,10 @@ msgstr ""
 msgid "Not classified"
 msgstr "未分類"
 
+#: app/controllers/CControllerMediatypeEnable.php:95
+msgid "Not enabled"
+msgstr ""
+
 #: include/forms.inc.php:315
 msgid "Not inherited items"
 msgstr "継承していないアイテム"
@@ -13622,6 +13669,10 @@ msgstr "特権管理者のみがレポートのオーナーを設定できます
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "有効なホストとアイテムのトリガーのみカウント"
 
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -13836,6 +13887,10 @@ msgstr "その他のパラメータ"
 #: include/views/configuration.httpconf.edit.php:90
 msgid "Others"
 msgstr "その他"
+
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr ""
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -14875,6 +14930,16 @@ msgstr "プロキシ名"
 msgid "Proxy updated"
 msgstr "プロキシを更新しました"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr ""
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -15527,6 +15592,10 @@ msgstr "要求ステータスコード"
 #: app/views/popup.httpstep.php:170
 msgid "Required string"
 msgstr "要求文字列"
+
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr ""
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
@@ -21198,6 +21267,10 @@ msgstr "論理値で指定してください"
 msgid "a character string is expected"
 msgstr "文字列で指定してください"
 
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "日付はYYYY-MM-DDフォーマットで指定してください。"
@@ -21908,6 +21981,11 @@ msgstr "一致しない"
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr "e() - オイラー数を返す"
+
+#: app/views/administration.mediatype.list.php:98
+#: app/views/administration.mediatype.list.php:103
+msgid "email"
+msgstr ""
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
@@ -23407,6 +23485,11 @@ msgstr "varsamp() - サンプル分散"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "via"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

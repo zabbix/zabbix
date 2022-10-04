@@ -102,7 +102,7 @@ static void	process_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device)
 	zbx_uint64_t	dstat[ZBX_DSTAT_MAX];
 
 	now = time(NULL);
-	if (FAIL == get_diskstat(device->name, dstat))
+	if (FAIL == zbx_get_diskstat(device->name, dstat))
 		return;
 
 	apply_diskstat(device, now, dstat);

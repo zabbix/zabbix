@@ -5519,6 +5519,30 @@ class CApiInputValidatorTest extends TestCase {
 				['with_hosts' => true],
 				true,
 				'Parameter "/real_hosts" is deprecated.'
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => '3', 'name2' => '2', 'value' => ['1', '2', '3', '4', '1']],
+				'/',
+				'Invalid parameter "/": unexpected parameter "name2".'
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => '3', 'name' => null, 'value' => ['1', '2', '3', '4', '1']],
+				'/',
+				['type' => ['3'], 'name' => null, 'value' => ['1', '2', '3', '4', '1']]
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => '3', 'name' => '2', 'value' => ['1', '2', '3', null, '1']],
+				'/',
+				'Invalid parameter "/value/4": a character string, integer or floating point value is expected.'
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => 3, 'name' => 2, 'value' => ['1', 2.5, '3', '4', '1']],
+				'/',
+				['type' => [3], 'name' => [2], 'value' => ['1', 2.5, '3', '4', '1']]
 			]
 		];
 	}
