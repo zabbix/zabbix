@@ -47,9 +47,9 @@ class CModule {
 
 	public function getAssets(): array {
 		return $this->manifest['assets'] + [
-				'css' => [],
-				'js' => []
-			];
+			'css' => [],
+			'js' => []
+		];
 	}
 
 	public function getActions(): array {

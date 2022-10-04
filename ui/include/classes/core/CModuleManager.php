@@ -36,10 +36,22 @@ final class CModuleManager {
 	 */
 	private const MAX_MANIFEST_VERSION = 2;
 
+	private const DASHBOARD_ACTIONS = [
+		'dashboard.print',
+		'dashboard.view',
+		'host.dashboard.view',
+		'template.dashboard.edit'
+	];
+
 	/**
 	 * Root path of modules.
 	 */
 	private string $root_path;
+
+	/**
+	 * Current action name.
+	 */
+	private string $action_name;
 
 	/**
 	 * Manifest data of added modules.
@@ -140,17 +152,21 @@ final class CModuleManager {
 		return $this->modules;
 	}
 
+	public function setAction(string $action_name): self {
+		$this->action_name = $action_name;
+
+		return $this;
+	}
+
 	/**
 	 * Get loaded module instance associated with given action name.
 	 *
-	 * @param string $action_name
-	 *
 	 * @return CModule|null
 	 */
-	public function getModuleByActionName(string $action_name): ?CModule {
+	public function getActionModule(): ?CModule {
 		/** @var CModule $module */
 		foreach ($this->modules as $module) {
-			if (array_key_exists($action_name, $module->getActions())) {
+			if (array_key_exists($this->action_name, $module->getActions())) {
 				return $module;
 			}
 		}
@@ -188,16 +204,6 @@ final class CModuleManager {
 		}
 
 		return $widget_defaults;
-	}
-
-	public function getWidgetsNames(bool $for_template_dashboard_only = false): array {
-		$names = [];
-
-		foreach ($this->getWidgets($for_template_dashboard_only) as $widget) {
-			$names[$widget->getId()] = $widget->getName();
-		}
-
-		return $names;
 	}
 
 	public function getWidget($module_id): ?CWidget {
@@ -261,6 +267,10 @@ final class CModuleManager {
 
 		/** @var CModule $module */
 		foreach ($this->modules as $module) {
+			if ($module instanceof CWidget && !in_array($this->action_name, self::DASHBOARD_ACTIONS, true)) {
+				continue;
+			}
+
 			$module_assets = $module->getAssets();
 
 			foreach ($module_assets['css'] as $css_file) {
@@ -347,7 +357,7 @@ final class CModuleManager {
 	 * @param string  $event   Event to publish.
 	 */
 	public function publishEvent(CAction $action, string $event): void {
-		$action_module = $this->getModuleByActionName($action->getAction());
+		$action_module = $this->getActionModule();
 
 		foreach ($this->modules as $module) {
 			if ($module != $action_module) {

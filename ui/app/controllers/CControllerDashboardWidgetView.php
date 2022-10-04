@@ -49,7 +49,7 @@ abstract class CControllerDashboardWidgetView extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$this->widget = APP::ModuleManager()->getModuleByActionName($this->getAction());
+		$this->widget = APP::ModuleManager()->getActionModule();
 
 		$validation_rules = $this->validation_rules;
 

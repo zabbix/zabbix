@@ -571,10 +571,11 @@ class ZBase {
 			}
 
 			$action->setAction($action_name);
+			$this->module_manager->setAction($action_name);
 
 			$modules = $this->module_manager->getModules();
 
-			$action_module = $this->module_manager->getModuleByActionName($action_name);
+			$action_module = $this->module_manager->getActionModule();
 
 			if ($action_module !== null) {
 				$modules = array_replace([$action_module->getId() => $action_module], $modules);
