@@ -47,7 +47,7 @@ FIELD		|attempt_clock	|t_integer	|0	|NOT NULL	|ZBX_NODATA
 FIELD		|rows_per_page	|t_integer	|50	|NOT NULL	|0
 FIELD		|timezone	|t_varchar(50)	|'default'|NOT NULL	|ZBX_NODATA
 FIELD		|roleid		|t_id		|	|NOT NULL	|0			|1|role
-FIELD		|userdirectoryid	|t_id	|NULL	|NULL	|0	|2|userdirectory	|	|RESTRICT
+FIELD		|userdirectoryid	|t_id	|'0'	|NULL	|0	|2|userdirectory	|userdirectoryid|0
 FIELD		|ts_provisioned		|t_time	|'0'	|NULL	|0
 UNIQUE		|1		|username
 INDEX		|2		|userdirectoryid
@@ -582,9 +582,10 @@ FIELD		|geomaps_max_zoom	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|geomaps_attribution|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|vault_provider	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_userdirectoryid	|t_id	|NULL |NULL	|0		|3|userdirectory	|userdirectoryid|RESTRICT
-FIELD		|jit_provision_interval	|t_varchar(32)	|'1h'	|NOT NULL	|0
+FIELD		|jit_provision_interval		|t_varchar(32)	|'1h'	|NOT NULL	|0
 FIELD		|saml_jit_status			|t_integer		|'0'	|NOT NULL	|0
 FIELD		|ldap_jit_status			|t_integer		|'0'	|NOT NULL	|0
+FIELD		|deprovisioned_groupid		|t_id			|NULL	|NULL		|0	|4|usrgrp	|usrgrpid|RESTRICT
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 INDEX		|3		|ldap_userdirectoryid
@@ -1947,6 +1948,7 @@ FIELD		|name				|t_varchar(128)	|''		|NOT NULL	|0
 FIELD		|description		|t_shorttext	|''		|NOT NULL	|0
 FIELD		|idp_type			|t_integer		|'1'	|NOT NULL	|0
 FIELD		|provision_status	|t_integer		|'0'	|NOT NULL	|0
+INDEX		|1			|idp_type
 
 TABLE|userdirectory_ldap|userdirectory_ldapid|0
 FIELD		|userdirectory_ldapid	|t_id			|		|NOT NULL	|0
@@ -1992,8 +1994,8 @@ INDEX		|1	|userdirectoryid
 
 TABLE|userdirectory_media|userdirectory_mediaid|0
 FIELD		|userdirectory_mediaid	|t_id			|	|NOT NULL	|0
-FIELD		|userdirectoryid	|t_id			|	|NOT NULL	|0	|1	|userdirectory	|userdirectoryid
-FIELD		|mediatypeid		|t_id			|	|NOT NULL	|0	|2	|media_type		|mediatypeid
+FIELD		|userdirectoryid	|t_id			|	|NOT NULL	|0	|1	|userdirectory
+FIELD		|mediatypeid		|t_id			|	|NOT NULL	|0	|2	|media_type
 FIELD		|name				|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|attribute			|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1	|userdirectoryid
@@ -2001,16 +2003,16 @@ INDEX		|2	|mediatypeid
 
 TABLE|userdirectory_usrgrp|userdirectory_usrgrpid|0
 FIELD		|userdirectory_usrgrpid		|t_id		|	|NOT NULL	|0
-FIELD		|userdirectory_idpgroupid	|t_id		|	|NOT NULL	|0	|1	|userdirectory_idpgroup	|userdirectory_idpgroupid
-FIELD		|usrgrpid				|t_id		|	|NOT NULL	|0	|2	|usrgrp|usrgrpid
+FIELD		|userdirectory_idpgroupid	|t_id		|	|NOT NULL	|0	|1	|userdirectory_idpgroup
+FIELD		|usrgrpid					|t_id		|	|NOT NULL	|0	|2	|usrgrp
 UNIQUE		|1	|userdirectory_idpgroupid,usrgrpid
 INDEX		|2	|usrgrpid
 INDEX		|3	|userdirectory_idpgroupid
 
 TABLE|userdirectory_idpgroup|userdirectory_idpgroupid|0
 FIELD		|userdirectory_idpgroupid	|t_id			|	|NOT NULL	|0
-FIELD		|userdirectoryid		|t_id			|	|NOT NULL	|0	|1	|userdirectory	|userdirectoryid
-FIELD		|roleid					|t_id			|	|NOT NULL	|0	|2	|role			|roleid
+FIELD		|userdirectoryid		|t_id			|	|NOT NULL	|0	|1	|userdirectory
+FIELD		|roleid					|t_id			|	|NOT NULL	|0	|2	|role
 FIELD		|name					|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|sortorder				|t_integer	|0	|NOT NULL	|0
 INDEX		|1	|userdirectoryid
@@ -2026,7 +2028,8 @@ INDEX		|1		|clock
 
 TABLE|scim_groups|scim_groupid|0
 FIELD		|scim_groupid	|t_id			|	|NOT NULL	|0
-FIELD		|display_name	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|name			|t_varchar(64)	|''	|NOT NULL	|0
+UNIQUE		|1		|name
 
 TABLE|users_scim_groups|users_scim_groupid|0
 FIELD		|users_scim_groupid	|t_id	|	|NOT NULL	|0
