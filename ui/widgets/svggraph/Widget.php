@@ -27,11 +27,11 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
-	public function hasPadding(array $values, int $view_mode): bool {
+	public function hasPadding(array $fields_values, int $view_mode): bool {
 		return true;
 	}
 
-	public function usesTimeSelector(array $values): bool {
-		return !WidgetForm::hasOverrideTime($values);
+	public function usesTimeSelector(array $fields_values): bool {
+		return !WidgetForm::hasOverrideTime($fields_values);
 	}
 }

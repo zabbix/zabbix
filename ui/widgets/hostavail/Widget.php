@@ -25,8 +25,8 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
-	public function hasPadding(array $values, int $view_mode): bool {
+	public function hasPadding(array $fields_values, int $view_mode): bool {
 		return $view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL
-			&& count($values['interface_type']) != 1;
+			&& count($fields_values['interface_type']) != 1;
 	}
 }

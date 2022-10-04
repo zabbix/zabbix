@@ -135,7 +135,7 @@ class CWidget extends CModule {
 		return (bool) $this->manifest['widget']['template_dashboard'];
 	}
 
-	public function usesTimeSelector(array $values): bool {
+	public function usesTimeSelector(array $fields_values): bool {
 		return (bool) $this->manifest['widget']['use_time_selector'];
 	}
 
