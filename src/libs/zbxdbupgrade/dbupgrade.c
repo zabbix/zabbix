@@ -1304,15 +1304,13 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 	return ret;
 }
 
-
 int	zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update(const char *table_name,
 		const char *original_column_name, const char *indexed_column_name, const char *func_name,
 		const char *idname)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
-	int	ret = FAIL;;
-
+	int	ret = FAIL;
 #ifdef HAVE_ORACLE
 	ZBX_UNUSED(idname);
 
@@ -1371,7 +1369,6 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update(const char *t
 			table_name, indexed_column_name, func_name, table_name, indexed_column_name,
 			original_column_name, table_name, table_name, indexed_column_name, func_name);
 #endif
-
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
 
@@ -1379,5 +1376,4 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update(const char *t
 
 	return ret;
 }
-
 #endif

@@ -479,8 +479,10 @@ static int	DBpatch_6030062(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update hosts set name_upper=UPPER(name)"))
+	if (ZBX_DB_OK > DBexecute("UPDATE hosts SET name_upper=UPPER(name)"))
 		return FAIL;
+
+	return SUCCEED;
 }
 
 static int	DBpatch_6030063(void)
