@@ -491,6 +491,34 @@ static int	DBpatch_6030063(void)
 			"hostid");
 }
 
+static int	DBpatch_6030064(void)
+{
+	const ZBX_FIELD field = {"name_upper", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_6030065(void)
+{
+	return DBcreate_index("items", "items_9", "name_upper", 0);
+}
+
+static int	DBpatch_6030066(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("UPDATE items SET name_upper=UPPER(name)"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6030067(void)
+{
+	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("items", "name", "name_upper", "UPPER",
+			"itemid");
+}
 #endif
 
 DBPATCH_START(6030)
@@ -561,5 +589,9 @@ DBPATCH_ADD(6030060, 0, 1)
 DBPATCH_ADD(6030061, 0, 1)
 DBPATCH_ADD(6030062, 0, 1)
 DBPATCH_ADD(6030063, 0, 1)
+DBPATCH_ADD(6030064, 0, 1)
+DBPATCH_ADD(6030065, 0, 1)
+DBPATCH_ADD(6030066, 0, 1)
+DBPATCH_ADD(6030067, 0, 1)
 
 DBPATCH_END()
