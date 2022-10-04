@@ -140,7 +140,7 @@ return [
 				'ref_field' => 'userdirectoryid'
 			],
 			'ts_provisioned' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
@@ -2741,6 +2741,14 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'deprovisioned_groupid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'default' => NULL,
+				'ref_table' => 'usrgrp',
+				'ref_field' => 'usrgrpid'
 			]
 		]
 	],
@@ -9280,7 +9288,7 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'display_name' => [
+			'name' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
