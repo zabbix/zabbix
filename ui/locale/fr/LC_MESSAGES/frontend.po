@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-09-23 18:29+0000\n"
+"PO-Revision-Date: 2022-09-29 17:15+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -270,12 +270,12 @@ msgstr "%1$s, sélectionné"
 #: app/controllers/CControllerMediatypeEnable.php:93
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
-msgstr ""
+msgstr "%1$s. %2$s : %3$s. %4$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s : %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
@@ -6486,11 +6486,11 @@ msgstr "Courriel"
 
 #: app/views/js/administration.mediatype.edit.js.php:397
 msgid "Email and password"
-msgstr ""
+msgstr "E-mail et mot de passe"
 
 #: app/views/administration.mediatype.edit.php:64
 msgid "Email provider"
-msgstr ""
+msgstr "Fournisseur de messagerie"
 
 #: app/views/popup.generic.php:50
 msgid "Empty"
@@ -9123,7 +9123,7 @@ msgstr "Paramètres \"propagation_rule\" et \"propagation_value\" incompatibles 
 #: app/controllers/CControllerMediatypeEnable.php:97
 #: app/controllers/CControllerMediatypeEnable.php:108
 msgid "Incomplete configuration"
-msgstr ""
+msgstr "Paramétrage incomplet"
 
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
@@ -11957,7 +11957,7 @@ msgstr[1] "Types de média désactivés"
 
 #: app/views/administration.user.edit.php:327
 msgid "Media type disabled by Administration."
-msgstr ""
+msgstr "Type de média désactivé par l'administration."
 
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
@@ -11996,7 +11996,7 @@ msgstr "Types de média"
 
 #: app/views/popup.media.php:75
 msgid "Media types disabled by Administration."
-msgstr ""
+msgstr "Types de média désactivés par l'administration."
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -13400,7 +13400,7 @@ msgstr "Non classé"
 
 #: app/controllers/CControllerMediatypeEnable.php:95
 msgid "Not enabled"
-msgstr ""
+msgstr "Non activé"
 
 #: include/forms.inc.php:315
 msgid "Not inherited items"
@@ -21411,7 +21411,7 @@ msgstr "une chaîne de caractères est attendue"
 
 #: include/classes/validators/CApiInputValidator.php:910
 msgid "a character string, integer or floating point value is expected"
-msgstr ""
+msgstr "une chaîne de caractères, un entier ou une valeur à virgule flottante est attendu"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -22127,7 +22127,7 @@ msgstr "e() - Retourne le nombre d'Euler"
 #: app/views/administration.mediatype.list.php:98
 #: app/views/administration.mediatype.list.php:103
 msgid "email"
-msgstr ""
+msgstr "courriel"
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
