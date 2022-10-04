@@ -344,7 +344,7 @@ return [
 				'length' => 32,
 				'default' => ''
 			],
-			'name_up' => [
+			'name_upper' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,

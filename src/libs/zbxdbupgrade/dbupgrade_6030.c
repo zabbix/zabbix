@@ -464,7 +464,7 @@ static int	DBpatch_6030059(void)
 
 static int	DBpatch_6030060(void)
 {
-	const ZBX_FIELD field = {"name_up", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const ZBX_FIELD field = {"name_upper", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
@@ -477,7 +477,7 @@ static int	DBpatch_6030061(void)
 
 static int	DBpatch_6030062(void)
 {
-	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("hosts", "name", "name_up", "UPPER",
+	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("hosts", "name", "name_upper", "UPPER",
 			"hostid");
 }
 
