@@ -1671,8 +1671,6 @@ class testInitialConfSync extends CIntegrationTest
 		$got = $this->parseSyncResults();
 		$this->assertEquals($this->expected_initial, $got);
 
-		$stringpool_old = $this->getStringPoolCount();
-
 		$this->purgeExisting('correlation', 'correlationids');
 		$this->purgeExisting('maintenance', 'maintenanceids');
 		$this->purgeExisting('host', 'hostids');
@@ -1687,24 +1685,22 @@ class testInitialConfSync extends CIntegrationTest
 
 		self::clearLog(self::COMPONENT_SERVER);
 
-		$this->loadInitialConfiguration();
-		$this->disableAllHosts();
-
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
-
-		$stringpool_new = $this->getStringPoolCount();
+		$stringpool_old = $this->getStringPoolCount();
 
 		self::stopComponent(self::COMPONENT_SERVER);
 		self::clearLog(self::COMPONENT_SERVER);
+
 		self::startComponent(self::COMPONENT_SERVER);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$stringpool_new = $this->getStringPoolCount();
 
 		$this->assertEquals($stringpool_old, $stringpool_new);
 
-		$got = $this->parseSyncResults();
-		$this->assertEquals($this->expected_initial, $got);
+		$this->loadInitialConfiguration();
+		$this->disableAllHosts();
 
 		return true;
 	}
