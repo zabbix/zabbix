@@ -104,6 +104,7 @@ class CControllerPopupActionEdit extends CController {
 		$eventsource = $this->getInput('eventsource', EVENT_SOURCE_TRIGGERS);
 
 		if ($this->action !== null) {
+			sortOperations($eventsource, $this->action['operations']);
 			$data = [
 				'eventsource' => $eventsource,
 				'actionid' => $this->action['actionid'],
