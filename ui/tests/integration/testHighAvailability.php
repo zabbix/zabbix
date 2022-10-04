@@ -209,8 +209,8 @@ class testHighAvailability extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER_HANODE1, '"'.self::NODE2_NAME.'" node switched to "active" mode');
 
 		$this->startComponent(self::COMPONENT_SERVER, 'HA manager started in standby mode');
-		sleep(10);
-		var_dump(file_get_contents(self::getLogPath(self::COMPONENT_SERVER_HANODE1)));
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER_HANODE1, 'started [trigger housekeeper');
+		sleep(1);
 
 		self::killComponent(self::COMPONENT_SERVER_HANODE1);
 
