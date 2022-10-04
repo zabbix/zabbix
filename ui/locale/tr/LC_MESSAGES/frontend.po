@@ -21312,6 +21312,10 @@ msgstr ""
 msgid "a character string is expected"
 msgstr "bir karakter string bekleniyor"
 
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr ""
