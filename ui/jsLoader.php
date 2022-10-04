@@ -120,9 +120,7 @@ $available_js = [
 	'items.js' => 'pages/',
 	'report2.js' => 'pages/',
 	'report4.js' => 'pages/',
-	'setup.js' => 'pages/',
-	'popup.condition.common.js' => 'pages/',
-	'popup.operation.common.js' => 'pages/'
+	'setup.js' => 'pages/'
 ];
 
 $translate_strings = [
@@ -422,9 +420,6 @@ $translate_strings = [
 	'macrovalue.js' => [
 		'Set new value' => _('Set new value'),
 		'value' => _('value')
-	],
-	'popup.condition.common.js' => [
-		'Services' => _('Services')
 	]
 ];
 

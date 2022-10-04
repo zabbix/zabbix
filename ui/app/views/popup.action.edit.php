@@ -252,7 +252,11 @@ if ($data['action']['operations']) {
 							(new CButton('remove', _('Remove')))
 								->addClass('js-remove-button')
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->removeId()
+								->removeId(),
+							new CVar('operations['.$operationid.']', $operation),
+							new CVar('operations_for_popup['.ACTION_OPERATION.']['.$operationid.']',
+								json_encode($operation_for_popup)
+							)
 						]
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
@@ -277,7 +281,11 @@ if ($data['action']['operations']) {
 							(new CButton('remove', _('Remove')))
 								->addClass('js-remove-button')
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->removeId()
+								->removeId(),
+							new CVar('operations['.$operationid.']', $operation),
+							new CVar('operations_for_popup['.ACTION_OPERATION.']['.$operationid.']',
+								json_encode($operation_for_popup)
+							)
 						]
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
@@ -360,7 +368,11 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 								->setAttribute('data-operationid', $operationid)
 								->addClass('js-remove-button')
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->removeId()
+								->removeId(),
+							new CVar('recovery_operations['.$operationid.']', $operation),
+							new CVar('operations_for_popup['.ACTION_RECOVERY_OPERATION.']['.$operationid.']',
+								json_encode($operation_for_popup)
+							)
 						]
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
@@ -428,7 +440,11 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 								->setAttribute('data-operationid', $operationid)
 								->addClass('js-remove-button')
 								->addClass(ZBX_STYLE_BTN_LINK)
-								->removeId()
+								->removeId(),
+							new CVar('update_operations['.$operationid.']', $operation),
+							new CVar('operations_for_popup['.ACTION_UPDATE_OPERATION.']['.$operationid.']',
+								json_encode($operation_for_popup)
+							)
 						]
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)

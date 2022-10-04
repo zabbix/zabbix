@@ -61,7 +61,6 @@ class CRouter {
 		'action.disable'							=> ['CControllerActionDisable',							null,					null],
 		'action.update'								=> ['CControllerActionUpdate',							'layout.json',			null],
 		'action.list'								=> ['CControllerActionList',							'layout.htmlpage',		'alerts.action.list'],
-		'action.operation.get'						=> ['CControllerActionOperationGet',					'layout.json',			null],
 		'action.operation.condition.check'			=> ['CControllerActionOperationConditionCheck',			'layout.json',			null],
 		'action.operation.check'					=> ['CControllerActionOperationCheck',					'layout.json',			null],
 		'audit.settings.edit'						=> ['CControllerAuditSettingsEdit',						'layout.htmlpage',		'administration.audit.settings.edit'],
@@ -175,7 +174,6 @@ class CRouter {
 		'popup.acknowledge.edit'					=> ['CControllerPopupAcknowledgeEdit',					'layout.json',			'popup.acknowledge.edit'],
 		'popup.action.edit'							=> ['CControllerPopupActionEdit',						'layout.json',			'popup.action.edit'],
 		'popup.action.operation.edit'				=> ['CControllerPopupActionOperationEdit',				'layout.json',			'popup.operation.edit'],
-		'popup.condition.actions'					=> ['CControllerPopupConditionActions',					'layout.json',			'popup.condition.common'],
 		'popup.condition.check'						=> ['CControllerActionConditionCheck',					'layout.json',			null],
 		'popup.condition.edit'						=> ['CControllerPopupActionConditionEdit',				'layout.json',			'popup.condition.edit'],
 		'popup.condition.event.corr'				=> ['CControllerPopupConditionEventCorr',				'layout.json',			'popup.condition.edit'],
@@ -354,7 +352,6 @@ class CRouter {
 		'widget.web.view'							=> ['CControllerWidgetWebView',							'layout.widget',		'monitoring.widget.web.view'],
 
 		// legacy actions
-		'actionconf.php'				=> ['CLegacyAction', null, null],
 		'auditacts.php'					=> ['CLegacyAction', null, null],
 		'browserwarning.php'			=> ['CLegacyAction', null, null],
 		'chart.php'						=> ['CLegacyAction', null, null],
