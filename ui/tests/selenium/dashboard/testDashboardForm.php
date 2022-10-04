@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  * @backup dashboard, profiles
  *
  * @onBefore prepareDashboardData
+ *
+ * @dataSource LoginUsers
  */
 class testDashboardForm extends CWebTest {
 
