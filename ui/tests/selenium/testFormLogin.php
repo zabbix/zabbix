@@ -40,7 +40,7 @@ class testFormLogin extends CWebTest {
 			[
 				[
 					'login' => 'disabled-user',
-					'password' => 'zabbix',
+					'password' => 'zabbix12345',
 					'expected' => TEST_BAD,
 					'error_message' => 'No permissions for system access.'
 				]
@@ -48,9 +48,9 @@ class testFormLogin extends CWebTest {
 			[
 				[
 					'login' => 'no-access-to-the-frontend',
-					'password' => 'zabbix',
+					'password' => 'zabbix12345',
 					'expected' => TEST_BAD,
-					'error_message' => 'Incorrect user name or password or account is temporarily blocked.'
+					'error_message' => 'GUI access disabled.'
 				]
 			],
 			[
