@@ -1155,7 +1155,7 @@ class testFormUserRoles extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [],
-					'api_methods' => [],
+					'api_methods' => '',
 					'message_header' => 'User role updated'
 				]
 			],
@@ -1591,7 +1591,9 @@ class testFormUserRoles extends CWebTest {
 
 			if (array_key_exists('api_methods', $data)) {
 				$api_methods = $this->query('xpath:(//div[@class="multiselect-control"])[3]')->asMultiselect()->one()->getValue();
-				rsort($api_methods);
+				if (is_array($api_methods)) {
+					rsort($api_methods);
+				}
 				$this->assertEquals($data['api_methods'], $api_methods);
 			}
 		}
