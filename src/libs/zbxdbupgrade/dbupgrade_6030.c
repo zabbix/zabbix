@@ -500,7 +500,7 @@ static int	DBpatch_6030064(void)
 
 static int	DBpatch_6030065(void)
 {
-	return DBcreate_index("items", "items_9", "name_upper", 0);
+	return DBcreate_index("items", "items_9", "hostid,name_upper", 0);
 }
 
 static int	DBpatch_6030066(void)
