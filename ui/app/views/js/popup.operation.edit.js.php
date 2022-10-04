@@ -122,6 +122,7 @@ window.operation_popup = new class {
 			'operation-message-custom-label', 'operation-message-custom', 'operation-message-subject',
 			'operation-message-body', 'operation_opmessage_default_msg', 'operation-message-mediatype-default'
 		]
+
 		this._enableFormFields(fields);
 		this._customMessageFields();
 	}
@@ -605,12 +606,12 @@ window.operation_popup = new class {
 				if($('#operation_opmessage_default_msg')[0].checked) {
 					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').show().attr('disabled', false);
 					$('[id="operation-message-body"],[id="operation-message-label"]').show().attr('disabled', false);
-					$('#operation_opmessage_default_msg').val(1);
+					$('#operation_opmessage_default_msg').val(0);
 				}
 				else {
 					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
 					$('[id="operation-message-body"],[id="operation-message-label"]').hide();
-					$('#operation_opmessage_default_msg').val(0);
+					$('#operation_opmessage_default_msg').val(1);
 				}
 			})
 			.trigger('change');

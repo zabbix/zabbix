@@ -137,7 +137,7 @@ class CControllerPopupActionOperationEdit extends CController {
 		$mediatypes = array_values($mediatypes);
 
 		return [
-			'custom_message' => ($operation['opmessage']['default_msg'] === '0'),
+			'custom_message' => ($operation['opmessage']['default_msg'] === '1'),
 			'subject' => $operation['opmessage']['subject'],
 			'body' => $operation['opmessage']['message'],
 			'mediatypeid' => $operation['opmessage']['mediatypeid'],
@@ -155,7 +155,7 @@ class CControllerPopupActionOperationEdit extends CController {
 				'subject' => '',
 				'message' => '',
 				'mediatypeid' => '0',
-				'default_msg' => '0'
+				'default_msg' => '1'
 			],
 			'operationtype' => '0',
 			'esc_step_from' => '1',

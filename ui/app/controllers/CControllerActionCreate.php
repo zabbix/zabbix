@@ -188,7 +188,7 @@ class CControllerActionCreate extends CController {
 
 				if (array_key_exists('opmessage', $operation)) {
 					if (!array_key_exists('default_msg', $operation['opmessage'])) {
-						$operation['opmessage']['default_msg'] = 1;
+						$operation['opmessage']['default_msg'] = 0;
 					}
 
 					if ($operation['opmessage']['default_msg'] == 1) {

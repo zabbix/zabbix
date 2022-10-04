@@ -220,7 +220,7 @@ $form_grid->addItem([
 	(new CFormField(
 		(new CCheckBox('operation[opmessage][default_msg]', $operation['opmessage']['default_msg']))
 			->setId('operation_opmessage_default_msg')
-			->setChecked($operation['opmessage']['default_msg'] !== '0')
+			->setChecked((bool) $operation['opmessage']['default_msg'] != '1')
 	))->setId('operation-message-custom')
 ]);
 
@@ -376,7 +376,7 @@ $form->addItem($form_grid);
 
 $buttons = [
 	[
-		'title' => $data['operation'] ? _('Update') : _('Add'),
+		'title' => array_key_exists('operationid',$data['operation']) ? _('Update') : _('Add'),
 		'class' => 'js-add',
 		'keepOpen' => true,
 		'isSubmit' => true,
