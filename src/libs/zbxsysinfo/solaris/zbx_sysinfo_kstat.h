@@ -17,22 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_HEART_H
-#define ZABBIX_HEART_H
+#include "zbxtypes.h"
 
-#include "zbxthreads.h"
-
-#include "zbxcomms.h"
-
-extern int	CONFIG_HEARTBEAT_FREQUENCY;
-
-typedef struct
-{
-	zbx_config_tls_t	*zbx_config_tls;
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
-}
-zbx_thread_heart_args;
-
-ZBX_THREAD_ENTRY(heart_thread, args);
-
-#endif
+#ifdef HAVE_KSTAT_H
+zbx_uint64_t    get_kstat_numeric_value(const kstat_named_t *kn);
+#endif /* HAVE_KSTAT_H */
