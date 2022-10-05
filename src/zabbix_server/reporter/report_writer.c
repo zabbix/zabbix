@@ -88,6 +88,7 @@ static char	*rw_curl_error(CURLcode err)
  *             config_tls_ca_file   - [IN]                                    *
  *             config_tls_cert_file - [IN]                                    *
  *             config_tls_key_file  - [IN]                                    *
+ *             config_source_ip     - [IN]                                    *
  *             error                - [OUT] the error message                 *
  *                                                                            *
  * Return value: SUCCEED - the report was downloaded successfully             *
@@ -96,7 +97,7 @@ static char	*rw_curl_error(CURLcode err)
  ******************************************************************************/
 static int	rw_get_report(const char *url, const char *cookie, int width, int height, char **report,
 		size_t *report_size, const char *config_tls_ca_file, const char *config_tls_cert_file,
-		const char *config_tls_key_file, char **error)
+		const char *config_tls_key_file, const char *config_source_ip, char **error)
 {
 #if !defined(HAVE_LIBCURL)
 	ZBX_UNUSED(url);
@@ -108,6 +109,7 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 	ZBX_UNUSED(config_tls_ca_file);
 	ZBX_UNUSED(config_tls_cert_file);
 	ZBX_UNUSED(config_tls_key_file);
+	ZBX_UNUSED(config_source_ip);
 
 	*error = zbx_strdup(NULL, "application compiled without cURL library");
 	return FAIL;
@@ -158,7 +160,8 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, CONFIG_WEBSERVICE_URL)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, j.buffer)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_INTERFACE, config_source_ip)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
 				(curl_error = rw_curl_error(err)));
@@ -252,6 +255,7 @@ out:
  *             config_tls_ca_file   - [IN]                                    *
  *             config_tls_cert_file - [IN]                                    *
  *             config_tls_key_file  - [IN]                                    *
+ *             config_source_ip     - [IN]                                    *
  *             error                - [OUT] the error message                 *
  *                                                                            *
  * Return value: SUCCEED - the report was started successfully                *
@@ -260,7 +264,7 @@ out:
  ******************************************************************************/
 static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispatch,
 		const char *config_tls_ca_file, const char *config_tls_cert_file, const char *config_tls_key_file,
-		char **error)
+		const char *config_source_ip, char **error)
 {
 	zbx_vector_ptr_pair_t	params;
 	int			i, ret, width, height;
@@ -292,7 +296,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 	}
 
 	if (SUCCEED == (ret = rw_get_report(url, cookie, width, height, &report, &report_size, config_tls_ca_file,
-			config_tls_cert_file, config_tls_key_file, error)))
+			config_tls_cert_file, config_tls_key_file, config_source_ip, error)))
 	{
 		ret = zbx_alerter_begin_dispatch(dispatch, subject, message, name, "application/pdf", report,
 				report_size, error);
@@ -434,7 +438,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 			get_program_type_string(poller_args_in->zbx_get_program_type_cb_arg()), server_num,
 			get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -458,7 +462,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 			finished_num = 0;
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != zbx_ipc_socket_read(&socket, &message))
 		{
@@ -466,7 +470,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 			exit(EXIT_FAILURE);
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		time_wake = zbx_time();
 		zbx_update_env(time_wake);
@@ -478,7 +482,8 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 				if (SUCCEED != (report_status = rw_begin_report(&message, &dispatch,
 						poller_args_in->config_tls_ca_file,
 						poller_args_in->config_tls_cert_file,
-						poller_args_in->config_tls_key_file, &error)))
+						poller_args_in->config_tls_key_file,
+						poller_args_in->config_source_ip, &error)))
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "failed to begin report dispatch: %s", error);
 				}

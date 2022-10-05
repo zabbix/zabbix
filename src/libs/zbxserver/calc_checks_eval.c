@@ -26,6 +26,7 @@
 #include "expression.h"
 #include "zbxnum.h"
 #include "zbxparam.h"
+#include "zbxsysinfo.h"
 
 #define ZBX_ITEM_QUERY_UNSET		0x0000
 
@@ -323,12 +324,12 @@ static int	replace_key_param_wildcard_cb(const char *data, int key_type, int lev
 		return SUCCEED;
 
 	tmp = zbx_strdup(NULL, data);
-	unquote_key_param(tmp);
+	zbx_unquote_key_param(tmp);
 	*param = zbx_dyn_escape_string(tmp, "\\%%");
 	zbx_free(tmp);
 
 	/* escaping cannot result in unquotable parameter */
-	if (FAIL == quote_key_param(param, quoted))
+	if (FAIL == zbx_quote_key_param(param, quoted))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		zbx_free(*param);
@@ -350,9 +351,9 @@ static int	expression_match_item_key(const char *item_key, const AGENT_REQUEST *
 	AGENT_REQUEST	key;
 	int		i, ret = FAIL;
 
-	init_request(&key);
+	zbx_init_agent_request(&key);
 
-	if (SUCCEED != parse_item_key(item_key, &key))
+	if (SUCCEED != zbx_parse_item_key(item_key, &key))
 		goto out;
 
 	if (pattern->nparam != key.nparam)
@@ -372,7 +373,7 @@ static int	expression_match_item_key(const char *item_key, const AGENT_REQUEST *
 
 	ret = SUCCEED;
 out:
-	free_request(&key);
+	zbx_free_agent_request(&key);
 
 	return ret;
 }
@@ -412,8 +413,8 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 
 	if (0 != (query->flags & ZBX_ITEM_QUERY_KEY_SOME))
 	{
-		init_request(&pattern);
-		if (SUCCEED != parse_item_key(query->ref.key, &pattern))
+		zbx_init_agent_request(&pattern);
+		if (SUCCEED != zbx_parse_item_key(query->ref.key, &pattern))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			zbx_free(sql);
@@ -523,7 +524,7 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 	DBfree_result(result);
 
 	if (0 != (query->flags & ZBX_ITEM_QUERY_KEY_SOME))
-		free_request(&pattern);
+		zbx_free_agent_request(&pattern);
 
 	zbx_free(sql);
 }
@@ -1954,15 +1955,16 @@ static void	host_index_free(zbx_host_index_t *index)
 
 /******************************************************************************
 *                                                                             *
-* Purpose: resolve expression with an empty host macro(default host)          *
+* Purpose: resolve expression with an empty host macro (default host)         *
 *          and macro host references, like:                                   *
-*          (two forward slashes, {HOST.HOST}, {HOST.HOST<N>}) to host names   *
+*          (two forward slashes, {HOST.HOST}, {HOST.HOST<N>},                 *
+*          {ITEM.KEY} and {ITEM.KEY<N>}) to host names and item keys          *
 *                                                                             *
 * Parameters: eval    - [IN/OUT] the evaluation expression                    *
 *             trigger - [IN] trigger which defines the evaluation expression  *
 *                                                                             *
 *******************************************************************************/
-void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, const ZBX_DB_TRIGGER *trigger)
+void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval, const ZBX_DB_TRIGGER *trigger)
 {
 	int			i, func_num, index;
 	zbx_vector_ptr_t	hosts;
@@ -1998,6 +2000,7 @@ void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, cons
 		if (NULL != hi->host)
 		{
 			query->ref.host = zbx_strdup(query->ref.host, hi->host);
+			DBget_trigger_value(trigger, &query->ref.key, func_num, ZBX_REQUEST_ITEM_KEY);
 		}
 		else
 		{

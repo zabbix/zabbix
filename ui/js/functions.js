@@ -160,40 +160,42 @@ function getUniqueId() {
 /**
  * Color palette object used for getting different colors from color palette.
  */
-var colorPalette = (function() {
+let colorPalette = (function() {
 	'use strict';
 
-	var current_color = 0,
-		palette = [];
+	let palette = [];
 
 	return {
-		incrementNextColor: function() {
-			if (++current_color == palette.length) {
-				current_color = 0;
-			}
-		},
-
 		/**
 		 * Gets next color from palette.
 		 *
-		 * @return string	hexadecimal color code
+		 * @param {array} used_colors  Array of already used hexadecimal color codes.
+		 *
+		 * @return string  Hexadecimal color code.
 		 */
-		getNextColor: function() {
-			var color = palette[current_color];
+		getNextColor: function(used_colors) {
+			if (!used_colors.length) {
+				return palette[0] || '';
+			}
 
-			this.incrementNextColor();
+			const palette_usage = {};
 
-			return color;
+			for (const color of palette) {
+				palette_usage[color] = used_colors.filter(used_color => used_color === color).length;
+			}
+
+			const min_used_color_count = Math.min(...Object.values(palette_usage));
+
+			return Object.keys(palette_usage).find(color => palette_usage[color] == min_used_color_count);
 		},
 
 		/**
-		 * Set theme specific color palette.
+		 * Set color palette.
 		 *
-		 * @param array colors  Array of hexadecimal color codes.
+		 * @param {array} colors  Array of hexadecimal color codes.
 		 */
 		setThemeColors: function(colors) {
 			palette = colors;
-			current_color = 0;
 		}
 	}
 }());
@@ -660,52 +662,41 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 })(jQuery);
 
 /**
- * Parse url string to object. Hash starting part of URL will be removed.
- * Return object where 'url' key contain parsed url, 'pairs' key is array of objects with parsed arguments.
+ * Parse URL string to object. Hash starting part of URL will be removed.
+ * Return object where 'url' key contains parsed URL, 'pairs' key is array of objects with parsed arguments.
  * For malformed URL strings will return false.
  *
- * @param {string} url    URL string to parse.
+ * @param {string} url_string  URL string to parse.
  *
  * @return {object|bool}
  */
-function parseUrlString(url) {
-	var url = url.replace(/#.+/, ''),
-		pos = url.indexOf('?'),
-		valid = true,
-		pairs = [],
-		query;
-
-	if (pos != -1) {
-		query = url.substring(pos + 1);
-		url = url.substring(0, pos);
-
-		jQuery.each(query.split('&'), function(i, pair) {
-			if (jQuery.trim(pair)) {
-				pair = pair.replace(/\+/g, ' ').split('=', 2);
-				pair.push('');
-
-				try {
-					if (pair[0].match(/%[01]/) || pair[1].match(/%[01]/)) {
-						// Non-printable characters in URL.
-						throw null;
-					}
-
-					pairs.push({
-						'name': decodeURIComponent(pair[0]),
-						'value': decodeURIComponent(pair[1])
-					});
-				}
-				catch( e ) {
-					valid = false;
-					// Break jQuery.each iteration.
-					return false;
-				}
-			}
-		});
+function parseUrlString(url_string) {
+	try {
+		decodeURI(url_string);
+	}
+	catch {
+		return false;
 	}
 
-	if (!valid) {
-		return false;
+	let url = url_string.replace(/#.+/, '');
+	const pos = url.indexOf('?');
+	const pairs = [];
+
+	if (pos != -1) {
+		const query = url.substring(pos + 1);
+		url = url.substring(0, pos);
+
+		for (const param of new URLSearchParams(query)) {
+			if (encodeURIComponent(param[0]).match(/%[01]/) || encodeURIComponent(param[1]).match(/%[01]/)) {
+				// Non-printable characters in URL.
+				return false;
+			}
+
+			pairs.push({
+				'name': param[0],
+				'value': param[1]
+			});
+		}
 	}
 
 	return {

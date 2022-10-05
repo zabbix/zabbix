@@ -5,7 +5,7 @@
 
 #include "zbxcommon.h"
 #include "module.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 static int	read_yaml_ret(void)
 {
@@ -37,10 +37,10 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	init_result(&result);
-	init_request(&request);
+	zbx_init_agent_result(&result);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(itemkey, &request))
+	if (SUCCEED != zbx_parse_item_key(itemkey, &request))
 		fail_msg("Invalid item key format '%s'", itemkey);
 
 	if (read_yaml_ret() != (ret = SYSTEM_CPU_INTR(&request, &result)))
@@ -50,15 +50,15 @@ void	zbx_mock_test_entry(void **state)
 	{
 		zbx_uint64_t	interr;
 
-		if (NULL == GET_UI64_RESULT(&result))
+		if (NULL == ZBX_GET_UI64_RESULT(&result))
 			fail_msg("result does not contain numeric unsigned value");
 
 		if ((interr = zbx_mock_get_parameter_uint64("out.interrupts_since_boot")) != result.ui64)
 			fail_msg("expected:" ZBX_FS_UI64 " actual:" ZBX_FS_UI64, interr, result.ui64);
 	}
-	else if (NULL == GET_MSG_RESULT(&result))
+	else if (NULL == ZBX_GET_MSG_RESULT(&result))
 		fail_msg("result does not contain failure message");
 
-	free_request(&request);
-	free_result(&result);
+	zbx_free_agent_request(&request);
+	zbx_free_agent_result(&result);
 }

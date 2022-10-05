@@ -23,6 +23,7 @@
 #include "simple.h"
 #include "log.h"
 #include "zbxself.h"
+#include "zbxsysinfo.h"
 
 typedef int	(*vmfunc_t)(AGENT_REQUEST *, const char *, const char *, AGENT_RESULT *);
 
@@ -204,9 +205,9 @@ int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' addr:'%s'", __func__, item->key_orig, item->interface.addr);
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key, &request))
+	if (SUCCEED != zbx_parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
@@ -253,15 +254,15 @@ int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	else
 	{
 		/* it will execute item from a loadable module if any */
-		if (SUCCEED == process(item->key, PROCESS_MODULE_COMMAND, result))
+		if (SUCCEED == zbx_execute_agent_check(item->key, ZBX_PROCESS_MODULE_COMMAND, result))
 			ret = SUCCEED;
 	}
 
-	if (NOTSUPPORTED == ret && !ISSET_MSG(result))
+	if (NOTSUPPORTED == ret && !ZBX_ISSET_MSG(result))
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Simple check is not supported."));
 
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

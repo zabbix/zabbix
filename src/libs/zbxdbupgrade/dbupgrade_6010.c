@@ -759,7 +759,7 @@ static int	DBpatch_6010033_split_groups(void)
 	ADD_GROUPIDS_FROM("opgroup");
 	ADD_GROUPIDS_FROM("scripts");
 
-	/* 0 - CONDITION_TYPE_HOST_GROUP */
+	/* 0 - ZBX_CONDITION_TYPE_HOST_GROUP */
 	result = DBselect("select distinct value from conditions where conditiontype=0");
 
 	while (NULL != (row = DBfetch(result)))

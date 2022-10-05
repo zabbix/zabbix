@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+
 #include "log.h"
 
 int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -38,12 +38,13 @@ int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-     	SET_UI64_RESULT(result, maxfiles);
+	SET_UI64_RESULT(result, maxfiles);
 
 	return SYSINFO_RET_OK;
 #else
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for \"kern.maxfiles\" system"
 			" parameter."));
+
 	return SYSINFO_RET_FAIL;
 #endif
 }
@@ -65,11 +66,13 @@ int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-     	SET_UI64_RESULT(result, maxproc);
+	SET_UI64_RESULT(result, maxproc);
+
 	return SYSINFO_RET_OK;
 #else
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for \"kern.maxproc\" system"
 			" parameter."));
+
 	return SYSINFO_RET_FAIL;
 #endif
 }

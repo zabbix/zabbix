@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Actions'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ACTION_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_ACTION_EDIT));
 
 // create form
 $actionForm = (new CForm())
@@ -37,7 +37,7 @@ $actionForm = (new CForm())
 		->setArgument('eventsource', $data['eventsource'])
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['actionid']) {

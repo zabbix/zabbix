@@ -17,12 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
+#include "inodes.h"
+
 #include "zbxjson.h"
 #include "log.h"
 #include "zbxalgo.h"
-#include "inodes.h"
 
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused, char **error)
@@ -82,6 +84,8 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 	}
 
 	return SYSINFO_RET_OK;
+#undef ZBX_STATFS
+#undef ZBX_BSIZE
 }
 
 static int	VFS_FS_USED(const char *fs, AGENT_RESULT *result)
@@ -236,6 +240,8 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct vmount	*vms = NULL, *vm;
 	struct zbx_json	j;
 
+	ZBX_UNUSED(request);
+
 	/* check how many bytes to allocate for the mounted filesystems */
 	if (-1 == (rc = mntctl(MCTL_QUERY, sizeof(sz), (char *)&sz)))
 	{
@@ -262,6 +268,8 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSNAME, (char *)vm + vm->vmt_data[VMT_STUB].vmt_off,
 				ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSTYPE, zbx_get_vfs_name_by_type(vm->vmt_gfstype),
+				ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSOPTIONS, (char *)vm + vm->vmt_data[VMT_ARGS].vmt_off,
 				ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 
@@ -291,10 +299,12 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t		itotal, inot_used, iused;
 	double			pfree, pused;
 	double			ipfree, ipused;
-	char 			*error;
+	char			*error;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_mpoint_t		*mntpoint;
-	char 			*mpoint;
+	char			*mpoint;
+
+	ZBX_UNUSED(request);
 
 	/* check how many bytes to allocate for the mounted filesystems */
 	if (-1 == (rc = mntctl(MCTL_QUERY, sizeof(sz), (char *)&sz)))
@@ -317,7 +327,10 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	for (i = 0, vm = vms; i < rc; i++)
 	{
+		char	*mntopts;
+
 		mpoint = (char *)vm + vm->vmt_data[VMT_STUB].vmt_off;
+		mntopts = (char *)vm + vm->vmt_data[VMT_ARGS].vmt_off;
 
 		if (SYSINFO_RET_OK != get_fs_size_stat(mpoint, &total, &not_used, &used, &pfree, &pused, &error))
 		{
@@ -344,6 +357,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		mntpoint->inodes.not_used = inot_used;
 		mntpoint->inodes.pfree = ipfree;
 		mntpoint->inodes.pused = ipused;
+		mntpoint->options = zbx_strdup(NULL, mntopts);
 
 		zbx_vector_ptr_append(&mntpoints, mntpoint);
 
@@ -385,6 +399,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->inodes.pfree);
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->inodes.pused);
 			zbx_json_close(&j);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mntpoint->options, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&j);
 		}
 
@@ -410,5 +425,4 @@ out:
 int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return zbx_execute_threaded_metric(vfs_fs_get, request, result);
-
 }
