@@ -36,13 +36,6 @@ final class CModuleManager {
 	 */
 	private const MAX_MANIFEST_VERSION = 2;
 
-	private const DASHBOARD_ACTIONS = [
-		'dashboard.print',
-		'dashboard.view',
-		'host.dashboard.view',
-		'template.dashboard.edit'
-	];
-
 	/**
 	 * Root path of modules.
 	 */
@@ -152,14 +145,14 @@ final class CModuleManager {
 		return $this->modules;
 	}
 
-	public function setAction(string $action_name): self {
+	public function setActionName(string $action_name): self {
 		$this->action_name = $action_name;
 
 		return $this;
 	}
 
 	/**
-	 * Get loaded module instance associated with given action name.
+	 * Get loaded module instance associated with action.
 	 *
 	 * @return CModule|null
 	 */
@@ -206,14 +199,12 @@ final class CModuleManager {
 		return $widget_defaults;
 	}
 
-	public function getWidget($module_id): ?CWidget {
+	public function getModule($module_id): ?CWidget {
 		if (!array_key_exists($module_id, $this->modules)) {
 			return null;
 		}
 
-		$module = $this->modules[$module_id];
-
-		return $module instanceof CWidget ? $module : null;
+		return $this->modules[$module_id];
 	}
 
 	public function getManifests(): array {
@@ -267,7 +258,7 @@ final class CModuleManager {
 
 		/** @var CModule $module */
 		foreach ($this->modules as $module) {
-			if ($module instanceof CWidget && !in_array($this->action_name, self::DASHBOARD_ACTIONS, true)) {
+			if ($module->getType() === CModule::TYPE_WIDGET && !CRouter::isDashboardAction($this->action_name)) {
 				continue;
 			}
 

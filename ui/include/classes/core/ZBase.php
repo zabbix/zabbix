@@ -19,9 +19,9 @@
 **/
 
 
-use Zabbix\Core\CModule,
-	CController as CAction;
-use Zabbix\Core\CWidget;
+use Zabbix\Core\CModule;
+
+use CController as CAction;
 
 require_once dirname(__FILE__).'/CAutoloader.php';
 
@@ -571,7 +571,7 @@ class ZBase {
 			}
 
 			$action->setAction($action_name);
-			$this->module_manager->setAction($action_name);
+			$this->module_manager->setActionName($action_name);
 
 			$modules = $this->module_manager->getModules();
 

@@ -18,19 +18,24 @@
 **/
 
 
-const WIDGET_SYSMAP_SOURCETYPE_MAP = 1;
-const WIDGET_SYSMAP_SOURCETYPE_FILTER = 2;
 
-const WIDGET_SYSMAP_EVENT_SUBMAP_SELECT = 'widget-sysmap-submap-select';
 
 class CWidgetMap extends CWidget {
+
+	static SOURCETYPE_MAP = 1;
+	static SOURCETYPE_FILTER = 2;
+
+	static EVENT_SUBMAP_SELECT = 'widget-map.submap-select';
+
+	static WIDGET_NAVTREE_EVENT_MARK = 'widget-navtree.mark';
+	static WIDGET_NAVTREE_EVENT_SELECT = 'widget-navtree.select';
 
 	_init() {
 		super._init();
 
 		this._map_svg = null;
 
-		this._source_type = this._fields.source_type || WIDGET_SYSMAP_SOURCETYPE_MAP;
+		this._source_type = this._fields.source_type || CWidgetMap.SOURCETYPE_MAP;
 		this._filter_widget = null;
 		this._filter_itemid = null;
 
@@ -61,8 +66,8 @@ class CWidgetMap extends CWidget {
 		super._doDestroy();
 
 		if (this._filter_widget) {
-			this._filter_widget.off(WIDGET_NAVTREE_EVENT_MARK, this._events.mark);
-			this._filter_widget.off(WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
+			this._filter_widget.off(CWidgetMap.WIDGET_NAVTREE_EVENT_MARK, this._events.mark);
+			this._filter_widget.off(CWidgetMap.WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
 		}
 	}
 
@@ -70,18 +75,18 @@ class CWidgetMap extends CWidget {
 		super.announceWidgets(widgets);
 
 		if (this._filter_widget !== null) {
-			this._filter_widget.off(WIDGET_NAVTREE_EVENT_MARK, this._events.mark);
-			this._filter_widget.off(WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
+			this._filter_widget.off(CWidgetMap.WIDGET_NAVTREE_EVENT_MARK, this._events.mark);
+			this._filter_widget.off(CWidgetMap.WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
 		}
 
-		if (this._source_type == WIDGET_SYSMAP_SOURCETYPE_FILTER) {
+		if (this._source_type == CWidgetMap.SOURCETYPE_FILTER) {
 			for (const widget of widgets) {
 				if (widget instanceof CWidgetNavTree
 						&& widget._fields.reference === this._fields.filter_widget_reference) {
 					this._filter_widget = widget;
 
-					this._filter_widget.on(WIDGET_NAVTREE_EVENT_MARK, this._events.mark);
-					this._filter_widget.on(WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
+					this._filter_widget.on(CWidgetMap.WIDGET_NAVTREE_EVENT_MARK, this._events.mark);
+					this._filter_widget.on(CWidgetMap.WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
 				}
 			}
 		}
@@ -90,7 +95,7 @@ class CWidgetMap extends CWidget {
 	_promiseUpdate() {
 		if (!this._has_contents || this._map_svg === null) {
 			if (this._sysmapid !== null
-					|| this._source_type == WIDGET_SYSMAP_SOURCETYPE_MAP
+					|| this._source_type == CWidgetMap.SOURCETYPE_MAP
 					|| this._filter_widget === null) {
 				return super._promiseUpdate();
 			}
@@ -174,7 +179,7 @@ class CWidgetMap extends CWidget {
 
 				this._navigateToMap(item.sysmapid);
 
-				this.fire(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, {
+				this.fire(CWidgetMap.EVENT_SUBMAP_SELECT, {
 					sysmapid: item.sysmapid,
 					parent_itemid: item.parent_itemid,
 					back: true
@@ -221,7 +226,7 @@ class CWidgetMap extends CWidget {
 
 		this._navigateToMap(sysmapid);
 
-		this.fire(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, {
+		this.fire(CWidgetMap.EVENT_SUBMAP_SELECT, {
 			sysmapid,
 			parent_itemid: this._filter_itemid
 		});

@@ -348,6 +348,13 @@ class CRouter {
 		'triggers.php'					=> ['CLegacyAction', null, null]
 	];
 
+	private const DASHBOARD_ACTIONS = [
+		'dashboard.print',
+		'dashboard.view',
+		'host.dashboard.view',
+		'template.dashboard.edit'
+	];
+
 	/**
 	 * Add new actions (potentially overwriting the existing ones).
 	 *
@@ -387,31 +394,23 @@ class CRouter {
 		}
 	}
 
-	/**
-	 * Returns layout name.
-	 */
 	public function getLayout(): ?string {
 		return $this->layout;
 	}
 
-	/**
-	 * Returns controller name.
-	 */
 	public function getController(): ?string {
 		return $this->controller;
 	}
 
-	/**
-	 * Returns view name.
-	 */
 	public function getView(): ?string {
 		return $this->view;
 	}
 
-	/**
-	 * Returns action name.
-	 */
 	public function getAction(): ?string {
 		return $this->action;
+	}
+
+	public static function isDashboardAction(string $action): bool {
+		return in_array($action, self::DASHBOARD_ACTIONS, true);
 	}
 }

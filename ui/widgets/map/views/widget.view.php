@@ -26,7 +26,9 @@
  * @var array $data
  */
 
-$item = new CDashboardWidgetMap($data['sysmap_data'], $data['widget_settings']);
+use Widgets\Map\Includes\WidgetMap;
+
+$item = new WidgetMap($data['sysmap_data'], $data['widget_settings']);
 
 (new CWidgetView($data))
 	->addItem($item)

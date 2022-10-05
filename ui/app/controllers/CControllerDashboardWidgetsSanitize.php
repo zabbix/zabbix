@@ -19,6 +19,8 @@
 **/
 
 
+use Zabbix\Core\CModule;
+
 /**
  * Controller for sanitizing fields of widgets before pasting previously copied widget.
  */
@@ -57,9 +59,9 @@ class CControllerDashboardWidgetsSanitize extends CController {
 
 				$widget_input = $validator->getValidInput();
 
-				$widget = APP::ModuleManager()->getWidget($widget_input['type']);
+				$widget = APP::ModuleManager()->getModule($widget_input['type']);
 
-				if ($widget === null) {
+				if ($widget === null || $widget->getType() === CModule::TYPE_WIDGET) {
 					error(_('Widget not supported.'));
 
 					$ret = false;

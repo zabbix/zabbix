@@ -18,10 +18,12 @@
 **/
 
 
-const WIDGET_NAVTREE_EVENT_MARK = 'widget-navtree-mark';
-const WIDGET_NAVTREE_EVENT_SELECT = 'widget-navtree-select';
-
 class CWidgetNavTree extends CWidget {
+
+	static EVENT_MARK = 'widget-navtree.mark';
+	static EVENT_SELECT = 'widget-navtree.select';
+
+	static WIDGET_MAP_EVENT_SUBMAP_SELECT = 'widget-map.submap-select';
 
 	_init() {
 		super._init();
@@ -228,7 +230,7 @@ class CWidgetNavTree extends CWidget {
 						[this._widgetid]
 					);
 
-					this.fire(WIDGET_NAVTREE_EVENT_SELECT, {
+					this.fire(CWidgetNavTree.EVENT_SELECT, {
 						sysmapid: this._navtree[this._navtree_item_selected].sysmapid,
 						itemid: this._navtree_item_selected
 					});
@@ -280,7 +282,7 @@ class CWidgetNavTree extends CWidget {
 				sysmapid = this._navtree[this._navtree_item_selected].sysmapid;
 			}
 
-			this.fire(WIDGET_NAVTREE_EVENT_SELECT, {sysmapid, itemid: this._navtree_item_selected});
+			this.fire(CWidgetNavTree.WIDGET_NAVTREE_EVENT_SELECT, {sysmapid, itemid: this._navtree_item_selected});
 		}
 	}
 
@@ -312,7 +314,7 @@ class CWidgetNavTree extends CWidget {
 
 		if (!this._is_edit_mode) {
 			for (const widget of this._maps) {
-				widget.on(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
+				widget.on(CWidgetNavTree.WIDGET_MAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
 			}
 		}
 	}
@@ -345,7 +347,7 @@ class CWidgetNavTree extends CWidget {
 
 		if (!this._is_edit_mode) {
 			for (const widget of this._maps) {
-				widget.off(WIDGET_SYSMAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
+				widget.off(CWidgetNavTree.WIDGET_MAP_EVENT_SUBMAP_SELECT, this._events.selectSubmap);
 			}
 		}
 	}
@@ -741,7 +743,7 @@ class CWidgetNavTree extends CWidget {
 
 		updateUserProfile('web.dashboard.widget.navtree.item.selected', this._navtree_item_selected, [this._widgetid]);
 
-		this.fire(WIDGET_NAVTREE_EVENT_MARK, {itemid: this._navtree_item_selected});
+		this.fire(CWidgetNavTree.EVENT_MARK, {itemid: this._navtree_item_selected});
 
 		return true;
 	}

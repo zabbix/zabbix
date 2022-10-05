@@ -25,6 +25,9 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
+	public const SOURCETYPE_MAP = 1;
+	public const SOURCETYPE_FILTER = 2;
+
 	public function hasPadding(array $fields_values, int $view_mode): bool {
 		return true;
 	}

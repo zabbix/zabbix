@@ -19,6 +19,8 @@
 **/
 
 
+use Zabbix\Core\CModule;
+
 class CDashboardHelper {
 
 	/**
@@ -70,9 +72,10 @@ class CDashboardHelper {
 			CArrayHelper::sort($page['widgets'], ['y', 'x']);
 
 			foreach ($page['widgets'] as $widget_data) {
-				$widget = APP::ModuleManager()->getWidget($widget_data['type']);
+				$widget = APP::ModuleManager()->getModule($widget_data['type']);
 
-				if ($widget === null || ($templateid !== null && !$widget->isSupportedInTemplate())) {
+				if ($widget === null || $widget->getType() !== CModule::TYPE_WIDGET
+						|| ($templateid !== null && !$widget->isSupportedInTemplate())) {
 					continue;
 				}
 
@@ -338,9 +341,10 @@ class CDashboardHelper {
 	public static function hasTimeSelector(array $pages): bool {
 		foreach ($pages as $page) {
 			foreach ($page['widgets'] as $widget_data) {
-				$widget = App::ModuleManager()->getWidget($widget_data['type']);
+				$widget = App::ModuleManager()->getModule($widget_data['type']);
 
-				if ($widget !== null && $widget->usesTimeSelector($widget_data['fields'])) {
+				if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET
+						&& $widget->usesTimeSelector($widget_data['fields'])) {
 					return true;
 				}
 			}
@@ -393,9 +397,10 @@ class CDashboardHelper {
 			}
 
 			foreach ($dashboard_page['widgets'] as $widget_index => &$widget_data) {
-				$widget = APP::ModuleManager()->getWidget($widget_data['type']);
+				$widget = APP::ModuleManager()->getModule($widget_data['type']);
 
-				if ($widget === null || ($templateid !== null && !$widget->isSupportedInTemplate())) {
+				if ($widget === null || $widget->getType() !== CModule::TYPE_WIDGET
+						|| ($templateid !== null && !$widget->isSupportedInTemplate())) {
 					continue;
 				}
 

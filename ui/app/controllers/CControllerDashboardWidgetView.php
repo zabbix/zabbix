@@ -64,8 +64,6 @@ abstract class CControllerDashboardWidgetView extends CController {
 				$this->hasInput('templateid') ? $this->getInput('templateid') : null
 			);
 
-			$this->fields_values = $this->form->getFieldsValues();
-
 			if ($errors = $this->form->validate()) {
 				foreach ($errors as $error) {
 					error($error);
@@ -73,6 +71,10 @@ abstract class CControllerDashboardWidgetView extends CController {
 
 				$ret = false;
 			}
+		}
+
+		if ($ret) {
+			$this->fields_values = $this->form->getFieldsValues();
 		}
 
 		if (!$ret) {

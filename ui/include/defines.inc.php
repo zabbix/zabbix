@@ -1613,10 +1613,6 @@ define('WIDGET_ITEM',				'item');
 // Deprecated widgets
 define('WIDGET_DATA_OVER',			'dataover');
 
-// sysmap widget source types
-define('WIDGET_SYSMAP_SOURCETYPE_MAP',	1);
-define('WIDGET_SYSMAP_SOURCETYPE_FILTER',	2);
-
 // widget select resource field types
 define('WIDGET_FIELD_SELECT_RES_SYSMAP',	1);
 

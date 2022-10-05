@@ -19,11 +19,12 @@
 **/
 
 
-use Zabbix\Core\CWidget;
-
-use Zabbix\Widgets\{
-	CWidgetForm
+use Zabbix\Core\{
+	CModule,
+	CWidget
 };
+
+use Zabbix\Widgets\CWidgetForm;
 
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldMultiSelectGraph,
@@ -55,9 +56,12 @@ class CControllerDashboardWidgetEdit extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$this->widget = APP::ModuleManager()->getWidget($this->getInput('type'));
+			$widget = APP::ModuleManager()->getModule($this->getInput('type'));
 
-			if ($this->widget === null) {
+			if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET) {
+				$this->widget = $widget;
+			}
+			else {
 				error(_('Widget not supported.'));
 
 				$ret = false;

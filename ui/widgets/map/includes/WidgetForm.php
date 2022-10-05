@@ -33,6 +33,8 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldWidgetSelect
 };
 
+use Widgets\Map\Widget;
+
 /**
  * Map widget form.
  */
@@ -45,15 +47,15 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('source_type', _('Source type'), [
-					WIDGET_SYSMAP_SOURCETYPE_MAP => _('Map'),
-					WIDGET_SYSMAP_SOURCETYPE_FILTER => _('Map navigation tree')
+					Widget::SOURCETYPE_MAP => _('Map'),
+					Widget::SOURCETYPE_FILTER => _('Map navigation tree')
 				]))
-					->setDefault(WIDGET_SYSMAP_SOURCETYPE_MAP)
+					->setDefault(Widget::SOURCETYPE_MAP)
 					->setAction('ZABBIX.Dashboard.reloadWidgetProperties()')
 			);
 
 		if (array_key_exists('source_type', $this->values)
-				&& $this->values['source_type'] == WIDGET_SYSMAP_SOURCETYPE_MAP) {
+				&& $this->values['source_type'] == Widget::SOURCETYPE_MAP) {
 
 			$this->addField(
 				(new CWidgetFieldSelectResource('sysmapid', _('Map')))

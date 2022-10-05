@@ -48,8 +48,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		// Get list of sysmapids.
 		$sysmapids = [];
 		$navtree_items = [];
+
 		foreach ($this->fields_values['navtree'] as $id => $navtree_item) {
 			$sysmapid = array_key_exists('sysmapid', $navtree_item) ? $navtree_item['sysmapid'] : 0;
+
 			if ($sysmapid != 0) {
 				$sysmapids[$sysmapid] = true;
 			}
