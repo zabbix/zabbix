@@ -148,7 +148,7 @@ class testDashboardForm extends CWebTest {
 						'permission' => 3
 					],
 					[
-						'userid' => 7,
+						'userid' => CDataHelper::get('LoginUsers.userids.disabled-user'),
 						'permission' => 2
 					]
 				],
