@@ -1064,14 +1064,6 @@ static void	zbx_on_exit(int ret)
 	exit(EXIT_SUCCESS);
 }
 
-static void	zbx_db_version_info_clear(void)
-{
-	zbx_free(db_version_info.friendly_current_version);
-	zbx_free(db_version_info.extension);
-	zbx_free(db_version_info.ext_friendly_current_version);
-	zbx_free(db_version_info.ext_lic);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: executes server processes                                         *
@@ -1244,7 +1236,7 @@ static void	zbx_check_db(void)
 
 	if (SUCCEED != result)
 	{
-		zbx_db_version_info_clear();
+		zbx_db_version_info_clear(&db_version_info);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -1997,7 +1989,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 	}
 
-	zbx_db_version_info_clear();
+	zbx_db_version_info_clear(&db_version_info);
 
 	zbx_on_exit(ZBX_EXIT_STATUS());
 

@@ -838,5 +838,6 @@ void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
 
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
+void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
 
 #endif /* ZABBIX_DBHIGH_H */
