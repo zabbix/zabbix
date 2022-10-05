@@ -29,6 +29,9 @@ Grant Zabbix agent 2 super/admin user privileges for smartctl utility.
 
 Plugin [parameters list](https://www.zabbix.com/documentation/6.4/manual/appendix/config/zabbix_agent2_plugins/smart_plugin)
 
+
+## Zabbix configuration
+
 No specific Zabbix configuration is required.
 
 ### Macros used
