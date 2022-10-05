@@ -28,7 +28,7 @@
 
 (new CWidgetView($data))
 	->addItem($data['style'] == STYLE_TOP
-		? (new CPartial('trigoverview.table.top', $data))->getOutput()
-		: (new CPartial('trigoverview.table.left', $data))->getOutput()
+		? (new CPartial('table.top', $data))->getOutput()
+		: (new CPartial('table.left', $data))->getOutput()
 	)
 	->show();
