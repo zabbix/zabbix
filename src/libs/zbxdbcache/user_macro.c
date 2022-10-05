@@ -413,6 +413,10 @@ static void	um_macro_kv_remove(zbx_um_macro_t *macro, zbx_dc_macro_kv_t *mkv)
 		if (0 == mkv->kv->macros.values_num)
 		{
 			zbx_vector_uint64_pair_destroy(&mkv->kv->macros);
+			dc_strpool_release(mkv->kv->key);
+			if (NULL != mkv->kv->value)
+				dc_strpool_release(mkv->kv->value);
+
 			zbx_hashset_remove_direct(&mkv->kv_path->kvs, mkv->kv);
 			if (0 == mkv->kv_path->kvs.num_data)
 				dc_kvs_path_remove(mkv->kv_path);
