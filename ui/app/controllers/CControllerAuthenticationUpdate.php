@@ -41,6 +41,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$fields = [
 			'form_refresh' =>					'int32',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
+			'deprovisioned_groupid' =>			'id',
 			'http_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_auth_enabled' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
 			'ldap_servers' =>					'array',
@@ -312,6 +313,7 @@ class CControllerAuthenticationUpdate extends CController {
 	private function processGeneralAuthenticationSettings(int $ldap_userdirectoryid): bool {
 		$fields = [
 			'authentication_type' => ZBX_AUTH_INTERNAL,
+			'deprovisioned_groupid' => 0,
 			'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
 			'ldap_userdirectoryid' => $ldap_userdirectoryid,
 			'ldap_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
@@ -340,6 +342,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 		$auth_params = [
 			CAuthenticationHelper::AUTHENTICATION_TYPE,
+			CAuthenticationHelper::DEPROVISIONED_GROUPID,
 			CAuthenticationHelper::HTTP_AUTH_ENABLED,
 			CAuthenticationHelper::HTTP_LOGIN_FORM,
 			CAuthenticationHelper::HTTP_STRIP_DOMAINS,

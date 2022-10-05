@@ -47,7 +47,7 @@ FIELD		|attempt_clock	|t_integer	|0	|NOT NULL	|ZBX_NODATA
 FIELD		|rows_per_page	|t_integer	|50	|NOT NULL	|0
 FIELD		|timezone	|t_varchar(50)	|'default'|NOT NULL	|ZBX_NODATA
 FIELD		|roleid		|t_id		|	|NOT NULL	|0			|1|role
-FIELD		|userdirectoryid	|t_id	|NULL	|NULL	|0	|2|userdirectory	|userdirectoryid|0
+FIELD		|userdirectoryid	|t_id	|NULL	|NULL	|0	|2|userdirectory	|userdirectoryid	|RESTRICT
 FIELD		|ts_provisioned		|t_time	|'0'	|NOT NULL	|0
 UNIQUE		|1		|username
 INDEX		|2		|userdirectoryid

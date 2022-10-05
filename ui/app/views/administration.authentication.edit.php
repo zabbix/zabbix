@@ -26,6 +26,13 @@
 
 $this->includeJsFile('administration.authentication.edit.js.php');
 
+$form = (new CForm())
+	->addVar('action', $data['action_submit'])
+	->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
+	->setId('authentication-form')
+	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->disablePasswordAutofill();
+
 // Authentication general fields.
 $auth_tab = (new CFormGrid())
 	->addItem([
@@ -36,6 +43,29 @@ $auth_tab = (new CFormGrid())
 				->addValue(_('LDAP'), ZBX_AUTH_LDAP)
 				->setModern(true)
 				->removeId()
+		)
+	])
+	->addItem([
+		new CLabel([
+			_('Deprovisioned users group')
+		]),
+		new CFormField(
+			(new CMultiSelect([
+				'name' => 'deprovisioned_groupid',
+				'object_name' => 'usersGroups',
+				'data' => $data['deprovisioned_group_ms'],
+				'multiple' => false,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'usrgrp',
+						'srcfld1' => 'usrgrpid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getId(),
+						'dstfld1' => 'deprovisioned_groupid',
+						'group_status' => GROUP_STATUS_DISABLED
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 		)
 	])
 	->addItem(
@@ -495,13 +525,8 @@ $saml_tab = (new CFormGrid())
 		))->addClass('saml-provision-status')
 	]);
 
-$form = (new CForm())
-	->addVar('action', $data['action_submit'])
-	->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
-	->setId('authentication-form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
-	->disablePasswordAutofill()
-	->addItem((new CTabView())
+
+	$form->addItem((new CTabView())
 		->setSelected($data['form_refresh'] ? null : 0)
 		->addTab('auth', _('Authentication'), $auth_tab)
 		->addTab('http', _('HTTP settings'), $http_tab, TAB_INDICATOR_AUTH_HTTP)
