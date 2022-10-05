@@ -52,6 +52,7 @@ class CControllerLatestView extends CControllerLatest {
 			'filter_show_counter' =>	'in 1,0',
 			'filter_counters' =>		'in 1',
 			'filter_reset' =>			'in 1',
+			'filter_set' =>				'in 1',
 			'counter_index' =>			'ge 0',
 			'subfilter_hostids' =>		'array',
 			'subfilter_tagnames' =>		'array',
@@ -121,9 +122,13 @@ class CControllerLatestView extends CControllerLatest {
 		$filter_tabs = [];
 		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
 
-		if ($this->getInputAll()) {
+		if ($this->hasInput('filter_reset')) {
 			$profile->reset();
-			$profile->setInput($this->cleanInput($this->getInputAll()));
+		}
+
+		if ($this->hasInput('filter_set')) {
+			$profile->reset();
+			$profile->setTabFilter(0, $this->cleanInput($this->getInputAll()));
 			$profile->update();
 		}
 

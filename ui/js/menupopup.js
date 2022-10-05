@@ -144,6 +144,7 @@ function getMenuPopupHost(options, trigger_element) {
 		}
 		url.setArgument('filter_name', '');
 		url.setArgument('hostids[]', options.hostid);
+		url.setArgument('filter_set', '1');
 		latest_data.url = url.getUrl();
 
 		if (!options.showTriggers) {
@@ -782,6 +783,7 @@ function getMenuPopupItemConfiguration(options) {
 		url.setArgument('hostids[]', options.hostid);
 		url.setArgument('name', options.name);
 		url.setArgument('filter_name', '');
+		url.setArgument('filter_set', '1');
 
 		items.push({
 			label: t('Latest data'),
