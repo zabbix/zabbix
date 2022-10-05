@@ -216,17 +216,19 @@ class CControllerActionOperationCheck extends CController {
 
 	protected function doAction() {
 		$operation = $this->getInput('operation');
-
-		if (!array_key_exists('default_msg', $operation['opmessage'])) {
-			$operation['opmessage']['default_msg'] = '1';
-
-			unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
-		}
-
 		$operationtype = preg_replace('[\D]', '', $operation['operationtype']);
 
 		if (preg_match('/\bscriptid\b/', $operation['operationtype'])){
 			$operationtype = OPERATION_TYPE_COMMAND;
+		}
+
+		if (!array_key_exists('default_msg', $operation['opmessage'])
+				&& ($operationtype === OPERATION_TYPE_MESSAGE
+				|| $operationtype === OPERATION_TYPE_RECOVERY_MESSAGE
+				|| $operationtype === OPERATION_TYPE_UPDATE_MESSAGE)) {
+			$operation['opmessage']['default_msg'] = '1';
+
+			unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
 		}
 
 		$data['operation'] = $operation;
