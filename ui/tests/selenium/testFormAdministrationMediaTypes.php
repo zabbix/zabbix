@@ -18,649 +18,1043 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup media_type
  */
-class testFormAdministrationMediaTypes extends CLegacyWebTest {
+class testFormAdministrationMediaTypes extends CWebTest {
 
-	public static function allMediaTypes() {
-		return CDBHelper::getDataProvider('SELECT * FROM media_type');
+	private static $mediatype_sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
+
+	private static $update_mediatypes = [
+		'Email' => 'Email',
+		'SMS' => 'SMS',
+		'Script' => 'Test script'
+	];
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
 	}
 
-	public static function layout() {
+	public function testFormAdministrationMediaTypes_GeneralLayout() {
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->query('button:Create media type')->waitUntilClickable()->one()->click();
+
+		$this->page->waitUntilReady();
+		$this->page->assertTitle('Configuration of media types');
+		$this->page->assertHeader('Media types');
+
+		$form = $this->query('id:media_type_form')->asForm()->one();
+		$this->assertEquals(json_encode(['Media type', 'Message templates', 'Options']),
+				json_encode($form->query("xpath:.//li[@role='tab']")->all()->asText())
+		);
+
+		// Check available media type types.
+		$this->assertEquals(['Email', 'SMS', 'Script', 'Webhook'], $form->getField('Type')->getOptions()->asText());
+
+		// Check common fields in Media type and Options tabs. Message templates are covered in separate test.
+		$tabs = [
+			[
+				'tab name' => 'Media type',
+				'defaults' => [
+					'Name' =>  '',
+					'Type' => 'Email',
+					'Description' => '',
+					'Enabled' => true
+				],
+				'maxlength' => [
+					'Name' => 100
+				],
+				'mandatory' => ['Name']
+			],
+			[
+				'tab name' => 'Options',
+				'defaults' => [
+					'Attempts' => 3,
+					'Attempt interval' => '10s'
+				],
+				'maxlength' => [
+					'Attempts' => 3,
+					'Attempt interval' => 12
+				],
+				'mandatory' => ['Attempts', 'Attempt interval']
+			]
+		];
+
+		foreach ($tabs as $parameters) {
+			$this->checkTabFields($form, $parameters);
+		}
+
+		// Concurrent sessions is checked separately, as it has a hidden input and cannot be checked via checkValue.
+		$concurrent_sessions = $form->getField('Concurrent sessions')->asSegmentedRadio();
+		$this->assertEquals('One', $concurrent_sessions->getSelected());
+
+		// Check the maxsessions input element.
+		$maxsessions = $concurrent_sessions->query('id:maxsessions')->one();
+		$this->assertFalse($maxsessions->isVisible());
+		$concurrent_sessions->fill('Custom');
+		$this->assertTrue($maxsessions->isVisible());
+		$this->assertEquals(0, $concurrent_sessions->query('id:maxsessions')->one()->getValue());
+
+		// Check that Add and Cancel buttons are present in the form and that they are clickable.
+		$this->assertEquals(2, $this->query('id', ['add', 'cancel'])->all()
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+		);
+	}
+
+
+
+	public static function getLayoutMediaTypes() {
 		return [
 			[
 				[
 					'type' => 'Email',
-					'smtp_server' => 'mail.example.com',
-					'smtp_port' => 25,
-					'smtp_helo' => 'example.com',
-					'smtp_email' => 'zabbix@example.com'
-				]
-			],
-			[
-				[
-					'type' => 'Email',
-					'smtp_server' => 'mail.example.com',
-					'smtp_port' => 25,
-					'smtp_helo' => 'example.com',
-					'smtp_email' => 'zabbix@example.com',
-					'smtp_security' => 'STARTTLS',
-					'smtp_authentication' => 'Username and password'
-				]
-			],
-			[
-				[
-					'type' => 'Email',
-					'smtp_server' => 'mail.example.com',
-					'smtp_port' => 25,
-					'smtp_helo' => 'example.com',
-					'smtp_email' => 'zabbix@example.com',
-					'smtp_security' => 'SSL/TLS'
-				]
-			],
-			[
-				[
-					'type' => 'Email',
-					'smtp_server' => 'mail.example.com',
-					'smtp_port' => 25,
-					'smtp_helo' => 'example.com',
-					'smtp_email' => 'zabbix@example.com',
-					'message_format' => 'Plain text'
-				]
-			],
-			[
-				[
-					'type' => 'Script'
+					'defaults' => [
+						'SMTP server' => 'mail.example.com',
+						'SMTP server port' => 25,
+						'SMTP helo' => 'example.com',
+						'SMTP email' => 'zabbix@example.com',
+						'Connection security' => 'None',
+						'Authentication' => 'None',
+						'Message format' => 'HTML'
+					],
+					'maxlength' => [
+						'SMTP server' => 255,
+						'SMTP server port' => 5,
+						'SMTP helo' => 255,
+						'SMTP email' => 255
+					],
+					'mandatory' => ['SMTP server', 'SMTP helo', 'SMTP email']
 				]
 			],
 			[
 				[
 					'type' => 'SMS',
-					'gsm_modem' => '/dev/ttyS0'
+					'defaults' => [
+						'GSM modem' => '/dev/ttyS0'
+					],
+					'maxlength' => [
+						'GSM modem' => 255
+					],
+					'mandatory' => ['GSM modem']
+				]
+			],
+			[
+				[
+					'type' => 'Script',
+					'defaults' => [
+						'Script name' => ''
+					],
+					'maxlength' => [
+						'Script name' => 255
+					],
+					'mandatory' => ['Script name']
+				]
+			],
+			[
+				[
+					'type' => 'Webhook',
+					'defaults' => [
+						'Script' => '',
+						'Timeout' => '30s',
+						'Process tags' => false,
+						'Include event menu entry' => false,
+						'Menu entry name' => '',
+						'Menu entry URL' => ''
+					],
+					'maxlength' => [
+						'Timeout' => 255,
+						'Menu entry name' => 255,
+						'Menu entry URL' => 2048
+					],
+					'mandatory' => ['Script', 'Timeout', 'Menu entry name', 'Menu entry URL']
 				]
 			]
 		];
 	}
 
 	/**
-	* @dataProvider layout
+	* @dataProvider getLayoutMediaTypes
 	*/
-	public function testFormAdministrationMediaTypes_CheckLayout($data) {
-		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
-		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestCheckHeader('Media types');
+	public function testFormAdministrationMediaTypes_MediatypeLayout($data) {
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->query('button:Create media type')->waitUntilClickable()->one()->click();
 
-		$this->zbxTestClickButtonText('Create media type');
+		$this->page->waitUntilReady();
+		$form = $this->query('id:media_type_form')->asForm()->one();
+		$form->getField('Type')->fill($data['type']);
 
-		$this->zbxTestCheckHeader('Media types');
-		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'SMTP helo', 'SMTP email',
-			'Connection security', 'Authentication', 'Message format']);
-
-		$this->zbxTestAssertElementPresentId('name');
-		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", 100);
-
-		$this->zbxTestAssertElementPresentId('type');
-		$this->zbxTestDropdownAssertSelected('type', 'Email');
-		$this->zbxTestDropdownHasOptions('type', ['Email', 'Script', 'SMS']);
-
-		$this->zbxTestAssertNotVisibleId('exec_path');
-		$this->zbxTestAssertNotVisibleId('exec_params_table');
-		$this->zbxTestAssertNotVisibleId('gsm_modem');
-		$this->zbxTestAssertNotVisibleId('passwd');
-
-		if($data['type'] != 'Email') {
-			$this->zbxTestDropdownSelectWait('type', $data['type']);
-			$this->zbxTestAssertNotVisibleId('smtp_server');
-			$this->zbxTestAssertNotVisibleId('smtp_port');
-			$this->zbxTestAssertNotVisibleId('smtp_helo');
-			$this->zbxTestAssertNotVisibleId('smtp_email');
-			$this->zbxTestAssertNotVisibleId('smtp_security_0');
-			$this->zbxTestAssertNotVisibleId('smtp_authentication_0');
-		}
+		$this->checkTabFields($form, $data);
 
 		switch ($data['type']) {
 			case 'Email':
-				$this->zbxTestAssertElementValue('smtp_server', $data['smtp_server']);
-				$this->zbxTestAssertAttribute("//input[@id='smtp_server']", "maxlength", 255);
+				$connection_security = $form->getField('Connection security');
+				// Check that SSL verify peer, SSL verify host, Username and Password fields are not visible.
+				$this->assertEquals(0, $this->query('id', ['smtp_verity_peer', 'smtp_verify_host', 'smtp_usename',
+					'smtp_password'])->all()->filter(new CElementFilter(CElementFilter::VISIBLE))->count()
+				);
+				foreach (['STARTTLS', 'SSL/TLS'] as $chosen_security) {
+					$connection_security->fill($chosen_security);
 
-				$this->zbxTestAssertElementValue('smtp_port', $data['smtp_port']);
-				$this->zbxTestAssertAttribute("//input[@id='smtp_port']", "maxlength", 5);
-
-				$this->zbxTestAssertElementValue('smtp_helo', $data['smtp_helo']);
-				$this->zbxTestAssertAttribute("//input[@id='smtp_helo']", "maxlength", 255);
-
-				$this->zbxTestAssertElementValue('smtp_email', $data['smtp_email']);
-				$this->zbxTestAssertAttribute("//input[@id='smtp_email']", "maxlength", 255);
-
-				if (array_key_exists('smtp_security', $data)) {
-					$smtp_security_id = $data['smtp_security']=='STARTTLS' ? 'smtp_security_1' : 'smtp_security_2';
-					$this->zbxTestClickXpath("//label[text()='".$data['smtp_security']."']");
-					$this->assertTrue($this->zbxTestCheckboxSelected($smtp_security_id));
-					$this->zbxTestAssertVisibleXpath("//label[@for='smtp_verify_host']");
-					$this->zbxTestAssertVisibleXpath("//label[@for='smtp_verify_peer']");
-				}
-				else {
-					$this->assertTrue($this->zbxTestCheckboxSelected('smtp_security_0'));
-					$this->zbxTestAssertNotVisibleXpath("//label[@for='smtp_verify_host']");
-					$this->zbxTestAssertNotVisibleXpath("//label[@for='smtp_verify_peer']");
+					foreach (['SSL verify peer', 'SSL verify host'] as $field_name) {
+						$ssl_field = $form->getField($field_name);
+						$this->assertTrue($ssl_field->isVisible());
+						$this->assertEquals(false, $ssl_field->getValue());
+					}
 				}
 
-				if (array_key_exists('smtp_authentication', $data)) {
-					$this->zbxTestClickXpath("//label[text()='".$data['smtp_authentication']."']");
-					$this->assertTrue($this->zbxTestCheckboxSelected('smtp_authentication_1'));
-					$this->zbxTestAssertVisibleId('smtp_username');
-					$this->zbxTestAssertVisibleId('passwd');
-				}
-				else {
-					$this->assertTrue($this->zbxTestCheckboxSelected('smtp_authentication_0'));
-					$this->zbxTestAssertNotVisibleId('smtp_username');
-					$this->zbxTestAssertNotVisibleId('passwd');
-				}
+				$form->getField('Authentication')->fill('Username and password');
 
-				if (array_key_exists('message_format', $data)) {
-					$this->zbxTestClickXpath("//label[text()='".$data['message_format']."']");
-					$this->assertTrue($this->zbxTestCheckboxSelected('content_type_1'));
-				}
-				else {
-					$this->assertTrue($this->zbxTestCheckboxSelected('content_type_0'));
+				foreach (['Username', 'Password'] as $field_name) {
+					$auth_field = $form->getField($field_name);
+					$this->assertTrue($auth_field->isVisible());
+					$this->assertEquals('', $auth_field->getValue());
+					$this->assertEquals(255, $auth_field->getAttribute('maxlength'));
 				}
 				break;
-			case 'Script':
-				$this->zbxTestAssertVisibleId('exec_path');
-				$this->zbxTestAssertAttribute("//input[@id='exec_path']", "maxlength", 255);
-				$this->zbxTestAssertVisibleId('exec_params_table');
-				break;
+
 			case 'SMS':
-				$this->zbxTestAssertElementValue('gsm_modem', $data['gsm_modem']);
-				$this->zbxTestAssertAttribute("//input[@id='gsm_modem']", "maxlength", 255);
-				break;
-		}
+				$form->selectTab('Options');
+				$labels_disabled = [
+					'One' => true,
+					'Unlimited' => false,
+					'Custom' => false
+				];
 
-		$this->zbxTestTabSwitch('Options');
-		$this->assertTrue($this->zbxTestCheckboxSelected('maxsessions_type_0'));
-		$this->zbxTestAssertElementValue('maxattempts', 3);
-		$this->zbxTestAssertElementValue('attempt_interval', '10s');
-		$this->zbxTestAssertNotVisibleId('maxsessions');
-
-		if($data['type'] == 'SMS') {
-			$this->zbxTestAssertElementPresentXpath("//input[@id='maxsessions_type_1'][@disabled]");
-			$this->zbxTestAssertElementPresentXpath("//input[@id='maxsessions_type_2'][@disabled]");
-			$this->zbxTestAssertNotVisibleId('maxsessions');
-		}
-		else {
-			$this->zbxTestClickXpath("//label[text()='Custom']");
-			$this->assertTrue($this->zbxTestCheckboxSelected('maxsessions_type_2'));
-			$this->zbxTestAssertVisibleId('maxsessions');
-			$this->zbxTestAssertElementValue('maxsessions', 0);
-		}
-
-		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
-
-		$this->zbxTestClickWait('cancel');
-
-		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestCheckHeader('Media types');
-	}
-
-	/**
-	* @dataProvider allMediaTypes
-	*/
-	public function testFormAdministrationMediaTypes_SimpleCancel($mediatype) {
-		$name = $mediatype['name'];
-
-		$sql = 'SELECT * FROM media_type ORDER BY mediatypeid';
-		$oldHashMediaType = CDBHelper::getHash($sql);
-
-		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
-		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestClickLinkTextWait($name);
-		$this->zbxTestClickWait('cancel');
-		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestCheckHeader('Media types');
-		$this->zbxTestTextPresent($name);
-
-		$this->assertEquals($oldHashMediaType, CDBHelper::getHash($sql));
-	}
-
-	public static function newMediaTypes() {
-		$data = [
-			[
-				'Email', ['Name' => 'Email2', 'SMTP server' => 'mail.zabbix.com',
-						'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix@zabbix.com',
-						'message_format' => 'Plain text']
-			],
-			[
-				'Email', ['Name' => 'Email3', 'SMTP server' => 'mail2.zabbix.com',
-					'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix2@zabbix.com']
-			],
-			[
-				'Script', ['Name' => 'Skype message', 'Script' => '/usr/local/bin/skype.sh']
-			],
-			[
-				'Script', ['Name' => 'Skype message2', 'Script' => '/usr/local/bin/skyp2.sh']
-			],
-			[
-				'SMS', ['Name' => 'Direct SMS messaging', 'GSM modem' => '/dev/ttyS3']
-			]
-		];
-		return $data;
-	}
-
-	/**
-	* @dataProvider newMediaTypes
-	*/
-	public function testFormAdministrationMediaTypes_Create($type, $data) {
-		$this->zbxTestLogin('zabbix.php?action=mediatype.edit');
-		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestCheckHeader('Media types');
-
-		switch ($type) {
-			case 'Email':
-				$this->zbxTestDropdownSelect('type', $type);
-				$this->zbxTestInputType('name', $data['Name']);
-				$this->zbxTestInputType('smtp_server', $data['SMTP server']);
-				$this->zbxTestInputType('smtp_helo', $data['SMTP helo']);
-				$this->zbxTestInputType('smtp_email', $data['SMTP email']);
-				if (array_key_exists('message_format', $data)) {
-					$this->zbxTestClickXpath("//label[text()='".$data['message_format']."']");
+				// Check that only option "One" is enabled in the Concurrent sessions dialog.
+				foreach ($form->getField('Concurrent sessions')->asSegmentedRadio()->getLabels() as $label_element) {
+					$label_text = $label_element->getText();
+					$this->assertEquals($labels_disabled[$label_text], $label_element->query('xpath:./../input')
+							->one()->isEnabled()
+					);
 				}
+
 				break;
+
 			case 'Script':
-				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->zbxTestInputType('name', $data['Name']);
-				$this->zbxTestInputType('exec_path', $data['Script']);
+				$script_params = $form->getField('Script parameters')->asTable();
+				$this->assertEquals(['Parameter', 'Action'], $script_params->getHeadersText());
+				$this->assertEquals(['Add'], $script_params->getRows()->asText());
+
+				// Click on the add button and check the added row for script parameter.
+				$script_params->query('button:Add')->one()->click();
+				$param_field = $script_params->query('xpath:.//input')->one();
+				$this->assertEquals('', $param_field->getValue());
+				$this->assertEquals(255, $param_field->getAttribute('maxlength'));
+
+				// Check removal ofscript parameters.
+				$script_params->query('button:Remove')->one()->click();
+				$this->assertFalse($param_field->isVisible());
 				break;
-			case 'SMS':
-				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->zbxTestInputType('name', $data['Name']);
-				$this->zbxTestInputType('gsm_modem', $data['GSM modem']);
+
+			case 'Webhook':
+				// Check parameters table
+				$webhook_params = [
+					['Name' => 'URL', 'Value' => ''],
+					['Name' => 'HTTPProxy', 'Value' => ''],
+					['Name' => 'To', 'Value' => '{ALERT.SENDTO}'],
+					['Name' => 'Subject', 'Value' => '{ALERT.SUBJECT}'],
+					['Name' => 'Message', 'Value' => '{ALERT.MESSAGE}']
+				];
+
+				$params_table = $this->query('id:parameters_table')->asMultifieldTable()->one();
+				$this->assertEquals(['Name', 'Value', 'Action'], $params_table->getHeadersText());
+				$params_table->checkValue($webhook_params);
+
+				// Check that Remove button for each parameter and Add button are present and clickable in Parameters table.
+				$this->assertEquals(count($webhook_params) + 1, $params_table->query('button', ['Add', 'Remove'])
+						->all()->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+				);
+
+				// Check Script dialog.
+				$form->getField('Script')->query('xpath:./button')->one()->click();
+				$script_dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+
+				$this->assertEquals('JavaScript', $script_dialog->getTitle());
+				$script_input = $script_dialog->query('xpath:.//textarea')->one();
+
+				foreach (['placeholder' => 'return value', 'maxlength' => 65535] as $attribute => $value) {
+					$this->assertEquals($value, $script_input->getAttribute($attribute));
+				}
+
+				// Check the element that counts remaining chars in script.
+				$char_count = $script_dialog->query('class:multilineinput-char-count')->one();
+				$this->assertEquals('65535 characters remaining', $char_count->getText());
+				$script_input->fill('12345');
+				$this->assertEquals('65530 characters remaining', $char_count->getText());
+				// Check dialog buttons.
+				$this->assertEquals(2, $script_dialog->query('button', ['Apply', 'Cancel'])->all()
+						->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+				);
+				$script_dialog->close();
+
+				// Check that Menu entry fields are enabled only when "Include event menu entry" is set.
+				$this->assertEquals(2, $this->query('id', ['event_menu_name', 'event_menu_url'])->all()
+						->filter(new CElementFilter(CElementFilter::ATTRIBUTES_PRESENT, ['disabled']))->count()
+				);
+
+				$form->getField('Include event menu entry')->fill(true);
+
+				$this->assertEquals(2, $this->query('id', ['event_menu_name', 'event_menu_url'])->all()
+						->filter(new CElementFilter(CElementFilter::ATTRIBUTES_NOT_PRESENT, ['disabled']))->count()
+				);
 				break;
 		}
-
-		$this->zbxTestClickWait('add');
-
-		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestCheckHeader('Media types');
-		$this->zbxTestTextNotPresent('Cannot add media type');
-		$this->zbxTestTextPresent('Media type added');
-		$this->zbxTestTextPresent($data['Name']);
 	}
 
 	/**
-	* @dataProvider allMediaTypes
-	*/
-	public function testFormAdministrationMediaTypes_SimpleUpdate($mediatype) {
-		$name = $mediatype['name'];
-		$sqlMediaType = 'SELECT * FROM  media_type ORDER BY name';
-		$oldHashMediaType=CDBHelper::getHash($sqlMediaType);
-
-		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
-		$this->zbxTestClickLinkTextWait($name);
-		$this->zbxTestClickWait('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type updated');
-		$this->zbxTestTextPresent($name);
-
-		$newHashMediaType = CDBHelper::getHash($sqlMediaType);
-		$this->assertEquals($oldHashMediaType, $newHashMediaType);
-	}
-
-	/**
-	* @dataProvider allMediaTypes
-	*/
-	public function testFormAdministrationMediaTypes_SimpleDelete($mediatype) {
-		$name = $mediatype['name'];
-		$id = $mediatype['mediatypeid'];
-
-		$row = DBfetch(DBselect('SELECT count(*) AS cnt FROM opmessage WHERE mediatypeid='.zbx_dbstr($id).''));
-		$used_by_operations = ($row['cnt'] > 0);
-
-		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
-		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestClickLinkTextWait($name);
-
-		$this->zbxTestClickWait('delete');
-
-		$this->zbxTestAcceptAlert();
-		$this->zbxTestCheckTitle('Configuration of media types');
-		if ($used_by_operations) {
-			$this->zbxTestTextNotPresent('Media type deleted');
-			$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete media type');
-			$this->zbxTestTextPresent('Media types used by action');
+	 * Check attributes of provided fields.
+	 *
+	 * @param CFormElement	$form			form that contains the fields to be checked
+	 * @param array			$parameters		field names, their attributes and attribute values
+	 */
+	private function checkTabFields($form, $parameters) {
+		if (CTestArrayHelper::get($parameters, 'tab name', 'Media type') !== $form->getSelectedTab()) {
+			$form->selectTab($parameters['tab name']);
 		}
-		else {
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type deleted');
-			$sql = 'SELECT * FROM media_type WHERE mediatypeid='.zbx_dbstr($id);
-			$this->assertEquals(0, CDBHelper::getCount($sql));
+
+		// Check field default values.
+		$form->checkValue($parameters['defaults']);
+
+		// Check maxlengths of input elements.
+		foreach ($parameters['maxlength'] as $field_name => $maxlength) {
+			$this->assertEquals($maxlength, $form->getField($field_name)->getAttribute('maxlength'));
+		}
+
+		// Check mandatory fields marking.
+		foreach ($parameters['mandatory'] as $label) {
+			$this->assertEquals('form-label-asterisk', $form->getLabel($label)->getAttribute('class'));
 		}
 	}
 
-	public static function create_options(){
+	public function getMediaTypeData() {
 		return [
-			// attempts validation
+			// Empty name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'Email',
-					'name' => 'Email with zero attempt',
-					'attempts' => 0,
+					'mediatype_tab' => [
+						'Name' => ''
+					],
+					'skip_prefix' => true,
+					'error' => 'Incorrect value for field "name": cannot be empty.'
+				]
+			],
+			// Empty space in name.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => '   '
+					],
+					'skip_prefix' => true,
+					'error' => 'Incorrect value for field "name": cannot be empty.'
+				]
+			],
+			// Duplicate mediatype name.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Discord'
+					],
+					'skip_prefix' => true,
+					'error' => 'Media type "Discord" already exists.'
+				]
+			],
+			// Empty SMTP server.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Empty SMTP server',
+						'SMTP server' => ''
+					],
+					'error' => 'Field "smtp_server" is missing a value for media type "Empty SMTP server"'
+				]
+			],
+			// Empty space in SMTP server.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Empty space in SMTP server',
+						'SMTP server' => '   '
+					],
+					'error' => 'Field "smtp_server" is missing a value for media type "Empty space in SMTP server"'
+				]
+			],
+			// Too high SMTP server port.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Too high SMTP server port',
+						'SMTP server port' => '99999'
+					],
+					'error' => 'Incorrect value "99999" in field "smtp_port" for media type "Too high SMTP server port"'
+				]
+			],
+			// Empty SMTP helo.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Empty SMTP helo',
+						'SMTP helo' => ''
+					],
+					'error' => 'Field "smtp_helo" is missing a value for media type "Empty SMTP helo"'
+				]
+			],
+			// Empty space in SMTP helo.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Empty space in SMTP helo',
+						'SMTP helo' => '   '
+					],
+					'error' => 'Field "smtp_helo" is missing a value for media type "Empty space in SMTP helo"'
+				]
+			],
+			// Empty SMTP email.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Empty SMTP email',
+						'SMTP email' => ''
+					],
+					'error' => 'Field "smtp_email" is missing a value for media type "Empty SMTP email"'
+				]
+			],
+			// Empty space in SMTP email.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Empty space in SMTP email',
+						'SMTP email' => '   '
+					],
+					'error' => 'Field "smtp_email" is missing a value for media type "Empty space in SMTP email"'
+				]
+			],
+			// Empty GSM modem.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Empty GSM modem',
+						'Type' => 'SMS',
+						'GSM modem' => ''
+					],
+					'error' => 'Field "gsm_modem" is missing a value for media type "Empty GSM modem"'
+				]
+			],
+			// Empty space in GSM modem.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Empty space in GSM modem',
+						'Type' => 'SMS',
+						'GSM modem' => '   '
+					],
+					'error' => 'Field "gsm_modem" is missing a value for media type "Empty space in GSM modem"'
+				]
+			],
+			// Empty Script name.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Empty Script name',
+						'Type' => 'Script',
+						'Script name' => ''
+					],
+					'error' => 'Field "exec_path" is missing a value for media type "Empty Script name"'
+				]
+			],
+			// Empty space in Script name.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Empty space in Script name',
+						'Type' => 'Script',
+						'Script name' => '   '
+					],
+					'error' => 'Field "exec_path" is missing a value for media type "Empty space in Script name"'
+				]
+			],
+			// Options validation - Attempts.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Email with zero attempt'
+					],
+					'options_tab' => [
+						'Attempts' => 0
+					],
 					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'Email',
-					'name' => 'Email with empty attempt',
-					'attempts' => '',
+					'mediatype_tab' => [
+						'Name' => 'Email with empty attempt'
+					],
+					'options_tab' => [
+						'Attempts' => ''
+					],
 					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'Email',
-					'name' => 'Email with 101 attempts',
-					'attempts' => 101,
+					'mediatype_tab' => [
+						'Name' => 'Email with 101 attempts'
+					],
+					'options_tab' => [
+						'Attempts' => 101
+					],
 					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Email attempts with symbols',
-					'type' => 'Email',
-					'attempts' => 'æų',
-					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".',
-					'jenkins' => true
+					'mediatype_tab' => [
+						'Name' => 'Email attempts with symbols'
+					],
+					'options_tab' => [
+						'Attempts' => 'æų'
+					],
+					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Email attempts with symbols',
-					'type' => 'Email',
-					'attempts' => '☺',
-					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".',
-					'jenkins' => true
+					'mediatype_tab' => [
+						'Name' => 'Email attempts with symbols'
+					],
+					'options_tab' => [
+						'Attempts' => '☺'
+					],
+					'error' => 'Incorrect value for field "maxattempts": must be between "1" and "100".'
 				]
 			],
-			// interval validation
+			// Options validation - Attempt interval
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'Email',
-					'name' => 'Email with 3601s in interval',
-					'interval' => '3601s',
+					'mediatype_tab' => [
+						'Name' => 'Email with 3601s in interval'
+					],
+					'options_tab' => [
+						'Attempt interval' => '3601s'
+					],
 					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'Email',
-					'name' => 'Email with 3601 in interval',
-					'interval' => '3601',
+					'mediatype_tab' => [
+						'Name' => 'Email with 3601 in interval'
+					],
+					'options_tab' => [
+						'Attempt interval' => '3601'
+					],
 					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'Email',
-					'name' => 'Email with 61m in interval',
-					'interval' => '61m',
+					'mediatype_tab' => [
+						'Name' => 'Email with 61m in interval'
+					],
+					'options_tab' => [
+						'Attempt interval' => '61m'
+					],
 					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'Email',
-					'name' => 'Email with 2h in inerval',
-					'interval' => '2h',
+					'mediatype_tab' => [
+						'Name' => 'Email with 2h in inerval'
+					],
+					'options_tab' => [
+						'Attempt interval' => '2h'
+					],
 					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'Email',
-					'name' => 'Email with symbols in interval',
-					'interval' => '1msms',
+					'mediatype_tab' => [
+						'Name' => 'Email with symbols in interval'
+					],
+					'options_tab' => [
+						'Attempt interval' => '1msms'
+					],
 					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'Email',
-					'name' => 'Email with symbols in interval',
-					'interval' => '☺',
+					'mediatype_tab' => [
+						'Name' => 'Email with smiley in interval'
+					],
+					'options_tab' => [
+						'Attempt interval' => '☺'
+					],
 					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'Email',
-					'name' => 'Email with -1s interval',
-					'interval' => '-1s',
+					'mediatype_tab' => [
+						'Name' => 'Email with -1s interval'
+					],
+					'options_tab' => [
+						'Attempt interval' => '-1s'
+					],
 					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'Email',
-					'name' => 'Email with -1 interval',
-					'interval' => -1,
+					'mediatype_tab' => [
+						'Name' => 'Email with -1 interval'
+					],
+					'options_tab' => [
+						'Attempt interval' => -1
+					],
 					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
 				]
 			],
-			// maxsessions validation
 			[
 				[
 					'expected' => TEST_BAD,
-					'type' => 'Email',
-					'name' => 'Email with 101 in custom sessions',
-					'sessions' => 'Custom',
-					'maxsessions' => '101',
+					'mediatype_tab' => [
+						'Name' => 'Trailing and leading spaces in Attempt interval'
+					],
+					'options_tab' => [
+						'Attempt interval' => '   10s   '
+					],
+					'error' => 'Incorrect value for field "attempt_interval": must be between "0" and "3600".'
+				]
+			],
+			// Options validation - Concurrent sessions.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Email with 101 in custom sessions'
+					],
+					'options_tab' => [
+						'id:maxsessions_type' => 'Custom',
+						'id:maxsessions' => 101
+					],
 					'error' => 'Incorrect value for field "maxsessions": must be between "0" and "100".'
 				]
 			],
+			// Successful mediatype creation/update.
+			[
+				[
+					'mediatype_tab' => [
+						'Name' => 'Media type with only default parameters'
+					]
+				]
+			],
+			[
+				[
+					'mediatype_tab' => [
+						'Name' => 'Email media type with all possible parameters',
+						'SMTP server' => 'παράδειγμα.%^&*(.com',
+						'SMTP server port' => 666,
+						'SMTP helo' => '!@#$%%^&*(.com',
+						'Connection security' => 'STARTTLS',
+						'SSL verify peer' => true,
+						'SSL verify host' => true,
+						'Authentication' => 'Username and password',
+						'Username' => 'χρήστης',
+						'Password' => 'παράδειγμα',
+						'Message format' => 'Plain text',
+						'Description' => 'If only χρήστης was παράδειγμα then everyone would be happy',
+						'Enabled' => false
+					],
+					'options_tab' => [
+						'id:maxsessions_type' => 'Custom',
+						'id:maxsessions' => 12,
+						'Attempts' => 9,
+						'Attempt interval' => 60
+					]
+				]
+			],
+			[
+				[
+					'mediatype_tab' => [
+						'Name' => 'SMS media type with default values',
+						'Type' => 'SMS'
+					]
+				]
+			],
+			[
+				[
+					'mediatype_tab' => [
+						'Name' => 'SMS media type with all possible parameters',
+						'Type' => 'SMS',
+						'GSM modem' => 'χρήστης',
+						'Description' => '良い一日を過ごしてください',
+						'Enabled' => false
+					],
+					'options_tab' => [
+						'id:maxsessions_type' => 'One',
+						'Attempts' => 2,
+						'Attempt interval' => '1s'
+					]
+				]
+			],
+			[
+				[
+					'mediatype_tab' => [
+						'Name' => 'Script media type with minimalset of values',
+						'Type' => 'Script',
+						'Script name' => '良い一日を過ごしてください'
+					]
+				]
+			],
+			[
+				[
+					'mediatype_tab' => [
+						'Name' => 'Script media type with parameters and options',
+						'Type' => 'Script',
+						'Script name' => '좋은 하루 되세요',
+						'Description' => ' I like cheese',
+						'Enabled' => false
+					],
+					'script_parameters' => [
+						[
+							'exec_param' => 'first parameter'
+						],
+						[
+							'exec_param' => '良い一日を過ごしてください'
+						],
+						[
+							'exec_param' => '!@#$%^&*()_+='
+						]
+					],
+					'options_tab' => [
+						'id:maxsessions_type' => 'Custom',
+						'id:maxsessions' => 'abc',
+						'Attempts' => 10,
+						'Attempt interval' => '60m'
+					],
+					'substitute_maxsessions' => true
+				]
+			],
 			// Successfully create media type with different options
+
 			[
 				[
-					'expected' => TEST_GOOD,
-					'type' => 'Email',
-					'name' => 'Email with one concurrent sessions',
-					'sessions' => 'One',
-					'attempts' => 10,
-					'interval' => '60m',
-					'dbCheck' => true
+					'mediatype_tab' => [
+						'Name' => 'Email with options: unlimited concurrent sessions and 0h interval'
+					],
+					'options_tab' => [
+						'id:maxsessions_type' => 'Unlimited',
+						'Attempts' => 100,
+						'Attempt interval' => '0h'
+					]
 				]
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
-					'type' => 'Email',
-					'name' => 'Email with unlimited concurrent sessions',
-					'sessions' => 'Unlimited',
-					'attempts' => 1,
-					'interval' => 0
+					'mediatype_tab' => [
+						'Name' => 'Email with options: 1h interval and default maxsessions (0)'
+					],
+					'options_tab' => [
+						'id:maxsessions_type' => 'Custom',
+						'Attempts' => 100,
+						'Attempt interval' => '1h'
+					],
+					'substitute_maxsessions' => true
 				]
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
-					'type' => 'Email',
-					'name' => 'Email with 0h intrval',
-					'sessions' => 'Unlimited',
-					'attempts' => 1,
-					'interval' => '0h'
+					'mediatype_tab' => [
+						'Name' => '   Email with trailing and leading spaces in params   ',
+						'SMTP server' => '   παράδειγμα.%^&*(.com   ',
+						'SMTP server port' => ' 25 ',
+						'SMTP helo' => '  !@#$%%^&*(.com  ',
+						'Authentication' => 'Username and password',
+						'Username' => '   χρήστης  '
+					],
+					'options_tab' => [
+						'id:maxsessions_type' => 'Custom',
+						'id:maxsessions' => ' 7 ',
+						'Attempts' => ' 2 '
+					],
+					'trim' => [
+						'mediatype_tab' => [
+							'Name',
+							'SMTP server',
+							'SMTP server port',
+							'SMTP helo',
+							'Username'
+						],
+						'options_tab' => [
+							'id:maxsessions',
+							'Attempts'
+						]
+					]
 				]
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
-					'type' => 'Email',
-					'name' => 'Email with 0d interval',
-					'sessions' => 'Unlimited',
-					'attempts' => 1,
-					'interval' => '0d'
+					'mediatype_tab' => [
+						'Name' => '   SMS with trailing and leading spaces in params   ',
+						'Type' => 'SMS',
+						'GSM modem' => '   /dev/ttyS0   '
+					],
+					'trim' => [
+						'mediatype_tab' => [
+							'Name',
+							'GSM modem'
+						]
+					]
 				]
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
-					'type' => 'Email',
-					'name' => 'Email with 100 attempts',
-					'sessions' => 'Unlimited',
-					'attempts' => 100,
-					'interval' => 3600
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'type' => 'Email',
-					'name' => 'Email with 3600s interval',
-					'sessions' => 'Unlimited',
-					'attempts' => 100,
-					'interval' => '3600s'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'type' => 'Email',
-					'name' => 'Email with 0s interval',
-					'sessions' => 'Unlimited',
-					'attempts' => 1,
-					'interval' => '0s'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'type' => 'Email',
-					'name' => 'Email with 1h interval',
-					'sessions' => 'Custom',
-					'maxsessions' => 100,
-					'interval' => '1h'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'type' => 'Script',
-					'name' => 'Script media type',
-					'script_name' => 'test',
-					'sessions' => 'Custom',
-					'maxsessions' => 'abc',
-					'attempts' => 10,
-					'interval' => '60m',
-					'dbCheck' => true
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'SMS media type',
-					'type' => 'SMS',
-					'attempts' => 1,
-					'interval' => '6s'
+					'mediatype_tab' => [
+						'Name' => '   Script with trailing and leading spaces in params   ',
+						'Type' => 'Script',
+						'Script name' => '   Script name   '
+					],
+					'trim' => [
+						'mediatype_tab' => [
+							'Name',
+							'Script name'
+						]
+					]
 				]
 			]
 		];
 	}
 
 	/**
-	 * Test media type creation with properties from tab "Options".
-	 *
-	 * @dataProvider create_options
+	* @dataProvider getMediaTypeData
+	*/
+	public function testFormAdministrationMediaTypes_Create($data) {
+		$this->checkAction($data);
+	}
+
+	/**
+	 * @dataProvider getMediaTypeData
 	 */
-	public function testFormAdministrationMediaTypes_CreateWithOptions($data) {
-		$this->zbxTestLogin('zabbix.php?action=mediatype.edit');
-		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestCheckHeader('Media types');
-		$this->zbxTestDropdownSelect('type', $data['type']);
-		$this->zbxTestInputType('name', $data['name']);
+	public function testFormAdministrationMediaTypes_Update($data) {
+		$this->checkAction($data, false);
+	}
 
-		if ($data['type'] == 'Script' ) {
-			$this->zbxTestInputType('exec_path', $data['script_name']);
-		}
-		if (array_key_exists('passwd', $data)){
-			$this->zbxTestInputType('passwd', $data['passwd']);
-		}
+	public function testFormAdministrationMediaTypes_CancelCreate() {
+		$this->checkActionCancellation();
+	}
 
-		$this->zbxTestTabSwitch('Options');
+	public function testFormAdministrationMediaTypes_CancelUpdate() {
+		$this->checkActionCancellation('update');
+	}
 
-		if (array_key_exists('attempts', $data)){
-			$this->zbxTestInputTypeOverwrite('maxattempts', $data['attempts']);
+	public function testFormAdministrationMediaTypes_CancelClone() {
+		$this->checkActionCancellation('clone');
+	}
+
+	public function testFormAdministrationMediaTypes_CancelDelete() {
+		$this->checkActionCancellation('delete');
+	}
+
+	private function checkActionCancellation($action = 'create') {
+		$new_values = [
+			'Media type' => [
+				'Name' => 'Email for action cancellation check',
+				'SMTP server' => '我是一只猫.com',
+				'SMTP server port' => 666,
+				'SMTP helo' => 'ស្វា.com',
+				'Connection security' => 'STARTTLS',
+				'SSL verify peer' => true,
+				'SSL verify host' => true,
+				'Authentication' => 'Username and password',
+				'Username' => 'χρήστης',
+				'Password' => 'παράδειγμα',
+				'Message format' => 'Plain text',
+				'Description' => 'I want to go home...',
+				'Enabled' => false
+			],
+			'Options' => [
+				'id:maxsessions_type' => 'Custom',
+				'id:maxsessions' => 5,
+				'Attempts' => 4,
+				'Attempt interval' => '3s'
+			]
+		];
+		$old_hash = CDBHelper::getHash(self::$mediatype_sql);
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
+
+		$locator = ($action === 'create') ? 'button:Create media type' : 'link:'.self::$update_mediatypes['Email'];
+		$this->query($locator)->waitUntilClickable()->one()->click();
+
+		$this->page->waitUntilReady();
+
+		$form = $this->query('id:media_type_form')->asForm()->one();
+
+		if ($action === 'delete') {
+			$form->query('button:Delete')->waitUntilClickable()->one()->click();
+
+			$this->page->dismissAlert();
 		}
-		if (array_key_exists('interval', $data)){
-			$this->zbxTestInputTypeOverwrite('attempt_interval', $data['interval']);
-		}
-		if (array_key_exists('sessions', $data)){
-			$this->zbxTestClickXpath("//label[text()='".$data['sessions']."']");
-			if ($data['sessions'] == 'Custom' && array_key_exists('maxsessions', $data)) {
-				$this->zbxTestInputTypeOverwrite('maxsessions', $data['maxsessions']);
-				// Fire onchange event.
-				$this->webDriver->executeScript('var event = document.createEvent("HTMLEvents");'.
-					'event.initEvent("change", false, true);'.
-					'document.getElementById("maxsessions").dispatchEvent(event);'
-				);
+		else {
+			if ($action === 'clone') {
+				$form->query('button:Clone')->waitUntilClickable()->one()->click();
+			}
+
+			foreach ($new_values as $tab => $values) {
+				if ($tab !== $form->getSelectedTab()) {
+					$form->selectTab($tab);
+				}
+				$form->fill($values);
 			}
 		}
 
-		$this->zbxTestClickWait('add');
+		$form->query('button:Cancel')->one()->click();
 
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type added');
-				$this->zbxTestCheckTitle('Configuration of media types');
-				$this->zbxTestTextPresent($data['name']);
-				break;
+		$this->page->waitUntilReady();
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
+	}
 
-			case TEST_BAD:
-				if (array_key_exists('jenkins', $data) && $this->zbxTestIsElementPresent("//*[@id='back']")) {
-					$this->zbxTestTextPresent('Fatal error, please report to the Zabbix team');
-				}
-				else {
-					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add media type');
-					$this->zbxTestTextPresent($data['error']);
-				}
-
-				$sql = "SELECT * FROM media_type WHERE name = '".$data['name']."'";
-				$this->assertEquals(0, CDBHelper::getCount($sql));
-				break;
+	/**
+	 * Check Mediatype creation or update actions and their validation.
+	 *
+	 * @param array		$data		data provider
+	 * @param boolean	$create		flag that specifies whether the action to be checked is a create action.
+	 */
+	public function checkAction($data, $create = true) {
+		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::$mediatype_sql);
 		}
 
-		if(array_key_exists('dbCheck', $data)) {
-			$result = DBselect("SELECT * FROM media_type WHERE name = '".$data['name']."'");
-			while ($row = DBfetch($result)) {
-				$this->assertEquals($row['maxattempts'], $data['attempts']);
-				$this->assertEquals($row['attempt_interval'], $data['interval']);
-				switch($data['sessions']) {
-					case 'One':
-						$this->assertEquals($row['maxsessions'], 1);
-						break;
-					case 'Unlimited':
-						$this->assertEquals($row['maxsessions'], 0);
-						break;
-					case 'Custom':
-						if (is_numeric($data['maxsessions'])){
-							$this->assertEquals($row['maxsessions'], $data['maxsessions']);
-						}
-						else {
-							$this->assertEquals($row['maxsessions'], 0);
-						}
-						break;
+		// Open the corresponding media type form.
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
+
+		if ($create) {
+			$this->query('button:Create media type')->waitUntilClickable()->one()->click();
+		}
+		else {
+			$type = CTestArrayHelper::get($data['mediatype_tab'], 'Type', 'Email');
+			$this->query('link', self::$update_mediatypes[$type])->waitUntilClickable()->one()->click();
+
+			// Add prefix to mediatype new name for update scenarios to avoid issues with duplicate names.
+			if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+				$data['mediatype_tab']['Name'] = (array_key_exists('trim', $data))
+						? '   Update: '.ltrim($data['mediatype_tab']['Name'])
+						: 'Update: '.$data['mediatype_tab']['Name'];
+			}
+		}
+
+		$this->page->waitUntilReady();
+
+		$form = $this->query('id:media_type_form')->asForm()->one();
+		$form->fill($data['mediatype_tab']);
+
+		if (array_key_exists('script_parameters', $data)) {
+			$form->getField('Script parameters')->asMultifieldTable()->fill($data['script_parameters']);
+		}
+
+		if (array_key_exists('options_tab', $data)) {
+			$form->selectTab('Options');
+			$form->fill($data['options_tab']);
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
+			$title = ($create) ? 'Cannot add media type' : 'Cannot update media type';
+			$this->assertMessage(TEST_BAD, $title, $data['error']);
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
+		}
+		else {
+			$title = ($create) ? 'Media type added' : 'Media type updated';
+			$this->assertMessage(TEST_GOOD, $title);
+
+			// Trim leading and trailing spaces from expected results if necessary.
+			if (array_key_exists('trim', $data)) {
+				foreach ($data['trim'] as $tab => $fields) {
+					foreach ($fields as $field) {
+						$data[$tab][$field] = trim($data[$tab][$field]);
+					}
 				}
+			}
+
+			// Check that the media type was actually created.
+			$this->assertEquals(1, CDBHelper::getCount('SELECT mediatypeid FROM media_type WHERE name='.
+					CDBHelper::escape($data['mediatype_tab']['Name']))
+			);
+
+			if (!$create) {
+				self::$update_mediatypes[$type] = $data['mediatype_tab']['Name'];
+			}
+
+			$this->page->query('link', $data['mediatype_tab']['Name'])->waitUntilClickable()->one()->click();
+			$this->page->waitUntilReady();
+			$form->invalidate();
+
+			if (array_key_exists('Password', $data['mediatype_tab'])) {
+				$this->assertEquals($data['mediatype_tab']['Password'],
+						CDBHelper::getValue('SELECT passwd FROM media_type WHERE name='.zbx_dbstr($data['mediatype_tab']['Name']))
+				);
+
+				unset($data['mediatype_tab']['Password']);
+			}
+
+			$form->checkValue($data['mediatype_tab']);
+
+			if (array_key_exists('script_parameters', $data)) {
+				$form->getField('Script parameters')->asMultifieldTable()->checkValue($data['script_parameters']);
+			}
+
+			if (array_key_exists('options_tab', $data)) {
+				$form->selectTab('Options');
+
+				// If maxsessions input has invalid value, Sessions type is set to Unlimited.
+				if (array_key_exists('substitute_maxsessions', $data)) {
+					$data['options_tab']['id:maxsessions_type'] = 'Unlimited';
+
+					if (array_key_exists('id:maxsessions', $data['options_tab'])) {
+						unset($data['options_tab']['id:maxsessions']);
+					}
+				}
+
+				$form->checkValue($data['options_tab']);
 			}
 		}
 	}
