@@ -10303,7 +10303,7 @@ static void	dc_status_update(void)
 		return;
 
 
-	if (0 == config->status->sync_ts || config->status->sync_ts != config->sync_ts)
+	if (config->status->sync_ts != config->sync_ts)
 		reset = SUCCEED;
 	else
 		reset = FAIL;
