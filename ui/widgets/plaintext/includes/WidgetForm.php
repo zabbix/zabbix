@@ -19,7 +19,7 @@
 **/
 
 
-namespace Widgets\PlainText\Actions;
+namespace Widgets\PlainText\Includes;
 
 use Zabbix\Widgets\{
 	CWidgetField,
