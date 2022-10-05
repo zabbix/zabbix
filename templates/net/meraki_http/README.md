@@ -85,8 +85,6 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$MERAKI.API.URL} |<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p> |`api.meraki.com/api/v1` |
 |{$MERAKI.CONFIG.CHANGE.TIMESPAN} |<p>Timespan for gathering config change log. Used in metric config and in URL query.</p> |`1200` |
-|{$MERAKI.DEVICE.LATENCY} |<p>Devices uplink latency threshold in ms.</p> |`150` |
-|{$MERAKI.DEVICE.LOSS} |<p>Devices uplink loss threshold in percents.</p> |`15` |
 |{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http</p> |`` |
 |{$MERAKI.LICENSE.EXPIRE} |<p>Time in seconds for license to expire.</p> |`86400` |
 |{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`` |
@@ -99,8 +97,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Devices discovery |<p>-</p> |DEPENDENT |meraki.devices.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.devices`</p> |
-|Devices uplinks loss and quality discovery |<p>-</p> |DEPENDENT |meraki.devices.uplinks.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL`</p> |
+|Devices discovery |<p>-</p> |DEPENDENT |meraki.devices.discovery |
 |Uplinks discovery |<p>-</p> |DEPENDENT |meraki.uplinks.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinks`</p> |
 |VPN stats discovery |<p>-</p> |DEPENDENT |meraki.vpn.stats.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.vpnStats`</p> |
 
@@ -129,16 +126,11 @@ There are no template links in this template.
 |Meraki |VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: mos avg |<p>VPN connection mos avg.</p> |DEPENDENT |meraki.vpn.stat.mos.avg[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.avgMos`</p> |
 |Meraki |VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: mos min |<p>VPN connection mos min.</p> |DEPENDENT |meraki.vpn.stat.mos.min[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.minMos`</p> |
 |Meraki |VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: mos max |<p>VPN connection mos max.</p> |DEPENDENT |meraki.vpn.stat.mos.max[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.maxMos`</p> |
-|Meraki |Device [{#NAME}]: status |<p>Device operational status</p><p>Network: {#NETWORK.ID} </p><p>MAC: {#MAC}</p> |DEPENDENT |meraki.device.status[{#SERIAL}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.devices[?(@.serial== '{#SERIAL}')].status.first()`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
-|Meraki |Device [{#NAME}]: public ip |<p>Device public ip</p><p>Network: {#NETWORK.ID} </p><p>MAC: {#MAC}</p> |DEPENDENT |meraki.device.public.ip[{#SERIAL}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.devices[?(@.serial== '{#SERIAL}')].publicIp.first()`</p> |
-|Meraki |Device uplink [{#IP}]: [{#UPLINK}]: [{#DEVICE.NAME}]: loss, % |<p>lossPercent of device uplink </p><p>Network: {#NETWORK.ID} </p><p>Device serial: {#SERIAL}</p> |DEPENDENT |meraki.device.loss.pct[{#IP},{#UPLINK},{#SERIAL}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL[?(@.ip == '{#IP}' && @.uplink== '{#UPLINK}' && @.serial== '{#SERIAL}')].timeSeries.[0].lossPercent.first()`</p><p>- JAVASCRIPT: `return value === "" ? -1 : value `</p> |
-|Meraki |Device uplink [{#IP}]: [{#UPLINK}]: [{#DEVICE.NAME}]: latency, ms |<p>latency of device uplink </p><p>Network: {#NETWORK.ID} </p><p>Device serial: {#SERIAL}</p> |DEPENDENT |meraki.device.latency.ms[{#IP},{#UPLINK},{#SERIAL}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL[?(@.ip == '{#IP}' && @.uplink== '{#UPLINK}' && @.serial== '{#SERIAL}')].timeSeries.[0].latencyMs.first()`</p><p>- JAVASCRIPT: `return value === "" ? -1 : value `</p> |
 |Zabbix raw items |Meraki: Get list of the networks |<p>Item for gathering all the networks of organization from Meraki API.</p> |SCRIPT |meraki.get.networks<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Zabbix raw items |Meraki: Networks item errors |<p>Item for gathering all the networks item errors.</p> |DEPENDENT |meraki.get.networks.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Zabbix raw items |Meraki: Get list of the vpn stats |<p>Item for gathering all the vpn stats of the organization.</p> |SCRIPT |meraki.get.vpn.stats<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Zabbix raw items |Meraki: VPN item errors |<p>Item for gathering all the vpn item errors.</p> |DEPENDENT |meraki.get.vpn.stats.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix raw items |Meraki: Get list of the devices |<p>Item for gathering all the devices of organization from Meraki API.</p> |SCRIPT |meraki.get.devices<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|Zabbix raw items |Meraki: Devices item errors |<p>Item for gathering all the devices item errors.</p> |DEPENDENT |meraki.get.devices.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Zabbix raw items |Meraki: Get list of the devices |<p>Item for gathering all the devices of organization from Meraki API.</p> |HTTP_AGENT |meraki.get.devices |
 |Zabbix raw items |Meraki: Get list of configuration changes |<p>Item for viewing the Change Log for your organization.\nGathering once per 20m by default.</p> |HTTP_AGENT |meraki.get.configuration.changes<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `2h`</p> |
 |Zabbix raw items |Meraki: Get list of adaptive policy aggregate statistics |<p>Item for adaptive policy aggregate statistics for an organization.</p> |HTTP_AGENT |meraki.get.adaptive.policy |
 |Zabbix raw items |Meraki: Get licenses info |<p>Return an overview of the license state for an organization.</p> |HTTP_AGENT |meraki.get.licenses |
@@ -150,13 +142,67 @@ There are no template links in this template.
 |Meraki: License status is not OK |<p>-</p> |`last(/Cisco Meraki organization by HTTP/meraki.license.status)<>1` |WARNING | |
 |Meraki: License expires in less than {$MERAKI.LICENSE.EXPIRE} seconds |<p>-</p> |`last(/Cisco Meraki organization by HTTP/meraki.license.expire)<{$MERAKI.LICENSE.EXPIRE} and last(/Cisco Meraki organization by HTTP/meraki.license.expire)>=0` |WARNING | |
 |Uplink [{#INTERFACE}]: [{#UPLINK.ROLE}]: [{#NETWORK.NAME}]: status is failed |<p>-</p> |`last(/Cisco Meraki organization by HTTP/meraki.uplink.status[{#NETWORK.NAME}, {#INTERFACE}, {#UPLINK.ROLE}])=0` |WARNING | |
-|Device [{#NAME}]: status is not online |<p>-</p> |`last(/Cisco Meraki organization by HTTP/meraki.device.status[{#SERIAL}])<>1` |WARNING | |
-|Device uplink [{#IP}]: [{#UPLINK}]: [{#DEVICE.NAME}]: loss > {$MERAKI.DEVICE.LOSS}% |<p>-</p> |`min(/Cisco Meraki organization by HTTP/meraki.device.loss.pct[{#IP},{#UPLINK},{#SERIAL}],#3)>{$MERAKI.DEVICE.LOSS}` |WARNING | |
-|Device uplink [{#IP}]: [{#UPLINK}]: [{#DEVICE.NAME}]: latency > {$MERAKI.DEVICE.LATENCY}ms |<p>-</p> |`min(/Cisco Meraki organization by HTTP/meraki.device.latency.ms[{#IP},{#UPLINK},{#SERIAL}],#3)>{$MERAKI.DEVICE.LATENCY}` |WARNING | |
 |Meraki: There are errors in 'Get networks' metric |<p>-</p> |`length(last(/Cisco Meraki organization by HTTP/meraki.get.networks.errors))>0` |WARNING | |
 |Meraki: There are errors in 'Get VPNs' metric |<p>-</p> |`length(last(/Cisco Meraki organization by HTTP/meraki.get.vpn.stats.errors))>0` |WARNING | |
-|Meraki: There are errors in 'Get Devices' metric |<p>-</p> |`length(last(/Cisco Meraki organization by HTTP/meraki.get.devices.errors))>0` |WARNING | |
 |Meraki: Configuration has been changed |<p>-</p> |`length(last(/Cisco Meraki organization by HTTP/meraki.get.configuration.changes))>3` |WARNING | |
+
+## Feedback
+
+Please report any issues with the template at https://support.zabbix.com
+
+# Cisco Meraki device by HTTP
+
+## Overview
+
+For Zabbix version: 6.0 and higher  
+
+## Setup
+
+Refer to the vendor documentation.
+
+## Zabbix configuration
+
+No specific Zabbix configuration is required.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$MERAKI.API.URL} |<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p> |`api.meraki.com/api/v1` |
+|{$MERAKI.DEVICE.LATENCY} |<p>Devices uplink latency threshold in seconds.</p> |`0.15` |
+|{$MERAKI.DEVICE.LOSS} |<p>Devices uplink loss threshold in percents.</p> |`15` |
+|{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http</p> |`` |
+|{$MERAKI.TOKEN} |<p>Cisco Meraki Dashboard API Token.</p> |`` |
+
+## Template links
+
+There are no template links in this template.
+
+## Discovery rules
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|----|
+|Uplinks loss and quality discovery |<p>-</p> |DEPENDENT |meraki.device.uplinks.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL`</p> |
+
+## Items collected
+
+|Group|Name|Description|Type|Key and additional info|
+|-----|----|-----------|----|---------------------|
+|Meraki |Meraki: status |<p>Device operational status</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p> |DEPENDENT |meraki.device.status<p>**Preprocessing**:</p><p>- JSONPATH: `$.device.status`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Meraki |Meraki: public ip |<p>Device public ip</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p> |DEPENDENT |meraki.device.public.ip<p>**Preprocessing**:</p><p>- JSONPATH: `$.device.publicIp`</p> |
+|Meraki |Uplink [{#IP}]: [{#UPLINK}]: Loss, % |<p>Loss percent of the device uplink. </p><p>Network: {#NETWORK.ID}. </p><p>Device serial: {$SERIAL}.</p> |DEPENDENT |meraki.device.loss.pct[{#IP},{#UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL[?(@.ip == '{#IP}' && @.uplink== '{#UPLINK}')].timeSeries.[0].lossPercent.first()`</p><p>- JAVASCRIPT: `return value === "" ? -1 : value `</p> |
+|Meraki |Uplink [{#IP}]: [{#UPLINK}]: Latency |<p>Latency of the device uplink. </p><p>Network: {#NETWORK.ID}. </p><p>Device serial: {$SERIAL}.</p> |DEPENDENT |meraki.device.latency[{#IP},{#UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL[?(@.ip == '{#IP}' && @.uplink== '{#UPLINK}' && @.serial== '{#SERIAL}')].timeSeries.[0].latencyMs.first()`</p><p>- JAVASCRIPT: `return value === "" ? -1000 : value `</p><p>- MULTIPLIER: `0.001`</p> |
+|Zabbix raw items |Meraki: Get device data |<p>Item for gathering device data from Meraki API.</p> |SCRIPT |meraki.get.device<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |Meraki: Device data item errors |<p>Item for gathering errors of the device item.</p> |DEPENDENT |meraki.get.device.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+
+## Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----|----|----|
+|Meraki: Status is not online |<p>-</p> |`last(/Cisco Meraki device by HTTP/meraki.device.status)<>1` |WARNING | |
+|Uplink [{#IP}]: [{#UPLINK}]: loss > {$MERAKI.DEVICE.LOSS}% |<p>-</p> |`min(/Cisco Meraki device by HTTP/meraki.device.loss.pct[{#IP},{#UPLINK}],#3)>{$MERAKI.DEVICE.LOSS}` |WARNING | |
+|Uplink [{#IP}]: [{#UPLINK}]: latency > {$MERAKI.DEVICE.LATENCY} |<p>-</p> |`min(/Cisco Meraki device by HTTP/meraki.device.latency[{#IP},{#UPLINK}],#3)>{$MERAKI.DEVICE.LATENCY}` |WARNING | |
+|Meraki: There are errors in 'Get Device data' metric |<p>-</p> |`length(last(/Cisco Meraki device by HTTP/meraki.get.device.errors))>0` |WARNING | |
 
 ## Feedback
 
