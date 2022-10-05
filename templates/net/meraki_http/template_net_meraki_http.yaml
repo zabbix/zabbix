@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-05T04:39:53Z'
+  date: '2022-10-05T13:14:09Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -154,7 +154,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.device.publicIp
+                - '$.device[0].publicIp'
           master_item:
             key: meraki.get.device
           tags:
@@ -178,7 +178,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.device.status
+                - '$.device[0].status'
             -
               type: JAVASCRIPT
               parameters:
@@ -227,7 +227,7 @@ zabbix_export:
             
             var response,
                 error_msg = '',
-                devices = [],
+                device = [],
                 uplinksLL = [];
             
             function getHttpData(url) {
@@ -276,18 +276,8 @@ zabbix_export:
                     request.setProxy(params.httpproxy);
                 }
             
-                devices = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/devices/statuses');
+                device = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/devices/statuses?serials[]=' + encodeURIComponent(params.serial));
                 uplinksLL = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/devices/uplinksLossAndLatency?timespan=60');
-            
-                if (devices.length > 0) {
-                    device = devices.filter(function(device) {
-                        return device.serial == params.serial;
-                    })[0];
-                }
-            
-                if (typeof device === 'undefined') {
-                    device = {};
-                }
             
                 if (uplinksLL.length > 0) {
                     uplinks = uplinksLL.filter(function(device) {

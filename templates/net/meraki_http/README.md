@@ -188,8 +188,8 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Meraki |Meraki: status |<p>Device operational status</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p> |DEPENDENT |meraki.device.status<p>**Preprocessing**:</p><p>- JSONPATH: `$.device.status`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
-|Meraki |Meraki: public ip |<p>Device public ip</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p> |DEPENDENT |meraki.device.public.ip<p>**Preprocessing**:</p><p>- JSONPATH: `$.device.publicIp`</p> |
+|Meraki |Meraki: status |<p>Device operational status</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p> |DEPENDENT |meraki.device.status<p>**Preprocessing**:</p><p>- JSONPATH: `$.device[0].status`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Meraki |Meraki: public ip |<p>Device public ip</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p> |DEPENDENT |meraki.device.public.ip<p>**Preprocessing**:</p><p>- JSONPATH: `$.device[0].publicIp`</p> |
 |Meraki |Uplink [{#IP}]: [{#UPLINK}]: Loss, % |<p>Loss percent of the device uplink. </p><p>Network: {#NETWORK.ID}. </p><p>Device serial: {$SERIAL}.</p> |DEPENDENT |meraki.device.loss.pct[{#IP},{#UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL[?(@.ip == '{#IP}' && @.uplink== '{#UPLINK}')].timeSeries.[0].lossPercent.first()`</p><p>- JAVASCRIPT: `return value === "" ? -1 : value `</p> |
 |Meraki |Uplink [{#IP}]: [{#UPLINK}]: Latency |<p>Latency of the device uplink. </p><p>Network: {#NETWORK.ID}. </p><p>Device serial: {$SERIAL}.</p> |DEPENDENT |meraki.device.latency[{#IP},{#UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL[?(@.ip == '{#IP}' && @.uplink== '{#UPLINK}' && @.serial== '{#SERIAL}')].timeSeries.[0].latencyMs.first()`</p><p>- JAVASCRIPT: `return value === "" ? -1000 : value `</p><p>- MULTIPLIER: `0.001`</p> |
 |Zabbix raw items |Meraki: Get device data |<p>Item for gathering device data from Meraki API.</p> |SCRIPT |meraki.get.device<p>**Expression**:</p>`The text is too long. Please see the template.` |
