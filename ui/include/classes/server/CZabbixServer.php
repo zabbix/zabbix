@@ -594,7 +594,7 @@ class CZabbixServer {
 			if (!$socket = @fsockopen($this->host, $this->port, $errorCode, $errorMsg, $this->connect_timeout)) {
 				switch ($errorMsg) {
 					case 'Connection refused':
-						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $this->host);
+						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s:%2\$s\" refused. Possible reasons:\n1. Incorrect \"NoderAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $this->host, $this->port);
 						break;
 
 					case 'No route to host':
