@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -24,11 +24,11 @@
  */
 class CControllerModuleList extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'sort' =>			'in name',
 			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
@@ -48,11 +48,11 @@ class CControllerModuleList extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		// sort fields
 		$sort_field = $this->getInput('sort', CProfile::get('web.modules.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('web.modules.sortorder', ZBX_SORT_UP));

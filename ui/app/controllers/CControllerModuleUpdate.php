@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -26,12 +26,10 @@ class CControllerModuleUpdate extends CController {
 
 	/**
 	 * List of modules to update.
-	 *
-	 * @var array
 	 */
-	private $modules = [];
+	private array $modules = [];
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'moduleids' =>		'required|array_db module.moduleid',
 
@@ -49,7 +47,7 @@ class CControllerModuleUpdate extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}
@@ -65,7 +63,7 @@ class CControllerModuleUpdate extends CController {
 		return (count($this->modules) == count($moduleids));
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$set_status = ($this->getAction() === 'module.update')
 			? ($this->hasInput('status') ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED)
 			: ($this->getAction() === 'module.enable' ? MODULE_STATUS_ENABLED : MODULE_STATUS_DISABLED);
