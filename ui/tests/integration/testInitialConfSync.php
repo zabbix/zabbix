@@ -39,257 +39,257 @@ class testInitialConfSync extends CIntegrationTest
 			[
 				'insert' => '1',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'autoreg' =>
 			[
 				'insert' => '1',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'autoreghost' =>
 			[
 				'insert' => '0',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'hosts' =>
 			[
 				'insert' => '17',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'host_invent' =>
 			[
 				'insert' => '3',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'templates' =>
 			[
 				'insert' => '4',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'globmacros' =>
 			[
 				'insert' => '3',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'hostmacros' =>
 			[
 				'insert' => '5',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'interfaces' =>
 			[
 				'insert' => '14',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'items' =>
 			[
 				'insert' => '93',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'template_items' =>
 			[
 				'insert' => '53',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'prototype_items' =>
 			[
 				'insert' => '5',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'item_discovery' =>
 			[
 				'insert' => '5',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'triggers' =>
 			[
 				'insert' => '28',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'trigdeps' =>
 			[
 				'insert' => '7',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'trigtags' =>
 			[
 				'insert' => '22',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'hosttags' =>
 			[
 				'insert' => '3',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'itemtags' =>
 			[
 				'insert' => '3',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'functions' =>
 			[
 				'insert' => '28',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'expressions' =>
 			[
 				'insert' => '1',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'actions' =>
 			[
 				'insert' => '1',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'operations' =>
 			[
 				'insert' => '0',
 				'update' => '1',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'conditions' =>
 			[
 				'insert' => '1',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'corr' =>
 			[
 				'insert' => '1',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'corr_cond' =>
 			[
 				'insert' => '1',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'corr_op' =>
 			[
 				'insert' => '1',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'hgroups' =>
 			[
 				'insert' => '17',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'itempproc' =>
 			[
 				'insert' => '44',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'itemscriptparam' =>
 			[
 				'insert' => '2',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'maintenance' =>
 			[
 				'insert' => '1',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'drules' =>
 			[
 				'insert' => '1',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'httptests' =>
 			[
 				'insert' => '5',
 				'update' => '0',
-				'delete' => '0',
-			],
-		],
+				'delete' => '0'
+			]
+		]
 	];
 
 	private $expected_update =
@@ -302,7 +302,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -313,7 +313,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"1",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -321,8 +321,8 @@ class testInitialConfSync extends CIntegrationTest
 			[
 				'insert' => '0',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			"hosts" =>
@@ -332,7 +332,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"16",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -343,7 +343,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"1",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -354,7 +354,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -365,7 +365,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"3",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -376,7 +376,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"2",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -387,7 +387,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"8",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -398,7 +398,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"72",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -409,7 +409,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -420,7 +420,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"1",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -431,7 +431,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -442,7 +442,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"10",
 				"delete" =>
-				"6",
+				"6"
 			]
 		],
 		[
@@ -453,7 +453,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"1",
+				"1"
 			]
 		],
 		[
@@ -464,7 +464,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"2",
+				"2"
 			]
 		],
 		[
@@ -475,7 +475,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"2",
+				"2"
 			]
 		],
 		[
@@ -486,7 +486,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"1",
+				"1"
 			]
 		],
 		[
@@ -497,7 +497,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"12",
+				"12"
 			]
 		],
 		[
@@ -508,7 +508,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"1",
+				"1"
 			]
 		],
 		[
@@ -519,7 +519,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"1",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -530,7 +530,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -541,7 +541,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"1",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -552,7 +552,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"1",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -563,7 +563,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"1",
+				"1"
 			]
 		],
 		[
@@ -574,7 +574,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"1",
+				"1"
 			]
 		],
 		[
@@ -585,7 +585,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -596,7 +596,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"10",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -607,7 +607,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"1",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -618,7 +618,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"1",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -629,7 +629,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -640,9 +640,9 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"1",
 				"delete" =>
-				"0",
+				"0"
 			]
-		],
+		]
 	];
 
 	private $expected_delete = [
@@ -654,7 +654,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -665,7 +665,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -673,8 +673,8 @@ class testInitialConfSync extends CIntegrationTest
 			[
 				'insert' => '0',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			"hosts" =>
@@ -684,7 +684,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"21",
+				"21"
 			]
 		],
 		[
@@ -695,7 +695,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"3",
+				"3"
 			]
 		],
 		[
@@ -706,7 +706,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"4",
+				"4"
 			]
 		],
 		[
@@ -717,7 +717,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -728,7 +728,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"5",
+				"5"
 			]
 		],
 		[
@@ -739,7 +739,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"14",
+				"14"
 			]
 		],
 		[
@@ -750,7 +750,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"149",
+				"149"
 			]
 		],
 		[
@@ -761,7 +761,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"53",
+				"53"
 			]
 		],
 		[
@@ -772,7 +772,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"149",
+				"149"
 			]
 		],
 		[
@@ -783,7 +783,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"5",
+				"5"
 			]
 		],
 		[
@@ -794,7 +794,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"28",
+				"28"
 			]
 		],
 		[
@@ -805,7 +805,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"7",
+				"7"
 			]
 		],
 		[
@@ -816,7 +816,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"22",
+				"22"
 			]
 		],
 		[
@@ -827,7 +827,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"3",
+				"3"
 			]
 		],
 		[
@@ -838,7 +838,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"3",
+				"3"
 			]
 		],
 		[
@@ -849,7 +849,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"28",
+				"28"
 			]
 		],
 		[
@@ -860,7 +860,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"1",
+				"1"
 			]
 		],
 		[
@@ -871,7 +871,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"1",
+				"1"
 			]
 		],
 		[
@@ -882,7 +882,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"0",
+				"0"
 			]
 		],
 		[
@@ -893,7 +893,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"1",
+				"1"
 			]
 		],
 		[
@@ -904,7 +904,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"1",
+				"1"
 			]
 		],
 		[
@@ -915,7 +915,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"1",
+				"1"
 			]
 		],
 		[
@@ -926,7 +926,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"1",
+				"1"
 			]
 		],
 		[
@@ -937,7 +937,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"2",
+				"2"
 			]
 		],
 		[
@@ -948,7 +948,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"44",
+				"44"
 			]
 		],
 		[
@@ -959,7 +959,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"2",
+				"2"
 			]
 		],
 		[
@@ -970,7 +970,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"1",
+				"1"
 			]
 		],
 		[
@@ -978,16 +978,16 @@ class testInitialConfSync extends CIntegrationTest
 			[
 				'insert' => '0',
 				'update' => '0',
-				'delete' => '0',
-			],
+				'delete' => '0'
+			]
 		],
 		[
 			'httptests' =>
 			[
 				'insert' => '0',
 				'update' => '0',
-				'delete' => '5',
-			],
+				'delete' => '5'
+			]
 		]
 	];
 
@@ -1021,7 +1021,7 @@ class testInitialConfSync extends CIntegrationTest
 				'LogFileSize' => 0,
 				'DebugLevel' => 5,
 				'Vault' => 'CyberArk',
-				'VaultURL' => 'https://127.0.0.1:1858',
+				'VaultURL' => 'https://127.0.0.1:1858'
 			]
 		];
 	}
@@ -1038,7 +1038,7 @@ class testInitialConfSync extends CIntegrationTest
 				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ DCsync_configuration\(\) /",
 				"/\s+/",
 				"/:sql:[0-9]+\.[0-9]+sync:[0-9]+\.[0-9]+sec/",
-				"/:sql:[0-9]+\.[0-9]+sec/",
+				"/:sql:[0-9]+\.[0-9]+sec/"
 			],
 			"",
 			$sync_lines
@@ -1047,7 +1047,7 @@ class testInitialConfSync extends CIntegrationTest
 		$sync_lines2 = preg_replace(
 			[
 				"/(\(\))|(\()/",
-				"/\)\.|\./",
+				"/\)\.|\./"
 			],
 			[
 				":",
@@ -1072,7 +1072,7 @@ class testInitialConfSync extends CIntegrationTest
 				$subject => [
 					'insert' => $operations[0],
 					'update' => $operations[1],
-					'delete' => $operations[2],
+					'delete' => $operations[2]
 				]
 			];
 
@@ -1294,7 +1294,7 @@ class testInitialConfSync extends CIntegrationTest
 		$response = $this->call('maintenance.update', [
 			'maintenanceid' => self::$maintenanceid,
 			'active_since' => time(),
-			'active_till' => time() + 86400,
+			'active_till' => time() + 86400
 		]);
 		$this->assertArrayHasKey('maintenanceids', $response['result']);
 		$this->assertEquals(1, count($response['result']['maintenanceids']));
@@ -1309,7 +1309,7 @@ class testInitialConfSync extends CIntegrationTest
 				'conditions' => [[
 					'type' => 1,
 					'tag' => 'ok'
-				]],
+				]]
 			],
 			'operations' => [
 				['type' => 0]
@@ -1330,7 +1330,7 @@ class testInitialConfSync extends CIntegrationTest
 					'type' => 3,
 					'oldtag' => 'x',
 					'newtag' => 'y'
-				]],
+				]]
 			],
 			'operations' => [
 				['type' => 1]
@@ -1483,7 +1483,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		$response = $this->call('usermacro.updateglobal', [
 			'globalmacroid' => self::$vaultmacroid,
-			'value' => 'secret/zabbix:ZABBIX123',
+			'value' => 'secret/zabbix:ZABBIX123'
 		]);
 		$this->assertArrayHasKey('globalmacroids', $response['result']);
 	}
@@ -1499,65 +1499,65 @@ class testInitialConfSync extends CIntegrationTest
 				'template_groups' =>
 				[
 					'updateExisting' => true,
-					'createMissing' => true,
+					'createMissing' => true
 				],
 				'host_groups' =>
 				[
 					'updateExisting' => true,
-					'createMissing' => true,
+					'createMissing' => true
 				],
 				'templates' =>
 				[
 					'updateExisting' => true,
-					'createMissing' => true,
+					'createMissing' => true
 				],
 				'valueMaps' =>
 				[
 					'updateExisting' => true,
 					'createMissing' => true,
-					'deleteMissing' => false,
+					'deleteMissing' => false
 				],
 				'templateDashboards' =>
 				[
 					'updateExisting' => true,
 					'createMissing' => true,
-					'deleteMissing' => false,
+					'deleteMissing' => false
 				],
 				'templateLinkage' =>
 				[
 					'createMissing' => true,
-					'deleteMissing' => false,
+					'deleteMissing' => false
 				],
 				'items' =>
 				[
 					'updateExisting' => true,
 					'createMissing' => true,
-					'deleteMissing' => false,
+					'deleteMissing' => false
 				],
 				'discoveryRules' =>
 				[
 					'updateExisting' => true,
 					'createMissing' => true,
-					'deleteMissing' => false,
+					'deleteMissing' => false
 				],
 				'triggers' =>
 				[
 					'updateExisting' => true,
 					'createMissing' => true,
-					'deleteMissing' => false,
+					'deleteMissing' => false
 				],
 				'graphs' =>
 				[
 					'updateExisting' => true,
 					'createMissing' => true,
-					'deleteMissing' => false,
+					'deleteMissing' => false
 				],
 				'httptests' =>
 				[
 					'updateExisting' => true,
 					'createMissing' => true,
-					'deleteMissing' => false,
-				],
+					'deleteMissing' => false
+				]
 			]
 		]);
 	}
@@ -1573,65 +1573,65 @@ class testInitialConfSync extends CIntegrationTest
 				'template_groups' =>
 				[
 					'updateExisting' => true,
-					'createMissing' => false,
+					'createMissing' => false
 				],
 				'host_groups' =>
 				[
 					'updateExisting' => true,
-					'createMissing' => false,
+					'createMissing' => false
 				],
 				'templates' =>
 				[
 					'updateExisting' => true,
-					'createMissing' => false,
+					'createMissing' => false
 				],
 				'valueMaps' =>
 				[
 					'updateExisting' => true,
 					'createMissing' => false,
-					'deleteMissing' => false,
+					'deleteMissing' => false
 				],
 				'templateDashboards' =>
 				[
 					'updateExisting' => true,
 					'createMissing' => false,
-					'deleteMissing' => false,
+					'deleteMissing' => false
 				],
 				'templateLinkage' =>
 				[
 					'createMissing' => false,
-					'deleteMissing' => false,
+					'deleteMissing' => false
 				],
 				'items' =>
 				[
 					'updateExisting' => true,
 					'createMissing' => false,
-					'deleteMissing' => false,
+					'deleteMissing' => false
 				],
 				'discoveryRules' =>
 				[
 					'updateExisting' => true,
 					'createMissing' => false,
-					'deleteMissing' => false,
+					'deleteMissing' => false
 				],
 				'triggers' =>
 				[
 					'updateExisting' => true,
 					'createMissing' => false,
-					'deleteMissing' => false,
+					'deleteMissing' => false
 				],
 				'graphs' =>
 				[
 					'updateExisting' => true,
 					'createMissing' => false,
-					'deleteMissing' => false,
+					'deleteMissing' => false
 				],
 				'httptests' =>
 				[
 					'updateExisting' => true,
 					'createMissing' => false,
-					'deleteMissing' => false,
-				],
+					'deleteMissing' => false
+				]
 			]
 		]);
 	}
@@ -1653,54 +1653,54 @@ class testInitialConfSync extends CIntegrationTest
 				'host_groups' =>
 				[
 				'updateExisting' => true,
-				'createMissing' => true,
+				'createMissing' => true
 				],
 				'hosts' =>
 				[
 				'updateExisting' => true,
-				'createMissing' => true,
+				'createMissing' => true
 				],
 				'valueMaps' =>
 				[
 				'updateExisting' => true,
 				'createMissing' => true,
-				'deleteMissing' => false,
+				'deleteMissing' => false
 				],
 				'templateLinkage' =>
 				[
 				'createMissing' => true,
-				'deleteMissing' => false,
+				'deleteMissing' => false
 				],
 				'items' =>
 				[
 				'updateExisting' => true,
 				'createMissing' => true,
-				'deleteMissing' => false,
+				'deleteMissing' => false
 				],
 				'discoveryRules' =>
 				[
 				'updateExisting' => true,
 				'createMissing' => true,
-				'deleteMissing' => false,
+				'deleteMissing' => false
 				],
 				'triggers' =>
 				[
 				'updateExisting' => true,
 				'createMissing' => true,
-				'deleteMissing' => false,
+				'deleteMissing' => false
 				],
 				'graphs' =>
 				[
 				'updateExisting' => true,
 				'createMissing' => true,
-				'deleteMissing' => false,
+				'deleteMissing' => false
 				],
 				'httptests' =>
 				[
 				'updateExisting' => true,
 				'createMissing' => true,
-				'deleteMissing' => false,
-				],
+				'deleteMissing' => false
+				]
 
 			]
 		]);
@@ -1814,7 +1814,7 @@ class testInitialConfSync extends CIntegrationTest
 				],
 				'templateLinkage' => [
 					'createMissing' => false
-				],
+				]
 			]
 
 		]);
