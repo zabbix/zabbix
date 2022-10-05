@@ -109,22 +109,6 @@ $widget = (new CWidget())
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 				])
-				->addItem([
-					new CLabel(_('Source '), 'filter_source'),
-					new CFormField(
-						(new CSelect('filter_source'))
-							->setId('filter-source')
-							->setValue($data['filter']['source'])
-							->setFocusableElementId('filter_source')
-							->addOptions(CSelect::createOptionsFromArray([
-								CControllerUserList::FILTERS_SOURCE_ALL => _('All'),
-								CControllerUserList::FILTERS_SOURCE_INTERNAL => _('Internal'),
-								CControllerUserList::FILTERS_SOURCE_LDAP => _('LDAP'),
-								CControllerUserList::FILTERS_SOURCE_SAML => _('SAML')
-							]))
-							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					)
-				])
 		])
 		->addVar('action', 'user.list')
 	);
@@ -154,7 +138,7 @@ $table = (new CTableInfo())
 		_('API access'),
 		_('Debug mode'),
 		_('Status'),
-		_('Source')
+		make_sorting_header(_('Provisioned'), 'ts_provisioned', $data['sort'], $data['sortorder'], $url)
 	]);
 
 foreach ($data['users'] as $user) {
@@ -262,18 +246,12 @@ foreach ($data['users'] as $user) {
 	}
 
 	$checkbox = new CCheckBox('userids['.$userid.']', $userid);
+	$provisioned = '';
 
-	if (array_key_exists($user['userdirectoryid'], $data['idp_types'])) {
-		if ($data['idp_types'][$user['userdirectoryid']] == IDP_TYPE_LDAP) {
-			$checkbox->setAttribute('data-actions', 'ldap');
-			$user_source = _('LDAP');
-		}
-		else {
-			$user_source = _('SAML');
-		}
-	}
-	else {
-		$user_source = _('Internal');
+	if ($user['userdirectoryid']) {
+		$idp = $data['idp_names'][$user['userdirectoryid']];
+		$provisioned = (new CDiv(date(ZBX_DATE_TIME, $user['ts_provisioned'])))
+			->setHint($idp['idp_type'] == IDP_TYPE_SAML ? _('SAML') : $idp['name']);
 	}
 
 	// Append user to table.
@@ -294,7 +272,7 @@ foreach ($data['users'] as $user) {
 		($user['users_status'] == GROUP_STATUS_DISABLED)
 			? (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED)
 			: (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN),
-		$user_source
+		$provisioned
 	]);
 }
 

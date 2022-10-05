@@ -32,7 +32,7 @@ class CControllerUserList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'sort' =>				'in username,name,surname,role_name',
+			'sort' =>				'in username,name,surname,role_name,ts_provisioned',
 			'sortorder' =>			'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'uncheck' =>			'in 1',
 			'filter_set' =>			'in 1',
@@ -42,7 +42,6 @@ class CControllerUserList extends CController {
 			'filter_surname' =>		'string',
 			'filter_roles' =>		'array_id',
 			'filter_usrgrpids'=>	'array_id',
-			'filter_source' =>		'id',
 			'page' =>				'ge 1'
 		];
 
@@ -73,9 +72,6 @@ class CControllerUserList extends CController {
 			CProfile::updateArray('web.user.filter_usrgrpids', $this->getInput('filter_usrgrpids', []),
 				PROFILE_TYPE_ID
 			);
-			CProfile::update('web.user.filter_source', $this->getInput('filter_source', self::FILTERS_SOURCE_ALL),
-				PROFILE_TYPE_INT
-			);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.user.filter_username');
@@ -83,7 +79,6 @@ class CControllerUserList extends CController {
 			CProfile::delete('web.user.filter_surname');
 			CProfile::deleteIdx('web.user.filter_roles');
 			CProfile::deleteIdx('web.user.filter_usrgrpids');
-			CProfile::delete('web.user.filter_source');
 		}
 
 		$filter = [
@@ -91,8 +86,7 @@ class CControllerUserList extends CController {
 			'name' => CProfile::get('web.user.filter_name', ''),
 			'surname' => CProfile::get('web.user.filter_surname', ''),
 			'roles' => CProfile::getArray('web.user.filter_roles', []),
-			'usrgrpids' => CProfile::getArray('web.user.filter_usrgrpids', []),
-			'source' => CProfile::get('web.user.filter_source', self::FILTERS_SOURCE_ALL)
+			'usrgrpids' => CProfile::getArray('web.user.filter_usrgrpids', [])
 		];
 
 		$data = [
@@ -120,31 +114,10 @@ class CControllerUserList extends CController {
 			]), ['usrgrpid' => 'id'])
 			: [];
 
-		switch ($filter['source']) {
-			case self::FILTERS_SOURCE_INTERNAL:
-				$filter_userdirectoryids = 0;
-				break;
-
-			case self::FILTERS_SOURCE_LDAP:
-			case self::FILTERS_SOURCE_SAML:
-				$filter_userdirectoryids = array_keys(API::UserDirectory()->get([
-					'output' => [],
-					'filter' => [
-						'idp_type' => $filter['source'] == self::FILTERS_SOURCE_LDAP ? IDP_TYPE_LDAP : IDP_TYPE_SAML
-					],
-					'preservekeys' => true
-				]));
-				break;
-
-			default:
-				$filter_userdirectoryids = null;
-				break;
-		}
-
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['users'] = API::User()->get([
 			'output' => ['userid', 'username', 'name', 'surname', 'autologout', 'attempt_failed', 'roleid',
-				'userdirectoryid'
+				'userdirectoryid', 'ts_provisioned'
 			],
 			'selectUsrgrps' => ['name', 'gui_access', 'users_status'],
 			'selectRole' => ['name'],
@@ -153,20 +126,21 @@ class CControllerUserList extends CController {
 				'name' => ($filter['name'] === '') ? null : $filter['name'],
 				'surname' => ($filter['surname'] === '') ? null : $filter['surname']
 			],
-			'filter' => [
-				'roleid' => ($filter['roles'] == -1) ? null : $filter['roles'],
-				'userdirectoryid' => $filter_userdirectoryids
-			],
 			'usrgrpids' => ($filter['usrgrpids'] == []) ? null : $filter['usrgrpids'],
 			'getAccess' => true,
 			'limit' => $limit
 		]);
 
-		$data['idp_types'] = API::UserDirectory()->get([
-			'output' => ['idp_type', 'userdirectoryid'],
-			'userdirectoryids' => array_column($data['users'], 'userdirectoryid')
-		]);
-		$data['idp_types'] = array_column($data['idp_types'], 'idp_type', 'userdirectoryid');
+		$userdirectoryids = array_column($data['users'], 'userdirectoryid', 'userdirectoryid');
+		$data['idp_names'] = [];
+
+		if ($userdirectoryids) {
+			$data['idp_names'] = API::UserDirectory()->get([
+				'output' => ['name', 'idp_type'],
+				'userdirectoryids' => array_keys($userdirectoryids),
+				'preservekeys' => true
+			]);
+		}
 
 		foreach ($data['users'] as &$user) {
 			$user['role_name'] = $user['role']['name'];
