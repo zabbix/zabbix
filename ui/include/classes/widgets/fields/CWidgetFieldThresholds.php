@@ -21,6 +21,10 @@
 
 namespace Zabbix\Widgets\Fields;
 
+use CArrayHelper,
+	CNumberParser,
+	CParser;
+
 use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldThresholds extends CWidgetField {

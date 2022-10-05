@@ -100,13 +100,8 @@ class CWidgetFieldNavTree extends CWidgetField {
 
 	/**
 	 * Check and fix the tree of the maps.
-	 *
-	 * @param array  $navtree_items
-	 * @param string $navtree_items[<id>]['parent']
-	 *
-	 * @return array
 	 */
-	static private function validateNavTree(array $navtree_items, array &$errors): array {
+	private static function validateNavTree(array $navtree_items, array &$errors): array {
 		// Check for incorrect parent IDs.
 		foreach ($navtree_items as $fieldid => &$navtree_item) {
 			if ($navtree_item['parent'] != 0 && !array_key_exists($navtree_item['parent'], $navtree_items)) {
@@ -119,7 +114,7 @@ class CWidgetFieldNavTree extends CWidgetField {
 		unset($navtree_item);
 
 		// Find and fix circular dependencies.
-		foreach ($navtree_items as $fieldid => $navtree_item) {
+		foreach ($navtree_items as $navtree_item) {
 			$parentid = $navtree_item['parent'];
 			$parentids = [$parentid => true];
 
