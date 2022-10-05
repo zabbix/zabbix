@@ -19,7 +19,7 @@
 **/
 
 
-namespace Widgets\SystemInfo\Actions;
+namespace Widgets\SystemInfo\Includes;
 
 use Zabbix\Widgets\CWidgetForm;
 
