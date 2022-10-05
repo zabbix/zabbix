@@ -478,13 +478,10 @@ static int	DBpatch_6030060(void)
 	if (SUCCEED != DBcreate_index("hosts", "hosts_6", "name_upper", 0))
 		return FAIL;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("UPDATE hosts SET name_upper=UPPER(name)"))
+	if (ZBX_DB_OK > DBexecute("update hosts set name_upper=upper(name)"))
 		return FAIL;
 
-	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("hosts", "name", "name_upper", "UPPER",
+	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("hosts", "name", "name_upper", "upper",
 			"hostid");
 }
 
@@ -504,13 +501,10 @@ static int	DBpatch_6030061(void)
 	if (SUCCEED != DBcreate_index("items", "items_9", "hostid,name_upper", 0))
 		return FAIL;
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("UPDATE items SET name_upper=UPPER(name)"))
+	if (ZBX_DB_OK > DBexecute("update items set name_upper=upper(name)"))
 		return FAIL;
 
-	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("items", "name", "name_upper", "UPPER",
+	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("items", "name", "name_upper", "upper",
 			"itemid");
 }
 #endif
