@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-05T13:14:09Z'
+  date: '2022-10-05T15:00:07Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -732,6 +732,9 @@ zabbix_export:
                                 if ('highAvailability' in responseUplinks[i] && 'role' in responseUplinks[i].highAvailability) {
                                     responseUplinks[i].uplinks[p].role = responseUplinks[i].highAvailability.role;
                                 }
+                                if ('serial' in responseUplinks[i]) {
+                                    responseUplinks[i].uplinks[p].serial = responseUplinks[i].serial;
+                                }
             
                                 uplinks.push(responseUplinks[i].uplinks[p]);
                             }
@@ -1269,6 +1272,9 @@ zabbix_export:
                 -
                   tag: network
                   value: '{#NETWORK.NAME}'
+                -
+                  tag: serial-number
+                  value: '{#UPLINK.DEVICE.SERIAL}'
               trigger_prototypes:
                 -
                   uuid: b1f3cbb8f3024c3f8cd6a8eaf7a5df52
@@ -1289,6 +1295,9 @@ zabbix_export:
             -
               lld_macro: '{#NETWORK.NAME}'
               path: $.networkName
+            -
+              lld_macro: '{#UPLINK.DEVICE.SERIAL}'
+              path: $.serial
             -
               lld_macro: '{#UPLINK.ROLE}'
               path: $.role
