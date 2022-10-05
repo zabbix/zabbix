@@ -801,7 +801,18 @@ sub process
 
 	newstate("table");
 
+	if ($output{"database"} eq "mysql")
+	{
+		print "DELIMITER \$\$${eol}\n";
+	}
+
 	print $sequences . $triggers . $sql_suffix;
+
+	if ($output{"database"} eq "mysql")
+	{
+		print "DELIMITER ;${eol}\n";
+	}
+
 	print $fkeys_prefix.$fkeys.$fkeys_suffix;
 	print $output{"after"};
 }
