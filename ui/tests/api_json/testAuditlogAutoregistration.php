@@ -19,19 +19,26 @@
 **/
 
 
-function media_type2str($type = null) {
-	$types = [
-		MEDIA_TYPE_EMAIL => _('Email'),
-		MEDIA_TYPE_EXEC => _('Script'),
-		MEDIA_TYPE_SMS => _('SMS'),
-		MEDIA_TYPE_WEBHOOK => _('Webhook')
-	];
+require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 
-	if ($type === null) {
-		natsort($types);
+/**
+ * @backup config_autoreg_tls, config
+ */
+class testAuditlogAutoregistration extends testAuditlogCommon {
 
-		return $types;
+	public function testAuditlogAutoregistration_Update() {
+		$updated = json_encode([
+			'autoregistration.tls_accept' => ['update', '3', '1'],
+			'autoregistration.tls_psk_identity' => ['update', '******', '******'],
+			'autoregistration.tls_psk' => ['update', '******', '******']
+		]);
+
+		$this->call('autoregistration.update', [
+			'tls_accept' => 3,
+			'tls_psk_identity' => 'PSK 001',
+			'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478'
+		]);
+
+		$this->getAuditDetails('details', $this->update_actionid, $updated, 1);
 	}
-
-	return $types[$type];
 }

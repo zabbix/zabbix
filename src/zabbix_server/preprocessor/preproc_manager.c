@@ -136,7 +136,7 @@ typedef struct
 	zbx_hashset_t			item_config;	/* item configuration L2 cache */
 	zbx_hashset_t			history_cache;	/* item value history cache */
 	zbx_hashset_t			linked_items;	/* linked items placed in queue */
-	int				cache_ts;	/* cache timestamp */
+	zbx_uint64_t			revision;	/* the configuration revision */
 	zbx_uint64_t			processed_num;	/* processed value counter */
 	zbx_uint64_t			queued_num;	/* queued value counter */
 	zbx_uint64_t			preproc_num;	/* queued values with preprocessing steps */
@@ -192,16 +192,16 @@ static void	request_free_steps(zbx_preprocessing_request_t *request)
 static void	preprocessor_sync_configuration(zbx_preprocessing_manager_t *manager)
 {
 	zbx_hashset_iter_t	iter;
-	int			ts;
+	zbx_uint64_t		old_revision;
 	zbx_preproc_history_t	*vault;
 	zbx_preproc_item_t	*item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ts = manager->cache_ts;
-	DCconfig_get_preprocessable_items(&manager->item_config, &manager->cache_ts);
+	old_revision = manager->revision;
+	DCconfig_get_preprocessable_items(&manager->item_config, &manager->revision);
 
-	if (ts != manager->cache_ts)
+	if (old_revision != manager->revision)
 	{
 		/* drop items with removed preprocessing steps from preprocessing history cache */
 		zbx_hashset_iter_reset(&manager->history_cache, &iter);
@@ -219,10 +219,8 @@ static void	preprocessor_sync_configuration(zbx_preprocessing_manager_t *manager
 		zbx_hashset_iter_reset(&manager->item_config, &iter);
 		while (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_iter_next(&iter)))
 		{
-			if (ts >= item->update_time && ZBX_PREPROC_MACRO_UPDATE_FALSE == item->macro_update)
+			if (item->preproc_revision < manager->revision)
 				continue;
-
-			item->macro_update = ZBX_PREPROC_MACRO_UPDATE_FALSE;
 
 			if (NULL == (vault = (zbx_preproc_history_t *)zbx_hashset_search(&manager->history_cache,
 					&item->itemid)))
@@ -1974,7 +1972,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_PREPROCESSING, &error))
 	{
@@ -2007,9 +2005,9 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 			manager.processed_num = 0;
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
 		zbx_update_env(sec);
 

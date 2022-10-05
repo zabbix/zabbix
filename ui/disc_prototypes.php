@@ -527,7 +527,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				if ($db_item['type'] != ITEM_TYPE_HTTPAGENT) {
 					$allowed_fields += array_fill_keys([
-						'authtype', 'username', 'password', 'params', 'publickey', 'privatekey'
+						'authtype', 'username', 'password', 'params', 'publickey', 'privatekey', 'interfaceid'
 					], true);
 				}
 

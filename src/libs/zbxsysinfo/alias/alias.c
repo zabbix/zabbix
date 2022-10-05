@@ -22,6 +22,7 @@
 
 #include "zbxstr.h"
 #include "log.h"
+#include "zbxexpr.h"
 
 static ALIAS	*aliasList = NULL;
 
@@ -89,7 +90,7 @@ const char	*zbx_alias_get(const char *orig)
 	size_t				buffer_offset = 0;
 	const char			*p = orig;
 
-	if (SUCCEED != parse_key(&p) || '\0' != *p)
+	if (SUCCEED != zbx_parse_key(&p) || '\0' != *p)
 		return orig;
 
 	for (alias = aliasList; NULL != alias; alias = alias->next)

@@ -3321,7 +3321,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/serviceid": an array is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3333,7 +3333,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/serviceid/1": a number is expected.',
+					'error' => 'Invalid parameter "/filter/serviceid/1": a character string, integer or floating point value is expected.',
 					'result' => []
 				]
 			],
@@ -3345,7 +3345,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/serviceid/1": a number is expected.',
+					'error' => 'Invalid parameter "/filter/serviceid/1": a character string, integer or floating point value is expected.',
 					'result' => []
 				]
 			],
@@ -3357,7 +3357,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/serviceid/1": a number is expected.',
+					'error' => 'Invalid parameter "/filter/serviceid/1": a character string, integer or floating point value is expected.',
 					'result' => []
 				]
 			],
@@ -3369,7 +3369,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/serviceid/1": a number is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3381,7 +3381,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/serviceid/1": a number is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3393,7 +3393,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/serviceid/1": a number is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3417,7 +3417,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/name": an array is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3429,7 +3429,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/name/1": a character string is expected.',
+					'error' => 'Invalid parameter "/filter/name/1": a character string, integer or floating point value is expected.',
 					'result' => []
 				]
 			],
@@ -3441,7 +3441,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/name/1": a character string is expected.',
+					'error' => 'Invalid parameter "/filter/name/1": a character string, integer or floating point value is expected.',
 					'result' => []
 				]
 			],
@@ -3453,7 +3453,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/name/1": a character string is expected.',
+					'error' => 'Invalid parameter "/filter/name/1": a character string, integer or floating point value is expected.',
 					'result' => []
 				]
 			],
@@ -3465,7 +3465,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/name/1": a character string is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3489,7 +3489,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/status": an array is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3501,7 +3501,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/status": an array is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3513,11 +3513,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/status/1": value must be one of '.
-						implode(', ', array_merge(
-							[ZBX_SEVERITY_OK],
-							range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
-						)).'.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3529,11 +3525,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/status/1": value must be one of '.
-						implode(', ', array_merge(
-							[ZBX_SEVERITY_OK],
-							range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
-						)).'.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3545,7 +3537,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/status/1": an integer is expected.',
+					'error' => 'Invalid parameter "/filter/status/1": a character string, integer or floating point value is expected.',
 					'result' => []
 				]
 			],
@@ -3557,7 +3549,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/status/1": an integer is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3569,7 +3561,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/status/1": an integer is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3581,11 +3573,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/status/1": value must be one of '.
-						implode(', ', array_merge(
-							[ZBX_SEVERITY_OK],
-							range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
-						)).'.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3597,11 +3585,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/status/1": value must be one of '.
-						implode(', ', array_merge(
-							[ZBX_SEVERITY_OK],
-							range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)
-						)).'.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3625,7 +3609,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/algorithm": an array is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3637,7 +3621,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/algorithm": an array is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3649,12 +3633,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/algorithm/1": value must be one of '.
-						implode(', ', [
-							ZBX_SERVICE_STATUS_CALC_SET_OK,
-							ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
-							ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE
-						]).'.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3666,7 +3645,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/algorithm/1": an integer is expected.',
+					'error' => 'Invalid parameter "/filter/algorithm/1": a character string, integer or floating point value is expected.',
 					'result' => []
 				]
 			],
@@ -3678,7 +3657,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/algorithm/1": an integer is expected.',
+					'error' => 'Invalid parameter "/filter/algorithm/1": a character string, integer or floating point value is expected.',
 					'result' => []
 				]
 			],
@@ -3690,7 +3669,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/algorithm/1": an integer is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3702,7 +3681,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/algorithm/1": an integer is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3714,12 +3693,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/algorithm/1": value must be one of '.
-						implode(', ', [
-							ZBX_SERVICE_STATUS_CALC_SET_OK,
-							ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
-							ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE
-						]).'.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -3731,12 +3705,7 @@ class testServices extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/algorithm/1": value must be one of '.
-						implode(', ', [
-							ZBX_SERVICE_STATUS_CALC_SET_OK,
-							ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
-							ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE
-						]).'.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -4305,7 +4274,7 @@ class testServices extends CAPITest {
 			return;
 		}
 
-		$this->assertEquals($response['result'], $expected['error']);
+		$this->assertEquals($response['result'], $expected['result']);
 	}
 
 	public static function service_update_data_invalid(): array {

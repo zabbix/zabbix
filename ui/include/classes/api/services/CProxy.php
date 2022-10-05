@@ -67,17 +67,8 @@ class CProxy extends CApiService {
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'proxyids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE])],
-				'lastaccess' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => '0:'.ZBX_MAX_DATE],
-				'version' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'compatibility' =>			['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_PROXY_VERSION_UNDEFINED, ZBX_PROXY_VERSION_CURRENT, ZBX_PROXY_VERSION_OUTDATED, ZBX_PROXY_VERSION_UNSUPPORTED])]
-			]],
-			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'host' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'description' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['host', 'status', 'lastaccess', 'version', 'compatibility']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['host', 'description']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -104,7 +95,7 @@ class CProxy extends CApiService {
 		$sql_parts = [
 			'select'	=> ['hostid' => 'h.hostid'],
 			'from'		=> ['hosts' => 'hosts h'],
-			'where'		=> [],
+			'where'		=> ['status' => 'h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')'],
 			'order'		=> []
 		];
 
@@ -135,10 +126,6 @@ class CProxy extends CApiService {
 		// filter
 		if ($options['filter'] === null) {
 			$options['filter'] = [];
-		}
-
-		if (!array_key_exists('status', $options['filter']) || $options['filter']['status'] === null) {
-			$options['filter']['status'] = [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE];
 		}
 
 		$this->dbFilter('hosts h', $options, $sql_parts);
