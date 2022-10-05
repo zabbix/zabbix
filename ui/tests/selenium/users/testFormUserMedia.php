@@ -53,8 +53,7 @@ class testFormUserMedia extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'SMS',
-						'Send to' => '+371 66600666',
-						'Use if severity' => ['Not classified']
+						'Send to' => '+371 66600666'
 					],
 					'additional media' => [
 						[
@@ -80,8 +79,7 @@ class testFormUserMedia extends CWebTest {
 						'Type' => 'SMS',
 						'Send to' => '+371 66600666',
 						'When active' => '{$DATE.TIME};6-7,09:00-15:00',
-						'Enabled' => false,
-						'Use if severity' => ['Not classified']
+						'Enabled' => false
 					]
 				]
 			],
