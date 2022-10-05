@@ -425,8 +425,8 @@ class CConfigurationExportBuilder {
 
 		CArrayHelper::sort($media_types, ['name']);
 
-		foreach ($media_types as $media_type) {
-			$result[] = [
+		foreach ($media_types as $i => $media_type) {
+			$result[$i] = [
 				'name' => $media_type['name'],
 				'type' => $media_type['type'],
 				'smtp_server' => $media_type['smtp_server'],
@@ -456,6 +456,10 @@ class CConfigurationExportBuilder {
 				'description' => $media_type['description'],
 				'message_templates' => self::formatMediaTypeMessageTemplates($media_type['message_templates'])
 			];
+
+			if ($media_type['type'] == MEDIA_TYPE_EMAIL) {
+				$result[$i] += ['provider' => $media_type['provider']];
+			}
 		}
 
 		return $result;

@@ -48,6 +48,14 @@ z-select,
 			border-color: $form-border-color;
 			box-shadow: none;
 		}
+
+		&.red {
+			color: $red;
+
+			&:after {
+				color: $font-color;
+			}
+		}
 	}
 
 	.list {

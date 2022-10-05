@@ -49,7 +49,7 @@ if ($data['type'] == MEDIA_TYPE_WEBHOOK) {
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 				->setEnabled(false),
 			(new CDiv(''))->setId('webhook_response_type'),
-			(new CDiv((new CLinkAction('Open log'))
+			(new CDiv((new CLinkAction(_('Open log')))
 				->setId('mediatypetest_log')
 				->addClass(ZBX_STYLE_DISABLED)
 				->onClick('openLogPopup(this)')))

@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "log.h"
 
@@ -30,7 +31,7 @@ typedef struct
 }
 zbx_kstat_t;
 
-int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
+int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	return FAIL;
 }
@@ -169,6 +170,13 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 
 	return SYSINFO_RET_OK;
 }
+
+typedef struct
+{
+	const char	*mode;
+	int		(*function)(const char *devname, AGENT_RESULT *result);
+}
+MODE_FUNCTION;
 
 static int	process_mode_function(AGENT_REQUEST *request, AGENT_RESULT *result, const MODE_FUNCTION *fl)
 {
