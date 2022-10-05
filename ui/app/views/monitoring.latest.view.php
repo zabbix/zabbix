@@ -35,6 +35,10 @@ $this->includeJsFile('monitoring.latest.view.js.php');
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
+if ($data['uncheck']) {
+	uncheckTableRows('latest');
+}
+
 $widget = (new CWidget())
 	->setTitle(_('Latest data'))
 	->setWebLayoutMode($web_layout_mode)

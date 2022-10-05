@@ -68,11 +68,11 @@
 
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				this.reloadPartialAndTabCounters();
+				chkbxRange.clearSelectedOnFilterChange();
 
 				if (this.active_filter !== this.filter._active_item) {
 					this.active_filter = this.filter._active_item;
 					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
-					chkbxRange.clearSelectedOnFilterChange();
 				}
 			});
 
