@@ -3,7 +3,7 @@
 	"id": "hostavail",
 	"type": "widget",
 	"name": "Host availability",
-	"namespace": "HostАvail",
+	"namespace": "HostAvail",
 	"version": "2.0",
 	"author": "Zabbix SIA",
 	"widget": {

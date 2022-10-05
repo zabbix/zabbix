@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -24,15 +24,15 @@
  */
 class CControllerModuleScan extends CController {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		return true;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		get_and_clear_messages();
 
 		$db_modules_create = [];

@@ -19,7 +19,7 @@
 **/
 
 
-namespace Widgets\HostАvail\Includes;
+namespace Widgets\HostAvail\Includes;
 
 use Zabbix\Widgets\CWidgetForm;
 

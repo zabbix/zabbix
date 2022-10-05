@@ -19,7 +19,7 @@
 **/
 
 
-namespace Widgets\HostАvail\Actions;
+namespace Widgets\HostAvail\Actions;
 
 use API,
 	CControllerDashboardWidgetView,

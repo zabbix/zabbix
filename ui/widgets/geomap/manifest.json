@@ -1,6 +1,6 @@
 {
 	"manifest_version": 1.0,
-	"id": "Geomap",
+	"id": "geomap",
 	"type": "widget",
 	"name": "Geomap",
 	"namespace": "Geomap",
