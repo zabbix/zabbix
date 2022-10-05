@@ -78,6 +78,7 @@ func MatchGlobalRegexp(
 	value, pattern string,
 	mode int,
 	output_template *string) (match bool, output string, err error) {
+
 	cvalue := C.CString(value)
 	cpattern := C.CString(pattern)
 	var ctemplate, coutput *C.char

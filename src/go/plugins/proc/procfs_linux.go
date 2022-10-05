@@ -38,6 +38,7 @@ import (
 	"syscall"
 
 	"zabbix.com/pkg/procfs"
+	"git.zabbix.com/ap/plugin-support/log"
 )
 
 type processUserInfo struct {

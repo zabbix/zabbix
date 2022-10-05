@@ -48,6 +48,7 @@ func decode(encoder string, inbuf []byte) (outbuf []byte) {
 			return inbuf
 		}
 	}
+
 	tocode := C.CString("UTF-8")
 	log.Tracef("Calling C function \"free()\"")
 	defer C.free(unsafe.Pointer(tocode))

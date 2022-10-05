@@ -1438,6 +1438,7 @@ func Init(config *Config) (err error) {
 		C.free(unsafe.Pointer(cErr))
 		return
 	}
+
 	log.Tracef("Calling C function \"tls_version()\"")
 	log.Infof("OpenSSL library (%s) initialized", C.GoString(C.tls_version()))
 	log.Debugf("default context ciphersuites:%s", describeCiphersuites(defaultContext))
