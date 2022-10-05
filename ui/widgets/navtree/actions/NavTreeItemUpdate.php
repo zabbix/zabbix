@@ -25,7 +25,7 @@ use API,
 	CController,
 	CControllerResponseData;
 
-class CControllerWidgetNavTreeItemUpdate extends CController {
+class NavTreeItemUpdate extends CController {
 
 	protected function init(): void {
 		$this->disableSIDValidation();

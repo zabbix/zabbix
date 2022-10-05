@@ -141,10 +141,10 @@ class CView {
 	 *
 	 * @return string
 	 */
-	public function readJsFile(string $file_name, array $data = null): string {
+	public function readJsFile(string $file_name, array $data = null, $relative_dir = '/js'): string {
 		$data = $data ?? $this->data;
 
-		$file_path = $this->directory.'/js/'.$file_name;
+		$file_path = $this->directory.$relative_dir.'/'.$file_name;
 
 		ob_start();
 

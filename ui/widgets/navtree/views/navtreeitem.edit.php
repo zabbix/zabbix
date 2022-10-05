@@ -64,7 +64,7 @@ $form
 
 $output = [
 	'body' => $form->toString(),
-	'script_inline' => $this->readJsFile('monitoring.widget.navtreeitem.edit.js.php')
+	'script_inline' => $this->readJsFile('navtreeitem.edit.js.php', null, '')
 ];
 
 if ($messages = get_and_clear_messages()) {

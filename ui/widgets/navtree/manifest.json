@@ -7,9 +7,14 @@
 	"version": "2.0",
 	"author": "Zabbix SIA",
 	"actions": {
-		"second.module": {
-			"class": "Test2",
-			"view": "second.module"
+		"widget.navtree.item.edit": {
+			"class": "NavTreeItemEdit",
+			"view": "navtreeitem.edit",
+			"layout": "layout.json"
+		},
+		"widget.navtree.item.update": {
+			"class": "NavTreeItemUpdate",
+			"layout": "layout.json"
 		}
 	},
 	"widget": {

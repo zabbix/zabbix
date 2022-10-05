@@ -305,10 +305,6 @@ class CRouter {
 		'userrole.update'							=> ['CControllerUserroleUpdate',						null,					null],
 		'web.view'									=> ['CControllerWebView',								'layout.htmlpage',		'monitoring.web.view'],
 
-	// TODO AS: move to NavTree widget
-		'widget.navtree.item.edit'					=> ['CControllerWidgetNavTreeItemEdit',					'layout.json',			'monitoring.widget.navtreeitem.edit'],
-		'widget.navtree.item.update'				=> ['CControllerWidgetNavTreeItemUpdate',				'layout.json',			null],
-
 		// legacy actions
 		'actionconf.php'				=> ['CLegacyAction', null, null],
 		'auditacts.php'					=> ['CLegacyAction', null, null],
