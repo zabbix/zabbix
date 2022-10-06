@@ -1,1 +1,1 @@
-A...I..... [ZBX-17419] added indexing on uppercase variant of the name column for hosts and items tables (arimdjonoks, jfreibergs)
+A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)

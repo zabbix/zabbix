@@ -131,7 +131,7 @@ class CProxy extends CApiService {
 		 */
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$options['output'] = array_diff(array_keys(DB::getSchema($this->tableName())['fields']),
-				['tls_psk_identity', 'tls_psk']
+				['tls_psk_identity', 'tls_psk', 'name_upper']
 			);
 		}
 		/*
@@ -162,6 +162,13 @@ class CProxy extends CApiService {
 		}
 
 		if ($result) {
+			if (array_key_exists('name_upper', reset($result))) {
+				foreach ($result as &$item) {
+					unset($item['name_upper']);
+				}
+				unset($item);
+			}
+
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 		}
