@@ -125,9 +125,10 @@ return [
 				'default' => 'default'
 			],
 			'roleid' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
+				'default' => NULL,
 				'ref_table' => 'role',
 				'ref_field' => 'roleid'
 			],
