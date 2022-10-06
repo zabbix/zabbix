@@ -210,59 +210,62 @@ foreach ($data['users'] as $user) {
 	$checkbox = new CCheckBox('userids['.$userid.']', $userid);
 	$gui_access = new CSpan(user_auth_type2str($user['gui_access']));
 	$info = $users_groups ? '' : makeWarningIcon(_('User do not have user groups!'));
-
-	if ($user['userdirectoryid']) {
-		$idp = $data['idp_names'][$user['userdirectoryid']];
-		$provisioned = (new CDiv(date(ZBX_DATE_TIME, $user['ts_provisioned'])))
-			->setHint($idp['idp_type'] == IDP_TYPE_SAML ? _('SAML') : $idp['name']);
-
-		if ($idp['idp_type'] == IDP_TYPE_LDAP) {
-			$checkbox->setAttribute('data-actions', 'ldap');
-		}
-
-		$gui_access = new CSpan($idp['idp_type'] == IDP_TYPE_LDAP ? _('LDAP') : _('SAML'));
-	}
-
-	switch ($user['gui_access']) {
-		case GROUP_GUI_ACCESS_INTERNAL:
-			$gui_access->addClass(ZBX_STYLE_ORANGE);
-			break;
-
-		case GROUP_GUI_ACCESS_DISABLED:
-			$gui_access->addClass(ZBX_STYLE_GREY);
-			break;
-
-		default:
-			$gui_access->addClass(ZBX_STYLE_GREEN);
-	}
-
-	$username = new CLink($user['username'], (new CUrl('zabbix.php'))
-		->setArgument('action', 'user.edit')
-		->setArgument('userid', $userid)
+	$username = new CLink($user['username'],
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'user.edit')
+			->setArgument('userid', $userid)
 	);
 
 	if (!$user['roleid']) {
 		$info = makeErrorIcon(_('User do not have user role!'));
-		$gui_access = (new CSpan(user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)))->addClass(ZBX_STYLE_GREY);
-	}
-	else if (!CRoleHelper::checkAccess('api.access', $user['roleid'])) {
+		$gui_access = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_GREY);
 		$api_access = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
 	}
 	else {
-		$api_access = (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN);
-		$api_methods = CRoleHelper::getRoleApiMethods($user['roleid']);
+		if ($user['userdirectoryid']) {
+			$idp = $data['idp_names'][$user['userdirectoryid']];
+			$provisioned = (new CDiv(date(ZBX_DATE_TIME, $user['ts_provisioned'])))
+				->setHint($idp['idp_type'] == IDP_TYPE_SAML ? _('SAML') : $idp['name']);
 
-		if ($api_methods) {
-			$hint_api_methods = [];
-			$status_class = CRoleHelper::checkAccess('api.mode', $user['roleid'])
-				? ZBX_STYLE_STATUS_GREEN
-				: ZBX_STYLE_STATUS_GREY;
-
-			foreach ($api_methods as $api_method) {
-				$hint_api_methods[] = (new CSpan($api_method))->addClass($status_class);
+			if ($idp['idp_type'] == IDP_TYPE_LDAP) {
+				$checkbox->setAttribute('data-actions', 'ldap');
 			}
 
-			$api_access->setHint((new CDiv($hint_api_methods))->addClass('rules-status-container'));
+			$gui_access = new CSpan($idp['idp_type'] == IDP_TYPE_LDAP ? _('LDAP') : _('SAML'));
+		}
+
+		switch ($user['gui_access']) {
+			case GROUP_GUI_ACCESS_INTERNAL:
+				$gui_access->addClass(ZBX_STYLE_ORANGE);
+				break;
+
+			case GROUP_GUI_ACCESS_DISABLED:
+				$gui_access->addClass(ZBX_STYLE_GREY);
+				break;
+
+			default:
+				$gui_access->addClass(ZBX_STYLE_GREEN);
+		}
+
+		if (!CRoleHelper::checkAccess('api.access', $user['roleid'])) {
+			$api_access = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
+		}
+		else {
+			$api_access = (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN);
+			$api_methods = CRoleHelper::getRoleApiMethods($user['roleid']);
+
+			if ($api_methods) {
+				$hint_api_methods = [];
+				$status_class = CRoleHelper::checkAccess('api.mode', $user['roleid'])
+					? ZBX_STYLE_STATUS_GREEN
+					: ZBX_STYLE_STATUS_GREY;
+
+				foreach ($api_methods as $api_method) {
+					$hint_api_methods[] = (new CSpan($api_method))->addClass($status_class);
+				}
+
+				$api_access->setHint((new CDiv($hint_api_methods))->addClass('rules-status-container'));
+			}
 		}
 	}
 
