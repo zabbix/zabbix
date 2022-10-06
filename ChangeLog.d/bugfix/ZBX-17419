@@ -1,1 +1,1 @@
-........S. [ZBX-17419] optimized api queries when searching names in hosts and items tables (arimdjonoks) 
+A.......S. [ZBX-17419] optimized API queries when searching through names in hosts and items tables (arimdjonoks, jfreibergs)
