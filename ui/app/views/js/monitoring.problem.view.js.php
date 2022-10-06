@@ -91,7 +91,6 @@
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				const url = new Curl();
 				url.setArgument('action', 'problem.view.csv');
-
 				$('#export_csv').attr('data-url', url.getUrl());
 
 				this.refreshResults();
