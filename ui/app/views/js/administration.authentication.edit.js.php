@@ -41,6 +41,7 @@
 			this.saml_provision_status = document.getElementById('saml_provision_status');
 			this.saml_provision_groups_table = document.getElementById('saml-group-table');
 			this.saml_media_type_mapping_table = document.getElementById('saml-media-type-mapping-table');
+			this.ldap_jit_status = document.getElementById('ldap_jit_status');
 
 			this._addEventListeners();
 			this._addLdapServers(ldap_servers, ldap_default_row_index);
@@ -48,6 +49,7 @@
 			this._renderProvisionMedia(saml_provision_media);
 
 			this.toggleSamlJitProvisioning(this.saml_provision_status.checked);
+			this.toggleProvisionPeriod(this.ldap_jit_status.checked);
 			this._initSortable();
 
 			if (document.getElementById('saml_auth_enabled') !== null
@@ -122,6 +124,10 @@
 
 			this.saml_provision_status.addEventListener('change', (e) => {
 				this.toggleSamlJitProvisioning(e.target.checked);
+			});
+
+			this.ldap_jit_status.addEventListener('change', (e) => {
+				this.toggleProvisionPeriod(e.target.checked);
 			});
 
 			this.saml_provision_groups_table.addEventListener('click', (e) => {
@@ -733,6 +739,12 @@
 
 		toggleSamlJitProvisioning(checked) {
 			for (const element of this.form.querySelectorAll('.saml-provision-status')) {
+				element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
+			}
+		}
+
+		toggleProvisionPeriod(checked) {
+			for (const element of this.form.querySelectorAll('.ldap-jit-status')) {
 				element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
 			}
 		}
