@@ -316,8 +316,8 @@ class CUser extends CApiService {
 			'theme' =>			['type' => API_STRING_UTF8, 'in' => $themes, 'length' => DB::getFieldLength('users', 'theme')],
 			'rows_per_page' =>	['type' => API_INT32, 'in' => '1:999999'],
 			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
-			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-			'usrgrps' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
+			'roleid' =>			['type' => API_ID],
+			'usrgrps' =>		['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'user_medias' =>	['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'replacement' => 'medias', 'fields' => [
@@ -360,7 +360,13 @@ class CUser extends CApiService {
 
 		$this->checkDuplicates(array_column($users, 'username'));
 		$this->checkLanguages(array_column($users, 'lang'));
-		$this->checkRoles(array_column($users, 'roleid'));
+
+		$roleids = array_flip(array_column($users, 'roleid'));
+
+		if ($roleids) {
+			$this->checkRoles(array_keys($roleids));
+		}
+
 		$this->checkUserGroups($users, []);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -407,7 +413,7 @@ class CUser extends CApiService {
 			'rows_per_page' =>	['type' => API_INT32, 'in' => '1:999999'],
 			'timezone' =>		['type' => API_STRING_UTF8, 'in' => $timezones, 'length' => DB::getFieldLength('users', 'timezone')],
 			'roleid' =>			['type' => API_ID],
-			'usrgrps' =>		['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
+			'usrgrps' =>		['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'user_medias' =>	['type' => API_OBJECTS, 'flags' => API_DEPRECATED, 'replacement' => 'medias', 'fields' => [
@@ -474,7 +480,7 @@ class CUser extends CApiService {
 			' WHERE type='.USER_TYPE_SUPER_ADMIN.
 				' AND readonly=1'
 		));
-		$readonly_superadmin_role = $db_roles[0];
+		$readonly_superadmin_role = reset($db_roles);
 
 		$superadminids_to_update = [];
 		$usernames = [];
@@ -483,7 +489,7 @@ class CUser extends CApiService {
 		foreach ($users as $i => &$user) {
 			$db_user = $db_users[$user['userid']];
 
-			if ($user['userdirectoryid'] != 0) {
+			if (array_key_exists('userdirectoryid', $user) && $user['userdirectoryid'] != 0) {
 				$provisioned_field = array_key_first(array_intersect_key(array_flip(self::PROVISIONED_FIELDS), $user));
 
 				if ($provisioned_field !== null) {
@@ -503,7 +509,7 @@ class CUser extends CApiService {
 				$user['passwd'] = password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST]);
 			}
 
-			if (array_key_exists('roleid', $user) && $user['roleid'] != $db_user['roleid']) {
+			if (array_key_exists('roleid', $user) && $user['roleid'] && $user['roleid'] != $db_user['roleid']) {
 				if ($db_user['roleid'] == $readonly_superadmin_role['roleid']) {
 					$superadminids_to_update[] = $user['userid'];
 				}
@@ -1689,7 +1695,8 @@ class CUser extends CApiService {
 
 		// Check system permissions.
 		if (($autologout != 0 && $db_session['lastaccess'] + $autologout <= $time)
-				|| $permissions['users_status'] == GROUP_STATUS_DISABLED) {
+				|| $permissions['users_status'] == GROUP_STATUS_DISABLED
+				|| !$db_user['roleid']) {
 			DB::delete('sessions', [
 				'status' => ZBX_SESSION_PASSIVE,
 				'userid' => $db_user['userid']
@@ -1712,19 +1719,18 @@ class CUser extends CApiService {
 		self::$userData = $db_user;
 
 		if (CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])
-				&& CAuthenticationHelper::isTimeToProvision($db_user['ts_provisioned'])) {
-			if (!$this->provisionLdapUser($db_user)) {
-				DB::delete('sessions', [
-					'status' => ZBX_SESSION_PASSIVE,
-					'userid' => $db_user['userid']
-				]);
-				DB::update('sessions', [
-					'values' => ['status' => ZBX_SESSION_PASSIVE],
-					'where' => ['sessionid' => $sessionid]
-				]);
+				&& CAuthenticationHelper::isTimeToProvision($db_user['ts_provisioned'])
+				&& !$this->provisionLdapUser($db_user)) {
+			DB::delete('sessions', [
+				'status' => ZBX_SESSION_PASSIVE,
+				'userid' => $db_user['userid']
+			]);
+			DB::update('sessions', [
+				'values' => ['status' => ZBX_SESSION_PASSIVE],
+				'where' => ['sessionid' => $sessionid]
+			]);
 
-				return [];
-			}
+			return [];
 		}
 
 		return $db_user;
@@ -1867,6 +1873,10 @@ class CUser extends CApiService {
 	 * @return int
 	 */
 	private function getUserType(string $roleid): int {
+		if (!$roleid) {
+			return USER_TYPE_ZABBIX_USER;
+		}
+
 		return DBfetchColumn(DBselect('SELECT type FROM role WHERE roleid='.zbx_dbstr($roleid)), 'type')[0];
 	}
 
@@ -2077,7 +2087,7 @@ class CUser extends CApiService {
 
 		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
 
-		if ($permissions['users_status'] == GROUP_STATUS_DISABLED) {
+		if ($permissions['users_status'] == GROUP_STATUS_DISABLED || !$db_user['roleid']) {
 			return ['error' => _('No permissions for system access.'), 'db_user' => $db_user];
 		}
 
@@ -2283,6 +2293,7 @@ class CUser extends CApiService {
 	 *
 	 * @param int   $db_userid
 	 * @param array $idp_user_data
+	 * @param array $idp_user_data['usrgrps']
 	 *
 	 * @return array
 	 */
@@ -2309,41 +2320,20 @@ class CUser extends CApiService {
 		]);
 		$db_users = [$db_userid => $db_user];
 
-		if ($idp_user_data['usrgrps']) {
-			$this->updateReal($users, $db_users);
-			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::API_USER['username'],
-				CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users
-			);
-
-			return reset($users);
+		if (!$idp_user_data['usrgrps']) {
+			$users[0]['usrgrps'] = [[
+				'usrgrpid' => CAuthenticationHelper::get(CAuthenticationHelper::DEPROVISIONED_GROUPID)
+			]];
+			$users[0]['roleid'] = 0;
+			$user = [];
 		}
 
-		try {
-			$userids = [$user['userid']];
+		$this->updateReal($users, $db_users);
+		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::API_USER['username'],
+			CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users
+		);
 
-			self::$userData = CProvisioning::API_USER;
-			$this->validateDelete($userids, $db_users);
-			self::$userData = null;
-			self::deleteForce($userids);
-			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::API_USER['username'],
-				CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $users
-			);
-		}
-		catch (Exception $e) {
-			/**
-			 * TODO: when user cannot be deleted remove groups and role. Maybe do not delete use but assign to disabled group.
-			 */
-			$user['usrgrps'] = [];
-			$user['roleid'] = 0;
-			$users = [$user];
-
-			$this->updateReal($users, $db_users);
-			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::API_USER['username'],
-				CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users
-			);
-		}
-
-		return [];
+		return $user;
 	}
 
 	/**

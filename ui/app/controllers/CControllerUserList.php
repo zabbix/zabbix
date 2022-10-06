@@ -143,7 +143,7 @@ class CControllerUserList extends CController {
 		}
 
 		foreach ($data['users'] as &$user) {
-			$user['role_name'] = $user['role']['name'];
+			$user['role_name'] = $user['role'] ? $user['role']['name'] : '';
 		}
 		unset($user);
 

@@ -35,7 +35,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'username' =>		'required|db users.username|not_empty',
 			'name' =>			'db users.name',
 			'surname' =>		'db users.surname',
-			'user_groups' =>	'required|array_id|not_empty',
+			'user_groups' =>	'array_id',
 			'password1' =>		'string',
 			'password2' =>		'string',
 			'medias' =>			'array',
@@ -47,7 +47,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 			'refresh' =>		'db users.refresh|not_empty',
 			'rows_per_page' =>	'db users.rows_per_page',
 			'url' =>			'db users.url',
-			'roleid' =>			'required|db users.roleid',
+			'roleid' =>			'id',
 			'form_refresh' =>	'int32'
 		];
 
@@ -90,7 +90,7 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 	}
 
 	protected function doAction() {
-		$user = [];
+		$user = ['roleid' => 0];
 
 		$this->getInputs($user, ['userid', 'username', 'name', 'surname', 'lang', 'timezone', 'theme', 'autologin',
 			'autologout', 'refresh', 'rows_per_page', 'url', 'roleid'

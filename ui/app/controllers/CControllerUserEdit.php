@@ -35,7 +35,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'username' =>			'db users.username',
 			'name' =>				'db users.name',
 			'surname' =>			'db users.surname',
-			'user_groups' =>		'array_id|not_empty',
+			'user_groups' =>		'array_id',
 			'change_password' =>	'in 1',
 			'password1' =>			'string',
 			'password2' =>			'string',
@@ -51,7 +51,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'new_media' =>			'array',
 			'enable_media' =>		'int32',
 			'disable_media' =>		'int32',
-			'roleid' =>				'db users.roleid',
+			'roleid' =>				'id',
 			'form_refresh' =>		'int32'
 		];
 

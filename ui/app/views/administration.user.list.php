@@ -138,10 +138,12 @@ $table = (new CTableInfo())
 		_('API access'),
 		_('Debug mode'),
 		_('Status'),
-		make_sorting_header(_('Provisioned'), 'ts_provisioned', $data['sort'], $data['sortorder'], $url)
+		make_sorting_header(_('Provisioned'), 'ts_provisioned', $data['sort'], $data['sortorder'], $url),
+		_('Info')
 	]);
 
 foreach ($data['users'] as $user) {
+	$info = '';
 	$userid = $user['userid'];
 	$session = $data['sessions'][$userid];
 
@@ -205,6 +207,14 @@ foreach ($data['users'] as $user) {
 		$users_groups[] = $group->addClass($style);
 	}
 
+	if (!$users_groups) {
+		$info = makeWarningIcon(_('User do not have user groups!'));
+	}
+
+	if (!$user['roleid']) {
+		$info = makeErrorIcon(_('User do not have user role!'));
+	}
+
 	// GUI Access style.
 	switch ($user['gui_access']) {
 		case GROUP_GUI_ACCESS_INTERNAL:
@@ -252,6 +262,10 @@ foreach ($data['users'] as $user) {
 		$idp = $data['idp_names'][$user['userdirectoryid']];
 		$provisioned = (new CDiv(date(ZBX_DATE_TIME, $user['ts_provisioned'])))
 			->setHint($idp['idp_type'] == IDP_TYPE_SAML ? _('SAML') : $idp['name']);
+
+		if ($idp['idp_type'] == IDP_TYPE_LDAP) {
+			$checkbox->setAttribute('data-actions', 'ldap');
+		}
 	}
 
 	// Append user to table.
@@ -260,7 +274,7 @@ foreach ($data['users'] as $user) {
 		(new CCol($username))->addClass(ZBX_STYLE_NOWRAP),
 		$user['name'],
 		$user['surname'],
-		$user['role']['name'],
+		$user['role_name'],
 		$users_groups,
 		$online,
 		$blocked,
@@ -272,7 +286,8 @@ foreach ($data['users'] as $user) {
 		($user['users_status'] == GROUP_STATUS_DISABLED)
 			? (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED)
 			: (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN),
-		$provisioned
+		$provisioned,
+		$info
 	]);
 }
 

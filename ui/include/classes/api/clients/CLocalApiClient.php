@@ -204,6 +204,11 @@ class CLocalApiClient extends CApiClient {
 			'userids' => $userid
 		]);
 
+		if (!$roleid) {
+			usleep(10000);
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
+
 		[$type] = DBfetchColumn(DBselect('SELECT type FROM role WHERE roleid='.zbx_dbstr($roleid)), 'type');
 
 		$db_usrgrps = DBselect(
