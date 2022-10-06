@@ -91,6 +91,7 @@
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				const url = new Curl();
 				url.setArgument('action', 'problem.view.csv');
+
 				$('#export_csv').attr('data-url', url.getUrl());
 
 				this.refreshResults();
@@ -312,6 +313,7 @@
 			});
 
 			refresh_url.setArgument('action', 'problem.view.refresh');
+			refresh_url.setArgument('filter_apply', '1');
 			this.refresh_url = refresh_url;
 			this.refreshNow();
 		},

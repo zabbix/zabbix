@@ -65,7 +65,7 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
 			$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 
-			$page = $this->getInput('page', 1);
+			$page = $this->hasInput('filter_apply') ? null : $this->getInput('page', 1);
 			$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'latest.view');
 			$paging_arguments = array_filter(array_intersect_key($filter, self::FILTER_FIELDS_DEFAULT));
 			array_map([$view_url, 'setArgument'], array_keys($paging_arguments), $paging_arguments);

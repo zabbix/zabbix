@@ -57,7 +57,8 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 			'tag_priority' =>		'string',
 			'from' =>				'range_time',
 			'to' =>					'range_time',
-			'filter_counters' =>	'in 1'
+			'filter_counters' =>	'in 1',
+			'filter_apply' =>		'in 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventory()
@@ -108,7 +109,7 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 		}
 		else {
 			$data = [
-				'page' => $this->getInput('page', 1),
+				'page' => $this->hasInput('filter_apply') ? null : $this->getInput('page', 1),
 				'action' => $this->getInput('action'),
 				'sort' => $this->getInput('sort', 'clock'),
 				'sortorder' => $this->getInput('sortorder', ZBX_SORT_DOWN),
