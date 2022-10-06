@@ -25,6 +25,7 @@
 #include "dbcache.h"
 #include "zbxrtc.h"
 #include "zbxtime.h"
+#include "valuecache.h"
 
 extern int		CONFIG_CONFSYNCER_FREQUENCY;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
@@ -61,7 +62,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	sec = zbx_time();
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
-	DCsync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO);
+	DCsync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL);
 	DCsync_kvs_paths(NULL);
 	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 			get_process_type_string(process_type), (sec = zbx_time() - sec), CONFIG_CONFSYNCER_FREQUENCY);
@@ -113,10 +114,17 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 		if (0 == secrets_reload)
 		{
-			DCsync_configuration(ZBX_DBSYNC_UPDATE, ZBX_SYNCED_NEW_CONFIG_YES);
+			zbx_vector_uint64_t	deleted_itemids;
+
+			zbx_vector_uint64_create(&deleted_itemids);
+
+			DCsync_configuration(ZBX_DBSYNC_UPDATE, ZBX_SYNCED_NEW_CONFIG_YES, &deleted_itemids);
 			DCsync_kvs_paths(NULL);
 			DCupdate_interfaces_availability();
 			nextcheck = (int)time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
+
+			zbx_vc_remove_items_by_ids(&deleted_itemids);
+			zbx_vector_uint64_destroy(&deleted_itemids);
 
 			if (0 != cache_reload)
 			{

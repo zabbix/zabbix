@@ -133,6 +133,7 @@
 			<arg line="--enable-agent2"/>
 			<arg line="--with-postgresql"/>
 			<arg line="--prefix=${basedir}"/>
+			<arg line="--with-libcurl"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>
@@ -311,6 +312,7 @@
 			<arg line="--enable-agent2"/>
 			<arg line="--with-mysql"/>
 			<arg line="--prefix=${basedir}"/>
+			<arg line="--with-libcurl"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>

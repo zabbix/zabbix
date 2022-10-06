@@ -22,6 +22,16 @@
 
 #include "zbxcommon.h"
 
+int	zbx_is_hostname_char(unsigned char c);
+int	zbx_is_key_char(unsigned char c);
+int	zbx_is_function_char(unsigned char c);
+int	zbx_is_macro_char(unsigned char c);
+int	zbx_is_discovery_macro(const char *name);
+int	zbx_parse_key(const char **exp);
+int	zbx_parse_host_key(char *exp, char **host, char **key);
+void	zbx_make_hostname(char *host);
+int	zbx_check_hostname(const char *hostname, char **error);
+
 int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len);
 int	zbx_function_validate_parameters(const char *expr, size_t *length);
 int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r,
@@ -214,4 +224,21 @@ int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *
 int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
 		const char *tz);
 /* interval END */
+
+/* condition operators */
+#define ZBX_CONDITION_OPERATOR_EQUAL		0
+#define ZBX_CONDITION_OPERATOR_NOT_EQUAL		1
+#define ZBX_CONDITION_OPERATOR_LIKE			2
+#define ZBX_CONDITION_OPERATOR_NOT_LIKE		3
+#define ZBX_CONDITION_OPERATOR_IN			4
+#define ZBX_CONDITION_OPERATOR_MORE_EQUAL		5
+#define ZBX_CONDITION_OPERATOR_LESS_EQUAL		6
+#define ZBX_CONDITION_OPERATOR_NOT_IN		7
+#define ZBX_CONDITION_OPERATOR_REGEXP		8
+#define ZBX_CONDITION_OPERATOR_NOT_REGEXP		9
+#define ZBX_CONDITION_OPERATOR_YES			10
+#define ZBX_CONDITION_OPERATOR_NO			11
+#define ZBX_CONDITION_OPERATOR_EXIST		12
+#define ZBX_CONDITION_OPERATOR_NOT_EXIST		13
+
 #endif /* ZABBIX_EXPR_H */

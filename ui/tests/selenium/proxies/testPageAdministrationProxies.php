@@ -78,13 +78,6 @@ class testPageAdministrationProxies extends CWebTest {
 				'Required vps', 'Hosts'], $table->getHeadersText()
 		);
 
-		// Check that sortable headers are clickable.
-		$this->assertTrue($table->query('link:Name')->one()->isClickable());
-		$this->assertTrue($table->query('link:Mode')->one()->isClickable());
-		$this->assertTrue($table->query('link:Encryption')->one()->isClickable());
-		$this->assertTrue($table->query('link:Version')->one()->isClickable());
-		$this->assertTrue($table->query('link:Last seen (age)')->one()->isClickable());
-
 		// Check versions and hints.
 		$versions = [
 			'active_current' => ['version' => '6.4.0'],
@@ -597,5 +590,38 @@ class testPageAdministrationProxies extends CWebTest {
 
 		// Check that user redirected on Proxies page.
 		$this->page->assertHeader('Proxies');
+	}
+
+	/**
+	 * @backup profiles
+	 */
+	public function testPageAdministrationProxies_SortColumns() {
+		// Open Proxies page with proxies sorted descendingly by name.
+		$this->page->login()->open('zabbix.php?action=proxy.list&sort=host&sortorder=DESC')->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
+
+		foreach (['Name', 'Mode', 'Encryption', 'Version', 'Last seen (age)'] as $column) {
+			$content = $this->getTableColumnData($column);
+
+			$sorted_asc = $content;
+			$sorted_desc = $content;
+
+			// Sort column contents ascending.
+			usort($sorted_asc, function($a, $b) {
+				return strcasecmp($a, $b);
+			});
+
+			// Sort column contents descending.
+			usort($sorted_desc, function($a, $b) {
+				return strcasecmp($b, $a);
+			});
+
+			// Check ascending and descending sorting in column.
+			foreach ([$sorted_asc, $sorted_desc] as $order) {
+				$table->query('link', $column)->waitUntilClickable()->one()->click();
+				$table->waitUntilReloaded();
+				$this->assertTableDataColumn($order, $column);
+			}
+		}
 	}
 }
