@@ -143,7 +143,6 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['users'] as $user) {
-	$info = '';
 	$userid = $user['userid'];
 	$session = $data['sessions'][$userid];
 
@@ -207,26 +206,34 @@ foreach ($data['users'] as $user) {
 		$users_groups[] = $group->addClass($style);
 	}
 
-	if (!$users_groups) {
-		$info = makeWarningIcon(_('User do not have user groups!'));
+	$provisioned = '';
+	$checkbox = new CCheckBox('userids['.$userid.']', $userid);
+	$gui_access = new CSpan(user_auth_type2str($user['gui_access']));
+	$info = $users_groups ? '' : makeWarningIcon(_('User do not have user groups!'));
+
+	if ($user['userdirectoryid']) {
+		$idp = $data['idp_names'][$user['userdirectoryid']];
+		$provisioned = (new CDiv(date(ZBX_DATE_TIME, $user['ts_provisioned'])))
+			->setHint($idp['idp_type'] == IDP_TYPE_SAML ? _('SAML') : $idp['name']);
+
+		if ($idp['idp_type'] == IDP_TYPE_LDAP) {
+			$checkbox->setAttribute('data-actions', 'ldap');
+		}
+
+		$gui_access = new CSpan($idp['idp_type'] == IDP_TYPE_LDAP ? _('LDAP') : _('SAML'));
 	}
 
-	if (!$user['roleid']) {
-		$info = makeErrorIcon(_('User do not have user role!'));
-	}
-
-	// GUI Access style.
 	switch ($user['gui_access']) {
 		case GROUP_GUI_ACCESS_INTERNAL:
-			$gui_access_style = ZBX_STYLE_ORANGE;
+			$gui_access->addClass(ZBX_STYLE_ORANGE);
 			break;
 
 		case GROUP_GUI_ACCESS_DISABLED:
-			$gui_access_style = ZBX_STYLE_GREY;
+			$gui_access->addClass(ZBX_STYLE_GREY);
 			break;
 
 		default:
-			$gui_access_style = ZBX_STYLE_GREEN;
+			$gui_access->addClass(ZBX_STYLE_GREEN);
 	}
 
 	$username = new CLink($user['username'], (new CUrl('zabbix.php'))
@@ -234,7 +241,11 @@ foreach ($data['users'] as $user) {
 		->setArgument('userid', $userid)
 	);
 
-	if (!CRoleHelper::checkAccess('api.access', $user['roleid'])) {
+	if (!$user['roleid']) {
+		$info = makeErrorIcon(_('User do not have user role!'));
+		$gui_access = (new CSpan(user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)))->addClass(ZBX_STYLE_GREY);
+	}
+	else if (!CRoleHelper::checkAccess('api.access', $user['roleid'])) {
 		$api_access = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
 	}
 	else {
@@ -255,19 +266,6 @@ foreach ($data['users'] as $user) {
 		}
 	}
 
-	$checkbox = new CCheckBox('userids['.$userid.']', $userid);
-	$provisioned = '';
-
-	if ($user['userdirectoryid']) {
-		$idp = $data['idp_names'][$user['userdirectoryid']];
-		$provisioned = (new CDiv(date(ZBX_DATE_TIME, $user['ts_provisioned'])))
-			->setHint($idp['idp_type'] == IDP_TYPE_SAML ? _('SAML') : $idp['name']);
-
-		if ($idp['idp_type'] == IDP_TYPE_LDAP) {
-			$checkbox->setAttribute('data-actions', 'ldap');
-		}
-	}
-
 	// Append user to table.
 	$table->addRow([
 		$checkbox,
@@ -278,12 +276,12 @@ foreach ($data['users'] as $user) {
 		$users_groups,
 		$online,
 		$blocked,
-		(new CSpan(user_auth_type2str($user['gui_access'])))->addClass($gui_access_style),
+		$gui_access,
 		$api_access,
 		($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_ORANGE)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_GREEN),
-		($user['users_status'] == GROUP_STATUS_DISABLED)
+		($user['users_status'] == GROUP_STATUS_DISABLED || !$user['roleid'])
 			? (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED)
 			: (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN),
 		$provisioned,
