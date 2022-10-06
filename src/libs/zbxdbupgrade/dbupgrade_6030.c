@@ -462,6 +462,52 @@ static int	DBpatch_6030059(void)
 	return DBset_default("media_type", &field);
 }
 
+static int	DBpatch_6030060(void)
+{
+	const ZBX_TABLE table =
+		{"event_rank", "eventid", 0,
+			{
+				{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"c_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030061(void)
+{
+	const ZBX_FIELD	field = {"eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_rank", 1, &field);
+}
+
+static int	DBpatch_6030062(void)
+{
+	const ZBX_TABLE table =
+		{"task_update_event_rank", "taskid", 0,
+			{
+				{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"acknowledgeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"c_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030063(void)
+{
+	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_update_event_rank", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -528,5 +574,9 @@ DBPATCH_ADD(6030056, 0, 1)
 DBPATCH_ADD(6030057, 0, 1)
 DBPATCH_ADD(6030058, 0, 1)
 DBPATCH_ADD(6030059, 0, 1)
+DBPATCH_ADD(6030060, 0, 1)
+DBPATCH_ADD(6030061, 0, 1)
+DBPATCH_ADD(6030062, 0, 1)
+DBPATCH_ADD(6030063, 0, 1)
 
 DBPATCH_END()

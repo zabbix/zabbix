@@ -1075,6 +1075,11 @@ FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|source,object,objectid,clock
 INDEX		|2		|source,object,clock
 
+TABLE|event_rank|eventid|0
+FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
+FIELD		|c_eventid	|t_id		|	|NOT NULL	|0
+FIELD		|userid		|t_id		|	|NOT NULL	|0
+
 TABLE|trends|itemid,clock|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
@@ -1523,6 +1528,11 @@ INDEX		|1		|parent_taskid
 TABLE|task_acknowledge|taskid|0
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
 FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
+
+TABLE|task_update_event_rank|taskid|0
+FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
+FIELD		|acknowledgeid	|t_id		|	|NOT NULL	|0			|-|acknowledges
+FIELD		|c_eventid	|t_id		|	|NOT NULL	|0			|-|events
 
 TABLE|sysmap_shape|sysmap_shapeid|ZBX_TEMPLATE
 FIELD		|sysmap_shapeid	|t_id		|	|NOT NULL	|0
