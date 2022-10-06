@@ -39,7 +39,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'name' => 'string',
 			'edit_mode' => 'in 0,1',
 			'dashboardid' => 'db dashboard.dashboardid',
-			'fields' => 'required|array',
+			'fields' => 'array',
 			'dynamic_hostid' => 'db hosts.hostid',
 			'content_width' => 'int32',
 			'content_height' => 'int32'

@@ -33,7 +33,7 @@ class WidgetView extends CControllerWidgetIterator {
 
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'required|array',
+			'fields' => 'array',
 			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]),
 			'dynamic_hostid' => 'db hosts.hostid'
 		]);

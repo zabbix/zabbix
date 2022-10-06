@@ -34,7 +34,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'required|array',
+			'fields' => 'array',
 			'initial_load' => 'in 0,1'
 		]);
 	}

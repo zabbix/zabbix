@@ -31,7 +31,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->setValidationRules([
 			'name' => 'string',
-			'fields' => 'required|array',
+			'fields' => 'array',
 			'initial_load' => 'in 0,1'
 		]);
 	}
@@ -71,7 +71,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		[$data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
 			$data['hosts_by_name'], $data['exceeded_limit']
-		] = getTriggersOverviewData(getSubGroups($this->fields_values['groupids']), $host_options, $trigger_options, // TODO AS: check getTriggersOverviewData(), getSubGroups() call
+		] = getTriggersOverviewData(getSubGroups($this->fields_values['groupids']), $host_options, $trigger_options,
 			$problem_options
 		);
 

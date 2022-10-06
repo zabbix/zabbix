@@ -48,7 +48,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'preview' => 'in 1',
 			'from' => 'string',
 			'to' => 'string',
-			'fields' => 'required|array'
+			'fields' => 'array'
 		]);
 	}
 

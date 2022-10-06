@@ -34,7 +34,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->setValidationRules([
 			'name' => 'string',
 			'initial_load' => 'in 0,1',
-			'fields' => 'required|array',
+			'fields' => 'array',
 			'current_sysmapid' => 'db sysmaps.sysmapid',
 			'unique_id' => 'string',
 			'previous_maps' => 'array'

@@ -38,7 +38,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'name' => 'string',
 			'widgetid' => 'db widget.widgetid',
 			'initial_load' => 'in 0,1',
-			'fields' => 'required|array'
+			'fields' => 'array'
 		]);
 	}
 
