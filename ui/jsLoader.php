@@ -161,54 +161,11 @@ $translate_strings = [
 		'Paste' => _s('Paste'),
 		'Refresh interval' => _s('Refresh interval')
 	],
-	// TODO AS: check usage
-	'class.widget.geomap.js' => [
-		'Actions' => _('Actions'),
-		'Set this view as default' => _('Set this view as default'),
-		'Reset to initial view' => _('Reset to initial view'),
-		'No problems' => _('No problems'),
-		'Not classified' => _('Not classified'),
-		'Information' => _('Information'),
-		'Warning' => _('Warning'),
-		'Average' => _('Average'),
-		'High' => _('High'),
-		'Disaster' => _('Disaster'),
-		'Host' => _('Host'),
-		'D' => _x('D', 'abbreviation of severity level'),
-		'H' => _x('H', 'abbreviation of severity level'),
-		'A' => _x('A', 'abbreviation of severity level'),
-		'W' => _x('W', 'abbreviation of severity level'),
-		'I' => _x('I', 'abbreviation of severity level'),
-		'N' => _x('N', 'abbreviation of severity level'),
-		'Navigate to default view' => _('Navigate to default view'),
-		'Navigate to initial view' => _('Navigate to initial view')
-	],
 	'class.widget.iterator.js' => [
 		'Next page' => _s('Next page'),
 		'Previous page' => _s('Previous page'),
 		'Widget is too small for the specified number of columns and rows.' =>
 			_s('Widget is too small for the specified number of columns and rows.')
-	],
-	// TODO AS: check usage
-	'class.widget.graph.js' => [
-		'Actions' => _s('Actions'),
-		'Download image' => _s('Download image')
-	],
-	// TODO AS: check usage
-	'class.widget.navtree.js' => [
-		'Add' => _s('Add'),
-		'Add child element' => _s('Add child element'),
-		'Add multiple maps' => _s('Add multiple maps'),
-		'Apply' => _s('Apply'),
-		'Cancel' => _s('Cancel'),
-		'Edit' => _s('Edit'),
-		'Edit tree element' => _s('Edit tree element'),
-		'Remove' => _s('Remove')
-	],
-	// TODO AS: check usage
-	'class.widget.svggraph.js' => [
-		'Actions' => _s('Actions'),
-		'Download image' => _s('Download image')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),

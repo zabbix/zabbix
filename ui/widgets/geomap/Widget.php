@@ -19,31 +19,34 @@
 **/
 
 
-namespace Widgets\NavTree;
+namespace Widgets\Geomap;
 
 use Zabbix\Core\CWidget;
 
-use Zabbix\Widgets\Fields\CWidgetFieldReference;
-
 class Widget extends CWidget {
-
-	public function getDefaults(): array {
-		return parent::getDefaults() + [
-			'reference_field' => CWidgetFieldReference::FIELD_NAME
-		];
-	}
 
 	public function getTranslationStrings(): array {
 		return [
 			'class.widget.js' => [
-				'Add' => _s('Add'),
-				'Add child element' => _s('Add child elementsssss'),
-				'Add multiple maps' => _s('Add multiple maps'),
-				'Apply' => _s('Apply'),
-				'Cancel' => _s('Cancel'),
-				'Edit' => _s('Edit'),
-				'Edit tree element' => _s('Edit tree element'),
-				'Remove' => _s('Remove')
+				'Actions' => _('Actions'),
+				'Set this view as default' => _('Set this view as default'),
+				'Reset to initial view' => _('Reset to initial view'),
+				'No problems' => _('No problems'),
+				'Not classified' => _('Not classified'),
+				'Information' => _('Information'),
+				'Warning' => _('Warning'),
+				'Average' => _('Average'),
+				'High' => _('High'),
+				'Disaster' => _('Disaster'),
+				'Host' => _('Host'),
+				'D' => _x('D', 'abbreviation of severity level'),
+				'H' => _x('H', 'abbreviation of severity level'),
+				'A' => _x('A', 'abbreviation of severity level'),
+				'W' => _x('W', 'abbreviation of severity level'),
+				'I' => _x('I', 'abbreviation of severity level'),
+				'N' => _x('N', 'abbreviation of severity level'),
+				'Navigate to default view' => _('Navigate to default view'),
+				'Navigate to initial view' => _('Navigate to initial view')
 			]
 		];
 	}

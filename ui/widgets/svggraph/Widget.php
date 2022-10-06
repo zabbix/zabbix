@@ -34,4 +34,13 @@ class Widget extends CWidget {
 	public function usesTimeSelector(array $fields_values): bool {
 		return !WidgetForm::hasOverrideTime($fields_values);
 	}
+
+	public function getTranslationStrings(): array {
+		return [
+			'class.widget.js' => [
+				'Actions' => _s('Actions'),
+				'Download image' => _s('Download image')
+			]
+		];
+	}
 }

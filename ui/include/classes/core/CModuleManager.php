@@ -254,7 +254,7 @@ final class CModuleManager {
 	}
 
 	public function getAssets(): array {
-		$assets = ['css' => [], 'js' => []];
+		$assets = [];
 
 		/** @var CModule $module */
 		foreach ($this->modules as $module) {
@@ -263,13 +263,17 @@ final class CModuleManager {
 			}
 
 			$module_assets = $module->getAssets();
+			$assets[$module->getId()] = [
+				'css' => [],
+				'js' => []
+			];
 
 			foreach ($module_assets['css'] as $css_file) {
-				$assets['css'][] = $module->getRelativePath().'/assets/css/'.$css_file;
+				$assets[$module->getId()]['css'][] = $css_file;
 			}
 
 			foreach ($module_assets['js'] as $js_file) {
-				$assets['js'][] = $module->getRelativePath().'/assets/js/'.$js_file;
+				$assets[$module->getId()]['js'][] = $js_file;
 			}
 		}
 

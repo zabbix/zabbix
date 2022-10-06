@@ -23,6 +23,8 @@ namespace Widgets\Map;
 
 use Zabbix\Core\CWidget;
 
+use Zabbix\Widgets\Fields\CWidgetFieldReference;
+
 class Widget extends CWidget {
 
 	public const SOURCETYPE_MAP = 1;
@@ -30,5 +32,12 @@ class Widget extends CWidget {
 
 	public function hasPadding(array $fields_values, int $view_mode): bool {
 		return true;
+	}
+
+	public function getDefaults(): array {
+		return parent::getDefaults() + [
+			'reference_field' => CWidgetFieldReference::FIELD_NAME,
+			'foreign_reference_fields' => ['filter_widget_reference']
+		];
 	}
 }

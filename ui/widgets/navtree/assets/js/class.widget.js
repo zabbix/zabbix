@@ -282,7 +282,7 @@ class CWidgetNavTree extends CWidget {
 				sysmapid = this._navtree[this._navtree_item_selected].sysmapid;
 			}
 
-			this.fire(CWidgetNavTree.WIDGET_NAVTREE_EVENT_SELECT, {sysmapid, itemid: this._navtree_item_selected});
+			this.fire(CWidgetNavTree.EVENT_SELECT, {sysmapid, itemid: this._navtree_item_selected});
 		}
 	}
 

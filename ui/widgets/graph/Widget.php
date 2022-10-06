@@ -28,4 +28,13 @@ class Widget extends CWidget {
 	public function hasPadding(array $fields_values, int $view_mode): bool {
 		return true;
 	}
+
+	public function getTranslationStrings(): array {
+		return [
+			'class.widget.js' => [
+				'Actions' => _s('Actions'),
+				'Download image' => _s('Download image')
+			]
+		];
+	}
 }

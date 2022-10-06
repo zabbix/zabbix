@@ -52,10 +52,17 @@ $show_gui_messaging = !defined('ZBX_PAGE_NO_MENU') || $data['web_layout_mode'] =
 	? (int)!CWebUser::isGuest()
 	: null;
 
+$modules_assets = APP::ModuleManager()->getAssets();
+
 $page_header->addCssFile('assets/styles/'.$page_header->getTheme().'.css');
 
-foreach (APP::ModuleManager()->getAssets()['css'] as $css_file) {
-	$page_header->addCssFile((new CUrl($css_file))->getUrl());
+foreach ($modules_assets as $module_id => $assets) {
+	$module = APP::ModuleManager()->getModule($module_id);
+	$relative_path = $module->getRelativePath().'/assets/css';
+
+	foreach ($assets['css'] as $css_file) {
+		$page_header->addCssFile((new CUrl($relative_path.'/'.$css_file))->getUrl());
+	}
 }
 
 $page_header
@@ -84,8 +91,20 @@ if ($scripts) {
 			->getUrl()
 	);
 
-	foreach (APP::ModuleManager()->getAssets()['js'] as $js_file) {
-		$page_header->addJsFile((new CUrl($js_file))->getUrl());
+	$page_header->addJavaScript('if (locale === undefined) { var locale = {}; }');
+
+	foreach ($modules_assets as $module_id => $assets) {
+		$module = APP::ModuleManager()->getModule($module_id);
+		$relative_path = $module->getRelativePath().'/assets/js';
+		$translation_strings = $module->getTranslationStrings();
+
+		foreach ($assets['js'] as $js_file) {
+			$page_header->addJsFile((new CUrl($relative_path.'/'.$js_file))->getUrl());
+
+			if (array_key_exists($js_file, $translation_strings)) {
+				$page_header->addJsTranslationStrings($translation_strings[$js_file]);
+			}
+		}
 	}
 }
 

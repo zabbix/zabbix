@@ -56,6 +56,10 @@ class CModule {
 		return $this->manifest['actions'];
 	}
 
+	public function getTranslationStrings(): array {
+		return [];
+	}
+
 	final public function getType(): string {
 		return $this->manifest['type'];
 	}

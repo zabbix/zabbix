@@ -113,6 +113,14 @@ class CHtmlPageHeader {
 		return $this;
 	}
 
+	public function addJsTranslationStrings(array $translations_strings): self {
+		foreach ($translations_strings as $orig_string => $string) {
+			$this->addJavaScript('locale[\''.$orig_string.'\'] = '.json_encode($string, JSON_THROW_ON_ERROR).';');
+		}
+
+		return $this;
+	}
+
 	/**
 	 * Show page head html.
 	 */
