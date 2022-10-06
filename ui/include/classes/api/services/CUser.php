@@ -709,6 +709,7 @@ class CUser extends CApiService {
 	 */
 	private function checkUserGroups(array $users, array $db_users) {
 		$usrgrpids = [];
+		$db_usrgrps = [];
 
 		foreach ($users as $user) {
 			if (array_key_exists('usrgrps', $user)) {
@@ -718,25 +719,21 @@ class CUser extends CApiService {
 			}
 		}
 
-		if (!$usrgrpids) {
-			return;
-		}
+		if ($usrgrpids) {
+			$usrgrpids = array_keys($usrgrpids);
 
-		$usrgrpids = array_keys($usrgrpids);
+			$db_usrgrps = DB::select('usrgrp', [
+				'output' => ['gui_access'],
+				'usrgrpids' => $usrgrpids,
+				'preservekeys' => true
+			]);
 
-		$db_usrgrps = DB::select('usrgrp', [
-			'output' => ['gui_access'],
-			'usrgrpids' => $usrgrpids,
-			'preservekeys' => true
-		]);
-
-		foreach ($usrgrpids as $usrgrpid) {
-			if (!array_key_exists($usrgrpid, $db_usrgrps)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group with ID "%1$s" is not available.', $usrgrpid));
+			foreach ($usrgrpids as $usrgrpid) {
+				if (!array_key_exists($usrgrpid, $db_usrgrps)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group with ID "%1$s" is not available.', $usrgrpid));
+				}
 			}
 		}
-
-		return;
 
 		foreach ($users as $user) {
 			if (array_key_exists('passwd', $user)) {
@@ -809,6 +806,10 @@ class CUser extends CApiService {
 			(CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_INTERNAL)
 				? GROUP_GUI_ACCESS_INTERNAL
 				: GROUP_GUI_ACCESS_LDAP;
+
+		if (!$user['usrgrps']) {
+			return $system_gui_access == GROUP_GUI_ACCESS_INTERNAL;
+		}
 
 		foreach($user['usrgrps'] as $usrgrp) {
 			$gui_access = (int) $db_usrgrps[$usrgrp['usrgrpid']]['gui_access'];

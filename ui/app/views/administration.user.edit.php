@@ -94,7 +94,7 @@ if ($data['action'] === 'user.edit') {
 				->setReadonly($data['readonly'])
 		)
 		->addRow(
-			(new CLabel(_('Groups'), 'user_groups__ms'))->setAsteriskMark(),
+			new CLabel(_('Groups'), 'user_groups__ms'),
 			(new CMultiSelect([
 				'name' => 'user_groups[]',
 				'object_name' => 'usersGroups',
