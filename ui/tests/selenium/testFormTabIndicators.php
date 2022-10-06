@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 /**
  * @dataSource EntitiesTags
  *
- * @backup services, profiles
+ * @backup profiles
  */
 class testFormTabIndicators extends CWebTest {
 
