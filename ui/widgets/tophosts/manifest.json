@@ -5,5 +5,12 @@
 	"name": "Top hosts",
 	"namespace": "TopHosts",
 	"version": "2.0",
-	"author": "Zabbix SIA"
+	"author": "Zabbix SIA",
+	"actions": {
+		"widget.tophosts.column.edit": {
+			"class": "ColumnEdit",
+			"view": "column.edit",
+			"layout": "layout.json"
+		}
+	}
 }

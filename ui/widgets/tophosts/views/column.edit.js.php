@@ -20,7 +20,7 @@
 
 
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
-// TODO AS: move to widget module
+
 ?>
 
 window.tophosts_column_edit_form = new class {

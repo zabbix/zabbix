@@ -75,8 +75,8 @@ $form_grid->addItem([
 	(new CLabel(_('Text'), 'text'))->setAsteriskMark(),
 	new CFormField(
 		(new CTextBox('text', $data['text']))
-			->setAttribute('placeholder', _('Text, supports {INVENTORY.*}, {HOST.*} macros'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('placeholder', _('Text, supports {INVENTORY.*}, {HOST.*} macros'))
 	)
 ]);
 
@@ -110,8 +110,8 @@ $form_grid->addItem([
 	new CLabel(_('Time shift'), 'timeshift'),
 	new CFormField(
 		(new CTextBox('timeshift', $data['timeshift']))
-			->setAttribute('placeholder', _('none'))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAttribute('placeholder', _('none'))
 	)
 ]);
 
@@ -161,7 +161,7 @@ $form_grid->addItem([
 			->addValue(_('As is'), CWidgetFieldColumnsList::DISPLAY_AS_IS)
 			->addValue(_('Bar'), CWidgetFieldColumnsList::DISPLAY_BAR)
 			->addValue(_('Indicators'), CWidgetFieldColumnsList::DISPLAY_INDICATORS)
-			->setModern(true)
+			->setModern()
 	)
 ]);
 
@@ -178,7 +178,7 @@ $form_grid->addItem([
 			->addValue(_('Auto'), CWidgetFieldColumnsList::HISTORY_DATA_AUTO)
 			->addValue(_('History'), CWidgetFieldColumnsList::HISTORY_DATA_HISTORY)
 			->addValue(_('Trends'), CWidgetFieldColumnsList::HISTORY_DATA_TRENDS)
-			->setModern(true)
+			->setModern()
 	)
 ]);
 
@@ -193,8 +193,8 @@ $form_grid->addItem([
 	new CLabel(_('Min'), 'min'),
 	new CFormField(
 		(new CTextBox('min', $data['min']))
-			->setAttribute('placeholder', _('calculated'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->setAttribute('placeholder', _('calculated'))
 	)
 ]);
 
@@ -203,8 +203,8 @@ $form_grid->addItem([
 	new CLabel(_('Max'), 'max'),
 	new CFormField(
 		(new CTextBox('max', $data['max']))
-			->setAttribute('placeholder', _('calculated'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->setAttribute('placeholder', _('calculated'))
 	)
 ]);
 
@@ -257,16 +257,16 @@ $form
 	->addItem(
 		(new CScriptTag('
 			tophosts_column_edit_form.init('.json_encode([
-				'form_name'			=> $form->getName(),
-				'thresholds'		=> $data['thresholds'],
-				'thresholds_colors'	=> $data['thresholds_colors']
-			]).');
+				'form_name' => $form->getName(),
+				'thresholds' => $data['thresholds'],
+				'thresholds_colors' => $data['thresholds_colors']
+			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);
 
 $output = [
 	'header'		=> array_key_exists('edit', $data) ? _('Update column') : _('New column'),
-	'script_inline'	=> implode('', $scripts).$this->readJsFile('popup.tophosts.column.edit.js.php'),
+	'script_inline'	=> implode('', $scripts).$this->readJsFile('column.edit.js.php', null, ''),
 	'body'			=> $form->toString(),
 	'buttons'		=> [
 		[
@@ -283,4 +283,4 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	$output['debug'] = CProfiler::getInstance()->make()->toString();
 }
 
-echo json_encode($output);
+echo json_encode($output, JSON_THROW_ON_ERROR);

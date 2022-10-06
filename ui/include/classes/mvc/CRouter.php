@@ -206,7 +206,6 @@ class CRouter {
 		'popup.testtriggerexpr'						=> ['CControllerPopupTestTriggerExpr',					'layout.json',			'popup.testtriggerexpr'],
 		'popup.token.edit'							=> ['CControllerPopupTokenEdit',						'layout.json',			'popup.token.edit'],
 		'popup.token.view'							=> ['CControllerPopupTokenView',						'layout.json',			'popup.token.view'],
-		'popup.tophosts.column.edit'				=> ['CControllerPopupTopHostsColumnEdit',				'layout.json',			'popup.tophosts.column.edit'],
 		'popup.triggerexpr'							=> ['CControllerPopupTriggerExpr',						'layout.json',			'popup.triggerexpr'],
 		'popup.valuemap.edit'						=> ['CControllerPopupValueMapEdit',						'layout.json',			'popup.valuemap.edit'],
 		'popup.valuemap.update'						=> ['CControllerPopupValueMapUpdate',					'layout.json',			null],

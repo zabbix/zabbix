@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -19,48 +19,56 @@
 **/
 
 
+namespace Widgets\TopHosts\Actions;
+
+use CArrayHelper,
+	CController,
+	CControllerResponseData,
+	CNumberParser,
+	CParser;
+
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
-class CControllerPopupTopHostsColumnEdit extends CController {
+class ColumnEdit extends CController {
 
-	protected $column_defaults = [
-		'name'					=> '',
-		'data'					=> CWidgetFieldColumnsList::DATA_ITEM_VALUE,
-		'item'					=> '',
-		'timeshift' 			=> '',
-		'aggregate_function'	=> AGGREGATE_NONE,
-		'aggregate_interval'	=> '1h',
-		'display'				=> CWidgetFieldColumnsList::DISPLAY_AS_IS,
-		'history'				=> CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
-		'min'					=> '',
-		'max'					=> '',
-		'base_color'			=> '',
-		'text'					=> '',
-		'thresholds'			=> []
+	protected array $column_defaults = [
+		'name' => '',
+		'data' => CWidgetFieldColumnsList::DATA_ITEM_VALUE,
+		'item' => '',
+		'timeshift' => '',
+		'aggregate_function' => AGGREGATE_NONE,
+		'aggregate_interval' => '1h',
+		'display' => CWidgetFieldColumnsList::DISPLAY_AS_IS,
+		'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
+		'min' => '',
+		'max' => '',
+		'base_color' => '',
+		'text' => '',
+		'thresholds' => []
 	];
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		// Validation is done by CWidgetFieldColumnsList
 		$fields = [
-			'name'					=> 'string',
-			'data'					=> 'int32',
-			'item'					=> 'string',
-			'timeshift'				=> 'string',
-			'aggregate_function'	=> 'int32',
-			'aggregate_interval'	=> 'string',
-			'display'				=> 'int32',
-			'history'				=> 'int32',
-			'min'					=> 'string',
-			'max'					=> 'string',
-			'base_color'			=> 'string',
-			'thresholds'			=> 'array',
-			'text'					=> 'string',
-			'edit'					=> 'in 1',
-			'update'				=> 'in 1'
+			'name' => 'string',
+			'data' => 'int32',
+			'item' => 'string',
+			'timeshift' => 'string',
+			'aggregate_function' => 'int32',
+			'aggregate_interval' => 'string',
+			'display' => 'int32',
+			'history' => 'int32',
+			'min' => 'string',
+			'max' => 'string',
+			'base_color' => 'string',
+			'thresholds' => 'array',
+			'text' => 'string',
+			'edit' => 'in 1',
+			'update' => 'in 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateFields($this->getInputAll());
@@ -71,7 +79,7 @@ class CControllerPopupTopHostsColumnEdit extends CController {
 					'error' => [
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])]))->disableView()
+				], JSON_THROW_ON_ERROR)]))->disableView()
 			);
 		}
 
@@ -93,23 +101,23 @@ class CControllerPopupTopHostsColumnEdit extends CController {
 		return !$errors;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$input = $this->getInputAll();
 		unset($input['update']);
 
 		if (!$this->hasInput('update')) {
 			$this->setResponse(new CControllerResponseData([
-				'action'			=> $this->getAction(),
-				'thresholds_colors'	=> CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE,
-				'errors' 			=> hasErrorMessages() ? getMessages() : null,
-				'user' 				=> [
-					'debug_mode' => $this->getDebugMode()
-				]
-			] + $input + $this->column_defaults));
+					'action' => $this->getAction(),
+					'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE,
+					'errors' => hasErrorMessages() ? getMessages() : null,
+					'user' => [
+						'debug_mode' => $this->getDebugMode()
+					]
+				] + $input + $this->column_defaults));
 
 			return;
 		}
@@ -142,6 +150,8 @@ class CControllerPopupTopHostsColumnEdit extends CController {
 			}
 		}
 
-		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($input)]))->disableView());
+		$this->setResponse(
+			(new CControllerResponseData(['main_block' => json_encode($input, JSON_THROW_ON_ERROR)]))->disableView()
+		);
 	}
 }
