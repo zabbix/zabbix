@@ -164,6 +164,13 @@ class CProxy extends CApiService {
 		}
 
 		if ($db_proxies) {
+			if (array_key_exists('name_upper', reset($db_proxies))) {
+				foreach ($db_proxies as &$proxy) {
+					unset($proxy['name_upper']);
+				}
+				unset($proxy);
+			}
+
 			$db_proxies = $this->addRelatedObjects($options, $db_proxies);
 			$db_proxies = $this->unsetExtraFields($db_proxies, ['proxyid'], $options['output']);
 
@@ -477,6 +484,12 @@ class CProxy extends CApiService {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
 
 		if (!$options['countOutput']) {
 			if ($options['selectInterface'] !== null) {

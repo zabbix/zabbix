@@ -412,6 +412,13 @@ class CItem extends CItemGeneral {
 		}
 
 		if ($result) {
+			if (array_key_exists('name_upper', reset($result))) {
+				foreach ($result as &$item) {
+					unset($item['name_upper']);
+				}
+				unset($item);
+			}
+
 			if (self::dbDistinct($sqlParts)) {
 				$result = $this->addNclobFieldValues($options, $result);
 			}
@@ -1264,6 +1271,12 @@ class CItem extends CItemGeneral {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
 
 		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
 				|| $this->outputIsRequested('error', $options['output'])))

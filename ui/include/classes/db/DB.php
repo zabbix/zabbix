@@ -1053,6 +1053,29 @@ class DB {
 	}
 
 	/**
+	 * If possible, substitute field used in a LIKE statement with the corresponding upper case index.
+	 *
+	 * @param string $field_name
+	 * @param string $table
+	 * @param string $table_alias
+	 *
+	 * @return string
+	 */
+	public static function likeField(string $field_name, string $table, string $table_alias): string {
+		static $indexed_tables = ['hosts' => true, 'items' => true];
+
+		if ($field_name === 'name' && array_key_exists($table, $indexed_tables)) {
+			$upcased_index = 'name_upper';
+
+			if (array_key_exists($upcased_index, self::getSchema($table)['fields'])) {
+				return $table_alias.'.'.$upcased_index;
+			}
+		}
+
+		return 'UPPER('.$table_alias.'.'.$field_name.')';
+	}
+
+	/**
 	 * Builds an SQL parts array from the given options.
 	 *
 	 * @param string $table_name
@@ -1230,7 +1253,7 @@ class DB {
 					$pattern = zbx_dbstr($pattern);
 				}
 
-				$search[] = 'UPPER('.self::fieldId($field_name, $table_alias).') LIKE '.$pattern." ESCAPE '!'";
+				$search[] = DB::likeField($field_name, $table_name, $table_alias).' LIKE '.$pattern." ESCAPE '!'";
 			}
 		}
 

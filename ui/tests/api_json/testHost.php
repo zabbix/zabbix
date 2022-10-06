@@ -1252,6 +1252,8 @@ class testHost extends CAPITest {
 	 * @return array
 	 */
 	public static function getHostGetFieldPresenceData() {
+		$uppercase_index_exists = array_key_exists('name_upper', DB::getSchema('hosts')['fields']);
+
 		return [
 			'Check if {"output": "extend"} includes "inventory_mode" and excludes write-only properties' => [
 				'request' => [
@@ -1264,12 +1266,15 @@ class testHost extends CAPITest {
 
 					// Write-only properties.
 					'tls_psk_identity' => null,
-					'tls_psk' => null
+					'tls_psk' => null,
+					'name_upper' => null
 				]
 			],
 			'Check it is not possible to select write-only fields' => [
 				'request' => [
-					'output' => ['host', 'tls_psk', 'tls_psk_identity'],
+					'output' => array_merge(['host', 'tls_psk', 'tls_psk_identity'],
+						$uppercase_index_exists ? ['name_upper'] : []
+					),
 					'hostids' => 'write_only'
 				],
 				'expected_result' => [
@@ -1280,12 +1285,15 @@ class testHost extends CAPITest {
 
 					// Write-only properties.
 					'tls_psk_identity' => null,
-					'tls_psk' => null
+					'tls_psk' => null,
+					'name_upper' => null
 				]
 			],
 			'Check direct request of inventory_mode and other properties' => [
 				'request' => [
-					'output' => ['inventory_mode', 'tls_connect', 'name'],
+					'output' => array_merge(['inventory_mode', 'tls_connect', 'name'],
+						$uppercase_index_exists ? ['name_upper'] : []
+					),
 					'hostids' => 'write_only'
 				],
 				'expected_result' => [
@@ -1294,7 +1302,8 @@ class testHost extends CAPITest {
 
 					// Samples of other specified properties.
 					'tls_connect' => '1',
-					'name' => 'API test hosts - write-only fields'
+					'name' => 'API test hosts - write-only fields',
+					'name_upper' => null
 				]
 			]
 		];
