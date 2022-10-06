@@ -320,6 +320,8 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_jit_status' => JIT_PROVISIONING_DISABLED,
 			'http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED,
 			'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
+			'saml_jit_status' => JIT_PROVISIONING_DISABLED,
+			'saml_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE,
 			'passwd_min_length' => DB::getDefault('config', 'passwd_min_length'),
 			'passwd_check_rules' => DB::getDefault('config', 'passwd_check_rules'),
 			'jit_provision_interval' => '1h'
@@ -330,13 +332,6 @@ class CControllerAuthenticationUpdate extends CController {
 				'http_case_sensitive' => 0,
 				'http_login_form' => 0,
 				'http_strip_domains' => ''
-			];
-		}
-
-		if ($this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
-			$fields += [
-				'saml_jit_status' => JIT_PROVISIONING_DISABLED,
-				'saml_case_sensitive' => ZBX_AUTH_CASE_INSENSITIVE
 			];
 		}
 
