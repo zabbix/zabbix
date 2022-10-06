@@ -6417,7 +6417,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_ITEM_DELAY],
 				-1,
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": value must be one of 0-'.SEC_PER_DAY.'.'
+				'Invalid parameter "/1/item_delay": a time unit is expected.'
 			],
 			[
 				['type' => API_ITEM_DELAY],
@@ -6435,7 +6435,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_ITEM_DELAY],
 				0,
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot be equal to zero without custom intervals set.'
+				'Invalid parameter "/1/item_delay": cannot be equal to zero without custom intervals.'
 			],
 			[
 				['type' => API_ITEM_DELAY],
@@ -6513,13 +6513,13 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_ITEM_DELAY],
 				'0;50s/1-6,09:00-18:00;0/1-6,00:00-24:00',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": must have at least one interval with active period.'
+				'Invalid parameter "/1/item_delay": cannot be executed.'
 			],
 			'Zero delay and multiple combined blocking zero-intervals' => [
 				['type' => API_ITEM_DELAY],
 				'0;50s/1-6,09:00-18:00;0/1-3,00:00-24:00;0/4-7,00:00-24:00',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot have flexible intervals with zero interval for all times.'
+				'Invalid parameter "/1/item_delay": cannot be executed.'
 			],
 			'Non-convertable due to macro in Period' => [
 				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
@@ -6531,31 +6531,31 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_ITEM_DELAY],
 				'1m;0/1-7,00:00-24:00',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot have flexible intervals with zero interval for all times.'
+				'Invalid parameter "/1/item_delay": cannot be executed.'
 			],
 			'Non-zero delay, but whole week combined of blocking intervals' => [
 				['type' => API_ITEM_DELAY],
-				'1m;0/1-4,00:00-24:00;0/3-7,00:00-23:00',
+				'1m;0/1-4,00:00-24:00;0/3-7,00:00-24:00',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": must have at least one interval with active period.'
+				'Invalid parameter "/1/item_delay": cannot be executed.'
 			],
 			'Macro used, but delay and intervals are all zero-blocking' => [
 				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
 				'0;0/1-6,09:00-12:00;0/{$M}',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot have only zero intervals.'
+				'Invalid parameter "/1/item_delay": cannot be executed.'
 			],
 			'Macro in Period, but zero-week block' => [
 				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
 				'0;0/1-7,00:00-24:00;1/{$M}',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot have flexible intervals with zero interval for all times.'
+				'Invalid parameter "/1/item_delay": cannot be executed.'
 			],
 			'Macro in Interval, but zero-week block' => [
 				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
 				'0;0/1-7,00:00-24:00;{$M}/1-7,00:00-24:00',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot have flexible intervals with zero interval for all times.'
+				'Invalid parameter "/1/item_delay": cannot be executed.'
 			],
 			'Non-zero delay, macro in Interval' => [
 				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
@@ -6565,9 +6565,9 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			'Polling overlapped by zero-interval as a whole' => [
 				['type' => API_ITEM_DELAY],
-				'1m;50s/2-4,00:00-24:00;0/1-5,00:00-24:00',
+				'5m;5m/2-4,00:00-24:00;0/1-7,00:00-23:57',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": must have at least one interval with active period.'
+				'Invalid parameter "/1/item_delay": cannot be executed.'
 			],
 			'Polling chunk overlapped by zero-interval as a whole, but has another active interval' => [
 				['type' => API_ITEM_DELAY],
@@ -6603,13 +6603,13 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_ITEM_DELAY],
 				'0;2h/1-6,09:00-12:00;0/1-6,09:00-10:30',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": must have at least one interval with active period.'
+				'Invalid parameter "/1/item_delay": cannot be executed.'
 			],
 			'Polling window available equal to interval' => [
 				['type' => API_ITEM_DELAY],
 				'0;90m/1-6,09:00-12:00;0/1-6,09:00-10:30',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": must have at least one interval with active period.'
+				'0;90m/1-6,09:00-12:00;0/1-6,09:00-10:30'
 			],
 			'Polling window just less than available interval (90m-1s)' => [
 				['type' => API_ITEM_DELAY],
