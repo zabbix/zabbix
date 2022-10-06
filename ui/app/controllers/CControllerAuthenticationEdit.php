@@ -139,7 +139,7 @@ class CControllerAuthenticationEdit extends CController {
 				'jit_provision_interval' => '',
 				'ldap_jit_status' => ZBX_AUTH_LDAP_DISABLED,
 				'saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED,
-				'saml_jit_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED,
+				'saml_jit_status' => JIT_PROVISIONING_DISABLED,
 				'idp_entityid' => '',
 				'sso_url' => '',
 				'slo_url' => '',
