@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-29T14:16:19Z'
+  date: '2022-10-06T15:40:43Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -143,6 +143,7 @@ zabbix_export:
                   expression: 'last(/OS processes by Zabbix agent/custom.proc.num[{#NAME}])=0'
                   name: 'Process [{#NAME}]: is not running'
                   priority: HIGH
+                  manual_close: 'YES'
                   tags:
                     -
                       tag: scope

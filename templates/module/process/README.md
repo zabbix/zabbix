@@ -6,6 +6,7 @@
 For Zabbix version: 6.2 and higher  
 The template to monitor processes by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
+For example, by specifying "zabbix" as macro value, you can monitor all zabbix processes.
 
 
 
@@ -66,7 +67,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Process [{#NAME}]: is not running |<p>-</p> |`last(/OS processes by Zabbix agent/custom.proc.num[{#NAME}])=0` |HIGH | |
+|Process [{#NAME}]: is not running |<p>-</p> |`last(/OS processes by Zabbix agent/custom.proc.num[{#NAME}])=0` |HIGH |<p>Manual close: YES</p> |
 
 ## Feedback
 
