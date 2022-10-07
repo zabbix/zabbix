@@ -1,1 +1,0 @@
-...G...... [ZBX-21637] fixed Zabbix server to rerun auto registration attempt in 120 seconds if host is deleted (vso)
