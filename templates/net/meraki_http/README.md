@@ -33,6 +33,8 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$MERAKI.API.URL} |<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p> |`api.meraki.com/api/v1` |
+|{$MERAKI.DEVICE.NAME.MATCHES} |<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p> |`.+` |
+|{$MERAKI.DEVICE.NAME.NOT_MATCHES} |<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p> |`CHANGE_IF_NEEDED` |
 |{$MERAKI.HTTP_PROXY} |<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http</p> |`` |
 |{$MERAKI.ORGANIZATION.NAME.MATCHES} |<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p> |`.+` |
 |{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES} |<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p> |`CHANGE_IF_NEEDED` |
@@ -46,18 +48,21 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Organizations discovery |<p>-</p> |DEPENDENT |meraki.organization.discovery<p>**Filter**:</p> <p>- {#NAME} MATCHES_REGEX `{$MERAKI.ORGANIZATION.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES}`</p> |
+|Devices discovery |<p>-</p> |DEPENDENT |meraki.devices.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.devices`</p><p>**Filter**:</p> <p>- {#NAME} MATCHES_REGEX `{$MERAKI.DEVICE.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$MERAKI.DEVICE.NAME.NOT_MATCHES}`</p> |
+|Organizations discovery |<p>-</p> |DEPENDENT |meraki.organization.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.organizations`</p><p>**Filter**:</p> <p>- {#NAME} MATCHES_REGEX `{$MERAKI.ORGANIZATION.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES}`</p> |
 
 ## Items collected
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Zabbix raw items |Meraki: Get list of the organizations |<p>Item for gathering all the organizations from Meraki API"</p> |HTTP_AGENT |meraki.get.organizations |
+|Zabbix raw items |Meraki: Get data |<p>Item for gathering all the organizations and devices from Meraki API"</p> |SCRIPT |meraki.get.data<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |Meraki: Data item errors |<p>Item for gathering all the data item errors.</p> |DEPENDENT |meraki.get.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
+|Meraki: There are errors in 'Get data' metric |<p>-</p> |`length(last(/Cisco Meraki dashboard by HTTP/meraki.get.data.errors))>0` |WARNING | |
 
 ## Feedback
 
@@ -97,7 +102,6 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Devices discovery |<p>-</p> |DEPENDENT |meraki.devices.discovery |
 |Uplinks discovery |<p>-</p> |DEPENDENT |meraki.uplinks.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinks`</p> |
 |VPN stats discovery |<p>-</p> |DEPENDENT |meraki.vpn.stats.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$.vpnStats`</p> |
 
@@ -130,7 +134,6 @@ There are no template links in this template.
 |Zabbix raw items |Meraki: Networks item errors |<p>Item for gathering all the networks item errors.</p> |DEPENDENT |meraki.get.networks.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Zabbix raw items |Meraki: Get list of the vpn stats |<p>Item for gathering all the vpn stats of the organization.</p> |SCRIPT |meraki.get.vpn.stats<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Zabbix raw items |Meraki: VPN item errors |<p>Item for gathering all the vpn item errors.</p> |DEPENDENT |meraki.get.vpn.stats.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix raw items |Meraki: Get list of the devices |<p>Item for gathering all the devices of organization from Meraki API.</p> |HTTP_AGENT |meraki.get.devices |
 |Zabbix raw items |Meraki: Get list of configuration changes |<p>Item for viewing the Change Log for your organization.\nGathering once per 20m by default.</p> |HTTP_AGENT |meraki.get.configuration.changes<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `2h`</p> |
 |Zabbix raw items |Meraki: Get list of adaptive policy aggregate statistics |<p>Item for adaptive policy aggregate statistics for an organization.</p> |HTTP_AGENT |meraki.get.adaptive.policy |
 |Zabbix raw items |Meraki: Get licenses info |<p>Return an overview of the license state for an organization.</p> |HTTP_AGENT |meraki.get.licenses |

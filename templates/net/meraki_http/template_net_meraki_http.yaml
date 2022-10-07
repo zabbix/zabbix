@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-05T15:00:07Z'
+  date: '2022-10-07T09:28:00Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -26,27 +26,234 @@ zabbix_export:
           name: 'Templates/Network devices'
       items:
         -
-          uuid: d1a5f3c79a604bae98c314d2aed64ff4
-          name: 'Meraki: Get list of the organizations'
-          type: HTTP_AGENT
-          key: meraki.get.organizations
+          uuid: aa00e906cf56488db52554a3acbe148e
+          name: 'Meraki: Get data'
+          type: SCRIPT
+          key: meraki.get.data
           delay: 1h
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Item for gathering all the organizations from Meraki API"'
-          timeout: 30s
-          url: 'https://{$MERAKI.API.URL}/organizations'
-          http_proxy: '{$MERAKI.HTTP_PROXY}'
-          headers:
+          params: |
+            var params = JSON.parse(value);
+            
+            var request = new HttpRequest();
+            
+            request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
+            
+            var response,
+                error_msg = '',
+                organizations = [],
+                devices = [];
+            
+            function getHttpData(url) {
+                response = request.get(url);
+                Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                if (response !== null) {
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
+                    }
+                }
+            
+                if (request.getStatus() !== 200) {
+                    if (response.errors) {
+                        throw response.errors.join(', ');
+                    } else {
+                        throw 'Failed to receive data: invalid response status code.';
+                    }
+                }
+            
+                if (typeof (response) !== 'object' || response === null) {
+                    throw 'Cannot process response data: received data is not an object.';
+                }
+            
+                return response;
+            };
+            
+            try {
+            
+                if (params.token === '{' + '$MERAKI.TOKEN}') {
+                    throw 'Please change {' + '$MERAKI.TOKEN} macro with the proper value.';
+                }
+            
+                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+                    params.url = 'https://' + params.url;
+                }
+            
+                if (!params.url.endsWith('/')) {
+                    params.url += '/';
+                }
+            
+                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !== '') {
+                    request.setProxy(params.httpproxy);
+                }
+            
+                organizations = getHttpData(params.url + '/organizations');
+            
+                if (Array.isArray(organizations) && organizations.length > 0) {
+                    for (i in organizations) {
+                        if ('id' in organizations[i]) {
+                            organization_devices = getHttpData(params.url + '/organizations/' + encodeURIComponent(organizations[i].id) + '/devices');
+            
+                            if (Array.isArray(organization_devices) && organization_devices.length > 0) {
+                                for (j in organization_devices) {
+                                    organization_devices[j].organizationId = organizations[i].id;
+            
+                                    devices.push(organization_devices[j]);
+                                }
+                            }
+                        }
+                    }
+                }
+            
+            } catch (error) {
+                error_msg = error;
+            };
+            
+            return JSON.stringify({
+              'organizations': organizations,
+              'devices': devices,
+              'error': error_msg.toString()
+            });
+          description: 'Item for gathering all the organizations and devices from Meraki API"'
+          timeout: 60s
+          parameters:
             -
-              name: X-Cisco-Meraki-API-Key
+              name: token
               value: '{$MERAKI.TOKEN}'
+            -
+              name: url
+              value: '{$MERAKI.API.URL}'
+            -
+              name: httpproxy
+              value: '{$MERAKI.HTTP_PROXY}'
           tags:
             -
               tag: component
               value: raw
+        -
+          uuid: 6fdd764d820341e7bd2a24f42802c58a
+          name: 'Meraki: Data item errors'
+          type: DEPENDENT
+          key: meraki.get.data.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'Item for gathering all the data item errors.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.error
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: meraki.get.data
+          tags:
+            -
+              tag: component
+              value: error
+          triggers:
+            -
+              uuid: 2bf9355f548e4e9b9b8581fb43f175fe
+              expression: 'length(last(/Cisco Meraki dashboard by HTTP/meraki.get.data.errors))>0'
+              name: 'Meraki: There are errors in ''Get data'' metric'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
+        -
+          uuid: 6488b49e692e4fe8b6a1c57f56b6ba7d
+          name: 'Devices discovery'
+          type: DEPENDENT
+          key: meraki.devices.discovery
+          delay: '0'
+          filter:
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$MERAKI.DEVICE.NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$MERAKI.DEVICE.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          host_prototypes:
+            -
+              uuid: 86d599f384d94b368508a170911213ec
+              host: '{#NAME}'
+              name: '[{#PRODUCT_TYPE}] {#NAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Applications
+              templates:
+                -
+                  name: 'Cisco Meraki device by HTTP'
+              macros:
+                -
+                  macro: '{$MAC}'
+                  value: '{#MAC}'
+                  description: 'MAC address of the device.'
+                -
+                  macro: '{$NETWORK.ID}'
+                  value: '{#NETWORK.ID}'
+                  description: 'Network ID of the device.'
+                -
+                  macro: '{$ORGANIZATION_ID}'
+                  value: '{#ORGANIZATION_ID}'
+                  description: 'Organization ID of the device.'
+                -
+                  macro: '{$SERIAL}'
+                  value: '{#SERIAL}'
+                  description: 'Serial number of the device.'
+              tags:
+                -
+                  tag: model
+                  value: '{#MODEL}'
+                -
+                  tag: serial-number
+                  value: '{#SERIAL}'
+          master_item:
+            key: meraki.get.data
+          timeout: 30s
+          lld_macro_paths:
+            -
+              lld_macro: '{#MAC}'
+              path: $.mac
+            -
+              lld_macro: '{#MODEL}'
+              path: $.model
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#NETWORK.ID}'
+              path: $.networkId
+            -
+              lld_macro: '{#ORGANIZATION_ID}'
+              path: $.organizationId
+            -
+              lld_macro: '{#PRODUCT_TYPE}'
+              path: $.productType
+            -
+              lld_macro: '{#SERIAL}'
+              path: $.serial
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.devices
         -
           uuid: 30f38d19659646009ca436d48f9598b0
           name: 'Organizations discovery'
@@ -85,7 +292,7 @@ zabbix_export:
                   value: '{#ID}'
                   description: 'ID of the organization.'
           master_item:
-            key: meraki.get.organizations
+            key: meraki.get.data
           lld_macro_paths:
             -
               lld_macro: '{#ID}'
@@ -99,6 +306,11 @@ zabbix_export:
             -
               lld_macro: '{#URL}'
               path: $.url
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.organizations
       tags:
         -
           tag: class
@@ -111,6 +323,14 @@ zabbix_export:
           macro: '{$MERAKI.API.URL}'
           value: api.meraki.com/api/v1
           description: 'Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1'
+        -
+          macro: '{$MERAKI.DEVICE.NAME.MATCHES}'
+          value: .+
+          description: 'This macro is used in devices discovery. Can be overridden on the host or linked template level.'
+        -
+          macro: '{$MERAKI.DEVICE.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in devices discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$MERAKI.HTTP_PROXY}'
           description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http'
@@ -305,7 +525,7 @@ zabbix_export:
               value: '{$MERAKI.API.URL}'
             -
               name: organizationId
-              value: '{$ID}'
+              value: '{$ORGANIZATION_ID}'
             -
               name: httpproxy
               value: '{$MERAKI.HTTP_PROXY}'
@@ -602,27 +822,6 @@ zabbix_export:
                 -
                   tag: scope
                   value: security
-        -
-          uuid: 9c8a5029accf46ecb247d004023a85e6
-          name: 'Meraki: Get list of the devices'
-          type: HTTP_AGENT
-          key: meraki.get.devices
-          delay: 3m
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          description: 'Item for gathering all the devices of organization from Meraki API.'
-          timeout: 60s
-          url: 'https://{$MERAKI.API.URL}/organizations/{$ID}/devices'
-          http_proxy: '{$MERAKI.HTTP_PROXY}'
-          headers:
-            -
-              name: X-Cisco-Meraki-API-Key
-              value: '{$MERAKI.TOKEN}'
-          tags:
-            -
-              tag: component
-              value: raw
         -
           uuid: 3306da0ec0d749829db2f5f42e4e7876
           name: 'Meraki: Get licenses info'
@@ -1162,66 +1361,6 @@ zabbix_export:
               tag: component
               value: policy
       discovery_rules:
-        -
-          uuid: 5c251303ef8849e49130726a3b7a7c1d
-          name: 'Devices discovery'
-          type: DEPENDENT
-          key: meraki.devices.discovery
-          delay: '0'
-          host_prototypes:
-            -
-              uuid: bca6b2016f80470fb303760430e3a96a
-              host: '{#NAME}'
-              name: '[{#PRODUCT_TYPE}] {#NAME}'
-              group_links:
-                -
-                  group:
-                    name: Templates/Applications
-              templates:
-                -
-                  name: 'Cisco Meraki device by HTTP'
-              macros:
-                -
-                  macro: '{$MAC}'
-                  value: '{#MAC}'
-                  description: 'MAC address of the device.'
-                -
-                  macro: '{$NETWORK.ID}'
-                  value: '{#NETWORK.ID}'
-                  description: 'Network ID of the device.'
-                -
-                  macro: '{$SERIAL}'
-                  value: '{#SERIAL}'
-                  description: 'Serial number of the device.'
-              tags:
-                -
-                  tag: model
-                  value: '{#MODEL}'
-                -
-                  tag: serial-number
-                  value: '{#SERIAL}'
-          master_item:
-            key: meraki.get.devices
-          timeout: 30s
-          lld_macro_paths:
-            -
-              lld_macro: '{#MAC}'
-              path: $.mac
-            -
-              lld_macro: '{#MODEL}'
-              path: $.model
-            -
-              lld_macro: '{#NAME}'
-              path: $.name
-            -
-              lld_macro: '{#NETWORK.ID}'
-              path: $.networkId
-            -
-              lld_macro: '{#PRODUCT_TYPE}'
-              path: $.productType
-            -
-              lld_macro: '{#SERIAL}'
-              path: $.serial
         -
           uuid: 03d6aeb2bc3d473b9aab87acd0e08f8c
           name: 'Uplinks discovery'
