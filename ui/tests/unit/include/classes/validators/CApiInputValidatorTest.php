@@ -6714,11 +6714,11 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/xml',
 				'<?xml version="1.0" encoding="UTF-8"?><node><script /></node>'
 			],
-			'Unparseable/unparsable mismatch OK here due to possible libxml version mismatch' => [
+			'Opening and ending tag mismatch' => [
 				['type' => API_XML],
-				'<?xml version="1.0" encoding="UTF-8"?><node></></node>',
+				'<?xml version="1.0" encoding="UTF-8"?><node></a></node>',
 				'/1/xml',
-				'Invalid parameter "/1/xml": (76) Opening and ending tag mismatch: node line 1 and unparseable [Line: 1 | Column: 48].'
+				'Invalid parameter "/1/xml": (76) Opening and ending tag mismatch: node line 1 and a [Line: 1 | Column: 49].'
 			],
 			[
 				['type' => API_XML],
@@ -7166,7 +7166,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SCRIPT]],
 				"let a = 'abc';\nreturn a;",
 				'/1/params',
-				'Invalid parameter "/1/params": unexpected parameter "2".'
+				"let a = 'abc';\nreturn a;"
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],

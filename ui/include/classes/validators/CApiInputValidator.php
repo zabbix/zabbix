@@ -3847,17 +3847,23 @@ class CApiInputValidator {
 		}
 
 		$json = $data;
-		$types = [
-			'usermacros' => (bool) ($flags & API_ALLOW_USER_MACRO),
-			'lldmacros' => (bool) ($flags & API_ALLOW_LLD_MACRO)
-		];
+
+		$types = [];
+
+		if ($flags & API_ALLOW_USER_MACRO) {
+			$types['usermacros'] = true;
+		}
+
+		if ($flags & API_ALLOW_LLD_MACRO) {
+			$types['lldmacros'] = true;
+		}
 
 		if (array_key_exists('macros_n', $rule)) {
 			$types['macros_n'] = $rule['macros_n'];
 		}
 
 		if ($types) {
-			$matches = (new CMacrosResolverGeneral)->getMacroPositions($json, $types);
+			$matches = (new CMacrosResolverGeneral())->getMacroPositions($json, $types);
 			$shift = 0;
 
 			foreach ($matches as $pos => $substr) {
