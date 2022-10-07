@@ -3,6 +3,13 @@ Changes for 5.0.29rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
+.........T [ZBX-21484] updated documentation for templates SMART by Zabbix agent 2 (atocko)
+........S. [ZBX-21537] fixed history syncers being stuck waiting on system information being collected (vso)
+.........T [ZBX-20296] fixed swap and available memory trigger functions for os templates (atocko)
+.........T [ZBX-20392] added close/ack/unack of events for OPSgenie media (atocko)
+...G...... [ZBX-21227] fixed Zabbix agent to log received service control commands (vso)
+..F....... [ZBX-21532] fixed missing inherited tags for templated triggers in edit form, tag tab (dpetra)
 ..F....... [ZBX-19512] fixed debug info block content refresh after changing table content in Monitoring -> Problems page (miks)
 ...G...... [ZBX-21610] fixed problem with sysctl() kern.proc.args API bug on FreeBSD <= 8.2 (ssimonenko)
 ........S. [ZBX-17060] fixed unexpected interface connection mode change during autoregistration (asestakovs)
