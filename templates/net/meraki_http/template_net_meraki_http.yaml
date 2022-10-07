@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-07T09:28:00Z'
+  date: '2022-10-07T10:13:00Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -26,7 +26,7 @@ zabbix_export:
           name: 'Templates/Network devices'
       items:
         -
-          uuid: aa00e906cf56488db52554a3acbe148e
+          uuid: d1a5f3c79a604bae98c314d2aed64ff4
           name: 'Meraki: Get data'
           type: SCRIPT
           key: meraki.get.data
@@ -596,7 +596,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.uplinksLL[?(@.ip == ''{#IP}'' && @.uplink== ''{#UPLINK}'' && @.serial== ''{#SERIAL}'')].timeSeries.[0].latencyMs.first()'
+                    - '$.uplinksLL[?(@.ip == ''{#IP}'' && @.uplink== ''{#UPLINK}'')].timeSeries.[0].latencyMs.first()'
                 -
                   type: JAVASCRIPT
                   parameters:
