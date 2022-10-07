@@ -3761,7 +3761,7 @@ class CApiInputValidator {
 					}
 				}
 
-				$active_time_from = $i == 0 ? $inactive_interval['time_to'] : $inactive_interval[$i - 1]['time_to'];
+				$active_time_from = $inactive_interval['time_to'];
 
 				$active_time_to = array_key_exists($i + 1, $_inactive_intervals)
 					? $_inactive_intervals[$i + 1]['time_from']
