@@ -964,7 +964,7 @@ class CApiInputValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateFloat(array $rule, &$data, string $path, ?string &$error): bool {
+	private static function validateFloat(array $rule, &$data, string $path, string &$error): bool {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
 		if (($flags & API_ALLOW_NULL) && $data === null) {
@@ -1039,6 +1039,8 @@ class CApiInputValidator {
 		if (($flags & API_ALLOW_NULL) && $data === null) {
 			return true;
 		}
+
+		$e = '';
 
 		if (($flags & API_NORMALIZE) && self::validateFloat([], $data, '', $e)) {
 			$data = [$data];
@@ -1124,7 +1126,7 @@ class CApiInputValidator {
 	 *
 	 * @return bool
 	 */
-	private static function checkFloatIn(array $rule, $data, string $path, ?string &$error) {
+	private static function checkFloatIn(array $rule, $data, string $path, string &$error) {
 		if (!array_key_exists('in', $rule)) {
 			return true;
 		}
@@ -1226,8 +1228,8 @@ class CApiInputValidator {
 		}
 
 		$parser = new CRangesParser([
-			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
-			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
+			'usermacros' => (bool) ($flags & API_ALLOW_USER_MACRO),
+			'lldmacros' => (bool) ($flags & API_ALLOW_LLD_MACRO),
 			'with_minus' => true
 		]);
 
@@ -2649,9 +2651,9 @@ class CApiInputValidator {
 
 		$ip_range_parser = new CIPRangeParser([
 			'v6' => ZBX_HAVE_IPV6,
-			'dns' => ($flags & API_ALLOW_DNS),
-			'ranges' => ($flags & API_ALLOW_RANGE),
-			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
+			'dns' => (bool) ($flags & API_ALLOW_DNS),
+			'ranges' => (bool) ($flags & API_ALLOW_RANGE),
+			'usermacros' => (bool) ($flags & API_ALLOW_USER_MACRO),
 			'macros' => array_key_exists('macros', $rule) ? $rule['macros'] : []
 		]);
 
@@ -3363,17 +3365,17 @@ class CApiInputValidator {
 
 	/**
 	 * @param array  $rule
-	 * @param array  $rule[compare]            (optional)
-	 * @param string $rule[compare][operator]
-	 * @param string $rule[compare][path]
-	 * @param mixed  $rule[compare][value]
+	 * @param array  $rule['compare']              (optional)
+	 * @param string $rule['compare']['operator']
+	 * @param string $rule['compare']['path']
+	 * @param mixed  $rule['compare']['value']
 	 * @param int    $data
 	 * @param string $path
 	 * @param string $error
 	 *
 	 * @return bool
 	 */
-	private static function checkCompare(array $rule, $data, string $path, ?string &$error): bool {
+	private static function checkCompare(array $rule, $data, string $path, string &$error): bool {
 		if (!array_key_exists('compare', $rule)) {
 			return true;
 		}
