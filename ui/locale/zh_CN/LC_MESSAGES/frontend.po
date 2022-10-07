@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-09-30 00:47+0000\n"
+"PO-Revision-Date: 2022-10-06 10:56+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -65,7 +65,7 @@ msgstr "\"%1$s\" 的值必须小于或等于 \"%2$s\" 的值"
 #: include/classes/import/validators/C10XmlValidator.php:383
 #: include/classes/import/validators/C10XmlValidator.php:405
 msgid "\"host:key\" pair is expected"
-msgstr "期望“主机:键值” 对形式"
+msgstr "需要“主机:键值” 对形式"
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
@@ -13677,6 +13677,10 @@ msgstr "只计算指派给启用的主机的和相依于启用的项目的触发
 msgid "Open in a new window"
 msgstr "在新窗口中打开"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -21273,7 +21277,7 @@ msgstr "请在字符串中指定"
 
 #: include/classes/validators/CApiInputValidator.php:910
 msgid "a character string, integer or floating point value is expected"
-msgstr "期望为字符串、整数或浮点值类型"
+msgstr "需要字符串、整数或浮点数类型"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -22667,7 +22671,7 @@ msgstr "无"
 #: include/classes/api/services/CItemGeneral.php:2595
 #: include/classes/api/services/CItemGeneral.php:2617
 msgid "nonempty key and value pair expected"
-msgstr "期望非空键和值对"
+msgstr "需要非空键和值对"
 
 #: include/actions.inc.php:31
 msgid "not in"
@@ -23212,7 +23216,7 @@ msgstr "表达式宏意外结束"
 
 #: include/classes/parsers/CItemKey.php:55
 msgid "unexpected end of key"
-msgstr "非期望的关键字结束"
+msgstr "键值意外结束"
 
 #: include/classes/parsers/CUserMacroParser.php:38
 msgid "unexpected end of macro"
