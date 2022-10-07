@@ -12910,6 +12910,10 @@ msgstr "Bare de siste 20 %% av indikatoren vises."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Bare utløsere som er tilordnet aktiverte verter, og avhengig av aktiverte elementer telles"
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:430
 msgid "Opera"
 msgstr "Opera"
