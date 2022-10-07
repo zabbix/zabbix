@@ -118,8 +118,7 @@ class CControllerDashboardView extends CController {
 				: $first_widget_type,
 			'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
 			'time_period' => getTimeSelectorPeriod($time_selector_options),
-			'active_tab' => CProfile::get('web.dashboard.filter.active', 1),
-			'allow_create_widget' => (bool) $widget_known_types // TODO: fix this for template dashboard
+			'active_tab' => CProfile::get('web.dashboard.filter.active', 1)
 		];
 
 		if (self::hasDynamicWidgets($dashboard['pages'])) {

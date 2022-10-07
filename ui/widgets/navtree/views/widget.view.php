@@ -26,7 +26,9 @@
  * @var array $data
  */
 
-$item = new CNavigationTree([
+use Widgets\NavTree\Includes\NavigationTree;
+
+$item = new NavigationTree([
 	'problems' => $data['problems'],
 	'severity_config' => $data['severity_config'],
 	'initial_load' => $data['initial_load'],
@@ -36,10 +38,6 @@ $item = new CNavigationTree([
 	'navtree_items_opened' => $data['navtree_items_opened'],
 	'show_unavailable' => $data['show_unavailable']
 ]);
-
-if ($data['error'] !== null) {
-	$item->setError($data['error']);
-}
 
 (new CWidgetView($data))
 	->addItem($item)

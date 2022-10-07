@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -42,7 +42,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 	private ?CWidget $widget;
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'type' =>						'string|required',
 			'fields' =>						'array',
@@ -82,7 +82,7 @@ class CControllerDashboardWidgetEdit extends CController {
 						'error' => [
 							'messages' => array_column(get_and_clear_messages(), 'message')
 						]
-					])
+					], JSON_THROW_ON_ERROR)
 				]))->disableView()
 			);
 		}
@@ -90,13 +90,13 @@ class CControllerDashboardWidgetEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->hasInput('templateid')
 			? ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN)
 			: ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$known_types = [];
 		$deprecated_types = [];
 
@@ -153,12 +153,8 @@ class CControllerDashboardWidgetEdit extends CController {
 					$captions['simple'][$resource_type] = [];
 				}
 
-				if ($id != 0) {
-					switch ($resource_type) {
-						case WIDGET_FIELD_SELECT_RES_SYSMAP:
-							$captions['simple'][$resource_type][$id] = _('Inaccessible map');
-							break;
-					}
+				if ($id != 0 && $resource_type == CWidgetFieldSelectResource::RESOURCE_TYPE_SYSMAP) {
+					$captions['simple'][$resource_type][$id] = _('Inaccessible map');
 				}
 			}
 		}
@@ -168,19 +164,17 @@ class CControllerDashboardWidgetEdit extends CController {
 				continue;
 			}
 
-			switch ($resource_type) {
-				case WIDGET_FIELD_SELECT_RES_SYSMAP:
-					$maps = API::Map()->get([
-						'sysmapids' => array_keys($list),
-						'output' => ['sysmapid', 'name']
-					]);
+			if ($resource_type == CWidgetFieldSelectResource::RESOURCE_TYPE_SYSMAP) {
+				$maps = API::Map()->get([
+					'sysmapids' => array_keys($list),
+					'output' => ['sysmapid', 'name']
+				]);
 
-					if ($maps) {
-						foreach ($maps as $map) {
-							$list[$map['sysmapid']] = $map['name'];
-						}
+				if ($maps) {
+					foreach ($maps as $map) {
+						$list[$map['sysmapid']] = $map['name'];
 					}
-					break;
+				}
 			}
 		}
 		unset($list);

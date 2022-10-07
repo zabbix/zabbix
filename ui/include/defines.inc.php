@@ -1586,39 +1586,6 @@ define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
 
 define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
 
-// dashboard widgets
-define('WIDGET_ACTION_LOG',			'actionlog');
-define('WIDGET_CLOCK',				'clock');
-define('WIDGET_DISCOVERY',			'discovery');
-define('WIDGET_FAV_GRAPHS',			'favgraphs');
-define('WIDGET_FAV_MAPS',			'favmaps');
-define('WIDGET_GEOMAP',				'geomap');
-define('WIDGET_GRAPH',				'graph');
-define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
-define('WIDGET_HOST_AVAIL',			'hostavail');
-define('WIDGET_MAP',				'map');
-define('WIDGET_NAV_TREE',			'navtree');
-define('WIDGET_PLAIN_TEXT',			'plaintext');
-define('WIDGET_PROBLEM_HOSTS',		'problemhosts');
-define('WIDGET_PROBLEMS',			'problems');
-define('WIDGET_PROBLEMS_BY_SV',		'problemsbysv');
-define('WIDGET_SLA_REPORT',			'slareport');
-define('WIDGET_SVG_GRAPH',			'svggraph');
-define('WIDGET_SYSTEM_INFO',		'systeminfo');
-define('WIDGET_TOP_HOSTS',			'tophosts');
-define('WIDGET_TRIG_OVER',			'trigover');
-define('WIDGET_URL',				'url');
-define('WIDGET_WEB',				'web');
-define('WIDGET_ITEM',				'item');
-// Deprecated widgets
-define('WIDGET_DATA_OVER',			'dataover');
-
-// widget select resource field types
-define('WIDGET_FIELD_SELECT_RES_SYSMAP',	1);
-
-// max depth of navigation tree
-define('WIDGET_NAVIGATION_TREE_MAX_DEPTH', 10);
-
 // event details sections
 define('SECTION_HAT_TRIGGERDETAILS',	'hat_triggerdetails');
 define('SECTION_HAT_EVENTDETAILS',		'hat_eventdetails');
@@ -1630,10 +1597,6 @@ define('SECTION_SEARCH_HOSTS',			'search_hosts');
 define('SECTION_SEARCH_HOSTGROUP',		'search_hostgroup');
 define('SECTION_SEARCH_TEMPLATES',		'search_templates');
 define('SECTION_SEARCH_TEMPLATEGROUP',	'search_templategroup');
-
-// dashboard widget dynamic state
-define('WIDGET_SIMPLE_ITEM',	0);
-define('WIDGET_DYNAMIC_ITEM',	1);
 
 // widget defaults
 define('ZBX_WIDGET_ROWS', 20);

@@ -35,6 +35,8 @@ use Zabbix\Widgets\Fields\{
 
 use Widgets\Map\Widget;
 
+use Zabbix\Core\CWidget;
+
 /**
  * Map widget form.
  */
@@ -59,13 +61,13 @@ class WidgetForm extends CWidgetForm {
 
 			$this->addField(
 				(new CWidgetFieldSelectResource('sysmapid', _('Map')))
-					->setResourceType(WIDGET_FIELD_SELECT_RES_SYSMAP)
+					->setResourceType(CWidgetFieldSelectResource::RESOURCE_TYPE_SYSMAP)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			);
 		}
 		else {
 			$this->addField(
-				(new CWidgetFieldWidgetSelect('filter_widget_reference', _('Filter'), WIDGET_NAV_TREE))
+				(new CWidgetFieldWidgetSelect('filter_widget_reference', _('Filter'), CWidget::NAV_TREE))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			);
 		}

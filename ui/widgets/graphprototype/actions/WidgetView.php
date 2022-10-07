@@ -26,6 +26,8 @@ use API,
 	CControllerWidgetIterator,
 	CTableInfo;
 
+use Zabbix\Core\CWidget;
+
 class WidgetView extends CControllerWidgetIterator {
 
 	public function __construct() {
@@ -70,7 +72,7 @@ class WidgetView extends CControllerWidgetIterator {
 		];
 
 		$is_template_dashboard = $this->hasInput('templateid');
-		$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == WIDGET_DYNAMIC_ITEM);
+		$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
 
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
@@ -151,7 +153,7 @@ class WidgetView extends CControllerWidgetIterator {
 
 			$children[] = [
 				'widgetid' => (string) $graphid,
-				'type' => WIDGET_GRAPH,
+				'type' => Cwidget::GRAPH,
 				'name' => $name,
 				'fields' => $child_fields,
 				'configuration' => $this->widget->getConfiguration($this->fields_values, $this->getInput('view_mode')),
@@ -190,7 +192,7 @@ class WidgetView extends CControllerWidgetIterator {
 		];
 
 		$is_template_dashboard = $this->hasInput('templateid');
-		$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == WIDGET_DYNAMIC_ITEM);
+		$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
 
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
@@ -269,7 +271,7 @@ class WidgetView extends CControllerWidgetIterator {
 
 			$children[] = [
 				'widgetid' => (string) $itemid,
-				'type' => WIDGET_GRAPH,
+				'type' => CWidget::GRAPH,
 				'name' => $name,
 				'fields' => $child_fields,
 				'configuration' => $this->widget->getConfiguration($this->fields_values, $this->getInput('view_mode')),

@@ -25,6 +25,8 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldSelectResource extends CWidgetField {
 
+	public const RESOURCE_TYPE_SYSMAP = 1;
+
 	public const DEFAULT_VALUE = '0';
 
 	private string $resource_type;
@@ -60,7 +62,7 @@ class CWidgetFieldSelectResource extends CWidgetField {
 	public function setResourceType(int $resource_type): self {
 		$this->resource_type = $resource_type;
 
-		if ($this->resource_type == WIDGET_FIELD_SELECT_RES_SYSMAP) {
+		if ($this->resource_type == self::RESOURCE_TYPE_SYSMAP) {
 			$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
 
 			$this->popup_options = array_merge($this->popup_options, [

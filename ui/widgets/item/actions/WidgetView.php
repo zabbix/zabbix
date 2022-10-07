@@ -68,7 +68,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$is_template_dashboard = $this->hasInput('templateid');
 		$is_dynamic = ($this->hasInput('dynamic_hostid')
-			&& ($is_template_dashboard || $this->fields_values['dynamic'] == WIDGET_DYNAMIC_ITEM)
+			&& ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::WIDGET_DYNAMIC_ITEM)
 		);
 
 		$tmp_items = [];

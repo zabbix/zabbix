@@ -52,7 +52,6 @@ class CDashboard extends CBaseComponent {
 		is_editable,
 		is_edit_mode,
 		can_edit_dashboards,
-		can_create_widget,
 		is_kiosk_mode,
 		time_period,
 		dynamic_hostid
@@ -89,7 +88,6 @@ class CDashboard extends CBaseComponent {
 		this._widget_max_rows = widget_max_rows;
 		this._widget_defaults = widget_defaults;
 		this._widget_last_type = widget_last_type;
-		this._can_create_widget = can_create_widget;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
 		this._can_edit_dashboards = can_edit_dashboards;
@@ -383,10 +381,6 @@ class CDashboard extends CBaseComponent {
 		return this._data;
 	}
 
-	get can_create_widget() {
-		return this._can_create_widget;
-	}
-
 	addNewDashboardPage() {
 		if (this._dashboard_pages.size >= this._max_dashboard_pages) {
 			this._warnDashboardExhausted();
@@ -422,7 +416,6 @@ class CDashboard extends CBaseComponent {
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
 			can_edit_dashboards: this._can_edit_dashboards,
-			can_create_widget: this.can_create_widget,
 			time_period: this._time_period,
 			dynamic_hostid: this._dynamic_hostid,
 			unique_id: this._createUniqueId()

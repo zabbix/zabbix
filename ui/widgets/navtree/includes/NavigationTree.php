@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,26 +19,28 @@
 **/
 
 
-class CNavigationTree extends CDiv {
+namespace Widgets\NavTree\Includes;
 
-	private $error;
-	private $data;
+use CDiv;
+
+use Widgets\NavTree\Widget;
+
+class NavigationTree extends CDiv
+{
+
+	private array $data;
 
 	public function __construct(array $data = []) {
 		parent::__construct();
 
 		$this->data = $data;
 
-		$this->setId(uniqid());
-		$this->addClass(ZBX_STYLE_NAVIGATIONTREE);
+		$this
+			->setId(uniqid('', true))
+			->addClass(ZBX_STYLE_NAVIGATIONTREE);
 	}
 
-	public function setError($value) {
-		$this->error = $value;
-		return $this;
-	}
-
-	public function getScriptData() {
+	public function getScriptData(): array {
 		return [
 			'problems' => $this->data['problems'],
 			'severity_levels' => $this->data['severity_config'],
@@ -48,19 +50,17 @@ class CNavigationTree extends CDiv {
 			'maps_accessible' => array_map('strval', $this->data['maps_accessible']),
 			'show_unavailable' => $this->data['show_unavailable'],
 			'initial_load' => $this->data['initial_load'],
-			'max_depth' => WIDGET_NAVIGATION_TREE_MAX_DEPTH
+			'max_depth' => Widget::MAX_DEPTH
 		];
 	}
 
-	private function build() {
-		if ($this->error !== null) {
-			$this->addClass(ZBX_STYLE_DISABLED);
-		}
-
-		$this->addItem((new CDiv())->addClass('tree'));
+	private function build(): void {
+		$this->addItem(
+			(new CDiv())->addClass('tree')
+		);
 	}
 
-	public function toString($destroy = true) {
+	public function toString($destroy = true): string {
 		$this->build();
 
 		return parent::toString($destroy);

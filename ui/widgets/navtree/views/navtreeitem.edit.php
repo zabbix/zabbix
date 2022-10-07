@@ -26,6 +26,8 @@
  * @var array $data
  */
 
+use Widgets\NavTree\Widget;
+
 $form = (new CForm('post'))
 	->cleanItems()
 	->setId('widget-dialogue-form')
@@ -48,7 +50,7 @@ $form_list = (new CFormList())
 		(new CButton('select', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
 	]);
 
-if ($data['depth'] >= WIDGET_NAVIGATION_TREE_MAX_DEPTH) {
+if ($data['depth'] >= Widget::MAX_DEPTH) {
 	$form_list->addRow(null, _('Cannot add submaps. Max depth reached.'));
 }
 else {

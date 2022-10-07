@@ -29,6 +29,8 @@ use API,
 	CPre,
 	Manager;
 
+use Zabbix\Core\CWidget;
+
 class WidgetView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
@@ -55,7 +57,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		else {
 			$is_template_dashboard = $this->hasInput('templateid');
-			$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == WIDGET_DYNAMIC_ITEM);
+			$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
 
 			if ($this->fields_values['itemids']) {
 				$items = API::Item()->get([

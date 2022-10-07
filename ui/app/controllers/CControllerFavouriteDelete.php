@@ -19,6 +19,8 @@
 **/
 
 
+use Zabbix\Core\CWidget;
+
 class CControllerFavouriteDelete extends CController {
 
 	protected function checkInput() {
@@ -47,9 +49,9 @@ class CControllerFavouriteDelete extends CController {
 		];
 
 		$widgetids = [
-			'graphid' => WIDGET_FAV_GRAPHS,
-			'itemid' => WIDGET_FAV_GRAPHS,
-			'sysmapid' => WIDGET_FAV_MAPS
+			'graphid' => CWidget::FAV_GRAPHS,
+			'itemid' => CWidget::FAV_GRAPHS,
+			'sysmapid' => CWidget::FAV_MAPS
 		];
 
 		$object = $this->getInput('object');

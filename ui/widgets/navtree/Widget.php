@@ -27,6 +27,9 @@ use Zabbix\Widgets\Fields\CWidgetFieldReference;
 
 class Widget extends CWidget {
 
+	// Max depth of navigation tree.
+	public const MAX_DEPTH = 10;
+
 	public function getDefaults(): array {
 		return parent::getDefaults() + [
 			'reference_field' => CWidgetFieldReference::FIELD_NAME

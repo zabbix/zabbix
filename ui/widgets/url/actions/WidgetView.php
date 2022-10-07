@@ -27,6 +27,8 @@ use CControllerDashboardWidgetView,
 	CMacrosResolverHelper,
 	CSettingsHelper;
 
+use Zabbix\Core\CWidget;
+
 class WidgetView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
@@ -49,7 +51,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$error = _('No data.');
 		}
 		else {
-			$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == WIDGET_DYNAMIC_ITEM);
+			$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
 
 			$dynamic_hostid = $this->getInput('dynamic_hostid', '0');
 

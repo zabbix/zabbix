@@ -33,7 +33,7 @@
 		is_busy: false,
 		is_busy_saving: false,
 
-		init({dashboard, time_period, dynamic, has_time_selector, widget_defaults, widget_last_type, web_layout_mode, can_create_widget}) {
+		init({dashboard, time_period, dynamic, has_time_selector, widget_defaults, widget_last_type, web_layout_mode}) {
 			this.dashboard = dashboard;
 			this.time_period = time_period;
 			this.dynamic = dynamic;
@@ -75,7 +75,6 @@
 				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
 				widget_defaults,
 				widget_last_type,
-				can_create_widget,
 				is_editable: dashboard.can_edit_dashboards && dashboard.editable
 					&& web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				is_edit_mode: dashboard.dashboardid === null,
@@ -298,8 +297,7 @@
 						items: [
 							{
 								label: <?= json_encode(_('Add widget')) ?>,
-								clickCallback: () => ZABBIX.Dashboard.addNewWidget(),
-								disabled: !ZABBIX.Dashboard.can_create_widget
+								clickCallback: () => ZABBIX.Dashboard.addNewWidget()
 							},
 							{
 								label: <?= json_encode(_('Add page')) ?>,
@@ -314,15 +312,14 @@
 								clickCallback: () => ZABBIX.Dashboard.pasteWidget(
 									ZABBIX.Dashboard.getStoredWidgetDataCopy()
 								),
-								disabled: !ZABBIX.Dashboard.can_create_widget
-									|| (ZABBIX.Dashboard.getStoredWidgetDataCopy() === null)
+								disabled: ZABBIX.Dashboard.getStoredWidgetDataCopy() === null
 							},
 							{
 								label: <?= json_encode(_('Paste page')) ?>,
 								clickCallback: () => ZABBIX.Dashboard.pasteDashboardPage(
 									ZABBIX.Dashboard.getStoredDashboardPageDataCopy()
 								),
-								disabled: (ZABBIX.Dashboard.getStoredDashboardPageDataCopy() === null)
+								disabled: ZABBIX.Dashboard.getStoredDashboardPageDataCopy() === null
 							}
 						]
 					}

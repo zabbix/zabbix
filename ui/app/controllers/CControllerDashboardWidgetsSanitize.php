@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -28,11 +28,11 @@ class CControllerDashboardWidgetsSanitize extends CController {
 
 	private array $widgets_data = [];
 
-	protected function init() {
+	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'templateid' =>	'db dashboard.templateid',
 			'widgets' =>	'array'
@@ -61,7 +61,7 @@ class CControllerDashboardWidgetsSanitize extends CController {
 
 				$widget = APP::ModuleManager()->getModule($widget_input['type']);
 
-				if ($widget === null || $widget->getType() === CModule::TYPE_WIDGET) {
+				if ($widget === null || $widget->getType() !== CModule::TYPE_WIDGET) {
 					error(_('Widget not supported.'));
 
 					$ret = false;
@@ -92,18 +92,18 @@ class CControllerDashboardWidgetsSanitize extends CController {
 					'error' => [
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+				], JSON_THROW_ON_ERROR)])
 			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$widgets = [];
 
 		foreach ($this->widgets_data as $widget_data) {
@@ -139,6 +139,6 @@ class CControllerDashboardWidgetsSanitize extends CController {
 			$output['widgets'][$widget_index]['fields'] = $output_fields;
 		}
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output, JSON_THROW_ON_ERROR)]));
 	}
 }

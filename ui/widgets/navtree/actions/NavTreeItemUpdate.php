@@ -25,6 +25,8 @@ use API,
 	CController,
 	CControllerResponseData;
 
+use Widgets\NavTree\Widget;
+
 class NavTreeItemUpdate extends CController {
 
 	protected function init(): void {
@@ -36,7 +38,7 @@ class NavTreeItemUpdate extends CController {
 			'name' => 'required|string|not_empty',
 			'sysmapid' => 'db sysmaps.sysmapid',
 			'add_submaps' => 'in 0,1',
-			'depth' => 'ge 1|le '.WIDGET_NAVIGATION_TREE_MAX_DEPTH
+			'depth' => 'ge 1|le '.Widget::MAX_DEPTH
 		];
 
 		$ret = $this->validateInput($fields);
@@ -83,7 +85,7 @@ class NavTreeItemUpdate extends CController {
 			$sysmapids[$sysmapid] = true;
 
 			do {
-				if ($depth++ > WIDGET_NAVIGATION_TREE_MAX_DEPTH) {
+				if ($depth++ > Widget::MAX_DEPTH) {
 					break;
 				}
 

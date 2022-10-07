@@ -32,10 +32,42 @@ use Zabbix\Widgets\Fields\CWidgetFieldSelect;
  */
 class CWidget extends CModule {
 
-	public const DEFAULT_FORM_CLASS = 'WidgetForm';
-	public const DEFAULT_JS_CLASS = 'CWidget';
-	public const DEFAULT_SIZE = ['width' => 12, 'height' => 5];
-	public const DEFAULT_REFRESH_RATE = 60;
+	public const DEFAULT_FORM_CLASS		= 'WidgetForm';
+	public const DEFAULT_JS_CLASS		= 'CWidget';
+	public const DEFAULT_SIZE			= ['width' => 12, 'height' => 5];
+	public const DEFAULT_REFRESH_RATE	= 60;
+
+	// Dashboard widget types.
+	public const ACTION_LOG			= 'actionlog';
+	public const CLOCK				= 'clock';
+	public const DISCOVERY			= 'discovery';
+	public const FAV_GRAPHS			= 'favgraphs';
+	public const FAV_MAPS			= 'favmaps';
+	public const GEOMAP				= 'geomap';
+	public const GRAPH				= 'graph';
+	public const GRAPH_PROTOTYPE	= 'graphprototype';
+	public const HOST_AVAIL			= 'hostavail';
+	public const MAP				= 'map';
+	public const NAV_TREE			= 'navtree';
+	public const PLAIN_TEXT			= 'plaintext';
+	public const PROBLEM_HOSTS		= 'problemhosts';
+	public const PROBLEMS			= 'problems';
+	public const PROBLEMS_BY_SV		= 'problemsbysv';
+	public const SLA_REPORT			= 'slareport';
+	public const SVG_GRAPH			= 'svggraph';
+	public const SYSTEM_INFO		= 'systeminfo';
+	public const TOP_HOSTS			= 'tophosts';
+	public const TRIG_OVER			= 'trigover';
+	public const URL				= 'url';
+	public const WEB				= 'web';
+	public const ITEM				= 'item';
+
+	// Deprecated widget types.
+	public const DATA_OVER	= 'dataover';
+
+	// Dashboard widget dynamic state.
+	public const SIMPLE_ITEM = 0;
+	public const DYNAMIC_ITEM = 1;
 
 	final public function getForm(array $values, ?string $templateid): CWidgetForm {
 		$form_class = array_key_exists('form_class', $this->manifest['widget'])

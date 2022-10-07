@@ -30,6 +30,8 @@ use API,
 	CUrl,
 	CWebUser;
 
+use Zabbix\Core\CWidget;
+
 class WidgetView extends CControllerDashboardWidgetView {
 
 	public function __construct() {
@@ -100,7 +102,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		$is_template_dashboard = $this->hasInput('templateid');
-		$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == WIDGET_DYNAMIC_ITEM);
+		$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
 
 		// Replace graph item by particular host item if dynamic items are used.
 		if ($is_dynamic_item && $dynamic_hostid != 0 && $resourceid) {
