@@ -758,6 +758,8 @@ class CConfigurationImport {
 			foreach ($order_tree[$host] as $item_key => $level) {
 				$item = $items[$item_key];
 				$item['hostid'] = $hostid;
+				unset($item['triggers']);
+
 				$levels[$level] = true;
 
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
@@ -1131,6 +1133,8 @@ class CConfigurationImport {
 				foreach ($item_prototypes as $index => $level) {
 					$item_prototype = $discovery_rule['item_prototypes'][$index];
 					$item_prototype['hostid'] = $hostid;
+					unset($item_prototype['trigger_prototypes']);
+
 					$levels[$level] = true;
 
 					if (array_key_exists('interface_ref', $item_prototype) && $item_prototype['interface_ref']) {
