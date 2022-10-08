@@ -466,7 +466,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			if ($upd_item) {
-				$response = API::ItemPrototype()->update(['itemid' => $itemid] + $upd_item);
+				$response = API::ItemPrototype()->update(['itemid' => $itemid] + $item);
 
 				if ($response === false) {
 					throw new Exception();
