@@ -480,7 +480,7 @@ out:
  *               SYSINFO_RET_FAIL - retrieving WMI value failed               *
  *                                                                            *
  ******************************************************************************/
-extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+extern "C" int	wmi_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char				*wmi_namespace, *wmi_query, *error = NULL;
 	VARIANT				*vtProp;
