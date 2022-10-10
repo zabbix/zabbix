@@ -42,7 +42,7 @@ int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 */
@@ -75,7 +75,7 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	case "vfs.fs.size":
 		return unsafe.Pointer(C.vfs_fs_size)
 	case "vfs.fs.get":
-		return unsafe.Pointer(C.VFS_FS_GET)
+		return unsafe.Pointer(C.vfs_fs_get)
 	case "vm.memory.size":
 		return unsafe.Pointer(C.VM_MEMORY_SIZE)
 

@@ -331,7 +331,7 @@ out:
 	return ret;
 }
 
-int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return zbx_execute_threaded_metric(vfs_fs_get, request, result);
 }
