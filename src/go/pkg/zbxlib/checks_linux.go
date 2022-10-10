@@ -35,7 +35,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	get_sensor(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -71,7 +71,7 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	case "net.udp.listen":
 		cfunc = unsafe.Pointer(C.NET_UDP_LISTEN)
 	case "sensor":
-		cfunc = unsafe.Pointer(C.GET_SENSOR)
+		cfunc = unsafe.Pointer(C.get_sensor)
 	case "system.cpu.load":
 		cfunc = unsafe.Pointer(C.SYSTEM_CPU_LOAD)
 	case "system.cpu.switches":

@@ -62,7 +62,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.boottime",	0,		SYSTEM_BOOTTIME,	NULL},
 	{"system.sw.arch",	0,		SYSTEM_SW_ARCH,		NULL},
 
-	{"sensor",		CF_HAVEPARAMS,	GET_SENSOR,		"cpu0,temp0"},
+	{"sensor",		CF_HAVEPARAMS,	get_sensor,		"cpu0,temp0"},
 
 	{NULL}
 };
