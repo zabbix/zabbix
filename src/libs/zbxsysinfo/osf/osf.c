@@ -33,7 +33,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"proc.num",		CF_HAVEPARAMS,	proc_num,		"inetd"},
 	{"proc.mem",		CF_HAVEPARAMS,	proc_mem,		"inetd"},
 
-	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,user,avg1"},
+	{"system.cpu.util",	CF_HAVEPARAMS,	system_cpu_util,	"all,user,avg1"},
 	{"system.cpu.load",	CF_HAVEPARAMS,	system_cpu_load,	"all,avg1"},
 	{"system.cpu.discovery",0,		SYSTEM_CPU_DISCOVERY,	NULL},
 

@@ -41,7 +41,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"proc.get",		CF_HAVEPARAMS,	proc_get,		"svchost.exe"},
 	{"proc.num",		CF_HAVEPARAMS,	proc_num,		"svchost.exe"},
 
-	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,system,avg1"},
+	{"system.cpu.util",	CF_HAVEPARAMS,	system_cpu_util,	"all,system,avg1"},
 	{"system.cpu.load",	CF_HAVEPARAMS,	system_cpu_load,	"all,avg1"},
 	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
 	{"system.cpu.discovery",0,		SYSTEM_CPU_DISCOVERY,	NULL},

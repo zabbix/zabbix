@@ -49,7 +49,7 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"system.cpu.switches",	0,		system_cpu_switches,	NULL},
 	{"system.cpu.intr",	0,		system_cpu_intr,	NULL},
-	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,idle"},
+	{"system.cpu.util",	CF_HAVEPARAMS,	system_cpu_util,	"all,idle"},
 	{"system.cpu.load",	CF_HAVEPARAMS,	system_cpu_load,	"all,avg1"},
 	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
 	{"system.cpu.discovery",0,		SYSTEM_CPU_DISCOVERY,	NULL},
