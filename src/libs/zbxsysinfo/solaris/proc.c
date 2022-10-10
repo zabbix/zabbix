@@ -904,7 +904,7 @@ out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
-int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*procname, *username, *cmdline, *tmp, *flags;
 	char		*errmsg = NULL;

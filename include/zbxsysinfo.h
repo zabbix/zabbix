@@ -231,7 +231,7 @@ int	kernel_maxproc(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	kernel_openfiles(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
-int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	proc_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
 int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
