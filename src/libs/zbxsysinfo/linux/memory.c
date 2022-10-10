@@ -216,7 +216,7 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 #endif
 }
 
-static int	VM_MEMORY_PROC_MEMINFO(const char *meminfo_entry, AGENT_RESULT *result)
+static int	vm_memory_proc_meminfo(const char *meminfo_entry, AGENT_RESULT *result)
 {
 	FILE		*f;
 	zbx_uint64_t	value;
@@ -271,15 +271,15 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "shared"))
 		ret = VM_MEMORY_SHARED(result);
 	else if (0 == strcmp(mode, "cached"))
-		ret = VM_MEMORY_PROC_MEMINFO("Cached:", result);
+		ret = vm_memory_proc_meminfo("Cached:", result);
 	else if (0 == strcmp(mode, "active"))
-		ret = VM_MEMORY_PROC_MEMINFO("Active:", result);
+		ret = vm_memory_proc_meminfo("Active:", result);
 	else if (0 == strcmp(mode, "anon"))
-		ret = VM_MEMORY_PROC_MEMINFO("AnonPages:", result);
+		ret = vm_memory_proc_meminfo("AnonPages:", result);
 	else if (0 == strcmp(mode, "inactive"))
-		ret = VM_MEMORY_PROC_MEMINFO("Inactive:", result);
+		ret = vm_memory_proc_meminfo("Inactive:", result);
 	else if (0 == strcmp(mode, "slab"))
-		ret = VM_MEMORY_PROC_MEMINFO("Slab:", result);
+		ret = vm_memory_proc_meminfo("Slab:", result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
