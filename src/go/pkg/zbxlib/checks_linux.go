@@ -44,7 +44,7 @@ int	system_hw_macaddr(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -87,7 +87,7 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	case "system.swap.in":
 		cfunc = unsafe.Pointer(C.system_swap_in)
 	case "system.swap.out":
-		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_OUT)
+		cfunc = unsafe.Pointer(C.system_swap_out)
 	case "vfs.dir.get":
 		cfunc = unsafe.Pointer(C.VFS_DIR_GET)
 	}

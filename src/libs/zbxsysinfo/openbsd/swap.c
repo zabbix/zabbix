@@ -274,7 +274,7 @@ int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret;
 	char		*swapdev, *mode, *error;
