@@ -40,7 +40,7 @@ int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -71,7 +71,7 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	case "vfs.fs.discovery":
 		return unsafe.Pointer(C.VFS_FS_DISCOVERY)
 	case "vfs.fs.inode":
-		return unsafe.Pointer(C.VFS_FS_INODE)
+		return unsafe.Pointer(C.vfs_fs_inode)
 	case "vfs.fs.size":
 		return unsafe.Pointer(C.VFS_FS_SIZE)
 	case "vfs.fs.get":

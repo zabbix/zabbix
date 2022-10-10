@@ -49,7 +49,7 @@ int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 */
 import "C"
