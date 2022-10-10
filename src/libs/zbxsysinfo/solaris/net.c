@@ -395,7 +395,7 @@ int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *mode;
 	int	ret;

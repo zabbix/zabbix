@@ -476,7 +476,7 @@ clean:
 	return ret;
 }
 
-int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	zbx_ifrow_t	ifrow = {NULL, NULL};

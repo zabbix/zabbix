@@ -36,7 +36,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"net.udp.listen",	CF_HAVEPARAMS,	NET_UDP_LISTEN,		"68"},
 
 	{"net.if.in",		CF_HAVEPARAMS,	net_if_in,		"en0,bytes"},
-	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"en0,bytes"},
+	{"net.if.out",		CF_HAVEPARAMS,	net_if_out,		"en0,bytes"},
 	{"net.if.total",	CF_HAVEPARAMS,	NET_IF_TOTAL,		"en0,bytes"},
 	{"net.if.collisions",   CF_HAVEPARAMS,	NET_IF_COLLISIONS,      "en0"},
 

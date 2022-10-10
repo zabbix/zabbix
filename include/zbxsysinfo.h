@@ -238,7 +238,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
