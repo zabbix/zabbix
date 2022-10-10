@@ -260,7 +260,7 @@ int	registry_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
 #ifdef _AIX
-int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_stat(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
 /* the fields used by proc queries */
