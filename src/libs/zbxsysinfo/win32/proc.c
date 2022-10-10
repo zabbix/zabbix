@@ -340,7 +340,7 @@ static int	GetProcessAttribute(HANDLE hProcess, int attr, int type, int count, d
  *         avg - average value for all processes named <process>
  *         sum - sum of values for all processes named <process>
  */
-int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_info(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	HANDLE			hProcessSnap, hProcess;
 	PROCESSENTRY32		pe32;

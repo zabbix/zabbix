@@ -63,7 +63,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"perf_counter_en",	CF_HAVEPARAMS,	PERF_COUNTER_EN,	"\\System\\Processes"},
 	{"perf_instance.discovery",	CF_HAVEPARAMS,	perf_instance_discovery,	"Processor"},
 	{"perf_instance_en.discovery",	CF_HAVEPARAMS,	perf_instance_discovery_en,	"Processor"},
-	{"proc_info",		CF_HAVEPARAMS,	PROC_INFO,		"svchost.exe"},
+	{"proc_info",		CF_HAVEPARAMS,	proc_info,		"svchost.exe"},
 
 	{"__UserPerfCounter",	CF_HAVEPARAMS,	user_perf_counter,	""},
 
