@@ -290,7 +290,7 @@ int	vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return vfs_dev_rw(request, result, ZBX_DEV_READ);
 }
 
-int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return vfs_dev_rw(request, result, ZBX_DEV_WRITE);
 }
