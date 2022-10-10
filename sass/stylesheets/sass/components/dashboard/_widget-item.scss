@@ -76,12 +76,14 @@ form.dashboard-widget-item {
 div.dashboard-widget-item {
 	$line-height: 1.14;
 
-	box-sizing: border-box;
-	height: 100%;
-	padding: 10px;
-	overflow-x: hidden;
+	> div {
+		box-sizing: border-box;
+		height: 100%;
+		padding: 10px;
+		overflow-x: hidden;
 
-	@extend %webkit-scrollbar;
+		@extend %webkit-scrollbar;
+	}
 
 	a {
 		box-sizing: border-box;

@@ -131,7 +131,5 @@ else {
 }
 
 (new CWidgetView($data))
-	->addItem(
-		(new CDiv($report))->addClass('dashboard-widget-slareport')
-	)
+	->addItem($report)
 	->show();

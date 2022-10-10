@@ -149,7 +149,5 @@ foreach ($data['rows'] as $columns) {
 }
 
 (new CWidgetView($data))
-	->addItem(
-		(new CDiv($table))->addClass('dashboard-widget-tophosts')
-	)
+	->addItem($table)
 	->show();

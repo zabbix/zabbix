@@ -84,9 +84,7 @@ else {
 				->addClass('clock-disabled');
 		}
 
-		$body = (new CDiv($rows))
-			->addClass('dashboard-widget-clock')
-			->addClass('clock-digital');
+		$body = (new CDiv($rows))->addClass('clock-digital');
 
 		if ($clock_data['bg_color'] !== '') {
 			$body->addStyle('background-color: #'.$clock_data['bg_color']);

@@ -42,7 +42,7 @@ form.dashboard-widget-clock {
 // Widget view.
 
 div.dashboard-widget-clock {
-	&.clock-digital {
+	.clock-digital {
 		$line-height: 1.14;
 
 		box-sizing: border-box;

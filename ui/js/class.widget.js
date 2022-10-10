@@ -873,6 +873,7 @@ class CWidget extends CBaseComponent {
 
 		this._content_body = document.createElement('div');
 		this._content_body.classList.add(this._css_classes.content);
+		this._content_body.classList.add(`dashboard-widget-${this._type}`);
 		this._content_body.classList.toggle('no-padding', !this._configuration.padding);
 
 		this._container.appendChild(this._content_body);

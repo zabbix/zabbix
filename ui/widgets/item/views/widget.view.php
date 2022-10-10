@@ -101,11 +101,13 @@ else {
 		$rows[] = new CDiv($cols);
 	}
 
-	$body = (new CDiv(
+	$body = new CDiv(
 		new CLink($rows, $data['url'])
-	))->addClass('dashboard-widget-item');
+	);
 
-	$body->addStyle('background-color: #'.$data['bg_color'].';');
+	if ($data['bg_color'] !== '') {
+		$body->addStyle('background-color: #'.$data['bg_color'].';');
+	}
 }
 
 (new CWidgetView($data))
