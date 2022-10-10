@@ -129,7 +129,7 @@ int	perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return perf_counter_ex(__func__, request, result, PERF_COUNTER_LANG_DEFAULT);
 }
 
-int	PERF_COUNTER_EN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_counter_en(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return perf_counter_ex(__func__, request, result, PERF_COUNTER_LANG_EN);
 }
