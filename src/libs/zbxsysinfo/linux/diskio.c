@@ -298,7 +298,7 @@ int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
 /* SCSI device type CD/DVD-ROM. http://en.wikipedia.org/wiki/SCSI_Peripheral_Device_Type */
 #define SCSI_TYPE_ROM			0x05
 
-int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define DEVTYPE_STR	"DEVTYPE="
 #define DEVTYPE_STR_LEN	ZBX_CONST_STRLEN(DEVTYPE_STR)

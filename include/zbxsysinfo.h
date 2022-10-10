@@ -233,7 +233,7 @@ int	system_uname(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_boottime(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
