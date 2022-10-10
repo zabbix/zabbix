@@ -436,42 +436,6 @@ function getMenuPopupMapElementGroup(options) {
  * @return array
  */
 function getMenuPopupMapElementTrigger(options) {
-	if (!options.allowed_ui_problems) {
-		return [];
-	}
-
-	var sections = [],
-		problems_url = new Curl('zabbix.php', false);
-
-	problems_url.setArgument('action', 'problem.view');
-	problems_url.setArgument('filter_name', '');
-	problems_url.setArgument('triggerids[]', options.triggerids);
-	if (typeof options.severities !== 'undefined') {
-		problems_url.setArgument('severities[]', options.severities);
-	}
-	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
-		problems_url.setArgument('show_suppressed', '1');
-	}
-
-	sections.push({
-		label: t('Go to'),
-		items: [{
-			label: t('Problems'),
-			url: problems_url.getUrl()
-		}]
-	});
-
-	// urls
-	if (typeof options.urls !== 'undefined') {
-		sections.push({
-			label: t('Links'),
-			items: options.urls
-		});
-	}
-
-	return sections;
-}
-function getMenuPopupMapElementTrigger(options, trigger_element) {
 	const sections = [];
 	const items = [];
 	let url;

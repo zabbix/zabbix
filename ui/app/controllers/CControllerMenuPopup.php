@@ -610,7 +610,7 @@ class CControllerMenuPopup extends CController {
 							'showEvents' => $show_events,
 							'allowed_ui_problems' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
 							'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-
+							'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 						];
 
 						if (array_key_exists('severity_min', $data)) {
