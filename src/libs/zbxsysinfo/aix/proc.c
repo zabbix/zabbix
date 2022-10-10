@@ -286,7 +286,7 @@ out:
 #undef ZBX_TRSS
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*param, *procname, *proccomm;
 	struct passwd		*usrinfo;

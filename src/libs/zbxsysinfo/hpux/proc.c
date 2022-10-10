@@ -51,7 +51,7 @@ static int	check_procstate(struct pst_status pst, int zbx_proc_stat)
 	return FAIL;
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_BURST	((size_t)10)
 	char			*procname, *proccomm, *param;

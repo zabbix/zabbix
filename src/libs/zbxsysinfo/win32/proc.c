@@ -119,7 +119,7 @@ lbl_err:
 	return res;
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	HANDLE			hProcessSnap, hProcess;
 	PROCESSENTRY32		pe32;

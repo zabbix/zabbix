@@ -880,7 +880,7 @@ out:
 #undef ZBX_VMPTE
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		tmp[MAX_STRING_LEN], *procname, *proccomm, *param;
 	DIR		*dir;

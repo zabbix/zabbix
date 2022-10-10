@@ -39,7 +39,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
 
 	{"proc.get",		CF_HAVEPARAMS,	proc_get,		"svchost.exe"},
-	{"proc.num",		CF_HAVEPARAMS,	PROC_NUM,		"svchost.exe"},
+	{"proc.num",		CF_HAVEPARAMS,	proc_num,		"svchost.exe"},
 
 	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,system,avg1"},
 	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},

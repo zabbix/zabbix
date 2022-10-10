@@ -553,7 +553,7 @@ out:
 	return SYSINFO_RET_OK;
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *zone_parameter;
 	DIR			*dir;
