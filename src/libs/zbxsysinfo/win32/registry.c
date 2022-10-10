@@ -430,7 +430,7 @@ int	registry_data(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	REGISTRY_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	registry_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*pkey, *pmode, *regexp;
 	int	mode;

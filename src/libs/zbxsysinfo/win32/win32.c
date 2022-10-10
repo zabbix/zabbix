@@ -73,7 +73,7 @@ ZBX_METRIC	parameters_specific[] =
 							"root\\cimv2,select * from Win32_OperatingSystem"},
 
 	{"registry.data",		CF_HAVEPARAMS,	registry_data,		NULL},
-	{"registry.get",		CF_HAVEPARAMS,	REGISTRY_GET,		NULL},
+	{"registry.get",		CF_HAVEPARAMS,	registry_get,		NULL},
 
 	{NULL}
 };
