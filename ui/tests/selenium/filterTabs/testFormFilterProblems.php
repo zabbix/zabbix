@@ -201,7 +201,7 @@ class testFormFilterProblems extends testFormFilter {
 		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
 		$formid = $this->query('xpath://a[text()="'.$data['filter']['Name'].'"]/parent::li')->waitUntilVisible()->one()->getAttribute('data-target');
 		$form = $this->query('id:'.$formid)->asForm()->one();
-		$table = $this->query('class:list-table')->asTable()->waitUntilReady()->one();
+		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Checking result amount before changing time period.
 		$this->assertEquals($table->getRows()->count(), 2);
@@ -212,7 +212,9 @@ class testFormFilterProblems extends testFormFilter {
 			$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 			$dialog->fill(['Set custom time period' => true, 'From' => '2020-10-23 18:00']);
 			$dialog->submit();
+			COverlayDialogElement::ensureNotPresent();
 			$this->page->waitUntilReady();
+			$table->waitUntilReloaded();
 		}
 		else {
 			// Changing time period from timeselector tab.
@@ -223,6 +225,7 @@ class testFormFilterProblems extends testFormFilter {
 			$filter_container->selectTab($data['filter']['Name']);
 			$this->query('button:Update')->one()->click();
 			$this->page->waitUntilReady();
+			$table->waitUntilReloaded();
 		}
 
 		// Checking that Show field tabs are disabled or enabled.
