@@ -35,7 +35,7 @@ ZBX_METRIC parameters_specific[] =
 	{"vfs.dev.write",	CF_HAVEPARAMS,	VFS_DEV_WRITE,		"sda,operations"},
 	{"vfs.dev.discovery",	0,		VFS_DEV_DISCOVERY,	NULL},
 
-	{"net.tcp.listen",	CF_HAVEPARAMS,	NET_TCP_LISTEN,		"80"},
+	{"net.tcp.listen",	CF_HAVEPARAMS,	net_tcp_listen,		"80"},
 	{"net.udp.listen",	CF_HAVEPARAMS,	NET_UDP_LISTEN,		"68"},
 
 	{"net.tcp.socket.count",CF_HAVEPARAMS,	NET_TCP_SOCKET_COUNT,	",80"},

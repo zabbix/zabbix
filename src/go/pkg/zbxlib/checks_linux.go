@@ -31,7 +31,7 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -67,7 +67,7 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	case "system.boottime":
 		cfunc = unsafe.Pointer(C.SYSTEM_BOOTTIME)
 	case "net.tcp.listen":
-		cfunc = unsafe.Pointer(C.NET_TCP_LISTEN)
+		cfunc = unsafe.Pointer(C.net_tcp_listen)
 	case "net.udp.listen":
 		cfunc = unsafe.Pointer(C.NET_UDP_LISTEN)
 	case "sensor":

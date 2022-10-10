@@ -28,7 +28,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL},
 	{"vfs.fs.get",		0,		VFS_FS_GET,		NULL},
 
-	{"net.tcp.listen",	CF_HAVEPARAMS,	NET_TCP_LISTEN,		"80"},
+	{"net.tcp.listen",	CF_HAVEPARAMS,	net_tcp_listen,		"80"},
 
 	{"net.if.in",		CF_HAVEPARAMS,	net_if_in,		"MS TCP Loopback interface,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	net_if_out,		"MS TCP Loopback interface,bytes"},
