@@ -119,4 +119,39 @@ zbx_mntopt_t;
 char		*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags);
 #endif
 
+/* external system functions */
+int	get_sensor(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	kernel_maxfiles(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	kernel_maxproc(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	kernel_openfiles(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+#ifdef ZBX_PROCSTAT_COLLECTOR
+int	proc_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result);
+#endif
+
+int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_tcp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_udp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_intr(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_chassis(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_devices(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_macaddr(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif /* ZABBIX_SYSINFO_H */
