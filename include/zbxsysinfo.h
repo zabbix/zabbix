@@ -241,7 +241,7 @@ int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	user_perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PERF_COUNTER_EN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PERF_INSTANCE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);

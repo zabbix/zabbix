@@ -27,7 +27,7 @@
 
 #include "perfstat.h"
 
-int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	user_perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
 	char	*counter, *error = NULL;
