@@ -254,12 +254,12 @@ err:
 	return ret;
 }
 
-int	PERF_INSTANCE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_instance_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return perf_instance_discovery_ex(__func__, request, result, PERF_COUNTER_LANG_DEFAULT);
 }
 
-int	PERF_INSTANCE_DISCOVERY_EN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_instance_discovery_en(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return perf_instance_discovery_ex(__func__, request, result, PERF_COUNTER_LANG_EN);
 }
