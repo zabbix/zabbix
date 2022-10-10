@@ -50,7 +50,7 @@ int	kernel_maxfiles(AGENT_REQUEST *request, AGENT_RESULT *result)
 #endif
 }
 
-int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	kernel_maxproc(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXPROC
 	int	mib[2];

@@ -67,7 +67,7 @@ void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func)
 	zbx_init_agent_result(&param_result);
 
 	if (ZABBIX_MOCK_KERNEL_MAXPROC == kernel_func)
-		actual_result = KERNEL_MAXPROC(&request, &param_result);
+		actual_result = kernel_maxproc(&request, &param_result);
 	else if (ZABBIX_MOCK_KERNEL_MAXFILES == kernel_func)
 		actual_result = kernel_maxfiles(&request, &param_result);
 	else

@@ -37,7 +37,7 @@ int	kernel_maxfiles(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	kernel_maxproc(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	mib[] = {CTL_KERN, KERN_MAXPROC}, maxproc;
 	size_t	len = sizeof(maxproc);
