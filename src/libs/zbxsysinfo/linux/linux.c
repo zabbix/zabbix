@@ -31,7 +31,7 @@ ZBX_METRIC parameters_specific[] =
 	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL},
 	{"vfs.fs.get",		0,		VFS_FS_GET,		NULL},
 
-	{"vfs.dev.read",	CF_HAVEPARAMS,	VFS_DEV_READ,		"sda,operations"},
+	{"vfs.dev.read",	CF_HAVEPARAMS,	vfs_dev_read,		"sda,operations"},
 	{"vfs.dev.write",	CF_HAVEPARAMS,	VFS_DEV_WRITE,		"sda,operations"},
 	{"vfs.dev.discovery",	0,		VFS_DEV_DISCOVERY,	NULL},
 
