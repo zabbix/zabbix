@@ -268,7 +268,7 @@ static int	net_if_total_errors(const char *if_name, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*if_name, *error;
