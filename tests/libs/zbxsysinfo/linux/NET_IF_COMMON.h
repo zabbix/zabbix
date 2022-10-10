@@ -22,7 +22,7 @@
 
 #define ZABBIX_MOCK_NET_IF_IN		0
 #define ZABBIX_MOCK_NET_IF_OUT		1
-#define ZABBIX_MOCK_NET_IF_TOTAL	2
+#define ZABBIX_MOCK_net_if_total	2
 
 void	zbx_mock_test_entry_NET_IF_COMMON(void **state, int net_if_func);
 #endif

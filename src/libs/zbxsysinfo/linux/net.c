@@ -1165,7 +1165,7 @@ int	net_tcp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return net_socket_count(NET_CONN_TYPE_TCP, request, result);
 }
 
-int	NET_UDP_SOCKET_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_udp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return net_socket_count(NET_CONN_TYPE_UDP, request, result);
 }
