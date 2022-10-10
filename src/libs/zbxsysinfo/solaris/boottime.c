@@ -22,7 +22,7 @@
 
 #include "log.h"
 
-int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_boottime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
 

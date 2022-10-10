@@ -21,7 +21,7 @@
 
 int	system_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	if (SYSINFO_RET_OK == SYSTEM_BOOTTIME(request, result))
+	if (SYSINFO_RET_OK == system_boottime(request, result))
 	{
 		time_t	now;
 

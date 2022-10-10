@@ -30,7 +30,7 @@ package zbxlib
 int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_boottime(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
