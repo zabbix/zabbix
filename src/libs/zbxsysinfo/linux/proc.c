@@ -1749,7 +1749,7 @@ static proc_data_t	*proc_read_data(char *path, int zbx_proc_mode)
 	return proc_data;
 }
 
-int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define SUM_PROC_VALUE(param)									\
 	do											\

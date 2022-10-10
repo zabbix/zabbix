@@ -405,7 +405,7 @@ static char	*get_state(struct kinfo_proc2 *proc)
 	return state;
 }
 
-int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char				*procname, *proccomm, *param, *args;
 	int				invalid_user = 0, count, i, k, zbx_proc_mode, pagesize, op, arg;

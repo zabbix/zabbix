@@ -688,7 +688,7 @@ static char	*get_state(struct kinfo_proc *proc)
 	return state;
 }
 
-int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char				*procname, *proccomm, *param, *args;
 	int				count, i, mib[4], mibs, zbx_proc_mode, pagesize, invalid_user = 0;

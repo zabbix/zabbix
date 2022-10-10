@@ -684,7 +684,7 @@ static char	*get_state(struct ZBX_STRUCT_KINFO_PROC *proc)
 	return state;
 }
 
-int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define SUM_PROC_VALUE(param)					\
 	do							\

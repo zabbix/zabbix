@@ -234,7 +234,7 @@ int	kernel_openfiles(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	proc_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
-int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result);
