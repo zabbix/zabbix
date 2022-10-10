@@ -30,6 +30,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  * @backup role
  *
  * @onBefore prepareRoleData
+ * @dataSource LoginUsers, ExecuteNowAction
  */
 class testPageUserRoles extends CWebTest {
 
@@ -176,8 +177,8 @@ class testPageUserRoles extends CWebTest {
 			],
 			[
 				'Name' => 'Super admin role',
-				'#' => 'Users 5',
-				'Users' => 'Admin (Zabbix Administrator), filter-create, filter-delete, filter-update, test-timezone'
+				'#' => 'Users 6',
+				'Users' => 'Admin (Zabbix Administrator), filter-create, filter-delete, filter-update, LDAP user, test-timezone'
 			],
 			[
 				'Name' => 'UR1-executenow-on',
