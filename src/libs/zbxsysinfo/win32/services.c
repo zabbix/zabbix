@@ -698,7 +698,7 @@ static int	check_service_state(SC_HANDLE h_srv, int service_state)
 	return FAIL;
 }
 
-int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	services(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int				start_type, service_state;
 	char				*type, *state, *exclude, *buf = NULL, *utf8;

@@ -249,7 +249,7 @@ int	perf_instance_discovery_en(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	service_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	service_info(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	service_state(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	services(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
