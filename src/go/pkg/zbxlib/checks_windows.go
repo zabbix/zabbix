@@ -42,7 +42,7 @@ int	system_cpu_intr(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_hw_chassis(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_hw_devices(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_macaddr(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result);

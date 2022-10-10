@@ -40,7 +40,7 @@ int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_cpu_intr(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_macaddr(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -81,7 +81,7 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	case "system.hw.cpu":
 		cfunc = unsafe.Pointer(C.system_hw_cpu)
 	case "system.hw.macaddr":
-		cfunc = unsafe.Pointer(C.SYSTEM_HW_MACADDR)
+		cfunc = unsafe.Pointer(C.system_hw_macaddr)
 	case "system.sw.os":
 		cfunc = unsafe.Pointer(C.SYSTEM_SW_OS)
 	case "system.swap.in":
