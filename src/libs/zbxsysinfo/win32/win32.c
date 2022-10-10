@@ -49,7 +49,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.sw.arch",	0,		system_sw_arch,		NULL},
 
 	{"system.swap.size",	CF_HAVEPARAMS,	system_swap_size,	"all,free"},
-	{"vm.vmemory.size",	CF_HAVEPARAMS,	VM_VMEMORY_SIZE,	"total"},
+	{"vm.vmemory.size",	CF_HAVEPARAMS,	vm_vmemory_size,	"total"},
 
 	{"system.uptime",	0,		system_uptime,		NULL},
 

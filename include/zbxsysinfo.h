@@ -254,7 +254,7 @@ int	proc_info(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_if_list(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	wmi_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	wmi_getall(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vm_vmemory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	REGISTRY_DATA(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	REGISTRY_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif

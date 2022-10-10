@@ -21,7 +21,7 @@
 
 #include "zbxsymbols.h"
 
-int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vm_vmemory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	MEMORYSTATUSEX	ms_ex;
 	MEMORYSTATUS	ms;
