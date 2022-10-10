@@ -69,7 +69,7 @@ ZBX_METRIC parameters_specific[] =
 	{"system.hw.macaddr",	CF_HAVEPARAMS,	system_hw_macaddr,	NULL},
 
 	{"system.sw.arch",	0,		system_sw_arch,		NULL},
-	{"system.sw.os",	CF_HAVEPARAMS,	SYSTEM_SW_OS,		NULL},
+	{"system.sw.os",	CF_HAVEPARAMS,	system_sw_os,		NULL},
 	{"system.sw.packages",	CF_HAVEPARAMS,	SYSTEM_SW_PACKAGES,	NULL},
 
 	{"system.swap.size",	CF_HAVEPARAMS,	SYSTEM_SWAP_SIZE,	"all,free"},

@@ -48,7 +48,7 @@ int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*type, line[MAX_STRING_LEN], tmp_line[MAX_STRING_LEN];
 	int	ret = SYSINFO_RET_FAIL, line_read = FAIL;
