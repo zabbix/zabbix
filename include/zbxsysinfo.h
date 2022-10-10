@@ -223,46 +223,6 @@ int	zbx_quote_key_param(char **param, int forced);
 int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c);
 void	zbx_set_agent_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime);
 
-/* external system functions */
-int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_uptime(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_uname(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	system_boottime(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
-
-#if defined(_WINDOWS) || defined(__MINGW32__)
-int	user_perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	perf_counter_en(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	perf_instance_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	perf_instance_discovery_en(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	service_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	service_info(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	service_state(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	services(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	proc_info(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	net_if_list(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	wmi_get(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	wmi_getall(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	vm_vmemory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	registry_data(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	registry_get(AGENT_REQUEST *request, AGENT_RESULT *result);
-#endif
-
-#ifdef _AIX
-int	system_stat(AGENT_REQUEST *request, AGENT_RESULT *result);
-#endif
-
 /* the fields used by proc queries */
 #define ZBX_SYSINFO_PROC_NONE		0x0000
 #define ZBX_SYSINFO_PROC_PID		0x0001
