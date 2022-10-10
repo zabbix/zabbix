@@ -154,7 +154,7 @@ end:
 
 #endif	/* HPUX_VERSION < 1131 */
 
-int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct zbx_json	j;
 	char		*if_name;

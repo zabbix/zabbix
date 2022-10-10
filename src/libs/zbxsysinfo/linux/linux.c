@@ -45,7 +45,7 @@ ZBX_METRIC parameters_specific[] =
 	{"net.if.out",		CF_HAVEPARAMS,	net_if_out,		"lo,bytes"},
 	{"net.if.total",	CF_HAVEPARAMS,	net_if_total,		"lo,bytes"},
 	{"net.if.collisions",	CF_HAVEPARAMS,	net_if_collisions,	"lo"},
-	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	NULL},
+	{"net.if.discovery",	0,		net_if_discovery,	NULL},
 
 	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"total"},
 

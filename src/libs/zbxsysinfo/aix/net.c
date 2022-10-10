@@ -202,7 +202,7 @@ int	net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #if defined(HAVE_LIBPERFSTAT)
 	int			rc, i, ret = SYSINFO_RET_FAIL;

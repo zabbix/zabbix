@@ -63,13 +63,13 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED != zbx_parse_item_key("net.if.discovery", &request))
 		fail_msg("Unexpected return code from zbx_parse_item_key()");
 
-	actual_ret = NET_IF_DISCOVERY(&request, &result);
+	actual_ret = net_if_discovery(&request, &result);
 
 	zbx_free_agent_request(&request);
 
 	if (actual_ret != expected_ret)
 	{
-		fail_msg("Unexpected return code from NET_IF_DISCOVERY(): expected %s, got %s",
+		fail_msg("Unexpected return code from net_if_discovery(): expected %s, got %s",
 				zbx_sysinfo_ret_string(expected_ret), zbx_sysinfo_ret_string(actual_ret));
 	}
 
