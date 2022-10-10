@@ -248,7 +248,7 @@ int	perf_instance_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	perf_instance_discovery_en(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	service_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	service_info(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	service_state(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result);

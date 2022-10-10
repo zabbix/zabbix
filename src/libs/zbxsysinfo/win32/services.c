@@ -549,7 +549,7 @@ int	service_info(AGENT_REQUEST *request, AGENT_RESULT *result)
 #undef ZBX_NON_EXISTING_SRV
 }
 
-int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	service_state(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SC_HANDLE	mgr, service;
 	char		*name;

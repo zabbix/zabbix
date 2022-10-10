@@ -57,7 +57,7 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"service.discovery",	0,		service_discovery,	NULL},
 	{"service.info",	CF_HAVEPARAMS,	service_info,		ZABBIX_SERVICE_NAME},
-	{"service_state",	CF_HAVEPARAMS,	SERVICE_STATE,		ZABBIX_SERVICE_NAME},
+	{"service_state",	CF_HAVEPARAMS,	service_state,		ZABBIX_SERVICE_NAME},
 	{"services",		CF_HAVEPARAMS,	SERVICES,		NULL},
 	{"perf_counter",	CF_HAVEPARAMS,	PERF_COUNTER,		"\\System\\Processes"},
 	{"perf_counter_en",	CF_HAVEPARAMS,	PERF_COUNTER_EN,	"\\System\\Processes"},
