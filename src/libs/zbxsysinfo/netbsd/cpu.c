@@ -42,7 +42,7 @@ static int	get_cpu_num()
 #endif
 }
 
-int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*tmp;
 	int	cpu_num;

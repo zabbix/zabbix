@@ -40,7 +40,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"net.if.total",	CF_HAVEPARAMS,	net_if_total,		"en0,bytes"},
 	{"net.if.collisions",   CF_HAVEPARAMS,	net_if_collisions,      "en0"},
 
-	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
+	{"system.cpu.num",	CF_HAVEPARAMS,	system_cpu_num,		"online"},
 	{"system.cpu.load",	CF_HAVEPARAMS,	system_cpu_load,	"all,avg1"},
 	{"system.cpu.discovery",0,		SYSTEM_CPU_DISCOVERY,	NULL},
 

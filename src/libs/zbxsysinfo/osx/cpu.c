@@ -37,7 +37,7 @@ static int	get_cpu_num(int online)
 	return cpu_num;
 }
 
-int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*tmp;
 	int	cpu_num, online = 0;

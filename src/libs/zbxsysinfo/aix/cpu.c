@@ -25,7 +25,7 @@
 #include <sys/dr.h>
 #include "stats.h"
 
-int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_LIBPERFSTAT
 	char			*tmp;
