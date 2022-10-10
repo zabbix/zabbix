@@ -391,7 +391,7 @@ static size_t	print_freq(char *buffer, size_t size, int filter, int cpu, zbx_uin
 	return offset;
 }
 
-int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL, filter, cpu, cur_cpu = -1, offset = 0;
 	zbx_uint64_t	maxfreq = ZBX_MAX_UINT64, curfreq = ZBX_MAX_UINT64;
