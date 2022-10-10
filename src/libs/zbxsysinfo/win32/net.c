@@ -678,7 +678,7 @@ static char	*get_if_adminstatus_string(DWORD status)
 	}
 }
 
-int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_list(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DWORD		dwSize, dwRetVal, i, j;
 	char		*buf = NULL;

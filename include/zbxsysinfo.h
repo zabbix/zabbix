@@ -251,7 +251,7 @@ int	service_info(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	service_state(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	services(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	proc_info(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_list(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	WMI_GETALL(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
