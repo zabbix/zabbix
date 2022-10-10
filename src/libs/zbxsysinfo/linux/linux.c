@@ -70,7 +70,7 @@ ZBX_METRIC parameters_specific[] =
 
 	{"system.sw.arch",	0,		system_sw_arch,		NULL},
 	{"system.sw.os",	CF_HAVEPARAMS,	system_sw_os,		NULL},
-	{"system.sw.packages",	CF_HAVEPARAMS,	SYSTEM_SW_PACKAGES,	NULL},
+	{"system.sw.packages",	CF_HAVEPARAMS,	system_sw_packages,	NULL},
 
 	{"system.swap.size",	CF_HAVEPARAMS,	SYSTEM_SWAP_SIZE,	"all,free"},
 	{"system.swap.in",	CF_HAVEPARAMS,	SYSTEM_SWAP_IN,		"all"},

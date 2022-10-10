@@ -181,7 +181,7 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 	{NULL}
 };
 
-int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	size_t			offset = 0;
 	int			ret = SYSINFO_RET_FAIL, show_pm, i, check_regex, check_manager;

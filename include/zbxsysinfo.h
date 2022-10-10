@@ -224,7 +224,7 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c);
 void	zbx_set_agent_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime);
 
 /* external system functions */
-int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
