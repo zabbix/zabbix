@@ -697,13 +697,15 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Check for valid user groups.
+	 * Check for valid user groups. Check is it allowed to have 'password' field empty.
 	 *
 	 * @param array $users
-	 * @param array $users[]['passwd']  (optional)
-	 * @param array $users[]['usrgrps']  (optional)
+	 * @param array $users[]['passwd']          (optional)
+	 * @param array $users[]['usrgrps']         (optional)
+	 * @param int   $users[]['userdirectoryid]  (optional)
 	 * @param array $db_users
 	 * @param array $db_users[]['passwd']
+	 * @param int   $db_users[]['userdirectoryid']
 	 *
 	 * @throws APIException  if user groups is not exists.
 	 */
@@ -736,18 +738,18 @@ class CUser extends CApiService {
 		}
 
 		foreach ($users as $user) {
-			if (array_key_exists('passwd', $user)) {
-				$passwd = $user['passwd'];
-			}
-			elseif (array_key_exists('userid', $user) && array_key_exists($user['userid'], $db_users)) {
-				$passwd = $db_users[$user['userid']]['passwd'];
-			}
-			else {
-				$passwd = '';
+			if ($user['userdirectoryid']) {
+				continue;
 			}
 
-			// Do not allow empty password for users with GROUP_GUI_ACCESS_INTERNAL.
-			if ($passwd === '' && self::hasInternalAuth($user, $db_usrgrps)) {
+			if (array_key_exists('userid', $user) && array_key_exists($user['userid'], $db_users)) {
+				$user += $db_users[$user['userid']];
+			}
+
+			$user += ['passwd' => ''];
+
+			// Do not allow empty password for not provisioned users with GROUP_GUI_ACCESS_INTERNAL.
+			if ($user['passwd'] === '' && self::hasInternalAuth($user, $db_usrgrps)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value for field "%1$s": %2$s.', 'passwd', _('cannot be empty'))
 				);
@@ -1448,13 +1450,15 @@ class CUser extends CApiService {
 
 		$new_user = [];
 		$ldap_userdirectoryid = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
+		$default_auth_type = CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE);
 		$user_data = $this->findAccessibleUser(
 			$user['username'],
 			CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE,
-			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE), true
+			$default_auth_type, true
 		);
 
 		if (!array_key_exists('db_user', $user_data) && $user['username'] !== ZBX_GUEST_USER
+				&& $default_auth_type == ZBX_AUTH_LDAP
 				&& CAuthenticationHelper::isLdapProvisionEnabled($ldap_userdirectoryid)) {
 			$idp_user_data = API::UserDirectory()->test([
 				'userdirectoryid' => $ldap_userdirectoryid,
@@ -1477,7 +1481,6 @@ class CUser extends CApiService {
 		}
 
 		$db_user = $this->addExtraFields($user_data['db_user'], $user_data['permissions']);
-		$this->setTimezone($db_user['timezone']);
 
 		if ($db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
 			$sec_left = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK))
@@ -1497,7 +1500,7 @@ class CUser extends CApiService {
 		try {
 			switch ($db_user['auth_type']) {
 				case ZBX_AUTH_LDAP:
-					if ($new_user && $new_user['userdirectoryid'] != 0) {
+					if ($new_user && $db_user['roleid']) {
 						break;
 					}
 
@@ -1529,14 +1532,17 @@ class CUser extends CApiService {
 					]);
 
 					if (CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])) {
+						$db_user['deprovisioned'] = true;
 						$upd_user = $this->updateProvisionedUser($db_user['userid'], $idp_user_data);
 
-						if (!$upd_user) {
-							$db_user = [];
-							self::exception(ZBX_API_ERROR_PERMISSIONS,
-								_('Incorrect user name or password or account is temporarily blocked.')
-							);
+						if ($upd_user) {
+							$user_data = $this->findAccessibleUser($db_user['username'], true, ZBX_AUTH_LDAP, false);
+							$db_user = $this->addExtraFields($user_data['db_user'], $user_data['permissions']);
 						}
+					}
+
+					if ($db_user['deprovisioned']) {
+						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions for system access.'));
 					}
 
 					break;
@@ -1593,6 +1599,7 @@ class CUser extends CApiService {
 
 		// Start session.
 		unset($db_user['passwd']);
+		$this->setTimezone($db_user['timezone']);
 		$db_user = self::createSession($db_user);
 
 		self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
@@ -1697,7 +1704,7 @@ class CUser extends CApiService {
 		// Check system permissions.
 		if (($autologout != 0 && $db_session['lastaccess'] + $autologout <= $time)
 				|| $permissions['users_status'] == GROUP_STATUS_DISABLED
-				|| !$db_user['roleid']) {
+				|| $db_user['deprovisioned']) {
 			DB::delete('sessions', [
 				'status' => ZBX_SESSION_PASSIVE,
 				'userid' => $db_user['userid']
@@ -1802,11 +1809,13 @@ class CUser extends CApiService {
 			'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
 			'users_status' => GROUP_STATUS_ENABLED,
 			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
+			'deprovisioned' => false,
 			'userdirectoryid' => 0
 		];
+		$deprovision_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DEPROVISIONED_GROUPID);
 
 		$db_usrgrps = DBselect(
-			'SELECT g.debug_mode,g.users_status,g.gui_access,g.userdirectoryid'.
+			'SELECT g.usrgrpid,g.debug_mode,g.users_status,g.gui_access,g.userdirectoryid'.
 			' FROM usrgrp g,users_groups ug'.
 			' WHERE g.usrgrpid=ug.usrgrpid'.
 				' AND ug.userid='.$userid
@@ -1817,6 +1826,12 @@ class CUser extends CApiService {
 		while ($db_usrgrp = DBfetch($db_usrgrps)) {
 			if ($db_usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 				$permissions['debug_mode'] = GROUP_DEBUG_MODE_ENABLED;
+			}
+
+			if ($db_usrgrp['usrgrpid'] == $deprovision_groupid) {
+				$permissions['deprovisioned'] = true;
+
+				continue;
 			}
 
 			if ($db_usrgrp['users_status'] == GROUP_STATUS_DISABLED) {
@@ -2088,7 +2103,7 @@ class CUser extends CApiService {
 
 		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
 
-		if ($permissions['users_status'] == GROUP_STATUS_DISABLED || !$db_user['roleid']) {
+		if ($permissions['users_status'] == GROUP_STATUS_DISABLED) {
 			return ['error' => _('No permissions for system access.'), 'db_user' => $db_user];
 		}
 
@@ -2103,6 +2118,7 @@ class CUser extends CApiService {
 	 * @param string $group_attrs['debug_mode']
 	 * @param string $group_attrs['gui_access']
 	 * @param string $group_attrs['userdirectoryid']
+	 * @param bool   $group_attrs['deprovisioned']
 	 *
 	 * @return array $db_user array with extra fields set.
 	 */
@@ -2111,6 +2127,7 @@ class CUser extends CApiService {
 		$db_user['userip'] = CWebUser::getIp();
 		$db_user['debug_mode'] = $group_attrs['debug_mode'];
 		$db_user['gui_access'] = $group_attrs['gui_access'];
+		$db_user['deprovisioned'] = $group_attrs['deprovisioned'];
 
 		if ($db_user['lang'] === LANG_DEFAULT) {
 			$db_user['lang'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG);
@@ -2281,20 +2298,20 @@ class CUser extends CApiService {
 		$this->validateCreate($users);
 		$users[0]['ts_provisioned'] = time();
 		$this->createReal($users);
-		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::API_USER['username'], CAudit::ACTION_ADD, CAudit::RESOURCE_USER,
-			$users
+		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_ADD,
+			CAudit::RESOURCE_USER, $users
 		);
 
 		return reset($users);
 	}
 
 	/**
-	 * Update provisioned user in database. Will return empty array when user were deleted because
-	 * do not have matching group mappings.
+	 * Update provisioned user in database. Return empty array when user is deprovisioned.
 	 *
 	 * @param int   $db_userid
 	 * @param array $idp_user_data
 	 * @param array $idp_user_data['usrgrps']
+	 * @param array $idp_user_data['medias']
 	 *
 	 * @return array
 	 */
@@ -2330,8 +2347,8 @@ class CUser extends CApiService {
 		}
 
 		$this->updateReal($users, $db_users);
-		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::API_USER['username'],
-			CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users
+		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_UPDATE,
+			CAudit::RESOURCE_USER, $users, $db_users
 		);
 
 		return $user;

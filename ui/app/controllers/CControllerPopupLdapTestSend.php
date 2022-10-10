@@ -73,12 +73,35 @@ class CControllerPopupLdapTestSend extends CController {
 	}
 
 	protected function doAction(): void {
-		$ldap_test_object = [];
+		$ldap_test_object = [
+			'provision_groups'	=> [],
+			'provision_media'	=> []
+		];
 		$this->getInputs($ldap_test_object, ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn', 'bind_password',
 			'search_attribute', 'start_tls', 'search_filter','test_username', 'test_password', 'provision_status',
 			'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username',
-			'user_lastname', 'provision_media', 'provision_groups'
+			'user_lastname'
 		]);
+
+		foreach ($this->getInput('provision_groups', []) as $provision_group) {
+			if ($provision_group['name'] === CProvisioning::FALLBACK_GROUP_NAME && !$provision_group['enabled']) {
+				continue;
+			}
+
+			$ldap_test_object['provision_groups'][] = [
+				'name'			=> $provision_group['name'],
+				'roleid'		=> $provision_group['roleid'],
+				'user_groups'	=> $provision_group['user_groups']
+			];
+		}
+
+		foreach ($this->getInput('provision_media', []) as $provision_media) {
+			$ldap_test_object['provision_media'][] = [
+				'attribute'		=> $provision_media['attribute'],
+				'mediatypeid'	=> $provision_media['mediatypeid'],
+				'name'			=> $provision_media['name']
+			];
+		}
 
 		$user = API::UserDirectory()->test($ldap_test_object);
 

@@ -24,14 +24,7 @@
  */
 class CProvisioning {
 
-	/**
-	 * Provision user data to set in API.
-	 */
-	public const API_USER = [
-		'type'		=> USER_TYPE_SUPER_ADMIN,
-		'userid'	=> 0,
-		'username'	=> 'System'
-	];
+	public const AUDITLOG_USERNAME = 'System';
 
 	public const FALLBACK_GROUP_NAME = '*';
 
@@ -143,21 +136,19 @@ class CProvisioning {
 	 */
 	public function getUser(array $idp_user): array {
 		$user = array_merge(['medias' => []], $this->getUserAttributes($idp_user, $this->userdirectory));
+		$group_key = $this->userdirectory['idp_type'] == IDP_TYPE_LDAP ? $this->userdirectory['group_membership'] : '';
 
 		if ($this->userdirectory['provision_media']) {
 			$user['medias'] = $this->getUserMedias($idp_user);
 		}
 
-		if ($this->userdirectory['idp_type'] == IDP_TYPE_LDAP && $this->userdirectory['group_membership'] !== ''
-				&& array_key_exists($this->userdirectory['group_membership'], $idp_user)) {
+		if ($group_key !== '' && array_key_exists($group_key, $idp_user) && is_array($idp_user[$group_key])) {
 			/**
 			 * Attribute to search for groups in user data defined, and if there will be no match, 'usrgrps' key
 			 * should exist to do not attempt to query LDAP for user groups once again.
 			 */
 			$user['usrgrps'] = [];
-			$user = array_merge($user,
-				$this->getUserGroupsAndRole($idp_user[$this->userdirectory['group_membership']])
-			);
+			$user = array_merge($user, $this->getUserGroupsAndRole($idp_user[$group_key]));
 		}
 
 		return $user;
