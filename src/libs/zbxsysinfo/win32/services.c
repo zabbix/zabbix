@@ -253,7 +253,7 @@ static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVIC
 	}
 }
 
-int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	service_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
 	SC_HANDLE			h_mgr;
