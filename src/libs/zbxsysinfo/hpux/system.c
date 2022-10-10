@@ -25,7 +25,7 @@
 #	include <sys/utsname.h>
 #endif
 
-int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_uname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct utsname	name;
 

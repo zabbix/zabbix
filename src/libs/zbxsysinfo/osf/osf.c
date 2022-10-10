@@ -37,7 +37,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.cpu.load",	CF_HAVEPARAMS,	system_cpu_load,	"all,avg1"},
 	{"system.cpu.discovery",0,		system_cpu_discovery,	NULL},
 
-	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
+	{"system.uname",	0,		system_uname,		NULL},
 
 	{"system.swap.size",	CF_HAVEPARAMS,	system_swap_size,	"all,free"},
 

@@ -53,7 +53,7 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"system.uptime",	0,		system_uptime,		NULL},
 
-	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
+	{"system.uname",	0,		system_uname,		NULL},
 
 	{"service.discovery",	0,		SERVICE_DISCOVERY,	NULL},
 	{"service.info",	CF_HAVEPARAMS,	SERVICE_INFO,		ZABBIX_SERVICE_NAME},

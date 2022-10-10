@@ -55,7 +55,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.cpu.num",	CF_HAVEPARAMS,	system_cpu_num,		"online"},
 	{"system.cpu.discovery",0,		system_cpu_discovery,	NULL},
 
-	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
+	{"system.uname",	0,		system_uname,		NULL},
 
 	{"system.sw.arch",	0,		system_sw_arch,		NULL},
 	{"system.swap.size",	CF_HAVEPARAMS,	system_swap_size,	"all,free"},
