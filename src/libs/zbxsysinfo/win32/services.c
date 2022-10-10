@@ -390,7 +390,7 @@ next:
 	return SYSINFO_RET_OK;
 }
 
-int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	service_info(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_SRV_PARAM_STATE		0x01
 #define ZBX_SRV_PARAM_DISPLAYNAME	0x02
