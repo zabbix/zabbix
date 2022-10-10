@@ -255,7 +255,7 @@ int	system_cpu_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_hw_chassis(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_devices(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result);

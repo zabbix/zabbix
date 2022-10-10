@@ -515,7 +515,7 @@ int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_hw_devices(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*type;
 
