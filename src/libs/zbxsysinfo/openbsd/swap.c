@@ -229,7 +229,7 @@ static int	get_swap_io(zbx_uint64_t *icount, zbx_uint64_t *ipages, zbx_uint64_t 
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret;
 	char		*swapdev, *mode, *error;
