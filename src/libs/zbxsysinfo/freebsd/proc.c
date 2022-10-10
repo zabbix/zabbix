@@ -227,7 +227,7 @@ static char	*get_commandline(struct kinfo_proc *proc)
 }
 #undef ARGV_START_SIZE
 
-int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int     proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_SIZE	1
 #define ZBX_RSS		2

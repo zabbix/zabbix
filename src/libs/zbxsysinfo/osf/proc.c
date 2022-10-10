@@ -26,7 +26,7 @@
 
 #include <sys/procfs.h>
 
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DIR		*dir;
 	int		proc;

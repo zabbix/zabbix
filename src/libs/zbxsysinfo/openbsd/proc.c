@@ -203,7 +203,7 @@ static void	collect_args(char **argv, int argc, char **args, size_t *args_alloc)
 
 #undef ARGS_START_SIZE
 
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param;
 	int			do_task, pagesize, count, i, proccount = 0, invalid_user = 0, proc_ok, comm_ok;

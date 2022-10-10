@@ -502,7 +502,7 @@ static int	get_total_memory(zbx_uint64_t *total_memory)
 	return ret;
 }
 
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_SIZE	0
 #define ZBX_RSS		1

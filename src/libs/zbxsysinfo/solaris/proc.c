@@ -388,7 +388,7 @@ static int	proc_match_props(const zbx_sysinfo_proc_t *proc, const struct passwd 
 	return SUCCEED;
 }
 
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *memtype = NULL;
 	DIR			*dir;
