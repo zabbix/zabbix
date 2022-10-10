@@ -730,7 +730,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				[
 					'request_type' => 'JSON data',
 					'error_details' => [
-						'Invalid parameter "/1": the parameter "posts" is missing.'
+						'Invalid parameter "/1/posts": cannot be empty.'
 					]
 				]
 			],
@@ -738,7 +738,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				[
 					'request_type' => 'XML data',
 					'error_details' => [
-						'Invalid parameter "/1": the parameter "posts" is missing.'
+						'Invalid parameter "/1/posts": cannot be empty.'
 					]
 				]
 			],
