@@ -131,7 +131,7 @@ int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return zbx_execute_threaded_metric(vfs_fs_size, request, result);
 }
 
-int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		line[MAX_STRING_LEN], *p, *mpoint, *mtype, *mntopts;
 	FILE		*f;

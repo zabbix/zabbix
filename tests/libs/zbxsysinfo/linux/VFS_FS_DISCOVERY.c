@@ -71,9 +71,9 @@ void	zbx_mock_test_entry(void **state)
 	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&result);
 
-	if (expected_result != (actual_result = VFS_FS_DISCOVERY(&request, &result)))
+	if (expected_result != (actual_result = vfs_fs_discovery(&request, &result)))
 	{
-		fail_msg("Unexpected return code from VFS_FS_DISCOVERY(): expected %s, got %s",
+		fail_msg("Unexpected return code from vfs_fs_discovery(): expected %s, got %s",
 				zbx_sysinfo_ret_string(expected_result), zbx_sysinfo_ret_string(actual_result));
 	}
 

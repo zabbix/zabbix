@@ -39,7 +39,7 @@ int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -69,7 +69,7 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	case "vfs.dir.get":
 		return unsafe.Pointer(C.VFS_DIR_GET)
 	case "vfs.fs.discovery":
-		return unsafe.Pointer(C.VFS_FS_DISCOVERY)
+		return unsafe.Pointer(C.vfs_fs_discovery)
 	case "vfs.fs.inode":
 		return unsafe.Pointer(C.vfs_fs_inode)
 	case "vfs.fs.size":

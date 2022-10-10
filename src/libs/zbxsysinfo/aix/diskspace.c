@@ -234,7 +234,7 @@ static const char	*zbx_get_vfs_name_by_type(int type)
 	return NULL != vfs_names[type] ? vfs_names[type] : "unknown";
 }
 
-int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		rc, sz, i, ret = SYSINFO_RET_FAIL;
 	struct vmount	*vms = NULL, *vm;

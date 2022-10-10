@@ -334,7 +334,7 @@ out:
 #undef zbx_wcsdup
 }
 
-int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct zbx_json		j;
 	int			i, ret = SYSINFO_RET_FAIL;
