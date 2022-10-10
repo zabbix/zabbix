@@ -205,7 +205,7 @@ static int	net_if_out_errors(const char *if_name, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	NET_IF_TOTAL_BYTES(const char *if_name, AGENT_RESULT *result)
+static int	net_if_total_bytes(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value_in, value_out;
 	char		*error;
@@ -228,7 +228,7 @@ static int	NET_IF_TOTAL_BYTES(const char *if_name, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	NET_IF_TOTAL_PACKETS(const char *if_name, AGENT_RESULT *result)
+static int	net_if_total_packets(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value_in, value_out;
 	char		*error;
@@ -251,7 +251,7 @@ static int	NET_IF_TOTAL_PACKETS(const char *if_name, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	NET_IF_TOTAL_ERRORS(const char *if_name, AGENT_RESULT *result)
+static int	net_if_total_errors(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value_in, value_out;
 	char		*error;
@@ -451,11 +451,11 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
-		ret = NET_IF_TOTAL_BYTES(if_name, result);
+		ret = net_if_total_bytes(if_name, result);
 	else if (0 == strcmp(mode, "packets"))
-		ret = NET_IF_TOTAL_PACKETS(if_name, result);
+		ret = net_if_total_packets(if_name, result);
 	else if (0 == strcmp(mode, "errors"))
-		ret = NET_IF_TOTAL_ERRORS(if_name, result);
+		ret = net_if_total_errors(if_name, result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
