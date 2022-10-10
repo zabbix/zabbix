@@ -32,7 +32,7 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"net.if.in",		CF_HAVEPARAMS,	net_if_in,		"MS TCP Loopback interface,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	net_if_out,		"MS TCP Loopback interface,bytes"},
-	{"net.if.total",	CF_HAVEPARAMS,	NET_IF_TOTAL,		"MS TCP Loopback interface,bytes"},
+	{"net.if.total",	CF_HAVEPARAMS,	net_if_total,		"MS TCP Loopback interface,bytes"},
 	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	NULL},
 	{"net.if.list",		0,		NET_IF_LIST,		NULL},
 

@@ -526,7 +526,7 @@ clean:
 	return ret;
 }
 
-int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	zbx_ifrow_t	ifrow = {NULL, NULL};

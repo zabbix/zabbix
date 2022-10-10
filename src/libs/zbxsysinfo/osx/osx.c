@@ -37,7 +37,7 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"net.if.in",		CF_HAVEPARAMS,	net_if_in,		"en0,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	net_if_out,		"en0,bytes"},
-	{"net.if.total",	CF_HAVEPARAMS,	NET_IF_TOTAL,		"en0,bytes"},
+	{"net.if.total",	CF_HAVEPARAMS,	net_if_total,		"en0,bytes"},
 	{"net.if.collisions",   CF_HAVEPARAMS,	NET_IF_COLLISIONS,      "en0"},
 
 	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},

@@ -86,7 +86,7 @@ void	zbx_mock_test_entry_NET_IF_COMMON(void **state, int net_if_func)
 	else if (ZABBIX_MOCK_net_if_out == net_if_func)
 		actual_result = net_if_out(&request, &param_result);
 	else if (ZABBIX_MOCK_NET_IF_TOTAL == net_if_func)
-		actual_result = NET_IF_TOTAL(&request, &param_result);
+		actual_result = net_if_total(&request, &param_result);
 	else
 		fail_msg("invalid net_if_func");
 
