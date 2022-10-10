@@ -146,7 +146,7 @@ clean:
 	return ret;
 }
 
-int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*mode;
 	int	ret = SYSINFO_RET_FAIL;

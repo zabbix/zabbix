@@ -299,7 +299,7 @@ out:
 }
 #endif /*HAVE_VMINFO_T_UPDATES*/
 
-int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*mode;
 	int	ret;

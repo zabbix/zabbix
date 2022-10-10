@@ -32,7 +32,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"net.if.out",		CF_HAVEPARAMS,	net_if_out,		"lan0,bytes"},
 	{"net.if.total",	CF_HAVEPARAMS,	net_if_total,		"lan0,bytes"},
 
-	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
+	{"vm.memory.size",	CF_HAVEPARAMS,	vm_memory_size,		"free"},
 
 	{"proc.num",		CF_HAVEPARAMS,  proc_num,		"inetd"},
 

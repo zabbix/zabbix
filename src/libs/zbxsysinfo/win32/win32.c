@@ -36,7 +36,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"net.if.discovery",	0,		net_if_discovery,	NULL},
 	{"net.if.list",		0,		NET_IF_LIST,		NULL},
 
-	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
+	{"vm.memory.size",	CF_HAVEPARAMS,	vm_memory_size,		"free"},
 
 	{"proc.get",		CF_HAVEPARAMS,	proc_get,		"svchost.exe"},
 	{"proc.num",		CF_HAVEPARAMS,	proc_num,		"svchost.exe"},

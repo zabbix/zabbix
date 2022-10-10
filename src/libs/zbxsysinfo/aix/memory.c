@@ -126,7 +126,7 @@ static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 
 #endif
 
-int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_LIBPERFSTAT
 	int	ret;

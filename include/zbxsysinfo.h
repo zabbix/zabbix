@@ -238,7 +238,7 @@ int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result);

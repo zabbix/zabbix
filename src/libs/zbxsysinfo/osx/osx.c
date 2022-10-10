@@ -30,7 +30,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"vfs.fs.discovery",	0,		vfs_fs_discovery,	NULL},
 	{"vfs.fs.get",		0,		vfs_fs_get,		NULL},
 
-	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
+	{"vm.memory.size",	CF_HAVEPARAMS,	vm_memory_size,		"free"},
 
 	{"net.tcp.listen",	CF_HAVEPARAMS,	net_tcp_listen,		"80"},
 	{"net.udp.listen",	CF_HAVEPARAMS,	net_udp_listen,		"68"},

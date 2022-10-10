@@ -28,7 +28,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"vfs.fs.size",		CF_HAVEPARAMS,	vfs_fs_size,		"/,free"},
 	{"vfs.fs.inode",	CF_HAVEPARAMS,	vfs_fs_inode,		"/,free"},
 
-	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
+	{"vm.memory.size",	CF_HAVEPARAMS,	vm_memory_size,		"free"},
 
 	{"proc.num",		CF_HAVEPARAMS,	proc_num,		"inetd"},
 	{"proc.mem",		CF_HAVEPARAMS,	proc_mem,		"inetd"},
