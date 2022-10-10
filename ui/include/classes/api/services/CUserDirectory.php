@@ -1032,16 +1032,21 @@ class CUserDirectory extends CApiService {
 			'user_lastname' =>		['type' => API_STRING_UTF8],
 			'idp_type' =>			['type' => API_INT32, 'in' => implode(',', [IDP_TYPE_LDAP])],
 			'provision_media' =>	['type' => API_OBJECTS, 'fields' => [
-				'mediatypeid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
+				'mediatypeid' =>		['type' => API_ID],
 				'attribute' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 			]],
-			'provision_groups' =>	['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['name']], 'fields' => [
-				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
-				'roleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-				'user_groups' =>		['type' => API_OBJECTS, 'fields' => [
-					'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
-				]]
+			'provision_groups' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'provision_status', 'in' => JIT_PROVISIONING_ENABLED],
+											'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['name']], 'fields' => [
+												'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+												'roleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+												'user_groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+													'usrgrpid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+												]]
+											]
+										],
+										['else' => false, 'type' => API_OBJECTS]
 			]],
 			'test_username' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'test_password' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]

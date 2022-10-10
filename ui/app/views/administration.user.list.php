@@ -216,6 +216,10 @@ foreach ($data['users'] as $user) {
 			->setArgument('userid', $userid)
 	);
 
+	if ($user['userdirectoryid'] && $data['idp_names'][$user['userdirectoryid']]['idp_type'] == IDP_TYPE_LDAP) {
+		$checkbox->setAttribute('data-actions', 'ldap');
+	}
+
 	if (!$user['roleid']) {
 		$info = makeErrorIcon(_('User do not have user role!'));
 		$gui_access = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_GREY);
@@ -226,10 +230,6 @@ foreach ($data['users'] as $user) {
 			$idp = $data['idp_names'][$user['userdirectoryid']];
 			$provisioned = (new CDiv(date(ZBX_DATE_TIME, $user['ts_provisioned'])))
 				->setHint($idp['idp_type'] == IDP_TYPE_SAML ? _('SAML') : $idp['name']);
-
-			if ($idp['idp_type'] == IDP_TYPE_LDAP) {
-				$checkbox->setAttribute('data-actions', 'ldap');
-			}
 
 			$gui_access = new CSpan($idp['idp_type'] == IDP_TYPE_LDAP ? _('LDAP') : _('SAML'));
 		}

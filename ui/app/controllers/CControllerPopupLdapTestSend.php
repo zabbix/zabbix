@@ -88,6 +88,10 @@ class CControllerPopupLdapTestSend extends CController {
 				continue;
 			}
 
+			if (!array_key_exists('roleid', $provision_group) || !array_key_exists('user_groups', $provision_group)) {
+				continue;
+			}
+
 			$ldap_test_object['provision_groups'][] = [
 				'name'			=> $provision_group['name'],
 				'roleid'		=> $provision_group['roleid'],

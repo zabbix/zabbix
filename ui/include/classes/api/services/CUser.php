@@ -32,7 +32,8 @@ class CUser extends CApiService {
 		'checkauthentication' => [],
 		'login' => [],
 		'logout' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'unblock' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+		'unblock' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'provision' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
 	protected $tableName = 'users';
@@ -1795,6 +1796,83 @@ class CUser extends CApiService {
 		}
 
 		return ['userids' => $userids];
+	}
+
+
+	/**
+	 * Provision users. Only users with IDP_TYPE_LDAP userdirectory will be provisioned.
+	 *
+	 * @param array $userids
+	 */
+	public function provision(array $userids): array {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+		if (!CApiInputValidator::validate($api_input_rules, $userids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_users = API::User()->get([
+			'output' => ['userid', 'username', 'userdirectoryid'],
+			'userids' => $userids,
+			'preservekeys' => true
+		]);
+		$userdirectoryids = array_column($db_users, 'userdirectoryid', 'userdirectoryid');
+		$provisionedids = [];
+		$db_userdirectories = [];
+
+		if ($userdirectoryids) {
+			$db_userdirectories = API::UserDirectory()->get([
+				'output' => ['host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls', 'search_filter',
+					'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username',
+					'user_lastname'
+				],
+				'userdirectoryids' => $userdirectoryids,
+				'filter' => [
+					'idp_type' => IDP_TYPE_LDAP,
+					'provision_status' => JIT_PROVISIONING_ENABLED
+				],
+				'selectProvisionMedia' => API_OUTPUT_EXTEND,
+				'selectProvisionGroups' => API_OUTPUT_EXTEND,
+				'preservekeys' => true
+			]);
+		}
+
+		if ($db_userdirectories) {
+			$db_bind_passwords = array_column(DB::select('userdirectory_ldap', [
+				'output' => ['userdirectoryid', 'bind_password'],
+				'filter' => ['userdirectoryid' => $userdirectoryids]
+			]), 'bind_password', 'userdirectoryid');
+			$db_user_userdirectory = array_column($db_users, 'userdirectoryid', 'userid');
+
+			foreach ($db_userdirectories as $db_userdirectoryid => $db_userdirectory) {
+				$provision_users = array_keys($db_user_userdirectory, $db_userdirectoryid);
+				$provision_users = array_intersect_key($db_users, array_flip($provision_users));
+				$ldap = new CLdap($db_userdirectory + ['bind_password' => $db_bind_passwords[$db_userdirectoryid]]);
+
+				if ($ldap->bind_type == CLdap::BIND_DNSTRING) {
+					continue;
+				}
+
+				$provisioning = new CProvisioning($db_userdirectory + ['idp_type' => IDP_TYPE_LDAP]);
+
+				foreach ($provision_users as $provision_user) {
+					$user_attributes = $provisioning->getUserIdpAttributes();
+					$idp_user = $ldap->getUserAttributes($user_attributes, $provision_user['username']);
+					$user = array_merge($provision_user, $provisioning->getUser($idp_user));
+
+					if (!array_key_exists('usrgrps', $user)) {
+						$group_attributes = $provisioning->getGroupIdpAttributes();
+						$ldap_groups = $ldap->getGroupAttributes($group_attributes, $user['username'], $user['password']);
+						$ldap_groups = array_column($ldap_groups, $db_userdirectory['group_name']);
+						$user = array_merge($user, $provisioning->getUserGroupsAndRole($ldap_groups));
+					}
+
+					$this->updateProvisionedUser($provision_user['userid'], $user);
+					$provisioned[] = $provision_user['userid'];
+				}
+			}
+		}
+
+		return ['userids' => $provisioned];
 	}
 
 	/**
