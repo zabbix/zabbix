@@ -252,7 +252,7 @@ int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_cpu_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
