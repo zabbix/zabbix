@@ -227,7 +227,7 @@ void	zbx_set_agent_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, i
 int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);

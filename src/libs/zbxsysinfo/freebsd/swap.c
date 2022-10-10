@@ -21,7 +21,7 @@
 
 #include "log.h"
 
-int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 /*
  *  FreeBSD 7.0 i386
