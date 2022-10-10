@@ -146,7 +146,7 @@ static int	get_ifdata(const char *if_name,
 #undef IFNET_ID
 }
 
-int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode, *error;
 	zbx_uint64_t	ibytes, ipackets, ierrors, idropped;

@@ -28,7 +28,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"vfs.fs.get",		0,		VFS_FS_GET,		NULL},
 
 	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	NULL},
-	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"lan0,bytes"},
+	{"net.if.in",		CF_HAVEPARAMS,	net_if_in,		"lan0,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"lan0,bytes"},
 	{"net.if.total",	CF_HAVEPARAMS,	NET_IF_TOTAL,		"lan0,bytes"},
 

@@ -76,7 +76,7 @@ static int	get_ifmib_general(const char *if_name, char **error)
 	return SYSINFO_RET_FAIL;
 }
 
-int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *mode, *error;
 

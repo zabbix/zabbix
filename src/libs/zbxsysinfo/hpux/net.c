@@ -408,7 +408,7 @@ static int	get_net_stat(Ext_mib_t *mib, const char *if_name)
 	return SUCCEED;
 }
 
-int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	Ext_mib_t	mib;

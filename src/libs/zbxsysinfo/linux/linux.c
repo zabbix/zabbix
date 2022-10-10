@@ -41,7 +41,7 @@ ZBX_METRIC parameters_specific[] =
 	{"net.tcp.socket.count",CF_HAVEPARAMS,	NET_TCP_SOCKET_COUNT,	",80"},
 	{"net.udp.socket.count",CF_HAVEPARAMS,	NET_UDP_SOCKET_COUNT,	",68"},
 
-	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"lo,bytes"},
+	{"net.if.in",		CF_HAVEPARAMS,	net_if_in,		"lo,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"lo,bytes"},
 	{"net.if.total",	CF_HAVEPARAMS,	NET_IF_TOTAL,		"lo,bytes"},
 	{"net.if.collisions",	CF_HAVEPARAMS,	NET_IF_COLLISIONS,	"lo"},
