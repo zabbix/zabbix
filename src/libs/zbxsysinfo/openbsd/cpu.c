@@ -187,7 +187,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		mib[] = {CTL_VM, VM_UVMEXP};
 	size_t		len;

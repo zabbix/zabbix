@@ -37,7 +37,7 @@ int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	get_sensor(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -75,7 +75,7 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	case "system.cpu.load":
 		cfunc = unsafe.Pointer(C.SYSTEM_CPU_LOAD)
 	case "system.cpu.switches":
-		cfunc = unsafe.Pointer(C.SYSTEM_CPU_SWITCHES)
+		cfunc = unsafe.Pointer(C.system_cpu_switches)
 	case "system.cpu.intr":
 		cfunc = unsafe.Pointer(C.SYSTEM_CPU_INTR)
 	case "system.hw.cpu":

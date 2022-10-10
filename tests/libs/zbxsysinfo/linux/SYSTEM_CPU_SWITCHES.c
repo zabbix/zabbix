@@ -41,7 +41,7 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	/* set up test case values from an external source */
-	/* SYSTEM_CPU_SWITCHES() does not use AGENT_REQUEST argument, only output parameters have to be set up */
+	/* system_cpu_switches() does not use AGENT_REQUEST argument, only output parameters have to be set up */
 
 	if (ZBX_MOCK_SUCCESS != (mock_ret_code = zbx_mock_out_parameter("expected_ret", &mock_handle)) ||
 			ZBX_MOCK_SUCCESS != (mock_ret_code = zbx_mock_string(mock_handle, &expected_ret_str)))
@@ -84,13 +84,13 @@ void	zbx_mock_test_entry(void **state)
 	zbx_init_agent_result(&zbx_agent_result);
 
 	/* call the function-under-test */
-	actual_ret = SYSTEM_CPU_SWITCHES(&zbx_agent_request, &zbx_agent_result);
+	actual_ret = system_cpu_switches(&zbx_agent_request, &zbx_agent_result);
 
 	/* check test results */
 
 	if (expected_ret != actual_ret)
 	{
-		fail_msg("Unexpected return code from SYSTEM_CPU_SWITCHES(): expected %s, got %s",
+		fail_msg("Unexpected return code from system_cpu_switches(): expected %s, got %s",
 				zbx_sysinfo_ret_string(expected_ret), zbx_sysinfo_ret_string(actual_ret));
 	}
 
@@ -99,11 +99,11 @@ void	zbx_mock_test_entry(void **state)
 		zbx_uint64_t	*actual_context_switches_count;
 
 		if (NULL == (actual_context_switches_count = ZBX_GET_UI64_RESULT(&zbx_agent_result)))
-			fail_msg("SYSTEM_CPU_SWITCHES() returned no valid number of context switches in AGENT_RESULT.");
+			fail_msg("system_cpu_switches() returned no valid number of context switches in AGENT_RESULT.");
 
 		if (expected_context_switches_count != *actual_context_switches_count)
 		{
-			fail_msg("SYSTEM_CPU_SWITCHES() context switches: expected " ZBX_FS_UI64 ", got " ZBX_FS_UI64
+			fail_msg("system_cpu_switches() context switches: expected " ZBX_FS_UI64 ", got " ZBX_FS_UI64
 					".", expected_context_switches_count, *actual_context_switches_count);
 		}
 	}
@@ -112,11 +112,11 @@ void	zbx_mock_test_entry(void **state)
 		char	**actual_error_msg;
 
 		if (NULL == (actual_error_msg = ZBX_GET_MSG_RESULT(&zbx_agent_result)) || NULL == *actual_error_msg)
-			fail_msg("SYSTEM_CPU_SWITCHES() returned no valid error message in AGENT_RESULT.");
+			fail_msg("system_cpu_switches() returned no valid error message in AGENT_RESULT.");
 
 		if (0 != strcmp(expected_error_msg, *actual_error_msg))
 		{
-			fail_msg("SYSTEM_CPU_SWITCHES() error message: expected \"%s\", got \"%s\"",
+			fail_msg("system_cpu_switches() error message: expected \"%s\", got \"%s\"",
 					expected_error_msg, *actual_error_msg);
 		}
 	}
