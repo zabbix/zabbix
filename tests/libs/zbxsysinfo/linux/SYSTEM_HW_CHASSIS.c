@@ -44,9 +44,9 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED != zbx_parse_item_key(param, &request))
 		fail_msg("Cannot parse item key: %s", param);
 
-	if (expected_result != (actual_result = SYSTEM_HW_CHASSIS(&request, &result)))
+	if (expected_result != (actual_result = system_hw_chassis(&request, &result)))
 	{
-		fail_msg("Unexpected return code from SYSTEM_HW_CHASSIS(): expected %s, got %s",
+		fail_msg("Unexpected return code from system_hw_chassis(): expected %s, got %s",
 				zbx_sysinfo_ret_string(expected_result), zbx_sysinfo_ret_string(actual_result));
 	}
 

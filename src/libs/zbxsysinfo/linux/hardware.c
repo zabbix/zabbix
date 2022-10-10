@@ -290,7 +290,7 @@ close:
 	return ret;
 }
 
-int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_hw_chassis(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*mode, buf[MAX_STRING_LEN];
 	int	ret = SYSINFO_RET_FAIL;

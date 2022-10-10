@@ -39,7 +39,7 @@ int	get_sensor(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_cpu_intr(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_chassis(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result);
