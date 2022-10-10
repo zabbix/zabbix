@@ -50,7 +50,7 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
 
-	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},
+	{"system.uptime",	0,		system_uptime,		NULL},
 
 	{"system.stat",		CF_HAVEPARAMS,	SYSTEM_STAT,		"page,fi"},
 	{"system.swap.size",	CF_HAVEPARAMS,	system_swap_size,	"all,free"},

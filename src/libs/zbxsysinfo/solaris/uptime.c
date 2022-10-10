@@ -19,7 +19,7 @@
 
 #include "zbxsysinfo.h"
 
-int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	if (SYSINFO_RET_OK == SYSTEM_BOOTTIME(request, result))
 	{

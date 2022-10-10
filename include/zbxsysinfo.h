@@ -228,7 +228,7 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_uptime(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result);

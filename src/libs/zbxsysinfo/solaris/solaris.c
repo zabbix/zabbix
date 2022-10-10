@@ -60,7 +60,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.swap.in",	CF_HAVEPARAMS,	system_swap_in,		"all"},
 	{"system.swap.out",	CF_HAVEPARAMS,	system_swap_out,	"all,count"},
 
-	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},
+	{"system.uptime",	0,		system_uptime,		NULL},
 	{"system.boottime",	0,		SYSTEM_BOOTTIME,	NULL},
 	{"system.sw.arch",	0,		system_sw_arch,		NULL},
 

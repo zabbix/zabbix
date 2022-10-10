@@ -21,7 +21,7 @@
 
 #include "log.h"
 
-int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #if defined(HAVE_SYSINFO_UPTIME)
 	struct sysinfo info;
