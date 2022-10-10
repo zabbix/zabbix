@@ -739,12 +739,12 @@ class CUser extends CApiService {
 		}
 
 		foreach ($users as $user) {
-			if ($user['userdirectoryid']) {
-				continue;
-			}
-
 			if (array_key_exists('userid', $user) && array_key_exists($user['userid'], $db_users)) {
 				$user += $db_users[$user['userid']];
+			}
+
+			if ($user['userdirectoryid']) {
+				continue;
 			}
 
 			$user += ['passwd' => ''];
