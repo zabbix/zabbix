@@ -35,7 +35,7 @@ int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -63,7 +63,7 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	case "net.tcp.port":
 		return unsafe.Pointer(C.NET_TCP_PORT)
 	case "net.udp.listen":
-		return unsafe.Pointer(C.NET_UDP_LISTEN)
+		return unsafe.Pointer(C.net_udp_listen)
 	case "system.cpu.load":
 		return unsafe.Pointer(C.SYSTEM_CPU_LOAD)
 	case "vfs.dir.get":

@@ -33,7 +33,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
 
 	{"net.tcp.listen",	CF_HAVEPARAMS,	net_tcp_listen,		"80"},
-	{"net.udp.listen",	CF_HAVEPARAMS,	NET_UDP_LISTEN,		"68"},
+	{"net.udp.listen",	CF_HAVEPARAMS,	net_udp_listen,		"68"},
 
 	{"net.if.in",		CF_HAVEPARAMS,	net_if_in,		"en0,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	net_if_out,		"en0,bytes"},

@@ -33,7 +33,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"vfs.dev.write",	CF_HAVEPARAMS,	VFS_DEV_WRITE,		"sd0,operations"},
 
 	{"net.tcp.listen",	CF_HAVEPARAMS,	net_tcp_listen,		"80"},
-	{"net.udp.listen",	CF_HAVEPARAMS,	NET_UDP_LISTEN,		"68"},
+	{"net.udp.listen",	CF_HAVEPARAMS,	net_udp_listen,		"68"},
 
 	{"net.if.in",		CF_HAVEPARAMS,	net_if_in,		"hme0,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	net_if_out,		"hme0,bytes"},

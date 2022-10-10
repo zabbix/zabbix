@@ -36,9 +36,9 @@ ZBX_METRIC parameters_specific[] =
 	{"vfs.dev.discovery",	0,		VFS_DEV_DISCOVERY,	NULL},
 
 	{"net.tcp.listen",	CF_HAVEPARAMS,	net_tcp_listen,		"80"},
-	{"net.udp.listen",	CF_HAVEPARAMS,	NET_UDP_LISTEN,		"68"},
+	{"net.udp.listen",	CF_HAVEPARAMS,	net_udp_listen,		"68"},
 
-	{"net.tcp.socket.count",CF_HAVEPARAMS,	NET_TCP_SOCKET_COUNT,	",80"},
+	{"net.tcp.socket.count",CF_HAVEPARAMS,	net_tcp_socket_count,	",80"},
 	{"net.udp.socket.count",CF_HAVEPARAMS,	NET_UDP_SOCKET_COUNT,	",68"},
 
 	{"net.if.in",		CF_HAVEPARAMS,	net_if_in,		"lo,bytes"},

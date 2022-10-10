@@ -210,7 +210,7 @@ int     net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return res;
 }
 
-int     NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int     net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*port_str, command[64];
 	unsigned short	port;
