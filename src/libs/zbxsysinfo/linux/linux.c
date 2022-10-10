@@ -55,7 +55,7 @@ ZBX_METRIC parameters_specific[] =
 	{"proc.mem",		CF_HAVEPARAMS,	proc_mem,		"inetd"},
 
 	{"system.cpu.switches", 0,		system_cpu_switches,	NULL},
-	{"system.cpu.intr",	0,		SYSTEM_CPU_INTR,	NULL},
+	{"system.cpu.intr",	0,		system_cpu_intr,	NULL},
 	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,user,avg1"},
 	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},
 	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},

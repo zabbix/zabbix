@@ -224,7 +224,7 @@ int     system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int     SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
+int     system_cpu_intr(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	char		line[MAX_STRING_LEN];

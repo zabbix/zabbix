@@ -234,7 +234,7 @@ int	system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result)
 #endif
 }
 
-int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_intr(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
 #ifdef HAVE_LIBPERFSTAT

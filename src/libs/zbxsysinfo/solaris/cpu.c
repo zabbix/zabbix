@@ -289,7 +289,7 @@ int	system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_intr(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	kstat_ctl_t	*kc;
 	kstat_t		*k;
