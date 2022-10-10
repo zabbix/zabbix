@@ -89,7 +89,7 @@ int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	request_tmp.params = zbx_malloc(NULL, request_tmp.nparam * sizeof(char *));
 	request_tmp.params[0] = counter_path;
 
-	ret = PERF_COUNTER(&request_tmp, result);
+	ret = perf_counter(&request_tmp, result);
 
 	zbx_free(request_tmp.params);
 
