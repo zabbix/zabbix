@@ -42,7 +42,7 @@ ZBX_METRIC	parameters_specific[] =
 	{"system.cpu.discovery",0,		system_cpu_discovery,	NULL},
 
 	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
-	{"system.sw.arch",	0,		SYSTEM_SW_ARCH,		NULL},
+	{"system.sw.arch",	0,		system_sw_arch,		NULL},
 
 	{NULL}
 };

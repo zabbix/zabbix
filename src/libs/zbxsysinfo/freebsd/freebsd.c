@@ -57,7 +57,7 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
 
-	{"system.sw.arch",	0,		SYSTEM_SW_ARCH,		NULL},
+	{"system.sw.arch",	0,		system_sw_arch,		NULL},
 	{"system.swap.size",	CF_HAVEPARAMS,	SYSTEM_SWAP_SIZE,	"all,free"},
 
 	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},

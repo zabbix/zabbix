@@ -62,7 +62,7 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},
 	{"system.boottime",	0,		SYSTEM_BOOTTIME,	NULL},
-	{"system.sw.arch",	0,		SYSTEM_SW_ARCH,		NULL},
+	{"system.sw.arch",	0,		system_sw_arch,		NULL},
 
 	{NULL}
 };
