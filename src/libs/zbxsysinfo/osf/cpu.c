@@ -68,7 +68,7 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*tmp;
 	int	ret = SYSINFO_RET_FAIL;

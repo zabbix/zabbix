@@ -127,7 +127,7 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return get_cpustat(result, cpu_num, state, mode);
 }
 
-int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*tmp;
 	int	mode, per_cpu = 1, cpu_num;

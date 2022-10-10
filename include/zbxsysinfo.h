@@ -248,7 +248,7 @@ int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_UDP_SOCKET_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_cpu_intr(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
