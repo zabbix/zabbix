@@ -1867,12 +1867,96 @@ class CUser extends CApiService {
 					}
 
 					$this->updateProvisionedUser($provision_user['userid'], $user);
-					$provisioned[] = $provision_user['userid'];
+					$provisionedids[] = $provision_user['userid'];
 				}
 			}
 		}
 
-		return ['userids' => $provisioned];
+		return ['userids' => $provisionedids];
+	}
+
+	/**
+	 * Create user in database from provision data.
+	 * User media are sanitized removing media with malformed or empty 'sendto'.
+	 *
+	 * @param array  $idp_user_data
+	 * @param string $idp_user_data['username']
+	 * @param string $idp_user_data['name']
+	 * @param string $idp_user_data['surname']
+	 * @param int    $idp_user_data['roleid']
+	 * @param array  $idp_user_data['media']                   Required to be set, can be empty array.
+	 * @param int    $idp_user_data['media'][]['mediatypeid']
+	 * @param array  $idp_user_data['media'][]['sendto']
+	 * @param string $idp_user_data['media'][]['sendto'][]
+	 * @param array  $idp_user_data['usrgrps']                 Required to be set, can be empty array.
+	 * @param int    $idp_user_data['usrgrps'][]['usrgrpid']
+	 * @param int    $idp_user_data['userdirectoryid']
+	 *
+	 * @return array of created user data in database.
+	 */
+	public function createProvisionedUser(array $idp_user_data): array {
+		$attrs = array_flip(array_merge(self::PROVISIONED_FIELDS, ['userdirectoryid']));
+		unset($attrs['passwd']);
+		$user = array_intersect_key($idp_user_data, $attrs);
+		$user['medias'] = $this->sanitizeUserMedia($user['medias']);
+		$users = [$user];
+		$this->validateCreate($users);
+		$users[0]['ts_provisioned'] = time();
+		$this->createReal($users);
+		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_ADD,
+			CAudit::RESOURCE_USER, $users
+		);
+
+		return reset($users);
+	}
+
+	/**
+	 * Update provisioned user in database. Return empty array when user is deprovisioned.
+	 *
+	 * @param int   $db_userid
+	 * @param array $idp_user_data
+	 * @param array $idp_user_data['usrgrps']
+	 * @param array $idp_user_data['medias']
+	 *
+	 * @return array
+	 */
+	public function updateProvisionedUser($db_userid, array $idp_user_data): array {
+		$attrs = array_flip(array_merge(self::PROVISIONED_FIELDS, ['userdirectoryid']));
+		unset($attrs['passwd']);
+		$user = array_intersect_key($idp_user_data, $attrs);
+		$user['medias'] = $this->sanitizeUserMedia($user['medias']);
+		$user['userid'] = $db_userid;
+		$user['ts_provisioned'] = time();
+		$users = [$user];
+
+		[$db_user] = DB::select('users', [
+			'output' => ['userid', 'username', 'name', 'surname', 'roleid', 'userdirectoryid', 'ts_provisioned'],
+			'userids' => [$db_userid]
+		]);
+		$db_user['usrgrps'] = DB::select('users_groups', [
+			'output' => ['usrgrpid', 'id'],
+			'filter' => ['userid' => $db_userid]
+		]);
+		$db_user['medias'] = DB::select('media', [
+			'output' => ['mediatypeid', 'mediaid', 'sendto'],
+			'filter' => ['userid' => $db_userid]
+		]);
+		$db_users = [$db_userid => $db_user];
+
+		if (!$idp_user_data['usrgrps']) {
+			$users[0]['usrgrps'] = [[
+				'usrgrpid' => CAuthenticationHelper::get(CAuthenticationHelper::DEPROVISIONED_GROUPID)
+			]];
+			$users[0]['roleid'] = 0;
+			$user = [];
+		}
+
+		$this->updateReal($users, $db_users);
+		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_UPDATE,
+			CAudit::RESOURCE_USER, $users, $db_users
+		);
+
+		return $user;
 	}
 
 	/**
@@ -2346,90 +2430,6 @@ class CUser extends CApiService {
 		$idp_user_data['username'] = $user_data['username'];
 
 		return $this->updateProvisionedUser($user_data['userid'], $idp_user_data);
-	}
-
-	/**
-	 * Create user in database from provision data.
-	 * User media are sanitized removing media with malformed or empty 'sendto'.
-	 *
-	 * @param array  $idp_user_data
-	 * @param string $idp_user_data['username']
-	 * @param string $idp_user_data['name']
-	 * @param string $idp_user_data['surname']
-	 * @param int    $idp_user_data['roleid']
-	 * @param array  $idp_user_data['media']                   Required to be set, can be empty array.
-	 * @param int    $idp_user_data['media'][]['mediatypeid']
-	 * @param array  $idp_user_data['media'][]['sendto']
-	 * @param string $idp_user_data['media'][]['sendto'][]
-	 * @param array  $idp_user_data['usrgrps']                 Required to be set, can be empty array.
-	 * @param int    $idp_user_data['usrgrps'][]['usrgrpid']
-	 * @param int    $idp_user_data['userdirectoryid']
-	 *
-	 * @return array of created user data in database.
-	 */
-	protected function createProvisionedUser(array $idp_user_data): array {
-		$attrs = array_flip(array_merge(self::PROVISIONED_FIELDS, ['userdirectoryid']));
-		unset($attrs['passwd']);
-		$user = array_intersect_key($idp_user_data, $attrs);
-		$user['medias'] = $this->sanitizeUserMedia($user['medias']);
-		$users = [$user];
-		$this->validateCreate($users);
-		$users[0]['ts_provisioned'] = time();
-		$this->createReal($users);
-		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_ADD,
-			CAudit::RESOURCE_USER, $users
-		);
-
-		return reset($users);
-	}
-
-	/**
-	 * Update provisioned user in database. Return empty array when user is deprovisioned.
-	 *
-	 * @param int   $db_userid
-	 * @param array $idp_user_data
-	 * @param array $idp_user_data['usrgrps']
-	 * @param array $idp_user_data['medias']
-	 *
-	 * @return array
-	 */
-	protected function updateProvisionedUser($db_userid, array $idp_user_data): array {
-		$attrs = array_flip(array_merge(self::PROVISIONED_FIELDS, ['userdirectoryid']));
-		unset($attrs['passwd']);
-		$user = array_intersect_key($idp_user_data, $attrs);
-		$user['medias'] = $this->sanitizeUserMedia($user['medias']);
-		$user['userid'] = $db_userid;
-		$user['ts_provisioned'] = time();
-		$users = [$user];
-
-		[$db_user] = DB::select('users', [
-			'output' => ['userid', 'username', 'name', 'surname', 'roleid', 'userdirectoryid', 'ts_provisioned'],
-			'userids' => [$db_userid]
-		]);
-		$db_user['usrgrps'] = DB::select('users_groups', [
-			'output' => ['usrgrpid', 'id'],
-			'filter' => ['userid' => $db_userid]
-		]);
-		$db_user['medias'] = DB::select('media', [
-			'output' => ['mediatypeid', 'mediaid', 'sendto'],
-			'filter' => ['userid' => $db_userid]
-		]);
-		$db_users = [$db_userid => $db_user];
-
-		if (!$idp_user_data['usrgrps']) {
-			$users[0]['usrgrps'] = [[
-				'usrgrpid' => CAuthenticationHelper::get(CAuthenticationHelper::DEPROVISIONED_GROUPID)
-			]];
-			$users[0]['roleid'] = 0;
-			$user = [];
-		}
-
-		$this->updateReal($users, $db_users);
-		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_UPDATE,
-			CAudit::RESOURCE_USER, $users, $db_users
-		);
-
-		return $user;
 	}
 
 	/**
