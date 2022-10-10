@@ -226,7 +226,7 @@ void	zbx_set_agent_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, i
 /* external system functions */
 
 int	get_sensor(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	kernel_maxfiles(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	KERNEL_OPENFILES(AGENT_REQUEST *request, AGENT_RESULT *result);
 

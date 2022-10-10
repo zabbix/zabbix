@@ -22,7 +22,7 @@
 ZBX_METRIC	parameters_specific[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
-	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	NULL},
+	{"kernel.maxfiles",	0,		kernel_maxfiles,	NULL},
 	{"kernel.maxproc",	0,		KERNEL_MAXPROC,	NULL},
 
 	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"/,free"},

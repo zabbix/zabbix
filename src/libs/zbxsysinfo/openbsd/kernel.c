@@ -21,7 +21,7 @@
 
 #include "log.h"
 
-int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	kernel_maxfiles(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXFILES
 	int	mib[2];

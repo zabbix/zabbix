@@ -21,7 +21,7 @@
 
 #include "log.h"
 
-int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	kernel_maxfiles(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	mib[] = {CTL_KERN, KERN_MAXFILES}, maxfiles;
 	size_t	len = sizeof(maxfiles);
