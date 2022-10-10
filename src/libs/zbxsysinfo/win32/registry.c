@@ -404,7 +404,7 @@ out:
 	return ret;
 }
 
-int	REGISTRY_DATA(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	registry_data(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*regkey, *value_name;
 
