@@ -448,14 +448,28 @@ static int	DBpatch_6030057(void)
 	return DBadd_foreign_key("httpstep_field", 1, &field);
 }
 
-static int DBpatch_6030058(void)
+static int	DBpatch_6030058(void)
+{
+	const ZBX_FIELD field = {"provider", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_6030059(void)
+{
+	const ZBX_FIELD field = {"status", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBset_default("media_type", &field);
+}
+
+static int DBpatch_6030060(void)
 {
 	const ZBX_FIELD	field = {"url_name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("triggers", &field);
 }
 
-static int DBpatch_6030059(void)
+static int DBpatch_6030061(void)
 {
 	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -528,5 +542,7 @@ DBPATCH_ADD(6030056, 0, 1)
 DBPATCH_ADD(6030057, 0, 1)
 DBPATCH_ADD(6030058, 0, 1)
 DBPATCH_ADD(6030059, 0, 1)
+DBPATCH_ADD(6030060, 0, 1)
+DBPATCH_ADD(6030061, 0, 1)
 
 DBPATCH_END()

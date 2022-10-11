@@ -116,7 +116,7 @@ static void	lld_filter_init(lld_filter_t *filter)
 {
 	zbx_vector_ptr_create(&filter->conditions);
 	filter->expression = NULL;
-	filter->evaltype = CONDITION_EVAL_TYPE_AND_OR;
+	filter->evaltype = ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR;
 }
 
 /******************************************************************************
@@ -195,7 +195,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, const 
 		;
 	DBfree_result(result);
 
-	if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
+	if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
 		zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -224,30 +224,30 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 
 	if (SUCCEED == (ret = zbx_lld_macro_value_by_name(jp_row, lld_macro_paths, condition->macro, &value)))
 	{
-		if (CONDITION_OPERATOR_NOT_EXIST == condition->op)
+		if (ZBX_CONDITION_OPERATOR_NOT_EXIST == condition->op)
 		{
 			ret = FAIL;
 		}
-		else if (CONDITION_OPERATOR_EXIST != condition->op)
+		else if (ZBX_CONDITION_OPERATOR_EXIST != condition->op)
 		{
 			switch (regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE))
 			{
 				case ZBX_REGEXP_MATCH:
-					ret = (CONDITION_OPERATOR_REGEXP == condition->op ? SUCCEED : FAIL);
+					ret = (ZBX_CONDITION_OPERATOR_REGEXP == condition->op ? SUCCEED : FAIL);
 					break;
 				case ZBX_REGEXP_NO_MATCH:
-					ret = (CONDITION_OPERATOR_NOT_REGEXP == condition->op ? SUCCEED : FAIL);
+					ret = (ZBX_CONDITION_OPERATOR_NOT_REGEXP == condition->op ? SUCCEED : FAIL);
 					break;
 				default:
 					ret = FAIL;
 			}
 		}
 	}
-	else if (CONDITION_OPERATOR_NOT_EXIST == condition->op)
+	else if (ZBX_CONDITION_OPERATOR_NOT_EXIST == condition->op)
 	{
 		ret = SUCCEED;
 	}
-	else if (CONDITION_OPERATOR_EXIST != condition->op)
+	else if (ZBX_CONDITION_OPERATOR_EXIST != condition->op)
 	{
 		*info = zbx_strdcatf(*info,
 				"Cannot accurately apply filter: no value received for macro \"%s\".\n",
@@ -455,13 +455,13 @@ static int	filter_evaluate(const lld_filter_t *filter, const struct zbx_json_par
 {
 	switch (filter->evaltype)
 	{
-		case CONDITION_EVAL_TYPE_AND_OR:
+		case ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR:
 			return filter_evaluate_and_or(filter, jp_row, lld_macro_paths, info);
-		case CONDITION_EVAL_TYPE_AND:
+		case ZBX_ACTION_CONDITION_EVAL_TYPE_AND:
 			return filter_evaluate_and(filter, jp_row, lld_macro_paths, info);
-		case CONDITION_EVAL_TYPE_OR:
+		case ZBX_ACTION_CONDITION_EVAL_TYPE_OR:
 			return filter_evaluate_or(filter, jp_row, lld_macro_paths, info);
-		case CONDITION_EVAL_TYPE_EXPRESSION:
+		case ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION:
 			return filter_evaluate_expression(filter, jp_row, lld_macro_paths, info);
 	}
 
@@ -512,7 +512,7 @@ static int	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_v
 	{
 		override = (lld_override_t *)overrides->values[i];
 
-		if (CONDITION_EVAL_TYPE_AND_OR == override->filter.evaltype)
+		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == override->filter.evaltype)
 			zbx_vector_ptr_sort(&override->filter.conditions, lld_condition_compare_by_macro);
 	}
 
@@ -686,11 +686,11 @@ static int	regexp_strmatch_condition(const char *value, const char *pattern, uns
 {
 	switch (op)
 	{
-		case CONDITION_OPERATOR_REGEXP:
+		case ZBX_CONDITION_OPERATOR_REGEXP:
 			if (NULL != zbx_regexp_match(value, pattern, NULL))
 				return SUCCEED;
 			break;
-		case CONDITION_OPERATOR_NOT_REGEXP:
+		case ZBX_CONDITION_OPERATOR_NOT_REGEXP:
 			if (NULL == zbx_regexp_match(value, pattern, NULL))
 				return SUCCEED;
 			break;

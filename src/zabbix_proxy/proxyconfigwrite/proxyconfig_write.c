@@ -76,6 +76,11 @@ static void	zbx_flags128_set(zbx_flags128_t *flags, int bit)
 	flags->blocks[bit >> 6] |= (__UINT64_C(1) << (bit & 0x3f));
 }
 
+static void	zbx_flags128_clear(zbx_flags128_t *flags, int bit)
+{
+	flags->blocks[bit >> 6] &= ~(__UINT64_C(1) << (bit & 0x3f));
+}
+
 static void	zbx_flags128_init(zbx_flags128_t *flags)
 {
 	memset(flags->blocks, 0, sizeof(zbx_uint64_t) * (128 / 64));
@@ -100,7 +105,6 @@ static int	zbx_flags128_isclear(zbx_flags128_t *flags)
 ZBX_PTR_VECTOR_DECL(table_row_ptr, struct zbx_table_row *)
 
 /* bit defines for proxyconfig row flags, lower bits are reserved for field update flags */
-#define PROXYCONFIG_ROW_UPDATE		126
 #define PROXYCONFIG_ROW_EXISTS		127
 
 typedef struct zbx_table_row
@@ -241,7 +245,7 @@ out:
  ******************************************************************************/
 static int	proxyconfig_parse_table_rows(zbx_table_data_t *td, struct zbx_json_parse *jp_table, char **error)
 {
-	const char		*p, *pf;
+	const char		*p;
 	int			ret = FAIL;
 	struct zbx_json_parse	jp, jp_row;
 	char			*buf;
@@ -261,7 +265,7 @@ static int	proxyconfig_parse_table_rows(zbx_table_data_t *td, struct zbx_json_pa
 		zbx_table_row_t	*row, row_local;
 
 		if (FAIL == zbx_json_brackets_open(p, &jp_row) ||
-				NULL == (pf = zbx_json_next_value_dyn(&jp_row, NULL, &buf, &buf_alloc, NULL)))
+				NULL == zbx_json_next_value_dyn(&jp_row, NULL, &buf, &buf_alloc, NULL))
 		{
 			*error = zbx_strdup(*error, zbx_json_strerror());
 			goto out;
@@ -547,8 +551,8 @@ static void	proxyconfig_dump_data(const zbx_vector_table_data_ptr_t *config_tabl
  *               FAIl - the rows doesn't match                                *
  *                                                                            *
  * Comments: The checked rows will be flagged as 'exists'. Also update flag   *
- *           will be set for each unmatching column. Finally global row       *
- *           uppdate flag will be set if at last one match failed.            *
+ *           will be set for each not matching column. Finally global row     *
+ *           update flag will be set if at last one match failed.             *
  *                                                                            *
  ******************************************************************************/
 static int	proxyconfig_compare_row(zbx_table_row_t *row, DB_ROW dbrow, char **buf, size_t *buf_alloc)
@@ -574,10 +578,7 @@ static int	proxyconfig_compare_row(zbx_table_row_t *row, DB_ROW dbrow, char **bu
 	}
 
 	if (SUCCEED != zbx_flags128_isclear(&row->flags))
-	{
-		zbx_flags128_set(&row->flags, PROXYCONFIG_ROW_UPDATE);
 		ret = FAIL;
-	}
 
 	zbx_flags128_set(&row->flags, PROXYCONFIG_ROW_EXISTS);
 
@@ -1254,6 +1255,52 @@ static int	proxyconfig_sync_regexps(zbx_vector_table_data_ptr_t *config_tables, 
 	return proxyconfig_update_rows(expressions, error);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: force proxy to re-send host availability data if server and proxy *
+ *          interface availability value is different and block proxy from    *
+ *          updating interface availability in database                       *
+ *                                                                            *
+ * Parameters: td - [IN] the interface table data                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	proxyconfig_check_interface_availability(zbx_table_data_t *td)
+{
+	zbx_vector_uint64_t	interfaceids;
+	int			i, index;
+
+	if (-1 == (index = table_data_get_field_index(td, "available")))
+		return;
+
+	zbx_vector_uint64_create(&interfaceids);
+
+	for (i = 0; i < td->updates.values_num;)
+	{
+		if (SUCCEED == zbx_flags128_isset(&td->updates.values[i]->flags, index))
+		{
+			zbx_flags128_t	flags;
+
+			zbx_vector_uint64_append(&interfaceids, td->updates.values[i]->recid);
+			zbx_flags128_clear(&td->updates.values[i]->flags, index);
+
+			flags = td->updates.values[i]->flags;
+			zbx_flags128_clear(&flags, PROXYCONFIG_ROW_EXISTS);
+			if (SUCCEED == zbx_flags128_isclear(&flags))
+			{
+				zbx_vector_table_row_ptr_remove(&td->updates, i);
+				continue;
+			}
+		}
+
+		i++;
+	}
+
+	if (0 != interfaceids.values_num)
+		DCtouch_interfaces_availability(&interfaceids);
+
+	zbx_vector_uint64_destroy(&interfaceids);
+}
+
 #define ZBX_PROXYCONFIG_GET_TABLE(table)					\
 	if (NULL == (table = proxyconfig_get_table(config_tables, #table)))	\
 	{									\
@@ -1367,6 +1414,9 @@ static int	proxyconfig_sync_hosts(zbx_vector_table_data_ptr_t *config_tables, in
 
 	/* item_rtdata must be only inserted/removed and never updated */
 	zbx_vector_table_row_ptr_clear(&item_rtdata->updates);
+
+	/* interface availability changes are never updated in database, but must be marked in cache */
+	proxyconfig_check_interface_availability(interface);
 
 	/* remove rows in reverse order to avoid depending on cascaded deletes */
 	for (i = host_tables.values_num - 1; 0 <= i; i--)
@@ -1520,7 +1570,7 @@ static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, zbx_tab
 
 		pf = zbx_json_next(&row->columns, NULL);
 
-		if (NULL != (pf = zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL)) &&
+		if (NULL != zbx_json_next_value(&row->columns, pf, buf, sizeof(buf), NULL) &&
 				SUCCEED == zbx_is_uint64(buf, &templateid))
 		{
 			zbx_vector_uint64_append(&templateids, templateid);
@@ -1816,7 +1866,7 @@ static int	proxyconfig_delete_hostmacros(const zbx_vector_uint64_t *hostids, cha
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
-	int	ret;
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1914,14 +1964,12 @@ int	zbx_proxyconfig_process(const char *addr, struct zbx_json_parse *jp, char **
 	if (SUCCEED != (ret = zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CONFIG_REVISION, tmp, sizeof(tmp), NULL)))
 	{
 		*error = zbx_strdup(NULL, "no config_revision tag in proxy configuration response");
-		ret = FAIL;
 		goto out;
 	}
 
 	if (SUCCEED != (ret = zbx_is_uint64(tmp, &config_revision)))
 	{
 		*error = zbx_strdup(NULL, "invalid config_revision value in proxy configuration response");
-		ret = FAIL;
 		goto out;
 	}
 
@@ -2028,8 +2076,8 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)zbx_dc_get_received_revision());
 
-	if (SUCCEED != (ret = zbx_tcp_send_ext(sock, j.buffer, j.buffer_size, 0, (unsigned char)sock->protocol,
-			CONFIG_TIMEOUT)))
+	if (SUCCEED != zbx_tcp_send_ext(sock, j.buffer, j.buffer_size, 0, (unsigned char)sock->protocol,
+			CONFIG_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy configuration information to sever at \"%s\": %s",
 				sock->peer, zbx_json_strerror());
@@ -2040,11 +2088,18 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *zbx_config
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot receive proxy configuration data from server at \"%s\": %s",
 				sock->peer, zbx_json_strerror());
-		ret = FAIL;
 		goto out;
 	}
 
-	if (NULL != sock->buffer && SUCCEED != (ret = zbx_json_open(sock->buffer, &jp_config)))
+	if (NULL == sock->buffer)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse empty proxy configuration data received from server at"
+				" \"%s\"", sock->peer);
+		zbx_send_proxy_response(sock, FAIL, "cannot parse empty data", CONFIG_TIMEOUT);
+		goto out;
+	}
+
+	if (SUCCEED != (ret = zbx_json_open(sock->buffer, &jp_config)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data received from server at"
 				" \"%s\": %s", sock->peer, zbx_json_strerror());

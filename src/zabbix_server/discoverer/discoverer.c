@@ -121,7 +121,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	init_result(&result);
+	zbx_init_agent_result(&result);
 
 	**value = '\0';
 
@@ -197,8 +197,8 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 			case SVC_TELNET:
 				zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
 
-				if (SUCCEED != process(key, 0, &result) || NULL == ZBX_GET_UI64_RESULT(&result) ||
-						0 == result.ui64)
+				if (SUCCEED != zbx_execute_agent_check(key, 0, &result) || NULL ==
+						ZBX_GET_UI64_RESULT(&result) || 0 == result.ui64)
 				{
 					ret = FAIL;
 				}
@@ -334,7 +334,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 
 		zbx_alarm_off();
 	}
-	free_result(&result);
+	zbx_free_agent_result(&result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -844,7 +844,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			get_program_type_string(discoverer_args_in->zbx_get_program_type_cb_arg()), server_num,
 			get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

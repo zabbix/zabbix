@@ -311,7 +311,7 @@ static int	proxyconfig_get_macro_updates(const char *table_name, const zbx_vecto
 			keys_path->path = path;
 
 			zbx_hashset_create(&keys_path->keys, 0, keys_hash, keys_compare);
-			zbx_hashset_insert(&keys_path->keys, &key, sizeof(char **));
+			zbx_hashset_insert(&keys_path->keys, &key, sizeof(char *));
 
 			zbx_vector_ptr_append(keys_paths, keys_path);
 			path = key = NULL;
@@ -474,7 +474,7 @@ static zbx_proxyconfig_dep_item_t	*proxyconfig_dep_item_create(zbx_uint64_t item
 	item->itemid = itemid;
 	item->master_itemid = master_itemid;
 	item->cols_num = cols_num;
-	item->row = (DB_ROW)zbx_malloc(NULL, sizeof(DB_ROW) * (size_t)cols_num);
+	item->row = (DB_ROW)zbx_malloc(NULL, sizeof(char *) * (size_t)cols_num);
 
 	for (i = 0; i < cols_num; i++)
 	{
@@ -762,7 +762,7 @@ out:
 static int	proxyconfig_get_expression_data(struct zbx_json *j, char **error)
 {
 	zbx_vector_uint64_t	regexpids;
-	int			ret;
+	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -798,7 +798,7 @@ out:
 static int	proxyconfig_get_httptest_data(const zbx_vector_uint64_t *httptestids, struct zbx_json *j, char **error)
 {
 	zbx_vector_uint64_t	httpstepids;
-	int			ret;
+	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

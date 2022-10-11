@@ -6397,7 +6397,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 	*param = zbx_strdup(NULL, data);
 
 	if (0 != level)
-		unquote_key_param(*param);
+		zbx_unquote_key_param(*param);
 
 	if (NULL == jp_row)
 		substitute_simple_macros_impl(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL, NULL, NULL, NULL,
@@ -6407,7 +6407,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 
 	if (0 != level)
 	{
-		if (FAIL == (ret = quote_key_param(param, quoted)))
+		if (FAIL == (ret = zbx_quote_key_param(param, quoted)))
 			zbx_free(*param);
 	}
 
@@ -6539,7 +6539,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 		{
 			char	*key = NULL, *host = NULL;
 
-			if (SUCCEED != parse_host_key(param, &host, &key) ||
+			if (SUCCEED != zbx_parse_host_key(param, &host, &key) ||
 					SUCCEED != substitute_key_macros_impl(&key, NULL, NULL, jp_row, lld_macro_paths,
 							MACRO_TYPE_ITEM_KEY, NULL, 0))
 			{
