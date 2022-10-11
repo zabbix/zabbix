@@ -1014,7 +1014,7 @@ class testFormItem extends CLegacyWebTest {
 					'delay' => 0,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals set.'
+						'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
 					]
 				]
 			],
@@ -1150,7 +1150,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": cannot have flexible intervals with zero interval for all times.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
@@ -1189,7 +1189,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": cannot have only zero intervals.'
+						'Invalid parameter "/1/delay": must have at least one interval greater than 0.'
 					]
 				]
 			],
@@ -1220,7 +1220,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": cannot have flexible intervals with zero interval for all times.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
@@ -1259,7 +1259,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": cannot have flexible intervals with zero interval for all times.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
@@ -1288,7 +1288,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": cannot have flexible intervals with zero interval for all times.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
@@ -1306,7 +1306,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": cannot have flexible intervals with zero interval for all times.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
@@ -1322,7 +1322,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": cannot have flexible intervals with zero interval for all times.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
@@ -1338,7 +1338,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": cannot have flexible intervals with zero interval for all times.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
