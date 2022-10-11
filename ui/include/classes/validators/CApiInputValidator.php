@@ -3651,7 +3651,7 @@ class CApiInputValidator {
 		}
 
 		if ($delay[0] !== '{' && $delay_sec == 0 && !$active_intervals && !$active_macro_interval) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be executed'));
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('must have at least one interval greater than 0'));
 
 			return false;
 		}
@@ -3678,7 +3678,9 @@ class CApiInputValidator {
 
 		if ($inactive_intervals && $inactive_intervals[0]['time_from'] == 0
 				&& $inactive_intervals[0]['time_to'] == 7 * SEC_PER_DAY) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be executed'));
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_('non-active intervals cannot fill the entire time')
+			);
 
 			return false;
 		}
@@ -3812,7 +3814,9 @@ class CApiInputValidator {
 			}
 		}
 
-		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be executed'));
+		$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+			_('must have a polling interval not blocked by non-active interval periods.')
+		);
 
 		return false;
 	}
