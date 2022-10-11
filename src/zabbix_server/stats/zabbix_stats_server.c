@@ -26,23 +26,27 @@
 #include "log.h"
 #include "zbxtrends.h"
 #include "zbxha.h"
+#include "zbxcomms.h"
 
 /******************************************************************************
  *                                                                            *
  * Purpose: get program type (server) specific internal statistics            *
  *                                                                            *
- * Parameters: json - [IN/OUT] the json data                                  *
+ * Parameters: json       - [IN/OUT] the json data                            *
+ *             zbx_config - [IN] server config                                *
  *                                                                            *
  * Comments: This function is used to gather server specific internal         *
  *           statistics.                                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_get_zabbix_stats_ext(struct zbx_json *json)
+void	zbx_zabbix_stats_ext_get(struct zbx_json *json, const zbx_config_comms_args_t *zbx_config)
 {
 	zbx_vc_stats_t		vc_stats;
 	zbx_uint64_t		queue_size;
 	char			*value, *error = NULL;
 	zbx_tfc_stats_t		tcache_stats;
+
+	ZBX_UNUSED(zbx_config);
 
 	/* zabbix[lld_queue] */
 	if (SUCCEED == zbx_lld_get_queue_size(&queue_size, &error))
@@ -111,7 +115,20 @@ void	zbx_get_zabbix_stats_ext(struct zbx_json *json)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot get HA node data: %s", error);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get HA node data: %s", error);
 		zbx_free(error);
 	}
+
+	if (SUCCEED == zbx_proxy_discovery_get(&value, &error))
+	{
+		zbx_json_addraw(json, "proxy", value);
+		zbx_free(value);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get proxy data: %s", error);
+		zbx_free(error);
+	}
+
+	zbx_json_close(json);
 }

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2020-10-16T09:33:49Z'
+  version: '6.0'
+  date: '2022-09-23T08:01:59Z'
   media_types:
     -
       name: Opsgenie
@@ -24,6 +24,9 @@ zabbix_export:
         -
           name: event_tags_json
           value: '{EVENT.TAGSJSON}'
+        -
+          name: event_update_action
+          value: '{EVENT.UPDATE.ACTION}'
         -
           name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
@@ -67,6 +70,9 @@ zabbix_export:
           name: severity_warning
           value: P4
         -
+          name: status_counter
+          value: '25'
+        -
           name: trigger_id
           value: '{TRIGGER.ID}'
         -
@@ -76,7 +82,8 @@ zabbix_export:
           name: zbxuser
           value: '{USER.FULLNAME}'
       script: |
-        var Media = {
+        var method,
+            Media = {
             params: {},
             name: '',
             labels: [],
@@ -203,14 +210,26 @@ zabbix_export:
             },
         
             getAlertId: function (requestId) {
+                status_counter = params.status_counter || 25; 
                 do {
                     resp = Media.request('get', 'requests/' + requestId, undefined, true);
+                status_counter -= 1;            
                 }
-                while (typeof resp.response !== 'object' || typeof resp.response.data === 'undefined'
-                        || resp.response.data.success === false);
+                while ( status_counter > 0 && 
+                    ( 
+                    typeof resp.response !== 'object' || 
+                    typeof resp.response.data === 'undefined' ||
+                    resp.response.data.success === false &&
+                        !resp.response.data.status.includes("There is no open alert") &&
+                        !resp.response.data.status.includes("Alert is already")
+                    ) 
+                );
         
                 if (typeof resp.response !== 'object' || typeof resp.response.data === 'undefined') {
                     throw 'Cannot get ' + Media.name + ' issue ID. Check debug log for more information.';
+                }
+                else if (resp.response.data.success === false ) {
+                    throw Media.name + ': Operation status (' + resp.response.data.status + ')';
                 }
         
                 return resp;
@@ -357,12 +376,24 @@ zabbix_export:
                     throw Media.name + ' response code is unexpected. Check debug log for more information.';
                 }
             }
-            // Update a created issue.
+            // Update or close the created issue.
             else {
                 fields.user = (params.event_value != 0) ? params.zbxuser : '';
                 fields.note = params.alert_message;
+                if ( [0, 3].indexOf(parseInt(params.event_source)) > -1  && params.event_value == 0 ) {
+                    // skip sending of close request from update operation(mandatory when both update & recovery operations are defined in action)  
+                    method = params.event_update_status == 0 ? "close" : "skip";
+                }
+                else if ( params.event_source == 0 && params.event_value == 1 && params.event_update_status == 1 && params.event_update_action.includes('acknowledged')) {
+                    method = params.event_update_action.includes('unacknowledged') ? "unacknowledge" : "acknowledge";
+                }
+                else {
+                    method = "notes";
+                }
+
+                if (method !== "skip") {
+                resp = Media.request('post', params.event_id + '/' + method +'?identifierType=alias', fields);
         
-                resp = Media.request('post', params.event_id + '/notes?identifierType=alias', fields);
                 if (typeof resp.response !== 'object' || typeof resp.response.result === 'undefined') {
                     throw 'Cannot update ' + Media.name + ' issue. Check debug log for more information.';
                 }
@@ -374,7 +405,7 @@ zabbix_export:
                     throw Media.name + ' response code is unexpected. Check debug log for more information.';
                 }
             }
-        
+            }
             return JSON.stringify(result);
         }
         catch (error) {

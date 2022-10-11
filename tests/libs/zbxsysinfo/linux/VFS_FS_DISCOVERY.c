@@ -21,7 +21,7 @@
 #include "zbxmockdata.h"
 
 #include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 #define GET_TEST_PARAM_FAIL(NAME, MOCK_ERR)	fail_msg("Cannot get \"%s\": %s", NAME, zbx_mock_error_string(MOCK_ERR))
 
@@ -68,8 +68,8 @@ void	zbx_mock_test_entry(void **state)
 		expected_string = expected_json;
 	}
 
-	init_request(&request);
-	init_result(&result);
+	zbx_init_agent_request(&request);
+	zbx_init_agent_result(&result);
 
 	if (expected_result != (actual_result = VFS_FS_DISCOVERY(&request, &result)))
 	{
@@ -78,9 +78,9 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	if (SYSINFO_RET_OK == actual_result)
-		p_result = GET_STR_RESULT(&result);
+		p_result = ZBX_GET_STR_RESULT(&result);
 	else
-		p_result = GET_MSG_RESULT(&result);
+		p_result = ZBX_GET_MSG_RESULT(&result);
 
 	if (NULL == p_result)
 		fail_msg("NULL result in AGENT_RESULT while expected \"%s\"", expected_string);
@@ -90,6 +90,6 @@ void	zbx_mock_test_entry(void **state)
 	if (0 != strcmp(expected_string, actual_string))
 		fail_msg("Unexpected result string: expected \"%s\", got \"%s\"", expected_string, actual_string);
 
-	free_request(&request);
-	free_result(&result);
+	zbx_free_agent_request(&request);
+	zbx_free_agent_result(&result);
 }

@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+
 #include "log.h"
 
 #ifdef HAVE_LIBPERFSTAT
@@ -40,7 +40,8 @@ static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_total << ZBX_PERFSTAT_PAGE_SHIFT);	/* total real memory in pages */
+	/* total real memory in pages */
+	SET_UI64_RESULT(result, m.real_total << ZBX_PERFSTAT_PAGE_SHIFT);
 
 	return SYSINFO_RET_OK;
 }
@@ -49,7 +50,8 @@ static int	VM_MEMORY_PINNED(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_pinned << ZBX_PERFSTAT_PAGE_SHIFT);	/* real memory which is pinned in pages */
+	/* real memory which is pinned in pages */
+	SET_UI64_RESULT(result, m.real_pinned << ZBX_PERFSTAT_PAGE_SHIFT);
 
 	return SYSINFO_RET_OK;
 }
@@ -58,7 +60,8 @@ static int	VM_MEMORY_FREE(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_free << ZBX_PERFSTAT_PAGE_SHIFT);	/* free real memory in pages */
+	/* free real memory in pages */
+	SET_UI64_RESULT(result, m.real_free << ZBX_PERFSTAT_PAGE_SHIFT);
 
 	return SYSINFO_RET_OK;
 }
@@ -67,7 +70,8 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_inuse << ZBX_PERFSTAT_PAGE_SHIFT);	/* real memory which is in use in pages */
+	/* real memory which is in use in pages */
+	SET_UI64_RESULT(result, m.real_inuse << ZBX_PERFSTAT_PAGE_SHIFT);
 
 	return SYSINFO_RET_OK;
 }
@@ -161,6 +165,7 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 #else
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for Perfstat API."));
+
 	return SYSINFO_RET_FAIL;
 #endif
 }

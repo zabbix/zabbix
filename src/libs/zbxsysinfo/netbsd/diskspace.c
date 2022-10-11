@@ -17,12 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
+#include "inodes.h"
+
 #include "zbxjson.h"
 #include "log.h"
 #include "zbxalgo.h"
-#include "inodes.h"
 
 static zbx_mntopt_t	mntopts[] = {
 	{MNT_ASYNC,		"asynchronous"},
@@ -111,6 +113,8 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 	}
 
 	return SYSINFO_RET_OK;
+#undef ZBX_STATFS
+#undef ZBX_BSIZE
 }
 
 static int	VFS_FS_USED(const char *fs, AGENT_RESULT *result)
@@ -280,10 +284,10 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t		itotal, inot_used, iused;
 	double			pfree, pused;
 	double			ipfree, ipused;
-	char 			*error;
+	char			*error;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_mpoint_t		*mntpoint;
-	char 			*mpoint;
+	char			*mpoint;
 	int			ret = SYSINFO_RET_FAIL;
 
 	/* check how many bytes to allocate for the mounted filesystems */

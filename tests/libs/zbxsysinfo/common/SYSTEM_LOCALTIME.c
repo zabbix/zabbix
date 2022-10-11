@@ -20,7 +20,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxnum.h"
 #include "../../../../src/libs/zbxsysinfo/common/system.h"
 
@@ -140,10 +140,10 @@ void	zbx_mock_test_entry(void **state)
 				zbx_mock_error_string(error));
 	}
 
-	init_request(&request);
-	init_result(&param_result);
+	zbx_init_agent_request(&request);
+	zbx_init_agent_result(&param_result);
 
-	if (SUCCEED != parse_item_key(key_string, &request))
+	if (SUCCEED != zbx_parse_item_key(key_string, &request))
 		fail_msg("Cannot parse item key from string '%s'", key_string);
 
 	if (0 != strcmp(request.key, "system.localtime"))
@@ -156,9 +156,9 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	if (SYSINFO_RET_OK == expected_result)
-		value = (NULL != GET_TEXT_RESULT(&param_result)) ? *GET_TEXT_RESULT(&param_result) : NULL;
+		value = (NULL != ZBX_GET_TEXT_RESULT(&param_result)) ? *ZBX_GET_TEXT_RESULT(&param_result) : NULL;
 	else
-		value = (NULL != GET_MSG_RESULT(&param_result)) ? *GET_MSG_RESULT(&param_result) : NULL;
+		value = (NULL != ZBX_GET_MSG_RESULT(&param_result)) ? *ZBX_GET_MSG_RESULT(&param_result) : NULL;
 
 	if (NULL == value || 0 != strcmp(expected_value_string, value))
 	{
@@ -166,8 +166,8 @@ void	zbx_mock_test_entry(void **state)
 				expected_value_string);
 	}
 
-	free_request(&request);
-	free_result(&param_result);
+	zbx_free_agent_request(&request);
+	zbx_free_agent_result(&param_result);
 }
 
 time_t	__wrap_time(time_t *seconds)
