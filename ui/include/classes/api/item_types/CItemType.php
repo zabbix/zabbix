@@ -155,7 +155,7 @@ abstract class CItemType {
 			case 'params':
 				switch (static::TYPE) {
 					case ITEM_TYPE_CALCULATED:
-						return ['type' => API_CALC_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'params')];
+						return ['type' => API_CALC_FORMULA, 'flags' => API_REQUIRED | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'params')];
 
 					default:
 						return ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')];
