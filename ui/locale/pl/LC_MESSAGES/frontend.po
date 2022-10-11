@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-09-02 18:29+0000\n"
+"PO-Revision-Date: 2022-09-29 21:13+0000\n"
 "Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -281,6 +281,16 @@ msgstr "%1$s, tylko do odczytu"
 msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, wybrano"
+
+#: app/controllers/CControllerMediatypeEnable.php:93
+#, c-format
+msgid "%1$s. %2$s: %3$s. %4$s."
+msgstr "%1$s. %2$s: %3$s. %4$s."
+
+#: app/controllers/CControllerMediatypeEnable.php:108
+#, c-format
+msgid "%1$s: %2$s"
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
@@ -2817,7 +2827,7 @@ msgstr "Nie można ocenić wyrażenia"
 
 #: include/classes/api/services/CScript.php:1064
 msgid "Cannot execute URL type script."
-msgstr ""
+msgstr "Nie można wykonać skryptu typu URL."
 
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
@@ -4855,7 +4865,7 @@ msgstr "Krytyczny"
 
 #: app/views/proxy.list.php:66
 msgid "Current"
-msgstr ""
+msgstr "Aktualny"
 
 #: app/partials/popup.operations.php:172
 msgid "Current host"
@@ -6560,6 +6570,14 @@ msgstr "Elipsa"
 #: include/media.inc.php:24
 msgid "Email"
 msgstr "Email"
+
+#: app/views/js/administration.mediatype.edit.js.php:397
+msgid "Email and password"
+msgstr "E-mail i hasło"
+
+#: app/views/administration.mediatype.edit.php:64
+msgid "Email provider"
+msgstr "Dostawca poczty e-mail"
 
 #: app/views/popup.generic.php:50
 msgid "Empty"
@@ -9199,6 +9217,11 @@ msgstr "Statystyka ruchu przychodzącego interfejsu sieciowego. Zwraca liczbę c
 msgid "Incompatible \"propagation_rule\" and \"propagation_value\" parameters for service \"%1$s\"."
 msgstr "Niekompatybilne parametry \"propagation_rule\" i \"propagation_value\" w usłudze \"%1$s\"."
 
+#: app/controllers/CControllerMediatypeEnable.php:97
+#: app/controllers/CControllerMediatypeEnable.php:108
+msgid "Incomplete configuration"
+msgstr "Niekompletna konfiguracja"
+
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
 #, c-format
@@ -11412,7 +11435,7 @@ msgstr "Lista wartości lub kluczy rejestru systemu Windows znajdujących się p
 
 #: include/classes/data/CItemData.php:1831
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
-msgstr ""
+msgstr "Lista serwerów proxy Zabbix z nazwą, trybem, szyfrowaniem, kompresją, wersją, czasem ostatniego połączenia, liczbą hostów, liczbą pozycji, wymaganymi wartościami na sekundę (vps) i kompatybilnością (bieżąca/przestarzała/nieobsługiwana). Zwraca JSON."
 
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
@@ -12042,6 +12065,10 @@ msgstr[0] "Wyłączono typ mediów"
 msgstr[1] "Wyłączono typy mediów"
 msgstr[2] "Wyłączono typy mediów"
 
+#: app/views/administration.user.edit.php:327
+msgid "Media type disabled by Administration."
+msgstr "Typ mediów wyłączony przez administrację."
+
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
@@ -12077,6 +12104,10 @@ msgstr "Typ mediów o ID \"%1$s\" jest niedostępny."
 #: include/classes/helpers/CRoleHelper.php:428
 msgid "Media types"
 msgstr "Typy mediów"
+
+#: app/views/popup.media.php:75
+msgid "Media types disabled by Administration."
+msgstr "Typy mediów wyłączone przez administrację."
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -13483,6 +13514,10 @@ msgstr "Niedostępny"
 msgid "Not classified"
 msgstr "Niesklasyfikowany"
 
+#: app/controllers/CControllerMediatypeEnable.php:95
+msgid "Not enabled"
+msgstr "Nie włączone"
+
 #: include/forms.inc.php:315
 msgid "Not inherited items"
 msgstr "Elementy niedziedziczone"
@@ -13870,6 +13905,10 @@ msgstr "Liczone są tylko wyzwalacze przypisane do włączonych hostów w zależ
 
 #: app/views/administration.script.edit.php:193
 msgid "Open in a new window"
+msgstr "Otwórz w nowym oknie"
+
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
 msgstr ""
 
 #: include/httptest.inc.php:421
@@ -14089,7 +14128,7 @@ msgstr "Inni"
 
 #: app/views/proxy.list.php:67
 msgid "Outdated"
-msgstr ""
+msgstr "Przestarzały"
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -15134,12 +15173,12 @@ msgstr "Zaktualizowano proxy"
 #: app/views/proxy.list.php:114
 #, c-format
 msgid "Proxy version is not supported by server version %1$s."
-msgstr ""
+msgstr "Wersja serwera proxy nie jest obsługiwana przez serwer w wersji %1$s."
 
 #: app/views/proxy.list.php:107
 #, c-format
 msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
-msgstr ""
+msgstr "Wersja proxy jest nieaktualna, w przypadku wersji serwera %1$s dostępne są tylko zbieranie danych i zdalne polecenia."
 
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
@@ -15798,7 +15837,7 @@ msgstr "Wymagany ciąg znaków"
 
 #: app/views/proxy.list.php:93
 msgid "Required vps"
-msgstr ""
+msgstr "Wymagane vps"
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
@@ -21516,6 +21555,10 @@ msgstr "spodziewano się wartości logicznej"
 msgid "a character string is expected"
 msgstr "oczekiwano ciągu znaków"
 
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr "oczekiwany jest ciąg znaków, liczba całkowita lub wartość zmiennoprzecinkowa"
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "spodziewano się daty w formacie RRRR-MM-DD"
@@ -22226,6 +22269,11 @@ msgstr "nie pasuje"
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr "e() - Liczba Eulera"
+
+#: app/views/administration.mediatype.list.php:98
+#: app/views/administration.mediatype.list.php:103
+msgid "email"
+msgstr "e-mail"
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
@@ -23733,7 +23781,7 @@ msgstr "przez"
 #: include/func.inc.php:659
 msgctxt "week short"
 msgid "w"
-msgstr ""
+msgstr "t"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"
