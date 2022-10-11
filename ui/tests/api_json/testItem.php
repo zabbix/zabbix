@@ -241,6 +241,7 @@ class testItem extends CAPITest {
 					'key_' => 'trapper_item_1',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => ITEM_TYPE_TRAPPER,
+					'delay' => 0,
 					'tags' => [
 						[
 							'tag' => 'tag',
