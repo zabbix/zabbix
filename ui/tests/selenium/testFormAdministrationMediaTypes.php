@@ -33,6 +33,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		'SMS' => 'SMS',
 		'Script' => 'Test script'
 	];
+	private static $delete_mediatype = 'Email (HTML)';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -108,8 +109,6 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 		);
 	}
-
-
 
 	public static function getLayoutMediaTypes() {
 		return [
@@ -893,6 +892,58 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->checkActionCancellation('delete');
 	}
 
+	public function testFormAdministrationMediaTypes_SimpleUpdate() {
+		$old_hash = CDBHelper::getHash(self::$mediatype_sql);
+
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->query('link:Email (HTML)')->one()->WaitUntilClickable()->click();
+		$form = $this->query('id:media_type_form')->asForm()->waitUntilVisible()->one()->submit();
+		$this->page->waitUntilReady();
+
+		$this->assertMessage(TEST_GOOD, 'Media type updated');
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
+	}
+
+	public function testFormAdministrationMediaTypes_Clone() {
+		$clone_sql = 'SELECT type, smtp_server, smtp_helo, smtp_email, exec_path, gsm_modem, username, passwd, '.
+				'status, smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, exec_params, '.
+				'maxsessions, maxattempts, attempt_interval, content_type, script, timeout, process_tags, show_event_menu, '.
+				'event_menu_url, event_menu_name, description FROM media_type WHERE name=';
+		$old_hash = CDBHelper::getHash($clone_sql.zbx_dbstr(self::$delete_mediatype));
+
+		// Clone the media type.
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->query('link', self::$delete_mediatype)->WaitUntilClickable()->one()->click();
+		$this->query('button:Clone')->one()->click();
+		$form = $this->query('id:media_type_form')->asForm()->waitUntilVisible()->one();
+		$clone_name = self::$delete_mediatype.' clone';
+		$form->fill(['Name' => $clone_name]);
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		$this->assertMessage(TEST_GOOD, 'Media type added');
+		$this->assertEquals($old_hash, CDBHelper::getHash($clone_sql.zbx_dbstr($clone_name)));
+	}
+
+	public function testFormAdministrationMediaTypes_Delete() {
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->query('link', self::$delete_mediatype)->WaitUntilClickable()->one()->click();
+
+		$this->query('button:Delete')->one()->waitUntilClickable()->click();
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+
+		$this->assertMessage(TEST_GOOD, 'Media type deleted');
+		$this->assertEquals(0, CDBHelper::getCount('SELECT mediatypeid FROM media_type WHERE name='.
+				zbx_dbstr(self::$delete_mediatype))
+		);
+	}
+
+	/**
+	 * Check cancellation scenarios for create, update, clone and delete actions.
+	 *
+	 * @param string	$action		type of action to be checked
+	 */
 	private function checkActionCancellation($action = 'create') {
 		$new_values = [
 			'Media type' => [
@@ -935,6 +986,9 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		else {
 			if ($action === 'clone') {
 				$form->query('button:Clone')->waitUntilClickable()->one()->click();
+			}
+			elseif ($action === 'update') {
+				unset($new_values['Media type']['Password']);
 			}
 
 			foreach ($new_values as $tab => $values) {
