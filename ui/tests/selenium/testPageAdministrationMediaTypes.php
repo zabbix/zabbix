@@ -418,7 +418,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 						'Message' => 'new message'
 					],
 					'error' => "Connection to Zabbix server \"localhost:10051\" refused. Possible reasons:\n".
-							"1. Incorrect \"NoderAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".
+							"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".
 							"2. Security environment (for example, SELinux) is blocking the connection;\n".
 							"3. Zabbix server daemon not running;\n".
 							"4. Firewall is blocking TCP connection.\n".
@@ -433,7 +433,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 						'Send to' => '/../"'
 					],
 					'error' => "Connection to Zabbix server \"localhost:10051\" refused. Possible reasons:\n".
-							"1. Incorrect \"NoderAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".
+							"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".
 							"2. Security environment (for example, SELinux) is blocking the connection;\n".
 							"3. Zabbix server daemon not running;\n".
 							"4. Firewall is blocking TCP connection.\n".
@@ -447,7 +447,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'webhook' => true,
 					'parameters' => ['HTTPProxy', 'Message', 'Subject', 'To', 'URL', 'Response'],
 					'error' => "Connection to Zabbix server \"localhost:10051\" refused. Possible reasons:\n".
-							"1. Incorrect \"NoderAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".
+							"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".
 							"2. Security environment (for example, SELinux) is blocking the connection;\n".
 							"3. Zabbix server daemon not running;\n".
 							"4. Firewall is blocking TCP connection.\n".
