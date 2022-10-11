@@ -51,7 +51,7 @@ class CItemTypeHttpAgent extends CItemType {
 										['if' => ['field' => 'post_type', 'in' => ZBX_POSTTYPE_XML], 'type' => API_XML, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'posts')]
 			]],
 			'headers' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => []],
-			'status_codes' =>		['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO | $is_item_prototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'status_codes')],
+			'status_codes' =>		['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'status_codes')],
 			'follow_redirects' =>	['type' => API_INT32, 'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])],
 			'retrieve_mode' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'request_method', 'in' => HTTPCHECK_REQUEST_HEAD], 'type' => API_INT32, 'in' => HTTPTEST_STEP_RETRIEVE_MODE_HEADERS],
