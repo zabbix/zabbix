@@ -173,7 +173,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => ''],
 						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'value']
 					],
-					'error' => 'Incorrect value for field "params":'
+					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
 				]
 			],
 			[
@@ -377,7 +377,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => ''],
 						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'value']
 					],
-					'error' => 'Incorrect value for field "params":'
+					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
 				]
 			],
 			[
