@@ -257,7 +257,7 @@ class testFormTags extends CWebTest {
 			case 'item prototype':
 				$sql = 'SELECT * FROM items ORDER BY itemid';
 				$locator = 'name:itemForm';
-				$fields = ['Name' => $data['name'], 'Key' => 'itemtag_'.microtime(true), 'Type' => 'Zabbix trapper'];
+				$fields = ['Name' => $data['name'], 'Key' => 'itemtag_'.microtime(true).'[{#KEY}]', 'Type' => 'Zabbix trapper'];
 				break;
 
 			case 'web scenario':

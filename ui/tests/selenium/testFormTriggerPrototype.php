@@ -506,77 +506,77 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_sysUptime',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => '1234567890',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'a?aa+',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => '}aa]a{',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => '-aaa=%',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa,;:',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa><.',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa*&_',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'aaa#@!',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => '([)$^',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0'
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_generalCheck',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<5',
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<5',
 					'type' => true,
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url' => 'http://www.zabbix.com',
@@ -588,7 +588,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_CheckUrl',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<5',
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<5',
 					'url' => 'index.php'
 				]
 			],
@@ -630,7 +630,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'description' => 'MyTrigger',
-					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<0 or {#MACRO}',
+					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0 or {#MACRO}',
 					'constructor' => [
 						'text' => ['A or B', 'A', 'B'],
 						'elements' => ['expr_0_53', 'expr_58_65']
@@ -789,7 +789,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		if (isset($data['expression'])) {
 			switch ($data['expression']) {
 				case 'default':
-					$expression = 'last(/'.$this->host.'/'.$this->itemKey.',#1)=0';
+					$expression = 'last(/'.$this->host.'/'.$this->itemKey.'[{#KEY}],#1)=0';
 					$this->zbxTestInputType('expression', $expression);
 					break;
 				default:
