@@ -4735,16 +4735,16 @@ section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:
     content: ''; }
 
 .icon-tree-top-bottom::before {
-  background-position: url("../img/icon-sprite.svg?20220722") no-repeat -84px -300px; }
+  background-position: -84px -300px; }
 
 .icon-tree-top-bottom-right::before {
-  background-position: url("../img/icon-sprite.svg?20220722") no-repeat -84px -334px; }
+  background-position: -84px -334px; }
 
 .icon-tree-top-right::before {
-  background-position: url("../img/icon-sprite.svg?20220722") no-repeat -84px -372px; }
+  background-position: -84px -372px; }
 
 .icon-tree-empty::before {
-  background-position: url("../img/icon-sprite.svg?20220722") no-repeat -84px -350px; }
+  background-position: -84px -350px; }
 
 .icon-cal {
   background: transparent url("../img/icon-sprite.svg?20220722") no-repeat -42px -834px; }

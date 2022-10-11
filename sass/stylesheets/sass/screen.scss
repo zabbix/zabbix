@@ -2618,10 +2618,10 @@ $var-icons: (
 }
 
 $trigger-expression-tree-icons: (
-	top-bottom: url($sprite-path) no-repeat -84px -300px,
-	top-bottom-right: url($sprite-path) no-repeat -84px -334px,
-	top-right: url($sprite-path) no-repeat -84px -372px,
-	empty: url($sprite-path) no-repeat -84px -350px
+	top-bottom: -84px -300px,
+	top-bottom-right: -84px -334px,
+	top-right: -84px -372px,
+	empty: -84px -350px
 );
 
 %trigger-expression-tree-icons-common {
