@@ -77,7 +77,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'host' => 'Simple form test host',
-					'key' => 'item-prototype-form1'
+					'key' => 'item-prototype-form1[{#KEY}]'
 				]
 			],
 			[
@@ -280,13 +280,13 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'template' => 'Inheritance test template',
-					'key' => 'item-prototype-test1'
+					'key' => 'item-prototype-test1[{#KEY}]'
 				]
 			],
 			[
 				[
 					'host' => 'Template inheritance test host',
-					'key' => 'item-prototype-test1'
+					'key' => 'item-prototype-test1[{#KEY}]'
 				]
 			],
 			[
@@ -484,7 +484,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				[
 					'host' => 'Template inheritance test host',
 					'hostTemplate' => 'Inheritance test template',
-					'key' => 'item-prototype-preprocessing',
+					'key' => 'item-prototype-preprocessing[{#KEY}]',
 					'preprocessing' => true
 				]
 			]
@@ -514,7 +514,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					' AND key_='.zbx_dbstr($data['key'])
 			);
 			$template_info = DBfetch($dbResult);
-
+			var_Dump($template_info);
 			$this->assertNotEquals($template_info, null);
 
 			$itemid = $template_info['itemid'];

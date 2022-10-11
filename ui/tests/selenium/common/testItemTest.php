@@ -58,10 +58,10 @@ class testItemTest extends CWebTest {
 				['Type' => 'Database monitor', 'SQL query' => 'query'],
 				['Type' => 'HTTP agent', 'URL' => 'https://www.zabbix.com'],
 				['Type' => 'IPMI agent', 'IPMI sensor' => 'Sensor'],
-				['Type' => 'SSH agent', 'Key' => 'ssh.run[Description,127.0.0.1,50]', 'User name' => 'Name', 'Executed script' => 'Script'],
-				['Type' => 'TELNET agent', 'Key' => 'telnet'],
-				['Type' => 'JMX agent', 'Key' => 'jmx','JMX endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi', 'User name' => ''],
-				['Type' => 'Dependent item', 'Key'=>'dependent', 'Master item' => 'Master item']
+				['Type' => 'SSH agent', 'Key' => 'ssh.run[Description,127.0.0.1,50,[{#KEY}]]', 'User name' => 'Name', 'Executed script' => 'Script'],
+				['Type' => 'TELNET agent', 'Key' => 'telnet[{#KEY}]'],
+				['Type' => 'JMX agent', 'Key' => 'jmx[{#KEY}]','JMX endpoint' => 'service:jmx:rmi:///jndi/rmi://{HOST.CONN}:{HOST.PORT}/jmxrmi', 'User name' => ''],
+				['Type' => 'Dependent item', 'Key'=>'dependent[{#KEY}]', 'Master item' => 'Master item']
 		];
 	}
 
@@ -70,7 +70,7 @@ class testItemTest extends CWebTest {
 	 */
 	public function getItemTestButtonStateData() {
 		return array_merge($this->getCommonTestButtonStateData(), [
-				['Type' => 'SNMP trap', 'Key' => 'snmptrap.fallback'],
+				['Type' => 'SNMP trap', 'Key' => 'snmptrap.fallback[{#KEY}]'],
 				['Type' => 'Calculated', 'Formula' => '"formula"']
 		]);
 	}
@@ -103,7 +103,7 @@ class testItemTest extends CWebTest {
 		$item_form->fill([
 			'Name' => $item_name,
 			'Type' => 'Zabbix agent',
-			'Key' => 'key'
+			'Key' => 'key[{#KEY}]'
 		]);
 		// Check Test item button.
 		$this->checkTestButtonInPreprocessing($item_type);
@@ -410,7 +410,7 @@ class testItemTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '', 'parameter_2' => '2']
 					],
-					'error' => 'Incorrect value for field "params": first parameter is expected.'
+					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
 				]
 			],
 			[
@@ -423,7 +423,7 @@ class testItemTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '1', 'parameter_2' => '']
 					],
-					'error' => 'Incorrect value for field "params": second parameter is expected.'
+					'error' => 'Invalid parameter "/1/params/2": cannot be empty.'
 				]
 			],
 			[
@@ -436,7 +436,7 @@ class testItemTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'XML XPath', 'parameter_1' => '']
 					],
-					'error' => 'Incorrect value for field "params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
 				]
 			],
 			[
@@ -454,7 +454,7 @@ class testItemTest extends CWebTest {
 						'error_handler' => 'Set error to',
 						'error_handler_params' => '']
 					],
-					'error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/error_handler_params": cannot be empty.'
 				]
 			],
 			[
