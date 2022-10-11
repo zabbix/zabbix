@@ -4914,6 +4914,28 @@ return [
 			]
 		]
 	],
+	'event_rank' => [
+		'key' => 'eventid',
+		'fields' => [
+			'eventid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'events',
+				'ref_field' => 'eventid'
+			],
+			'c_eventid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'userid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			]
+		]
+	],
 	'trends' => [
 		'key' => 'itemid,clock',
 		'fields' => [
@@ -7036,6 +7058,32 @@ return [
 				'length' => 20,
 				'ref_table' => 'acknowledges',
 				'ref_field' => 'acknowledgeid'
+			]
+		]
+	],
+	'task_update_event_rank' => [
+		'key' => 'taskid',
+		'fields' => [
+			'taskid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'task',
+				'ref_field' => 'taskid'
+			],
+			'acknowledgeid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'acknowledges',
+				'ref_field' => 'acknowledgeid'
+			],
+			'c_eventid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'events',
+				'ref_field' => 'c_eventid'
 			]
 		]
 	],
