@@ -140,38 +140,33 @@ $form = (new CForm('post', $form_action))
 		])
 		->addItem([
 			(new CLabel(_('Group member attribute'), 'group_member'))
-				->setAsteriskMark()
 				->addClass('allow-jit-provisioning'),
 			(new CFormField(
 				(new CTextBox('group_member', $data['group_member'], false,
 					DB::getFieldLength('userdirectory_ldap', 'group_member')
 				))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setAriaRequired()
 			))->addClass('allow-jit-provisioning')
 		])
 		->addItem([
 			(new CLabel(_('Group filter'), 'group_filter'))
-				->setAsteriskMark()
 				->addClass('allow-jit-provisioning'),
 			(new CFormField(
 				(new CTextBox('group_filter', $data['group_filter'], false,
 					DB::getFieldLength('userdirectory_ldap', 'group_filter')
 				))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setAriaRequired()
+					->setAttribute('placeholder', CLdap::DEFAULT_FILTER_GROUP)
 			))->addClass('allow-jit-provisioning')
 		])
 		->addItem([
 			(new CLabel(_('User group membership attribute'), 'group_membership'))
-				->setAsteriskMark()
 				->addClass('allow-jit-provisioning'),
 			(new CFormField(
 				(new CTextBox('group_membership', $data['group_membership'], false,
 					DB::getFieldLength('userdirectory_ldap', 'group_membership')
 				))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-					->setAriaRequired()
 			))->addClass('allow-jit-provisioning')
 		])
 		->addItem([
@@ -267,7 +262,7 @@ $form = (new CForm('post', $form_action))
 				(new CTextBox('search_filter', $data['search_filter'], false,
 					DB::getFieldLength('userdirectory_ldap', 'search_filter')
 				))
-					->setAttribute('placeholder', '(%{attr}=%{user})')
+					->setAttribute('placeholder', CLdap::DEFAULT_FILTER_USER)
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))->addClass('advanced-configuration')
 		])

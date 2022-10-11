@@ -56,17 +56,13 @@ class CControllerPopupLdapCheck extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret && $this->getInput('provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
-			foreach (['group_basedn', 'group_member', 'group_filter', 'group_membership'] as $field) {
-				if (!$this->hasInput($field)) {
-					error(_s('Field "%1$s" is mandatory.', $field));
-					$ret = false;
-					break;
-				}
-				elseif ($this->getInput($field) === '') {
-					error(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
-					$ret = false;
-					break;
-				}
+			if (!$this->hasInput('group_basedn')) {
+				error(_s('Field "%1$s" is mandatory.', 'group_basedn'));
+				$ret = false;
+			}
+			elseif ($this->getInput('group_basedn') === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'group_basedn', _('cannot be empty')));
+				$ret = false;
 			}
 
 			if ($ret && !$this->validateProvisionGroups()) {

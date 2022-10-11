@@ -206,7 +206,7 @@ foreach ($data['users'] as $user) {
 		$users_groups[] = $group->addClass($style);
 	}
 
-	$provisioned = '';
+	$provisioned = $user['userdirectoryid'] ? new CDiv(date(ZBX_DATE_TIME, $user['ts_provisioned'])) : '';
 	$checkbox = new CCheckBox('userids['.$userid.']', $userid);
 	$gui_access = new CSpan(user_auth_type2str($user['gui_access']));
 	$info = $users_groups ? '' : makeWarningIcon(_('User do not have user groups!'));
@@ -228,9 +228,7 @@ foreach ($data['users'] as $user) {
 	else {
 		if ($user['userdirectoryid']) {
 			$idp = $data['idp_names'][$user['userdirectoryid']];
-			$provisioned = (new CDiv(date(ZBX_DATE_TIME, $user['ts_provisioned'])))
-				->setHint($idp['idp_type'] == IDP_TYPE_SAML ? _('SAML') : $idp['name']);
-
+			$provisioned->setHint($idp['idp_type'] == IDP_TYPE_SAML ? _('SAML') : $idp['name']);
 			$gui_access = new CSpan($idp['idp_type'] == IDP_TYPE_LDAP ? _('LDAP') : _('SAML'));
 		}
 

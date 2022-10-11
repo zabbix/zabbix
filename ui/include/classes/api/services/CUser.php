@@ -1534,7 +1534,8 @@ class CUser extends CApiService {
 
 					if (CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])) {
 						$db_user['deprovisioned'] = true;
-						$upd_user = $this->updateProvisionedUser($db_user['userid'], $idp_user_data);
+						$idp_user_data['userid'] = $db_user['userid'];
+						$upd_user = $this->updateProvisionedUser($idp_user_data);
 
 						if ($upd_user) {
 							$user_data = $this->findAccessibleUser($db_user['username'], true, ZBX_AUTH_LDAP, false);
@@ -1866,7 +1867,8 @@ class CUser extends CApiService {
 						$user = array_merge($user, $provisioning->getUserGroupsAndRole($ldap_groups));
 					}
 
-					$this->updateProvisionedUser($provision_user['userid'], $user);
+					$user['userid'] = $provision_user['userid'];
+					$this->updateProvisionedUser($user);
 					$provisionedids[] = $provision_user['userid'];
 				}
 			}
@@ -1915,33 +1917,33 @@ class CUser extends CApiService {
 	 *
 	 * @param int   $db_userid
 	 * @param array $idp_user_data
+	 * @param array $idp_user_data['userid']
 	 * @param array $idp_user_data['usrgrps']
 	 * @param array $idp_user_data['medias']
 	 *
 	 * @return array
 	 */
-	public function updateProvisionedUser($db_userid, array $idp_user_data): array {
-		$attrs = array_flip(array_merge(self::PROVISIONED_FIELDS, ['userdirectoryid']));
+	public function updateProvisionedUser(array $idp_user_data): array {
+		$attrs = array_flip(array_merge(self::PROVISIONED_FIELDS, ['userdirectoryid', 'userid']));
 		unset($attrs['passwd']);
 		$user = array_intersect_key($idp_user_data, $attrs);
 		$user['medias'] = $this->sanitizeUserMedia($user['medias']);
-		$user['userid'] = $db_userid;
 		$user['ts_provisioned'] = time();
 		$users = [$user];
 
 		[$db_user] = DB::select('users', [
 			'output' => ['userid', 'username', 'name', 'surname', 'roleid', 'userdirectoryid', 'ts_provisioned'],
-			'userids' => [$db_userid]
+			'userids' => [$user['userid']]
 		]);
 		$db_user['usrgrps'] = DB::select('users_groups', [
 			'output' => ['usrgrpid', 'id'],
-			'filter' => ['userid' => $db_userid]
+			'filter' => ['userid' => $user['userid']]
 		]);
 		$db_user['medias'] = DB::select('media', [
 			'output' => ['mediatypeid', 'mediaid', 'sendto'],
-			'filter' => ['userid' => $db_userid]
+			'filter' => ['userid' => $user['userid']]
 		]);
-		$db_users = [$db_userid => $db_user];
+		$db_users = [$user['userid'] => $db_user];
 
 		if (!$idp_user_data['usrgrps']) {
 			$users[0]['usrgrps'] = [[
@@ -2428,8 +2430,9 @@ class CUser extends CApiService {
 		}
 
 		$idp_user_data['username'] = $user_data['username'];
+		$idp_user_data['userid'] = $user_data['userid'];
 
-		return $this->updateProvisionedUser($user_data['userid'], $idp_user_data);
+		return $this->updateProvisionedUser($idp_user_data);
 	}
 
 	/**
