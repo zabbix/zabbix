@@ -885,7 +885,8 @@ class CItemPrototype extends CItemGeneral {
 				$item_indexes = array_flip(array_column($items_to_link, 'itemid'));
 
 				foreach ($items_to_link as $i => $item) {
-					if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+					if ($item['type'] == ITEM_TYPE_DEPENDENT
+							&& array_key_exists($item['master_itemid'], $item_indexes)) {
 						$dep_items_to_link[$item_indexes[$item['master_itemid']]][$i] = $item;
 
 						unset($items_to_link[$i]);
