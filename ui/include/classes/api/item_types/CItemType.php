@@ -293,8 +293,8 @@ abstract class CItemType {
 									ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT,
 									ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
 								]);
-							}, 'type' => API_CALC_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'params')],
-							['else' => true, 'type' => API_CALC_FORMULA, 'length' => DB::getFieldLength('items', 'params')]
+							}, 'type' => API_CALC_FORMULA, 'flags' => API_REQUIRED | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'params')],
+							['else' => true, 'type' => API_CALC_FORMULA, 'flags' => ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'params')]
 						]];
 
 					default:
@@ -403,7 +403,7 @@ abstract class CItemType {
 			case 'params':
 				switch (static::TYPE) {
 					case ITEM_TYPE_CALCULATED:
-						return ['type' => API_CALC_FORMULA, 'length' => DB::getFieldLength('items', 'params')];
+						return ['type' => API_CALC_FORMULA, 'flags' => ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'params')];
 
 					case ITEM_TYPE_SCRIPT:
 						return ['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED];
