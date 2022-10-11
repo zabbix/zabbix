@@ -15,7 +15,6 @@ SUBDIRS = \
 	trapper \
 	escalator \
 	proxypoller \
-	selfmon \
 	vmware \
 	taskmanager \
 	ipmi \
@@ -71,7 +70,6 @@ zabbix_server_LDADD = \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
 	proxyconfigread/libzbxproxyconfigread.a \
-	selfmon/libzbxselfmon.a \
 	vmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager.a \
 	odbc/libzbxodbc.a \

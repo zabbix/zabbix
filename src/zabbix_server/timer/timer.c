@@ -560,19 +560,20 @@ static int	update_host_maintenances(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(timer_thread, args)
 {
-	double		sec;
-	int		maintenance_time = 0, update_time = 0, idle = 1, events_num, hosts_num, update;
-	char		*info = NULL;
-	size_t		info_alloc = 0, info_offset = 0;
+	double			sec;
+	int			maintenance_time = 0, update_time = 0, idle = 1, events_num, hosts_num, update;
+	char			*info = NULL;
+	size_t			info_alloc = 0, info_offset = 0;
+	zbx_thread_info_t	*thread_info = &((zbx_thread_args_t *)args)->info;
 
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	zbx_strcpy_alloc(&info, &info_alloc, &info_offset, "started");
@@ -651,7 +652,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		}
 
 		if (0 != idle)
-			zbx_sleep_loop(1);
+			zbx_sleep_loop(thread_info, 1);
 
 		idle = 1;
 	}

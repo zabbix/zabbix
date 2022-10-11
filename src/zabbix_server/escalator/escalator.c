@@ -3438,16 +3438,17 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	double				sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time;
 	zbx_config_t			cfg;
+	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(escalator_args_in->zbx_get_program_type_cb_arg()), server_num,
 			get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -3513,7 +3514,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 			last_stat_time = now;
 		}
 
-		zbx_sleep_loop(sleeptime);
+		zbx_sleep_loop(info, sleeptime);
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

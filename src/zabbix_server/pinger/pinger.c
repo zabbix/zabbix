@@ -543,15 +543,16 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 	double			sec;
 	static icmpitem_t	*items = NULL;
 	static int		items_alloc = 4;
+	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	if (NULL == items)
 		items = (icmpitem_t *)zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);
@@ -576,7 +577,7 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 		zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), process_num, itc, sec, sleeptime);
 
-		zbx_sleep_loop(sleeptime);
+		zbx_sleep_loop(info, sleeptime);
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

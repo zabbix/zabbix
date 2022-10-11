@@ -190,17 +190,18 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, int ti
 ZBX_THREAD_ENTRY(vmware_thread, args)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	int	services_updated = 0, services_removed = 0;
-	double	time_now, time_stat, time_idle = 0;
+	int			services_updated = 0, services_removed = 0;
+	double			time_now, time_stat, time_idle = 0;
+	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #define JOB_TIMEOUT	1
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -243,9 +244,9 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 		if (zbx_time() - time_now <= JOB_TIMEOUT)
 		{
 			time_idle += JOB_TIMEOUT;
-			zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-			zbx_sleep_loop(JOB_TIMEOUT);
-			zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
+			zbx_sleep_loop(info, JOB_TIMEOUT);
+			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 		}
 	}
 

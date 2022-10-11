@@ -91,18 +91,19 @@ static int	housekeep_problems_without_triggers(void)
 
 ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 {
-	int		deleted;
-	double		sec;
+	int			deleted;
+	double			sec;
 	zbx_ipc_async_socket_t	rtc;
+	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -117,7 +118,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
 
-		if (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY) &&
+		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY) &&
 				0 != rtc_cmd)
 		{
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)

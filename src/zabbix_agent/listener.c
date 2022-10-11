@@ -118,9 +118,9 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	assert(((zbx_thread_args_t *)args)->args);
 
 	init_child_args_in = (zbx_thread_listener_args *)((((zbx_thread_args_t *)args))->args);
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(init_child_args_in->zbx_get_program_type_cb_arg()),

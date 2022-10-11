@@ -497,13 +497,13 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			unsigned short	process_num = 0;
 
 			if ('\0' == *tmp || 0 == strcmp(tmp, "avg"))
-				aggr_func = ZBX_AGGR_FUNC_AVG;
+				aggr_func = ZBX_SELFMON_AGGR_FUNC_AVG;
 			else if (0 == strcmp(tmp, "max"))
-				aggr_func = ZBX_AGGR_FUNC_MAX;
+				aggr_func = ZBX_SELFMON_AGGR_FUNC_MAX;
 			else if (0 == strcmp(tmp, "min"))
-				aggr_func = ZBX_AGGR_FUNC_MIN;
+				aggr_func = ZBX_SELFMON_AGGR_FUNC_MIN;
 			else if (SUCCEED == zbx_is_ushort(tmp, &process_num) && 0 < process_num)
-				aggr_func = ZBX_AGGR_FUNC_ONE;
+				aggr_func = ZBX_SELFMON_AGGR_FUNC_ONE;
 			else
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));

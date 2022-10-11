@@ -24,6 +24,7 @@
 #include "zbxjson.h"
 #include "zbxself.h"
 #include "log.h"
+#include "zbxthreads.h"
 
 extern int	CONFIG_TIMEOUT;
 
@@ -288,27 +289,28 @@ void	zbx_rtc_subscribe(zbx_ipc_async_socket_t *rtc, unsigned char proc_type, int
  * Purpose: wait for RTC notification                                         *
  *                                                                            *
  * Parameters: rtc     - [IN] the RTC notification subscription socket        *
+ *             info    - [IN] caller process info                             *
  *             cmd     - [OUT] the RTC notification code                      *
  *             data    - [OUT] the RTC notification data                      *
  *             timeout - [OUT] the timeout                                    *
- *             error   - [OUT] error message                                  *
  *                                                                            *
  * Return value: SUCCEED - a notification was received or timeout occurred    *
  *               FAIL    - communication error                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rtc_wait(zbx_ipc_async_socket_t *rtc, zbx_uint32_t *cmd, unsigned char **data, int timeout)
+int	zbx_rtc_wait(zbx_ipc_async_socket_t *rtc, const zbx_thread_info_t *info, zbx_uint32_t *cmd,
+		unsigned char **data, int timeout)
 {
 	zbx_ipc_message_t	*message;
 	int			ret;
 
 	if (0 != timeout)
-		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 	ret = zbx_ipc_async_socket_recv(rtc, timeout, &message);
 
 	if (0 != timeout)
-		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	if (FAIL == ret)
 		return FAIL;
