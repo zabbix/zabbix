@@ -4006,7 +4006,7 @@ class CApiInputValidator {
 			case ZBX_PREPROC_VALIDATE_RANGE:
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 					'1' =>	['type' => API_FLOAT, 'flags' => API_REQUIRED | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO)],
-					'2' =>	['type' => API_FLOAT, 'flags' => API_REQUIRED | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO), 'compare' => ['operator' => '>', 'field' => '1']]
+					'2' =>	['type' => API_FLOAT, 'flags' => ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO), 'compare' => ['operator' => '>', 'field' => '1']]
 				]];
 				break;
 

@@ -2107,6 +2107,10 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 				}
 				unset($param);
 
+				if ($step['params'][1] === '') {
+					unset($step['params'][1]);
+				}
+
 				$step['params'] = implode("\n", $step['params']);
 				break;
 
