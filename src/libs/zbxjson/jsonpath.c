@@ -255,6 +255,7 @@ static zbx_jsonpath_t	*jsonpath_create_token_jsonpath(const char *text, size_t l
 		zbx_set_json_strerror("only simple path are supported in jsonpath expression: \"%s\"", text);
 		zbx_jsonpath_clear(path);
 		zbx_free(path);
+		goto out;
 	}
 
 	if (ZBX_JSONPATH_SEGMENT_FUNCTION == path->segments[path->segments_num - 1].type)
