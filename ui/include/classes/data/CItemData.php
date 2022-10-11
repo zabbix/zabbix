@@ -1503,7 +1503,7 @@ final class CItemData {
 			],
 			'vmware.hv.perfcounter[<url>,<uuid>,<path>,<instance>]' => [
 				'description' => _('VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance'),
-				'value_type' => null
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.hv.power[<url>,<uuid>,<max>]' => [
 				'description' => _('Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage'),
@@ -1675,7 +1675,7 @@ final class CItemData {
 			],
 			'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]' => [
 				'description' => _('VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance'),
-				'value_type' => null
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.vm.powerstate[<url>,<uuid>]' => [
 				'description' => _('VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),

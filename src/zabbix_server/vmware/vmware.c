@@ -4454,7 +4454,7 @@ static int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_di
 		zbx_vmware_diskextent_t	*diskextent;
 		xmlNode			*xn = nodeset->nodeTab[i];
 
-		if (NULL == (value= zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("diskName"))))
+		if (NULL == (value = zbx_xml_node_read_value(doc, xn, ZBX_XPATH_NN("diskName"))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Cannot get diskName.", __func__);
 			continue;
@@ -5031,7 +5031,7 @@ static int	vmware_service_hv_disks_parse_info(xmlDoc *xdoc, const zbx_vector_vmw
 
 		pr.first = lun_key;
 
-		if (!(FAIL != j && 0 == strcmp(disks_info->values[j].first, lun_key)) &&
+		if ((FAIL == j || 0 != strcmp(disks_info->values[j].first, lun_key)) &&
 				FAIL == (j = zbx_vector_ptr_pair_search(disks_info, pr,
 				ZBX_DEFAULT_STR_COMPARE_FUNC)))
 		{
@@ -5246,7 +5246,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 
 	zbx_vector_str_create(&scsi_luns);
 	zbx_xml_read_values(hv_data, ZBX_XPATH_HV_SCSI_TOPOLOGY, &scsi_luns);
-	total =  scsi_luns.values_num;
+	total = scsi_luns.values_num;
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() count of scsiLun:%d", __func__, total);
 
 	if (0 == total)
@@ -6194,7 +6194,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		}
 	}
 
-	zbx_vector_vmware_diskinfo_reserve(&hv->diskinfo, disks_info.values_num);
+	zbx_vector_vmware_diskinfo_reserve(&hv->diskinfo, (size_t)disks_info.values_num);
 
 	for (i = 0; i < disks_info.values_num; i++)
 	{
@@ -9215,9 +9215,7 @@ static int	vmware_perf_counters_expired_remove(zbx_vector_ptr_t *counters)
 
 	for (i = counters->values_num - 1; i >= 0 ; i--)
 	{
-		zbx_vmware_perf_counter_t	*counter;
-
-		counter = (zbx_vmware_perf_counter_t *) counters->values[i];
+		zbx_vmware_perf_counter_t	*counter = (zbx_vmware_perf_counter_t *) counters->values[i];
 
 		if (0 == (counter->state & ZBX_VMWARE_COUNTER_CUSTOM))
 			continue;
@@ -9240,7 +9238,7 @@ static int	vmware_perf_counters_expired_remove(zbx_vector_ptr_t *counters)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: setting flag ZBX_VMWARE_COUNTER_ACCEPTABLE for new perf counters  *
+ * Purpose: update cache with lists of available perf counter for entity      *
  *                                                                            *
  * Parameters: service        - [IN] the vmware service                       *
  *             easyhandle     - [IN] prepared cURL connection handle          *
@@ -9249,7 +9247,7 @@ static int	vmware_perf_counters_expired_remove(zbx_vector_ptr_t *counters)
  *             refresh        - [IN] vmware refresh interval for perf counter *
  *             begin_time     - [IN] vmware begin time for perf counters list *
  *             perf_available - [IN/OUT] list of available counter per object *
- *             entities       - [IN/OUT] the list of perf entities            *
+ *             perf           - [IN/OUT] the list of perf entities            *
  *             error          - [OUT] the error message in the case of failure*
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
@@ -9265,7 +9263,7 @@ static int	vmware_perf_available_update(zbx_vmware_service_t *service, CURL *eas
 			"<ns0:_this type=\"PerformanceManager\">%s</ns0:_this>"			\
 			"<ns0:entity type=\"%s\">%s</ns0:entity>"				\
 			"<ns0:beginTime>%s</ns0:beginTime>"					\
-			"%s"					\
+			"%s"									\
 		"</ns0:QueryAvailablePerfMetric>"						\
 		ZBX_POST_VSPHERE_FOOTER
 
@@ -9357,7 +9355,7 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
 			zbx_vmware_perf_counter_t	*counter;
 			zbx_vmware_perf_available_t	*perf, perf_cmp = {.type = entity->type, .id = entity->id};
 
-			counter = (zbx_vmware_perf_counter_t *)entity->counters.values[i];
+			counter = (zbx_vmware_perf_counter_t *)entity->counters.values[j];
 
 			if (0 == (counter->state & ZBX_VMWARE_COUNTER_CUSTOM) ||
 					0 != (counter->state & ZBX_VMWARE_COUNTER_ACCEPTABLE))

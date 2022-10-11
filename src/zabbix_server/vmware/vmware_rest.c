@@ -415,12 +415,12 @@ static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service,
 
 	if (0 == page->offset)
 	{
-		*error = zbx_strdup(*error, "Authentication fail, receive empty response.");
+		*error = zbx_strdup(*error, "Cannot authenticate, receive empty response.");
 		goto out;
 	}
 	else if ('"' != page->data[0] && FAIL == vmware_rest_response_open(page->data, NULL, error))
 	{
-		*error = zbx_dsprintf(*error, "Authentication fail, %s.", *error);
+		*error = zbx_dsprintf(*error, "Cannot authenticate, %s.", *error);
 		goto out;
 	}
 

@@ -302,17 +302,17 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 
 	perfcounter = (zbx_vmware_perf_counter_t *)entity->counters.values[i];
 
+	if (0 != (perfcounter->state & ZBX_VMWARE_COUNTER_NOTSUPPORTED))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter not supported or data not ready."));
+		goto out;
+	}
+
 	if (0 == (perfcounter->state & ZBX_VMWARE_COUNTER_NOTSUPPORTED) &&
 			0 != (ZBX_VMWARE_COUNTER_CUSTOM & perfcounter->state) &&
 			0 != (ZBX_VMWARE_COUNTER_READY & perfcounter->state))
 	{
 		perfcounter->last_used = time(NULL);
-	}
-
-	if (0 != (perfcounter->state & ZBX_VMWARE_COUNTER_NOTSUPPORTED))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter not supported or data not ready."));
-		goto out;
 	}
 
 	if (0 == (perfcounter->state & ZBX_VMWARE_COUNTER_READY))
@@ -1587,8 +1587,8 @@ int	check_vcenter_hv_diskinfo_get(AGENT_REQUEST *request, const char *username, 
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "local_disk", ZBX_NULL2EMPTY_STR(di->vsan->local_disk),
 					ZBX_JSON_TYPE_STRING);
-			zbx_json_adduint64(&json_data, "block",di->vsan->block);
-			zbx_json_adduint64(&json_data, "block_size",di->vsan->block_size);
+			zbx_json_adduint64(&json_data, "block", di->vsan->block);
+			zbx_json_adduint64(&json_data, "block_size", di->vsan->block_size);
 		}
 
 		zbx_json_close(&json_data);
@@ -2429,6 +2429,7 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 
 		if (NULL == (datastore = ds_get(&service->data->datastores, dsname->uuid)))
 		{
+			zbx_json_free(&json_data);
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
 			goto unlock;
 		}
