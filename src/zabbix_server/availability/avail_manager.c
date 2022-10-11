@@ -396,6 +396,19 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 	}
 }
 
+static void	update_proxy_heartbeat(zbx_avail_active_hb_cache_t *cache, zbx_ipc_message_t *message)
+{
+	zbx_active_avail_proxy_t	*proxy_avail;
+	zbx_uint64_t			proxy_hostid;
+
+	zbx_availability_deserialize_active_proxy_hb_update(message->data, &proxy_hostid);
+
+	if (NULL != (proxy_avail = zbx_hashset_search(&cache->proxy_avail, &proxy_hostid)))
+	{
+		proxy_avail->lastaccess = (int)time(NULL);
+	}
+}
+
 ZBX_THREAD_ENTRY(availability_manager_thread, args)
 {
 	zbx_ipc_service_t		service;
@@ -477,7 +490,6 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 				case ZBX_IPC_AVAILABILITY_REQUEST:
 					zbx_availability_deserialize(message->data, message->size,
 							&interface_availabilities);
-
 					break;
 				case ZBX_IPC_AVAILMAN_ACTIVE_HB:
 					process_active_hb(&active_hb_cache, message);
@@ -497,6 +509,9 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 					break;
 				case ZBX_IPC_AVAILMAN_PROXY_FLUSH_ALL_HOSTS:
 					flush_all_hosts(&active_hb_cache);
+					break;
+				case ZBX_IPC_AVAILMAN_ACTIVE_PROXY_HB_UPDATE:
+					update_proxy_heartbeat(&active_hb_cache, message);
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
