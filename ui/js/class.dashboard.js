@@ -1224,7 +1224,8 @@ class CDashboard extends CBaseComponent {
 	}
 
 	reloadWidgetProperties() {
-		const overlay = overlays_stack.getById('widget_properties');
+		const dialogueid = 'widget_properties';
+		const overlay = overlays_stack.getById(dialogueid);
 		const form = overlay.$dialogue.$body[0].querySelector('form');
 		const fields = getFormFields(form);
 
@@ -1246,6 +1247,8 @@ class CDashboard extends CBaseComponent {
 
 			properties.fields = fields;
 		}
+
+		overlay.$dialogue[0].dispatchEvent(new CustomEvent('overlay.reload', {detail: {dialogueid}}));
 
 		this.editWidgetProperties(properties, {new_widget_pos: this._new_widget_pos});
 	}
