@@ -3815,7 +3815,7 @@ class CApiInputValidator {
 		}
 
 		$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-			_('must have a polling interval not blocked by non-active interval periods.')
+			_('must have a polling interval not blocked by non-active interval periods')
 		);
 
 		return false;

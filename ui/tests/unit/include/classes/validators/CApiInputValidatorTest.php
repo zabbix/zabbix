@@ -6513,13 +6513,13 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_ITEM_DELAY],
 				'0;50s/1-6,09:00-18:00;0/1-6,00:00-24:00',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot be executed.'
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
 			],
 			'Zero delay and multiple combined blocking zero-intervals' => [
 				['type' => API_ITEM_DELAY],
 				'0;50s/1-6,09:00-18:00;0/1-3,00:00-24:00;0/4-7,00:00-24:00',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot be executed.'
+				'Invalid parameter "/1/item_delay": non-active intervals cannot fill the entire time.'
 			],
 			'Non-convertable due to macro in Period' => [
 				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
@@ -6531,31 +6531,31 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_ITEM_DELAY],
 				'1m;0/1-7,00:00-24:00',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot be executed.'
+				'Invalid parameter "/1/item_delay": non-active intervals cannot fill the entire time.'
 			],
 			'Non-zero delay, but whole week combined of blocking intervals' => [
 				['type' => API_ITEM_DELAY],
 				'1m;0/1-4,00:00-24:00;0/3-7,00:00-24:00',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot be executed.'
+				'Invalid parameter "/1/item_delay": non-active intervals cannot fill the entire time.'
 			],
 			'Macro used, but delay and intervals are all zero-blocking' => [
 				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
 				'0;0/1-6,09:00-12:00;0/{$M}',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot be executed.'
+				'Invalid parameter "/1/item_delay": must have at least one interval greater than 0.'
 			],
 			'Macro in Period, but zero-week block' => [
 				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
 				'0;0/1-7,00:00-24:00;1/{$M}',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot be executed.'
+				'Invalid parameter "/1/item_delay": non-active intervals cannot fill the entire time.'
 			],
 			'Macro in Interval, but zero-week block' => [
 				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
 				'0;0/1-7,00:00-24:00;{$M}/1-7,00:00-24:00',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot be executed.'
+				'Invalid parameter "/1/item_delay": non-active intervals cannot fill the entire time.'
 			],
 			'Non-zero delay, macro in Interval' => [
 				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
@@ -6567,7 +6567,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_ITEM_DELAY],
 				'5m;5m/2-4,00:00-24:00;0/1-7,00:00-23:57',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot be executed.'
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
 			],
 			'Polling chunk overlapped by zero-interval as a whole, but has another active interval' => [
 				['type' => API_ITEM_DELAY],
@@ -6603,7 +6603,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_ITEM_DELAY],
 				'0;2h/1-6,09:00-12:00;0/1-6,09:00-10:30',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": cannot be executed.'
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
 			],
 			'Polling window available equal to interval' => [
 				['type' => API_ITEM_DELAY],
