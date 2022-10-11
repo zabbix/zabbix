@@ -34,34 +34,44 @@ $form = (new CForm('post'))
 	->setName('widget_dialogue_form')
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
 
-// TODO AS: should be as CFormGrid
-$form_list = (new CFormList())
-	->addRow(
+$form_grid = (new CFormGrid())
+	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['name']))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAttribute('autofocus', 'autofocus')
-			->setAriaRequired()
-	)
-	->addRow(_('Linked map'), [
-		new CVar('sysmapid', $data['sysmap']['sysmapid']),
-		(new CTextBox('sysmapname', $data['sysmap']['name'], true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('select', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
+		new CFormField(
+			(new CTextBox('name', $data['name']))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setAttribute('autofocus', 'autofocus')
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		new CLabel(_('Linked map')),
+		new CFormField([
+			new CVar('sysmapid', $data['sysmap']['sysmapid']),
+			(new CTextBox('sysmapname', $data['sysmap']['name'], true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CButton('select', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
+		])
 	]);
 
 if ($data['depth'] >= Widget::MAX_DEPTH) {
-	$form_list->addRow(null, _('Cannot add submaps. Max depth reached.'));
+	$form_grid->addItem([
+		null,
+		new CFormField(_('Cannot add submaps. Max depth reached.'))
+	]);
 }
 else {
-	$form_list->addRow(null, [
-		new CCheckBox('add_submaps', 1),
-		new CLabel(_('Add submaps'), 'add_submaps')
+	$form_grid->addItem([
+		null,
+		new CFormField([
+			new CCheckBox('add_submaps', 1),
+			new CLabel(_('Add submaps'), 'add_submaps')
+		])
 	]);
 }
 
 $form
-	->addItem($form_list)
+	->addItem($form_grid)
 	->addItem((new CScriptTag('navtreeitem_edit_popup.init();'))->setOnDocumentReady());
 
 $output = [

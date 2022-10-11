@@ -92,7 +92,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 		->setPlaceholder(_('value'))
 		->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 
-	return (new CDiv()) // TODO AS: fix columns
+	return (new CDiv())
 		->addClass(ZBX_STYLE_GRID_COLUMNS)
 		->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 		->addItem(

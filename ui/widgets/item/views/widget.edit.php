@@ -35,7 +35,9 @@ $form
 		new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['ms']['items']['itemid'])
 	)
 	->addField(
-		new CWidgetFieldCheckBoxListView($data['fields']['show']) // TODO AS: list should be in two columns
+		(new CWidgetFieldCheckBoxListView($data['fields']['show']))
+			->addClass(ZBX_STYLE_GRID_COLUMNS)
+			->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 	)
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['adv_conf'])

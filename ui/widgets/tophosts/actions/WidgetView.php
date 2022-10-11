@@ -62,7 +62,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private function getData(): array {
 		$configuration = $this->fields_values['columns'];
 
-		// TODO AS: check function call getSubGroups
 		$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
 		$hostids = $this->fields_values['hostids'] ?: null;
 
@@ -321,7 +320,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		}
 
-		// TODO AS: check timeUnitToSeconds()
 		$timeshift = $column['timeshift'] !== '' ? timeUnitToSeconds($column['timeshift']) : 0;
 
 		$time_to = $time_now + $timeshift;
