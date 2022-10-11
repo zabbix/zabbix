@@ -69,10 +69,8 @@ $widget = (new CWidget())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_ACTION_LIST))
 	->setControls(
 		(new CTag('nav', true,
-		(new CForm('get'))
-			->cleanItems()
-			->addItem(new CInput('hidden', 'eventsource', $data['eventsource']))
-			->addItem((new CSimpleButton(_('Create action')))->addClass('js-action-create'))
+			(new CList())
+				->addItem((new CSimpleButton(_('Create action')))->addClass('js-action-create'))
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
