@@ -149,7 +149,6 @@ zabbix_export:
                         {
                             markdown: 'false',
                             activityTitle: params.alert_subject,
-                            activitySubtitle: 'On ' + params.host_name + ' [' + params.host_ip + ']',
                             text: (params.use_default_message.toLowerCase() == 'true')
                                 ? params.alert_message
                                 : params.trigger_description
@@ -181,6 +180,10 @@ zabbix_export:
                         name: 'Event time',
                         value: params.event_time + ' ' + params.event_date
                     });
+                    facts.push({
+                        name: 'Host',
+                        value: params.host_name + ' [' + params.host_ip + ']'
+                    });
                 }
                 // Update message.
                 else if (params.event_update_status === '1') {
@@ -189,10 +192,13 @@ zabbix_export:
                     if (params.event_update_message) {
                         body.sections[0].text += '<br>Message:<br>' + params.event_update_message;
                     }
-        
                     facts.push({
                         name: 'Event update time',
                         value: params.event_update_time + ' ' + params.event_update_date
+                    });
+                    facts.push({
+                        name: 'Host',
+                        value: params.host_name + ' [' + params.host_ip + ']'
                     });
                 }
                 // Resolved message.
@@ -201,15 +207,18 @@ zabbix_export:
                         name: 'Recovery time',
                         value: params.event_recovery_time + ' ' + params.event_recovery_date
                     });
+                    facts.push({
+                        name: 'Host',
+                        value: params.host_name + ' [' + params.host_ip + ']'
+                    });
                 }
-        
+
                 if (params.event_severity && params.event_severity !== '{EVENT.SEVERITY}') {
                     facts.push({
                         name: 'Severity',
                         value: params.event_severity
                     });
                 }
-        
         
                 if (params.event_opdata && params.event_opdata !== '{EVENT.OPDATA}') {
                     facts.push({
@@ -366,5 +375,3 @@ zabbix_export:
             Service description: {SERVICE.DESCRIPTION}
             
             {SERVICE.ROOTCAUSE}
-
-
