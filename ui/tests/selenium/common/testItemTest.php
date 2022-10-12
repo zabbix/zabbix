@@ -387,7 +387,8 @@ class testItemTest extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Key' => ''
 					],
-					'error' => 'Incorrect value for field "key_": key is empty.'
+					'error' => 'Incorrect value for field "key_": key is empty.',
+					'lld_error' => 'Incorrect value for field "key_": key is empty.',
 				]
 			],
 			[
@@ -397,7 +398,8 @@ class testItemTest extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Key' => 'key space'
 					],
-					'error' => 'Incorrect value for field "key_": incorrect syntax near " space".'
+					'error' => 'Incorrect value for field "key_": incorrect syntax near " space".',
+					'lld_error' => 'Incorrect value for field "key_": incorrect syntax near " space".'
 				]
 			],
 			[
@@ -410,7 +412,8 @@ class testItemTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '', 'parameter_2' => '2']
 					],
-					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
+					'error' => 'Invalid parameter "/1/params/1": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "params": first parameter is expected.'
 				]
 			],
 			[
@@ -423,7 +426,8 @@ class testItemTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'Regular expression', 'parameter_1' => '1', 'parameter_2' => '']
 					],
-					'error' => 'Invalid parameter "/1/params/2": cannot be empty.'
+					'error' => 'Invalid parameter "/1/params/2": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "params": second parameter is expected.'
 				]
 			],
 			[
@@ -436,7 +440,8 @@ class testItemTest extends CWebTest {
 					'preprocessing' => [
 						['type' => 'XML XPath', 'parameter_1' => '']
 					],
-					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
+					'error' => 'Invalid parameter "/1/params/1": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "params": cannot be empty.'
 				]
 			],
 			[
@@ -454,7 +459,8 @@ class testItemTest extends CWebTest {
 						'error_handler' => 'Set error to',
 						'error_handler_params' => '']
 					],
-					'error' => 'Invalid parameter "/1/error_handler_params": cannot be empty.'
+					'error' => 'Invalid parameter "/1/error_handler_params": cannot be empty.',
+					'lld_error' => 'Incorrect value for field "error_handler_params": cannot be empty.'
 				]
 			],
 			[
@@ -1021,7 +1027,8 @@ class testItemTest extends CWebTest {
 				}
 				break;
 			case TEST_BAD:
-				$this->assertMessage(TEST_BAD, null, $data['error']);
+				$error_message = ($lld) ? $data['lld_error'] : $data['error'];
+				$this->assertMessage(TEST_BAD, null, $error_message);
 				$overlay->close();
 				break;
 		}

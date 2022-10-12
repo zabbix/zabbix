@@ -390,7 +390,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Update interval' => ['Delay' => '0']
 					],
-					'details' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals set.'
+					'details' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
 				]
 			],
 			[

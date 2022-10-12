@@ -1210,7 +1210,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
 							'the combinations of (type)=((22, 23)).',
-					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'lld_error' => 'Only one Prometheus step is allowed.'
 				]
 			],
 			[
