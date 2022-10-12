@@ -641,7 +641,8 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			$form = $dashboard->addWidget()->asForm();
 
 			if ($form->getField('Type')->getValue() !== 'Trigger overview') {
-				$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Trigger overview')]);
+				$form->getField('Type')->fill('Trigger overview');
+				$form->invalidate();
 			}
 		}
 
@@ -746,10 +747,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			$this->assertEquals(array_keys($dependency), $hint_table->getHeadersText());
 
 			// Gather data from rows and compare result with reference.
-			$hint_rows = [];
-			foreach ($hint_table->getRows() as $hint_row) {
-				$hint_rows[] = $hint_row->getText();
-			}
+			$hint_rows = $hint_table->getRows()->asText();
 
 			$this->assertEquals(array_values($dependency), [$hint_rows]);
 		}
