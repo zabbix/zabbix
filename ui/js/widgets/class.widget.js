@@ -788,7 +788,7 @@ class CWidget extends CBaseComponent {
 
 	_hidePreloader() {
 		// Fixed Safari 16 bug: class removal set on timeout due to not hiding preloader icons from widgets.
-		setTimeout(() => {
+		requestAnimationFrame(() => {
 			this._content_body.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
 		});
 	}
