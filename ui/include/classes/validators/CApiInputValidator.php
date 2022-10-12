@@ -3637,14 +3637,14 @@ class CApiInputValidator {
 				if ($update_interval == 0) {
 					$inactive_intervals[] = [
 						'time_from' => ($day - 1) * SEC_PER_DAY + $time_from,
-						'time_to' => ($day - 1) * SEC_PER_DAY + $time_to,
+						'time_to' => ($day - 1) * SEC_PER_DAY + $time_to
 					];
 				}
 				else {
 					$active_intervals[] = [
 						'update_interval' => $update_interval,
 						'time_from' => ($day - 1) * SEC_PER_DAY + $time_from,
-						'time_to' => ($day - 1) * SEC_PER_DAY + $time_to,
+						'time_to' => ($day - 1) * SEC_PER_DAY + $time_to
 					];
 				}
 			}
@@ -4033,7 +4033,7 @@ class CApiInputValidator {
 
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'1' =>	['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO), 'in' => implode(':', [1, 25 * SEC_PER_YEAR])],
+					'1' =>	['type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO), 'in' => implode(':', [1, 25 * SEC_PER_YEAR])]
 				]];
 				break;
 

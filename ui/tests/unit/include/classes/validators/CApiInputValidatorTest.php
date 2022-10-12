@@ -1437,25 +1437,25 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_FLOAT, 'flags' => API_ALLOW_LLD_MACRO],
 				108.108,
 				'/1/float',
-				108.108,
+				108.108
 			],
 			[
 				['type' => API_FLOAT, 'flags' => API_ALLOW_LLD_MACRO],
 				'108.108',
 				'/1/float',
-				108.108,
+				108.108
 			],
 			[
 				['type' => API_FLOAT, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#LLD_MACRO}',
 				'/1/float',
-				'{#LLD_MACRO}',
+				'{#LLD_MACRO}'
 			],
 			[
 				['type' => API_FLOAT, 'flags' => API_ALLOW_LLD_MACRO],
 				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}',
 				'/1/float',
-				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}',
+				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}'
 			],
 			[
 				['type' => API_FLOAT, 'flags' => API_ALLOW_LLD_MACRO],
@@ -5265,13 +5265,13 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_JSON, 'macros_n' => ['{HOST.IP}']],
 				'{"key1": {HOST.IP1}, "key2": {HOST.IP2}}',
 				'/1/json',
-				'{"key1": {HOST.IP1}, "key2": {HOST.IP2}}',
+				'{"key1": {HOST.IP1}, "key2": {HOST.IP2}}'
 			],
 			[
 				['type' => API_JSON],
 				'[]',
 				'/1/json',
-				'[]',
+				'[]'
 			],
 			[
 				['type' => API_JSON],
@@ -5295,25 +5295,25 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_JSON],
 				'[1, 2, 3]',
 				'/1/json',
-				'[1, 2, 3]',
+				'[1, 2, 3]'
 			],
 			[
 				['type' => API_JSON],
 				'[[true]]',
 				'/1/json',
-				'[[true]]',
+				'[[true]]'
 			],
 			[
 				['type' => API_JSON],
 				'[[null]]',
 				'/1/json',
-				'[[null]]',
+				'[[null]]'
 			],
 			[
 				['type' => API_JSON],
 				'{null: "value"}',
 				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.',
+				'Invalid parameter "/1/json": JSON is expected.'
 			],
 			[
 				['type' => API_JSON],
@@ -5325,13 +5325,13 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_JSON],
 				'[{"key": "value"}, {"key": "value"}]',
 				'/1/json',
-				'[{"key": "value"}, {"key": "value"}]',
+				'[{"key": "value"}, {"key": "value"}]'
 			],
 			[
 				['type' => API_JSON],
 				'["key": "value"]',
 				'/1/json',
-				'Invalid parameter "/1/json": JSON is expected.',
+				'Invalid parameter "/1/json": JSON is expected.'
 			],
 
 			[
@@ -6839,13 +6839,13 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_REGSUB]],
 				"{\$MACRO}\n\\1",
 				'/1/params',
-				"{\$MACRO}\n\\1",
+				"{\$MACRO}\n\\1"
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_REGSUB]],
 				"{\#LLD_MACRO}\n\\1",
 				'/1/params',
-				"{\#LLD_MACRO}\n\\1",
+				"{\#LLD_MACRO}\n\\1"
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_REGSUB]],
@@ -6872,12 +6872,12 @@ class CApiInputValidatorTest extends TestCase {
 				]],
 				[
 					'type' => ZBX_PREPROC_REGSUB,
-					'params' => "^[a-z]$\n\\1",
+					'params' => "^[a-z]$\n\\1"
 				],
 				'/',
 				[
 					'type' => ZBX_PREPROC_REGSUB,
-					'params' => "^[a-z]$\n\\1",
+					'params' => "^[a-z]$\n\\1"
 				],
 			],
 			[
@@ -7382,37 +7382,37 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
 				"abc\n",
 				'/1/params',
-				"abc\n",
+				"abc\n"
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
 				"abc",
 				'/1/params',
-				"abc\n",
+				"abc\n"
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
 				"abc\ndef",
 				'/1/params',
-				"abc\ndef",
+				"abc\ndef"
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
 				"",
 				'/1/params',
-				'Invalid parameter "/1/params/1": cannot be empty.',
+				'Invalid parameter "/1/params/1": cannot be empty.'
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
 				"\n",
 				'/1/params',
-				'Invalid parameter "/1/params/1": cannot be empty.',
+				'Invalid parameter "/1/params/1": cannot be empty.'
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
 				"\n\n",
 				'/1/params',
-				'Invalid parameter "/1/params": unexpected parameter "3".',
+				'Invalid parameter "/1/params": unexpected parameter "3".'
 			],
 			[
 				['type' => API_PROMETHEUS_PATTERN],

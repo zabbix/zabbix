@@ -388,7 +388,7 @@ class testItemTest extends CWebTest {
 						'Key' => ''
 					],
 					'error' => 'Incorrect value for field "key_": key is empty.',
-					'lld_error' => 'Incorrect value for field "key_": key is empty.',
+					'lld_error' => 'Incorrect value for field "key_": key is empty.'
 				]
 			],
 			[

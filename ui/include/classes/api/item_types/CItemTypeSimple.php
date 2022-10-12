@@ -74,7 +74,7 @@ class CItemTypeSimple extends CItemType {
 			'interfaceid' =>	self::getUpdateFieldRuleDiscovered('interfaceid'),
 			'username' =>		self::getUpdateFieldRuleDiscovered('username'),
 			'password' =>		self::getUpdateFieldRuleDiscovered('password'),
-			'delay' =>			self::getUpdateFieldRuleDiscovered('delay'),
+			'delay' =>			self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}
 }

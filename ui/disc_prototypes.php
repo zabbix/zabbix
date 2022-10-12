@@ -404,7 +404,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$item += getSanitizedItemFields($input + [
 				'templateid' => '0',
 				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
-				'hosts' => $lld_rules[0]['hosts'],
+				'hosts' => $lld_rules[0]['hosts']
 			]);
 
 			$response = API::ItemPrototype()->create($item);

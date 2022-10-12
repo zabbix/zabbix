@@ -690,7 +690,7 @@ abstract class CItemGeneral extends CApiService {
 		$options = [
 			'output' => ['itemid', 'hostid', 'templateid'],
 			'filter' => [
-				'templateid' => array_keys($ins_item_indexes + $upd_item_indexes),
+				'templateid' => array_keys($ins_item_indexes + $upd_item_indexes)
 			] + $hostids_condition
 		];
 		$result = DBselect(DB::makeSql('items', $options));
@@ -795,7 +795,7 @@ abstract class CItemGeneral extends CApiService {
 				'hostid' => array_keys($upd_item_indexes + $ins_item_indexes),
 				'type' => array_keys($interface_types),
 				'main' => INTERFACE_PRIMARY
-			],
+			]
 		];
 		$result = DBselect(DB::makeSql('interface', $options));
 
@@ -2365,7 +2365,7 @@ abstract class CItemGeneral extends CApiService {
 		do {
 			$options = [
 				'output' => ['itemid', 'name'],
-				'filter' => ['templateid' => $templateids],
+				'filter' => ['templateid' => $templateids]
 			];
 			$result = DBselect(DB::makeSql('items', $options));
 
