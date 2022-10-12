@@ -23,8 +23,6 @@
  * @var CView $this
  */
 
-// TODO: if All checkbox is not checked but all the checkboxed under it are checked then All checkbox should go checked.
-
 $rules_table = (new CTable())->setId('rules_table');
 
 $titles = [
