@@ -1669,7 +1669,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		// Click "Change" button for every macros row in first case for discovered host form.
 		$macros_count = count($this->getMacros());
-		if ($first_case) {
+		if ($discovered && $first_case) {
 			$first_case = false;
 
 			for ($i = 0; $i < $macros_count; $i++) {
