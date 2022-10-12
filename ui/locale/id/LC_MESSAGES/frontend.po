@@ -13670,6 +13670,10 @@ msgstr "Hanya trigger yang ditugaskan ke host aktif dan tergantung pada item akt
 msgid "Open in a new window"
 msgstr ""
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"

@@ -37,7 +37,7 @@ if ($data['success']) {
 	if ($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
 		$row_description[] = new CVar('debug', json_encode($data['debug']));
 		$row_description[] = new CDiv(
-			(new CLinkAction('Open log'))
+			(new CLinkAction(_('Open log')))
 				->setId('script_execution_log')
 				->addClass($data['debug'] ? '' : ZBX_STYLE_DISABLED)
 		);

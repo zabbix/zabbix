@@ -13813,6 +13813,10 @@ msgstr "Nur Auslöser, die mit aktiven Hosts und aktiven Datenpunkten verbunden 
 msgid "Open in a new window"
 msgstr ""
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 # Der Browser
 #: include/httptest.inc.php:421
 msgid "Opera"

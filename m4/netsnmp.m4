@@ -22,7 +22,7 @@ AC_DEFUN([LIBNETSNMP_CHECK_CONFIG],
 
   AC_ARG_WITH(net-snmp,
 [If you want to use Net-SNMP library:
-AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
+AS_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 		[use Net-SNMP package @<:@default=no@:>@, optionally specify path to net-snmp-config])
 	],[ if test "$withval" = "no"; then
             want_netsnmp="no"
@@ -158,13 +158,13 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 
 		dnl Check for SHA224/256/384/512 protocol support for auth
 		AC_MSG_CHECKING(for strong SHA auth protocol support)
-		AC_TRY_LINK([
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
-		],[
+		]], [[
 struct snmp_session session;
 session.securityAuthProto = usmHMAC384SHA512AuthProtocol;
-		],[
+		]])],[
 		AC_DEFINE(HAVE_NETSNMP_STRONG_AUTH, 1, [Define to 1 if strong SHA auth protocols are supported.])
 		AC_MSG_RESULT(yes)
 		],[
@@ -173,13 +173,13 @@ session.securityAuthProto = usmHMAC384SHA512AuthProtocol;
 
 		dnl Check for AES192/256 protocol support for privacy
 		AC_MSG_CHECKING(for strong AES privacy protocol support)
-		AC_TRY_LINK([
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
-		],[
+		]], [[
 struct snmp_session session;
 session.securityPrivProto = usmAES256PrivProtocol;
-		],[
+		]])],[
 		AC_DEFINE(HAVE_NETSNMP_STRONG_PRIV, 1, [Define to 1 if strong AES priv protocols are supported.])
 		AC_MSG_RESULT(yes)
 		],[
@@ -188,28 +188,22 @@ session.securityPrivProto = usmAES256PrivProtocol;
 
 		dnl Check for localname in struct snmp_session
 		AC_MSG_CHECKING(for localname in struct snmp_session)
-		AC_TRY_COMPILE([
+		AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <net-snmp/net-snmp-config.h>
-#include <net-snmp/net-snmp-includes.h>],
-		[
+#include <net-snmp/net-snmp-includes.h>]], [[
 struct snmp_session session;
 session.localname = "";
-		],
-		AC_DEFINE(HAVE_NETSNMP_SESSION_LOCALNAME, 1, [Define to 1 if 'session.localname' exist.])
-		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT(no))
+		]])],[AC_DEFINE(HAVE_NETSNMP_SESSION_LOCALNAME, 1, Define to 1 if 'session.localname' exist.)
+		AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
-		AC_TRY_COMPILE([
+		AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <net-snmp/net-snmp-config.h>
-#include <net-snmp/net-snmp-includes.h>],
-		[
+#include <net-snmp/net-snmp-includes.h>]], [[
 struct snmp_session session;
 
 session.securityPrivProto = usmDESPrivProtocol;
-		],
-		AC_DEFINE(HAVE_NETSNMP_SESSION_DES, 1, [Define to 1 if 'usmDESPrivProtocol' exist.])
-		AC_MSG_RESULT(yes),
-		AC_MSG_RESULT(no))
+		]])],[AC_DEFINE(HAVE_NETSNMP_SESSION_DES, 1, Define to 1 if 'usmDESPrivProtocol' exist.)
+		AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
 		CFLAGS="$_save_netsnmp_cflags"
 		LDFLAGS="$_save_netsnmp_ldflags"

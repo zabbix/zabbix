@@ -13667,6 +13667,10 @@ msgstr "활성화된 호스트와 아이템의 트리거만 카운트"
 msgid "Open in a new window"
 msgstr ""
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"

@@ -13783,6 +13783,10 @@ msgstr "Csak az engedélyezett hosztokhoz rendelt, engedélyezett elemekhez tart
 msgid "Open in a new window"
 msgstr ""
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr ""
