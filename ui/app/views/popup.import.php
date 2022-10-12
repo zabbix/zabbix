@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$rules_table = new CTable();
+$rules_table = (new CTable())->setId('rules_table');
 
 $titles = [
 	'template_groups' => _('Template groups'),
@@ -74,6 +74,45 @@ foreach ($titles as $key => $title) {
 		$col_delete = ($col_delete || array_key_exists('deleteMissing', $data['rules'][$key]));
 	}
 }
+
+$all_table = new CTable();
+
+$rules_table->addRow([
+	(new CCol('All'))->addStyle('width: 124px;'),
+	$col_update ? (new CCol((new CCheckBox('update_all'))
+			->setChecked(true)))
+		->addClass(ZBX_STYLE_CENTER)
+		->onClick(
+			'const update_all = document.getElementById("update_all");'.
+			'const table = document.getElementById("rules_table");'.
+			'const checkboxes = Array.from(table.getElementsByTagName("input"));'.
+			'const upd_checkboxes = checkboxes.filter((checkbox) => checkbox.name.includes("update"));'.
+			'upd_checkboxes.forEach((checkbox) => checkbox.checked = update_all.checked)'
+		)
+		: null,
+	$col_create ? (new CCol((new CCheckBox('create_all'))
+		->setChecked(true)))
+		->addClass(ZBX_STYLE_CENTER)
+		->onClick(
+			'const create_all = document.getElementById("create_all");'.
+			'const table = document.getElementById("rules_table");'.
+			'const checkboxes = Array.from(table.getElementsByTagName("input"));'.
+			'const upd_checkboxes = checkboxes.filter((checkbox) => checkbox.name.includes("create"));'.
+			'upd_checkboxes.forEach((checkbox) => checkbox.checked = create_all.checked)'
+		)
+		: null,
+	$col_delete ? (new CCol((new CCheckBox('delete_all'))
+		->setChecked(false)))
+		->addClass(ZBX_STYLE_CENTER)
+		->onClick(
+			'const delete_all = document.getElementById("delete_all");'.
+			'const table = document.getElementById("rules_table");'.
+			'const checkboxes = Array.from(table.getElementsByTagName("input"));'.
+			'const upd_checkboxes = checkboxes.filter((checkbox) => checkbox.name.includes("delete"));'.
+			'upd_checkboxes.forEach((checkbox) => checkbox.checked = delete_all.checked)'
+		)
+		: null,
+]);
 
 foreach ($titles as $key => $title) {
 	if (!array_key_exists($key, $data['rules'])) {
@@ -134,12 +173,15 @@ foreach ($titles as $key => $title) {
 			}
 	}
 
-	$rules_table->addRow([
+	$rules_table->addItem((new CRow([
 		$title,
 		$col_update ? (new CCol($checkbox_update))->addClass(ZBX_STYLE_CENTER) : null,
 		$col_create ? (new CCol($checkbox_create))->addClass(ZBX_STYLE_CENTER) : null,
 		$col_delete ? (new CCol($checkbox_delete))->addClass(ZBX_STYLE_CENTER) : null
-	]);
+	]))
+		->addClass('advanced_configuration')
+		->addClass('display-none')
+	);
 }
 
 $rules_table->setHeader([
@@ -156,7 +198,15 @@ $form_list = (new CFormList())
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Rules'), new CDiv($rules_table));
+	->addRow(_('Advanced options'), (new CCheckBox())
+		->setChecked(false)
+		->onClick(
+		'const rules = document.getElementsByClassName("advanced_configuration");'.
+		'for (let i = 0; i < rules.length; i++) {'.
+		'	rules[i].classList.toggle("display-none");'.
+		'}'
+	))
+	->addRow(_('Rules'), new CDiv([$all_table, $rules_table]));
 
 $form = (new CForm('post', null, 'multipart/form-data'))
 	->setId('import-form')
