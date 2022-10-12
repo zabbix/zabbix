@@ -1072,7 +1072,7 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update(const char *t
 			"create trigger %s_%s_update\n"
 			"before update on %s for each row\n"
 			"begin\n"
-				"if :new.%s<>:olf.%s\n"
+				"if :new.%s<>:old.%s\n"
 				"then\n"
 					":new.%s=%s(:new.%s);\n"
 				"end if;\n"
