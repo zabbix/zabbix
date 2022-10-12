@@ -3376,7 +3376,7 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function checkCompare(array $rule, $data, string $path, string &$error): bool {
-		if (!array_key_exists('compare', $rule)) {
+		if (!array_key_exists('compare', $rule) || $rule['compare']['value'] === null) {
 			return true;
 		}
 
@@ -4004,9 +4004,20 @@ class CApiInputValidator {
 				break;
 
 			case ZBX_PREPROC_VALIDATE_RANGE:
+				if (count($params) == 2 && ($params[1] === '' || $params[2] === '')) {
+					if ($params[1] === '' && $params[2] === '') {
+						$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+
+						return false;
+					}
+
+					$params[1] = $params[1] === '' ? null : $params[1];
+					$params[2] = $params[2] === '' ? null : $params[2];
+				}
+
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'1' =>	['type' => API_FLOAT, 'flags' => API_REQUIRED | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO)],
-					'2' =>	['type' => API_FLOAT, 'flags' => ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO), 'compare' => ['operator' => '>', 'field' => '1']]
+					'1' =>	['type' => API_FLOAT, 'flags' => API_REQUIRED | API_ALLOW_NULL | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO)],
+					'2' =>	['type' => API_FLOAT, 'flags' => API_REQUIRED | API_ALLOW_NULL | ($flags & API_ALLOW_USER_MACRO) | ($flags & API_ALLOW_LLD_MACRO), 'compare' => ['operator' => '>', 'field' => '1']]
 				]];
 				break;
 

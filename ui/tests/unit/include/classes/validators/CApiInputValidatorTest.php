@@ -6918,9 +6918,15 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
-				'10.01',
+				"1\n",
 				'/1/params',
-				'10.01'
+				"1\n"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"\n10",
+				'/1/params',
+				"\n10"
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
@@ -6930,9 +6936,21 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"\n",
+				'/1/params',
+				'Invalid parameter "/1/params": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
 				"10.01\n10",
 				'/1/params',
 				'Invalid parameter "/1/params/2": cannot be less than or equal to the value of parameter "/1/params/1".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"10.01",
+				'/1/params',
+				'Invalid parameter "/1/params": the parameter "2" is missing.'
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
