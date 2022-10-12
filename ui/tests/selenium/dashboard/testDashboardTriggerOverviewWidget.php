@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
@@ -31,7 +30,6 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 class testDashboardTriggerOverviewWidget extends CWebTest {
 
-	use TagTrait;
 	use TableTrait;
 
 	/**
@@ -43,8 +41,8 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
-	private static $dashboardid;
-	private static $create_page = 'Page for creation';
+	private static $create_dashboardid;
+	private static $update_dashboardid;
 	private static $update_widget = 'Trigger overview for reference';
 	private static $delete_widget = 'Trigger overview for delete';
 	private static $resolved_trigger = '1_trigger_Average';
@@ -82,7 +80,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	 * because it can change.
 	 */
 	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboardid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
@@ -95,45 +93,38 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	public static function prepareData() {
 		$response = CDataHelper::call('dashboard.create', [
 			[
-				'name' => 'Dashboard for Trigger overview widgets',
-				'private' => 0,
-				'auto_start' => 0,
-				'pages' => [
+				'name' => 'Trigger overview create dashboard'
+			],
+			[
+				'name' => 'Trigger overview update dashboard',
+				'widgets' => [
 					[
-						'name' => 'Page with widgets',
-						'widgets' => [
-							[
-								'type' => 'trigover',
-								'name' => self::$update_widget,
-								'width' => 24,
-								'height' => 4
-							],
-							[
-								'type' => 'trigover',
-								'name' => self::$delete_widget,
-								'x' => 0,
-								'y' => 4,
-								'width' => 24,
-								'height' => 4,
-								'fields' => [
-									[
-										'type' => 0,
-										'name' => 'show_suppressed',
-										'value' => 1
-									]
-								]
-							]
-						]
+						'type' => 'trigover',
+						'name' => self::$update_widget,
+						'width' => 24,
+						'height' => 4
 					],
 					[
-						'name' => self::$create_page,
-						'widgets' => []
+						'type' => 'trigover',
+						'name' => self::$delete_widget,
+						'x' => 0,
+						'y' => 4,
+						'width' => 24,
+						'height' => 4,
+						'fields' => [
+							[
+								'type' => 0,
+								'name' => 'show_suppressed',
+								'value' => 1
+							]
+						]
 					]
 				]
 			]
 		]);
 
-		self::$dashboardid = $response['dashboardids'][0];
+		self::$create_dashboardid = $response['dashboardids'][0];
+		self::$update_dashboardid = $response['dashboardids'][1];
 		$timestamp = time();
 
 		// Resolve one of existing problems to create a recent problem.
@@ -146,17 +137,17 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		DBexecute('UPDATE problem SET r_clock='.zbx_dbstr($timestamp).' WHERE objectid='.zbx_dbstr($triggerids[0]));
 
 		// Change the resolved triggers blinking period as the default value is too small for this test.
-		CDataHelper::call('settings.update', ['blink_period' => '5m']);
+		DBexecute('UPDATE config SET blink_period='.zbx_dbstr('5m'));
 
 		// Enable the trigger that other triggers depend on.
 		CDataHelper::call('trigger.update', [['triggerid' => $triggerids[1], 'status' => 0]]);
 	}
 
 	public function testDashboardTriggerOverviewWidget_Layout() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$update_dashboardid);
 		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Trigger overview')]);
-		$this->assertEquals(['Type', 'Name', 'Refresh interval', 'Show', 'Host groups', 'Hosts', 'Tags', '',
+		$this->assertEquals(['Type', 'Name', 'Refresh interval', 'Show', 'Host groups', 'Hosts', 'Application',
 				'Show suppressed problems', 'Hosts location'], $form->getLabels()->asText()
 		);
 
@@ -167,32 +158,21 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			'Show' => 'Recent problems',
 			'Host groups' => '',
 			'Hosts' => '',
-			'id:evaltype' => 'And/Or',
-			'id:tags_0_tag' => '',
-			'id:tags_0_value' => '',
-			'id:tags_0_operator' => 'Contains',
+			'Application' => '',
 			'Show suppressed problems' => false,
 			'Hosts location' => 'Left'
 		];
 
 		$form->checkValue($default_values);
 
-		// Check field lengths and placeholders.
-		foreach (['Name' => 'default', 'id:tags_0_tag' => 'tag', 'id:tags_0_value' => 'value'] as $field => $placeholder) {
-			$field = $form->getField($field);
-			$this->assertEquals(255, $field->getAttribute('maxlength'));
-			$this->assertEquals($placeholder, $field->getAttribute('placeholder'));
-		}
-
-		// Check operators dropdown options.
-		$this->assertEquals(['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal',
-				'Does not contain'], $form->getField('id:tags_0_operator')->asDropdown()->getOptions()->asText()
-		);
+		// Check Name field maxlength and placeholder.
+		$field = $form->getField('Name');
+		$this->assertEquals(255, $field->getAttribute('maxlength'));
+		$this->assertEquals('default', $field->getAttribute('placeholder'));
 
 		// Check possible values of radio buttons.
 		$radio_buttons = [
 			'Show' => ['Recent problems', 'Problems', 'Any'],
-			'Tags' => ['And/Or', 'Or'],
 			'Hosts location' => ['Left', 'Top']
 		];
 
@@ -200,11 +180,6 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			$radio_element = $form->getField($radio_button);
 			$this->assertEquals($values, $radio_element->getLabels()->asText());
 		}
-
-		// Check buttons in Tags table.
-		$this->assertEquals(2, $form->query('id:tags_table_tags')->one()->query('button', ['Add', 'Remove'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
-		);
 
 		// Close the widget configuration form dialog to avoid possible alerts in following tests.
 		COverlayDialogElement::find()->one()->close();
@@ -400,73 +375,10 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Filter triggers by tag with default operator'
-					],
-					'tags' => [
-						['name' => 'server', 'operator' => 'Contains', 'value' => 'sel']
+						'Name' => 'Filter triggers by tag with default operator',
+						'Application' => '4 application'
 					],
 					'expected' => [
-						'Host for triggers filtering' => [
-							'Inheritance trigger with tags'
-						]
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Filter triggers by tag with default operator'
-					],
-					'tags' => [
-						['name' => 'server', 'operator' => 'Contains', 'value' => 'sel']
-					],
-					'expected' => [
-						'Host for triggers filtering' => [
-							'Inheritance trigger with tags'
-						]
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Filter triggers by 2 tags with Or operator',
-						'Tags' => 'Or'
-					],
-					'tags' => [
-						['name' => 'Street', 'operator' => 'Exists'],
-						['name' => 'webhook', 'operator' => 'Equals', 'value' => '1']
-					],
-					'expected' => [
-						'1_Host_to_check_Monitoring_Overview' => [
-							'1_trigger_High'
-						],
-						'Host for triggers filtering' => [
-							'Inheritance trigger with tags'
-						]
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Does not exists and Does not equal tag operators',
-						'Show' => 'Problems'
-					],
-					'tags' => [
-						['name' => 'Street', 'operator' => 'Does not exist'],
-						['name' => 'webhook', 'operator' => 'Does not equal', 'value' => '1']
-					],
-					'expected' => [
-						'1_Host_to_check_Monitoring_Overview' => [
-							'1_trigger_Disaster',
-							'1_trigger_Not_classified',
-							'1_trigger_Warning',
-							'2_trigger_Information'
-						],
-						'3_Host_to_check_Monitoring_Overview' => [
-							'3_trigger_Average'
-						],
 						'4_Host_to_check_Monitoring_Overview' => [
 							'4_trigger_Average'
 						]
@@ -476,64 +388,9 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Виджет с tag + 良い１日を un žšī!@#$%^&*()_ vardā'
-					],
-					'tags' => [
-						['name' => 'Street', 'operator' => 'Does not contain', 'value' => 'elza']
-					],
-					'expected' => [
-						'1_Host_to_check_Monitoring_Overview' => [
-							'1_trigger_Average',
-							'1_trigger_Disaster',
-							'1_trigger_High',
-							'1_trigger_Not_classified',
-							'1_trigger_Warning',
-							'2_trigger_Information'
-						],
-						'3_Host_to_check_Monitoring_Overview' => [
-							'3_trigger_Average'
-						],
-						'4_Host_to_check_Monitoring_Overview' => [
-							'4_trigger_Average'
-						]
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'No result - filter triggers by 2 tags with And operator'
-					],
-					'tags' => [
-						['name' => 'server', 'operator' => 'Contains', 'value' => 'sel'],
-						['name' => 'webhook', 'operator' => 'Equals', 'value' => '1']
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Filter by 2 tags without value',
-						'Tags' => 'Or'
-					],
-					'tags' => [
-						['name' => 'server', 'operator' => 'Contains', 'value' => ''],
-						['name' => 'webhook', 'operator' => 'Equals', 'value' => '']
-					],
-					'expected' => [
-						'Host for triggers filtering' => [
-							'Inheritance trigger with tags'
-						]
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Only tag specified only by value'
-					],
-					'tags' => [
-						['name' => '', 'operator' => 'Contains', 'value' => '1']
+						'Name' => 'No result - filter triggers with non-related host and application',
+						'Hosts' => ['3_Host_to_check_Monitoring_Overview'],
+						'Application' => '1 application'
 					]
 				]
 			],
@@ -574,7 +431,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	public function testDashboardTriggerOverviewWidget_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$update_dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
 
@@ -630,7 +487,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$old_hash = CDBHelper::getHash($this->sql);
 		$new_name = 'Widget to be cancelled';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$update_dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
 
 		// Start updating or creating a widget.
@@ -652,13 +509,10 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			'Show' => 'Any',
 			'Host groups' => ['Another group to check Overview'],
 			'Hosts' => ['4_Host_to_check_Monitoring_Overview'],
-			'Tags' => 'Or',
+			'Application' => '4 application',
 			'Show suppressed problems' => 'true',
 			'Hosts location' => 'Top'
 		]);
-
-		$this->setTagSelector('id:tags_table_tags');
-		$this->setTags([['name' => 'webhook', 'operator' => 'Equals', 'value' => '1']]);
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
@@ -691,7 +545,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	}
 
 	public function testDashboardSlaReportWidget_Delete() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$update_dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$widget = $dashboard->getWidget(self::$delete_widget);
 
@@ -727,7 +581,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			]
 		];
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$update_dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
 
 		$form = $dashboard->getWidget(self::$update_widget)->edit();
@@ -760,12 +614,12 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	 * @param boolean	$create		flag that specifies whether a create action is performed
 	 */
 	public function checkWidgetAction($data, $create = true) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dashboardid = ($create) ? self::$create_dashboardid : self::$update_dashboardid;
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit();
 
 		if ($create) {
-			$dashboard->selectPage(self::$create_page);
 			$form = $dashboard->addWidget()->asForm();
 
 			// Set type to Trigger overview in case if this field has a different value.
@@ -785,11 +639,6 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			$form->fill($data['fields']);
 		}
 
-		if (CTestArrayHelper::get($data,'tags', false)) {
-			$this->setTagSelector('id:tags_table_tags');
-			$this->setTags($data['tags']);
-		}
-
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
 
@@ -798,10 +647,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
-		if ($create) {
-			$dashboard->selectPage(self::$create_page);
-		}
-		else {
+		if (!$create) {
 			self::$update_widget = (array_key_exists('fields', $data)) ? $data['fields']['Name'] : 'Trigger overview';
 		}
 
@@ -868,7 +714,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			'Show' => 'Recent problems',
 			'Host groups' => '',
 			'Hosts' => '',
-			'Tags' => 'And/Or',
+			'Application' => '',
 			'Show suppressed problems' => false,
 			'Hosts location' => 'Left'
 		];
@@ -884,12 +730,6 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 					$field->fill($value);
 				}
 			}
-		}
-
-		// Remove tags left from previous case and add a blank row for new data.
-		if ($form->getField('id:tags_0_tag')->getValue() !== '' || $form->getField('id:tags_0_value')->getValue() !== '') {
-			$form->query('button:Remove')->all()->click();
-			$form->query('button:Add')->one()->click();
 		}
 	}
 
