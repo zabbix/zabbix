@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+// TODO: uncheck All checkbox if any of under checkbox get unchecked.
+
 $rules_table = (new CTable())->setId('rules_table');
 
 $titles = [
@@ -85,7 +87,7 @@ $rules_table->addRow([
 			'const table = document.getElementById("rules_table");'.
 			'const checkboxes = Array.from(table.getElementsByTagName("input"));'.
 			'const upd_checkboxes = checkboxes.filter((checkbox) => checkbox.name.includes("update"));'.
-			'upd_checkboxes.forEach((checkbox) => checkbox.checked = update_all.checked)'
+			'upd_checkboxes.forEach((checkbox) => checkbox.checked = update_all.checked);'
 		)
 		: null,
 	$col_create ? (new CCol((new CCheckBox('create_all'))
@@ -96,7 +98,7 @@ $rules_table->addRow([
 			'const table = document.getElementById("rules_table");'.
 			'const checkboxes = Array.from(table.getElementsByTagName("input"));'.
 			'const upd_checkboxes = checkboxes.filter((checkbox) => checkbox.name.includes("create"));'.
-			'upd_checkboxes.forEach((checkbox) => checkbox.checked = create_all.checked)'
+			'upd_checkboxes.forEach((checkbox) => checkbox.checked = create_all.checked);'
 		)
 		: null,
 	$col_delete ? (new CCol((new CCheckBox('delete_all'))
@@ -107,7 +109,7 @@ $rules_table->addRow([
 			'const table = document.getElementById("rules_table");'.
 			'const checkboxes = Array.from(table.getElementsByTagName("input"));'.
 			'const upd_checkboxes = checkboxes.filter((checkbox) => checkbox.name.includes("delete"));'.
-			'upd_checkboxes.forEach((checkbox) => checkbox.checked = delete_all.checked)'
+			'upd_checkboxes.forEach((checkbox) => checkbox.checked = delete_all.checked);'
 		)
 		: null,
 ]);
@@ -199,10 +201,10 @@ $form_list = (new CFormList())
 	->addRow(_('Advanced options'), (new CCheckBox())
 		->setChecked(false)
 		->onClick(
-		'const rules = document.getElementsByClassName("advanced_configuration");'.
-		'for (let i = 0; i < rules.length; i++) {'.
-		'	rules[i].classList.toggle("display-none");'.
-		'}'
+			'const rules = document.getElementsByClassName("advanced_configuration");'.
+			'for (let i = 0; i < rules.length; i++) {'.
+			'	rules[i].classList.toggle("display-none");'.
+			'}'
 	))
 	->addRow(_('Rules'), new CDiv($rules_table));
 
