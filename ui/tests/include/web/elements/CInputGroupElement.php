@@ -83,16 +83,14 @@ class CInputGroupElement extends CElement {
 		$xpath_secret = 'xpath:.//div[@class="input-secret"]/..//button[contains(@id, "type_button")]';
 
 		if ($this->query($xpath_secret)->exists()) {
-			$type = self::TYPE_SECRET;
-		}
-		elseif ($this->query($xpath_vault)->exists()) {
-			$type = self::TYPE_VAULT;
-		}
-		else {
-			$type = self::TYPE_TEXT;
+			return self::TYPE_SECRET;
 		}
 
-		return $type;
+		if ($this->query($xpath_vault)->exists()) {
+			return self::TYPE_VAULT;
+		}
+
+		return self::TYPE_TEXT;
 	}
 
 	/**

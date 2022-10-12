@@ -549,8 +549,9 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$form->selectTab('Macros');
 
 		// Click "Change" button for every macros row in first case for discovered host form.
+		$macros_count = count($this->getMacros());
 		if (CTestArrayHelper::get($data, 'expected_macros')) {
-			for ($i = 0; $i < count($this->getMacros()); $i++) {
+			for ($i = 0; $i < $macros_count; $i++) {
 				$form->query('id:macros_'.$i.'_change_state')->one()->waitUntilClickable()->click();
 				$this->assertFalse($form->query('id:macros_'.$i.'_macro')->one()->isEnabled());
 			}
@@ -1235,7 +1236,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		if ($data !== null) {
 			// Write expected macros to data for discovered host for first case in discovered host.
 			if (CTestArrayHelper::get($data, 'expected_macros')) {
-				for ($i = 0; $i < count($data['expected_macros']); $i++) {
+				foreach (array_keys($data['expected_macros']) as $i ) {
 					$data['macros'][$i]['macro'] = $data['expected_macros'][$i]['macro'];
 				}
 			}
@@ -1385,8 +1386,9 @@ abstract class testFormMacros extends CLegacyWebTest {
 		else {
 			$value_field = $this->getValueField($data['macro']);
 
+			$macros_count = count($this->getMacros());
 			if ($discovered) {
-				for ($i = 0; $i < count($this->getMacros()); $i++) {
+				for ($i = 0; $i < $macros_count; $i++) {
 					$this->query('id:macros_'.$i.'_change_state')->one()->waitUntilClickable()->click();
 				}
 			}
@@ -1571,9 +1573,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$form = $this->openMacrosTab($url, $source, true, $name);
 
 		if ($discovered) {
-			$fields = $data['fields'];
 			$expected = $data['expected'];
-			$data = $fields;
+			$data = $data['fields'];
 
 			// Click "Change" button for every macros row in first case for discovered host form.
 			$form->query('id:macros_'.$data['index'].'_change_state')->one()->waitUntilClickable()->click();
@@ -1629,8 +1630,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					'macro_fields' => [
 						'macro' => $this->revert_macro_1,
 						'value' => 'Secret '.$this->revert_macro_object.' value'
-					],
-					'first_case' => true
+					]
 				]
 			],
 			[
@@ -1648,13 +1648,15 @@ abstract class testFormMacros extends CLegacyWebTest {
 	/**
 	 *  Check that it is possible to revert secret macro changes for host, host prototype and template entities.
 	 *
-	 * @param array		$data		given data provider
+	 * @param array	$data		given data provider
 	 * @param string	$url		url of configuration form of the corresponding entity
 	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
 	 * @param string	$name		name of the host where macros to be updated
 	 * @param boolean	$discovered true if object is discovered host, false - if normal
 	 */
 	public function revertSecretMacroChanges($data, $url, $source, $name = null, $discovered = false) {
+		static $first_case = true;
+
 		$form = $this->openMacrosTab($url, $source, true, $name);
 
 		$sql = 'SELECT * FROM hostmacro WHERE macro='.CDBHelper::escape($data['macro_fields']['macro']);
@@ -1666,8 +1668,11 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$this->assertEquals('******', $value_field->getValue());
 
 		// Click "Change" button for every macros row in first case for discovered host form.
-		if ($discovered && CTestArrayHelper::get($data, 'first_case')) {
-			for ($i = 0; $i < count($this->getMacros()); $i++) {
+		$macros_count = count($this->getMacros());
+		if ($first_case) {
+			$first_case = false;
+
+			for ($i = 0; $i < $macros_count; $i++) {
 				$form->query('id:macros_'.$i.'_change_state')->one()->waitUntilClickable()->click();
 			}
 		}
@@ -2267,9 +2272,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['fields']['index'].'_'.$field.'"]')->one()->getText();
 		}
 
-		if (CTestArrayHelper::get($data, 'expected_macros')) {
-			$data = $data['expected_macros'];
-		}
+		$data = CTestArrayHelper::get($data, 'expected_macros', $data);
 
 		$this->assertEquals([$data['fields']['macro'], $data['fields']['value']['text'], $data['fields']['description']], $result);
 		array_push($result, ZBX_MACRO_TYPE_VAULT);

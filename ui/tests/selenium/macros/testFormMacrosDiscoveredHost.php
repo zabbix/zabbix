@@ -77,11 +77,13 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 
 		// Create prototypes and discovered host names and ids.
 		foreach ($cases as $i => $case) {
-			self::$hosts[$i]['prototype_name'] = '{#KEY} Discovered host '.$case;
-			self::$hosts[$i]['name'] = $i.' Discovered host '.$case;
-			self::$hosts[$i]['hostid'] = $i + 700000;
-			self::$hosts[$i]['interfaceid'] = $i + 800000;
-			self::$hosts[$i]['host_groupid'] = $i + 900000;
+			self::$hosts[$i] = [
+				'prototype_name' => '{#KEY} Discovered host '.$case,
+				'name' => $i.' Discovered host '.$case,
+				'hostid' => $i + 700000,
+				'interfaceid' => $i + 800000,
+				'host_groupid' => $i + 900000
+			];
 		}
 
 		// Define macros for each discovered host.
