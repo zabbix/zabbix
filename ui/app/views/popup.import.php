@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-// TODO: uncheck All checkbox if any of under checkbox get unchecked.
+// TODO: if All checkbox is not checked but all the checkboxed under it are checked then All checkbox should go checked.
 
 $rules_table = (new CTable())->setId('rules_table');
 
@@ -82,35 +82,17 @@ $rules_table->addRow([
 	$col_update ? (new CCol((new CCheckBox('update_all'))
 			->setChecked(true)))
 		->addClass(ZBX_STYLE_CENTER)
-		->onClick(
-			'const update_all = document.getElementById("update_all");'.
-			'const table = document.getElementById("rules_table");'.
-			'const checkboxes = Array.from(table.getElementsByTagName("input"));'.
-			'const upd_checkboxes = checkboxes.filter((checkbox) => checkbox.name.includes("update"));'.
-			'upd_checkboxes.forEach((checkbox) => checkbox.checked = update_all.checked);'
-		)
+		->onClick('toggleAll("update");')
 		: null,
 	$col_create ? (new CCol((new CCheckBox('create_all'))
 		->setChecked(true)))
 		->addClass(ZBX_STYLE_CENTER)
-		->onClick(
-			'const create_all = document.getElementById("create_all");'.
-			'const table = document.getElementById("rules_table");'.
-			'const checkboxes = Array.from(table.getElementsByTagName("input"));'.
-			'const upd_checkboxes = checkboxes.filter((checkbox) => checkbox.name.includes("create"));'.
-			'upd_checkboxes.forEach((checkbox) => checkbox.checked = create_all.checked);'
-		)
+		->onClick('toggleAll("create");')
 		: null,
 	$col_delete ? (new CCol((new CCheckBox('delete_all'))
 		->setChecked(false)))
 		->addClass(ZBX_STYLE_CENTER)
-		->onClick(
-			'const delete_all = document.getElementById("delete_all");'.
-			'const table = document.getElementById("rules_table");'.
-			'const checkboxes = Array.from(table.getElementsByTagName("input"));'.
-			'const upd_checkboxes = checkboxes.filter((checkbox) => checkbox.name.includes("delete"));'.
-			'upd_checkboxes.forEach((checkbox) => checkbox.checked = delete_all.checked);'
-		)
+		->onClick('toggleAll("delete");')
 		: null,
 ]);
 
@@ -125,7 +107,8 @@ foreach ($titles as $key => $title) {
 
 	if (array_key_exists('updateExisting', $data['rules'][$key])) {
 		$checkbox_update = (new CCheckBox('rules['.$key.'][updateExisting]'))
-			->setChecked($data['rules'][$key]['updateExisting']);
+			->setChecked($data['rules'][$key]['updateExisting'])
+			->onClick('updateAllCheckbox("update", this)');
 
 		if ($key === 'images') {
 			$checkbox_update->onClick('updateWarning(this, '.json_encode(_('Images for all maps will be updated!')).')');
@@ -134,13 +117,15 @@ foreach ($titles as $key => $title) {
 
 	if (array_key_exists('createMissing', $data['rules'][$key])) {
 		$checkbox_create = (new CCheckBox('rules['.$key.'][createMissing]'))
-			->setChecked($data['rules'][$key]['createMissing']);
+			->setChecked($data['rules'][$key]['createMissing'])
+			->onClick('updateAllCheckbox("create", this)');
 	}
 
 	if (array_key_exists('deleteMissing', $data['rules'][$key])) {
 		$checkbox_delete = (new CCheckBox('rules['.$key.'][deleteMissing]'))
 			->setChecked($data['rules'][$key]['deleteMissing'])
-			->addClass('deleteMissing');
+			->addClass('deleteMissing')
+			->onClick('updateAllCheckbox("delete", this)');
 
 		if ($key === 'templateLinkage') {
 			$checkbox_delete->onClick('updateWarning(this, '.json_encode(

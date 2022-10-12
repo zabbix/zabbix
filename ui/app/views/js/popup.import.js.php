@@ -197,3 +197,18 @@ function updateWarning(obj, content) {
 		}, obj);
 	}
 }
+
+function updateAllCheckbox(action, input) {
+	const all_checkbox = document.getElementById(action + '_all')
+	if (!input.checked) {
+		all_checkbox.checked = false;
+	}
+}
+
+function toggleAll(action) {
+	const action_all = document.getElementById(action + '_all');
+	const table = document.getElementById('rules_table');
+	const checkboxes = Array.from(table.getElementsByTagName('input'));
+	const action_checkboxes = checkboxes.filter((checkbox) => checkbox.name.includes(action));
+	action_checkboxes.forEach((checkbox) => checkbox.checked = action_all.checked);
+}
