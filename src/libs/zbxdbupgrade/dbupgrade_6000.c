@@ -248,32 +248,52 @@ static int	DBpatch_6000008(void)
 {
 	const ZBX_FIELD	field = {"name_upper", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	if (ZBX_DB_OK > DBadd_field("hosts", &field))
-		return FAIL;
-
-	if (SUCCEED != DBcreate_index("hosts", "hosts_6", "name_upper", 0))
-		return FAIL;
-
-	if (ZBX_DB_OK > DBexecute("update hosts set name_upper=upper(name)"))
-		return FAIL;
-
-	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("hosts", "name", "name_upper", "upper",
-			"hostid");
+	return DBadd_field("hosts", &field);
 }
 
 static int	DBpatch_6000009(void)
 {
+	return DBcreate_index("hosts", "hosts_6", "name_upper", 0);
+}
+
+static int	DBpatch_6000010(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update hosts set name_upper=upper(name)"))
+		return FAIL;
+}
+
+static int	DBpatch_6000011(void)
+{
+	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("hosts", "name", "name_upper", "upper",
+			"hostid");
+}
+
+static int	DBpatch_6000012(void)
+{
 	const ZBX_FIELD field = {"name_upper", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	if (ZBX_DB_OK > DBadd_field("items", &field))
-		return FAIL;
+	return DBadd_field("items", &field);
+}
 
-	if (SUCCEED != DBcreate_index("items", "items_9", "hostid,name_upper", 0))
-		return FAIL;
+static int	DBpatch_6000013(void)
+{
+	return DBcreate_index("items", "items_9", "hostid,name_upper", 0);
+}
+
+static int	DBpatch_6000014(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update items set name_upper=upper(name)"))
 		return FAIL;
+}
 
+static int	DBpatch_6000015(void)
+{
 	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("items", "name", "name_upper", "upper",
 			"itemid");
 }
@@ -293,5 +313,11 @@ DBPATCH_ADD(6000006, 0, 0)
 DBPATCH_ADD(6000007, 0, 0)
 DBPATCH_ADD(6000008, 0, 0)
 DBPATCH_ADD(6000009, 0, 0)
+DBPATCH_ADD(6000010, 0, 0)
+DBPATCH_ADD(6000011, 0, 0)
+DBPATCH_ADD(6000012, 0, 0)
+DBPATCH_ADD(6000013, 0, 0)
+DBPATCH_ADD(6000014, 0, 0)
+DBPATCH_ADD(6000015, 0, 0)
 
 DBPATCH_END()
