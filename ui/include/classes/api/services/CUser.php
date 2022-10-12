@@ -1862,12 +1862,12 @@ class CUser extends CApiService {
 
 					if (!array_key_exists('usrgrps', $user)) {
 						$group_attributes = $provisioning->getGroupIdpAttributes();
-						$ldap_groups = $ldap->getGroupAttributes($group_attributes, $user['username'], $user['password']);
+						$ldap_groups = $ldap->getGroupAttributes($group_attributes, $user['username']);
 						$ldap_groups = array_column($ldap_groups, $db_userdirectory['group_name']);
 						$user = array_merge($user, $provisioning->getUserGroupsAndRole($ldap_groups));
 					}
 
-					$user['userid'] = $provision_user['userid'];
+					$user += ['usrgrps' => []];
 					$this->updateProvisionedUser($user);
 					$provisionedids[] = $provision_user['userid'];
 				}
