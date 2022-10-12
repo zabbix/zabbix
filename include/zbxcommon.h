@@ -854,8 +854,6 @@ typedef enum
 }
 zbx_task_t;
 
-#define ZBX_IPC_RTC_MAX				9999
-
 typedef enum
 {
 	HTTPTEST_AUTH_NONE = 0,

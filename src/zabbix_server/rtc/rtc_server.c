@@ -24,7 +24,9 @@
 #include "zbxtypes.h"
 #include "zbxcommon.h"
 #include "zbxservice.h"
-#include "rtc_constants.h"
+#include "zbx_rtc_constants.h"
+#include "zbxjson.h"
+#include "zbxtime.h"
 
 static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
 {
@@ -516,7 +518,7 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
  *                                                                            *
  * Purpose: process runtime control option and print result                   *
  *                                                                            *
- * Parameters: option   - [IN] the runtime control option                     *
+ * Parameters: option   - [IN] runtime control option                         *
  *             error    - [OUT] error message                                 *
  *                                                                            *
  * Return value: SUCCEED - the runtime control option was processed           *

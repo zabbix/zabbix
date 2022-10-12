@@ -21,7 +21,7 @@
 #define ZABBIX_RTC_SERVER_H
 
 #include "zbxrtc.h"
-#include "zbxtypes.h"
+#include "zbxipcservice.h"
 
 int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result);
 int	rtc_process(const char *option, char **error);

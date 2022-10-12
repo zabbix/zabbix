@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef RTC_CONSTANTS_H
-#define RTC_CONSTANTS_H
+#ifndef ZABBIX_ZBX_RTC_CONSTANTS_H
+#define ZABBIX_ZBX_RTC_CONSTANTS_H
 
 /* runtime control commands */
 #define ZBX_RTC_UNKNOWN				0
@@ -45,5 +45,7 @@
 
 /* runtime control notifications, must be less than 10000 */
 #define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
+
+#define ZBX_IPC_RTC_MAX				9999
 
 #endif

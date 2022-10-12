@@ -18,7 +18,7 @@
 **/
 
 #include "zbxrtc.h"
-#include "rtc_constants.h"
+#include "zbx_rtc_constants.h"
 #include "rtc.h"
 
 #include "zbxcommon.h"

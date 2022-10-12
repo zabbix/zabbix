@@ -65,7 +65,6 @@
 #include "events.h"
 #include "../libs/zbxdbcache/valuecache.h"
 #include "setproctitle.h"
-#include "zbxcrypto.h"
 #include "zbxhistory.h"
 #include "postinit.h"
 #include "../libs/zbxvault/vault.h"
@@ -80,7 +79,7 @@
 #include "diag/diag_server.h"
 #include "zbxip.h"
 #include "zbxsysinfo.h"
-#include "rtc_constants.h"
+#include "zbx_rtc_constants.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"

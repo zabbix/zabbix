@@ -20,13 +20,12 @@
 #include "rtc_proxy.h"
 
 #include "proxy.h"
-#include "rtc_constants.h"
+#include "zbx_rtc_constants.h"
 
 extern int	CONFIG_PROXYMODE;
 
 int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
 {
-	ZBX_UNUSED(rtc);
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(result);
 

@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZBXHA_H
 #define ZABBIX_ZBXHA_H
 
+#include "zbx_rtc_constants.h"
+
 #define ZBX_IPC_SERVICE_HA	"haservice"
 
 #define ZBX_IPC_SERVICE_HA_PAUSE		1
