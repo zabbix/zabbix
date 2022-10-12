@@ -70,12 +70,12 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Problems');
 
 		// Check the default tag filter option AND and tag value option Contains
+		$result_form = $this->query('xpath://form[@name="problem"]')->one();
 		$this->zbxTestClickButtonText('Reset');
-		$this->query('id:filter-tags_0')->one()->waitUntilReloaded();
+		$result_form->waitUntilReloaded();
 		$this->assertTrue($this->zbxTestCheckboxSelected('evaltype_00'));
 		$form = $this->query('id:tabfilter_0')->asForm()->waitUntilPresent()->one();
 		$this->zbxTestDropdownAssertSelected('tags_00_operator', 'Contains');
-		$result_form = $this->query('xpath://form[@name="problem"]')->one();
 
 		// Select "AND" option and two tag names with partial "Contains" value match
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
