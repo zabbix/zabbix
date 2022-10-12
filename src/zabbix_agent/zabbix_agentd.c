@@ -24,6 +24,7 @@
 #include "modbtype.h"
 #include "zbxstr.h"
 #include "zbxip.h"
+#include "zbxexpr.h"
 
 static char	*CONFIG_PID_FILE = NULL;
 
@@ -285,6 +286,7 @@ char	*opt = NULL;
 
 #ifdef _WINDOWS
 void	zbx_co_uninitialize();
+int	zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep);
 #endif
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
@@ -1078,6 +1080,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	int		i, j = 0, ret = SUCCEED;
 #ifdef _WINDOWS
 	DWORD		res;
+
+	AddVectoredExceptionHandler(1, (PVECTORED_EXCEPTION_HANDLER)&zbx_win_exception_filter);
 #endif
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
