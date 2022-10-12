@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:33:28Z'
+  date: '2022-08-22T13:58:35Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -452,6 +452,8 @@ zabbix_export:
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
           delay: 1h
           history: 1w
+          trends: '0'
+          value_type: CHAR
           tags:
             -
               tag: component
@@ -766,8 +768,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'OpenBSD by Zabbix agent'
                         name: 'CPU load'
-                        host: 'OpenBSD by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -782,8 +784,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'OpenBSD by Zabbix agent'
                         name: 'CPU utilization'
-                        host: 'OpenBSD by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -798,8 +800,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Memory usage'
                         host: 'OpenBSD by Zabbix agent'
+                        name: 'Memory usage'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -815,8 +817,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Swap usage'
                         host: 'OpenBSD by Zabbix agent'
+                        name: 'Swap usage'
       valuemaps:
         -
           uuid: 693c226692c548869e77d3313934ca28

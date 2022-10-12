@@ -18,11 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 /**
  * @onBefore removeGuestFromDisabledGroup
  * @onAfter addGuestToDisabledGroup
+ * @dataSource LoginUsers
  */
 class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
@@ -352,7 +354,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 			[
 				[
 					'user' => 'local.com\\test-user',
-					'password' => 'zabbix',
+					'password' => 'zabbix12345',
 					'file' => 'htaccess',
 					'http_authentication' => [
 						'Enable HTTP authentication' => true,
@@ -689,6 +691,6 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	}
 
 	public static function addGuestToDisabledGroup() {
-		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
+		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (1551, 9, 2)');
 	}
 }

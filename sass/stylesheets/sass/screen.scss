@@ -6210,7 +6210,7 @@ $range-input-width: 31px;
 			}
 		}
 
-		&:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) {
+		&:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) :first-child {
 			.interface-cell:not(.interface-cell-details) {
 				padding-top: 10px;
 				margin-top: 5px;

@@ -13272,6 +13272,10 @@ msgstr ""
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr ""
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr ""
@@ -20416,6 +20420,10 @@ msgstr ""
 msgid "a character string is expected"
 msgstr ""
 
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr ""
@@ -22602,6 +22610,11 @@ msgstr ""
 #: include/actions.inc.php:605 include/actions.inc.php:623
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
+msgstr ""
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
 msgstr ""
 
 #: include/classes/api/services/CTask.php:443
