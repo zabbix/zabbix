@@ -597,7 +597,6 @@ static int	process_proxy(void)
 			if (proxy.proxy_data_nextcheck <= now && (proxy.compatibility == ZBX_PROXY_VERSION_CURRENT ||
 					proxy.compatibility == ZBX_PROXY_VERSION_OUTDATED))
 			{
-
 				int	more;
 
 				do
