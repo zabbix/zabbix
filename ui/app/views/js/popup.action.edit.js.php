@@ -549,45 +549,43 @@ window.action_edit_popup = new class {
 	}
 
 	_processTypeOfCalculation() {
-		this.show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
+		this.show_formula = document.querySelector('#evaltype').value === <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
 
-		jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");
-		jQuery('#expression').toggle(!this.show_formula);
-		jQuery('#label-evaltype').toggle(this.row_count > 1);
-		jQuery('#evaltype-formfield').toggle(this.row_count > 1);
+		document.querySelector('#formula').style.display = this.show_formula ? '' : 'none';
+		document.querySelector('#expression').style.display = this.show_formula ? 'none' : '';
+		document.querySelector('#label-evaltype').style.display = this.row_count > 1 ? '' : 'none';
+		document.querySelector('#evaltype-formfield').style.display = this.row_count > 1 ? '' : 'none';
 
-		const labels = jQuery('#conditionTable .label');
-		var conditions = [];
-		labels.each(function (index, label) {
-			var label = jQuery(label);
+		const labels = document.querySelectorAll('#conditionTable .label');
+		let conditions = [];
+		[...labels].forEach(function (label) {
 
 			conditions.push({
-				id: label.data('formulaid'),
-				type: label.data('conditiontype')
+				id: label.getAttribute('data-formulaid'),
+				type: label.getAttribute('data-conditiontype')
 			});
 		});
 
-		jQuery('#expression').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
+		document.getElementById('expression').innerHTML = getConditionFormula(conditions, + document.querySelector('#evaltype').value);
 
-		jQuery('#evaltype').change(function () {
-			this.show_formula = (jQuery(this).val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
+		document.querySelector('#evaltype').onchange = function() {
+			this.show_formula = +document.querySelector('#evaltype').value === <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
 
-			jQuery('#formula').toggle(this.show_formula).removeAttr("readonly");
-			jQuery('#expression').toggle(!this.show_formula);
+			document.querySelector('#formula').style.display = this.show_formula ? '' : 'none';
+			document.querySelector('#formula').removeAttribute('readonly');
+			document.querySelector('#expression').style.display = this.show_formula ? 'none' : '';
 
-			const labels = jQuery('#conditionTable .label');
-			var conditions = [];
-
-			labels.each(function (index, label) {
-				var label = jQuery(label);
+			const labels = document.querySelectorAll('#conditionTable .label');
+			let conditions = [];
+			[...labels].forEach(function (label) {
 
 				conditions.push({
-					id: label.data('formulaid'),
-					type: label.data('conditiontype')
+					id: label.getAttribute('data-formulaid'),
+					type: label.getAttribute('data-conditiontype')
 				});
 			});
 
-			jQuery('#expression').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
-		});
+			document.getElementById('expression').innerHTML = getConditionFormula(conditions, + document.querySelector('#evaltype').value);
+		};
 	}
 }
