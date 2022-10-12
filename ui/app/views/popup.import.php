@@ -75,8 +75,6 @@ foreach ($titles as $key => $title) {
 	}
 }
 
-$all_table = new CTable();
-
 $rules_table->addRow([
 	(new CCol('All'))->addStyle('width: 124px;'),
 	$col_update ? (new CCol((new CCheckBox('update_all'))
@@ -206,7 +204,7 @@ $form_list = (new CFormList())
 		'	rules[i].classList.toggle("display-none");'.
 		'}'
 	))
-	->addRow(_('Rules'), new CDiv([$all_table, $rules_table]));
+	->addRow(_('Rules'), new CDiv($rules_table));
 
 $form = (new CForm('post', null, 'multipart/form-data'))
 	->setId('import-form')
