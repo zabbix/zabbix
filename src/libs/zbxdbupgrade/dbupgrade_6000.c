@@ -263,6 +263,8 @@ static int	DBpatch_6000010(void)
 
 	if (ZBX_DB_OK > DBexecute("update hosts set name_upper=upper(name)"))
 		return FAIL;
+
+	return SUCCEED;
 }
 
 static int	DBpatch_6000011(void)
@@ -290,6 +292,8 @@ static int	DBpatch_6000014(void)
 
 	if (ZBX_DB_OK > DBexecute("update items set name_upper=upper(name)"))
 		return FAIL;
+
+	return SUCCEED;
 }
 
 static int	DBpatch_6000015(void)
