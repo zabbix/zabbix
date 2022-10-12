@@ -164,6 +164,11 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 		// Check Audit record about autoregistration update.
 		$this->page->open('zabbix.php?action=auditlog.list');
 
+		// Click on Filter tab if it is not selected.
+		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
+			$this->query('id:ui-id-2')->one()->click();
+		}
+
 		// Reset filter to delete deependencies from previous tests.
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
