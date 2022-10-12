@@ -3797,6 +3797,7 @@ static void	vmware_vm_snapshot_disksize(xmlDoc *xdoc, const char *key, xmlNode *
  *             uniquesize - [IN/OUT] total uniquesize of all snapshots        *
  *             count      - [IN/OUT] total number of all snapshots            *
  *             latestdate - [OUT] the date of last snapshot                   *
+ *             oldestdate - [OUT] the date of oldest snapshot                 *
  *             json_data  - [OUT] json with info about snapshot               *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
@@ -3805,7 +3806,7 @@ static void	vmware_vm_snapshot_disksize(xmlDoc *xdoc, const char *key, xmlNode *
  ******************************************************************************/
 static int	vmware_vm_snapshot_collect(xmlDoc *xdoc, xmlNode *snap_node, xmlNode *layout_node,
 		zbx_vector_uint64_t *disks_used, zbx_uint64_t *size, zbx_uint64_t *uniquesize, zbx_uint64_t *count,
-		char **latestdate, struct zbx_json *json_data)
+		char **latestdate, char **oldestdate, struct zbx_json *json_data)
 {
 	int			i, ret = FAIL;
 	char			*value, xpath[MAX_STRING_LEN], *name, *desc, *crtime;
@@ -3880,10 +3881,13 @@ static int	vmware_vm_snapshot_collect(xmlDoc *xdoc, xmlNode *snap_node, xmlNode 
 	zbx_json_adduint64(json_data, "uniquesize", snap_usize);
 	zbx_json_close(json_data);
 
+	if (NULL != oldestdate)
+		*oldestdate = zbx_strdup(NULL, crtime);
+
 	if (NULL != (next_node = zbx_xml_node_get(xdoc, snap_node, ZBX_XNN("childSnapshotList"))))
 	{
 		ret = vmware_vm_snapshot_collect(xdoc, next_node, layout_node, disks_used, size, uniquesize, count,
-				latestdate, json_data);
+				latestdate, NULL, json_data);
 	}
 	else
 	{
@@ -3921,9 +3925,10 @@ static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
 	xmlDoc			*xdoc = node->doc;
 	struct zbx_json		json_data;
 	int			ret = FAIL;
-	char			*latestdate = NULL;
-	zbx_uint64_t		count, size, uniquesize;
+	char			*latestdate = NULL, *oldestdate = NULL;
+	zbx_uint64_t		count, size, uniquesize, latest_age = 0, oldest_age = 0;
 	zbx_vector_uint64_t	disks_used;
+	time_t			xml_time, now = time(NULL);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3949,14 +3954,23 @@ static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
 	uniquesize = 0;
 
 	if (FAIL == (ret = vmware_vm_snapshot_collect(xdoc, root_node, layout_node, &disks_used, &size, &uniquesize,
-			&count, &latestdate, &json_data)))
+			&count, &latestdate, &oldestdate, &json_data)))
 	{
 		goto out;
 	}
 
+	if (SUCCEED == zbx_iso8601_utc(ZBX_NULL2EMPTY_STR(latestdate), &xml_time))
+		latest_age = now - xml_time;
+
+	if (SUCCEED == zbx_iso8601_utc(ZBX_NULL2EMPTY_STR(oldestdate), &xml_time))
+		oldest_age = now - xml_time;
+
 	zbx_json_close(&json_data);
 	zbx_json_adduint64(&json_data, "count", count);
 	zbx_json_addstring(&json_data, "latestdate", ZBX_NULL2EMPTY_STR(latestdate), ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(&json_data, "latest_age", latest_age);
+	zbx_json_addstring(&json_data, "oldestdate", ZBX_NULL2EMPTY_STR(oldestdate), ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(&json_data, "oldest_age", oldest_age);
 	zbx_json_adduint64(&json_data, "size", size);
 	zbx_json_adduint64(&json_data, "uniquesize", uniquesize);
 	zbx_json_close(&json_data);
@@ -6903,7 +6917,8 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 {
 	zbx_vmware_event_t		*event = NULL;
 	char				*message, *time_str, *ip;
-	int				timestamp = 0, nodes_det = 0;
+	int				nodes_det = 0;
+	time_t				timestamp = 0;
 	unsigned int			i;
 	zbx_uint64_t			sz;
 	static event_hostinfo_node_t	host_nodes[] =
@@ -6971,21 +6986,11 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 	}
 	else
 	{
-		int	year, mon, mday, hour, min, sec, t;
-
-		/* 2013-06-04T14:19:23.406298Z */
-		if (6 != sscanf(time_str, "%d-%d-%dT%d:%d:%d.%*s", &year, &mon, &mday, &hour, &min, &sec))
+		if (FAIL == zbx_iso8601_utc(time_str, &timestamp))	/* 2013-06-04T14:19:23.406298Z */
 		{
-			zabbix_log(LOG_LEVEL_TRACE, "unexpected format of createdTime '%s' for event"
-					" key '" ZBX_FS_UI64 "'", time_str, xml_event.id);
-		}
-		else if (SUCCEED != zbx_utc_time(year, mon, mday, hour, min, sec, &t))
-		{
-			zabbix_log(LOG_LEVEL_TRACE, "cannot convert createdTime '%s' for event key '"
+			zabbix_log(LOG_LEVEL_TRACE, "unexpected format of createdTime '%s' for event key '"
 					ZBX_FS_UI64 "'", time_str, xml_event.id);
 		}
-		else
-			timestamp = t;
 
 		zbx_free(time_str);
 	}
