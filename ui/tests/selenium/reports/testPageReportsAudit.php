@@ -66,7 +66,8 @@ class testPageReportsAudit extends CWebTest {
 
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
-		$filter_actions = ['Add', 'Delete', 'Execute', 'Failed login', 'History clear', 'Login', 'Logout', 'Update'];
+		$filter_actions = ['Add', 'Configuration refresh', 'Delete', 'Execute', 'Failed login', 'History clear',
+				'Login', 'Logout', 'Update'];
 
 		// Check filter buttons.
 		foreach (['Apply', 'Reset'] as $button) {
@@ -115,7 +116,7 @@ class testPageReportsAudit extends CWebTest {
 			'Map' => ['Add', 'Delete', 'Update'],
 			'Media type' => ['Add', 'Delete', 'Update'],
 			'Module' => ['Add', 'Delete', 'Update'],
-			'Proxy' => ['Add', 'Delete', 'Update'],
+			'Proxy' => ['Add', 'Configuration refresh', 'Delete', 'Update'],
 			'Regular expression' => ['Add', 'Delete', 'Update'],
 			'SLA' => ['Add', 'Delete', 'Update'],
 			'Scheduled report' => ['Add', 'Delete', 'Update'],
@@ -525,7 +526,7 @@ class testPageReportsAudit extends CWebTest {
 				}
 
 				// Get all results from column and remove existing values.
-				$table_value = $this->getTableResult($column);
+				$table_value = $this->getTableColumnData($column);
 
 				foreach ($values as $value) {
 					$this->assertTrue(in_array($value, $table_value));

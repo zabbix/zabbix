@@ -822,6 +822,7 @@ class testPageLatestData extends CWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('xpath://table[contains(@class, "overflow-ellipsis")]')->asTable()->waitUntilPresent()->one();
 		$this->query('button:Reset')->one()->click();
+		$table->waitUntilReloaded();
 		$form->fill(['Name' => '4_item'])->submit();
 		$table->waitUntilReloaded();
 

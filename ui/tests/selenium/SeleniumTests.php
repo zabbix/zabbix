@@ -132,6 +132,7 @@ require_once dirname(__FILE__).'/services/testPageServicesServicesMassUpdate.php
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
+require_once dirname(__FILE__).'/tags/testFormTagsDiscoveredHost.php';
 require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
 require_once dirname(__FILE__).'/tags/testFormTagsHostPrototype.php';
 require_once dirname(__FILE__).'/tags/testFormTagsServices.php';
@@ -337,6 +338,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTabIndicators');
+		$suite->addTestSuite('testFormTagsDiscoveredHost');
 		$suite->addTestSuite('testFormTagsHost');
 		$suite->addTestSuite('testFormTagsHostPrototype');
 		$suite->addTestSuite('testFormTagsServices');
