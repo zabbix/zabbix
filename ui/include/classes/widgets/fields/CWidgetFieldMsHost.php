@@ -27,17 +27,26 @@ class CWidgetFieldMsHost extends CWidgetFieldMs {
 	 *
 	 * @var string  (nullable) ID for Multiselect element.
 	 */
-	public $filter_preselect_host_group_field;
+	protected $filter_preselect;
 
 	/**
 	 * Create widget field for Host selection
 	 *
-	 * @param string      $name     field name in form
-	 * @param string      $label    label for the field in form
+	 * @param string $name   field name in form
+	 * @param string $label  label for the field in form
 	 */
-	public function __construct($name, $label) {
+	public function __construct(string $name, string $label) {
 		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_HOST);
+	}
+
+	public function setFilterPreselect(string $id) {
+		$this->filter_preselect = $id;
+		return $this;
+	}
+
+	public function getFilterPreselect() {
+		return $this->filter_preselect;
 	}
 }

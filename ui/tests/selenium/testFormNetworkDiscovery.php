@@ -669,7 +669,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 			$names = [($drule['name']), 'CLONE: '.$drule['name']];
 			foreach ($names as $name) {
-				$sql_drules[] = CDBHelper::getHash('SELECT proxy_hostid, iprange, delay, nextcheck, status'.
+				$sql_drules[] = CDBHelper::getHash('SELECT proxy_hostid, iprange, delay, status'.
 						' FROM drules'.
 						' WHERE name='.zbx_dbstr($name).
 						' ORDER BY druleid'

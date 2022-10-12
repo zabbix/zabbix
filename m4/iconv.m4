@@ -16,24 +16,21 @@
 AC_DEFUN([LIBICONV_TRY_LINK],
 [
 found_iconv=$1
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <stdlib.h>
 #include <iconv.h>
-],
-[
+]], [[
 	iconv_t cd = iconv_open("","");
 	iconv(cd, NULL, NULL, NULL, NULL);
 	iconv_close(cd);
-],
-found_iconv="yes")
+]])],[found_iconv="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBICONV_CHECK_CONFIG],
 [
 	AC_ARG_WITH([iconv],[
 If you want to specify iconv installation directories:
-AC_HELP_STRING([--with-iconv@<:@=DIR@:>@], [use iconv from given base install directory (DIR), default is to search through a number of common places for the iconv files.])],
+AS_HELP_STRING([--with-iconv@<:@=DIR@:>@], [use iconv from given base install directory (DIR), default is to search through a number of common places for the iconv files.])],
 		[
 			if test "$withval" = "yes"; then
 				ICONV_CFLAGS="-I/usr/include"
@@ -49,7 +46,7 @@ AC_HELP_STRING([--with-iconv@<:@=DIR@:>@], [use iconv from given base install di
 	)
 
 	AC_ARG_WITH([iconv-include],
-		AC_HELP_STRING([--with-iconv-include@<:@=DIR@:>@],
+		AS_HELP_STRING([--with-iconv-include@<:@=DIR@:>@],
 			[use iconv include headers from given path.]
 		),
 		[
@@ -59,7 +56,7 @@ AC_HELP_STRING([--with-iconv@<:@=DIR@:>@], [use iconv from given base install di
 	)
 
 	AC_ARG_WITH([iconv-lib],
-		AC_HELP_STRING([--with-iconv-lib@<:@=DIR@:>@],
+		AS_HELP_STRING([--with-iconv-lib@<:@=DIR@:>@],
 			[use iconv libraries from given path.]
 		),
 		[

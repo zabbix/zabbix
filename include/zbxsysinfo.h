@@ -171,7 +171,7 @@ extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 #define ZBX_DSTAT_W_OPER	4
 #define ZBX_DSTAT_W_BYTE	5
 #define ZBX_DSTAT_MAX		6
-int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
+int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat);
 
 /* flags for process */
 #define ZBX_PROCESS_LOCAL_COMMAND	0x1
@@ -185,48 +185,43 @@ typedef enum
 }
 zbx_key_access_rule_type_t;
 
-void	init_metrics(void);
-int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
-int	add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len);
-void	free_metrics_ext(ZBX_METRIC **metrics);
-void	free_metrics(void);
+void	zbx_init_metrics(void);
+int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
+void	zbx_free_metrics_ext(ZBX_METRIC **metrics);
+void	zbx_free_metrics(void);
 
-void	init_key_access_rules(void);
-void	finalize_key_access_rules_configuration(void);
-int	add_key_access_rule(const char *parameter, char *pattern, zbx_key_access_rule_type_t type);
-int	check_key_access_rules(const char *metric);
-int	check_request_access_rules(AGENT_REQUEST *request);
-void	free_key_access_rules(void);
+void	zbx_init_key_access_rules(void);
+void	zbx_finalize_key_access_rules_configuration(void);
 
-int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
+int	zbx_add_key_access_rule(const char *parameter, char *pattern, zbx_key_access_rule_type_t type);
+int	zbx_check_key_access_rules(const char *metric);
+int	zbx_check_request_access_rules(AGENT_REQUEST *request);
+void	zbx_free_key_access_rules(void);
 
-void	set_user_parameter_dir(const char *path);
-int	add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len);
-void	remove_user_parameters(void);
-void	get_metrics_copy(ZBX_METRIC **metrics);
-void	set_metrics(ZBX_METRIC *metrics);
-int	add_user_module(const char *key, int (*function)(void));
-void	test_parameters(void);
-void	test_parameter(const char *key);
+int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result);
 
-void	init_result(AGENT_RESULT *result);
+void	zbx_set_user_parameter_dir(const char *path);
+int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len);
+void	zbx_remove_user_parameters(void);
+void	zbx_get_metrics_copy(ZBX_METRIC **metrics);
+void	zbx_set_metrics(ZBX_METRIC *metrics);
+void	zbx_test_parameters(void);
+void	zbx_test_parameter(const char *key);
+
+void	zbx_init_agent_result(AGENT_RESULT *result);
 void	zbx_log_free(zbx_log_t *log);
-void	free_result(AGENT_RESULT *result);
+void	zbx_free_agent_result(AGENT_RESULT *result);
 
-void	init_request(AGENT_REQUEST *request);
-void	free_request(AGENT_REQUEST *request);
+void	zbx_init_agent_request(AGENT_REQUEST *request);
+void	zbx_free_agent_request(AGENT_REQUEST *request);
 
-int	parse_item_key(const char *itemkey, AGENT_REQUEST *request);
+int	zbx_parse_item_key(const char *itemkey, AGENT_REQUEST *request);
 
-void	unquote_key_param(char *param);
-int	quote_key_param(char **param, int forced);
+void	zbx_unquote_key_param(char *param);
+int	zbx_quote_key_param(char **param, int forced);
 
-int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
-void	set_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime);
-
-#ifdef HAVE_KSTAT_H
-zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn);
-#endif
+int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c);
+void	zbx_set_agent_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime);
 
 /* external system functions */
 
@@ -303,42 +298,6 @@ int	REGISTRY_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
-#if defined(_WINDOWS) || defined(__MINGW32__)
-typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event);
-#else
-typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
-#endif
-
-typedef struct
-{
-	const char	*mode;
-	int		(*function)(const char *devname, AGENT_RESULT *result);
-}
-MODE_FUNCTION;
-
-typedef struct
-{
-	zbx_uint64_t	total;
-	zbx_uint64_t	not_used;
-	zbx_uint64_t	used;
-	double		pfree;
-	double		pused;
-}
-zbx_fs_metrics_t;
-
-typedef struct
-{
-	char			fsname[MAX_STRING_LEN];
-	char			fstype[MAX_STRING_LEN];
-	zbx_fs_metrics_t	bytes;
-	zbx_fs_metrics_t	inodes;
-	char			*options;
-}
-zbx_mpoint_t;
-
-int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
-void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
-
 /* the fields used by proc queries */
 #define ZBX_SYSINFO_PROC_NONE		0x0000
 #define ZBX_SYSINFO_PROC_PID		0x0001
@@ -350,20 +309,7 @@ void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
 #define ZBX_MUTEX_ALL_ALLOW		0
 #define ZBX_MUTEX_THREAD_DENIED		1
 #define ZBX_MUTEX_LOGGING_DENIED	2
-zbx_uint32_t get_thread_global_mutex_flag(void);
-#endif
-
-#ifndef _WINDOWS
-int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname);
-
-typedef struct
-{
-	zbx_uint64_t	flag;
-	const char	*name;
-}
-zbx_mntopt_t;
-
-char		*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags);
+zbx_uint32_t	zbx_get_thread_global_mutex_flag(void);
 #endif
 
 void		zbx_add_alias(const char *name, const char *value);

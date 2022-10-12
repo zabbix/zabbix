@@ -252,6 +252,7 @@ import (
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/tls"
+	"git.zabbix.com/ap/plugin-support/log"
 )
 
 const (
@@ -312,22 +313,27 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 	}
 	ckey := C.CString(itemutil.MakeKey(key, params))
 
+	log.Tracef("Calling C function \"new_metric()\"")
 	return unsafe.Pointer(C.new_metric(ckey, C.zbx_uint64_t(lastLogsize), C.int(mtime), C.int(flags))), nil
 }
 
 func FreeActiveMetric(data unsafe.Pointer) {
+	log.Tracef("Calling C function \"metric_free()\"")
 	C.metric_free(C.ZBX_ACTIVE_METRIC_LP(data))
 }
 
 func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsafe.Pointer) {
+	log.Tracef("Calling C function \"metric_set_refresh()\"")
 	C.metric_set_refresh(C.ZBX_ACTIVE_METRIC_LP(data), C.int(refresh))
 
 	var clastLogsizeSent, clastLogsizeLast C.zbx_uint64_t
 	var cmtimeSent, cmtimeLast C.int
+	log.Tracef("Calling C function \"metric_get_meta()\"")
 	C.metric_get_meta(C.ZBX_ACTIVE_METRIC_LP(data), &clastLogsizeSent, &cmtimeSent)
 	clastLogsizeLast = clastLogsizeSent
 	cmtimeLast = cmtimeSent
 
+	log.Tracef("Calling C function \"new_log_result()\"")
 	result := C.new_log_result(C.int(item.Output.PersistSlotsAvailable()))
 
 	var tlsConfig *tls.Config
@@ -345,6 +351,7 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 		return
 	}
 	if (nil != tlsConfig) {
+		log.Tracef("Calling C function \"zbx_config_tls_init_for_agent2()\"")
 		C.zbx_config_tls_init_for_agent2(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
 			(C.CString)(tlsConfig.PSKIdentity), (C.CString)(tlsConfig.PSKKey),
 			(C.CString)(tlsConfig.CAFile), (C.CString)(tlsConfig.CRLFile), (C.CString)(tlsConfig.CertFile),
@@ -354,11 +361,14 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 	}
 
 	var cerrmsg *C.char
+	log.Tracef("Calling C function \"new_prep_vec()\"")
 	cprepVec := C.new_prep_vec() // In Agent2 it is always empty vector. Not used but required for linking.
+	log.Tracef("Calling C function \"process_log_check()\"")
 	ret := C.process_log_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)), C.zbx_vector_ptr_lp_t(cblob),
 		C.ZBX_ACTIVE_METRIC_LP(data), C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
 		&cmtimeSent, &cerrmsg, cprepVec, ctlsConfig_p)
 
+	log.Tracef("Calling C function \"free_prep_vec()\"")
 	C.free_prep_vec(cprepVec)
 
 	// add cached results
@@ -369,6 +379,7 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 	if logTs.Before(item.LastTs) {
 		logTs = item.LastTs
 	}
+	log.Tracef("Calling C function \"get_log_value()\"")
 	for i := 0; C.get_log_value(result, C.int(i), &cvalue, &cstate, &clastlogsize, &cmtime) != C.FAIL; i++ {
 		var value string
 		var err error
@@ -389,16 +400,19 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 		item.Results = append(item.Results, r)
 		logTs = logTs.Add(time.Nanosecond)
 	}
+	log.Tracef("Calling C function \"free_log_result()\"")
 	C.free_log_result(result)
 
 	item.LastTs = logTs
 
 	if ret == C.FAIL {
+		log.Tracef("Calling C function \"metric_set_unsupported()\"")
 		C.metric_set_unsupported(C.ZBX_ACTIVE_METRIC_LP(data))
 
 		var err error
 		if cerrmsg != nil {
 			err = errors.New(C.GoString(cerrmsg))
+			log.Tracef("Calling C function \"free()\"")
 			C.free(unsafe.Pointer(cerrmsg))
 		} else {
 			err = errors.New("Unknown error.")
@@ -409,10 +423,12 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 		}
 		item.Results = append(item.Results, result)
 	} else {
+		log.Tracef("Calling C function \"metric_set_supported()\"")
 		ret := C.metric_set_supported(C.ZBX_ACTIVE_METRIC_LP(data), clastLogsizeSent, cmtimeSent, clastLogsizeLast,
 			cmtimeLast)
 
 		if ret == Succeed {
+			log.Tracef("Calling C function \"metric_get_meta()\"")
 			C.metric_get_meta(C.ZBX_ACTIVE_METRIC_LP(data), &clastLogsizeLast, &cmtimeLast)
 			result := &LogResult{
 				Ts:          time.Now(),

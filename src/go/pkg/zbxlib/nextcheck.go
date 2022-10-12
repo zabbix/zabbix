@@ -33,6 +33,8 @@ import (
 	"errors"
 	"time"
 	"unsafe"
+
+	"git.zabbix.com/ap/plugin-support/log"
 )
 
 func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.Time, scheduling bool, err error) {
@@ -41,11 +43,13 @@ func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.T
 	cdelay := C.CString(delay)
 
 	now := from.Unix()
+	log.Tracef("Calling C function \"zbx_get_agent_item_nextcheck()\"")
 	ret := C.zbx_get_agent_item_nextcheck(C.zbx_uint64_t(itemid), cdelay, C.int(now),
 		&cnextcheck, &cscheduling, &cerr)
 
 	if ret != Succeed {
 		err = errors.New(C.GoString(cerr))
+		log.Tracef("Calling C function \"free()\"")
 		C.free(unsafe.Pointer(cerr))
 	} else {
 		nextcheck = time.Unix(int64(cnextcheck), 0)
@@ -53,6 +57,7 @@ func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.T
 			scheduling = true
 		}
 	}
+	log.Tracef("Calling C function \"free()\"")
 	C.free(unsafe.Pointer(cdelay))
 
 	return

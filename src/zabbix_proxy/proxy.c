@@ -203,12 +203,13 @@ int	CONFIG_PROXY_OFFLINE_BUFFER	= 1;
 int	CONFIG_HEARTBEAT_FREQUENCY	= -1;
 
 /* how often active Zabbix proxy requests configuration data from server, in seconds */
-int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_MIN * 5;
+int	CONFIG_PROXYCONFIG_FREQUENCY	= 0;	/* will be set to default 5 seconds if not configured */
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;
 
 int	CONFIG_HISTSYNCER_FORKS		= 4;
 int	CONFIG_HISTSYNCER_FREQUENCY	= 1;
 int	CONFIG_CONFSYNCER_FORKS		= 1;
+int	CONFIG_CONFSYNCER_FREQUENCY	= 0;
 
 int	CONFIG_VMWARE_FORKS		= 0;
 int	CONFIG_VMWARE_FREQUENCY		= 60;
@@ -442,9 +443,9 @@ static void	zbx_set_defaults(void)
 		if (NULL == CONFIG_HOSTNAME_ITEM)
 			CONFIG_HOSTNAME_ITEM = zbx_strdup(CONFIG_HOSTNAME_ITEM, "system.hostname");
 
-		init_result(&result);
+		zbx_init_agent_result(&result);
 
-		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, ZBX_PROCESS_LOCAL_COMMAND, &result) &&
+		if (SUCCEED == zbx_execute_agent_check(CONFIG_HOSTNAME_ITEM, ZBX_PROCESS_LOCAL_COMMAND, &result) &&
 				NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
 			assert(*value);
@@ -460,7 +461,7 @@ static void	zbx_set_defaults(void)
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "failed to get proxy name from [%s])", CONFIG_HOSTNAME_ITEM);
 
-		free_result(&result);
+		zbx_free_agent_result(&result);
 	}
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
 	{
@@ -648,6 +649,25 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 #if !defined(HAVE_OPENIPMI)
 	err |= (FAIL == check_cfg_feature_int("StartIPMIPollers", CONFIG_IPMIPOLLER_FORKS, "IPMI support"));
 #endif
+	if (0 != CONFIG_CONFSYNCER_FREQUENCY)
+	{
+		if (0 != CONFIG_PROXYCONFIG_FREQUENCY)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Deprecated \"ConfigFrequency\" configuration parameter cannot"
+					" be used together with \"ProxyConfigFrequency\" parameter");
+			err = 1;
+		}
+		else
+		{
+			CONFIG_PROXYCONFIG_FREQUENCY = CONFIG_CONFSYNCER_FREQUENCY;
+			zabbix_log(LOG_LEVEL_WARNING, "\"ConfigFrequency\" configuration parameter is deprecated, "
+					"use \"ProxyConfigFrequency\" instead");
+		}
+	}
+
+	/* assign default ProxyConfigFrequency value if not configured */
+	if (0 == CONFIG_PROXYCONFIG_FREQUENCY)
+		CONFIG_PROXYCONFIG_FREQUENCY = 10;
 
 	err |= (FAIL == zbx_db_validate_config_features());
 
@@ -728,7 +748,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			720},
 		{"HeartbeatFrequency",		&CONFIG_HEARTBEAT_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	0,			ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX},
-		{"ConfigFrequency",		&CONFIG_PROXYCONFIG_FREQUENCY,		TYPE_INT,
+		{"ConfigFrequency",		&CONFIG_CONFSYNCER_FREQUENCY,		TYPE_INT,
+			PARM_OPT,	1,			SEC_PER_WEEK},
+		{"ProxyConfigFrequency",	&CONFIG_PROXYCONFIG_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_WEEK},
 		{"DataSenderFrequency",		&CONFIG_PROXYDATA_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
@@ -949,7 +971,7 @@ static void	zbx_on_exit(int ret)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_disable();
 #endif
-	free_metrics();
+	zbx_free_metrics();
 	zbx_ipc_service_free_env();
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
@@ -962,7 +984,7 @@ static void	zbx_on_exit(int ret)
 	/* free vmware support */
 	zbx_vmware_destroy();
 
-	free_selfmon_collector();
+	zbx_free_selfmon_collector();
 	free_proxy_history_lock();
 
 	zbx_unload_modules();
@@ -1072,7 +1094,7 @@ int	main(int argc, char **argv)
 		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 
 	/* required for simple checks */
-	init_metrics();
+	zbx_init_metrics();
 
 	zbx_load_config(&t);
 
@@ -1318,7 +1340,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != init_selfmon_collector(&error))
+	if (SUCCEED != zbx_init_selfmon_collector(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
 		zbx_free(error);

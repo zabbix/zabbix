@@ -67,14 +67,8 @@ class CTemplateGroup extends CApiService {
 			'with_httptests' =>						['type' => API_BOOLEAN, 'default' => false],
 			'with_graphs' =>						['type' => API_BOOLEAN, 'default' => false],
 			'with_graph_prototypes' =>				['type' => API_BOOLEAN, 'default' => false],
-			'filter' =>								['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'groupid' =>							['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>								['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'uuid' =>								['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
-			'search' =>								['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'name' =>								['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
+			'filter' =>								['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['groupid', 'name', 'uuid']],
+			'search' =>								['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
 			'searchByAny' =>						['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>						['type' => API_BOOLEAN, 'default' => false],
 			'excludeSearch' =>						['type' => API_BOOLEAN, 'default' => false],
