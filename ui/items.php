@@ -733,15 +733,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if ($db_item['logtimefmt'] !== getRequest('logtimefmt', '')) {
 						$item['logtimefmt'] = getRequest('logtimefmt', '');
 					}
-					if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
-						$item['interfaceid'] = getRequest('interfaceid', 0);
-					}
 					if ($db_item['params'] !== getRequest('params', '')) {
 						$item['params'] = getRequest('params', '');
 					}
 					if ($db_item['preprocessing'] !== $preprocessing) {
 						$item['preprocessing'] = $preprocessing;
 					}
+				}
+
+				if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
+					$item['interfaceid'] = getRequest('interfaceid', 0);
 				}
 
 				if ($db_item['delay'] != $delay) {
@@ -802,18 +803,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['password'] !== getRequest('password', '')) {
 					$item['password'] = getRequest('password', '');
 				}
-			}
-
-			if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
-				$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
-			}
-
-			if ($db_item['username'] !== getRequest('username', '')) {
-				$item['username'] = getRequest('username', '');
-			}
-
-			if ($db_item['password'] !== getRequest('password', '')) {
-				$item['password'] = getRequest('password', '');
 			}
 
 			if ($db_item['publickey'] !== getRequest('publickey', '')) {

@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-09-02 13:56+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-09-13 08:37+0000\n"
+"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
@@ -13399,6 +13399,10 @@ msgstr "Vlastníka reportu môžu nastaviť iba superadministrátori."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Len spúšťače priradené k monitorovaným hostom alebo závislé na monitorovaných položkách sú započítané"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -20570,6 +20574,10 @@ msgstr "očakáva sa boolovská hodnota"
 msgid "a character string is expected"
 msgstr "reťazec znakov je očakávaný"
 
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "očakáva sa dátum vo formáte RRRR-MM-DD"
@@ -22759,6 +22767,11 @@ msgstr "varsamp() - Ukážkový rozptyl"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "cez"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr "w"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"
