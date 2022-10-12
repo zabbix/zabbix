@@ -20,7 +20,7 @@
 #include "eventlog.h"
 
 #include "log.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxregexp.h"
 #include "winmeta.h"
 #include <strsafe.h>
@@ -1701,9 +1701,9 @@ int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 	int		rate;
 	OSVERSIONINFO	versionInfo;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(metric->key, &request))
+	if (SUCCEED != zbx_parse_item_key(metric->key, &request))
 	{
 		*error = zbx_strdup(*error, "Invalid item key format.");
 		goto out;
@@ -1827,7 +1827,7 @@ int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 				error);
 	}
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

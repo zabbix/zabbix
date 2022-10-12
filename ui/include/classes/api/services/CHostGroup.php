@@ -63,6 +63,9 @@ class CHostGroup extends CApiService {
 			'parameters', 'params', 'delay', 'master_itemid', 'lifetime', 'trapper_hosts', 'allow_traps', 'description',
 			'status', 'state', 'error', 'templateid'
 		];
+		$host_prototype_fields = ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode', 'discover',
+			'custom_interfaces', 'uuid'
+		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
@@ -86,15 +89,8 @@ class CHostGroup extends CApiService {
 			'with_monitored_httptests' =>			['type' => API_BOOLEAN, 'default' => false],
 			'with_graphs' =>						['type' => API_BOOLEAN, 'default' => false],
 			'with_graph_prototypes' =>				['type' => API_BOOLEAN, 'default' => false],
-			'filter' =>								['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'groupid' =>							['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>								['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'flags' =>								['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'uuid' =>								['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
-			'search' =>								['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'name' =>								['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
+			'filter' =>								['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['groupid', 'name', 'flags', 'uuid']],
+			'search' =>								['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
 			'searchByAny' =>						['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>						['type' => API_BOOLEAN, 'default' => false],
 			'excludeSearch' =>						['type' => API_BOOLEAN, 'default' => false],
@@ -104,6 +100,7 @@ class CHostGroup extends CApiService {
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
 			'selectGroupDiscovery' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_discovery_fields), 'default' => null],
 			'selectDiscoveryRule' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
+			'selectHostPrototype' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
 			'sortfield' =>							['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -1522,6 +1519,33 @@ class CHostGroup extends CApiService {
 				'preservekeys' => true
 			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		}
+
+		// adding host prototype
+		if ($options['selectHostPrototype'] !== null) {
+			$db_links = DBFetchArray(DBselect(
+				'SELECT gd.groupid,gp.hostid'.
+					' FROM group_discovery gd,group_prototype gp'.
+					' WHERE '.dbConditionInt('gd.groupid', $groupIds).
+					' AND gd.parent_group_prototypeid=gp.group_prototypeid'
+			));
+
+			$host_prototypes = API::HostPrototype()->get([
+				'output' => $options['selectHostPrototype'],
+				'hostids' => array_column($db_links, 'hostid'),
+				'preservekeys' => true
+			]);
+
+			foreach ($result as &$row) {
+				$row['hostPrototype'] = [];
+			}
+			unset($row);
+
+			foreach ($db_links as $row) {
+				if (array_key_exists($row['hostid'], $host_prototypes)) {
+					$result[$row['groupid']]['hostPrototype'] = $host_prototypes[$row['hostid']];
+				}
+			}
 		}
 
 		// adding group discovery

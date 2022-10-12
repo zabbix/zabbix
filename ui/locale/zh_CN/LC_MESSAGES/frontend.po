@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-08-19 11:09+0000\n"
+"PO-Revision-Date: 2022-10-06 10:56+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -65,7 +65,7 @@ msgstr "\"%1$s\" 的值必须小于或等于 \"%2$s\" 的值"
 #: include/classes/import/validators/C10XmlValidator.php:383
 #: include/classes/import/validators/C10XmlValidator.php:405
 msgid "\"host:key\" pair is expected"
-msgstr "期望“主机:键值” 对形式"
+msgstr "需要“主机:键值” 对形式"
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
@@ -254,6 +254,16 @@ msgstr "%1$s, 只读"
 msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, 已选择"
+
+#: app/controllers/CControllerMediatypeEnable.php:93
+#, c-format
+msgid "%1$s. %2$s: %3$s. %4$s."
+msgstr "%1$s. %2$s: %3$s. %4$s."
+
+#: app/controllers/CControllerMediatypeEnable.php:108
+#, c-format
+msgid "%1$s: %2$s"
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
@@ -2674,6 +2684,10 @@ msgstr[0] "无法启用Web场景"
 msgid "Cannot evaluate expression"
 msgstr "无法计算表达式"
 
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr "无法执行 URL 类型脚本。"
+
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
 msgid "Cannot execute operation"
@@ -4686,6 +4700,10 @@ msgstr "由用户创建"
 msgid "Critical"
 msgstr "严重"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr "当前"
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "当前主机"
@@ -6382,6 +6400,14 @@ msgstr "椭圆"
 msgid "Email"
 msgstr "电子邮件"
 
+#: app/views/js/administration.mediatype.edit.js.php:397
+msgid "Email and password"
+msgstr "邮箱和密码"
+
+#: app/views/administration.mediatype.edit.php:64
+msgid "Email provider"
+msgstr "邮箱提供商"
+
 #: app/views/popup.generic.php:50
 msgid "Empty"
 msgstr "空"
@@ -6487,7 +6513,7 @@ msgstr "启用主机"
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:78
 #: include/classes/widgets/forms/CWidgetFormUrl.php:42
 msgid "Enable host selection"
-msgstr ""
+msgstr "启用选择主机"
 
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
@@ -9001,6 +9027,11 @@ msgstr "网络接口上传流量统计。返回 整数"
 msgid "Incompatible \"propagation_rule\" and \"propagation_value\" parameters for service \"%1$s\"."
 msgstr "服务“%1$s”的“propagation_rule”和“propagation_value”参数不兼容。"
 
+#: app/controllers/CControllerMediatypeEnable.php:97
+#: app/controllers/CControllerMediatypeEnable.php:108
+msgid "Incomplete configuration"
+msgstr "配置不完整"
+
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
 #, c-format
@@ -11192,6 +11223,10 @@ msgstr "操作系统进程及属性列表。返回 JSON 数组"
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr "位于给定键的 Windows 注册表值或键的列表。返回 JSON。"
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr "Zabbix 代理列表，包括名称、模式、加密、压缩、版本、上次看到、主机数、项目数、每秒所需值 (vps) 和兼容性（当前/过期/不支持）。返回 JSON。"
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "块设备列表及其类型。返回 JSON"
@@ -11814,6 +11849,10 @@ msgid "Media type disabled"
 msgid_plural "Media types disabled"
 msgstr[0] "消息介质类型已禁用"
 
+#: app/views/administration.user.edit.php:327
+msgid "Media type disabled by Administration."
+msgstr "媒介类型已被管理禁用。"
+
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
@@ -11847,6 +11886,10 @@ msgstr "ID为 \"%1$s\" 的媒体类型不可用。"
 #: include/classes/helpers/CRoleHelper.php:428
 msgid "Media types"
 msgstr "媒介"
+
+#: app/views/popup.media.php:75
+msgid "Media types disabled by Administration."
+msgstr "媒介类型已被管理禁用。"
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -13243,6 +13286,10 @@ msgstr "不可用"
 msgid "Not classified"
 msgstr "未分类"
 
+#: app/controllers/CControllerMediatypeEnable.php:95
+msgid "Not enabled"
+msgstr "未启用"
+
 #: include/forms.inc.php:315
 msgid "Not inherited items"
 msgstr "未继承的监控项"
@@ -13626,6 +13673,14 @@ msgstr "只允许超级管理员可以设置报告所有者。"
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "只计算指派给启用的主机的和相依于启用的项目的触发器"
 
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr "在新窗口中打开"
+
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -13840,6 +13895,10 @@ msgstr "其他参数"
 #: include/views/configuration.httpconf.edit.php:90
 msgid "Others"
 msgstr "其它"
+
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr "过时"
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -14879,6 +14938,16 @@ msgstr "agent代理程序名称"
 msgid "Proxy updated"
 msgstr "agent代理程序已添加"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr "server版本 %1$s 不支持proxy版本。"
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr "proxy版本已过时，server版本 %1$s 只能使用数据收集和远程执行。"
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -15531,6 +15600,10 @@ msgstr "要求的状态码"
 #: app/views/popup.httpstep.php:170
 msgid "Required string"
 msgstr "要求的字串"
+
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr "所需 vps"
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
@@ -18216,6 +18289,10 @@ msgstr "本月"
 msgid "This month so far"
 msgstr "这个月到目前为止"
 
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
+msgstr "此设置仅适用于数值类型。"
+
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "此设置仅适用于数值数据。非数字数据将始终取自历史记录。"
@@ -20292,7 +20369,7 @@ msgstr "验证"
 #: include/views/monitoring.history.php:293
 #, c-format
 msgid "Value"
-msgstr "ֵ值"
+msgstr "值"
 
 #: app/views/monitoring.widget.plaintext.view.php:51
 msgctxt "compact table header"
@@ -21198,6 +21275,10 @@ msgstr "需用布尔值"
 msgid "a character string is expected"
 msgstr "请在字符串中指定"
 
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr "需要字符串、整数或浮点数类型"
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "需用 YYYY-MM-DD 格式的日期"
@@ -21909,6 +21990,11 @@ msgstr "不匹配"
 msgid "e() - Returns Euler's number"
 msgstr "e() - 返回自然常数（欧拉数）"
 
+#: app/views/administration.mediatype.list.php:98
+#: app/views/administration.mediatype.list.php:103
+msgid "email"
+msgstr "电子邮件"
+
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
 #: include/views/inventory.host.list.php:72
@@ -22585,7 +22671,7 @@ msgstr "无"
 #: include/classes/api/services/CItemGeneral.php:2595
 #: include/classes/api/services/CItemGeneral.php:2617
 msgid "nonempty key and value pair expected"
-msgstr "期望非空键和值对"
+msgstr "需要非空键和值对"
 
 #: include/actions.inc.php:31
 msgid "not in"
@@ -23130,7 +23216,7 @@ msgstr "表达式宏意外结束"
 
 #: include/classes/parsers/CItemKey.php:55
 msgid "unexpected end of key"
-msgstr "非期望的关键字结束"
+msgstr "键值意外结束"
 
 #: include/classes/parsers/CUserMacroParser.php:38
 msgid "unexpected end of macro"
@@ -23407,6 +23493,11 @@ msgstr "varsamp() - 样本方差"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "通过"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr "周"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

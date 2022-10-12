@@ -32,6 +32,7 @@ import (
 	"strings"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/log"
 )
 
 // Plugin -
@@ -132,10 +133,12 @@ func (p *Plugin) addCpu(index int) {
 }
 
 func numCPUConf() int {
+	log.Tracef("Calling C function \"sysconf()\"")
 	return int(C.sysconf(C._SC_NPROCESSORS_CONF))
 }
 
 func numCPUOnline() int {
+	log.Tracef("Calling C function \"sysconf()\"")
 	return int(C.sysconf(C._SC_NPROCESSORS_ONLN))
 }
 

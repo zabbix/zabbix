@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-08-17 06:23+0000\n"
+"PO-Revision-Date: 2022-10-03 13:59+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -251,6 +251,16 @@ msgstr "%1$sは読み込み専用です"
 msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s件選択済"
+
+#: app/controllers/CControllerMediatypeEnable.php:93
+#, c-format
+msgid "%1$s. %2$s: %3$s. %4$s."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeEnable.php:108
+#, c-format
+msgid "%1$s: %2$s"
+msgstr ""
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
@@ -504,7 +514,7 @@ msgstr "確認済"
 #: app/views/monitoring.widget.problems.view.php:81
 msgctxt "compact table header"
 msgid "Ack"
-msgstr ""
+msgstr "確認済"
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
@@ -602,7 +612,7 @@ msgstr "アクション"
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "アクション"
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
@@ -674,7 +684,7 @@ msgstr "アクション"
 #: app/views/monitoring.widget.problems.view.php:82
 msgctxt "compact table header"
 msgid "Actions"
-msgstr ""
+msgstr "アクション"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -1079,7 +1089,7 @@ msgstr "通知メッセージ"
 #: include/classes/helpers/CMenuHelper.php:283
 #: include/classes/helpers/CRoleHelper.php:338
 msgid "Alerts"
-msgstr ""
+msgstr "通知"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
@@ -1630,7 +1640,7 @@ msgstr "利用可能"
 #: app/views/monitoring.widget.hostavail.view.php:37
 msgctxt "compact table header"
 msgid "Available"
-msgstr ""
+msgstr "利用可能"
 
 #: app/views/administration.trigdisplay.edit.php:128 jsLoader.php:179
 msgid "Average"
@@ -2670,6 +2680,10 @@ msgstr[0] "Webシナリオを有効にできません"
 #: app/controllers/CControllerPopupTestTriggerExpr.php:199
 msgid "Cannot evaluate expression"
 msgstr "条件式を評価できません"
+
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr "URLタイプのスクリプトを実行できません。"
 
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
@@ -3901,7 +3915,7 @@ msgstr "圧縮"
 #: app/views/administration.housekeeping.edit.php:174
 #: app/views/administration.housekeeping.edit.php:184
 msgid "Compression is not supported."
-msgstr ""
+msgstr "圧縮はサポートされていません。"
 
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
@@ -4683,6 +4697,10 @@ msgstr "作成者"
 msgid "Critical"
 msgstr "クリティカル"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr "現行"
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "現在のホスト"
@@ -4900,7 +4918,7 @@ msgstr "取得データ"
 #: include/classes/helpers/CMenuHelper.php:215
 #: include/classes/helpers/CRoleHelper.php:337
 msgid "Data collection"
-msgstr ""
+msgstr "データ収集"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
@@ -5049,7 +5067,7 @@ msgstr "日"
 #: include/classes/helpers/CSlaHelper.php:68
 msgctxt "compact table header"
 msgid "Day"
-msgstr ""
+msgstr "日"
 
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
@@ -5652,7 +5670,7 @@ msgstr "Webシナリオの詳細"
 
 #: app/views/administration.housekeeping.edit.php:195
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "検出されたTimescaleDBのライセンスは、圧縮をサポートしてません。圧縮はTimescaleDBのCommunity Editionでサポートされています。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -5978,7 +5996,7 @@ msgstr "ディスカバリルール"
 #: app/views/monitoring.widget.discovery.view.php:33
 msgctxt "compact table header"
 msgid "Discovery rule"
-msgstr ""
+msgstr "ディスカバリルール"
 
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
@@ -6204,7 +6222,7 @@ msgstr "ダウンタイム"
 #: app/views/monitoring.widget.slareport.view.php:100
 msgctxt "compact table header"
 msgid "Downtime"
-msgstr ""
+msgstr "ダウンタイム"
 
 #: include/classes/widgets/CWidgetHelper.php:924
 #: include/classes/widgets/CWidgetHelper.php:968
@@ -6273,7 +6291,7 @@ msgstr "継続期間"
 #: app/views/monitoring.widget.problems.view.php:80
 msgctxt "compact table header"
 msgid "Duration"
-msgstr ""
+msgstr "継続期間"
 
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
@@ -6378,6 +6396,14 @@ msgstr "楕円"
 #: include/media.inc.php:24
 msgid "Email"
 msgstr "メール"
+
+#: app/views/js/administration.mediatype.edit.js.php:397
+msgid "Email and password"
+msgstr "メールアドレスとパスワード"
+
+#: app/views/administration.mediatype.edit.php:64
+msgid "Email provider"
+msgstr "メールプロバイダ"
 
 #: app/views/popup.generic.php:50
 msgid "Empty"
@@ -6484,7 +6510,7 @@ msgstr "ホストを有効"
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:78
 #: include/classes/widgets/forms/CWidgetFormUrl.php:42
 msgid "Enable host selection"
-msgstr ""
+msgstr "ホスト選択を有効"
 
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
@@ -6714,7 +6740,7 @@ msgstr "エラーバジェット"
 #: app/views/monitoring.widget.slareport.view.php:101
 msgctxt "compact table header"
 msgid "Error budget"
-msgstr ""
+msgstr "エラーバジェット"
 
 #: include/db.inc.php:518
 #, c-format
@@ -6735,7 +6761,7 @@ msgstr "エラー！サポートされていないデータベースのバージ
 #: app/partials/administration.system.info.php:159
 #: app/partials/administration.system.info.php:172
 msgid "Error! Unable to start Zabbix server."
-msgstr ""
+msgstr "エラー！Zabbixサーバーを起動できません。"
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -6865,7 +6891,7 @@ msgstr "除外するダウンタイム"
 #: app/views/monitoring.widget.slareport.view.php:102
 msgctxt "compact table header"
 msgid "Excluded downtimes"
-msgstr ""
+msgstr "除外するダウンタイム"
 
 #: app/controllers/CControllerAuditLogList.php:197 jsLoader.php:219
 msgid "Execute"
@@ -7074,7 +7100,7 @@ msgstr "失敗"
 #: app/views/monitoring.widget.web.view.php:34
 msgctxt "compact table header"
 msgid "Failed"
-msgstr ""
+msgstr "失敗"
 
 #: app/controllers/CControllerAuditLogList.php:192
 msgid "Failed login"
@@ -8135,7 +8161,7 @@ msgstr[0] "ホスト"
 #: app/views/monitoring.widget.problems.view.php:67
 msgctxt "compact table header"
 msgid "Host"
-msgstr ""
+msgstr "ホスト"
 
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
@@ -8230,7 +8256,7 @@ msgstr "ホストグループ"
 #: app/views/monitoring.widget.web.view.php:32
 msgctxt "compact table header"
 msgid "Host group"
-msgstr ""
+msgstr "ホストグループ"
 
 #: include/classes/api/services/CHostGroup.php:760
 #, c-format
@@ -8996,6 +9022,11 @@ msgstr "ネットワークインターフェースの受信統計。整数値を
 #, c-format
 msgid "Incompatible \"propagation_rule\" and \"propagation_value\" parameters for service \"%1$s\"."
 msgstr "サービス\"%1$s\"のための\"propagation_rule\"と\"propagation_value\"は互換性がありません。"
+
+#: app/controllers/CControllerMediatypeEnable.php:97
+#: app/controllers/CControllerMediatypeEnable.php:108
+msgid "Incomplete configuration"
+msgstr "不完全な構成"
 
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
@@ -9820,7 +9851,7 @@ msgstr "情報"
 #: app/views/monitoring.widget.problems.view.php:64
 msgctxt "compact table header"
 msgid "Info"
-msgstr ""
+msgstr "情報"
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -11188,6 +11219,10 @@ msgstr "OS上の属性情報付きのプロセスのリスト。JSONで返す"
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr "キーで指定されたWindowsのレジストリの値またはキーのリスト。JSONで返す。"
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr "名前、モード、暗号化、圧縮、バージョン、最新確認時刻、ホスト数、アイテム数、求められる1秒あたりの値処理数(vps)、および互換性 (現行/古い/サポートされていない) を含む Zabbixプロキシのリスト。 JSONで返す。"
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "ブロックデバイスとそのタイプのリスト。JSONで返す"
@@ -11810,6 +11845,10 @@ msgid "Media type disabled"
 msgid_plural "Media types disabled"
 msgstr[0] "メディアタイプを無効にしました"
 
+#: app/views/administration.user.edit.php:327
+msgid "Media type disabled by Administration."
+msgstr "管理者によってメディアタイプを無効にされました。"
+
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
@@ -11843,6 +11882,10 @@ msgstr "ID \"%1$s\"のメディアタイプは使用できません。"
 #: include/classes/helpers/CRoleHelper.php:428
 msgid "Media types"
 msgstr "メディアタイプ"
+
+#: app/views/popup.media.php:75
+msgid "Media types disabled by Administration."
+msgstr "管理者によってメディアタイプを無効にされました。"
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -11898,7 +11941,7 @@ msgstr "メッセージ"
 #: app/views/monitoring.widget.actionlog.view.php:44
 msgctxt "compact table header"
 msgid "Message"
-msgstr ""
+msgstr "メッセージ"
 
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
@@ -12166,7 +12209,7 @@ msgstr "月"
 #: include/classes/helpers/CSlaHelper.php:70
 msgctxt "compact table header"
 msgid "Month"
-msgstr ""
+msgstr "月"
 
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
@@ -12432,7 +12475,7 @@ msgstr "名前"
 #: app/views/monitoring.widget.plaintext.view.php:49
 msgctxt "compact table header"
 msgid "Name"
-msgstr ""
+msgstr "名前"
 
 #: app/controllers/CControllerPopupGeneric.php:218
 #: app/views/administration.user.edit.php:77
@@ -13233,11 +13276,15 @@ msgstr "利用不可"
 #: app/views/monitoring.widget.hostavail.view.php:38
 msgctxt "compact table header"
 msgid "Not available"
-msgstr ""
+msgstr "利用不可"
 
 #: app/views/administration.trigdisplay.edit.php:101 jsLoader.php:176
 msgid "Not classified"
 msgstr "未分類"
+
+#: app/controllers/CControllerMediatypeEnable.php:95
+msgid "Not enabled"
+msgstr "有効になっていません"
 
 #: include/forms.inc.php:315
 msgid "Not inherited items"
@@ -13526,7 +13573,7 @@ msgstr "正常"
 #: app/views/monitoring.widget.web.view.php:33
 msgctxt "compact table header"
 msgid "Ok"
-msgstr ""
+msgstr "正常"
 
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
@@ -13622,6 +13669,14 @@ msgstr "特権管理者のみがレポートのオーナーを設定できます
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "有効なホストとアイテムのトリガーのみカウント"
 
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr "新しいウィンドウで開く"
+
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -13674,7 +13729,7 @@ msgstr "運用データ"
 #: app/views/monitoring.widget.problems.view.php:78
 msgctxt "compact table header"
 msgid "Operational data"
-msgstr ""
+msgstr "運用データ"
 
 #: app/views/configuration.correlation.edit.php:145
 #: app/views/configuration.correlation.list.php:78
@@ -13836,6 +13891,10 @@ msgstr "その他のパラメータ"
 #: include/views/configuration.httpconf.edit.php:90
 msgid "Others"
 msgstr "その他"
+
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr "古い"
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -14672,7 +14731,7 @@ msgstr "障害"
 #: app/views/monitoring.widget.problems.view.php:71
 msgctxt "compact table header"
 msgid "Problem"
-msgstr ""
+msgstr "障害"
 
 #: include/actions.inc.php:2059
 msgid "Problem created"
@@ -14875,6 +14934,16 @@ msgstr "プロキシ名"
 msgid "Proxy updated"
 msgstr "プロキシを更新しました"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr "プロキシのバージョンはサーバーのバージョン%1$sではサポートされていません。"
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr "プロキシのバージョンが古いので、サーバーのバージョン%1$sではデータの収集とリモートコマンドの実行のみできます。"
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -14903,7 +14972,7 @@ msgstr "四半期"
 #: include/classes/helpers/CSlaHelper.php:71
 msgctxt "compact table header"
 msgid "Quarter"
-msgstr ""
+msgstr "四半期"
 
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
@@ -15054,7 +15123,7 @@ msgstr "送信先"
 #: app/views/monitoring.widget.actionlog.view.php:43
 msgctxt "compact table header"
 msgid "Recipient"
-msgstr ""
+msgstr "送信先"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
@@ -15106,7 +15175,7 @@ msgstr "復旧時刻"
 #: app/views/monitoring.widget.problems.view.php:59
 msgctxt "compact table header"
 msgid "Recovery time"
-msgstr ""
+msgstr "復旧時刻"
 
 #: include/views/js/monitoring.sysmaps.js.php:371
 #: include/views/js/monitoring.sysmaps.js.php:531
@@ -15528,6 +15597,10 @@ msgstr "要求ステータスコード"
 msgid "Required string"
 msgstr "要求文字列"
 
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr "要求vps"
+
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
 msgid "Reset"
@@ -15911,7 +15984,7 @@ msgstr "SLI"
 #: app/views/monitoring.widget.slareport.view.php:98
 msgctxt "compact table header"
 msgid "SLI"
-msgstr ""
+msgstr "SLI"
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
@@ -15925,7 +15998,7 @@ msgstr "SLO"
 #: app/views/monitoring.widget.slareport.view.php:97
 msgctxt "compact table header"
 msgid "SLO"
-msgstr ""
+msgstr "SLO"
 
 #: app/views/administration.authentication.edit.php:236
 msgid "SLO service URL"
@@ -16551,7 +16624,7 @@ msgstr "サービス"
 #: app/views/monitoring.widget.slareport.view.php:37
 msgctxt "compact table header"
 msgid "Service"
-msgstr ""
+msgstr "サービス"
 
 #: include/classes/api/services/CService.php:1479
 #: include/classes/api/services/CService.php:1519
@@ -16755,7 +16828,7 @@ msgstr "深刻度"
 #: app/views/monitoring.widget.problems.view.php:75
 msgctxt "compact table header"
 msgid "Severity"
-msgstr ""
+msgstr "深刻度"
 
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
@@ -17311,7 +17384,7 @@ msgstr "ステータス"
 #: app/views/monitoring.widget.problems.view.php:62
 msgctxt "compact table header"
 msgid "Status"
-msgstr ""
+msgstr "ステータス"
 
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
@@ -17759,7 +17832,7 @@ msgstr "タグ"
 #: app/views/monitoring.widget.problems.view.php:83
 msgctxt "compact table header"
 msgid "Tags"
-msgstr ""
+msgstr "タグ"
 
 #: include/views/configuration.copy.elements.php:69
 #: include/views/configuration.trigger.prototype.edit.php:202
@@ -18212,6 +18285,10 @@ msgstr "今月"
 msgid "This month so far"
 msgstr "今月(現在まで)"
 
+#: include/classes/widgets/views/widget.item.form.view.php:231
+msgid "This setting applies only to numeric data."
+msgstr "この設定は数値データにだけ適用されます。"
+
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "この設定は数値データにだけ適用されます。非数値データは常にヒストリから取得されます。"
@@ -18303,7 +18380,7 @@ msgstr "時間"
 #: app/views/monitoring.widget.problems.view.php:41
 msgctxt "compact table header"
 msgid "Time"
-msgstr ""
+msgstr "時間"
 
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
@@ -18371,7 +18448,7 @@ msgstr "タイムスタンプ"
 #: app/views/monitoring.widget.plaintext.view.php:33
 msgctxt "compact table header"
 msgid "Timestamp"
-msgstr ""
+msgstr "タイムスタンプ"
 
 #: app/views/sla.list.php:91
 msgid "Timezone"
@@ -18434,7 +18511,7 @@ msgstr "合計"
 #: app/views/monitoring.widget.problemhosts.view.php:35
 msgctxt "compact table header"
 msgid "Total"
-msgstr ""
+msgstr "合計"
 
 #: include/classes/debug/CProfiler.php:153
 #, c-format
@@ -18942,7 +19019,7 @@ msgstr "タイプ"
 #: app/views/monitoring.widget.actionlog.view.php:40
 msgctxt "compact table header"
 msgid "Type"
-msgstr ""
+msgstr "タイプ"
 
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
@@ -19212,7 +19289,7 @@ msgstr "不明"
 #: app/views/monitoring.widget.web.view.php:35
 msgctxt "compact table header"
 msgid "Unknown"
-msgstr ""
+msgstr "不明"
 
 #: app/views/reports.auditlog.list.php:119
 msgid "Unknown action"
@@ -19492,7 +19569,7 @@ msgstr "アップタイム"
 #: app/views/monitoring.widget.slareport.view.php:99
 msgctxt "compact table header"
 msgid "Uptime"
-msgstr ""
+msgstr "アップタイム"
 
 #: include/classes/data/CItemData.php:1686
 msgid "Uptime of Zabbix server process in seconds."
@@ -20293,7 +20370,7 @@ msgstr "値"
 #: app/views/monitoring.widget.plaintext.view.php:51
 msgctxt "compact table header"
 msgid "Value"
-msgstr ""
+msgstr "値"
 
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
@@ -20668,7 +20745,7 @@ msgstr "週"
 #: include/classes/helpers/CSlaHelper.php:69
 msgctxt "compact table header"
 msgid "Week"
-msgstr ""
+msgstr "週"
 
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
@@ -20767,7 +20844,7 @@ msgstr "障害あり"
 #: app/views/monitoring.widget.problemhosts.view.php:34
 msgctxt "compact table header"
 msgid "With problems"
-msgstr ""
+msgstr "障害あり"
 
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
@@ -20788,7 +20865,7 @@ msgstr "障害なし"
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgctxt "compact table header"
 msgid "Without problems"
-msgstr ""
+msgstr "障害なし"
 
 #: include/forms.inc.php:343
 msgid "Without triggers"
@@ -20984,7 +21061,7 @@ msgstr "年"
 #: include/classes/helpers/CSlaHelper.php:72
 msgctxt "compact table header"
 msgid "Year"
-msgstr ""
+msgstr "年"
 
 #: app/partials/scheduledreport.formgrid.html.php:101
 #: app/partials/scheduledreport.table.html.php:52 report4.php:93
@@ -21193,6 +21270,10 @@ msgstr "論理値で指定してください"
 #: include/classes/validators/CNewValidator.php:332
 msgid "a character string is expected"
 msgstr "文字列で指定してください"
+
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr "文字列、整数または浮動小数の値で指定してください"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -21904,6 +21985,11 @@ msgstr "一致しない"
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr "e() - オイラー数を返す"
+
+#: app/views/administration.mediatype.list.php:98
+#: app/views/administration.mediatype.list.php:103
+msgid "email"
+msgstr "メール"
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
@@ -23403,6 +23489,11 @@ msgstr "varsamp() - サンプル分散"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "via"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr "w"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

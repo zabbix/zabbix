@@ -18,12 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-//require_once dirname(__FILE__).'/../include/class.cwebtest.php';
+
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
 /**
+ * @dataSource Proxies
+ *
  * @backup drules
  */
 class testFormNetworkDiscovery extends CLegacyWebTest {
@@ -667,7 +669,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 			$names = [($drule['name']), 'CLONE: '.$drule['name']];
 			foreach ($names as $name) {
-				$sql_drules[] = CDBHelper::getHash('SELECT proxy_hostid, iprange, delay, nextcheck, status'.
+				$sql_drules[] = CDBHelper::getHash('SELECT proxy_hostid, iprange, delay, status'.
 						' FROM drules'.
 						' WHERE name='.zbx_dbstr($name).
 						' ORDER BY druleid'

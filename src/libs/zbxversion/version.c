@@ -17,33 +17,62 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "version.h"
+#include "zbxversion.h"
 #include "zbxtypes.h"
+#include "zbxcommon.h"
 
 /******************************************************************************
  *                                                                            *
- * Purpose: extracts protocol version from value                              *
- *                                                                            *
- * Note: Function modifies argument 'value'!                                  *
+ * Purpose: Extracts protocol version from string cont. Alphanumeric release  *
+ *          candidate version part is ignored.                                *
  *                                                                            *
  * Parameters:                                                                *
- *     value      - [IN] textual representation of version                    *
+ *     version_str - [IN] textual representation of version                   *
+ *                   Example: "6.4.0alpha1", "6.4.0" or "6.4"                 *
  *                                                                            *
  * Return value: The protocol version if it was successfully extracted,       *
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_component_version(char *value)
+int	zbx_get_component_version(const char *version_str)
 {
-	char	*pminor, *ptr;
+	char	*pmid, *plow;
+	char	version_buf[ZBX_VERSION_BUF_LEN];
 
-	if (NULL == (pminor = strchr(value, '.')))
+	zbx_strlcpy(version_buf, version_str, sizeof(version_buf));
+
+	if (NULL == (pmid = strchr(version_buf, '.')))
 		return FAIL;
 
-	*pminor++ = '\0';
+	*pmid++ = '\0';
 
-	if (NULL != (ptr = strchr(pminor, '.')))
-		*ptr = '\0';
+	if (NULL == (plow = strchr(pmid, '.')))
+		return ZBX_COMPONENT_VERSION(atoi(version_buf), atoi(pmid), 0);
 
-	return ZBX_COMPONENT_VERSION(atoi(value), atoi(pminor));
+	*plow++ = '\0';
+
+	return ZBX_COMPONENT_VERSION(atoi(version_buf), atoi(pmid), atoi(plow));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Extracts protocol version from string. Only the two most          *
+ *          significant groups of digits are extracted.                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     value      - [IN] textual representation of version                    *
+ *                  Example: "6.4.0alpha1"                                    *
+ *                                                                            *
+ * Return value: The protocol version if it was successfully extracted,       *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_get_component_version_without_patch(const char *value)
+{
+	int	ver;
+
+	if (FAIL == (ver = zbx_get_component_version(value)))
+		return FAIL;
+
+	return ZBX_COMPONENT_VERSION_WITHOUT_PATCH(ver);
 }

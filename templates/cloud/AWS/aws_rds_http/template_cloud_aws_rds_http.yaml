@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-07-27T14:14:38Z'
+  date: '2022-09-01T13:23:32Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -715,6 +715,8 @@ zabbix_export:
             
                         payload.NextToken = alarms.DescribeAlarmsResponse.DescribeAlarmsResult.NextToken || '';
             
+                        if (!Array.isArray(alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms))
+                            alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms = [alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms]
                         alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms.forEach(function (alarm) {
                             var dimensions = alarm.Dimensions;
             
@@ -908,6 +910,9 @@ zabbix_export:
                             || typeof events.DescribeEventsResponse.DescribeEventsResult.Events !== 'object') {
                             throw 'Cannot get events from AWS RDS API. Check debug log for more information.';
                         }
+            
+                        if (!Array.isArray(events.DescribeEventsResponse.DescribeEventsResult.Events))
+                            events.DescribeEventsResponse.DescribeEventsResult.Events = [events.DescribeEventsResponse.DescribeEventsResult.Events]
                         events.DescribeEventsResponse.DescribeEventsResult.Events.forEach(function (event) {
                             event.EventCategories = event.EventCategories.toString()
                             result.push(event)

@@ -993,7 +993,9 @@ $(function() {
 		pos_side = 10,
 		side = 'right';
 
-	main.appendChild(ntf_node);
+	if (main !== null) {
+		main.appendChild(ntf_node);
+	}
 
 	if (ntf_pos !== null && 'top' in ntf_pos) {
 		side = ('right' in ntf_pos ? 'right' : ('left' in ntf_pos ? 'left' : null));
