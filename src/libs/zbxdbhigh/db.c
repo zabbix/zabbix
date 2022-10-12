@@ -2239,7 +2239,6 @@ int	DBtrigger_exists(const char *table_name, const char *trigger_name)
 			" and trigger_name='%s'",
 			table_name_esc, trigger_name_esc);
 #endif
-
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
 	DBfree_result(result);
