@@ -950,7 +950,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 	int			ret, nextcheck, nextcleanup, polled_num = 0, scheduled_num = 0, now;
 	double			time_stat, time_idle = 0, time_now, sec;
 	zbx_timespec_t		timeout = {0, 0};
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

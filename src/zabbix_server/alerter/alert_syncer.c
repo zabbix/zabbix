@@ -917,7 +917,7 @@ ZBX_THREAD_ENTRY(alert_syncer_thread, args)
 	int			alerts_num, sleeptime, nextcheck, freq_watchdog, results_num;
 	zbx_am_db_t		amdb;
 	char			*error = NULL;
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

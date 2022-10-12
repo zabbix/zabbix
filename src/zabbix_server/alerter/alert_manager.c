@@ -2241,7 +2241,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 				time_mediatype = 0;
 	double			time_stat, time_idle = 0, time_now, sec;
 	zbx_timespec_t		timeout = {1, 0};
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

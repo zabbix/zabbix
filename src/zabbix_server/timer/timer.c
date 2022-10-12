@@ -564,7 +564,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 	int			maintenance_time = 0, update_time = 0, idle = 1, events_num, hosts_num, update;
 	char			*info = NULL;
 	size_t			info_alloc = 0, info_offset = 0;
-	zbx_thread_info_t	*thread_info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*thread_info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

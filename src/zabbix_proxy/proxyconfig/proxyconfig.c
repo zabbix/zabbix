@@ -244,7 +244,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_ipc_async_socket_t		rtc;
 	int				sleeptime;
 	zbx_synced_new_config_t		synced = ZBX_SYNCED_NEW_CONFIG_NO;
-	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

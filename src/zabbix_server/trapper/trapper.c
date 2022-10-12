@@ -1259,7 +1259,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	double			sec = 0.0;
 	zbx_socket_t		s;
 	int			ret;
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 #ifdef HAVE_NETSNMP
 	zbx_ipc_async_socket_t	rtc;

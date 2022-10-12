@@ -44,7 +44,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	double			sec = 0.0;
 	int			nextcheck = 0, sleeptime, secrets_reload = 0, cache_reload = 0;
 	zbx_ipc_async_socket_t	rtc;
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

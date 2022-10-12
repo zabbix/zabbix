@@ -90,7 +90,7 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	char			*stats = NULL;
 	const char		*process_name;
 	size_t			stats_alloc = 0, stats_offset = 0;
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

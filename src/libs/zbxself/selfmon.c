@@ -677,7 +677,7 @@ void	zbx_sleep_loop(const zbx_thread_info_t *info, int sleeptime)
 ZBX_THREAD_ENTRY(zbx_selfmon_thread, args)
 {
 	zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
-	zbx_thread_info_t	*info = &thread_args->info;
+	const zbx_thread_info_t	*info = &thread_args->info;
 	const char		*program_type_str = NULL, *process_type_str = NULL;
 	int			server_num = info->server_num, process_num = info->process_num;
 

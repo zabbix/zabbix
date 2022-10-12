@@ -407,7 +407,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	zbx_vector_availability_ptr_t	interface_availabilities;
 	zbx_timespec_t			timeout = {ZBX_AVAILABILITY_MANAGER_DELAY, 0};
 	zbx_avail_active_hb_cache_t	active_hb_cache;
-	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

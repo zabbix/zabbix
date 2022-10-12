@@ -2301,7 +2301,7 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 	int			ret, processed_num = 0, created_num = 0;
 	zbx_rm_t		manager;
 	zbx_timespec_t		timeout;
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

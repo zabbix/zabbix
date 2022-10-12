@@ -94,7 +94,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 	int			deleted;
 	double			sec;
 	zbx_ipc_async_socket_t	rtc;
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

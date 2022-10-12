@@ -1959,7 +1959,7 @@ ZBX_THREAD_ENTRY(preprocessing_manager_thread, args)
 	int				ret;
 	double				time_stat, time_idle = 0, time_now, time_flush, sec;
 	zbx_timespec_t			timeout = {ZBX_PREPROCESSING_MANAGER_DELAY, 0};
-	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

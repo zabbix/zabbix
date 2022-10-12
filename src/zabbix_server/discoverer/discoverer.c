@@ -835,7 +835,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	double				sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time, nextcheck = 0;
 	zbx_ipc_async_socket_t		rtc;
-	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

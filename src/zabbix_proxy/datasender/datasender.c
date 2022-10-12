@@ -297,7 +297,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 	int				records = 0, hist_upload_state = ZBX_PROXY_UPLOAD_ENABLED, more;
 	double				time_start, time_diff = 0.0, time_now;
 	time_t				last_conn_time;
-	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

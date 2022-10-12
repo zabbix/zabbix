@@ -3267,7 +3267,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	zbx_service_manager_t	service_manager;
 	zbx_timespec_t		timeout = {1, 0};
 	int			service_cache_reload_requested = 0;
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

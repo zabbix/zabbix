@@ -173,7 +173,7 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 	zbx_ipc_async_socket_t	ipmi_socket;
 	int			polled_num = 0;
 	double			time_stat, time_idle = 0, time_now, time_read;
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

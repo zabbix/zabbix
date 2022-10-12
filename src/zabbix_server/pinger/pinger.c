@@ -543,7 +543,7 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 	double			sec;
 	static icmpitem_t	*items = NULL;
 	static int		items_alloc = 4;
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

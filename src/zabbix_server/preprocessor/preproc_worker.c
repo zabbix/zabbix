@@ -583,7 +583,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 	zbx_ipc_socket_t		socket;
 	zbx_ipc_message_t		message;
 	zbx_preproc_dep_request_t	dep_request;
-	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

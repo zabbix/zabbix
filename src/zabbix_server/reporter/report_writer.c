@@ -415,7 +415,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 	zbx_alerter_dispatch_t		dispatch = {0};
 	int				report_status = FAIL, started_num = 0, sent_num = 0, finished_num = 0;
 	double				time_now, time_stat, time_wake, time_idle = 0;
-	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

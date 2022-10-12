@@ -291,7 +291,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 	zbx_ipc_socket_t	alerter_socket;
 	zbx_ipc_message_t	message;
 	double			time_stat, time_idle = 0, time_now, time_read;
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

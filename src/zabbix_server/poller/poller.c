@@ -955,7 +955,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	time_t			last_stat_time;
 	unsigned char		poller_type;
 	zbx_ipc_async_socket_t	rtc;
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

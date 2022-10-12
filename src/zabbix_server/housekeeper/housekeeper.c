@@ -1121,7 +1121,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	double			sec, time_slept, time_now;
 	char			sleeptext[25];
 	zbx_ipc_async_socket_t	rtc;
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

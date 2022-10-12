@@ -192,7 +192,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	int			services_updated = 0, services_removed = 0;
 	double			time_now, time_stat, time_idle = 0;
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;

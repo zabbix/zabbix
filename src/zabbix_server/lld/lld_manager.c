@@ -567,7 +567,7 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 	zbx_uint64_t		processed_num = 0;
 	int			ret;
 	zbx_timespec_t		timeout = {1, 0};
-	zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	server_num = ((zbx_thread_args_t *)args)->info.server_num;
