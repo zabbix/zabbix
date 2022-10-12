@@ -1568,6 +1568,9 @@ static void	services_times_convert_downtime(zbx_vector_services_times_t *service
 	{
 		services_times_t	*service_downtime = &services_downtimes.values[i];
 
+		if (service_downtime->from > service_downtime->to)
+			continue;
+
 		for (j = 0; j < services_times->values_num; j++)
 		{
 			services_times_t	*service_time = &services_times->values[j];
