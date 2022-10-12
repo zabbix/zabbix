@@ -51,13 +51,8 @@ class testItemPrototype extends CAPITest {
 			switch ($type) {
 				case ITEM_TYPE_IPMI:
 					$params = [
-						'ipmi_sensor' => '1.2.3'
-					];
-					break;
-
-				case ITEM_TYPE_TRAPPER:
-					$params = [
-						'delay' => '0'
+						'ipmi_sensor' => '1.2.3',
+						'delay' => '30s'
 					];
 					break;
 
@@ -65,40 +60,44 @@ class testItemPrototype extends CAPITest {
 				case ITEM_TYPE_SSH:
 					$params = [
 						'username' => 'username',
-						'authtype' => ITEM_AUTHTYPE_PASSWORD
+						'authtype' => ITEM_AUTHTYPE_PASSWORD,
+						'delay' => '30s'
 					];
 					break;
 
 				case ITEM_TYPE_DEPENDENT:
 					$params = [
-						'master_itemid' => '150151',
-						'delay' => '0'
+						'master_itemid' => '150151'
 					];
 					break;
 
 				case ITEM_TYPE_JMX:
 					$params = [
 						'username' => 'username',
-						'password' => 'password'
+						'password' => 'password',
+						'delay' => '30s'
 					];
 					break;
 
 				case ITEM_TYPE_HTTPAGENT:
 					$params = [
-						'url' => 'http://0.0.0.0'
+						'url' => 'http://0.0.0.0',
+						'delay' => '30s'
 					];
 					break;
 
 				case ITEM_TYPE_SNMP:
 					$params = [
-						'snmp_oid' => '1.2.3'
+						'snmp_oid' => '1.2.3',
+						'delay' => '30s'
 					];
 					break;
 
 				case ITEM_TYPE_SCRIPT:
 					$params = [
 						'params' => 'script',
-						'timeout' => '30s'
+						'timeout' => '30s',
+						'delay' => '30s'
 					];
 					break;
 
@@ -116,10 +115,9 @@ class testItemPrototype extends CAPITest {
 					'hostid' => '50009',
 					'ruleid' => '400660',
 					'name' => 'Test item prototype of type '.$type,
-					'key_' => 'test_item_prototype_of_type_'.$type,
+					'key_' => 'test_item_prototype_of_type_'.$type.'[{#LLD_MACRO}]',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
-					'type' => (string) $type,
-					'delay' => '30s'
+					'type' => (string) $type
 				],
 				'expected_error' => null
 			];
@@ -167,7 +165,7 @@ class testItemPrototype extends CAPITest {
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => ITEM_TYPE_ZABBIX
 				],
-				'expected_error' => 'Incorrect arguments passed to function.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "ruleid" is missing.'
 			],
 			[
 				'request_data' => [
@@ -180,7 +178,7 @@ class testItemPrototype extends CAPITest {
 					'type' => ITEM_TYPE_ZABBIX,
 					'delay' => '0'
 				],
-				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+				'expected_error' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
 			],
 			// Test update interval for mqtt key of the Active agent type.
 			[
@@ -189,7 +187,6 @@ class testItemPrototype extends CAPITest {
 					'ruleid' => '400660',
 					'name' => 'Test mqtt key for active agent',
 					'key_' => 'mqtt.get[{#3}]',
-					'interfaceid' => '50022',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => ITEM_TYPE_ZABBIX_ACTIVE
 				],
@@ -201,7 +198,6 @@ class testItemPrototype extends CAPITest {
 					'ruleid' => '400660',
 					'name' => 'Test mqtt key with 0 delay for active agent',
 					'key_' => 'mqtt.get[{#4}]',
-					'interfaceid' => '50022',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 					'delay' => '0'
@@ -214,7 +210,6 @@ class testItemPrototype extends CAPITest {
 					'ruleid' => '400660',
 					'name' => 'Test mqtt with wrong key and 0 delay',
 					'key_' => 'mqt.get[{#5}]',
-					'interfaceid' => '50022',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 					'delay' => '0'

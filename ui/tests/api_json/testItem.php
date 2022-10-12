@@ -55,26 +55,24 @@ class testItem extends CAPITest {
 			switch ($type) {
 				case ITEM_TYPE_IPMI:
 					$params = [
-						'ipmi_sensor' => '1.2.3'
-					];
-					break;
-
-				case ITEM_TYPE_TRAPPER:
-					$params = [
-						'delay' => '0'
+						'ipmi_sensor' => '1.2.3',
+						'delay' => '30s'
 					];
 					break;
 
 				case ITEM_TYPE_TELNET:
 					$params = [
-						'username' => 'username'
+						'username' => 'username',
+						'params' => 'return true;',
+						'delay' => '30s'
 					];
 					break;
 
 				case ITEM_TYPE_SSH:
 					$params = [
 						'username' => 'username',
-						'authtype' => ITEM_AUTHTYPE_PASSWORD
+						'authtype' => ITEM_AUTHTYPE_PASSWORD,
+						'delay' => '30s'
 					];
 					break;
 
@@ -87,33 +85,38 @@ class testItem extends CAPITest {
 				case ITEM_TYPE_JMX:
 					$params = [
 						'username' => 'username',
-						'password' => 'password'
+						'password' => 'password',
+						'delay' => '30s'
 					];
 					break;
 
 				case ITEM_TYPE_HTTPAGENT:
 					$params = [
-						'url' => 'http://0.0.0.0'
+						'url' => 'http://0.0.0.0',
+						'delay' => '30s'
 					];
 					break;
 
 				case ITEM_TYPE_SNMP:
 					$params = [
-						'snmp_oid' => '1.2.3'
+						'snmp_oid' => '1.2.3',
+						'delay' => '30s'
 					];
 					break;
 
 				case ITEM_TYPE_SCRIPT:
 					$params = [
 						'params' => 'script',
-						'timeout' => '30s'
+						'timeout' => '30s',
+						'delay' => '30s'
 					];
 
 					break;
 
 				case ITEM_TYPE_CALCULATED:
 					$params = [
-						'params' => '1+1'
+						'params' => '1+1',
+						'delay' => '30s'
 					];
 					break;
 
@@ -132,8 +135,7 @@ class testItem extends CAPITest {
 					'key_' => 'item_of_type_'.$type,
 					'hostid' => '50009',
 					'type' => (string) $type,
-					'value_type' => ITEM_VALUE_TYPE_UINT64,
-					'delay' => '30s'
+					'value_type' => ITEM_VALUE_TYPE_UINT64
 				],
 				'expected_error' => null
 			];
@@ -210,7 +212,7 @@ class testItem extends CAPITest {
 					'type' => ITEM_TYPE_ZABBIX,
 					'delay' => '0'
 				],
-				'expected_error' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals set.'
+				'expected_error' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
 			],
 			// Test update interval for mqtt key of the Active agent type.
 			[
@@ -264,7 +266,7 @@ class testItem extends CAPITest {
 					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 					'delay' => '0'
 				],
-				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+				'expected_error' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
 			],
 			// Item preprocessing.
 			[
@@ -284,7 +286,7 @@ class testItem extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "0".'
+				'expected_error' => 'Invalid parameter "/1/preprocessing/1/error_handler": value must be one of 1, 2, 3.'
 			]
 		] + $item_type_tests + $interfaces_tests;
 	}
@@ -369,6 +371,17 @@ class testItem extends CAPITest {
 
 	public static function getItemUpdateData() {
 		return [
+			[
+				'request_data' => [
+					'item' => 'testItem_Update:agent.version',
+					'name' => 'Test mqtt key for active agent',
+					'key_' => 'mqtt.get[33]',
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE
+				],
+				'expected_error' => null
+			]
+		];
+		return [
 			// Test update interval for mqtt key of the Agent item type.
 			[
 				'request_data' => [
@@ -376,7 +389,7 @@ class testItem extends CAPITest {
 					'key_' => 'mqtt.get[00]',
 					'delay' => '0'
 				],
-				'expected_error' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals set.'
+				'expected_error' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
 			],
 			// Test update interval for wrong mqtt key of the Active agent item type.
 			[
@@ -386,7 +399,7 @@ class testItem extends CAPITest {
 					'type' => ITEM_TYPE_ZABBIX,
 					'delay' => '0'
 				],
-				'expected_error' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals set.'
+				'expected_error' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
 			],
 			// Change type to active agent and check update interval for mqtt key.
 			[
@@ -420,6 +433,7 @@ class testItem extends CAPITest {
 
 		if ($expected_error === null) {
 			if ($request_data['type'] === ITEM_TYPE_ZABBIX_ACTIVE && substr($request_data['key_'], 0, 8) === 'mqtt.get') {
+
 				$request_data['delay'] = CTestArrayHelper::get($request_data, 'delay', '0');
 			}
 
