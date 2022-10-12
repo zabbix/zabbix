@@ -42,7 +42,7 @@ zbx_active_avail_proxy_t;
 #define ZBX_AVAILABILITY_MANAGER_DELAY				1
 #define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC		5
 #define ZBX_AVAILABILITY_MANAGER_ACTIVE_HEARTBEAT_DELAY_SEC	10
-#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	(SEC_PER_MIN * 10)
+#define ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	(SEC_PER_MIN * 1)
 
 static int	interface_availability_compare(const void *d1, const void *d2)
 {
@@ -127,6 +127,12 @@ static void	db_update_active_check_status(zbx_vector_uint64_t *hostids, int stat
 			"update host_rtdata set active_available=%i where", status);
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+
+	zabbix_log(1, "%s:%llu, updating active check status to %i for ", __func__, __LINE__, status);
+	for (int i = 0; i < hostids->values_num; i++)
+	{
+		zabbix_log(1, "  hostid %llu", __func__, __LINE__, hostids->values[i]);
+	}
 
 	DBexecute("%s", sql);
 	zbx_free(sql);
@@ -337,11 +343,16 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 
 		proxy_avail_local.hostid = proxy_hostid;
 		proxy_avail_local.lastaccess = (int)time(NULL);
+		zabbix_log(1, "DBG updating proxy lastaccess to %i", proxy_avail_local.lastaccess);
 
 		zbx_hashset_insert(&cache->proxy_avail, &proxy_avail_local, sizeof(zbx_active_avail_proxy_t));
 	}
 	else
+	{
 		proxy_avail->lastaccess = (int)time(NULL);
+		zabbix_log(1, "DBG updating proxy lastaccess to %i", proxy_avail->lastaccess);
+	}
+
 
 	zbx_vector_uint64_destroy(&status_unknown);
 	zbx_vector_uint64_destroy(&status_available);
@@ -355,18 +366,23 @@ static void flush_all_hosts(zbx_avail_active_hb_cache_t *cache)
 	zbx_hashset_iter_t	iter;
 	zbx_host_active_avail_t	*host;
 
+	zabbix_log(1, "DBG start %s(), host count = %llu, queue size = %llu", __func__, cache->hosts.num_data, cache->queue.num_data);
+
 	if (0 == cache->hosts.num_data)
 		return;
 
-	zbx_hashset_iter_reset(&cache->queue, &iter);
+	zbx_hashset_iter_reset(&cache->hosts, &iter);
 
 	while (NULL != (host = (zbx_host_active_avail_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (NULL == zbx_hashset_search(&cache->queue, &host->hostid))
 		{
+			zabbix_log(1, "DBG %s(), host %llu was added to queue", __func__, host->hostid);
 			zbx_hashset_insert(&cache->queue, host, sizeof(zbx_host_active_avail_t));
 		}
 	}
+
+	zabbix_log(1, "DBG end %s(), host count = %llu, queue size = %llu", __func__, cache->hosts.num_data, cache->queue.num_data);
 }
 
 static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache_t *cache)
@@ -416,7 +432,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	zbx_ipc_client_t		*client;
 	zbx_ipc_message_t		*message;
 	int				ret, processed_num = 0;
-	double				time_stat, time_idle = 0, time_now, time_flush, sec;
+	double				time_stat, time_idle = 0, time_now, time_flush, sec, last_proxy_flush;
 	zbx_vector_availability_ptr_t	interface_availabilities;
 	zbx_timespec_t			timeout = {ZBX_AVAILABILITY_MANAGER_DELAY, 0};
 	zbx_avail_active_hb_cache_t	active_hb_cache;
@@ -445,7 +461,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	}
 
 	/* initialize statistics */
-	time_stat = zbx_time();
+	time_stat = last_proxy_flush = zbx_time();
 	time_flush = time_stat;
 	active_hb_cache.last_proxy_avail_refresh = active_hb_cache.last_status_refresh = zbx_time();
 
@@ -552,6 +568,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 				flush_active_hb_queue(&active_hb_cache);
 				zbx_hashset_clear(&active_hb_cache.queue);
 			}
+
 		}
 
 		if (ZBX_AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC < time_now -
@@ -559,6 +576,14 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 		{
 			active_hb_cache.last_proxy_avail_refresh = time_now;
 			active_checks_calculate_proxy_availability(&active_hb_cache);
+		}
+
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY) && last_proxy_flush + (SEC_PER_MIN * 2) <= time_now)
+		{
+			flush_all_hosts(&active_hb_cache);
+			zabbix_log(1, "DBG, flushing all hosts to the server, host count %llu, enqueued host count %llu",
+				active_hb_cache.hosts.num_data, active_hb_cache.queue.num_data);
+			last_proxy_flush = time_now;
 		}
 	}
 
