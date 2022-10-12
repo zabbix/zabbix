@@ -3273,6 +3273,9 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.url_name);
+					substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, NULL, NULL, tz, &replace_to, MACRO_TYPE_TRIGGER_URL,
+							error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
 				{
@@ -3555,6 +3558,9 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL_NAME))
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.url_name);
+					substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, NULL, NULL, tz, &replace_to, MACRO_TYPE_TRIGGER_URL,
+							error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				{
