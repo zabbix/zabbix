@@ -72,10 +72,7 @@ class ZBase {
 	 */
 	private $mode;
 
-	/**
-	 * @var CModuleManager
-	 */
-	private $module_manager;
+	private CModuleManager $module_manager;
 
 	/**
 	 * Returns the current instance of APP.
@@ -826,8 +823,8 @@ class ZBase {
 				continue;
 			}
 
-			$manifest = $this->module_manager->addModule($db_module['relative_path'], $db_module['id'],
-				$db_module['config']
+			$manifest = $this->module_manager->addModule($db_module['relative_path'], $db_module['moduleid'],
+				$db_module['id'], $db_module['config']
 			);
 
 			if (!$manifest) {

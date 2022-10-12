@@ -72,17 +72,24 @@ final class CModuleManager {
 	 * Add module and prepare it's manifest data.
 	 *
 	 * @param string      $relative_path  Relative path to the module.
+	 * @param string|null $moduleid       DB module ID.
 	 * @param string|null $id             Stored module ID to optionally check the manifest module ID against.
 	 * @param array|null  $config         Override configuration to use instead of one stored in the manifest file.
 	 *
 	 * @return array|null  Either manifest data or null if manifest file had errors or IDs didn't match.
 	 */
-	public function addModule(string $relative_path, string $id = null, array $config = null): ?array {
+	public function addModule(string $relative_path, string $moduleid = null, string $id = null,
+			array $config = null): ?array {
+
 		$manifest = $this->loadManifest($relative_path);
 
 		// Ignore module without a valid manifest.
 		if ($manifest === null) {
 			return null;
+		}
+
+		if ($moduleid !== null) {
+			$manifest['moduleid'] = $moduleid;
 		}
 
 		// Ignore module with an unexpected id.

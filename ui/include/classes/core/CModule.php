@@ -21,7 +21,8 @@
 
 namespace Zabbix\Core;
 
-use CController as CAction;
+use API,
+	CController as CAction;
 
 /**
  * Base class for user modules. If Module.php is not provided by user module, this class will be instantiated instead.
@@ -60,40 +61,51 @@ class CModule {
 		return [];
 	}
 
-	final public function getType(): string {
+	public function getType(): string {
 		return $this->manifest['type'];
 	}
 
-	final public function getDir(): string {
+	public function getDir(): string {
 		return $this->dir;
 	}
 
-	final public function getRelativePath(): string {
+	public function getRelativePath(): string {
 		return $this->relative_path;
 	}
 
-	final public function getManifest(): array {
+	public function getManifest(): array {
 		return $this->manifest;
 	}
 
-	final public function getId(): string {
+	public function getId(): string {
 		return $this->manifest['id'];
 	}
 
-	final public function getRootNamespace(): string {
+	public function getRootNamespace(): string {
 		return $this->manifest['root_namespace'];
 	}
 
-	final public function getNamespace(): string {
+	public function getNamespace(): string {
 		return $this->manifest['namespace'];
 	}
 
-	final public function getVersion(): string {
+	public function getVersion(): string {
 		return $this->manifest['version'];
 	}
 
-	final public function getConfig(): array {
+	public function getConfig(): array {
 		return $this->manifest['config'];
+	}
+
+	public function setConfig(array $config): self {
+		$this->manifest['config'] = $config;
+
+		API::Module()->update([[
+			'moduleid' => $this->manifest['moduleid'],
+			'config' => $config
+		]]);
+
+		return $this;
 	}
 
 	/**
@@ -104,7 +116,7 @@ class CModule {
 	 *
 	 * @return mixed  Configuration option (if exists) or the $default value.
 	 */
-	final public function getOption(string $name = null, $default = null) {
+	public function getOption(string $name = null, $default = null) {
 		return array_key_exists($name, $this->manifest['config']) ? $this->manifest['config'][$name] : $default;
 	}
 
