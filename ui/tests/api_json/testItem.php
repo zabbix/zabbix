@@ -53,9 +53,35 @@ class testItem extends CAPITest {
 
 		foreach ($valid_item_types as $type => $interfaceid) {
 			switch ($type) {
+				case ITEM_TYPE_ZABBIX:
+				case ITEM_TYPE_SIMPLE:
+				case ITEM_TYPE_INTERNAL:
+				case ITEM_TYPE_ZABBIX_ACTIVE:
+				case ITEM_TYPE_EXTERNAL:
+					$params = [
+						'delay' => '30s'
+					];
+					break;
+
+				case ITEM_TYPE_DB_MONITOR:
+					$params = [
+						'params' => 'SELECT * FROM table',
+						'delay' => '30s'
+					];
+					break;
+
 				case ITEM_TYPE_IPMI:
 					$params = [
 						'ipmi_sensor' => '1.2.3',
+						'delay' => '30s'
+					];
+					break;
+
+				case ITEM_TYPE_SSH:
+					$params = [
+						'username' => 'username',
+						'authtype' => ITEM_AUTHTYPE_PASSWORD,
+						'params' => 'return true;',
 						'delay' => '30s'
 					];
 					break;
@@ -68,17 +94,10 @@ class testItem extends CAPITest {
 					];
 					break;
 
-				case ITEM_TYPE_SSH:
+				case ITEM_TYPE_CALCULATED:
 					$params = [
-						'username' => 'username',
-						'authtype' => ITEM_AUTHTYPE_PASSWORD,
+						'params' => '1+1',
 						'delay' => '30s'
-					];
-					break;
-
-				case ITEM_TYPE_DEPENDENT:
-					$params = [
-						'master_itemid' => '150151'
 					];
 					break;
 
@@ -87,6 +106,12 @@ class testItem extends CAPITest {
 						'username' => 'username',
 						'password' => 'password',
 						'delay' => '30s'
+					];
+					break;
+
+				case ITEM_TYPE_DEPENDENT:
+					$params = [
+						'master_itemid' => '150151'
 					];
 					break;
 
@@ -108,14 +133,6 @@ class testItem extends CAPITest {
 					$params = [
 						'params' => 'script',
 						'timeout' => '30s',
-						'delay' => '30s'
-					];
-
-					break;
-
-				case ITEM_TYPE_CALCULATED:
-					$params = [
-						'params' => '1+1',
 						'delay' => '30s'
 					];
 					break;
@@ -148,19 +165,30 @@ class testItem extends CAPITest {
 		foreach ($item_type_tests as $item_type_test) {
 			if (in_array($item_type_test['request_data']['type'], $optional)) {
 				unset($item_type_test['request_data']['interfaceid']);
-				$interfaces_tests[] = $item_type_test;
 
-				$item_type_test['request_data']['interfaceid'] = '0';
-				$interfaces_tests[] = $item_type_test;
+				$request_data = [
+					'name' => $item_type_test['request_data']['name'].' missing',
+					'key_' => $item_type_test['request_data']['key_'].'_missing'
+				] + $item_type_test['request_data'];
+
+				$interfaces_tests[] = ['request_data' => $request_data] + $item_type_test;
+
+				$request_data = [
+					'name' => $item_type_test['request_data']['name'].' zero',
+					'key_' => $item_type_test['request_data']['key_'].'_zero',
+					'interfaceid' => '0'
+				] + $item_type_test['request_data'];
+
+				$interfaces_tests[] = ['request_data' => $request_data] + $item_type_test;
 			}
 			else if (in_array($item_type_test['request_data']['type'], $required)) {
 				unset($item_type_test['request_data']['interfaceid']);
-				$item_type_test['expected_error'] = 'No interface found.';
+				$item_type_test['expected_error'] = 'Invalid parameter "/1": the parameter "interfaceid" is missing.';
 				$interfaces_tests[] = $item_type_test;
 			}
 		}
 
-		return [
+		return array_merge([
 			[
 				'request_data' => [
 					'hostid' => '50009',
@@ -231,8 +259,7 @@ class testItem extends CAPITest {
 					'name' => 'Test mqtt key with 0 delay for active agent',
 					'key_' => 'mqtt.get[4]',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
-					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-					'delay' => '0'
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE
 				],
 				'expected_error' => null
 			],
@@ -243,7 +270,6 @@ class testItem extends CAPITest {
 					'key_' => 'trapper_item_1',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => ITEM_TYPE_TRAPPER,
-					'delay' => 0,
 					'tags' => [
 						[
 							'tag' => 'tag',
@@ -277,7 +303,6 @@ class testItem extends CAPITest {
 					'interfaceid' => '50022',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-					'delay' => '0',
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
@@ -288,7 +313,7 @@ class testItem extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/preprocessing/1/error_handler": value must be one of 1, 2, 3.'
 			]
-		] + $item_type_tests + $interfaces_tests;
+		], $item_type_tests, $interfaces_tests);
 	}
 
 	/**
@@ -300,6 +325,10 @@ class testItem extends CAPITest {
 		if ($expected_error === null) {
 			if ($request_data['type'] === ITEM_TYPE_ZABBIX_ACTIVE && substr($request_data['key_'], 0, 8) === 'mqtt.get') {
 				$request_data['delay'] = CTestArrayHelper::get($request_data, 'delay', '0');
+			}
+
+			if (!array_key_exists('delay', $request_data)) {
+				$request_data['delay'] = 0;
 			}
 
 			foreach ($result['result']['itemids'] as $id) {
