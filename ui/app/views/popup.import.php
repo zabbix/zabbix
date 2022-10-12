@@ -88,9 +88,14 @@ $rules_table->addRow([
 		->onClick('toggleAll("create");')
 		: null,
 	$col_delete ? (new CCol((new CCheckBox('delete_all'))
-		->setChecked(false)))
+			->setChecked(false)
+			->onClick('updateWarning(this, '.json_encode(
+					_('Template and host properties that are inherited through template linkage will be unlinked and cleared.')
+				).');'
+			)
+		)
+	)
 		->addClass(ZBX_STYLE_CENTER)
-		->onClick('toggleAll("delete");')
 		: null,
 ]);
 
@@ -106,29 +111,29 @@ foreach ($titles as $key => $title) {
 	if (array_key_exists('updateExisting', $data['rules'][$key])) {
 		$checkbox_update = (new CCheckBox('rules['.$key.'][updateExisting]'))
 			->setChecked($data['rules'][$key]['updateExisting'])
-			->onClick('updateAllCheckbox("update", this)');
+			->onClick('updateAllCheckbox("update", this);');
 
 		if ($key === 'images') {
-			$checkbox_update->onClick('updateWarning(this, '.json_encode(_('Images for all maps will be updated!')).')');
+			$checkbox_update->onClick('updateWarning(this, '.json_encode(_('Images for all maps will be updated!')).');');
 		}
 	}
 
 	if (array_key_exists('createMissing', $data['rules'][$key])) {
 		$checkbox_create = (new CCheckBox('rules['.$key.'][createMissing]'))
 			->setChecked($data['rules'][$key]['createMissing'])
-			->onClick('updateAllCheckbox("create", this)');
+			->onClick('updateAllCheckbox("create", this);');
 	}
 
 	if (array_key_exists('deleteMissing', $data['rules'][$key])) {
 		$checkbox_delete = (new CCheckBox('rules['.$key.'][deleteMissing]'))
 			->setChecked($data['rules'][$key]['deleteMissing'])
 			->addClass('deleteMissing')
-			->onClick('updateAllCheckbox("delete", this)');
+			->onClick('updateAllCheckbox("delete", this);');
 
 		if ($key === 'templateLinkage') {
 			$checkbox_delete->onClick('updateWarning(this, '.json_encode(
 				_('Template and host properties that are inherited through template linkage will be unlinked and cleared.')
-			).')');
+			).');');
 		}
 	}
 

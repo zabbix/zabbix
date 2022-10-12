@@ -183,7 +183,11 @@ function updateWarning(obj, content) {
 				{
 					title: <?= json_encode(_('OK')) ?>,
 					focused: true,
-					action: function() {}
+					action: function() {
+						if (obj.id === 'delete_all') {
+							toggleAll('delete');
+						}
+					}
 				},
 				{
 					title: <?= json_encode(_('Cancel')) ?>,
@@ -191,6 +195,9 @@ function updateWarning(obj, content) {
 					class: '<?= ZBX_STYLE_BTN_ALT ?>',
 					action: function() {
 						jQuery(obj).prop('checked', false);
+						if (obj.id === 'delete_all') {
+							toggleAll('delete');
+						}
 					}
 				}
 			]
