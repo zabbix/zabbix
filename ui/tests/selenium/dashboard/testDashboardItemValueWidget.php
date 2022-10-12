@@ -556,7 +556,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Item' => 'Available memory in %',
-						'Advanced configuration' => true,
+						'Advanced configuration' => true
 					],
 					'thresholds' => [
 						['threshold' => '-']
@@ -572,7 +572,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Item' => 'Available memory in %',
-						'Advanced configuration' => true,
+						'Advanced configuration' => true
 					],
 					'thresholds' => [
 						['threshold' => 'a']
@@ -588,7 +588,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Item' => 'Available memory in %',
-						'Advanced configuration' => true,
+						'Advanced configuration' => true
 					],
 					'thresholds' => [
 						['threshold' => '1a%?']
@@ -604,7 +604,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Item' => 'Available memory in %',
-						'Advanced configuration' => true,
+						'Advanced configuration' => true
 					],
 					'thresholds' => [
 						['threshold' => '0.00001']
@@ -620,7 +620,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Item' => 'Available memory in %',
-						'Advanced configuration' => true,
+						'Advanced configuration' => true
 					],
 					'thresholds' => [
 						['threshold' => '9999999999999999']
@@ -636,7 +636,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Item' => 'Available memory in %',
-						'Advanced configuration' => true,
+						'Advanced configuration' => true
 					],
 					'thresholds' => [
 						['threshold' => '1'],
@@ -653,7 +653,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Item' => 'Available memory in %',
-						'Advanced configuration' => true,
+						'Advanced configuration' => true
 					],
 					'thresholds' => [
 						['threshold' => '1'],
@@ -670,7 +670,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Item' => 'Available memory in %',
-						'Advanced configuration' => true,
+						'Advanced configuration' => true
 					],
 					'thresholds' => [
 						['threshold' => '1', 'color' => '']
@@ -686,7 +686,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Item' => 'Available memory in %',
-						'Advanced configuration' => true,
+						'Advanced configuration' => true
 					],
 					'thresholds' => [
 						['threshold' => '1', 'color' => 'AABBCC'],
@@ -703,7 +703,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Item' => 'Available memory in %',
-						'Advanced configuration' => true,
+						'Advanced configuration' => true
 					],
 					'thresholds' => [
 						['threshold' => 'a', 'color' => 'AABBCC']
@@ -891,7 +891,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'xpath://button[@id="lbl_time_color"]/..' => '11AA00',
 						'xpath://button[@id="lbl_up_color"]/..' => '00FF00',
 						'xpath://button[@id="lbl_down_color"]/..' => 'FF0000',
-						'xpath://button[@id="lbl_updown_color"]/..' => '0000FF',
+						'xpath://button[@id="lbl_updown_color"]/..' => '0000FF'
 					]
 				]
 			],
@@ -1234,41 +1234,34 @@ class testDashboardItemValueWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-							'Type' => 'Item value',
 							'Item' => 'System description',
 							'Name' => 'Item Widget with type of information - characters',
 							'Advanced configuration' => true
-					],
-					'error' => 'This setting applies only to numeric data.'
+					]
 				]
 			],
 			[
 				[
 					'fields' => [
-							'Type' => 'Item value',
 							'Item' => 'Software installed',
 							'Name' => 'Item Widget with type of information - text',
 							'Advanced configuration' => true
-					],
-					'error' => 'This setting applies only to numeric data.'
+					]
 				]
 			],
 			[
 				[
 					'fields' => [
-							'Type' => 'Item value',
 							'Item' => 'item_testPageHistory_CheckLayout_Log',
 							'Name' => 'Item Widget with type of information - log',
 							'Advanced configuration' => true
-					],
-					'error' => 'This setting applies only to numeric data.'
+					]
 				]
 			],
 			[
 				[
 					'numeric' => true,
 					'fields' => [
-							'Type' => 'Item value',
 							'Item' => 'Free swap space',
 							'Name' => 'Item Widget with type of information - Numeric (unsigned)',
 							'Advanced configuration' => true
@@ -1279,7 +1272,6 @@ class testDashboardItemValueWidget extends CWebTest {
 				[
 					'numeric' => true,
 					'fields' => [
-							'Type' => 'Item value',
 							'Item' => 'Interrupts per second',
 							'Name' => 'Item Widget with type of information - Numeric (float)',
 							'Advanced configuration' => true
@@ -1290,18 +1282,22 @@ class testDashboardItemValueWidget extends CWebTest {
 	}
 
 	/**
-	 * Check warning message.
+	 * Check warning message for threshold, when item type is not numeric.
 	 *
 	 * @dataProvider getWarningMessageData
 	 */
-	public function testDashboardItemValueWidget_CheckWarningMessage($data) {
+	public function testDashboardItemValueWidget_ThresholdWarningMessage($data) {
 		$warning = 'id:item-value-thresholds-warning';
 		$info = 'class:icon-info';
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
+
+		if ($form->getField('Type')->getValue() !== 'Item value') {
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
+		}
+
 		$form->fill($data['fields']);
-		COverlayDialogElement::find()->waitUntilReady()->one();
 
 		if (!array_key_exists('numeric', $data)) {
 			// Check that warning item is displayed.
@@ -1312,12 +1308,11 @@ class testDashboardItemValueWidget extends CWebTest {
 
 			// Check hint-box.
 			$form->query($warning)->one()->click();
-			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
-			$this->assertEquals($data['error'], $hint->one()->getText());
+			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
+			$this->assertEquals('This setting applies only to numeric data.', $hint->getText());
 
 			// Close the hint-box.
-			$hint->query('xpath://button[@class="overlay-close-btn"]')->one()->click();
-			$hint->waitUntilNotPresent();
+			$hint->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click()->waitUntilNotVisible();
 		}
 		else {
 			// Check that warning item is not displayed.
@@ -1328,10 +1323,9 @@ class testDashboardItemValueWidget extends CWebTest {
 		}
 	}
 
-	public function testDashboardItemValueWidget_CheckBackgroundColor() {
+	public function testDashboardItemValueWidget_ThresholdColor() {
 		$data = [
 			'fields' => [
-				'Type' => 'Item value',
 				'Item' => 'Available memory in %',
 				'Name' => 'Item Widget with threshold',
 				'Advanced configuration' => true
@@ -1345,25 +1339,31 @@ class testDashboardItemValueWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
+
+		if ($form->getField('Type')->getValue() !== 'Item value') {
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
+		}
+
 		$form->fill($data['fields']);
 		$this->getThresholdTable()->fill($data['thresholds']);
 
 		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
 		$this->page->waitUntilReady();
 		$dashboard->save();
 		$this->assertMessage('Dashboard updated');
 
-		// value for threshold trigger.
+		// Value for threshold trigger.
 		$index = 1;
-
 		foreach ($data['thresholds'] as $threshold) {
-		// Insert item data.
-		CDataHelper::addItemData(42244,$index,time()+$index);
-		$this->page->refresh();
-		$rgb = implode(', ', sscanf($threshold['color'], "%02x%02x%02x"));
-		$this->assertEquals('rgba('.$rgb.', 1)', $dashboard->getWidget($data['fields']['Name'])->getContent()
-				->query('class:dashboard-widget-item')->one()->getCSSValue('background-color'));
-		$index++;
+			// Insert item data.
+			CDataHelper::addItemData(42244, $index, time() + $index);
+			$this->page->refresh()->waitUntilReady();
+			$rgb = implode(', ', sscanf($threshold['color'], "%02x%02x%02x"));
+			$this->assertEquals('rgba('.$rgb.', 1)', $dashboard->getWidget($data['fields']['Name'])->getContent()
+					->query('class:dashboard-widget-item')->one()->getCSSValue('background-color')
+			);
+			$index++;
 		}
 	}
 }

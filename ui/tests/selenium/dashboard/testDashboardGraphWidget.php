@@ -2071,7 +2071,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'host' => 'xpath://div[@id="or_'.$i.'_hosts_"]/..',
 					'item' => 'xpath://div[@id="or_'.$i.'_items_"]/..',
 					'time_shift' => 'name:or['.$i.'][timeshift]',
-					'color' => 'xpath://button[@id="lbl_or_'.$i.'__color_"]/..',
+					'color' => 'xpath://button[@id="lbl_or_'.$i.'__color_"]/..'
 				];
 				$inputs = [];
 				foreach ($mapping as $field => $selector) {
