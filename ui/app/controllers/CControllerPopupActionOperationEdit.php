@@ -93,6 +93,9 @@ class CControllerPopupActionOperationEdit extends CController {
 		$media_type[] = '- '._('All').' -';
 		foreach($media_types as $type) {
 			$media_type[$type['mediatypeid']] = $type['name'];
+			if ($type['status'] == MEDIA_TYPE_STATUS_DISABLED) {
+				$disabled_media[] = $type['mediatypeid'];
+			}
 		}
 
 		$data = [
@@ -101,7 +104,8 @@ class CControllerPopupActionOperationEdit extends CController {
 			'recovery' => $recovery,
 			'operation' => $operation,
 			'operation_types' => $operation_type,
-			'media_types' => $media_type,
+			'mediatype_options' => CSelect::createOptionsFromArray($media_type),
+			'disabled_media' => $disabled_media
 		];
 
 		$this->setResponse(new CControllerResponseData($data));

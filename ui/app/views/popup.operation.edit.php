@@ -187,9 +187,18 @@ $form_grid->addItem([
 		->setId('operation-message-users')
 ]);
 
+// Make CSelectOption label red, if media type is disabled.
+/** @var CSelectOption $option */
+foreach ($data['mediatype_options'] as $option) {
+	$mediatype = $option->toArray();
+	if(in_array($mediatype['value'], array_values($data['disabled_media']))) {
+		$option->addClass(ZBX_STYLE_RED);
+	}
+}
+
 // Operation message media type row.
 $select_opmessage_mediatype_default = (new CSelect('operation[opmessage][mediatypeid]'))
-	->addOptions(CSelect::createOptionsFromArray($data['media_types']))
+	->addOptions($data['mediatype_options'])
 	->setFocusableElementId('operation-opmessage-mediatypeid')
 	->setValue($operation['opmessage']['mediatypeid'] ?? 0);
 
@@ -202,7 +211,7 @@ $form_grid->addItem([
 
 // Operation message media type row (explicit).
 $select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
-	->addOptions(CSelect::createOptionsFromArray($data['media_types']))
+	->addOptions($data['mediatype_options'])
 	->setFocusableElementId('operation-opmessage-mediatypeid')
 	->setName('operation[opmessage][mediatypeid]')
 	->setValue($operation['opmessage']['mediatypeid'] ?? 0);
