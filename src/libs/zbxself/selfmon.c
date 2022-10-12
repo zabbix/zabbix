@@ -678,14 +678,12 @@ ZBX_THREAD_ENTRY(zbx_selfmon_thread, args)
 {
 	zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
 	const zbx_thread_info_t	*info = &thread_args->info;
-	const char		*program_type_str = NULL, *process_type_str = NULL;
-	int			server_num = info->server_num, process_num = info->process_num;
+	int			process_num = info->process_num;
+	const char		*program_type_str = get_program_type_string(program_type);
+	const char		*process_type_str = get_process_type_string(info->process_type);
 
-	program_type_str = get_program_type_string(program_type);
-	process_type_str = get_process_type_string(info->process_type);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",  program_type_str, server_num, process_type_str,
-			process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",  program_type_str, info->server_num,
+			process_type_str, process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
