@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-09-20T11:54:20Z'
+  date: '2022-10-12T08:25:09Z'
   template_groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -11,7 +11,7 @@ zabbix_export:
       template: 'HPE Synergy by HTTP'
       name: 'HPE Synergy by HTTP'
       description: |
-        The template to monitor HPE Synergy by HTTP.
+        This template is designed to monitor HPE Synergy by HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
@@ -241,7 +241,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The JSON with result of API requests.'
+          description: 'The JSON with the result from requests to API.'
           timeout: '{$HPE.SYNERGY.DATA.TIMEOUT}'
           parameters:
             -
@@ -266,7 +266,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Datacenters data.'
+          description: 'Data of the datacenters.'
           preprocessing:
             -
               type: JSONPATH
@@ -333,7 +333,7 @@ zabbix_export:
               name: 'HPE Synergy: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Zabbix has received errors in requests to API.'
+              description: 'Zabbix has received errors from API.'
               dependencies:
                 -
                   name: 'HPE Synergy: Service is unavailable'
@@ -351,7 +351,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Ethernet networks data.'
+          description: 'Data of the ethernet networks.'
           preprocessing:
             -
               type: JSONPATH
@@ -373,7 +373,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Fabrics data.'
+          description: 'Data of the fabrics.'
           preprocessing:
             -
               type: JSONPATH
@@ -395,7 +395,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'FC networks data.'
+          description: 'Data of the FC networks.'
           preprocessing:
             -
               type: JSONPATH
@@ -417,7 +417,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Hypervisor managers data.'
+          description: 'Data of the hypervisor managers.'
           preprocessing:
             -
               type: JSONPATH
@@ -439,7 +439,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Interconnects data.'
+          description: 'Data of the interconnects.'
           preprocessing:
             -
               type: JSONPATH
@@ -461,7 +461,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Logical enclosures data.'
+          description: 'Data of the logical enclosures.'
           preprocessing:
             -
               type: JSONPATH
@@ -483,7 +483,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Racks data.'
+          description: 'Data of the racks.'
           preprocessing:
             -
               type: JSONPATH
@@ -505,7 +505,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Server hardware data.'
+          description: 'Data of the server hardware.'
           preprocessing:
             -
               type: JSONPATH
@@ -527,7 +527,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Storage pools data.'
+          description: 'Data of the storage pools.'
           preprocessing:
             -
               type: JSONPATH
@@ -549,7 +549,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Storage systems data.'
+          description: 'Data of the storage systems.'
           preprocessing:
             -
               type: JSONPATH
@@ -571,7 +571,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Storage volumes data.'
+          description: 'Data of the storage volumes.'
           preprocessing:
             -
               type: JSONPATH
@@ -593,7 +593,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Uplink sets data.'
+          description: 'Data of the uplink sets.'
           preprocessing:
             -
               type: JSONPATH
@@ -612,7 +612,7 @@ zabbix_export:
           type: SIMPLE
           key: 'net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{HOST.CONN}","{$HPE.SYNERGY.API.PORT}"]'
           history: 7d
-          description: 'Checks if the service is running and accepting TCP connections.'
+          description: 'Checks if the service is running and accepting the TCP connections.'
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -657,10 +657,10 @@ zabbix_export:
               description: |
                 The power state of the appliance bay.
                 
-                EFuse - The power state of the bay is that it has been EFused.
-                Reset - The power state of the bay is that it has been reset.
-                SoftReset - The power state of the bay is that it has been soft reset.
-                Unknown - The power state of the bay is unknown.
+                *EFuse* - the power state of the bay - it has been EFused.
+                *Reset* - the power state of the bay - it has been reset.
+                *SoftReset* - the power state of the bay - it has been softly reset.
+                *Unknown* - the power state of the bay is unknown.
               valuemap:
                 name: 'Power state'
               preprocessing:
@@ -716,7 +716,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] data'
+              description: 'Data of the appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -746,7 +746,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'The model name for the appliance.'
+              description: 'The model name of the appliance.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -806,7 +806,7 @@ zabbix_export:
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",powered_on]'
               delay: '0'
               history: 7d
-              description: 'Yes if the appliance is powered on; false otherwise.'
+              description: '*Yes*, if the appliance is powered on; *false*, otherwise.'
               valuemap:
                 name: Boolean
               preprocessing:
@@ -844,11 +844,11 @@ zabbix_export:
               description: |
                 Indicates whether an appliance is present in the bay:
                 
-                Absent - The device slot is empty.
-                PresenceNoOp - The device slot is uninitialized.
-                PresenceUnknown - The device presence is unknown.
-                Present - The device slot has a device in it.
-                Subsumed - The device slot is configured to be part of another device slot. Not applicable for fan or power supply bays.
+                *Absent* - the device slot is empty;
+                *PresenceNoOp* - the device slot is uninitialized;
+                *PresenceUnknown* - the device presence is unknown;
+                *Present* - the device slot has a device in it;
+                *Subsumed* - the device slot is configured to be part of another device slot. Not applicable for the fan or power supply bays.
               valuemap:
                 name: 'Device presence'
               preprocessing:
@@ -976,11 +976,11 @@ zabbix_export:
               description: |
                 The hardware status of the appliance:
                 
-                Critical - Needs immediate attention.
-                Disabled - The resource is currently not operational.
-                OK - Indicates normal/informational behaviour.
-                Unknown - The health status is not yet known or cannot be determined.
-                Warning - Needs attention soon.
+                *Critical* - requires immediate attention;
+                *Disabled* - the resource is currently not operational;
+                *OK* - indicates normal/informational behavior;
+                *Unknown* - the health status is not yet known or cannot be determined;
+                *Warning* - requires attention soon.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -1042,7 +1042,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0'
                   name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status'
                   priority: HIGH
-                  description: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.'
+                  description: 'The appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -1052,7 +1052,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4'
                   name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status'
                   priority: WARNING
-                  description: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.'
+                  description: 'The appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -1062,7 +1062,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1'
                   name: 'Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled'
                   priority: INFO
-                  description: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] currently not operational.'
+                  description: 'The appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational'
                   tags:
                     -
                       tag: scope
@@ -1091,7 +1091,7 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.synergy.crossbars.discovery
           delay: '0'
-          description: 'SDX cross fabric module connects to all compute devices installed in the system enclosure and brings in the capability of hard partitioning. Crossbar details are relevant only for enclosures with type "SDX".'
+          description: 'SDX cross fabric module connects to all computing devices installed in the system enclosure and brings in the capability of hard partitioning. Crossbar details are relevant only for enclosures with type "SDX".'
           item_prototypes:
             -
               uuid: cedc8d60b7c647efbd148d020432861d
@@ -1132,7 +1132,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Hardware version.'
+              description: 'The hardware version.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1193,13 +1193,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Presence in a bay:
+                The presence in a bay:
                 
-                Absent - The device slot is empty.
-                PresenceNoOp - The device slot is uninitialized.
-                PresenceUnknown - The device presence is unknown.
-                Present - The device slot has a device in it.
-                Subsumed - The device slot is configured to be part of another device slot. Not applicable for fan or power supply bays.
+                *Absent* - the device slot is empty;
+                *PresenceNoOp* - the device slot is uninitialized;
+                *PresenceUnknown* - the device presence is unknown;
+                *Present* - the device slot has a device in it;
+                *Subsumed* - the device slot is configured to be part of another device slot. Not applicable for the fan or power supply bays.
               valuemap:
                 name: 'Device presence'
               preprocessing:
@@ -1275,7 +1275,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Serial number.'
+              description: 'A serial number.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1305,13 +1305,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the crossbar:
+                The overall health status of the crossbar:
                 
-                Critical - Needs immediate attention.
-                Disabled - The resource is currently not operational.
-                OK - Indicates normal/informational behaviour.
-                Unknown - The health status is not yet known or cannot be determined.
-                Warning - Needs attention soon.
+                *Critical* - requires immediate attention;
+                *Disabled* - the resource is currently not operational;
+                *OK* - indicates normal/informational behavior;
+                *Unknown* - the health status is not yet known or cannot be determined;
+                *Warning* - requires attention soon.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -1373,7 +1373,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0'
                   name: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status'
                   priority: HIGH
-                  description: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.'
+                  description: 'The crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -1383,7 +1383,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4'
                   name: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status'
                   priority: WARNING
-                  description: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.'
+                  description: 'The crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -1393,7 +1393,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1'
                   name: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled'
                   priority: INFO
-                  description: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] currently not operational.'
+                  description: 'The crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -1433,7 +1433,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Datacenter [{#NAME}] data'
+              description: 'Data of the datacenter [{#NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1458,7 +1458,7 @@ zabbix_export:
               key: 'hpe.synergy.datacenter["{#NAME}",state]'
               delay: '0'
               history: 7d
-              description: 'The current state of the resource. Valid values include Adding, AddError, Configured, CredentialError, Refreshing, RefreshError, Removing, RemoveError, and Unmanaged.'
+              description: 'The current state of the resource. The valid values include Adding, AddError, Configured, CredentialError, Refreshing, RefreshError, Removing, RemoveError, and Unmanaged.'
               valuemap:
                 name: 'Rack state'
               preprocessing:
@@ -1533,7 +1533,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",state])=1'
                   name: 'Datacenter [{#NAME}]: Add error'
                   priority: AVERAGE
-                  description: 'Datacenter [{#NAME}] add failed.'
+                  description: 'The adding of the datacenter [{#NAME}] has failed.'
                   tags:
                     -
                       tag: scope
@@ -1543,7 +1543,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",state])=3'
                   name: 'Datacenter [{#NAME}]: Has credential error'
                   priority: AVERAGE
-                  description: 'Datacenter [{#NAME}] has credential error.'
+                  description: 'The datacenter [{#NAME}] has a credential error.'
                   tags:
                     -
                       tag: scope
@@ -1553,7 +1553,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",state])=5'
                   name: 'Datacenter [{#NAME}]: Has refresh error'
                   priority: AVERAGE
-                  description: 'Datacenter [{#NAME}] has refresh error.'
+                  description: 'The datacenter [{#NAME}] has a refresh error.'
                   tags:
                     -
                       tag: scope
@@ -1563,7 +1563,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",state])=7'
                   name: 'Datacenter [{#NAME}]: Has remove error'
                   priority: AVERAGE
-                  description: 'Datacenter [{#NAME}] has remove error.'
+                  description: 'The datacenter [{#NAME}] has a remove error.'
                   tags:
                     -
                       tag: scope
@@ -1576,13 +1576,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the resource. The following are the valid values for the status of the resource:
+                The overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior.
-                Disabled - indicates that a resource is not operational.
-                Warning - needs attention soon.
-                Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
+                *OK* - indicates normal/informational behavior;
+                *Disabled* - indicates that a resource is not operational;
+                *Warning* - requires attention soon;
+                *Critical* - requires immediate attention;
+                *Unknown* - should be avoided, but there may be rare occasions when the status is unknown.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -1641,7 +1641,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",status])=0'
                   name: 'Datacenter [{#NAME}]: Has critical status'
                   priority: HIGH
-                  description: 'Datacenter [{#NAME}] status is critical. Needs immediate attention.'
+                  description: 'The datacenter [{#NAME}] status is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -1651,7 +1651,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",status])=4'
                   name: 'Datacenter [{#NAME}]: Has warning status'
                   priority: WARNING
-                  description: 'Datacenter [{#NAME}] status is warning. Needs attention soon.'
+                  description: 'The datacenter [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -1661,7 +1661,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",status])=1'
                   name: 'Datacenter [{#NAME}]: Is disabled'
                   priority: INFO
-                  description: 'Datacenter [{#NAME}] currently not operational.'
+                  description: 'the datacenter [{#NAME}] currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -1698,7 +1698,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Device [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] data'
+              description: 'Data of the device [{#ENCLOSURE_NAME}:{#BAY_NUMBER}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1728,7 +1728,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Model name of an unsupported device occupying the bay, if available.'
+              description: 'The model name of an unsupported device occupying the bay if available.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1790,11 +1790,11 @@ zabbix_export:
               description: |
                 Indicates whether a device is present:
                 
-                Absent - The device slot is empty.
-                PresenceNoOp - The device slot is uninitialized.
-                PresenceUnknown - The device presence is unknown.
-                Present - The device slot has a device in it.
-                Subsumed - The device slot is configured to be part of another device slot. Not applicable for fan or power supply bays.
+                *Absent* - the device slot is empty;
+                *PresenceNoOp* - the device slot is uninitialized;
+                *PresenceUnknown* - the device presence is unknown;
+                *Present* - the device slot has a device in it;
+                *Subsumed* - the device slot is configured to be part of another device slot. Not applicable for the fan or power supply bays.
               valuemap:
                 name: 'Device presence'
               preprocessing:
@@ -1926,7 +1926,7 @@ zabbix_export:
               key: 'hpe.synergy.enclosure["{#NAME}",appliance_bay_count]'
               delay: '0'
               history: 7d
-              description: 'The number of appliance bays in the enclosure.'
+              description: 'The number of the appliance bays in the enclosure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1957,7 +1957,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Enclosure [{#NAME}] data'
+              description: 'Data of the enclosure [{#NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1982,7 +1982,7 @@ zabbix_export:
               key: 'hpe.synergy.enclosure["{#NAME}",device_bay_count]'
               delay: '0'
               history: 7d
-              description: 'The number of device bays in the enclosure.'
+              description: 'The number of the device bays in the enclosure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2038,7 +2038,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: W
-              description: 'The amount of power allocated for the fans and management devices of the enclosure.'
+              description: 'The amount of the power allocated for the fans and management devices of the enclosure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2069,7 +2069,7 @@ zabbix_export:
               key: 'hpe.synergy.enclosure["{#NAME}",fan_bay_count]'
               delay: '0'
               history: 7d
-              description: 'The number of fan bays in the enclosure.'
+              description: 'The number of the fan bays in the enclosure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2126,7 +2126,7 @@ zabbix_export:
               key: 'hpe.synergy.enclosure["{#NAME}",interconnect_bay_count]'
               delay: '0'
               history: 7d
-              description: 'The number of interconnect bays in the enclosure.'
+              description: 'The number of the interconnect bays in the enclosure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2181,7 +2181,7 @@ zabbix_export:
               key: 'hpe.synergy.enclosure["{#NAME}",min_ps]'
               delay: '0'
               history: 7d
-              description: 'The minimum number of power supplies needed.'
+              description: 'The minimum number of the power supplies needed.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2210,7 +2210,7 @@ zabbix_export:
               key: 'hpe.synergy.enclosure["{#NAME}",min_ps_redundant]'
               delay: '0'
               history: 7d
-              description: 'The minimum number of power supplies needed to fulfill the redundant line feed power mode.'
+              description: 'The minimum number of the power supplies needed to fulfill the redundant line feed power mode.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2241,7 +2241,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'The enclosure model name, eg, "BladeSystem c7000 Enclosure G2".'
+              description: 'The enclosure model name, for example, "BladeSystem c7000 Enclosure G2.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2322,7 +2322,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: W
-              description: 'The total amount of power allocated in the enclosure.'
+              description: 'The total amount of the power allocated in the enclosure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2348,7 +2348,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: W
-              description: 'The amount of unallocated power in the enclosure.'
+              description: 'The amount of the unallocated power in the enclosure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2373,7 +2373,7 @@ zabbix_export:
               key: 'hpe.synergy.enclosure["{#NAME}",ps_bay_count]'
               delay: '0'
               history: 7d
-              description: 'The number of power supply bays in the enclosure.'
+              description: 'The number of the power supply bays in the enclosure.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2431,18 +2431,18 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Current resource state of the enclosure:
+                The current resource state of the enclosure:
                 
-                Adding - The enclosure is being added.
-                Configured - The enclosure is configured and part of a logical enclosure. This is the usual state for an enclosure under full management.
-                Configuring - A transient state while the enclosure is being configured for a logical enclosure.
-                Interrupted - The previous operation on the enclosure did not complete. The operation should be re-attempted.
-                Monitored - The enclosure is being monitored. It is not part of a logical enclosure and only hardware-control operations are available.
-                Pending - There are pending operations on the enclosure. Additional operations are denied.
-                RemoveFailed - The previous operation to remove the enclosure did not succeed. The operation should be re-attempted.
-                Removing - The enclosure is being removed.
-                Unmanaged - The enclosure has been discovered, but has not yet been added for management or monitoring.
-                Unsupported - The enclosure model or version is not currently supported by HPE OneView. It cannot be configured or monitored.
+                *Adding* - the enclosure is being added;
+                *Configured* - the enclosure is configured and is a part of the logical enclosure. This is the usual state for an enclosure under full management;
+                *Configuring* - a transient state while the enclosure is being configured for a logical enclosure;
+                *Interrupted* - the previous operation on the enclosure did not complete. The operation should be re-attempted;
+                *Monitored* - the enclosure is being monitored. It is not a part of the logical enclosure and only hardware-control operations are available;
+                *Pending* - there are pending operations on the enclosure. Additional operations are denied;
+                *RemoveFailed* - the previous operation to remove the enclosure did not succeed. The operation should be re-attempted;
+                *Removing* - the enclosure is being removed;
+                *Unmanaged* - the enclosure has been discovered, but has not yet been added for the management or monitoring;
+                *Unsupported* - the enclosure model or version is not currently supported by HPE OneView. It cannot be configured or monitored.
               valuemap:
                 name: 'Enclosure state'
               preprocessing:
@@ -2524,16 +2524,16 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Indicates the reason the resource in its current state:
+                Indicates the reason why the resource in its current state:
                 
-                Missing - The enclosure is no longer connected into the frame link topology.
-                None - No reason is available, or none applies.
-                NotAdded - The enclosure has not been added.
-                NotOwner - The enclosure reports being managed by something other than this HPE OneView.
-                OperationFailed - A prior operation was interrupted.
-                Unowned - The enclosure reports not being under management.
-                UnsupportedFirmware - The firmware version of the enclosure is not supported by this version of HPE OneView.
-                UpdatingFirmware - A firmware update is in progress.
+                *Missing* - the enclosure is no longer connected into the frame link topology;
+                *None* - no reason is available, or none applies;
+                *NotAdded* - the enclosure has not been added;
+                *NotOwner* - the enclosure reports being managed by something other than this HPE OneView;
+                *OperationFailed* - a prior operation was interrupted;
+                *Unowned* - the enclosure reports are not being under the management;
+                *UnsupportedFirmware* - the firmware version of the enclosure is not supported by this version of HPE OneView;
+                *UpdatingFirmware* - a firmware update is in progress.
               valuemap:
                 name: 'State reason'
               preprocessing:
@@ -2613,7 +2613,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])=5'
                   name: 'Enclosure [{#NAME}]: Is unowned'
                   priority: AVERAGE
-                  description: 'The enclosure reports not being under management.'
+                  description: 'The enclosure reports are not being under the management.'
                   tags:
                     -
                       tag: scope
@@ -2626,14 +2626,14 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the enclosure.
-                The enclosure status reflects the hardware health of the enclosure, all bays, and enclosure components (e.g. enclosure mid-plane, fans, power supplies, Synergy Frame Link Modules, and Synergy Composers). It explicitly does not include the status of other HPE OneView resources such as blades (server hardware), interconnects, and drive enclosures.
+                The overall health status of the enclosure.
+                The enclosure status reflects the hardware health of the enclosure, all the bays, and the enclosure components (e.g. the enclosure mid-plane, fans, power supplies, Synergy Frame Link Modules, and Synergy Composers). It explicitly does not include the status of the other HPE OneView resources such as the blades (server hardware), the interconnects, and the drive enclosures.
                 
-                Critical - Needs immediate attention.
-                Disabled - The resource is currently not operational.
-                OK - Indicates normal/informational behaviour.
-                Unknown - The health status is not yet known or cannot be determined.
-                Warning - Needs attention soon.
+                *Critical* - requires immediate attention.
+                *Disabled* - the resource is currently not operational.
+                *OK* - indicates normal/informational behavior.
+                *Unknown* - the health status is not yet known or cannot be determined.
+                *Warning* - requires attention soon.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -2692,7 +2692,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",status])=0'
                   name: 'Enclosure [{#NAME}]: Has critical status'
                   priority: HIGH
-                  description: 'Enclosure [{#NAME}] status is critical. Needs immediate attention.'
+                  description: 'The status of the enclosure [{#NAME}] is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -2702,7 +2702,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",status])=4'
                   name: 'Enclosure [{#NAME}]: Has warning status'
                   priority: WARNING
-                  description: 'Enclosure [{#NAME}] status is warning. Needs attention soon.'
+                  description: 'The status of the enclosure [{#NAME}] is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -2712,7 +2712,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",status])=1'
                   name: 'Enclosure [{#NAME}]: Is disabled'
                   priority: INFO
-                  description: 'Enclosure [{#NAME}] currently not operational.'
+                  description: 'The enclosure [{#NAME}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -2726,7 +2726,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'The type of the enclosure, eg, "C7000" or "SY12000" or "SDX".'
+              description: 'The type of the enclosure, for example, "C7000" or "SY12000" or "SDX".'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2851,7 +2851,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Ethernet network [{#NAME}] data'
+              description: 'Data of the ethernet network [{#NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2905,13 +2905,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the resource. The following are the valid values for the status of the resource:
+                The overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior.
-                Disabled - indicates that a resource is not operational.
-                Warning - needs attention soon.
-                Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
+                *OK* - indicates normal/informational behavior;
+                *Disabled* - indicates that the resource is not operational;
+                *Warning* - requires attention soon;
+                *Critical* - requires immediate attention;
+                *Unknown* - should be avoided, but there may be rare occasions when the status is unknown.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -2970,7 +2970,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.ethernet.network["{#NAME}",status])=0'
                   name: 'Ethernet network [{#NAME}]: Has critical status'
                   priority: HIGH
-                  description: 'Ethernet network [{#NAME}] status is critical. Needs immediate attention.'
+                  description: 'The ethernet network [{#NAME}] status is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -2980,7 +2980,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.ethernet.network["{#NAME}",status])=4'
                   name: 'Ethernet network [{#NAME}]: Has warning status'
                   priority: WARNING
-                  description: 'Ethernet network [{#NAME}] status is warning. Needs attention soon.'
+                  description: 'The ethernet network [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -2990,7 +2990,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.ethernet.network["{#NAME}",status])=1'
                   name: 'Ethernet network [{#NAME}]: Is disabled'
                   priority: INFO
-                  description: 'Ethernet network [{#NAME}] currently not operational.'
+                  description: 'The ethernet network [{#NAME}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -3027,7 +3027,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Fabric [{#NAME}] data'
+              description: 'Data of the fabric [{#NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3081,13 +3081,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the resource. The following are the valid values for the status of the resource:
+                The overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior.
-                Disabled - indicates that a resource is not operational.
-                Warning - needs attention soon.
-                Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
+                *OK* - indicates normal/informational behavior;
+                *Disabled* - indicates that the resource is not operational;
+                *Warning* - requires attention soon;
+                *Critical* - requires immediate attention;
+                *Unknown* - should be avoided, but there may be rare occasions when the status is unknown.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -3146,7 +3146,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fabric["{#NAME}",status])=0'
                   name: 'Fabric [{#NAME}]: Has critical status'
                   priority: HIGH
-                  description: 'Fabric [{#NAME}] status is critical. Needs immediate attention.'
+                  description: 'The status of the fabric [{#NAME}] is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -3156,7 +3156,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fabric["{#NAME}",status])=4'
                   name: 'Fabric [{#NAME}]: Has warning status'
                   priority: WARNING
-                  description: 'Fabric [{#NAME}] status is warning. Needs attention soon.'
+                  description: 'The status of the fabric [{#NAME}] is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -3166,7 +3166,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fabric["{#NAME}",status])=1'
                   name: 'Fabric [{#NAME}]: Is disabled'
                   priority: INFO
-                  description: 'Fabric [{#NAME}] currently not operational.'
+                  description: 'The status of the fabric [{#NAME}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -3203,7 +3203,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] data'
+              description: 'Data of the fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3296,11 +3296,11 @@ zabbix_export:
               description: |
                 Indicates whether a fan is present:
                 
-                Absent - The device slot is empty.
-                PresenceNoOp - The device slot is uninitialized.
-                PresenceUnknown - The device presence is unknown.
-                Present - The device slot has a device in it.
-                Subsumed - The device slot is configured to be part of another device slot. Not applicable for fan or power supply bays.
+                *Absent* - the device slot is empty;
+                *PresenceNoOp* - the device slot is uninitialized;
+                *PresenceUnknown* - the device presence is unknown;
+                *Present* - the device slot has a device in it;
+                *Subsumed* - the device slot is configured to be part of another device slot. Not applicable for the fan or power supply bays.
               valuemap:
                 name: 'Device presence'
               preprocessing:
@@ -3461,14 +3461,14 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Current state of the fan:
+                The current state of the fan:
                 
-                Degraded - Fan is degraded.
-                Failed - Fan has failed.
-                Misplaced - Fan is present, but not required, in this bay, and the overall fan configuration is not compliant with the enclosure fan placement rules.
-                Missing - Fan is required, but is not present.
-                OK - Fan bay has no issues.
-                Unknown - Unknown fan's state.
+                *Degraded* - a fan is degraded;
+                *Failed* -  a fan has failed;
+                *Misplaced* - a fan is present, but not required in this bay, and the overall fan configuration is not compliant with the enclosure fan placement rules;
+                *Missing* - a fan is required, but is not present;
+                *OK* - a fan bay has no issues;
+                *Unknown* - the state of a fan is unknown.
               valuemap:
                 name: 'Resource state'
               preprocessing:
@@ -3528,7 +3528,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",state])=0'
                   name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is degraded'
                   priority: AVERAGE
-                  description: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is in degraded state.'
+                  description: 'The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is in degraded state.'
                   tags:
                     -
                       tag: scope
@@ -3538,7 +3538,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",state])=1'
                   name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is failed'
                   priority: HIGH
-                  description: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is in failed state.'
+                  description: 'The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is in failed state.'
                   tags:
                     -
                       tag: scope
@@ -3548,7 +3548,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",state])=2'
                   name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is misplaced'
                   priority: WARNING
-                  description: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is misplaced.'
+                  description: 'The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is misplaced.'
                   tags:
                     -
                       tag: scope
@@ -3558,7 +3558,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",state])=3'
                   name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is missing'
                   priority: AVERAGE
-                  description: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is missing.'
+                  description: 'The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is missing.'
                   tags:
                     -
                       tag: scope
@@ -3571,13 +3571,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the fan:
+                The overall health status of the fan:
                 
-                Critical - Needs immediate attention.
-                Disabled - The resource is currently not operational.
-                OK - Indicates normal/informational behavior.
-                Unknown - The health status is not yet known or cannot be determined.
-                Warning - Needs attention soon.
+                *Critical* - requires immediate attention;
+                *Disabled* - the resource is currently not operational;
+                *OK* - indicates normal/informational behavior;
+                *Unknown* - the health status is not yet known or cannot be determined;
+                *Warning* - requires attention soon.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -3639,7 +3639,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0'
                   name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status'
                   priority: HIGH
-                  description: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.'
+                  description: 'The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -3649,7 +3649,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4'
                   name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status'
                   priority: WARNING
-                  description: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.'
+                  description: 'The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -3659,7 +3659,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1'
                   name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled'
                   priority: INFO
-                  description: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] currently not operational.'
+                  description: 'The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -3699,7 +3699,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'FC network [{#NAME}] data'
+              description: 'Data of the FC network [{#NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3753,13 +3753,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the resource. The following are the valid values for the status of the resource:
+                The overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior.
-                Disabled - indicates that a resource is not operational.
-                Warning - needs attention soon.
-                Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
+                *OK* - indicates normal/informational behavior;
+                *Disabled* - indicates that the resource is not operational;
+                *Warning* - requires attention soon;
+                *Critical* - requires immediate attention;
+                *Unknown* - should be avoided, but there may be rare occasions when the status is unknown.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -3818,7 +3818,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fc.network["{#NAME}",status])=0'
                   name: 'FC network [{#NAME}]: Has critical status'
                   priority: HIGH
-                  description: 'FC network [{#NAME}] status is critical. Needs immediate attention.'
+                  description: 'The FC network [{#NAME}] status is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -3828,7 +3828,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fc.network["{#NAME}",status])=4'
                   name: 'FC network [{#NAME}]: Has warning status'
                   priority: WARNING
-                  description: 'FC network [{#NAME}] status is warning. Needs attention soon.'
+                  description: 'The FC network [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -3838,7 +3838,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fc.network["{#NAME}",status])=1'
                   name: 'FC network [{#NAME}]: Is disabled'
                   priority: INFO
-                  description: 'FC network [{#NAME}] currently not operational.'
+                  description: 'The FC network [{#NAME}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -3875,7 +3875,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] data'
+              description: 'Data of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -3937,9 +3937,9 @@ zabbix_export:
               description: |
                 The state of the LINK port:
                 
-                Disabled - The port is disabled.
-                Linked - The port is linked.
-                Unlinked - The port is unlinked.
+                *Disabled* - the port is disabled;
+                *Linked* - the port is linked;
+                *Unlinked* - the port is unlinked.
               valuemap:
                 name: 'Link port state'
               preprocessing:
@@ -3995,11 +3995,11 @@ zabbix_export:
               description: |
                 The status of the LINK port:
                 
-                Critical - Needs immediate attention.
-                Disabled - The resource is currently not operational.
-                OK - Indicates normal/informational behavior.
-                Unknown - The health status is not yet known or cannot be determined.
-                Warning - Needs attention soon.
+                *Critical* - requires immediate attention;
+                *Disabled* - the resource is currently not operational;
+                *OK* - indicates normal/informational behavior;
+                *Unknown* - the health status is not yet known or cannot be determined;
+                *Warning* - requires attention soon.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -4061,7 +4061,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",link_port_status])=0'
                   name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Link port has critical status'
                   priority: HIGH
-                  description: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] link port status is critical. Needs immediate attention.'
+                  description: 'The link port status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -4074,7 +4074,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",link_port_status])=4'
                   name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Link port has warning status'
                   priority: WARNING
-                  description: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] link port status is warning. Needs attention soon.'
+                  description: 'The link port status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -4087,7 +4087,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",link_port_status])=1'
                   name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Link port is disabled'
                   priority: INFO
-                  description: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] link port currently not operational.'
+                  description: 'The link port of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -4102,12 +4102,12 @@ zabbix_export:
               description: |
                 The state of the MGMT port:
                 
-                Active - The port is in active mode.
-                Disabled - The port is in disabled mode.
-                I3s - The port is configured for OS deployment network traffic.
-                Other - The port is in other mode.
-                Standby - The port is in standby mode.
-                Unknown - The port mode is not known.
+                *Active* - the port is in active mode;
+                *Disabled* - the port is in disabled mode;
+                *I3s* - the port is configured for the deployment of an OS network traffic.
+                *Other* - the port is in other mode;
+                *Standby* - the port is in standby mode;
+                *Unknown* - the mode of the port is not known.
               valuemap:
                 name: 'MGMT port state'
               preprocessing:
@@ -4178,11 +4178,11 @@ zabbix_export:
               description: |
                 The status of the MGMT port:
                 
-                Critical - Needs immediate attention.
-                Disabled - The resource is currently not operational.
-                OK - Indicates normal/informational behavior.
-                Unknown - The health status is not yet known or cannot be determined.
-                Warning - Needs attention soon.
+                *Critical* - requires immediate attention;
+                *Disabled* - the resource is currently not operational;
+                *OK* - indicates normal/informational behavior;
+                *Unknown* - the health status is not yet known or cannot be determined;
+                *Warning* - requires attention soon.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -4244,7 +4244,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",mgmt_port_status])=0'
                   name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: MGMT port has critical status'
                   priority: HIGH
-                  description: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] mgmt port status is critical. Needs immediate attention.'
+                  description: 'The MGMT port status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -4254,7 +4254,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",mgmt_port_status])=4'
                   name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: MGMT port has warning status'
                   priority: WARNING
-                  description: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] MGMT port status is warning. Needs attention soon.'
+                  description: 'The MGMT port status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -4264,7 +4264,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",mgmt_port_status])=1'
                   name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: MGMT port is disabled'
                   priority: INFO
-                  description: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] MGMT port currently not operational.'
+                  description: 'The MGMT port of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -4341,11 +4341,11 @@ zabbix_export:
               description: |
                 Indicates whether a manager is present in the bay:
                 
-                Absent - The device slot is empty.
-                PresenceNoOp - The device slot is uninitialized.
-                PresenceUnknown - The device presence is unknown.
-                Present - The device slot has a device in it.
-                Subsumed - The device slot is configured to be part of another device slot. Not applicable for fan or power supply bays.
+                *Absent* - the device slot is empty;
+                *PresenceNoOp* - the device slot is uninitialized;
+                *PresenceUnknown* - the device presence is unknown;
+                *Present* - the device slot has a device in it;
+                *Subsumed* - the device slot is configured to be part of another device slot. Not applicable for the fan or power supply bays.
               valuemap:
                 name: 'Device presence'
               preprocessing:
@@ -4484,11 +4484,11 @@ zabbix_export:
               description: |
                 The health status of the link module:
                 
-                Critical - Needs immediate attention.
-                Disabled - The resource is currently not operational.
-                OK - Indicates normal/informational behavior.
-                Unknown - The health status is not yet known or cannot be determined.
-                Warning - Needs attention soon.
+                *Critical* - requires immediate attention;
+                *Disabled* - the resource is currently not operational;
+                *OK* - indicates normal/informational behavior;
+                *Unknown* - the health status is not yet known or cannot be determined;
+                *Warning* - requires attention soon.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -4550,7 +4550,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0'
                   name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status'
                   priority: HIGH
-                  description: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.'
+                  description: 'The status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -4560,7 +4560,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4'
                   name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status'
                   priority: WARNING
-                  description: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.'
+                  description: 'The status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -4570,7 +4570,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1'
                   name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled'
                   priority: INFO
-                  description: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] currently not operational.'
+                  description: 'The manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -4610,7 +4610,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Hypervisor manager [{#NAME}] data'
+              description: 'Data of the hypervisor manager [{#NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4635,7 +4635,7 @@ zabbix_export:
               key: 'hpe.synergy.hypervisor_manager["{#NAME}",state]'
               delay: '0'
               history: 7d
-              description: 'Current state of the resource. Valid values include Connected, Disconnected, Configuring and Error.'
+              description: 'The current state of the resource. The valid values include Connected, Disconnected, Configuring and Error.'
               valuemap:
                 name: 'Hypervisor manager state'
               preprocessing:
@@ -4688,7 +4688,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Indicates the reason the resource in its current state.'
+              description: 'Indicates the reason why the resource is in its current state.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4715,13 +4715,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Current status of this resource:
+                The current status of this resource:
                 
-                Critical - Needs immediate attention.
-                Disabled - The resource is currently not operational.
-                OK - Indicates normal/informational behavior.
-                Unknown - The health status is not yet known or cannot be determined.
-                Warning - Needs attention soon.
+                *Critical* - requires immediate attention;
+                *Disabled* - the resource is currently not operational;
+                *OK* - indicates normal/informational behavior;
+                *Unknown* - the health status is not yet known or cannot be determined;
+                *Warning* - requires attention soon.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -4780,7 +4780,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",status])=0'
                   name: 'Hypervisor manager [{#NAME}]: Has critical status'
                   priority: HIGH
-                  description: 'Hypervisor manager [{#NAME}] status is critical. Needs immediate attention.'
+                  description: 'The hypervisor manager [{#NAME}] status is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -4790,7 +4790,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",status])=4'
                   name: 'Hypervisor manager [{#NAME}]: Has warning status'
                   priority: WARNING
-                  description: 'Hypervisor manager [{#NAME}] status is warning. Needs attention soon.'
+                  description: 'The hypervisor manager [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -4800,7 +4800,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",status])=1'
                   name: 'Hypervisor manager [{#NAME}]: Is disabled'
                   priority: INFO
-                  description: 'Hypervisor manager [{#NAME}] currently not operational.'
+                  description: 'The hypervisor manager [{#NAME}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -4812,7 +4812,7 @@ zabbix_export:
               name: 'Hypervisor manager [{#NAME}]: Is in error state'
               opdata: 'Reason: {ITEM.LASTVALUE2}'
               priority: HIGH
-              description: 'Hypervisor manager [{#NAME}] has error.'
+              description: 'The hypervisor manager [{#NAME}] has an error.'
               tags:
                 -
                   tag: scope
@@ -4838,7 +4838,7 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.synergy.interconnects.discovery
           delay: '0'
-          description: 'Interconnects are centrally managed by their containing logical interconnect. The interconnect provides a physical view of detailed downlink and uplink port state and configuration, including the current link state, speed, port role (uplink, downlink, or stacking), current pluggable media, power state, and immediate connected neighbor.'
+          description: 'Interconnects are centrally managed by their containing logical interconnect. The interconnect provides a physical view of a detailed downlink and uplink port state and configuration, including the current link state, speed, port role (uplink, downlink, or stacking), current pluggable media, power state, and immediate connected neighbor.'
           item_prototypes:
             -
               uuid: 5c504f8c744244febae87002cd520cbd
@@ -4849,7 +4849,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Interconnect [{#NAME}] data'
+              description: 'Data of the interconnect [{#NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4876,7 +4876,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Interconnect hardware health status.'
+              description: 'The health status of the interconnect hardware.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4907,7 +4907,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Interconnect model.'
+              description: 'The interconnect model.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4935,7 +4935,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Interconnect part number.'
+              description: 'The part number of the interconnect.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4961,7 +4961,7 @@ zabbix_export:
               key: 'hpe.synergy.interconnect["{#NAME}",port_count]'
               delay: '0'
               history: 7d
-              description: 'Number of ports on the interconnect.'
+              description: 'The number of ports on the interconnect.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -4989,7 +4989,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Interconnect serial number.'
+              description: 'The serial number of the interconnect.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -5017,7 +5017,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Interconnect spare part number.'
+              description: 'The spare part number of the interconnect.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -5045,7 +5045,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Current state of the resource'
+              description: 'The current state of the resource.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -5072,13 +5072,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the resource. The following are the valid values for the status of the resource:
+                The overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                Critical - Needs immediate attention.
-                Disabled - The resource is currently not operational.
-                OK - Indicates normal/informational behavior.
-                Unknown - The health status is not yet known or cannot be determined.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
+                *OK* - indicates normal/informational behavior;
+                *Disabled* - indicates that the resource is not operational;
+                *Warning* - requires attention soon;
+                *Critical* - requires immediate attention;
+                *Unknown* - should be avoided, but there may be rare occasions when the status is unknown.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -5137,7 +5137,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.interconnect["{#NAME}",status])=0'
                   name: 'Interconnect [{#NAME}]: Has critical status'
                   priority: HIGH
-                  description: 'Interconnect [{#NAME}] status is critical. Needs immediate attention.'
+                  description: 'The interconnect [{#NAME}] status is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -5147,7 +5147,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.interconnect["{#NAME}",status])=4'
                   name: 'Interconnect [{#NAME}]: Has warning status'
                   priority: WARNING
-                  description: 'Interconnect [{#NAME}] status is warning. Needs attention soon.'
+                  description: 'The interconnect [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -5157,7 +5157,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.interconnect["{#NAME}",status])=1'
                   name: 'Interconnect [{#NAME}]: Is disabled'
                   priority: INFO
-                  description: 'Interconnect [{#NAME}] currently not operational.'
+                  description: 'The interconnect [{#NAME}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -5197,7 +5197,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Logical enclosure [{#NAME}] data'
+              description: 'Data of the logical enclosure [{#NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -5223,14 +5223,14 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Current resource state of the logical enclosure:
+                The current resource state of the logical enclosure:
                 
-                Consistent - This is the expected state of the logical enclosure. The logical enclosure configuration is consistent with the enclosure group and the configuration of the hardware resources is consistent with the logical enclosure configuration.
-                Creating - The logical enclosure is being created.
-                DeleteFailed - The prior attempt to delete the logical enclosure failed. Retry the delete operation potentially with the force option. No other logical enclosure operations are allowed in this state.
-                Deleting - The logical enclosure is being deleted.
-                Inconsistent - The configuration of the logical enclosure differs from that of the enclosure group, or the configuration of the hardware resources is inconsistent with the logical enclosure configuration. Perform an Update from group, Reapply configuration, or Update firmware action as appropriate to bring the configuration back into consistency.
-                Updating - Configuration changes are being applied to the hardware configuration.
+                *Consistent* - this is the expected state of the logical enclosure. The logical enclosure configuration is consistent with the enclosure group, and the configuration of the hardware resources is consistent with the logical enclosure configuration;
+                *Creating* - the logical enclosure is being created;
+                *DeleteFailed* - the prior attempt to delete the logical enclosure failed. Retry the delete operation potentially with the force option. No other logical enclosure operations are allowed in this state;
+                *Deleting* - the logical enclosure is being deleted;
+                *Inconsistent* - the configuration of the logical enclosure differs from that of the enclosure group, or the configuration of the hardware resources is inconsistent with the logical enclosure configuration. Perform an Update from group, Reapply configuration, or Update firmware action as an appropriate to bring the configuration back into consistency;
+                *Updating* - configuration changes are being applied to the hardware configuration.
               valuemap:
                 name: 'Logical enclosure state'
               preprocessing:
@@ -5300,7 +5300,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",state])=0'
                   name: 'Logical enclosure [{#NAME}]: Is inconsistent'
                   priority: AVERAGE
-                  description: 'The configuration of the logical enclosure differs from that of the enclosure group, or the configuration of the hardware resources is inconsistent with the logical enclosure configuration. Perform an Update from group, Reapply configuration, or Update firmware action as appropriate to bring the configuration back into consistency.'
+                  description: 'The configuration of the logical enclosure differs from that of the enclosure group, or the configuration of the hardware resources is inconsistent with the logical enclosure configuration. Perform an Update from group, Reapply configuration, or Update firmware action as an appropriate to bring the configuration back into consistency.'
                   tags:
                     -
                       tag: scope
@@ -5313,13 +5313,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the resource. The following are the valid values for the status of the resource:
+                The overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior.
-                Disabled - indicates that a resource is not operational.
-                Warning - needs attention soon.
-                Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
+                *OK* - indicates normal/informational behavior;
+                *Disabled* - indicates that the resource is not operational;
+                *Warning* - requires attention soon;
+                *Critical* - requires immediate attention;
+                *Unknown* - should be avoided, but there may be rare occasions when the status is unknown.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -5378,7 +5378,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",status])=0'
                   name: 'Logical enclosure [{#NAME}]: Has critical status'
                   priority: HIGH
-                  description: 'Logical enclosure [{#NAME}] status is critical. Needs immediate attention.'
+                  description: 'The status of the logical enclosure [{#NAME}] is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -5388,7 +5388,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",status])=4'
                   name: 'Logical enclosure [{#NAME}]: Has warning status'
                   priority: WARNING
-                  description: 'Logical enclosure [{#NAME}] status is warning. Needs attention soon.'
+                  description: 'The status of the logical enclosure [{#NAME}] is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -5398,7 +5398,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",status])=1'
                   name: 'Logical enclosure [{#NAME}]: Is disabled'
                   priority: INFO
-                  description: 'Logical enclosure [{#NAME}] currently not operational.'
+                  description: 'The logical enclosure [{#NAME}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -5435,7 +5435,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}] data'
+              description: 'Data of the partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -5493,12 +5493,12 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Indicates the health of the partition and the health of its owned resources (blades and IO bays) as reported by firmware. If a problem is detected with one of the resources, the health of the partition is reported as Degraded. If all of the resources in the partition are operating correctly the health of the partition is reported as OK.
+                Indicates the health of the partition and the health of its owned resources (blades and IO bays) as reported by the firmware. If a problem is detected with one of the resources, the health of the partition is reported as Degraded. If all the resources in the partition are operating correctly, the health of the partition is reported as OK.
                 
-                NparDegrade - One or more resources in the partition are unhealthy.
-                NparHealthInvalid - Partition health is invalid.
-                NparHealthMax - Delimiter defined by firmware.
-                NparOk - All the resources in partition are healthy.
+                *NparDegrade* - one or more resources in the partition are unhealthy.
+                *NparHealthInvalid* - a partition health is invalid.
+                *NparHealthMax* - a delimiter defined by the firmware.
+                *NparOk* - all the resources in the partition are healthy.
               valuemap:
                 name: 'Partition health'
               preprocessing:
@@ -5564,7 +5564,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",health])=1'
                   name: 'Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Health is invalid'
                   priority: AVERAGE
-                  description: 'Partition health is invalid.'
+                  description: 'The partition health is invalid.'
                   tags:
                     -
                       tag: scope
@@ -5577,7 +5577,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Total memory of the partition.'
+              description: 'The total memory of the partition.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -5646,15 +5646,15 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Indicates whether the partition has booted and its current power state:
+                Indicates whether the partition has been booted and also indicates its current power state:
                 
-                ParStatusActive - Partition is active when a 'poweron' operation is initiated on the partition and the firmware boot process is started.
-                ParStatusInactive - Partition is in inactive state after it has been created or shut down.
-                ParStatusInvalid - Partition status is invalid.
-                ParStatusManualRepair - Partition is under manual repair.
-                ParStatusMax - Delimiter defined by OA firmware.
-                ParStatusUndefined - Partition status is undefined.
-                ParStatusUnknown - Partition might report an 'Unknown' state after an OA restart. This state is possible when the firmware is not able to identify the correct partition state due to internal firmware errors at OA startup. The state is persistent and can only be cleared by force powering off the partition from the OA. A partition in this state will not accept any partition operation except parstatus and force poweroff. Any active OS instances continue to run unhindered even when the partition is in an Unknown state.
+                *ParStatusActive* - a partition is active when a 'poweron' operation is initiated on the partition and the firmware boot process is started;
+                *ParStatusInactive* - a partition is in an inactive state after it has been created or shut down;
+                *ParStatusInvalid* - a partition status is invalid;
+                *ParStatusManualRepair* -  a partition under manual repair;
+                *ParStatusMax* - a delimiter defined by the OA firmware;
+                *ParStatusUndefined* - partition status is undefined;
+                *ParStatusUnknown* - a partition might report an Unknown state after an OA restart. This state is possible when the firmware is not able to identify the correct partition state due to the internal firmware errors at an OA startup. The state is persistent and can only be cleared by force powering off of the partition from the OA. A partition in this state will not accept any partition operation except parstatus and force poweroff. Any active OS instances continue to run unhindered even when the partition is in an unknown state.
               valuemap:
                 name: 'Partition status'
               preprocessing:
@@ -5726,7 +5726,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",status])=2'
                   name: 'Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Is invalid'
                   priority: AVERAGE
-                  description: 'Partition status is invalid.'
+                  description: 'The partition status is invalid.'
                   tags:
                     -
                       tag: scope
@@ -5766,7 +5766,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] data'
+              description: 'Data of the power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -5826,7 +5826,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: W
-              description: 'The power supply output capacity.'
+              description: 'The output capacity of the power supply.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -5887,13 +5887,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Indicates whether a power supply is present.
+                Indicates whether a power supply is present:
                 
-                Absent - The device slot is empty.
-                PresenceNoOp - The device slot is uninitialized.
-                PresenceUnknown - The device presence is unknown.
-                Present - The device slot has a device in it.
-                Subsumed - The device slot is configured to be part of another device slot. Not applicable for fan or power supply bays.
+                *Absent* - the device slot is empty;
+                *PresenceNoOp* - the device slot is uninitialized;
+                *PresenceUnknown* - the device presence is unknown;
+                *Present* - the device slot has a device in it;
+                *Subsumed* - the device slot is configured to be part of another device slot. Not applicable for the fan or power supply bays.
               valuemap:
                 name: 'Device presence'
               preprocessing:
@@ -6019,13 +6019,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the power supply:
+                The overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                Critical - Needs immediate attention.
-                Disabled - The resource is currently not operational.
-                OK - Indicates normal/informational behavior.
-                Unknown - The health status is not yet known or cannot be determined.
-                Warning - Needs attention soon.
+                *OK* - indicates normal/informational behavior;
+                *Disabled* - indicates that the resource is not operational;
+                *Warning* - requires attention soon;
+                *Critical* - requires immediate attention;
+                *Unknown* - should be avoided, but there may be rare occasions when the status is unknown.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -6087,7 +6087,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0'
                   name: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status'
                   priority: HIGH
-                  description: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.'
+                  description: 'The status of the power supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -6097,7 +6097,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4'
                   name: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status'
                   priority: WARNING
-                  description: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.'
+                  description: 'The status of the power supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -6107,7 +6107,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1'
                   name: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled'
                   priority: INFO
-                  description: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] currently not operational.'
+                  description: 'The status of Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -6147,7 +6147,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Rack [{#NAME}] data'
+              description: 'Data of the rack [{#NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -6172,7 +6172,7 @@ zabbix_export:
               key: 'hpe.synergy.rack["{#NAME}",state]'
               delay: '0'
               history: 7d
-              description: 'The current state of the resource. Valid values include Adding, AddError, Configured, CredentialError, Refreshing, RefreshError, Removing, RemoveError, and Unmanaged.'
+              description: 'The current state of the resource. the valid values include Adding, AddError, Configured, CredentialError, Refreshing, RefreshError, Removing, RemoveError, and Unmanaged.'
               valuemap:
                 name: 'Rack state'
               preprocessing:
@@ -6247,7 +6247,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",state])=1'
                   name: 'Rack [{#NAME}]: Add error'
                   priority: AVERAGE
-                  description: 'Rack [{#NAME}] add failed.'
+                  description: 'Adding the rack [{#NAME}] failed.'
                   tags:
                     -
                       tag: scope
@@ -6260,7 +6260,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",state])=3'
                   name: 'Rack [{#NAME}]: Has credential error'
                   priority: AVERAGE
-                  description: 'Rack [{#NAME}] has credential error.'
+                  description: 'The rack [{#NAME}] has credential error.'
                   tags:
                     -
                       tag: scope
@@ -6270,7 +6270,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",state])=5'
                   name: 'Rack [{#NAME}]: Has refresh error'
                   priority: AVERAGE
-                  description: 'Rack [{#NAME}] has refresh error.'
+                  description: 'The rack [{#NAME}] has refresh error.'
                   tags:
                     -
                       tag: scope
@@ -6280,7 +6280,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",state])=7'
                   name: 'Rack [{#NAME}]: Has remove error'
                   priority: AVERAGE
-                  description: 'Rack [{#NAME}] has remove error.'
+                  description: 'The rack [{#NAME}] has remove error.'
                   tags:
                     -
                       tag: scope
@@ -6293,13 +6293,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the resource. The following are the valid values for the status of the resource:
+                The overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior.
-                Disabled - indicates that a resource is not operational.
-                Warning - needs attention soon.
-                Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
+                *OK* - indicates normal/informational behavior;
+                *Disabled* - indicates that the resource is not operational;
+                *Warning* - requires attention soon;
+                *Critical* - requires immediate attention;
+                *Unknown* - should be avoided, but there may be rare occasions when the status is unknown.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -6358,7 +6358,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",status])=0'
                   name: 'Rack [{#NAME}]: Has critical status'
                   priority: HIGH
-                  description: 'Rack [{#NAME}] status is critical. Needs immediate attention.'
+                  description: 'The rack [{#NAME}] status is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -6368,7 +6368,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",status])=4'
                   name: 'Rack [{#NAME}]: Has warning status'
                   priority: WARNING
-                  description: 'Rack [{#NAME}] status is warning. Needs attention soon.'
+                  description: 'The rack [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -6378,7 +6378,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",status])=1'
                   name: 'Rack [{#NAME}]: Is disabled'
                   priority: INFO
-                  description: 'Rack [{#NAME}] currently not operational.'
+                  description: 'The rack [{#NAME}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -6478,7 +6478,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!MHz'
-              description: 'Speed of the CPUs.'
+              description: 'The speed of the CPUs.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -6512,7 +6512,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Type of CPU installed on this server hardware.'
+              description: 'The type of the CPU installed on this server hardware.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -6546,7 +6546,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Server [{#SERVER_NAME}:{#LOCATION}] data'
+              description: 'Data of the server [{#SERVER_NAME}:{#LOCATION}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -6574,7 +6574,7 @@ zabbix_export:
               key: 'hpe.synergy.server_hardware["{#LOCATION}",maintenance_state]'
               delay: '0'
               history: 7d
-              description: 'Server Hardware maintenance flag - Disruptive maintenance operations like firmware update can cause many server hardware alerts to be generated in a short period of time. Ex: Network connectivity lost or Server reset detected. When this field is set, predefined alerts for this particular device are suppressed. This field is set only when firmware update is ongoing. The alerts are processed normally once firmware update operation completes. Possible values are Maintenance and Normal.'
+              description: 'The maintenance flag of the Server Hardware - disruptive maintenance operations, such as firmware update, can cause many server hardware alerts to be generated in a short period of time. Example: network connectivity is lost or the server reset is detected. When this field is set, predefined alerts for this particular device are suppressed. This field is set only when firmware update is ongoing. The alerts are processed normally once firmware update operation completes. Possible values are Maintenance and Normal.'
               valuemap:
                 name: 'Maintenance state'
               preprocessing:
@@ -6621,7 +6621,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'This field is set to Firmware update when server is put to maintenance.'
+              description: 'This field is set to Firmware update when the server is put under maintenance.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -6652,7 +6652,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Amount of memory installed on this server hardware.'
+              description: 'The amount of memory installed on this server hardware.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -6689,11 +6689,11 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                The state of an ongoing VCM migration:
+                The state of an ongoing virtual connect manager (VCM) migration:
                 
-                Migrating - The enclosure is in the process of migrating from VCM.
-                NotApplicable - The enclosure did not require or has already completed migration.
-                Unknown - The migration state is unknown.
+                *Migrating* - the enclosure is in the process of migrating from VCM;
+                *NotApplicable* - the enclosure did not require or has already completed the migration;
+                *Unknown* - the migration state is unknown.
               valuemap:
                 name: 'Migration state'
               preprocessing:
@@ -6745,7 +6745,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'The full server hardware model string.'
+              description: 'The model string of the full server hardware.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -6805,7 +6805,7 @@ zabbix_export:
               key: 'hpe.synergy.server_hardware["{#LOCATION}",power_state]'
               delay: '0'
               history: 7d
-              description: 'Current power state of the server hardware. Values are Unknown, On, Off, PoweringOn, PoweringOff or Resetting.'
+              description: 'The current power state of the server hardware. The values are Unknown, On, Off, PoweringOn, PoweringOff or Resetting.'
               valuemap:
                 name: 'Physical server power state'
               preprocessing:
@@ -6904,22 +6904,22 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                The current resource state of the server hardware. Allowable values are:
+                The current resource state of the server hardware. The allowable values are:
                 
-                Unknown - Not initialized,
-                Adding - Server being added,
-                NoProfileApplied - Server successfully added,
-                Monitored - Server being monitored,
-                Unmanaged - Discovered a supported server,
-                Removing - Server being removed,
-                RemoveFailed - Unsuccessful server removal,
-                Removed - Server successfully removed,
-                ApplyingProfile - Profile being applied to server,
-                ProfileApplied - Profile successfully applied,
-                RemovingProfile - Profile being removed,
-                ProfileError - Unsuccessful profile apply or removal,
-                Unsupported - Server model or version not currently supported by the appliance,
-                UpdatingFirmware - Server firmware update in progress.
+                *Unknown* - not initialized;
+                *Adding* - a server is being added;
+                *NoProfileApplied* - a server successfully added;
+                *Monitored* - a server is being monitored;
+                *Unmanaged* - a discovered and supported server;
+                *Removing* - a server is being removed;
+                *RemoveFailed* - an unsuccessful server removal;
+                *Removed* - a server is successfully removed;
+                *ApplyingProfile* - a server is successfully removed;
+                *ProfileApplied* - a profile is successfully applied;
+                *RemovingProfile* - a profile is being removed;
+                *ProfileError* -  an Unsuccessful profile is applied or removed;
+                *Unsupported* - a server model or version is not currently supported by the appliance;
+                *UpdatingFirmware* - a server firmware update is in progress.
               valuemap:
                 name: 'Server hardware state'
               preprocessing:
@@ -7022,7 +7022,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state])=11'
                   name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Has profile error'
                   priority: AVERAGE
-                  description: 'Unsuccessful profile apply or removal.'
+                  description: 'The unsuccessful profile application or removal.'
                   tags:
                     -
                       tag: scope
@@ -7032,7 +7032,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state])=0'
                   name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Is not initialized'
                   priority: WARNING
-                  description: 'Server not initialized.'
+                  description: 'The server is not initialized.'
                   tags:
                     -
                       tag: scope
@@ -7042,7 +7042,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state])=12'
                   name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Is unsupported'
                   priority: AVERAGE
-                  description: 'Server model or version not currently supported by the appliance.'
+                  description: 'The server model or version is not currently supported by the appliance.'
                   tags:
                     -
                       tag: scope
@@ -7067,17 +7067,17 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: |
-                The reason for the current resource state of the server hardware. This only applies if the state is 'Unmanaged', otherwise it is set to 'NotApplicable'. Allowable values are:
+                The reason for the current resource state of the server hardware. This only applies if the state is Unmanaged, otherwise it is set to NotApplicable. The allowable values are:
                 
-                Unsupported - Server model or version not currently supported by the appliance,
-                UpdatingFirmware - Server firmware update in progress,
-                NotApplicable - When PhysicalServerState is anything besides 'Unmanaged',
-                NotOwner - No claim on server,
-                Inventory - Server added by PDU,
-                Unconfigured - Discovery data incomplete or iLO configuration failure,
-                UnsupportedFirmware - iLO firmware version below minimum support level,
-                Interrupted - When PhysicalServerState is a result of an operation that was terminated before completing,
-                CommunicationError - Appliance cannot communicate with iLO or OA.
+                *Unsupported* - a server model or version is not currently supported by the appliance;
+                *UpdatingFirmware* - a server firmware update is in progress;
+                *NotApplicable* - when PhysicalServerState is anything besides Unmanaged;
+                *NotOwner* -  no claim on the server;
+                *Inventory* - a server is added by the PDU;
+                *Unconfigured* - the discovery data is incomplete or an iLO configuration has failed;
+                *UnsupportedFirmware* - an iLO firmware version is below the minimum support level;
+                *Interrupted* - when PhysicalServerState is a result of an operation that was terminated before completing;
+                *CommunicationError* - an appliance cannot communicate with an iLO or an OA.
               preprocessing:
                 -
                   type: JSONPATH
@@ -7107,13 +7107,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the resource. The following are the valid values for the status of the resource:
+                The overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior.
-                Disabled - indicates that a resource is not operational or that a server profile has not been assigned.
-                Warning - needs attention soon.
-                Critical - needs attention soon.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
+                *OK* - indicates normal/informational behavior;
+                *Disabled* - indicates that the resource is not operational;
+                *Warning* - requires attention soon;
+                *Critical* - requires immediate attention;
+                *Unknown* - should be avoided, but there may be rare occasions when the status is unknown.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -7175,7 +7175,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",status])=0'
                   name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Has critical status'
                   priority: HIGH
-                  description: 'Server [{#SERVER_NAME}:{#LOCATION}] status is critical. Needs immediate attention.'
+                  description: 'The status of the server [{#SERVER_NAME}:{#LOCATION}] is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -7185,7 +7185,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",status])=4'
                   name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Has warning status'
                   priority: WARNING
-                  description: 'Server [{#SERVER_NAME}:{#LOCATION}] status is warning. Needs attention soon.'
+                  description: 'The status of the server [{#SERVER_NAME}:{#LOCATION}] is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -7195,7 +7195,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",status])=1'
                   name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Is disabled'
                   priority: INFO
-                  description: 'Server [{#SERVER_NAME}:{#LOCATION}] currently not operational.'
+                  description: 'The server [{#SERVER_NAME}:{#LOCATION}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -7207,7 +7207,7 @@ zabbix_export:
               name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Is in maintenance mode'
               opdata: 'Reason: {ITEM.LASTVALUE2}'
               priority: INFO
-              description: 'Disruptive maintenance operations like firmware update can cause many server hardware alerts to be generated in a short period of time. Ex: Network connectivity lost or Server reset detected.'
+              description: 'The disruptive maintenance operations like firmware update can cause many server hardware alerts to be generated in a short period of time. Example: Network connectivity is lost or the server reset is detected.'
               tags:
                 -
                   tag: scope
@@ -7257,7 +7257,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Capacity allocated from the storage pool in bytes.'
+              description: 'The capacity allocated from the storage pool in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7280,7 +7280,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Free capacity available from the storage pool in bytes.'
+              description: 'The free capacity available from the storage pool in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7303,7 +7303,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'The pool capacity allocated to snapshots in bytes.'
+              description: 'The pool capacity allocated to the snapshots in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7326,7 +7326,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Total capacity of the storage pool in bytes.'
+              description: 'The total capacity of the storage pool in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7350,7 +7350,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Storage pool [{#NAME}] data'
+              description: 'Data of the storage pool [{#NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7376,22 +7376,22 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Current state of the resource:
+                The current state of the resource:
                 
-                AddFailed - An attempt to add the resource failed
-                Adding - The resource is in the process of being added
-                Configured - The resource is configured
-                Connected - The appliance has connected to the resource
-                Copying - The resource is in the process of being copied
-                CreateFailed - An attempt to create the resource failed
-                Creating - The resource is in the process of being created
-                DeleteFailed - An attempt to delete the resource failed
-                Deleting - The resource is in the process of being deleted
-                Discovered - The resource has been discovered by the appliance, but it is not managed by the appliance
-                Managed - The resource is managed by the appliance
-                Normal - The resource is in a normal state
-                UpdateFailed - An attempt to update the resource failed
-                Updating - The resource is in the process of being updated
+                *AddFailed* - an attempt to add the resource failed;
+                *Adding* - the resource is in the process of being added;
+                *Configured* - the resource is configured;
+                *Connected* - the appliance has connected to the resource;
+                *Copying* - the resource is in the process of being copied;
+                *CreateFailed* - an attempt to create the resource failed;
+                *Creating* - the resource is in the process of being created;
+                *DeleteFailed* - an attempt to delete the resource failed;
+                *Deleting* - the resource is in the process of being deleted;
+                *Discovered* - the resource has been discovered by the appliance, but it is not managed by the appliance;
+                *Managed* - the resource is managed by the appliance;
+                *Normal* - the resource is in a normal state;
+                *UpdateFailed* - an attempt to update the resource failed;
+                *Updating* - the resource is in the process of being updated.
               valuemap:
                 name: 'Storage volume state'
               preprocessing:
@@ -7491,7 +7491,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=0'
                   name: 'Storage pool [{#NAME}]: Add error'
                   priority: AVERAGE
-                  description: 'Storage pool [{#NAME}] add failed.'
+                  description: 'Adding of the storage pool [{#NAME}] failed.'
                   tags:
                     -
                       tag: scope
@@ -7504,7 +7504,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=5'
                   name: 'Storage pool [{#NAME}]: Create failed'
                   priority: AVERAGE
-                  description: 'Storage pool [{#NAME}] create failed.'
+                  description: 'Creating of the storage pool [{#NAME}] failed.'
                   tags:
                     -
                       tag: scope
@@ -7517,7 +7517,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=7'
                   name: 'Storage pool [{#NAME}]: Delete failed'
                   priority: AVERAGE
-                  description: 'Storage pool [{#NAME}] delete failed.'
+                  description: 'Deletion of the storage pool [{#NAME}] failed.'
                   tags:
                     -
                       tag: scope
@@ -7527,7 +7527,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=12'
                   name: 'Storage pool [{#NAME}]: Update failed'
                   priority: AVERAGE
-                  description: 'Storage pool [{#NAME}] update failed.'
+                  description: 'Updating of the storage pool [{#NAME}] failed.'
                   tags:
                     -
                       tag: scope
@@ -7540,13 +7540,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the resource. The following are the valid values for the status of the resource:
+                The overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior.
-                Disabled - indicates that a resource is not operational.
-                Warning - needs attention soon.
-                Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
+                *OK* - indicates normal/informational behavior;
+                *Disabled* - indicates that the resource is not operational;
+                *Warning* - requires attention soon;
+                *Critical* - requires immediate attention;
+                *Unknown* - should be avoided, but there may be rare occasions when the status is unknown.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -7605,7 +7605,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",status])=0'
                   name: 'Storage pool [{#NAME}]: Has critical status'
                   priority: HIGH
-                  description: 'Storage pool [{#NAME}] status is critical. Needs immediate attention.'
+                  description: 'The status of the storage pool [{#NAME}] is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -7618,7 +7618,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",status])=4'
                   name: 'Storage pool [{#NAME}]: Has warning status'
                   priority: WARNING
-                  description: 'Storage pool [{#NAME}] status is warning. Needs attention soon.'
+                  description: 'The status of the storage pool [{#NAME}] is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -7631,7 +7631,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",status])=1'
                   name: 'Storage pool [{#NAME}]: Is disabled'
                   priority: INFO
-                  description: 'Storage pool [{#NAME}] currently not operational.'
+                  description: 'The storage pool [{#NAME}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -7689,7 +7689,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Capacity allocated in bytes.'
+              description: 'The capacity allocated in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7712,7 +7712,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Free capacity of the storage system in bytes.'
+              description: 'The free capacity of the storage system in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7735,7 +7735,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Total capacity of the storage system in bytes.'
+              description: 'The total capacity of the storage system in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7759,7 +7759,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Storage system [{#NAME}] data'
+              description: 'Data of the storage system [{#NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -7785,22 +7785,22 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Current state of the resource:
+                The current state of the resource:
                 
-                AddFailed - An attempt to add the resource failed
-                Adding - The resource is in the process of being added
-                Configured - The resource is configured
-                Connected - The appliance has connected to the resource
-                Copying - The resource is in the process of being copied
-                CreateFailed - An attempt to create the resource failed
-                Creating - The resource is in the process of being created
-                DeleteFailed - An attempt to delete the resource failed
-                Deleting - The resource is in the process of being deleted
-                Discovered - The resource has been discovered by the appliance, but it is not managed by the appliance
-                Managed - The resource is managed by the appliance
-                Normal - The resource is in a normal state
-                UpdateFailed - An attempt to update the resource failed
-                Updating - The resource is in the process of being updated
+                *AddFailed* - an attempt to add the resource failed;
+                *Adding* - the resource is in the process of being added;
+                *Configured* - the resource is configured;
+                *Connected* - the appliance has connected to the resource;
+                *Copying* - the resource is in the process of being copied;
+                *CreateFailed* - an attempt to create the resource failed;
+                *Creating* - the resource is in the process of being created;
+                *DeleteFailed* - an attempt to delete the resource failed;
+                *Deleting* - the resource is in the process of being deleted;
+                *Discovered* - the resource has been discovered by the appliance, but it is not managed by the appliance;
+                *Managed* - the resource is managed by the appliance;
+                *Normal* - the resource is in a normal state;
+                *UpdateFailed* - an attempt to update the resource failed;
+                *Updating* - the resource is in the process of being updated.
               valuemap:
                 name: 'Storage volume state'
               preprocessing:
@@ -7900,7 +7900,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=0'
                   name: 'Storage system [{#NAME}]: Add error'
                   priority: AVERAGE
-                  description: 'Storage system [{#NAME}] add failed.'
+                  description: 'Adding the storage system [{#NAME}] failed.'
                   tags:
                     -
                       tag: scope
@@ -7913,7 +7913,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=5'
                   name: 'Storage system [{#NAME}]: Create failed'
                   priority: AVERAGE
-                  description: 'Storage system [{#NAME}] create failed.'
+                  description: 'Creating of the storage system [{#NAME}] failed.'
                   tags:
                     -
                       tag: scope
@@ -7926,7 +7926,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=7'
                   name: 'Storage system [{#NAME}]: Delete failed'
                   priority: AVERAGE
-                  description: 'Storage system [{#NAME}] delete failed.'
+                  description: 'Deletion of the storage system [{#NAME}] failed.'
                   tags:
                     -
                       tag: scope
@@ -7936,7 +7936,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=12'
                   name: 'Storage system [{#NAME}]: Update failed'
                   priority: AVERAGE
-                  description: 'Storage system [{#NAME}] update failed.'
+                  description: 'Updating of the storage system [{#NAME}] failed.'
                   tags:
                     -
                       tag: scope
@@ -7949,13 +7949,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the resource. The following are the valid values for the status of the resource:
+                The overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior.
-                Disabled - indicates that a resource is not operational.
-                Warning - needs attention soon.
-                Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
+                *OK* - indicates normal/informational behavior;
+                *Disabled* - indicates that the resource is not operational;
+                *Warning* - requires attention soon;
+                *Critical* - requires immediate attention;
+                *Unknown* - should be avoided, but there may be rare occasions when the status is unknown.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -8014,7 +8014,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",status])=0'
                   name: 'Storage system [{#NAME}]: Has critical status'
                   priority: HIGH
-                  description: 'Storage system [{#NAME}] status is critical. Needs immediate attention.'
+                  description: 'The status of the storage system [{#NAME}] is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -8027,7 +8027,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",status])=4'
                   name: 'Storage system [{#NAME}]: Has warning status'
                   priority: WARNING
-                  description: 'Storage system [{#NAME}] status is warning. Needs attention soon.'
+                  description: 'The status of the storage system [{#NAME}] is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -8040,7 +8040,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",status])=1'
                   name: 'Storage system [{#NAME}]: Is disabled'
                   priority: INFO
-                  description: 'Storage system [{#NAME}] currently not operational.'
+                  description: 'The storage system [{#NAME}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -8098,7 +8098,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Capacity allocated in bytes.'
+              description: 'The capacity allocated in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -8121,7 +8121,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Total provisioned capacity of volume in bytes.'
+              description: 'The total provisioned capacity of the volume in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -8145,7 +8145,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Storage volume [{#NAME}] data'
+              description: 'Data of the storage volume [{#NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -8171,22 +8171,22 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Current state of the resource:
+                The current state of the resource:
                 
-                AddFailed - An attempt to add the resource failed
-                Adding - The resource is in the process of being added
-                Configured - The resource is configured
-                Connected - The appliance has connected to the resource
-                Copying - The resource is in the process of being copied
-                CreateFailed - An attempt to create the resource failed
-                Creating - The resource is in the process of being created
-                DeleteFailed - An attempt to delete the resource failed
-                Deleting - The resource is in the process of being deleted
-                Discovered - The resource has been discovered by the appliance, but it is not managed by the appliance
-                Managed - The resource is managed by the appliance
-                Normal - The resource is in a normal state
-                UpdateFailed - An attempt to update the resource failed
-                Updating - The resource is in the process of being updated
+                *AddFailed* - an attempt to add the resource failed;
+                *Adding* - the resource is in the process of being added;
+                *Configured* - the resource is configured;
+                *Connected* - the appliance has connected to the resource;
+                *Copying* - the resource is in the process of being copied;
+                *CreateFailed* - an attempt to create the resource failed;
+                *Creating* - the resource is in the process of being created;
+                *DeleteFailed* - an attempt to delete the resource failed;
+                *Deleting* - the resource is in the process of being deleted;
+                *Discovered* - the resource has been discovered by the appliance, but it is not managed by the appliance;
+                *Managed* - the resource is managed by the appliance;
+                *Normal* - the resource is in a normal state;
+                *UpdateFailed* - an attempt to update the resource failed;
+                *Updating* - the resource is in the process of being updated.
               valuemap:
                 name: 'Storage volume state'
               preprocessing:
@@ -8286,7 +8286,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=0'
                   name: 'Storage volume [{#NAME}]: Add error'
                   priority: AVERAGE
-                  description: 'Storage volume [{#NAME}] add failed.'
+                  description: 'Adding the storage volume [{#NAME}] failed.'
                   tags:
                     -
                       tag: scope
@@ -8299,7 +8299,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=5'
                   name: 'Storage volume [{#NAME}]: Create failed'
                   priority: AVERAGE
-                  description: 'Storage volume [{#NAME}] create failed.'
+                  description: 'Creating of the storage volume [{#NAME}] failed.'
                   tags:
                     -
                       tag: scope
@@ -8312,7 +8312,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=7'
                   name: 'Storage volume [{#NAME}]: Delete failed'
                   priority: AVERAGE
-                  description: 'Storage volume [{#NAME}] delete failed.'
+                  description: 'Deletion of the storage volume [{#NAME}] failed.'
                   tags:
                     -
                       tag: scope
@@ -8322,7 +8322,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=12'
                   name: 'Storage volume [{#NAME}]: Update failed'
                   priority: AVERAGE
-                  description: 'Storage volume [{#NAME}] update failed.'
+                  description: 'Updating of the storage volume [{#NAME}] failed.'
                   tags:
                     -
                       tag: scope
@@ -8335,13 +8335,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the resource. The following are the valid values for the status of the resource:
+                The overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior.
-                Disabled - indicates that a resource is not operational.
-                Warning - needs attention soon.
-                Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
+                *OK* - indicates normal/informational behavior;
+                *Disabled* - indicates that the resource is not operational;
+                *Warning* - requires attention soon;
+                *Critical* - requires immediate attention;
+                *Unknown* - should be avoided, but there may be rare occasions when the status is unknown.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -8400,7 +8400,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",status])=0'
                   name: 'Storage volume [{#NAME}]: Has critical status'
                   priority: HIGH
-                  description: 'Storage volume [{#NAME}] status is critical. Needs immediate attention.'
+                  description: 'The status of the storage volume [{#NAME}] is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -8413,7 +8413,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",status])=4'
                   name: 'Storage volume [{#NAME}]: Has warning status'
                   priority: WARNING
-                  description: 'Storage volume [{#NAME}] status is warning. Needs attention soon.'
+                  description: 'The status of the storage volume [{#NAME}] is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -8426,7 +8426,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",status])=1'
                   name: 'Storage volume [{#NAME}]: Is disabled'
                   priority: INFO
-                  description: 'Storage volume [{#NAME}] currently not operational.'
+                  description: 'The storage volume [{#NAME}] is currently not operational.'
                   tags:
                     -
                       tag: scope
@@ -8482,7 +8482,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Uplink set [{#NAME}] data'
+              description: 'Data of the uplink set [{#NAME}].'
               preprocessing:
                 -
                   type: JSONPATH
@@ -8512,7 +8512,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Current state of the resource.'
+              description: 'The current state of the resource.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -8542,13 +8542,13 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                Overall health status of the resource. The following are the valid values for the status of the resource:
+                The overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior.
-                Disabled - indicates that a resource is not operational.
-                Warning - needs attention soon.
-                Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
+                *OK* - indicates normal/informational behavior;
+                *Disabled* - indicates that the resource is not operational;
+                *Warning* - requires attention soon;
+                *Critical* - requires immediate attention;
+                *Unknown* - should be avoided, but there may be rare occasions when the status is unknown.
               valuemap:
                 name: 'Health status'
               preprocessing:
@@ -8610,7 +8610,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.uplink_set["{#NAME}",status])=0'
                   name: 'Uplink set [{#NAME}]: Has critical status'
                   priority: HIGH
-                  description: 'Uplink set [{#NAME}] status is critical. Needs immediate attention.'
+                  description: 'The status of the uplink set [{#NAME}] is critical. Needs immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -8620,7 +8620,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.uplink_set["{#NAME}",status])=4'
                   name: 'Uplink set [{#NAME}]: Has warning status'
                   priority: WARNING
-                  description: 'Uplink set [{#NAME}] status is warning. Needs attention soon.'
+                  description: 'The status of the uplink set [{#NAME}] is warning. Needs attention soon.'
                   tags:
                     -
                       tag: scope
@@ -8630,7 +8630,7 @@ zabbix_export:
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.uplink_set["{#NAME}",status])=1'
                   name: 'Uplink set [{#NAME}]: Is disabled'
                   priority: INFO
-                  description: 'Uplink set [{#NAME}] currently not operational.'
+                  description: 'The uplink set [{#NAME}] is currently not operational.'
                   tags:
                     -
                       tag: scope
