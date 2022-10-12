@@ -217,7 +217,6 @@ int	get_process_type_forks(unsigned char proc_type)
 }
 
 #ifndef _WINDOWS
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Initialize structures and prepare state                           *
@@ -317,7 +316,7 @@ void	zbx_free_selfmon_collector(void)
  *             state - [IN] new process state; ZBX_PROCESS_STATE_*            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_update_selfmon_counter(const zbx_thread_info_t* info, unsigned char state)
+void	zbx_update_selfmon_counter(const zbx_thread_info_t *info, unsigned char state)
 {
 	zbx_stat_process_t	*process;
 	clock_t			ticks;
@@ -711,5 +710,4 @@ ZBX_THREAD_ENTRY(zbx_selfmon_thread, args)
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
 }
-
 #endif
