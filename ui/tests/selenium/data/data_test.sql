@@ -536,8 +536,8 @@ INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (1503
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15031, 15095, 15011);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15032, 15096, 15016);
 
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, posts, headers)                          VALUES (15083, 15002, 0, 'testInheritanceItemPrototype5', 'item-prototype-test5'    , '30s', 3, '', '', 2, '', '');
-INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15084, 15001, 0, 'testInheritanceItemPrototype5', 'item-prototype-test5'    , '30s', 3, '', '', 2, 15000, 15083, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, posts, headers)                          VALUES (15083, 15002, 0, 'testInheritanceItemPrototype5', 'item-prototype-test5[{#KEY}]', '30s', 3, '', '', 2, '', '');
+INSERT INTO items (itemid, hostid, type, name, key_, delay, value_type, params, description, flags, interfaceid, templateid, posts, headers) VALUES (15084, 15001, 0, 'testInheritanceItemPrototype5', 'item-prototype-test5[{#KEY}]', '30s', 3, '', '', 2, 15000, 15083, '', '');
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15083, 15083, 15081);
 INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid) values (15084, 15084, 15082);
 
