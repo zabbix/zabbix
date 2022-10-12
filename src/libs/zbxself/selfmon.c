@@ -676,7 +676,6 @@ void	zbx_sleep_loop(const zbx_thread_info_t *info, int sleeptime)
 
 ZBX_THREAD_ENTRY(zbx_selfmon_thread, args)
 {
-	double	sec;
 	zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
 	zbx_thread_info_t	*info = &thread_args->info;
 	const char		*program_type_str = NULL, *process_type_str = NULL;
@@ -692,7 +691,8 @@ ZBX_THREAD_ENTRY(zbx_selfmon_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		sec = zbx_time();
+		double	sec = zbx_time();
+
 		zbx_update_env(sec);
 
 		zbx_setproctitle("%s [processing data]", process_type_str);
