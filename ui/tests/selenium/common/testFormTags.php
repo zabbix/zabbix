@@ -621,7 +621,7 @@ class testFormTags extends CWebTest {
 			case 'item':
 			case 'item prototype':
 				$form = $this->query('name:itemForm')->asForm()->waitUntilPresent()->one();
-				$form->fill(['Name' => $new_name, 'Key' => 'newkey_'.microtime(true)]);
+				$form->fill(['Name' => $new_name, 'Key' => 'newkey_'.microtime(true).'[{#KEY}]']);
 				$sql_old_name = 'SELECT NULL FROM items WHERE name='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM items WHERE name='.zbx_dbstr($new_name);
 				break;
