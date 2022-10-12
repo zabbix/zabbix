@@ -466,43 +466,108 @@ static int	DBpatch_6030060(void)
 {
 	const ZBX_FIELD	field = {"name_upper", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	if (SUCCEED == DBfield_exists("hosts", "name_upper"))
+	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "name_upper column in table hosts already exists, skipping patch");
+		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
+				" skipping patch of adding \"name_upper\" column to \"hosts\" table");
 		return SUCCEED;
 	}
 
-	if (ZBX_DB_OK > DBadd_field("hosts", &field))
-		return FAIL;
+	return DBadd_field("hosts", &field);
+}
 
-	if (SUCCEED != DBcreate_index("hosts", "hosts_6", "name_upper", 0))
-		return FAIL;
+static int	DBpatch_6030061(void)
+{
+	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
+				" skipping patch of adding index to \"name_upper\" column");
+		return SUCCEED;
+	}
+
+	return DBcreate_index("hosts", "hosts_6", "name_upper", 0);
+}
+
+
+static int	DBpatch_6030062(void)
+{
+	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
+				" skipping patch of updating \"name_upper\" column");
+
+		return SUCCEED;
+	}
 
 	if (ZBX_DB_OK > DBexecute("update hosts set name_upper=upper(name)"))
 		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6030063(void)
+{
+	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
+				" skipping patch of adding it (and also insert trigger) to \"hosts\" table");
+		return SUCCEED;
+	}
 
 	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("hosts", "name", "name_upper", "upper",
 			"hostid");
 }
 
-static int	DBpatch_6030061(void)
+static int	DBpatch_6030064(void)
 {
 	const ZBX_FIELD field = {"name_upper", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	if (SUCCEED == DBfield_exists("items", "name_upper"))
+	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "name_upper column in table items already exists, skipping patch");
+		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
+				" skipping patch of adding \"name_upper\" column to \"items\" table");
 		return SUCCEED;
 	}
 
-	if (ZBX_DB_OK > DBadd_field("items", &field))
-		return FAIL;
+	return DBadd_field("items", &field);
+}
 
-	if (SUCCEED != DBcreate_index("items", "items_9", "hostid,name_upper", 0))
-		return FAIL;
+static int	DBpatch_6030065(void)
+{
+	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
+				" skipping patch of adding index to \"name_upper\" column");
+
+		return SUCCEED;
+	}
+
+	return DBcreate_index("items", "items_9", "hostid,name_upper", 0);
+}
+
+static int	DBpatch_6030066(void)
+{
+	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
+				" skipping patch of updating \"name_upper\" column");
+		return SUCCEED;
+	}
 
 	if (ZBX_DB_OK > DBexecute("update items set name_upper=upper(name)"))
 		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6030067(void)
+{
+	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
+				" skipping patch of adding it (and also insert trigger) to \"items\" table");
+		return SUCCEED;
+	}
 
 	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("items", "name", "name_upper", "upper",
 			"itemid");
@@ -575,5 +640,10 @@ DBPATCH_ADD(6030058, 0, 1)
 DBPATCH_ADD(6030059, 0, 1)
 DBPATCH_ADD(6030060, 0, 1)
 DBPATCH_ADD(6030061, 0, 1)
-
+DBPATCH_ADD(6030062, 0, 1)
+DBPATCH_ADD(6030063, 0, 1)
+DBPATCH_ADD(6030064, 0, 1)
+DBPATCH_ADD(6030065, 0, 1)
+DBPATCH_ADD(6030066, 0, 1)
+DBPATCH_ADD(6030067, 0, 1)
 DBPATCH_END()
