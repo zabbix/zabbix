@@ -21,7 +21,9 @@
 namespace SCIM;
 
 use API as JSRPC;
+use APIException;
 use CAuthenticationHelper;
+use CApiInputValidator;
 use CApiService;
 use CProvisioning;
 use DB;
@@ -49,6 +51,8 @@ class Group extends CApiService {
 	 * @return array                Returns group data necessary for GET request SCIM response.
 	 */
 	public function get(array $options = []): array {
+		$this->validateGet($options);
+
 		if (!array_key_exists('id', $options)) {
 			$db_scim_groups = DB::select('scim_groups', [
 				'output' => ['name', 'scim_groupid']
@@ -73,10 +77,25 @@ class Group extends CApiService {
 
 			if ($db_scim_group) {
 				$this->setData($options['id'], $db_scim_group[0]['name'], $users);
-			}													// TODO need to add error in case there is no such group
+			}
 		}
 
 		return $this->data;
+	}
+
+	/**
+	 * @param array $options
+	 *
+	 * @throws APIException if input is invalid.
+	 */
+	private function validateGet(array $options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'id' =>			['type' => API_ID],
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
@@ -91,10 +110,12 @@ class Group extends CApiService {
 	 * @return array                                 Returns array with data necessary for SCIM response.
 	 */
 	public function post(array $options): array {
+		$this->validatePost($options);
+
 		$saml_provisioning_data = new CProvisioning(CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML));
 
 		$scim_groupid = DB::insert('scim_groups', [['name' => $options['displayName']]]);
-		$memberids = array_column($options['members'], 'value'); 			// TODO: check how data is passed if no members in group yet?
+		$memberids = array_column($options['members'], 'value');
 
 		foreach ($memberids as $memberid) {
 			DB::insert('users_scim_groups', [[
@@ -116,6 +137,25 @@ class Group extends CApiService {
 	}
 
 	/**
+	 * @param array $options
+	 *
+	 * @throws APIException if input is invalid.
+	 */
+	private function validatePost(array $options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
+			'displayName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'members' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+				'display' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'value' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
 	 * Receives new information on the SCIM group and its members. Updates 'users_scim_groups' table, updates users'
 	 * user groups mapping based on the remaining SCIM groups and SAML settings.
 	 *
@@ -127,6 +167,8 @@ class Group extends CApiService {
 	 * @return array                                 Returns array with data necessary for SCIM response.
 	 */
 	public function put(array $options): array {
+		$this->validatePut($options);
+
 		$saml_provisioning_data = new CProvisioning(CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML));
 
 		$db_scim_group = DB::select('scim_groups', [
@@ -150,7 +192,7 @@ class Group extends CApiService {
 					'scim_groupid' => $options['id']
 				]]);
 
-				$this->updateProvisionedUsersGroup($userid, $saml_provisioning_data);
+				$this->updateProvisionedUsersGroup($userid, $saml_provisioning_data);				// TODO: Do I need a check here and error in case user cannot be updated?
 			}
 		}
 		elseif($users_to_remove) {
@@ -172,6 +214,25 @@ class Group extends CApiService {
 	}
 
 	/**
+	 * @param array $options
+	 *
+	 * @throws APIException if input is invalid.
+	 */
+	private function validatePut($options) {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
+			'displayName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'members' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
+				'display' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'value' =>			['type' => API_ID, 'flags' => API_REQUIRED]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
 	 * Deletes SCIM group from 'scim_group' table. Deletes the users that belong to this group from 'users_scim_groups'
 	 * table. Updates users' user groups mapping based on the remaining SCIM groups and SAML settings.
 	 *
@@ -181,6 +242,8 @@ class Group extends CApiService {
 	 * @return array                Returns schema parameter in the array if the deletion was successful.
 	 */
 	public function delete(array $options): array {
+		$this->validateDelete($options);
+
 		$db_scim_group_members = DB::select('users_scim_groups', [
 			'filter' => ['scim_groupid' => $options['id']],
 			'output' => ['userid']
@@ -195,8 +258,26 @@ class Group extends CApiService {
 				$this->updateProvisionedUsersGroup($userid, $saml_provisioning_data);
 			}
 		}
+		else {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Unable to delete this group')); // TODO: how to format this error correctly?
+		}
 
 		return $this->data;
+	}
+
+	/**
+	 * @param array $options
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	private function validateDelete(array $options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+			'id' =>	['type' => API_ID, 'flags' => API_REQUIRED, 'uniq' => true]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**

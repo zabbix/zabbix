@@ -79,7 +79,7 @@ class User extends CApiService {
 			$this->data += $this->prepareData($user[0], $saml_settings);
 		}
 		else {
-			$this->data['Resources'] = [];
+			$this->data['Resources'] = [];				// TODO: or should there be some error message
 		}
 
 		return $this->data;
@@ -97,7 +97,6 @@ class User extends CApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			sdff($error);
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
@@ -150,7 +149,9 @@ class User extends CApiService {
 		if ($user) {
 			$this->setData($user['userid'], $saml_settings, $options);
 		}
-													// TODO here need to add error message in case user is not created
+		else {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Unable to create this user')); // TODO: how to format this error correctly?
+		}
 
 		return $this->data;
 	}
@@ -188,7 +189,7 @@ class User extends CApiService {
 		$saml_provisioning_data = new CProvisioning($saml_settings);
 		$db_user = JSRPC::User()->get([
 			'userids' => $options['id']
-		]);
+		]);																// TODO: do I need to check this, if put will be run only if this user exists?
 
 		if ($options['active'] == true) {
 			$user_attributes = $saml_provisioning_data->getUserAttributes($options);
@@ -210,9 +211,16 @@ class User extends CApiService {
 			if ($user) {
 				$this->setData($user['userid'], $saml_settings, $options);
 			}
+			else {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Unable to create this user')); // TODO: how to format this error correctly?
+			}
 		}
 		else {
-			JSRPC::User()->delete([$db_user[0]['userid']]);
+			$user = JSRPC::User()->delete([$db_user[0]['userid']]);
+
+			if (!$user) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Unable to delete this user')); // TODO: how to format this error correctly?
+			}
 		}
 
 		return $this->data;
@@ -250,9 +258,13 @@ class User extends CApiService {
 			'userids' => $options['id']
 		]);
 
-		if ($db_user) {
-			JSRPC::User()->delete([$db_user[0]['userid']]);
-		}										// TODO need to add response if user was not found
+		if ($db_user) {												// TODO: do I need to check this, if put will be run only if this user exists?
+			$user = JSRPC::User()->delete([$db_user[0]['userid']]);
+
+			if (!$user) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Unable to delete this user')); // TODO: how to format this error correctly?
+			}
+		}
 
 		return $this->data;
 	}
