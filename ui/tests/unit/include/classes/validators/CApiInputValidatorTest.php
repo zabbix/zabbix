@@ -5319,7 +5319,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_JSON],
 				'[{"key": "value"}]',
 				'/1/json',
-				'[{"key": "value"}]',
+				'[{"key": "value"}]'
 			],
 			[
 				['type' => API_JSON],
@@ -6878,7 +6878,7 @@ class CApiInputValidatorTest extends TestCase {
 				[
 					'type' => ZBX_PREPROC_REGSUB,
 					'params' => "^[a-z]$\n\\1"
-				],
+				]
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_XPATH]],
