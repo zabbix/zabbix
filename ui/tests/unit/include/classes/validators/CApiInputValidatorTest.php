@@ -1283,12 +1283,6 @@ class CApiInputValidatorTest extends TestCase {
 				'0'
 			],
 			[
-				['type' => API_ID, 'flags' => API_NOT_EMPTY],
-				0,
-				'/1/id',
-				'Invalid parameter "/1/id": cannot be empty.'
-			],
-			[
 				['type' => API_ID],
 				12345,
 				'/1/id',
@@ -1347,12 +1341,6 @@ class CApiInputValidatorTest extends TestCase {
 				null,
 				'/1/id',
 				'Invalid parameter "/1/id": a number is expected.'
-			],
-			[
-				['type' => API_ID, 'flags' => API_ALLOW_NULL],
-				null,
-				'/1/id',
-				null
 			],
 			[
 				['type' => API_ID],
@@ -5414,6 +5402,30 @@ class CApiInputValidatorTest extends TestCase {
 				],
 				'/',
 				'Invalid parameter "/active_till": cannot be less than or equal to the value of parameter "/active_since".'
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => '3', 'name2' => '2', 'value' => ['1', '2', '3', '4', '1']],
+				'/',
+				'Invalid parameter "/": unexpected parameter "name2".'
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => '3', 'name' => null, 'value' => ['1', '2', '3', '4', '1']],
+				'/',
+				['type' => ['3'], 'name' => null, 'value' => ['1', '2', '3', '4', '1']]
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => '3', 'name' => '2', 'value' => ['1', '2', '3', null, '1']],
+				'/',
+				'Invalid parameter "/value/4": a character string, integer or floating point value is expected.'
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => 3, 'name' => 2, 'value' => ['1', 2.5, '3', '4', '1']],
+				'/',
+				['type' => [3], 'name' => [2], 'value' => ['1', 2.5, '3', '4', '1']]
 			]
 		];
 	}

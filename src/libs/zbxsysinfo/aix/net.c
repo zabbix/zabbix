@@ -208,6 +208,8 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	perfstat_netinterface_t	*ps_netif = NULL;
 	struct zbx_json		j;
 
+	ZBX_UNUSED(request);
+
 	/* check how many perfstat_netinterface_t structures are available */
 	if (-1 == (rc = perfstat_netinterface(NULL, NULL, sizeof(perfstat_netinterface_t), 0)))
 	{
@@ -251,6 +253,8 @@ end:
 
 	return ret;
 #else
+	ZBX_UNUSED(request);
+
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for Perfstat API."));
 	return SYSINFO_RET_FAIL;
 #endif

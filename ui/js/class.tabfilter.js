@@ -63,6 +63,10 @@ class CTabFilter extends CBaseComponent {
 		for (const title of this._target.querySelectorAll('nav [data-target]')) {
 			item = this.create(title, options.data[index] || {});
 
+			if (index > 0) {
+				item.initUnsavedIndicator();
+			}
+
 			if (options.selected == index) {
 				item.renderContentTemplate();
 				this.setSelectedItem(item);
@@ -762,7 +766,14 @@ class CTabFilter extends CBaseComponent {
 		this._filters_footer.querySelector('[name="filter_new"]')
 			.addEventListener('click', this._events.buttonSaveAsAction);
 		this._filters_footer.querySelector('[name="filter_apply"]')
-			.addEventListener('click', this._events.buttonApplyAction);
+			.addEventListener('click', () => {
+				if (this._active_item._index == 0) {
+					this._events.buttonUpdateAction();
+				}
+				else {
+					this._events.buttonApplyAction();
+				}
+			});
 		this._filters_footer.querySelector('[name="filter_reset"]')
 			.addEventListener('click', this._events.buttonResetAction);
 		this._filters_footer.addEventListener('click', this._events.buttonActionNotify);
