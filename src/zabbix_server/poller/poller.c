@@ -47,8 +47,6 @@
 #include "zbxtime.h"
 #include "zbxsysinfo.h"
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: write interface availability changes into database                *
@@ -957,12 +955,12 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
 	poller_type = (poller_args_in->poller_type);
-	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(poller_args_in->zbx_get_program_type_cb_arg()), server_num,

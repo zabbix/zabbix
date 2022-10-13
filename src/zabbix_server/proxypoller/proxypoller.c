@@ -36,7 +36,6 @@
 #include "zbxversion.h"
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 
 static int	connect_to_proxy(const DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
 {
@@ -646,8 +645,8 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_get_program_type_cb = proxy_poller_args_in->zbx_get_program_type_cb_arg;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",

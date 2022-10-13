@@ -49,7 +49,6 @@
 
 static zbx_get_program_type_f          zbx_get_program_type_cb = NULL;
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern size_t				(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
 
 extern int	CONFIG_CONFSYNCER_FORKS;
@@ -1261,12 +1260,12 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 #ifdef HAVE_NETSNMP
 	zbx_ipc_async_socket_t	rtc;
 #endif
 
-	process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_get_program_type_cb = trapper_args_in->zbx_get_program_type_cb_arg;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",

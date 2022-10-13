@@ -37,7 +37,6 @@
 #define MAX_SIZE	65507
 #define MIN_TIMEOUT	50
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 
 /******************************************************************************
@@ -489,7 +488,7 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process_num)
+static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process_num, int process_type)
 {
 	int			i, first_index = 0, ping_result;
 	char			error[ZBX_ITEM_ERROR_LEN_MAX];
@@ -545,8 +544,7 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
-
-	process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -564,7 +562,7 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 		zbx_setproctitle("%s #%d [getting values]", get_process_type_string(process_type), process_num);
 
 		get_pinger_hosts(&items, &items_alloc, &items_count);
-		process_pinger_hosts(items, items_count, process_num);
+		process_pinger_hosts(items, items_count, process_num, process_type);
 		sec = zbx_time() - sec;
 		itc = items_count;
 

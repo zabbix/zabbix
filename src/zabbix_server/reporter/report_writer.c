@@ -27,7 +27,6 @@
 #include "report_protocol.h"
 #include "zbxtime.h"
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 
 extern char	*CONFIG_WEBSERVICE_URL;
@@ -417,8 +416,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
-
-	process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
