@@ -21,15 +21,18 @@
 #include "ssh_run.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
+
+#include "zbxsysinfo.h"
+
 int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED;
 	const char	*port, *encoding, *dns;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key, &request))
+	if (SUCCEED != zbx_parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
@@ -51,7 +54,7 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (NULL != (dns = get_rparam(&request, 1)) && '\0' != *dns)
 	{
-		strscpy(item->interface.dns_orig, dns);
+		zbx_strscpy(item->interface.dns_orig, dns);
 		item->interface.addr = item->interface.dns_orig;
 	}
 
@@ -64,7 +67,7 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (NULL != (port = get_rparam(&request, 2)) && '\0' != *port)
 	{
-		if (FAIL == is_ushort(port, &item->interface.port))
+		if (FAIL == zbx_is_ushort(port, &item->interface.port))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;
@@ -77,7 +80,7 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 
 	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding));
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

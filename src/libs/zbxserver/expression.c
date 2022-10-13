@@ -32,6 +32,7 @@
 #include "zbxexpr.h"
 #include "zbxnum.h"
 #include "zbxparam.h"
+#include "zbxsysinfo.h"
 
 typedef struct
 {
@@ -2516,7 +2517,7 @@ static const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *f
 
 		if ('?' != mod_macros[i].macro[1] && len != fm_len)
 		{
-			if (SUCCEED != is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
+			if (SUCCEED != zbx_is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
 					sizeof(*N_functionid), 1, 9))
 			{
 				continue;
@@ -2525,7 +2526,7 @@ static const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *f
 		else if (mod_macros[i].macro[len - 1] != str[fm->macro.l + fm_len - 1])
 			continue;
 
-		if (SUCCEED == str_n_in_list(mod_macros[i].functions, str + fm->func.l, fm->func_param.l - fm->func.l,
+		if (SUCCEED == zbx_str_n_in_list(mod_macros[i].functions, str + fm->func.l, fm->func_param.l - fm->func.l,
 				','))
 		{
 			return mod_macros[i].macro;
@@ -2578,7 +2579,7 @@ static int	get_expression_macro_result(const ZBX_DB_EVENT *event, char *data, zb
 	}
 
 	zbx_expression_eval_init(&eval, ZBX_EXPRESSION_NORMAL, &ctx);
-	zbx_expression_eval_resolve_trigger_hosts(&eval, &event->trigger);
+	zbx_expression_eval_resolve_trigger_hosts_items(&eval, &event->trigger);
 
 	if (SUCCEED == (ret = zbx_expression_eval_execute(&eval, ts, &value, error)))
 	{
@@ -6387,7 +6388,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 	*param = zbx_strdup(NULL, data);
 
 	if (0 != level)
-		unquote_key_param(*param);
+		zbx_unquote_key_param(*param);
 
 	if (NULL == jp_row)
 		substitute_simple_macros_impl(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL, NULL, NULL, NULL,
@@ -6397,7 +6398,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 
 	if (0 != level)
 	{
-		if (FAIL == (ret = quote_key_param(param, quoted)))
+		if (FAIL == (ret = zbx_quote_key_param(param, quoted)))
 			zbx_free(*param);
 	}
 
@@ -6465,7 +6466,7 @@ static int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, DC_ITEM
 			exit(EXIT_FAILURE);
 	}
 
-	ret = replace_key_params_dyn(data, key_type, replace_key_param_cb, &replace_key_param_data, error, maxerrlen);
+	ret = zbx_replace_key_params_dyn(data, key_type, replace_key_param_cb, &replace_key_param_data, error, maxerrlen);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __func__, zbx_result_string(ret), *data);
 
@@ -6529,7 +6530,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 		{
 			char	*key = NULL, *host = NULL;
 
-			if (SUCCEED != parse_host_key(param, &host, &key) ||
+			if (SUCCEED != zbx_parse_host_key(param, &host, &key) ||
 					SUCCEED != substitute_key_macros_impl(&key, NULL, NULL, jp_row, lld_macro_paths,
 							MACRO_TYPE_ITEM_KEY, NULL, 0))
 			{

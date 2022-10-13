@@ -27,7 +27,7 @@
 #ifdef _WINDOWS
 #	include "messages.h"
 #	include "zbxwinservice.h"
-#	include "sysinfo.h"
+#	include "zbxsysinfo.h"
 static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 #endif
 
@@ -163,7 +163,7 @@ static void	rotate_log(const char *filename)
 	{
 		char	filename_old[MAX_STRING_LEN];
 
-		strscpy(filename_old, filename);
+		zbx_strscpy(filename_old, filename);
 		zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
 		remove(filename_old);
 #ifdef _WINDOWS
@@ -265,7 +265,7 @@ static void	unlock_log(void)
 static void	lock_log(void)
 {
 #ifdef ZABBIX_AGENT
-	if (0 == (ZBX_MUTEX_LOGGING_DENIED & get_thread_global_mutex_flag()))
+	if (0 == (ZBX_MUTEX_LOGGING_DENIED & zbx_get_thread_global_mutex_flag()))
 #endif
 		LOCK_LOG;
 }
@@ -273,7 +273,7 @@ static void	lock_log(void)
 static void	unlock_log(void)
 {
 #ifdef ZABBIX_AGENT
-	if (0 == (ZBX_MUTEX_LOGGING_DENIED & get_thread_global_mutex_flag()))
+	if (0 == (ZBX_MUTEX_LOGGING_DENIED & zbx_get_thread_global_mutex_flag()))
 #endif
 		UNLOCK_LOG;
 }
@@ -327,7 +327,7 @@ int	zabbix_open_log(int type, int level, const char *filename, char **error)
 			return FAIL;
 		}
 
-		strscpy(log_filename, filename);
+		zbx_strscpy(log_filename, filename);
 		zbx_fclose(log_file);
 	}
 	else if (LOG_TYPE_CONSOLE == type || LOG_TYPE_UNDEFINED == type)

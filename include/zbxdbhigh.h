@@ -25,6 +25,7 @@
 #include "zbxdbschema.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxversion.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;
@@ -184,12 +185,18 @@ zbx_host_template_link_type;
 #	define	ZBX_SQL_STRVAL_NE(str)	"<>", str
 #endif
 
+#ifdef HAVE_MYSQL
+#	define ZBX_SQL_CONCAT()		"concat(%s,%s)"
+#else
+#	define ZBX_SQL_CONCAT()		"%s||%s"
+#endif
+
 #define ZBX_SQL_NULLCMP(f1, f2)	"((" f1 " is null and " f2 " is null) or " f1 "=" f2 ")"
 
 #define ZBX_DBROW2UINT64(uint, row)	if (SUCCEED == DBis_null(row))		\
 						uint = 0;			\
 					else					\
-						is_uint64(row, &uint)
+						zbx_is_uint64(row, &uint)
 
 #define ZBX_DB_MAX_ID	(zbx_uint64_t)__UINT64_C(0x7fffffffffffffff)
 
@@ -685,14 +692,16 @@ void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
 
 typedef struct
 {
-	zbx_uint64_t		hostid;
-	unsigned char		compress;
-	int			version;
-	int			lastaccess;
-	int			last_version_error_time;
-	int			proxy_delay;
-	int			more_data;
-	zbx_proxy_suppress_t	nodata_win;
+	zbx_uint64_t			hostid;
+	unsigned char			compress;
+	char				*version_str;
+	int				version_int;
+	zbx_proxy_compatibility_t	compatibility;
+	int				lastaccess;
+	int				last_version_error_time;
+	int				proxy_delay;
+	int				more_data;
+	zbx_proxy_suppress_t		nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)
@@ -701,13 +710,12 @@ typedef struct
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR			__UINT64_C(0x0008)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY			__UINT64_C(0x0010)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN		__UINT64_C(0x0020)
-#define ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT			__UINT64_C(0x0040)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG			__UINT64_C(0x0080)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
-	zbx_uint64_t	flags;
+	zbx_uint64_t			flags;
 }
 zbx_proxy_diff_t;
 
@@ -836,5 +844,41 @@ void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
 
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
+
+/* condition evaluation types */
+#define ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR			0
+#define ZBX_ACTION_CONDITION_EVAL_TYPE_AND			1
+#define ZBX_ACTION_CONDITION_EVAL_TYPE_OR			2
+#define ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION		3
+
+/* condition types */
+#define ZBX_CONDITION_TYPE_HOST_GROUP			0
+#define ZBX_CONDITION_TYPE_HOST				1
+#define ZBX_CONDITION_TYPE_TRIGGER			2
+#define ZBX_CONDITION_TYPE_TRIGGER_NAME			3
+#define ZBX_CONDITION_TYPE_TRIGGER_SEVERITY		4
+/* #define ZBX_CONDITION_TYPE_TRIGGER_VALUE		5	deprecated */
+#define ZBX_CONDITION_TYPE_TIME_PERIOD			6
+#define ZBX_CONDITION_TYPE_DHOST_IP			7
+#define ZBX_CONDITION_TYPE_DSERVICE_TYPE		8
+#define ZBX_CONDITION_TYPE_DSERVICE_PORT		9
+#define ZBX_CONDITION_TYPE_DSTATUS			10
+#define ZBX_CONDITION_TYPE_DUPTIME			11
+#define ZBX_CONDITION_TYPE_DVALUE			12
+#define ZBX_CONDITION_TYPE_HOST_TEMPLATE		13
+#define ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED		14
+/* #define ZBX_CONDITION_TYPE_APPLICATION		15	deprecated */
+#define ZBX_CONDITION_TYPE_SUPPRESSED			16
+#define ZBX_CONDITION_TYPE_DRULE			18
+#define ZBX_CONDITION_TYPE_DCHECK			19
+#define ZBX_CONDITION_TYPE_PROXY			20
+#define ZBX_CONDITION_TYPE_DOBJECT			21
+#define ZBX_CONDITION_TYPE_HOST_NAME			22
+#define ZBX_CONDITION_TYPE_EVENT_TYPE			23
+#define ZBX_CONDITION_TYPE_HOST_METADATA		24
+#define ZBX_CONDITION_TYPE_EVENT_TAG			25
+#define ZBX_CONDITION_TYPE_EVENT_TAG_VALUE		26
+#define ZBX_CONDITION_TYPE_SERVICE			27
+#define ZBX_CONDITION_TYPE_SERVICE_NAME			28
 
 #endif /* ZABBIX_DBHIGH_H */

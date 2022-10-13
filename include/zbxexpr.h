@@ -22,6 +22,16 @@
 
 #include "zbxcommon.h"
 
+int	zbx_is_hostname_char(unsigned char c);
+int	zbx_is_key_char(unsigned char c);
+int	zbx_is_function_char(unsigned char c);
+int	zbx_is_macro_char(unsigned char c);
+int	zbx_is_discovery_macro(const char *name);
+int	zbx_parse_key(const char **exp);
+int	zbx_parse_host_key(char *exp, char **host, char **key);
+void	zbx_make_hostname(char *host);
+int	zbx_check_hostname(const char *hostname, char **error);
+
 int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len);
 int	zbx_function_validate_parameters(const char *expr, size_t *length);
 int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r,
@@ -49,7 +59,7 @@ zbx_function_type_t;
 zbx_function_type_t	zbx_get_function_type(const char *func);
 
 int	zbx_is_double_suffix(const char *str, unsigned char flags);
-double	str2double(const char *str);
+double	zbx_str2double(const char *str);
 int	zbx_suffixed_number_parse(const char *number, int *len);
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 
@@ -205,13 +215,30 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 int	zbx_validate_interval(const char *str, char **error);
 int	zbx_custom_interval_is_scheduling(const zbx_custom_interval_t *custom_intervals);
 void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals);
-int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
+int	zbx_calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
 		const zbx_custom_interval_t *custom_intervals, time_t now);
-int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
+int	zbx_calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
 		time_t disable_until);
 
 int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res);
 int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
 		const char *tz);
 /* interval END */
+
+/* condition operators */
+#define ZBX_CONDITION_OPERATOR_EQUAL		0
+#define ZBX_CONDITION_OPERATOR_NOT_EQUAL		1
+#define ZBX_CONDITION_OPERATOR_LIKE			2
+#define ZBX_CONDITION_OPERATOR_NOT_LIKE		3
+#define ZBX_CONDITION_OPERATOR_IN			4
+#define ZBX_CONDITION_OPERATOR_MORE_EQUAL		5
+#define ZBX_CONDITION_OPERATOR_LESS_EQUAL		6
+#define ZBX_CONDITION_OPERATOR_NOT_IN		7
+#define ZBX_CONDITION_OPERATOR_REGEXP		8
+#define ZBX_CONDITION_OPERATOR_NOT_REGEXP		9
+#define ZBX_CONDITION_OPERATOR_YES			10
+#define ZBX_CONDITION_OPERATOR_NO			11
+#define ZBX_CONDITION_OPERATOR_EXIST		12
+#define ZBX_CONDITION_OPERATOR_NOT_EXIST		13
+
 #endif /* ZABBIX_EXPR_H */

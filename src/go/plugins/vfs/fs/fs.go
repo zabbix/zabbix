@@ -53,6 +53,7 @@ type FsInfo struct {
 	DriveType  *string  `json:"{#FSDRIVETYPE},omitempty"`
 	Bytes      *FsStats `json:"bytes,omitempty"`
 	Inodes     *FsStats `json:"inodes,omitempty"`
+	FsOptions  *string  `json:"{#FSOPTIONS},omitempty"`
 }
 
 type FsInfoNew struct {
@@ -62,6 +63,7 @@ type FsInfoNew struct {
 	DriveType  *string  `json:"fsdrivetype,omitempty"`
 	Bytes      *FsStats `json:"bytes,omitempty"`
 	Inodes     *FsStats `json:"inodes,omitempty"`
+	FsOptions  *string  `json:"options",omitempty"`
 }
 
 type Plugin struct {
@@ -125,7 +127,6 @@ func (p *Plugin) export(params []string, getStats func(string) (*FsStats, error)
 	}
 
 	fsCaller := p.newFSCaller(getStats, 1)
-	defer fsCaller.close()
 
 	var stats *FsStats
 	if stats, err = fsCaller.run(params[0]); err != nil {

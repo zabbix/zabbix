@@ -749,7 +749,7 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
 		case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 			ret =  correlation_match_event_hostgroup(event, condition->data.group.groupid);
 
-			if (CONDITION_OPERATOR_NOT_EQUAL == condition->data.group.op)
+			if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->data.group.op)
 				return (SUCCEED == ret ? "0" : "1");
 
 			return (SUCCEED == ret ? "1" : "0");
@@ -810,7 +810,7 @@ static zbx_correlation_match_result_t	correlation_match_new_event(zbx_correlatio
 
 		loc = &token.data.objectid.name;
 
-		if (SUCCEED != is_uint64_n(expression + loc->l, loc->r - loc->l + 1, &conditionid))
+		if (SUCCEED != zbx_is_uint64_n(expression + loc->l, loc->r - loc->l + 1, &conditionid))
 			continue;
 
 		if (NULL == (condition = (zbx_corr_condition_t *)zbx_hashset_search(&correlation_rules.conditions,
@@ -866,19 +866,19 @@ static int	correlation_has_old_event_operation(const zbx_correlation_t *correlat
 	return FAIL;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: adds sql statement to match tag according to the defined          *
- *          matching operation                                                *
- *                                                                            *
- * Parameters: sql         - [IN/OUT]                                         *
- *             sql_alloc   - [IN/OUT]                                         *
- *             sql_offset  - [IN/OUT]                                         *
- *             tag         - [IN] the tag to match                            *
- *             value       - [IN] the tag value to match                      *
- *             op          - [IN] the matching operation (CONDITION_OPERATOR_)*
- *                                                                            *
- ******************************************************************************/
+/***********************************************************************************
+ *                                                                                 *
+ * Purpose: adds sql statement to match tag according to the defined               *
+ *          matching operation                                                     *
+ *                                                                                 *
+ * Parameters: sql         - [IN/OUT]                                              *
+ *             sql_alloc   - [IN/OUT]                                              *
+ *             sql_offset  - [IN/OUT]                                              *
+ *             tag         - [IN] the tag to match                                 *
+ *             value       - [IN] the tag value to match                           *
+ *             op          - [IN] the matching operation (ZBX_CONDITION_OPERATOR_) *
+ *                                                                                 *
+ ***********************************************************************************/
 static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *tag,
 		const char *value, unsigned char op)
 {
@@ -889,8 +889,8 @@ static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, s
 
 	switch (op)
 	{
-		case CONDITION_OPERATOR_NOT_EQUAL:
-		case CONDITION_OPERATOR_NOT_LIKE:
+		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
+		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "not ");
 			break;
 	}
@@ -900,13 +900,13 @@ static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, s
 
 	switch (op)
 	{
-		case CONDITION_OPERATOR_EQUAL:
-		case CONDITION_OPERATOR_NOT_EQUAL:
+		case ZBX_CONDITION_OPERATOR_EQUAL:
+		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "pt.tag='%s' and pt.value" ZBX_SQL_STRCMP,
 					tag_esc, ZBX_SQL_STRVAL_EQ(value_esc));
 			break;
-		case CONDITION_OPERATOR_LIKE:
-		case CONDITION_OPERATOR_NOT_LIKE:
+		case ZBX_CONDITION_OPERATOR_LIKE:
+		case ZBX_CONDITION_OPERATOR_NOT_LIKE:
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "pt.tag='%s' and pt.value like '%%%s%%'",
 					tag_esc, value_esc);
 			break;
@@ -1044,7 +1044,7 @@ static int	correlation_add_event_filter(char **sql, size_t *sql_alloc, size_t *s
 
 		loc = &token.data.objectid.name;
 
-		if (SUCCEED != is_uint64_n(expression + loc->l, loc->r - loc->l + 1, &conditionid))
+		if (SUCCEED != zbx_is_uint64_n(expression + loc->l, loc->r - loc->l + 1, &conditionid))
 			continue;
 
 		if (NULL == (condition = (zbx_corr_condition_t *)zbx_hashset_search(&correlation_rules.conditions, &conditionid)))

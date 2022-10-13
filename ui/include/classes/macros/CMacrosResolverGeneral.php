@@ -782,34 +782,30 @@ class CMacrosResolverGeneral {
 	 *
 	 * @param string $function	a trigger function
 	 * @param array  $macros	the list of macros (['{<MACRO>}' => '<value>', ...])
-	 * @param array  $types		the types of macros (see getMacroPositions() for more details)
 	 *
 	 * @return string
 	 */
-	protected function resolveFunctionMacros($function, array $macros, array $types) {
+	protected function resolveFunctionMacros($function, array $macros) {
 		$hist_function_parser = new CHistFunctionParser(['usermacros' => true, 'lldmacros' => true]);
 
 		if ($hist_function_parser->parse($function) == CParser::PARSE_SUCCESS) {
-			foreach (array_reverse($hist_function_parser->getParameters()) as $parameter) {
-				$param = $parameter['match'];
-				$forced = false;
+			foreach (array_reverse($hist_function_parser->getParameters(), true) as $i => $parameter) {
+				switch ($parameter['type']) {
+					case CHistFunctionParser::PARAM_TYPE_PERIOD:
+					case CHistFunctionParser::PARAM_TYPE_UNQUOTED:
+					case CHistFunctionParser::PARAM_TYPE_QUOTED:
+						$param = strtr($hist_function_parser->getParam($i), $macros);
 
-				if ($parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED) {
-					$param = CHistFunctionParser::unquoteParam($param);
-					$forced = true;
+						if ($parameter['type'] != CHistFunctionParser::PARAM_TYPE_PERIOD) {
+							$param = CExpressionParser::quoteString($param, true,
+								$parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED
+							);
+						}
+
+						$function = substr_replace($function, $param, $parameter['pos'], $parameter['length']);
+
+						break;
 				}
-
-				$matched_macros = $this->getMacroPositions($param, $types);
-
-				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-					$param = substr_replace($param, $macros[$macro], $pos, strlen($macro));
-				}
-
-				if ($parameter['type'] != CHistFunctionParser::PARAM_TYPE_PERIOD) {
-					$param = quoteFunctionParam($param, $forced);
-				}
-
-				$function = substr_replace($function, $param, $parameter['pos'], $parameter['length']);
 			}
 		}
 
@@ -1825,8 +1821,6 @@ class CMacrosResolverGeneral {
 	/**
 	 * Function returns array holding of inventory macros as a keys and corresponding database fields as value.
 	 *
-	 * @static
-	 *
 	 * @return array
 	 */
 	protected static function getSupportedHostInventoryMacrosMap(): array {
@@ -2691,9 +2685,76 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Get macro value refer by type.
+	 * Get and resolve user data macros like name, surname, username. Input array contains a collection of prepared
+	 * and unresolved macros. Get data from API service, because direct requests to API do no have CWebUser data.
 	 *
-	 * @static
+	 * Example input:
+	 *     array (
+	 *         0 => array (
+	 *             '{USER.FULLNAME}' => '*UNKNOWN*',
+	 *         ),
+	 *         1 => array (
+	 *             '{USER.NAME}' => '*UNKNOWN*',
+	 *             '{USER.SURNAME}' => '*UNKNOWN*',
+	 *         )
+	 *     )
+	 *
+	 * Output:
+	 *     array (
+	 *         0 => array (
+	 *             '{USER.FULLNAME}' => 'Zabbix Administrator',
+	 *         ),
+	 *         1 => array (
+	 *             '{USER.NAME}' => 'Zabbix',
+	 *             '{USER.SURNAME}' => 'Administrator',
+	 *         )
+	 *     )
+	 *
+	 * @param array $macro_values  Array of macros to be replaced.
+	 *
+	 * @return array
+	 */
+	protected static function getUserDataMacros(array $macro_values): array {
+		foreach ($macro_values as &$macros) {
+			foreach ($macros as $macro => &$value) {
+				switch ($macro) {
+					case '{USER.ALIAS}': // Deprecated in version 5.4.
+					case '{USER.USERNAME}':
+						$value = CApiService::$userData['username'];
+						break;
+
+					case '{USER.FULLNAME}':
+						$fullname = [];
+
+						foreach (['name', 'surname'] as $field) {
+							if (CApiService::$userData[$field] !== '') {
+								$fullname[] = CApiService::$userData[$field];
+							}
+						}
+
+						$value = $fullname
+							? implode(' ', array_merge($fullname, ['('.CApiService::$userData['username'].')']))
+							: CApiService::$userData['username'];
+						break;
+
+					case '{USER.NAME}':
+						$value = CApiService::$userData['name'];
+						break;
+
+					case '{USER.SURNAME}':
+						$value = CApiService::$userData['surname'];
+						break;
+				}
+			}
+			unset($value);
+		}
+		unset($macros);
+
+		return $macro_values;
+	}
+
+	/**
+	 * Get macro value refer by type.
 	 *
 	 * @param array $macro
 	 *
@@ -2727,8 +2788,6 @@ class CMacrosResolverGeneral {
 	/**
 	 * Sorting global macros.
 	 *
-	 * @static
-	 *
 	 * @param array $global_macros
 	 *
 	 * @return array
@@ -2744,8 +2803,6 @@ class CMacrosResolverGeneral {
 
 	/**
 	 * Sort regex.
-	 *
-	 * @static
 	 *
 	 * @param array $macros
 	 *

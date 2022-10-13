@@ -61,7 +61,7 @@ static int	DBpatch_3050001(void)
 		int		index;
 		zbx_uint64_t	widget_fieldid;
 
-		if (NULL == (p = strrchr(row[1], '.')) || SUCCEED != is_uint31(p + 1, &index))
+		if (NULL == (p = strrchr(row[1], '.')) || SUCCEED != zbx_is_uint31(p + 1, &index))
 			continue;
 
 		widget_fieldid = DBget_maxid_num("widget_field", 1);
@@ -1660,8 +1660,8 @@ static int	DBpatch_3050145(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	/* CONDITION_OPERATOR_IN (4) -> CONDITION_OPERATOR_YES (10) */
-	/* for conditiontype CONDITION_TYPE_SUPPRESSED (16)         */
+	/* ZBX_CONDITION_OPERATOR_IN (4) -> ZBX_CONDITION_OPERATOR_YES (10) */
+	/* for conditiontype ZBX_CONDITION_TYPE_SUPPRESSED (16)         */
 	ret = DBexecute("update conditions"
 			" set operator=10"
 			" where conditiontype=16"
@@ -1680,8 +1680,8 @@ static int	DBpatch_3050146(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	/* CONDITION_OPERATOR_NOT_IN (7) -> CONDITION_OPERATOR_NO (11) */
-	/* for conditiontype CONDITION_TYPE_SUPPRESSED (16)            */
+	/* ZBX_CONDITION_OPERATOR_NOT_IN (7) -> ZBX_CONDITION_OPERATOR_NO (11) */
+	/* for conditiontype ZBX_CONDITION_TYPE_SUPPRESSED (16)            */
 	ret = DBexecute("update conditions"
 			" set operator=11"
 			" where conditiontype=16"

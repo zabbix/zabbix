@@ -26,7 +26,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Items'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ITEM_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_EDIT));
 
 $host = $data['host'];
 
@@ -42,7 +42,7 @@ $url = (new CUrl('items.php'))
 $form = (new CForm('post', $url))
 	->setId('item-form')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);
 
@@ -626,10 +626,6 @@ if ($data['display_interfaces']) {
 			->setFocusableElementId('interfaceid')
 			->setAriaRequired();
 
-		if ($readonly) {
-			$select_interface->setAttribute('readonly', 'readonly');
-		}
-
 		$item_tab->addItem([
 			(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
 				->setAsteriskMark()
@@ -746,7 +742,7 @@ $item_tab
 		(new CLabel(_('Formula'), 'params_f'))
 			->setAsteriskMark()
 			->setId('js-item-formula-label'),
-		(new CFormField((new CTextArea('params_f', $data['params'], $discovered_item))
+		(new CFormField((new CTextArea('params_f', $data['params']))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
@@ -762,7 +758,7 @@ $item_tab
 		(new CLabel(_('Update interval'), 'delay'))
 			->setAsteriskMark()
 			->setId('js-item-delay-label'),
-		(new CFormField((new CTextBox('delay', $data['delay']))
+		(new CFormField((new CTextBox('delay', $data['delay'], $discovered_item))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 		))->setId('js-item-delay-field')
@@ -781,7 +777,7 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 			->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
 			->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
 			->setModern(true)
-			->setEnabled(!$discovered_item);
+			->setEnabled(false);
 	}
 	else {
 		$type_input = (new CRadioButtonList('delay_flex['.$i.'][type]', (int) $delay_flex['type']))
@@ -1033,7 +1029,8 @@ $item_tabs = (new CTabView())
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'readonly' => $discovered_item,
-			'tabs_id' => 'tabs'
+			'tabs_id' => 'tabs',
+			'tags_tab_id' => 'tags-tab'
 		]),
 		TAB_INDICATOR_TAGS
 	)

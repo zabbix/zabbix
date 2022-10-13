@@ -18,7 +18,7 @@
 **/
 
 #include "checks_internal.h"
-#include "zbxserver.h"
+#include "zbxstats.h"
 
 #include "checks_java.h"
 #include "zbxself.h"
@@ -28,6 +28,7 @@
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
 #include "zbxavailability.h"
 #include "zbxnum.h"
+#include "zbxsysinfo.h"
 
 extern unsigned char	program_type;
 
@@ -172,21 +173,23 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
  *                                                                            *
  * Purpose: retrieve data from Zabbix server (internally supported items)     *
  *                                                                            *
- * Parameters: item - item we are interested in                               *
+ * Parameters: item       - [IN] item we are interested in                    *
+ *             result     - [OUT] value of the requested item                 *
+ *             zbx_config - [IN] Zabbix server/proxy config                   *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_config_comms_args_t *zbx_config)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
 	const char	*tmp, *tmp1;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key, &request))
+	if (SUCCEED != zbx_parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
@@ -261,14 +264,14 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 		}
 
 		if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp &&
-				FAIL == is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
+				FAIL == zbx_is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 			goto out;
 		}
 
 		if (NULL != (tmp = get_rparam(&request, 2)) && '\0' != *tmp &&
-				FAIL == is_time_suffix(tmp, &to, ZBX_LENGTH_UNLIMITED))
+				FAIL == zbx_is_time_suffix(tmp, &to, ZBX_LENGTH_UNLIMITED))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;
@@ -462,7 +465,6 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
-			case ZBX_PROCESS_TYPE_HEARTBEAT:
 				if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
@@ -500,7 +502,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 				aggr_func = ZBX_AGGR_FUNC_MAX;
 			else if (0 == strcmp(tmp, "min"))
 				aggr_func = ZBX_AGGR_FUNC_MIN;
-			else if (SUCCEED == is_ushort(tmp, &process_num) && 0 < process_num)
+			else if (SUCCEED == zbx_is_ushort(tmp, &process_num) && 0 < process_num)
 				aggr_func = ZBX_AGGR_FUNC_ONE;
 			else
 			{
@@ -531,7 +533,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 				goto out;
 			}
 
-			get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
+			zbx_get_selfmon_stats(process_type, aggr_func, process_num, state, &value);
 
 			SET_DBL_RESULT(result, value);
 		}
@@ -747,7 +749,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 		{
 			port_number = ZBX_DEFAULT_SERVER_PORT;
 		}
-		else if (SUCCEED != is_ushort(port_str, &port_number))
+		else if (SUCCEED != zbx_is_ushort(port_str, &port_number))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;
@@ -763,11 +765,11 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 				/* work for both data received from internal and external source. */
 				zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
 
-				zbx_get_zabbix_stats(&json);
+				zbx_zabbix_stats_get(&json, zbx_config);
 
 				zbx_json_close(&json);
 
-				set_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
+				zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
 
 				zbx_json_free(&json);
 			}
@@ -788,14 +790,14 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 					int	from = ZBX_QUEUE_FROM_DEFAULT, to = ZBX_QUEUE_TO_INFINITY;
 
 					if (NULL != tmp && '\0' != *tmp &&
-							FAIL == is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
+							FAIL == zbx_is_time_suffix(tmp, &from, ZBX_LENGTH_UNLIMITED))
 					{
 						SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
 						goto out;
 					}
 
 					if (NULL != tmp1 && '\0' != *tmp1 &&
-							FAIL == is_time_suffix(tmp1, &to, ZBX_LENGTH_UNLIMITED))
+							FAIL == zbx_is_time_suffix(tmp1, &to, ZBX_LENGTH_UNLIMITED))
 					{
 						SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid sixth parameter."));
 						goto out;
@@ -813,7 +815,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 					zbx_json_adduint64(&json, ZBX_PROTO_VALUE_ZABBIX_STATS_QUEUE,
 							DCget_item_queue(NULL, from, to));
 
-					set_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
+					zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, json.buffer);
 
 					zbx_json_free(&json);
 				}
@@ -925,10 +927,10 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 
 	ret = SUCCEED;
 out:
-	if (NOTSUPPORTED == ret && !ISSET_MSG(result))
+	if (NOTSUPPORTED == ret && !ZBX_ISSET_MSG(result))
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Internal check is not supported."));
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

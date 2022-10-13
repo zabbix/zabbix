@@ -982,12 +982,18 @@ class CItem extends CItemGeneral {
 			// if we have a duplicate inventory links after merging - we are in trouble
 			if (max($valuesCount) > 1) {
 				// what inventory field caused this conflict?
-				$conflictedLink = array_keys($valuesCount, 2);
+				$conflictedLink = array_keys($valuesCount, max($valuesCount));
 				$conflictedLink = reset($conflictedLink);
 
 				// which of updated items populates this link?
 				$beingSavedItemName = '';
+				$names = [];
+
 				foreach ($items as $item) {
+					if (count($names) == 2) {
+						break;
+					}
+
 					if ($item['inventory_link'] == $conflictedLink) {
 						if (isset($item['name'])) {
 							$beingSavedItemName = $item['name'];
@@ -1000,27 +1006,36 @@ class CItem extends CItemGeneral {
 							]);
 							$beingSavedItemName = $thisItem[0]['name'];
 						}
-						break;
+
+						$names[] = $beingSavedItemName;
 					}
 				}
 
-				// name of the original item that already populates the field
-				$originalItem = API::Item()->get([
-					'output' => ['name'],
-					'filter' => [
-						'hostid' => $hostId,
-						'inventory_link' => $conflictedLink
-					],
-					'nopermissions' => true
-				]);
-				$originalItemName = $originalItem[0]['name'];
+				// Case when at least two templates that are being linked have items that populate same inventory field.
+				if (count($names) == 2) {
+					[$name1, $name2] = $names;
+				}
+				else {
+					// name of the original item that already populates the field
+					$originalItem = API::Item()->get([
+						'output' => ['name'],
+						'filter' => [
+							'hostid' => $hostId,
+							'inventory_link' => $conflictedLink
+						],
+						'nopermissions' => true
+					]);
+
+					$name1 = reset($names);
+					$name2 = $originalItem[0]['name'];
+				}
 
 				self::exception(
 					ZBX_API_ERROR_PARAMETERS,
 					_s(
 						'Two items ("%1$s" and "%2$s") cannot populate one host inventory field "%3$s", this would lead to a conflict.',
-						$beingSavedItemName,
-						$originalItemName,
+						$name1,
+						$name2,
 						$possibleHostInventories[$conflictedLink]['title']
 					)
 				);

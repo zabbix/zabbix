@@ -32,6 +32,7 @@
 #include "zbxavailability.h"
 #include "zbxtrends.h"
 #include "zbxnum.h"
+#include "zbxsysinfo.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
 static zbx_shmem_info_t	*hc_mem = NULL;
@@ -1661,7 +1662,7 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, const DC_I
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			strscpy(value, h->value.str);
+			zbx_strscpy(value, h->value.str);
 			break;
 		default:
 			return;
@@ -3808,7 +3809,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		zbx_uint64_t	lastlogsize;
 		int		mtime;
 
-		if (NULL != result && 0 != ISSET_META(result))
+		if (NULL != result && 0 != ZBX_ISSET_META(result))
 		{
 			value_flags = ZBX_DC_FLAG_META;
 			lastlogsize = result->lastlogsize;
@@ -3828,15 +3829,15 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 		return;
 
 	/* allow proxy to send timestamps of empty (throttled etc) values to update nextchecks for queue */
-	if (!ISSET_VALUE(result) && !ISSET_META(result) && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	if (!ZBX_ISSET_VALUE(result) && !ZBX_ISSET_META(result) && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return;
 
 	value_flags = 0;
 
-	if (!ISSET_VALUE(result))
+	if (!ZBX_ISSET_VALUE(result))
 		value_flags |= ZBX_DC_FLAG_NOVALUE;
 
-	if (ISSET_META(result))
+	if (ZBX_ISSET_META(result))
 		value_flags |= ZBX_DC_FLAG_META;
 
 	/* Add data to the local history cache if:                                           */
@@ -3847,7 +3848,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 	{
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item_flags))
 		{
-			if (NULL == GET_TEXT_RESULT(result))
+			if (NULL == ZBX_GET_TEXT_RESULT(result))
 				return;
 
 			/* proxy stores low-level discovery (lld) values in db */
@@ -3857,27 +3858,27 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned
 			return;
 		}
 
-		if (ISSET_LOG(result))
+		if (ZBX_ISSET_LOG(result))
 		{
 			dc_local_add_history_log(itemid, item_value_type, ts, result->log, result->lastlogsize,
 					result->mtime, value_flags);
 		}
-		else if (ISSET_UI64(result))
+		else if (ZBX_ISSET_UI64(result))
 		{
 			dc_local_add_history_uint(itemid, item_value_type, ts, result->ui64, result->lastlogsize,
 					result->mtime, value_flags);
 		}
-		else if (ISSET_DBL(result))
+		else if (ZBX_ISSET_DBL(result))
 		{
 			dc_local_add_history_dbl(itemid, item_value_type, ts, result->dbl, result->lastlogsize,
 					result->mtime, value_flags);
 		}
-		else if (ISSET_STR(result))
+		else if (ZBX_ISSET_STR(result))
 		{
 			dc_local_add_history_text(itemid, item_value_type, ts, result->str, result->lastlogsize,
 					result->mtime, value_flags);
 		}
-		else if (ISSET_TEXT(result))
+		else if (ZBX_ISSET_TEXT(result))
 		{
 			dc_local_add_history_text(itemid, item_value_type, ts, result->text, result->lastlogsize,
 					result->mtime, value_flags);

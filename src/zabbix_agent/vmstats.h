@@ -20,7 +20,7 @@
 #ifndef ZABBIX_VMSTAT_H
 #define ZABBIX_VMSTAT_H
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 #ifdef _AIX
 

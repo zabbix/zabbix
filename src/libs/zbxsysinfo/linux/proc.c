@@ -18,12 +18,14 @@
 **/
 
 #include "proc.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
+#include "stats.h"
 
 #include "zbxstr.h"
 #include "zbxregexp.h"
 #include "log.h"
-#include "stats.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
@@ -184,7 +186,7 @@ static int	read_value_from_proc_file(FILE *f, long pos, const char *label, int t
 		{
 			*str = zbx_strdup(NULL, p_value);
 		}
-		else if (FAIL == is_uint64(p_value, num))
+		else if (FAIL == zbx_is_uint64(p_value, num))
 		{
 			ret = FAIL;
 			break;
@@ -462,7 +464,7 @@ int	byte_value_from_proc_file(FILE *f, const char *label, const char *guard, zbx
 		while (' ' == *p_value)
 			p_value++;
 
-		if (FAIL == is_uint64(p_value, bytes))
+		if (FAIL == zbx_is_uint64(p_value, bytes))
 		{
 			ret = FAIL;
 			break;
@@ -862,7 +864,6 @@ out:
 	}
 
 	return SYSINFO_RET_OK;
-
 #undef ZBX_SIZE
 #undef ZBX_RSS
 #undef ZBX_VSIZE
@@ -1143,7 +1144,7 @@ static int	proc_read_value(const char *ptr, zbx_uint64_t *value)
 
 	len = ptr - start;
 
-	if (SUCCEED == is_uint64_n(start, len, value))
+	if (SUCCEED == zbx_is_uint64_n(start, len, value))
 		return len;
 
 	return FAIL;
@@ -1400,7 +1401,7 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 	while (NULL != (entries = readdir(dir)))
 	{
 		/* skip entries not containing pids */
-		if (FAIL == is_uint32(entries->d_name, &pid))
+		if (FAIL == zbx_is_uint32(entries->d_name, &pid))
 			continue;
 
 		if (NULL == (proc = proc_create(pid, flags)))
@@ -1864,7 +1865,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_free(user);
 		zbx_free(group);
 
-		if (FAIL == is_uint32(entries->d_name, &pid))
+		if (FAIL == zbx_is_uint32(entries->d_name, &pid))
 			continue;
 
 		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/cmdline", entries->d_name);
@@ -1967,7 +1968,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 				while (NULL != (threads = readdir(taskdir)))
 				{
-					if (FAIL == is_uint32(threads->d_name, &tid))
+					if (FAIL == zbx_is_uint32(threads->d_name, &tid))
 						continue;
 
 					zbx_snprintf(path, sizeof(path), "%s/%s", tmp, threads->d_name);

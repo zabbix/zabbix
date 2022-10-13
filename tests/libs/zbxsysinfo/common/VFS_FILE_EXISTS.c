@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "file.h"
 
 #define TEST_NAME "VFS_FILE_EXISTS"
@@ -39,10 +39,10 @@ void	zbx_mock_test_entry(void **state)
 	key = zbx_mock_get_parameter_string("in.key");
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 
-	init_request(&request);
-	init_result(&result);
+	zbx_init_agent_request(&request);
+	zbx_init_agent_result(&result);
 
-	if (SUCCEED != parse_item_key(key, &request))
+	if (SUCCEED != zbx_parse_item_key(key, &request))
 		fail_msg("Cannot parse item key: %s", key);
 
 	ret = VFS_FILE_EXISTS(&request, &result);
@@ -59,6 +59,6 @@ void	zbx_mock_test_entry(void **state)
 			zbx_mock_get_parameter_string("out.error"), result.msg);
 	}
 
-	free_result(&result);
-	free_request(&request);
+	zbx_free_agent_result(&result);
+	zbx_free_agent_request(&request);
 }

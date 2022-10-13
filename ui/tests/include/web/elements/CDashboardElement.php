@@ -113,6 +113,19 @@ class CDashboardElement extends CElement {
 	}
 
 	/**
+	 * Open dashboard properties overlay dialog.
+	 *
+	 * @return COverlayDialogElement
+	 */
+	public function editProperties() {
+		$this->checkIfEditable();
+		$this->getControls()->query('id:dashboard-config')->one()->click();
+
+		return $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="dashboard_properties"]')
+				->waitUntilVisible()->asOverlayDialog()->one()->waitUntilReady();
+	}
+
+	/**
 	 * Open widget adding form.
 	 * Dashboard should be in editing mode.
 	 *
@@ -266,5 +279,17 @@ class CDashboardElement extends CElement {
 		$this->query('xpath://ul[@role="menu"]')->asPopupMenu()->one()->select('Add page');
 
 		return $this;
+	}
+
+	/**
+	 * Select dashboard page by name.
+	 *
+	 * @param string	$name		page name to be selected
+	 * @param integer	$index		expected number of pages with the provided name
+	 */
+	public function selectPage($name, $index = 1) {
+		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($name);
+		$this->query('xpath:('.$selection.'])['.$index.']')->waitUntilClickable()->one()->click();
+		$this->query('xpath:'.$selection.']/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
 	}
 }
