@@ -44,6 +44,7 @@ use Widgets\TopHosts\Widget;
 class WidgetForm extends CWidgetForm {
 
 	private const DEFAULT_HOSTS_COUNT = 10;
+	private const DEFAULT_ORDER_COLUMN = 0;
 
 	private array $field_column_values = [];
 
@@ -124,7 +125,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldSelect('column', _('Order column'), $this->field_column_values))
 					->setDefault($this->field_column_values
-						? (int) array_keys($this->field_column_values)[0]
+						? self::DEFAULT_ORDER_COLUMN
 						: CWidgetFieldSelect::DEFAULT_VALUE
 					)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
