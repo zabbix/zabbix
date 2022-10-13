@@ -138,8 +138,6 @@ class testFormUpdateProblem extends CWebTest {
 		$this->assertArrayHasKey('triggerids', $triggers);
 		self::$triggerids = CDataHelper::getIds('description');
 
-		var_dump(self::$triggerids);
-
 		// Create events.
 		self::$time = time();
 		$i=0;
