@@ -950,6 +950,41 @@ class CItem extends CItemGeneral {
 
 		self::checkDoubleInheritedNames($items, $db_items, $tpl_links);
 
+		if ($hostids !== null && !$is_dep_items) {
+			$dep_items_to_link = [];
+
+			$item_indexes = array_flip(array_column($items, 'itemid'));
+
+			foreach ($items as $i => $item) {
+				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+					$dep_items_to_link[$item_indexes[$item['master_itemid']]][$i] = $item;
+
+					unset($items[$i]);
+				}
+			}
+		}
+
+		$chunks = self::getInheritChunks($items, $tpl_links);
+
+		foreach ($chunks as $chunk) {
+			$_items = array_intersect_key($items, array_flip($chunk['item_indexes']));
+			$_db_items = array_intersect_key($db_items, array_flip(array_column($_items, 'itemid')));
+			$_hostids = array_keys($chunk['hosts']);
+
+			self::inheritChunk($_items, $_db_items, $tpl_links, $_hostids);
+		}
+
+		if ($hostids !== null && !$is_dep_items) {
+			self::inheritDependentItems($dep_items_to_link, $items, $hostids);
+		}
+	}
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 * @param array $tpl_links
+	 * @param array $hostids
+	 */
+	protected static function inheritChunk(array $items, array $db_items, array $tpl_links, array $hostids): void {
 		$items_to_link = [];
 		$items_to_update = [];
 
@@ -969,31 +1004,17 @@ class CItem extends CItemGeneral {
 		$upd_db_items = [];
 
 		if ($items_to_link) {
-			if ($hostids !== null && !$is_dep_items) {
-				$dep_items_to_link = [];
-
-				$item_indexes = array_flip(array_column($items_to_link, 'itemid'));
-
-				foreach ($items_to_link as $i => $item) {
-					if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-						$dep_items_to_link[$item_indexes[$item['master_itemid']]][$i] = $item;
-
-						unset($items_to_link[$i]);
-					}
-				}
-			}
-
 			$upd_db_items = self::getChildObjectsUsingName($items_to_link, $hostids);
 
 			if ($upd_db_items) {
 				$upd_items = self::getUpdChildObjectsUsingName($items_to_link, $upd_db_items);
 			}
 
-			$ins_items = self::getInsChildObjects($items_to_link, $upd_db_items, $tpl_links);
+			$ins_items = self::getInsChildObjects($items_to_link, $upd_db_items, $tpl_links, $hostids);
 		}
 
 		if ($items_to_update) {
-			$_upd_db_items = self::getChildObjectsUsingTemplateid($items_to_update, $db_items);
+			$_upd_db_items = self::getChildObjectsUsingTemplateid($items_to_update, $db_items, $hostids);
 			$_upd_items = self::getUpdChildObjectsUsingTemplateid($items_to_update, $db_items, $_upd_db_items);
 
 			self::checkDuplicates($_upd_items, $_upd_db_items);
@@ -1020,25 +1041,23 @@ class CItem extends CItemGeneral {
 		}
 
 		self::inherit(array_merge($upd_items, $ins_items), $upd_db_items);
-
-		if ($hostids !== null && !$is_dep_items) {
-			self::inheritDependentItems($dep_items_to_link, $items_to_link, $hostids);
-		}
 	}
 
 	/**
 	 * @param array $items
 	 * @param array $db_items
+	 * @param array $hostids
 	 *
 	 * @return array
 	 */
-	private static function getChildObjectsUsingTemplateid(array $items, array $db_items): array {
+	private static function getChildObjectsUsingTemplateid(array $items, array $db_items, array $hostids): array {
 		$upd_db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'filter' => [
-				'templateid' => array_keys($db_items)
+				'templateid' => array_keys($db_items),
+				'hostid' => $hostids
 			],
 			'preservekeys' => true
 		]);
@@ -1049,7 +1068,7 @@ class CItem extends CItemGeneral {
 			$parent_indexes = array_flip(array_column($items, 'itemid'));
 			$upd_items = [];
 
-			foreach ($upd_db_items as $upd_db_item) {
+			foreach ($upd_db_items as $i => $upd_db_item) {
 				$item = $items[$parent_indexes[$upd_db_item['templateid']]];
 				$db_item = $db_items[$upd_db_item['templateid']];
 
@@ -1108,14 +1127,12 @@ class CItem extends CItemGeneral {
 	}
 
 	/**
-	 * @param array      $items
-	 * @param array|null $hostids
+	 * @param array $items
+	 * @param array $hostids
 	 *
 	 * @return array
 	 */
-	private static function getChildObjectsUsingName(array $items, ?array $hostids): array {
-		$hostids_condition = ($hostids !== null) ? ' AND '.dbConditionId('ht.hostid', $hostids) : '';
-
+	private static function getChildObjectsUsingName(array $items, array $hostids): array {
 		$result = DBselect(
 			'SELECT i.itemid,ht.hostid,i.key_,i.templateid,i.flags,h.status AS host_status,'.
 				'ht.templateid AS parent_hostid'.
@@ -1124,7 +1141,7 @@ class CItem extends CItemGeneral {
 				' AND ht.hostid=h.hostid'.
 				' AND '.dbConditionId('ht.templateid', array_unique(array_column($items, 'hostid'))).
 				' AND '.dbConditionString('i.key_', array_unique(array_column($items, 'key_'))).
-				$hostids_condition
+				' AND '.dbConditionId('ht.hostid', $hostids)
 		);
 
 		$upd_db_items = [];
@@ -1222,10 +1239,12 @@ class CItem extends CItemGeneral {
 	 * @param array $items
 	 * @param array $upd_db_items
 	 * @param array $tpl_links
+	 * @param array $hostids
 	 *
 	 * @return array
 	 */
-	private static function getInsChildObjects(array $items, array $upd_db_items, array $tpl_links): array {
+	private static function getInsChildObjects(array $items, array $upd_db_items, array $tpl_links,
+			array $hostids): array {
 		$ins_items = [];
 
 		$upd_item_keys = [];
@@ -1239,8 +1258,9 @@ class CItem extends CItemGeneral {
 			$item = self::unsetNestedObjectIds($item);
 
 			foreach ($tpl_links[$item['hostid']] as $host) {
-				if (array_key_exists($host['hostid'], $upd_item_keys)
-						&& in_array($item['key_'], $upd_item_keys[$host['hostid']])) {
+				if (!in_array($host['hostid'], $hostids)
+						|| (array_key_exists($host['hostid'], $upd_item_keys)
+							&& in_array($item['key_'], $upd_item_keys[$host['hostid']]))) {
 					continue;
 				}
 

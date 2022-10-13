@@ -74,6 +74,13 @@ abstract class CItemGeneral extends CApiService {
 	protected const VALUE_TYPE_FIELD_NAMES = [];
 
 	/**
+	 * A max count of the inheritable items per iteration.
+	 *
+	 * @var int
+	 */
+	protected const INHERIT_CHUNK_SIZE = 100;
+
+	/**
 	 * @abstract
 	 *
 	 * @param array $options
@@ -505,6 +512,63 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Get item chunks to inherit.
+	 *
+	 * @param array $items
+	 * @param array $tpl_links
+	 *
+	 * @return array
+	 */
+	protected static function getInheritChunks(array $items, array $tpl_links): array {
+		$chunks = [];
+		$last = -1;
+		$first_item_index = key($items);
+
+		foreach ($items as $i => $item) {
+			$hosts_chunks = array_chunk($tpl_links[$item['hostid']], self::INHERIT_CHUNK_SIZE, true);
+
+			foreach ($hosts_chunks as $j => $hosts) {
+				if (array_key_exists($j + 1, $hosts_chunks) || ($i == $first_item_index && $j == 0)) {
+					$chunks[++$last] = [
+						'item_indexes' => [$i],
+						'hosts' => $hosts
+					];
+				}
+				else {
+					$can_add_hosts = true;
+					$last_chunk_size = 0;
+
+					foreach ($chunks[$last]['item_indexes'] as $_i) {
+						$new_hosts = array_diff_key($hosts, $chunks[$last]['hosts']);
+
+						if (array_intersect_key($tpl_links[$items[$_i]['hostid']], $new_hosts)) {
+							$can_add_hosts = false;
+							break;
+						}
+
+						$last_chunk_size += count(
+							array_intersect_key($chunks[$last]['hosts'], $tpl_links[$items[$_i]['hostid']])
+						);
+					}
+
+					if ($can_add_hosts && $last_chunk_size + count($hosts) <= self::INHERIT_CHUNK_SIZE) {
+						$chunks[$last]['item_indexes'][] = $i;
+						$chunks[$last]['hosts'] += $hosts;
+					}
+					else {
+						$chunks[++$last] = [
+							'item_indexes' => [$i],
+							'hosts' => $hosts
+						];
+					}
+				}
+			}
+		}
+
+		return $chunks;
+	}
+
+	/**
 	 * @param array $item
 	 * @param array $upd_db_item
 	 *
@@ -661,11 +725,11 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * Update relation to master item for inherited dependent items.
 	 *
-	 * @param array      $upd_items
-	 * @param array      $ins_items
-	 * @param array|null $hostids
+	 * @param array $upd_items
+	 * @param array $ins_items
+	 * @param array $hostids
 	 */
-	protected static function setChildMasterItemIds(array &$upd_items, array &$ins_items, ?array $hostids): void {
+	protected static function setChildMasterItemIds(array &$upd_items, array &$ins_items, array $hostids): void {
 		$upd_item_indexes = [];
 		$ins_item_indexes = [];
 
@@ -685,13 +749,12 @@ abstract class CItemGeneral extends CApiService {
 			return;
 		}
 
-		$hostids_condition = ($hostids !== null) ? ['hostid' => $hostids] : [];
-
 		$options = [
 			'output' => ['itemid', 'hostid', 'templateid'],
 			'filter' => [
-				'templateid' => array_keys($ins_item_indexes + $upd_item_indexes)
-			] + $hostids_condition
+				'templateid' => array_keys($ins_item_indexes + $upd_item_indexes),
+				'hostid' => $hostids
+			]
 		];
 		$result = DBselect(DB::makeSql('items', $options));
 
