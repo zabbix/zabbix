@@ -242,10 +242,6 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
-ZBX_THREAD_LOCAL unsigned char	process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
-ZBX_THREAD_LOCAL int		process_num;
-ZBX_THREAD_LOCAL int		server_num	= 0;
-
 static zbx_thread_activechk_args	*config_active_args = NULL;
 
 int	CONFIG_ALERTER_FORKS		= 0;
