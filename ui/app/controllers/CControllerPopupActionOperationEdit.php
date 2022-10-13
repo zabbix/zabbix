@@ -137,6 +137,26 @@ class CControllerPopupActionOperationEdit extends CController {
 			return $host_group;
 		}
 
+		if($operation['opgroup']) {
+			foreach($operation['opgroup'] as &$host_group) {
+				$host_group = API::HostGroup()->get([
+					'output' => ['name'],
+					'groupids' => $host_group['groupid']
+				]);
+			}
+			return $host_group;
+		}
+
+		if($operation['optemplate']) {
+			foreach($operation['optemplate'] as &$template) {
+				$template = API::Template()->get([
+					'output' => ['name'],
+					'templateids' => $template['templateid']
+				]);
+			}
+			return $template;
+		}
+
 		return $host;
 	}
 

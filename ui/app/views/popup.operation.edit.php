@@ -274,6 +274,22 @@ if($operation['opcommand_grp']) {
 	}
 }
 
+if($operation['opgroup']) {
+	foreach ($operation['opgroup'] as $group) {
+		$host_group['id'] = $group[0]['hostid'];
+		$host_group['name'] = $group[0]['name'];
+		$multiselect_values_ophost_grp[] = $host_group;
+	}
+}
+
+if($operation['optemplate']) {
+	foreach ($operation['optemplate'] as $template) {
+		$templates['id'] = $template[0]['templateid'];
+		$templates['name'] = $template[0]['name'];
+		$multiselect_values_optemplate[] = $templates;
+	}
+}
+
 // Command execution targets row.
 $form_grid->addItem([
 	(new CLabel(_('Target list')))
@@ -339,6 +355,7 @@ $form_grid->addItem([
 		(new CMultiSelect([
 			'name' => 'operation[opgroup][][groupid]',
 			'object_name' => 'hostGroup',
+			'data' => $multiselect_values_ophost_grp,
 			'popup' => [
 				'parameters' => [
 					'multiselect' => '1',
@@ -364,6 +381,7 @@ $form_grid->addItem([
 		(new CMultiSelect([
 			'name' => 'operation[optemplate][][templateid]',
 			'object_name' => 'templates',
+			'data' => $multiselect_values_optemplate,
 			'popup' => [
 				'parameters' => [
 					'multiselect' => '1',
