@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @backup hosts, hstgrp
+ * @backup hosts
  *
  * @onBefore prepareProblemsData
  */
@@ -138,46 +138,26 @@ class testFormUpdateProblem extends CWebTest {
 		$this->assertArrayHasKey('triggerids', $triggers);
 		self::$triggerids = CDataHelper::getIds('description');
 
+		var_dump(self::$triggerids);
+
 		// Create events.
 		self::$time = time();
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100550, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for float']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for float').', 0)'
-		);
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100551, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for char']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for char').', 1)'
-		);
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100552, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for log']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for log').', 2)'
-		);
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100553, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for unsigned']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for unsigned').', 3)'
-		);
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100554, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for text']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for text').', 4)'
-		);
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (100555, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for icon test']).', '.self::$time.', 0, 1, '.zbx_dbstr('Trigger for icon test').', 3)'
-		);
+		$i=0;
+		foreach (self::$triggerids as $name => $id) {
+			DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.(100550 + $i).', 0, 0, '.
+					zbx_dbstr($id).', '.self::$time.', 0, 1, '.zbx_dbstr($name).', '.zbx_dbstr($i).')'
+			);
+			$i++;
+		}
 
 		// Create problems.
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100550, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for float']).', '.self::$time.', 0, '.zbx_dbstr('Trigger for float').', 0)'
-		);
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100551, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for char']).', '.self::$time.', 0, '.zbx_dbstr('Trigger for char').', 1)'
-		);
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100552, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for log']).', '.self::$time.', 0, '.zbx_dbstr('Trigger for log').', 2)'
-		);
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity, acknowledged) VALUES (100553, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for unsigned']).', '.self::$time.', 0, '.zbx_dbstr('Trigger for unsigned').', 3, 1)'
-		);
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100554, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for text']).', '.self::$time.', 0, '.zbx_dbstr('Trigger for text').', 4)'
-		);
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (100555, 0, 0, '.
-				zbx_dbstr(self::$triggerids ['Trigger for icon test']).', '.self::$time.', 0, '.zbx_dbstr('Trigger for icon test').', 3)'
-		);
+		$j=0;
+		foreach (self::$triggerids as $name => $id) {
+			DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.(100550 + $j).', 0, 0, '.
+					zbx_dbstr($id).', '.self::$time.', 0, '.zbx_dbstr($name).', '.zbx_dbstr($j).')'
+			);
+			$j++;
+		}
 
 		// Change triggers' state to Problem. Manual close is true for the problem: Trigger for char'.
 		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Trigger for float').', '.
@@ -275,7 +255,7 @@ class testFormUpdateProblem extends CWebTest {
 			[
 				[
 					'problems' => ['Trigger for float', 'Trigger for char', 'Trigger for log', 'Trigger for unsigned', 'Trigger for text'],
-					// If more than one problems selected - History label is absent.
+					// If more than one problem selected - History label is absent.
 					'labels' => ['Problem', 'Message', 'Scope', 'Change severity', 'Suppress', 'Unsuppress',
 							'Acknowledge', 'Unacknowledge', 'Close problem', ''
 					],
