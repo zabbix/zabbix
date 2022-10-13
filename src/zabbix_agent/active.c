@@ -1435,7 +1435,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	time_t				nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0,
 					heartbeat_nextcheck = 0;
 	zbx_uint32_t			config_revision_local = 0;
-	unsigned char   		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
