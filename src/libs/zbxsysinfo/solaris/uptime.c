@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 int	system_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
