@@ -1,1 +1,0 @@
-........S. [ZBX-21510] made NodeAddress use ListenIP and ListenPort if not explicitly specified (kprutkovs)

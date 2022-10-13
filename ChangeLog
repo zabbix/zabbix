@@ -1,17 +1,73 @@
+Changes for 6.2.4rc1
+
+New features:
+A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
+A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
+
+Bug fixes:
+........S. [ZBX-21709] fixed database upgrade patch to skip unexpected invalid service downtime instead of failing (vso)
+..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
+........S. [ZBX-21537] fixed history syncers being stuck waiting on system information being collected (vso)
+.........T [ZBX-21484] updated documentation for templates SMART by Zabbix agent 2 (atocko)
+.......PS. [ZBX-21725] fixed configuration cache shared memory leak when removing vault macros (wiper)
+.........T [ZBX-20296] fixed swap trigger function for windows os and modules by Zabbix agent templates (atocko)
+.........T [ZBX-20392] added close/ack/unack of events for OPSgenie media (atocko)
+...G...... [ZBX-21227] fixed Zabbix agent to log received service control commands (vso)
+...G...... [ZBX-21456] fixed net.tcp.socket.count and net.udp.socket.count problem on Zabbix agent 2 when ipv6 is disabled (dgoloscapov)
+..F....... [ZBX-21532] fixed missing inherited tags for templated triggers in edit form, tag tab (dpetra)
+..F....... [ZBX-21000] fixed possibility to update host interface on items from templates (dpetra)
+........S. [ZBX-21706] fixed double precision update patch for TimescaleDb (akozlovs)
+..F....... [ZBX-19512] fixed debug info block content refresh after changing table content in Monitoring -> Problems page (miks)
+..F....... [ZBX-21682] removed unnecessary horizontal separator from Host interface (kkuzmina)
+...G...... [ZBX-21610] fixed problem with sysctl() kern.proc.args API bug on FreeBSD <= 8.2 (ssimonenko)
+........S. [ZBX-17060] fixed unexpected interface connection mode change during autoregistration (asestakovs)
+........S. [ZBX-21510] made NodeAddress use ListenIP and ListenPort if not explicitly specified (kprutkovs)
+...G...... [ZBX-21388] fixed Zabbix agent 2 plugin read error and updated plugin support dependency for Zabbix agent 2 (esneiders)
+...G...PS. [ZBX-20864] fixed format specifier definitions on AIX (jxl)
+..F....... [ZBX-21605] fixed possible PHP runtime errors in several modal popup dialogs (Sasha)
+A.F....... [ZBX-21097] fixed filtering by "Resource ID" and "Recordset ID" fields for "Audit log" page (Sasha)
+.........T [ZBX-21580] optimized HPE MSA 2060 Storage by HTTP template to spread the load across preprocessing workers (drasihov)
+.........T [ZBX-21579] optimized HPE MSA 2040 Storage by HTTP template to spread the load across preprocessing workers (drasihov)
+.........T [ZBX-21421] fixed variable spelling in Kubernetes cluster state by HTTP template (atocko)
+...G...... [ZBX-21466] fixed race condition in Zabbix agent 2 leading to permanently stuck mount reads (arimdjonoks)
+..F....... [ZBX-21544] fixed value of query field being truncated to the first "=" sign when pressing parse button (agriscenko)
+.........T [ZBX-21581] optimized HPE Primera template to spread the load across preprocessing workers (vkhaliev)
+........S. [ZBX-21009] fixed double escaping in trigger function upon host autoregistration (kprutkovs)
+.........T [ZBX-21580] optimized HPE MSA 2060 Storage by HTTP template to spread the load across preprocessing workers (drasihov)
+.........T [ZBX-21579] optimized HPE MSA 2040 Storage by HTTP template to spread the load across preprocessing workers (drasihov)
+.........T [ZBX-21421] fixed variable spelling in Kubernetes cluster state by HTTP template (atocko)
+...G...... [ZBX-21466] fixed race condition in Zabbix agent 2 leading to permanently stuck mount reads (arimdjonoks)
+..F....... [ZBX-21544] fixed value of query field being truncated to the first "=" sign when pressing parse button (agriscenko)
+.........T [ZBX-21581] optimized HPE Primera template to spread the load across preprocessing workers (vkhaliev)
+........S. [ZBX-21009] fixed double escaping in trigger function upon host autoregistration (kprutkovs)
+
+--------------------------------------------------------------------------------
+Changes for 6.2.3
+
+6.2.3rc2 was released as 6.2.3 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.2.3rc2
+
+Bug fixes:
+........S. [ZBX-21664] fixed Zabbix server crashing during database upgrade when converting service times and there is downtime inside uptime (vso)
+
+--------------------------------------------------------------------------------
 Changes for 6.2.3rc1
 
 New features:
 .........T [ZBXNEXT-7877] added master template for AWS cloud services (abakaldin)
-...G...... [ZBXNEXT-6666] added listen socket security fix for Agent 2 on Windows (ssimonenko)
+...G...... [ZBXNEXT-6666] added listen socket security fix for Zabbix agent 2 on Windows (ssimonenko)
 
 Bug fixes:
+..F....... [ZBX-20644] fixed slow loading of Latest data when filtered by single host (averza)
 .......P.. [ZBX-21624] fixed "Something impossible" error and Vault macro not working on passive Zabbix proxy (vso)
 ........S. [ZBX-19783] added sourceip handling for scheduled reports (dgoloscapov)
 .......PS. [ZBX-21517] fixed invalid update interval handling in network discovery and web scenario scheduling (wiper)
 ........S. [ZBX-21558] fixed possible crash in value cache when a new item is being added in low memory situation (wiper)
 A......... [ZBX-21116] fixed undefined offset error when adding dependency for trigger prototype on host trigger (vmaksimovs)
 ..F....... [ZBX-21536] fixed backslash escape in trigger expression constructor (gcalenko)
-....I..PS. [ZBX-20943] fixed long hostgroup names in LLD hostgroup prototypes fails 2nd and consequent runs (mprihodko, Sasha)
+....I..PS. [ZBX-20943] fixed LLD hostgroup prototypes failure at 2nd and consequent runs because of long hostgroup names (mprihodko, Sasha)
 A......... [ZBX-21608] fixed inability to import a template without linked templates when no changes in template linkage are selected in import options (vmaksimovs)
 ..F....... [ZBX-21494] fixed 'Highlight whole row' checkbox label clickability on Problems page (kkuzmina)
 ..F....... [ZBX-20683] fixed action buttons functionality in Tags tab of host configuration if it is opened as popup on another Tags tab (dpetra)
@@ -361,18 +417,65 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.10rc1
+
+New features:
+..F....... [ZBXNEXT-7567] implemented saving the state of the default filters in monitoring sections (acikuns)
+A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
+
+Bug fixes:
+........S. [ZBX-21709] fixed database upgrade patch to skip unexpected invalid service downtime instead of failing (vso)
+..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
+........S. [ZBX-21537] fixed history syncers being stuck waiting on system information being collected (vso)
+.........T [ZBX-21484] updated documentation for templates SMART by Zabbix agent 2 (atocko)
+.........T [ZBX-20296] fixed swap trigger function for windows os and modules by Zabbix agent templates (atocko)
+.........T [ZBX-20392] added close/ack/unack of events for OPSgenie media (atocko)
+...G...... [ZBX-21227] fixed Zabbix agent to log received service control commands (vso)
+...G...... [ZBX-21456] fixed net.tcp.socket.count and net.udp.socket.count problem on Zabbix agent 2 when ipv6 is disabled (dgoloscapov)
+..F....... [ZBX-21532] fixed missing inherited tags for templated triggers in edit form, tag tab (dpetra)
+..F....... [ZBX-21000] fixed possibility to update host interface on items from templates (dpetra)
+........S. [ZBX-21706] fixed double precision update patch for TimescaleDb (akozlovs)
+..F....... [ZBX-19512] fixed debug info block content refresh after changing table content in Monitoring -> Problems page (miks)
+..F....... [ZBX-21682] removed unnecessary horizontal separator from Host interface (kkuzmina)
+...G...... [ZBX-21610] fixed problem with sysctl() kern.proc.args API bug on FreeBSD <= 8.2 (ssimonenko)
+........S. [ZBX-17060] fixed unexpected interface connection mode change during autoregistration (asestakovs)
+...G...... [ZBX-21388] fixed Zabbix agent 2 plugin read error and updated plugin support dependency for Zabbix agent 2 (esneiders)
+...G...PS. [ZBX-20864] fixed format specifier definitions on AIX (jxl)
+..F....... [ZBX-21605] fixed possible PHP runtime errors in several modal popup dialogs (Sasha)
+.........T [ZBX-21580] optimized HPE MSA 2060 Storage by HTTP template to spread the load across preprocessing workers (drasihov)
+.........T [ZBX-21579] optimized HPE MSA 2040 Storage by HTTP template to spread the load across preprocessing workers (drasihov)
+.........T [ZBX-21421] fixed variable spelling in Kubernetes cluster state by HTTP template (atocko)
+...G...... [ZBX-21466] fixed race condition in Zabbix agent 2 leading to permanently stuck mount reads (arimdjonoks)
+A.F....... [ZBX-21097] fixed filtering by "Resource ID" and "Recordset ID" fields for "Audit log" page (Sasha)
+..F....... [ZBX-21544] fixed value of query field being truncated to the first "=" sign when pressing parse button (agriscenko)
+.........T [ZBX-21581] optimized HPE Primera template to spread the load across preprocessing workers (vkhaliev)
+........S. [ZBX-21009] fixed double escaping in trigger function upon host autoregistration (kprutkovs)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.9
+
+6.0.9rc2 was released as 6.0.9 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.9rc2
+
+Bug fixes:
+........S. [ZBX-21664] fixed Zabbix server crashing during database upgrade when converting service times and there is downtime inside uptime (vso)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.9rc1
 
 New features:
-...G...... [ZBXNEXT-6666] added listen socket security fix for Agent 2 on Windows (ssimonenko)
+...G...... [ZBXNEXT-6666] added listen socket security fix for Zabbix agent 2 on Windows (ssimonenko)
 
 Bug fixes:
+..F....... [ZBX-20644] fixed slow loading of Latest data when filtered by single host (averza)
 ........S. [ZBX-19783] added sourceip handling for scheduled reports (dgoloscapov)
 .......PS. [ZBX-21517] fixed invalid update interval handling in network discovery and web scenario scheduling (wiper)
 ........S. [ZBX-21558] fixed possible crash in value cache when a new item is being added in low memory situation (wiper)
 A......... [ZBX-21116] fixed undefined offset error when adding dependency for trigger prototype on host trigger (vmaksimovs)
 ..F....... [ZBX-21536] fixed backslash escape in trigger expression constructor (gcalenko)
-....I..PS. [ZBX-20943] fixed long hostgroup names in LLD hostgroup prototypes fails 2nd and consequent runs (mprihodko, Sasha)
+....I..PS. [ZBX-20943] fixed LLD hostgroup prototypes failure at 2nd and consequent runs because of long hostgroup names (mprihodko, Sasha)
 .D.......T [ZBX-21519] added note about php-fpm process name in documentation of PHP-FPM by Zabbix agent template (drasihov)
 A......... [ZBX-21608] fixed inability to import a template without linked templates when no changes in template linkage are selected in import options (vmaksimovs)
 ..F....... [ZBX-21494] fixed 'Highlight whole row' checkbox label clickability on Problems page (kkuzmina)
@@ -2476,6 +2579,30 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.29rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
+.........T [ZBX-21484] updated documentation for templates SMART by Zabbix agent 2 (atocko)
+........S. [ZBX-21537] fixed history syncers being stuck waiting on system information being collected (vso)
+.........T [ZBX-20296] fixed swap and available memory trigger functions for os templates (atocko)
+.........T [ZBX-20392] added close/ack/unack of events for OPSgenie media (atocko)
+...G...... [ZBX-21227] fixed Zabbix agent to log received service control commands (vso)
+..F....... [ZBX-21532] fixed missing inherited tags for templated triggers in edit form, tag tab (dpetra)
+..F....... [ZBX-19512] fixed debug info block content refresh after changing table content in Monitoring -> Problems page (miks)
+...G...... [ZBX-21610] fixed problem with sysctl() kern.proc.args API bug on FreeBSD <= 8.2 (ssimonenko)
+........S. [ZBX-17060] fixed unexpected interface connection mode change during autoregistration (asestakovs)
+..F....... [ZBX-21605] fixed possible PHP runtime errors in several modal popup dialogs (Sasha)
+...G...... [ZBX-21466] fixed race condition in Zabbix agent 2 leading to permanently stuck mount reads (arimdjonoks)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.28
+
+5.0.28rc1 was released as 5.0.28 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.28rc1
@@ -5079,6 +5206,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.45rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.44
+
+4.0.44rc1 was released as 4.0.44 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.44rc1

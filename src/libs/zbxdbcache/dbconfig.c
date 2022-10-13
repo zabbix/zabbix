@@ -6703,6 +6703,7 @@ int	init_configuration_cache(char **error)
 
 	config->status = (ZBX_DC_STATUS *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_STATUS));
 	config->status->last_update = 0;
+	config->status->sync_ts = 0;
 
 	config->availability_diff_ts = 0;
 	config->sync_ts = 0;
@@ -10620,56 +10621,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check that functionids in trigger (recovery) expression           *
- *                                                                            *
- * Parameters: expression - [IN] trigger (recovery) expression                *
- *             data       - [IN] parsed and serialized expression             *
- *                                                                            *
- * Return value: SUCCEED - all functionids correspond to enabled items and    *
- *                           enabled hosts                                    *
- *               FAIL    - at least one item or host is disabled              *
- *                                                                            *
- ******************************************************************************/
-static int	dc_trigger_items_hosts_enabled(const char *expression, const unsigned char *data)
-{
-	zbx_uint64_t		functionid;
-	const ZBX_DC_ITEM	*dc_item;
-	const ZBX_DC_FUNCTION	*dc_function;
-	const ZBX_DC_HOST	*dc_host;
-	int			i, ret = FAIL;
-	zbx_vector_uint64_t	functionids;
-
-	zbx_vector_uint64_create(&functionids);
-	zbx_get_serialized_expression_functionids(expression, data, &functionids);
-
-	for (i = 0; i < functionids.values_num; i++)
-	{
-		functionid = functionids.values[i];
-
-		if (NULL == (dc_function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionid)))
-			goto out;
-
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &dc_function->itemid)))
-			goto out;
-
-		if (ITEM_STATUS_ACTIVE != dc_item->status)
-			goto out;
-
-		if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-			goto out;
-
-		if (HOST_STATUS_MONITORED != dc_host->status)
-			goto out;
-	}
-
-	ret = SUCCEED;
-out:
-	zbx_vector_uint64_destroy(&functionids);
-
-	return ret;
-}
-
-/******************************************************************************
+ * Function: dc_status_update                                                 *
  *                                                                            *
  * Purpose: check when status information stored in configuration cache was   *
  *          updated last time and update it if necessary                      *
@@ -10704,9 +10656,16 @@ static void	dc_status_update(void)
 	ZBX_DC_HOST		*dc_host, *dc_proxy_host;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_TRIGGER	*dc_trigger;
+	int			reset;
 
 	if (0 != config->status->last_update && config->status->last_update + ZBX_STATUS_LIFETIME > time(NULL))
 		return;
+
+
+	if (config->status->sync_ts != config->sync_ts)
+		reset = SUCCEED;
+	else
+		reset = FAIL;
 
 	/* reset global counters */
 
@@ -10718,17 +10677,22 @@ static void	dc_status_update(void)
 	config->status->triggers_enabled_ok = 0;
 	config->status->triggers_enabled_problem = 0;
 	config->status->triggers_disabled = 0;
-	config->status->required_performance = 0.0;
+
+	if (SUCCEED == reset)
+		config->status->required_performance = 0.0;
 
 	/* loop over proxies to reset per-proxy host and required performance counters */
 
-	zbx_hashset_iter_reset(&config->proxies, &iter);
-
-	while (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
+	if (SUCCEED == reset)
 	{
-		dc_proxy->hosts_monitored = 0;
-		dc_proxy->hosts_not_monitored = 0;
-		dc_proxy->required_performance = 0.0;
+		zbx_hashset_iter_reset(&config->proxies, &iter);
+
+		while (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
+		{
+			dc_proxy->hosts_monitored = 0;
+			dc_proxy->hosts_not_monitored = 0;
+			dc_proxy->required_performance = 0.0;
+		}
 	}
 
 	/* loop over hosts */
@@ -10750,17 +10714,27 @@ static void	dc_status_update(void)
 				config->status->hosts_monitored++;
 				if (0 == dc_host->proxy_hostid)
 					break;
-				if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &dc_host->proxy_hostid)))
-					break;
-				dc_proxy->hosts_monitored++;
+
+				if (SUCCEED == reset)
+				{
+					if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
+							&dc_host->proxy_hostid)))
+						break;
+					dc_proxy->hosts_monitored++;
+				}
 				break;
 			case HOST_STATUS_NOT_MONITORED:
 				config->status->hosts_not_monitored++;
 				if (0 == dc_host->proxy_hostid)
 					break;
-				if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &dc_host->proxy_hostid)))
-					break;
-				dc_proxy->hosts_not_monitored++;
+
+				if (SUCCEED == reset)
+				{
+					if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
+							&dc_host->proxy_hostid)))
+						break;
+					dc_proxy->hosts_not_monitored++;
+				}
 				break;
 		}
 	}
@@ -10782,7 +10756,9 @@ static void	dc_status_update(void)
 
 		if (0 != dc_host->proxy_hostid)
 		{
-			dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &dc_host->proxy_hostid);
+			if (SUCCEED == reset)
+				dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &dc_host->proxy_hostid);
+
 			dc_proxy_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_host->proxy_hostid);
 		}
 
@@ -10791,22 +10767,25 @@ static void	dc_status_update(void)
 			case ITEM_STATUS_ACTIVE:
 				if (HOST_STATUS_MONITORED == dc_host->status)
 				{
-					int	delay;
-					char	*delay_s;
-
-					delay_s = dc_expand_user_macros_dyn(dc_item->delay, &dc_item->hostid, 1,
-							ZBX_MACRO_ENV_NONSECURE);
-
-					if (SUCCEED == zbx_interval_preproc(delay_s, &delay, NULL, NULL) &&
-							0 != delay)
+					if (SUCCEED == reset)
 					{
-						config->status->required_performance += 1.0 / delay;
+						int	delay;
+						char	*delay_s;
 
-						if (NULL != dc_proxy)
-							dc_proxy->required_performance += 1.0 / delay;
+						delay_s = dc_expand_user_macros_dyn(dc_item->delay, &dc_item->hostid, 1,
+								ZBX_MACRO_ENV_NONSECURE);
+
+						if (SUCCEED == zbx_interval_preproc(delay_s, &delay, NULL, NULL) &&
+								0 != delay)
+						{
+							config->status->required_performance += 1.0 / delay;
+
+							if (NULL != dc_proxy)
+								dc_proxy->required_performance += 1.0 / delay;
+						}
+
+						zbx_free(delay_s);
 					}
-
-					zbx_free(delay_s);
 
 					switch (dc_item->state)
 					{
@@ -10851,11 +10830,7 @@ static void	dc_status_update(void)
 		switch (dc_trigger->status)
 		{
 			case TRIGGER_STATUS_ENABLED:
-				if (SUCCEED == dc_trigger_items_hosts_enabled(dc_trigger->expression,
-						dc_trigger->expression_bin) &&
-						(TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION != dc_trigger->recovery_mode ||
-						SUCCEED == dc_trigger_items_hosts_enabled(dc_trigger->recovery_expression,
-								dc_trigger->recovery_expression_bin)))
+				if (TRIGGER_FUNCTIONAL_TRUE == dc_trigger->functional)
 				{
 					switch (dc_trigger->value)
 					{
@@ -10880,6 +10855,7 @@ static void	dc_status_update(void)
 		}
 	}
 
+	config->status->sync_ts = config->sync_ts;
 	config->status->last_update = time(NULL);
 
 #undef ZBX_STATUS_LIFETIME
