@@ -77,7 +77,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		'Trigger disabled with tags' => 'icon-depend-up'
 	];
 
-	/*
+	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
 	 * because it can change.
 	 */
@@ -795,6 +795,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 
 		$widget_name = (array_key_exists('fields', $data)) ? $data['fields']['Name'] : 'Trigger overview';
 		$widget = $dashboard->getWidget($widget_name);
+		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
