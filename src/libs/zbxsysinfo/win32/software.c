@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

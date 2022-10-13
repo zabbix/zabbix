@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 #include "../common/zbxsysinfo_common.h"
 #include "zbx_sysinfo_kstat.h"
 

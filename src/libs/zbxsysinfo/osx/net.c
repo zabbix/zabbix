@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "../common/zbxsysinfo_common.h"
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
+#include "../common/zbxsysinfo_common.h"
 
 #include "zbxnum.h"
 #include "log.h"

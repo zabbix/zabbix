@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxstr.h"
 #include "zbxnum.h"
