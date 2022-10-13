@@ -82,10 +82,24 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 				'oldtag' =>  $this->hasInput('oldtag')? $this->getInput('oldtag') : '',
 				'newtag' =>  $this->hasInput('newtag')? $this->getInput('newtag') : '',
 				'value' =>  $this->hasInput('value')? $this->getInput('value') : '',
-				'groupids' =>  $this->hasInput('groupids')? $this->getInput('groupids') : '',
+				'groupids' =>  $this->hasInput('groupids')? $this->getGroupId() : '',
 				'operator_name' => $this->getLabelByOperator()
 			]
 		];
+	}
+
+	protected function getGroupId() {
+		$groups = API::HostGroup()->get([
+			'output' => ['name'],
+			'groupids' => $this->getInput('groupids'),
+			'preservekeys' => true
+		]);
+
+		foreach($groups as $group){
+			$group_name[] = $group['name'];
+		}
+
+		return $group_name;
 	}
 
 	protected function getLabelByOperator(int $operator = null): array {
