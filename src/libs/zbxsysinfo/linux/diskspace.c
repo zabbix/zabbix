@@ -86,7 +86,7 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 #undef ZBX_BSIZE
 }
 
-static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_fs_size_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*fsname, *mode, *error;
 	zbx_uint64_t	total, free, used;
@@ -128,7 +128,7 @@ static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_size, request, result);
+	return zbx_execute_threaded_metric(vfs_fs_size_local, request, result);
 }
 
 int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -191,7 +191,7 @@ int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			line[MAX_STRING_LEN], *p, *mpoint, *mtype, *mntopts, *error;
 	FILE			*f;
@@ -333,5 +333,5 @@ out:
 
 int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_get, request, result);
+	return zbx_execute_threaded_metric(vfs_fs_get_local, request, result);
 }

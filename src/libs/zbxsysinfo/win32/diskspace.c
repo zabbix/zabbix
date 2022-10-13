@@ -95,7 +95,7 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *n
 
 }
 
-static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
+static int	vfs_fs_size_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	char		*path, *mode;
 	char		*error;
@@ -148,7 +148,7 @@ static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE time
 
 int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_size, request, result);
+	return zbx_execute_threaded_metric(vfs_fs_size_local, request, result);
 }
 
 static const char	*get_drive_type_string(UINT type)
@@ -379,7 +379,7 @@ out:
 	return ret;
 }
 
-static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
+static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	size_t			sz;
 	struct zbx_json		j;
@@ -466,5 +466,5 @@ out:
 
 int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_get, request, result);
+	return zbx_execute_threaded_metric(vfs_fs_get_local, request, result);
 }
