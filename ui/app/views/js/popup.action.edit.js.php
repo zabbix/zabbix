@@ -566,7 +566,8 @@ window.action_edit_popup = new class {
 			});
 		});
 
-		document.getElementById('expression').innerHTML = getConditionFormula(conditions, + document.querySelector('#evaltype').value);
+		document.getElementById('expression')
+			.innerHTML = getConditionFormula(conditions, + document.querySelector('#evaltype').value);
 
 		document.querySelector('#evaltype').onchange = function() {
 			this.show_formula = +document.querySelector('#evaltype').value === <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
@@ -585,7 +586,8 @@ window.action_edit_popup = new class {
 				});
 			});
 
-			document.getElementById('expression').innerHTML = getConditionFormula(conditions, + document.querySelector('#evaltype').value);
+			document.getElementById('expression')
+				.innerHTML = getConditionFormula(conditions, + document.querySelector('#evaltype').value);
 		};
 	}
 }

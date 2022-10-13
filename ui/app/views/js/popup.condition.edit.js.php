@@ -38,8 +38,8 @@ window.condition_popup = new class {
 	}
 
 	_loadViews() {
-		if($("#condition-type").val() == <?= CONDITION_TYPE_SERVICE ?>) {
-			jQuery('#service-new-condition')
+		if(parseInt(document.querySelector('#condition-type').value) === <?= CONDITION_TYPE_SERVICE ?>) {
+			$('#service-new-condition')
 				.multiSelect('getSelectButton')
 				.addEventListener('click', () => {
 					this.selectServices();
@@ -47,14 +47,15 @@ window.condition_popup = new class {
 		}
 
 		this.form.addEventListener('click', (e) => {
-			$("#condition-type").change(function() {
+			document.querySelector('#condition-type').onchange = function() {
 				reloadPopup(e.target.closest('form'), 'popup.condition.edit')
-			})
-			$("#trigger_context").change(function() {
-				reloadPopup(e.target.closest("form"), 'popup.condition.edit')
-			})
+			}
+			if (document.querySelector('#trigger_context')) {
+				document.querySelector('#trigger_context').onchange = function() {
+					reloadPopup(e.target.closest("form"), 'popup.condition.edit')
+				}
+			}
 		})
-
 	}
 
 	submit() {

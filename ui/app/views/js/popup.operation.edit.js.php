@@ -50,12 +50,12 @@ window.operation_popup = new class {
 		const operation_type = document.getElementById('operation-type-select').value;
 		this._changeView(operation_type)
 
-		jQuery('#operation-type-select').on('change', () => {
+		document.querySelector('#operation-type-select').onchange = () => {
 			const operation_type = document.getElementById('operation-type-select').value;
 
 			this._removeAllFields();
 			this._changeView(operation_type)
-		});
+		}
 
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('operation-message-user-groups-footer')) {
@@ -128,59 +128,13 @@ window.operation_popup = new class {
 	}
 
 	_hostGroupFields() {
-		jQuery('#operation-attr-hostgroups').toggle(true);
-		jQuery('#operation-attr-hostgroups-label').toggle(true);
-
-		this.hostgroups_ms = jQuery('#operation_opgroup__groupid');
-
-		const ms_groups_url = new Curl('jsrpc.php', false);
-		ms_groups_url.setArgument('method', 'multiselect.get');
-		ms_groups_url.setArgument('object_name', 'hostGroup');
-		ms_groups_url.setArgument('editable', '1');
-		ms_groups_url.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
-
-		this.hostgroups_ms.multiSelect({
-			url: ms_groups_url.getUrl(),
-			name: 'operation[opgroup][][groupid]',
-			popup: {
-				parameters: {
-					multiselect: '1',
-					srctbl: 'host_groups',
-					srcfld1: 'groupid',
-					dstfrm: 'action.edit',
-					dstfld1: 'operation_opgroup__groupid',
-					editable: '1'
-				}
-			}
-		});
+		document.getElementById('operation-attr-hostgroups').style.display='';
+		document.getElementById('operation-attr-hostgroups-label').style.display='';
 	}
 
 	_templateFields() {
-		jQuery('#operation-attr-templates').toggle(true)
-		jQuery('#operation-attr-templates-label').toggle(true)
-
-		this.templates_ms = jQuery('#operation_optemplate__templateid');
-
-		const ms_templates_url = new Curl('jsrpc.php', false);
-		ms_templates_url.setArgument('method', 'multiselect.get');
-		ms_templates_url.setArgument('object_name', 'templates');
-		ms_templates_url.setArgument('editable', '1');
-		ms_templates_url.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
-
-		this.templates_ms.multiSelect({
-			url: ms_templates_url.getUrl(),
-			name: 'operation[optemplate][][templateid]',
-			popup: {
-				parameters: {
-					multiselect: '1',
-					srctbl: 'templates',
-					srcfld1: 'hostid',
-					dstfrm: 'action.edit',
-					dstfld1: 'operation_optemplate__templateid',
-					editable: '1'
-				}
-			}
-		});
+		document.getElementById('operation-attr-templates').style.display='';
+		document.getElementById('operation-attr-templates-label').style.display='';
 	}
 
 	_removeAllFields() {
@@ -212,7 +166,7 @@ window.operation_popup = new class {
 	}
 
 	_sendMessageFields() {
-		$('#operation_opmessage_default_msg').trigger('change')
+		document.getElementById('operation_opmessage_default_msg').dispatchEvent(new Event('change'));
 
 		switch (this.eventsource) {
 			case <?= EVENT_SOURCE_TRIGGERS ?>:
@@ -316,51 +270,6 @@ window.operation_popup = new class {
 		}
 
 		this._enableFormFields(fields);
-
-		this.targets_hosts_ms = jQuery('#operation_opcommand_hst__hostid');
-
-		const ms_hosts_url = new Curl('jsrpc.php', false);
-		ms_hosts_url.setArgument('method', 'multiselect.get');
-		ms_hosts_url.setArgument('object_name', 'hosts');
-		ms_hosts_url.setArgument('editable', '1');
-		ms_hosts_url.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
-
-		this.targets_hosts_ms.multiSelect({
-			url: ms_hosts_url.getUrl(),
-			name: 'operation[opcommand_hst][][hostid]',
-			popup: {
-				parameters: {
-					multiselect: '1',
-					srctbl: 'hosts',
-					srcfld1: 'hostid',
-					dstfrm: 'action.edit',
-					dstfld1: 'operation_opcommand_hst__hostid',
-					editable: '1'
-				}
-			}
-		});
-
-		const ms_groups_url = new Curl('jsrpc.php', false);
-		ms_groups_url.setArgument('method', 'multiselect.get');
-		ms_groups_url.setArgument('object_name', 'hostGroup');
-		ms_groups_url.setArgument('editable', '1');
-		ms_groups_url.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
-
-		this.targets_groups_ms = jQuery('#operation_opcommand_grp__groupid');
-		this.targets_groups_ms.multiSelect({
-			url: ms_groups_url.getUrl(),
-			name: 'operation[opcommand_grp][][groupid]',
-			popup: {
-				parameters: {
-					multiselect: '1',
-					srctbl: 'host_groups',
-					srcfld1: 'groupid',
-					dstfrm: 'action.edit',
-					dstfld1: 'operation_opcommand_grp__groupid',
-					editable: '1'
-				}
-			}
-		});
 	}
 
 	_openUserGroupPopup(target) {
@@ -476,7 +385,8 @@ window.operation_popup = new class {
 		row.appendChild(this._createHiddenInput(`operation[opconditions][${this.row_count-1}][operator]`, input.operator));
 		row.appendChild(this._createHiddenInput(`operation[opconditions][${this.row_count-1}][value]`, input.value));
 
-		$('#operation-condition-list tr:last').before(row);
+		let cond_table_rows = document.getElementById('operation-condition-list').getElementsByTagName('tr');
+		cond_table_rows[cond_table_rows.length - 1].before(row);
 	}
 
 	_createLabel(input) {
@@ -567,53 +477,64 @@ window.operation_popup = new class {
 	}
 
 	_processTypeOfCalculation() {
-		jQuery('#operation-evaltype').toggle(this.row_count > 1);
-		jQuery('#operation-evaltype-label').toggle(this.row_count > 1);
-		jQuery('#operation-condition-row').toggle(this.row_count > 1);
+		document.querySelector('#operation-evaltype').style.display = this.row_count > 1 ? '' : 'none';
+		document.querySelector('#operation-evaltype-label').style.display = this.row_count > 1 ? '' : 'none';
+		document.querySelector('#operation-condition-row').style.display = this.row_count > 1 ? '' : 'none';
 
-		const labels = jQuery('#operation-condition-list .label');
-		var conditions = [];
-		labels.each(function(index, label) {
-			var label = jQuery(label);
+		const labels = document.querySelectorAll('#operation-condition-list .label');
+		let conditions = [];
+		[...labels].forEach(function (label) {
 
 			conditions.push({
-				id: label.data('formulaid'),
-				type: label.data('conditiontype')
+				id: label.getAttribute('data-formulaid'),
+				type: label.getAttribute('data-conditiontype')
 			});
 		});
-		jQuery('#operation-condition-evaltype-formula').html(getConditionFormula(conditions, +jQuery('#operation-evaltype').val()));
 
-		jQuery('#operation-evaltype').change(function() {
-			const labels = jQuery('#operation-condition-list .label');
-			var conditions = [];
+		document.getElementById('operation-condition-evaltype-formula')
+			.innerHTML = getConditionFormula(conditions, + document.querySelector('#operation-evaltype').value);
 
-			labels.each(function(index, label) {
-				var label = jQuery(label);
+		document.querySelector('#operation-evaltype').onchange = function() {
+			const labels = document.querySelectorAll('#operation-condition-list .label');
+			let conditions = [];
+			[...labels].forEach(function (label) {
 
 				conditions.push({
-					id: label.data('formulaid'),
-					type: label.data('conditiontype')
+					id: label.getAttribute('data-formulaid'),
+					type: label.getAttribute('data-conditiontype')
 				});
 			});
 
-			jQuery('#operation-condition-evaltype-formula').html(getConditionFormula(conditions, +jQuery('#operation-evaltype').val()));
-		});
+			document.getElementById('operation-condition-evaltype-formula')
+				.innerHTML = getConditionFormula(conditions, + document.querySelector('#operation-evaltype').value);
+		}
 	}
 
 	_customMessageFields() {
-		$('#operation_opmessage_default_msg')
-			.change(function() {
-				if($('#operation_opmessage_default_msg')[0].checked) {
-					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').show().attr('disabled', false);
-					$('[id="operation-message-body"],[id="operation-message-label"]').show().attr('disabled', false);
-					$('#operation_opmessage_default_msg').val(0);
-				}
-				else {
-					$('[id="operation-message-subject"],[id="operation-message-subject-label"]').hide();
-					$('[id="operation-message-body"],[id="operation-message-label"]').hide();
-					$('#operation_opmessage_default_msg').val(1);
-				}
-			})
-			.trigger('change');
+		let default_msg = document.querySelector('#operation_opmessage_default_msg')
+
+		let message_fields = [
+			'operation-message-subject-label', 'operation-message-subject', 'operation-message-label',
+			'operation-message-body'
+		]
+
+		default_msg.onchange = function() {
+			if(document.querySelector('#operation_opmessage_default_msg').checked) {
+				message_fields.forEach((field) => {
+					document.getElementById(field).style.display='';
+					document.getElementById(field).removeAttribute('disabled');
+				});
+
+				document.querySelector('#operation_opmessage_default_msg').value = 0;
+			}
+			else {
+				message_fields.forEach((field) => {
+					document.getElementById(field).style.display='none';
+				});
+
+				document.querySelector('#operation_opmessage_default_msg').value = 1;
+			}
+		}
+		default_msg.dispatchEvent(new Event('change'));
 	}
 }

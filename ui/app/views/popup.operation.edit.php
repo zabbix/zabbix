@@ -274,16 +274,33 @@ $form_grid->addItem([
 				(new CMultiSelect([
 					'name' => 'operation[opcommand_hst][][hostid]',
 					'object_name' => 'hosts',
-					'add_post_js' => false,
-				]))
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					'popup' => [
+						'parameters' => [
+							'multiselect' => '1',
+							'srctbl' => 'hosts',
+							'srcfld1' => 'hostid',
+							'dstfrm' => 'action.edit',
+							'dstfld1' => 'operation_opcommand_hst__hostid',
+							'editable' => '1'
+						]
+					]
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			])
 			->addItem([
 				new CLabel(_('Host group')),
 				(new CMultiSelect([
 					'name' => 'operation[opcommand_grp][][groupid]',
 					'object_name' => 'hostGroup',
-					'add_post_js' => false
+					'popup' => [
+						'parameters' => [
+							'multiselect' => '1',
+							'srctbl' => 'host_groups',
+							'srcfld1' => 'groupid',
+							'dstfrm' => 'action.edit',
+							'dstfld1' => 'operation_opcommand_grp__groupid',
+							'editable' => '1'
+						]
+					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			])
 	))
@@ -297,11 +314,21 @@ $form_grid->addItem([
 	(new CLabel(_('Host groups'),'operation-attr-hostgroups'))
 		->setId('operation-attr-hostgroups-label')
 		->setAsteriskMark(),
-	(new CFormField((new CMultiSelect([
-		'name' => 'operation[opgroup][][groupid]',
-		'object_name' => 'hostGroup',
-		'add_post_js' => false,
-	]))
+	(new CFormField(
+		(new CMultiSelect([
+			'name' => 'operation[opgroup][][groupid]',
+			'object_name' => 'hostGroup',
+			'popup' => [
+				'parameters' => [
+					'multiselect' => '1',
+					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => 'action.edit',
+					'dstfld1' => 'operation_opgroup__groupid',
+					'editable' => '1'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired()
 		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
 	)->setId('operation-attr-hostgroups')
@@ -310,15 +337,25 @@ $form_grid->addItem([
 // Link / unlink templates attribute row.
 $form_grid->addItem([
 	(new CLabel(_('Templates')))
-		->setAsteriskMark()
-		->setId('operation-attr-templates-label'),
-	(new CFormField((new CMultiSelect([
-		'name' => 'operation[optemplate][][templateid]',
-		'object_name' => 'templates',
-		'add_post_js' => false
-	]))
-		->setAriaRequired()
-		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
+		->setId('operation-attr-templates-label')
+		->setAsteriskMark(),
+	(new CFormField(
+		(new CMultiSelect([
+			'name' => 'operation[optemplate][][templateid]',
+			'object_name' => 'templates',
+			'popup' => [
+				'parameters' => [
+					'multiselect' => '1',
+					'srctbl' => 'templates',
+					'srcfld1' => 'hostid',
+					'dstfrm' => 'action.edit',
+					'dstfld1' => 'operation_optemplate__templateid',
+					'editable' => '1'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
 	)->setId('operation-attr-templates')
 ]);
 
