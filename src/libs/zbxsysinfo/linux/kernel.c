@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 static int	read_uint64_from_procfs(const char *path, int first_num, zbx_uint64_t *value)
 {

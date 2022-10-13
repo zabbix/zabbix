@@ -87,7 +87,7 @@ while(0)
 #undef get_string
 }
 
-static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_fs_inode_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*fsname, *mode, *error;
 	zbx_uint64_t		total, free, used;
@@ -145,5 +145,5 @@ static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_inode, request, result);
+	return zbx_execute_threaded_metric(vfs_fs_inode_local, request, result);
 }
