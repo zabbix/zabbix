@@ -26,6 +26,11 @@ require_once __DIR__.'/include/debug.inc.php';
 
 use SCIM\User;
 use SCIM\Group;
+use SCIM\ServiceProviderConfig;
+use SCIM\Me;
+use SCIM\ResourceType;
+use SCIM\Schema;
+use SCIM\Bulk;
 use SCIM\API as SCIM;
 use SCIM\HttpResponse;
 
@@ -36,9 +41,14 @@ try {
 	API::setWrapper();
 	$client = new CLocalApiClient();
 	$client->setServiceFactory(new CRegistryFactory([
-		'user'			=> CUser::class,
-		'/users'		=> User::class,
-		'/groups'		=> Group::class
+		'user'						=> CUser::class,
+		'/users'					=> User::class,
+		'/groups'					=> Group::class,
+		'/serviceproviderconfigs'	=> ServiceProviderConfig::class,
+		'/me'						=> Me::class,
+		'/resourcetypes'			=> ResourceType::class,
+		'/schemas'					=> Schema::class,
+		'/bulk'						=> Bulk::class
 	]));
 	$scim = new SCIM();
 

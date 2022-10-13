@@ -32,14 +32,16 @@ use Exception;
 class User extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'put' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'post' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'post' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'patch' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	private const ZBX_SCIM_ERROR_USER_NOT_FOUND = 404;
 	private const ZBX_SCIM_ERROR_BAD_REQUEST = 400;
+	private const ZBX_SCIM_METHOD_NOT_SUPPORTED = 405;
+	private const ZBX_SCIM_ERROR_USER_NOT_FOUND = 404;
 	private const ZBX_SCIM_ERROR = 500;
 
 	private const ZBX_SCIM_USER_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User';
@@ -276,6 +278,10 @@ class User extends CApiService {
 		}
 	}
 
+	public function patch(): void {
+		self::exception(self::ZBX_SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
+	}
+
 	/**
 	 * Deletes requested user based on userid.
 	 *
@@ -284,7 +290,7 @@ class User extends CApiService {
 	 *
 	 * @return array          Returns only schema parameter, the rest of the parameters are not included.
 	 */
-	public function delete(array $options) {
+	public function delete(array $options): array {
 		$this->validateDelete($options);
 
 		$saml_settings = CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML);

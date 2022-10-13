@@ -26,21 +26,23 @@ use CHttpRequest;
 use CApiClientResponse;
 
 class API {
-
-	public function execute(CApiClient $client, CHttpRequest $request) {
+	/**
+	 * Executes received request.
+	 *
+	 * @param CApiClient   $client   API client.
+	 * @param CHttpRequest $request  Request received.
+	 *
+	 * @return HttpResponse
+	 */
+	public function execute(CApiClient $client, CHttpRequest $request): HttpResponse {
 		[$input, $auth, $class, $id] = $this->parseRequestData($request);
 
 		if ($id != null) {
 			$input['id'] = $id;
 		}
 
-		if ($class === 'Users') {
-			/** @var CApiClientResponse $response */
-			$response = $client->callMethod('/users', strtolower($request->method()), $input, $auth);
-		}
-		elseif ($class === 'Groups') {
-			$response = $client->callMethod('/groups', strtolower($request->method()), $input, $auth);
-		}
+		/** @var CApiClientResponse $response */
+		$response = $client->callMethod($class, strtolower($request->method()), $input, $auth);
 
 		if ($response->errorCode !== null) {
 			throw new Exception($response->errorMessage, $response->errorCode);
@@ -49,11 +51,20 @@ class API {
 		return new HttpResponse($response->data);
 	}
 
+	/**
+	 * Parses the information sent in request and returns specific data.
+	 *
+	 * @param CHttpRequest $request
+	 *
+	 * @return array with input, authorisation token, class and id.
+	 */
 	private function parseRequestData(CHttpRequest $request): array {
 		$input = $request->body() === '' ? [] : json_decode($request->body(), true);
 
 		[, $auth] = explode('Bearer ', $request->header('AUTHORIZATION'), 2) + ['', ''];
 		[, $class, $id] = explode('/', $request->header('PATH-INFO'));
+
+		$class = '/' . strtolower($class);
 
 		if (array_key_exists('filter', $_GET)) {
 			[, $filter] = explode(' eq ', $_GET['filter']);

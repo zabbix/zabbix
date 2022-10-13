@@ -32,14 +32,16 @@ use Exception;
 class Group extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'put' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'post' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'post' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'patch' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	private const ZBX_SCIM_ERROR_GROUP_NOT_FOUND = 404;
 	private const ZBX_SCIM_ERROR_BAD_REQUEST = 400;
+	private const ZBX_SCIM_ERROR_GROUP_NOT_FOUND = 404;
+	private const ZBX_SCIM_METHOD_NOT_SUPPORTED = 405;
 	private const ZBX_SCIM_ERROR = 500;
 
 	private const ZBX_SCIM_GROUP_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group';
@@ -276,6 +278,10 @@ class Group extends CApiService {
 		if (!in_array(self::ZBX_SCIM_GROUP_SCHEMA, $options['schemas'], true)) {
 			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
 		}
+	}
+
+	public function patch(): void {
+		self::exception(self::ZBX_SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
 	}
 
 	/**

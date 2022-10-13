@@ -61,9 +61,18 @@ class HttpResponse {
 		return $this;
 	}
 
-	public function send() {
-		if ($this->exception && $this->exception instanceof Throwable) {
-			$this->data['error'] = $this->exception->getMessage();
+	/**
+	 * Send HTTP response.
+	 *
+	 * @return void
+	 */
+	public function send(): void {
+		if ($this->exception instanceof Throwable) {
+			$this->setData([
+				'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+				'detail' => $this->exception->getMessage(),
+				'status' => $this->exception->getCode()
+			]);
 		}
 
 		header('Content-Type: application/json', true, $this->response_code);
