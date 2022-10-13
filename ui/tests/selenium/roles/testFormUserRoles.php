@@ -1393,12 +1393,19 @@ class testFormUserRoles extends CWebTest {
 	 */
 	public function testFormUserRoles_Modules() {
 		$this->page->login();
+
 		foreach ([true, false] as $enable_modules) {
 			$modules = ['4th Module', '5th Module'];
 			$this->page->open('zabbix.php?action=userrole.edit&roleid=2')->waitUntilReady();
 			$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
+
 			if ($enable_modules === true) {
-				$this->assertTrue($form->query('xpath://label[text()="No enabled modules found."]')->one()->isDisplayed());
+				foreach ($modules as $module) {
+					$this->assertFalse($form->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($module)."]")
+							->one(false)->isValid()
+					);
+				}
+
 				$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
 				$this->query('button:Scan directory')->one()->click();
 				$table = $this->query('class:list-table')->asTable()->one();
@@ -1408,7 +1415,6 @@ class testFormUserRoles extends CWebTest {
 				$this->page->waitUntilReady();
 			}
 			else {
-				$this->assertFalse($form->query('xpath://label[text()="No enabled modules found."]')->one($enable_modules)->isDisplayed());
 				foreach ($modules as $module) {
 					$form->getField($module)->isChecked();
 				}

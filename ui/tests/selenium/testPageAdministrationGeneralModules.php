@@ -42,9 +42,10 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	}
 
 	private static $widget_names = ['Action log', 'Clock', 'Data overview', 'Discovery status', 'Favorite graphs',
-			'Favorite maps','Geomap', 'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value',
-			'Map', 'Map navigation tree', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
-			'System information', 'Top hosts', 'Trigger overview', 'URL', 'Web monitoring'];
+		'Favorite maps','Geomap', 'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value',
+		'Map', 'Map navigation tree', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
+		'System information', 'Top hosts', 'Trigger overview', 'URL', 'Web monitoring'
+	];
 
 	public function testPageAdministrationGeneralModules_Layout() {
 		$modules = [
@@ -91,7 +92,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		foreach (self::$widget_names as $name) {
 			$widget_modules[$i]['Name'] = $name;
-			$widget_modules[$i]['Version'] = '2.0';
+			$widget_modules[$i]['Version'] = '1.0';
 			$widget_modules[$i]['Author'] = 'Zabbix SIA';
 			$widget_modules[$i]['Description'] = '';
 			$widget_modules[$i]['Status'] = 'Enabled';
