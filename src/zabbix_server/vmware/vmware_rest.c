@@ -22,8 +22,10 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 extern int	CONFIG_VMWARE_TIMEOUT;
-#define		VMWARE_SHORT_STR_LEN		MAX_STRING_LEN / 8
-#define		IS_VMWARE_API_VERSION_NEW	(72 <= service->major_version * 10 + service->minor_version)
+#define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
+
+#define IS_VMWARE_API_VERSION_NEW	(702 <= service->major_version * 100 + service->minor_version * 10 + \
+		service->update_version)
 
 typedef struct
 {
@@ -374,44 +376,24 @@ static int	vmware_rest_response_open(const char *data, struct zbx_json_parse *jp
 		return FAIL;
 	}
 
-	if (SUCCEED == zbx_json_value_by_name(jp, "majorErrorCode", err, sizeof(err), NULL) &&
-			SUCCEED == zbx_json_brackets_by_name(jp, "localizableMessages", &jp_data))
+	if (SUCCEED == zbx_json_value_by_name(jp, "majorErrorCode", err, sizeof(err), NULL))
 	{
-		char			err_data[VMWARE_SHORT_STR_LEN];
+		char			err_msg[VMWARE_SHORT_STR_LEN];
 		const char		*p = NULL;
 		struct zbx_json_parse	jp_row;
 
-		if (NULL == (p = zbx_json_next(&jp_data, p)) ||
+		zbx_json_value_by_name(jp, "name", err, sizeof(err), NULL);
+
+		if (SUCCEED != zbx_json_brackets_by_name(jp, "localizableMessages", &jp_data) ||
+				NULL == (p = zbx_json_next(&jp_data, p)) ||
 				SUCCEED != zbx_json_brackets_open(p, &jp_row) ||
-				SUCCEED != zbx_json_value_by_name(&jp_row, "defaultMessage", err_data, sizeof(err_data),
+				SUCCEED != zbx_json_value_by_name(&jp_row, "defaultMessage", err_msg, sizeof(err_msg),
 				NULL))
 		{
-			*error = zbx_dsprintf(*error, "%s", err);
+			err_msg[0] = '\0';
 		}
-		else
-			*error = zbx_dsprintf(*error, "%s: %s", err, err_data);
 
-		return FAIL;
-	}
-
-	if (SUCCEED == zbx_json_value_by_name(jp, "type", err, sizeof(err), NULL) &&
-			SUCCEED == zbx_json_brackets_by_name(jp, "value", &jp_data))
-	{
-		char			err_data[VMWARE_SHORT_STR_LEN];
-		const char		*p = NULL;
-		struct zbx_json_parse	jp_step, jp_row;
-
-
-		if (SUCCEED != zbx_json_brackets_by_name(&jp_data, "messages", &jp_step) ||
-				NULL == (p = zbx_json_next(&jp_step, p)) ||
-				SUCCEED != zbx_json_brackets_open(p, &jp_row) ||
-				SUCCEED != zbx_json_value_by_name(&jp_row, "default_message", err_data, sizeof(err_data),
-				NULL))
-		{
-			*error = zbx_dsprintf(*error, "%s", err);
-		}
-		else
-			*error = zbx_dsprintf(*error, "%s: %s", err, err_data);
+		*error = zbx_dsprintf(*error, "%s:%s", err, err_msg);
 
 		return FAIL;
 	}
@@ -704,17 +686,25 @@ static int	vmware_vectors_update(zbx_vmware_service_t *service, const char *tag_
 {
 	struct zbx_json_parse	jp, jp_data;
 	int			i;
-	char			cid[VMWARE_SHORT_STR_LEN], name[MAX_STRING_LEN], desc[MAX_STRING_LEN], *id_prefix,
-				tmp[MAX_STRING_LEN];
+	char			cid[VMWARE_SHORT_STR_LEN], name[MAX_STRING_LEN], desc[MAX_STRING_LEN], *url_tag,
+				*url_cat;
 	zbx_vmware_key_value_t	cat_cmp;
 	zbx_vmware_tag_t	*tag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() tag_id:%s", __func__, tag_id);
 
-	id_prefix = 0 == IS_VMWARE_API_VERSION_NEW ? "id:" : "";
-	zbx_snprintf(tmp, sizeof(tmp), "/cis/tagging/tag/%s", id_prefix);
+	if (0 == IS_VMWARE_API_VERSION_NEW)
+	{
+		url_tag = "/cis/tagging/tag/id:";
+		url_cat = "/cis/tagging/category/id:";
+	}
+	else
+	{
+		url_tag = "/cis/tagging/tag/";
+		url_cat = "/cis/tagging/category/";
+	}
 
-	if (FAIL == vmware_rest_get(__func__, easyhandle, tmp, tag_id, &jp_data, error))
+	if (FAIL == vmware_rest_get(__func__, easyhandle, url_tag, tag_id, &jp_data, error))
 		return FAIL;
 
 	if (0 == IS_VMWARE_API_VERSION_NEW)
@@ -739,9 +729,7 @@ static int	vmware_vectors_update(zbx_vmware_service_t *service, const char *tag_
 		zbx_vmware_key_value_t	category;
 		char			value[MAX_STRING_LEN];
 
-		zbx_snprintf(tmp, sizeof(tmp), "/cis/tagging/category/%s", id_prefix);
-
-		if (FAIL == vmware_rest_get(__func__, easyhandle, tmp, cid, &jp_data, error))
+		if (FAIL == vmware_rest_get(__func__, easyhandle, url_cat, cid, &jp_data, error))
 			return FAIL;
 
 		if (0 == IS_VMWARE_API_VERSION_NEW)

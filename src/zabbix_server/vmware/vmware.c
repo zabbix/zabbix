@@ -7202,9 +7202,7 @@ static void	vmware_counters_add_new(zbx_vector_ptr_t *counters, zbx_uint64_t cou
  ******************************************************************************/
 static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyhandle, char **error)
 {
-#	define UNPARSED_SERVICE_MAJOR_VERSION_DELIM	"."
-
-	char			*version_without_major, *version = NULL, *fullname = NULL;
+	char			*version_without_major, *version_update, *version = NULL, *fullname = NULL;
 	zbx_vector_ptr_t	counters;
 	int			ret = FAIL;
 
@@ -7263,14 +7261,16 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 
 	/* version should have the "x.y.z" format, but there is also an "x.y Un" format in nature */
 	/* according to https://www.vmware.com/support/policies/version.html */
-	if (NULL == (version_without_major = strstr(version, UNPARSED_SERVICE_MAJOR_VERSION_DELIM)))
+	if (NULL == (version_without_major = strchr(version, '.')) ||
+			(NULL == (version_update = strchr(++version_without_major, '.')) &&
+			NULL == (version_update = strchr(version_without_major, 'U'))))
 	{
 		*error = zbx_dsprintf(*error, "Invalid version: %s.", version);
 		goto unlock;
 	}
 
-	service->minor_version = (unsigned short)atoi(
-			strlen(UNPARSED_SERVICE_MAJOR_VERSION_DELIM) + version_without_major);
+	service->minor_version = (unsigned short)atoi(version_without_major);
+	service->update_version = (unsigned short)atoi(++version_update);
 
 	ret = SUCCEED;
 unlock:
