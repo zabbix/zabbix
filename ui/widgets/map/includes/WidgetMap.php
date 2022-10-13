@@ -37,7 +37,7 @@ class WidgetMap extends CDiv
 	/**
 	 * Reference of linked map navigation tree widget.
 	 */
-	private string $filter_widget_reference;
+	private ?string $filter_widget_reference;
 
 	/**
 	 * Map that will be linked to 'go back to [previous map name]' link in dashboard map widget.
