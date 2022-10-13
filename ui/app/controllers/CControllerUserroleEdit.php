@@ -19,6 +19,8 @@
 **/
 
 
+use Zabbix\Core\CModule;
+
 /**
  * Class containing operations with userrole edit form.
  */
@@ -304,23 +306,14 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			$labels['rules'][$section] = CRoleHelper::getUiSectionRulesLabels($section, USER_TYPE_SUPER_ADMIN);
 		}
 
-		$db_modules = API::Module()->get([
-			'output' => ['moduleid', 'relative_path'],
-			'filter' => [
-				'status' => MODULE_STATUS_ENABLED
-			]
-		]);
+		$labels['modules'] = [];
 
-		if ($db_modules) {
-			$module_manager = new CModuleManager(APP::getRootDir());
-			foreach ($db_modules as $module) {
-				$manifest = $module_manager->addModule($module['relative_path']);
-				$labels['modules'][$module['moduleid']] = $manifest['name'];
-			}
+		/** @var CModule $module */
+		foreach (APP::ModuleManager()->getModules() as $module) {
+			$labels['modules'][$module->getManifest()['moduleid']] = $module->getDefaultName();
 		}
-		else {
-			$labels['modules'] = [];
-		}
+
+		asort($labels['modules']);
 
 		return $labels;
 	}

@@ -19,6 +19,8 @@
 **/
 
 
+use Zabbix\Core\CModule;
+
 /**
  * Class containing operations with user edit form.
  */
@@ -241,11 +243,14 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['templategroups_rights'] = collapseGroupRights(getTemplateGroupsRights($user_groups));
 		}
 
-		$data['modules'] = API::Module()->get([
-			'output' => ['id'],
-			'filter' => ['status' => MODULE_STATUS_ENABLED],
-			'preservekeys' => true
-		]);
+		$data['modules'] = [];
+
+		/** @var CModule $module */
+		foreach (APP::ModuleManager()->getModules() as $module) {
+			$data['modules'][$module->getManifest()['moduleid']] = $module->getDefaultName();
+		}
+
+		asort($data['modules']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));

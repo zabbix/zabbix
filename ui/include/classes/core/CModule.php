@@ -89,6 +89,10 @@ class CModule {
 		return $this->manifest['namespace'];
 	}
 
+	public function getDefaultName(): string {
+		return _($this->manifest['name']);
+	}
+
 	public function getVersion(): string {
 		return $this->manifest['version'];
 	}

@@ -244,28 +244,22 @@ $form_grid->addItem(
 );
 
 $modules = [];
-foreach ($data['labels']['modules'] as $moduleid => $label) {
+foreach ($data['labels']['modules'] as $moduleid => $module_name) {
 	$modules[] = new CDiv(
 		(new CCheckBox('modules['.$moduleid.']', 1))
 			->setChecked(
 				array_key_exists($moduleid, $data['rules']['modules']) ? $data['rules']['modules'][$moduleid] : true
 			)
 			->setReadonly($data['readonly'])
-			->setLabel($label)
+			->setLabel($module_name)
 			->setUncheckedValue(0)
 	);
 }
 
 if ($modules) {
-	$form_grid->addItem([
-		new CFormField(
-			(new CDiv(
-				(new CDiv($modules))
-					->addClass(ZBX_STYLE_COLUMNS)
-					->addClass(ZBX_STYLE_COLUMNS_3)
-			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-	]);
+	$form_grid->addItem(
+		new CFormField($modules)
+	);
 }
 else {
 	$form_grid->addItem(
