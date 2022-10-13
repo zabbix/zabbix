@@ -319,6 +319,7 @@ class CControllerActionOperationCheck extends CController {
 		$type = $operation['recovery'];
 		$operationtype = preg_replace('[\D]', '', $operation['operationtype']);
 
+
 		if (preg_match('/\bscriptid\b/', $operation['operationtype'])){
 			$operationtype = OPERATION_TYPE_COMMAND;
 		}
@@ -379,7 +380,7 @@ class CControllerActionOperationCheck extends CController {
 			}
 		}
 		else {
-			switch ($operation['operationtype']) {
+			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
 					$media_typeid = $operation['opmessage']['mediatypeid'];
 
@@ -403,7 +404,7 @@ class CControllerActionOperationCheck extends CController {
 				case OPERATION_TYPE_COMMAND:
 					if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
 						foreach ($operation['opcommand_hst'] as $host) {
-							if ($host['hostid'] != 0) {
+							if (!array_key_exists('current_host', $host)) {
 								$hostids[$host['hostid']] = $host['hostid'];
 							}
 						}
@@ -415,7 +416,7 @@ class CControllerActionOperationCheck extends CController {
 						}
 					}
 
-					$scriptids[$operation['operationtype']] = true;
+					$scriptids[$operation['opcommand']['scriptid']] = true;
 					break;
 			}
 		}
@@ -534,7 +535,6 @@ class CControllerActionOperationCheck extends CController {
 					break;
 
 				case OPERATION_TYPE_COMMAND:
-
 					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
 						$result['type'][] = _s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name']);
 						break;
@@ -685,11 +685,8 @@ class CControllerActionOperationCheck extends CController {
 					break;
 
 				case OPERATION_TYPE_COMMAND:
-					$scriptid = $operation['opcommand']['scriptid'];
-
 					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
-						$result['type'][] = [_s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name'])];
-
+						$result['type'][] = _s('Run script "%1$s" on Zabbix server', $scripts[$scriptid]['name']);
 						break;
 					}
 
@@ -697,17 +694,18 @@ class CControllerActionOperationCheck extends CController {
 						$host_list = [];
 
 						foreach ($operation['opcommand_hst'] as $host) {
-							if ($host['hostid'] == 0) {
-								$result['type'][] = [_s('Run script "%1$s" on current host', $scripts[$scriptid]['name'])];
+							if ($host['hostid']['current_host'] == 0) {
+								$result['type'][] = (_s('Run script "%1$s" on current host', $scripts[$scriptid]['name']));
 							}
 							elseif (isset($hosts[$host['hostid']])) {
 								$host_list[] = $hosts[$host['hostid']]['name'];
 							}
 						}
+
 						if ($host_list) {
 							order_result($host_list);
 
-							$result['type'][] = _s('Run script "%1$s" on hosts', $scripts[$scriptid]['name']).': ';
+							$result['type'][] = _s('Run script "%1$s" on hosts', $scripts[$scriptid]['name'].': ');
 							$result['data'][] = [implode(', ', $host_list)];
 						}
 					}
@@ -720,12 +718,13 @@ class CControllerActionOperationCheck extends CController {
 								$host_group_list[] = $host_groups[$host_group['groupid']]['name'];
 							}
 						}
-
 						order_result($host_group_list);
-						$result['type'][] = _s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': ';
+
+						$result['type'][] = (_s('Run script "%1$s" on host groups', $scripts[$scriptid]['name']).': ');
 						$result['data'][] = [implode(', ', $host_group_list)];
 					}
 					break;
+
 
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
 				case OPERATION_TYPE_UPDATE_MESSAGE:

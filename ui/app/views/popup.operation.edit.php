@@ -255,6 +255,25 @@ $opcommand_hst_value = array_key_exists('0', $operation['opcommand_hst'])
 	? $operation['opcommand_hst']['0']['hostid']
 	: null;
 
+foreach($operation['opcommand_hst'] as $host) {
+	if ($host[0]['hostid'] == 0) {
+		$multiselect_values_host = null;
+	}
+	else {
+		$hosts['id'] = $host[0]['hostid'];
+		$hosts['name'] = $host[0]['name'];
+		$multiselect_values_host[] = $hosts;
+	}
+}
+
+if($operation['opcommand_grp']) {
+	foreach ($operation['opcommand_grp'] as $group) {
+		$host_group['id'] = $group[0]['hostid'];
+		$host_group['name'] = $group[0]['name'];
+		$multiselect_values_host_grp[] = $host_group;
+	}
+}
+
 // Command execution targets row.
 $form_grid->addItem([
 	(new CLabel(_('Target list')))
@@ -274,6 +293,7 @@ $form_grid->addItem([
 				(new CMultiSelect([
 					'name' => 'operation[opcommand_hst][][hostid]',
 					'object_name' => 'hosts',
+					'data' => $multiselect_values_host  == null ? [] : $multiselect_values_host ,
 					'popup' => [
 						'parameters' => [
 							'multiselect' => '1',
@@ -291,6 +311,7 @@ $form_grid->addItem([
 				(new CMultiSelect([
 					'name' => 'operation[opcommand_grp][][groupid]',
 					'object_name' => 'hostGroup',
+					'data' => $multiselect_values_host_grp,
 					'popup' => [
 						'parameters' => [
 							'multiselect' => '1',

@@ -98,6 +98,8 @@ class CControllerPopupActionOperationEdit extends CController {
 			}
 		}
 
+		$this->getData($operation);
+
 		$data = [
 			'eventsource' => $eventsource,
 			'actionid' => $this->getInput('actionid', []),
@@ -109,6 +111,33 @@ class CControllerPopupActionOperationEdit extends CController {
 		];
 
 		$this->setResponse(new CControllerResponseData($data));
+	}
+
+	private function getData(&$operation) {
+		if ($operation['opcommand_hst'][0]['hostid'] == 0) {
+			$host = '';
+		}
+
+		else if ($operation['opcommand_hst'][0]['hostid'] !== '0') {
+			foreach($operation['opcommand_hst'] as &$host) {
+				$host = API::Host()->get([
+					'output' => ['hostid', 'name'],
+					'hostids' => $host['hostid']
+				]);
+			}
+		}
+
+		if ($operation['opcommand_grp']) {
+			foreach($operation['opcommand_grp'] as &$host_group) {
+				$host_group = API::HostGroup()->get([
+					'output' => ['name'],
+					'groupids' => $host_group['groupid']
+				]);
+			}
+			return $host_group;
+		}
+
+		return $host;
 	}
 
 	private function popupConfigOperationMessage(array $operation, int $eventsource): ?array {
