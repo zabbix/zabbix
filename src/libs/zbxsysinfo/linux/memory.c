@@ -170,7 +170,7 @@ static int	vm_memory_pavailable(AGENT_RESULT *result)
 
 	zbx_init_agent_result(&result_tmp);
 
-	ret = VM_MEMORY_AVAILABLE(&result_tmp);
+	ret = vm_memory_available(&result_tmp);
 
 	if (SYSINFO_RET_FAIL == ret)
 	{

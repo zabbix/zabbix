@@ -36,7 +36,7 @@
 #include "stats.h"
 #endif
 
-static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
+static int	vm_memory_total(AGENT_RESULT *result)
 {
 	int	ret;
 	long	 res_SC_PHYS_PAGES, res_SC_PAGESIZE;
@@ -55,7 +55,7 @@ out:
 }
 
 #ifndef HAVE_VMINFO_T_UPDATES
-static int	VM_MEMORY_USED(AGENT_RESULT *result)
+static int	vm_memory_used(AGENT_RESULT *result)
 {
 	int		ret;
 	zbx_uint64_t	used;
@@ -77,7 +77,7 @@ out:
 	return ret;
 }
 
-static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
+static int	vm_memory_pused(AGENT_RESULT *result)
 {
 	int		ret;
 	zbx_uint64_t	used, total;
@@ -105,7 +105,7 @@ out:
 	return ret;
 }
 
-static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
+static int	vm_memory_available(AGENT_RESULT *result)
 {
 	int		ret;
 	long		res_SC_AVPHYS_PAGES, res_SC_PAGESIZE;
@@ -123,7 +123,7 @@ out:
 	return ret;
 }
 
-static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
+static int	vm_memory_pavailable(AGENT_RESULT *result)
 {
 	int		ret;
 	zbx_uint64_t	total;
@@ -152,7 +152,7 @@ out:
 
 #else /*HAVE_VMINFO_T_UPDATES*/
 
-static int	VM_MEMORY_USED(AGENT_RESULT *result)
+static int	vm_memory_used(AGENT_RESULT *result)
 {
 	int		ret;
 	zbx_uint64_t	freemem;
@@ -185,7 +185,7 @@ out:
 	return ret;
 }
 
-static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
+static int	vm_memory_pused(AGENT_RESULT *result)
 {
 	int		ret;
 	zbx_uint64_t	freemem, total;
@@ -228,7 +228,7 @@ out:
 	return ret;
 }
 
-static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
+static int	vm_memory_available(AGENT_RESULT *result)
 {
 	int		ret;
 	zbx_uint64_t	freemem;
@@ -256,7 +256,7 @@ out:
 	return ret;
 }
 
-static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
+static int	vm_memory_pavailable(AGENT_RESULT *result)
 {
 	int		ret;
 	zbx_uint64_t	total, freemem;
@@ -317,15 +317,15 @@ int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 0);
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
-		ret = VM_MEMORY_TOTAL(result);
+		ret = vm_memory_total(result);
 	else if (0 == strcmp(mode, "used"))
-		ret = VM_MEMORY_USED(result);
+		ret = vm_memory_used(result);
 	else if (0 == strcmp(mode, "pused"))
-		ret = VM_MEMORY_PUSED(result);
+		ret = vm_memory_pused(result);
 	else if (0 == strcmp(mode, "available") || 0 == strcmp(mode, "free"))
-		ret = VM_MEMORY_AVAILABLE(result);
+		ret = vm_memory_available(result);
 	else if (0 == strcmp(mode, "pavailable"))
-		ret = VM_MEMORY_PAVAILABLE(result);
+		ret = vm_memory_pavailable(result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
