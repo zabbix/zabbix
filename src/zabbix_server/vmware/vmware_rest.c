@@ -22,7 +22,8 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 extern int	CONFIG_VMWARE_TIMEOUT;
-#define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
+#define		VMWARE_SHORT_STR_LEN		MAX_STRING_LEN / 8
+#define		IS_VMWARE_API_VERSION_NEW	(72 <= service->major_version * 10 + service->minor_version)
 
 typedef struct
 {
@@ -236,7 +237,7 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
  *                                                                            *
  * Purpose: cURL handle prepare                                               *
  *                                                                            *
- * Parameters: url        - [IN] the vmware service url                       *
+ * Parameters: service    - [IN] the vmware service                           *
  *             easyhandle - [OUT] cURL handle                                 *
  *             page       - [OUT] the response buffer for cURL                *
  *             headers    - [OUT] the request headers for cURL                *
@@ -245,8 +246,8 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
  * Return value: SUCCEED if the cURL prepared, FAIL otherwise                 *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_curl_init(const char *url, CURL **easyhandle, ZBX_HTTPPAGE *page, struct curl_slist **headers,
-		char **error)
+static int	vmware_curl_init(zbx_vmware_service_t *service, CURL **easyhandle, ZBX_HTTPPAGE *page,
+		struct curl_slist **headers, char **error)
 {
 #	define INIT_PERF_REST_SIZE	2 * ZBX_KIBIBYTE
 #	define ZBX_XML_HEADER1		"Accept: application/json, text/plain, */*"
@@ -269,7 +270,7 @@ static int	vmware_curl_init(const char *url, CURL **easyhandle, ZBX_HTTPPAGE *pa
 
 	page->alloc = INIT_PERF_REST_SIZE;
 	page->data = (char *)zbx_malloc(NULL, page->alloc);
-	page->url = zbx_strdup(NULL, url);
+	page->url = zbx_strdup(NULL, service->url);
 	zbx_rtrim(page->url, "/");
 	url_sz = strlen(page->url);
 
@@ -279,7 +280,14 @@ static int	vmware_curl_init(const char *url, CURL **easyhandle, ZBX_HTTPPAGE *pa
 		goto out;
 	}
 
-	memcpy(&page->url[url_sz - ZBX_CONST_STRLEN("api")], "api", ZBX_CONST_STRLEN("api"));
+	if (0 == IS_VMWARE_API_VERSION_NEW)
+	{
+		page->url = zbx_dsprintf(page->url, "%.*s%s", (int)(url_sz - ZBX_CONST_STRLEN("sdk")), page->url,
+				"rest/com/vmware");
+	}
+	else
+		memcpy(&page->url[url_sz - ZBX_CONST_STRLEN("api")], "api", ZBX_CONST_STRLEN("api"));
+
 	*headers = curl_slist_append(*headers, ZBX_XML_HEADER1);
 	*headers = curl_slist_append(*headers, ZBX_XML_HEADER2);
 
@@ -366,6 +374,48 @@ static int	vmware_rest_response_open(const char *data, struct zbx_json_parse *jp
 		return FAIL;
 	}
 
+	if (SUCCEED == zbx_json_value_by_name(jp, "majorErrorCode", err, sizeof(err), NULL) &&
+			SUCCEED == zbx_json_brackets_by_name(jp, "localizableMessages", &jp_data))
+	{
+		char			err_data[VMWARE_SHORT_STR_LEN];
+		const char		*p = NULL;
+		struct zbx_json_parse	jp_row;
+
+		if (NULL == (p = zbx_json_next(&jp_data, p)) ||
+				SUCCEED != zbx_json_brackets_open(p, &jp_row) ||
+				SUCCEED != zbx_json_value_by_name(&jp_row, "defaultMessage", err_data, sizeof(err_data),
+				NULL))
+		{
+			*error = zbx_dsprintf(*error, "%s", err);
+		}
+		else
+			*error = zbx_dsprintf(*error, "%s: %s", err, err_data);
+
+		return FAIL;
+	}
+
+	if (SUCCEED == zbx_json_value_by_name(jp, "type", err, sizeof(err), NULL) &&
+			SUCCEED == zbx_json_brackets_by_name(jp, "value", &jp_data))
+	{
+		char			err_data[VMWARE_SHORT_STR_LEN];
+		const char		*p = NULL;
+		struct zbx_json_parse	jp_step, jp_row;
+
+
+		if (SUCCEED != zbx_json_brackets_by_name(&jp_data, "messages", &jp_step) ||
+				NULL == (p = zbx_json_next(&jp_step, p)) ||
+				SUCCEED != zbx_json_brackets_open(p, &jp_row) ||
+				SUCCEED != zbx_json_value_by_name(&jp_row, "default_message", err_data, sizeof(err_data),
+				NULL))
+		{
+			*error = zbx_dsprintf(*error, "%s", err);
+		}
+		else
+			*error = zbx_dsprintf(*error, "%s: %s", err, err_data);
+
+		return FAIL;
+	}
+
 	return SUCCEED;
 }
 
@@ -386,13 +436,13 @@ static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service,
 		struct curl_slist **headers, ZBX_HTTPPAGE *page, char **error)
 {
 	int		ret = FAIL;
-	char		tmp[MAX_STRING_LEN];
+	char		tmp[MAX_STRING_LEN], *token;
 	CURLcode	err;
 	CURLoption	opt;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
 
-	zbx_snprintf(tmp, sizeof(tmp),"%s/session", page->url);
+	zbx_snprintf(tmp, sizeof(tmp), 0 != IS_VMWARE_API_VERSION_NEW ? "%s/session" : "%s/cis/session", page->url);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, tmp)) ||
@@ -417,9 +467,17 @@ static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	zbx_ltrim(page->data, "\"");
-	zbx_rtrim(page->data, "\"");
-	zbx_snprintf(tmp, sizeof(tmp),"vmware-api-session-id: %s", page->data);
+	if (0 == IS_VMWARE_API_VERSION_NEW && NULL != (token = strchr(page->data, ':')))
+	{
+		token++;
+		token[strlen(token) - 1] = '\0';
+	}
+	else
+		token = page->data;
+
+	zbx_lrtrim(token, "\"");
+	zbx_snprintf(tmp, sizeof(tmp),"vmware-api-session-id: %s", token);
+
 	*headers = curl_slist_append(*headers, tmp);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, *headers)))
@@ -580,7 +638,8 @@ static int	vmware_rest_post(const char *fn_parent, CURL *easyhandle, const char 
  *                                                                            *
  * Purpose: get list of tags linked with object                               *
  *                                                                            *
- * Parameters: obj_id     - [IN] the parent function name for Log records     *
+ * Parameters: service    - [IN] the vmware service                           *
+ *             obj_id     - [IN] the parent function name for Log records     *
  *             easyhandle - [IN] the CURL handle                              *
  *             ids        - [OUT] the vector with tags id                     *
  *             error      - [OUT] the error message in the case of failure    *
@@ -588,11 +647,11 @@ static int	vmware_rest_post(const char *fn_parent, CURL *easyhandle, const char 
  * Return value: SUCCEED if the receive list of tags id, FAIL otherwise       *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_tags_linked_id(const zbx_vmware_obj_id_t *obj_id, CURL *easyhandle, zbx_vector_str_t *ids,
-		char **error)
+static int	vmware_tags_linked_id(zbx_vmware_service_t *service, const zbx_vmware_obj_id_t *obj_id,
+		CURL *easyhandle, zbx_vector_str_t *ids, char **error)
 {
-	int			ret = FAIL;
-	char			tmp[MAX_STRING_LEN];
+	int			ret;
+	char			tmp[MAX_STRING_LEN], *url;
 	const char		*p = NULL;
 	struct zbx_json_parse	jp;
 
@@ -600,13 +659,27 @@ static int	vmware_tags_linked_id(const zbx_vmware_obj_id_t *obj_id, CURL *easyha
 
 	zbx_snprintf(tmp, sizeof(tmp),"{\"object_id\":{\"id\":\"%s\",\"type\":\"%s\"}}", obj_id->id, obj_id->type);
 
-	if (SUCCEED == (ret = vmware_rest_post(__func__, easyhandle,
-			"/cis/tagging/tag-association?action=list-attached-tags", tmp, &jp, error)))
+	if (0 != IS_VMWARE_API_VERSION_NEW)
+		url = "/cis/tagging/tag-association?action=list-attached-tags";
+	else
+		url = "/cis/tagging/tag-association?~action=list-attached-tags";
+
+	if (SUCCEED == (ret = vmware_rest_post(__func__, easyhandle, url, tmp, &jp, error)))
 	{
-		while (NULL != (p = zbx_json_next_value(&jp, p, tmp, sizeof(tmp), NULL)))
+		struct zbx_json_parse	jp_step;
+
+		if (0 == IS_VMWARE_API_VERSION_NEW)
+		{
+			if (SUCCEED != (ret = zbx_json_brackets_by_name(&jp, "value", &jp_step)))
+				goto out;
+		}
+		else
+			jp_step = jp;
+
+		while (NULL != (p = zbx_json_next_value(&jp_step, p, tmp, sizeof(tmp), NULL)))
 			zbx_vector_str_append(ids, zbx_strdup(NULL, tmp));
 	}
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ids:%d", __func__, ids->values_num);
 
 	return ret;
@@ -616,7 +689,8 @@ static int	vmware_tags_linked_id(const zbx_vmware_obj_id_t *obj_id, CURL *easyha
  *                                                                            *
  * Purpose: get tag details and save to cache vectors                         *
  *                                                                            *
- * Parameters: tag_id     - [IN] the tag id                                   *
+ * Parameters: service    - [IN] the vmware service                           *
+ *             tag_id     - [IN] the tag id                                   *
  *             easyhandle - [IN] the CURL handle                              *
  *             tags       - [OUT] the vector with tags info                   *
  *             categories - [OUT] the vector with categories info             *
@@ -625,36 +699,37 @@ static int	vmware_tags_linked_id(const zbx_vmware_obj_id_t *obj_id, CURL *easyha
  * Return value: SUCCEED if the receive tag details, FAIL otherwise           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, zbx_vector_vmware_tag_t *tags,
-		zbx_vector_vmware_key_value_t *categories, char **error)
+static int	vmware_vectors_update(zbx_vmware_service_t *service, const char *tag_id, CURL *easyhandle,
+		zbx_vector_vmware_tag_t *tags, zbx_vector_vmware_key_value_t *categories, char **error)
 {
-	struct zbx_json_parse	jp;
+	struct zbx_json_parse	jp, jp_data;
 	int			i;
-	char			cid[VMWARE_SHORT_STR_LEN], name[MAX_STRING_LEN], desc[MAX_STRING_LEN];
+	char			cid[VMWARE_SHORT_STR_LEN], name[MAX_STRING_LEN], desc[MAX_STRING_LEN], *id_prefix,
+				tmp[MAX_STRING_LEN];
 	zbx_vmware_key_value_t	cat_cmp;
 	zbx_vmware_tag_t	*tag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() tag_id:%s", __func__, tag_id);
 
-	if (FAIL == vmware_rest_get(__func__, easyhandle, "/cis/tagging/tag/", tag_id, &jp, error))
+	id_prefix = 0 == IS_VMWARE_API_VERSION_NEW ? "id:" : "";
+	zbx_snprintf(tmp, sizeof(tmp), "/cis/tagging/tag/%s", id_prefix);
+
+	if (FAIL == vmware_rest_get(__func__, easyhandle, tmp, tag_id, &jp_data, error))
 		return FAIL;
 
-	if (FAIL == zbx_json_value_by_name(&jp, "name", name, sizeof(name), NULL))
+	if (0 == IS_VMWARE_API_VERSION_NEW)
 	{
-		*error = zbx_dsprintf(*error, "Cannot read vmware response: %s", zbx_json_strerror());
-		return FAIL;
+		if (SUCCEED != zbx_json_brackets_by_name(&jp_data, "value", &jp))
+			goto json_err;
 	}
+	else
+		jp = jp_data;
 
-	if (FAIL == zbx_json_value_by_name(&jp, "description", desc, sizeof(desc), NULL))
+	if (FAIL == zbx_json_value_by_name(&jp, "name", name, sizeof(name), NULL) ||
+			FAIL == zbx_json_value_by_name(&jp, "description", desc, sizeof(desc), NULL) ||
+			FAIL == zbx_json_value_by_name(&jp, "category_id", cid, sizeof(cid), NULL))
 	{
-		*error = zbx_dsprintf(*error, "Cannot read vmware response: %s", zbx_json_strerror());
-		return FAIL;
-	}
-
-	if (FAIL == zbx_json_value_by_name(&jp, "category_id", cid, sizeof(cid), NULL))
-	{
-		*error = zbx_dsprintf(*error, "Cannot read vmware response: %s", zbx_json_strerror());
-		return FAIL;
+		goto json_err;
 	}
 
 	cat_cmp.key = cid;
@@ -664,14 +739,21 @@ static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, zbx_vecto
 		zbx_vmware_key_value_t	category;
 		char			value[MAX_STRING_LEN];
 
-		if (FAIL == vmware_rest_get(__func__, easyhandle, "/cis/tagging/category/", cid, &jp, error))
+		zbx_snprintf(tmp, sizeof(tmp), "/cis/tagging/category/%s", id_prefix);
+
+		if (FAIL == vmware_rest_get(__func__, easyhandle, tmp, cid, &jp_data, error))
 			return FAIL;
 
-		if (FAIL == zbx_json_value_by_name(&jp, "name", value, sizeof(value), NULL))
+		if (0 == IS_VMWARE_API_VERSION_NEW)
 		{
-			*error = zbx_dsprintf(*error, "Cannot read vmware response: %s", zbx_json_strerror());
-			return FAIL;
+			if (SUCCEED != zbx_json_brackets_by_name(&jp_data, "value", &jp))
+				goto json_err;
 		}
+		else
+			jp = jp_data;
+
+		if (FAIL == zbx_json_value_by_name(&jp, "name", value, sizeof(value), NULL))
+			goto json_err;
 
 		category.key = zbx_strdup(NULL, cid);
 		category.value = zbx_strdup(NULL, value);
@@ -704,13 +786,17 @@ static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, zbx_vecto
 			tags->values[i]->name, tags->values[i]->description, tags->values[i]->category);
 
 	return i;
+json_err:
+	*error = zbx_dsprintf(*error, "Cannot read vmware response: %s", zbx_json_strerror());
+	return FAIL;
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: create vector with tags details                                   *
  *                                                                            *
- * Parameters: entity_tags - [IN/OUT] the tag entity                          *
+ * Parameters: service     - [IN] the vmware service                          *
+ *             entity_tags - [IN/OUT] the tag entity                          *
  *             tags        - [IN/OUT] the vector with tags info               *
  *             categories  - [IN/OUT] the vector with categories info         *
  *             easyhandle  - [IN/OUT] the CURL handle                         *
@@ -718,8 +804,8 @@ static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, zbx_vecto
  * Return value: SUCCEED if the create tags vector, FAIL otherwise            *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_tags_get(zbx_vmware_entity_tags_t *entity_tags, zbx_vector_vmware_tag_t *tags,
-		zbx_vector_vmware_key_value_t *categories, CURL *easyhandle)
+static int	vmware_tags_get(zbx_vmware_service_t *service, zbx_vmware_entity_tags_t *entity_tags,
+		zbx_vector_vmware_tag_t *tags, zbx_vector_vmware_key_value_t *categories, CURL *easyhandle)
 {
 	int			i, found_tags = 0;
 	zbx_vector_str_t	tag_ids;
@@ -728,7 +814,7 @@ static int	vmware_tags_get(zbx_vmware_entity_tags_t *entity_tags, zbx_vector_vmw
 
 	zbx_vector_str_create(&tag_ids);
 
-	if (FAIL == vmware_tags_linked_id(entity_tags->obj_id, easyhandle, &tag_ids, &entity_tags->error))
+	if (FAIL == vmware_tags_linked_id(service, entity_tags->obj_id, easyhandle, &tag_ids, &entity_tags->error))
 		goto out;
 
 	for (i = 0; i < tag_ids.values_num; i++)
@@ -737,8 +823,8 @@ static int	vmware_tags_get(zbx_vmware_entity_tags_t *entity_tags, zbx_vector_vmw
 		zbx_vmware_tag_t	*tag, cmp = {.id = tag_ids.values[i]};
 
 		if (FAIL == (j = zbx_vector_vmware_tag_bsearch(tags, &cmp, zbx_vmware_tag_id_compare)) &&
-				FAIL == (j = vmware_vectors_update(tag_ids.values[i], easyhandle, tags, categories,
-				&entity_tags->error)))
+				FAIL == (j = vmware_vectors_update(service, tag_ids.values[i], easyhandle, tags,
+				categories, &entity_tags->error)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() problem with tag_id:%s error:%s", __func__, tag_ids.values[i],
 					entity_tags->error);
@@ -774,7 +860,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
 {
 	int				i, found_tags = 0, ret = FAIL;
 	zbx_vector_vmware_entity_tags_t	entity_tags;
-	zbx_vector_vmware_tag_t	tags;
+	zbx_vector_vmware_tag_t		tags;
 	zbx_vector_vmware_key_value_t	categories;
 	CURL				*easyhandle = NULL;
 	struct curl_slist		*headers = NULL;
@@ -798,16 +884,14 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
 	zbx_vmware_unlock();
 
 	if (0 != entity_tags.values_num && (
-			SUCCEED != vmware_curl_init(service->url, &easyhandle, &page, &headers, &error) ||
+			SUCCEED != vmware_curl_init(service, &easyhandle, &page, &headers, &error) ||
 			SUCCEED != vmware_service_rest_authenticate(service, easyhandle, &headers, &page, &error)))
 	{
 		goto clean;
 	}
 
 	for (i = 0; i < entity_tags.values_num; i++)
-	{
-		found_tags += vmware_tags_get(entity_tags.values[i], &tags, &categories, easyhandle);
-	}
+		found_tags += vmware_tags_get(service, entity_tags.values[i], &tags, &categories, easyhandle);
 
 	if (NULL != headers)
 		vmware_service_rest_logout(easyhandle, &page);
