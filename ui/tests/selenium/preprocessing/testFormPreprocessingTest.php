@@ -173,7 +173,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => ''],
 						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'value']
 					],
-					'error' => 'Invalid parameter "/1/params/1": a floating point value is expected.'
+					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
 				]
 			],
 			[

@@ -335,7 +335,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'preprocessing' => [
 						['type' => 'In range']
 					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
 			[
