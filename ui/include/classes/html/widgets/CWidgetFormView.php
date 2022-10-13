@@ -202,7 +202,8 @@ class CWidgetFormView {
 			->setId('type')
 			->setValue($this->data['type'])
 			->setAttribute('autofocus', 'autofocus')
-			->addOptions(CSelect::createOptionsFromArray($this->data['known_types']));
+			->addOptions(CSelect::createOptionsFromArray($this->data['known_types']))
+			->addStyle('max-width: '.ZBX_TEXTAREA_MEDIUM_WIDTH.'px');
 
 		if ($this->data['deprecated_types']) {
 			$types_select->addOptionGroup(
