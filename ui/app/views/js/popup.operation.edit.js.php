@@ -189,7 +189,7 @@ window.operation_popup = new class {
 					'operation-message-user-groups', 'operation-message-notice', 'operation-message-users',
 					'operation-message-mediatype-only', 'operation-message-custom', 'operation_esc_period',
 					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
-					'operation-message-subject', 'operation-message-body'
+					'operation-message-body'
 				]
 				this._customMessageFields();
 				break;
