@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
@@ -95,8 +96,15 @@ trait MacrosTrait {
 
 		if ($with_type) {
 			foreach ($values as &$value) {
-				$value['type'] = ($this->getValueField($value['macro'])->getInputType() === CInputGroupElement::TYPE_SECRET)
-						? ZBX_MACRO_TYPE_SECRET : ZBX_MACRO_TYPE_TEXT;
+				if ($this->getValueField($value['macro'])->getInputType() === CInputGroupElement::TYPE_SECRET) {
+					$value['type'] = ZBX_MACRO_TYPE_SECRET;
+				}
+				elseif ($this->getValueField($value['macro'])->getInputType() === CInputGroupElement::TYPE_VAULT) {
+					$value['type'] = ZBX_MACRO_TYPE_VAULT;
+				}
+				else {
+					$value['type'] = ZBX_MACRO_TYPE_TEXT;
+				}
 			}
 			unset($value);
 		}
