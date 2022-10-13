@@ -70,6 +70,12 @@ class API {
 			[, $filter] = explode(' eq ', $_GET['filter']);
 			$input['userName'] = str_replace('"', '', $filter);
 		}
+		elseif (array_key_exists('startIndex', $_GET)) {
+			$input['startIndex'] = $_GET['startIndex'];
+		}
+		elseif (array_key_exists('count', $_GET)) {
+			$input['count'] = $_GET['count'];
+		}
 
 		return [$input, $auth, $class, $id];
 	}

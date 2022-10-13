@@ -69,7 +69,6 @@ class User extends CApiService {
 
 		if (array_key_exists('userName', $options)) {
 			$user = JSRPC::User()->get([
-				'outputCount' => true,
 				'filter' => [
 					'userdirectoryid' => $saml_settings['userdirectoryid'],
 					'username' => $options['userName']
@@ -93,7 +92,27 @@ class User extends CApiService {
 			}
 		}
 		else {
+			$total_users = JSRPC::User()->get([
+				'countOutput' => true,
+				'filter' => ['userdirectoryid' => $saml_settings['userdirectoryid']]
+			]);
+			$this->data['totalResults'] = $total_users;
+			$this->data['startIndex'] = 1;
+			$this->data['itemsPerPage'] = 0;
+
+			if (array_key_exists('startIndex', $options) && $options['startIndex'] > 0) {
+				$this->data['startIndex'] = $options['startIndex'];
+			}
+
+			if (array_key_exists('count', $options) && $options['count'] > 0 && $options['count'] < $total_users) {
+				$this->data['itemsPerPage'] = $options['count'];
+			}
+			elseif ($total_users > 0) {
+				$this->data['itemsPerPage'] = $total_users;
+			}
+
 			$this->listResponse($saml_settings);
+
 			return $this->data;
 		}
 
@@ -111,8 +130,10 @@ class User extends CApiService {
 	 */
 	private function validateGet(array $options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'id' =>			['type' => API_ID],
-			'userName' =>	['type' => API_STRING_UTF8]
+			'id' =>				['type' => API_ID],
+			'userName' =>		['type' => API_STRING_UTF8],
+			'startIndex' =>		['type' => API_STRING_UTF8],
+			'count' =>			['type' => API_STRING_UTF8]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
