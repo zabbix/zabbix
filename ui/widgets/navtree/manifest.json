@@ -1,10 +1,10 @@
 {
-	"manifest_version": 1.0,
+	"manifest_version": 2.0,
 	"id": "navtree",
 	"type": "widget",
 	"name": "Map navigation tree",
 	"namespace": "NavTree",
-	"version": "2.0",
+	"version": "1.0",
 	"author": "Zabbix SIA",
 	"actions": {
 		"widget.navtree.item.edit": {
