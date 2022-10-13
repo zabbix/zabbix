@@ -60,7 +60,7 @@ class CRouter {
 		'action.delete'								=> ['CControllerActionDelete',							'layout.json',			null],
 		'action.disable'							=> ['CControllerActionDisable',							null,					null],
 		'action.update'								=> ['CControllerActionUpdate',							'layout.json',			null],
-		'action.list'								=> ['CControllerActionList',							'layout.htmlpage',		'alerts.action.list'],
+		'action.list'								=> ['CControllerActionList',							'layout.htmlpage',		'action.list'],
 		'action.operation.condition.check'			=> ['CControllerActionOperationConditionCheck',			'layout.json',			null],
 		'action.operation.check'					=> ['CControllerActionOperationCheck',					'layout.json',			null],
 		'audit.settings.edit'						=> ['CControllerAuditSettingsEdit',						'layout.htmlpage',		'administration.audit.settings.edit'],

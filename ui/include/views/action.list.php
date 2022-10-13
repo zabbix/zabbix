@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-require_once __DIR__ .'/js/alerts.action.list.js.php';
+require_once __DIR__ .'/js/action.list.js.php';
 
 $submenu_source = [];
 
