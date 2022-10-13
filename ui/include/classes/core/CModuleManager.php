@@ -206,7 +206,7 @@ final class CModuleManager {
 		return $widget_defaults;
 	}
 
-	public function getModule($module_id): ?CWidget {
+	public function getModule($module_id): ?CModule {
 		if (!array_key_exists($module_id, $this->modules)) {
 			return null;
 		}
