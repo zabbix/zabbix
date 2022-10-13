@@ -405,10 +405,7 @@ static void	update_proxy_heartbeat(zbx_avail_active_hb_cache_t *cache, zbx_ipc_m
 	zbx_availability_deserialize_active_proxy_hb_update(message->data, &proxy_hostid);
 
 	if (NULL != (proxy_avail = zbx_hashset_search(&cache->proxy_avail, &proxy_hostid)))
-	{
 		proxy_avail->lastaccess = (int)time(NULL);
-		zabbix_log(1, "DBG updating proxy lastaccess to %i", proxy_avail->lastaccess);
-	}
 }
 
 ZBX_THREAD_ENTRY(availability_manager_thread, args)
