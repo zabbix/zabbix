@@ -1,9 +1,10 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2021-11-07 10:00+0300\n"
+"PO-Revision-Date: 2022-10-03 20:12+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -11,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.1.3\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1636272025.000000\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
@@ -10731,7 +10732,7 @@ msgstr "ב׳"
 #: include/func.inc.php:597 jsLoader.php:144
 msgctxt "month short"
 msgid "M"
-msgstr ""
+msgstr "ח׳"
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:90
 msgid "MAC address A"
@@ -12914,6 +12915,10 @@ msgstr "רק 20%% האחרונים של המחוון מוצגים."
 #: include/blocks.inc.php:648
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "רק הקפצות שמוקצות למארחים מופעלים שתלויות בפריטים פעילים נספרות"
+
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr ""
 
 #: include/httptest.inc.php:430
 msgid "Opera"

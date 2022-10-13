@@ -44,7 +44,7 @@ if (!hasRequest('form_refresh')) {
 $frmHost = (new CForm())
 	->setId('hostPrototypeForm')
 	->setName('hostPrototypeForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', getRequest('form', 1))
 	->addVar('parent_discoveryid', $discoveryRule['itemid'])
 	->addVar('tls_accept', $parentHost['tls_accept']);

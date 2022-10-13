@@ -30,7 +30,7 @@ $widget = (new CWidget())->setTitle(_('Templates'));
 // Create form.
 $form = (new CForm())
 	->setName('templateForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'template.massupdate')
 	->setId('templateForm')
 	->disablePasswordAutofill();

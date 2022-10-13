@@ -12906,6 +12906,10 @@ msgstr "Göstergenin yalnızca son %%20'si görüntüleniyor."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Yalnızca etkin ana makinelere atanmış ve etkin öğelere bağımlılığı olan tetikler sayıldı"
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:430
 msgid "Opera"
 msgstr "Opera"

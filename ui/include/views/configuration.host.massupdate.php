@@ -30,7 +30,7 @@ $hostWidget = (new CWidget())->setTitle(_('Hosts'));
 // create form
 $hostView = (new CForm())
 	->setName('hostForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', 'host.massupdate')
 	->addVar('tls_accept', $data['tls_accept'])
 	->setId('hostForm')

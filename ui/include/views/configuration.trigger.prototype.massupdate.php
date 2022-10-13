@@ -33,7 +33,7 @@ $widget->addItem(get_header_host_table('trigger_prototypes', $data['hostid'], $d
 // Create form.
 $form = (new CForm())
 	->setName('triggersForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
 	->addVar('parent_discoveryid', $data['parent_discoveryid']);
 

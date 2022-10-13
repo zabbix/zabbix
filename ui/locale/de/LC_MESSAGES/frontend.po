@@ -12932,6 +12932,10 @@ msgstr "Nur die letzten 20%% des Indikators werden angezeigt."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Nur Auslöser, die mit aktiven Hosts und aktiven Datenpunkten verbunden sind, werden gezählt"
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr ""
+
 # Der Browser
 #: include/httptest.inc.php:430
 msgid "Opera"

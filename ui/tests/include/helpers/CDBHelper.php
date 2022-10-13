@@ -174,6 +174,24 @@ class CDBHelper {
 	}
 
 	/**
+	 * Get all values of database column.
+	 *
+	 * @param type $sql			 query to be executed
+	 * @param type $column		 column name
+	 *
+	 * @return array
+	 */
+	public static function getColumn($sql, $column) {
+		$data = [];
+
+		foreach (CDBHelper::getAll($sql) as $row) {
+			$data[] = $row[$column];
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Get list of all referenced tables sorted by dependency level.
 	 *
 	 * For example: getTables($tables, 'users')

@@ -47,8 +47,8 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m) |<p>The system is running out of free memory.</p> |`{TEMPLATE_NAME:vm.memory.util[snmp].min(5m)}>{$MEMORY.UTIL.MAX}` |AVERAGE |<p>**Depends on**:</p><p>- Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</p> |
-|Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2}) |<p>-</p> |`{TEMPLATE_NAME:vm.memory.available[snmp].min(5m)}<{$MEMORY.AVAILABLE.MIN} and {TEMPLATE_NAME:vm.memory.total[memTotalReal.0].last()}>0` |AVERAGE | |
-|High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free) |<p>This trigger is ignored, if there is no swap configured.</p> |`{TEMPLATE_NAME:system.swap.pfree[snmp].min(5m)}<{$SWAP.PFREE.MIN.WARN} and {TEMPLATE_NAME:system.swap.total[memTotalSwap.0].last()}>0` |WARNING |<p>**Depends on**:</p><p>- High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)</p><p>- Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</p> |
+|Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2}) |<p>-</p> |`{TEMPLATE_NAME:vm.memory.available[snmp].max(5m)}<{$MEMORY.AVAILABLE.MIN} and {TEMPLATE_NAME:vm.memory.total[memTotalReal.0].last()}>0` |AVERAGE | |
+|High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free) |<p>This trigger is ignored, if there is no swap configured.</p> |`{TEMPLATE_NAME:system.swap.pfree[snmp].max(5m)}<{$SWAP.PFREE.MIN.WARN} and {TEMPLATE_NAME:system.swap.total[memTotalSwap.0].last()}>0` |WARNING |<p>**Depends on**:</p><p>- High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)</p><p>- Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})</p> |
 
 ## Feedback
 
