@@ -154,8 +154,6 @@ static unsigned char	get_program_type(void)
 }
 
 ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
-ZBX_THREAD_LOCAL int		process_num	= 0;
-ZBX_THREAD_LOCAL int		server_num	= 0;
 
 int	CONFIG_PROXYMODE		= ZBX_PROXYMODE_ACTIVE;
 int	CONFIG_DATASENDER_FORKS		= 1;

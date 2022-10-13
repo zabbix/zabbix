@@ -29,7 +29,6 @@
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 extern char	*CONFIG_WEBSERVICE_URL;
 
@@ -416,10 +415,10 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 	int				report_status = FAIL, started_num = 0, sent_num = 0, finished_num = 0;
 	double				time_now, time_stat, time_wake, time_idle = 0;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 

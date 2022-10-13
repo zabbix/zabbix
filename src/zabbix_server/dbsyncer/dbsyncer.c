@@ -29,7 +29,6 @@
 extern int				CONFIG_HISTSYNCER_FREQUENCY;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 static sigset_t				orig_mask;
 
 /******************************************************************************
@@ -91,10 +90,10 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 	const char		*process_name;
 	size_t			stats_alloc = 0, stats_offset = 0;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type), server_num,
 			(process_name = get_process_type_string(process_type)), process_num);

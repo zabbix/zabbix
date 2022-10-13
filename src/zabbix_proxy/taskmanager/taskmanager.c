@@ -41,7 +41,6 @@ extern int				CONFIG_ENABLE_REMOTE_COMMANDS;
 extern int				CONFIG_LOG_REMOTE_COMMANDS;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern int				CONFIG_PROXYMODE;
 extern char 				*CONFIG_HOSTNAME;
 
@@ -433,10 +432,10 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	int				tasks_num, sleeptime, nextcheck;
 	zbx_ipc_async_socket_t		rtc;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(taskmanager_args_in->zbx_get_program_type_cb_arg()),

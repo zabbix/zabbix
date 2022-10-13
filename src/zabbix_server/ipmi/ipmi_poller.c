@@ -35,7 +35,6 @@
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -174,14 +173,13 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 	int			polled_num = 0;
 	double			time_stat, time_idle = 0, time_now, time_read;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
 	process_type = ((zbx_thread_args_t *)args)->info.process_type;
-
-	server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
