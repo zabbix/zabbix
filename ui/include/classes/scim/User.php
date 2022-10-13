@@ -38,8 +38,14 @@ class User extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
+	private const ZBX_SCIM_ERROR_USER_NOT_FOUND = 404;
+	private const ZBX_SCIM_ERROR_BAD_REQUEST = 400;
+	private const ZBX_SCIM_ERROR = 500;
+
+	private const ZBX_SCIM_USER_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User';
+
 	protected array $data = [
-		'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User']
+		'schemas' => [self::ZBX_SCIM_USER_SCHEMA]
 	];
 
 	/**
@@ -62,13 +68,27 @@ class User extends CApiService {
 		if (array_key_exists('userName', $options)) {
 			$user = JSRPC::User()->get([
 				'outputCount' => true,
-				'filter' => ['username' => $options['userName']]
+				'filter' => [
+					'userdirectoryid' => $saml_settings['userdirectoryid'],
+					'username' => $options['userName']
+				]
 			]);
+
+			if (!$user) {
+				$this->data['Resources'] = [];
+			}
 		}
 		elseif (array_key_exists('id', $options)) {
 			$user = JSRPC::User()->get([
-				'userids' => $options['id']
+				'userids' => $options['id'],
+				'filter' => [
+					'userdirectoryid' => $saml_settings['userdirectoryid']
+				]
 			]);
+
+			if (!$user) {
+				self::exception(self::ZBX_SCIM_ERROR_USER_NOT_FOUND, _('This user does not exist.'));
+			}
 		}
 		else {
 			$this->listResponse($saml_settings);
@@ -77,9 +97,6 @@ class User extends CApiService {
 
 		if ($user) {
 			$this->data += $this->prepareData($user[0], $saml_settings);
-		}
-		else {
-			$this->data['Resources'] = [];				// TODO: or should there be some error message
 		}
 
 		return $this->data;
@@ -119,6 +136,7 @@ class User extends CApiService {
 		$db_user = JSRPC::User()->get([
 			'output' => ['userid'],
 			'filter' => [
+				'userdirectoryid' => $saml_settings['userdirectoryid'],
 				'username' => $options['userName']
 			]
 		]);
@@ -146,12 +164,11 @@ class User extends CApiService {
 			$user['userid'] = $db_user[0]['userid'];
 		}
 
-		if ($user) {
-			$this->setData($user['userid'], $saml_settings, $options);
+		if (!$user) {
+			self::exception(self::ZBX_SCIM_ERROR, _('Unable to create this user.'));
 		}
-		else {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Unable to create this user')); // TODO: how to format this error correctly?
-		}
+
+		$this->setData($user['userid'], $saml_settings, $options);
 
 		return $this->data;
 	}
@@ -163,11 +180,16 @@ class User extends CApiService {
 	 */
 	private function validatePost(array $options) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
+			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'userName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if (!in_array(self::ZBX_SCIM_USER_SCHEMA, $options['schemas'], true)) {
+			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
 		}
 	}
 
@@ -188,8 +210,15 @@ class User extends CApiService {
 		$saml_settings = CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML);
 		$saml_provisioning_data = new CProvisioning($saml_settings);
 		$db_user = JSRPC::User()->get([
-			'userids' => $options['id']
-		]);																// TODO: do I need to check this, if put will be run only if this user exists?
+			'userids' => $options['id'],
+			'filter' => [
+				'userdirectoryid' => $saml_settings['userdirectoryid']
+			]
+		]);
+
+		if (!$db_user) {
+			self::exception(self::ZBX_SCIM_ERROR_USER_NOT_FOUND, _('This user does not exist.'));
+		}
 
 		if ($options['active'] == true) {
 			$user_attributes = $saml_provisioning_data->getUserAttributes($options);
@@ -208,18 +237,17 @@ class User extends CApiService {
 				'medias' => $provision_media
 			]);
 
-			if ($user) {
-				$this->setData($user['userid'], $saml_settings, $options);
+			if (!$user) {
+				self::exception(self::ZBX_SCIM_ERROR, _('Unable to update this user.'));
 			}
-			else {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Unable to create this user')); // TODO: how to format this error correctly?
-			}
+
+			$this->setData($user['userid'], $saml_settings, $options);
 		}
 		else {
 			$user = JSRPC::User()->delete([$db_user[0]['userid']]);
 
 			if (!$user) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Unable to delete this user')); // TODO: how to format this error correctly?
+				self::exception(self::ZBX_SCIM_ERROR, _('Unable to delete this user.'));
 			}
 		}
 
@@ -233,6 +261,7 @@ class User extends CApiService {
 	 */
 	private function validatePut(array $options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
+			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'userName' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
 			'active' =>		['type' => API_BOOLEAN, 'flags' => API_NOT_EMPTY]
@@ -240,6 +269,10 @@ class User extends CApiService {
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if (!in_array(self::ZBX_SCIM_USER_SCHEMA, $options['schemas'], true)) {
+			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
 		}
 	}
 
@@ -254,16 +287,23 @@ class User extends CApiService {
 	public function delete(array $options) {
 		$this->validateDelete($options);
 
+		$saml_settings = CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML);
+
 		$db_user = JSRPC::User()->get([
-			'userids' => $options['id']
+			'userids' => $options['id'],
+			'filter' => [
+				'userdirectoryid' => $saml_settings['userdirectoryid']
+			]
 		]);
 
-		if ($db_user) {												// TODO: do I need to check this, if put will be run only if this user exists?
-			$user = JSRPC::User()->delete([$db_user[0]['userid']]);
+		if (!$db_user) {
+			self::exception(self::ZBX_SCIM_ERROR_USER_NOT_FOUND, _('This user does not exist.'));
+		}
 
-			if (!$user) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Unable to delete this user')); // TODO: how to format this error correctly?
-			}
+		$user = JSRPC::User()->delete([$db_user[0]['userid']]);
+
+		if (!$user) {
+			self::exception(self::ZBX_SCIM_ERROR, _('Unable to delete this user.'));
 		}
 
 		return $this->data;
@@ -314,7 +354,8 @@ class User extends CApiService {
 	 */
 	private function setData(string $userid, array $saml_settings, array $options = []): void {
 		$user = JSRPC::User()->get([
-			'userids' => $userid
+			'userids' => $userid,
+			'filter' => ['userdirectoryid' => $saml_settings['userdirectoryid']]
 		]);
 
 		$this->data += $this->prepareData($user[0], $saml_settings, $options);

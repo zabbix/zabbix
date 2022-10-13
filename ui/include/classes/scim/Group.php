@@ -38,8 +38,14 @@ class Group extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
+	private const ZBX_SCIM_ERROR_GROUP_NOT_FOUND = 404;
+	private const ZBX_SCIM_ERROR_BAD_REQUEST = 400;
+	private const ZBX_SCIM_ERROR = 500;
+
+	private const ZBX_SCIM_GROUP_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group';
+
 	protected array $data = [
-		'schemas' => ["urn:ietf:params:scim:schemas:core:2.0:Group"]
+		'schemas' => [self::ZBX_SCIM_GROUP_SCHEMA]
 	];
 
 	/**
@@ -57,14 +63,17 @@ class Group extends CApiService {
 			$db_scim_groups = DB::select('scim_groups', [
 				'output' => ['name', 'scim_groupid']
 			]);
+
 			$this->data['Resources'] = [];
 
-			foreach ($db_scim_groups as $db_scim_group) {
-				$users = $this->getUsersByGroupId($db_scim_group['scim_groupid']);
+			if ($db_scim_groups) {
+				foreach ($db_scim_groups as $db_scim_group) {
+					$users = $this->getUsersByGroupId($db_scim_group['scim_groupid']);
 
-				$this->data['Resources'][] = $this->prepareData(
-					$db_scim_group['scim_groupid'], $db_scim_group['name'], $users
-				);
+					$this->data['Resources'][] = $this->prepareData(
+						$db_scim_group['scim_groupid'], $db_scim_group['name'], $users
+					);
+				}
 			}
 		}
 		else {
@@ -73,11 +82,13 @@ class Group extends CApiService {
 				'output' => ['name']
 			]);
 
+			if (!$db_scim_group) {
+				self::exception(self::ZBX_SCIM_ERROR_GROUP_NOT_FOUND, _('This group does not exist.'));
+			}
+
 			$users = $this->getUsersByGroupId($options['id']);
 
-			if ($db_scim_group) {
-				$this->setData($options['id'], $db_scim_group[0]['name'], $users);
-			}
+			$this->setData($options['id'], $db_scim_group[0]['name'], $users);
 		}
 
 		return $this->data;
@@ -112,23 +123,36 @@ class Group extends CApiService {
 	public function post(array $options): array {
 		$this->validatePost($options);
 
-		$saml_provisioning_data = new CProvisioning(CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML));
-
+		$saml_settings = CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML);
 		$scim_groupid = DB::insert('scim_groups', [['name' => $options['displayName']]]);
+
+		if (!$scim_groupid) {
+			self::exception(self::ZBX_SCIM_ERROR, _s('Unable to create group "%1$s".', $options['displayName']));
+		}
+
 		$memberids = array_column($options['members'], 'value');
 
 		foreach ($memberids as $memberid) {
-			DB::insert('users_scim_groups', [[
+			$user_group = DB::insert('users_scim_groups', [[
 				'userid' => $memberid,
 				'scim_groupid' => $scim_groupid[0]
 			]]);
 
-			$this->updateProvisionedUsersGroup($memberid, $saml_provisioning_data);
+			if (!$user_group) {
+				self::exception(self::ZBX_SCIM_ERROR,
+					_s('Unable to add user "%1$s" to group "%2$s".', $memberid, $options['displayName'])
+				);
+			}
+
+			$this->updateProvisionedUsersGroup($memberid, $saml_settings);
 		}
 
 		$users = JSRPC::User()->get([
 			'output' => ['userid', 'username'],
-			'userids' => $memberids
+			'userids' => $memberids,
+			'filter' => [
+				'userdirectoryid' => $saml_settings['userdirectoryid']
+			]
 		]);
 
 		$this->setData($scim_groupid[0], $options['displayName'], $users);
@@ -143,6 +167,7 @@ class Group extends CApiService {
 	 */
 	private function validatePost(array $options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
+			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'displayName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'members' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
 				'display' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
@@ -152,6 +177,10 @@ class Group extends CApiService {
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if (!in_array(self::ZBX_SCIM_GROUP_SCHEMA, $options['schemas'], true)) {
+			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
 		}
 	}
 
@@ -169,12 +198,17 @@ class Group extends CApiService {
 	public function put(array $options): array {
 		$this->validatePut($options);
 
-		$saml_provisioning_data = new CProvisioning(CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML));
+		$saml_settings = CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML);
 
 		$db_scim_group = DB::select('scim_groups', [
 			'scim_groupids' => $options['id'],
 			'output' => ['name']
 		]);
+
+		if (!$db_scim_group) {
+			self::exception(self::ZBX_SCIM_ERROR_GROUP_NOT_FOUND, _('This group does not exist.'));
+		}
+
 		$scim_group_members = array_column($options['members'], 'value');
 
 		$db_scim_group_members = DB::select('users_scim_groups', [
@@ -187,25 +221,32 @@ class Group extends CApiService {
 
 		if($users_to_add) {
 			foreach ($users_to_add as $userid) {
-				DB::insert('users_scim_groups', [[
+				$user_group = DB::insert('users_scim_groups', [[
 					'userid' => $userid,
 					'scim_groupid' => $options['id']
 				]]);
 
-				$this->updateProvisionedUsersGroup($userid, $saml_provisioning_data);				// TODO: Do I need a check here and error in case user cannot be updated?
+				if (!$user_group) {
+					self::exception(self::ZBX_SCIM_ERROR,
+						_s('Unable to add user "%1$s" to group "%2$s".', $userid, $options['displayName'])
+					);
+				}
+
+				$this->updateProvisionedUsersGroup($userid, $saml_settings);
 			}
 		}
 		elseif($users_to_remove) {
 			DB::delete('users_scim_groups', ['userid' => array_values($users_to_remove)]);
 
 			foreach ($users_to_remove as $userid) {
-				$this->updateProvisionedUsersGroup($userid, $saml_provisioning_data);
+				$this->updateProvisionedUsersGroup($userid, $saml_settings);
 			}
 		}
 
 		$db_users = JSRPC::User()->get([
 			'output' => ['userid', 'username'],
-			'userids' => $scim_group_members
+			'userids' => $scim_group_members,
+			'filter' => ['userdirectoryid' => $saml_settings['userdirectoryid']]
 		]);
 
 		$this->setData($options['id'], $db_scim_group[0]['name'], $db_users);
@@ -220,6 +261,7 @@ class Group extends CApiService {
 	 */
 	private function validatePut($options) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
+			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'displayName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 			'members' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
 				'display' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
@@ -229,6 +271,10 @@ class Group extends CApiService {
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if (!in_array(self::ZBX_SCIM_GROUP_SCHEMA, $options['schemas'], true)) {
+			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
 		}
 	}
 
@@ -251,15 +297,14 @@ class Group extends CApiService {
 
 		$deleted_group = DB::delete('scim_groups', ['scim_groupid' => $options['id']]);
 
-		if ($deleted_group) {
-			$saml_provisioning_data = new CProvisioning(CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML));
-
-			foreach (array_column($db_scim_group_members, 'userid') as $userid) {
-				$this->updateProvisionedUsersGroup($userid, $saml_provisioning_data);
-			}
+		if (!$deleted_group) {
+			self::exception(self::ZBX_SCIM_ERROR, _s('Unable to delete group "%1$s".', $options['id']));
 		}
-		else {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Unable to delete this group')); // TODO: how to format this error correctly?
+
+		$saml_settings = CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML);
+
+		foreach (array_column($db_scim_group_members, 'userid') as $userid) {
+			$this->updateProvisionedUsersGroup($userid, $saml_settings);
 		}
 
 		return $this->data;
@@ -353,11 +398,13 @@ class Group extends CApiService {
 	 * user's user group and role based on this mapping.
 	 *
 	 * @param string $userid
-	 * @param CProvisioning $saml_provisioning_data
+	 * @param array  $saml_settings
 	 *
 	 * @return void
 	 */
-	private function updateProvisionedUsersGroup(string $userid, CProvisioning $saml_provisioning_data): void {
+	private function updateProvisionedUsersGroup(string $userid, array $saml_settings): void {
+		$saml_provisioning_data = new CProvisioning($saml_settings);
+
 		$user_scim_groupids = DB::select('users_scim_groups', [
 			'filter' => ['userid' => $userid],
 			'output' => ['scim_groupid']
@@ -373,7 +420,8 @@ class Group extends CApiService {
 		$user_media = JSRPC::User()->get([
 			'output' => ['medias'],
 			'userids' => $userid,
-			'selectMedias' => ['mediatypeid', 'sendto']
+			'selectMedias' => ['mediatypeid', 'sendto'],
+			'filter' => ['userdirectoryid' => $saml_settings['userdirectoryid']]
 		]);
 
 		JSRPC::User()->updateProvisionedUser([
