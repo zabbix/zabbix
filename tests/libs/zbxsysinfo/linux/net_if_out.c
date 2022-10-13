@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "KERNEL_COMMON.h"
+#include "net_if_common.h"
 #include "zbxmocktest.h"
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_mock_test_entry_KERNEL_COMMON(state, ZABBIX_MOCK_KERNEL_MAXFILES);
+	zbx_mock_test_entry_net_if_common(state, ZABBIX_MOCK_net_if_out);
 }

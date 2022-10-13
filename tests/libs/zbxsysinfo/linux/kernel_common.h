@@ -23,5 +23,5 @@
 #define ZABBIX_MOCK_KERNEL_MAXPROC	0
 #define ZABBIX_MOCK_KERNEL_MAXFILES	1
 
-void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func);
+void	zbx_mock_test_entry_kernel_common(void **state, int kernel_func);
 #endif

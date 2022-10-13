@@ -17,14 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "NET_IF_COMMON.h"
+#include "net_if_common.h"
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
 #include "zbxsysinfo.h"
 #include "zbxnum.h"
 
-void	zbx_mock_test_entry_NET_IF_COMMON(void **state, int net_if_func)
+void	zbx_mock_test_entry_net_if_common(void **state, int net_if_func)
 {
 	AGENT_REQUEST		request;
 	AGENT_RESULT 		param_result;

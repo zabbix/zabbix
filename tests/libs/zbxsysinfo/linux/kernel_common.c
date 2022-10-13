@@ -17,14 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "KERNEL_COMMON.h"
+#include "kernel_common.h"
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
 #include "zbxsysinfo.h"
 #include "zbxnum.h"
 
-void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func)
+void	zbx_mock_test_entry_kernel_common(void **state, int kernel_func)
 {
 	AGENT_REQUEST		request;
 	AGENT_RESULT		param_result;
