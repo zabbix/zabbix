@@ -31,9 +31,6 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
-
 extern zbx_vector_ptr_t	zbx_addrs;
 extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
@@ -298,10 +295,9 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 	double				time_start, time_diff = 0.0, time_now;
 	time_t				last_conn_time;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-
-	process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = info->process_type;
+	int				server_num = info->server_num;
+	int				process_num = info->process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(datasender_args_in->zbx_get_program_type_cb_arg()),
