@@ -56,9 +56,7 @@ class WidgetForm extends CWidgetForm {
 					->setAction('ZABBIX.Dashboard.reloadWidgetProperties()')
 			);
 
-		if (array_key_exists('source_type', $this->values)
-				&& $this->values['source_type'] == Widget::SOURCETYPE_MAP) {
-
+		if (!array_key_exists('source_type', $this->values) || $this->values['source_type'] == Widget::SOURCETYPE_MAP) {
 			$this->addField(
 				(new CWidgetFieldSelectResource('sysmapid', _('Map')))
 					->setResourceType(CWidgetFieldSelectResource::RESOURCE_TYPE_SYSMAP)
