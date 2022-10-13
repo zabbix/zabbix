@@ -288,10 +288,8 @@ clean:
  ******************************************************************************/
 ZBX_THREAD_ENTRY(datasender_thread, args)
 {
-	zbx_thread_datasender_args	*datasender_args_in = (zbx_thread_datasender_args *)
-							(((zbx_thread_args_t *)args)->args);
-	int				records = 0, hist_upload_state = ZBX_PROXY_UPLOAD_ENABLED, more;
-	double				time_start, time_diff = 0.0, time_now;
+	int		records = 0, hist_upload_state = ZBX_PROXY_UPLOAD_ENABLED, more;
+	double		time_start, time_diff = 0.0, time_now;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
