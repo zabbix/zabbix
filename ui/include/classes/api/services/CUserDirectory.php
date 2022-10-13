@@ -941,7 +941,17 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
-			$provisioning = new CProvisioning($userdirectory);
+			$mapping_roles = [];
+
+			if ($userdirectory['provision_groups']) {
+				$mapping_roles = API::Role()->get([
+					'output' => ['roleid', 'name', 'type'],
+					'roleids' => array_column($userdirectory['provision_groups'], 'roleid', 'roleid'),
+					'preservekeys' => true
+				]);
+			}
+
+			$provisioning = new CProvisioning($userdirectory, $mapping_roles);
 			$user_attributes = $provisioning->getUserIdpAttributes();
 			$idp_user = $ldap->getUserAttributes($user_attributes, $user['username'], $user['password']);
 			$user = array_merge($user, $provisioning->getUser($idp_user));

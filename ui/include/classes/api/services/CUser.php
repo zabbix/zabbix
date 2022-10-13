@@ -1817,43 +1817,41 @@ class CUser extends CApiService {
 			'preservekeys' => true
 		]);
 		$userdirectoryids = array_column($db_users, 'userdirectoryid', 'userdirectoryid');
+		unset($userdirectoryids[0]);
 		$provisionedids = [];
-		$db_userdirectories = [];
+		$db_userdirectoryids = [];
 
 		if ($userdirectoryids) {
-			$db_userdirectories = API::UserDirectory()->get([
-				'output' => ['host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls', 'search_filter',
-					'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username',
-					'user_lastname'
-				],
+			$db_userdirectoryids = API::UserDirectory()->get([
+				'output' => [],
 				'userdirectoryids' => $userdirectoryids,
 				'filter' => [
 					'idp_type' => IDP_TYPE_LDAP,
 					'provision_status' => JIT_PROVISIONING_ENABLED
 				],
-				'selectProvisionMedia' => API_OUTPUT_EXTEND,
-				'selectProvisionGroups' => API_OUTPUT_EXTEND,
 				'preservekeys' => true
 			]);
+
+			if (array_diff_key($userdirectoryids, $db_userdirectoryids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 
-		if ($db_userdirectories) {
-			$db_bind_passwords = array_column(DB::select('userdirectory_ldap', [
-				'output' => ['userdirectoryid', 'bind_password'],
-				'filter' => ['userdirectoryid' => $userdirectoryids]
-			]), 'bind_password', 'userdirectoryid');
+		if ($db_userdirectoryids) {
 			$db_user_userdirectory = array_column($db_users, 'userdirectoryid', 'userid');
 
-			foreach ($db_userdirectories as $db_userdirectoryid => $db_userdirectory) {
+			foreach (array_keys($db_userdirectoryids) as $db_userdirectoryid) {
+				$provisioning = CProvisioning::forUserDirectoryId($db_userdirectoryid);
 				$provision_users = array_keys($db_user_userdirectory, $db_userdirectoryid);
 				$provision_users = array_intersect_key($db_users, array_flip($provision_users));
-				$ldap = new CLdap($db_userdirectory + ['bind_password' => $db_bind_passwords[$db_userdirectoryid]]);
+				$config = $provisioning->getIdpConfig();
+				$ldap = new CLdap($config);
 
 				if ($ldap->bind_type == CLdap::BIND_DNSTRING) {
 					continue;
 				}
-
-				$provisioning = new CProvisioning($db_userdirectory + ['idp_type' => IDP_TYPE_LDAP]);
 
 				foreach ($provision_users as $provision_user) {
 					$user_attributes = $provisioning->getUserIdpAttributes();
@@ -1863,7 +1861,7 @@ class CUser extends CApiService {
 					if (!array_key_exists('usrgrps', $user)) {
 						$group_attributes = $provisioning->getGroupIdpAttributes();
 						$ldap_groups = $ldap->getGroupAttributes($group_attributes, $user['username']);
-						$ldap_groups = array_column($ldap_groups, $db_userdirectory['group_name']);
+						$ldap_groups = array_column($ldap_groups, $config['group_name']);
 						$user = array_merge($user, $provisioning->getUserGroupsAndRole($ldap_groups));
 					}
 
@@ -2391,33 +2389,15 @@ class CUser extends CApiService {
 	 * @return array
 	 */
 	protected function provisionLdapUser(array $user_data): array {
-		[$userdirectory] = API::UserDirectory()->get([
-			'output' => ['provision_status', 'idp_type'],
-			'userdirectoryids' => [$user_data['userdirectoryid']],
-			'filter' => ['idp_type' => IDP_TYPE_LDAP],
-			'selectProvisionMedia' => API_OUTPUT_EXTEND,
-			'selectProvisionGroups' => API_OUTPUT_EXTEND
-		]);
-
-		if (!$userdirectory) {
-			return $user_data;
-		}
-
-		$userdirectory += DB::select('userdirectory_ldap', [
-			'output' => ['host', 'port', 'base_dn', 'bind_dn', 'bind_password', 'search_attribute', 'start_tls',
-				'search_filter', 'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership',
-				'user_username', 'user_lastname'
-			],
-			'filter' => ['userdirectoryid' => $user_data['userdirectoryid']]
-		])[0];
-		$ldap = new CLdap($userdirectory);
+		$provisioning = CProvisioning::forUserDirectoryId($user_data['userdirectoryid']);
+		$config = $provisioning->getIdpConfig();
+		$ldap = new CLdap($config);
 
 		if ($ldap->bind_type != CLdap::BIND_ANONYMOUS && $ldap->bind_type != CLdap::BIND_CONFIG_CREDENTIALS) {
 			return $user_data;
 		}
 
 		$idp_user_data = [];
-		$provisioning = new CProvisioning($userdirectory);
 		$user_attributes = $provisioning->getUserIdpAttributes();
 		$idp_user = $ldap->getUserAttributes($user_attributes, $user_data['username']);
 		$idp_user_data = $provisioning->getUser($idp_user);
@@ -2425,7 +2405,7 @@ class CUser extends CApiService {
 		if (!array_key_exists('usrgrps', $idp_user_data)) {
 			$group_attributes = $provisioning->getGroupIdpAttributes();
 			$ldap_groups = $ldap->getGroupAttributes($group_attributes, $user_data['username']);
-			$ldap_groups = array_column($ldap_groups, $userdirectory['group_name']);
+			$ldap_groups = array_column($ldap_groups, $config['group_name']);
 			$idp_user_data = array_merge($idp_user_data, $provisioning->getUserGroupsAndRole($ldap_groups));
 		}
 

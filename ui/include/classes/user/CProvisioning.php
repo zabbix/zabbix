@@ -43,44 +43,72 @@ class CProvisioning {
 	 */
 	protected $userdirectory = [];
 
-	public function __construct(array $userdirectory) {
-		$userdirectory['provision_groups'] = $this->sortProvisionGroups($userdirectory['provision_groups']);
+	/**
+	 * Array of user roles data used in group mappings.
+	 *
+	 * @var array  $mapping_roles[]
+	 * @var int    $mapping_roles[roleid]['roleid']
+	 * @var int    $mapping_roles[roleid]['user_type']
+	 * @var string $mapping_roles[roleid]['name']
+	 */
+	protected $mapping_roles = [];
+
+	public function __construct(array $userdirectory, array $mapping_roles) {
 		$this->userdirectory = $userdirectory;
+		$this->mapping_roles = $mapping_roles;
 	}
 
 	/**
-	 * Sort provision_groups objects according 'sortorder' column, fallback will be set as last element.
-	 * If sortorder property is not set for at least one element all provision_groups elements will be assigned
-	 * autoincrementing 'sortorder' field.
+	 * Create instance for specific user directory by it id.
 	 *
-	 * @param array $provision_groups  Array of group mapping definitions.
+	 * @param int $userdirectoryid  User directory id to create CProvisioning instance for.
+	 */
+	public static function forUserDirectoryId($userdirectoryid): self {
+		[$userdirectory] = API::UserDirectory()->get([
+			'output' => ['host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls', 'search_filter',
+				'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username',
+				'user_lastname', 'idp_type'
+			],
+			'userdirectoryids' => [$userdirectoryid],
+			'filter' => ['provision_status' => JIT_PROVISIONING_ENABLED],
+			'selectProvisionMedia' => API_OUTPUT_EXTEND,
+			'selectProvisionGroups' => API_OUTPUT_EXTEND
+		]);
+		$userdirectory += DB::select('userdirectory_ldap', [
+			'output' => ['bind_password'],
+			'filter' => ['userdirectoryid' => $userdirectoryid]
+		])[0];
+		$mapping_roles = [];
+
+		if ($userdirectory['provision_groups']) {
+			$mapping_roles = API::Role()->get([
+				'output' => ['roleid', 'name', 'type'],
+				'roleids' => array_column($userdirectory['provision_groups'], 'roleid', 'roleid'),
+				'preservekeys' => true
+			]);
+		}
+
+		return new self($userdirectory, $mapping_roles);
+	}
+
+	/**
+	 * Get configuration options for idp.
 	 *
 	 * @return array
 	 */
-	public function sortProvisionGroups(array $provision_groups): array {
-		if (count(array_column($provision_groups, 'sortorder')) != count($provision_groups)) {
-			$i = 0;
+	public function getIdpConfig(): array {
+		$keys = [];
 
-			foreach ($provision_groups as &$provision_group) {
-				$provision_group['sortorder'] = $i++;
-			}
-			unset($provision_group);
-		}
-
-		foreach ($provision_groups as &$provision_group) {
-			if ($provision_group['name'] == CProvisioning::FALLBACK_GROUP_NAME) {
-				$provision_group['sortorder'] = max(
-					max(array_column($provision_groups, 'sortorder'),
-					count($provision_groups))
-				);
+		switch ($this->userdirectory['idp_type']) {
+			case IDP_TYPE_LDAP:
+				$keys = ['host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls', 'search_filter',
+					'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username',
+					'user_lastname', 'bind_password'
+				];
 				break;
-			}
 		}
-		unset($provision_group);
 
-		CArrayHelper::sort($provision_groups, ['sortorder']);
-
-		return $provision_groups;
+		return array_intersect_key($this->userdirectory, array_flip($keys));
 	}
 
 	/**
@@ -211,7 +239,7 @@ class CProvisioning {
 	 * Return array with user groups matched to provision groups criteria. Return first matched mapping groups.
 	 * Fallback mapping when set should be last in provision_groups list of group mappings.
 	 *
-	 * @param array $group_names    User group names data from external source, LDAP/SAML.
+	 * @param array  $group_names         User group names data from external source, LDAP/SAML.
 	 *
 	 * @return array
 	 *         ['roleid']                 Matched roleid to set for user.
@@ -224,6 +252,9 @@ class CProvisioning {
 		if (!$group_names || !$this->userdirectory['provision_groups']) {
 			return $user;
 		}
+
+		$roleids = [];
+		$groups = [];
 
 		foreach ($this->userdirectory['provision_groups'] as $provision_group) {
 			if (strpos($provision_group['name'], '*') === false) {
@@ -238,12 +269,22 @@ class CProvisioning {
 			}
 
 			if ($match) {
-				$user['roleid'] = $provision_group['roleid'];
-				$user['usrgrps'] = $provision_group['user_groups'];
-
-				break;
+				$roleids[$provision_group['roleid']] = 1;
+				$groups = array_merge($groups, $provision_group['user_groups']);
 			}
 		}
+
+		if (!$groups) {
+			return $user;
+		}
+
+		$roles = array_intersect_key($this->mapping_roles, $roleids);
+		CArrayHelper::sort($roles, [
+			['field' => 'type', 'order' => ZBX_SORT_DOWN],
+			['field' => 'name', 'order' => ZBX_SORT_UP]
+		]);
+		['roleid' => $user['roleid']] = reset($roles);
+		$user['usrgrps'] = $groups;
 
 		return $user;
 	}

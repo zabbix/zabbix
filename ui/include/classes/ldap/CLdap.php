@@ -40,7 +40,7 @@ class CLdap {
 	const ERR_QUERY_FAILED = 15;
 
 	const DEFAULT_FILTER_USER = '(%{attr}=%{user})';
-	const DEFAULT_FILTER_GROUP = '(&(%{groupattr}=%{userdn})(objectClass=groupOfNames))';
+	const DEFAULT_FILTER_GROUP = '(%{groupattr}=%{user})';
 
 	/**
 	 * Type of binding made to LDAP server. One of static::BIND_ constant value.
@@ -294,7 +294,6 @@ class CLdap {
 
 		$placeholders = [
 			'%{user}'	=> $user,
-			'%{userdn}'	=> $this->cnf['search_attribute'].'='.$user.','.$this->cnf['base_dn'],
 			'%{groupattr}'	=> $this->cnf['group_member']
 		];
 		$results = $this->search($this->cnf['group_basedn'], $this->cnf['group_filter'], $placeholders, $attributes);
