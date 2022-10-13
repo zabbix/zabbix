@@ -34,7 +34,7 @@ class testPageWeb extends CWebTest {
 	* Function checks the layout of Web page.
 	*/
 	public function testPageWeb_CheckLayout() {
-		// Logins directly into required page
+		// Logins directly into required page.
 		$this->page->login()->open('zabbix.php?action=web.view');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
