@@ -117,9 +117,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 						]
 					],
 					'add_post_js' => false
-				]))
-					->addClass('js-hosts-multiselect')
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				]))->addClass('js-hosts-multiselect'),
 				(new CPatternSelect([
 					'name' => $field_name.'['.$row_num.'][items][]',
 					'object_name' => 'items',
@@ -137,9 +135,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 						]
 					],
 					'add_post_js' => false
-				]))
-					->addClass('js-items-multiselect')
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				]))->addClass('js-items-multiselect')
 			]);
 		}
 		else {

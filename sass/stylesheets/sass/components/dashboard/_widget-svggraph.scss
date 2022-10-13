@@ -32,32 +32,30 @@ form.dashboard-widget-svggraph {
 		padding: 0;
 	}
 
-	.dataset-head {
-		display: grid;
-		grid-template-columns: 24px 24px 1fr 1fr 24px;
-		grid-gap: 10px;
-		align-items: start;
+	.dataset-head,
+	.dataset-body.list-accordion-item-body {
+		display: contents;
 	}
 
-	.dataset-body.list-accordion-item-body {
-		display: grid;
-		grid-template-columns: 24px 1fr 1fr 24px;
-		grid-gap: 10px;
-		align-items: start;
-		position: relative;
-		margin-top: 10px;
+	.dataset-head {
+		.multiselect {
+			width: 100%;
+		}
+	}
 
+	.dataset-body {
 		.form-grid {
 			padding-top: 0;
 
 			&:first-child {
-				grid-column-start: 2;
+				grid-column-start: 3;
 			}
 		}
 	}
 
 	.drag-icon {
 		position: absolute;
+		top: 5px;
 		left: -14px;
 	}
 
@@ -93,17 +91,15 @@ form.dashboard-widget-svggraph {
 			margin-top: -5px;
 			margin-bottom: -5px;
 		}
-
-		.list-accordion-item-head {
-			padding: 0;
-		}
 	}
 
 	.list-accordion-item {
 		position: relative;
-		width: 100%;
+		display: grid;
+		grid-template-columns: 24px 24px 1fr 1fr 24px;
+		grid-gap: 10px;
+		align-items: start;
 		padding: 5px 0;
-		list-style-type: none;
 
 		&.list-accordion-item-opened {
 			&::before {
@@ -124,10 +120,6 @@ form.dashboard-widget-svggraph {
 				overflow: hidden;
 			}
 
-			.dataset-body {
-				display: none;
-			}
-
 			.dataset-head {
 				.table-forms-separator {
 					border: none;
@@ -141,6 +133,10 @@ form.dashboard-widget-svggraph {
 						display: none;
 					}
 				}
+			}
+
+			.dataset-body {
+				display: none;
 			}
 
 			.items-list {

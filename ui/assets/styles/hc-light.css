@@ -1734,24 +1734,18 @@ form.dashboard-widget-svggraph .table-forms-container, form.dashboard-widget-svg
   border-top: none; }
 form.dashboard-widget-svggraph .table-forms-separator {
   padding: 0; }
-form.dashboard-widget-svggraph .dataset-head {
-  display: grid;
-  grid-template-columns: 24px 24px 1fr 1fr 24px;
-  grid-gap: 10px;
-  align-items: start; }
+form.dashboard-widget-svggraph .dataset-head,
 form.dashboard-widget-svggraph .dataset-body.list-accordion-item-body {
-  display: grid;
-  grid-template-columns: 24px 1fr 1fr 24px;
-  grid-gap: 10px;
-  align-items: start;
-  position: relative;
-  margin-top: 10px; }
-  form.dashboard-widget-svggraph .dataset-body.list-accordion-item-body .form-grid {
-    padding-top: 0; }
-    form.dashboard-widget-svggraph .dataset-body.list-accordion-item-body .form-grid:first-child {
-      grid-column-start: 2; }
+  display: contents; }
+form.dashboard-widget-svggraph .dataset-head .multiselect {
+  width: 100%; }
+form.dashboard-widget-svggraph .dataset-body .form-grid {
+  padding-top: 0; }
+  form.dashboard-widget-svggraph .dataset-body .form-grid:first-child {
+    grid-column-start: 3; }
 form.dashboard-widget-svggraph .drag-icon {
   position: absolute;
+  top: 5px;
   left: -14px; }
 form.dashboard-widget-svggraph .td-drag-icon .drag-icon {
   top: 0;
@@ -1773,13 +1767,13 @@ form.dashboard-widget-svggraph .list-vertical-accordion {
     overflow: visible;
     margin-top: -5px;
     margin-bottom: -5px; }
-  form.dashboard-widget-svggraph .list-vertical-accordion .list-accordion-item-head {
-    padding: 0; }
 form.dashboard-widget-svggraph .list-accordion-item {
   position: relative;
-  width: 100%;
-  padding: 5px 0;
-  list-style-type: none; }
+  display: grid;
+  grid-template-columns: 24px 24px 1fr 1fr 24px;
+  grid-gap: 10px;
+  align-items: start;
+  padding: 5px 0; }
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-opened::before {
     content: ' ';
     position: absolute;
@@ -1791,14 +1785,14 @@ form.dashboard-widget-svggraph .list-accordion-item {
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .multiselect {
     height: 24px;
     overflow: hidden; }
-  form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-body {
-    display: none; }
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .table-forms-separator {
     border: none; }
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table thead,
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table tfoot,
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-handle,
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-action {
+    display: none; }
+  form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-body {
     display: none; }
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .items-list {
     padding-left: 0; }
