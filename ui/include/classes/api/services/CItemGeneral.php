@@ -108,12 +108,9 @@ abstract class CItemGeneral extends CApiService {
 				$api_input_rules['fields'] += $item_type::getCreateValidationRules($item);
 			}
 			elseif ($db_item['templateid'] != 0) {
-				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-					$item += array_intersect_key($db_item, array_flip(['allow_traps']));
-				}
-				elseif ($item['type'] == ITEM_TYPE_SSH) {
-					$item += array_intersect_key($db_item, array_flip(['authtype']));
-				}
+				$item += array_intersect_key($db_item, array_flip(['authtype', 'allow_traps', 'publickey',
+					'privatekey'
+				]));
 
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRulesInherited($db_item);
 			}
@@ -121,14 +118,10 @@ abstract class CItemGeneral extends CApiService {
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRulesDiscovered();
 			}
 			else {
-				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-					$item += array_intersect_key($db_item, array_flip(
-						['request_method', 'post_type', 'authtype', 'allow_traps']
-					));
-				}
-				elseif ($item['type'] == ITEM_TYPE_SSH) {
-					$item += array_intersect_key($db_item, array_flip(['authtype']));
-				}
+				$item += array_intersect_key($db_item, array_flip(['interfaceid', 'authtype', 'username', 'params',
+					'delay', 'master_itemid', 'request_method', 'post_type', 'posts', 'allow_traps', 'ipmi_sensor',
+					'jmx_endpoint', 'snmp_oid', 'publickey', 'privatekey'
+				]));
 
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRules($db_item);
 			}

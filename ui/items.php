@@ -679,7 +679,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			if ($upd_item) {
-				$response = API::Item()->update(['itemid' => $itemid] + $item);
+				$response = API::Item()->update(['itemid' => $itemid] + $upd_item);
 
 				if ($response === false) {
 					throw new Exception();

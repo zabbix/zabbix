@@ -63,18 +63,10 @@ class CItemTypeSsh extends CItemType {
 			'authtype' =>		self::getUpdateFieldRule('authtype', $db_item),
 			'username' =>		self::getUpdateFieldRule('username', $db_item),
 			'publickey' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $data['authtype'] == ITEM_AUTHTYPE_PUBLICKEY
-											&& ($db_item['type'] != ITEM_TYPE_SSH || $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY);
-									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'publickey')],
 									['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'publickey')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'publickey')]
 			]],
 			'privatekey' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $data['authtype'] == ITEM_AUTHTYPE_PUBLICKEY
-											&& ($db_item['type'] != ITEM_TYPE_SSH || $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY);
-									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'privatekey')],
 									['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'privatekey')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'privatekey')]
 			]],
@@ -93,16 +85,10 @@ class CItemTypeSsh extends CItemType {
 			'authtype' =>		self::getUpdateFieldRuleInherited('authtype', $db_item),
 			'username' =>		self::getUpdateFieldRuleInherited('username', $db_item),
 			'publickey' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $data['authtype'] == ITEM_AUTHTYPE_PUBLICKEY && $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY;
-									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'publickey')],
 									['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'publickey')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'publickey')]
 			]],
 			'privatekey' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $data['authtype'] == ITEM_AUTHTYPE_PUBLICKEY && $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY;
-									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'privatekey')],
 									['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'privatekey')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'privatekey')]
 			]],

@@ -49,12 +49,7 @@ class CItemTypeJmx extends CItemType {
 	public static function getUpdateValidationRules(array $db_item): array {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRule('interfaceid', $db_item),
-			'jmx_endpoint' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function () use ($db_item): bool {
-										return $db_item['type'] != ITEM_TYPE_JMX;
-									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'jmx_endpoint')],
-									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'jmx_endpoint')]
-			]],
+			'jmx_endpoint' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'jmx_endpoint')],
 			'username' =>		self::getUpdateFieldRule('username', $db_item),
 			'password' =>		self::getUpdateFieldRule('password', $db_item),
 			'delay' =>			self::getUpdateFieldRule('delay', $db_item)

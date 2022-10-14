@@ -47,12 +47,7 @@ class CItemTypeSnmp extends CItemType {
 	public static function getUpdateValidationRules(array $db_item): array {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRule('interfaceid', $db_item),
-			'snmp_oid' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function () use ($db_item): bool {
-										return $db_item['type'] != ITEM_TYPE_SNMP;
-									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'snmp_oid')],
-									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'snmp_oid')]
-			]],
+			'snmp_oid' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'snmp_oid')],
 			'delay' =>			self::getUpdateFieldRule('delay', $db_item)
 		];
 	}

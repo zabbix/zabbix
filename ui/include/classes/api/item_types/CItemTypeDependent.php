@@ -44,12 +44,7 @@ class CItemTypeDependent extends CItemType {
 	 */
 	public static function getUpdateValidationRules(array $db_item): array {
 		return [
-			'master_itemid' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function () use ($db_item): bool {
-										return $db_item['type'] != ITEM_TYPE_DEPENDENT;
-									}, 'type' => API_ID, 'flags' => API_REQUIRED],
-									['else' => true, 'type' => API_ID]
-			]]
+			'master_itemid' =>	['type' => API_ID]
 		];
 	}
 

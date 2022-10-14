@@ -51,9 +51,6 @@ class CItemTypeIpmi extends CItemType {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRule('interfaceid', $db_item),
 			'ipmi_sensor' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => static function (array $data) use ($db_item): bool {
-										return $db_item['type'] != ITEM_TYPE_IPMI && $data['key_'] !== 'ipmi.get';
-									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'ipmi_sensor')],
 									['if' => ['field' => 'key_', 'in' => 'ipmi.get'], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ipmi_sensor')],
 									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'ipmi_sensor')]
 			]],

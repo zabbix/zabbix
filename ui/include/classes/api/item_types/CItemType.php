@@ -219,19 +219,6 @@ abstract class CItemType {
 					default:
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function () use ($db_item): bool {
-								$non_interface_type = in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL,
-									ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
-									ITEM_TYPE_SCRIPT
-								]);
-
-								$opt_interface_type = in_array($db_item['type'], [ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL,
-									ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_HTTPAGENT
-								]);
-
-								return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
-									&& ($non_interface_type || ($opt_interface_type && $db_item['interfaceid'] == 0));
-							}, 'type' => API_ID, 'flags' => API_REQUIRED],
-							['if' => static function () use ($db_item): bool {
 								return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 							}, 'type' => API_ID],
 							['else' => true, 'type' => API_ID, 'in' => '0']
@@ -257,15 +244,7 @@ abstract class CItemType {
 
 					case ITEM_TYPE_SSH:
 					case ITEM_TYPE_TELNET:
-						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function () use ($db_item): bool {
-								return in_array($db_item['type'], [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL,
-									ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_CALCULATED,
-									ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
-								]) || (in_array($db_item['type'], [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT]) && $db_item['username'] === '');
-							}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'username')],
-							['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'username')]
-						]];
+						return ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'username')];
 
 					default:
 						return ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')];
@@ -286,28 +265,10 @@ abstract class CItemType {
 			case 'params':
 				switch (static::TYPE) {
 					case ITEM_TYPE_CALCULATED:
-						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function () use ($db_item): bool {
-								return in_array($db_item['type'], [
-									ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-									ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT,
-									ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
-								]);
-							}, 'type' => API_CALC_FORMULA, 'flags' => API_REQUIRED | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'params')],
-							['else' => true, 'type' => API_CALC_FORMULA, 'flags' => ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'params')]
-						]];
+						return ['type' => API_CALC_FORMULA, 'flags' => ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'params')];
 
 					default:
-						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function () use ($db_item): bool {
-								return in_array($db_item['type'], [
-									ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-									ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT,
-									ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP
-								]);
-							}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
-							['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')]
-						]];
+						return ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')];
 				}
 
 			case 'timeout':
@@ -317,10 +278,6 @@ abstract class CItemType {
 				switch (static::TYPE) {
 					case ITEM_TYPE_ZABBIX_ACTIVE:
 						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function (array $data) use ($db_item): bool {
-								return in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-									|| (strncmp($data['key_'], 'mqtt.get', 8) !== 0 && strncmp($db_item['key_'], 'mqtt.get', 8) === 0);
-							}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
 							['if' => static function (array $data): bool {
 								return strncmp($data['key_'], 'mqtt.get', 8) !== 0;
 							}, 'type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
@@ -328,13 +285,7 @@ abstract class CItemType {
 						]];
 
 					default:
-						return ['type' => API_MULTIPLE, 'rules' => [
-							['if' => static function () use ($db_item): bool {
-								return in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-									|| ($db_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($db_item['key_'], 'mqtt.get', 8) === 0);
-							}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
-							['else' => true, 'type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')]
-						]];
+						return ['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')];
 				}
 
 			case 'trapper_hosts':
