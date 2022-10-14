@@ -43,15 +43,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 */
 	protected array $geomap_config;
 
-	public function __construct() {
-		parent::__construct();
+	protected function init(): void {
+		parent::init();
 
-		$this->setValidationRules([
-			'name' => 'string',
-			'initial_load' => 'in 0,1',
-			'widgetid' => 'db widget.widgetid',
-			'unique_id' => 'required|string',
-			'fields' => 'array'
+		$this->addValidationRules([
+			'initial_load', 'in 0,1',
+			'widgetid', 'db widget.widgetid',
+			'unique_id', 'required|string'
 		]);
 	}
 

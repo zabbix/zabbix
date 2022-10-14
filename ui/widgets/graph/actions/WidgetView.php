@@ -34,14 +34,12 @@ use Zabbix\Core\CWidget;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
-	public function __construct() {
-		parent::__construct();
+	protected function init(): void {
+		parent::init();
 
-		$this->setValidationRules([
-			'name' => 'string',
+		$this->addValidationRules([
 			'edit_mode' => 'in 0,1',
 			'dashboardid' => 'db dashboard.dashboardid',
-			'fields' => 'array',
 			'dynamic_hostid' => 'db hosts.hostid',
 			'content_width' => 'int32',
 			'content_height' => 'int32'

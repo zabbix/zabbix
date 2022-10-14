@@ -31,12 +31,10 @@ require_once APP::getRootDir().'/include/blocks.inc.php';
 
 class WidgetView extends CControllerDashboardWidgetView {
 
-	public function __construct() {
-		parent::__construct();
+	protected function init(): void {
+		parent::init();
 
-		$this->setValidationRules([
-			'name' => 'string',
-			'fields' => 'array',
+		$this->addValidationRules([
 			'initial_load' => 'in 0,1'
 		]);
 	}

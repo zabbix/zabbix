@@ -30,12 +30,10 @@ use Zabbix\Core\CWidget;
 
 class WidgetView extends CControllerWidgetIterator {
 
-	public function __construct() {
-		parent::__construct();
+	protected function init(): void {
+		parent::init();
 
-		$this->setValidationRules([
-			'name' => 'string',
-			'fields' => 'array',
+		$this->addValidationRules([
 			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]),
 			'dynamic_hostid' => 'db hosts.hostid'
 		]);

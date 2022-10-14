@@ -28,15 +28,6 @@ use CControllerDashboardWidgetView,
 
 class WidgetView extends CControllerDashboardWidgetView {
 
-	public function __construct() {
-		parent::__construct();
-
-		$this->setValidationRules([
-			'name' => 'string',
-			'fields' => 'array'
-		]);
-	}
-
 	protected function doAction(): void {
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),

@@ -34,12 +34,10 @@ use Widgets\Item\Widget;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
-	public function __construct() {
-		parent::__construct();
+	protected function init(): void {
+		parent::init();
 
-		$this->setValidationRules([
-			'name' => 'string',
-			'fields' => 'array',
+		$this->addValidationRules([
 			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}

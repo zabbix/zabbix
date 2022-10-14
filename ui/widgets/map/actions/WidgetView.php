@@ -28,13 +28,11 @@ use API,
 
 class WidgetView extends CControllerDashboardWidgetView {
 
-	public function __construct() {
-		parent::__construct();
+	protected function init(): void {
+		parent::init();
 
-		$this->setValidationRules([
-			'name' => 'string',
+		$this->addValidationRules([
 			'initial_load' => 'in 0,1',
-			'fields' => 'array',
 			'current_sysmapid' => 'db sysmaps.sysmapid',
 			'unique_id' => 'string',
 			'previous_maps' => 'array'

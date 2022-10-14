@@ -31,13 +31,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	private array $problems_per_severity_tpl;
 
-	public function __construct() {
-		parent::__construct();
+	protected function init(): void {
+		parent::init();
 
-		$this->setValidationRules([
+		$this->addValidationRules([
 			'name' => 'string',
-			'widgetid' => 'db widget.widgetid',
-			'initial_load' => 'in 0,1',
 			'fields' => 'array'
 		]);
 	}

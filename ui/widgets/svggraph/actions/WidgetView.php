@@ -37,18 +37,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private const GRAPH_HEIGHT_MIN = 1;
 	private const GRAPH_HEIGHT_MAX = 65535;
 
-	public function __construct() {
-		parent::__construct();
+	protected function init(): void {
+		parent::init();
 
-		$this->setValidationRules([
-			'name' => 'string',
+		$this->addValidationRules([
 			'edit_mode' => 'in 0,1',
 			'content_width' => 'int32|ge '.self::GRAPH_WIDTH_MIN.'|le '.self::GRAPH_WIDTH_MAX,
 			'content_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
 			'preview' => 'in 1',
 			'from' => 'string',
-			'to' => 'string',
-			'fields' => 'array'
+			'to' => 'string'
 		]);
 	}
 

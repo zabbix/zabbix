@@ -29,15 +29,6 @@ use API,
 
 class WidgetView extends CControllerDashboardWidgetView {
 
-	public function __construct() {
-		parent::__construct();
-
-		$this->setValidationRules([
-			'name' => 'string',
-			'fields' => 'array'
-		]);
-	}
-
 	protected function doAction(): void {
 		$filter_groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
 		$filter_hostids = $this->fields_values['hostids'] ?: null;

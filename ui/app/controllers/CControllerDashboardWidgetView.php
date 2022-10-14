@@ -36,10 +36,21 @@ abstract class CControllerDashboardWidgetView extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+
+		$this->setValidationRules([
+			'name' => 'string',
+			'fields' => 'array'
+		]);
 	}
 
-	protected function setValidationRules(array $validation_rules): object {
+	protected function setValidationRules(array $validation_rules): self {
 		$this->validation_rules = $validation_rules;
+
+		return $this;
+	}
+
+	protected function addValidationRules(array $validation_rules): self {
+		$this->validation_rules = array_merge($this->validation_rules, $validation_rules);
 
 		return $this;
 	}

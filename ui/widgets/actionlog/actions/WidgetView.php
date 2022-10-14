@@ -27,15 +27,6 @@ use API,
 
 class WidgetView extends CControllerDashboardWidgetView {
 
-	public function __construct() {
-		parent::__construct();
-
-		$this->setValidationRules([
-			'name' => 'string',
-			'fields' => 'array'
-		]);
-	}
-
 	protected function doAction(): void {
 		[$sortfield, $sortorder] = self::getSorting($this->fields_values['sort_triggers']);
 		$alerts = $this->getAlerts($sortfield, $sortorder, $this->fields_values['show_lines']);

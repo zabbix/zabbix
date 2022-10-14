@@ -28,15 +28,6 @@ use API,
 
 class WidgetView extends CControllerDashboardWidgetView {
 
-	public function __construct() {
-		parent::__construct();
-
-		$this->setValidationRules([
-			'name' => 'string',
-			'fields' => 'array'
-		]);
-	}
-
 	protected function doAction(): void {
 		$interface_types = CItemGeneral::INTERFACE_TYPES_BY_PRIORITY;
 

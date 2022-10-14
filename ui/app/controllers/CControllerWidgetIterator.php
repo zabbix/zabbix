@@ -24,24 +24,12 @@
  */
 abstract class CControllerWidgetIterator extends CControllerDashboardWidgetView {
 
-	/**
-	 * Validation rules for input parameters of the iterator.
-	 */
-	private static array $iterator_validation_rules = [
-		'page' => 'required|ge 1'
-	];
+	protected function init(): void {
+		parent::init();
 
-	public function __construct() {
-		parent::__construct();
-
-		$this->setValidationRules(self::$iterator_validation_rules);
-	}
-
-	/**
-	 * Set validation rules for input parameters.
-	 */
-	protected function setValidationRules(array $validation_rules): object {
-		return parent::setValidationRules(array_merge(self::$iterator_validation_rules, $validation_rules));
+		$this->addValidationRules([
+			'page' => 'required|ge 1'
+		]);
 	}
 
 	/**
