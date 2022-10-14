@@ -27,13 +27,13 @@ package zbxlib
 #include "zbxsysinfo.h"
 #include "module.h"
 
-int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_localtime(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_boottime(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_service(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	get_sensor(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -46,8 +46,8 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_users_num(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_dir_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -63,7 +63,7 @@ import (
 func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	switch key {
 	case "system.localtime":
-		cfunc = unsafe.Pointer(C.SYSTEM_LOCALTIME)
+		cfunc = unsafe.Pointer(C.system_localtime)
 	case "system.boottime":
 		cfunc = unsafe.Pointer(C.system_boottime)
 	case "net.tcp.listen":
@@ -89,7 +89,7 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	case "system.swap.out":
 		cfunc = unsafe.Pointer(C.system_swap_out)
 	case "vfs.dir.get":
-		cfunc = unsafe.Pointer(C.VFS_DIR_GET)
+		cfunc = unsafe.Pointer(C.vfs_dir_get)
 	}
 	return
 }

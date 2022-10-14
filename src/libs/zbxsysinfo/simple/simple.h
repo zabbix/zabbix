@@ -26,6 +26,6 @@ extern char		*CONFIG_SOURCE_IP;
 extern ZBX_METRIC	parameters_simple[];
 
 int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	check_check_service(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_service(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #endif /* ZABBIX_SYSINFO_SIMPLE_H */
