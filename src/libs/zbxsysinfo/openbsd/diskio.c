@@ -130,7 +130,7 @@ static int	vfs_dev_read_operations(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	vfs_dev_write_BYTES(const char *devname, AGENT_RESULT *result)
+static int	vfs_dev_write_bytes(const char *devname, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -146,7 +146,7 @@ static int	vfs_dev_write_BYTES(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	vfs_dev_write_OPERATIONS(const char *devname, AGENT_RESULT *result)
+static int	vfs_dev_write_operations(const char *devname, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -204,9 +204,9 @@ int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 1);
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "operations"))
-		ret = vfs_dev_write_OPERATIONS(devname, result);
+		ret = vfs_dev_write_operations(devname, result);
 	else if (0 == strcmp(mode, "bytes"))
-		ret = vfs_dev_write_BYTES(devname, result);
+		ret = vfs_dev_write_bytes(devname, result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
