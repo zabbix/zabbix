@@ -520,47 +520,48 @@ abstract class CItemGeneral extends CApiService {
 	 * @return array
 	 */
 	protected static function getInheritChunks(array $items, array $tpl_links): array {
-		$chunks = [];
-		$last = -1;
-		$first_item_index = key($items);
+		$chunks = [
+			[
+				'item_indexes' => [],
+				'hosts' => [],
+				'size' => 0
+			]
+		];
+		$last = 0;
 
 		foreach ($items as $i => $item) {
 			$hosts_chunks = array_chunk($tpl_links[$item['hostid']], self::INHERIT_CHUNK_SIZE, true);
 
-			foreach ($hosts_chunks as $j => $hosts) {
-				if (array_key_exists($j + 1, $hosts_chunks) || ($i == $first_item_index && $j == 0)) {
-					$chunks[++$last] = [
-						'item_indexes' => [$i],
-						'hosts' => $hosts
-					];
-				}
-				else {
+			foreach ($hosts_chunks as $hosts) {
+				if ($chunks[$last]['size'] < self::INHERIT_CHUNK_SIZE) {
+					$_hosts = array_slice($hosts, 0, self::INHERIT_CHUNK_SIZE - $chunks[$last]['size'], true);
+
 					$can_add_hosts = true;
-					$last_chunk_size = 0;
 
 					foreach ($chunks[$last]['item_indexes'] as $_i) {
-						$new_hosts = array_diff_key($hosts, $chunks[$last]['hosts']);
+						$new_hosts = array_diff_key($_hosts, $chunks[$last]['hosts']);
 
 						if (array_intersect_key($tpl_links[$items[$_i]['hostid']], $new_hosts)) {
 							$can_add_hosts = false;
 							break;
 						}
-
-						$last_chunk_size += count(
-							array_intersect_key($chunks[$last]['hosts'], $tpl_links[$items[$_i]['hostid']])
-						);
 					}
 
-					if ($can_add_hosts && $last_chunk_size + count($hosts) <= self::INHERIT_CHUNK_SIZE) {
+					if ($can_add_hosts) {
 						$chunks[$last]['item_indexes'][] = $i;
-						$chunks[$last]['hosts'] += $hosts;
+						$chunks[$last]['hosts'] += $_hosts;
+						$chunks[$last]['size'] += count($_hosts);
+
+						$hosts = array_diff_key($hosts, $_hosts);
 					}
-					else {
-						$chunks[++$last] = [
-							'item_indexes' => [$i],
-							'hosts' => $hosts
-						];
-					}
+				}
+
+				if ($hosts) {
+					$chunks[++$last] = [
+						'item_indexes' => [$i],
+						'hosts' => $hosts,
+						'size' => count($hosts)
+					];
 				}
 			}
 		}
