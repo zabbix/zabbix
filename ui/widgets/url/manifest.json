@@ -7,7 +7,7 @@
 	"version": "1.0",
 	"author": "Zabbix SIA",
 	"widget": {
-		"template_dashboard": true,
+		"template_support": true,
 		"refresh_rate": 0
 	}
 }

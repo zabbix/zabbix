@@ -436,7 +436,7 @@ final class CModuleManager {
 				'js_class' => CWidget::DEFAULT_JS_CLASS,
 				'size' => CWidget::DEFAULT_SIZE,
 				'refresh_rate' => CWidget::DEFAULT_REFRESH_RATE,
-				'template_dashboard' => false,
+				'template_support' => false,
 				'use_time_selector' => false
 			];
 		}

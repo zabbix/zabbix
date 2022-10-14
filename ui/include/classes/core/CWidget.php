@@ -164,7 +164,7 @@ class CWidget extends CModule {
 	}
 
 	public function isSupportedInTemplate(): bool {
-		return (bool) $this->manifest['widget']['template_dashboard'];
+		return (bool) $this->manifest['widget']['template_support'];
 	}
 
 	public function usesTimeSelector(array $fields_values): bool {
