@@ -407,7 +407,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
 
 		$this->zbxTestInputTypeByXpath("//input[@name='description']", 'Test LLD trigger');
-		$this->zbxTestInputType('expression', 'last(/Inheritance test template/item-discovery-prototype,#1)=0');
+		$this->zbxTestInputType('expression', 'last(/Inheritance test template/item-discovery-prototype[{#KEY}],#1)=0');
 		$this->zbxTestCheckboxSelect('type_1');
 		$this->zbxTestInputType('comments', 'comments');
 		$this->zbxTestInputType('url', 'zabbix.php');
@@ -436,7 +436,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('description'));
 		$getName = $this->zbxTestGetValue("//input[@name='description']");
 		$this->assertEquals($getName, 'Test LLD trigger');
-		$this->zbxTestAssertElementValue('expression', 'last(/Template inheritance test host/item-discovery-prototype,#1)=0');
+		$this->zbxTestAssertElementValue('expression', 'last(/Template inheritance test host/item-discovery-prototype[{#KEY}],#1)=0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
 		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
 		$this->zbxTestAssertElementText('//*[@name="comments"]', 'comments');

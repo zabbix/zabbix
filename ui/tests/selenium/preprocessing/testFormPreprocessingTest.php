@@ -162,9 +162,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Left trim', 'parameter_1' => ''],
 						['type' => 'XML XPath', 'parameter_1' => ''],
 						['type' => 'JSONPath', 'parameter_1' => ''],
-						['type' => 'Custom multiplier', 'parameter_1' => ''],
 						['type' => 'JavaScript', 'parameter_1' => ''],
-						['type' => 'In range', 'parameter_1' => '', 'parameter_2' => ''],
 						['type' => 'Matches regular expression', 'parameter_1' => ''],
 						['type' => 'Does not match regular expression', 'parameter_1' => ''],
 						['type' => 'Check for error in JSON', 'parameter_1' => ''],
@@ -174,6 +172,26 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'value']
 					],
 					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'preprocessing' => [
+						['type' => 'In range', 'parameter_1' => '', 'parameter_2' => '']
+
+					],
+					'error' => 'Invalid parameter "/1/params": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'preprocessing' => [
+						['type' => 'Custom multiplier', 'parameter_1' => '']
+
+					],
+					'error' => 'Invalid parameter "/1/params/1": a floating point value is expected.'
 				]
 			],
 			[
@@ -529,15 +547,6 @@ class testFormPreprocessingTest extends CWebTest {
 			case TEST_BAD:
 				$message = $dialog->query('tag:output')->asMessage()->waitUntilPresent()->one();
 				$this->assertTrue($message->isBad());
-
-				// Workaround for single step which has different message.
-				$this->assertTrue($message->hasLine(
-						($id !== null && $data['preprocessing'][$id]['type'] === 'Discard unchanged with heartbeat')
-						? 'Invalid parameter "params":'
-						: $data['error']
-					)
-				);
-
 				$dialog->close();
 				break;
 
