@@ -182,7 +182,7 @@ final class CModuleManager {
 
 		/** @var CWidget $widget */
 		foreach ($this->modules as $widget) {
-			if (!($widget instanceof CWidget) || ($for_template_dashboard_only && !$widget->isSupportedInTemplate())) {
+			if (!($widget instanceof CWidget) || ($for_template_dashboard_only && !$widget->hasTemplateSupport())) {
 				continue;
 			}
 			$widgets[$widget->getId()] = $widget;

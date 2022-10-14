@@ -55,7 +55,7 @@ class CControllerDashboardWidgetConfigure extends CController {
 			}
 		}
 
-		if ($ret && $this->hasInput('templateid') && !$this->widget->isSupportedInTemplate()) {
+		if ($ret && $this->hasInput('templateid') && !$this->widget->hasTemplateSupport()) {
 			error(_('Widget type is not supported in this context.'));
 
 			$ret = false;

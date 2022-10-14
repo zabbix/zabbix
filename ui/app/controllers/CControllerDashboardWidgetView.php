@@ -64,7 +64,7 @@ abstract class CControllerDashboardWidgetView extends CController {
 
 		$validation_rules = $this->validation_rules;
 
-		if ($this->widget->isSupportedInTemplate()) {
+		if ($this->widget->hasTemplateSupport()) {
 			$validation_rules['templateid'] = 'db dashboard.templateid';
 		}
 

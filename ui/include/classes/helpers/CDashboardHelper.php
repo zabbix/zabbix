@@ -75,7 +75,7 @@ class CDashboardHelper {
 				$widget = APP::ModuleManager()->getModule($widget_data['type']);
 
 				if ($widget === null || $widget->getType() !== CModule::TYPE_WIDGET
-						|| ($templateid !== null && !$widget->isSupportedInTemplate())) {
+						|| ($templateid !== null && !$widget->hasTemplateSupport())) {
 					continue;
 				}
 
@@ -400,7 +400,7 @@ class CDashboardHelper {
 				$widget = APP::ModuleManager()->getModule($widget_data['type']);
 
 				if ($widget === null || $widget->getType() !== CModule::TYPE_WIDGET
-						|| ($templateid !== null && !$widget->isSupportedInTemplate())) {
+						|| ($templateid !== null && !$widget->hasTemplateSupport())) {
 					continue;
 				}
 

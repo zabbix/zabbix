@@ -163,7 +163,7 @@ class CWidget extends CModule {
 		return (int) $this->manifest['widget']['refresh_rate'];
 	}
 
-	public function isSupportedInTemplate(): bool {
+	public function hasTemplateSupport(): bool {
 		return (bool) $this->manifest['widget']['template_support'];
 	}
 
