@@ -295,7 +295,9 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
-		(new CTextBox('url', $data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('url', $data['url']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('users', 'url'))
 	);
 
 $tabs->addTab('userTab', _('User'), $user_form_list);
@@ -311,21 +313,38 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), _('Status'), _('Action')]);
 
 	foreach ($data['medias'] as $index => $media) {
-		if ($media['active'] == MEDIA_STATUS_ACTIVE) {
-			$status_action = 'return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);';
-			$status_label = _('Enabled');
-			$status_class = ZBX_STYLE_GREEN;
+		if ($data['mediatypes'][$media['mediatypeid']]['status'] == MEDIA_TYPE_STATUS_ACTIVE) {
+			$media_name = $media['name'];
+
+			if ($media['active'] == MEDIA_STATUS_ACTIVE) {
+				$status_action = 'return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);';
+				$status_label = _('Enabled');
+				$status_class = ZBX_STYLE_GREEN;
+			}
+			else {
+				$status_action = 'return create_var("'.$user_form->getName().'","enable_media",'.$index.', true);';
+				$status_label = _('Disabled');
+				$status_class = ZBX_STYLE_RED;
+			}
+
+			$status = (new CSimpleButton($status_label))
+				->onClick(!$data['readonly'] ? $status_action : null)
+				->addClass(ZBX_STYLE_BTN_LINK.($data['readonly'] ? '' : ' '.$status_class))
+				->setEnabled(!$data['readonly']);
 		}
 		else {
-			$status_action = 'return create_var("'.$user_form->getName().'","enable_media",'.$index.', true);';
-			$status_label = _('Disabled');
-			$status_class = ZBX_STYLE_RED;
-		}
+			$media_name = new CDiv([
+				$media['name'],
+				(new CSpan([
+					' ',
+					makeWarningIcon(
+						_('Media type disabled by Administration.')
+					)
+				]))
+			]);
 
-		$status = (new CSimpleButton($status_label))
-			->onClick(!$data['readonly'] ? $status_action : null)
-			->addClass(ZBX_STYLE_BTN_LINK.($data['readonly'] ? '' : ' '.$status_class))
-			->setEnabled(!$data['readonly']);
+			$status = (new CDiv(_('Disabled')))->addClass(ZBX_STYLE_RED);
+		}
 
 		$parameters = [
 			'dstfrm' => $user_form->getName(),
@@ -361,7 +380,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 
 		$media_table_info->addRow(
 			(new CRow([
-				$media['name'],
+				$media_name,
 				$media['sendto'],
 				(new CDiv($media['period']))
 					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')

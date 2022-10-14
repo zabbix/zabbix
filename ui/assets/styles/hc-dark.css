@@ -2942,6 +2942,12 @@ z-select,
       background-color: #383838;
       border-color: #666666;
       box-shadow: none; }
+    z-select button.focusable.red,
+    .z-select button.focusable.red {
+      color: #ff5050; }
+      z-select button.focusable.red:after,
+      .z-select button.focusable.red:after {
+        color: #ffffff; }
   z-select .list,
   .z-select .list {
     display: none;
@@ -6995,7 +7001,7 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
       color: #cacaca; }
     .interfaces .interface-container.interface-container-header .interface-cell-action {
       grid-column: span 2; }
-    .interfaces .interface-container:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) .interface-cell:not(.interface-cell-details) {
+    .interfaces .interface-container:not(.interface-container-header):not(:empty) ~ .interface-container:not(:empty) :first-child .interface-cell:not(.interface-cell-details) {
       padding-top: 10px;
       margin-top: 5px;
       border-top: 1px solid #666666; }

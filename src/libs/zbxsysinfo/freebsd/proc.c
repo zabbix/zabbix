@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxregexp.h"
 #include "log.h"
@@ -29,7 +30,6 @@
 #endif
 
 #if (__FreeBSD_version) < 500000
-#	define ZBX_COMMLEN		MAXCOMLEN
 #	define ZBX_PROC_PID		kp_proc.p_pid
 #	define ZBX_PROC_PPID		kp_eproc.e_ppid
 #	define ZBX_PROC_COMM		kp_proc.p_comm
@@ -51,7 +51,6 @@
 #	define ZBX_PROC_UID		kp_proc.p_ruid
 #	define ZBX_PROC_GID		kp_proc.p_rgid
 #else
-#	define ZBX_COMMLEN		COMMLEN
 #	define ZBX_PROC_PID		ki_pid
 #	define ZBX_PROC_PPID		ki_ppid
 #	define ZBX_PROC_JID		ki_jid
@@ -148,18 +147,25 @@ static void	proc_data_free(proc_data_t *proc_data)
 	zbx_free(proc_data);
 }
 
+#define ARGV_START_SIZE	64
 static char	*get_commandline(struct kinfo_proc *proc)
 {
 	int		mib[4], i;
 	size_t		sz;
 	static char	*args = NULL;
+#if (__FreeBSD_version >= 802510)
 	static int	args_alloc = 0;
+#else
+	int		argv_max, err = -1;
+	static int	args_alloc = ARGV_START_SIZE;
+#endif
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_PROC;
 	mib[2] = KERN_PROC_ARGS;
 	mib[3] = proc->ZBX_PROC_PID;
 
+#if (__FreeBSD_version >= 802510)
 	if (-1 == sysctl(mib, 4, NULL, &sz, NULL, 0))
 		return NULL;
 
@@ -176,16 +182,50 @@ static char	*get_commandline(struct kinfo_proc *proc)
 
 	if (-1 == sysctl(mib, 4, args, &sz, NULL, 0))
 		return NULL;
+#else
+	/*
+	 * Before FreeBSD 8.3 sysctl() API for kern.proc.args didn't follow the regular convention
+	 * that a user can query the needed size for results by passing in a NULL old pointer
+	 * and a valid oldsize, given that we have to estimate the required output buffer size manually:
+	 *
+	 * https://github.com/freebsd/freebsd-src/commit/9f688f2ce3c01f30b0c98d17c6ce057660819c8c
+	*/
 
+	if (NULL == args)
+		args = zbx_malloc(args, args_alloc);
+
+	if (-1 == (argv_max = sysconf(_SC_ARG_MAX)))
+		return NULL;
+
+	while (0 != err && args_alloc < argv_max)
+	{
+		sz = (size_t)args_alloc;
+
+		if (-1 == (err = sysctl(mib, 4, args, &sz, NULL, 0)))
+		{
+			if (ENOMEM == errno)
+			{
+				args_alloc *= 2;
+				args = zbx_realloc(args, args_alloc);
+			}
+			else
+				return NULL;
+		}
+	}
+
+	if (-1 == err)
+		return NULL;
+#endif
 	for (i = 0; i < (int)(sz - 1); i++)
 		if (args[i] == '\0')
 			args[i] = ' ';
 
-	if (sz == 0)
+	if (0 == sz)
 		zbx_strlcpy(args, proc->ZBX_PROC_COMM, args_alloc);
 
 	return args;
 }
+#undef ARGV_START_SIZE
 
 int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -196,7 +236,6 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_TSIZE	5
 #define ZBX_DSIZE	6
 #define ZBX_SSIZE	7
-
 	char		*procname, *proccomm, *param, *args, *mem_type = NULL;
 	int		do_task, pagesize, count, i, proccount = 0, invalid_user = 0, mem_type_code, mib[4];
 	unsigned int	mibs;
@@ -443,7 +482,6 @@ out:
 	}
 
 	return SYSINFO_RET_OK;
-
 #undef ZBX_SIZE
 #undef ZBX_RSS
 #undef ZBX_VSIZE

@@ -17,12 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+
+#include "zbxjson.h"
+#include "zbxstr.h"
 
 #include "stats.h"
 #include "diskdevices.h"
-#include "zbxjson.h"
-#include "zbxstr.h"
 
 #define ZBX_DEV_PFX		"/dev/"
 #define ZBX_DEV_READ		0
@@ -31,7 +32,7 @@
 
 #if defined(KERNEL_2_4)
 #	define INFO_FILE_NAME	"/proc/partitions"
-#	define PARSE(line)	if (sscanf(line, ZBX_FS_UI64 ZBX_FS_UI64 " %*d %s " 		\
+#	define PARSE(line)	if (sscanf(line, ZBX_FS_UI64 ZBX_FS_UI64 " %*d %s "		\
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d "			\
 					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d",	\
 				&rdev_major,							\
@@ -71,13 +72,13 @@
 				) continue
 #endif
 
-int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
+int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	FILE		*f;
 	char		tmp[MAX_STRING_LEN], name[MAX_STRING_LEN], dev_path[MAX_STRING_LEN];
 	int		i, ret = FAIL, dev_exists = FAIL;
 	zbx_uint64_t	ds[ZBX_DSTAT_MAX], rdev_major, rdev_minor;
-	zbx_stat_t 	dev_st;
+	zbx_stat_t	dev_st;
 	int		found = 0;
 
 	for (i = 0; i < ZBX_DSTAT_MAX; i++)
@@ -210,7 +211,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 			return SYSINFO_RET_FAIL;
 		}
 
-		if (SUCCEED != get_diskstat(devname, dstats))
+		if (SUCCEED != zbx_get_diskstat(devname, dstats))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk information."));
 			return SYSINFO_RET_FAIL;
@@ -262,7 +263,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 
 	if (NULL == (device = collector_diskdevice_get(kernel_devname)))
 	{
-		if (SUCCEED != get_diskstat(kernel_devname, dstats))
+		if (SUCCEED != zbx_get_diskstat(kernel_devname, dstats))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain disk information."));
 
@@ -407,7 +408,6 @@ int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_free(&j);
 
 	return SYSINFO_RET_OK;
-
 #undef DEVTYPE_STR
 #undef DEVTYPE_STR_LEN
 }

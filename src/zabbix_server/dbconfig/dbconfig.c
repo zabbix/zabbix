@@ -25,6 +25,8 @@
 #include "dbcache.h"
 #include "zbxrtc.h"
 #include "zbxtime.h"
+#include "zbx_rtc_constants.h"
+#include "valuecache.h"
 
 extern int		CONFIG_CONFSYNCER_FREQUENCY;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
@@ -41,7 +43,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 ZBX_THREAD_ENTRY(dbconfig_thread, args)
 {
 	double			sec = 0.0;
-	int			nextcheck = 0, sleeptime, secrets_reload = 0;
+	int			nextcheck = 0, sleeptime, secrets_reload = 0, cache_reload = 0;
 	zbx_ipc_async_socket_t	rtc;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
@@ -51,7 +53,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	zbx_rtc_subscribe(&rtc, process_type, process_num);
 
@@ -61,7 +63,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	sec = zbx_time();
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
-	DCsync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO);
+	DCsync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL);
 	DCsync_kvs_paths(NULL);
 	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 			get_process_type_string(process_type), (sec = zbx_time() - sec), CONFIG_CONFSYNCER_FREQUENCY);
@@ -81,10 +83,10 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		{
 			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
 			{
-				if (0 != nextcheck)
+				if (0 == cache_reload)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
-					nextcheck = 0;
+					cache_reload = 1;
 				}
 				else
 					zabbix_log(LOG_LEVEL_WARNING, "configuration cache reloading is already in progress");
@@ -113,15 +115,29 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 		if (0 == secrets_reload)
 		{
-			DCsync_configuration(ZBX_DBSYNC_UPDATE, ZBX_SYNCED_NEW_CONFIG_YES);
+			zbx_vector_uint64_t	deleted_itemids;
+
+			zbx_vector_uint64_create(&deleted_itemids);
+
+			DCsync_configuration(ZBX_DBSYNC_UPDATE, ZBX_SYNCED_NEW_CONFIG_YES, &deleted_itemids);
 			DCsync_kvs_paths(NULL);
 			DCupdate_interfaces_availability();
 			nextcheck = (int)time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
+
+			zbx_vc_remove_items_by_ids(&deleted_itemids);
+			zbx_vector_uint64_destroy(&deleted_itemids);
+
+			if (0 != cache_reload)
+			{
+				cache_reload = 0;
+				zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the configuration cache");
+			}
 		}
 		else
 		{
 			DCsync_kvs_paths(NULL);
 			secrets_reload = 0;
+			zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the secrets");
 		}
 
 		sec = zbx_time() - sec;

@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "log.h"
 
 typedef struct
@@ -30,7 +31,7 @@ typedef struct
 }
 zbx_kstat_t;
 
-int	get_diskstat(const char *devname, zbx_uint64_t *dstat)
+int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	return FAIL;
 }
@@ -170,6 +171,13 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
+typedef struct
+{
+	const char	*mode;
+	int		(*function)(const char *devname, AGENT_RESULT *result);
+}
+MODE_FUNCTION;
+
 static int	process_mode_function(AGENT_REQUEST *request, AGENT_RESULT *result, const MODE_FUNCTION *fl)
 {
 	const char	*devname, *mode;
@@ -218,8 +226,8 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
-		{"bytes", 	VFS_DEV_WRITE_BYTES},
-		{"operations", 	VFS_DEV_WRITE_OPERATIONS},
+		{"bytes",	VFS_DEV_WRITE_BYTES},
+		{"operations",	VFS_DEV_WRITE_OPERATIONS},
 		{NULL,		NULL}
 	};
 

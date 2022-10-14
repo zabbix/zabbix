@@ -199,8 +199,8 @@ class CLocalApiClient extends CApiClient {
 			throw new APIException(ZBX_API_ERROR_PERMISSIONS, _('API token expired.'));
 		}
 
-		[['roleid' => $roleid, 'username' => $username]] = DB::select('users', [
-			'output' => ['roleid', 'username'],
+		[['roleid' => $roleid, 'username' => $username, 'name' => $name, 'surname' => $surname]] = DB::select('users', [
+			'output' => ['roleid', 'username', 'name', 'surname'],
 			'userids' => $userid
 		]);
 
@@ -233,6 +233,8 @@ class CLocalApiClient extends CApiClient {
 		CApiService::$userData = [
 			'userid' => $userid,
 			'username' => $username,
+			'name' => $name,
+			'surname' => $surname,
 			'type' => $type,
 			'roleid' => $roleid,
 			'userip' => CWebUser::getIp(),

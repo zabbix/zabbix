@@ -39,7 +39,7 @@ ZBX_THREAD_ENTRY(selfmon_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -48,7 +48,7 @@ ZBX_THREAD_ENTRY(selfmon_thread, args)
 
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
-		collect_selfmon_stats();
+		zbx_collect_selfmon_stats();
 		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [processed data in " ZBX_FS_DBL " sec, idle 1 sec]",

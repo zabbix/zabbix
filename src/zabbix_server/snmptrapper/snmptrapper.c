@@ -28,6 +28,7 @@
 #include "preproc.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxsysinfo.h"
 
 static int	trap_fd = -1;
 static off_t	trap_lastsize;
@@ -103,7 +104,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	for (i = 0; i < num; i++)
 	{
-		init_result(&results[i]);
+		zbx_init_agent_result(&results[i]);
 		errcodes[i] = FAIL;
 
 		items[i].key = zbx_strdup(items[i].key, items[i].key_orig);
@@ -121,9 +122,9 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 			continue;
 		}
 
-		init_request(&request);
+		zbx_init_agent_request(&request);
 
-		if (SUCCEED != parse_item_key(items[i].key, &request))
+		if (SUCCEED != zbx_parse_item_key(items[i].key, &request))
 			goto next;
 
 		if (0 != strcmp(get_rkey(&request), "snmptrap"))
@@ -162,17 +163,17 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		}
 
 		value_type = (ITEM_VALUE_TYPE_LOG == items[i].value_type ? ITEM_VALUE_TYPE_LOG : ITEM_VALUE_TYPE_TEXT);
-		set_result_type(&results[i], value_type, trap);
+		zbx_set_agent_result_type(&results[i], value_type, trap);
 		errcodes[i] = SUCCEED;
 		ret = SUCCEED;
 next:
-		free_request(&request);
+		zbx_free_agent_request(&request);
 	}
 
 	if (FAIL == ret && -1 != fb)
 	{
 		value_type = (ITEM_VALUE_TYPE_LOG == items[fb].value_type ? ITEM_VALUE_TYPE_LOG : ITEM_VALUE_TYPE_TEXT);
-		set_result_type(&results[fb], value_type, trap);
+		zbx_set_agent_result_type(&results[fb], value_type, trap);
 		errcodes[fb] = SUCCEED;
 		ret = SUCCEED;
 	}
@@ -206,7 +207,7 @@ next:
 		}
 
 		zbx_free(items[i].key);
-		free_result(&results[i]);
+		zbx_free_agent_result(&results[i]);
 	}
 
 	zbx_free(results);
@@ -599,7 +600,7 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trapfile:'%s'", __func__, CONFIG_SNMPTRAP_FILE);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

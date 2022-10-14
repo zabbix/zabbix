@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-08-11 00:25+0000\n"
+"PO-Revision-Date: 2022-09-26 07:56+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -266,6 +266,16 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, selecionado"
 
+#: app/controllers/CControllerMediatypeEnable.php:93
+#, c-format
+msgid "%1$s. %2$s: %3$s. %4$s."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeEnable.php:108
+#, c-format
+msgid "%1$s: %2$s"
+msgstr ""
+
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
@@ -307,7 +317,7 @@ msgstr "(Só super-administradores podem criar grupos)"
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(criado pela descoberta do host)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
@@ -1100,7 +1110,7 @@ msgstr "Algoritmo"
 #: include/classes/helpers/CMenuHelper.php:283
 #: include/classes/helpers/CRoleHelper.php:338
 msgid "Alerts"
-msgstr ""
+msgstr "Alertas"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
@@ -1451,7 +1461,7 @@ msgstr "Pelo menos uma operação deve existir."
 #: include/classes/api/services/CHostGroup.php:1594
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
-msgstr ""
+msgstr "Pelo menos um dos parâmetros \"%1$s\" ou \"%2$s\" deve estar habilitado."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
@@ -2092,7 +2102,7 @@ msgstr "Não foi possível adicionar template"
 #: app/controllers/CControllerTemplateGroupCreate.php:40
 #: app/controllers/CControllerTemplateGroupCreate.php:70
 msgid "Cannot add template group"
-msgstr ""
+msgstr "Não é possível adicionar o grupo de template"
 
 #: triggers.php:306
 msgid "Cannot add trigger"
@@ -2378,7 +2388,7 @@ msgstr[1] "Não é possível excluir os grupos de servidores %1$s porque a manut
 #: app/controllers/CControllerHostGroupDelete.php:39
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
-msgstr ""
+msgstr "Não é possível eliminar os grupos de hosts"
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2499,7 +2509,7 @@ msgstr "Não foi possível eliminar template"
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
-msgstr[0] ""
+msgstr[0] "Não é possível eliminar o grupo do template"
 msgstr[1] ""
 
 #: include/classes/api/services/CGraphPrototype.php:374
@@ -2741,6 +2751,10 @@ msgstr[1] "Não foi possível activar os cenários web"
 #: app/controllers/CControllerPopupTestTriggerExpr.php:199
 msgid "Cannot evaluate expression"
 msgstr "Não é possível avaliar a expressão"
+
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
@@ -4754,6 +4768,10 @@ msgstr ""
 msgid "Critical"
 msgstr "Crítico"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr ""
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "Host actual"
@@ -6454,6 +6472,14 @@ msgstr "Elipse"
 #: include/media.inc.php:24
 msgid "Email"
 msgstr "E-mail"
+
+#: app/views/js/administration.mediatype.edit.js.php:397
+msgid "Email and password"
+msgstr ""
+
+#: app/views/administration.mediatype.edit.php:64
+msgid "Email provider"
+msgstr ""
 
 #: app/views/popup.generic.php:50
 msgid "Empty"
@@ -9083,6 +9109,11 @@ msgstr "Retorna estatísticas de tráfego de uma interface. Retorna: número int
 msgid "Incompatible \"propagation_rule\" and \"propagation_value\" parameters for service \"%1$s\"."
 msgstr ""
 
+#: app/controllers/CControllerMediatypeEnable.php:97
+#: app/controllers/CControllerMediatypeEnable.php:108
+msgid "Incomplete configuration"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
 #, c-format
@@ -11285,6 +11316,10 @@ msgstr ""
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr ""
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
@@ -11910,6 +11945,10 @@ msgid_plural "Media types disabled"
 msgstr[0] "Tipo de média desactivado"
 msgstr[1] "Tipo de média desactivado"
 
+#: app/views/administration.user.edit.php:327
+msgid "Media type disabled by Administration."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
@@ -11944,6 +11983,10 @@ msgstr "O tipo de mídia com o ID \"%1$s\" não está disponível."
 #: include/classes/helpers/CRoleHelper.php:428
 msgid "Media types"
 msgstr "Tipos de média"
+
+#: app/views/popup.media.php:75
+msgid "Media types disabled by Administration."
+msgstr ""
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -13345,6 +13388,10 @@ msgstr ""
 msgid "Not classified"
 msgstr "Sem classificação"
 
+#: app/controllers/CControllerMediatypeEnable.php:95
+msgid "Not enabled"
+msgstr ""
+
 #: include/forms.inc.php:315
 msgid "Not inherited items"
 msgstr ""
@@ -13729,6 +13776,14 @@ msgstr ""
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Apenas são contabilizados triggers associados a hosts activos e que dependam de items activos"
 
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr ""
+
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -13943,6 +13998,10 @@ msgstr "Outros parâmetros"
 #: include/views/configuration.httpconf.edit.php:90
 msgid "Others"
 msgstr "Outros"
+
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr ""
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -14983,6 +15042,16 @@ msgstr "Nome do proxy"
 msgid "Proxy updated"
 msgstr "Proxy actualizado"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr ""
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -15636,6 +15705,10 @@ msgstr "Códigos de estado necessários"
 #: app/views/popup.httpstep.php:170
 msgid "Required string"
 msgstr "String obrigatória"
+
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr ""
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
@@ -21327,6 +21400,10 @@ msgstr ""
 msgid "a character string is expected"
 msgstr "um texto é esperado"
 
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr ""
@@ -22036,6 +22113,11 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
+msgstr ""
+
+#: app/views/administration.mediatype.list.php:98
+#: app/views/administration.mediatype.list.php:103
+msgid "email"
 msgstr ""
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
@@ -23539,6 +23621,11 @@ msgstr ""
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "via"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

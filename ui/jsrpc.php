@@ -662,12 +662,35 @@ switch ($data['method']) {
 				break;
 
 			case 'items':
+				$hostids = null;
+
+				if (array_key_exists('host_pattern', $data)) {
+					$host_pattern_multiple = array_key_exists('host_pattern_multiple', $data)
+						&& $data['host_pattern_multiple'] == 1;
+					$host_patterns = $host_pattern_multiple ? $data['host_pattern'] : [$data['host_pattern']];
+					$host_pattern_wildcard_enabled = array_key_exists('host_pattern_wildcard_allowed', $data)
+						&& !in_array('*', $host_patterns, true);
+
+					$hosts = API::Host()->get([
+						'output' => [],
+						'search' => [
+							'name' => $host_pattern_wildcard_enabled ? $host_patterns : null
+						],
+						'searchWildcardsEnabled' => $host_pattern_wildcard_enabled,
+						'searchByAny' => true,
+						'preservekeys' => true
+					]);
+
+					$hostids = array_keys($hosts);
+				}
+
 				$options = [
 					'output' => ['name'],
 					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
 					'searchWildcardsEnabled' => $wildcard_enabled,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
+					'hostids' => $hostids,
 					'webitems' => true,
 					'limit' => $limit
 				];
@@ -695,7 +718,7 @@ switch ($data['method']) {
 		];
 
 		if ($db_result) {
-			$db_result = array_flip(zbx_objectValues($db_result, 'name'));
+			$db_result = array_flip(array_column($db_result, 'name'));
 
 			if (array_key_exists($search, $db_result)) {
 				unset($db_result[$search]);
