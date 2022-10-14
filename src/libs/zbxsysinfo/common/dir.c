@@ -1050,12 +1050,12 @@ err1:
 	return ret;
 }
 
-static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
+static int	vfs_dir_count_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	return vfs_dir_info(request, result, timeout_event, 1);
 }
 
-static int	vfs_dir_get(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
+static int	vfs_dir_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	return vfs_dir_info(request, result, timeout_event, 0);
 }
