@@ -874,6 +874,11 @@ sub process_update_trigger_function($)
 	my $line = shift;
 	my $out = "";
 
+	if ($output{"database"} eq "c" || $output{"database"} eq "sqlite3")
+	{
+		return;
+	}
+
 	my ($original_column_name, $indexed_column_name, $idname, $func_name) = split(/\|/, $line, 4);
 
 	if ($output{"database"} eq "oracle")
