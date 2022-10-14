@@ -777,11 +777,11 @@ switch ($data['type']) {
 
 			// Trigger name form elements.
 			case CONDITION_TYPE_TRIGGER_NAME:
-				// Host name form elements.
+			// Host name form elements.
 			case CONDITION_TYPE_HOST_NAME:
-				// Host metadata form elements.
+			// Host metadata form elements.
 			case CONDITION_TYPE_HOST_METADATA:
-				// Service name form elements.
+			// Service name form elements.
 			case CONDITION_TYPE_SERVICE_NAME:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_LIKE))->setModern(true);
 				foreach ($operators_by_condition[$condition_type] as $key => $value) {

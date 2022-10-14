@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -16,8 +17,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+?>
+
 
 window.operation_popup = new class {
+
 	init({eventsource, recovery_phase, data, actionid}) {
 		this.recovery_phase = recovery_phase;
 		this.eventsource = eventsource;
@@ -75,34 +79,55 @@ window.operation_popup = new class {
 	}
 
 	_changeView(operation_type) {
-		switch (operation_type) {
-			case 'cmd[0]':
+		let type = parseInt(operation_type.replace(/\D/g, ''));
+
+		if ((/\b(scriptid)\b/g).test(operation_type)){
+			type = <?= 	OPERATION_TYPE_COMMAND ?>;
+		}
+
+		switch (type) {
+			case <?= OPERATION_TYPE_MESSAGE ?>:
 				this._sendMessageFields();
 				break;
-			case 'cmd[4]':
-			case 'cmd[5]':
+
+			case <?= OPERATION_TYPE_GROUP_ADD ?>:
+			case <?= OPERATION_TYPE_GROUP_REMOVE ?>:
 				this._hostGroupFields();
 				break;
-			case 'cmd[6]':
-			case 'cmd[7]':
+
+			case <?= OPERATION_TYPE_TEMPLATE_ADD ?>:
+			case <?= OPERATION_TYPE_TEMPLATE_REMOVE ?>:
 				this._templateFields();
 				break;
-			case 'cmd[10]':
+
+			case <?= OPERATION_TYPE_HOST_INVENTORY ?>:
 				this._hostInventoryFields();
 				break;
-			case 'cmd[11]':
+
+			case <?= OPERATION_TYPE_RECOVERY_MESSAGE ?>:
 				this._allInvolvedRecoveryFields();
 				break;
-			case 'cmd[12]':
+
+			case <?= OPERATION_TYPE_UPDATE_MESSAGE ?>:
 				this._allInvolvedFieldsUpdate();
 				break;
-			case 'cmd[2]':
-			case 'cmd[3]':
-			case 'cmd[8]':
-			case 'cmd[9]':
+
+			case <?= OPERATION_TYPE_HOST_ADD ?>:
+			case <?= OPERATION_TYPE_HOST_REMOVE ?>:
+			case <?= OPERATION_TYPE_HOST_ENABLE ?>:
+			case <?= OPERATION_TYPE_HOST_DISABLE ?>:
 				break;
-			default:
+
+			case <?= OPERATION_TYPE_UPDATE_MESSAGE ?>:
+				this._allInvolvedFieldsUpdate();
+				break;
+
+			case <?= OPERATION_TYPE_COMMAND ?>:
 				this._addScriptFields();
+				break;
+
+			default:
+				this._sendMessageFields();
 				break;
 		}
 	}
@@ -436,9 +461,10 @@ window.operation_popup = new class {
 		const cell = document.createElement('td');
 		if (input.conditiontype == <?= CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
 			if (input.value == 1) {
-				cell.append('Event is acknowledged');
-			} else if (input.value == 0) {
-				cell.append('Event is not acknowledged');
+				cell.append(<?= json_encode(_('Event is acknowledged')) ?> + ' ');
+			}
+			else if (input.value == 0) {
+				cell.append(<?= json_encode(_('Event is not acknowledged')) ?> + ' ');
 			}
 		}
 		return cell;

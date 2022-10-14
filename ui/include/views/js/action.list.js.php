@@ -26,6 +26,7 @@
 
 <script>
 	const view = new class {
+
 		init({eventsource}) {
 			this.eventsource = eventsource;
 			this._initActions();

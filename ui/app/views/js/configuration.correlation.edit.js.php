@@ -126,7 +126,7 @@
 		cell.appendChild(createHiddenInput('operator' ,input.operator));
 
 		if (input.type == <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?>) {
-			span.append('Value of old event tag ');
+			span.append(<?= json_encode(_('Value of old event tag')) ?> + ' ');
 
 			value2.textContent = input.oldtag;
 			span.append(value2)
@@ -140,7 +140,7 @@
 			cell.appendChild(createHiddenInput('newtag',input.newtag));
 		}
 		else if (input.type == <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>) {
-			span.append('Old event tag name ');
+			span.append(<?= json_encode(_('Old event tag name')) ?> + ' ');
 
 			span.append(input.operator_name[input.operator] + ' ');
 
@@ -149,7 +149,7 @@
 			cell.appendChild(createHiddenInput('tag', input.tag));
 		}
 		else if (input.type == <?= ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP ?>) {
-			span.append('New event host group ');
+			span.append(<?= json_encode(_('New event host group')) ?> + ' ');
 
 			span.append(input.operator_name[input.operator] + ' ');
 
@@ -157,7 +157,7 @@
 			span.append(value);
 		}
 		else if (input.type == <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>) {
-			span.append('New event tag name ');
+			span.append(<?= json_encode(_('New event tag name')) ?> + ' ');
 
 			span.append(input.operator_name[input.operator] + ' ');
 
@@ -166,7 +166,7 @@
 			cell.appendChild(createHiddenInput('tag', input.tag));
 		}
 		else if (input.type == <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE?>) {
-			span.append('Value of old event tag ');
+			span.append(<?= json_encode(_('Value of old event tag')) ?> + ' ');
 
 			value2.textContent = input.tag;
 			span.append(value2)
@@ -180,7 +180,7 @@
 			cell.appendChild(createHiddenInput('value',input.value));
 		}
 		else if (input.type == <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE?>) {
-			span.append('Value of new event tag ');
+			span.append(<?= json_encode(_('Value of new event tag')) ?> + ' ');
 
 			value2.textContent = input.tag;
 			span.append(value2)
@@ -213,7 +213,7 @@
 		jQuery('#clone').click(function() {
 			jQuery('#correlationid, #delete, #clone').remove();
 			jQuery('#update')
-				.text(t('Add'))
+				.text(<?= json_encode(_s('Add')) ?>)
 				.val('correlation.create')
 				.attr({id: 'add'});
 

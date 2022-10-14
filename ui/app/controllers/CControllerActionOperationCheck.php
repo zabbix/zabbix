@@ -20,16 +20,16 @@
 
 
 class CControllerActionOperationCheck extends CController {
-	protected function init(): void
-	{
+
+	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableSIDvalidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
-			'operation' => 'array',
-			'actionid'	=> 'db actions.actionid'
+			'operation' =>	'array',
+			'actionid' =>	'db actions.actionid'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateOperation();
@@ -198,7 +198,7 @@ class CControllerActionOperationCheck extends CController {
 		return true;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN) {
 			if (!$this->getInput('actionid', '0')) {
 				return true;
@@ -214,7 +214,7 @@ class CControllerActionOperationCheck extends CController {
 		return false;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$operation = $this->getInput('operation');
 		$operationtype = preg_replace('[\D]', '', $operation['operationtype']);
 
@@ -261,7 +261,7 @@ class CControllerActionOperationCheck extends CController {
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
 
-	protected function createStartInColumn($operation):string {
+	protected function createStartInColumn($operation): string {
 		$operation_type = $this->getInput('operation')['recovery'];
 		$previous_operations = [];
 
@@ -283,7 +283,7 @@ class CControllerActionOperationCheck extends CController {
 			);
 	}
 
-	protected function createStepsColumn($operation):string {
+	protected function createStepsColumn($operation): string {
 		$steps = '';
 		$step_from = $operation['esc_step_from'];
 		if ($operation['esc_step_from'] < 1) {
@@ -299,7 +299,7 @@ class CControllerActionOperationCheck extends CController {
 		return $steps;
 	}
 
-	protected function createDurationColumn($step_duration):string {
+	protected function createDurationColumn($step_duration): string {
 		return $step_duration === '0'
 			? 'Default'
 			: $step_duration;

@@ -20,19 +20,20 @@
 
 
 class CControllerPopupActionOperationEdit extends CController {
+
 	protected function checkInput(): bool {
 		$fields = [
-			'eventsource' => 'required|in '.implode(',', [
-				EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL,
-				EVENT_SOURCE_SERVICE
-			]),
-			'recovery' => 'required|in '.implode(',', [
-				ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION
-			]),
-			'actionid' => 'db actions.actionid',
-			'operation' => 'array',
-			'operationid' => 'string',
-			'data' => 'array'
+			'eventsource' =>	'required|in '.implode(',', [
+									EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+									EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+								]),
+			'recovery' =>		'required|in '.implode(',', [
+									ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION
+								]),
+			'actionid' =>		'db actions.actionid',
+			'operation' =>		'array',
+			'operationid' =>	'string',
+			'data' =>			'array'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateInputConstraints();
@@ -155,6 +156,50 @@ class CControllerPopupActionOperationEdit extends CController {
 				]);
 			}
 			return $template;
+		}
+
+		if ($operation['opmessage_grp']) {
+			$i = 0;
+
+			foreach ($operation['opmessage_grp'] as $opmessage_grp) {
+				$usr_grpids = $opmessage_grp['usrgrpid'];
+
+				$user_groups = API::UserGroup()->get([
+					'output' => ['name'],
+					'usrgrpids' => $usr_grpids,
+					'preservekeys' => true
+				]);
+
+				foreach ($user_groups as $user_group) {
+
+					$operation['opmessage_grp'][$i]['name'] = $user_group['name'];
+					$i++;
+				}
+			}
+			return $user_group;
+		}
+
+		if ($operation['opmessage_usr']) {
+			$i = 0;
+			foreach ($operation['opmessage_usr'] as $opmessage_usr) {
+				$userids = $opmessage_usr['userid'];
+
+				$fullnames = [];
+
+				$users = API::User()->get([
+					'output' => ['userid', 'username', 'name', 'surname'],
+					'userids' => $userids
+				]);
+
+				foreach ($users as $user) {
+					$fullnames[$user['userid']] = getUserFullname($user);
+					sdff($fullnames);
+
+					$operation['opmessage_usr'][$i]['name'] = $fullnames[$opmessage_usr['userid']];
+					$i++;
+				}
+			}
+			return $fullnames[$opmessage_usr['userid']];
 		}
 
 		return $host;

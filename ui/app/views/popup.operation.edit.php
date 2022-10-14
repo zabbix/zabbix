@@ -112,27 +112,6 @@ $usergroup_table = (new CTable())
 		))->setId('operation-message-user-groups-footer')
 	);
 
-if (array_key_exists('opmessage_grp', $operation)) {
-	$i = 0;
-
-	foreach ($operation['opmessage_grp'] as $opmessage_grp) {
-		$usr_grpids = $opmessage_grp['usrgrpid'];
-
-		$user_groups = API::UserGroup()->get([
-			'output' => ['name'],
-			'usrgrpids' => $usr_grpids,
-			'preservekeys' => true
-		]);
-
-		foreach ($user_groups as $user_group) {
-			foreach ($operation['opmessage_grp'] as $group)
-
-			$operation['opmessage_grp'][$i]['name'] = $user_group['name'];
-			$i++;
-		}
-	}
-}
-
 $form_grid->addItem([
 	(new CLabel(_('Send to user groups')))->setId('operation-message-user-groups-label'),
 	(new CFormField(
@@ -146,27 +125,6 @@ $form_grid->addItem([
 $user_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([_('User'), _('Action')]);
-
-if (array_key_exists('opmessage_usr', $operation)) {
-	$i = 0;
-	foreach ($operation['opmessage_usr'] as $opmessage_usr) {
-		$userids = $opmessage_usr['userid'];
-
-		$fullnames = [];
-
-		$users = API::User()->get([
-			'output' => ['userid', 'username', 'name', 'surname'],
-			'userids' => $userids
-		]);
-
-		foreach ($users as $user) {
-			$fullnames[$user['userid']] = getUserFullname($user);
-
-			$operation['opmessage_usr'][$i]['name'] = $fullnames[$opmessage_usr['userid']];
-			$i++;
-		}
-	}
-}
 
 $user_table->addRow(
 	(new CRow(
@@ -457,7 +415,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS && $data['recovery'] == ACTION
 			->setId('operation-condition-table')
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-
 	]);
 }
 
@@ -483,7 +440,7 @@ $output = [
 			'recovery_phase' => $data['recovery'],
 			'data' => $operation,
 			'actionid' => $data['actionid']
-		]).');',
+		]).');'
 ];
 
 echo json_encode($output);

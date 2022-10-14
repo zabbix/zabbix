@@ -56,13 +56,13 @@ class CRouter {
 	private $routes = [
 		// action									controller												layout					view
 		'action.create'								=> ['CControllerActionCreate',							'layout.json',			null],
-		'action.enable'								=> ['CControllerActionEnable',							null,					null],
 		'action.delete'								=> ['CControllerActionDelete',							'layout.json',			null],
 		'action.disable'							=> ['CControllerActionDisable',							null,					null],
-		'action.update'								=> ['CControllerActionUpdate',							'layout.json',			null],
+		'action.enable'								=> ['CControllerActionEnable',							null,					null],
 		'action.list'								=> ['CControllerActionList',							'layout.htmlpage',		'action.list'],
-		'action.operation.condition.check'			=> ['CControllerActionOperationConditionCheck',			'layout.json',			null],
 		'action.operation.check'					=> ['CControllerActionOperationCheck',					'layout.json',			null],
+		'action.operation.condition.check'			=> ['CControllerActionOperationConditionCheck',			'layout.json',			null],
+		'action.update'								=> ['CControllerActionUpdate',							'layout.json',			null],
 		'audit.settings.edit'						=> ['CControllerAuditSettingsEdit',						'layout.htmlpage',		'administration.audit.settings.edit'],
 		'audit.settings.update'						=> ['CControllerAuditSettingsUpdate',					null,					null],
 		'auditlog.list'								=> ['CControllerAuditLogList',							'layout.htmlpage',		'reports.auditlog.list'],

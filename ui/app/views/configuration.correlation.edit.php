@@ -23,7 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('popup.condition.common.js');
 $this->includeJsFile('configuration.correlation.edit.js.php');
 
 $widget = (new CWidget())

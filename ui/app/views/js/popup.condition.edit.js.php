@@ -19,16 +19,18 @@
 **/
 ?>
 
+
 window.condition_popup = new class {
+
 	init() {
-		if (overlays_stack.stack[0] === 'event_corr_condition') {
-			this.overlay = overlays_stack.getById('event_corr_condition');
-		}
-		if (overlays_stack.stack[0] === 'action-edit') {
-			this.overlay = overlays_stack.getById('action-condition');
-		}
 		if (overlays_stack.stack.includes('operation-condition')) {
 			this.overlay = overlays_stack.getById('operation-condition');
+		}
+		else if (overlays_stack.stack[0] === 'event_corr_condition') {
+			this.overlay = overlays_stack.getById('event_corr_condition');
+		}
+		else if (overlays_stack.stack[0] === 'action-edit') {
+			this.overlay = overlays_stack.getById('action-condition');
 		}
 
 		this.dialogue = this.overlay.$dialogue[0];

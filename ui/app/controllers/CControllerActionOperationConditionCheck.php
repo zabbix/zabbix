@@ -20,32 +20,26 @@
 **/
 
 
-/**
- * Actions new condition popup.
- */
-
-class CControllerActionOperationConditionCheck extends CController
-{
-	protected function init(): void
-	{
+class CControllerActionOperationConditionCheck extends CController {
+	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableSIDvalidation();
 	}
 
-	protected function checkInput(): bool
-	{
+	protected function checkInput(): bool {
 		$fields = [
-			'actionid' => 'db actions.actionid',
-			'type' => 'required|in ' . ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
-			'source' => 'required|in ' .  EVENT_SOURCE_TRIGGERS,
-			'condition_type' => 'in ' . CONDITION_TYPE_EVENT_ACKNOWLEDGED,
-			'operator' => 'in ' . implode(',', [
-					CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-					CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_IN, CONDITION_OPERATOR_MORE_EQUAL,
-					CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_NOT_IN, CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO,
-					CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP
-				]),
-			'value' => ''
+			'actionid' =>		'db actions.actionid',
+			'type' =>			'required|in ' . ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
+			'source' =>			'required|in ' .  EVENT_SOURCE_TRIGGERS,
+			'condition_type' =>	'in ' . CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+			'operator' =>		'in ' . implode(',', [
+									CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
+									CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_IN,
+									CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL,
+									CONDITION_OPERATOR_NOT_IN, CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO,
+									CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP
+								]),
+			'value' =>			'not_empty'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -63,17 +57,14 @@ class CControllerActionOperationConditionCheck extends CController
 		return $ret;
 	}
 
-	protected function checkPermissions(): bool
-	{
+	protected function checkPermissions(): bool {
 		return ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN);
 	}
-
 
 	/**
 	 * @throws JsonException
 	 */
-	protected function doAction(): void
-	{
+	protected function doAction(): void {
 		$data = [
 			'title' => _('New condition'),
 			'command' => '',

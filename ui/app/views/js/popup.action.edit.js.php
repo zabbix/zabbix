@@ -17,10 +17,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
 ?>
 
+
 window.action_edit_popup = new class {
+
 	init({condition_operators, condition_types, conditions, actionid, eventsource}) {
 		this.overlay = overlays_stack.getById('action-edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -73,7 +74,8 @@ window.action_edit_popup = new class {
 				actionid: this.actionid,
 				data: data
 			}
-		} else {
+		}
+		else {
 			this.parameters = {
 				eventsource: this.eventsource,
 				recovery: operation_data.operationtype,
@@ -239,29 +241,28 @@ window.action_edit_popup = new class {
 	}
 
 	_isTriggerOrInternalOrServiceEventSource() {
-			return this.eventsource == <?=EVENT_SOURCE_TRIGGERS?>
-				|| this.eventsource == <?=EVENT_SOURCE_INTERNAL?>
-				|| this.eventsource == <?=EVENT_SOURCE_SERVICE?>;
+		return this.eventsource == <?=EVENT_SOURCE_TRIGGERS?>
+			|| this.eventsource == <?=EVENT_SOURCE_INTERNAL?>
+			|| this.eventsource == <?=EVENT_SOURCE_SERVICE?>;
 	}
 
 	_createOperationsRow(input, row_id = null) {
 		const operation_data = input.detail.operation;
-
 		this.recovery = input.detail.operation.recovery;
-
-		let table_id, row_id_prefix;
+		let table_id;
+		let row_id_prefix;
 
 		if (this._isRecoveryOperation()) {
 			table_id = 'rec-table';
 			row_id_prefix = 'recovery_operations_';
 		}
 
-		if (this._isUpdateOperation()) {
+		else if (this._isUpdateOperation()) {
 			table_id = 'upd-table';
 			row_id_prefix = 'update_operations_';
 		}
 
-		if (this._isActionOperation()) {
+		else if (this._isActionOperation()) {
 			table_id = 'op-table';
 			row_id_prefix = 'operations_';
 		}
@@ -298,7 +299,8 @@ window.action_edit_popup = new class {
 
 		if (row_id) {
 			$(`#${row_id}`).replaceWith(this.operation_row);
-		} else {
+		}
+		else {
 			$(`#${table_id} tr:last`).before(this.operation_row);
 		}
 
@@ -311,7 +313,6 @@ window.action_edit_popup = new class {
 		rows.each(index => {
 			$(rows[index])
 				.attr('id', prefix.concat(index))
-			//.attr('data-id', index)
 		});
 	}
 
@@ -324,7 +325,8 @@ window.action_edit_popup = new class {
 
 		if (this.recovery === <?= ACTION_RECOVERY_OPERATION ?>) {
 			this.recovery_prefix = 'recovery_'
-		} else if (this.recovery === <?= ACTION_UPDATE_OPERATION ?>) {
+		}
+		else if (this.recovery === <?= ACTION_UPDATE_OPERATION ?>) {
 			this.recovery_prefix = 'update_'
 		}
 
@@ -347,7 +349,8 @@ window.action_edit_popup = new class {
 
 		if (this.recovery == <?= ACTION_RECOVERY_OPERATION ?>) {
 			this.recovery_prefix = 'recovery_'
-		} else if (this.recovery == <?= ACTION_UPDATE_OPERATION ?>) {
+		}
+		else if (this.recovery == <?= ACTION_UPDATE_OPERATION ?>) {
 			this.recovery_prefix = 'update_'
 		}
 
@@ -391,9 +394,11 @@ window.action_edit_popup = new class {
 	_addUserFields(index, name, value, group) {
 		if (this.recovery == <?=ACTION_OPERATION?>) {
 			this.prefix = ''
-		} else if (this.recovery == <?=ACTION_RECOVERY_OPERATION?>) {
+		}
+		else if (this.recovery == <?=ACTION_RECOVERY_OPERATION?>) {
 			this.prefix = 'recovery_'
-		} else if (this.recovery == <?=ACTION_UPDATE_OPERATION?>) {
+		}
+		else if (this.recovery == <?=ACTION_UPDATE_OPERATION?>) {
 			this.prefix = 'update_'
 		}
 
@@ -471,7 +476,8 @@ window.action_edit_popup = new class {
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
 					messages = exception.error.messages;
-				} else {
+				}
+				else {
 					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 				}
 

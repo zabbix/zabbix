@@ -20,23 +20,24 @@
 
 
 class CControllerActionList extends CController {
+
 	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
-			'eventsource'=> 'in '.implode(',', [
-					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL,
-					EVENT_SOURCE_SERVICE
-			]),
-			'g_actionid' => 'array_id',
-			'filter_set' => 'in 1',
-			'filter_rst' =>	'in 1',
-			'filter_name' =>'string',
-			'sort' => 'in '.implode(',', ['name', 'status']),
-			'sortorder' => 'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
-			'filter_status' =>'in '.implode(',', [-1, ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED])
+			'eventsource' =>	'in '.implode(',', [
+									EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+									EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+								]),
+			'g_actionid' =>		'array_id',
+			'filter_set' =>		'in 1',
+			'filter_rst' =>		'in 1',
+			'filter_name' =>	'string',
+			'sort' =>			'in '.implode(',', ['name', 'status']),
+			'sortorder' =>		'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
+			'filter_status' =>	'in '.implode(',', [-1, ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED])
 		];
 		$ret = $this->validateInput($fields);
 
@@ -117,11 +118,11 @@ class CControllerActionList extends CController {
 		$data['actions'] = API::Action()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'search' => [
-				'name' => ($filter['name'] === '') ? null : $filter['name']
+				'name' => $filter['name'] === '' ? null : $filter['name']
 			],
 			'filter' => [
 				'eventsource' => $data['eventsource'],
-				'status' => ($filter['status'] == -1) ? null : $filter['status']
+				'status' => $filter['status'] == -1 ? null : $filter['status']
 			],
 			'selectFilter' => ['formula', 'conditions', 'evaltype'],
 			'selectOperations' => API_OUTPUT_EXTEND,

@@ -20,13 +20,14 @@
 
 
 class CControllerActionEnable extends CController {
+
 	protected function checkInput(): bool {
 		$fields = [
-			'eventsource'=> 'in '.implode(',', [
-					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
-					EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
-			]),
-			'g_actionid' => 'array_id|required|not_empty'
+			'eventsource' =>	'in '.implode(',', [
+									EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+									EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+								]),
+			'g_actionid' =>		'array_id|required|not_empty'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -46,31 +47,25 @@ class CControllerActionEnable extends CController {
 
 	protected function checkPermissions(): bool {
 		$eventsource = $this->getInput('eventsource');
-		$has_permission = false;
 
 		switch ($eventsource) {
 			case EVENT_SOURCE_TRIGGERS:
-				$has_permission = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
 
 			case EVENT_SOURCE_DISCOVERY:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
 
 			case EVENT_SOURCE_AUTOREGISTRATION:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
 
 			case EVENT_SOURCE_INTERNAL:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
 
 			case EVENT_SOURCE_SERVICE:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
 		}
 
-		return $has_permission;
+		return false;
 	}
 
 	protected function doAction(): void {

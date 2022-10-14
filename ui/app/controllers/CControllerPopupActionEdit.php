@@ -20,21 +20,22 @@
 
 
 class CControllerPopupActionEdit extends CController {
+
 	protected function checkInput(): bool {
 		$fields = [
-			'eventsource' => 'in '.implode(',', [
-					EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
-					EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
-				]),
-			'g_actionid' => 'array_id',
-			'actionid' => 'string',
-			'filter_set' => 'string',
-			'filter_rst' =>	'string',
-			'form_refresh' => 'string',
-			'add_condition' => 'string',
-			'filter_name' =>'string',
-			'new_condition' => 'string',
-			'filter_status' =>'in '.implode(',', [-1, ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED])
+			'eventsource' =>	'in '.implode(',', [
+									EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+									EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+								]),
+			'g_actionid' =>		'array_id',
+			'actionid' =>		'string',
+			'filter_set' =>		'string',
+			'filter_rst' =>		'string',
+			'form_refresh' =>	'string',
+			'add_condition' =>	'string',
+			'filter_name' =>	'string',
+			'new_condition' =>	'string',
+			'filter_status' =>	'in '.implode(',', [-1, ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED])
 		];
 
 		$ret = $this->validateInput($fields);
