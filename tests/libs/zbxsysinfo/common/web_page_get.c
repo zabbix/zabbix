@@ -23,6 +23,7 @@
 
 #include "zbxcomms.h"
 #include "zbxsysinfo.h"
+#include "../../../../src/libs/zbxsysinfo/sysinfo.h"
 #include "../../../../src/libs/zbxsysinfo/common/http.h"
 
 #ifndef HAVE_LIBCURL

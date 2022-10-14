@@ -29,20 +29,20 @@
 
 static char	*called_key = NULL;
 
-int	__wrap_SYSTEM_LOCALTIME(const char *command, AGENT_RESULT *result);
-int	__wrap_VFS_FILE_SIZE(const char *command, AGENT_RESULT *result);
-int	__wrap_VFS_FILE_TIME(const char *command, AGENT_RESULT *result);
-int	__wrap_VFS_FILE_EXISTS(const char *command, AGENT_RESULT *result);
-int	__wrap_VFS_FILE_CONTENTS(const char *command, AGENT_RESULT *result);
-int	__wrap_VFS_FILE_REGEXP(const char *command, AGENT_RESULT *result);
-int	__wrap_VFS_FILE_REGMATCH(const char *command, AGENT_RESULT *result);
-int	__wrap_VFS_FILE_MD5SUM(const char *command, AGENT_RESULT *result);
-int	__wrap_VFS_FILE_CKSUM(const char *command, AGENT_RESULT *result);
-int	__wrap_VFS_DIR_SIZE(const char *command, AGENT_RESULT *result);
-int	__wrap_NET_DNS(const char *command, AGENT_RESULT *result);
-int	__wrap_NET_DNS_RECORD(const char *command, AGENT_RESULT *result);
-int	__wrap_NET_TCP_PORT(const char *command, AGENT_RESULT *result);
-int	__wrap_SYSTEM_USERS_NUM(const char *command, AGENT_RESULT *result);
+int	__wrap_system_localtime(const char *command, AGENT_RESULT *result);
+int	__wrap_vfs_file_size(const char *command, AGENT_RESULT *result);
+int	__wrap_vfs_file_time(const char *command, AGENT_RESULT *result);
+int	__wrap_vfs_file_exists(const char *command, AGENT_RESULT *result);
+int	__wrap_vfs_file_contents(const char *command, AGENT_RESULT *result);
+int	__wrap_vfs_file_regexp(const char *command, AGENT_RESULT *result);
+int	__wrap_vfs_file_regmatch(const char *command, AGENT_RESULT *result);
+int	__wrap_vfs_file_md5sum(const char *command, AGENT_RESULT *result);
+int	__wrap_vfs_file_cksum(const char *command, AGENT_RESULT *result);
+int	__wrap_vfs_dir_size(const char *command, AGENT_RESULT *result);
+int	__wrap_net_dns(const char *command, AGENT_RESULT *result);
+int	__wrap_net_dns_record(const char *command, AGENT_RESULT *result);
+int	__wrap_net_tcp_port(const char *command, AGENT_RESULT *result);
+int	__wrap_system_users_num(const char *command, AGENT_RESULT *result);
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -83,7 +83,7 @@ void	zbx_mock_test_entry(void **state)
 	}
 }
 
-int	__wrap_SYSTEM_LOCALTIME(const char *command, AGENT_RESULT *result)
+int	__wrap_system_localtime(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -93,7 +93,7 @@ int	__wrap_SYSTEM_LOCALTIME(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_VFS_FILE_SIZE(const char *command, AGENT_RESULT *result)
+int	__wrap_vfs_file_size(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -103,7 +103,7 @@ int	__wrap_VFS_FILE_SIZE(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_VFS_FILE_TIME(const char *command, AGENT_RESULT *result)
+int	__wrap_vfs_file_time(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -113,7 +113,7 @@ int	__wrap_VFS_FILE_TIME(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_VFS_FILE_EXISTS(const char *command, AGENT_RESULT *result)
+int	__wrap_vfs_file_exists(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -123,7 +123,7 @@ int	__wrap_VFS_FILE_EXISTS(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_VFS_FILE_CONTENTS(const char *command, AGENT_RESULT *result)
+int	__wrap_vfs_file_contents(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -133,7 +133,7 @@ int	__wrap_VFS_FILE_CONTENTS(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_VFS_FILE_REGEXP(const char *command, AGENT_RESULT *result)
+int	__wrap_vfs_file_regexp(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -143,7 +143,7 @@ int	__wrap_VFS_FILE_REGEXP(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_VFS_FILE_REGMATCH(const char *command, AGENT_RESULT *result)
+int	__wrap_vfs_file_regmatch(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -153,7 +153,7 @@ int	__wrap_VFS_FILE_REGMATCH(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_VFS_FILE_MD5SUM(const char *command, AGENT_RESULT *result)
+int	__wrap_vfs_file_md5sum(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -163,7 +163,7 @@ int	__wrap_VFS_FILE_MD5SUM(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_VFS_FILE_CKSUM(const char *command, AGENT_RESULT *result)
+int	__wrap_vfs_file_cksum(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -173,7 +173,7 @@ int	__wrap_VFS_FILE_CKSUM(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_VFS_DIR_SIZE(const char *command, AGENT_RESULT *result)
+int	__wrap_vfs_dir_size(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -183,7 +183,7 @@ int	__wrap_VFS_DIR_SIZE(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_NET_DNS(const char *command, AGENT_RESULT *result)
+int	__wrap_net_dns(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -193,7 +193,7 @@ int	__wrap_NET_DNS(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_NET_DNS_RECORD(const char *command, AGENT_RESULT *result)
+int	__wrap_net_dns_record(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -203,7 +203,7 @@ int	__wrap_NET_DNS_RECORD(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_NET_TCP_PORT(const char *command, AGENT_RESULT *result)
+int	__wrap_net_tcp_port(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -213,7 +213,7 @@ int	__wrap_NET_TCP_PORT(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_SYSTEM_USERS_NUM(const char *command, AGENT_RESULT *result)
+int	__wrap_system_users_num(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);

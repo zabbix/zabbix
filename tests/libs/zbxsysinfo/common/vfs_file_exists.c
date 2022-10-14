@@ -23,6 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxsysinfo.h"
+#include "../../../../src/libs/zbxsysinfo/sysinfo.h"
 #include "file.h"
 
 #define TEST_NAME "VFS_FILE_EXISTS"

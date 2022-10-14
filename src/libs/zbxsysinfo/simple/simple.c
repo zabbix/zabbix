@@ -305,7 +305,7 @@ static int	validate_imap(const char *line)
 	return 0 == strncmp(line, "* OK", 4) ? ZBX_TCP_EXPECT_OK : ZBX_TCP_EXPECT_FAIL;
 }
 
-static int	check_service_local(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf)
+int	check_service_default_addr(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf)
 {
 	unsigned short	port = 0;
 	char		*service, *ip_str, ip[ZBX_MAX_DNSNAME_LEN + 1], *port_str;
@@ -495,10 +495,10 @@ static int	check_service_local(AGENT_REQUEST *request, const char *default_addr,
 
 int	check_service(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return check_service_local(request, "127.0.0.1", result, 0);
+	return check_service_default_addr(request, "127.0.0.1", result, 0);
 }
 
 int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return check_service_local(request, "127.0.0.1", result, 1);
+	return check_service_default_addr(request, "127.0.0.1", result, 1);
 }

@@ -217,12 +217,12 @@ int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t
 
 	if (0 == strcmp(request.key, "net.tcp.service") || 0 == strcmp(request.key, "net.udp.service"))
 	{
-		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, result, 0))
+		if (SYSINFO_RET_OK == check_service_default_addr(&request, item->interface.addr, result, 0))
 			ret = SUCCEED;
 	}
 	else if (0 == strcmp(request.key, "net.tcp.service.perf") || 0 == strcmp(request.key, "net.udp.service.perf"))
 	{
-		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, result, 1))
+		if (SYSINFO_RET_OK == check_service_default_addr(&request, item->interface.addr, result, 1))
 			ret = SUCCEED;
 	}
 	else if (SUCCEED == get_vmware_function(request.key, &vmfunc))
