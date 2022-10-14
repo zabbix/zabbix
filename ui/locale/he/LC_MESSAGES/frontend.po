@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2022-10-03 20:12+0000\n"
+"PO-Revision-Date: 2022-10-12 08:30+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12918,7 +12918,7 @@ msgstr "רק הקפצות שמוקצות למארחים מופעלים שתלו�
 
 #: app/views/popup.mediatypetest.edit.php:52
 msgid "Open log"
-msgstr ""
+msgstr "פתיחת היומן"
 
 #: include/httptest.inc.php:430
 msgid "Opera"
