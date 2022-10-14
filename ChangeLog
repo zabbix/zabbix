@@ -2647,6 +2647,8 @@ Changes for 5.0.29rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
+A......... [ZBX-19224] added ability to unset headers in web scenario (rlataria)
 ..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
 .........T [ZBX-21484] updated documentation for templates SMART by Zabbix agent 2 (atocko)
 ........S. [ZBX-21537] fixed history syncers being stuck waiting on system information being collected (vso)
