@@ -70,7 +70,7 @@ system_localtime_LDADD = \
 
 system_localtime_LDADD += @AGENT_LIBS@
 
-system_localtime_LDFLAGS = @AGENT_LDFLAGS@ $(SYSTEM_LOCALTIME_WRAP_FUNCS)
+system_localtime_LDFLAGS = @AGENT_LDFLAGS@ $(system_localtime_WRAP_FUNCS)
 
 system_localtime_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
