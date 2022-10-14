@@ -56,12 +56,12 @@ class CControllerModuleScan extends CController {
 		$module_manager = new CModuleManager(APP::getRootDir());
 
 		foreach (['widgets', 'modules'] as $modules_dir) {
-			foreach (new DirectoryIterator(APP::getRootDir().'/'.$modules_dir) as $dir) {
-				if (!$dir->isDir() || $dir->isDot()) {
+			foreach (new DirectoryIterator(APP::getRootDir().'/'.$modules_dir) as $item) {
+				if (!$item->isDir() || $item->isDot()) {
 					continue;
 				}
 
-				$relative_path = $modules_dir.'/'.$dir->getFilename();
+				$relative_path = $modules_dir.'/'.$item->getFilename();
 
 				$manifest = $module_manager->addModule($relative_path);
 
