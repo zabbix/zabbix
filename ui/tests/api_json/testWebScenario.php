@@ -199,6 +199,10 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'header_name-symbols☺æų""\\//!@#$%^&*()_+',
 							'value' => 'header_value-symbols☺æų""\\//!@#$%^&*()_+'
+						],
+						[
+							'name' => 'header_name-without-value',
+							'value' => ''
 						]
 					],
 					'variables' => [
@@ -733,27 +737,6 @@ class testWebScenario extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/delay": a time unit is expected.'
 			],
 			// Check web headers.
-			[
-				'httptest' => [
-					'name' => 'Api web with wrong headers',
-					'headers' => [
-						['name' => '☺', 'value' => '']
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/headers/1/value": cannot be empty.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with empty headers value',
-					'headers' => [
-						[
-							'name' => 'login',
-							'value' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/headers/1/value": cannot be empty.'
-			],
 			[
 				'httptest' => [
 					'name' => 'Api web with empty headers name',

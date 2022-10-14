@@ -12815,6 +12815,10 @@ msgstr "Hanya sekitar 20%% indikator yang ditampilkan."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Hanya trigger yang ditugaskan ke host aktif dan tergantung pada item aktif yang dihitung."
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:430
 msgid "Opera"
 msgstr "Opera"

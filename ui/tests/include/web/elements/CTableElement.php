@@ -35,7 +35,7 @@ class CTableElement extends CElement {
 	protected $selectors = [
 		'header' => 'xpath:./thead/tr/th',
 		'row' => 'xpath:./tbody/tr',
-		'column' => 'xpath:./td'
+		'column' => 'xpath:./*'
 	];
 
 	/**

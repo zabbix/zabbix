@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 /**
  * @onBefore removeGuestFromDisabledGroup
  * @onAfter addGuestToDisabledGroup
+ * @dataSource LoginUsers
  */
 class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
@@ -353,7 +354,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 			[
 				[
 					'user' => 'local.com\\test-user',
-					'password' => 'zabbix',
+					'password' => 'zabbix12345',
 					'file' => 'htaccess',
 					'http_authentication' => [
 						'Enable HTTP authentication' => true,
@@ -612,7 +613,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 		$form->submit();
 
 		// Check DB configuration.
-		$defautl_values = [
+		$default_values = [
 			'authentication_type' => '0',
 			'ldap_host' => '',
 			'ldap_port' => '389',
@@ -628,7 +629,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 				'http_strip_domains,http_case_sensitive'.
 				' FROM config';
 		$result = CDBHelper::getRow($sql);
-		$this->assertEquals(array_merge($defautl_values, $data['db_check']), $result);
+		$this->assertEquals(array_merge($default_values, $data['db_check']), $result);
 
 		$this->page->logout();
 	}

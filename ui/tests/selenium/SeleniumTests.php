@@ -20,7 +20,6 @@
 
 require_once dirname(__FILE__).'/testGeneric.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
-require_once dirname(__FILE__).'/testPageDashboard.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
 require_once dirname(__FILE__).'/testPageOverview.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
@@ -165,9 +164,14 @@ require_once dirname(__FILE__).'/testZBX6663.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardFavoriteGraphsWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardFavoriteMapsWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardForm.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardViewMode.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardTriggerOverviewWidget.php';
 require_once dirname(__FILE__).'/testSID.php';
 
 use PHPUnit\Framework\TestSuite;
@@ -189,7 +193,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
 		$suite->addTestSuite('testPageAdministrationScripts');
 		$suite->addTestSuite('testPageAvailabilityReport');
-		$suite->addTestSuite('testPageDashboard');
 		$suite->addTestSuite('testPageDashboardWidgets');
 		$suite->addTestSuite('testPageEventCorrelation');
 		$suite->addTestSuite('testPageGraphPrototypes');
@@ -323,9 +326,14 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardCopyWidgets');
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
+		$suite->addTestSuite('testDashboardFavoriteGraphsWidget');
+		$suite->addTestSuite('testDashboardFavoriteMapsWidget');
+		$suite->addTestSuite('testDashboardForm');
+		$suite->addTestSuite('testDashboardViewMode');
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testSID');
 
 		return $suite;

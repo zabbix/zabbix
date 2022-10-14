@@ -12927,6 +12927,10 @@ msgstr "Индикаторът показва само последните 20%%
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Преброени са само тригерите възложени за активни хостове и зависими от активни елементи на данните"
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:430
 msgid "Opera"
 msgstr "Opera"
