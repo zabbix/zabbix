@@ -247,9 +247,7 @@ window.action_edit_popup = new class {
 	_createOperationsRow(input, row_id = null) {
 		const operation_data = input.detail.operation;
 
-		if (this.recovery == null) {
-			this.recovery = input.detail.operation.operationtype;
-		}
+		this.recovery = input.detail.operation.recovery;
 
 		let table_id, row_id_prefix;
 
@@ -347,9 +345,9 @@ window.action_edit_popup = new class {
 	createHiddenInputFromObject(obj, namePrefix, idPrefix, exceptKeys = []) {
 		this.recovery_prefix = '';
 
-		if (this.recovery === <?= ACTION_RECOVERY_OPERATION ?>) {
+		if (this.recovery == <?= ACTION_RECOVERY_OPERATION ?>) {
 			this.recovery_prefix = 'recovery_'
-		} else if (this.recovery === <?= ACTION_UPDATE_OPERATION ?>) {
+		} else if (this.recovery == <?= ACTION_UPDATE_OPERATION ?>) {
 			this.recovery_prefix = 'update_'
 		}
 
