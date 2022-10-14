@@ -6659,19 +6659,15 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 
 	zbx_vector_str_create(&ids);
 
-	zbx_xml_read_values(cluster_data, "/*/*/*/*/*[local-name()='objects']/*[local-name()='obj']"
-			"[@type='" ZBX_VMWARE_SOAP_CLUSTER "']", &ids);
-
-	if (0 == clusters->values_alloc)
-		zbx_vector_ptr_reserve(clusters, (size_t)(ids.values_num));
+	zbx_xml_read_values(cluster_data, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_CLUSTER), &ids);
+	zbx_vector_ptr_reserve(clusters, (size_t)(clusters->values_alloc + ids.values_num));
 
 	for (i = 0; i < ids.values_num; i++)
 	{
 		char	*name;
 
-		zbx_snprintf(tmp, sizeof(tmp), "/*/*/*/*/*[local-name()='objects'][*[local-name()='obj']"
-				"[@type='" ZBX_VMWARE_SOAP_CLUSTER "'][.='%s']]/" ZBX_XPATH_PROP_NAME_NODE("name"),
-				ids.values[i]);
+		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_CLUSTER, "[text()='%s']")
+				"/" ZBX_XPATH_PROP_NAME_NODE("name"), ids.values[i]);
 
 		if (NULL == (name = zbx_xml_doc_read_value(cluster_data, tmp)))
 			continue;
@@ -6699,9 +6695,8 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 	zbx_vector_str_sort(&rpools_all, ZBX_DEFAULT_STR_COMPARE_FUNC);
 	zbx_vector_str_append_array(&rpools_uniq, rpools_all.values, rpools_all.values_num);
 	zbx_vector_str_uniq(&rpools_uniq, ZBX_DEFAULT_STR_COMPARE_FUNC);
-
-	if (0 == resourcepools->values_num)
-		zbx_vector_vmware_resourcepool_reserve(resourcepools, (size_t)rpools_uniq.values_num);
+	zbx_vector_vmware_resourcepool_reserve(resourcepools,
+			(size_t)(resourcepools->values_num + rpools_uniq.values_num));
 
 	for (i = 0; i < rpools_uniq.values_num; i++)
 	{
