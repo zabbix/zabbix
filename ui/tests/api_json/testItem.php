@@ -400,17 +400,6 @@ class testItem extends CAPITest {
 
 	public static function getItemUpdateData() {
 		return [
-			[
-				'request_data' => [
-					'item' => 'testItem_Update:agent.version',
-					'name' => 'Test mqtt key for active agent',
-					'key_' => 'mqtt.get[33]',
-					'type' => ITEM_TYPE_ZABBIX_ACTIVE
-				],
-				'expected_error' => null
-			]
-		];
-		return [
 			// Test update interval for mqtt key of the Agent item type.
 			[
 				'request_data' => [

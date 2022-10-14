@@ -978,6 +978,7 @@ class CItem extends CItemGeneral {
 			self::inheritDependentItems($dep_items_to_link, $items, $hostids);
 		}
 	}
+
 	/**
 	 * @param array $items
 	 * @param array $db_items
@@ -1068,7 +1069,7 @@ class CItem extends CItemGeneral {
 			$parent_indexes = array_flip(array_column($items, 'itemid'));
 			$upd_items = [];
 
-			foreach ($upd_db_items as $i => $upd_db_item) {
+			foreach ($upd_db_items as $upd_db_item) {
 				$item = $items[$parent_indexes[$upd_db_item['templateid']]];
 				$db_item = $db_items[$upd_db_item['templateid']];
 

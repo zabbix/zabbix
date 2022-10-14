@@ -74,7 +74,7 @@ abstract class CItemGeneral extends CApiService {
 	protected const VALUE_TYPE_FIELD_NAMES = [];
 
 	/**
-	 * A max count of the inheritable items per iteration.
+	 * Maximum number of inheritable items per iteration.
 	 *
 	 * @var int
 	 */
@@ -108,9 +108,17 @@ abstract class CItemGeneral extends CApiService {
 				$api_input_rules['fields'] += $item_type::getCreateValidationRules($item);
 			}
 			elseif ($db_item['templateid'] != 0) {
-				$item += array_intersect_key($db_item, array_flip(['authtype', 'allow_traps', 'publickey',
-					'privatekey'
-				]));
+				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+					$item += array_intersect_key($db_item, array_flip(['allow_traps']));
+				}
+				elseif ($item['type'] == ITEM_TYPE_SSH) {
+					$item += array_intersect_key($db_item, array_flip(['authtype']));
+				}
+
+				if ($item['type'] === ITEM_TYPE_SSH && $item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY
+						&& $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY) {
+					$item += array_intersect_key($db_item, array_flip(['publickey', 'privatekey']));
+				}
 
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRulesInherited($db_item);
 			}
@@ -118,10 +126,98 @@ abstract class CItemGeneral extends CApiService {
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRulesDiscovered();
 			}
 			else {
-				$item += array_intersect_key($db_item, array_flip(['interfaceid', 'authtype', 'username', 'params',
-					'delay', 'master_itemid', 'request_method', 'post_type', 'posts', 'allow_traps', 'ipmi_sensor',
-					'jmx_endpoint', 'snmp_oid', 'publickey', 'privatekey'
-				]));
+				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+					$item += array_intersect_key($db_item, array_flip(
+						['request_method', 'post_type', 'authtype', 'allow_traps']
+					));
+				}
+				elseif ($item['type'] == ITEM_TYPE_SSH) {
+					$item += array_intersect_key($db_item, array_flip(['authtype']));
+				}
+
+				$interfaceid_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI,
+					ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_HTTPAGENT,
+					ITEM_TYPE_SNMP
+				];
+
+				if (in_array($item['type'], $interfaceid_types)) {
+					$opt_interface_types = [ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+						ITEM_TYPE_HTTPAGENT
+					];
+
+					if (in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+							&& (!in_array($db_item['type'], $interfaceid_types)
+								|| (in_array($item['type'], array_diff($interfaceid_types, $opt_interface_types))
+									&& in_array($db_item['type'], $opt_interface_types)
+									&& $db_item['interfaceid'] == 0))) {
+						$item += array_intersect_key($db_item, array_flip(['interfaceid']));
+					}
+				}
+
+				$username_types = [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+					ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT
+				];
+
+				if (in_array($item['type'], [ITEM_TYPE_SSH, ITEM_TYPE_TELNET])) {
+					$opt_username_types = array_diff($username_types, [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]);
+
+					if (!in_array($db_item['type'], $username_types)
+							|| (in_array($db_item['type'], $opt_username_types) && $db_item['username'] === '')) {
+						$item += array_intersect_key($db_item, array_flip(['username']));
+					}
+				}
+
+				$params_types = [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED,
+					ITEM_TYPE_SCRIPT
+				];
+
+				if (in_array($item['type'], $params_types) && !in_array($db_item['type'], $params_types)) {
+					$item += array_intersect_key($db_item, array_flip(['params']));
+				}
+
+				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+				];
+
+				if (in_array($item['type'], $delay_types)) {
+					if (!in_array($db_item['type'], $delay_types)
+							|| ($db_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+								&& strncmp($db_item['key_'], 'mqtt.get', 8) === 0)) {
+						$item += array_intersect_key($db_item, array_flip(['delay']));
+					}
+				}
+
+				if ($item['type'] == ITEM_TYPE_DEPENDENT && $db_item['type'] != ITEM_TYPE_DEPENDENT) {
+					$item += array_intersect_key($db_item, array_flip(['master_itemid']));
+				}
+
+				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+					$post_types = [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML];
+
+					if (in_array($item['post_type'], $post_types) && !in_array($db_item['post_type'], $post_types)) {
+						$item += array_intersect_key($db_item, array_flip(['posts']));
+					}
+				}
+
+				if ($item['type'] == ITEM_TYPE_IPMI
+						&& ($db_item['type'] != ITEM_TYPE_IPMI
+							|| ($item['key_'] !== $db_item['key_'] && $db_item['key_'] === 'ipmi.get'))) {
+					$item += array_intersect_key($db_item, array_flip(['ipmi_sensor']));
+				}
+
+				if ($item['type'] == ITEM_TYPE_JMX && $db_item['type'] != ITEM_TYPE_JMX) {
+					$item += array_intersect_key($db_item, array_flip(['jmx_endpoint']));
+				}
+
+				if ($item['type'] == ITEM_TYPE_SNMP && $db_item['type'] != ITEM_TYPE_SNMP) {
+					$item += array_intersect_key($db_item, array_flip(['snmp_oid']));
+				}
+
+				if ($item['type'] === ITEM_TYPE_SSH && $item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY
+						&& $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY) {
+					$item += array_intersect_key($db_item, array_flip(['publickey', 'privatekey']));
+				}
 
 				$api_input_rules['fields'] += $item_type::getUpdateValidationRules($db_item);
 			}
