@@ -73,75 +73,21 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 	}
 
 	/**
-	 * Return Userdirectory API object by userdirectoryid.
+	 * Returns SAML userdirectoryid.
 	 *
-	 * @param string $userdirectoryid
-	 * @return array|null
+	 * @return string
 	 *
-	 * @throws Exception
 	 */
-	public static function getUserdirectory(string $userdirectoryid): ?array {
-		if (!self::$userdirectory_params) {
-			self::$userdirectory_params = API::getApiService('userdirectory')->getGlobal([
-				'output' => 'extend',
-				'selectProvisionGroups' => 'extend',
-				'selectProvisionMedia' => 'extend'
-			], false);
+	public static function getSamlUserdirectoryid(): string {
+		$userdirectoryid = API::getApiService('userdirectory')->get([
+			'output' => ['userdirectoryid'],
+			'filter' => ['idp_type' => IDP_TYPE_SAML]
+		]);
 
-			if (!self::$userdirectory_params) {
-				throw new Exception(_('Unable to load userdirectory API parameters.'));
-			}
+		if (!$userdirectoryid) {
+			throw new Exception(_('Unable to find SAML userdirectory.'));
 		}
-
-		foreach (self::$userdirectory_params as $userdirectory) {
-			if ($userdirectory['userdirectoryid'] == $userdirectoryid) {
-				return $userdirectory;
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Return Userdirectory API object by idp type.
-	 *
-	 * @param string $idp_type
-	 * @return array|null
-	 *
-	 * @throws Exception
-	 */
-	public static function getDefaultUserdirectory(string $idp_type): ?array {
-		if (!self::$userdirectory_params) {
-			self::$userdirectory_params = API::getApiService('userdirectory')->getGlobal([
-				'output' => 'extend',
-				'selectProvisionGroups' => 'extend',
-				'selectProvisionMedia' => 'extend'
-			], false);
-
-			if (!self::$userdirectory_params) {
-				throw new Exception(_('Unable to load userdirectory API parameters.'));
-			}
-		}
-
-		if ($idp_type == IDP_TYPE_SAML) {
-			foreach (self::$userdirectory_params as $userdirectory) {
-				if ($userdirectory['idp_type'] == $idp_type) {
-					return $userdirectory;
-				}
-			}
-		}
-		else {
-			foreach (self::$userdirectory_params as $userdirectory) {
-				if ($userdirectory['userdirectoryid'] == CAuthenticationHelper::get(
-					CAuthenticationHelper::LDAP_USERDIRECTORYID
-					)
-				) {
-					return $userdirectory;
-				}
-			}
-		}
-
-		return null;
+		return $userdirectoryid[0]['userdirectoryid'];
 	}
 
 	/**
