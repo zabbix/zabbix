@@ -495,62 +495,23 @@ abstract class CGraphGeneral extends CApiService {
 	 * Check if new items are from same templated host, validate Y axis items and values and hosts and templates.
 	 *
 	 * @param array $graphs
-	 *
-	 * @throws APIException
 	 */
 	protected function validateCreate(array $graphs) {
-
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'width' => 				['type' => API_INT32, 'flags' => API_REQUIRED],
-			'height' => 			['type' => API_INT32, 'flags' => API_REQUIRED],
-			'yaxismin' => 			['type' => API_FLOAT],
-			'yaxismax' => 			['type' => API_FLOAT],
-			'show_work_period' => 	['type' => API_INT32],
-			'show_triggers' => 		['type' => API_INT32],
-			'show_legend' => 		['type' => API_INT32],
-			'show_3d' => 			['type' => API_INT32],
-			'percent_left' => 		['type' => API_FLOAT],
-			'percent_right' => 		['type' => API_FLOAT],
-			'ymin_item_1' => 		['type' => API_UINT64],
-			'ymax_item_1' => 		['type' => API_UINT64],
-			'ymin_itemid' => 		['type' => API_UINT64, 'flags' => API_ALLOW_NULL],
-			'ymax_itemid' => 		['type' => API_UINT64, 'flags' => API_ALLOW_NULL],
-			'graphtype' => 			['type' => API_INT32],
-			'ymin_type' => 			['type' => API_INT32],
-			'ymax_type' => 			['type' => API_INT32],
-			'gitems' => 			['type' => API_OBJECTS, 'fields' => [
-				'sortorder' =>	['type' => API_INT32],
-				'color' =>		['type' => API_COLOR, 'flags' => API_REQUIRED],
-				'flags' =>		['type' => API_INT32],
-				'item' =>		['type' => API_OBJECT, 'fields' => [
-					'host' =>		['type' => API_STRING_UTF8],
-					'key' =>		['type' => API_STRING_UTF8]
-				]],
-				'drawtype' =>	['type' => API_INT32],
-				'yaxisside' =>	['type' => API_INT32],
-				'calc_fnc' =>	['type' => API_CALC_FORMULA],
-				'type' =>		['type' => API_STRING_UTF8],
-				'itemid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_ALLOW_NULL]
-			]]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $graphs, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
 		$colorValidator = new CColorValidator();
 
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_set = _('Cannot set "%1$s" for graph "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
+				]];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_set = _('Cannot set "%1$s" for graph prototype "%2$s".');
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
+					'discover' =>	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])],
+					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
 				]];
 				break;
 
@@ -682,64 +643,23 @@ abstract class CGraphGeneral extends CApiService {
 	 *
 	 * @param array $graphs
 	 * @param array $dbGraphs
-	 *
-	 * @throws APIException
 	 */
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
-
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
-			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'width' => 				['type' => API_INT32, 'flags' => API_REQUIRED],
-			'height' => 			['type' => API_INT32, 'flags' => API_REQUIRED],
-			'yaxismin' => 			['type' => API_FLOAT],
-			'yaxismax' => 			['type' => API_FLOAT],
-			'show_work_period' => 	['type' => API_INT32],
-			'show_triggers' => 		['type' => API_INT32],
-			'show_legend' => 		['type' => API_INT32],
-			'show_3d' => 			['type' => API_INT32],
-			'percent_left' => 		['type' => API_FLOAT],
-			'percent_right' => 		['type' => API_FLOAT],
-			'ymin_item_1' => 		['type' => API_UINT64],
-			'ymax_item_1' => 		['type' => API_UINT64],
-			'graphtype' => 			['type' => API_INT32],
-			'ymin_type' => 			['type' => API_INT32],
-			'ymax_type' => 			['type' => API_INT32],
-			'gitems' => 			['type' => API_OBJECTS, 'fields' => [
-				'sortorder' =>	['type' => API_INT32],
-				'color' =>		['type' => API_COLOR, 'flags' => API_REQUIRED],
-				'item' =>		['type' => API_OBJECT, 'fields' => [
-					'host' =>		['type' => API_STRING_UTF8],
-					'key' =>		['type' => API_STRING_UTF8],
-				]],
-				'gitemid' =>	['type' => API_STRING_UTF8],
-				'flags' =>		['type' => API_INT32],
-				'drawtype' =>	['type' => API_INT32],
-				'yaxisside' =>	['type' => API_INT32],
-				'calc_fnc' =>	['type' => API_CALC_FORMULA],
-				'type' =>		['type' => API_STRING_UTF8],
-				'itemid' =>		['type' => API_ID, 'flags' => API_REQUIRED | API_ALLOW_NULL]
-			]],
-			'graphid' =>	['type' => API_ID],
-			'ymin_itemid' => 		['type' => API_UINT64, 'flags' => API_ALLOW_NULL],
-			'ymax_itemid' => 		['type' => API_UINT64, 'flags' => API_ALLOW_NULL],
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $graphs, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
 		$colorValidator = new CColorValidator();
 
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_update = _('Cannot update "%1$s" for graph "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
+				]];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_update = _('Cannot update "%1$s" for graph prototype "%2$s".');
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
+					'discover' => 	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])],
+					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
 				]];
 				break;
 
