@@ -268,7 +268,7 @@ foreach($operation['opcommand_hst'] as $host) {
 
 if($operation['opcommand_grp']) {
 	foreach ($operation['opcommand_grp'] as $group) {
-		$host_group['id'] = $group[0]['hostid'];
+		$host_group['id'] = $group[0]['groupid'];
 		$host_group['name'] = $group[0]['name'];
 		$multiselect_values_host_grp[] = $host_group;
 	}
@@ -276,7 +276,7 @@ if($operation['opcommand_grp']) {
 
 if($operation['opgroup']) {
 	foreach ($operation['opgroup'] as $group) {
-		$host_group['id'] = $group[0]['hostid'];
+		$host_group['id'] = $group[0]['groupid'];
 		$host_group['name'] = $group[0]['name'];
 		$multiselect_values_ophost_grp[] = $host_group;
 	}
@@ -317,7 +317,8 @@ $form_grid->addItem([
 							'srcfld1' => 'hostid',
 							'dstfrm' => 'action.edit',
 							'dstfld1' => 'operation_opcommand_hst__hostid',
-							'editable' => '1'
+							'editable' => '1',
+							'disableids' => array_column($multiselect_values_host, 'id')
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -335,7 +336,8 @@ $form_grid->addItem([
 							'srcfld1' => 'groupid',
 							'dstfrm' => 'action.edit',
 							'dstfld1' => 'operation_opcommand_grp__groupid',
-							'editable' => '1'
+							'editable' => '1',
+							'disableids' => array_column($multiselect_values_host_grp, 'id')
 						]
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -363,7 +365,8 @@ $form_grid->addItem([
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'action.edit',
 					'dstfld1' => 'operation_opgroup__groupid',
-					'editable' => '1'
+					'editable' => '1',
+					'disableids' => array_column($multiselect_values_ophost_grp, 'id')
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -389,7 +392,8 @@ $form_grid->addItem([
 					'srcfld1' => 'hostid',
 					'dstfrm' => 'action.edit',
 					'dstfld1' => 'operation_optemplate__templateid',
-					'editable' => '1'
+					'editable' => '1',
+					'disableids' => array_column($multiselect_values_optemplate, 'id')
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

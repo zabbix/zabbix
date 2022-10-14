@@ -130,7 +130,7 @@ class CControllerPopupActionOperationEdit extends CController {
 		if ($operation['opcommand_grp']) {
 			foreach($operation['opcommand_grp'] as &$host_group) {
 				$host_group = API::HostGroup()->get([
-					'output' => ['name'],
+					'output' => ['groupid', 'name'],
 					'groupids' => $host_group['groupid']
 				]);
 			}
@@ -140,7 +140,7 @@ class CControllerPopupActionOperationEdit extends CController {
 		if($operation['opgroup']) {
 			foreach($operation['opgroup'] as &$host_group) {
 				$host_group = API::HostGroup()->get([
-					'output' => ['name'],
+					'output' => ['groupid', 'name'],
 					'groupids' => $host_group['groupid']
 				]);
 			}
