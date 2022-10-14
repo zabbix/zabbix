@@ -65,9 +65,12 @@ class CProvisioning {
 	 */
 	public static function forUserDirectoryId($userdirectoryid): self {
 		[$userdirectory] = API::UserDirectory()->get([
-			'output' => ['host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls', 'search_filter',
-				'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username',
-				'user_lastname', 'idp_type'
+			'output' => ['idp_type', 'user_username', 'user_lastname',
+				'host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls',
+				'search_filter', 'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership',
+				'idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages',
+				'sign_assertions', 'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
+				'encrypt_assertions'
 			],
 			'userdirectoryids' => [$userdirectoryid],
 			'filter' => ['provision_status' => JIT_PROVISIONING_ENABLED],
@@ -97,18 +100,21 @@ class CProvisioning {
 	 * @return array
 	 */
 	public function getIdpConfig(): array {
-		$keys = [];
+		$keys = [
+			IDP_TYPE_LDAP	=> ['host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls', 'search_filter',
+				'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username',
+				'user_lastname', 'bind_password'
+			],
+			IDP_TYPE_SAML	=> ['idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid',
+				'nameid_format', 'sign_messages', 'sign_assertions', 'sign_authn_requests', 'sign_logout_requests',
+				'sign_logout_responses', 'encrypt_nameid', 'encrypt_assertions', 'group_name', 'user_username',
+				'user_lastname', 'scim_status'
+			]
+		];
 
-		switch ($this->userdirectory['idp_type']) {
-			case IDP_TYPE_LDAP:
-				$keys = ['host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls', 'search_filter',
-					'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username',
-					'user_lastname', 'bind_password'
-				];
-				break;
-		}
-
-		return array_intersect_key($this->userdirectory, array_flip($keys));
+		return array_key_exists($this->userdirectory['idp_type'], $keys)
+			? array_intersect_key($this->userdirectory, array_flip($keys[$this->userdirectory['idp_type']]))
+			: [];
 	}
 
 	/**

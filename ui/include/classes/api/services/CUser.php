@@ -1543,10 +1543,6 @@ class CUser extends CApiService {
 						}
 					}
 
-					if ($db_user['deprovisioned']) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions for system access.'));
-					}
-
 					break;
 
 				case ZBX_AUTH_INTERNAL:
@@ -1597,6 +1593,10 @@ class CUser extends CApiService {
 			}
 
 			self::exception(ZBX_API_ERROR_PERMISSIONS, $e->getMessage());
+		}
+
+		if ($db_user['deprovisioned']) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions for system access.'));
 		}
 
 		// Start session.
