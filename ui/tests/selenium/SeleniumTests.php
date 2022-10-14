@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/testDocumentationLinks.php';
 require_once dirname(__FILE__).'/testGeneric.php';
 require_once dirname(__FILE__).'/testExecuteNow.php';
@@ -114,6 +115,7 @@ require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosAdministrationGeneral.php';
+require_once dirname(__FILE__).'/macros/testFormMacrosDiscoveredHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
@@ -323,6 +325,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormLowLevelDiscovery');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormMacrosAdministrationGeneral');
+		$suite->addTestSuite('testFormMacrosDiscoveredHost');
 		$suite->addTestSuite('testFormMacrosHost');
 		$suite->addTestSuite('testFormMacrosHostPrototype');
 		$suite->addTestSuite('testFormMacrosTemplate');

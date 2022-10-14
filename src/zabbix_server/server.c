@@ -65,13 +65,13 @@
 #include "events.h"
 #include "../libs/zbxdbcache/valuecache.h"
 #include "setproctitle.h"
-#include "zbxcrypto.h"
 #include "zbxhistory.h"
 #include "postinit.h"
 #include "../libs/zbxvault/vault.h"
 #include "zbxtrends.h"
 #include "ha/ha.h"
 #include "zbxrtc.h"
+#include "rtc/rtc_server.h"
 #include "zbxha.h"
 #include "zbxstats.h"
 #include "stats/zabbix_stats.h"
@@ -79,6 +79,7 @@
 #include "diag/diag_server.h"
 #include "zbxip.h"
 #include "zbxsysinfo.h"
+#include "zbx_rtc_constants.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -1165,7 +1166,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != (ret = zbx_rtc_process(t.opts, &error)))
+		if (SUCCEED != (ret = rtc_process(t.opts, &error)))
 		{
 			zbx_error("Cannot perform runtime control command: %s", error);
 			zbx_free(error);
@@ -1373,7 +1374,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_vc_enable();
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
-				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc)))
+				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc, rtc_process_request_ex)))
 					goto out;
 
 				if (SUCCEED != (ret = zbx_ha_get_status(CONFIG_HA_NODE_NAME, ha_stat, ha_failover,
@@ -1561,7 +1562,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 
 	zbx_unset_child_signal_handler();
 
-	zbx_rtc_reset(rtc);
+	rtc_reset(rtc);
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	/* Disable locks so main process doesn't hang on logging if a process was              */
@@ -1912,7 +1913,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||
 					ZBX_RTC_LOG_LEVEL_INCREASE == message->code)
 			{
-				zbx_rtc_dispatch(&rtc, client, message);
+				zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_ex);
 			}
 			else
 			{
