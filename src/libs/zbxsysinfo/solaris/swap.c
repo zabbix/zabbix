@@ -106,7 +106,7 @@ finish:
 	return ret;
 }
 
-static int	SYSTEM_SWAP_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	system_swap_total(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_uint64_t	total, free1;
 	char		*error;
@@ -122,7 +122,7 @@ static int	SYSTEM_SWAP_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_SWAP_USED(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	system_swap_used(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_uint64_t	total, free1;
 	char		*error;
@@ -138,7 +138,7 @@ static int	SYSTEM_SWAP_USED(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_SWAP_FREE(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	system_swap_free(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_uint64_t	total, free1;
 	char		*error;
@@ -154,7 +154,7 @@ static int	SYSTEM_SWAP_FREE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_SWAP_PUSED(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	system_swap_pused(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_uint64_t	total, free1;
 	char		*error;
@@ -173,7 +173,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_SWAP_PFREE(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	system_swap_pfree(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_uint64_t	total, free1;
 	char		*error;
@@ -214,15 +214,15 @@ int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	tmp = get_rparam(request, 1);
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "free"))	/* default parameter */
-		ret = SYSTEM_SWAP_FREE(request, result);
+		ret = system_swap_free(request, result);
 	else if (0 == strcmp(tmp, "total"))
-		ret = SYSTEM_SWAP_TOTAL(request, result);
+		ret = system_swap_total(request, result);
 	else if (0 == strcmp(tmp, "used"))
-		ret = SYSTEM_SWAP_USED(request, result);
+		ret = system_swap_used(request, result);
 	else if (0 == strcmp(tmp, "pfree"))
-		ret = SYSTEM_SWAP_PFREE(request, result);
+		ret = system_swap_pfree(request, result);
 	else if (0 == strcmp(tmp, "pused"))
-		ret = SYSTEM_SWAP_PUSED(request, result);
+		ret = system_swap_pused(request, result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
