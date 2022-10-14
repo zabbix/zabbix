@@ -45,10 +45,11 @@ window.condition_popup = new class {
 					this.selectServices();
 				});
 		}
+		this._disableChosenMultiselectValues();
 
 		this.form.addEventListener('click', (e) => {
 			document.querySelector('#condition-type').onchange = function() {
-				reloadPopup(e.target.closest('form'), 'popup.condition.edit')
+				reloadPopup(e.target.closest('form'), 'popup.condition.edit');
 			}
 			if (document.querySelector('#trigger_context')) {
 				document.querySelector('#trigger_context').onchange = function() {
@@ -122,6 +123,23 @@ window.condition_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	_disableChosenMultiselectValues() {
+		const $trigger_ms = $('#trigger_new_condition');
+		const $discovery_rule_ms = $('#drule_new_condition');
+		const $host_ms = $('#host_new_condition');
+		const $hostgroup_ms = $('#hostgroup_new_condition');
+		const $template_ms = $('#template_new_condition');
+
+		let multiselects = [$trigger_ms, $discovery_rule_ms, $host_ms, $hostgroup_ms, $template_ms]
+		multiselects.forEach((multiselect) => {
+			multiselect.on('change', () => {
+				multiselect.multiSelect('setDisabledEntries',
+					[... this.form.querySelectorAll('[name^="value["]')].map((input) => input.value)
+				);
+			});
+		})
 	}
 
 	selectServices() {
