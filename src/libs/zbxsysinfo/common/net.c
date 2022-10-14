@@ -77,7 +77,7 @@ out:
 	return SYSINFO_RET_OK;
 }
 
-int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_tcp_port(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	unsigned short	port;
 	int		value_int, ret;

@@ -40,7 +40,7 @@
 
 extern int	CONFIG_TIMEOUT;
 
-int	VFS_FILE_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
 	char		*filename, *mode;
@@ -133,7 +133,7 @@ err:
 	return ret;
 }
 
-int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_time(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_file_time_t	file_time;
 	char		*filename, *type;
@@ -178,7 +178,7 @@ err:
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_file_exists_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*filename;
 	int		ret = SYSINFO_RET_FAIL, file_exists = 0, types, types_incl, types_excl;
@@ -270,7 +270,7 @@ err:
 	return ret;
 }
 #else /* not _WINDOWS or __MINGW32__ */
-static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_file_exists_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
 	const char	*filename;
@@ -349,12 +349,12 @@ static int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 }
 #endif
 
-int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return vfs_file_exists(request, result);
+	return vfs_file_exists_local(request, result);
 }
 
-int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *tmp, encoding[32];
 	char		read_buf[MAX_BUFFER_LEN], *utf8, *contents = NULL;
@@ -464,7 +464,7 @@ err:
 	return ret;
 }
 
-int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
 	char		buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr = NULL;
@@ -585,7 +585,7 @@ err:
 	return ret;
 }
 
-int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *regexp, *tmp, encoding[32];
 	char		buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
@@ -760,7 +760,7 @@ err:
 	return ret;
 }
 
-int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_md5sum(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename;
 
@@ -967,7 +967,7 @@ err:
  * Comments: computes POSIX 1003.2 checksum                                   *
  *                                                                            *
  ******************************************************************************/
-int	VFS_FILE_CKSUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_cksum(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*filename, *method;
 	int	ret = SYSINFO_RET_FAIL;
@@ -1000,7 +1000,7 @@ err:
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_owner(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*filename, *ownertype, *resulttype;
 	int			ret = SYSINFO_RET_FAIL;
@@ -1100,7 +1100,7 @@ err:
 	return ret;
 }
 #else
-int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_owner(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *ownertype, *resulttype;
 	int		ret = SYSINFO_RET_FAIL, type;
@@ -1183,7 +1183,7 @@ err:
 #endif
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-int	VFS_FILE_PERMISSIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_permissions(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Item is not supported on Windows."));
@@ -1197,7 +1197,7 @@ static char	*get_file_permissions(zbx_stat_t *st)
 				(S_IRWXU & st->st_mode) >> 6, (S_IRWXG & st->st_mode) >> 3, S_IRWXO & st->st_mode);
 }
 
-int	VFS_FILE_PERMISSIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_permissions(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename;
 	int		ret = SYSINFO_RET_FAIL;
@@ -1693,7 +1693,7 @@ err:
 }
 #endif
 
-static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
+static int	vfs_file_get_local(const char *filename, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	char		*error = NULL;
@@ -1720,7 +1720,7 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 #undef VFS_FILE_ADD_TIME
 #undef VFS_FILE_ADD_TS
 
-int	VFS_FILE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_file_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*filename;
 
@@ -1738,5 +1738,5 @@ int	VFS_FILE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	return vfs_file_get(filename, result);
+	return vfs_file_get_local(filename, result);
 }

@@ -186,7 +186,7 @@ int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size
 	{
 		metric.key = get_rkey(&request);
 		metric.flags = flags;
-		metric.function = &EXECUTE_USER_PARAMETER;
+		metric.function = &execute_user_parameter;
 		metric.test_param = command;
 
 		ret = zbx_add_metric(&metric, error, max_error_len);

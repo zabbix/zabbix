@@ -154,7 +154,7 @@ int	execute_str(const char *command, AGENT_RESULT *result)
 
 int	execute_dbl(const char *command, AGENT_RESULT *result)
 {
-	if (SYSINFO_RET_OK != EXECUTE_STR(command, result))
+	if (SYSINFO_RET_OK != execute_str(command, result))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == ZBX_GET_DBL_RESULT(result))
@@ -171,7 +171,7 @@ int	execute_dbl(const char *command, AGENT_RESULT *result)
 
 int	execute_int(const char *command, AGENT_RESULT *result)
 {
-	if (SYSINFO_RET_OK != EXECUTE_STR(command, result))
+	if (SYSINFO_RET_OK != execute_str(command, result))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == ZBX_GET_UI64_RESULT(result))
@@ -209,7 +209,7 @@ static int	system_run_local(AGENT_REQUEST *request, AGENT_RESULT *result, int le
 
 	if (NULL == flag || '\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
 	{
-		return EXECUTE_STR(command, result);
+		return execute_str(command, result);
 	}
 	else if (0 == strcmp(flag, "nowait"))
 	{

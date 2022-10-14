@@ -34,7 +34,7 @@
  * Comments: Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
-int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_localtime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*type, buf[32];
 	long		milliseconds;
@@ -73,7 +73,7 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_users_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	char		counter_path[64];
@@ -98,6 +98,6 @@ int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #else
 	ZBX_UNUSED(request);
 
-	return EXECUTE_INT("who | wc -l", result);
+	return execute_int("who | wc -l", result);
 #endif
 }

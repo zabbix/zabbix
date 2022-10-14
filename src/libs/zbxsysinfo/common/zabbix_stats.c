@@ -182,7 +182,7 @@ int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const
 	return 0 == ZBX_ISSET_MSG(result) ? SUCCEED : FAIL;
 }
 
-int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	zabbix_stats(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*ip_str, *port_str, *queue_str;
 	unsigned short	port_number;

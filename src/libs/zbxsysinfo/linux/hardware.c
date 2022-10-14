@@ -529,9 +529,9 @@ int	system_hw_devices(AGENT_REQUEST *request, AGENT_RESULT *result)
 	type = get_rparam(request, 0);
 
 	if (NULL == type || '\0' == *type || 0 == strcmp(type, "pci"))
-		return EXECUTE_STR("lspci", result);	/* list PCI devices by default */
+		return execute_str("lspci", result);	/* list PCI devices by default */
 	else if (0 == strcmp(type, "usb"))
-		return EXECUTE_STR("lsusb", result);
+		return execute_str("lsusb", result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));

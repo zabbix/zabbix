@@ -29,6 +29,6 @@ int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESUL
 int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const char *from, const char *to,
 		AGENT_RESULT *result);
 
-int	ZABBIX_STATS(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	zabbix_stats(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #endif /* ZABBIX_SYSINFO_COMMON_ZABBIX_STATS_H_ */
