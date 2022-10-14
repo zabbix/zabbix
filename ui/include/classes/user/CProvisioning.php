@@ -53,6 +53,15 @@ class CProvisioning {
 	 */
 	protected $mapping_roles = [];
 
+	/**
+	 * Array of media types data used in media mappings.
+	 *
+	 * @var array $mapping_mediatypes[]
+	 * @var int   $mapping_mediatypes[mediatypeid]['mediatypeid']
+	 * @var int   $mapping_mediatypes[mediatypeid]['type']
+	 */
+	protected $mapping_mediatypes = [];
+
 	public function __construct(array $userdirectory, array $mapping_roles) {
 		$this->userdirectory = $userdirectory;
 		$this->mapping_roles = $mapping_roles;
@@ -77,10 +86,14 @@ class CProvisioning {
 			'selectProvisionMedia' => API_OUTPUT_EXTEND,
 			'selectProvisionGroups' => API_OUTPUT_EXTEND
 		]);
-		$userdirectory += DB::select('userdirectory_ldap', [
-			'output' => ['bind_password'],
-			'filter' => ['userdirectoryid' => $userdirectoryid]
-		])[0];
+
+		if ($userdirectory['idp_type'] == IDP_TYPE_LDAP) {
+			$userdirectory += DB::select('userdirectory_ldap', [
+				'output' => ['bind_password'],
+				'filter' => ['userdirectoryid' => $userdirectoryid]
+			])[0];
+		}
+
 		$mapping_roles = [];
 
 		if ($userdirectory['provision_groups']) {
@@ -91,7 +104,58 @@ class CProvisioning {
 			]);
 		}
 
+		$mapping_mediatypes = [];
+
+		if ($userdirectory['provision_media']) {
+			$mapping_mediatypes = API::MediaType()->get([
+				'output' => ['mediatypeid', 'type'],
+				'mediatypeids' => array_column($userdirectory['provision_media'], 'mediatypeid', 'mediatypeid'),
+				'preservekeys' => true
+			]);
+		}
+
 		return new self($userdirectory, $mapping_roles);
+	}
+
+	/**
+	 * Keep only valid media.
+	 *
+	 * @param array   $medias
+	 * @param int     $medias['mediatypeid']
+	 * @param string  $medias['sendto']
+	 */
+	public function sanitizeUserMedia(array $medias): array {
+		if (!$medias) {
+			return $medias;
+		}
+
+		$user_medias = [];
+		$email_mediatypeids = array_keys(array_column($this->mapping_mediatypes, 'type', 'mediatypeid'),
+			MEDIA_TYPE_EMAIL
+		);
+		$max_length = DB::getFieldLength('media', 'sendto');
+		$email_validator = new CEmailValidator();
+
+		foreach ($medias as $media) {
+			$sendto = array_filter($media['sendto'], 'strlen');
+
+			if (in_array($media['mediatypeid'], $email_mediatypeids)) {
+				$sendto = array_filter($media['sendto'], [$email_validator, 'validate']);
+
+				while (mb_strlen(implode("\n", $sendto)) > $max_length && count($sendto) > 0) {
+					array_pop($sendto);
+				}
+			}
+
+			if ($sendto) {
+				$user_medias[] = [
+					'mediatypeid' => $media['mediatypeid'],
+					'sendto' => $sendto
+				];
+			}
+		}
+
+		return $user_medias;
 	}
 
 	/**
