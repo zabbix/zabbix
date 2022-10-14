@@ -22,7 +22,6 @@
 
 #include "zbxalgo.h"
 #include "zbxipcservice.h"
-#include "zbxtypes.h"
 
 #define ZBX_IPC_SERVICE_RTC	"rtc"
 
