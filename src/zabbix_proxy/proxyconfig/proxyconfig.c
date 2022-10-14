@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "zbxnix.h"
-#include "proxy.h"
+#include "dbcache.h"
 #include "zbxself.h"
 #include "zbxtime.h"
 
@@ -29,6 +29,7 @@
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
 #include "proxyconfigwrite/proxyconfig_write.h"
+#include "zbx_rtc_constants.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 

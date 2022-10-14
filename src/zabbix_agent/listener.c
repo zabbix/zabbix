@@ -24,6 +24,7 @@
 #include "log.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbx_rtc_constants.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"

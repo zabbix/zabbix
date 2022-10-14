@@ -5,6 +5,7 @@ SUBDIRS = \
 	housekeeper \
 	proxyconfig \
 	datasender \
+	rtc \
 	stats \
 	taskmanager \
 	proxyconfigwrite
@@ -88,7 +89,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_builddir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_service.a \
-	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_proxy.a \
+	rtc/libzbxrtc_proxy.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc.a \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxdiag/libzbxdiag.a \

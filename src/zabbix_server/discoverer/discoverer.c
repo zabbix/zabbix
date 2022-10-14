@@ -33,6 +33,7 @@
 #include "zbxtime.h"
 #include "zbxip.h"
 #include "zbxsysinfo.h"
+#include "zbx_rtc_constants.h"
 
 extern unsigned char			program_type;
 

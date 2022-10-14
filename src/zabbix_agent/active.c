@@ -29,6 +29,7 @@
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbx_rtc_constants.h"
 
 extern ZBX_THREAD_LOCAL char		*CONFIG_HOSTNAME;
 extern int				CONFIG_HEARTBEAT_FREQUENCY;

@@ -25,6 +25,7 @@
 #include "dbcache.h"
 #include "zbxrtc.h"
 #include "zbxtime.h"
+#include "zbx_rtc_constants.h"
 #include "valuecache.h"
 
 extern int		CONFIG_CONFSYNCER_FREQUENCY;

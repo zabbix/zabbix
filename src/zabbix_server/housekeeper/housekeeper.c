@@ -27,6 +27,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "history_compress.h"
+#include "zbx_rtc_constants.h"
 
 extern unsigned char			program_type;
 

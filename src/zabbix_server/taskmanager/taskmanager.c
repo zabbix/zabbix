@@ -38,6 +38,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxversion.h"
+#include "zbx_rtc_constants.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
