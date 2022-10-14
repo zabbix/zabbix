@@ -1,6 +1,6 @@
-# This are test cases for SYSTEM_BOOTTIME() function responsible for "system.boottime" item checks on Linux OS.
-# Section "out" must contain either "result" with expected result of successful SYSTEM_BOOTTIME() execution or "error"
-# with expected error message when SYSTEM_BOOTTIME() should fail. Since check is based on reading /proc/stat file in
+# This are test cases for system_boottime() function responsible for "system.boottime" item checks on Linux OS.
+# Section "out" must contain either "result" with expected result of successful system_boottime() execution or "error"
+# with expected error message when system_boottime() should fail. Since check is based on reading /proc/stat file in
 # search for "btime", section "files" should typically contain "/proc/stat" with some contents to be parsed.
 ---
 test case: no /proc/stat file
