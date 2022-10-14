@@ -491,14 +491,18 @@ class testFormUserPermissions extends CWebTest {
 			$this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm()->selectTab('Permissions');
 
 			if ($enable_modules) {
-				$this->assertEquals('status-green', $this->query($modules_selector.'[text()="4"]')->one()->getAttribute('class'));
+				$this->assertEquals('status-green', $this->query($modules_selector.'[text()="4th Module"]')->one()
+						->getAttribute('class')
+				);
 				$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$admin_roleid);
 				$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 				$form->getField('4th Module')->uncheck();
 				$form->submit();
 			}
 			else {
-				$this->assertEquals('status-grey', $this->query($modules_selector.'[text()="4"]')->one()->getAttribute('class'));
+				$this->assertEquals('status-grey', $this->query($modules_selector.'[text()="4th Module"]')->one()
+						->getAttribute('class')
+				);
 			}
 		}
 	}
