@@ -2439,50 +2439,6 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Add the dependent items of the given items to the given item array. Also add the dependent LLD rules and item
-	 * prototypes to the given appropriate variables.
-	 *
-	 * @param array      $db_items
-	 * @param array|null $del_ruleids
-	 * @param array|null $db_item_prototypes
-	 */
-	protected static function addDependentItems(array &$db_items, array &$del_ruleids = null,
-			array &$db_item_prototypes = null): void {
-		$del_ruleids = [];
-		$db_item_prototypes = [];
-
-		$master_itemids = array_keys($db_items);
-
-		do {
-			$options = [
-				'output' => ['itemid', 'name', 'flags'],
-				'filter' => ['master_itemid' => $master_itemids]
-			];
-			$result = DBselect(DB::makeSql('items', $options));
-
-			$master_itemids = [];
-
-			while ($row = DBfetch($result)) {
-				if ($row['flags'] == ZBX_FLAG_DISCOVERY_RULE) {
-					$del_ruleids[] = $row['itemid'];
-				}
-				elseif ($row['flags'] ==  ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$master_itemids[] = $row['itemid'];
-
-					$db_item_prototypes[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
-				}
-				else {
-					if (!array_key_exists($row['itemid'], $db_items)) {
-						$master_itemids[] = $row['itemid'];
-
-						$db_items[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
-					}
-				}
-			}
-		} while ($master_itemids);
-	}
-
-	/**
 	 * Reset the MIN and MAX values of Y axis in the graphs, if such are calculated using the given items.
 	 *
 	 * @param array $del_itemids

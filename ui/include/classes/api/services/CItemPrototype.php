@@ -1514,6 +1514,31 @@ class CItemPrototype extends CItemGeneral {
 	}
 
 	/**
+	 * Add the dependent item prototypes of the given items to the given item prototypes array.
+	 *
+	 * @param array      $db_items
+	 */
+	protected static function addDependentItems(array &$db_items): void {
+		$master_itemids = array_keys($db_items);
+
+		do {
+			$options = [
+				'output' => ['itemid', 'name'],
+				'filter' => ['master_itemid' => $master_itemids]
+			];
+			$result = DBselect(DB::makeSql('items', $options));
+
+			$master_itemids = [];
+
+			while ($row = DBfetch($result)) {
+				$master_itemids[] = $row['itemid'];
+
+				$db_items[$row['itemid']] = $row;
+			}
+		} while ($master_itemids);
+	}
+
+	/**
 	 * Delete graph prototypes, which would remain without item prototypes after the given item prototypes deletion.
 	 *
 	 * @param array $del_itemids
