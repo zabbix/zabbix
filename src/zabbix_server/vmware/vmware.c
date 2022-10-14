@@ -7262,8 +7262,7 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 	/* version should have the "x.y.z" format, but there is also an "x.y Un" format in nature */
 	/* according to https://www.vmware.com/support/policies/version.html */
 	if (NULL == (version_without_major = strchr(version, '.')) ||
-			(NULL == (version_update = strchr(++version_without_major, '.')) &&
-			NULL == (version_update = strchr(version_without_major, 'U'))))
+			NULL == (version_update = strpbrk(++version_without_major, ".U")))
 	{
 		*error = zbx_dsprintf(*error, "Invalid version: %s.", version);
 		goto unlock;
