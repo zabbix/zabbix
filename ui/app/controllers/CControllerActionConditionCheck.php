@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -54,7 +54,8 @@ class CControllerActionConditionCheck extends CController {
 					CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP
 			]),
 			'value' => 'not_empty',
-			'value2' => 'not_empty'
+			'value2' => 'not_empty',
+			'row_index' => 'int32'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateCondition();
@@ -107,6 +108,7 @@ class CControllerActionConditionCheck extends CController {
 		$data = [
 			'title' => _('New condition'),
 			'command' => '',
+			'row_index' => $this->getInput('row_index'),
 			'message' => '',
 			'errors' => null,
 			'action' => $this->getAction(),
@@ -132,10 +134,10 @@ class CControllerActionConditionCheck extends CController {
 		$triggerIds = [];
 		$hostIds = [];
 		$templateIds = [];
-		$proxyIds = [];
 		$dRuleIds = [];
 		$dCheckIds = [];
 		$serviceids = [];
+		$proxyIds = 0;
 
 		$result = _('Unknown');
 
@@ -162,6 +164,10 @@ class CControllerActionConditionCheck extends CController {
 
 			case CONDITION_TYPE_SERVICE:
 				$serviceids = $condition['value'];
+				break;
+
+			case CONDITION_TYPE_DRULE:
+				$dRuleIds = $condition['value'];
 				break;
 
 			// return values as is for following condition types
@@ -291,41 +297,57 @@ class CControllerActionConditionCheck extends CController {
 		if ($groups || $triggers || $hosts || $templates || $proxies || $dRules || $dChecks || $services) {
 			$id = $condition['value'];
 
+
 			switch ($condition['condition_type']) {
 				case CONDITION_TYPE_HOST_GROUP:
-					if (array_key_exists($groupIds[0], $groups)) {
-						$result = $groups[$groupIds[0]]['name'];
+					foreach ($id as $groupId) {
+						if (array_key_exists($groupId, $groups)) {
+							$result = $groups[$groupId]['name'];
+						}
+						$names[] = $result;
 					}
 					break;
 
 				case CONDITION_TYPE_TRIGGER:
-					if (array_key_exists($triggerIds[0], $triggers)) {
-						$host = reset($triggers[$triggerIds[0]]['hosts']);
-						$result = $host['name'] . NAME_DELIMITER . $triggers[$triggerIds[0]]['description'];
+					foreach ($id as $triggerId) {
+						if (array_key_exists($triggerId, $triggers)) {
+							$host = reset($triggers[$triggerId]['hosts']);
+							$result = $host['name'] . NAME_DELIMITER . $triggers[$triggerId]['description'];
+						}
+						$names[] = $result;
 					}
 					break;
 
 				case CONDITION_TYPE_HOST:
-					if (array_key_exists($hostIds[0], $hosts)) {
-						$result = $hosts[$hostIds[0]]['name'];
+					foreach ($id as $hostId) {
+						if (array_key_exists($hostId, $hosts)) {
+							$result = $hosts[$hostId]['name'];
+						}
+						$names[] = $result;
 					}
 					break;
 
 				case CONDITION_TYPE_TEMPLATE:
-					if (array_key_exists($templateIds[0], $templates)) {
-						$result = $templates[$templateIds[0]]['name'];
+					foreach ($id as $templateId) {
+						if (array_key_exists($templateId, $templates)) {
+							$result = $templates[$templateId]['name'];
+						}
+						$names[] = $result;
 					}
 					break;
 
 				case CONDITION_TYPE_PROXY:
-					if (array_key_exists($proxyIds[0], $proxies)) {
-						$result = $proxies[$proxyIds[0]]['host'];
+					if (array_key_exists($proxyIds, $proxies)) {
+						$result = $proxies[$proxyIds]['host'];
 					}
 					break;
 
 				case CONDITION_TYPE_DRULE:
-					if (array_key_exists($id, $dRules)) {
-						$result = $dRules[$id]['name'];
+					foreach ($id as $dRuleId) {
+						if (array_key_exists($dRuleId, $dRules)) {
+							$result = $dRules[$dRuleId]['name'];
+						}
+						$names[] = $result;
 					}
 					break;
 
@@ -343,14 +365,23 @@ class CControllerActionConditionCheck extends CController {
 					break;
 
 				case CONDITION_TYPE_SERVICE:
-					if (array_key_exists($serviceids[0], $services)) {
-						$result = $services[$serviceids[0]]['name'];
+					foreach ($id as $serviceId) {
+						if (array_key_exists($serviceId, $services)) {
+							$result = $services[$serviceId]['name'];
+						}
+						$names[] = $result;
 					}
 					break;
+
 			}
 		}
 
-		$result_arr[] = $result;
-		return $result_arr;
+		if ($groups || $triggers || $hosts || $templates || $services || $dRules) {
+			$all_results = $names;
+		}
+		else {
+			$all_results[] = $result;
+		}
+		return $all_results;
 	}
 }

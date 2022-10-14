@@ -40,6 +40,7 @@ class CControllerPopupActionConditionEdit extends CController {
 					CONDITION_TYPE_HOST_METADATA, CONDITION_TYPE_EVENT_TAG, CONDITION_TYPE_EVENT_TAG_VALUE,
 					CONDITION_TYPE_SERVICE, CONDITION_TYPE_SERVICE_NAME
 				]),
+			'row_index' => 'required|int32',
 			'trigger_context' => 'in '.implode(',', ['host', 'template']),
 			'operator' => 'in '.implode(',', [
 					CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
@@ -114,6 +115,7 @@ class CControllerPopupActionConditionEdit extends CController {
 		$data = [
 			'title' => _('New condition'),
 			'command' => '',
+			'row_index' => $this->getInput('row_index'),
 			'message' => '',
 			'errors' => null,
 			'action' => $this->getAction(),

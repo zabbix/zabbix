@@ -45,7 +45,6 @@ window.condition_popup = new class {
 					this.selectServices();
 				});
 		}
-		this._disableChosenMultiselectValues();
 
 		this.form.addEventListener('click', (e) => {
 			document.querySelector('#condition-type').onchange = function() {
@@ -57,6 +56,8 @@ window.condition_popup = new class {
 				}
 			}
 		})
+
+		this._disableChosenMultiselectValues();
 	}
 
 	submit() {

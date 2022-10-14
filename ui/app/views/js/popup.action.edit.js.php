@@ -34,6 +34,7 @@ window.action_edit_popup = new class {
 
 		this._initActionButtons();
 		this._processTypeOfCalculation();
+		this._initTemplates();
 	}
 
 	_initActionButtons() {
@@ -57,7 +58,7 @@ window.action_edit_popup = new class {
 			else if (e.target.classList.contains('js-edit-button')) {
 				this._openEditOperationPopup(e, JSON.parse(e.target.getAttribute('data-operation')), $(e.target).closest('tr').attr('id'));
 			}
-			else if (e.target.classList.contains('js-remove-button')) {
+			else if (e.target.classList.contains('js-remove')) {
 				e.target.closest('tr').remove();
 			}
 		});
@@ -110,10 +111,20 @@ window.action_edit_popup = new class {
 	}
 
 	_openConditionPopup() {
-		const parameters = {
+		this._processTypeOfCalculation();
+
+		let parameters;
+		let row_index = 0;
+
+		while (document.querySelector(`#conditionTable [data-row_index="${row_index}"]`) !== null) {
+			row_index++;
+		}
+
+		parameters = {
 			type: <?= ZBX_POPUP_CONDITION_TYPE_ACTION ?>,
 			source: this.eventsource,
-			actionid: this.actionid
+			actionid: this.actionid,
+			row_index: row_index
 		};
 
 		const overlay = PopUp('popup.condition.edit', parameters, {
@@ -122,8 +133,97 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
-			this._checkRow(e.detail);
+			this._createRow(e.detail);
 		});
+	}
+
+	_createRow(input) {
+
+		if (is_array(input.value)) {
+			input.value.forEach((value, index) => {
+				let element = {...input, name: input.name[index], value: input.value[index]};
+
+				// todo : add check row with the same value and conditiontype
+				// let has_row = this._checkRow(element);
+
+				// const result = [has_row.some(it => it === true)]
+				// if (result[0] === true) {
+				//	return;
+				// }
+				// else {
+					element.condition_name = this._getConditionName(element);
+					element.label = num2letter(input.row_index);
+					input.row_index ++;
+				document
+						.querySelector('#conditionTable tbody')
+						.insertAdjacentHTML('beforeend', this.condition_template.evaluate(element))
+				//}
+				this._processTypeOfCalculation();
+
+			})
+		}
+		else {
+		//	let has_row = this._checkRow(input);
+
+			// const result = [has_row.some(it => it === true)]
+			// if (result[0] === true) {
+			//	return;
+			// }
+			// else {
+				input.condition_name = this._getConditionName(input);
+				input.label = num2letter(input.row_index);
+				document
+					.querySelector('#conditionTable tbody')
+					.insertAdjacentHTML('beforeend', this.condition_template.evaluate(input))
+			// }
+			this._processTypeOfCalculation();
+
+		}
+	}
+
+	_checkRow(input) {
+		// Check if row with the same conditiontype and value already exists.
+		let result = [];
+		[...document.getElementById('conditionTable').getElementsByTagName('tr')].map(it => {
+			const table_row = it.getElementsByTagName('td')[1];
+
+			if (table_row !== undefined) {
+				let conditiontype = table_row.getElementsByTagName('input')[0].value;
+				let value = table_row.getElementsByTagName('input')[2].value;
+				let value2 = table_row.getElementsByTagName('input')[3].value
+					? table_row.getElementsByTagName('input')[3].value
+					: null;
+
+				result.push(input.conditiontype === conditiontype && input.value === value && input.value2 === value2);
+			}
+
+			result.push(false);
+		});
+
+		return result;
+	}
+
+	_getConditionName(input) {
+		switch (parseInt(input.conditiontype)) {
+			case <?= CONDITION_TYPE_EVENT_TAG_VALUE ?> :
+				this.condition_name = ('Value of tag ') + input.value2 + ' ' +
+					this.condition_operators[input.operator] + ' ' + input.value;
+				break;
+
+			case <?= CONDITION_TYPE_SUPPRESSED ?> :
+				if (<?= CONDITION_OPERATOR_YES ?>) {
+					this.condition_name = <?= json_encode(_('Problem is suppressed')) ?>;
+				}
+				else {
+					this.condition_name = <?= json_encode(_('Problem is not suppressed')) ?>;
+				}
+				break;
+
+			default:
+				this.condition_name = this.condition_types[input.conditiontype] + ' ' +
+					this.condition_operators[input.operator] + ' ' + input.name;
+		}
+		return this.condition_name
 	}
 
 	_isActionOperation() {
@@ -308,121 +408,11 @@ window.action_edit_popup = new class {
 		return input;
 	}
 
-
 	_addColumn(input) {
 		const cell = document.createElement('td');
 
 		cell.append(input);
 		return cell;
-	}
-
-	_checkRow(input) {
-		// check if identical condition already exists in table
-		const hasRows = [...document.getElementById('conditionTable').getElementsByTagName('tr')].map(it => {
-			const table_row = it.getElementsByTagName('td')[1];
-			if (table_row !== undefined) {
-				return (table_row.innerHTML === this._createNameCell(input).getElementsByTagName('td')[0].innerHTML);
-			}
-		});
-
-		const hasRow = [hasRows.some(it => it === true)]
-		if (hasRow[0] === true) {
-			return;
-		} else {
-			this._createRow(input)
-		}
-	}
-
-	_createRow(input) {
-		this.row = document.createElement('tr');
-		this.row.append(this._createLabelCell(input));
-		this.row.append(this._createNameCell(input));
-		this.row.append(this._createRemoveCell());
-
-		this.table = document.getElementById('conditionTable');
-		this.row_count = this.table.rows.length - 1;
-
-		$('#conditionTable tr:last').before(this.row);
-		this._processTypeOfCalculation();
-	}
-
-	_createLabelCell(input) {
-		const cell = document.createElement('td');
-
-		this.label = num2letter(document.getElementById('conditionTable').rows.length - 2);
-		cell.setAttribute('class', 'label');
-		cell.setAttribute('data-formulaid', this.label);
-		cell.setAttribute('data-conditiontype', input.conditiontype);
-		cell.append(this.label);
-		return cell;
-	}
-
-	_createNameCell(input) {
-		const cell = document.createElement('tr');
-		const span = document.createElement('td');
-		const value = document.createElement('em');
-		const value2 = document.createElement('em');
-
-		cell.appendChild(this._createConditionsHiddenInput('formulaid', this.label));
-		cell.appendChild(this._createConditionsHiddenInput('conditiontype', input.conditiontype));
-		cell.appendChild(this._createConditionsHiddenInput('operator', input.operator));
-		cell.appendChild(this._createConditionsHiddenInput('value', input.value));
-		if (input.value2 !== '') {
-			cell.appendChild(this._createConditionsHiddenInput('value2', input.value2));
-		}
-
-		if (input.conditiontype == <?= CONDITION_TYPE_EVENT_TAG_VALUE ?>) {
-			value2.textContent = input.value2;
-
-			span.append('Value of tag ');
-			span.append(value2)
-			span.append(' ' + this.condition_operators[input.operator] + ' ');
-			value.textContent = input.value;
-			span.append(value);
-		} else if (input.conditiontype == <?= CONDITION_TYPE_SUPPRESSED ?>) {
-			if (input.operator == <?= CONDITION_OPERATOR_YES ?>) {
-				span.append(<?= json_encode(_('Problem is suppressed')) ?>);
-			} else {
-				span.append(<?= json_encode(_('Problem is not suppressed')) ?>);
-			}
-		} else if (input.conditiontype == <?= CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
-			if (input.value) {
-				span.append(<?= json_encode(_('Event is acknowledged')) ?>);
-			} else {
-				span.append(<?= json_encode(_('Event is not acknowledged')) ?>);
-			}
-		} else {
-			value.textContent = input.name;
-
-			span.append(this.condition_types[input.conditiontype] + ' ' + this.condition_operators[input.operator] + ' ');
-			span.append(value);
-		}
-		cell.append(span);
-
-		return cell;
-	}
-
-	_createRemoveCell() {
-		const cell = document.createElement('td');
-		const btn = document.createElement('button');
-		btn.type = 'button';
-		btn.classList.add('btn-link', 'element-table-remove');
-		btn.textContent = <?= json_encode(_('Remove')) ?>;
-
-		btn.addEventListener('click', () => btn.closest('tr').remove());
-
-		cell.appendChild(btn);
-		return cell;
-	}
-
-	_createConditionsHiddenInput(name, value) {
-		const input = document.createElement('input');
-		input.type = 'hidden';
-		input.id = `conditions_${this.row_count}_${name}`;
-		input.name = `conditions[${this.row_count}][${name}]`;
-		input.value = value;
-
-		return input;
 	}
 
 	_createActionCell(input) {
@@ -550,11 +540,12 @@ window.action_edit_popup = new class {
 
 	_processTypeOfCalculation() {
 		this.show_formula = document.querySelector('#evaltype').value === <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
+		let row_count = document.getElementById('conditionTable').rows.length -2;
 
 		document.querySelector('#formula').style.display = this.show_formula ? '' : 'none';
 		document.querySelector('#expression').style.display = this.show_formula ? 'none' : '';
-		document.querySelector('#label-evaltype').style.display = this.row_count > 1 ? '' : 'none';
-		document.querySelector('#evaltype-formfield').style.display = this.row_count > 1 ? '' : 'none';
+		document.querySelector('#label-evaltype').style.display = row_count > 1 ? '' : 'none';
+		document.querySelector('#evaltype-formfield').style.display = row_count > 1 ? '' : 'none';
 
 		const labels = document.querySelectorAll('#conditionTable .label');
 		let conditions = [];
@@ -589,5 +580,27 @@ window.action_edit_popup = new class {
 			document.getElementById('expression')
 				.innerHTML = getConditionFormula(conditions, + document.querySelector('#evaltype').value);
 		};
+	}
+
+	_initTemplates() {
+		this.condition_template = new Template(`
+		<tr data-row_index="#{row_index}">
+			<td class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{label}</td>
+			<td class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{condition_name}</td>
+			<td>
+				<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
+					<li>
+						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+					</li>
+					<li>
+						<input type="hidden" name="conditions[#{row_index}][conditiontype]" value="#{conditiontype}">
+						<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
+						<input type="hidden" name="conditions[#{row_index}][value]" value="#{value}">
+						<input type="hidden" name="conditions[#{row_index}][value2]" value="#{value2}">
+					</li>
+				</ul>
+			</td>
+		</tr>
+	`);
 	}
 }

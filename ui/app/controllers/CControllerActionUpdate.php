@@ -132,6 +132,7 @@ class CControllerActionUpdate extends CController {
 				if ($condition['conditiontype'] != CONDITION_TYPE_EVENT_TAG_VALUE) {
 					unset($condition['value2']);
 				}
+				unset($condition['row_index'], $condition['name']);
 			}
 			unset($condition);
 

@@ -84,7 +84,7 @@ if ($data['action']['filter']['conditions']) {
 				(new CCol([
 					(new CButton('remove', _('Remove')))
 						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove')
+						->addClass('js-remove')
 						->removeId(),
 					new CVar('conditions['.$i.']', $condition)
 				]))
@@ -126,11 +126,16 @@ $action_tab
 	])
 	->setId('actionCalculationRow');
 
-$condition_table->setFooter(
-	(new CSimpleButton(_('Add')))
-	->setAttribute('data-eventsource', $data['eventsource'])
-		->addClass(ZBX_STYLE_BTN_LINK)
-	->addClass('js-condition-create')
+$condition_table->addItem(
+	(new CTag('tfoot', true))
+		->addItem(
+			(new CCol(
+				(new CSimpleButton(_('Add')))
+					->setAttribute('data-eventsource', $data['eventsource'])
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('js-condition-create')
+			))->setColSpan(4)
+		)
 );
 
 // action tab
@@ -250,7 +255,7 @@ if ($data['action']['operations']) {
 							])),
 						[
 							(new CButton('remove', _('Remove')))
-								->addClass('js-remove-button')
+								->addClass('js-remove')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
 							new CVar('operations['.$operationid.']', $operation),
@@ -279,7 +284,7 @@ if ($data['action']['operations']) {
 							])),
 						[
 							(new CButton('remove', _('Remove')))
-								->addClass('js-remove-button')
+								->addClass('js-remove')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
 							new CVar('operations['.$operationid.']', $operation),
@@ -366,7 +371,7 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 						[
 							(new CButton('remove', _('Remove')))
 								->setAttribute('data-operationid', $operationid)
-								->addClass('js-remove-button')
+								->addClass('js-remove')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
 							new CVar('recovery_operations['.$operationid.']', $operation),
@@ -438,7 +443,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 						[
 							(new CButton('remove', _('Remove')))
 								->setAttribute('data-operationid', $operationid)
-								->addClass('js-remove-button')
+								->addClass('js-remove')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
 							new CVar('update_operations['.$operationid.']', $operation),
