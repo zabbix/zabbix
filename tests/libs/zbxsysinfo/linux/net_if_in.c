@@ -22,5 +22,5 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_mock_test_entry_net_if_common(state, ZABBIX_MOCK_net_if_in);
+	zbx_mock_test_entry_net_if_common(state, ZABBIX_MOCK_NET_IF_IN);
 }
