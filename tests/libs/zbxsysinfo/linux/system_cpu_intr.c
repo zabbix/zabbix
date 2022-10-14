@@ -5,6 +5,7 @@
 
 #include "module.h"
 #include "zbxsysinfo.h"
+#include "../../../../src/libs/zbxsysinfo/sysinfo.h"
 
 static int	read_yaml_ret(void)
 {

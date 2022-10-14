@@ -81,7 +81,7 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED != zbx_parse_item_key(init_param, &request))
 		fail_msg("Cannot parse item key: %s", init_param);
 
-	if (expected_result != (actual_result = WEB_PAGE_GET(&request, &param_result)))
+	if (expected_result != (actual_result = web_page_get(&request, &param_result)))
 	{
 		fail_msg("Got %s instead of %s as a result.", zbx_sysinfo_ret_string(actual_result),
 			zbx_sysinfo_ret_string(expected_result));

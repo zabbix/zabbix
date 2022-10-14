@@ -97,7 +97,7 @@ web_page_get_LDADD = \
 
 web_page_get_LDADD += @AGENT_LIBS@
 
-web_page_get_LDFLAGS = @AGENT_LDFLAGS@ $(WEB_PAGE_GET_WRAP_FUNCS)
+web_page_get_LDFLAGS = @AGENT_LDFLAGS@ $(web_page_get_WRAP_FUNCS)
 
 web_page_get_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
