@@ -1071,7 +1071,8 @@ abstract class CItemGeneral extends CApiService {
 				$item += array_intersect_key($type_field_defaults, $field_names);
 			}
 			elseif ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
-				if ($item['key_'] !== $db_item['key_'] && strncmp($item['key_'], 'mqtt.get', 8) == 0) {
+				if (array_key_exists('key_', $item) && $item['key_'] !== $db_item['key_']
+						&& strncmp($item['key_'], 'mqtt.get', 8) == 0) {
 					$item += array_intersect_key($type_field_defaults, array_flip(['delay']));
 				}
 			}
