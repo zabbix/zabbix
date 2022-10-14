@@ -2092,10 +2092,6 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
     .msg-good .link-action .arrow-down,
     .msg-warning .link-action .arrow-down {
       border-top-color: #2f9f5e; }
-  .msg-bad button,
-  .msg-good button,
-  .msg-warning button {
-    background-color: #ffffff; }
   .msg-bad::before,
   .msg-good::before,
   .msg-warning::before {
