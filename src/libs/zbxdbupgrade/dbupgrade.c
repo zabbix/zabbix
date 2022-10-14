@@ -1110,9 +1110,9 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update(const char *t
 
 			"create trigger %s_%s_insert after insert\n"
 				"on %s\n"
-				"for each row execute procedure %s_%s_%s();"
+				"for each row execute function %s_%s_%s();"
 			"create trigger %s_%s_update after update of %s on %s\n"
-				"for each row execute procedure %s_%s_%s();",
+				"for each row execute function %s_%s_%s();",
 			table_name, indexed_column_name, func_name, table_name, indexed_column_name, func_name,
 			original_column_name, idname, idname, table_name, indexed_column_name, table_name,
 			table_name, indexed_column_name, func_name, table_name, indexed_column_name,
