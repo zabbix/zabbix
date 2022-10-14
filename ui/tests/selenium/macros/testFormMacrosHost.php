@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormMacros.php';
 
 /**
@@ -42,8 +43,6 @@ class testFormMacrosHost extends testFormMacros {
 			]
 		]);
 	}
-
-	use MacrosTrait;
 
 	/**
 	 * The name of the host for updating macros, id=20006.
@@ -87,7 +86,8 @@ class testFormMacrosHost extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateMacrosData
+	 * @dataProvider getUpdateMacrosNormalData
+	 * @dataProvider getUpdateMacrosCommonData
 	 */
 	public function testFormMacrosHost_Update($data) {
 		$this->checkMacros($data, 'host', $this->host_name_update, true);
@@ -166,94 +166,11 @@ class testFormMacrosHost extends testFormMacros {
 		);
 	}
 
-	public function getSecretMacrosLayoutData() {
-		return [
-			[
-				[
-					'macro' => '{$SECRET_HOST_MACRO}',
-					'type' => 'Secret text'
-				]
-			],
-			[
-				[
-					'macro' => '{$SECRET_HOST_MACRO}',
-					'type' => 'Secret text',
-					'chenge_type' => true
-				]
-			],
-			[
-				[
-					'macro' => '{$TEXT_HOST_MACRO}',
-					'type' => 'Text'
-				]
-			],
-			[
-				[
-					'global' => true,
-					'macro' => '{$X_TEXT_2_SECRET}',
-					'type' => 'Text'
-				]
-			],
-			[
-				[
-					'global' => true,
-					'macro' => '{$X_SECRET_2_SECRET}',
-					'type' => 'Secret text'
-				]
-			]
-		];
-	}
-
 	/**
 	 * @dataProvider getSecretMacrosLayoutData
 	 */
 	public function testFormMacrosHost_CheckSecretMacrosLayout($data) {
 		$this->checkSecretMacrosLayout($data, 'zabbix.php?action=host.view', 'hosts', 'Host for suppression');
-	}
-
-	public function getCreateSecretMacrosData() {
-		return [
-			[
-				[
-					'macro_fields' => [
-						'action' => USER_ACTION_UPDATE,
-						'index' => 0,
-						'macro' => '{$SECRET_MACRO}',
-						'value' => [
-							'text' => 'host secret value',
-							'type' => 'Secret text'
-						],
-						'description' => 'secret description'
-					],
-					'check_default_type' => true
-				]
-			],
-			[
-				[
-					'macro_fields' => [
-						'macro' => '{$TEXT_MACRO}',
-						'value' => [
-							'text' => 'host plain text value',
-							'type' => 'Secret text'
-						],
-						'description' => 'plain text description'
-					],
-					'back_to_text' => true
-				]
-			],
-			[
-				[
-					'macro_fields' => [
-						'macro' => '{$SECRET_EMPTY_MACRO}',
-						'value' => [
-							'text' => '',
-							'type' => 'Secret text'
-						],
-						'description' => 'secret empty value'
-					]
-				]
-			]
-		];
 	}
 
 	/**
@@ -333,7 +250,6 @@ class testFormMacrosHost extends testFormMacros {
 
 	/**
 	 * @dataProvider getCreateVaultMacrosData
-	 *
 	 */
 	public function testFormMacrosHost_CreateVaultMacros($data) {
 		$host = ($data['vault'] === 'Hashicorp') ? 'Host 1 from first group' : 'Empty host';
@@ -341,7 +257,8 @@ class testFormMacrosHost extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateVaultMacrosData
+	 * @dataProvider getUpdateVaultMacrosNormalData
+	 * @dataProvider getUpdateVaultMacrosCommonData
 	 */
 	public function testFormMacrosHost_UpdateVaultMacros($data) {
 		$this->updateVaultMacros($data, 'zabbix.php?action=host.view', 'hosts', 'Host for suppression');
