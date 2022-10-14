@@ -128,17 +128,20 @@ static int	DBpatch_6030001(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		const char	*rel_path = row[1];
-		char		*updated_path;
+		char		*updated_path, *updated_path_esc;
 
 		if (NULL == rel_path || '\0' == *rel_path)
 			continue;
 
-		updated_path = zbx_dsprintf(updated_path, "modules/%s", rel_path);
+		updated_path = zbx_dsprintf(NULL, "modules/%s", rel_path);
+
+		updated_path_esc = DBdyn_escape_string(updated_path);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update module set relative_path='%s' "
-				"where moduleid=%s;\n", updated_path, row[0]);
+				"where moduleid=%s;\n", updated_path_esc, row[0]);
 
 		zbx_free(updated_path);
+		zbx_free(updated_path_esc);
 
 		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
@@ -178,7 +181,7 @@ static int	DBpatch_6030002(void)
 	{
 		char	*path;
 
-		path = zbx_dsprintf(path, "widgets/%s", modules[i]);
+		path = zbx_dsprintf(NULL, "widgets/%s", modules[i]);
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), modules[i], path, 1, "[]");
 		zbx_free(path);
 	}
