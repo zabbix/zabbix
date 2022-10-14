@@ -912,6 +912,8 @@ class CConfigurationImport {
 	protected function updateItemsWithDependency(array $items_by_level, string $master_item_key,
 			CItemGeneral $api_service): void {
 		foreach ($items_by_level as $items_to_update) {
+			$hostids = [];
+
 			foreach ($items_to_update as &$item) {
 				if (array_key_exists($master_item_key, $item)) {
 					$item['master_itemid'] = $this->referencer->findItemidByKey($item['hostid'],
@@ -927,6 +929,8 @@ class CConfigurationImport {
 				}
 
 				unset($item['uuid']);
+
+				$hostids[] = $item['hostid'];
 				unset($item['hostid']);
 			}
 			unset($item);
@@ -934,6 +938,8 @@ class CConfigurationImport {
 			$updated_items = $api_service->update($items_to_update);
 
 			foreach ($items_to_update as $index => $item) {
+				$item['hostid'] = array_shift($hostids);
+
 				$this->referencer->setDbItem($updated_items['itemids'][$index], $item);
 			}
 		}
