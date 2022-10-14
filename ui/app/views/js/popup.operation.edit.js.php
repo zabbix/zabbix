@@ -130,11 +130,27 @@ window.operation_popup = new class {
 	_hostGroupFields() {
 		document.getElementById('operation-attr-hostgroups').style.display='';
 		document.getElementById('operation-attr-hostgroups-label').style.display='';
+
+		const $hostgroup_ms = $('#operation_opgroup__groupid');
+
+		$hostgroup_ms.on('change', () => {
+			$hostgroup_ms.multiSelect('setDisabledEntries',
+				[... this.form.querySelectorAll('[name^="operation[opgroup]["]')].map((input) => input.value)
+			);
+		});
 	}
 
 	_templateFields() {
 		document.getElementById('operation-attr-templates').style.display='';
 		document.getElementById('operation-attr-templates-label').style.display='';
+
+		const $template_ms = $('#operation_optemplate__templateid');
+
+		$template_ms.on('change', () => {
+			$template_ms.multiSelect('setDisabledEntries',
+				[... this.form.querySelectorAll('[name^="operation[optemplate]["]')].map((input) => input.value)
+			);
+		});
 	}
 
 	_removeAllFields() {
@@ -270,6 +286,22 @@ window.operation_popup = new class {
 		}
 
 		this._enableFormFields(fields);
+
+		const $host_ms = $('#operation_opcommand_hst__hostid');
+
+		$host_ms.on('change', () => {
+			$host_ms.multiSelect('setDisabledEntries',
+				[... this.form.querySelectorAll('[name^="operation[opcommand_hst]["]')].map((input) => input.value)
+			);
+		});
+
+		const $hostgroup_ms = $('#operation_opcommand_grp__groupid');
+
+		$hostgroup_ms.on('change', () => {
+			$hostgroup_ms.multiSelect('setDisabledEntries',
+				[... this.form.querySelectorAll('[name^="operation[opcommand_grp]["]')].map((input) => input.value)
+			);
+		});
 	}
 
 	_openUserGroupPopup(target) {
