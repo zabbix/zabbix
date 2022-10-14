@@ -556,10 +556,10 @@ class CHost extends CHostGeneral {
 
 		if ($result) {
 			if (array_key_exists('name_upper', reset($result))) {
-				foreach ($result as &$item) {
-					unset($item['name_upper']);
+				foreach ($result as &$row) {
+					unset($row['name_upper']);
 				}
-				unset($item);
+				unset($row);
 			}
 
 			$result = $this->addRelatedObjects($options, $result);
