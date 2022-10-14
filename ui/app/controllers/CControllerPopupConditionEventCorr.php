@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -32,11 +32,11 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 										ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG,
 										ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
 										ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
-									]),
+								]),
 			'operator' =>		'in '.implode(',', [
 										CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
 										CONDITION_OPERATOR_NOT_LIKE
-									]),
+								]),
 			'tag' =>			'string',
 			'oldtag' =>			'string',
 			'newtag' =>			'string',

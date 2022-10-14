@@ -65,9 +65,7 @@ class CControllerActionUpdate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$eventsource = $this->getInput('eventsource');
-
-		switch ($eventsource) {
+		switch ($this->getInput('eventsource')) {
 			case EVENT_SOURCE_TRIGGERS:
 				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
 
