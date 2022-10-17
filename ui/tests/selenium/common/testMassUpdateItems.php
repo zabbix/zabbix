@@ -111,7 +111,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'SNMP agent']
 					],
-					'details' => 'Invalid parameter "/1": the parameter "snmp_oid" is missing.'
+					'details' => 'Invalid parameter "/1/snmp_oid": cannot be empty.'
 				]
 			],
 			[
@@ -124,7 +124,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'TELNET agent']
 					],
-					'details' => 'Invalid parameter "/2": the parameter "username" is missing.'
+					'details' => 'Invalid parameter "/2/username": cannot be empty.'
 				]
 			],
 			[
@@ -138,7 +138,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051']
 					],
-					'details' => 'Invalid parameter "/1": the parameter "username" is missing.'
+					'details' => 'Invalid parameter "/1/username": cannot be empty.'
 				]
 			],
 			[
@@ -653,7 +653,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'SNMP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5:10055']
 					],
-					'details' => 'Invalid parameter "/1": the parameter "snmp_oid" is missing.',
+					'details' => 'Invalid parameter "/1/snmp_oid": cannot be empty.',
 					'interface_text_part' => 'SNMPv3, Context name: zabbix'
 				]
 			],
