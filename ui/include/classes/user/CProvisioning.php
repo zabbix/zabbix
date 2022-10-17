@@ -73,7 +73,7 @@ class CProvisioning {
 	 * @param int $userdirectoryid  User directory id to create CProvisioning instance for.
 	 */
 	public static function forUserDirectoryId($userdirectoryid): self {
-		[$userdirectory] = API::UserDirectory()->get([
+		[$userdirectory] = API::getApiService('userdirectory')->get([
 			'output' => ['userdirectoryid', 'idp_type', 'provision_status', 'user_username', 'user_lastname',
 				'host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls',
 				'search_filter', 'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership',
@@ -100,7 +100,7 @@ class CProvisioning {
 		$mapping_roles = [];
 
 		if ($userdirectory['provision_groups']) {
-			$mapping_roles = API::Role()->get([
+			$mapping_roles = API::getApiService('role')->get([
 				'output' => ['roleid', 'name', 'type'],
 				'roleids' => array_column($userdirectory['provision_groups'], 'roleid', 'roleid'),
 				'preservekeys' => true
