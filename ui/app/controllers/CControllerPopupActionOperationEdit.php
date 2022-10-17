@@ -193,7 +193,6 @@ class CControllerPopupActionOperationEdit extends CController {
 
 				foreach ($users as $user) {
 					$fullnames[$user['userid']] = getUserFullname($user);
-					sdff($fullnames);
 
 					$operation['opmessage_usr'][$i]['name'] = $fullnames[$opmessage_usr['userid']];
 					$i++;

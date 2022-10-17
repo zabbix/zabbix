@@ -378,6 +378,185 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
 	return $description;
 }
 
+function getActionOperationData(array $actions, int $type): array {
+	$data = [];
+
+	foreach ($actions as $action) {
+		if ($type == ACTION_OPERATION) {
+			foreach ($action['operations'] as $operation) {
+
+				switch ($operation['operationtype']) {
+					case OPERATION_TYPE_MESSAGE:
+						$data['media_typeid'] = $operation['opmessage']['mediatypeid'];
+
+						if ($data['media_typeid'] != 0) {
+							$data['media_typeids'][$data['media_typeid']] = $data['media_typeid'];
+						}
+
+						if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
+							foreach ($operation['opmessage_usr'] as $users) {
+								$data['userids'][$users['userid']] = $users['userid'];
+							}
+						}
+
+						if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
+							foreach ($operation['opmessage_grp'] as $user_groups) {
+								$data['usr_grpids'][$user_groups['usrgrpid']] = $user_groups['usrgrpid'];
+							}
+						}
+						break;
+
+					case OPERATION_TYPE_COMMAND:
+						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
+							foreach ($operation['opcommand_hst'] as $host) {
+								if ($host['hostid'] != 0) {
+									$data['hostids'][$host['hostid']] = $host['hostid'];
+								}
+							}
+						}
+
+						if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
+							foreach ($operation['opcommand_grp'] as $host_group) {
+								$data['groupids'][$host_group['groupid']] = true;
+							}
+						}
+
+						$data['scriptids'][$operation['opcommand']['scriptid']] = true;
+						break;
+
+					case OPERATION_TYPE_GROUP_ADD:
+					case OPERATION_TYPE_GROUP_REMOVE:
+						foreach ($operation['opgroup'] as $groupid) {
+							$data['groupids'][$groupid['groupid']] = true;
+						}
+						break;
+
+					case OPERATION_TYPE_TEMPLATE_ADD:
+					case OPERATION_TYPE_TEMPLATE_REMOVE:
+						foreach ($operation['optemplate'] as $templateid) {
+							$data['templateids'][$templateid['templateid']] = true;
+						}
+						break;
+				}
+			}
+		}
+		else {
+			$operations_key = ($type == ACTION_RECOVERY_OPERATION)
+				? 'recovery_operations'
+				: 'update_operations';
+
+			foreach ($action[$operations_key] as $operation) {
+				switch ($operation['operationtype']) {
+					case OPERATION_TYPE_MESSAGE:
+						$media_typeid = $operation['opmessage']['mediatypeid'];
+
+						if ($media_typeid != 0) {
+							$data['media_typeids'][$media_typeid] = $media_typeid;
+						}
+
+						if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
+							foreach ($operation['opmessage_usr'] as $users) {
+								$data['userids'][$users['userid']] = $users['userid'];
+							}
+						}
+
+						if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
+							foreach ($operation['opmessage_grp'] as $user_groups) {
+								$data['usr_grpids'][$user_groups['usrgrpid']] = $user_groups['usrgrpid'];
+							}
+						}
+						break;
+
+					case OPERATION_TYPE_COMMAND:
+						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
+							foreach ($operation['opcommand_hst'] as $host) {
+								if ($host['hostid'] != 0) {
+									$data['hostids'][$host['hostid']] = $host['hostid'];
+								}
+							}
+						}
+
+						if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
+							foreach ($operation['opcommand_grp'] as $host_group) {
+								$data['groupids'][$host_group['groupid']] = true;
+							}
+						}
+
+						$data['scriptids'][$operation['opcommand']['scriptid']] = true;
+						break;
+				}
+			}
+		}
+	}
+	return $data;
+}
+
+function getOperationDataValues($data): array {
+	$result = [];
+	if (array_key_exists('media_typeids', $data)) {
+		$result['media_types'] = API::Mediatype()->get([
+			'output' => ['name'],
+			'mediatypeids' => $data['media_typeids'],
+			'preservekeys' => true
+		]);
+	}
+
+	if (array_key_exists('userids', $data)) {
+
+		$result['users'] = API::User()->get([
+			'output' => ['userid', 'username', 'name', 'surname'],
+			'userids' => $data['userids']
+		]);
+
+		foreach ($result['users'] as $user) {
+			$result['users']['fullnames'][$user['userid']] = getUserFullname($user);
+		}
+	}
+
+	if (array_key_exists('usr_grpids', $data)) {
+			$result['user_groups'] = API::UserGroup()->get([
+			'output' => ['name'],
+			'usrgrpids' => $data['usr_grpids'],
+			'preservekeys' => true
+		]);
+	}
+
+	if (array_key_exists('hostids', $data)) {
+		$result['hosts'] = API::Host()->get([
+			'output' => ['name'],
+			'hostids' => $data['hostids'],
+			'preservekeys' => true
+		]);
+	}
+
+	if (array_key_exists('groupids', $data)) {
+		$result['host_groups'] = API::HostGroup()->get([
+			'output' => ['name'],
+			'groupids' => array_keys($data['groupids']),
+			'preservekeys' => true
+		]);
+	}
+
+	if (array_key_exists('templateids', $data)) {
+		$result['templates'] = API::Template()->get([
+			'output' => ['name'],
+			'templateids' => array_keys($data['templateids']),
+			'preservekeys' => true
+		]);
+	}
+
+	if (array_key_exists('scriptids', $data)) {
+		$result['scripts'] = API::Script()->get([
+			'output' => ['name'],
+			'scriptids' => array_keys($data['scriptids']),
+			'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
+			'preservekeys' => true
+		]);
+	}
+
+	return $result;
+}
+
 /**
  * Gathers media types, user groups, users, host groups, hosts and templates for actions and their operations, and
  * returns the HTML representation of action operation values according to action operation type.
@@ -389,197 +568,16 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
  * @return array  Returns an array of actions operation descriptions.
  */
 function getActionOperationDescriptions(int $eventsource, array $actions, int $type): array {
+	$data = getActionOperationData($actions, $type);
+	$operation_values = getOperationDataValues($data);
 	$result = [];
 
-	$media_typeids = [];
-	$userids = [];
-	$usr_grpids = [];
-	$hostids = [];
-	$groupids = [];
-	$templateids = [];
-	$scriptids = [];
-
-	foreach ($actions as $i => $action) {
-		$result[$i] = [];
-
-		if ($type == ACTION_OPERATION) {
-			foreach ($action['operations'] as $j => $operation) {
-				$result[$i][$j] = [];
-
-				switch ($operation['operationtype']) {
-					case OPERATION_TYPE_MESSAGE:
-						$media_typeid = $operation['opmessage']['mediatypeid'];
-
-						if ($media_typeid != 0) {
-							$media_typeids[$media_typeid] = $media_typeid;
-						}
-
-						if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
-							foreach ($operation['opmessage_usr'] as $users) {
-								$userids[$users['userid']] = $users['userid'];
-							}
-						}
-
-						if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
-							foreach ($operation['opmessage_grp'] as $user_groups) {
-								$usr_grpids[$user_groups['usrgrpid']] = $user_groups['usrgrpid'];
-							}
-						}
-						break;
-
-					case OPERATION_TYPE_COMMAND:
-						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
-							foreach ($operation['opcommand_hst'] as $host) {
-								if ($host['hostid'] != 0) {
-									$hostids[$host['hostid']] = $host['hostid'];
-								}
-							}
-						}
-
-						if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
-							foreach ($operation['opcommand_grp'] as $host_group) {
-								$groupids[$host_group['groupid']] = true;
-							}
-						}
-
-						$scriptids[$operation['opcommand']['scriptid']] = true;
-						break;
-
-					case OPERATION_TYPE_GROUP_ADD:
-					case OPERATION_TYPE_GROUP_REMOVE:
-						foreach ($operation['opgroup'] as $groupid) {
-							$groupids[$groupid['groupid']] = true;
-						}
-						break;
-
-					case OPERATION_TYPE_TEMPLATE_ADD:
-					case OPERATION_TYPE_TEMPLATE_REMOVE:
-						foreach ($operation['optemplate'] as $templateid) {
-							$templateids[$templateid['templateid']] = true;
-						}
-						break;
-				}
-			}
-		}
-		else {
-			$operations_key = ($type == ACTION_RECOVERY_OPERATION)
-				? 'recovery_operations'
-				: 'update_operations';
-
-			foreach ($action[$operations_key] as $j => $operation) {
-				$result[$i][$j] = [];
-
-				switch ($operation['operationtype']) {
-					case OPERATION_TYPE_MESSAGE:
-						$media_typeid = $operation['opmessage']['mediatypeid'];
-
-						if ($media_typeid != 0) {
-							$media_typeids[$media_typeid] = $media_typeid;
-						}
-
-						if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
-							foreach ($operation['opmessage_usr'] as $users) {
-								$userids[$users['userid']] = $users['userid'];
-							}
-						}
-
-						if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
-							foreach ($operation['opmessage_grp'] as $user_groups) {
-								$usr_grpids[$user_groups['usrgrpid']] = $user_groups['usrgrpid'];
-							}
-						}
-						break;
-
-					case OPERATION_TYPE_COMMAND:
-						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
-							foreach ($operation['opcommand_hst'] as $host) {
-								if ($host['hostid'] != 0) {
-									$hostids[$host['hostid']] = $host['hostid'];
-								}
-							}
-						}
-
-						if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
-							foreach ($operation['opcommand_grp'] as $host_group) {
-								$groupids[$host_group['groupid']] = true;
-							}
-						}
-
-						$scriptids[$operation['opcommand']['scriptid']] = true;
-						break;
-				}
-			}
-		}
-	}
-
-	$media_types = [];
-	$user_groups = [];
-	$hosts = [];
-	$host_groups = [];
-	$templates = [];
-	$scripts = [];
-
-	if ($media_typeids) {
-		$media_types = API::Mediatype()->get([
-			'output' => ['name'],
-			'mediatypeids' => $media_typeids,
-			'preservekeys' => true
-		]);
-	}
-
-	if ($userids) {
-		$fullnames = [];
-
-		$users = API::User()->get([
-			'output' => ['userid', 'username', 'name', 'surname'],
-			'userids' => $userids
-		]);
-
-		foreach ($users as $user) {
-			$fullnames[$user['userid']] = getUserFullname($user);
-		}
-	}
-
-	if ($usr_grpids) {
-		$user_groups = API::UserGroup()->get([
-			'output' => ['name'],
-			'usrgrpids' => $usr_grpids,
-			'preservekeys' => true
-		]);
-	}
-
-	if ($hostids) {
-		$hosts = API::Host()->get([
-			'output' => ['name'],
-			'hostids' => $hostids,
-			'preservekeys' => true
-		]);
-	}
-
-	if ($groupids) {
-		$host_groups = API::HostGroup()->get([
-			'output' => ['name'],
-			'groupids' => array_keys($groupids),
-			'preservekeys' => true
-		]);
-	}
-
-	if ($templateids) {
-		$templates = API::Template()->get([
-			'output' => ['name'],
-			'templateids' => array_keys($templateids),
-			'preservekeys' => true
-		]);
-	}
-
-	if ($scriptids) {
-		$scripts = API::Script()->get([
-			'output' => ['name'],
-			'scriptids' => array_keys($scriptids),
-			'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
-			'preservekeys' => true
-		]);
-	}
+	$media_types = array_key_exists('media_types', $operation_values) ? $operation_values['media_types'] : [];
+	$user_groups = array_key_exists('user_groups', $operation_values) ? $operation_values['user_groups'] : [];
+	$hosts = array_key_exists('hosts', $operation_values) ? $operation_values['hosts'] : [];
+	$host_groups = array_key_exists('host_groups', $operation_values) ? $operation_values['host_groups'] : [];
+	$templates = array_key_exists('templates', $operation_values) ? $operation_values['templates'] : [];
+	$scripts = array_key_exists('scripts', $operation_values) ? $operation_values['scripts'] : [];
 
 	// Format the HTML output.
 	foreach ($actions as $i => $action) {
@@ -598,8 +596,8 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 							$user_names_list = [];
 
 							foreach ($operation['opmessage_usr'] as $user) {
-								if (isset($fullnames[$user['userid']])) {
-									$user_names_list[] = $fullnames[$user['userid']];
+								if (array_key_exists($user['userid'], $operation_values['users']['fullnames'])){
+									$user_names_list[] =$operation_values['users']['fullnames'][$user['userid']];
 								}
 							}
 

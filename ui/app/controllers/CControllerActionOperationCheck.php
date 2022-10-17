@@ -217,6 +217,7 @@ class CControllerActionOperationCheck extends CController {
 	protected function doAction(): void {
 		$operation = $this->getInput('operation');
 		$operationtype = preg_replace('[\D]', '', $operation['operationtype']);
+		$eventsource = $operation['eventsource'];
 
 		if (preg_match('/\bscriptid\b/', $operation['operationtype'])){
 			$operationtype = OPERATION_TYPE_COMMAND;
@@ -231,9 +232,25 @@ class CControllerActionOperationCheck extends CController {
 			unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
 		}
 
+		$operation['operationtype'] = $operationtype;
+
+		$action = [
+			'name' => '',
+			'esc_period' => DB::getDefault('actions', 'esc_period'),
+			'eventsource' => $eventsource,
+			'status' => 0,
+			'operations' => $operation['recovery'] == ACTION_OPERATION? [$operation] : [],
+			'recovery_operations' => $operation['recovery'] == ACTION_RECOVERY_OPERATION ? [$operation] : [],
+			'update_operations' => $operation['recovery'] == ACTION_UPDATE_OPERATION ? [$operation] : [],
+			'filter' => [
+				'conditions' => [],
+				'evaltype' => ''
+			],
+			'pause_suppressed' => ACTION_PAUSE_SUPPRESSED_TRUE,
+			'notify_if_canceled' =>  ACTION_NOTIFY_IF_CANCELED_TRUE
+		];
+
 		$data['operation'] = $operation;
-		$data['operation']['operationtype'] = $operationtype;
-		$data['operation']['details'] = $this->getActionOperationDescription($operation);
 
 		if ($operationtype == OPERATION_TYPE_COMMAND) {
 			$data['operation']['opcommand']['scriptid'] = preg_replace('[\D]', '', $operation['operationtype']);
@@ -243,20 +260,20 @@ class CControllerActionOperationCheck extends CController {
 			}
 		}
 
-		$eventsource = $operation['eventsource'];
-
 		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_SERVICE, EVENT_SOURCE_INTERNAL])
 				&& $operation['recovery'] == ACTION_OPERATION) {
 			$data['operation']['start_in'] = $this->createStartInColumn($operation);
 
 			if ($operation['recovery'] == ACTION_OPERATION &&
-					($operation['eventsource'] == EVENT_SOURCE_TRIGGERS
-					|| $operation['eventsource'] == EVENT_SOURCE_INTERNAL
-					|| $operation['eventsource'] == EVENT_SOURCE_SERVICE)) {
+					($eventsource == EVENT_SOURCE_TRIGGERS
+					|| $eventsource == EVENT_SOURCE_INTERNAL
+					|| $eventsource == EVENT_SOURCE_SERVICE)) {
 				$data['operation']['duration'] = $this->createDurationColumn($operation['esc_period']);
 				$data['operation']['steps'] = $this->createStepsColumn($operation);
 			}
 		}
+		$data['operation']['operationtype'] = $operationtype;
+		$data['operation']['details'] = $this->getData($operationtype, [$action], $operation['recovery']);
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
@@ -305,195 +322,34 @@ class CControllerActionOperationCheck extends CController {
 			: $step_duration;
 	}
 
-	function getActionOperationDescription(array $operation): array {
+	protected function getData(int $operationtype, array $action, int $type): array {
+		$data = getActionOperationData($action, $type);
+		$operation_values = getOperationDataValues($data);
 		$result = [];
 
-		$media_typeids = [];
-		$userids = [];
-		$usr_grpids = [];
-		$hostids = [];
-		$groupids = [];
-		$templateids = [];
-		$scriptids = [];
+		$media_types = array_key_exists('media_types', $operation_values) ? $operation_values['media_types'] : [];
+		$user_groups = array_key_exists('user_groups', $operation_values) ? $operation_values['user_groups'] : [];
+		$hosts = array_key_exists('hosts', $operation_values) ? $operation_values['hosts'] : [];
+		$host_groups = array_key_exists('host_groups', $operation_values) ? $operation_values['host_groups'] : [];
+		$templates = array_key_exists('templates', $operation_values) ? $operation_values['templates'] : [];
+		$scripts = array_key_exists('scripts', $operation_values) ? $operation_values['scripts'] : [];
 
-		$type = $operation['recovery'];
-		$operationtype = preg_replace('[\D]', '', $operation['operationtype']);
+		switch ($type) {
+			case ACTION_OPERATION:
+				$operation = $action[0]['operations'][0];
+				break;
 
+			case ACTION_RECOVERY_OPERATION:
+				$operation = $action[0]['recovery_operations'][0];
+				break;
 
-		if (preg_match('/\bscriptid\b/', $operation['operationtype'])){
-			$operationtype = OPERATION_TYPE_COMMAND;
-		}
-
-		if ($type == ACTION_OPERATION) {
-			switch ($operationtype) {
-				case OPERATION_TYPE_MESSAGE:
-					$media_typeid = $operation['opmessage']['mediatypeid'];
-
-					if ($media_typeid != 0) {
-						$media_typeids[$media_typeid] = $media_typeid;
-					}
-
-					if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
-						foreach ($operation['opmessage_usr'] as $users) {
-							$userids[$users['userid']] = $users['userid'];
-						}
-					}
-
-					if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
-						foreach ($operation['opmessage_grp'] as $user_groups) {
-							$usr_grpids[$user_groups['usrgrpid']] = $user_groups['usrgrpid'];
-						}
-					}
-					break;
-
-				case OPERATION_TYPE_COMMAND:
-					if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
-						foreach ($operation['opcommand_hst'] as $host) {
-							if (!array_key_exists('current_host', $host)) {
-								$hostids[$host['hostid']] = $host['hostid'];
-							}
-						}
-					}
-
-					if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
-						foreach ($operation['opcommand_grp'] as $host_group) {
-							$groupids[$host_group['groupid']] = true;
-						}
-					}
-
-					$scriptids[$operation['opcommand']['scriptid']] = true;
-					break;
-
-				case OPERATION_TYPE_GROUP_ADD:
-				case OPERATION_TYPE_GROUP_REMOVE:
-					foreach ($operation['opgroup'] as $groupid) {
-						$groupids[$groupid['groupid']] = true;
-					}
-					break;
-
-				case OPERATION_TYPE_TEMPLATE_ADD:
-				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					foreach ($operation['optemplate'] as $templateid) {
-						$templateids[$templateid['templateid']] = true;
-					}
-					break;
-			}
-		}
-		else {
-			switch ($operationtype) {
-				case OPERATION_TYPE_MESSAGE:
-					$media_typeid = $operation['opmessage']['mediatypeid'];
-
-					if ($media_typeid != 0) {
-						$media_typeids[$media_typeid] = $media_typeid;
-					}
-
-					if (array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr']) {
-						foreach ($operation['opmessage_usr'] as $users) {
-							$userids[$users['userid']] = $users['userid'];
-						}
-					}
-
-					if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
-						foreach ($operation['opmessage_grp'] as $user_groups) {
-							$usr_grpids[$user_groups['usrgrpid']] = $user_groups['usrgrpid'];
-						}
-					}
-					break;
-
-				case OPERATION_TYPE_COMMAND:
-					if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
-						foreach ($operation['opcommand_hst'] as $host) {
-							if (!array_key_exists('current_host', $host)) {
-								$hostids[$host['hostid']] = $host['hostid'];
-							}
-						}
-					}
-
-					if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
-						foreach ($operation['opcommand_grp'] as $host_group) {
-							$groupids[$host_group['groupid']] = true;
-						}
-					}
-
-					$scriptids[$operation['opcommand']['scriptid']] = true;
-					break;
-			}
-		}
-
-		$media_types = [];
-		$user_groups = [];
-		$hosts = [];
-		$host_groups = [];
-		$templates = [];
-		$scripts = [];
-
-		if ($media_typeids) {
-			$media_types = API::Mediatype()->get([
-				'output' => ['name'],
-				'mediatypeids' => $media_typeids,
-				'preservekeys' => true
-			]);
-		}
-
-		if ($userids) {
-			$fullnames = [];
-
-			$users = API::User()->get([
-				'output' => ['userid', 'username', 'name', 'surname'],
-				'userids' => $userids
-			]);
-
-			foreach ($users as $user) {
-				$fullnames[$user['userid']] = getUserFullname($user);
-			}
-		}
-
-		if ($usr_grpids) {
-			$user_groups = API::UserGroup()->get([
-				'output' => ['name'],
-				'usrgrpids' => $usr_grpids,
-				'preservekeys' => true
-			]);
-		}
-
-		if ($hostids) {
-			$hosts = API::Host()->get([
-				'output' => ['name'],
-				'hostids' => $hostids,
-				'preservekeys' => true
-			]);
-		}
-
-		if ($groupids) {
-			$host_groups = API::HostGroup()->get([
-				'output' => ['name'],
-				'groupids' => array_keys($groupids),
-				'preservekeys' => true
-			]);
-		}
-
-		if ($templateids) {
-			$templates = API::Template()->get([
-				'output' => ['name'],
-				'templateids' => array_keys($templateids),
-				'preservekeys' => true
-			]);
-		}
-
-		if ($scriptids) {
-			$scriptid = preg_replace('[\D]', '', $operation['operationtype']);
-			$scripts = API::Script()->get([
-				'output' => ['name'],
-				'scriptids' => $scriptid,
-				'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
-				'preservekeys' => true
-			]);
+			case ACTION_UPDATE_OPERATION:
+				$operation =  $action[0]['update_operations'][0];
+				break;
 		}
 
 		// Format the output.
 		if ($type == ACTION_OPERATION) {
-
 			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
 					$media_type = _('all media');
@@ -532,7 +388,7 @@ class CControllerActionOperationCheck extends CController {
 						$result['type'][] = _('Send message to user groups').': ';
 						$result['data'][] = [implode(', ', $user_groups_list), _('via'), $media_type];
 					}
-					break;
+				break;
 
 				case OPERATION_TYPE_COMMAND:
 					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
@@ -612,7 +468,7 @@ class CControllerActionOperationCheck extends CController {
 
 					$result['data'][] = [implode(', ', $host_group_list)];
 
-				break;
+					break;
 
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
@@ -646,6 +502,7 @@ class CControllerActionOperationCheck extends CController {
 		else {
 			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
+
 					$media_type = _('all media');
 					$media_typeid = $operation['opmessage']['mediatypeid'];
 

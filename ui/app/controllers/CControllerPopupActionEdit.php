@@ -145,7 +145,7 @@ class CControllerPopupActionEdit extends CController {
 					'name' => '',
 					'esc_period' => DB::getDefault('actions', 'esc_period'),
 					'eventsource' => $eventsource,
-					'status' =>'',
+					'status' => '',
 					'operations' => [],
 					'recovery_operations' => [],
 					'update_operations' => [],
