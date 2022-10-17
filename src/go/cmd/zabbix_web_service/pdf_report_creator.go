@@ -29,6 +29,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/log"
@@ -120,6 +121,23 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 	u, err := parseUrl(req.URL)
 	if err != nil {
 		logAndWriteError(w, fmt.Sprintf("Incorrect request url: %s", err.Error()), http.StatusBadRequest)
+		return
+	}
+
+	if u.Scheme != "http" && u.Scheme != "https" {
+		logAndWriteError(w, fmt.Sprintf("Unexpected URL scheme: \"%s\"", u.Scheme), http.StatusBadRequest)
+		return
+	}
+
+	if ! strings.HasSuffix(u.Path, "/zabbix.php") {
+		logAndWriteError(w, fmt.Sprintf("Unexpected URL path: \"%s\"", u.Path), http.StatusBadRequest)
+		return
+	}
+
+	queryParams := u.Query()
+
+	if queryParams.Get("action") != "dashboard.print" {
+		logAndWriteError(w, fmt.Sprintf("Unexpected URL action: \"%s\"", queryParams.Get("action")), http.StatusBadRequest)
 		return
 	}
 
