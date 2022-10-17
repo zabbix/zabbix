@@ -969,6 +969,23 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
+			// Headers -screenshot
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Headers -screenshot',
+					'headers' => [
+						['name' => 'header name', 'value' => 'header value'],
+						['name' => 'Content-Type', 'value' => 'application/json'],
+						['name' => 'Any name', 'value' => 'Any value']
+					],
+					'add_step' => [
+						['step' => 'Headers -screenshot'],
+						['step' => 'Headers -screenshot2'],
+						['step' => 'Headers -screenshot3']
+					]
+				]
+			],
 			// Headers -empty value
 			[
 				[
@@ -1469,6 +1486,11 @@ class testFormWeb extends CLegacyWebTest {
 				$i++;
 			}
 		}
+		// Take a screenshot to test draggable object position (It is here because of scrolling).
+		if (isset($data['name']) && $data['name'] === 'Headers -screenshot') {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('xpath://table[@data-type="headers"]')->waitUntilPresent()->one(), 'Web_Headers_fields');
+		}
 
 		$this->zbxTestTabSwitchById('tab_authenticationTab', 'Authentication');
 		if (isset($data['authentication'])) {
@@ -1502,6 +1524,12 @@ class testFormWeb extends CLegacyWebTest {
 					$this->zbxTestClickXpathWait('//table[contains(@class, "httpconf-steps-dynamic-row")]//button[contains(@class,"element-table-remove")]');
 				}
 			}
+		}
+
+		// Take a screenshot to test draggable object position.
+		if (isset($data['name']) && $data['name'] === 'Headers -screenshot') {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('class:httpconf-steps-dynamic-row')->waitUntilPresent()->one(), 'Web_steps');
 		}
 
 		$this->zbxTestClickWait('add');

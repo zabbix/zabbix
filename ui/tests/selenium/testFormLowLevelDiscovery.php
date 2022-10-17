@@ -2047,4 +2047,35 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->assertEquals($lld_macro['path'], $row->getColumn('JSONPath')->query('tag:textarea')->one()->getValue());
 		}
 	}
+
+	/**
+	 * Test screenshot of a discovery rule Preprocessing Steps tab.
+	 */
+	public function testFormLowLevelDiscovery_PreprocessingStepsScreenshot() {
+		$this->page->login()->open('host_discovery.php?hostid='.$this->hostid);
+		$this->query('button:Create discovery rule')->one()->click();
+
+		$form = $this->query('name:itemForm')->asForm()->one();
+		$form->getField('Name')->fill('Rule for a screenshot');
+		$form->getField('Key')->fill('key');
+		$form->selectTab('Preprocessing');
+
+		$macros_table = $form->getField('Preprocessing steps');
+		$button = $macros_table->query('button:Add')->one();
+		$fields = [
+			['name' => 'Regular expression', 'parameter' => '?bytes.free.first()'],
+			['name' => 'Replace', 'parameter' => 'string_to_replace'],
+			['name' => 'JSONPath', 'parameter' => '$.object.name']
+		];
+
+		foreach ($fields as $i => $step) {
+			$button->click();
+			$macros_table->query('id:preprocessing_'.$i.'_type')->asDropdown()->one()->select($step['name']);
+			$macros_table->query('id:preprocessing_'.$i.'_params_0')->one()->fill($step['parameter']);
+		}
+
+		// Take a screenshot to test draggable object position.
+		$this->page->removeFocus();
+		$this->assertScreenshot($this->query('id:preprocessing')->waitUntilPresent()->one(), 'LLD_preprocessing');
+	}
 }

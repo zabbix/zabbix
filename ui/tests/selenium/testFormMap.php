@@ -140,4 +140,27 @@ class testFormMap extends CLegacyWebTest {
 		}
 	}
 
+	/**
+	 * Test screenshot of a Map Element with trigger type.
+	 */
+	public function testFormMap_MapElementScreenshot() {
+		$this->page->login()->open('sysmaps.php');
+		$this->query('class:list-table')->one()->query('link:Test map 1')->one()->click();
+		$this->query('button:Edit map')->one()->click();
+		$this->query('xpath://div[@data-id="3"]')->one()->click();
+
+		$form = $this->query('id:map-window')->asForm()->one()->waitUntilReady();
+		$form->query('id:elementType')->asDropdown()->one()->select('Trigger');
+
+		$triggers = $form->getField('New triggers')->asMultiselect();
+		$triggers->selectMultiple(
+				['First test trigger with tag priority',
+				'Fourth test trigger with tag priority',
+				'Lack of available memory (<20M of *UNKNOWN*)'], 'ЗАББИКС Сервер'
+		);
+		$form->query('button:Add')->one()->click();
+		// Take a screenshot to test draggable object position.
+		$this->page->removeFocus();
+		$this->assertScreenshot($this->query('id:triggerContainer')->waitUntilPresent()->one(), 'Map_element');
+	}
 }

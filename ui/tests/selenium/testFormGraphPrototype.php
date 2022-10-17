@@ -1041,7 +1041,13 @@ class testFormGraphPrototype extends CLegacyWebTest {
 						'Incorrect value "-22" for "Height" field: must be between 20 and 65535.'
 					]
 				]
-			]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'graphName' => 'graphProtoScreenshot',
+				]
+			],
 		];
 	}
 
@@ -1084,6 +1090,11 @@ class testFormGraphPrototype extends CLegacyWebTest {
 				'context' => $this->hostGroup
 			]);
 			$this->query('link', $this->itemSimple)->waitUntilClickable()->one()->click();
+
+			if (CTestArrayHelper::get($data, 'graphName') === 'graphProtoScreenshot') {
+				// Take a screenshot to test draggable object position.
+				$this->assertScreenshot($this->query('id:itemsTable')->one(), 'GraphPrototype_Items');
+			}
 
 			if (isset($data['removeItem'])) {
 				$this->zbxTestClickWait('items_0_remove');

@@ -1023,6 +1023,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 					$this->zbxTestAssertElementValue("preprocessing_".($itemPreproc['step']-1)."_params_1", $reg_exp[1]);
 				}
 			}
+			// Take a screenshot to test draggable object position.
+			$this->assertScreenshot($this->query('id:preprocessing')->one(), 'prototype_preprocessing');
 		}
 	}
 

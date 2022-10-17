@@ -823,6 +823,20 @@ class testFormGraph extends CLegacyWebTest {
 					'dbCheck' => true,
 					'formCheck' => true
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'graphForScreenshot',
+					'graphtype' => 'Normal',
+					'addItems' => [
+						['itemName' => 'testFormItem'],
+						['itemName' => 'testFormItem1'],
+						['itemName' => 'testFormItem2'],
+						['itemName' => 'testFormItem3']
+					],
+					'screenshot' => true
+				]
 			]
 		];
 	}
@@ -864,6 +878,11 @@ class testFormGraph extends CLegacyWebTest {
 				if(isset($item['remove'])) {
 					$this->zbxTestClickWait('items_0_remove');
 					$this->zbxTestTextNotPresent($link);
+				}
+
+				if (isset($data['screenshot']) && $item['itemName'] === 'testFormItem3') {
+				// Take a screenshot to test draggable object position.
+				$this->assertScreenshot($this->query('id:itemsTable')->one(), 'Graph_Items');
 				}
 			}
 		}

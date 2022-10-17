@@ -977,6 +977,26 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'check_form' => true
 				]
+			],
+			// Instance for the screenshot.
+			[
+				[
+					'fields' => [
+						'Name' => 'item for screenshot',
+						'Key' => 'screenshot',
+						'URL' => 'zabbix.com'
+					],
+					'query' => [
+						['name' => 'login', 'value' => 'administrator'],
+						['name' => 'password', 'value' => 'passw0rd1'],
+						['name' => 'some name', 'value' => 'any value']
+					],
+					'headers' => [
+						['name' => 'Content-Type', 'value' => 'application/json'],
+						['name' => 'Content-Type', 'value' => 'application/xml'],
+						['name' => 'new header', 'value' => 'new value']
+					]
+				]
 			]
 		];
 	}
@@ -1026,6 +1046,13 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		// Check query fields after url parse.
 		if (array_key_exists('parsed_query', $data)) {
 			$this->parseUrlAndCheckQuery($data['parsed_query'], $data['parsed_url']);
+		}
+
+		// Take a screenshot to test draggable object position.
+		if ($data['fields']['Name'] === 'item for screenshot') {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('id:query_fields_pairs')->one(), 'Query_fields');
+			$this->assertScreenshot($this->query('id:headers_pairs')->one(), 'Headers_fields');
 		}
 
 		$this->zbxTestClickWait('add');
