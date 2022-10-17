@@ -361,6 +361,7 @@ function PopUp(action, parameters, {
 		.then(function(resp) {
 			if ('error' in resp) {
 				overlay.setProperties({
+					title: resp.header !== undefined ? resp.header : '',
 					content: makeMessageBox('bad', resp.error.messages, resp.error.title, false),
 					buttons: [
 						{

@@ -78,8 +78,8 @@ class CControllerDashboardWidgetEdit extends CController {
 			$this->setResponse(
 				(new CControllerResponseData([
 					'main_block' => json_encode([
+						'header' => $this->hasInput('unique_id') ? _('Edit widget') : _('Add widget'),
 						'error' => [
-							'title' => $this->hasInput('unique_id') ? _('Edit widget') : _('Add widget'),
 							'messages' => array_column(get_and_clear_messages(), 'message')
 						]
 					], JSON_THROW_ON_ERROR)
