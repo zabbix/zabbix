@@ -115,11 +115,11 @@ function getMenuPopupHost(options, trigger_element) {
 	// go to section
 	if (options.hasGoTo) {
 		// dashboard
-		url = new Curl('zabbix.php', false);
-		url.setArgument('action', 'host.dashboard.view')
-		url.setArgument('hostid', options.hostid)
-
 		if (options.allowed_ui_hosts) {
+			url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'host.dashboard.view')
+			url.setArgument('hostid', options.hostid)
+
 			items.push({
 				label: t('Dashboards'),
 				disabled: !options.showDashboards,
@@ -128,22 +128,25 @@ function getMenuPopupHost(options, trigger_element) {
 		}
 
 		// problems
-		url = new Curl('zabbix.php', false);
-		url.setArgument('action', 'problem.view');
-		url.setArgument('filter_name', '');
-		url.setArgument('hostids[]', options.hostid);
-		if (typeof options.severities !== 'undefined') {
-			url.setArgument('severities[]', options.severities);
-		}
-		if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
-			url.setArgument('show_suppressed', '1');
-		}
-		if (typeof options.tags !== 'undefined') {
-			url.setArgument('tags', options.tags);
-			url.setArgument('evaltype', options.evaltype);
-		}
-
 		if (options.allowed_ui_problems) {
+			url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'problem.view');
+			url.setArgument('filter_name', '');
+			url.setArgument('hostids[]', options.hostid);
+
+			if (typeof options.severities !== 'undefined') {
+				url.setArgument('severities[]', options.severities);
+			}
+
+			if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
+				url.setArgument('show_suppressed', '1');
+			}
+
+			if (typeof options.tags !== 'undefined') {
+				url.setArgument('tags', options.tags);
+				url.setArgument('evaltype', options.evaltype);
+			}
+
 			items.push({
 				label: t('Problems'),
 				disabled: !options.showTriggers,
@@ -152,17 +155,18 @@ function getMenuPopupHost(options, trigger_element) {
 		}
 
 		// latest data
-		url = new Curl('zabbix.php', false);
-		url.setArgument('action', 'latest.view');
-		if (typeof options.tags !== 'undefined') {
-			url.setArgument('tags', options.tags);
-			url.setArgument('evaltype', options.evaltype);
-		}
-		url.setArgument('filter_name', '');
-		url.setArgument('hostids[]', options.hostid);
-
-
 		if (options.allowed_ui_latest_data) {
+			url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'latest.view');
+
+			if (typeof options.tags !== 'undefined') {
+				url.setArgument('tags', options.tags);
+				url.setArgument('evaltype', options.evaltype);
+			}
+
+			url.setArgument('filter_name', '');
+			url.setArgument('hostids[]', options.hostid);
+
 			items.push({
 				label: t('Latest data'),
 				url: url.getUrl()
@@ -170,12 +174,12 @@ function getMenuPopupHost(options, trigger_element) {
 		}
 
 		// graphs
-		url = new Curl('zabbix.php', false);
-		url.setArgument('action', 'charts.view')
-		url.setArgument('filter_hostids[]', options.hostid);
-		url.setArgument('filter_set', '1');
-
 		if (options.allowed_ui_hosts) {
+			url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'charts.view')
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('filter_set', '1');
+
 			items.push({
 				label: t('Graphs'),
 				disabled: !options.showGraphs,
@@ -184,12 +188,12 @@ function getMenuPopupHost(options, trigger_element) {
 		}
 
 		// web
-		url = new Curl('zabbix.php', false);
-		url.setArgument('action', 'web.view');
-		url.setArgument('filter_hostids[]', options.hostid);
-		url.setArgument('filter_set', '1');
-
 		if (options.allowed_ui_hosts) {
+			url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'web.view');
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('filter_set', '1');
+
 			items.push({
 				label: t('Web'),
 				disabled: !options.showWeb,
@@ -198,10 +202,10 @@ function getMenuPopupHost(options, trigger_element) {
 		}
 
 		// inventory link
-		url = new Curl('hostinventories.php', false);
-		url.setArgument('hostid', options.hostid);
-
 		if (options.allowed_ui_inventory) {
+			url = new Curl('hostinventories.php', false);
+			url.setArgument('hostid', options.hostid);
+
 			items.push({
 				label: t('Inventory'),
 				url: url.getUrl()
@@ -214,79 +218,91 @@ function getMenuPopupHost(options, trigger_element) {
 				items: items
 			});
 		}
-	}
 
-	// Configuration
-	if (options.allowed_ui_conf_hosts) {
-		// host
-		url = new Curl('zabbix.php', false);
-		url.setArgument('action', 'host.edit');
-		url.setArgument('hostid', options.hostid);
+		// Configuration
+		if (options.allowed_ui_conf_hosts) {
+			// host
+			url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'host.edit');
+			url.setArgument('hostid', options.hostid);
 
-		config_urls.push({
-			label: t('Host'),
-			disabled: !options.isWriteable,
-			url: url.getUrl(),
-			clickCallback: function(e){
-				e.preventDefault();
-				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+			config_urls.push({
+				label: t('Host'),
+				disabled: !options.isWriteable,
+				url: url.getUrl(),
+				clickCallback: function(e) {
+					e.preventDefault();
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-				view.editHost(options.hostid);
-			}
-		});
+					view.editHost(options.hostid);
+				}
+			});
 
-		// items
-		url = new Curl('items.php', false);
-		url.setArgument('filter_set', '1');
-		url.setArgument('filter_hostids[]', options.hostid);
-		url.setArgument('context', 'host');
+			// items
+			url = new Curl('items.php', false);
+			url.setArgument('filter_set', '1');
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('context', 'host');
 
-		config_urls.push({
-			label: t('Items'),
-			disabled: !options.isWriteable,
-			url: url.getUrl()
-		});
+			config_urls.push({
+				label: t('Items'),
+				disabled: !options.isWriteable,
+				url: url.getUrl()
+			});
 
-		// triggers
-		url = new Curl('triggers.php', false);
-		url.setArgument('filter_set', '1');
-		url.setArgument('filter_hostids[]', options.hostid);
-		url.setArgument('context', 'host');
+			// triggers
+			url = new Curl('triggers.php', false);
+			url.setArgument('filter_set', '1');
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('context', 'host');
 
-		config_urls.push({
-			label: t('Triggers'),
-			disabled: !options.isWriteable,
-			url: url.getUrl()
-		});
+			config_urls.push({
+				label: t('Triggers'),
+				disabled: !options.isWriteable,
+				url: url.getUrl()
+			});
 
-		// discovery
-		url = new Curl('host_discovery.php', false);
-		url.setArgument('filter_set', '1');
-		url.setArgument('filter_hostids[]', options.hostid);
-		url.setArgument('context', 'host');
+			// graphs
+			url = new Curl('graphs.php', false);
+			url.setArgument('filter_set', '1');
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('context', 'host');
 
-		config_urls.push({
-			label: t('Discovery'),
-			disabled: !options.isWriteable,
-			url: url.getUrl()
-		});
+			config_urls.push({
+				label: t('Graphs'),
+				disabled: !options.isWriteable,
+				url: url.getUrl()
+			});
 
-		// web scenario
-		url = new Curl('httpconf.php', false);
-		url.setArgument('filter_set', '1');
-		url.setArgument('filter_hostids[]', options.hostid);
-		url.setArgument('context', 'host');
+			// discovery
+			url = new Curl('host_discovery.php', false);
+			url.setArgument('filter_set', '1');
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('context', 'host');
 
-		config_urls.push({
-			label: t('Web'),
-			disabled: !options.isWriteable,
-			url: url.getUrl()
-		});
+			config_urls.push({
+				label: t('Discovery'),
+				disabled: !options.isWriteable,
+				url: url.getUrl()
+			});
 
-		sections.push({
-			label: t('Configuration'),
-			items: config_urls
-		});
+			// web scenario
+			url = new Curl('httpconf.php', false);
+			url.setArgument('filter_set', '1');
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('context', 'host');
+
+			config_urls.push({
+				label: t('Web'),
+				disabled: !options.isWriteable,
+				url: url.getUrl()
+			});
+
+			sections.push({
+				label: t('Configuration'),
+				items: config_urls
+			});
+		}
 	}
 
 	// urls
