@@ -33,10 +33,9 @@ window.widget_problemsbysv_form = new class {
 	}
 
 	updateForm() {
-		const show_type_totals = this._show_type
-			.querySelector('input:checked').value == <?= Widget::SHOW_TOTALS ?>;
+		const show_type_totals = this._show_type.querySelector('input:checked').value == <?= Widget::SHOW_TOTALS ?>;
 
-		document.getElementById('hide_empty_groups').disabled = !show_type_totals;
+		document.getElementById('hide_empty_groups').disabled = show_type_totals;
 
 		for (const radio of document.querySelectorAll('#layout input')) {
 			radio.disabled = !show_type_totals;
