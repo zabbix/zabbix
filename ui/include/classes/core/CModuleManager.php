@@ -113,19 +113,20 @@ final class CModuleManager {
 
 		$module_class = $base_classname;
 
-		if (is_file($this->root_path.'/'.$relative_path.'/'.$classname.'.php')) {
-			$module_class = implode('\\', [$manifest['root_namespace'], $manifest['namespace'], $classname]);
-
-			if (!class_exists($module_class)) {
-				$this->errors[] = _s('Wrong %1$s.php class name for module located at %2$s.', $classname,
-					$relative_path
-				);
-
-				return;
-			}
-		}
-
 		try {
+			if (is_file($this->root_path.'/'.$relative_path.'/'.$classname.'.php')) {
+				$module_class = implode('\\', [$manifest['root_namespace'], $manifest['namespace'], $classname]);
+
+
+				if (!class_exists($module_class)) {
+					$this->errors[] = _s('Wrong %1$s.php class name for module located at %2$s.', $classname,
+						$relative_path
+					);
+
+					return;
+				}
+			}
+
 			/** @var CModule $instance */
 			$instance = new $module_class($this->root_path, $relative_path, $manifest);
 
@@ -140,7 +141,7 @@ final class CModuleManager {
 				);
 			}
 		}
-		catch (Exception $e) {
+		catch (Throwable $e) {
 			$this->errors[] = _s('%1$s - thrown by module located at %2$s.', $e->getMessage(), $relative_path);
 		}
 	}
