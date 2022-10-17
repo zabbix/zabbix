@@ -23,13 +23,12 @@ namespace SCIM;
 use API as APIRPC;
 use APIException;
 use CApiInputValidator;
-use CApiService;
 use CAuthenticationHelper;
 use CProvisioning;
 use DB;
 use Exception;
 
-class User extends CApiService {
+class User extends CScimApiService {
 
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
@@ -39,15 +38,10 @@ class User extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	private const ZBX_SCIM_ERROR_BAD_REQUEST = 400;
-	private const ZBX_SCIM_METHOD_NOT_SUPPORTED = 405;
-	private const ZBX_SCIM_ERROR_USER_NOT_FOUND = 404;
-	private const ZBX_SCIM_ERROR = 500;
-
-	private const ZBX_SCIM_USER_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User';
+	private const SCIM_USER_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User';
 
 	protected array $data = [
-		'schemas' => [self::ZBX_SCIM_USER_SCHEMA]
+		'schemas' => [self::SCIM_USER_SCHEMA]
 	];
 
 	/**
@@ -77,7 +71,7 @@ class User extends CApiService {
 			}
 			else {
 				if ($user[0]['userdirectoryid'] != $userdirectoryid) {
-					self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST,
+					self::exception(self::SCIM_ERROR_BAD_REQUEST,
 						_s('The username "%1$s" has already been taken by another user.', $options['userName'])
 					);
 				}
@@ -89,11 +83,11 @@ class User extends CApiService {
 			]);
 
 			if (!$user) {
-				self::exception(self::ZBX_SCIM_ERROR_USER_NOT_FOUND, _('This user does not exist.'));
+				self::exception(self::SCIM_ERROR_NOT_FOUND, _('This user does not exist.'));
 			}
 
 			if ($user[0]['userdirectoryid'] != $userdirectoryid) {
-				self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST,
+				self::exception(self::SCIM_ERROR_BAD_REQUEST,
 					_s('The user "%1$s" belongs to another userdirectory.', $options['id'])
 				);
 			}
@@ -182,13 +176,13 @@ class User extends CApiService {
 			$user['userid'] = $db_user['userid'];
 		}
 		else {
-			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST,
+			self::exception(self::SCIM_ERROR_BAD_REQUEST,
 				_s('The username "%1$s" has already been taken by another user.', $options['userName'])
 			);
 		}
 
 		if (!$user) {
-			self::exception(self::ZBX_SCIM_ERROR, _('Unable to create this user.'));
+			self::exception(self::SCIM_INTERNAL_ERROR, _('Unable to create this user.'));
 		}
 
 		$this->setData($user['userid'], $userdirectoryid, $options);
@@ -211,8 +205,8 @@ class User extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::ZBX_SCIM_USER_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
+		if (!in_array(self::SCIM_USER_SCHEMA, $options['schemas'], true)) {
+			self::exception(self::SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
 		}
 	}
 
@@ -279,8 +273,8 @@ class User extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::ZBX_SCIM_USER_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
+		if (!in_array(self::SCIM_USER_SCHEMA, $options['schemas'], true)) {
+			self::exception(self::SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
 		}
 
 		[$db_user] = APIRPC::User()->get([
@@ -290,10 +284,10 @@ class User extends CApiService {
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
 
 		if (!$db_user) {
-			self::exception(self::ZBX_SCIM_ERROR_USER_NOT_FOUND, _('This user does not exist.'));
+			self::exception(self::SCIM_ERROR_NOT_FOUND, _('This user does not exist.'));
 		}
 		elseif ($db_user['userdirectoryid'] != $userdirectoryid) {
-			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST,
+			self::exception(self::SCIM_ERROR_BAD_REQUEST,
 				_s('The user "%1$s" belongs to another userdirectory.', $options['id'])
 			);
 		}
@@ -308,7 +302,7 @@ class User extends CApiService {
 	 * @throws APIException
 	 */
 	public function patch(): void {
-		self::exception(self::ZBX_SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
+		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
 	}
 
 	/**
@@ -358,10 +352,10 @@ class User extends CApiService {
 		]);
 
 		if (!$db_user) {
-			self::exception(self::ZBX_SCIM_ERROR_USER_NOT_FOUND, _('This user does not exist.'));
+			self::exception(self::SCIM_ERROR_NOT_FOUND, _('This user does not exist.'));
 		}
 		elseif ($db_user['userdirectoryid'] != $userdirectoryid) {
-			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST,
+			self::exception(self::SCIM_ERROR_BAD_REQUEST,
 				_s('The user "%1$s" belongs to another userdirectory.', $options['id'])
 			);
 		}

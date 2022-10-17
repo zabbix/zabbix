@@ -20,9 +20,7 @@
 
 namespace SCIM;
 
-use CApiService;
-
-class Me extends CApiService {
+class Me extends CScimApiService {
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'put' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
@@ -31,31 +29,28 @@ class Me extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	public const ZBX_SCIM_ENDPOINT_NOT_AVAILABLE = 405;
-	public const ZBX_SCIM_METHOD_NOT_SUPPORTED = 405;
-
 	/**
 	 * Returns array with information that is or is not supported by Zabbix SCIM model.
 	 *
 	 * @return array
 	 */
 	public function get(): array {
-		self::exception(self::ZBX_SCIM_ENDPOINT_NOT_AVAILABLE, _('The requested endpoint is not available.'));
+		self::exception(self::SCIM_ERROR_BAD_REQUEST, _('The requested endpoint is not available.'));
 	}
 
 	public function put(): void {
-		self::exception(self::ZBX_SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
+		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
 	}
 
 	public function post(): void {
-		self::exception(self::ZBX_SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
+		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
 	}
 
 	public function patch(): void {
-		self::exception(self::ZBX_SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
+		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
 	}
 
 	public function delete(): void {
-		self::exception(self::ZBX_SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
+		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
 	}
 }

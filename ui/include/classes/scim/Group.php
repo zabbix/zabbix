@@ -24,11 +24,10 @@ use API as APIRPC;
 use APIException;
 use CAuthenticationHelper;
 use CApiInputValidator;
-use CApiService;
 use CProvisioning;
 use DB;
 
-class Group extends CApiService {
+class Group extends CScimApiService {
 
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
@@ -38,15 +37,10 @@ class Group extends CApiService {
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	private const ZBX_SCIM_ERROR_BAD_REQUEST = 400;
-	private const ZBX_SCIM_ERROR_GROUP_NOT_FOUND = 404;
-	private const ZBX_SCIM_METHOD_NOT_SUPPORTED = 405;
-	private const ZBX_SCIM_ERROR = 500;
-
-	private const ZBX_SCIM_GROUP_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group';
+	private const SCIM_GROUP_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group';
 
 	protected array $data = [
-		'schemas' => [self::ZBX_SCIM_GROUP_SCHEMA]
+		'schemas' => [self::SCIM_GROUP_SCHEMA]
 	];
 
 	/**
@@ -67,7 +61,7 @@ class Group extends CApiService {
 			]);
 
 			if (!$db_scim_group) {
-				self::exception(self::ZBX_SCIM_ERROR_GROUP_NOT_FOUND, _('This group does not exist.'));
+				self::exception(self::SCIM_ERROR_NOT_FOUND, _('This group does not exist.'));
 			}
 
 			$users = $this->getUsersByGroupId($options['id']);
@@ -128,7 +122,7 @@ class Group extends CApiService {
 		[$scim_groupid] = DB::insert('scim_groups', [['name' => $options['displayName']]]);
 
 		if (!$scim_groupid) {
-			self::exception(self::ZBX_SCIM_ERROR, _s('Unable to create group "%1$s".', $options['displayName']));
+			self::exception(self::SCIM_INTERNAL_ERROR, _s('Unable to create group "%1$s".', $options['displayName']));
 		}
 
 		$scim_group_members = array_column($options['members'], 'value');
@@ -140,7 +134,7 @@ class Group extends CApiService {
 			]]);
 
 			if (!$user_group) {
-				self::exception(self::ZBX_SCIM_ERROR,
+				self::exception(self::SCIM_INTERNAL_ERROR,
 					_s('Unable to add user "%1$s" to group "%2$s".', $memberid, $options['displayName'])
 				);
 			}
@@ -178,8 +172,8 @@ class Group extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::ZBX_SCIM_GROUP_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
+		if (!in_array(self::SCIM_GROUP_SCHEMA, $options['schemas'], true)) {
+			self::exception(self::SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
 		}
 	}
 
@@ -205,7 +199,7 @@ class Group extends CApiService {
 		]);
 
 		if (!$db_scim_group) {
-			self::exception(self::ZBX_SCIM_ERROR_GROUP_NOT_FOUND, _('This group does not exist.'));
+			self::exception(self::SCIM_ERROR_NOT_FOUND, _('This group does not exist.'));
 		}
 
 		$scim_group_members = array_column($options['members'], 'value');
@@ -226,7 +220,7 @@ class Group extends CApiService {
 				]]);
 
 				if (!$user_group) {
-					self::exception(self::ZBX_SCIM_ERROR,
+					self::exception(self::SCIM_INTERNAL_ERROR,
 						_s('Unable to add user "%1$s" to group "%2$s".', $userid, $options['displayName'])
 					);
 				}
@@ -275,8 +269,8 @@ class Group extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::ZBX_SCIM_GROUP_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
+		if (!in_array(self::SCIM_GROUP_SCHEMA, $options['schemas'], true)) {
+			self::exception(self::SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
 		}
 	}
 
@@ -288,7 +282,7 @@ class Group extends CApiService {
 	 * @throws APIException
 	 */
 	public function patch(): void {
-		self::exception(self::ZBX_SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
+		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
 	}
 
 	/**
@@ -311,7 +305,7 @@ class Group extends CApiService {
 		$deleted_group = DB::delete('scim_groups', ['scim_groupid' => $options['id']]);
 
 		if (!$deleted_group) {
-			self::exception(self::ZBX_SCIM_ERROR, _s('Unable to delete group "%1$s".', $options['id']));
+			self::exception(self::SCIM_INTERNAL_ERROR, _s('Unable to delete group "%1$s".', $options['id']));
 		}
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
