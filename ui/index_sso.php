@@ -53,9 +53,10 @@ use OneLogin\Saml2\Utils;
 global $SSO;
 
 if (!is_array($SSO)) {
-	$SSO = ['SETTINGS' => []];
+	$SSO = [];
 }
 
+$SSO += ['SETTINGS' => []];
 $certs = [
 	'SP_KEY'	=> 'conf/certs/sp.key',
 	'SP_CERT'	=> 'conf/certs/sp.crt',
@@ -175,7 +176,6 @@ try {
 			throw new Exception($auth->getLastErrorReason());
 		}
 
-		// $user_attributes = $auth->getAttributes();
 		$groups_key = $saml_settings['group_name'];
 
 		foreach ($auth->getAttributes() as $attribute => $value) {
@@ -206,8 +206,7 @@ try {
 			$user = $provision->getUser($user_attributes);
 			$idp_groups = [];
 
-			if (array_key_exists($groups_key, $user_attributes)
-					&& is_array($user_attributes[$groups_key])) {
+			if (array_key_exists($groups_key, $user_attributes) && is_array($user_attributes[$groups_key])) {
 				$idp_groups = $user_attributes[$groups_key];
 			}
 
