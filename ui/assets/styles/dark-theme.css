@@ -1854,7 +1854,7 @@ form.is-loading {
       position: relative; }
       .table-forms .table-forms-td-right td.td-drag-icon {
         padding: 0 0 0 0;
-        top: 8px; }
+        vertical-align: middle; }
       .table-forms .table-forms-td-right td.center {
         text-align: center;
         vertical-align: middle; }
