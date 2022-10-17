@@ -1,11 +1,14 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-11T12:57:51Z'
+  date: '2022-10-17T08:20:23Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
   host_groups:
+    -
+      uuid: 748ad4d098d447d492bb935c907f652f
+      name: Databases
     -
       uuid: 137f19e6e2dc4219b33553b812627bc2
       name: 'Virtual machines'
@@ -15,11 +18,11 @@ zabbix_export:
       template: 'Azure by HTTP'
       name: 'Azure by HTTP'
       description: |
-        The template to monitor Microsoft Azure by HTTP.
+        This template is designed to monitor Microsoft Azure by HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
-          1. Create an Azure service principal via Azure CLI for your subscription.
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
@@ -64,7 +67,7 @@ zabbix_export:
               name: 'Azure: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Zabbix has received errors in requests to API.'
+              description: 'Zabbix has received errors in response to API requests.'
               tags:
                 -
                   tag: scope
@@ -130,8 +133,15 @@ zabbix_export:
             };
             
             var result,
-                data = {};
-                data['errors'] = {};
+                data = {},
+                types = [
+                    {"method": "Microsoft.Compute/virtualMachines", "version": "2022-03-01"}, 
+                    {"method": "Microsoft.DBforMySQL/flexibleServers", "version": "2021-05-01"}, 
+                    {"method": "Microsoft.DBforMySQL/servers", "version": "2017-12-01"}
+                ];
+                data['errors'] = {},
+                data['resources'] = {};
+                data.resources.value = [];
             
             try {
                 Azure.setParams(JSON.parse(value));
@@ -154,23 +164,24 @@ zabbix_export:
             
                 if (!('auth' in data.errors)) {
                     try {
-                        raw_data = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/Microsoft.Compute/virtualMachines?api-version=2022-03-01');
+                        for (var i in types) {
+                            raw_data = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/' + types[i].method + '?api-version=' + types[i].version);
                         
-                        if ('nextLink' in raw_data) {
-                            next_data = raw_data;
-                            while ('nextLink' in next_data) {
-                                next_data = Azure.request(next_data.nextLink);
-                                next_data.value.forEach(function (value) {
-                                    raw_data.value.push(value);
-                                });
+                            if ('nextLink' in raw_data) {
+                                next_data = raw_data;
+                                while ('nextLink' in next_data) {
+                                    next_data = Azure.request(next_data.nextLink);
+                                    next_data.value.forEach(function (value) {
+                                        raw_data.value.push(value);
+                                    });
+                                }
                             }
-                        }
                         
-                        raw_data.value.forEach(function (value) {
-                            value.resourceGroup = value.id.split("/")[4];
-                        });
-            
-                        data.resources = raw_data;
+                            raw_data.value.forEach(function (value) {
+                                value.resourceGroup = value.id.split("/")[4];
+                                data.resources.value.push(value);
+                            });
+                        }
                     }
                     catch (error) {
                         data.errors.resources = error.toString();
@@ -193,7 +204,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The JSON with result of API requests.'
+          description: 'The result of API requests is in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             -
@@ -213,6 +224,139 @@ zabbix_export:
               tag: component
               value: raw
       discovery_rules:
+        -
+          uuid: 7fafbef68f8b46d083eb43da7cd1e2cc
+          name: 'MySQL servers discovery'
+          type: DEPENDENT
+          key: azure.mysql.servers.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#TYPE}'
+                value: ^Microsoft.DBforMySQL
+                formulaid: G
+              -
+                macro: '{#NAME}'
+                value: '{$AZURE.MYSQL.DB.NAME.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#NAME}'
+                value: '{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              -
+                macro: '{#LOCATION}'
+                value: '{$AZURE.MYSQL.DB.LOCATION.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#LOCATION}'
+                value: '{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
+                formulaid: B
+              -
+                macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+          description: 'The list of the MySQL servers is provided by the subscription.'
+          host_prototypes:
+            -
+              uuid: 55b87078c14c4561b53e64af5ed77d61
+              host: 'Azure MySQL server {#NAME}'
+              name: 'Azure MySQL server {#NAME}'
+              group_links:
+                -
+                  group:
+                    name: Databases
+              macros:
+                -
+                  macro: '{$AZURE.RESOURCE_ID}'
+                  value: '{#ID}'
+              tags:
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+                -
+                  tag: resource-group
+                  value: '{#GROUP}'
+                -
+                  tag: size
+                  value: '{#SIZE}'
+                -
+                  tag: version
+                  value: '{#VERSION}'
+          master_item:
+            key: azure.get.resources
+          lld_macro_paths:
+            -
+              lld_macro: '{#GROUP}'
+              path: $.resourceGroup
+            -
+              lld_macro: '{#ID}'
+              path: $.id
+            -
+              lld_macro: '{#LOCATION}'
+              path: $.location
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#SIZE}'
+              path: $.sku.name
+            -
+              lld_macro: '{#TYPE}'
+              path: $.type
+            -
+              lld_macro: '{#VERSION}'
+              path: $.properties.version
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.resources.value
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          overrides:
+            -
+              name: 'Flexible server'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: Microsoft.DBforMySQL/flexibleServers
+                    formulaid: A
+              operations:
+                -
+                  operationobject: HOST_PROTOTYPE
+                  operator: REGEXP
+                  templates:
+                    -
+                      name: 'Azure MySQL flexible server by HTTP'
+            -
+              name: 'Single server'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: Microsoft.DBforMySQL/servers
+                    formulaid: A
+              operations:
+                -
+                  operationobject: HOST_PROTOTYPE
+                  operator: REGEXP
+                  templates:
+                    -
+                      name: 'Azure MySQL single server by HTTP'
         -
           uuid: f9386233186648ce828f406c52972ce5
           name: 'Virtual machines discovery'
@@ -246,14 +390,14 @@ zabbix_export:
                 formulaid: D
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.VM.RESOURCE_GROUP.MATCHES}'
-                formulaid: A
+                value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
+                formulaid: B
               -
                 macro: '{#GROUP}'
-                value: '{$AZURE.VM.RESOURCE_GROUP.NOT_MATCHES}'
+                value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
-          description: 'A list of the virtual machines in the subscription.'
+                formulaid: A
+          description: 'The list of the virtual machines is provided by the subscription.'
           host_prototypes:
             -
               uuid: d08c0ee33c924b28bf1fed571da6c7f4
@@ -330,11 +474,35 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
-          description: 'Response timeout for API.'
+          description: 'A response timeout for API.'
+        -
+          macro: '{$AZURE.MYSQL.DB.LOCATION.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in MySQL servers discovery rules.'
+        -
+          macro: '{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in MySQL servers discovery rules.'
+        -
+          macro: '{$AZURE.MYSQL.DB.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in MySQL servers discovery rules.'
+        -
+          macro: '{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in MySQL servers discovery rules.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
+        -
+          macro: '{$AZURE.RESOURCE_GROUP.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in discovery rules.'
+        -
+          macro: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in discovery rules.'
         -
           macro: '{$AZURE.SUBSCRIPTION_ID}'
           description: 'Microsoft Azure subscription ID.'
@@ -344,41 +512,1630 @@ zabbix_export:
         -
           macro: '{$AZURE.VM.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro used in virtual machines discovery rule.'
+          description: 'This macro is used in virtual machines discovery rule.'
         -
           macro: '{$AZURE.VM.LOCATION.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro used in virtual machines discovery rule.'
+          description: 'This macro is used in virtual machines discovery rule.'
         -
           macro: '{$AZURE.VM.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro used in virtual machines discovery rule.'
+          description: 'This macro is used in virtual machines discovery rule.'
         -
           macro: '{$AZURE.VM.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro used in virtual machines discovery rule.'
+          description: 'This macro is used in virtual machines discovery rule.'
+    -
+      uuid: ec92c7b0b1d14946b6ac61de89357199
+      template: 'Azure MySQL flexible server by HTTP'
+      name: 'Azure MySQL flexible server by HTTP'
+      description: |
+        This template is designed to monitor Microsoft Azure MySQL flexible servers by HTTP.
+        It works without any external scripts and uses the script item.
+        
+        Setup:
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+            `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+            See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
+          2. Link the template to a host.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.42
+      groups:
         -
-          macro: '{$AZURE.VM.RESOURCE_GROUP.MATCHES}'
-          value: '.*'
-          description: 'This macro used in virtual machines discovery rule.'
+          name: Templates/Cloud
+      items:
         -
-          macro: '{$AZURE.VM.RESOURCE_GROUP.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'This macro used in virtual machines discovery rule.'
+          uuid: 9c87cde45e984ce282d8ba9fbe184f9b
+          name: 'Azure MySQL: Availability status detailed'
+          type: DEPENDENT
+          key: azure.db.mysql.availability.details
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The summary description of the availability status.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.health.summary
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: 7f2d8e8d94ae4c87ba0480a2d9518f65
+          name: 'Azure MySQL: Availability state'
+          type: DEPENDENT
+          key: azure.db.mysql.availability.state
+          delay: '0'
+          history: 7d
+          description: 'The availability status of the resource.'
+          valuemap:
+            name: 'Azure resource health state'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.health.availabilityState
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '3'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Available
+                - '0'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Degraded
+                - '1'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Unavailable
+                - '2'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Unknown
+                - '3'
+            -
+              type: IN_RANGE
+              parameters:
+                - '0'
+                - '3'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '3'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: e822fd2214fb41db9b57cdb8eec0444a
+              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=1'
+              name: 'Azure MySQL: MySQL server is degraded'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The resource is in degraded state.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: ebb35037a5b646a0bd2c6be44bb1f3c6
+              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=3'
+              name: 'Azure MySQL: MySQL server is in unknown state'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The resource state is unknown.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: 240b861c09a94e209036782b6c7496fa
+              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=2'
+              name: 'Azure MySQL: MySQL server is unavailable'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'The resource state is unavailable.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: cab6ac822f2c4e118b030e49cc15eaa2
+          name: 'Azure MySQL: Connections aborted'
+          type: DEPENDENT
+          key: azure.db.mysql.connections.aborted
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of aborted connections.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.aborted_connections.total
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: 3346ea2331c14fa18658eb33e461ec7c
+              expression: 'min(/Azure MySQL flexible server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED_CONN.MAX.WARN}'
+              name: 'Azure MySQL: Server has aborted connections'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The number of failed attempts to connect to the MySQL server is more than {$AZURE.DB.ABORTED_CONN.MAX.WARN}.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 71b33f0a5d37498dbb57d185ac0f2741
+          name: 'Azure MySQL: Connections active'
+          type: DEPENDENT
+          key: azure.db.mysql.connections.active
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of active connections.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.active_connections.maximum
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 1993ae276fe44db6a89451291749f703
+          name: 'Azure MySQL: Connections total'
+          type: DEPENDENT
+          key: azure.db.mysql.connections.total
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of total connections.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.total_connections.total
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: b235666b98954555ae5e75e757bba707
+          name: 'Azure MySQL: CPU credits consumed'
+          type: DEPENDENT
+          key: azure.db.mysql.cpu.credits.consumed
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Consumed CPU credits.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cpu_credits_consumed.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 4f591346d3d34d49b37cfff2a169f57e
+          name: 'Azure MySQL: CPU credits remaining'
+          type: DEPENDENT
+          key: azure.db.mysql.cpu.credits.remaining
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Remaining CPU credits.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cpu_credits_remaining.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: afe4d11c2f474428acc00d153ad2a6e5
+          name: 'Azure MySQL: Percentage CPU'
+          type: DEPENDENT
+          key: azure.db.mysql.cpu.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The CPU percent of a host.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cpu_percent.maximum
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+          triggers:
+            -
+              uuid: 5af82cc95239479c86c7ab3dabcfb592
+              expression: 'min(/Azure MySQL flexible server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              name: 'Azure MySQL: High CPU utilization'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: f960e7667571497c96454b5c4b7b69ff
+          name: 'Azure MySQL: Get errors'
+          type: DEPENDENT
+          key: azure.db.mysql.data.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'A list of errors from API requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.errors
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+          triggers:
+            -
+              uuid: 98c1b86b79e9469cac2870fb2ba42949
+              expression: 'length(last(/Azure MySQL flexible server by HTTP/azure.db.mysql.data.errors))>0'
+              name: 'Azure MySQL: There are errors in requests to API'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in response to API requests.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: de712334db1440309fa68f9252d4f9bc
+          name: 'Azure MySQL: Get data'
+          type: SCRIPT
+          key: azure.db.mysql.data.get
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var AzureDB = {
+                params: {},
+                token: null,
+            
+                setParams: function (params) {
+                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
+            
+                    AzureDB.params = params;
+                },
+            
+            
+                request: function (url, data) {
+                    if (typeof data === 'undefined' || data === null) {
+                        data = '';
+                    }
+            
+                    var response, request = new HttpRequest();
+                        if (AzureDB.token) {
+                            request.addHeader('Accept: application/json');
+                            request.addHeader('Authorization: Bearer ' + AzureDB.token);
+                        }
+                
+                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            
+                    if (data !== '') {
+                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
+                        response = request.post(url, data);
+                    }
+                    else {
+                        response = request.get(url);
+                    }
+            
+                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() !== 200 || response === null) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    try {
+                        return JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from API.';
+                    }
+            }
+            
+            };
+            
+            var metrics = [
+                'cpu_percent',
+                'memory_percent',
+                'network_bytes_egress',
+                'network_bytes_ingress',
+                'active_connections',
+                'total_connections',
+                'aborted_connections',
+                'Queries',
+                'io_consumption_percent',
+                'storage_percent',
+                'storage_used',
+                'storage_limit',
+                'backup_storage_used',
+                'replication_lag',
+                'cpu_credits_remaining',
+                'cpu_credits_consumed'
+            ],
+                prepared_metrics = [],
+                data = {};
+                data['errors'] = {};
+                data['metrics'] = {};
+            
+            try {
+                AzureDB.setParams(JSON.parse(value));
+            
+                try {
+                    result = AzureDB.request(
+                            'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+                    );
+            
+                    if ('access_token' in result) {
+                        AzureDB.token = result['access_token'];
+                    } else {
+                        throw 'Auth response does not contain access token.';
+                    }
+                }
+                catch (error) {
+                    data.errors.auth = error.toString();
+                }
+            
+                if (!('auth' in data.errors)) {
+                    try {
+                        health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
+                        data.health = health.value[0].properties;
+                    }
+                    catch (error) {
+                        data.errors.health = error.toString();
+                    }
+            
+                    for (var i = 0; i < metrics.length; i += 20) {
+                        var chunk = metrics.slice(i, i + 20);
+            
+                        prepared_metrics.push(
+                            chunk.map(function(element) {
+                                return encodeURIComponent(element);
+                            }).join(',')
+                        );
+                    }
+            
+                    start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
+                    end_date = new Date().toISOString().replace(/\.\d+/, '');
+                    
+                    for (var j in prepared_metrics) {
+                        try {
+                            metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+                            for (k in metrics_data.value) {
+                                data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                            }
+                        }
+                        catch (error) {
+                            data.errors[prepared_metrics[j]] = error.toString();
+                        }
+                    } 
+                }
+            }
+            catch (error) {
+                data.errors.params = error.toString();
+            }
+            
+            if (Object.keys(data.errors).length !== 0) {
+                errors = 'Failed to receive data:';
+                for (var error in data.errors) {
+                    errors += '\n' + error + ' : ' + data.errors[error];
+                }
+                data.errors = errors;
+            }
+            else {
+                data.errors = '';
+            }
+            
+            return JSON.stringify(data);
+          description: 'The result of API requests is in the JSON.'
+          timeout: '{$AZURE.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: app_id
+              value: '{$AZURE.APP_ID}'
+            -
+              name: password
+              value: '{$AZURE.PASSWORD}'
+            -
+              name: tenant_id
+              value: '{$AZURE.TENANT_ID}'
+            -
+              name: subscription_id
+              value: '{$AZURE.SUBSCRIPTION_ID}'
+            -
+              name: resource_id
+              value: '{$AZURE.RESOURCE_ID}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: b4a6363aac734b6c8d043718ca667c09
+          name: 'Azure MySQL: IO consumption percent'
+          type: DEPENDENT
+          key: azure.db.mysql.io.consumption.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The IO percent.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.io_consumption_percent.maximum
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: operations
+        -
+          uuid: f0f56a67942a40509d6835f3da9eb7e2
+          name: 'Azure MySQL: Memory utilization'
+          type: DEPENDENT
+          key: azure.db.mysql.memory.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The memory percent of a host.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.memory_percent.maximum
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 84f3d2b152784993944a2d4c3fad1a59
+          name: 'Azure MySQL: Network out'
+          type: DEPENDENT
+          key: azure.db.mysql.network.egress
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: bps
+          description: 'Network egress of a host in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.network_bytes_egress.total
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.0088'
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 5f38b6b4e3a849d09022bd34c4347088
+          name: 'Azure MySQL: Network in'
+          type: DEPENDENT
+          key: azure.db.mysql.network.ingress
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: bps
+          description: 'Network ingress of a host in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.network_bytes_ingress.total
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.0088'
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 05329dcdb2e14080a43d1bf7553037f6
+          name: 'Azure MySQL: Queries'
+          type: DEPENDENT
+          key: azure.db.mysql.queries
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of queries.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.Queries.total
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: queries
+        -
+          uuid: 80a05247fec04e39a99ccafaefbd0441
+          name: 'Azure MySQL: Replication lag'
+          type: DEPENDENT
+          key: azure.db.mysql.replication.lag
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Replication lag in seconds.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.replication_lag.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: replication
+        -
+          uuid: 8d5cd0d3cd0744a5a260a8a0485f6735
+          name: 'Azure MySQL: Backup storage used'
+          type: DEPENDENT
+          key: azure.db.mysql.storage.backup.used
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'The backup storage used in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.backup_storage_used.maximum
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 78f3e03b5caf4f85a3c61513cf242f76
+          name: 'Azure MySQL: Storage limit'
+          type: DEPENDENT
+          key: azure.db.mysql.storage.limit
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'The storage limit in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.storage_limit.maximum
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: ced51184b59643adaa51bef90710166b
+          name: 'Azure MySQL: Storage percent'
+          type: DEPENDENT
+          key: azure.db.mysql.storage.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Storage utilization in %.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.storage_percent.maximum
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+          triggers:
+            -
+              uuid: 1703edc1553644e5aa25d35928c5eafd
+              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              name: 'Azure MySQL: Storage space is critically low'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Critical utilization of the storage space.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+            -
+              uuid: a2ec23a5e77c40aa9e45d214f4e06ca1
+              expression: 'last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              name: 'Azure MySQL: Storage space is low'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'High utilization of the storage space.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+        -
+          uuid: 9f96e947eee646f890742676e9f9a22a
+          name: 'Azure MySQL: Storage used'
+          type: DEPENDENT
+          key: azure.db.mysql.storage.used
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Used storage space in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.storage_used.maximum
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: azure
+      macros:
+        -
+          macro: '{$AZURE.APP_ID}'
+          description: 'Microsoft Azure app ID.'
+        -
+          macro: '{$AZURE.DATA.TIMEOUT}'
+          value: 60s
+          description: 'A response timeout for API.'
+        -
+          macro: '{$AZURE.DB.ABORTED_CONN.MAX.WARN}'
+          value: '25'
+          description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
+        -
+          macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the CPU utilization in %.'
+        -
+          macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the memory utilization in %.'
+        -
+          macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the storage utilization in %.'
+        -
+          macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
+          value: '80'
+          description: 'The warning threshold of the storage utilization in %.'
+        -
+          macro: '{$AZURE.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Microsoft Azure password.'
+        -
+          macro: '{$AZURE.RESOURCE_ID}'
+          description: 'Microsoft Azure virtual machine ID.'
+        -
+          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          description: 'Microsoft Azure subscription ID.'
+        -
+          macro: '{$AZURE.TENANT_ID}'
+          description: 'Microsoft Azure tenant ID.'
+      valuemaps:
+        -
+          uuid: 4eec167b4d69441398b96b8e375d6825
+          name: 'Azure resource health state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Available
+            -
+              value: '1'
+              newvalue: Degraded
+            -
+              value: '2'
+              newvalue: Unavailable
+            -
+              value: '3'
+              newvalue: Unknown
+    -
+      uuid: c1396bf1e8cf46f6a407e88ddceef0b8
+      template: 'Azure MySQL single server by HTTP'
+      name: 'Azure MySQL single server by HTTP'
+      description: |
+        This template is designed to monitor Microsoft Azure MySQL single servers by HTTP.
+        It works without any external scripts and uses the script item.
+        
+        Setup:
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+            `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+            See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
+          2. Link the template to a host.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.42
+      groups:
+        -
+          name: Templates/Cloud
+      items:
+        -
+          uuid: c7771aa67d3c424490d8de2d6c2d609a
+          name: 'Azure MySQL: Availability status detailed'
+          type: DEPENDENT
+          key: azure.db.mysql.availability.details
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The summary description of the availability status.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.health.summary
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: c325b977b26e4e00acc3ea8703895f05
+          name: 'Azure MySQL: Availability state'
+          type: DEPENDENT
+          key: azure.db.mysql.availability.state
+          delay: '0'
+          history: 7d
+          description: 'The availability status of the resource.'
+          valuemap:
+            name: 'Azure resource health state'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.health.availabilityState
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '3'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Available
+                - '0'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Degraded
+                - '1'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Unavailable
+                - '2'
+            -
+              type: STR_REPLACE
+              parameters:
+                - Unknown
+                - '3'
+            -
+              type: IN_RANGE
+              parameters:
+                - '0'
+                - '3'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '3'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: 91a32645266547d78df3a70b44c7782b
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=1'
+              name: 'Azure MySQL: MySQL server is degraded'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The resource is in degraded state.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: 852aba88476a40aeb2170b933726b7d8
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=3'
+              name: 'Azure MySQL: MySQL server is in unknown state'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The resource state is unknown.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: 5f2d2254dfc24f5481207585bed0d933
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=2'
+              name: 'Azure MySQL: MySQL server is unavailable'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'The resource state is unavailable.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 69aba8caa6874c9d9423926a2ee78e99
+          name: 'Azure MySQL: Connections active'
+          type: DEPENDENT
+          key: azure.db.mysql.connections.active
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of active connections.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.active_connections.average
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: e185b56984914507bc40c07c55153967
+          name: 'Azure MySQL: Connections failed'
+          type: DEPENDENT
+          key: azure.db.mysql.connections.failed
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The count of failed connections.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.connections_failed.total
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: 5b3a09ca04704e6a9972ee4865d358cd
+              expression: 'min(/Azure MySQL single server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED_CONN.MAX.WARN}'
+              name: 'Azure MySQL: Server has failed connections'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The number of failed attempts to connect to the MySQL server is more than {$AZURE.DB.FAILED_CONN.MAX.WARN}.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: d0b5864a56094166b76fbc58a5e05c7c
+          name: 'Azure MySQL: Percentage CPU'
+          type: DEPENDENT
+          key: azure.db.mysql.cpu.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The CPU percent of a host.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.cpu_percent.average
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: cpu
+          triggers:
+            -
+              uuid: 7115fb320e2b4cc1ad1739c8a6cee155
+              expression: 'min(/Azure MySQL single server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}'
+              name: 'Azure MySQL: High CPU utilization'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 2fc253a20100478d91cac13590a64bfc
+          name: 'Azure MySQL: Get errors'
+          type: DEPENDENT
+          key: azure.db.mysql.data.errors
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'A list of errors from API requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.errors
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: raw
+          triggers:
+            -
+              uuid: df5fa33f8c13413bb9d61ea4470b9b2d
+              expression: 'length(last(/Azure MySQL single server by HTTP/azure.db.mysql.data.errors))>0'
+              name: 'Azure MySQL: There are errors in requests to API'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in response to API requests.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: cd62d92ef0384ea9acf0cae71c88ebc6
+          name: 'Azure MySQL: Get data'
+          type: SCRIPT
+          key: azure.db.mysql.data.get
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var AzureDB = {
+                params: {},
+                token: null,
+            
+                setParams: function (params) {
+                    ['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
+            
+                    AzureDB.params = params;
+                },
+            
+            
+                request: function (url, data) {
+                    if (typeof data === 'undefined' || data === null) {
+                        data = '';
+                    }
+            
+                    var response, request = new HttpRequest();
+                        if (AzureDB.token) {
+                            request.addHeader('Accept: application/json');
+                            request.addHeader('Authorization: Bearer ' + AzureDB.token);
+                        }
+                
+                    Zabbix.log(4, '[ Azure ] Sending request: ' + url);
+            
+                    if (data !== '') {
+                        request.addHeader('Content-Type: application/x-www-form-urlencoded');
+                        response = request.post(url, data);
+                    }
+                    else {
+                        response = request.get(url);
+                    }
+            
+                    Zabbix.log(4, '[ Azure ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() !== 200 || response === null) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    try {
+                        return JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from API.';
+                    }
+            }
+            
+            };
+            
+            var metrics = [
+                'cpu_percent',
+                'memory_percent',
+                'io_consumption_percent',
+                'storage_percent',
+                'storage_used',
+                'storage_limit',
+                'serverlog_storage_percent',
+                'serverlog_storage_usage',
+                'serverlog_storage_limit',
+                'active_connections',
+                'connections_failed',
+                'seconds_behind_master',
+                'backup_storage_used',
+                'network_bytes_egress',
+                'network_bytes_ingress'
+            ],
+                prepared_metrics = [],
+                data = {};
+                data['errors'] = {};
+                data['metrics'] = {};
+            
+            try {
+                AzureDB.setParams(JSON.parse(value));
+            
+                try {
+                    result = AzureDB.request(
+                            'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+                    );
+            
+                    if ('access_token' in result) {
+                        AzureDB.token = result['access_token'];
+                    } else {
+                        throw 'Auth response does not contain access token.';
+                    }
+                }
+                catch (error) {
+                    data.errors.auth = error.toString();
+                }
+            
+                if (!('auth' in data.errors)) {
+                    try {
+                        health = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.ResourceHealth/availabilityStatuses?api-version=2020-05-01');
+                        data.health = health.value[0].properties;
+                    }
+                    catch (error) {
+                        data.errors.health = error.toString();
+                    }
+            
+                    for (var i = 0; i < metrics.length; i += 20) {
+                        var chunk = metrics.slice(i, i + 20);
+            
+                        prepared_metrics.push(
+                            chunk.map(function(element) {
+                                return encodeURIComponent(element);
+                            }).join(',')
+                        );
+                    }
+            
+                    start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
+                    end_date = new Date().toISOString().replace(/\.\d+/, '');
+                    
+                    for (var j in prepared_metrics) {
+                        try {
+                            metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
+                            for (k in metrics_data.value) {
+                                data.metrics[metrics_data.value[k].name.value.replace(/(\s|\/)+/g, '')] = metrics_data.value[k].timeseries[0].data[metrics_data.value[k].timeseries[0].data.length - 1];
+                            }
+                        }
+                        catch (error) {
+                            data.errors[prepared_metrics[j]] = error.toString();
+                        }
+                    } 
+                }
+            }
+            catch (error) {
+                data.errors.params = error.toString();
+            }
+            
+            if (Object.keys(data.errors).length !== 0) {
+                errors = 'Failed to receive data:';
+                for (var error in data.errors) {
+                    errors += '\n' + error + ' : ' + data.errors[error];
+                }
+                data.errors = errors;
+            }
+            else {
+                data.errors = '';
+            }
+            
+            return JSON.stringify(data);
+          description: 'The result of API requests is in the JSON.'
+          timeout: '{$AZURE.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: app_id
+              value: '{$AZURE.APP_ID}'
+            -
+              name: password
+              value: '{$AZURE.PASSWORD}'
+            -
+              name: tenant_id
+              value: '{$AZURE.TENANT_ID}'
+            -
+              name: subscription_id
+              value: '{$AZURE.SUBSCRIPTION_ID}'
+            -
+              name: resource_id
+              value: '{$AZURE.RESOURCE_ID}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: a17c365253eb4821841ec82ac8f61106
+          name: 'Azure MySQL: IO consumption percent'
+          type: DEPENDENT
+          key: azure.db.mysql.io.consumption.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The IO percent.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.io_consumption_percent.average
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: operations
+        -
+          uuid: 5c19c08912634993b1f96fb11e5d1ae2
+          name: 'Azure MySQL: Memory utilization'
+          type: DEPENDENT
+          key: azure.db.mysql.memory.percentage
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The memory percent of a host.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.memory_percent.average
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: memory
+          triggers:
+            -
+              uuid: a67b35f1ac674d6692b0b2bcd6f89bd8
+              expression: 'min(/Azure MySQL single server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}'
+              name: 'Azure MySQL: High memory utilization'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: fe1b9846a634412aaa6a76fc05dbe46a
+          name: 'Azure MySQL: Network out'
+          type: DEPENDENT
+          key: azure.db.mysql.network.egress
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: bps
+          description: 'Network outbound traffic across the active connections.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.network_bytes_egress.total
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.0088'
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 1cc97817bda5470887e3d5d9f2d78650
+          name: 'Azure MySQL: Network in'
+          type: DEPENDENT
+          key: azure.db.mysql.network.ingress
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: bps
+          description: 'Network inbound traffic across the active connections.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.network_bytes_ingress.total
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.0088'
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 8e60794282ea42c7bad1573811b2e498
+          name: 'Azure MySQL: Replication lag'
+          type: DEPENDENT
+          key: azure.db.mysql.replication.lag
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Replication lag in seconds.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.seconds_behind_master.maximum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: replication
+        -
+          uuid: 1303a659d17a4e4fa9fa03cef35fef5a
+          name: 'Azure MySQL: Backup storage used'
+          type: DEPENDENT
+          key: azure.db.mysql.storage.backup.used
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'The backup storage used in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.backup_storage_used.average
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 4aed6d0c01d1458fbd1f7c7ea5386303
+          name: 'Azure MySQL: Storage limit'
+          type: DEPENDENT
+          key: azure.db.mysql.storage.limit
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'The storage limit in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.storage_limit.maximum
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 5b1b350be6f0409fb7ab842571c3f086
+          name: 'Azure MySQL: Storage percent'
+          type: DEPENDENT
+          key: azure.db.mysql.storage.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Storage utilization in %.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.storage_percent.average
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+          triggers:
+            -
+              uuid: 3afcb840e8004822a2dada2a89971f69
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
+              name: 'Azure MySQL: Storage space is critically low'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Critical utilization of the storage space.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+            -
+              uuid: 2e605f906b284f769e7c880d4e642b43
+              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}'
+              name: 'Azure MySQL: Storage space is low'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'High utilization of the storage space.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+        -
+          uuid: 7f553d8a0898477b87a2828e51efcfcc
+          name: 'Azure MySQL: Server log storage limit'
+          type: DEPENDENT
+          key: azure.db.mysql.storage.server.log.limit
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'The storage limit of server log in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.serverlog_storage_limit.maximum
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: cf5a77306c554a24b3741ef065b6d27a
+          name: 'Azure MySQL: Server log storage percent'
+          type: DEPENDENT
+          key: azure.db.mysql.storage.server.log.percent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'The storage utilization by a server log in %.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.serverlog_storage_percent.average
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 8ed99a951e264185b1e0f343d7ea0aec
+          name: 'Azure MySQL: Server log storage used'
+          type: DEPENDENT
+          key: azure.db.mysql.storage.server.log.used
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'The storage space used by a server log in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.serverlog_storage_usage.average
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 0c9a5496d9884c8e9a434fb232b3208f
+          name: 'Azure MySQL: Storage used'
+          type: DEPENDENT
+          key: azure.db.mysql.storage.used
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Used storage space in bytes.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.metrics.storage_used.average
+          master_item:
+            key: azure.db.mysql.data.get
+          tags:
+            -
+              tag: component
+              value: storage
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: azure
+      macros:
+        -
+          macro: '{$AZURE.APP_ID}'
+          description: 'Microsoft Azure app ID.'
+        -
+          macro: '{$AZURE.DATA.TIMEOUT}'
+          value: 60s
+          description: 'A response timeout for API.'
+        -
+          macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the CPU utilization in %.'
+        -
+          macro: '{$AZURE.DB.FAILED_CONN.MAX.WARN}'
+          value: '25'
+          description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
+        -
+          macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the memory utilization in %.'
+        -
+          macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the storage utilization in %.'
+        -
+          macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
+          value: '80'
+          description: 'The warning threshold of the storage utilization in %.'
+        -
+          macro: '{$AZURE.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Microsoft Azure password.'
+        -
+          macro: '{$AZURE.RESOURCE_ID}'
+          description: 'Microsoft Azure virtual machine ID.'
+        -
+          macro: '{$AZURE.SUBSCRIPTION_ID}'
+          description: 'Microsoft Azure subscription ID.'
+        -
+          macro: '{$AZURE.TENANT_ID}'
+          description: 'Microsoft Azure tenant ID.'
+      valuemaps:
+        -
+          uuid: 323a5259fb854724891515767f341540
+          name: 'Azure resource health state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Available
+            -
+              value: '1'
+              newvalue: Degraded
+            -
+              value: '2'
+              newvalue: Unavailable
+            -
+              value: '3'
+              newvalue: Unknown
     -
       uuid: 820fa4a1565c43e4aac07a691a5bface
       template: 'Azure virtual machine by HTTP'
       name: 'Azure virtual machine by HTTP'
       description: |
-        The template to monitor Microsoft Azure virtual machines by HTTP.
+        This template is designed to monitor Microsoft Azure virtual machines by HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
-          1. Create an Azure service principal via Azure CLI for your subscription.
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID} and {$AZURE.SUBSCRIPTION_ID}.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -396,7 +2153,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Summary description of the availability status.'
+          description: 'The summary description of the availability status.'
           preprocessing:
             -
               type: JSONPATH
@@ -419,7 +2176,7 @@ zabbix_export:
           key: azure.vm.availability.state
           delay: '0'
           history: 7d
-          description: 'Availability status of the resource.'
+          description: 'The availability status of the resource.'
           valuemap:
             name: 'Azure resource health state'
           preprocessing:
@@ -548,7 +2305,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Total number of credits consumed by the Virtual Machine. Only available on B-series burstable VMs.'
+          description: 'The total number of credits consumed by the Virtual Machine. Only available on B-series burstable VMs.'
           preprocessing:
             -
               type: JSONPATH
@@ -569,7 +2326,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Total number of credits available to burst. Only available on B-series burstable VMs.'
+          description: 'The total number of credits available to burst. Only available on B-series burstable VMs.'
           preprocessing:
             -
               type: JSONPATH
@@ -610,7 +2367,7 @@ zabbix_export:
               name: 'Azure: High CPU utilization'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'CPU utilization is too high. the system might be slow to respond.'
+              description: 'CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope
@@ -624,7 +2381,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of data disk bandwidth consumed per minute.'
+          description: 'The percentage of the Data Disk bandwidth consumed per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -646,7 +2403,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of data disk I/Os consumed per minute.'
+          description: 'The percentage of the Data Disk I/Os consumed per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -711,7 +2468,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Data Disk Queue Depth(or Queue Length).'
+          description: 'The queue depth (or queue length) of the Data Disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -733,7 +2490,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes/Sec read from a single disk during monitoring period.'
+          description: 'Bytes/Sec read from a single disk during the monitoring period.'
           preprocessing:
             -
               type: JSONPATH
@@ -755,7 +2512,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Read IOPS from a single disk during monitoring period.'
+          description: 'The read IOPS from a single disk during the monitoring period.'
           preprocessing:
             -
               type: JSONPATH
@@ -821,7 +2578,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of Data Disk burst bandwidth credits used so far.'
+          description: 'The percentage of the Data Disk burst bandwidth credits used so far.'
           preprocessing:
             -
               type: JSONPATH
@@ -843,7 +2600,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of Data Disk burst I/O credits used so far.'
+          description: 'The percentage of the Data Disk burst I/O credits used so far.'
           preprocessing:
             -
               type: JSONPATH
@@ -865,7 +2622,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes/Sec written to a single disk during monitoring period.'
+          description: 'Bytes/Sec written to a single disk during the monitoring period.'
           preprocessing:
             -
               type: JSONPATH
@@ -887,7 +2644,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Write IOPS from a single disk during monitoring period.'
+          description: 'The write IOPS from a single disk during the monitoring period.'
           preprocessing:
             -
               type: JSONPATH
@@ -932,7 +2689,7 @@ zabbix_export:
               name: 'Azure: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Zabbix has received errors in requests to API.'
+              description: 'Zabbix has received errors in response to API requests.'
               tags:
                 -
                   tag: scope
@@ -1125,7 +2882,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The JSON with result of API requests.'
+          description: 'The result of API requests is in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             -
@@ -1156,7 +2913,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes read from disk during monitoring period (1 minute).'
+          description: 'Bytes read from the disk during the monitoring period (1 minute).'
           preprocessing:
             -
               type: JSONPATH
@@ -1181,7 +2938,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Disk read IOPS.'
+          description: 'The count of read operations from the disk per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -1202,7 +2959,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes written to disk during monitoring period (1 minute).'
+          description: 'Bytes written to the disk during the monitoring period (1 minute).'
           preprocessing:
             -
               type: JSONPATH
@@ -1227,7 +2984,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Disk write IOPS.'
+          description: 'The count of write operations to the disk per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -1247,7 +3004,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Inbound Flows are number of current flows in the inbound direction (traffic going into the VM).'
+          description: 'Inbound Flows are number of the current flows in the inbound direction (traffic going into the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -1268,7 +3025,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The maximum creation rate of inbound flows (traffic going into the VM).'
+          description: 'The maximum creation rate of the inbound flows (traffic going into the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -1289,7 +3046,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Outbound Flows are number of current flows in the outbound direction (traffic going out of the VM).'
+          description: 'Outbound Flows are number of the current flows in the outbound direction (traffic going out of the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -1310,7 +3067,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The maximum creation rate of outbound flows (traffic going out of the VM).'
+          description: 'The maximum creation rate of the outbound flows (traffic going out of the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -1331,7 +3088,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'Amount of physical memory, in bytes, immediately available for allocation to a process or for system use in the Virtual Machine.'
+          description: 'The amount of physical memory, in bytes, immediately available for allocation to a process or for system use in the Virtual Machine.'
           preprocessing:
             -
               type: JSONPATH
@@ -1404,7 +3161,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of operating system disk bandwidth consumed per minute.'
+          description: 'The percentage of the operating system disk bandwidth consumed per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -1426,7 +3183,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of operating system disk I/Os consumed per minute.'
+          description: 'The percentage of the operating system disk I/Os consumed per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -1491,7 +3248,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'OS Disk Queue Depth(or Queue Length).'
+          description: 'The OS disk queue depth (or queue length).'
           preprocessing:
             -
               type: JSONPATH
@@ -1513,7 +3270,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes/Sec read from a single disk during monitoring period for OS disk.'
+          description: 'Bytes/Sec read from a single disk during the monitoring period for OS disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -1535,7 +3292,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Read IOPS from a single disk during monitoring period for OS disk.'
+          description: 'The read IOPS from a single disk during the monitoring period for OS disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -1601,7 +3358,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of OS Disk burst bandwidth credits used so far.'
+          description: 'The percentage of the OS Disk burst bandwidth credits used so far.'
           preprocessing:
             -
               type: JSONPATH
@@ -1645,7 +3402,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes/Sec written to a single disk during monitoring period for OS disk.'
+          description: 'Bytes/Sec written to a single disk during the monitoring period for OS disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -1667,7 +3424,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Write IOPS from a single disk during monitoring period for OS disk.'
+          description: 'The write IOPS from a single disk during the monitoring period for OS disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -1688,7 +3445,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: 'Premium data disk cache read hit.'
+          description: 'Premium Data Disk cache read hit.'
           preprocessing:
             -
               type: JSONPATH
@@ -1709,7 +3466,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: 'Premium data disk cache read miss.'
+          description: 'Premium Data Disk cache read miss.'
           preprocessing:
             -
               type: JSONPATH
@@ -1772,7 +3529,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: 'Percentage of uncached disk bandwidth consumed by the VM.'
+          description: 'The percentage of the uncached disk bandwidth consumed by the VM.'
           preprocessing:
             -
               type: JSONPATH
@@ -1792,7 +3549,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: 'Percentage of uncached disk IOPS consumed by the VM.'
+          description: 'The percentage of the uncached disk IOPS consumed by the VM.'
           preprocessing:
             -
               type: JSONPATH
@@ -1818,7 +3575,7 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'Response timeout for API.'
+          description: 'A response timeout for API.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -2016,3 +3773,114 @@ zabbix_export:
           item:
             host: 'Azure virtual machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.miss
+    -
+      uuid: 750ae48e6ef749c19a06f4bbe716f92f
+      name: 'Azure MySQL: Connections'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL flexible server by HTTP'
+            key: azure.db.mysql.connections.active
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL flexible server by HTTP'
+            key: azure.db.mysql.connections.total
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Azure MySQL flexible server by HTTP'
+            key: azure.db.mysql.connections.aborted
+    -
+      uuid: 360a24b56be74cf48df3135008437824
+      name: 'Azure MySQL: Connections'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.connections.active
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.connections.failed
+    -
+      uuid: f929f47602734f82a79f22a5f4446f61
+      name: 'Azure MySQL: Network traffic'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL flexible server by HTTP'
+            key: azure.db.mysql.network.egress
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL flexible server by HTTP'
+            key: azure.db.mysql.network.ingress
+    -
+      uuid: dc6840162405481ebc1c3c98fdfcaef1
+      name: 'Azure MySQL: Network traffic'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.network.egress
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.network.ingress
+    -
+      uuid: 3fcf43fd338e4902874d940fc0bec8b9
+      name: 'Azure MySQL: Server log storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.storage.server.log.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.storage.server.log.limit
+    -
+      uuid: bdc178e6faaa4850badc0c60c7c80d40
+      name: 'Azure MySQL: Storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.storage.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.storage.limit
+    -
+      uuid: 4210e6b4ed8744589dce88217e961a56
+      name: 'Azure MySQL: Storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL flexible server by HTTP'
+            key: azure.db.mysql.storage.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL flexible server by HTTP'
+            key: azure.db.mysql.storage.limit
