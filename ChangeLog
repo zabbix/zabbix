@@ -1,9 +1,14 @@
 Changes for 6.4.0beta2
 
 New features:
+.........T [ZBX-21672] fixed event source in mediatypes (egordymov)
 ........S. [ZBXNEXT-7920] improved value cache not to drop items from cache when no new value has arrived in 24 hours (vso)
 
 Bug fixes:
+.........T [ZBX-21582] optimized HPE Synergy template to spread load across preprocessing workers (vkhaliev)
+..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
+..F....... [ZBX-21606] fixed "Allowed hosts" field in HTTP agent item (kkuzmina)
+A......... [ZBX-19224] added ability to unset headers in web scenario (rlataria)
 ........S. [ZBX-21709] fixed database upgrade patch to skip unexpected invalid service downtime instead of failing (vso)
 ..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
 ...G...... [ZBX-21637] fixed Zabbix server to rerun auto registration attempt in 120 seconds if host is deleted (vso)
@@ -62,10 +67,15 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 Changes for 6.2.4rc1
 
 New features:
+.........T [ZBX-21672] fixed event source in mediatypes (egordymov)
 A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 
 Bug fixes:
+.........T [ZBX-21582] optimized HPE Synergy template to spread load across preprocessing workers (vkhaliev)
+..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
+..F....... [ZBX-21606] fixed "Allowed hosts" field in HTTP agent item (kkuzmina)
+A......... [ZBX-19224] added ability to unset headers in web scenario (rlataria)
 ........S. [ZBX-21709] fixed database upgrade patch to skip unexpected invalid service downtime instead of failing (vso)
 ..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
 ........S. [ZBX-21537] fixed history syncers being stuck waiting on system information being collected (vso)
@@ -481,10 +491,15 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.10rc1
 
 New features:
+.........T [ZBX-21672] fixed event source in mediatypes (egordymov)
 ..F....... [ZBXNEXT-7567] implemented saving the state of the default filters in monitoring sections (acikuns)
 A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 
 Bug fixes:
+.........T [ZBX-21582] optimized HPE Synergy template to spread load across preprocessing workers (vkhaliev)
+..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
+..F....... [ZBX-21606] fixed "Allowed hosts" field in HTTP agent item (kkuzmina)
+A......... [ZBX-19224] added ability to unset headers in web scenario (rlataria)
 ........S. [ZBX-21709] fixed database upgrade patch to skip unexpected invalid service downtime instead of failing (vso)
 ..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
 ........S. [ZBX-21537] fixed history syncers being stuck waiting on system information being collected (vso)
@@ -2647,6 +2662,8 @@ Changes for 5.0.29rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
+A......... [ZBX-19224] added ability to unset headers in web scenario (rlataria)
 ..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
 .........T [ZBX-21484] updated documentation for templates SMART by Zabbix agent 2 (atocko)
 ........S. [ZBX-21537] fixed history syncers being stuck waiting on system information being collected (vso)
