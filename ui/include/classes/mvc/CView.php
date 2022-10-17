@@ -43,7 +43,8 @@ class CView {
 	 * Directory where the view file was found.
 	 */
 	private ?string $directory = null;
-	private static $last_directory;
+
+	private string $assets_path = 'assets';
 
 	/**
 	 * View name.
@@ -94,8 +95,6 @@ class CView {
 			throw new RuntimeException(sprintf('View not found: "%s".', $name));
 		}
 
-		self::$last_directory = $this->directory;
-
 		if (!is_readable($file_path)) {
 			throw new RuntimeException(sprintf('View not readable: "%s".', $file_path));
 		}
@@ -104,8 +103,18 @@ class CView {
 		$this->data = $data;
 	}
 
-	public static function getLastDirectory(): string {
-		return self::$last_directory;
+	public function getDirectory(): string {
+		return $this->directory;
+	}
+
+	public function setAssetsPath(string $asset_path): self {
+		$this->assets_path = $asset_path;
+
+		return $this;
+	}
+
+	public function getAssetsPath(): string {
+		RETURN $this->assets_path;
 	}
 
 	/**

@@ -74,6 +74,8 @@ class ZBase {
 
 	private CModuleManager $module_manager;
 
+	private ?CView $view = null;
+
 	/**
 	 * Returns the current instance of APP.
 	 *
@@ -81,7 +83,7 @@ class ZBase {
 	 *
 	 * @return APP
 	 */
-	public static function getInstance() {
+	public static function getInstance(): APP {
 		if (self::$instance === null) {
 			self::$instance = new static;
 		}
@@ -94,7 +96,7 @@ class ZBase {
 	 *
 	 * @return CComponentRegistry
 	 */
-	public static function Component() {
+	public static function Component(): CComponentRegistry {
 		return self::getInstance()->component_registry;
 	}
 
@@ -103,8 +105,15 @@ class ZBase {
 	 *
 	 * @return CModuleManager
 	 */
-	public static function ModuleManager() {
+	public static function ModuleManager(): CModuleManager {
 		return self::getInstance()->module_manager;
+	}
+
+	/**
+	 * @return CView|null
+	 */
+	public static function View(): ?CView {
+		return self::getInstance()->view;
 	}
 
 	/**
@@ -688,17 +697,23 @@ class ZBase {
 			];
 
 			if ($router->getView() !== null && $response->isViewEnabled()) {
-				$view = new CView($router->getView(), $response->getData());
+				$this->view = new CView($router->getView(), $response->getData());
+
+				$module = $this->module_manager->getActionModule();
+
+				if ($module !== null) {
+					$this->view->setAssetsPath($module->getRelativePath().'/assets');
+				}
 
 				$layout_data = array_replace($layout_data_defaults, [
-					'main_block' => $view->getOutput(),
+					'main_block' => $this->view->getOutput(),
 					'javascript' => [
-						'files' => $view->getJsFiles()
+						'files' => $this->view->getJsFiles()
 					],
 					'stylesheet' => [
-						'files' => $view->getCssFiles()
+						'files' => $this->view->getCssFiles()
 					],
-					'web_layout_mode' => $view->getLayoutMode()
+					'web_layout_mode' => $this->view->getLayoutMode()
 				]);
 			}
 			else {

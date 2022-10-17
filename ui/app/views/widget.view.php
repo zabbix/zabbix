@@ -20,11 +20,10 @@
 
 
 /**
- * Favorite graphs widget form view.
+ * Widget default view.
  *
  * @var CView $this
  * @var array $data
  */
 
-(new CWidgetFormView($data))
-	->show();
+(new CWidgetView($data))->show();

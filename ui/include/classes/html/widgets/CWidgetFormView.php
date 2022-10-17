@@ -114,15 +114,20 @@ class CWidgetFormView {
 	}
 
 	public function includeJsFile(string $file_path): self {
-		ob_start();
+		$view = APP::View();
 
-		if ((include CView::getLastDirectory().'/'.$file_path) === false) {
-			ob_end_clean();
+		if ($view !== null) {
+			ob_start();
 
-			throw new RuntimeException(sprintf('Cannot read file: "%s".', $file_path));
+			if ((include $view->getDirectory().'/'.$file_path) === false) {
+				ob_end_clean();
+
+				throw new RuntimeException(sprintf('Cannot read file: "%s".', $file_path));
+			}
+
+			$this->javascript[] = ob_get_clean();
 		}
 
-		$this->javascript[] = ob_get_clean();
 
 		return $this;
 	}

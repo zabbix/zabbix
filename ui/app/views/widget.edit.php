@@ -20,11 +20,10 @@
 
 
 /**
- * Favorite maps widget form view.
+ * Widget default form view.
  *
  * @var CView $this
  * @var array $data
  */
 
-(new CWidgetFormView($data))
-	->show();
+(new CWidgetFormView($data))->show();
