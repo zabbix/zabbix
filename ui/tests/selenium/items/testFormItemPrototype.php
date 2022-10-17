@@ -514,7 +514,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 					' AND key_='.zbx_dbstr($data['key'])
 			);
 			$template_info = DBfetch($dbResult);
-			var_Dump($template_info);
 			$this->assertNotEquals($template_info, null);
 
 			$itemid = $template_info['itemid'];
