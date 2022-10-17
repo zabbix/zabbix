@@ -39,22 +39,21 @@ class testPageWeb extends CWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 
-		// Checks Title, Header, and column names
+		// Checks Title, Header, and column names.
 		$this->page->assertTitle('Web monitoring');
 		$this->page->assertHeader('Web monitoring');
-		$columns = ['Host', 'Name', 'Number of steps', 'Last check', 'Status', 'Tags'];
-		$this->assertSame($columns, $table->getHeadersText());
+        $this->assertEquals(['Host', 'Name', 'Number of steps', 'Last check', 'Status', 'Tags'], $table->getHeadersText());
 
 		// Check if Apply and Reset button are clickable.
-		foreach(['Apply', 'Reset'] as $option) {
-			$this->assertTrue($form->query('button', $option)->one()->isClickable());
+		foreach(['Apply', 'Reset'] as $button) {
+			$this->assertTrue($form->query('button', $button)->one()->isClickable());
 		}
 
-		// Check filter collapse/expand.
-		foreach ([true, false] as $status) {
-			$this->assertTrue($this->query('xpath://li[contains(@class, "expanded")]')->one()->isPresent($status));
-			$this->query('xpath://a[@class="filter-trigger ui-tabs-anchor"]')->one()->click();
-		}
+        // Check filter collapse/expand.
+        foreach (['true', 'false'] as $status) {
+            $this->assertTrue($this->query('xpath://li[@aria-expanded="'.$status.'"]')->one()->isPresent());
+            $this->query('xpath://a[@class="filter-trigger ui-tabs-anchor"]')->one()->click();
+        }
 
 		// Check fields maximum length.
 		foreach(['filter_tags[0][tag]', 'filter_tags[0][value]'] as $field) {
@@ -73,7 +72,7 @@ class testPageWeb extends CWebTest {
 		// Check if rows are correctly displayed.
 		$this->assertTableStats($table->getRows()->count());
 
-		// Checks if it's possible to order Host names and Web names by ascending and descending order
+		// Checks if it's possible to order Host names and Web names by ascending and descending order.
 		foreach (['ASC', 'DESC'] as $order) {
 		$table->query('xpath://a[@href="zabbix.php?action=web.view&sort=hostname&sortorder='.$order.'"]')
 			->one()->click();
@@ -83,6 +82,47 @@ class testPageWeb extends CWebTest {
 			->one()->click();
 		}
 	}
+
+    /**
+     * Test Web sorting by Name column.
+     */
+    public function testPageWeb_CheckSorting() {
+        $this->page->login()->open('zabbix.php?action=web.view');
+        $table = $this->query('class:list-table')->asTable()->one();
+        $table_names = $this->getTableResult('Name');
+
+        foreach(['asc', 'desc'] as $sorting) {
+            $expected = ($sorting === 'desc') ? $table_names : array_reverse($table_names);
+            $values = [];
+        }
+        foreach ($table->getRows() as $row) {
+            $values[] = $row->getColumn('Name')->getText();
+        }
+        $this->assertEquals($expected, $values);
+    }
+
+    /**
+     * Test that title field disappears while Kioskmode is active.
+     */
+    public function testPageWeb_CheckKioskMode() {
+        $this->page->login()->open('zabbix.php?action=web.view');
+        $this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+        $this->page->waitUntilReady();
+        $this->query('xpath://h1[@id="page-title-general"]')->waitUntilNotVisible();
+        $this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click(true);
+        $this->page->waitUntilReady();
+    }
+
+    /**
+     * Test that links to web service names are working properly and directed to needed form.
+     */
+    public function testPageWeb_CheckLinks() {
+        $this->page->login()->open('zabbix.php?action=web.view');
+        $row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'testFormWeb1');
+        $row->query('link', 'testFormWeb1')->one()->click();
+        $this->page->waitUntilReady();
+        $this->assertEquals('Details of web scenario: testFormWeb1', $this->query('xpath://h1[@id="page-title-general"]')->one()->getText());
+    }
 
 	public static function getCheckFilterData() {
 		return [
@@ -180,11 +220,9 @@ class testPageWeb extends CWebTest {
 	 * @dataProvider getCheckFilterData
 	 */
 	public function testPageWeb_CheckFilter($data) {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1');
-		$table = $this->query('class:list-table')->asTable()->one();
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$form->fill($data['filter']);
-		$this->query('button:Apply')->waitUntilClickable()->one()->click();
+        $form->fill($data['filter'])->submit();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn($data['expected']);
 	}
