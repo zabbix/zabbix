@@ -937,7 +937,7 @@ class testFormWebStep extends CLegacyWebTest {
 				$this->addPairs('//div[@class="overlay-dialogue-body"]//table[@data-type="'.$data_type.'"]', $data[$field]);
 			}
 
-			// Take a screenshot to test draggable object position.
+			// Take a screenshot to test draggable object position (It is here because of scrolling).
 			if ($data_type === 'query_fields' && $data['name'] === 'Take a screenshots' && $data['query'][2]['name'] === 'query3'){
 				$this->page->removeFocus();
 				$this->assertScreenshot($this->query('xpath://table[@data-type="query_fields"]')->waitUntilPresent()->one(), 'Step_query_fields');

@@ -1486,7 +1486,7 @@ class testFormWeb extends CLegacyWebTest {
 				$i++;
 			}
 		}
-		// Take a screenshot to test draggable object position (It is here because of scrolling).
+		// Take a screenshot to test draggable object position.
 		if (isset($data['name']) && $data['name'] === 'Headers -screenshot') {
 			$this->page->removeFocus();
 			$this->assertScreenshot($this->query('xpath://table[@data-type="headers"]')->waitUntilPresent()->one(), 'Web_Headers_fields');

@@ -1,26 +1,25 @@
 <?php
-
 /*
- * * Zabbix
- * * Copyright (C) 2001-2022 Zabbix SIA
- * *
- * * This program is free software; you can redistribute it and/or modify
- * * it under the terms of the GNU General Public License as published by
- * * the Free Software Foundation; either version 2 of the License, or
- * * (at your option) any later version.
- * *
- * * This program is distributed in the hope that it will be useful,
- * * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * * GNU General Public License for more details.
- * *
- * * You should have received a copy of the GNU General Public License
- * * along with this program; if not, write to the Free Software
- * * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * */
+** Zabbix
+** Copyright (C) 2001-2022 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
 
-require_once dirname(__FILE__) . '/../include/CWebTest.php';
-require_once dirname(__FILE__) . '/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup items, ids
@@ -29,26 +28,28 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 	const HOST_ID = 40001;
 	const UPDATED_ID = 133800;
+
 	const INTERVAL_MAPPING = [
 		'Type' => [
 			'name' => 'type',
 			'class' => 'CSegmentedRadioElement',
-			'selector' => 'xpath:./ul[contains(@class, "radio-list-control")]' .
-			'|./ul/li/ul[contains(@class, "radio-list-control")]|./div/ul[contains(@class, "radio-list-control")]'
+			'selector' => 'xpath:./ul[contains(@class, "radio-list-control")]'.
+					'|./ul/li/ul[contains(@class, "radio-list-control")]|./div/ul[contains(@class, "radio-list-control")]'
 		],
 		'Interval' => [
 			'name' => 'delay',
 			'class' => 'CElement',
-			'selector' => 'xpath:./input[@name][not(@type) or @type="text" or @type="password"][not(@style) or ' .
-			'not(contains(@style,"display: none"))]|./textarea[@name]'
+			'selector' => 'xpath:./input[@name][not(@type) or @type="text" or @type="password"][not(@style) or '.
+					'not(contains(@style,"display: none"))]|./textarea[@name]'
 		],
 		'Period' => [
 			'name' => 'period',
 			'class' => 'CElement',
-			'selector' => 'xpath:./input[@name][not(@type) or @type="text" or @type="password"][not(@style) or ' .
-			'not(contains(@style,"display: none"))]|./textarea[@name]'
+			'selector' => 'xpath:./input[@name][not(@type) or @type="text" or @type="password"][not(@style) or '.
+					'not(contains(@style,"display: none"))]|./textarea[@name]'
 		]
 	];
+
 
 	public static $created_id;
 	public static $old_hash;
@@ -65,7 +66,6 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	/*
 	 * Overrides data for LLD creation.
 	 */
-
 	public static function getCreateData() {
 		return [
 			[
@@ -267,8 +267,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									]
 								]
 							],
-							'error' => 'Item will not be refreshed. Specified update interval requires ' .
-							'having at least one either flexible or scheduling interval.'
+							'error' => 'Item will not be refreshed. Specified update interval requires '.
+									'having at least one either flexible or scheduling interval.'
 						]
 					]
 				]
@@ -291,8 +291,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									]
 								]
 							],
-							'error' => 'Item will not be refreshed. Update interval should be between 1s and 1d. ' .
-							'Also Scheduled/Flexible intervals can be used.'
+							'error' => 'Item will not be refreshed. Update interval should be between 1s and 1d. '.
+									'Also Scheduled/Flexible intervals can be used.'
 						]
 					]
 				]
@@ -612,7 +612,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						]
 					]
 				]
-			],
+			]
 		];
 	}
 
@@ -624,9 +624,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	}
 
 	private function overridesCreate($data) {
-		$this->page->login()->open('host_discovery.php?form=create&hostid=' . self::HOST_ID);
+		$this->page->login()->open('host_discovery.php?form=create&hostid='.self::HOST_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		$key = 'lld_override' . time();
+		$key = 'lld_override'.time();
 		$form->fill([
 			'Name' => 'LLD with overrides',
 			'Key' => $key
@@ -636,7 +636,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		$override_container = $form->getField('Overrides')->asTable();
 
 		// Add overrides from data to lld rule.
-		foreach ($data['overrides'] as $i => $override) {
+		foreach($data['overrides'] as $i => $override){
 			$override_container->query('button:Add')->one()->click();
 			$override_overlay = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 
@@ -656,7 +656,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				);
 				// Check that Override in table has correct processing status.
 				$stop_processing = (CTestArrayHelper::get($override,
-								'fields.If filter matches') === 'Stop processing') ? 'Yes' : 'No';
+						'fields.If filter matches') === 'Stop processing') ? 'Yes' : 'No';
 				$this->assertEquals($stop_processing,
 						$override_container->getRow($i)->getColumn('Stop processing')->getText()
 				);
@@ -664,16 +664,16 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 			if (CTestArrayHelper::get($override['fields'], 'Name') === 'Name for the screenshot 3') {
 				// Take a screenshot to test draggable object position.
-				$this->assertScreenshot($this->query('class:lld-overrides-table')->one(),
-						'LLD_override');
+				$this->assertScreenshot($this->query('class:lld-overrides-table')->one(), 'LLD_override');
 			}
+
 		}
 
 		if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
 			// Submit LLD create.
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, 'Discovery rule created');
-			self::$created_id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_=' . zbx_dbstr($key));
+			self::$created_id = CDBHelper::getValue('SELECT itemid FROM items WHERE key_='.zbx_dbstr($key));
 		}
 
 		$this->checkSavedState($data);
@@ -713,7 +713,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
-			[
+						[
 				[
 					'expected' => TEST_BAD,
 					'overrides' => [
@@ -1032,8 +1032,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									]
 								]
 							],
-							'error' => 'Item will not be refreshed. Specified update interval requires ' .
-							'having at least one either flexible or scheduling interval.'
+							'error' => 'Item will not be refreshed. Specified update interval requires '.
+									'having at least one either flexible or scheduling interval.'
 						]
 					]
 				]
@@ -1064,8 +1064,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									]
 								]
 							],
-							'error' => 'Item will not be refreshed. Update interval should be between 1s and 1d. ' .
-							'Also Scheduled/Flexible intervals can be used.'
+							'error' => 'Item will not be refreshed. Update interval should be between 1s and 1d. '.
+									'Also Scheduled/Flexible intervals can be used.'
 						]
 					]
 				]
@@ -1369,10 +1369,10 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'action' => USER_ACTION_REMOVE,
 									'index' => 1,
 									'fields' =>
-									[
-										'Object' => 'Trigger prototype',
-										'Condition' => ['operator' => 'does not equal', 'value' => 'test trigger pattern']
-									]
+										[
+											'Object' => 'Trigger prototype',
+											'Condition' => ['operator' => 'does not equal', 'value' => 'test trigger pattern']
+										]
 								]
 							]
 						],
@@ -1384,10 +1384,10 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									'action' => USER_ACTION_REMOVE,
 									'index' => 1,
 									'fields' =>
-									[
-										'Object' => 'Host prototype',
-										'Condition' => ['operator' => 'does not match', 'value' => 'test host pattern']
-									]
+										[
+											'Object' => 'Host prototype',
+											'Condition' => ['operator' => 'does not match', 'value' => 'test host pattern']
+										]
 								]
 							]
 						]
@@ -1408,7 +1408,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 	private function overridesUpdate($data) {
 		self::$old_hash = CDBHelper::getHash('SELECT * FROM items WHERE flags=1 ORDER BY itemid');
-		$this->page->login()->open('host_discovery.php?form=update&itemid=' . self::UPDATED_ID);
+		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::UPDATED_ID);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Overrides');
 		$form->invalidate();
@@ -1513,11 +1513,11 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						}
 					}
 
-					$this->assertNotNull($id, 'Cannot find reference data by override name ' . $override['name']);
+					$this->assertNotNull($id, 'Cannot find reference data by override name '.$override['name']);
 
 					// Check if source has fields from data to update them.
 					foreach (CTestArrayHelper::get($override, 'fields', []) as $key => $value) {
-						$this->assertArrayHasKey($key, $sources[$id]['fields'], 'Cannot find field ' . $key . ' in source');
+						$this->assertArrayHasKey($key, $sources[$id]['fields'], 'Cannot find field '.$key.' in source');
 						$sources[$id]['fields'][$key] = $value;
 					}
 
@@ -1533,7 +1533,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					}
 
 					foreach ($conditions as $condition) {
-						switch ($condition['action']) {
+						switch($condition['action']) {
 							case USER_ACTION_ADD:
 								$sources[$id]['Filters']['filter_conditions'][] = $condition;
 								break;
@@ -1581,7 +1581,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 									}
 
 									$this->assertArrayHasKey($key, $sources[$id]['Operations'][$operation['index']],
-											'Cannot find field ' . $key . ' in source');
+											'Cannot find field '.$key.' in source');
 									$sources[$id]['Operations'][$operation['index']][$key] = $value;
 								}
 
@@ -1612,13 +1612,15 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 					if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
 						// Check that Override with correct name was added to Overrides table.
-						$fields = (CTestArrayHelper::get($override, 'fields')) ? $override['fields']['Name'] : $sources[$i]['fields']['Name'];
+						$fields = (CTestArrayHelper::get($override, 'fields'))
+							? $override['fields']['Name']
+							: $sources[$i]['fields']['Name'];
 						$this->assertEquals($fields, $override_container->getRow($i)->getColumn('Name')->getText());
 						// Check that Override in table has correct processing status.
 						$stop_processing = (CTestArrayHelper::get($override,
-										'fields.If filter matches') === 'Stop processing') ? 'Yes' : 'No';
+								'fields.If filter matches') === 'Stop processing') ? 'Yes' : 'No';
 						$this->assertEquals($stop_processing, $override_container->getRow($i)->getColumn('Stop processing')
-										->getText());
+								->getText());
 					}
 					break;
 
@@ -1628,7 +1630,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					break;
 
 				default:
-					throw new Exception('Cannot perform action "' . $override_action . '".');
+					throw new Exception('Cannot perform action "'.$override_action.'".');
 			}
 		}
 
@@ -1636,7 +1638,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			// Submit LLD update.
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
-			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE itemid =' . self::UPDATED_ID));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE itemid ='.self::UPDATED_ID));
 
 			self::$created_id = self::UPDATED_ID;
 			$this->checkSavedState(['overrides' => $sources]);
@@ -1681,7 +1683,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		$operation_container = $override_overlay->getField('Operations')->asTable();
 
 		// Add Operations to override.
-		foreach (CTestArrayHelper::get($override, 'Operations', []) as $i => $operation) {
+		foreach(CTestArrayHelper::get($override, 'Operations', []) as $i => $operation){
 
 			$operation_action = CTestArrayHelper::get($operation, 'action', USER_ACTION_ADD);
 			unset($operation['action']);
@@ -1722,7 +1724,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->one()
 										->fill($operation['Update interval']['Custom intervals']);
 							}
-						} else {
+						}
+						else {
 							$operation_overlay->query('id:visible_opperiod')->one()->asCheckbox()->fill(false);
 						}
 					}
@@ -1748,7 +1751,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 							$value = $sources[$id]['Operations'][$i]['Condition']['value'];
 						}
 
-						$condition_text = $object . ' ' . $operator . ' ' . $value;
+						$condition_text = $object.' '.$operator.' '.$value;
 						$this->assertEquals($condition_text,
 								$operation_container->getRow($row)->getColumn('Condition')->getText()
 						);
@@ -1756,11 +1759,11 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					break;
 
 				case USER_ACTION_REMOVE:
-					$condition_text = $operation['fields']['Object'] . ' ' .
-							$operation['fields']['Condition']['operator'] . ' ' .
+					$condition_text = $operation['fields']['Object'].' '.
+							$operation['fields']['Condition']['operator'].' '.
 							$operation['fields']['Condition']['value'];
 					$row = $operation_container->findRow('Condition', $condition_text)
-									->query('button:Remove')->one()->click();
+						->query('button:Remove')->one()->click();
 					$row->waitUntilNotPresent();
 					break;
 			}
@@ -1794,7 +1797,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		}
 
 		// Open saved LLD.
-		$this->page->login()->open('host_discovery.php?form=update&itemid=' . self::$created_id);
+		$this->page->login()->open('host_discovery.php?form=update&itemid='.self::$created_id);
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Overrides');
 		$override_container = $form->getField('Overrides')->asTable();
@@ -1805,7 +1808,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		foreach ($data['overrides'] as $override) {
 			$override_names[] = $override['fields']['Name'];
 			$stop_processing[] = (CTestArrayHelper::get($override['fields'],
-							'If filter matches') === 'Stop processing') ? 'Yes' : 'No';
+					'If filter matches') === 'Stop processing') ? 'Yes' : 'No';
 		}
 
 		// Compare Override names from table with data.
@@ -1839,7 +1842,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 				// Check that Fiters are filled correctly.
 				$override_overlay->query('id:overrides_filters')->asMultifieldTable()->one()
-						->checkValue($override['Filters']['filter_conditions']);
+					->checkValue($override['Filters']['filter_conditions']);
 
 				// Check that Evaluation type is filled correctly.
 				if (array_key_exists('Type of calculation', $override['Filters'])) {
@@ -1848,7 +1851,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 					// Check that Formula is filled correctly.
 					if (array_key_exists('formula', $override['Filters'])) {
-						$formula = CTestArrayHelper::get($override['Filters'], 'Type of calculation') !== 'Custom expression' ? $override_overlay->query('id:overrides_expression')->one()->getText() : $override_overlay->query('id:overrides_formula')->one()->getValue();
+						$formula = CTestArrayHelper::get($override['Filters'], 'Type of calculation') !== 'Custom expression'
+							? $override_overlay->query('id:overrides_expression')->one()->getText()
+							: $override_overlay->query('id:overrides_formula')->one()->getValue();
 						$this->assertEquals($override['Filters']['formula'], $formula);
 					}
 				}
@@ -1864,8 +1869,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				foreach ($override['Operations'] as $operation) {
 					$fields = array_key_exists('fields', $operation) ? $operation['fields'] : $operation;
 
-					$condition_text[] = $fields['Object'] . ' ' .
-							$fields['Condition']['operator'] . ' ' .
+					$condition_text[] = $fields['Object'].' '.
+							$fields['Condition']['operator'].' '.
 							$fields['Condition']['value'];
 				}
 
