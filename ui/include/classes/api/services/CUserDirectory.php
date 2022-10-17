@@ -344,7 +344,6 @@ class CUserDirectory extends CApiService {
 			'filter' => [
 				'userdirectoryid' => array_keys($result)
 			],
-			'sortfield' => ['sortorder'],
 			'preservekeys' => true
 		]);
 
@@ -421,12 +420,8 @@ class CUserDirectory extends CApiService {
 			}
 
 			if (array_key_exists('provision_groups', $userdirectory)) {
-				$sortorder = 1;
 				foreach ($userdirectory['provision_groups'] as $group) {
-					$userdirectory_idpgroups[] = [
-						'userdirectoryid' => $userdirectory['userdirectoryid'],
-						'sortorder' => $sortorder++
-					] + $group;
+					$userdirectory_idpgroups[] = ['userdirectoryid' => $userdirectory['userdirectoryid']] + $group;
 				}
 			}
 		}
@@ -718,7 +713,7 @@ class CUserDirectory extends CApiService {
 		}
 
 		$db_provision_groups = DB::select('userdirectory_idpgroup', [
-			'output' => ['userdirectory_idpgroupid', 'userdirectoryid', 'roleid', 'name', 'sortorder'],
+			'output' => ['userdirectory_idpgroupid', 'userdirectoryid', 'roleid', 'name'],
 			'filter' => [
 				'userdirectoryid' => $affected_userdirectoryids
 			],
@@ -752,7 +747,6 @@ class CUserDirectory extends CApiService {
 				'userdirectory_idpgroupid' => $prov_groupid,
 				'name' => $db_prov_groups['name'],
 				'roleid' => $db_prov_groups['roleid'],
-				'sortorder' => $db_prov_groups['sortorder'],
 				'user_groups' => $db_idpgroup_usergroups[$prov_groupid]
 			];
 		}
@@ -1113,13 +1107,10 @@ class CUserDirectory extends CApiService {
 				$db_group['user_groups'] = array_values($db_group['user_groups']);
 
 				$provision_groups_remove[$userdirectoryid][$db_group['userdirectory_idpgroupid']]
-					= array_intersect_key($db_group, array_flip(['name', 'roleid','sortorder', 'user_groups']));
+					= array_intersect_key($db_group, array_flip(['name', 'roleid', 'user_groups']));
 			}
 
-			$sortorder = 1;
 			foreach ($userdirectories[$userdirectoryid]['provision_groups'] as $index => &$group) {
-				$group['sortorder'] = $sortorder++;
-
 				CArrayHelper::sort($group['user_groups'], ['usrgrpid']);
 				$group['user_groups'] = array_values($group['user_groups']);
 

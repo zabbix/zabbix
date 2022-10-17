@@ -464,7 +464,7 @@ $saml_tab = (new CFormGrid())
 					->setAttribute('style', 'width: 100%;')
 					->setHeader(
 						(new CRowHeader([
-							'', _('SAML group pattern'), _('User groups'), _('User role'), _('Action')
+							_('SAML group pattern'), _('User groups'), _('User role'), _('Action')
 						]))->addClass(ZBX_STYLE_GREY)
 					)
 					->addItem(

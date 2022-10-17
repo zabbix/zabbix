@@ -119,19 +119,6 @@ class CControllerPopupLdapCheck extends CController {
 			]
 		];
 
-		foreach ($data['body']['provision_groups'] as $index => $group) {
-			if (array_key_exists('enabled', $group) && $group['enabled'] == 0) {
-				unset($data['body']['provision_groups'][$index]);
-				continue;
-			}
-
-			$group_props = ['name', 'sortorder', 'user_groups', 'roleid'];
-			$data['body']['provision_groups'][$index] = array_intersect_key($group, array_flip($group_props));
-		}
-
-		CArrayHelper::sort($data['body']['provision_groups'], ['sortorder']);
-		$data['body']['provision_groups'] = array_values($data['body']['provision_groups']);
-
 		if ($this->hasInput('userdirectoryid')) {
 			$data['body']['userdirectoryid'] = $this->getInput('userdirectoryid');
 		}
@@ -156,19 +143,8 @@ class CControllerPopupLdapCheck extends CController {
 				return false;
 			}
 
-			if (array_key_exists('enabled', $group) && $group['enabled'] == 0) {
-				unset($groups[$index]);
-				continue;
-			}
-
 			if (!array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
 					|| !array_key_exists('roleid', $group) || !ctype_digit($group['roleid'])) {
-				return false;
-			}
-
-			if (!array_key_exists('enabled', $group)
-					&& (!array_key_exists('name', $group) || $group['name'] === ''
-							|| $group['name'] === CProvisioning::FALLBACK_GROUP_NAME)) {
 				return false;
 			}
 		}

@@ -44,7 +44,6 @@ window.ldap_edit_popup = new class {
 		this._addEventListeners();
 		this._renderProvisionGroups(provision_groups);
 		this._renderProvisionMedia(provision_media);
-		this._initSortable();
 	}
 
 	_addEventListeners() {
@@ -97,44 +96,6 @@ window.ldap_edit_popup = new class {
 		for (const element of this.form.querySelectorAll('.allow-jit-provisioning')) {
 			element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
 		}
-	}
-
-	_initSortable() {
-		$(this.provision_groups_table).sortable({
-			items: 'tbody tr.sortable',
-			axis: 'y',
-			containment: 'parent',
-			cursor: 'grabbing',
-			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-			tolerance: 'pointer',
-			opacity: 0.6,
-			helper: function(e, ui) {
-				for (let td of ui.find('>td')) {
-					let $td = $(td);
-					$td.attr('width', $td.width())
-				}
-
-				// when dragging element on safari, it jumps out of the table
-				if (SF) {
-					// move back draggable element to proper position
-					ui.css('left', (ui.offset().left - 2) + 'px');
-				}
-
-				return ui;
-			},
-			update: (e, ui) => {
-				[...this.provision_groups_table.querySelectorAll('tbody tr')].forEach((row, i) => {
-					row.querySelector('[name^="provision_groups"][name$="[sortorder]"]').value = i + 1;
-				});
-			},
-			stop: function(e, ui) {
-				ui.item.find('>td').removeAttr('width');
-				ui.item.removeAttr('style');
-			},
-			start: function(e, ui) {
-				$(ui.placeholder).height($(ui.helper).height());
-			}
-		});
 	}
 
 	showPasswordField(e) {
@@ -253,15 +214,11 @@ window.ldap_edit_popup = new class {
 	editProvisionGroup(row = null) {
 		let popup_params = {};
 		let row_index = 0;
-		let sortorder;
 
 		if (row === null) {
 			while (this.provision_groups_table.querySelector(`[data-row_index="${row_index}"]`) !== null) {
 				row_index++;
 			}
-
-			const sortorders = [...this.provision_groups_table.querySelectorAll(`[name^="provision_groups"][name$="[sortorder]"]`)];
-			sortorder = sortorders.length ? Math.max(sortorders.map(v => parseInt(v.value))) + 1 : 1;
 
 			popup_params = {
 				add_group: 1,
@@ -270,7 +227,6 @@ window.ldap_edit_popup = new class {
 		}
 		else {
 			row_index = row.dataset.row_index;
-			sortorder = parseInt(row.querySelector(`[name="provision_groups[${row_index}][sortorder]"`).value);
 
 			popup_params.name = row.querySelector(`[name="provision_groups[${row_index}][name]"`).value;
 
@@ -292,8 +248,7 @@ window.ldap_edit_popup = new class {
 		const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			const group = {...e.detail, ...{row_index, sortorder, enabled: 1}};
-			const new_row = this._renderProvisionGroupRow(group);
+			const new_row = this._renderProvisionGroupRow({...e.detail, ...{row_index}});
 
 			if (row === null) {
 				this.provision_groups_table.querySelector('tbody').appendChild(new_row);
@@ -345,10 +300,9 @@ window.ldap_edit_popup = new class {
 
 	_renderProvisionGroups(groups) {
 		for (const key in groups) {
-			let sortorder = parseInt(key) + 1
 			this.provision_groups_table
 				.querySelector('tbody')
-				.appendChild(this._renderProvisionGroupRow({...groups[key], ...{row_index: key, sortorder}}));
+				.appendChild(this._renderProvisionGroupRow({...groups[key], ...{row_index: key}}));
 		}
 	}
 
@@ -389,14 +343,10 @@ window.ldap_edit_popup = new class {
 
 	_templateProvisionGroupRow() {
 		return `
-			<tr data-row_index="#{row_index}" class="sortable">
-				<td class="td-drag-icon">
-					<div class="drag-icon ui-sortable-handle"></div>
-				</td>
+			<tr data-row_index="#{row_index}">
 				<td>
 					<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
 					<input type="hidden" name="provision_groups[#{row_index}][name]" value="#{name}">
-					<input type="hidden" name="provision_groups[#{row_index}][sortorder]" value="#{sortorder}">
 				</td>
 				<td class="wordbreak">#{user_group_names}</td>
 				<td class="wordbreak">#{role_name}</td>

@@ -195,7 +195,7 @@ $form = (new CForm('post', $form_action))
 						->setId('ldap-user-groups-table')
 						->setHeader(
 							(new CRowHeader([
-								'', _('LDAP group pattern '), _('User groups'), _('User role'), _('Action')
+								_('LDAP group pattern '), _('User groups'), _('User role'), _('Action')
 							]))->addClass(ZBX_STYLE_GREY)
 						)
 						->addItem(

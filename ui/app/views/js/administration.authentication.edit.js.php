@@ -50,11 +50,9 @@
 
 			this.toggleSamlJitProvisioning(this.saml_provision_status.checked);
 			this.toggleProvisionPeriod(this.ldap_jit_status.checked);
-			this._initSortable();
 
 			if (document.getElementById('saml_auth_enabled') !== null
 					&& !document.getElementById('saml_auth_enabled').checked) {
-				$(this.saml_provision_groups_table).sortable('disable');
 				this.disableTable(this.saml_provision_groups_table);
 				this.disableTable(this.saml_media_type_mapping_table);
 			}
@@ -110,12 +108,10 @@
 					});
 
 					if (e.target.checked) {
-						$(this.saml_provision_groups_table).sortable('enable');
 						this.enableTable(this.saml_provision_groups_table);
 						this.enableTable(this.saml_media_type_mapping_table);
 					}
 					else {
-						$(this.saml_provision_groups_table).sortable('disable');
 						this.disableTable(this.saml_provision_groups_table);
 						this.disableTable(this.saml_media_type_mapping_table);
 					}
@@ -169,58 +165,14 @@
 		}
 
 		enableTable(table) {
-			table.querySelectorAll('a, .drag-icon').forEach(element => {
-				element.classList.remove('<?= ZBX_STYLE_DISABLED ?>');
-			});
 			table.querySelectorAll('button').forEach(button => {
 				button.disabled = false;
 			});
 		}
 
 		disableTable(table) {
-			table.querySelectorAll('a, .drag-icon').forEach(element => {
-				element.classList.add('<?= ZBX_STYLE_DISABLED ?>');
-			});
 			table.querySelectorAll('button').forEach(button => {
 				button.disabled = true;
-			});
-		}
-
-		_initSortable() {
-			$(this.saml_provision_groups_table).sortable({
-				items: 'tbody tr.sortable',
-				axis: 'y',
-				containment: 'parent',
-				cursor: 'grabbing',
-				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-				tolerance: 'pointer',
-				opacity: 0.6,
-				helper: function(e, ui) {
-					for (let td of ui.find('>td')) {
-						let $td = $(td);
-						$td.attr('width', $td.width());
-					}
-
-					// When dragging element on safari, it jumps out of the table.
-					if (SF) {
-						// Move back draggable element to proper position.
-						ui.css('left', (ui.offset().left - 2) + 'px');
-					}
-
-					return ui;
-				},
-				update: (e, ui) => {
-					[...this.saml_provision_groups_table.querySelectorAll('tbody tr')].forEach((row, i) => {
-						row.querySelector('[name^="saml_provision_groups"][name$="[sortorder]"]').value = i + 1;
-					});
-				},
-				stop: function(e, ui) {
-					ui.item.find('>td').removeAttr('width');
-					ui.item.removeAttr('style');
-				},
-				start: function(e, ui) {
-					$(ui.placeholder).height($(ui.helper).height());
-				}
 			});
 		}
 
@@ -254,7 +206,6 @@
 		_renderProvisionGroups(saml_provision_groups) {
 			for (const [row_index, saml_provision_group] of Object.entries(saml_provision_groups)) {
 				saml_provision_group.row_index = row_index;
-				saml_provision_group.sortorder = parseInt(row_index) + 1;
 
 				this.saml_provision_groups_table
 					.querySelector('tbody')
@@ -275,11 +226,9 @@
 		editSamlProvisionGroup(row = null) {
 			let popup_params = {};
 			let row_index = 0;
-			let sortorder;
 
 			if (row !== null) {
 				row_index = row.dataset.row_index;
-				sortorder = row.querySelector(`[name="saml_provision_groups[${row_index}][sortorder]"`).value;
 
 				popup_params.name = row.querySelector(`[name="saml_provision_groups[${row_index}][name]"`).value;
 
@@ -300,11 +249,6 @@
 					row_index++;
 				}
 
-				const sortorders = [...this.saml_provision_groups_table.querySelectorAll(
-					`[name^="provision_groups"][name$="[sortorder]"]`
-				)];
-				sortorder = sortorders.length ? Math.max(sortorders.map(v => parseInt(v.value))) + 1 : 1;
-
 				popup_params = {
 					add_group: 1,
 					name: ''
@@ -316,8 +260,7 @@
 			const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				const saml_provision_group = {...e.detail, ...{row_index, sortorder, enabled: 1}};
-				const new_row = this._renderProvisionGroupRow(saml_provision_group);
+				const new_row = this._renderProvisionGroupRow({...e.detail, ...{row_index}});
 
 				if (row === null) {
 					this.saml_provision_groups_table.querySelector('tbody').appendChild(new_row);
@@ -375,10 +318,10 @@
 				row_index = row.dataset.row_index;
 
 				const provision_group_indexes = [...row.querySelectorAll(
-					`[name^="ldap_servers[${row_index}][provision_groups]"][name$="[sortorder]"]`
+					`[name^="ldap_servers[${row_index}][provision_groups]"][name$="[name]"]`
 				)].map((element) => {
 					let start = 33 + row_index.toString().length;
-					let end = element.name.length - 12;
+					let end = element.name.length - 7;
 					return element.name.substring(start, end);
 				});
 
@@ -392,9 +335,6 @@
 					let provision_group = {
 						roleid: row.querySelector(
 							`[name="ldap_servers[${row_index}][provision_groups][${i}][roleid]"`
-						).value,
-						sortorder: row.querySelector(
-							`[name="ldap_servers[${row_index}][provision_groups][${i}][sortorder]"`
 						).value,
 						user_groups: [...user_groups].map(usrgrp => usrgrp.value)
 					}
@@ -510,8 +450,6 @@
 
 			if ('provision_groups' in ldap) {
 				for (const [group_index, provision_group] of Object.entries(ldap.provision_groups)) {
-					provision_group.sortorder = +group_index + 1;
-
 					for (const [name, value] of Object.entries(provision_group)) {
 						if (name === 'user_groups') {
 							for (const usrgrp of value) {
@@ -644,14 +582,10 @@
 
 		_templateProvisionGroupRow() {
 			return `
-				<tr data-row_index="#{row_index}" class="sortable">
-					<td class="td-drag-icon">
-						<div class="drag-icon ui-sortable-handle"></div>
-					</td>
+				<tr data-row_index="#{row_index}">
 					<td>
 						<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
 						<input type="hidden" name="saml_provision_groups[#{row_index}][name]" value="#{name}">
-						<input type="hidden" name="saml_provision_groups[#{row_index}][sortorder]" value="#{sortorder}">
 					</td>
 					<td class="wordbreak">#{user_group_names}</td>
 					<td class="wordbreak">#{role_name}</td>
