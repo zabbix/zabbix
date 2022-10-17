@@ -20,7 +20,7 @@
 
 namespace SCIM;
 
-use API as JSRPC;
+use API as APIRPC;
 use APIException;
 use CApiInputValidator;
 use CApiService;
@@ -65,36 +65,43 @@ class User extends CApiService {
 	public function get(array $options = []): array {
 		$this->validateGet($options);
 
-		$saml_settings = CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML);
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryId();
 
 		if (array_key_exists('userName', $options)) {
-			$user = JSRPC::User()->get([
-				'filter' => [
-					'userdirectoryid' => $saml_settings['userdirectoryid'],
-					'username' => $options['userName']
-				]
+			$user = APIRPC::User()->get([
+				'filter' => ['username' => $options['userName']]
 			]);
 
 			if (!$user) {
 				$this->data['Resources'] = [];
 			}
+			else {
+				if ($user[0]['userdirectoryid'] != $userdirectoryid) {
+					self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST,
+						_s('The username "%1$s" has already been taken by another user.', $options['userName'])
+					);
+				}
+			}
 		}
 		elseif (array_key_exists('id', $options)) {
-			$user = JSRPC::User()->get([
-				'userids' => $options['id'],
-				'filter' => [
-					'userdirectoryid' => $saml_settings['userdirectoryid']
-				]
+			$user = APIRPC::User()->get([
+				'userids' => $options['id']
 			]);
 
 			if (!$user) {
 				self::exception(self::ZBX_SCIM_ERROR_USER_NOT_FOUND, _('This user does not exist.'));
 			}
+
+			if ($user[0]['userdirectoryid'] != $userdirectoryid) {
+				self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST,
+					_s('The user "%1$s" belongs to another userdirectory.', $options['id'])
+				);
+			}
 		}
 		else {
-			$total_users = JSRPC::User()->get([
+			$total_users = APIRPC::User()->get([
 				'countOutput' => true,
-				'filter' => ['userdirectoryid' => $saml_settings['userdirectoryid']]
+				'filter' => ['userdirectoryid' => $userdirectoryid]
 			]);
 			$this->data['totalResults'] = $total_users;
 			$this->data['startIndex'] = 1;
@@ -111,13 +118,13 @@ class User extends CApiService {
 				$this->data['itemsPerPage'] = $total_users;
 			}
 
-			$this->listResponse($saml_settings);
+			$this->listResponse($userdirectoryid);
 
 			return $this->data;
 		}
 
 		if ($user) {
-			$this->data += $this->prepareData($user[0], $saml_settings);
+			$this->data += $this->prepareData($user[0]);
 		}
 
 		return $this->data;
@@ -148,50 +155,43 @@ class User extends CApiService {
 	 * @param array  $options              Array with different attributes that might be set up in SAML settings.
 	 * @param string $options['userName']  Users user name based on which user will be searched.
 	 *
-	 * @return array          Returns SCIM data that is necessary for POST request response.
+	 * @return array                       Returns SCIM data that is necessary for POST request response.
 	 */
 	public function post(array $options): array {
 		$this->validatePost($options);
 
-		$saml_settings = CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML);
-		$saml_provisioning_data = new CProvisioning($saml_settings);
-
-		$db_user = JSRPC::User()->get([
-			'output' => ['userid'],
-			'filter' => [
-				'userdirectoryid' => $saml_settings['userdirectoryid'],
-				'username' => $options['userName']
-			]
+		[$db_user] = APIRPC::User()->get([
+			'output' => ['userid', 'userdirectoryid'],
+			'filter' => ['username' => $options['userName']]
 		]);
 
-		$user_attributes = $saml_provisioning_data->getUserAttributes($options);
-		$provision_media = $saml_provisioning_data->getUserMedias($options);
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
+		$provisioning = CProvisioning::forUserDirectoryId($userdirectoryid);
+
+		$user_data['userdirectoryid'] = $userdirectoryid;
+		$user_data += $provisioning->getUserAttributes($options);
+		$user_data['medias'] = $provisioning->getUserMedias($options);
 
 		if (!$db_user) {
-			$user = JSRPC::User()->createProvisionedUser([
-				'username' => $options['userName'],
-				'name' => $user_attributes['name'],
-				'surname' => $user_attributes['surname'],
-				'medias' => $provision_media,
-				'userdirectoryid' => $saml_settings['userdirectoryid']
-			]);
+			$user_data['username'] = $options['userName'];
+			$user = APIRPC::User()->createProvisionedUser($user_data);
+		}
+		elseif ($db_user['userdirectoryid'] == $userdirectoryid) {
+			$user_data['userid'] = $db_user['userid'];
+			$user = APIRPC::User()->updateProvisionedUser($user_data);
+			$user['userid'] = $db_user['userid'];
 		}
 		else {
-			$user = JSRPC::User()->updateProvisionedUser([
-				'userid' => $db_user[0]['userid'],
-				'name' => $user_attributes['name'],
-				'surname' => $user_attributes['surname'],
-				'medias' => $provision_media,
-				'userdirectoryid' => $saml_settings['userdirectoryid']
-			]);
-			$user['userid'] = $db_user[0]['userid'];
+			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST,
+				_s('The username "%1$s" has already been taken by another user.', $options['userName'])
+			);
 		}
 
 		if (!$user) {
 			self::exception(self::ZBX_SCIM_ERROR, _('Unable to create this user.'));
 		}
 
-		$this->setData($user['userid'], $saml_settings, $options);
+		$this->setData($user['userid'], $userdirectoryid, $options);
 
 		return $this->data;
 	}
@@ -228,50 +228,31 @@ class User extends CApiService {
 	 * @return array          Returns SCIM data that is necessary for PUT request response.
 	 */
 	public function put(array $options): array {
-		$this->validatePut($options);
+		$db_user = $this->validatePut($options);
 
-		$saml_settings = CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML);
-		$saml_provisioning_data = new CProvisioning($saml_settings);
-		$db_user = JSRPC::User()->get([
-			'userids' => $options['id'],
-			'filter' => [
-				'userdirectoryid' => $saml_settings['userdirectoryid']
-			]
-		]);
-
-		if (!$db_user) {
-			self::exception(self::ZBX_SCIM_ERROR_USER_NOT_FOUND, _('This user does not exist.'));
+		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
+		$group_attribute = $provisioning->getGroupIdpAttributes()[0];
+		$user_group_names = [];
+		if (array_key_exists($group_attribute, $options)) {
+			$user_group_names = array_column($options[$group_attribute], 'display');
 		}
+
+		$user_data = [
+			'userid' => $db_user['userid'],
+			'username' => $options['userName']
+		];
+		$user_data += $provisioning->getUserAttributes($options);
+		$user_data += $provisioning->getUserGroupsAndRole($user_group_names);
+		$user_data['medias'] = $provisioning->getUserMedias($options);
 
 		if ($options['active'] == true) {
-			$user_attributes = $saml_provisioning_data->getUserAttributes($options);
-			$group_attribute = $saml_provisioning_data->getGroupIdpAttributes()[0];
-			$user_group_names = array_column($options[$group_attribute], 'display');
-			$provision_groups = $saml_provisioning_data->getUserGroupsAndRole($user_group_names);
-			$provision_media = $saml_provisioning_data->getUserMedias($options);
+			APIRPC::User()->updateProvisionedUser($user_data);
 
-			$user = JSRPC::User()->updateProvisionedUser([
-				'userid' => $db_user[0]['userid'],
-				'username' => $options['userName'],
-				'name' => $user_attributes['name'],
-				'surname' => $user_attributes['surname'],
-				'usrgrps' => $provision_groups['usrgrps'],
-				'roleid' => $provision_groups['roleid'],
-				'medias' => $provision_media
-			]);
-
-			if (!$user) {
-				self::exception(self::ZBX_SCIM_ERROR, _('Unable to update this user.'));
-			}
-
-			$this->setData($user['userid'], $saml_settings, $options);
+			$this->setData($db_user['userid'], $db_user['userdirectoryid'], $options);
 		}
 		else {
-			$user = JSRPC::User()->delete([$db_user[0]['userid']]);
-
-			if (!$user) {
-				self::exception(self::ZBX_SCIM_ERROR, _('Unable to delete this user.'));
-			}
+			$user_data['usrgrps'] = [];
+			APIRPC::User()->updateProvisionedUser($user_data);
 		}
 
 		return $this->data;
@@ -280,9 +261,13 @@ class User extends CApiService {
 	/**
 	 * @param array $options
 	 *
+	 * @returns array                Returns user data from the database.
+	 *          ['userid']
+	 *          ['userdirectoryid']
+	 *
 	 * @throws APIException if input is invalid.
 	 */
-	private function validatePut(array $options): void {
+	private function validatePut(array $options): array {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
@@ -297,8 +282,31 @@ class User extends CApiService {
 		if (!in_array(self::ZBX_SCIM_USER_SCHEMA, $options['schemas'], true)) {
 			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
 		}
+
+		[$db_user] = APIRPC::User()->get([
+			'output' => ['userid', 'userdirectoryid'],
+			'userids' => $options['id']
+		]);
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
+
+		if (!$db_user) {
+			self::exception(self::ZBX_SCIM_ERROR_USER_NOT_FOUND, _('This user does not exist.'));
+		}
+		elseif ($db_user['userdirectoryid'] != $userdirectoryid) {
+			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST,
+				_s('The user "%1$s" belongs to another userdirectory.', $options['id'])
+			);
+		}
+
+		return $db_user;
 	}
 
+	/**
+	 * User patch endpoint is not supported.
+	 *
+	 * @return void
+	 * @throws APIException
+	 */
 	public function patch(): void {
 		self::exception(self::ZBX_SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
 	}
@@ -312,26 +320,18 @@ class User extends CApiService {
 	 * @return array          Returns only schema parameter, the rest of the parameters are not included.
 	 */
 	public function delete(array $options): array {
-		$this->validateDelete($options);
+		$db_user = $this->validateDelete($options);
 
-		$saml_settings = CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML);
+		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
+		$user_data = [
+			'userid' => $db_user[0]['userid'],
+			'username' => $options['userName']
+		];
+		$user_data += $provisioning->getUserAttributes($options);
+		$user_data['medias'] = $provisioning->getUserMedias($options);
+		$user_data['usrgrps'] = [];
 
-		$db_user = JSRPC::User()->get([
-			'userids' => $options['id'],
-			'filter' => [
-				'userdirectoryid' => $saml_settings['userdirectoryid']
-			]
-		]);
-
-		if (!$db_user) {
-			self::exception(self::ZBX_SCIM_ERROR_USER_NOT_FOUND, _('This user does not exist.'));
-		}
-
-		$user = JSRPC::User()->delete([$db_user[0]['userid']]);
-
-		if (!$user) {
-			self::exception(self::ZBX_SCIM_ERROR, _('Unable to delete this user.'));
-		}
+		APIRPC::User()->updateProvisionedUser($user_data);
 
 		return $this->data;
 	}
@@ -341,7 +341,7 @@ class User extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array $options): void {
+	private function validateDelete(array $options): array {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'id' =>	['type' => API_ID, 'flags' => API_REQUIRED, 'uniq' => true]
 		]];
@@ -349,24 +349,42 @@ class User extends CApiService {
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
+
+		[$db_user] = APIRPC::User()->get([
+			'output' => ['userid', 'userdirectoryid'],
+			'userids' => $options['id']
+		]);
+
+		if (!$db_user) {
+			self::exception(self::ZBX_SCIM_ERROR_USER_NOT_FOUND, _('This user does not exist.'));
+		}
+		elseif ($db_user['userdirectoryid'] != $userdirectoryid) {
+			self::exception(self::ZBX_SCIM_ERROR_BAD_REQUEST,
+				_s('The user "%1$s" belongs to another userdirectory.', $options['id'])
+			);
+		}
+
+		return $db_user;
 	}
 
 	/**
 	 * Updates $this->data parameter with ListResponse data that is required by SCIM.
 	 *
-	 * @param array $saml_settings  Information on SAML user directory. Use CAuthenticationHelper to get default SAML.
+	 * @param string $userdirectoryid  SAML userdirectoryid
 	 *
 	 * @return void
 	 */
-	private function listResponse(array $saml_settings): void {
+	private function listResponse(string $userdirectoryid): void {
 		$this->data['schemas'] = ['urn:ietf:params:scim:api:messages:2.0:ListResponse'];
 		$this->data['Resources'] = [];
-		$users = JSRPC::User()->get([
-			'filter' => ['userdirectoryid' => $saml_settings['userdirectoryid']]
+		$users = APIRPC::User()->get([
+			'filter' => ['userdirectoryid' => $userdirectoryid]
 		]);
 
 		foreach ($users as $user) {
-			$this->data['Resources'][] = $this->prepareData($user, $saml_settings);
+			$this->data['Resources'][] = $this->prepareData($user);
 		}
 	}
 
@@ -374,18 +392,18 @@ class User extends CApiService {
 	 * Updates $this->data parameter with the data that is required by SCIM.
 	 *
 	 * @param string $userid
-	 * @param array  $saml_settings  Information on SAML user directory. Use CAuthenticationHelper to get default SAML.
-	 * @param array  $options        Optional. User information sent in request from IdP.
+	 * @param string $userdirectoryid  SAML userdirectory ID.
+	 * @param array  $options          Optional. User information sent in request from IdP.
 	 *
 	 * @return void
 	 */
-	private function setData(string $userid, array $saml_settings, array $options = []): void {
-		$user = JSRPC::User()->get([
+	private function setData(string $userid, string $userdirectoryid, array $options = []): void {
+		$user = APIRPC::User()->get([
 			'userids' => $userid,
-			'filter' => ['userdirectoryid' => $saml_settings['userdirectoryid']]
+			'filter' => ['userdirectoryid' => $userdirectoryid]
 		]);
 
-		$this->data += $this->prepareData($user[0], $saml_settings, $options);
+		$this->data += $this->prepareData($user[0], $options);
 	}
 
 	/**
@@ -394,12 +412,6 @@ class User extends CApiService {
 	 * @param array  $user
 	 * @param string $user['userid']
 	 * @param string $user['username']
-	 * @param array  $saml_settings
-	 * @param string $saml_settings['user_username']
-	 * @param string $saml_settings['user_lastname']
-	 * @param array  $saml_settings['provision_media']
-	 * @param string $saml_settings['provision_media']['attribute']  Some other specific attribute defined in SAML
-	 *                                                               settings.
 	 * @param array  $options                                        Optional. User information sent in request from IdP.
 	 *
 	 * @return array                                                 Returns array with data formatted according to SCIM.
@@ -409,24 +421,20 @@ class User extends CApiService {
 	 *         ['active']
 	 *         ['attribute']                                          Some other attributes set up in SAML settings.
 	 */
-	private function prepareData(array $user, array $saml_settings, array $options = []): array {
+	private function prepareData(array $user, array $options = []): array {
 		$data = [];
-
 		$data['id'] = $user['userid'];
 		$data['userName'] = $user['username'];
 		$data['active'] = true;
 
-		if (array_key_exists($saml_settings['user_username'], $options)) {
-			$data[$saml_settings['user_username']] = $user['name'];
-		}
+		$provisioning = CProvisioning::forUserDirectoryId($user['userdirectoryid']);
+		$user_attributes = $provisioning->getUserAttributes($options);
+		$data += $user_attributes;
 
-		if (array_key_exists($saml_settings['user_lastname'], $options)) {
-			$data[$saml_settings['user_lastname']] = $user['surname'];
-		}
-
-		foreach($saml_settings['provision_media'] as $media) {
-			if (array_key_exists($media['attribute'], $options)) {
-				$data[$media['attribute']] = $options[$media['attribute']];
+		$media_attributes = $provisioning->getUserIdpMediaAttributes();
+		foreach($media_attributes as $media) {
+			if (array_key_exists($media, $options)) {
+				$data[$media] = $options[$media];
 			}
 		}
 

@@ -188,6 +188,17 @@ class CProvisioning {
 	}
 
 	/**
+	 * Get array of media attributes to request from external source.
+	 *
+	 * @return array
+	 */
+	public function getUserIdpMediaAttributes(): array {
+		$attributes = array_column($this->userdirectory['provision_media'], 'attribute');
+
+		return array_keys(array_flip(array_filter($attributes, 'strlen')));
+	}
+
+	/**
 	 * Return array with user data created from external user data attributes.
 	 *
 	 * @param array $idp_user       User data from external source.
