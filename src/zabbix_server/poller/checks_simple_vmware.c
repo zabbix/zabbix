@@ -308,8 +308,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	if (0 == (perfcounter->state & ZBX_VMWARE_COUNTER_NOTSUPPORTED) &&
-			0 != (ZBX_VMWARE_COUNTER_CUSTOM & perfcounter->state) &&
+	if (0 != (ZBX_VMWARE_COUNTER_CUSTOM & perfcounter->state) &&
 			0 != (ZBX_VMWARE_COUNTER_READY & perfcounter->state))
 	{
 		perfcounter->last_used = time(NULL);

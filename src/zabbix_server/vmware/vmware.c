@@ -3926,9 +3926,9 @@ static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
 	struct zbx_json		json_data;
 	int			ret = FAIL;
 	char			*latestdate = NULL, *oldestdate = NULL;
-	zbx_uint64_t		count, size, uniquesize, latest_age = 0, oldest_age = 0;
+	zbx_uint64_t		count, size, uniquesize;
 	zbx_vector_uint64_t	disks_used;
-	time_t			xml_time, now = time(NULL);
+	time_t			xml_time, now = time(NULL), latest_age = 0, oldest_age = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3968,9 +3968,9 @@ static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
 	zbx_json_close(&json_data);
 	zbx_json_adduint64(&json_data, "count", count);
 	zbx_json_addstring(&json_data, "latestdate", ZBX_NULL2EMPTY_STR(latestdate), ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(&json_data, "latest_age", latest_age);
+	zbx_json_addint64(&json_data, "latest_age", latest_age);
 	zbx_json_addstring(&json_data, "oldestdate", ZBX_NULL2EMPTY_STR(oldestdate), ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(&json_data, "oldest_age", oldest_age);
+	zbx_json_addint64(&json_data, "oldest_age", oldest_age);
 	zbx_json_adduint64(&json_data, "size", size);
 	zbx_json_adduint64(&json_data, "uniquesize", uniquesize);
 	zbx_json_close(&json_data);
@@ -8582,6 +8582,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service)
 	if (SUCCEED != vmware_service_initialize(service, easyhandle, &data->error))
 		goto clean;
 
+	/* update headers after VC version detection */
 	if (SUCCEED != vmware_curl_set_header(easyhandle, service->major_version, &headers, &data->error))
 		goto clean;
 
@@ -9120,7 +9121,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 				char	st_str[ZBX_XML_DATETIME];
 
 				/* add startTime for entity performance counter request for decrease XML data load */
-				st_raw = zbx_time() - SEC_PER_HOUR;
+				st_raw = time(NULL) - SEC_PER_HOUR;
 				gmtime_r(&st_raw, &st);
 				strftime(st_str, sizeof(st_str), "%Y-%m-%dT%TZ", &st);
 				zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:startTime>%s</ns0:startTime>",
@@ -9220,7 +9221,7 @@ static int	vmware_perf_counters_expired_remove(zbx_vector_ptr_t *counters)
 
 	for (i = counters->values_num - 1; i >= 0 ; i--)
 	{
-		zbx_vmware_perf_counter_t	*counter = (zbx_vmware_perf_counter_t *) counters->values[i];
+		zbx_vmware_perf_counter_t	*counter = (zbx_vmware_perf_counter_t *)counters->values[i];
 
 		if (0 == (counter->state & ZBX_VMWARE_COUNTER_CUSTOM))
 			continue;
@@ -9373,7 +9374,7 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
 				time_t		st_raw;
 				struct	tm	st;
 
-				st_raw = zbx_time() - SEC_PER_HOUR;
+				st_raw = time(NULL) - SEC_PER_HOUR;
 				gmtime_r(&st_raw, &st);
 				strftime(begin_time, sizeof(begin_time), "%Y-%m-%dT%TZ", &st);
 			}
