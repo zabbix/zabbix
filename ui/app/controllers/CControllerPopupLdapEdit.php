@@ -147,14 +147,7 @@ class CControllerPopupLdapEdit extends CController {
 			])
 			: [];
 
-		$has_fallback_group = false;
 		foreach ($provision_groups as &$provision_group) {
-			if (!array_key_exists('name', $provision_group)
-					|| $provision_group['name'] === CProvisioning::FALLBACK_GROUP_NAME) {
-				$provision_group['enabled'] = 1;
-				$has_fallback_group = true;
-			}
-
 			$provision_group['role_name'] = $roles[$provision_group['roleid']]['name'];
 
 			foreach ($provision_group['user_groups'] as &$user_group) {
@@ -166,13 +159,6 @@ class CControllerPopupLdapEdit extends CController {
 			unset($user_group);
 		}
 		unset($provision_group);
-
-		if (!$has_fallback_group) {
-			$provision_groups[] = [
-				'name' => CProvisioning::FALLBACK_GROUP_NAME,
-				'enabled' => 0
-			];
-		}
 	}
 
 	private static function extendProvisionMedia(array &$provision_media): void {

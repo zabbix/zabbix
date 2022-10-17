@@ -143,12 +143,6 @@
 				else if (e.target.classList.contains('js-remove')) {
 					e.target.closest('tr').remove()
 				}
-				else if (e.target.classList.contains('js-enabled')) {
-					this.toggleFallbackStatus(0);
-				}
-				else if (e.target.classList.contains('js-disabled')) {
-					this.toggleFallbackStatus(1);
-				}
 			});
 
 			this.saml_media_type_mapping_table
@@ -190,24 +184,6 @@
 			table.querySelectorAll('button').forEach(button => {
 				button.disabled = true;
 			});
-		}
-
-		toggleFallbackStatus(status) {
-			const row = document.querySelector('[data-row_fallback]');
-			const btn = row.querySelector('.btn-link');
-
-			if (status == 1) {
-				row.querySelector('[name$="[enabled]"]').value = status;
-				btn.classList.replace('<?= ZBX_STYLE_RED ?>', '<?= ZBX_STYLE_GREEN?>');
-				btn.classList.replace('js-disabled', 'js-enabled');
-				btn.innerText = '<?= _('Enabled') ?>';
-			}
-			else {
-				row.querySelector('[name$="[enabled]"]').value = status;
-				btn.classList.replace('<?= ZBX_STYLE_GREEN ?>', '<?= ZBX_STYLE_RED?>');
-				btn.classList.replace('js-enabled', 'js-disabled');
-				btn.innerText = '<?= _('Disabled') ?>';
-			}
 		}
 
 		_initSortable() {
@@ -300,7 +276,6 @@
 			let popup_params = {};
 			let row_index = 0;
 			let sortorder;
-			const fallback_row = document.querySelector('[data-row_fallback]');
 
 			if (row !== null) {
 				row_index = row.dataset.row_index;
@@ -325,7 +300,10 @@
 					row_index++;
 				}
 
-				sortorder = fallback_row.querySelector(`[name^="saml_provision_groups"][name$="[sortorder]"]`).value;
+				const sortorders = [...this.saml_provision_groups_table.querySelectorAll(
+					`[name^="provision_groups"][name$="[sortorder]"]`
+				)];
+				sortorder = sortorders.length ? Math.max(sortorders.map(v => parseInt(v.value))) + 1 : 1;
 
 				popup_params = {
 					add_group: 1,
@@ -339,15 +317,13 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				const saml_provision_group = {...e.detail, ...{row_index, sortorder, enabled: 1}};
+				const new_row = this._renderProvisionGroupRow(saml_provision_group);
 
 				if (row === null) {
-					fallback_row.parentNode.insertBefore(this._renderProvisionGroupRow(saml_provision_group),
-						fallback_row
-					);
-					fallback_row.querySelector(`[name^="saml_provision_groups"][name$="[sortorder]"]`).value = parseInt(sortorder) + 1;
+					this.saml_provision_groups_table.querySelector('tbody').appendChild(new_row);
 				}
 				else {
-					row.replaceWith(this._renderProvisionGroupRow(saml_provision_group));
+					row.replaceWith(new_row);
 				}
 			});
 		}
@@ -588,26 +564,12 @@
 		}
 
 		_renderProvisionGroupRow(saml_provision_group) {
-			const is_fallback = saml_provision_group.name === '<?= CProvisioning::FALLBACK_GROUP_NAME ?>';
 			saml_provision_group.user_group_names = ('user_groups' in saml_provision_group)
 				? Object.values(saml_provision_group.user_groups).map(user_group => user_group.name).join(', ')
 				: '';
 
-			if (is_fallback) {
-				if (saml_provision_group.enabled == 1) {
-					saml_provision_group.action_label = '<?= _('Enabled') ?>';
-					saml_provision_group.action_class = 'js-enabled <?= ZBX_STYLE_GREEN ?>';
-				}
-				else {
-					saml_provision_group.action_label = '<?= _('Disabled') ?>';
-					saml_provision_group.action_class = 'js-disabled <?= ZBX_STYLE_RED ?>';
-				}
-			}
-
 			const template = document.createElement('template');
-			const template_saml_group_row = is_fallback
-				? new Template(this._templateProvisionFallbackGroupRow())
-				: new Template(this._templateProvisionGroupRow());
+			const template_saml_group_row = new Template(this._templateProvisionGroupRow());
 			template.innerHTML = template_saml_group_row.evaluate(saml_provision_group).trim();
 			const row = template.content.firstChild;
 
@@ -675,25 +637,6 @@
 					</td>
 					<td>
 						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-					</td>
-				</tr>
-			`;
-		}
-
-		_templateProvisionFallbackGroupRow() {
-			return `
-				<tr data-row_index="#{row_index}" data-row_fallback>
-					<td></td>
-					<td>
-						<a href="javascript:void(0);" class="wordwrap js-edit"><?= _('Fallback group') ?></a>
-						<input type="hidden" name="saml_provision_groups[#{row_index}][name]" value="<?= CProvisioning::FALLBACK_GROUP_NAME ?>">
-						<input type="hidden" name="saml_provision_groups[#{row_index}][enabled]" value="#{enabled}">
-						<input type="hidden" name="saml_provision_groups[#{row_index}][sortorder]" value="#{sortorder}">
-					</td>
-					<td class="wordbreak">#{user_group_names}</td>
-					<td class="wordbreak">#{role_name}</td>
-					<td>
-						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> #{action_class}">#{action_label}</button>
 					</td>
 				</tr>
 			`;

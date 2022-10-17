@@ -66,12 +66,6 @@ window.ldap_edit_popup = new class {
 			else if (e.target.classList.contains('js-remove')) {
 				e.target.closest('tr').remove();
 			}
-			else if (e.target.classList.contains('js-enabled')) {
-				this.toggleFallbackStatus(0);
-			}
-			else if (e.target.classList.contains('js-disabled')) {
-				this.toggleFallbackStatus(1);
-			}
 		});
 
 		document
@@ -102,24 +96,6 @@ window.ldap_edit_popup = new class {
 	toggleAllowJitProvisioning(checked) {
 		for (const element of this.form.querySelectorAll('.allow-jit-provisioning')) {
 			element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
-		}
-	}
-
-	toggleFallbackStatus(status) {
-		const row = this.dialogue.querySelector('[data-row_fallback]');
-		const btn = row.querySelector('.btn-link');
-
-		if (status == 1) {
-			row.querySelector('[name$="[enabled]"]').value = status;
-			btn.classList.replace('<?= ZBX_STYLE_RED ?>', '<?= ZBX_STYLE_GREEN ?>');
-			btn.classList.replace('js-disabled', 'js-enabled');
-			btn.innerText = '<?= _('Enabled') ?>';
-		}
-		else {
-			row.querySelector('[name$="[enabled]"]').value = status;
-			btn.classList.replace('<?= ZBX_STYLE_GREEN ?>', '<?= ZBX_STYLE_RED ?>');
-			btn.classList.replace('js-enabled', 'js-disabled');
-			btn.innerText = '<?= _('Disabled') ?>';
 		}
 	}
 
@@ -278,14 +254,14 @@ window.ldap_edit_popup = new class {
 		let popup_params = {};
 		let row_index = 0;
 		let sortorder;
-		const fallback_row = this.dialogue.querySelector('[data-row_fallback]');
 
 		if (row === null) {
 			while (this.provision_groups_table.querySelector(`[data-row_index="${row_index}"]`) !== null) {
 				row_index++;
 			}
 
-			sortorder = parseInt(fallback_row.querySelector(`[name^="provision_groups"][name$="[sortorder]"]`).value);
+			const sortorders = [...this.provision_groups_table.querySelectorAll(`[name^="provision_groups"][name$="[sortorder]"]`)];
+			sortorder = sortorders.length ? Math.max(sortorders.map(v => parseInt(v.value))) + 1 : 1;
 
 			popup_params = {
 				add_group: 1,
@@ -317,13 +293,13 @@ window.ldap_edit_popup = new class {
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const group = {...e.detail, ...{row_index, sortorder, enabled: 1}};
+			const new_row = this._renderProvisionGroupRow(group);
 
 			if (row === null) {
-				fallback_row.parentNode.insertBefore(this._renderProvisionGroupRow(group), fallback_row);
-				fallback_row.querySelector(`[name^="provision_groups"][name$="[sortorder]"`).value = sortorder + 1;
+				this.provision_groups_table.querySelector('tbody').appendChild(new_row);
 			}
 			else {
-				row.replaceWith(this._renderProvisionGroupRow(group));
+				row.replaceWith(new_row);
 			}
 		});
 	}
@@ -377,28 +353,14 @@ window.ldap_edit_popup = new class {
 	}
 
 	_renderProvisionGroupRow(group) {
-		const is_fallback = group.name === '<?= CProvisioning::FALLBACK_GROUP_NAME ?>';
 		const attributes = {
 			user_group_names: ('user_groups' in group)
 				? Object.values(group.user_groups).map(user_group => user_group.name).join(', ')
 				: ''
 		};
 
-		if (is_fallback) {
-			if (group.enabled == 1) {
-				attributes.action_label = '<?= _('Enabled') ?>';
-				attributes.action_class = 'js-enabled <?= ZBX_STYLE_GREEN ?>';
-			}
-			else {
-				attributes.action_label = '<?= _('Disabled') ?>';
-				attributes.action_class = 'js-disabled <?= ZBX_STYLE_RED ?>';
-			}
-		}
-
 		const template = document.createElement('template');
-		const template_row = is_fallback
-			? new Template(this._templateProvisionFallbackGroupRow())
-			: new Template(this._templateProvisionGroupRow());
+		const template_row = new Template(this._templateProvisionGroupRow());
 		template.innerHTML = template_row.evaluate({...group, ...attributes}).trim();
 		const row = template.content.firstChild;
 
@@ -423,25 +385,6 @@ window.ldap_edit_popup = new class {
 		}
 
 		return row;
-	}
-
-	_templateProvisionFallbackGroupRow() {
-		return `
-			<tr data-row_index="#{row_index}" data-row_fallback>
-				<td></td>
-				<td>
-					<a href="javascript:void(0);" class="wordwrap js-edit"><?= _('Fallback group') ?></a>
-					<input type="hidden" name="provision_groups[#{row_index}][name]" value="<?= CProvisioning::FALLBACK_GROUP_NAME ?>">
-					<input type="hidden" name="provision_groups[#{row_index}][enabled]" value="#{enabled}">
-					<input type="hidden" name="provision_groups[#{row_index}][sortorder]" value="#{sortorder}">
-				</td>
-				<td class="wordbreak">#{user_group_names}</td>
-				<td class="wordbreak">#{role_name}</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> #{action_class}">#{action_label}</button>
-				</td>
-			</tr>
-		`;
 	}
 
 	_templateProvisionGroupRow() {

@@ -84,10 +84,6 @@ class CControllerPopupLdapTestSend extends CController {
 		]);
 
 		foreach ($this->getInput('provision_groups', []) as $provision_group) {
-			if ($provision_group['name'] === CProvisioning::FALLBACK_GROUP_NAME && !$provision_group['enabled']) {
-				continue;
-			}
-
 			if (!array_key_exists('roleid', $provision_group) || !array_key_exists('user_groups', $provision_group)) {
 				continue;
 			}

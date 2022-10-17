@@ -425,9 +425,7 @@ class CUserDirectory extends CApiService {
 				foreach ($userdirectory['provision_groups'] as $group) {
 					$userdirectory_idpgroups[] = [
 						'userdirectoryid' => $userdirectory['userdirectoryid'],
-						'sortorder' => $group['name'] === CProvisioning::FALLBACK_GROUP_NAME
-							? count($userdirectory['provision_groups'])
-							: $sortorder++
+						'sortorder' => $sortorder++
 					] + $group;
 				}
 			}
@@ -1120,9 +1118,7 @@ class CUserDirectory extends CApiService {
 
 			$sortorder = 1;
 			foreach ($userdirectories[$userdirectoryid]['provision_groups'] as $index => &$group) {
-				$group['sortorder'] = $group['name'] === CProvisioning::FALLBACK_GROUP_NAME
-					? count($userdirectories[$userdirectoryid]['provision_groups'])
-					: $sortorder++;
+				$group['sortorder'] = $sortorder++;
 
 				CArrayHelper::sort($group['user_groups'], ['usrgrpid']);
 				$group['user_groups'] = array_values($group['user_groups']);
