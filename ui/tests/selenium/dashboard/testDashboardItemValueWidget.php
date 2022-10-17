@@ -43,7 +43,6 @@ class testDashboardItemValueWidget extends CWebTest {
 
 	protected static $dashboardid;
 	protected static $old_name = 'New widget';
-	protected static $threshold_widget = 'Widget with thresholds';
 	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
@@ -51,28 +50,6 @@ class testDashboardItemValueWidget extends CWebTest {
 			' INNER JOIN widget w'.
 			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
 			' wf.value_itemid, wf.value_graphid';
-
-	/**
-	 * Get threshold table element with mapping set.
-	 *
-	 * @return CMultifieldTable
-	 */
-	protected function getThresholdTable() {
-		return $this->query('id:thresholds-table')->asMultifieldTable([
-			'mapping' => [
-				'' => [
-					'name' => 'color',
-					'selector' => 'class:color-picker',
-					'class' => 'CColorPickerElement'
-				],
-				'Threshold' => [
-					'name' => 'threshold',
-					'selector' => 'xpath:./input',
-					'class' => 'CElement'
-				]
-			]
-		])->waitUntilVisible()->one();
-	}
 
 	public static function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
@@ -145,41 +122,6 @@ class testDashboardItemValueWidget extends CWebTest {
 										'type' => 0,
 										'name' => 'time_size',
 										'value' => 14
-									]
-								]
-							],
-							[
-								'type' => 'item',
-								'name' => 'Widget with thresholds',
-								'x' => 0,
-								'y' => 6,
-								'width' => 10,
-								'height' => 3,
-								'fields' => [
-									[
-										'type' => 4,
-										'name' => 'itemid',
-										'value' => 42230
-									],
-									[
-										'type' => '1',
-										'name' => 'thresholds.color.0',
-										'value' => 'BF00FF'
-									],
-									[
-										'type' => '1',
-										'name' => 'thresholds.threshold.0',
-										'value' => '0'
-									],
-									[
-										'type' => '1',
-										'name' => 'thresholds.color.1',
-										'value' => 'FF0080'
-									],
-									[
-										'type' => '1',
-										'name' => 'thresholds.threshold.1',
-										'value' => '0.01'
 									]
 								]
 							],
@@ -552,169 +494,6 @@ class testDashboardItemValueWidget extends CWebTest {
 			],
 			[
 				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => '-']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/1/threshold": a number is expected.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => 'a']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/1/threshold": a number is expected.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => '1a%?']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/1/threshold": a number is expected.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => '0.00001']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/1/threshold": a number has too many fractional digits.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => '9999999999999999']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/1/threshold": a number is too large.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => '1'],
-						['threshold' => 'a']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/2/threshold": a number is expected.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => '1'],
-						['threshold' => '1']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/2": value (threshold)=(1) already exists.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => '1', 'color' => '']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/1/color": cannot be empty.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => '1', 'color' => 'AABBCC'],
-						['threshold' => '2', 'color' => '']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/2/color": cannot be empty.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => 'a', 'color' => 'AABBCC']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/1/threshold": a number is expected.'
-					]
-				]
-			],
-			[
-				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Type' => 'Item value',
@@ -894,55 +673,6 @@ class testDashboardItemValueWidget extends CWebTest {
 						'xpath://button[@id="lbl_updown_color"]/..' => '0000FF'
 					]
 				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Name' => 'Item Widget with threshold',
-						'Refresh interval' => '1 minute',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => '0.01']
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Name' => 'One threshold with color',
-						'Refresh interval' => '2 minutes',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['color' => 'EF6C00', 'threshold' => '0.02']
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Name' => 'Thresholds',
-						'Refresh interval' => '2 minutes',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => '0.9999'],
-						['color' => 'AABBCC', 'threshold' => '1'],
-						['threshold' => '999999999999999'],
-						['threshold' => '1K'],
-						['color' => 'FFEB3B', 'threshold' => '5G']
-					]
-				]
 			]
 		];
 	}
@@ -955,46 +685,8 @@ class testDashboardItemValueWidget extends CWebTest {
 		$this->checkWidgetForm($data);
 	}
 
-	public static function getWidgetUpdateData() {
-		return [
-			[
-				[
-					'expected' => TEST_GOOD,
-					'threshold_widget' => true,
-					'fields' => [
-						'Item' => 'Available memory in %',
-						'Name' => 'Widget with thresholds - update',
-						'Refresh interval' => '10 minutes',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'color' => 'AABBCC', 'threshold' => '1'],
-						['action' => USER_ACTION_UPDATE, 'index' => 1, 'threshold' => '999999999999999']
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'threshold_widget' => true,
-					'fields' => [
-						'Item' => 'Available memory in %',
-						'Name' => 'Widget with thresholds - remove',
-						'Refresh interval' => '10 minutes',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['action' => USER_ACTION_REMOVE, 'index' => 0],
-						['action' => USER_ACTION_REMOVE, 'index' => 0]
-					]
-				]
-			]
-		];
-	}
-
 	/**
 	 * @dataProvider getWidgetData
-	 * @dataProvider getWidgetUpdateData
 	 */
 	public function testDashboardItemValueWidget_Update($data) {
 		$this->checkWidgetForm($data, true);
@@ -1013,9 +705,8 @@ class testDashboardItemValueWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
-		$name = ($update && array_key_exists('threshold_widget', $data)) ? self::$threshold_widget : self::$old_name;
 		$form = ($update)
-			? $dashboard->getWidget($name)->edit()->asForm()
+			? $dashboard->getWidget(self::$old_name)->edit()->asForm()
 			: $dashboard->edit()->addWidget()->asForm();
 
 		COverlayDialogElement::find()->one()->waitUntilReady();
@@ -1023,10 +714,6 @@ class testDashboardItemValueWidget extends CWebTest {
 
 		if ($update && !CTestArrayHelper::get($data['fields'], 'Name')) {
 			$form->fill(['Name' => '']);
-		}
-
-		if (array_key_exists('thresholds', $data)) {
-			$this->getThresholdTable()->fill($data['thresholds']);
 		}
 
 		$values = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
@@ -1075,7 +762,7 @@ class testDashboardItemValueWidget extends CWebTest {
 
 			// Check that original widget was not left in DB.
 			if ($update) {
-				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM widget WHERE name='.zbx_dbstr($name)));
+				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM widget WHERE name='.zbx_dbstr(self::$old_name)));
 			}
 
 			// Close widget popup and check update interval.
@@ -1092,12 +779,7 @@ class testDashboardItemValueWidget extends CWebTest {
 
 			// Write new name to update widget for update scenario.
 			if ($update) {
-				if (array_key_exists('threshold_widget', $data)) {
-					self::$threshold_widget = $header;
-				}
-				else {
-					self::$old_name = $header;
-				}
+				self::$old_name = $header;
 			}
 		}
 	}
@@ -1227,143 +909,5 @@ class testDashboardItemValueWidget extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		$this->assertEquals($old_widget_count - 1, $dashboard->getWidgets()->count());
 		$this->assertEquals('', CDBHelper::getRow('SELECT * from widget WHERE name = '.zbx_dbstr('Widget to delete')));
-	}
-
-	public static function getWarningMessageData() {
-		return [
-			[
-				[
-					'fields' => [
-							'Item' => 'System description',
-							'Name' => 'Item Widget with type of information - characters',
-							'Advanced configuration' => true
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-							'Item' => 'Software installed',
-							'Name' => 'Item Widget with type of information - text',
-							'Advanced configuration' => true
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-							'Item' => 'item_testPageHistory_CheckLayout_Log',
-							'Name' => 'Item Widget with type of information - log',
-							'Advanced configuration' => true
-					]
-				]
-			],
-			[
-				[
-					'numeric' => true,
-					'fields' => [
-							'Item' => 'Free swap space',
-							'Name' => 'Item Widget with type of information - Numeric (unsigned)',
-							'Advanced configuration' => true
-					]
-				]
-			],
-			[
-				[
-					'numeric' => true,
-					'fields' => [
-							'Item' => 'Interrupts per second',
-							'Name' => 'Item Widget with type of information - Numeric (float)',
-							'Advanced configuration' => true
-					]
-				]
-			]
-		];
-	}
-
-	/**
-	 * Check warning message for threshold, when item type is not numeric.
-	 *
-	 * @dataProvider getWarningMessageData
-	 */
-	public function testDashboardItemValueWidget_ThresholdWarningMessage($data) {
-		$warning = 'id:item-value-thresholds-warning';
-		$info = 'class:icon-info';
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->edit()->addWidget()->asForm();
-
-		if ($form->getField('Type')->getValue() !== 'Item value') {
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
-		}
-
-		$form->fill($data['fields']);
-
-		if (!array_key_exists('numeric', $data)) {
-			// Check that warning item is displayed.
-			$this->assertTrue($form->query($warning)->one()->isVisible());
-
-			// Check that info icon is displayed.
-			$this->assertTrue($form->query($info)->one()->isVisible());
-
-			// Check hint-box.
-			$form->query($warning)->one()->click();
-			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
-			$this->assertEquals('This setting applies only to numeric data.', $hint->getText());
-
-			// Close the hint-box.
-			$hint->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click()->waitUntilNotVisible();
-		}
-		else {
-			// Check that warning item is not displayed.
-			$this->assertFalse($form->query($warning)->one()->isVisible());
-
-			// Check that info icon is not displayed.
-			$this->assertFalse($form->query($info)->one()->isVisible());
-		}
-	}
-
-	public function testDashboardItemValueWidget_ThresholdColor() {
-		$data = [
-			'fields' => [
-				'Item' => 'Available memory in %',
-				'Name' => 'Item Widget with threshold',
-				'Advanced configuration' => true
-			],
-			'thresholds' => [
-				['color' => 'AABBCC', 'threshold' => '1'],
-				['color' => 'CCDDAA', 'threshold' => '2']
-			]
-		];
-
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->edit()->addWidget()->asForm();
-
-		if ($form->getField('Type')->getValue() !== 'Item value') {
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
-		}
-
-		$form->fill($data['fields']);
-		$this->getThresholdTable()->fill($data['thresholds']);
-
-		$form->submit();
-		COverlayDialogElement::ensureNotPresent();
-		$this->page->waitUntilReady();
-		$dashboard->save();
-		$this->assertMessage('Dashboard updated');
-
-		// Value for threshold trigger.
-		$index = 1;
-		foreach ($data['thresholds'] as $threshold) {
-			// Insert item data.
-			CDataHelper::addItemData(42244, $index, time() + $index);
-			$this->page->refresh()->waitUntilReady();
-			$rgb = implode(', ', sscanf($threshold['color'], "%02x%02x%02x"));
-			$this->assertEquals('rgba('.$rgb.', 1)', $dashboard->getWidget($data['fields']['Name'])->getContent()
-					->query('class:dashboard-widget-item')->one()->getCSSValue('background-color')
-			);
-			$index++;
-		}
 	}
 }
