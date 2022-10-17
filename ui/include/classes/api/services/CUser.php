@@ -1865,7 +1865,6 @@ class CUser extends CApiService {
 						$user = array_merge($user, $provisioning->getUserGroupsAndRole($ldap_groups));
 					}
 
-					$user += ['usrgrps' => []];
 					$this->updateProvisionedUser($user);
 					$provisionedids[] = $provision_user['userid'];
 				}
@@ -2208,7 +2207,7 @@ class CUser extends CApiService {
 	 *                       - 'db_user' - contains user data when at least one user is found;
 	 *                       - 'permissions' - (optional) contains user permissions data.
 	 */
-	private function findAccessibleUser(string $username, bool $case_sensitive, int $default_auth,
+	public function findAccessibleUser(string $username, bool $case_sensitive, int $default_auth,
 			bool $do_group_check): array {
 		$db_users = [];
 		$group_to_auth_map = [
@@ -2397,22 +2396,19 @@ class CUser extends CApiService {
 			return $user_data;
 		}
 
-		$idp_user_data = [];
 		$user_attributes = $provisioning->getUserIdpAttributes();
-		$idp_user = $ldap->getUserAttributes($user_attributes, $user_data['username']);
-		$idp_user_data = $provisioning->getUser($idp_user);
+		$user = $provisioning->getUser($ldap->getUserAttributes($user_attributes, $user_data['username']));
 
-		if (!array_key_exists('usrgrps', $idp_user_data)) {
+		if (!array_key_exists('usrgrps', $user)) {
 			$group_attributes = $provisioning->getGroupIdpAttributes();
 			$ldap_groups = $ldap->getGroupAttributes($group_attributes, $user_data['username']);
-			$ldap_groups = array_column($ldap_groups, $config['group_name']);
-			$idp_user_data = array_merge($idp_user_data, $provisioning->getUserGroupsAndRole($ldap_groups));
+			$user += $provisioning->getUserGroupsAndRole(array_column($ldap_groups, $config['group_name']));
 		}
 
-		$idp_user_data['username'] = $user_data['username'];
-		$idp_user_data['userid'] = $user_data['userid'];
+		$user['username'] = $user_data['username'];
+		$user['userid'] = $user_data['userid'];
 
-		return $this->updateProvisionedUser($idp_user_data);
+		return $this->updateProvisionedUser($user);
 	}
 
 	/**

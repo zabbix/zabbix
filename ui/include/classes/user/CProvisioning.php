@@ -26,11 +26,11 @@ class CProvisioning {
 
 	public const AUDITLOG_USERNAME = 'System';
 
-	public const FALLBACK_GROUP_NAME = '*';
-
 	/**
 	 * User directory data array.
 	 *
+	 * @var int    $userdirectory['userdirectoryid']
+	 * @var int    $userdirectory['provisioin_status']
 	 * @var string $userdirectory['user_username']
 	 * @var string $userdirectory['user_lastname']
 	 * @var string $userdirectory['search_attribute']
@@ -74,7 +74,7 @@ class CProvisioning {
 	 */
 	public static function forUserDirectoryId($userdirectoryid): self {
 		[$userdirectory] = API::UserDirectory()->get([
-			'output' => ['idp_type', 'user_username', 'user_lastname',
+			'output' => ['userdirectoryid', 'idp_type', 'provision_status', 'user_username', 'user_lastname',
 				'host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls',
 				'search_filter', 'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership',
 				'idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages',
@@ -82,10 +82,13 @@ class CProvisioning {
 				'encrypt_assertions'
 			],
 			'userdirectoryids' => [$userdirectoryid],
-			'filter' => ['provision_status' => JIT_PROVISIONING_ENABLED],
 			'selectProvisionMedia' => API_OUTPUT_EXTEND,
 			'selectProvisionGroups' => API_OUTPUT_EXTEND
 		]);
+
+		if (!$userdirectory || $userdirectory['provision_status'] == JIT_PROVISIONING_DISABLED) {
+			return new self($userdirectory, []);
+		}
 
 		if ($userdirectory['idp_type'] == IDP_TYPE_LDAP) {
 			$userdirectory += DB::select('userdirectory_ldap', [
@@ -104,58 +107,7 @@ class CProvisioning {
 			]);
 		}
 
-		$mapping_mediatypes = [];
-
-		if ($userdirectory['provision_media']) {
-			$mapping_mediatypes = API::MediaType()->get([
-				'output' => ['mediatypeid', 'type'],
-				'mediatypeids' => array_column($userdirectory['provision_media'], 'mediatypeid', 'mediatypeid'),
-				'preservekeys' => true
-			]);
-		}
-
 		return new self($userdirectory, $mapping_roles);
-	}
-
-	/**
-	 * Keep only valid media.
-	 *
-	 * @param array   $medias
-	 * @param int     $medias['mediatypeid']
-	 * @param string  $medias['sendto']
-	 */
-	public function sanitizeUserMedia(array $medias): array {
-		if (!$medias) {
-			return $medias;
-		}
-
-		$user_medias = [];
-		$email_mediatypeids = array_keys(array_column($this->mapping_mediatypes, 'type', 'mediatypeid'),
-			MEDIA_TYPE_EMAIL
-		);
-		$max_length = DB::getFieldLength('media', 'sendto');
-		$email_validator = new CEmailValidator();
-
-		foreach ($medias as $media) {
-			$sendto = array_filter($media['sendto'], 'strlen');
-
-			if (in_array($media['mediatypeid'], $email_mediatypeids)) {
-				$sendto = array_filter($media['sendto'], [$email_validator, 'validate']);
-
-				while (mb_strlen(implode("\n", $sendto)) > $max_length && count($sendto) > 0) {
-					array_pop($sendto);
-				}
-			}
-
-			if ($sendto) {
-				$user_medias[] = [
-					'mediatypeid' => $media['mediatypeid'],
-					'sendto' => $sendto
-				];
-			}
-		}
-
-		return $user_medias;
 	}
 
 	/**
@@ -181,6 +133,23 @@ class CProvisioning {
 			: [];
 	}
 
+	/**
+	 * Get provisioning status.
+	 *
+	 * @return bool  Return true when enabled.
+	 */
+	public function isProvisioningEnabled(): bool {
+		return $this->userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED;
+	}
+
+	/**
+	 * Get provisioning user directory database id.
+	 *
+	 * @return int
+	 */
+	public function getUserdirectoryId(): int {
+		return $this->userdirectory['userdirectoryid'];
+	}
 	/**
 	 * Get array of attributes to request from external source when requesting user data.
 	 *
@@ -306,18 +275,17 @@ class CProvisioning {
 	}
 
 	/**
-	 * Return array with user groups matched to provision groups criteria. Return first matched mapping groups.
-	 * Fallback mapping when set should be last in provision_groups list of group mappings.
+	 * Return array with user groups matched to provision groups criteria and roleid.
 	 *
 	 * @param array  $group_names         User group names data from external source, LDAP/SAML.
 	 *
 	 * @return array
-	 *         ['roleid']                 Matched roleid to set for user.
-	 *         ['usrgrps']                Matched mapping user groups to set for user.
+	 *         ['roleid']                 Matched roleid to set for user. Is 0 when no match.
+	 *         ['usrgrps']                Matched mapping user groups to set for user. Empty array when no match.
 	 *         ['usrgrps'][]['usrgrpid']  User group
 	 */
 	public function getUserGroupsAndRole(array $group_names): array {
-		$user = [];
+		$user = ['usrgrps' => [], 'roleid' => 0];
 
 		if (!$group_names || !$this->userdirectory['provision_groups']) {
 			return $user;
