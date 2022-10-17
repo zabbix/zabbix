@@ -1411,6 +1411,10 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot log out.'));
 		}
 
+		if (CAuthenticationHelper::isLdapProvisionEnabled(self::$userData['userdirectoryid'])) {
+			$this->provisionLdapUser(self::$userData);
+		}
+
 		DB::delete('sessions', [
 			'status' => ZBX_SESSION_PASSIVE,
 			'userid' => $db_sessions[0]['userid']
@@ -1421,13 +1425,7 @@ class CUser extends CApiService {
 		]);
 
 		self::addAuditLog(CAudit::ACTION_LOGOUT, CAudit::RESOURCE_USER);
-
-		$user_data = self::$userData;
 		self::$userData = null;
-
-		if (CAuthenticationHelper::isLdapProvisionEnabled($user_data['userdirectoryid'])) {
-			$this->provisionLdapUser($user_data);
-		}
 
 		return true;
 	}
