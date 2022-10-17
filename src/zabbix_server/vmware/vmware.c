@@ -6667,12 +6667,17 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 	for (i = 0; i < ids.values_num; i++)
 	{
 		char	*name;
+		xmlNode	*node;
 
-		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_CLUSTER, "[text()='%s']")
-				"/" ZBX_XPATH_PROP_NAME_NODE("name"), ids.values[i]);
+		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_CLUSTER, "[text()='%s']"),
+				ids.values[i]);
 
-		if (NULL == (name = zbx_xml_doc_read_value(cluster_data, tmp)))
+		if (NULL == (node = zbx_xml_doc_get(cluster_data, tmp)) ||
+				NULL == (name = zbx_xml_node_read_value(cluster_data, node,
+				ZBX_XPATH_PROP_NAME_NODE("name"))))
+		{
 			continue;
+		}
 
 		cluster = (zbx_vmware_cluster_t *)zbx_malloc(NULL, sizeof(zbx_vmware_cluster_t));
 		cluster->id = zbx_strdup(NULL, ids.values[i]);
@@ -6680,7 +6685,8 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 		cluster->status = NULL;
 		zbx_vector_str_create(&cluster->alarm_ids);
 
-		if (SUCCEED != vmware_service_get_alarms_data(__func__, service, easyhandle, cluster_data, NULL,
+		if (SUCCEED != vmware_service_get_alarms_data(__func__, service, easyhandle, cluster_data,
+				zbx_xml_node_get(cluster_data, node, ZBX_XPATH_PROP_NAME_NODE("triggeredAlarmState")),
 				&cluster->alarm_ids, alarms_data, error))
 		{
 			vmware_cluster_free(cluster);
