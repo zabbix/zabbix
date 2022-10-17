@@ -2686,14 +2686,15 @@ typedef struct
 zbx_property_collection_iter;
 
 static int	zbx_property_collection_init(CURL *easyhandle, const char *property_collection_query,
-		const char *property_collector, zbx_property_collection_iter **iter, xmlDoc **xdoc, char **error)
+		const char *property_collector, const char *fn_parent, zbx_property_collection_iter **iter,
+		xmlDoc **xdoc, char **error)
 {
 	*iter = (zbx_property_collection_iter *)zbx_malloc(*iter, sizeof(zbx_property_collection_iter));
 	(*iter)->property_collector = property_collector;
 	(*iter)->easyhandle = easyhandle;
 	(*iter)->token = NULL;
 
-	if (SUCCEED != zbx_soap_post(__func__, (*iter)->easyhandle, property_collection_query, xdoc, &(*iter)->token,
+	if (SUCCEED != zbx_soap_post(fn_parent, (*iter)->easyhandle, property_collection_query, xdoc, &(*iter)->token,
 			error))
 	{
 		return FAIL;
@@ -2702,7 +2703,8 @@ static int	zbx_property_collection_init(CURL *easyhandle, const char *property_c
 	return SUCCEED;
 }
 
-static int	zbx_property_collection_next(zbx_property_collection_iter *iter, xmlDoc **xdoc, char **error)
+static int	zbx_property_collection_next(const char *fn_parent, zbx_property_collection_iter *iter, xmlDoc **xdoc,
+		char **error)
 {
 #	define ZBX_POST_CONTINUE_RETRIEVE_PROPERTIES								\
 		ZBX_POST_VSPHERE_HEADER										\
@@ -2726,7 +2728,7 @@ static int	zbx_property_collection_next(zbx_property_collection_iter *iter, xmlD
 	zbx_snprintf(post, sizeof(post), ZBX_POST_CONTINUE_RETRIEVE_PROPERTIES, iter->property_collector, token_esc);
 	zbx_free(token_esc);
 
-	if (SUCCEED != zbx_soap_post(__func__, iter->easyhandle, post, xdoc, NULL, error))
+	if (SUCCEED != zbx_soap_post(fn_parent, iter->easyhandle, post, xdoc, NULL, error))
 		return FAIL;
 
 	zbx_free(iter->token);
@@ -5192,7 +5194,7 @@ static int	vmware_hv_ds_access_update(zbx_vmware_service_t *service, CURL *easyh
 			hvid_esc, hvid_esc, hvid_esc, hvid_esc);
 	zbx_free(hvid_esc);
 
-	if (SUCCEED != zbx_property_collection_init(easyhandle, tmp, "propertyCollector", &iter, &doc, error))
+	if (SUCCEED != zbx_property_collection_init(easyhandle, tmp, "propertyCollector", __func__, &iter, &doc, error))
 		goto out;
 
 	updated += vmware_hv_ds_access_parse(doc, hv_dss, hv_uuid, hv_id, dss);
@@ -5202,7 +5204,7 @@ static int	vmware_hv_ds_access_update(zbx_vmware_service_t *service, CURL *easyh
 		zbx_xml_free_doc(doc);
 		doc = NULL;
 
-		if (SUCCEED != zbx_property_collection_next(iter, &doc, error))
+		if (SUCCEED != zbx_property_collection_next(__func__, iter, &doc, error))
 			goto out;
 
 		updated += vmware_hv_ds_access_parse(doc, hv_dss, hv_uuid, hv_id, dss);
@@ -5855,7 +5857,7 @@ static int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *serv
 			vmware_service_objects[service->type].property_collector,
 			vmware_service_objects[service->type].root_folder);
 
-	if (SUCCEED != zbx_property_collection_init(easyhandle, tmp, "propertyCollector", &iter, &doc, error))
+	if (SUCCEED != zbx_property_collection_init(easyhandle, tmp, "propertyCollector", __func__, &iter, &doc, error))
 	{
 		goto out;
 	}
@@ -5882,7 +5884,7 @@ static int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *serv
 		zbx_xml_free_doc(doc);
 		doc = NULL;
 
-		if (SUCCEED != zbx_property_collection_next(iter, &doc, error))
+		if (SUCCEED != zbx_property_collection_next(__func__, iter, &doc, error))
 			goto out;
 
 		if (ZBX_VMWARE_TYPE_VCENTER == service->type)
@@ -7005,8 +7007,8 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_property_collection_init(easyhandle, ZBX_POST_VCENTER_CLUSTER, "propertyCollector", &iter,
-			&cluster_data, error))
+	if (SUCCEED != zbx_property_collection_init(easyhandle, ZBX_POST_VCENTER_CLUSTER, "propertyCollector",
+			__func__, &iter, &cluster_data, error))
 	{
 		goto out;
 	}
@@ -7022,7 +7024,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 		zbx_xml_free_doc(cluster_data);
 		cluster_data = NULL;
 
-		if (SUCCEED != zbx_property_collection_next(iter, &cluster_data, error))
+		if (SUCCEED != zbx_property_collection_next(__func__, iter, &cluster_data, error))
 			goto out;
 
 		if (SUCCEED != vmware_service_process_cluster_data(service, easyhandle, cluster_data, clusters,
