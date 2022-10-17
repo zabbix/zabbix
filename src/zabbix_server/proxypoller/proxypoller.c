@@ -34,6 +34,7 @@
 #include "zbxtime.h"
 #include "proxyconfigread/proxyconfig_read.h"
 #include "zbxversion.h"
+#include "zbx_rtc_constants.h"
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

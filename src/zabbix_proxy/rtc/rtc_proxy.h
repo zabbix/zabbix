@@ -17,12 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_RTC_H
-#define ZABBIX_RTC_H
+#ifndef ZABBIX_RTC_PROXY_H
+#define ZABBIX_RTC_PROXY_H
 
-#include "zbxtypes.h"
+#include "zbxrtc.h"
 
-int	zbx_rtc_parse_loglevel_option(const char *opt, size_t len, pid_t *pid, int *proc_type, int *proc_num,
-		char **error);
-
+int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result);
+int	rtc_process(const char *option, char **error);
 #endif
