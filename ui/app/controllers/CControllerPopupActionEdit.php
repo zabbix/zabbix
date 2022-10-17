@@ -126,6 +126,7 @@ class CControllerPopupActionEdit extends CController {
 			];
 			foreach ($data['action']['filter']['conditions'] as  $row_index => &$condition) {
 				$condition_name = $this->conditionValueToString($condition);
+				$data['condition_name'][] = $condition_name;
 				$condition += [
 					'row_index' => $row_index,
 					'name' => $condition_name

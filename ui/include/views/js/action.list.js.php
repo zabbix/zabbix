@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -35,19 +35,34 @@
 		_initActions() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-action-create')) {
-					this._edit({eventsource: this.eventsource})
+					this._edit();
 				}
 				else if (e.target.classList.contains('js-action-edit')) {
-					this._edit({eventsource: this.eventsource, actionid: e.target.attributes.actionid.nodeValue})
+					this._edit({actionid: e.target.getAttribute('actionid')});
+				}
+				else if (e.target.classList.contains('js-enable-action')) {
+					this._enable(e.target, [e.target.getAttribute('actionid')]);
+				}
+				else if (e.target.classList.contains('js-massenable-action')) {
+					this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-disable-action')) {
+					this._disable(e.target, [e.target.getAttribute('actionid')]);
+				}
+				else if (e.target.classList.contains('js-massdisable-action')) {
+					this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-massdelete-action')) {
-					this._massDeleteActions(e.target)
+					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			})
 		}
 
 		_edit(parameters = {}) {
-			const overlay = this._openActionPopup(parameters);
+			const overlay = PopUp('popup.action.edit', parameters, {
+				dialogueid: 'action-edit',
+				dialogue_class: 'modal-popup-large'
+			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				postMessageOk(e.detail.title);
@@ -57,33 +72,71 @@
 				}
 				location.href = location.href;
 			});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.actionDelete, {once: true});
-		}
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('g_actionid');
 
-		_openActionPopup(parameters = {}) {
-			return PopUp('popup.action.edit', parameters, {
-				dialogueid: 'action-edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
 			});
 		}
 
-		_massDeleteActions(target) {
-			const confirm_text = <?= json_encode(_('Delete selected actions?')) ?>;
-			if (!confirm(confirm_text)) {
+		_enable(target, actionids) {
+			const confirmation = actionids.length > 1
+				? <?= json_encode(_('Enable selected actions?')) ?>
+				: <?= json_encode(_('Enable selected action?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'action.enable');
+
+			this._post(target, actionids, curl.getUrl());
+		}
+
+		_disable(target, actionids) {
+			const confirmation = actionids.length > 1
+				? <?= json_encode(_('Disable selected actions?')) ?>
+				: <?= json_encode(_('Disable selected action?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'action.disable');
+
+			this._post(target, actionids, curl.getUrl());
+		}
+
+		_delete(target, actionids) {
+			const confirmation = actionids.length > 1
+				? <?= json_encode(_('Delete selected actions?')) ?>
+				: <?= json_encode(_('Delete selected action?')) ?>;
+
+			if (!window.confirm(confirmation)) {
 				return;
 			}
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'action.delete');
-			curl.setArgument('eventsource', this.eventsource);
 
+			this._post(target, actionids, curl.getUrl());
+		}
+
+		_post(target, actionids, url) {
 			target.classList.add('is-loading');
 
-			fetch(curl.getUrl(), {
+			return fetch(url, {
 				method: 'POST',
-				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-				body: urlEncodeData({g_actionid: Object.keys(chkbxRange.getSelectedIds())})
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({g_actionid: actionids})
 			})
 				.then((response) => response.json())
 				.then((response) => {
@@ -91,7 +144,10 @@
 						if ('title' in response.error) {
 							postMessageError(response.error.title);
 						}
+
 						postMessageDetails('error', response.error.messages);
+
+						uncheckTableRows(this.eventsource, response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -99,33 +155,22 @@
 						if ('messages' in response.success) {
 							postMessageDetails('success', response.success.messages);
 						}
+
+						uncheckTableRows(this.eventsource);
 					}
 
 					location.href = location.href;
 				})
 				.catch(() => {
 					clearMessages();
+
 					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+
 					addMessage(message_box);
 				})
 				.finally(() => {
-					uncheckTableRows('g_actionid');
+					target.classList.remove('is-loading');
 				});
-		}
-
-		actionDelete(e) {
-			const data = e.detail;
-
-			if ('success' in data) {
-				postMessageOk(data.success.title);
-
-				if ('messages' in data.success) {
-					postMessageDetails('success', data.success.messages);
-				}
-			}
-
-			uncheckTableRows('actionForm');
-			location.href = location.href;
 		}
 	};
 </script>

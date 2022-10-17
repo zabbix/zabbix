@@ -21,6 +21,10 @@
 
 class CControllerActionEnable extends CController {
 
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'eventsource' =>	'in '.implode(',', [
@@ -67,34 +71,30 @@ class CControllerActionEnable extends CController {
 	}
 
 	protected function doAction(): void {
-		$eventsource = $this->getInput('eventsource');
+		$actionids = $this->getInput('g_actionid');
+		$actions_count = count($actionids);
+		$actions = [];
 
-		if ($this->hasInput('g_actionid')) {
-			$actionids = $this->getInput('g_actionid', []);
-			$actions_count = count($actionids);
-			$actions = [];
-
-			foreach ($actionids as $actionid) {
-				$actions[] = ['actionid' => $actionid, 'status' => ACTION_STATUS_ENABLED];
-			}
-
-			$result = API::Action()->update($actions);
-
-			if ($result && array_key_exists('actionids', $result)) {
-				CMessageHelper::setSuccessTitle(_n('Action enabled', 'Actions enabled', $actions_count));
-			}
-			else {
-				CMessageHelper::setErrorTitle(_n('Cannot enable action ', 'Cannot enable actions', $actions_count));
-			}
-
-			uncheckTableRows('g_actionid');
-
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'action.list')
-				->setArgument('eventsource', $eventsource)
-			);
-
-			$this->setResponse($response);
+		foreach ($actionids as $actionid) {
+			$actions[] = ['actionid' => $actionid, 'status' => ACTION_STATUS_ENABLED];
 		}
+
+		$result = API::Action()->update($actions);
+
+		if ($result) {
+			$output['success']['title'] = _n('Action enabled', 'Actions enabled', $actions_count);
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
+		}
+		else {
+			$output['error'] = [
+				'title' => _n('Cannot enable action ', 'Cannot enable actions', $actions_count),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

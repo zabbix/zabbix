@@ -38,7 +38,8 @@ class CControllerActionOperationConditionCheck extends CController {
 									CONDITION_OPERATOR_NOT_IN, CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO,
 									CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP
 								]),
-			'value' =>			'not_empty'
+			'value' =>			'not_empty',
+			'row_index' => 		'int32'
 		];
 
 		$ret = $this->validateInput($fields);

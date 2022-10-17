@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -146,30 +146,17 @@ if ($this->data['actions']) {
 			$operations[] = $actionOperationDescriptions[$aIdx][$oIdx];
 		}
 
-		if ($action['status'] == ACTION_STATUS_DISABLED) {
-			$status = (new CLink(_('Disabled'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'action.enable')
-					->setArgument('g_actionid[]', $action['actionid'])
-					->setArgument('eventsource', $data['eventsource'])
-					->getUrl()
-			))
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_RED)
-				->addSID();
-		}
-		else {
-			$status = (new CLink(_('Enabled'),
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'action.disable')
-					->setArgument('g_actionid[]', $action['actionid'])
-					->setArgument('eventsource', $data['eventsource'])
-					->getUrl()
-			))
+		$status = ($action['status'] == ACTION_STATUS_ENABLED)
+			? (new CLink(_('Enabled')))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
-				->addSID();
-		}
+				->addClass('js-disable-action')
+				->setAttribute('actionid', $action['actionid'])
+			: (new CLink(_('Disabled')))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_RED)
+				->addClass('js-enable-action')
+				->setAttribute('actionid', $action['actionid']);
 
 		$actionTable->addRow([
 			new CCheckBox('g_actionid['.$action['actionid'].']', $action['actionid']),
@@ -187,9 +174,19 @@ $actionForm->addItem([
 	$actionTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'g_actionid', [
-		'action.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected actions?')],
-		'action.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected actions?')],
-		'action.delete' => [
+		'action.massenable' => [
+			'content' => (new CSimpleButton(_('Enable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massenable-action')
+				->addClass('no-chkbxrange')
+		],
+		'action.massdisable' => [
+			'content' => (new CSimpleButton(_('Disable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdisable-action')
+				->addClass('no-chkbxrange')
+		],
+		'action.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-action')

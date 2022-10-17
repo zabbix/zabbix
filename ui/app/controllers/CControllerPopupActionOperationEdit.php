@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -126,6 +126,7 @@ class CControllerPopupActionOperationEdit extends CController {
 					'hostids' => $host['hostid']
 				]);
 			}
+			$result[] = $host;
 		}
 
 		if ($operation['opcommand_grp']) {
@@ -135,7 +136,7 @@ class CControllerPopupActionOperationEdit extends CController {
 					'groupids' => $host_group['groupid']
 				]);
 			}
-			return $host_group;
+			$result[] = $host_group;
 		}
 
 		if($operation['opgroup']) {
@@ -145,7 +146,7 @@ class CControllerPopupActionOperationEdit extends CController {
 					'groupids' => $host_group['groupid']
 				]);
 			}
-			return $host_group;
+			$result[] = $host_group;
 		}
 
 		if($operation['optemplate']) {
@@ -155,8 +156,9 @@ class CControllerPopupActionOperationEdit extends CController {
 					'templateids' => $template['templateid']
 				]);
 			}
-			return $template;
+			$result[] = $template;
 		}
+
 
 		if ($operation['opmessage_grp']) {
 			$i = 0;
@@ -176,7 +178,7 @@ class CControllerPopupActionOperationEdit extends CController {
 					$i++;
 				}
 			}
-			return $user_group;
+			$result[] = $user_group;
 		}
 
 		if ($operation['opmessage_usr']) {
@@ -198,10 +200,10 @@ class CControllerPopupActionOperationEdit extends CController {
 					$i++;
 				}
 			}
-			return $fullnames[$opmessage_usr['userid']];
+			$result[] = $fullnames[$opmessage_usr['userid']];
 		}
 
-		return $host;
+		return $result;
 	}
 
 	private function popupConfigOperationMessage(array $operation, int $eventsource): ?array {

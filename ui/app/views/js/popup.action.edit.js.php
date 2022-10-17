@@ -36,6 +36,10 @@ window.action_edit_popup = new class {
 		this._initActionButtons();
 		this._processTypeOfCalculation();
 		this._initTemplates();
+
+		for (const condition of conditions) {
+			this._createConditionsRow(condition);
+		}
 	}
 
 	_initActionButtons() {
@@ -52,15 +56,15 @@ window.action_edit_popup = new class {
 			else if (e.target.classList.contains('js-update-operations-create')) {
 				this._openOperationPopup(this.eventsource, <?= ACTION_UPDATE_OPERATION ?>, this.actionid);
 			}
-			else if (e.target.classList.contains('element-table-remove')) {
-				this.row_count--;
-				this._processTypeOfCalculation();
-			}
 			else if (e.target.classList.contains('js-edit-button')) {
 				this._openEditOperationPopup(e, JSON.parse(e.target.getAttribute('data-operation')), $(e.target).closest('tr').attr('id'));
 			}
 			else if (e.target.classList.contains('js-remove')) {
 				e.target.closest('tr').remove();
+			}
+			else if (e.target.classList.contains('js-remove-condition')) {
+				e.target.closest('tr').remove();
+				this._processTypeOfCalculation();
 			}
 		});
 	}
@@ -135,12 +139,11 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
-			this._createRow(e.detail);
+			this._createConditionsRow(e.detail);
 		});
 	}
 
-	_createRow(input) {
-
+	_createConditionsRow(input) {
 		if (is_array(input.value)) {
 			input.value.forEach((value, index) => {
 				let element = {...input, name: input.name[index], value: input.value[index]};
@@ -161,7 +164,6 @@ window.action_edit_popup = new class {
 						.insertAdjacentHTML('beforeend', this.condition_template.evaluate(element))
 				//}
 				this._processTypeOfCalculation();
-
 			})
 		}
 		else {
@@ -179,7 +181,6 @@ window.action_edit_popup = new class {
 					.insertAdjacentHTML('beforeend', this.condition_template.evaluate(input))
 			// }
 			this._processTypeOfCalculation();
-
 		}
 	}
 
@@ -249,6 +250,7 @@ window.action_edit_popup = new class {
 	_createOperationsRow(input, row_id = null) {
 		const operation_data = input.detail.operation;
 		this.recovery = input.detail.operation.recovery;
+
 		let table_id;
 		let row_id_prefix;
 
@@ -338,9 +340,9 @@ window.action_edit_popup = new class {
 		operation_input.setAttribute('value', '1');
 		form.appendChild(operation_input);
 
-		const some = ['details', 'start_in', 'steps', 'duration'];
+		const except_keys = ['details', 'start_in', 'steps', 'duration'];
 
-		this.createHiddenInputFromObject(input.detail.operation, `operations[${this.operation_row_count}]`, `operations_${this.operation_row_count}`, some);
+		this.createHiddenInputFromObject(input.detail.operation, `operations[${this.operation_row_count}]`, `operations_${this.operation_row_count}`, except_keys);
 		this.operation_row.append(this._addHiddenOperationsFields('operationtype', input.detail.operation.operationtype));
 	}
 
@@ -359,7 +361,6 @@ window.action_edit_popup = new class {
 		}
 
 		Object.keys(obj).map(key => {
-
 			if (exceptKeys.includes(key)) {
 				return;
 			}
@@ -425,7 +426,7 @@ window.action_edit_popup = new class {
 
 		remove_btn.type = 'button';
 		remove_btn.textContent = <?= json_encode(_('Remove')) ?>;
-		remove_btn.classList.add('btn-link', 'js-remove-button');
+		remove_btn.classList.add('btn-link', 'js-remove');
 
 		edit_btn.type = 'button';
 		edit_btn.classList.add('btn-link', 'js-edit-button');
@@ -547,7 +548,7 @@ window.action_edit_popup = new class {
 		let row_count = document.getElementById('conditionTable').rows.length -2;
 
 		document.querySelector('#formula').style.display = this.show_formula ? '' : 'none';
-		document.querySelector('#expression').style.display = this.show_formula ? 'none' : '';
+		document.querySelector('#expression').style.display = '';
 		document.querySelector('#label-evaltype').style.display = row_count > 1 ? '' : 'none';
 		document.querySelector('#evaltype-formfield').style.display = row_count > 1 ? '' : 'none';
 
@@ -567,9 +568,9 @@ window.action_edit_popup = new class {
 		document.querySelector('#evaltype').onchange = function() {
 			this.show_formula = +document.querySelector('#evaltype').value === <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
 
+			document.querySelector('#expression').style.display = this.show_formula ? 'none' : '';
 			document.querySelector('#formula').style.display = this.show_formula ? '' : 'none';
 			document.querySelector('#formula').removeAttribute('readonly');
-			document.querySelector('#expression').style.display = this.show_formula ? 'none' : '';
 
 			const labels = document.querySelectorAll('#conditionTable .label');
 			let conditions = [];
@@ -588,23 +589,23 @@ window.action_edit_popup = new class {
 
 	_initTemplates() {
 		this.condition_template = new Template(`
-		<tr data-row_index="#{row_index}">
-			<td class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{label}</td>
-			<td class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{condition_name}</td>
-			<td>
-				<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-					<li>
-						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-					</li>
-					<li>
-						<input type="hidden" name="conditions[#{row_index}][conditiontype]" value="#{conditiontype}">
-						<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
-						<input type="hidden" name="conditions[#{row_index}][value]" value="#{value}">
-						<input type="hidden" name="conditions[#{row_index}][value2]" value="#{value2}">
-					</li>
-				</ul>
-			</td>
-		</tr>
-	`);
+			<tr data-row_index="#{row_index}">
+				<td class="label" data-conditiontype="#{conditiontype}" data-formulaid= "#{label}">#{label}</td>
+				<td class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{condition_name}</td>
+				<td>
+					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove-condition"><?= _('Remove') ?></button>
+						</li>
+						<li>
+							<input type="hidden" name="conditions[#{row_index}][conditiontype]" value="#{conditiontype}">
+							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
+							<input type="hidden" name="conditions[#{row_index}][value]" value="#{value}">
+							<input type="hidden" name="conditions[#{row_index}][value2]" value="#{value2}">
+						</li>
+					</ul>
+				</td>
+			</tr>
+		`);
 	}
 }

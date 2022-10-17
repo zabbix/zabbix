@@ -21,6 +21,10 @@
 
 class CControllerActionDelete extends CController {
 
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'eventsource' =>	'in '.implode(',', [
@@ -67,28 +71,26 @@ class CControllerActionDelete extends CController {
 	}
 
 	protected function doAction(): void {
-		if ($this->hasInput('g_actionid')) {
-			$actionids = $this->getInput('g_actionid', []);
+		$actionids = $this->getInput('g_actionid');
+		$actions_count = count($actionids);
 
-			$actions_count = count($actionids);
+		$result = API::Action()->delete($actionids);
 
-			$result = API::Action()->delete($actionids);
+		if ($result) {
 
-			if ($result) {
-				$output['success']['title'] = (_n('Selected action deleted', 'Selected actions deleted', $actions_count));
+			$output['success']['title'] = (_n('Selected action deleted', 'Selected actions deleted', $actions_count));
 
-				if ($messages = get_and_clear_messages()) {
-					$output['success']['messages'] = array_column($messages, 'message');
-				}
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
 			}
-			else {
-				$output['error'] = [
-					'title' => (_n('Cannot delete selected action', 'Cannot delete selected actions', $actions_count)),
-					'messages' => array_column(get_and_clear_messages(), 'message')
-				];
-			}
-
-			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 		}
+		else {
+			$output['error'] = [
+				'title' => (_n('Cannot delete selected action', 'Cannot delete selected actions', $actions_count)),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -101,16 +101,18 @@ $form_grid->addItem(
 $usergroup_table = (new CTable())
 	->setId('operation-message-user-groups-table')
 	->addStyle('width: 100%;')
-	->setHeader([_('User group'), _('Action')])
-	->addRow(
-		(new CRow(
+	->setHeader([_('User group'), _('Action')]);
+
+$usergroup_table->addItem(
+	(new CTag('tfoot', true))
+		->addItem(
 			(new CCol(
-				(new CButton(null, _('Add')))
+				(new CSimpleButton(_('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('operation-message-user-groups-footer')
-			))->setColSpan(2)
-		))->setId('operation-message-user-groups-footer')
-	);
+			))->setColSpan(4)
+		)->setId('operation-message-user-groups-footer')
+);
 
 $form_grid->addItem([
 	(new CLabel(_('Send to user groups')))->setId('operation-message-user-groups-label'),
@@ -123,17 +125,19 @@ $form_grid->addItem([
 ]);
 
 $user_table = (new CTable())
+	->setId('operation-message-user-table')
 	->addStyle('width: 100%;')
 	->setHeader([_('User'), _('Action')]);
 
-$user_table->addRow(
-	(new CRow(
-		(new CCol(
-			(new CButton(null, _('Add')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('operation-message-users-footer')
-		))->setColSpan(2)
-	))->setId('operation-message-users-footer')
+$user_table->addItem(
+	(new CTag('tfoot', true))
+		->addItem(
+			(new CCol(
+				(new CSimpleButton(_('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('operation-message-users-footer')
+			))->setColSpan(4)
+		)->setId('operation-message-users-footer')
 );
 
 // Message recipient (users) row.
@@ -394,16 +398,20 @@ $form_grid->addItem([
 $conditions_table = (new CTable())
 	->setId('operation-condition-list')
 	->addStyle('width: 100%;')
-	->setHeader([_('Label'), _('Name'), _('Action')])
-	->addRow(
-		(new CRow(
+	->setHeader([_('Label'), _('Name'), _('Action')]);
+
+
+$conditions_table->addItem(
+	(new CTag('tfoot', true))
+		->addItem(
 			(new CCol(
-				(new CButton(null, _('Add')))
+				(new CSimpleButton(_('Add')))
+					->setAttribute('data-eventsource', $data['eventsource'])
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('operation-condition-list-footer')
-			))->setColSpan(3)
-		))->setId('operation-condition-list-footer')
-	);
+			))->setColSpan(4)
+		)
+);
 
 // Conditions row.
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS && $data['recovery'] == ACTION_OPERATION) {

@@ -1,6 +1,4 @@
-<?php
-
-//declare(strict_types = 0);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -48,51 +46,6 @@ $condition_table = (new CTable())
 	->setId('conditionTable')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Label'), _('Name'), _('Action')]);
-
-$i = 0;
-
-if ($data['action']['filter']['conditions']) {
-	$actionConditionStringValues = actionConditionValueToString([$data['action']]);
-
-	foreach ($data['action']['filter']['conditions'] as $cIdx => $condition) {
-		if (!isset($condition['conditiontype'])) {
-			$condition['conditiontype'] = 0;
-		}
-		if (!isset($condition['operator'])) {
-			$condition['operator'] = 0;
-		}
-		if (!isset($condition['value'])) {
-			$condition['value'] = '';
-		}
-		if (!array_key_exists('value2', $condition)) {
-			$condition['value2'] = '';
-		}
-
-		$label = isset($condition['formulaid']) ? $condition['formulaid'] : num2letter($i);
-
-		$labelSpan = (new CSpan($label))
-			->addClass('label')
-			->setAttribute('data-conditiontype', $condition['conditiontype'])
-			->setAttribute('data-formulaid', $label);
-
-		$condition_table
-			->addRow([
-				$labelSpan,
-				(new CCol(getConditionDescription($condition['conditiontype'], $condition['operator'],
-					$actionConditionStringValues[0][$cIdx], $condition['value2']
-				)))->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
-				(new CCol([
-					(new CButton('remove', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('js-remove')
-						->removeId(),
-					new CVar('conditions['.$i.']', $condition)
-				]))
-			]);
-
-		$i++;
-	}
-}
 
 $formula = (new CTextBox('formula', $data['formula'], DB::getFieldLength('actions', 'formula')))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -301,15 +254,18 @@ if ($data['action']['operations']) {
 	}
 }
 
-$operations_table->setFooter(
-	(new CSimpleButton(_('Add')))
-		->setAttribute('data-actionid', $data['actionid'])
-		->setAttribute('data-eventsource', $data['eventsource'])
-		->addClass('js-operation-details')
-		->setAttribute('actionid', $data['actionid'])
-		->setAttribute('eventsource', $data['eventsource'])
-		->setAttribute('operationtype', ACTION_OPERATION)
-		->addClass(ZBX_STYLE_BTN_LINK)
+$operations_table->addItem(
+	(new CTag('tfoot', true))
+		->addItem(
+			(new CCol(
+				(new CSimpleButton(_('Add')))
+					->setAttribute('data-actionid', $data['actionid'])
+					->setAttribute('data-eventsource', $data['eventsource'])
+					->setAttribute('operationtype', ACTION_OPERATION)
+					->addClass('js-operation-details')
+					->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColSpan(4)
+		)
 );
 
 $operations_tab->addItem([
@@ -508,7 +464,7 @@ $form
 				'conditions' => $data['action']['filter']['conditions'],
 				'actionid' => $data['actionid'] ?: 0,
 				'eventsource' => $data['eventsource'],
-				'allowed_operations' => $data['allowedOperations']
+				'allowed_operations' => $data['allowedOperations'],
 			], JSON_THROW_ON_ERROR) .');
 		'))->setOnDocumentReady()
 	);

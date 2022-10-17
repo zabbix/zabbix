@@ -36,6 +36,7 @@ window.operation_popup = new class {
 
 		this._loadViews();
 		this._processTypeOfCalculation();
+		this._initTemplates();
 
 		if (data?.opconditions) {
 			data?.opconditions.map(row => this._createRow(row))
@@ -74,6 +75,9 @@ window.operation_popup = new class {
 			else if (e.target.classList.contains('element-table-remove')) {
 				this.row_count--;
 				this._processTypeOfCalculation();
+			}
+			else if (e.target.classList.contains('js-remove')) {
+				e.target.closest('tr').remove();
 			}
 		});
 	}
@@ -354,27 +358,19 @@ window.operation_popup = new class {
 		})
 	}
 
-	_addUserGroup(values, row_count = 0) {
-		values.forEach((value, index) => {
-			const row = document.createElement('tr');
-			row.append(value.name)
-			row.append(this._createRemoveCell())
-			row.appendChild(
-				this._createHiddenInput(`operation[opmessage_grp][${index + row_count}][usrgrpid]`, value.usrgrpid)
-			);
-
-			document.getElementById('operation-message-user-groups-footer').before(row);
+	_addUserGroup(values) {
+		values.forEach((value) => {
+			document
+				.querySelector('#operation-message-user-groups-table tbody')
+				.insertAdjacentHTML('beforeend', this.usrgrp_template.evaluate(value))
 		});
 	}
 
-	_addUser(values, row_count = 0) {
-		values.forEach((value, index) => {
-			const row = document.createElement('tr');
-			row.append(value.name)
-			row.append(this._createRemoveCell())
-			row.append(this._createHiddenInput(`operation[opmessage_usr][${index + row_count}][userid]`, value.id))
-
-			document.getElementById('operation-message-users-footer').before(row);
+	_addUser(values) {
+		values.forEach((value) => {
+			document
+				.querySelector('#operation-message-user-table tbody')
+				.insertAdjacentHTML('beforeend', this.usr_template.evaluate(value))
 		});
 	}
 
@@ -409,78 +405,52 @@ window.operation_popup = new class {
 	}
 
 	_openConditionsPopup(trigger_element) {
-		const parameters = {
-			'type': <?= ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION ?>,
-			'source': this.eventsource
+		this._processTypeOfCalculation();
+
+		let parameters;
+		let row_index = 0;
+
+		while (document.querySelector(`#operation-condition-list [data-id="${row_index}"]`) !== null) {
+			row_index++;
+		}
+
+		parameters = {
+			type: <?= ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION ?>,
+			source: this.eventsource,
+			row_index: row_index
 		};
 
 		const overlay = PopUp('popup.condition.operations', parameters, {
+			dialogueid: 'operation-condition',
 			dialogue_class: 'modal-popup-medium',
-			trigger_element: trigger_element,
-			dialogueid: 'operation-condition'
+			trigger_element: trigger_element
 		});
 
 		overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
-			this._createRow(e.detail);
-			this._processTypeOfCalculation();
+			this._createOperationConditionsRow(e.detail, row_index);
 		});
 	}
 
-	_createRow(input) {
-		const row = document.createElement('tr');
-
-		row.append(this._createLabel(input));
-		row.append(this._createName(input));
-		row.append(this._createRemoveCell());
-
-		this.table = document.getElementById('operation-condition-list');
-		this.row_count = this.table.rows.length -1;
-
-		row.appendChild(this._createHiddenInput(
-			`operation[opconditions][${this.row_count-1}][conditiontype]`, input.conditiontype)
-		);
-		row.appendChild(this._createHiddenInput(`operation[opconditions][${this.row_count-1}][operator]`, input.operator));
-		row.appendChild(this._createHiddenInput(`operation[opconditions][${this.row_count-1}][value]`, input.value));
-
-		let cond_table_rows = document.getElementById('operation-condition-list').getElementsByTagName('tr');
-		cond_table_rows[cond_table_rows.length - 1].before(row);
-	}
-
-	_createLabel(input) {
-		const cell = document.createElement('td');
-
-		this.label = num2letter(document.getElementById('operation-condition-list').rows.length -2);
-		cell.setAttribute('class', 'label');
-		cell.setAttribute('data-formulaid', this.label);
-		cell.setAttribute('data-conditiontype', input.conditiontype);
-		cell.append(this.label);
-		return cell;
-	}
-
-	_createName(input) {
-		const cell = document.createElement('td');
+	_createOperationConditionsRow(input, row_index) {
 		if (input.conditiontype == <?= CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
 			if (input.value == 1) {
-				cell.append(<?= json_encode(_('Event is acknowledged')) ?> + ' ');
+				input.name = <?= json_encode(_('Event is acknowledged')) ?> + ' '
 			}
 			else if (input.value == 0) {
-				cell.append(<?= json_encode(_('Event is not acknowledged')) ?> + ' ');
+				input.name = <?= json_encode(_('Event is not acknowledged')) ?> + ' '
 			}
 		}
-		return cell;
+
+		input.label = num2letter(row_index);
+		input.row_index = row_index;
+
+		document
+			.querySelector('#operation-condition-list tbody')
+			.insertAdjacentHTML('beforeend', this.op_condition_template.evaluate(input))
+
+		this._processTypeOfCalculation();
 	}
 
-	_createRemoveCell() {
-		const cell = document.createElement('td');
-		const btn = document.createElement('button');
-		btn.type = 'button';
-		btn.classList.add('btn-link', 'element-table-remove');
-		btn.textContent = <?= json_encode(_('Remove')) ?>;
-		btn.addEventListener('click', () => btn.closest('tr').remove());
-
-		cell.appendChild(btn);
-		return cell;
-	}
 
 	submit() {
 		const actionid = this._createHiddenInput('actionid', this.actionid)
@@ -535,9 +505,14 @@ window.operation_popup = new class {
 	}
 
 	_processTypeOfCalculation() {
-		document.querySelector('#operation-evaltype').style.display = this.row_count > 1 ? '' : 'none';
-		document.querySelector('#operation-evaltype-label').style.display = this.row_count > 1 ? '' : 'none';
-		document.querySelector('#operation-condition-row').style.display = this.row_count > 1 ? '' : 'none';
+		let row_count
+		document.getElementById('operation-condition-list')
+			? row_count = document.getElementById('operation-condition-list').rows.length -2
+			: row_count = 0;
+
+		document.querySelector('#operation-evaltype').style.display = row_count > 1 ? '' : 'none';
+		document.querySelector('#operation-evaltype-label').style.display = row_count > 1 ? '' : 'none';
+		document.querySelector('#operation-condition-row').style.display = row_count > 1 ? '' : 'none';
 
 		const labels = document.querySelectorAll('#operation-condition-list .label');
 		let conditions = [];
@@ -594,5 +569,48 @@ window.operation_popup = new class {
 			}
 		}
 		default_msg.dispatchEvent(new Event('change'));
+	}
+
+	_initTemplates() {
+		this.op_condition_template = new Template(`
+			<tr data-id="#{row_index}">
+				<td>
+					<span  class="label" data-conditiontype="#{conditiontype}" data-formulaid= "#{label}" >#{label}</span>
+				</td>
+				<td>
+					<span>#{name}</span>
+				</td>
+				<td class="<?= ZBX_STYLE_NOWRAP ?>">
+					<input type="hidden" name="operation[opconditions][#{row_index}][conditiontype]" value="#{conditiontype}" />
+					<input type="hidden" name="operation[opconditions][#{row_index}][operator]" value="#{operator}" />
+					<input type="hidden" name="operation[opconditions][#{row_index}][value]" value="#{value}" />
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+				</td>
+			</tr>
+		`);
+
+		this.usrgrp_template = new Template(`
+			<tr data-id="#{usrgrpid}">
+				<td>
+					<span>#{name}</span>
+				</td>
+				<td class="<?= ZBX_STYLE_NOWRAP ?>">
+					<input name="operation[opmessage_grp][][usrgrpid]" type="hidden" value="#{usrgrpid}" />
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+				</td>
+			</tr>
+		`);
+
+		this.usr_template =  new Template(`
+			<tr data-id="#{id}">
+				<td>
+					<span>#{name}</span>
+				</td>
+				<td class="<?= ZBX_STYLE_NOWRAP ?>">
+					<input name="operation[opmessage_usr][][userid]" type="hidden" value="#{id}" />
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+				</td>
+			</tr>
+		`);
 	}
 }
