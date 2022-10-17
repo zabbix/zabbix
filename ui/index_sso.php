@@ -52,52 +52,39 @@ use OneLogin\Saml2\Utils;
 
 global $SSO;
 
-$sp_key = '';
-$sp_cert = '';
-$idp_cert = '';
-
-if (is_array($SSO) && array_key_exists('SP_KEY', $SSO)) {
-	if (is_readable($SSO['SP_KEY'])) {
-		$sp_key = file_get_contents($SSO['SP_KEY']);
-	}
-}
-elseif (is_readable('conf/certs/sp.key')) {
-	$sp_key = file_get_contents('conf/certs/sp.key');
+if (!is_array($SSO)) {
+	$SSO = ['SETTINGS' => []];
 }
 
-if (is_array($SSO) && array_key_exists('SP_CERT', $SSO)) {
-	if (is_readable($SSO['SP_CERT'])) {
-		$sp_cert = file_get_contents($SSO['SP_CERT']);
-	}
-}
-elseif (is_readable('conf/certs/sp.crt')) {
-	$sp_cert = file_get_contents('conf/certs/sp.crt');
+$certs = [
+	'SP_KEY'	=> 'conf/certs/sp.key',
+	'SP_CERT'	=> 'conf/certs/sp.crt',
+	'IDP_CERT'	=> 'conf/certs/idp.crt'
+];
+$certs = array_merge($certs, array_intersect_key($SSO, $certs));
+$certs = array_filter($certs, 'is_readable');
+$certs = array_map('file_get_contents', $certs);
+$certs += array_fill_keys(['SP_KEY', 'SP_CERT', 'IDP_CERT'], '');
+/** @var CUser $service */
+$service = API::getApiService('user');
+$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
+$provision = CProvisioning::forUserDirectoryId($userdirectoryid);
+$provisioning_enabled = ($provision->isProvisioningEnabled()
+	&& CAuthenticationHelper::get(CAuthenticationHelper::SAML_JIT_STATUS) ==  JIT_PROVISIONING_ENABLED
+);
+
+if (array_key_exists('baseurl', $SSO['SETTINGS']) && !is_array($SSO['SETTINGS']['baseurl'])
+		&& $SSO['SETTINGS']['baseurl'] !== '') {
+	Utils::setBaseURL((string) $SSO['SETTINGS']['baseurl']);
 }
 
-if (is_array($SSO) && array_key_exists('IDP_CERT', $SSO)) {
-	if (is_readable($SSO['IDP_CERT'])) {
-		$idp_cert = file_get_contents($SSO['IDP_CERT']);
-	}
-}
-elseif (is_readable('conf/certs/idp.crt')) {
-	$idp_cert = file_get_contents('conf/certs/idp.crt');
-}
-
-if (is_array($SSO) && array_key_exists('SETTINGS', $SSO)) {
-	if (array_key_exists('baseurl', $SSO['SETTINGS']) && !is_array($SSO['SETTINGS']['baseurl'])
-			&& $SSO['SETTINGS']['baseurl'] !== '') {
-		Utils::setBaseURL((string) $SSO['SETTINGS']['baseurl']);
-	}
-
-	if (array_key_exists('use_proxy_headers', $SSO['SETTINGS']) && (bool) $SSO['SETTINGS']['use_proxy_headers']) {
-		Utils::setProxyVars(true);
-	}
+if (array_key_exists('use_proxy_headers', $SSO['SETTINGS']) && (bool) $SSO['SETTINGS']['use_proxy_headers']) {
+	Utils::setProxyVars(true);
 }
 
 $baseurl = Utils::getSelfURLNoQuery();
 $relay_state = null;
-$saml_settings = CAuthenticationHelper::getDefaultUserdirectory(IDP_TYPE_SAML);
-
+$saml_settings = $provision->getIdpConfig();
 $settings = [
 	'sp' => [
 		'entityId' => $saml_settings['sp_entityid'],
@@ -108,8 +95,8 @@ $settings = [
 			'url' => $baseurl.'?sls'
 		],
 		'NameIDFormat' => $saml_settings['nameid_format'],
-		'x509cert' => $sp_cert,
-		'privateKey' => $sp_key
+		'x509cert' => $certs['SP_CERT'],
+		'privateKey' => $certs['SP_KEY']
 	],
 	'idp' => [
 		'entityId' => $saml_settings['idp_entityid'],
@@ -119,7 +106,7 @@ $settings = [
 		'singleLogoutService' => [
 			'url' => $saml_settings['slo_url']
 		],
-		'x509cert' => $idp_cert
+		'x509cert' => $certs['IDP_CERT']
 	],
 	'security' => [
 		'nameIdEncrypted' => (bool) $saml_settings['encrypt_nameid'],
@@ -133,48 +120,54 @@ $settings = [
 	]
 ];
 
-if (is_array($SSO) && array_key_exists('SETTINGS', $SSO)) {
-	foreach (['strict', 'compress', 'contactPerson', 'organization'] as $option) {
-		if (array_key_exists($option, $SSO['SETTINGS'])) {
-			$settings[$option] = $SSO['SETTINGS'][$option];
+foreach (['strict', 'compress', 'contactPerson', 'organization'] as $option) {
+	if (array_key_exists($option, $SSO['SETTINGS'])) {
+		$settings[$option] = $SSO['SETTINGS'][$option];
+	}
+}
+
+if (array_key_exists('sp', $SSO['SETTINGS'])) {
+	foreach (['attributeConsumingService', 'x509certNew'] as $option) {
+		if (array_key_exists($option, $SSO['SETTINGS']['sp'])) {
+			$settings['sp'][$option] = $SSO['SETTINGS']['sp'][$option];
 		}
 	}
+}
 
-	if (array_key_exists('sp', $SSO['SETTINGS'])) {
-		foreach (['attributeConsumingService', 'x509certNew'] as $option) {
-			if (array_key_exists($option, $SSO['SETTINGS']['sp'])) {
-				$settings['sp'][$option] = $SSO['SETTINGS']['sp'][$option];
-			}
-		}
+if (array_key_exists('idp', $SSO['SETTINGS'])) {
+	if (array_key_exists('singleLogoutService', $SSO['SETTINGS']['idp'])
+			&& array_key_exists('responseUrl', $SSO['SETTINGS']['idp']['singleLogoutService'])) {
+		$settings['idp']['singleLogoutService']['responseUrl'] =
+			$SSO['SETTINGS']['idp']['singleLogoutService']['responseUrl'];
 	}
 
-	if (array_key_exists('idp', $SSO['SETTINGS'])) {
-		if (array_key_exists('singleLogoutService', $SSO['SETTINGS']['idp'])
-				&& array_key_exists('responseUrl', $SSO['SETTINGS']['idp']['singleLogoutService'])) {
-			$settings['idp']['singleLogoutService']['responseUrl'] =
-				$SSO['SETTINGS']['idp']['singleLogoutService']['responseUrl'];
-		}
-
-		foreach (['certFingerprint', 'certFingerprintAlgorithm', 'x509certMulti'] as $option) {
-			if (array_key_exists($option, $SSO['SETTINGS']['idp'])) {
-				$settings['idp'][$option] = $SSO['SETTINGS']['idp'][$option];
-			}
+	foreach (['certFingerprint', 'certFingerprintAlgorithm', 'x509certMulti'] as $option) {
+		if (array_key_exists($option, $SSO['SETTINGS']['idp'])) {
+			$settings['idp'][$option] = $SSO['SETTINGS']['idp'][$option];
 		}
 	}
+}
 
-	if (array_key_exists('security', $SSO['SETTINGS'])) {
-		foreach (['signMetadata', 'wantNameId', 'requestedAuthnContext', 'requestedAuthnContextComparison',
-				'wantXMLValidation', 'relaxDestinationValidation', 'destinationStrictlyMatches', 'lowercaseUrlencoding',
-				'rejectUnsolicitedResponsesWithInResponseTo', 'signatureAlgorithm', 'digestAlgorithm'] as $option) {
-			if (array_key_exists($option, $SSO['SETTINGS']['security'])) {
-				$settings['security'][$option] = $SSO['SETTINGS']['security'][$option];
-			}
+if (array_key_exists('security', $SSO['SETTINGS'])) {
+	foreach (['signMetadata', 'wantNameId', 'requestedAuthnContext', 'requestedAuthnContextComparison',
+			'wantXMLValidation', 'relaxDestinationValidation', 'destinationStrictlyMatches', 'lowercaseUrlencoding',
+			'rejectUnsolicitedResponsesWithInResponseTo', 'signatureAlgorithm', 'digestAlgorithm'] as $option) {
+		if (array_key_exists($option, $SSO['SETTINGS']['security'])) {
+			$settings['security'][$option] = $SSO['SETTINGS']['security'][$option];
 		}
 	}
 }
 
 try {
 	$auth = new Auth($settings);
+
+	if (hasRequest('metadata')) {
+		$metadata = $auth->getSettings()->getSPMetadata();
+
+		header('Content-Type: text/xml');
+		die($metadata);
+	}
+
 	if (hasRequest('acs') && !CSessionHelper::has('saml_data')) {
 		$auth->processResponse();
 
@@ -182,78 +175,44 @@ try {
 			throw new Exception($auth->getLastErrorReason());
 		}
 
-		$user_attributes = $auth->getAttributes();
+		// $user_attributes = $auth->getAttributes();
+		$groups_key = $saml_settings['group_name'];
 
-		if (!array_key_exists($saml_settings['username_attribute'],
-			$user_attributes
-		)) {
+		foreach ($auth->getAttributes() as $attribute => $value) {
+			if ($groups_key !== $attribute) {
+				$value = reset($value);
+			}
+
+			$user_attributes[$attribute] = $value;
+		}
+
+		if (!array_key_exists($saml_settings['username_attribute'], $user_attributes)) {
 			throw new Exception(
 				_s('The parameter "%1$s" is missing from the user attributes.', $saml_settings['username_attribute'])
 			);
 		}
 
 		$saml_data = [
-			'username_attribute' => reset(
-				$user_attributes[$saml_settings['username_attribute']]
-			),
-			'nameid' => $auth->getNameId(),
-			'nameid_format' => $auth->getNameIdFormat(),
-			'nameid_name_qualifier' => $auth->getNameIdNameQualifier(),
-			'nameid_sp_name_qualifier' => $auth->getNameIdSPNameQualifier(),
-			'session_index' => $auth->getSessionIndex()
+			'username_attribute'		=> $user_attributes[$saml_settings['username_attribute']],
+			'nameid'					=> $auth->getNameId(),
+			'nameid_format'				=> $auth->getNameIdFormat(),
+			'nameid_name_qualifier'		=> $auth->getNameIdNameQualifier(),
+			'nameid_sp_name_qualifier'	=> $auth->getNameIdSPNameQualifier(),
+			'session_index'				=> $auth->getSessionIndex(),
+			'provisioned_user'			=> []
 		];
 
-		if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_JIT_STATUS)
-				&& $saml_settings['provision_status'] == JIT_PROVISIONING_ENABLED) {
-			if (!array_key_exists($saml_settings['group_name'], $user_attributes)) {
-				throw new Exception(
-					_s('The parameter "%1$s" is missing from the user attributes.', $saml_settings['group_name'])
-				);
+		if ($provisioning_enabled) {
+			$user = $provision->getUser($user_attributes);
+			$idp_groups = [];
+
+			if (array_key_exists($groups_key, $user_attributes)
+					&& is_array($user_attributes[$groups_key])) {
+				$idp_groups = $user_attributes[$groups_key];
 			}
 
-			$saml_data['group_names'] = $user_attributes[$saml_settings['group_name']];
-			$saml_data['user_name'] = array_key_exists($saml_settings['user_username'], $user_attributes)
-				? reset($user_attributes[$saml_settings['user_username']])
-				: '';
-			$saml_data['user_lastname'] = array_key_exists($saml_settings['user_lastname'], $user_attributes)
-				? reset($user_attributes[$saml_settings['user_lastname']])
-				: '';
-
-			foreach ($saml_data['group_names'] as $group_name) {
-				foreach ($saml_settings['provision_groups'] as $provision_group) {
-					if ($provision_group['is_fallback'] == GROUP_MAPPING_REGULAR) {
-						$pattern = '/^'.str_replace('\*', '.*', preg_quote($provision_group['name'], '/')).'$/i';
-						if (preg_match($pattern, $group_name)) {
-							$saml_data['provision_groups'] = [
-								'user_groups' => $provision_group['user_groups'],
-								'roleid' => $provision_group['roleid']
-							];
-							break;
-						}
-					}
-
-					if ($provision_group['is_fallback'] == GROUP_MAPPING_FALLBACK
-						&& $provision_group['fallback_status'] == GROUP_MAPPING_FALLBACK_ON
-						&& !array_key_exists('provision_groups', $saml_data)) {
-						$saml_data['provision_groups'] = [
-							'user_groups' => $provision_group['user_groups'],
-							'roleid' => $provision_group['roleid']
-						];
-					}
-				}
-			}
-
-			$provision_media = [];
-			foreach($saml_settings['provision_media'] as $media) {
-				if (array_key_exists($media['attribute'], $user_attributes)) {
-					$provision_media[] = [
-						'mediatypeid' => $media['mediatypeid'],
-						'sendto' => $user_attributes[$media['attribute']]
-					];
-				}
-			}
-
-			$saml_data['medias'] = $provision_media != [] ? $provision_media : [];
+			$user += $provision->getUserGroupsAndRole($idp_groups);
+			$saml_data['provisioned_user'] = $user;
 		}
 
 		$saml_data['sign'] = CEncryptHelper::sign(json_encode($saml_data));
@@ -301,34 +260,34 @@ try {
 			throw new Exception(_('Session initialization error.'));
 		}
 
-		$user = API::getApiService('user')->findAccessibleUser($saml_data['username_attribute'], // TODO check if this works well after updates from API
-			(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
-			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE), false);
+		if ($saml_data['provisioned_user'] && $provisioning_enabled) {
+			$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
+			$user_data = $service->findAccessibleUser($saml_data['username_attribute'],
+				(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
+				CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE), false
+			);
 
-		if (!array_key_exists('db_user', $user)) {
-			if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_JIT_STATUS)
-				&& $saml_settings['provision_status'] == JIT_PROVISIONING_ENABLED) {
-
-				$result = API::getApiService('user')->create([
-					'username' => $saml_data['username_attribute'],
-					'name' => $saml_data['user_name'],
-					'surname' => $saml_data['user_lastname'],
-					'passwd' => 'zabbixzabbix123',							// TODO here needs to be some kind of password, it is not used for login, just for user creation
-					'roleid' => $saml_data['provision_groups']['roleid'],
-					'usrgrps' => $saml_data['provision_groups']['user_groups'],
-					'medias' => $saml_data['medias']
-				], ['userdirecotryid' => $saml_settings['userdirectoryid']]);
+			if (array_key_exists('db_user', $user_data)) {
+				if ($user_data['db_user']['userdirectoryid'] == $userdirectoryid) {
+					$saml_data['provisioned_user']['userid'] = $user_data['db_user']['userid'];
+					$service->updateProvisionedUser($saml_data['provisioned_user']);
+				}
+			}
+			else {
+				$saml_data['provisioned_user'] += [
+					'userdirectoryid'	=> $userdirectoryid,
+					'username'			=> $saml_data['username_attribute']
+				];
+				$service->createProvisionedUser($saml_data['provisioned_user']);
 			}
 		}
 
-		CWebUser::$data = API::getApiService('user')->loginByUsername($saml_data['username_attribute'],
+		CWebUser::$data = $service->loginByUsername($saml_data['username_attribute'],
 			(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
 			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		);
 
 		if (CWebUser::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-			CSessionHelper::unset(['saml_data']);
-
 			throw new Exception(_('GUI access disabled.'));
 		}
 
@@ -342,6 +301,8 @@ try {
 	$auth->login();
 }
 catch (Exception $e) {
+	CSessionHelper::unset(['saml_data']);
+
 	error($e->getMessage());
 }
 
