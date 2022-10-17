@@ -267,9 +267,15 @@ try {
 			);
 
 			if (array_key_exists('db_user', $user_data)) {
+				$deprovisioned = $user_data['permissions']['deprovisioned'];
+
 				if ($user_data['db_user']['userdirectoryid'] == $userdirectoryid) {
 					$saml_data['provisioned_user']['userid'] = $user_data['db_user']['userid'];
-					$service->updateProvisionedUser($saml_data['provisioned_user']);
+					$deprovisioned = !$service->updateProvisionedUser($saml_data['provisioned_user']);
+				}
+
+				if ($deprovisioned) {
+					throw new Exception(_('GUI access disabled.'));
 				}
 			}
 			else {
