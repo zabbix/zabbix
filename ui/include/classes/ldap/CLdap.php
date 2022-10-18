@@ -299,6 +299,10 @@ class CLdap {
 		$results = $this->search($this->cnf['group_basedn'], $this->cnf['group_filter'], $placeholders, $attributes);
 		$groups = [];
 
+		if (!array_key_exists('count', $results)) {
+			return $groups;
+		}
+
 		for ($j = 0; $j < $results['count']; $j++) {
 			$result = $results[$j];
 			$result_attributes = array_intersect_key($result, array_flip($attributes));
