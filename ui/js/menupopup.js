@@ -134,15 +134,15 @@ function getMenuPopupHost(options, trigger_element) {
 			url.setArgument('filter_name', '');
 			url.setArgument('hostids[]', options.hostid);
 
-			if (typeof options.severities !== 'undefined') {
+			if ('severities' in options) {
 				url.setArgument('severities[]', options.severities);
 			}
 
-			if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
+			if ('show_suppressed' in options) {
 				url.setArgument('show_suppressed', '1');
 			}
 
-			if (typeof options.tags !== 'undefined') {
+			if ('tags' in options) {
 				url.setArgument('tags', options.tags);
 				url.setArgument('evaltype', options.evaltype);
 			}
@@ -159,7 +159,7 @@ function getMenuPopupHost(options, trigger_element) {
 			url = new Curl('zabbix.php', false);
 			url.setArgument('action', 'latest.view');
 
-			if (typeof options.tags !== 'undefined') {
+			if ('tags' in options) {
 				url.setArgument('tags', options.tags);
 				url.setArgument('evaltype', options.evaltype);
 			}
@@ -306,7 +306,7 @@ function getMenuPopupHost(options, trigger_element) {
 	}
 
 	// urls
-	if (typeof options.urls !== 'undefined') {
+	if ('urls' in options) {
 		sections.push({
 			label: t('Links'),
 			items: getMenuPopupURLData(options.urls, trigger_element)
@@ -314,7 +314,7 @@ function getMenuPopupHost(options, trigger_element) {
 	}
 
 	// scripts
-	if (typeof options.scripts !== 'undefined') {
+	if ('scripts' in options) {
 		sections.push({
 			label: t('Scripts'),
 			items: getMenuPopupScriptData(options.scripts, trigger_element, options.hostid)
@@ -461,10 +461,12 @@ function getMenuPopupMapElementTrigger(options) {
 		url.setArgument('action', 'problem.view');
 		url.setArgument('filter_name', '');
 		url.setArgument('triggerids', options.triggers.map((value) => value.triggerid));
-		if (typeof options.severities !== 'undefined') {
+
+		if ('severities' in options) {
 			url.setArgument('severities[]', options.severities);
 		}
-		if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
+
+		if ('show_suppressed' in options) {
 			url.setArgument('show_suppressed', '1');
 		}
 
@@ -477,16 +479,23 @@ function getMenuPopupMapElementTrigger(options) {
 
 	// items problems
 	if (options.allowed_ui_latest_data && options.items.length) {
+		const latest_data = [];
+
 		for (const item of options.items) {
 			url = new Curl('history.php', false);
 			url.setArgument('action', item.params.action);
 			url.setArgument('itemids[]', item.params.itemid);
 
-			items.push({
+			latest_data.push({
 				label: item.name,
 				url: url.getUrl()
 			});
 		};
+
+		items.push({
+			label: t('Latest data'),
+			items: latest_data
+		});
 	}
 
 	if (items.length) {
@@ -502,66 +511,42 @@ function getMenuPopupMapElementTrigger(options) {
 		const trigger_urls = [];
 		const item_urls = [];
 
-		if (options.triggers.length === 1) {
+		for (const value of options.triggers) {
 			url = new Curl('triggers.php', false);
 			url.setArgument('form', 'update');
-			url.setArgument('triggerid', options.triggers[0].triggerid);
+			url.setArgument('triggerid', value.triggerid);
 			url.setArgument('context', 'host');
 
-			config_urls.push({
-				label: t('Trigger'),
+			trigger_urls.push({
+				label: value.description,
 				url: url.getUrl()
 			});
 		}
-		else {
-			for (const value of options.triggers) {
-				url = new Curl('triggers.php', false);
-				url.setArgument('form', 'update');
-				url.setArgument('triggerid', value.triggerid);
-				url.setArgument('context', 'host');
 
-				trigger_urls.push({
-					label: value.description,
-					url: url.getUrl()
-				});
-			}
+		config_urls.push({
+			label: t('Triggers'),
+			items: trigger_urls
+		});
 
-			config_urls.push({
-				label: t('Triggers'),
-				items: trigger_urls
-			});
-		}
 
 		if (options.items.length) {
-			if (options.items.length === 1) {
+			for (const item of options.items) {
 				url = new Curl('items.php', false);
 				url.setArgument('form', 'update');
-				url.setArgument('itemid', options.items[0].params.itemid);
+				url.setArgument('itemid', item.params.itemid);
 				url.setArgument('context', 'host');
 
-				config_urls.push({
-					label: t('Item'),
+				item_urls.push({
+					label: item.name,
+					disabled: item.params.web,
 					url: url.getUrl()
 				});
-			}
-			else {
-				for (const item of options.items) {
-					url = new Curl('items.php', false);
-					url.setArgument('form', 'update');
-					url.setArgument('itemid', item.params.itemid);
-					url.setArgument('context', 'host');
+			};
 
-					item_urls.push({
-						label: item.name,
-						url: url.getUrl()
-					});
-				};
-
-				config_urls.push({
-					label: t('Items'),
-					items: item_urls
-				});
-			}
+			config_urls.push({
+				label: t('Items'),
+				items: item_urls
+			});
 		}
 
 		sections.push({
@@ -571,7 +556,7 @@ function getMenuPopupMapElementTrigger(options) {
 	}
 
 	// urls
-	if (typeof options.urls !== 'undefined') {
+	if ('urls' in options) {
 		sections.push({
 			label: t('Links'),
 			items: options.urls
@@ -744,7 +729,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 	}
 
 	// acknowledge
-	if (typeof options.acknowledge !== 'undefined' && options.acknowledge) {
+	if ('acknowledge' in options) {
 		items.push({
 			label: t('Acknowledge'),
 			clickCallback: function() {
@@ -757,16 +742,23 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 	// items problems
 	if (options.allowed_ui_latest_data && options.items.length) {
+		const latest_data = [];
+
 		for (const item of options.items) {
 			url = new Curl('history.php', false);
 			url.setArgument('action', item.params.action);
 			url.setArgument('itemids[]', item.params.itemid);
 
-			items.push({
+			latest_data.push({
 				label: item.name,
 				url: url.getUrl()
 			});
 		};
+
+		items.push({
+			label: t('Latest data'),
+			items: latest_data
+		});
 	}
 
 	if (items.length) {
@@ -792,35 +784,22 @@ function getMenuPopupTrigger(options, trigger_element) {
 		});
 
 		if (options.items.length) {
-			if (options.items.length === 1) {
+			for (const item of options.items) {
 				url = new Curl('items.php', false);
 				url.setArgument('form', 'update');
-				url.setArgument('itemid', options.items[0].params.itemid);
+				url.setArgument('itemid', item.params.itemid);
 				url.setArgument('context', 'host');
 
-				config_urls.push({
-					label: t('Item'),
+				item_urls.push({
+					label: item.name,
 					url: url.getUrl()
 				});
 			}
-			else {
-				for (const item of options.items) {
-					url = new Curl('items.php', false);
-					url.setArgument('form', 'update');
-					url.setArgument('itemid', item.params.itemid);
-					url.setArgument('context', 'host');
 
-					item_urls.push({
-						label: item.name,
-						url: url.getUrl()
-					});
-				};
-
-				config_urls.push({
-					label: t('Items'),
-					items: item_urls
-				});
-			}
+			config_urls.push({
+				label: t('Items'),
+				items: item_urls
+			});
 		}
 
 		sections.push({
@@ -838,7 +817,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 	}
 
 	// scripts
-	if (typeof options.scripts !== 'undefined') {
+	if ('scripts' in options) {
 		sections.push({
 			label: t('Scripts'),
 			items: getMenuPopupScriptData(options.scripts, trigger_element, null, options.eventid)

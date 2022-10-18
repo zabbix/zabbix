@@ -554,11 +554,12 @@ class CControllerMenuPopup extends CController {
 						$triggers = [];
 						$hosts = [];
 						$show_events = true;
+						$unique_itemids = [];
 
 						$db_triggers = API::Trigger()->get([
 							'output' => ['triggerid', 'description'],
 							'selectHosts' => ['hostid', 'name', 'status'],
-							'selectItems' => ['itemid', 'hostid', 'name', 'value_type'],
+							'selectItems' => ['itemid', 'hostid', 'name', 'value_type', 'type'],
 							'triggerids' => array_column($selement['elements'], 'triggerid'),
 							'preservekeys' => true
 						]);
@@ -582,6 +583,10 @@ class CControllerMenuPopup extends CController {
 							$with_hostname = count($hosts) > 1;
 
 							foreach ($db_trigger['items'] as $item) {
+								if (in_array($item['itemid'], $unique_itemids)) {
+									continue;
+								}
+
 								$items[] = [
 									'name' => $with_hostname
 										? $item['hostname'].NAME_DELIMITER.$item['name']
@@ -592,9 +597,12 @@ class CControllerMenuPopup extends CController {
 											$item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
 										)
 											? HISTORY_GRAPH
-											: HISTORY_VALUES
+											: HISTORY_VALUES,
+										'web' => $item['type'] == ITEM_TYPE_HTTPTEST
 									]
 								];
+
+								$unique_itemids[] = $item['itemid'];
 							}
 
 							$triggers[] = [
