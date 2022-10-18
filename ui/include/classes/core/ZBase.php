@@ -857,15 +857,7 @@ class ZBase {
 			$this->autoloader->addNamespace($namespace, $paths);
 		}
 
-		['conflicting_manifests' => $conflicting_manifests] = $this->module_manager->checkConflicts();
-
-		$non_conflicting_manifests = array_diff_key($this->module_manager->getManifests(),
-			array_flip($conflicting_manifests)
-		);
-
-		foreach ($non_conflicting_manifests as $relative_path => $manifest) {
-			$this->module_manager->initModule($relative_path, $manifest);
-		}
+		$this->module_manager->initModules();
 
 		array_map('error', $this->module_manager->getErrors());
 	}
