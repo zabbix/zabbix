@@ -611,7 +611,17 @@ static int	vmware_rest_post(const char *fn_parent, CURL *easyhandle, const char 
 		return FAIL;
 	}
 
-	return vmware_http_request(fn_parent, easyhandle, url_suffix, jp, error);
+	if (SUCCEED != vmware_http_request(fn_parent, easyhandle, url_suffix, jp, error))
+		return FAIL;
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, NULL)))
+	{
+		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", CURLOPT_POSTFIELDS,
+				curl_easy_strerror(err));
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -660,8 +670,6 @@ static int	vmware_tags_linked_id(const zbx_vmware_obj_id_t *obj_id, CURL *easyha
 			zbx_vector_str_append(ids, zbx_strdup(NULL, tmp));
 	}
 out:
-	curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, NULL);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ids:%d", __func__, ids->values_num);
 
 	return ret;
