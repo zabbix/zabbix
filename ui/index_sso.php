@@ -166,7 +166,10 @@ try {
 		$metadata = $auth->getSettings()->getSPMetadata();
 
 		header('Content-Type: text/xml');
-		die($metadata);
+		echo $metadata;
+
+		session_write_close();
+		exit;
 	}
 
 	if (hasRequest('acs') && !CSessionHelper::has('saml_data')) {
@@ -235,6 +238,7 @@ try {
 		}
 
 		if (hasRequest('sls')) {
+			CSessionHelper::unset(['saml_data']);
 			$auth->processSLO();
 
 			redirect('index.php');
