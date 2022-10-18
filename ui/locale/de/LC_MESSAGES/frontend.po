@@ -13307,6 +13307,10 @@ msgstr "Nur Superadmins können den Berichtseigentümer festlegen."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Nur Auslöser, die mit aktiven Hosts und aktiven Datenpunkten verbunden sind, werden gezählt"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 # Der Browser
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -20470,6 +20474,10 @@ msgstr "ein boolescher Wert wird erwartet"
 #: include/classes/validators/CNewValidator.php:290
 msgid "a character string is expected"
 msgstr "Zeichenfolge erwartet"
+
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"

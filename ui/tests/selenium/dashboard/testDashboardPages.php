@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+
 /**
  * @backup dashboard
  *
@@ -555,6 +557,11 @@ class testDashboardPages extends CWebTest {
 		// Check that Delete option is disabled when one page left.
 		$page_menu = $this->getPageMenu('Page 1');
 		$this->assertTrue($page_menu->query('xpath:.//a[@aria-label="Actions, Delete"]')->one()->isEnabled(false));
+
+		// Press Escape key to close page menu before saving the dashboard.
+		$this->page->keyPress(WebDriverKeys::ESCAPE);
+		$page_menu->waitUntilNotVisible();
+
 		$dashboard->save();
 		$this->assertEquals(['Page 1'], $this->getPagesTitles());
 	}

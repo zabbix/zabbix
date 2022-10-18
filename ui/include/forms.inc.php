@@ -1816,7 +1816,8 @@ function getTriggerFormData(array $data) {
 			$db_hosts = API::Host()->get([
 				'output' => [],
 				'selectTags' => ['tag', 'value'],
-				'hostids' => $data['hostid']
+				'hostids' => $data['hostid'],
+				'templated_hosts' => true
 			]);
 
 			if ($db_hosts) {

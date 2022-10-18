@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,13 +19,16 @@
 **/
 
 
+/**
+ * Controller for the "Problems" page and Problems CSV export.
+ */
 class CControllerProblemView extends CControllerProblem {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableSIDValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'show' =>					'in '.TRIGGERS_OPTION_RECENT_PROBLEM.','.TRIGGERS_OPTION_IN_PROBLEM.','.TRIGGERS_OPTION_ALL,
 			'groupids' =>				'array_id',
@@ -62,30 +65,8 @@ class CControllerProblemView extends CControllerProblem {
 			'counter_index' =>			'ge 0'
 		];
 
-		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
-
-		if ($ret && $this->hasInput('inventory')) {
-			foreach ($this->getInput('inventory') as $filter_inventory) {
-				if (count($filter_inventory) != 2
-						|| !array_key_exists('field', $filter_inventory) || !is_string($filter_inventory['field'])
-						|| !array_key_exists('value', $filter_inventory) || !is_string($filter_inventory['value'])) {
-					$ret = false;
-					break;
-				}
-			}
-		}
-
-		if ($ret && $this->hasInput('tags')) {
-			foreach ($this->getInput('tags') as $filter_tag) {
-				if (count($filter_tag) != 3
-						|| !array_key_exists('tag', $filter_tag) || !is_string($filter_tag['tag'])
-						|| !array_key_exists('value', $filter_tag) || !is_string($filter_tag['value'])
-						|| !array_key_exists('operator', $filter_tag) || !is_string($filter_tag['operator'])) {
-					$ret = false;
-					break;
-				}
-			}
-		}
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventory()
+			&& $this->validateTags();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -94,15 +75,20 @@ class CControllerProblemView extends CControllerProblem {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$filter_tabs = [];
-		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
-			->read()
-			->setInput($this->cleanInput($this->getInputAll()));
+		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
+
+		if ($this->hasInput('filter_reset')) {
+			$profile->reset();
+		}
+		else {
+			$profile->setInput($this->cleanInput($this->getInputAll()));
+		}
 
 		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
 			if ($filter_tab['filter_custom_time']) {
@@ -119,6 +105,13 @@ class CControllerProblemView extends CControllerProblem {
 		}
 
 		$filter = $filter_tabs[$profile->selected];
+		$refresh_curl = new CUrl('zabbix.php');
+		$filter['action'] = 'problem.view.refresh';
+		array_map([$refresh_curl, 'setArgument'], array_keys($filter), $filter);
+
+		if (!$this->hasInput('page')) {
+			$refresh_curl->removeArgument('page');
+		}
 
 		$data = [
 			'action' => $this->getAction(),
@@ -139,6 +132,7 @@ class CControllerProblemView extends CControllerProblem {
 				] + getTimeselectorActions($profile->from, $profile->to)
 			],
 			'filter_tabs' => $filter_tabs,
+			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'inventories' => array_column(getHostInventories(), 'title', 'db_field'),
 			'sort' => $filter['sort'],

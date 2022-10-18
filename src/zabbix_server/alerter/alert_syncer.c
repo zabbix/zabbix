@@ -624,7 +624,7 @@ static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_even
 
 		for (j = 0; j < local_event_tags->tags.values_num; j++)
 		{
-			tag = (zbx_tag_t *)(local_event_tags->tags).values[j];
+			tag = local_event_tags->tags.values[j];
 			zbx_db_insert_add_values(db_event, __UINT64_C(0), local_event_tags->eventid, tag->tag,
 					tag->value);
 
