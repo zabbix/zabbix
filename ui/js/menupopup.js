@@ -792,6 +792,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 				item_urls.push({
 					label: item.name,
+					disabled: item.params.web,
 					url: url.getUrl()
 				});
 			}
