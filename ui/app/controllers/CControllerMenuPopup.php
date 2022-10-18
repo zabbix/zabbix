@@ -593,11 +593,8 @@ class CControllerMenuPopup extends CController {
 										: $item['name'],
 									'params' => [
 										'itemid' => $item['itemid'],
-										'action' => in_array(
-											$item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
-										)
-											? HISTORY_GRAPH
-											: HISTORY_VALUES,
+										'hostid' => $item['hostid'],
+										'name' => $item['name'],
 										'web' => $item['type'] == ITEM_TYPE_HTTPTEST
 									]
 								];
@@ -710,9 +707,8 @@ class CControllerMenuPopup extends CController {
 						: $item['name'],
 					'params' => [
 						'itemid' => $item['itemid'],
-						'action' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
-							? HISTORY_GRAPH
-							: HISTORY_VALUES,
+						'hostid' => $item['hostid'],
+						'name' => $item['name'],
 						'web' => $item['type'] == ITEM_TYPE_HTTPTEST
 					]
 				];

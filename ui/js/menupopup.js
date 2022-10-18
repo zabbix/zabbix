@@ -482,9 +482,11 @@ function getMenuPopupMapElementTrigger(options) {
 		const latest_data = [];
 
 		for (const item of options.items) {
-			url = new Curl('history.php', false);
-			url.setArgument('action', item.params.action);
-			url.setArgument('itemids[]', item.params.itemid);
+			url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'latest.view');
+			url.setArgument('hostids[]', item.params.hostid);
+			url.setArgument('name', item.params.name);
+			url.setArgument('filter_name', '')
 
 			latest_data.push({
 				label: item.name,
@@ -745,9 +747,11 @@ function getMenuPopupTrigger(options, trigger_element) {
 		const latest_data = [];
 
 		for (const item of options.items) {
-			url = new Curl('history.php', false);
-			url.setArgument('action', item.params.action);
-			url.setArgument('itemids[]', item.params.itemid);
+			url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'latest.view');
+			url.setArgument('hostids[]', item.params.hostid);
+			url.setArgument('name', item.params.name);
+			url.setArgument('filter_name', '')
 
 			latest_data.push({
 				label: item.name,
@@ -848,13 +852,13 @@ function getMenuPopupItem(options) {
 	let url;
 
 	// latest data link
-	url = new Curl('zabbix.php', false);
-	url.setArgument('action', 'latest.view');
-	url.setArgument('hostids[]', options.hostid);
-	url.setArgument('name', options.name);
-	url.setArgument('filter_name', '');
-
 	if (options.allowed_ui_latest_data) {
+		url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'latest.view');
+		url.setArgument('hostids[]', options.hostid);
+		url.setArgument('name', options.name);
+		url.setArgument('filter_name', '');
+
 		items.push({
 			label: t('Latest data'),
 			url: url.getUrl()
