@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-18T11:53:15Z'
+  date: '2022-10-18T21:10:39Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1550,7 +1550,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: Bps
-              description: 'Read rate per pool (bytes per second).'
+              description: 'The read rate per pool (bytes per second).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1581,7 +1581,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: ops
-              description: 'Read rate per pool (operations per second).'
+              description: 'The read rate per pool (operations per second).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1638,7 +1638,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: Bps
-              description: 'Write rate per pool (bytes per second).'
+              description: 'The write rate per pool (bytes per second).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1669,7 +1669,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: ops
-              description: 'Write rate per pool (operations per second).'
+              description: 'The write rate per pool (operations per second).'
               preprocessing:
                 -
                   type: JSONPATH
