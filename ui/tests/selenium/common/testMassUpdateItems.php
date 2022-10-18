@@ -661,19 +661,6 @@ class testMassUpdateItems extends CWebTest{
 				[
 					'expected' => TEST_BAD,
 					'names' => [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Dependent item']
-					],
-					'details' => 'Invalid parameter "/1": the parameter "master_itemid" is missing.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'names' => [
 						'17_Script',
 						'18_Script'
 					],

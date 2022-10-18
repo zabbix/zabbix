@@ -633,7 +633,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<0 or {#MACRO}',
 					'constructor' => [
 						'text' => ['A or B', 'A', 'B'],
-						'elements' => ['expr_0_53', 'expr_58_65']
+						'elements' => ['expr_0_61', 'expr_66_73']
 					]
 				]
 			],

@@ -67,7 +67,7 @@ class testFormTestItemPrototype extends testItemTest {
 	 *
 	 * @depends testFormTestItemPrototype_CheckButtonStateTemplate
 	 */
-	public function ttestFormTestItemPrototype_TestItemTemplate($data) {
+	public function testFormTestItemPrototype_TestItemTemplate($data) {
 		$this->checkTestItem($data, false, self::TEMPLATE_LLD_ID, null, true);
 	}
 }

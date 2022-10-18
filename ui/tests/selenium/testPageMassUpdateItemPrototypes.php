@@ -274,7 +274,20 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 						'Discover' => ['id' => 'discover', 'value' => 'Yes']
 					]
 				]
-			]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names' => [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Dependent item']
+					],
+					'details' => 'Invalid parameter "/1/master_itemid": an item/item prototype ID is expected.'
+				]
+			],
 		];
 	}
 

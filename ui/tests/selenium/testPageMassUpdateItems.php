@@ -258,6 +258,19 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 						'Update interval' => ['Delay' => '1m']
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names' => [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Dependent item']
+					],
+					'details' => 'Invalid parameter "/1/master_itemid": an item ID is expected.'
+				]
 			]
 		];
 	}
