@@ -37,10 +37,4 @@ class CWidgetFieldMultiSelectHostView extends CWidgetFieldMultiSelectView {
 			'srcfld1' => 'hostid'
 		];
 	}
-
-	protected function getFilterPreselectFields(): array {
-		return [
-			'hostgroups' => 'groupids_'
-		];
-	}
 }

@@ -27,6 +27,7 @@
 #include "log.h"
 #include "control.h"
 #include "pid.h"
+#include "zbx_rtc_constants.h"
 
 #if defined(__linux__)
 #define ZBX_PID_FILE_TIMEOUT 20

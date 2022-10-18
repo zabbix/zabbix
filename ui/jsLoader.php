@@ -339,7 +339,6 @@ $translate_strings = [
 		'Submap' => _('Submap'),
 		'S_TRIGGER' => _('Trigger'),
 		'URL' => _('URL'),
-		'URLs' => _('URLs'),
 		'Values' => _('Values'),
 		'Web' => _('Web'),
 		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')

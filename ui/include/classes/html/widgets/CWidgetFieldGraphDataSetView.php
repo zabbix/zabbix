@@ -99,25 +99,27 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		];
 
 		if ($dataset_type == CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM) {
+			$host_pattern_field = (new CPatternSelect([
+				'name' => $field_name.'['.$row_num.'][hosts][]',
+				'object_name' => 'hosts',
+				'data' => $value['hosts'],
+				'placeholder' => _('host pattern'),
+				'wildcard_allowed' => 1,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'hosts',
+						'srcfld1' => 'host',
+						'dstfrm' => $this->form_name,
+						'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][hosts][]')
+					]
+				],
+				'add_post_js' => false
+			]))->addClass('js-hosts-multiselect');
+
 			$dataset_head = array_merge($dataset_head, [
 				(new CColor($field_name.'['.$row_num.'][color]', $value['color']))
 					->appendColorPickerJs(false),
-				(new CPatternSelect([
-					'name' => $field_name.'['.$row_num.'][hosts][]',
-					'object_name' => 'hosts',
-					'data' => $value['hosts'],
-					'placeholder' => _('host pattern'),
-					'wildcard_allowed' => 1,
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'hosts',
-							'srcfld1' => 'host',
-							'dstfrm' => $this->form_name,
-							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][hosts][]')
-						]
-					],
-					'add_post_js' => false
-				]))->addClass('js-hosts-multiselect'),
+				$host_pattern_field,
 				(new CPatternSelect([
 					'name' => $field_name.'['.$row_num.'][items][]',
 					'object_name' => 'items',
@@ -132,6 +134,26 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 							'numeric' => 1,
 							'dstfrm' => $this->form_name,
 							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
+						],
+						'filter_preselect' => [
+							'id' => $host_pattern_field->getId(),
+							'submit_as' => 'host_pattern',
+							'submit_parameters' => [
+								'host_pattern_wildcard_allowed' => 1,
+								'host_pattern_multiple' => 1
+							],
+							'multiple' => true
+						]
+					],
+					'autosuggest' => [
+						'filter_preselect' => [
+							'id' => $host_pattern_field->getId(),
+							'submit_as' => 'host_pattern',
+							'submit_parameters' => [
+								'host_pattern_wildcard_allowed' => 1,
+								'host_pattern_multiple' => 1
+							],
+							'multiple' => true
 						]
 					],
 					'add_post_js' => false

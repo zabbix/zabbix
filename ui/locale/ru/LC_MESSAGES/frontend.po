@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-03-25 14:20+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-09-29 11:41+0000\n"
+"Last-Translator: sergejs.maklakovs <sergejs.maklakovs@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -282,10 +282,20 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, выбрано"
 
+#: app/controllers/CControllerMediatypeEnable.php:93
+#, c-format
+msgid "%1$s. %2$s: %3$s. %4$s."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeEnable.php:108
+#, c-format
+msgid "%1$s: %2$s"
+msgstr ""
+
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "%1$sый процент: %2$s"
 
 #: include/func.inc.php:1947
 #, c-format
@@ -325,11 +335,11 @@ msgstr "(Только супер администраторы могут соз�
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(создано с помощью обнаружения узлов сети)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
-msgstr ""
+msgstr "(связано с помощью обнаружения узлов сети)"
 
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
@@ -362,11 +372,11 @@ msgstr "100 наиболее загруженных триггеров"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:184
 msgid "12-hour"
-msgstr ""
+msgstr "12-часов"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:183
 msgid "24-hour"
-msgstr ""
+msgstr "24-часа"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
@@ -544,7 +554,7 @@ msgstr "Подтверждено"
 #: app/views/monitoring.widget.problems.view.php:81
 msgctxt "compact table header"
 msgid "Ack"
-msgstr ""
+msgstr "Подтв."
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
@@ -642,7 +652,7 @@ msgstr "Действие"
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "Действие"
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
@@ -718,7 +728,7 @@ msgstr "Действия"
 #: app/views/monitoring.widget.problems.view.php:82
 msgctxt "compact table header"
 msgid "Actions"
-msgstr ""
+msgstr "Действия"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -735,7 +745,7 @@ msgstr "Активно"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "Активные проверки"
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -930,7 +940,7 @@ msgstr "Добавить узел сети"
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
 msgid "Add host trigger"
-msgstr ""
+msgstr "Добавить триггер узла сети"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
@@ -1123,7 +1133,7 @@ msgstr "Сообщение оповещения"
 #: include/classes/helpers/CMenuHelper.php:283
 #: include/classes/helpers/CRoleHelper.php:338
 msgid "Alerts"
-msgstr ""
+msgstr "Оповещения"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
@@ -1162,7 +1172,7 @@ msgstr "Все панели"
 
 #: app/views/monitoring.charts.view.php:83
 msgid "All graphs"
-msgstr ""
+msgstr "Все графики"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
 #: app/views/administration.user.edit.php:429
@@ -1239,7 +1249,7 @@ msgstr "Общее количество потребляемой физичес�
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
-msgstr ""
+msgstr "Аналоговый"
 
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:119
@@ -1331,7 +1341,7 @@ msgstr "Применить права доступа и фильтры тего�
 
 #: app/partials/configuration.templategroup.edit.html.php:47
 msgid "Apply permissions to all subgroups"
-msgstr ""
+msgstr "Применить разрешения ко всем подгруппам"
 
 #: include/views/configuration.maintenance.list.php:71
 #: include/views/configuration.maintenance.list.php:105
@@ -1341,7 +1351,7 @@ msgstr "Близится"
 
 #: include/classes/widgets/CWidgetHelper.php:1443
 msgid "Approximation"
-msgstr ""
+msgstr "Аппроксимация"
 
 #: include/func.inc.php:239
 msgid "Apr"
@@ -1425,7 +1435,7 @@ msgstr "В (час:минута)"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:125
 msgid "At least one LDAP server must exist."
-msgstr ""
+msgstr "Должен быть указан хотя бы один сервер LDAP."
 
 #: app/views/administration.userrole.edit.php:117
 msgid "At least one UI element must be checked."
@@ -1448,7 +1458,7 @@ msgstr "Должен существовать, по крайней мере, о�
 
 #: include/classes/api/services/CMaintenance.php:683
 msgid "At least one day of the week or day of the month must be specified."
-msgstr ""
+msgstr "Должен быть указан хотя бы один день недели или день месяца."
 
 #: include/classes/api/services/CMaintenance.php:382
 #: include/classes/api/services/CMaintenance.php:574
@@ -1476,7 +1486,7 @@ msgstr "Должна существовать по крайней мере од�
 #: include/classes/api/services/CHostGroup.php:1594
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
-msgstr ""
+msgstr "Как минимум один параметр должен быть включён \"%1$s\" или \"%2$s\"."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
@@ -1600,7 +1610,7 @@ msgstr "Авторизация"
 
 #: app/views/popup.tophosts.column.edit.php:162
 msgid "Auto"
-msgstr ""
+msgstr "Автоматически"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:154
@@ -1678,7 +1688,7 @@ msgstr "Доступен"
 #: app/views/monitoring.widget.hostavail.view.php:37
 msgctxt "compact table header"
 msgid "Available"
-msgstr ""
+msgstr "Доступно"
 
 #: app/views/administration.trigdisplay.edit.php:128 jsLoader.php:179
 msgid "Average"
@@ -1836,7 +1846,7 @@ msgstr "По нижнему краю"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr ""
+msgstr "По нижнему краю"
 
 #: jsLoader.php:276
 msgid "Bring forward"
@@ -1900,7 +1910,7 @@ msgstr "Использование CPU в процентном отношени�
 
 #: include/classes/data/CItemData.php:1429
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
-msgstr ""
+msgstr "Использование ЦП в герцах в течение интервала в пуле ресурсов VMware, <url> — URL-адрес службы VMware, <rpid> — идентификатор пула ресурсов VMware"
 
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
@@ -2032,7 +2042,7 @@ msgstr "Не удалось добавить узел сети"
 #: app/controllers/CControllerHostGroupCreate.php:40
 #: app/controllers/CControllerHostGroupCreate.php:70
 msgid "Cannot add host group"
-msgstr ""
+msgstr "Не удалось добавить группу узлов сети"
 
 #: host_prototypes.php:304
 msgid "Cannot add host prototype"
@@ -2118,7 +2128,7 @@ msgstr "Не удалось добавить шаблон"
 #: app/controllers/CControllerTemplateGroupCreate.php:40
 #: app/controllers/CControllerTemplateGroupCreate.php:70
 msgid "Cannot add template group"
-msgstr ""
+msgstr "Не удалось добавить группу шаблонов"
 
 #: triggers.php:306
 msgid "Cannot add trigger"
@@ -2229,7 +2239,7 @@ msgstr[2] "Не удалось скопировать триггеры"
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Не удалось скопировать триггер \"%1$s\", потому что он содержит несколько узлов сети в выражении."
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2239,7 +2249,7 @@ msgstr "Не удалось скопировать триггер \"%1$s:%2$s\",
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
 msgid "Cannot create SLA"
-msgstr ""
+msgstr "Не удалось создать SLA"
 
 #: include/classes/api/services/CHostPrototype.php:1110
 #, c-format
@@ -2274,7 +2284,7 @@ msgstr "Не удалось создать соответствие иконок
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
-msgstr ""
+msgstr "Не удалось создать запрос"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
@@ -2283,7 +2293,7 @@ msgstr "Не удалось создать регулярный отчет"
 #: app/controllers/CControllerServiceCreate.php:96
 #: app/controllers/CControllerServiceCreate.php:184
 msgid "Cannot create service"
-msgstr ""
+msgstr "Не удалось создать сервис"
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
@@ -2345,7 +2355,7 @@ msgstr[2] "Не удалось удалить панели"
 
 #: include/classes/api/services/CUserDirectory.php:383
 msgid "Cannot delete default user directory."
-msgstr ""
+msgstr "Не получилось удалить каталог пользователя по умолчанию."
 
 #: include/classes/api/services/CTrigger.php:882
 #: include/classes/api/services/CTriggerPrototype.php:570
@@ -2394,14 +2404,14 @@ msgstr "Не удалось удалить узел сети"
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось удалить узел сети %1$s, так как обслуживание \"%2$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
+msgstr[1] "Не удалось удалить узлы сети %1$s, так как обслуживание \"%2$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
+msgstr[2] "Не удалось удалить узлы сети %1$s, так как обслуживание \"%2$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
 
 #: app/controllers/CControllerHostGroupDelete.php:75
 msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
-msgstr[0] ""
+msgstr[0] "Не удалось удалить группу узлов сети"
 msgstr[1] ""
 msgstr[2] ""
 
@@ -2814,6 +2824,10 @@ msgstr[2] "Не удалось активировать веб-сценарии"
 #: app/controllers/CControllerPopupTestTriggerExpr.php:199
 msgid "Cannot evaluate expression"
 msgstr "Не удалось раскрыть выражение"
+
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr ""
 
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
@@ -4849,6 +4863,10 @@ msgstr "Создано пользователями"
 msgid "Critical"
 msgstr "Критичная"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr ""
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "Текущий узел сети"
@@ -6552,6 +6570,14 @@ msgstr "Эллипс"
 #: include/media.inc.php:24
 msgid "Email"
 msgstr "Email"
+
+#: app/views/js/administration.mediatype.edit.js.php:397
+msgid "Email and password"
+msgstr ""
+
+#: app/views/administration.mediatype.edit.php:64
+msgid "Email provider"
+msgstr ""
 
 #: app/views/popup.generic.php:50
 msgid "Empty"
@@ -8317,7 +8343,7 @@ msgstr[2] "Узлы сети"
 #: app/views/monitoring.widget.problems.view.php:67
 msgctxt "compact table header"
 msgid "Host"
-msgstr ""
+msgstr "Узел сети"
 
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
@@ -9190,6 +9216,11 @@ msgstr "Статистика входящего трафика сетевого 
 #, c-format
 msgid "Incompatible \"propagation_rule\" and \"propagation_value\" parameters for service \"%1$s\"."
 msgstr "Несовместимые параметры \"propagation_rule\" и \"propagation_value\" услуги \"%1$s\"."
+
+#: app/controllers/CControllerMediatypeEnable.php:97
+#: app/controllers/CControllerMediatypeEnable.php:108
+msgid "Incomplete configuration"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
@@ -11402,6 +11433,10 @@ msgstr ""
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr ""
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Список блочных устройств и их типы. Возвращает JSON"
@@ -12030,6 +12065,10 @@ msgstr[0] "Способ оповещения деактивирован"
 msgstr[1] "Способы оповещения деактивированы"
 msgstr[2] "Способы оповещения деактивированы"
 
+#: app/views/administration.user.edit.php:327
+msgid "Media type disabled by Administration."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
@@ -12065,6 +12104,10 @@ msgstr "Способ оповещения с ID \"%1$s\" недоступен."
 #: include/classes/helpers/CRoleHelper.php:428
 msgid "Media types"
 msgstr "Способы оповещений"
+
+#: app/views/popup.media.php:75
+msgid "Media types disabled by Administration."
+msgstr ""
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -12398,7 +12441,7 @@ msgstr "Месяц"
 #: include/classes/helpers/CSlaHelper.php:70
 msgctxt "compact table header"
 msgid "Month"
-msgstr ""
+msgstr "Месяц"
 
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
@@ -12476,7 +12519,7 @@ msgstr "N%"
 
 #: include/classes/helpers/CSlaHelper.php:183
 msgid "N/A"
-msgstr ""
+msgstr "Недоступно"
 
 #: include/discovery.inc.php:53
 msgid "NNTP"
@@ -12664,7 +12707,7 @@ msgstr "Имя"
 #: app/views/monitoring.widget.plaintext.view.php:49
 msgctxt "compact table header"
 msgid "Name"
-msgstr ""
+msgstr "Имя"
 
 #: app/controllers/CControllerPopupGeneric.php:218
 #: app/views/administration.user.edit.php:77
@@ -13471,6 +13514,10 @@ msgstr ""
 msgid "Not classified"
 msgstr "Не классифицировано"
 
+#: app/controllers/CControllerMediatypeEnable.php:95
+msgid "Not enabled"
+msgstr ""
+
 #: include/forms.inc.php:315
 msgid "Not inherited items"
 msgstr "Без унаследованных элементов данных"
@@ -13856,6 +13903,14 @@ msgstr "Только супер администраторы могут зада
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Подсчитываются только триггеры у активированных узлов сети и которые зависят от активных элементов данных"
 
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr ""
+
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -14070,6 +14125,10 @@ msgstr "Прочие параметры"
 #: include/views/configuration.httpconf.edit.php:90
 msgid "Others"
 msgstr "Другие"
+
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr ""
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -15111,6 +15170,16 @@ msgstr "Имя прокси"
 msgid "Proxy updated"
 msgstr "Прокси обновлен"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr ""
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr ""
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -15765,6 +15834,10 @@ msgstr "Требуемые коды состояния"
 #: app/views/popup.httpstep.php:170
 msgid "Required string"
 msgstr "Требуемая строка"
+
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr ""
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
@@ -18139,7 +18212,7 @@ msgstr ""
 #: include/views/configuration.template.list.php:45
 #: include/views/configuration.triggers.list.php:33
 msgid "Template groups"
-msgstr ""
+msgstr "Группы шаблонов"
 
 #: app/views/popup.import.php:34
 msgid "Template linkage"
@@ -18508,7 +18581,7 @@ msgstr "Порог"
 
 #: app/views/popup.tophosts.column.edit.php:232
 msgid "Thresholds"
-msgstr ""
+msgstr "Пороги"
 
 #: include/items.inc.php:1891 include/items.inc.php:1895
 msgid "Throttling"
@@ -18567,7 +18640,7 @@ msgstr "Время"
 #: app/views/monitoring.widget.problems.view.php:41
 msgctxt "compact table header"
 msgid "Time"
-msgstr ""
+msgstr "Время"
 
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
@@ -18635,11 +18708,11 @@ msgstr "Отметка времени"
 #: app/views/monitoring.widget.plaintext.view.php:33
 msgctxt "compact table header"
 msgid "Timestamp"
-msgstr ""
+msgstr "Таймстемп"
 
 #: app/views/sla.list.php:91
 msgid "Timezone"
-msgstr ""
+msgstr "Часовой пояс"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: app/partials/massupdate.valuemaps.tab.php:46
@@ -18698,7 +18771,7 @@ msgstr "Всего"
 #: app/views/monitoring.widget.problemhosts.view.php:35
 msgctxt "compact table header"
 msgid "Total"
-msgstr ""
+msgstr "Всего"
 
 #: include/classes/debug/CProfiler.php:153
 #, c-format
@@ -21055,7 +21128,7 @@ msgstr "С проблемами"
 #: app/views/monitoring.widget.problemhosts.view.php:34
 msgctxt "compact table header"
 msgid "With problems"
-msgstr ""
+msgstr "С проблемами"
 
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
@@ -21067,7 +21140,7 @@ msgstr "С триггерами"
 
 #: app/controllers/CControllerLatest.php:534
 msgid "Without data"
-msgstr ""
+msgstr "Без данных"
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
 msgid "Without problems"
@@ -21076,7 +21149,7 @@ msgstr "Без проблем"
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgctxt "compact table header"
 msgid "Without problems"
-msgstr ""
+msgstr "Без проблем"
 
 #: include/forms.inc.php:343
 msgid "Without triggers"
@@ -21272,7 +21345,7 @@ msgstr "Год"
 #: include/classes/helpers/CSlaHelper.php:72
 msgctxt "compact table header"
 msgid "Year"
-msgstr ""
+msgstr "Год"
 
 #: app/partials/scheduledreport.formgrid.html.php:101
 #: app/partials/scheduledreport.table.html.php:52 report4.php:93
@@ -21481,6 +21554,10 @@ msgstr "ожидается логическое значение"
 #: include/classes/validators/CNewValidator.php:332
 msgid "a character string is expected"
 msgstr "ожидается строка символов"
+
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -22193,6 +22270,11 @@ msgstr "не соответствует"
 msgid "e() - Returns Euler's number"
 msgstr "e() - Возвращает число Эйлера"
 
+#: app/views/administration.mediatype.list.php:98
+#: app/views/administration.mediatype.list.php:103
+msgid "email"
+msgstr ""
+
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
 #: include/views/inventory.host.list.php:72
@@ -22486,7 +22568,7 @@ msgstr "недопустимый третий параметр в функции
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:101
 msgid "invalid time"
-msgstr ""
+msgstr "неправильное время"
 
 #: app/controllers/CControllerWidgetTopHostsView.php:422
 #: include/classes/graphdraw/CLineGraphDraw.php:250
@@ -22812,7 +22894,7 @@ msgstr "новый"
 
 #: include/classes/api/services/CAuthentication.php:180
 msgid "no LDAP servers"
-msgstr ""
+msgstr "нет серверов LDAP"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1464
 #: include/classes/graphdraw/CPieGraphDraw.php:320
@@ -23695,6 +23777,11 @@ msgstr "varsamp() - Выборочная дисперсия"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "через"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

@@ -20,10 +20,11 @@
 #include "listener.h"
 
 #include "zbxconf.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "log.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbx_rtc_constants.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
@@ -50,11 +51,11 @@ static void	process_listener(zbx_socket_t *s)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", s->buffer);
 
-		init_result(&result);
+		zbx_init_agent_result(&result);
 
-		if (SUCCEED == process(s->buffer, PROCESS_WITH_ALIAS, &result))
+		if (SUCCEED == zbx_execute_agent_check(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result))
 		{
-			if (NULL != (value = GET_TEXT_RESULT(&result)))
+			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
 				ret = zbx_tcp_send_to(s, *value, CONFIG_TIMEOUT);
@@ -62,7 +63,7 @@ static void	process_listener(zbx_socket_t *s)
 		}
 		else
 		{
-			value = GET_MSG_RESULT(&result);
+			value = ZBX_GET_MSG_RESULT(&result);
 
 			if (NULL != value)
 			{
@@ -90,7 +91,7 @@ static void	process_listener(zbx_socket_t *s)
 			}
 		}
 
-		free_result(&result);
+		zbx_free_agent_result(&result);
 	}
 
 	if (FAIL == ret)
@@ -126,7 +127,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			get_program_type_string(init_child_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 
-	memcpy(&s, (zbx_socket_t *)(init_child_args_in->listen_sock), sizeof(zbx_socket_t));
+	memcpy(&s, init_child_args_in->listen_sock, sizeof(zbx_socket_t));
 
 	zbx_free(args);
 

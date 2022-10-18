@@ -31,9 +31,15 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 
 	protected bool $custom_select = false;
 
+	protected array $filter_preselect = [];
+
 	public function __construct(CWidgetFieldMultiSelect $field, array $data) {
 		$this->field = $field;
 		$this->data = $data;
+	}
+
+	public function getId(): string {
+		return $this->multiselect->getId();
 	}
 
 	public function getLabel(): ?CLabel {
@@ -45,33 +51,11 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 	}
 
 	public function getView(): CMultiSelect {
-		return $this->getMultiselect();
-	}
-
-	public function getJavaScript(): string {
-		return $this->getMultiselect()->getPostJS();
-	}
-
-	protected function getObjectName(): string {
-		return '';
-	}
-
-	protected function getPopupParameters(): array {
-		return [];
-	}
-
-	protected function getFilterPreselectFields(): array {
-		return [];
-	}
-
-	private function getId(): string {
-		return $this->field->getName().($this->field->isMultiple() ? '[]' : '');
-	}
-
-	private function getMultiselect(): CMultiSelect {
 		if ($this->multiselect === null) {
+			$multiselect_name = $this->field->getName().($this->field->isMultiple() ? '[]' : '');
+
 			$options = [
-				'name' => $this->getId(),
+				'name' => $multiselect_name,
 				'object_name' => $this->getObjectName(),
 				'multiple' => $this->field->isMultiple(),
 				'data' => $this->data,
@@ -84,15 +68,13 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 			else {
 				$options['popup'] = [
 					'parameters' => [
-						'dstfrm' => $this->form_name,
-						'dstfld1' => zbx_formatDomId($this->getId())
-					] + $this->getPopupParameters() + $this->field->getFilterParameters()
+							'dstfrm' => $this->form_name,
+							'dstfld1' => zbx_formatDomId($multiselect_name)
+						] + $this->getPopupParameters() + $this->field->getFilterParameters()
 				];
 
-				$filter_preselect_fields = $this->getFilterPreselectFields();
-
-				if ($filter_preselect_fields) {
-					$options['popup']['filter_preselect_fields'] = $filter_preselect_fields;
+				if ($this->filter_preselect) {
+					$options['popup']['filter_preselect'] = $this->filter_preselect;
 				}
 			}
 
@@ -102,5 +84,23 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 		}
 
 		return $this->multiselect;
+	}
+
+	public function getJavaScript(): string {
+		return $this->getView()->getPostJS();
+	}
+
+	public function setFilterPreselect(array $filter_preselect): self {
+		$this->filter_preselect = $filter_preselect;
+
+		return $this;
+	}
+
+	protected function getObjectName(): string {
+		return '';
+	}
+
+	protected function getPopupParameters(): array {
+		return [];
 	}
 }

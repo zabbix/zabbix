@@ -62,8 +62,9 @@ $left_column = (new CFormGrid())
 					? $filter_view_data['hosts_multiselect']
 					: [],
 				'popup' => [
-					'filter_preselect_fields' => [
-						'hostgroups' => 'groupids_'
+					'filter_preselect' => [
+						'id' => 'groupids_',
+						'submit_as' => 'groupid'
 					],
 					'parameters' => [
 						'srctbl' => 'hosts',
@@ -297,8 +298,9 @@ if (array_key_exists('render_html', $data)) {
 			name: 'hostids[]',
 			data: (data.filter_view_data.hosts_multiselect || []),
 			popup: {
-				filter_preselect_fields: {
-					hostgroups: 'groupids_' + data.uniqid
+				filter_preselect: {
+					id: 'groupids_' + data.uniqid,
+					submit_as: 'groupid'
 				},
 				parameters: {
 					multiselect: 1,

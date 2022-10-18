@@ -598,7 +598,7 @@ if ($data['display_interfaces']) {
 		->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
 		->setFocusableElementId('interfaceid')
 		->setAriaRequired()
-		->setReadonly($readonly);
+		->setReadonly(($data['type'] == ITEM_TYPE_HTTPAGENT) ? $readonly : false);
 
 	$item_tab->addItem([
 		(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
@@ -888,7 +888,8 @@ $item_tabs = (new CTabView())
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'readonly' => false,
-			'tabs_id' => 'tabs'
+			'tabs_id' => 'tabs',
+			'tags_tab_id' => 'tags-tab'
 		]),
 		TAB_INDICATOR_TAGS
 	)

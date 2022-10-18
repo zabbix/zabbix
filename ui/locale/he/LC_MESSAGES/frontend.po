@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-08-19 14:42+0000\n"
+"PO-Revision-Date: 2022-10-12 08:31+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -265,6 +265,16 @@ msgstr "%1$s, קריאה בלבד"
 msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, בבחירה"
+
+#: app/controllers/CControllerMediatypeEnable.php:93
+#, c-format
+msgid "%1$s. %2$s: %3$s. %4$s."
+msgstr "%1$s. %2$s: %3$s. %4$s."
+
+#: app/controllers/CControllerMediatypeEnable.php:108
+#, c-format
+msgid "%1$s: %2$s"
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
@@ -1100,7 +1110,7 @@ msgstr "הודעת אזהרה"
 #: include/classes/helpers/CMenuHelper.php:283
 #: include/classes/helpers/CRoleHelper.php:338
 msgid "Alerts"
-msgstr ""
+msgstr "התראות"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
@@ -2741,6 +2751,10 @@ msgstr[1] "לא ניתן להפעיל תרחישי רשת"
 #: app/controllers/CControllerPopupTestTriggerExpr.php:199
 msgid "Cannot evaluate expression"
 msgstr "לא ניתן להעריך ביטוי"
+
+#: include/classes/api/services/CScript.php:1064
+msgid "Cannot execute URL type script."
+msgstr "לא ניתן להריץ סקריפט סוג כתובת."
 
 #: app/controllers/CControllerItemMassCheckNow.php:243
 #: app/controllers/CControllerItemMassCheckNow.php:251
@@ -4765,6 +4779,10 @@ msgstr "נוצר על ידי המשתמשים"
 msgid "Critical"
 msgstr "קריטי"
 
+#: app/views/proxy.list.php:66
+msgid "Current"
+msgstr "נוכחי"
+
 #: app/partials/popup.operations.php:172
 msgid "Current host"
 msgstr "מארח נוכחי"
@@ -6465,6 +6483,14 @@ msgstr "אליפסה"
 msgid "Email"
 msgstr "דוא״ל"
 
+#: app/views/js/administration.mediatype.edit.js.php:397
+msgid "Email and password"
+msgstr "דוא״ל וסיסמה"
+
+#: app/views/administration.mediatype.edit.php:64
+msgid "Email provider"
+msgstr "ספק דוא״ל"
+
 #: app/views/popup.generic.php:50
 msgid "Empty"
 msgstr "ריק"
@@ -6570,7 +6596,7 @@ msgstr "הפעלת מארח"
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:78
 #: include/classes/widgets/forms/CWidgetFormUrl.php:42
 msgid "Enable host selection"
-msgstr ""
+msgstr "הפעלת בחירת מארחים"
 
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
@@ -9093,6 +9119,11 @@ msgstr "סטטיסטיקת תעבורה נכנסת על מנשק רשת. מחז�
 msgid "Incompatible \"propagation_rule\" and \"propagation_value\" parameters for service \"%1$s\"."
 msgstr "משתני „propagation_rule” (כלל הפצה) מבלי לציין משתנה „propagation_value” (ערך הפצה) אינם תואמים לשירות „%1$s”."
 
+#: app/controllers/CControllerMediatypeEnable.php:97
+#: app/controllers/CControllerMediatypeEnable.php:108
+msgid "Incomplete configuration"
+msgstr "הגדרות חלקיות"
+
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
 #, c-format
@@ -11294,6 +11325,10 @@ msgstr "רשימת תהליכי מערכת הפעלה עם מאפיינים. מ�
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr "רשימה של ערכים או מפתחות ברישום המערכת של Windows שממוקמת תחת מפתח מסוים. מחזירה JSON."
 
+#: include/classes/data/CItemData.php:1831
+msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
+msgstr "רשימת מתווכים של Zabbix עם שם, מצב, הצפנה, דחיסה, גרסה, מופע אחרון, כמות מארחים, כמות פרטים, ערכים נחוצים לשנייה (vps) ותאימות (נוכחי/מיושן/לא נתמך). מחזירה JSON."
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "רשימה של התקני אחסון והסוג שלהם. מחזירה JSON"
@@ -11474,7 +11509,7 @@ msgstr "ב׳"
 #: include/func.inc.php:592 jsLoader.php:226
 msgctxt "month short"
 msgid "M"
-msgstr ""
+msgstr "ח"
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
@@ -11919,6 +11954,10 @@ msgid_plural "Media types disabled"
 msgstr[0] "סוג המדיה מושבת"
 msgstr[1] "סוגי המדיה מושבתים"
 
+#: app/views/administration.user.edit.php:327
+msgid "Media type disabled by Administration."
+msgstr "סוג המדיה הושבת על ידי ההנהלה."
+
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
@@ -11953,6 +11992,10 @@ msgstr "סוג המדיה עם המזהה „%1$s” אינו זמין."
 #: include/classes/helpers/CRoleHelper.php:428
 msgid "Media types"
 msgstr "סוגי המדיה"
+
+#: app/views/popup.media.php:75
+msgid "Media types disabled by Administration."
+msgstr "סוגי המדיה הושבתו על ידי ההנהלה."
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -13354,6 +13397,10 @@ msgstr "לא זמין"
 msgid "Not classified"
 msgstr "אין סיווג"
 
+#: app/controllers/CControllerMediatypeEnable.php:95
+msgid "Not enabled"
+msgstr "לא פעיל"
+
 #: include/forms.inc.php:315
 msgid "Not inherited items"
 msgstr "פריטים שלא התקבלו בירושה"
@@ -13738,6 +13785,14 @@ msgstr "רק מנהלי על יכולים להגדיר בעלות על דוח."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "רק הקפצות שמוקצות למארחים מופעלים שתלויות בפריטים פעילים נספרות"
 
+#: app/views/administration.script.edit.php:193
+msgid "Open in a new window"
+msgstr "פתיחה בחלון חדש"
+
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr "פתיחת היומן"
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -13952,6 +14007,10 @@ msgstr "פרמטרים אחרים"
 #: include/views/configuration.httpconf.edit.php:90
 msgid "Others"
 msgstr "אחרים"
+
+#: app/views/proxy.list.php:67
+msgid "Outdated"
+msgstr "מיושן"
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -14992,6 +15051,16 @@ msgstr "שם מתווך"
 msgid "Proxy updated"
 msgstr "מתווך עודכן"
 
+#: app/views/proxy.list.php:114
+#, c-format
+msgid "Proxy version is not supported by server version %1$s."
+msgstr "גרסת המתווך לא נתמכת על ידי שרת בגרסה %1$s."
+
+#: app/views/proxy.list.php:107
+#, c-format
+msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
+msgstr "גרסת המתווך מיושנת, רק איסוף נתונים והפעלה מרוחקת זמינות עם שרת בגרסה %1$s."
+
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
 msgid "Public"
@@ -15646,6 +15715,10 @@ msgstr "קודים נדרשים למצב"
 msgid "Required string"
 msgstr "מחרוזת נדרשת"
 
+#: app/views/proxy.list.php:93
+msgid "Required vps"
+msgstr "כמות מבוקשת של ערכים נחוצים לשנייה"
+
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
 msgid "Reset"
@@ -16032,7 +16105,7 @@ msgstr "SLI"
 #: app/views/monitoring.widget.slareport.view.php:98
 msgctxt "compact table header"
 msgid "SLI"
-msgstr ""
+msgstr "SLI"
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
@@ -16046,7 +16119,7 @@ msgstr "SLO"
 #: app/views/monitoring.widget.slareport.view.php:97
 msgctxt "compact table header"
 msgid "SLO"
-msgstr ""
+msgstr "SLO"
 
 #: app/views/administration.authentication.edit.php:236
 msgid "SLO service URL"
@@ -18343,7 +18416,7 @@ msgstr "החודש הזה עד כה"
 
 #: include/classes/widgets/views/widget.item.form.view.php:231
 msgid "This setting applies only to numeric data."
-msgstr ""
+msgstr "ההגדרה הזאת חלה רק על נתונים מספריים."
 
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
@@ -20045,15 +20118,15 @@ msgstr "מצב קלאסטר VMware,‏ <url> - כתובת שירות VMware,‏ 
 
 #: include/classes/data/CItemData.php:1264
 msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "מערך תגיות לקלאסטר VMware,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה קלאסטר VMware"
 
 #: include/classes/data/CItemData.php:1296
 msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
-msgstr ""
+msgstr "נתוני התראות חוות שרתי VMware, מחזירה JSON,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה חוות שרתי VMware"
 
 #: include/classes/data/CItemData.php:1304
 msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
-msgstr ""
+msgstr "מערך תגיות חוות שרתי VMware,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה חוות שרתי VMware, מחזירה JSON"
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -20065,7 +20138,7 @@ msgstr "חוות (datacenters) של VMware והמזהים שלהם. מחזירה
 
 #: include/classes/data/CItemData.php:1268
 msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
-msgstr ""
+msgstr "נתוני התראות מאגרי נתונים של VMware, מחזירה JSON,‏ <url> - כתובת שירות VMware,‏ <uuid> - מזהה מאגר נתונים של VMware"
 
 #: include/classes/data/CItemData.php:1242
 #: include/classes/data/CItemData.php:1298
@@ -20078,7 +20151,7 @@ msgstr "רשימת מאגרי הנתונים של ה־Hypervisors של VMware,�
 
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
-msgstr ""
+msgstr "מאפיין מאגרי נתונים של VMware, ‏<url> - כתובת שירות VMware,‏ <uuid> - שם מאגר נתונים, <prop> - נתיב מאפיין"
 
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -20086,7 +20159,7 @@ msgstr "סטטיסטיקת קריאה ממאגרי נתונים של VMware,‏ 
 
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
-msgstr ""
+msgstr "מערך תגיות מאגרי נתונים של VMware, ‏<url> - כתובת שירות VMware,‏ <uuid> - מזהה ייחודי למאגר נתונים של VMware. מחזירה JSON"
 
 #: include/classes/data/CItemData.php:1246
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -20106,7 +20179,7 @@ msgstr "חיישני מצב יצרן חומרה של VMware hypervisor,‏ <url>
 
 #: include/classes/data/CItemData.php:1324
 msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "נתוני התראות של ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
 #: include/classes/data/CItemData.php:1350
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20178,7 +20251,7 @@ msgstr "ניצול תהליך hypervisor של VMware בהרץ,‏ <url> כתוב
 
 #: include/classes/data/CItemData.php:1472
 msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
-msgstr ""
+msgstr "מאפיין hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware,‏ <prop> - נתיב מאפיין"
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -20194,7 +20267,7 @@ msgstr "מצב ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VM
 
 #: include/classes/data/CItemData.php:1472
 msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "מערך תגיות ב־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware. מחזירה JSON"
 
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20226,11 +20299,11 @@ msgstr "גרסת שירות ה־VMware,‏ <url> - כתובת שירות ה־VMw
 
 #: include/classes/data/CItemData.php:1244
 msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
-msgstr ""
+msgstr "נתוני התראות של מרכז VMware וירטואלי, מחזירה JSON,‏ <url> - כתובת שירות VMware"
 
 #: include/classes/data/CItemData.php:1500
 msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
-msgstr ""
+msgstr "נתוני התראות מכונה וירטואלית ב־VMware,‏ מחזירה JSON,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המכונה הווירטואלית ב־VMware"
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -21339,6 +21412,10 @@ msgstr "אמור להיות ערך בוליאני"
 msgid "a character string is expected"
 msgstr "אמור להיות מחרוזת תווים"
 
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr "אמור להיות מחרוזת תווים, מספר שלם וחיובי או שבר עשרוני"
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "התאריך אמור להיות בתצורה YYYY-MM-DD"
@@ -22049,6 +22126,11 @@ msgstr "לא תואם"
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr "e()‎ - מחזירה את קבוע אוילר"
+
+#: app/views/administration.mediatype.list.php:98
+#: app/views/administration.mediatype.list.php:103
+msgid "email"
+msgstr "דוא״ל"
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
@@ -23550,6 +23632,11 @@ msgstr "varsamp()‎ - סטיית דגימה"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "דרך"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr "שב"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

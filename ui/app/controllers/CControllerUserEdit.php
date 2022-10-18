@@ -252,6 +252,11 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		asort($data['modules']);
 
+		$data['mediatypes'] = API::MediaType()->get([
+			'output' => ['status'],
+			'preservekeys' => true
+		]);
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));
 		$this->setResponse($response);

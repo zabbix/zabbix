@@ -33,12 +33,18 @@ use Zabbix\Widgets\Fields\{
 
 $form = (new CWidgetFormView($data));
 
+$groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
+	$data['captions']['ms']['groups']['groupids']
+);
+
 $form
+	->addField($groupids)
 	->addField(
-		new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['ms']['groups']['groupids'])
-	)
-	->addField(
-		new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids'])
+		(new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids']))
+			->setFilterPreselect([
+				'id' => $groupids->getId(),
+				'submit_as' => 'groupid'
+			])
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['evaltype'])
