@@ -172,7 +172,9 @@ class CDashboardElement extends CElement {
 		$controls = $this->getControls();
 
 		if ($controls->query('xpath:.//nav[@class="dashboard-edit"]')->one()->isDisplayed()) {
-			$controls->query('id:dashboard-save')->one()->waitUntilClickable()->click(true);
+			$button = $controls->query('id:dashboard-save')->one()->waitUntilClickable();
+			$button->getLocationOnScreenOnceScrolledIntoView();
+			$button->click();
 			$controls->query('xpath:.//nav[@class="dashboard-edit"]')->waitUntilNotVisible();
 		}
 
