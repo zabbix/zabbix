@@ -41,10 +41,7 @@ $form
 	->addField($groupids)
 	->addField(
 		(new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids']))
-			->setFilterPreselect([
-				'id' => $groupids->getId(),
-				'submit_as' => 'groupid'
-			])
+			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['evaltype'])
