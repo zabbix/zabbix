@@ -660,6 +660,8 @@ static int	vmware_tags_linked_id(const zbx_vmware_obj_id_t *obj_id, CURL *easyha
 			zbx_vector_str_append(ids, zbx_strdup(NULL, tmp));
 	}
 out:
+	curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, NULL);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ids:%d", __func__, ids->values_num);
 
 	return ret;
