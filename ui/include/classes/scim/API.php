@@ -62,7 +62,7 @@ class API {
 		$input = $request->body() === '' ? [] : json_decode($request->body(), true);
 
 		[, $auth] = explode('Bearer ', $request->header('AUTHORIZATION'), 2) + ['', ''];
-		[, $class, $id] = explode('/', $request->header('PATH-INFO'));
+		[, $class, $id] = explode('/', $request->header('PATH-INFO'), 3) + ['', '', ''];
 
 		$class = '/' . strtolower($class);
 
