@@ -329,7 +329,8 @@ if($operation['opgroup']) {
 						'disableids' => array_column($multiselect_values_ophost_grp, 'id')
 					]
 				]
-			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
 		)->setId('operation-attr-hostgroups')

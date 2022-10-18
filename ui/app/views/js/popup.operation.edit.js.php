@@ -161,6 +161,7 @@ window.operation_popup = new class {
 		document.getElementById('operation-attr-hostgroups-label').style.display='';
 
 		const $hostgroup_ms = $('#operation_opgroup__groupid');
+		this._enableFormFields(['operation-attr-hostgroups']);
 
 		$hostgroup_ms.on('change', () => {
 			$hostgroup_ms.multiSelect('setDisabledEntries',
@@ -174,6 +175,7 @@ window.operation_popup = new class {
 		document.getElementById('operation-attr-templates-label').style.display='';
 
 		const $template_ms = $('#operation_optemplate__templateid');
+		this._enableFormFields(['operation-attr-templates']);
 
 		$template_ms.on('change', () => {
 			$template_ms.multiSelect('setDisabledEntries',
