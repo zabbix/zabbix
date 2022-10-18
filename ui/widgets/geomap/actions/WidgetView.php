@@ -47,9 +47,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'initial_load', 'in 0,1',
-			'widgetid', 'db widget.widgetid',
-			'unique_id', 'required|string'
+			'initial_load' => 'in 0,1',
+			'widgetid' => 'db widget.widgetid',
+			'unique_id' => 'required|string'
 		]);
 	}
 
