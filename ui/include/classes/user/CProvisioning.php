@@ -81,9 +81,9 @@ class CProvisioning {
 				'sign_assertions', 'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
 				'encrypt_assertions'
 			],
-			'userdirectoryids' => [$userdirectoryid],
-			'selectProvisionMedia' => API_OUTPUT_EXTEND,
-			'selectProvisionGroups' => API_OUTPUT_EXTEND
+			'userdirectoryids'		=> [$userdirectoryid],
+			'selectProvisionMedia'	=> API_OUTPUT_EXTEND,
+			'selectProvisionGroups'	=> API_OUTPUT_EXTEND
 		]);
 
 		if (!$userdirectory || $userdirectory['provision_status'] == JIT_PROVISIONING_DISABLED) {
@@ -101,9 +101,10 @@ class CProvisioning {
 
 		if ($userdirectory['provision_groups']) {
 			$mapping_roles = API::getApiService('role')->get([
-				'output' => ['roleid', 'name', 'type'],
-				'roleids' => array_column($userdirectory['provision_groups'], 'roleid', 'roleid'),
-				'preservekeys' => true
+				'output'		=> ['roleid', 'name', 'type'],
+				'roleids'		=> array_column($userdirectory['provision_groups'], 'roleid', 'roleid'),
+				'preservekeys'	=> true,
+				'nopermissions' => true
 			]);
 		}
 
