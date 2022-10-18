@@ -214,7 +214,7 @@ window.action_edit_popup = new class {
 				break;
 
 			case <?= CONDITION_TYPE_SUPPRESSED ?> :
-				if (<?= CONDITION_OPERATOR_YES ?>) {
+				if (input.operator == <?= CONDITION_OPERATOR_YES ?>) {
 					this.condition_name = <?= json_encode(_('Problem is suppressed')) ?>;
 				}
 				else {

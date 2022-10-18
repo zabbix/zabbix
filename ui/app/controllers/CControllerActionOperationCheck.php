@@ -331,6 +331,7 @@ class CControllerActionOperationCheck extends CController {
 		$host_groups = array_key_exists('host_groups', $operation_values) ? $operation_values['host_groups'] : [];
 		$templates = array_key_exists('templates', $operation_values) ? $operation_values['templates'] : [];
 		$scripts = array_key_exists('scripts', $operation_values) ? $operation_values['scripts'] : [];
+		$fullnames = array_key_exists('users', $operation_values) ? $operation_values['users']['fullnames'] : [];
 
 		switch ($type) {
 			case ACTION_OPERATION:
@@ -398,7 +399,7 @@ class CControllerActionOperationCheck extends CController {
 						$host_list = [];
 
 						foreach ($operation['opcommand_hst'] as $host) {
-							if ($host['hostid']['current_host'] == 0) {
+							if ($host['hostid'] == 0) {
 								$result['type'][] = (_s('Run script "%1$s" on current host', $scripts[$operation['opcommand']['scriptid']]['name']));
 							}
 							elseif (isset($hosts[$host['hostid']])) {
@@ -549,7 +550,7 @@ class CControllerActionOperationCheck extends CController {
 						$host_list = [];
 
 						foreach ($operation['opcommand_hst'] as $host) {
-							if ($host['hostid']['current_host'] == 0) {
+							if ($host['hostid'] == 0) {
 								$result['type'][] = (_s('Run script "%1$s" on current host', $scripts[$operation['opcommand']['scriptid']]['name']));
 							}
 							elseif (isset($hosts[$host['hostid']])) {

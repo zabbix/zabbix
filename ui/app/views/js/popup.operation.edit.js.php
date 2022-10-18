@@ -39,7 +39,7 @@ window.operation_popup = new class {
 		this._initTemplates();
 
 		if (data?.opconditions) {
-			data?.opconditions.map(row => this._createRow(row))
+			data?.opconditions.map(row => this._createOperationConditionsRow(row, 0))
 		}
 		if (data?.opmessage_grp) {
 			this._addUserGroup(data.opmessage_grp, data.opmessage_grp.length);
@@ -224,6 +224,7 @@ window.operation_popup = new class {
 					'operation-condition-row', 'operation-condition-evaltype-formula', 'operation-evaltype-label',
 					'operation-evaltype'
 				]
+
 				this._customMessageFields();
 				this._processTypeOfCalculation();
 				break;

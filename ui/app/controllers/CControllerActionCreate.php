@@ -132,6 +132,7 @@ class CControllerActionCreate extends CController {
 
 		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
 			foreach ($action[$operation_group] as &$operation) {
+
 				switch ($operation_group) {
 					case 'operations':
 						if ($eventsource == EVENT_SOURCE_TRIGGERS) {
@@ -168,8 +169,10 @@ class CControllerActionCreate extends CController {
 						}
 
 						if ($operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
-							if (!array_key_exists('default_msg', $operation['opmessage'])) {
-								$operation['opmessage']['default_msg'] = 0;
+							if (!array_key_exists('opmessage', $operation)) {
+								if (!array_key_exists('default_msg', $operation['opmessage'])) {
+									$operation['opmessage']['default_msg'] = 0;
+								}
 							}
 						}
 						break;

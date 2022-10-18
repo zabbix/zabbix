@@ -33,7 +33,8 @@ class CControllerPopupActionOperationEdit extends CController {
 			'actionid' =>		'db actions.actionid',
 			'operation' =>		'array',
 			'operationid' =>	'string',
-			'data' =>			'array'
+			'data' =>			'array',
+			'operationtype' =>	'int32'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateInputConstraints();
@@ -110,23 +111,26 @@ class CControllerPopupActionOperationEdit extends CController {
 			'mediatype_options' => CSelect::createOptionsFromArray($media_type),
 			'disabled_media' => $disabled_media
 		];
-
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
 	private function getData(&$operation) {
-		if ($operation['opcommand_hst'][0]['hostid'] == 0) {
-			$host = '';
-		}
+		$result = [];
 
-		else if ($operation['opcommand_hst'][0]['hostid'] !== '0') {
-			foreach($operation['opcommand_hst'] as &$host) {
-				$host = API::Host()->get([
-					'output' => ['hostid', 'name'],
-					'hostids' => $host['hostid']
-				]);
+		if (array_key_exists('0', $operation['opcommand_hst'])) {
+			if ($operation['opcommand_hst'][0]['hostid'] == 0) {
+				$host = '';
+				$result[] = $host;
 			}
-			$result[] = $host;
+			else if ($operation['opcommand_hst'][0]['hostid'] !== '0') {
+				foreach($operation['opcommand_hst'] as &$host) {
+					$host = API::Host()->get([
+						'output' => ['hostid', 'name'],
+						'hostids' => $host['hostid']
+					]);
+				}
+				$result[] = $host;
+			}
 		}
 
 		if ($operation['opcommand_grp']) {

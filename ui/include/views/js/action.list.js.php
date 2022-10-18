@@ -35,10 +35,10 @@
 		_initActions() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-action-create')) {
-					this._edit();
+					this._edit({eventsource: this.eventsource});
 				}
 				else if (e.target.classList.contains('js-action-edit')) {
-					this._edit({actionid: e.target.getAttribute('actionid')});
+					this._edit({actionid: e.target.getAttribute('actionid'), eventsource: this.eventsource});
 				}
 				else if (e.target.classList.contains('js-enable-action')) {
 					this._enable(e.target, [e.target.getAttribute('actionid')]);

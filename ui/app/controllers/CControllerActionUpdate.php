@@ -97,6 +97,7 @@ class CControllerActionUpdate extends CController {
 			'recovery_operations' => $this->getInput('recovery_operations', []),
 			'update_operations' => $this->getInput('update_operations', [])
 		];
+
 		$filter = [
 			'conditions' => $this->getInput('conditions', []),
 			'evaltype' => $this->getInput('evaltype')
@@ -133,48 +134,71 @@ class CControllerActionUpdate extends CController {
 
 		foreach (['operations', 'recovery_operations', 'update_operations'] as $operation_group) {
 			foreach ($action[$operation_group] as &$operation) {
-				if ($operation_group === 'operations') {
-					if ($eventsource == EVENT_SOURCE_TRIGGERS) {
-						if (array_key_exists('opconditions', $operation)) {
-							foreach ($operation['opconditions'] as &$opcondition) {
-								unset($opcondition['opconditionid'], $opcondition['operationid']);
-							}
-							unset($opcondition);
-						}
-						else {
-							$operation['opconditions'] = [];
-						}
-					}
-					elseif ($eventsource == EVENT_SOURCE_DISCOVERY || $eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
-						unset($operation['esc_period'], $operation['esc_step_from'], $operation['esc_step_to'],
-							$operation['evaltype']
-						);
-					}
-					elseif ($eventsource == EVENT_SOURCE_INTERNAL || $eventsource == EVENT_SOURCE_SERVICE) {
-						unset($operation['evaltype']);
-					}
-				}
-				elseif ($operation_group === 'recovery_operations') {
-					if (array_key_exists('evaltype', $operation)) {
-						unset($operation['evaltype']);
-					}
-					if ($operation['operationtype'] != OPERATION_TYPE_MESSAGE) {
-						unset($operation['opmessage']['mediatypeid']);
-					}
+				unset($operation['evaltype']);
 
-					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
-						unset($operation['opmessage']);
-					}
-				}
-				elseif ($operation_group === 'update_operations') {
-					unset($operation['evaltype'], $operation_group);
+				if ($operation ['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE
+						&& !array_key_exists('opmessage', $operation)) {
+					$operation['opmessage']['default_msg'] = 1;
 				}
 
 				if (array_key_exists('opmessage', $operation)) {
-					if ($operation['opmessage']['default_msg'] == 1) {
-						unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
-					}
+					if (!array_key_exists('default_msg', $operation['opmessage'])) {
+						$operation['opmessage']['default_msg'] = 1;
 				}
+
+				if($operation['opmessage']['default_msg'] == 1) {
+					unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
+				}
+			}
+
+				if ($operation ['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE
+					&& !array_key_exists('opmessage', $operation)) {
+					$operation['opmessage']['default_msg'] = 1;
+					unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
+				}
+
+			if ($operation_group) {
+				switch ($operation_group) {
+					case 'operations':
+						if ($eventsource == EVENT_SOURCE_TRIGGERS) {
+							if (array_key_exists('opconditions', $operation)) {
+								foreach ($operation['opconditions'] as &$opcondition) {
+									unset($opcondition['opconditionid'], $opcondition['operationid']);
+								}
+								unset($opcondition);
+							}
+							else {
+								$operation['opconditions'] = [];
+							}
+						}
+						elseif ($eventsource == EVENT_SOURCE_DISCOVERY || $eventsource == EVENT_SOURCE_AUTOREGISTRATION) {
+							unset($operation['esc_period'], $operation['esc_step_from'], $operation['esc_step_to'],
+								$operation['evaltype']
+							);
+						}
+						elseif ($eventsource == EVENT_SOURCE_INTERNAL || $eventsource == EVENT_SOURCE_SERVICE) {
+							unset($operation['evaltype']);
+						}
+						break;
+
+					case 'recovery_operations':
+						if (array_key_exists('evaltype', $operation)) {
+							unset($operation['evaltype']);
+						}
+						if ($operation['operationtype'] != OPERATION_TYPE_MESSAGE) {
+							unset($operation['opmessage']['mediatypeid']);
+						}
+
+						if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
+							unset($operation['opmessage']);
+						}
+						break;
+
+					case 'update_operations':
+						unset($operation['evaltype']);
+						break;
+				}
+			}
 
 				if (array_key_exists('opmessage_grp', $operation) || array_key_exists('opmessage_usr', $operation)) {
 					if (!array_key_exists('opmessage_grp', $operation)) {
@@ -223,6 +247,7 @@ class CControllerActionUpdate extends CController {
 			$action['pause_suppressed'] = $this->getInput('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
 			$action['notify_if_canceled'] = $this->getInput('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_FALSE);
 		}
+
 
 		switch ($eventsource) {
 			case EVENT_SOURCE_DISCOVERY:

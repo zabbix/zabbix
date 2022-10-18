@@ -191,7 +191,7 @@ $form_grid->addItem([
 	(new CFormField(
 		(new CCheckBox('operation[opmessage][default_msg]', $operation['opmessage']['default_msg']))
 			->setId('operation_opmessage_default_msg')
-			->setChecked((bool) $operation['opmessage']['default_msg'] != '1')
+			->setChecked($operation['opmessage']['default_msg'] != '1')
 	))->setId('operation-message-custom')
 ]);
 
@@ -217,6 +217,9 @@ $opcommand_hst_value = array_key_exists('0', $operation['opcommand_hst'])
 	? $operation['opcommand_hst']['0']['hostid']
 	: null;
 
+$multiselect_values_host = [];
+$multiselect_values_host_grp = [];
+
 foreach($operation['opcommand_hst'] as $host) {
 	if ($host[0]['hostid'] == 0) {
 		$multiselect_values_host = null;
@@ -236,12 +239,101 @@ if($operation['opcommand_grp']) {
 	}
 }
 
+if(array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand_grp', $operation)) {
+	// Command execution targets row.
+	$form_grid->addItem([
+		(new CLabel(_('Target list')))
+			->setId('operation-command-targets-label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CFormGrid())
+				->cleanItems()
+				->addItem([
+					new CLabel(_('Current host')),
+					(new CFormField((new CCheckBox('operation[opcommand_hst][][hostid][current_host]', '0'))
+						->setChecked($opcommand_hst_value == 0 && $opcommand_hst_value !== null)
+					))->setId('operation-command-checkbox')
+				])
+				->addItem([
+					(new CLabel(_('Host'))),
+					(new CMultiSelect([
+						'name' => 'operation[opcommand_hst][][hostid]',
+						'object_name' => 'hosts',
+						'data' => $multiselect_values_host,
+						'popup' => [
+							'parameters' => [
+								'multiselect' => '1',
+								'srctbl' => 'hosts',
+								'srcfld1' => 'hostid',
+								'dstfrm' => 'action.edit',
+								'dstfld1' => 'operation_opcommand_hst__hostid',
+								'editable' => '1',
+								'disableids' => array_column($multiselect_values_host, 'id')
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				])
+				->addItem([
+					new CLabel(_('Host group')),
+					(new CMultiSelect([
+						'name' => 'operation[opcommand_grp][][groupid]',
+						'object_name' => 'hostGroup',
+						'data' => $multiselect_values_host_grp,
+						'popup' => [
+							'parameters' => [
+								'multiselect' => '1',
+								'srctbl' => 'host_groups',
+								'srcfld1' => 'groupid',
+								'dstfrm' => 'action.edit',
+								'dstfld1' => 'operation_opcommand_grp__groupid',
+								'editable' => '1',
+								'disableids' => array_column($multiselect_values_host_grp, 'id')
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				])
+		))
+			->setId('operation-command-targets')
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	]);
+}
+
+
+
 if($operation['opgroup']) {
 	foreach ($operation['opgroup'] as $group) {
 		$host_group['id'] = $group[0]['groupid'];
 		$host_group['name'] = $group[0]['name'];
 		$multiselect_values_ophost_grp[] = $host_group;
 	}
+
+	// Add / remove host group attribute row.
+	$form_grid->addItem([
+		(new CLabel(_('Host groups'),'operation-attr-hostgroups'))
+			->setId('operation-attr-hostgroups-label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CMultiSelect([
+				'name' => 'operation[opgroup][][groupid]',
+				'object_name' => 'hostGroup',
+				'data' => $multiselect_values_ophost_grp,
+				'popup' => [
+					'parameters' => [
+						'multiselect' => '1',
+						'srctbl' => 'host_groups',
+						'srcfld1' => 'groupid',
+						'dstfrm' => 'action.edit',
+						'dstfld1' => 'operation_opgroup__groupid',
+						'editable' => '1',
+						'disableids' => array_column($multiselect_values_ophost_grp, 'id')
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
+		)->setId('operation-attr-hostgroups')
+	]);
 }
 
 if($operation['optemplate']) {
@@ -250,119 +342,34 @@ if($operation['optemplate']) {
 		$templates['name'] = $template[0]['name'];
 		$multiselect_values_optemplate[] = $templates;
 	}
+
+	// Link / unlink templates attribute row.
+	$form_grid->addItem([
+		(new CLabel(_('Templates')))
+			->setId('operation-attr-templates-label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CMultiSelect([
+				'name' => 'operation[optemplate][][templateid]',
+				'object_name' => 'templates',
+				'data' => $multiselect_values_optemplate,
+				'popup' => [
+					'parameters' => [
+						'multiselect' => '1',
+						'srctbl' => 'templates',
+						'srcfld1' => 'hostid',
+						'dstfrm' => 'action.edit',
+						'dstfld1' => 'operation_optemplate__templateid',
+						'editable' => '1',
+						'disableids' => array_column($multiselect_values_optemplate, 'id')
+					]
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
+		)->setId('operation-attr-templates')
+	]);
 }
-
-// Command execution targets row.
-$form_grid->addItem([
-	(new CLabel(_('Target list')))
-		->setId('operation-command-targets-label')
-		->setAsteriskMark(),
-	(new CFormField(
-		(new CFormGrid())
-			->cleanItems()
-			->addItem([
-				new CLabel(_('Current host')),
-				(new CFormField((new CCheckBox('operation[opcommand_hst][][hostid][current_host]', '0'))
-				->setChecked($opcommand_hst_value == 0 && $opcommand_hst_value !== null)
-				))->setId('operation-command-checkbox')
-			])
-			->addItem([
-				(new CLabel(_('Host'))),
-				(new CMultiSelect([
-					'name' => 'operation[opcommand_hst][][hostid]',
-					'object_name' => 'hosts',
-					'data' => $multiselect_values_host  == null ? [] : $multiselect_values_host ,
-					'popup' => [
-						'parameters' => [
-							'multiselect' => '1',
-							'srctbl' => 'hosts',
-							'srcfld1' => 'hostid',
-							'dstfrm' => 'action.edit',
-							'dstfld1' => 'operation_opcommand_hst__hostid',
-							'editable' => '1',
-							'disableids' => array_column($multiselect_values_host, 'id')
-						]
-					]
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			])
-			->addItem([
-				new CLabel(_('Host group')),
-				(new CMultiSelect([
-					'name' => 'operation[opcommand_grp][][groupid]',
-					'object_name' => 'hostGroup',
-					'data' => $multiselect_values_host_grp,
-					'popup' => [
-						'parameters' => [
-							'multiselect' => '1',
-							'srctbl' => 'host_groups',
-							'srcfld1' => 'groupid',
-							'dstfrm' => 'action.edit',
-							'dstfld1' => 'operation_opcommand_grp__groupid',
-							'editable' => '1',
-							'disableids' => array_column($multiselect_values_host_grp, 'id')
-						]
-					]
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			])
-	))
-		->setId('operation-command-targets')
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-]);
-
-// Add / remove host group attribute row.
-$form_grid->addItem([
-	(new CLabel(_('Host groups'),'operation-attr-hostgroups'))
-		->setId('operation-attr-hostgroups-label')
-		->setAsteriskMark(),
-	(new CFormField(
-		(new CMultiSelect([
-			'name' => 'operation[opgroup][][groupid]',
-			'object_name' => 'hostGroup',
-			'data' => $multiselect_values_ophost_grp,
-			'popup' => [
-				'parameters' => [
-					'multiselect' => '1',
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => 'action.edit',
-					'dstfld1' => 'operation_opgroup__groupid',
-					'editable' => '1',
-					'disableids' => array_column($multiselect_values_ophost_grp, 'id')
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired()
-		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
-	)->setId('operation-attr-hostgroups')
-]);
-
-// Link / unlink templates attribute row.
-$form_grid->addItem([
-	(new CLabel(_('Templates')))
-		->setId('operation-attr-templates-label')
-		->setAsteriskMark(),
-	(new CFormField(
-		(new CMultiSelect([
-			'name' => 'operation[optemplate][][templateid]',
-			'object_name' => 'templates',
-			'data' => $multiselect_values_optemplate,
-			'popup' => [
-				'parameters' => [
-					'multiselect' => '1',
-					'srctbl' => 'templates',
-					'srcfld1' => 'hostid',
-					'dstfrm' => 'action.edit',
-					'dstfld1' => 'operation_optemplate__templateid',
-					'editable' => '1',
-					'disableids' => array_column($multiselect_values_optemplate, 'id')
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
-	)->setId('operation-attr-templates')
-]);
 
 // Host inventory mode attribute row.
 $form_grid->addItem([
