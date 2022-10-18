@@ -2085,6 +2085,23 @@ static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, ch
 	return SUCCEED;
 }
 
+static int	item_preproc_group_flat_json(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	char	*err = NULL;
+
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+
+	return SUCCEED;
+
+	*errmsg = zbx_dsprintf(*errmsg, "cannot extract value from json by path \"%s\": %s", params, err);
+
+	zbx_free(err);
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: execute preprocessing operation                                   *
@@ -2186,6 +2203,9 @@ int	zbx_item_preproc(zbx_preproc_cache_t *cache, unsigned char value_type, zbx_v
 			break;
 		case ZBX_PREPROC_CSV_TO_JSON:
 			ret = item_preproc_csv_to_json(value, op->params, error);
+			break;
+		case ZBX_PREPROC_GROUP_FLAT_JSON_DATA:
+			ret = item_preproc_group_flat_json(value, op->params, error);
 			break;
 		case ZBX_PREPROC_STR_REPLACE:
 			ret = item_preproc_str_replace(value, op->params, error);

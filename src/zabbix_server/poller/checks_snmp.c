@@ -763,6 +763,97 @@ end:
 	return strval_dyn;
 }
 
+static int	zbx_snmp_get_json_value(const struct variable_list *var, struct zbx_json *j)
+{
+#define ZBX_JSON_SNMPGET_VALUE_KEY	"value"
+	char		*strval_dyn;
+	unsigned char	string_type = ZBX_SNMP_STR_UNDEFINED;
+	int		ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d", __func__, (int)var->type);
+
+	if (ASN_OCTET_STR == var->type || ASN_OBJECT_ID == var->type)
+	{
+		if (NULL == (strval_dyn = zbx_snmp_get_octet_string(var, &string_type)))
+		{
+			return FAIL;
+		}
+		else
+		{
+			if (ZBX_SNMP_STR_HEX == string_type)
+				zbx_remove_chars(strval_dyn, "\r\n");
+
+			zbx_json_addstring(j, ZBX_JSON_SNMPGET_VALUE_KEY, strval_dyn, ZBX_JSON_TYPE_STRING);
+			zbx_free(strval_dyn);
+		}
+	}
+#ifdef OPAQUE_SPECIAL_TYPES
+	else if (ASN_UINTEGER == var->type || ASN_COUNTER == var->type || ASN_OPAQUE_U64 == var->type ||
+			ASN_TIMETICKS == var->type || ASN_GAUGE == var->type)
+#else
+	else if (ASN_UINTEGER == var->type || ASN_COUNTER == var->type ||
+			ASN_TIMETICKS == var->type || ASN_GAUGE == var->type)
+#endif
+	{
+		zbx_json_adduint64(j, ZBX_JSON_SNMPGET_VALUE_KEY, (unsigned long)*var->val.integer);
+	}
+#ifdef OPAQUE_SPECIAL_TYPES
+	else if (ASN_COUNTER64 == var->type || ASN_OPAQUE_COUNTER64 == var->type)
+#else
+	else if (ASN_COUNTER64 == var->type)
+#endif
+	{
+		zbx_uint64_t	ui64_val;
+		ui64_val = (((zbx_uint64_t)var->val.counter64->high) << 32) + (zbx_uint64_t)var->val.counter64->low;
+		zbx_json_adduint64(j, ZBX_JSON_SNMPGET_VALUE_KEY, ui64_val);
+	}
+#ifdef OPAQUE_SPECIAL_TYPES
+	else if (ASN_INTEGER == var->type || ASN_OPAQUE_I64 == var->type)
+#else
+	else if (ASN_INTEGER == var->type)
+#endif
+	{
+		char		buffer[21];
+		zbx_int64_t	i64_val;
+
+		zbx_snprintf(buffer, sizeof(buffer), "%ld", *var->val.integer);
+		i64_val = strtoll(buffer, NULL, 10);
+
+		zbx_json_addint64(j, ZBX_JSON_SNMPGET_VALUE_KEY, i64_val);
+	}
+#ifdef OPAQUE_SPECIAL_TYPES
+	else if (ASN_OPAQUE_FLOAT == var->type)
+	{
+		zbx_json_addfloat(j, ZBX_JSON_SNMPGET_VALUE_KEY, *var->val.floatVal);
+	}
+	else if (ASN_OPAQUE_DOUBLE == var->type)
+	{
+		zbx_json_addfloat(j, ZBX_JSON_SNMPGET_VALUE_KEY, *var->val.doubleVal);
+	}
+#endif
+	else if (ASN_IPADDRESS == var->type)
+	{
+		char	*ip_val;
+
+		ip_val = zbx_dsprintf(NULL, "%u.%u.%u.%u",
+				(unsigned int)var->val.string[0],
+				(unsigned int)var->val.string[1],
+				(unsigned int)var->val.string[2],
+				(unsigned int)var->val.string[3]);
+		
+		zbx_json_addstring(j, ZBX_JSON_SNMPGET_VALUE_KEY, ip_val, ZBX_JSON_TYPE_STRING);
+		zbx_free(ip_val);
+	}
+	else
+	{
+		return FAIL;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
 static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *result, unsigned char *string_type)
 {
 	char		*strval_dyn;
@@ -1879,6 +1970,172 @@ static void	zbx_snmp_walk_cache_cb(void *arg, const char *snmp_oid, const char *
 	cache_put_snmp_index((const DC_ITEM *)arg, snmp_oid, index, value);
 }
 
+static int	zbx_snmp_process_snmp_get(struct snmp_session *ss, const DC_ITEM *item, AGENT_RESULT *result,
+		int *errcode, char *error, size_t max_error_len)
+{
+#define SNMP_BULKWALK_MAXVARS	10
+	struct snmp_pdu		*pdu = NULL, *response = NULL;
+	int			i, j, ret = SUCCEED, status, num_vars;
+	struct zbx_json		js;
+	zbx_snmp_ddata_t	data;
+	zbx_snmp_dobject_t	*obj;
+	zbx_vector_str_t	oids;
+	struct variable_list	*var;
+
+	zbx_init_agent_request(&data.request);
+
+	if (SUCCEED != zbx_parse_item_key(item->snmp_oid, &data.request))
+	{
+		zbx_strlcpy(error, "Invalid SNMP OID: cannot parse parameter.", max_error_len);
+		ret = CONFIG_ERROR;
+		goto out;
+	}
+
+	// GetBulk is available only starting from SNMPv2
+	if (ZBX_IF_SNMP_VERSION_1 == item->snmp_version)
+	{
+		zbx_strlcpy(error, "GetBulk requests are not compatible with SNMPv1.", max_error_len);
+		ret = CONFIG_ERROR;
+		goto out;
+	}
+
+	//if (SUCCEED != (ret = zbx_snmp_ddata_init(&data, item->snmp_oid, error, max_error_len)))
+		//goto out;
+
+	if (0 == data.request.nparam || (1 == data.request.nparam && '\0' == *(data.request.params[0])))
+	{
+		zbx_strlcpy(error, "Invalid parameters: at least one OID is expected.", max_error_len);
+		ret = CONFIG_ERROR;
+		goto out;
+	}
+
+	zbx_json_initarray(&js, ZBX_JSON_STAT_BUF_LEN*100);
+
+	for (i = 0; i < data.request.nparam; i++)
+	{
+		char	oid_translated[ZBX_ITEM_SNMP_OID_LEN_MAX];
+		int running = 1;
+		oid	root_oid[MAX_OID_LEN];
+		size_t	root_oid_len = MAX_OID_LEN;
+		oid             name[MAX_OID_LEN];
+		size_t          name_length = MAX_OID_LEN;
+
+		zbx_snmp_translate(oid_translated, data.request.params[i], sizeof(oid_translated));
+
+		if (NULL == snmp_parse_oid(oid_translated, root_oid, &root_oid_len))
+		{
+			zbx_snprintf(error, max_error_len, "snmp_parse_oid(): cannot parse OID \"%s\".", oid_translated);
+			ret = CONFIG_ERROR;
+			goto out;
+		}
+
+		memmove(name, root_oid, root_oid_len * sizeof(oid));
+		name_length = root_oid_len;
+
+		while (running)
+		{
+			/* create PDU */
+			if (NULL == (pdu = snmp_pdu_create(SNMP_MSG_GETBULK)))
+			{
+				zbx_strlcpy(error, "snmp_pdu_create(): cannot create PDU object.", max_error_len);
+				ret = CONFIG_ERROR;
+				goto out;
+			}
+			pdu->non_repeaters = 0;
+			pdu->max_repetitions = SNMP_BULKWALK_MAXVARS;
+
+			if (NULL == snmp_add_null_var(pdu, name, name_length))
+			{
+				zbx_strlcpy(error, "snmp_add_null_var(): cannot add null variable.", max_error_len);
+				ret = CONFIG_ERROR;
+				snmp_free_pdu(pdu);
+				break;
+			}
+
+			status = snmp_synch_response(ss, pdu, &response);
+			if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
+			{
+				ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, max_error_len);
+				zabbix_log(1, "Bad snmp errcode received");
+				goto out;
+			}
+
+			if (response->errstat == SNMP_ERR_NOSUCHNAME)
+				break;
+
+			for (num_vars = 0, var = response->variables; NULL != var; num_vars++, var = var->next_variable)
+			{
+				char	printed_oid[MAX_STRING_LEN*10];
+				char	*printed_oid_escaped;
+				char	*strval_dyn;
+				unsigned char	string_type = ZBX_SNMP_STR_UNDEFINED;
+
+				if (var->name_length < root_oid_len ||  (memcmp(root_oid, var->name, root_oid_len * sizeof(oid)) != 0)) {
+					running = 0;
+					break;
+				}
+				if (SNMP_ENDOFMIBVIEW != var->type && SNMP_NOSUCHOBJECT != var->type && SNMP_NOSUCHINSTANCE != var->type)
+				{
+					if (snmp_oid_compare(name, name_length,
+								var->name,
+								var->name_length) >= 0)
+					{
+						running = 0;
+						break;
+					}
+
+					if (-1 == zbx_snmp_print_oid(printed_oid, sizeof(printed_oid), var->name, var->name_length, ZBX_OID_INDEX_STRING))
+					{
+						if (-1 == zbx_snmp_print_oid(printed_oid, sizeof(printed_oid), var->name, var->name_length, ZBX_OID_INDEX_NUMERIC))
+						{
+							zabbix_log(1, "Failed to print oid name, variable was ignored");
+							continue;
+						}
+						else
+						{
+							printed_oid_escaped = printed_oid;
+						}
+					}
+					else
+						printed_oid_escaped = zbx_dyn_escape_string(printed_oid, "\\");
+
+					zbx_json_addobject(&js, NULL);
+					zbx_json_addstring(&js, "oid", printed_oid_escaped, ZBX_JSON_TYPE_STRING);
+
+					zbx_snmp_get_json_value(var, &js);
+					zbx_json_close(&js);
+
+					if (var->next_variable == NULL) {
+						memmove(name, var->name,
+							var->name_length * sizeof(oid));
+						name_length = var->name_length;
+					}
+				} else {
+					running = 0;
+					break;
+				}
+			}
+		}
+	}
+
+	zbx_json_close(&js);
+
+	SET_TEXT_RESULT(result, zbx_strdup(NULL, js.buffer));
+	zbx_json_free(&js);
+out:
+
+	if (NULL != response)
+		snmp_free_pdu(response);
+
+	if (SUCCEED != (*errcode = ret))
+		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+
+	zabbix_log(1, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+#undef SNMP_BULKWALK_MAXVARS
+}
+
 static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
 		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int bulk,
 		unsigned char poller_type)
@@ -2178,6 +2435,10 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 
 		err = zbx_snmp_process_discovery(ss, &items[j], &results[j], &errcodes[j], error, sizeof(error),
 				&max_succeed, &min_fail, max_vars, bulk);
+	}
+	else if (0 == strncmp(items[j].snmp_oid, "snmp.get[", 9))
+	{
+		err = zbx_snmp_process_snmp_get(ss, &items[j], &results[j], &errcodes[j], error, sizeof(error));
 	}
 	else if (NULL != strchr(items[j].snmp_oid, '['))
 	{

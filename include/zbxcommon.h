@@ -1091,6 +1091,7 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_STR_REPLACE			25
 #define ZBX_PREPROC_VALIDATE_NOT_SUPPORTED	26
 #define ZBX_PREPROC_XML_TO_JSON			27
+#define ZBX_PREPROC_GROUP_FLAT_JSON_DATA	28
 
 /* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0
