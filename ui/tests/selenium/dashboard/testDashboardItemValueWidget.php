@@ -664,7 +664,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'id:units_size' => '99',
 						'id:units_bold' => true,
 						'Background color' => 'FFAAAA',
-						'.//button[@id="lbl_desc_color"]/..' => 'AABBCC',
+						'xpath://button[@id="lbl_desc_color"]/..' => 'AABBCC',
 						'xpath://button[@id="lbl_value_color"]/..' => 'CC11CC',
 						'xpath://button[@id="lbl_units_color"]/..' => 'BBCC55',
 						'xpath://button[@id="lbl_time_color"]/..' => '11AA00',
