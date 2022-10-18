@@ -148,38 +148,38 @@ window.action_edit_popup = new class {
 			input.value.forEach((value, index) => {
 				let element = {...input, name: input.name[index], value: input.value[index]};
 
-				// todo : add check row with the same value and conditiontype
-				// let has_row = this._checkRow(element);
+				this._checkRow(element);
+				let has_row = this._checkRow(element);
 
-				// const result = [has_row.some(it => it === true)]
-				// if (result[0] === true) {
-				//	return;
-				// }
-				// else {
+				const result = [has_row.some(it => it === true)]
+				if (result[0] === true) {
+					return;
+				}
+				else {
 					element.condition_name = this._getConditionName(element);
 					element.label = num2letter(input.row_index);
 					input.row_index ++;
 				document
 						.querySelector('#conditionTable tbody')
 						.insertAdjacentHTML('beforeend', this.condition_template.evaluate(element))
-				//}
+				}
 				this._processTypeOfCalculation();
 			})
 		}
 		else {
-		//	let has_row = this._checkRow(input);
+			let has_row = this._checkRow(input);
 
-			// const result = [has_row.some(it => it === true)]
-			// if (result[0] === true) {
-			//	return;
-			// }
-			// else {
+			const result = [has_row.some(it => it === true)]
+			if (result[0] === true) {
+				return;
+			}
+			else {
 				input.condition_name = this._getConditionName(input);
 				input.label = num2letter(input.row_index);
 				document
 					.querySelector('#conditionTable tbody')
 					.insertAdjacentHTML('beforeend', this.condition_template.evaluate(input))
-			// }
+			}
 			this._processTypeOfCalculation();
 		}
 	}
@@ -188,7 +188,7 @@ window.action_edit_popup = new class {
 		// Check if row with the same conditiontype and value already exists.
 		let result = [];
 		[...document.getElementById('conditionTable').getElementsByTagName('tr')].map(it => {
-			const table_row = it.getElementsByTagName('td')[1];
+			const table_row = it.getElementsByTagName('td')[2];
 
 			if (table_row !== undefined) {
 				let conditiontype = table_row.getElementsByTagName('input')[0].value;
