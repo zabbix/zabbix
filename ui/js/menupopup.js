@@ -923,17 +923,16 @@ function getMenuPopupItem(options) {
 			disabled: options.triggers.length === 0
 		};
 
-		url = new Curl('items.php', false);
-		url.setArgument('form', 'update');
-		url.setArgument('hostid', options.hostid);
-		url.setArgument('itemid', options.itemid);
-		url.setArgument('backurl', options.backurl);
-		url.setArgument('context', options.context);
-
 		if (options.isWriteable) {
+			url = new Curl('items.php', false);
+			url.setArgument('form', 'update');
+			url.setArgument('hostid', options.hostid);
+			url.setArgument('itemid', options.itemid);
+			url.setArgument('backurl', options.backurl);
+			url.setArgument('context', options.context);
+
 			config_urls.push({
 				label: t('Item'),
-				disabled: !options.isWriteable,
 				url: url.getUrl()
 			});
 		}
@@ -969,7 +968,6 @@ function getMenuPopupItem(options) {
 
 		config_urls.push({
 			label: t('Create trigger'),
-			disabled: !options.isWriteable,
 			url: url.getUrl()
 		});
 

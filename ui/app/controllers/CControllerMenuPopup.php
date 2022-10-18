@@ -345,7 +345,7 @@ class CControllerMenuPopup extends CController {
 				),
 				'history' => $db_item['history'] != 0,
 				'trends' => $db_item['trends'] != 0,
-				'isDiscovery' => ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
+				'isDiscovery' => $db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
 				'isExecutable' => $is_executable,
 				'isWriteable' => $is_writable,
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
