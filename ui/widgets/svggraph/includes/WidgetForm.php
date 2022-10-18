@@ -54,20 +54,20 @@ class WidgetForm extends CWidgetForm {
 	private const PERCENTILE_MIN = 1;
 	private const PERCENTILE_MAX = 100;
 
-	private bool $percentile_left_on;
-	private bool $percentile_right_on;
+	private bool $percentile_left_on = false;
+	private bool $percentile_right_on = false;
 
-	private bool $graph_time_on;
+	private bool $graph_time_on = false;
 
-	private bool $lefty_on;
-	private bool $lefty_units_static;
-	private bool $righty_on;
-	private bool $righty_units_static;
+	private bool $lefty_on = true;
+	private bool $lefty_units_static = false;
+	private bool $righty_on = true;
+	private bool $righty_units_static = false;
 
-	private bool $legend_on;
-	private bool $legend_statistic_on;
+	private bool $legend_on = true;
+	private bool $legend_statistic_on = false;
 
-	private bool $problems_on;
+	private bool $problems_on = false;
 
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
@@ -160,60 +160,73 @@ class WidgetForm extends CWidgetForm {
 	protected function normalizeValues(array $values): array {
 		$values = parent::normalizeValues($values);
 
-		$this->percentile_left_on = array_key_exists('percentile_left', $values)
-			&& $values['percentile_left'] == SVG_GRAPH_PERCENTILE_LEFT_ON;
+		if (array_key_exists('percentile_left', $values)) {
+			$this->percentile_left_on = $values['percentile_left'] == SVG_GRAPH_PERCENTILE_LEFT_ON;
+		}
 
 		if (!$this->percentile_left_on) {
 			unset($values['percentile_left_value']);
 		}
 
-		$this->percentile_right_on = array_key_exists('percentile_right', $values)
-			&& $values['percentile_right'] == SVG_GRAPH_PERCENTILE_RIGHT_ON;
+		if (array_key_exists('percentile_right', $values)) {
+			$this->percentile_right_on = $values['percentile_right'] == SVG_GRAPH_PERCENTILE_RIGHT_ON;
+		}
 
 		if (!$this->percentile_right_on) {
 			unset($values['percentile_right_value']);
 		}
 
-		$this->graph_time_on = array_key_exists('graph_time', $values)
-			&& $values['graph_time'] == SVG_GRAPH_CUSTOM_TIME_ON;
+		if (array_key_exists('graph_time', $values)) {
+			$this->graph_time_on = $values['graph_time'] == SVG_GRAPH_CUSTOM_TIME_ON;
+		}
 
 		if (!$this->graph_time_on) {
 			unset($values['time_from'], $values['time_to']);
 		}
 
-		$this->lefty_on = array_key_exists('lefty', $values) && $values['lefty'] == SVG_GRAPH_AXIS_ON;
+		if (array_key_exists('lefty', $values)) {
+			$this->lefty_on = $values['lefty'] == SVG_GRAPH_AXIS_ON;
+		}
 
 		if (!$this->lefty_on) {
 			unset($values['lefty_min'], $values['lefty_max'], $values['lefty_units']);
 		}
 
-		$this->lefty_units_static = array_key_exists('lefty_units', $values)
-			&& $values['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC;
+		if (array_key_exists('lefty_units', $values)) {
+			$this->lefty_units_static = $values['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC;
+		}
 
 		if (!$this->lefty_on || !$this->lefty_units_static) {
 			unset($values['lefty_static_units']);
 		}
 
-		$this->righty_on = array_key_exists('righty', $values) && $values['righty'] == SVG_GRAPH_AXIS_ON;
+		if (array_key_exists('righty', $values)) {
+			$this->righty_on = $values['righty'] == SVG_GRAPH_AXIS_ON;
+		}
 
 		if (!$this->righty_on) {
 			unset($values['righty_min'], $values['righty_max'], $values['righty_units']);
 		}
 
-		$this->righty_units_static = array_key_exists('righty_units', $values)
-			&& $values['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC;
+		if (array_key_exists('righty_units', $values)) {
+			$this->righty_units_static = $values['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC;
+		}
 
 		if (!$this->righty_on || !$this->righty_units_static) {
 			unset($values['righty_static_units']);
 		}
 
-		$this->legend_on = array_key_exists('legend', $values) && $values['legend'] == SVG_GRAPH_LEGEND_ON;
+		if (array_key_exists('legend', $values)) {
+			$this->legend_on = $values['legend'] == SVG_GRAPH_LEGEND_ON;
+		}
 
-		$this->legend_statistic_on = array_key_exists('legend_statistic', $values)
-			&& $values['legend_statistic'] == SVG_GRAPH_LEGEND_STATISTIC_ON;
+		if (array_key_exists('legend_statistic', $values)) {
+			$this->legend_statistic_on = $values['legend_statistic'] == SVG_GRAPH_LEGEND_STATISTIC_ON;
+		}
 
-		$this->problems_on = array_key_exists('show_problems', $values)
-			&& $values['show_problems'] == SVG_GRAPH_PROBLEMS_ON;
+		if (array_key_exists('show_problems', $values)) {
+			$this->problems_on = $values['show_problems'] == SVG_GRAPH_PROBLEMS_ON;
+		}
 
 		if (!$this->problems_on) {
 			unset($values['graph_item_problems'], $values['problemhosts'], $values['severities'],

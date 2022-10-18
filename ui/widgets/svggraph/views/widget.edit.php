@@ -214,7 +214,7 @@ function getAxesTab(CWidgetFormView $form, array $fields): CDiv {
 		->addItem(
 			new CFormGrid(
 				$form->makeCustomField(
-					new CWidgetFieldCheckBoxView($fields['righty'])
+					new CWidgetFieldCheckBoxView($fields['axisx'])
 				)
 			)
 		);

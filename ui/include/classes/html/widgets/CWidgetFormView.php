@@ -74,7 +74,7 @@ class CWidgetFormView {
 		if ($field_view !== null) {
 			$this->registerFieldView($field_view);
 
-			$this->addItem($this->makeField($field_view, $row_class, $show_label));
+			$this->form_grid->addItem($this->makeField($field_view, $row_class, $show_label));
 		}
 
 		return $this;
@@ -201,7 +201,7 @@ class CWidgetFormView {
 		}
 	}
 
-	private function makeFormGrid(): self {
+	private function makeFormGrid(): void {
 		$types_select = (new CSelect('type'))
 			->setFocusableElementId('label-type')
 			->setId('type')
@@ -246,8 +246,6 @@ class CWidgetFormView {
 		if (array_key_exists('rf_rate', $this->data['fields'])) {
 			$this->addField(new CWidgetFieldSelectView($this->data['fields']['rf_rate']));
 		}
-
-		return $this;
 	}
 
 	private function makeField(CWidgetFieldView $field_view, string $row_class = null, bool $show_label = true): array {

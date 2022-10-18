@@ -667,7 +667,6 @@ footer {
 
 .form-grid {
   display: grid;
-  padding: 5px;
   row-gap: 10px;
   column-gap: 10px;
   grid-template-columns: minmax(15%, max-content) auto; }
@@ -1728,18 +1727,28 @@ div.dashboard-widget-slareport .date-vertical {
 form.dashboard-widget-svggraph .svg-graph-preview,
 form.dashboard-widget-svggraph .graph-widget-config-tabs {
   grid-column: 1 / -1; }
-form.dashboard-widget-svggraph .graph-widget-config-tabs {
-  padding: 10px 0; }
-  form.dashboard-widget-svggraph .graph-widget-config-tabs > .tabs-nav {
-    margin-right: 0;
-    margin-left: 0;
-    border-top: 1px solid #303030; }
-  form.dashboard-widget-svggraph .graph-widget-config-tabs .ui-tabs-nav {
-    position: sticky;
+form.dashboard-widget-svggraph .svg-graph-preview {
+  position: relative;
+  min-width: 1110px;
+  height: 300px; }
+  form.dashboard-widget-svggraph .svg-graph-preview > div {
+    position: absolute;
     top: 0;
+    right: 0;
+    left: 0;
+    margin: 0 -10px;
+    height: 300px;
     background: #2b2b2b;
     z-index: 3; }
+form.dashboard-widget-svggraph .graph-widget-config-tabs > .tabs-nav {
+  border-top: 1px solid #303030; }
+form.dashboard-widget-svggraph .graph-widget-config-tabs .ui-tabs-nav {
+  position: sticky;
+  top: 0;
+  background: #2b2b2b;
+  z-index: 3; }
 form.dashboard-widget-svggraph .table-forms-container, form.dashboard-widget-svggraph .browser-warning-container {
+  margin: -10px 0 0 0;
   border: 1px solid #303030;
   border-top: none; }
 form.dashboard-widget-svggraph .table-forms-separator {
@@ -5447,20 +5456,6 @@ section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:
   stroke-opacity: .35;
   stroke: #e45959;
   stroke-width: 2px; }
-
-.svg-graph-preview {
-  margin-top: 10px;
-  min-width: 1120px;
-  height: 300px;
-  position: relative; }
-  .svg-graph-preview > div {
-    background: #2b2b2b;
-    height: 300px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    z-index: 3; }
 
 .svg-graph-hintbox {
   font-size: 12px;

@@ -3742,23 +3742,6 @@ $form-icon-btn: (
 	stroke-width: 2px;
 }
 
-.svg-graph-preview {
-	margin-top: 10px;
-	min-width: 1120px;
-	height: 300px;
-	position: relative;
-
-	> div {
-		background: $ui-bg-color;
-		height: 300px;
-		position: absolute;
-		left: 0;
-		right: 0;
-		top: 0;
-		z-index: 3; // More than z-index of form controls, less than z-index of .msg-*.
-	}
-}
-
 .svg-graph-hintbox {
 	font-size: 12px;
 	line-height: 18px;
