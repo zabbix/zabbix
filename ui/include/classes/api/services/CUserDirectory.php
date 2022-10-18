@@ -981,8 +981,8 @@ class CUserDirectory extends CApiService {
 						'user_username', 'user_lastname'
 					],
 					'userdirectoryids' => $userdirectory['userdirectoryid'],
-					'selectProvisionMedia' => API_OUTPUT_EXTEND,
-					'selectProvisionGroups' => API_OUTPUT_EXTEND
+					'selectProvisionMedia' => ['name', 'mediatypeid', 'attribute'],
+					'selectProvisionGroups' => ['name', 'roleid', 'user_groups']
 				])[0];
 			}
 		}
