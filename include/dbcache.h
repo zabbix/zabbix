@@ -40,7 +40,6 @@
 #define	ZBX_POLLER_TYPE_ODBC		6
 #define	ZBX_POLLER_TYPE_COUNT		7	/* number of poller types */
 
-
 typedef enum
 {
 	ZBX_SESSION_TYPE_DATA = 0,
@@ -593,13 +592,9 @@ typedef struct
 	unsigned char	type;
 	unsigned char	error_handler;
 	char		*params;
-	char		*params_orig;
 	char		*error_handler_params;
 }
 zbx_preproc_op_t;
-
-#define ZBX_PREPROC_MACRO_UPDATE_TRUE	1
-#define ZBX_PREPROC_MACRO_UPDATE_FALSE	0
 
 typedef struct
 {
@@ -610,8 +605,8 @@ typedef struct
 
 	int			dep_itemids_num;
 	int			preproc_ops_num;
-	int			update_time;
-	int			macro_update;
+	zbx_uint64_t		revision;
+	zbx_uint64_t		preproc_revision;
 
 	zbx_uint64_pair_t	*dep_itemids;
 	zbx_preproc_op_t	*preproc_ops;
@@ -743,7 +738,7 @@ zbx_synced_new_config_t;
 #define ZBX_TRIGGER_GET_DEFAULT		(~(unsigned int)ZBX_TRIGGER_GET_ITEMIDS)
 #define ZBX_TRIGGER_GET_ALL		(~(unsigned int)0)
 
-void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced);
+void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zbx_vector_uint64_t *deleted_itemids);
 void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
 int	init_configuration_cache(char **error);
 void	free_configuration_cache(void);
@@ -761,7 +756,7 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 		unsigned int mode);
 int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid);
 void	DCconfig_get_active_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, int *errcodes, size_t num);
-void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, int *timestamp);
+void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revision);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
@@ -1018,8 +1013,10 @@ zbx_dc_revision_t;
 
 const char	*zbx_dc_get_session_token(void);
 zbx_session_t	*zbx_dc_get_or_create_session(zbx_uint64_t hostid, const char *token, zbx_session_type_t session_type);
+
 int	zbx_dc_register_config_session(zbx_uint64_t hostid, const char *token, zbx_uint64_t session_config_revision,
-		zbx_dc_revision_t *config_revision);
+		zbx_dc_revision_t *dc_revision);
+
 void		zbx_dc_cleanup_sessions(void);
 
 void		zbx_dc_cleanup_autoreg_host(void);
@@ -1170,6 +1167,27 @@ void	zbx_cached_proxy_free(zbx_cached_proxy_t *proxy);
 
 int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name);
 
+/* item snmpv3 security levels */
+#define ZBX_ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
+#define ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV	1
+#define ZBX_ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV	2
+
+/* maintenance tag operators */
+#define ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL	0
+#define ZBX_MAINTENANCE_TAG_OPERATOR_LIKE	2
+
+/* maintenance tag evaluation types */
+/* SYNC WITH PHP!                   */
+#define ZBX_MAINTENANCE_TAG_EVAL_TYPE_AND_OR	0
+#define ZBX_MAINTENANCE_TAG_EVAL_TYPE_OR	2
+
+/* special item key used for ICMP pings */
+#define ZBX_SERVER_ICMPPING_KEY	"icmpping"
+/* special item key used for ICMP ping latency */
+#define ZBX_SERVER_ICMPPINGSEC_KEY	"icmppingsec"
+/* special item key used for ICMP ping loss packages */
+#define ZBX_SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
+
 int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck);
 void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
 
@@ -1188,5 +1206,4 @@ void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vect
 		zbx_vector_uint64_t *del_macro_hostids);
 void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *templateids);
-
 #endif

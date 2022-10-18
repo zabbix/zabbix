@@ -368,7 +368,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 				DBfree_result(result3);
 
 				/* for host uniqueness purposes */
-				make_hostname(host);	/* replace not-allowed symbols */
+				zbx_make_hostname(host);	/* replace not-allowed symbols */
 				host_unique = DBget_unique_hostname_by_sample(host, "host");
 				zbx_free(host);
 
@@ -422,7 +422,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 				DBfree_result(result3);
 				zbx_free(sql);
 
-				make_hostname(host_visible);	/* replace not-allowed symbols */
+				zbx_make_hostname(host_visible);	/* replace not-allowed symbols */
 				zbx_free(hostname);
 				hostname = DBget_unique_hostname_by_sample(host_visible, "name");
 				zbx_free(host_visible);

@@ -626,10 +626,6 @@ if ($data['display_interfaces']) {
 			->setFocusableElementId('interfaceid')
 			->setAriaRequired();
 
-		if ($readonly) {
-			$select_interface->setAttribute('readonly', 'readonly');
-		}
-
 		$item_tab->addItem([
 			(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
 				->setAsteriskMark()
