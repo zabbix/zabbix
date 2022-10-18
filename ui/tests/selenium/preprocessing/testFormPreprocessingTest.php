@@ -629,7 +629,7 @@ class testFormPreprocessingTest extends CWebTest {
 				// Check Zabbix server down message.
 				$message = $form->getOverlayMessage();
 				$this->assertTrue($message->isBad());
-				$this->assertTrue($message->hasLine('Connection to Zabbix server "localhost" refused. Possible reasons:'));
+				$this->assertTrue($message->hasLine('Connection to Zabbix server "localhost:10051" refused. Possible reasons:'));
 				$dialog->close();
 				break;
 
