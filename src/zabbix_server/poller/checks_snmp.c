@@ -840,7 +840,7 @@ static int	zbx_snmp_get_json_value(const struct variable_list *var, struct zbx_j
 				(unsigned int)var->val.string[1],
 				(unsigned int)var->val.string[2],
 				(unsigned int)var->val.string[3]);
-		
+
 		zbx_json_addstring(j, ZBX_JSON_SNMPGET_VALUE_KEY, ip_val, ZBX_JSON_TYPE_STRING);
 		zbx_free(ip_val);
 	}
