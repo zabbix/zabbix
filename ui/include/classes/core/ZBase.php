@@ -43,7 +43,7 @@ class ZBase {
 	 *
 	 * @var string
 	 */
-	protected $rootDir;
+	protected $root_dir;
 
 	/**
 	 * @var array of config data from zabbix config file
@@ -120,7 +120,7 @@ class ZBase {
 	 * Init modules required to run frontend.
 	 */
 	protected function init() {
-		$this->rootDir = $this->findRootDir();
+		$this->root_dir = $this->findRootDir();
 		$this->initAutoloader();
 		$this->component_registry = new CComponentRegistry;
 
@@ -280,7 +280,7 @@ class ZBase {
 	 * Returns the absolute path to the root dir.
 	 */
 	public static function getRootDir(): string {
-		return self::getInstance()->rootDir;
+		return self::getInstance()->root_dir;
 	}
 
 	/**
@@ -299,63 +299,63 @@ class ZBase {
 	 */
 	private function getIncludePaths() {
 		return [
-			$this->rootDir.'/include/classes/api',
-			$this->rootDir.'/include/classes/api/services',
-			$this->rootDir.'/include/classes/api/helpers',
-			$this->rootDir.'/include/classes/api/managers',
-			$this->rootDir.'/include/classes/api/clients',
-			$this->rootDir.'/include/classes/api/wrappers',
-			$this->rootDir.'/include/classes/core',
-			$this->rootDir.'/include/classes/data',
-			$this->rootDir.'/include/classes/mvc',
-			$this->rootDir.'/include/classes/db',
-			$this->rootDir.'/include/classes/debug',
-			$this->rootDir.'/include/classes/validators',
-			$this->rootDir.'/include/classes/validators/schema',
-			$this->rootDir.'/include/classes/validators/string',
-			$this->rootDir.'/include/classes/validators/object',
-			$this->rootDir.'/include/classes/validators/hostgroup',
-			$this->rootDir.'/include/classes/validators/host',
-			$this->rootDir.'/include/classes/validators/hostprototype',
-			$this->rootDir.'/include/classes/validators/event',
-			$this->rootDir.'/include/classes/export',
-			$this->rootDir.'/include/classes/export/writers',
-			$this->rootDir.'/include/classes/export/elements',
-			$this->rootDir.'/include/classes/graph',
-			$this->rootDir.'/include/classes/graphdraw',
-			$this->rootDir.'/include/classes/import',
-			$this->rootDir.'/include/classes/import/converters',
-			$this->rootDir.'/include/classes/import/importers',
-			$this->rootDir.'/include/classes/import/preprocessors',
-			$this->rootDir.'/include/classes/import/readers',
-			$this->rootDir.'/include/classes/import/validators',
-			$this->rootDir.'/include/classes/items',
-			$this->rootDir.'/include/classes/triggers',
-			$this->rootDir.'/include/classes/server',
-			$this->rootDir.'/include/classes/screens',
-			$this->rootDir.'/include/classes/services',
-			$this->rootDir.'/include/classes/sysmaps',
-			$this->rootDir.'/include/classes/helpers',
-			$this->rootDir.'/include/classes/helpers/trigger',
-			$this->rootDir.'/include/classes/macros',
-			$this->rootDir.'/include/classes/html',
-			$this->rootDir.'/include/classes/html/svg',
-			$this->rootDir.'/include/classes/html/widgets',
-			$this->rootDir.'/include/classes/html/interfaces',
-			$this->rootDir.'/include/classes/parsers',
-			$this->rootDir.'/include/classes/parsers/results',
-			$this->rootDir.'/include/classes/controllers',
-			$this->rootDir.'/include/classes/routing',
-			$this->rootDir.'/include/classes/json',
-			$this->rootDir.'/include/classes/user',
-			$this->rootDir.'/include/classes/setup',
-			$this->rootDir.'/include/classes/regexp',
-			$this->rootDir.'/include/classes/ldap',
-			$this->rootDir.'/include/classes/pagefilter',
-			$this->rootDir.'/include/classes/xml',
-			$this->rootDir.'/include/classes/vaults',
-			$this->rootDir.'/local/app/controllers',
-			$this->rootDir.'/app/controllers'
+			$this->root_dir.'/include/classes/api',
+			$this->root_dir.'/include/classes/api/services',
+			$this->root_dir.'/include/classes/api/helpers',
+			$this->root_dir.'/include/classes/api/managers',
+			$this->root_dir.'/include/classes/api/clients',
+			$this->root_dir.'/include/classes/api/wrappers',
+			$this->root_dir.'/include/classes/core',
+			$this->root_dir.'/include/classes/data',
+			$this->root_dir.'/include/classes/mvc',
+			$this->root_dir.'/include/classes/db',
+			$this->root_dir.'/include/classes/debug',
+			$this->root_dir.'/include/classes/validators',
+			$this->root_dir.'/include/classes/validators/schema',
+			$this->root_dir.'/include/classes/validators/string',
+			$this->root_dir.'/include/classes/validators/object',
+			$this->root_dir.'/include/classes/validators/hostgroup',
+			$this->root_dir.'/include/classes/validators/host',
+			$this->root_dir.'/include/classes/validators/hostprototype',
+			$this->root_dir.'/include/classes/validators/event',
+			$this->root_dir.'/include/classes/export',
+			$this->root_dir.'/include/classes/export/writers',
+			$this->root_dir.'/include/classes/export/elements',
+			$this->root_dir.'/include/classes/graph',
+			$this->root_dir.'/include/classes/graphdraw',
+			$this->root_dir.'/include/classes/import',
+			$this->root_dir.'/include/classes/import/converters',
+			$this->root_dir.'/include/classes/import/importers',
+			$this->root_dir.'/include/classes/import/preprocessors',
+			$this->root_dir.'/include/classes/import/readers',
+			$this->root_dir.'/include/classes/import/validators',
+			$this->root_dir.'/include/classes/items',
+			$this->root_dir.'/include/classes/triggers',
+			$this->root_dir.'/include/classes/server',
+			$this->root_dir.'/include/classes/screens',
+			$this->root_dir.'/include/classes/services',
+			$this->root_dir.'/include/classes/sysmaps',
+			$this->root_dir.'/include/classes/helpers',
+			$this->root_dir.'/include/classes/helpers/trigger',
+			$this->root_dir.'/include/classes/macros',
+			$this->root_dir.'/include/classes/html',
+			$this->root_dir.'/include/classes/html/svg',
+			$this->root_dir.'/include/classes/html/widgets',
+			$this->root_dir.'/include/classes/html/interfaces',
+			$this->root_dir.'/include/classes/parsers',
+			$this->root_dir.'/include/classes/parsers/results',
+			$this->root_dir.'/include/classes/controllers',
+			$this->root_dir.'/include/classes/routing',
+			$this->root_dir.'/include/classes/json',
+			$this->root_dir.'/include/classes/user',
+			$this->root_dir.'/include/classes/setup',
+			$this->root_dir.'/include/classes/regexp',
+			$this->root_dir.'/include/classes/ldap',
+			$this->root_dir.'/include/classes/pagefilter',
+			$this->root_dir.'/include/classes/xml',
+			$this->root_dir.'/include/classes/vaults',
+			$this->root_dir.'/local/app/controllers',
+			$this->root_dir.'/app/controllers'
 		];
 	}
 
@@ -392,7 +392,7 @@ class ZBase {
 	 * Load zabbix config file.
 	 */
 	protected function loadConfigFile(): void {
-		$configFile = self::getRootDir().CConfigFile::CONFIG_FILE_PATH;
+		$configFile = $this->root_dir.CConfigFile::CONFIG_FILE_PATH;
 
 		$config = new CConfigFile($configFile);
 
@@ -404,11 +404,11 @@ class ZBase {
 	 */
 	protected function initAutoloader() {
 		// Register base directory path for 'include' and 'require' functions.
-		set_include_path(get_include_path().PATH_SEPARATOR.$this->rootDir);
+		set_include_path(get_include_path().PATH_SEPARATOR.$this->root_dir);
 		$autoloader = new CAutoloader;
 		$autoloader->addNamespace('', $this->getIncludePaths());
-		$autoloader->addNamespace('Zabbix\\Core', [$this->rootDir.'/include/classes/core']);
-		$autoloader->addNamespace('Zabbix\\Widgets', [$this->rootDir.'/include/classes/widgets']);
+		$autoloader->addNamespace('Zabbix\\Core', [$this->root_dir.'/include/classes/core']);
+		$autoloader->addNamespace('Zabbix\\Widgets', [$this->root_dir.'/include/classes/widgets']);
 		$autoloader->register();
 		$this->autoloader = $autoloader;
 	}
@@ -494,7 +494,7 @@ class ZBase {
 			error($error);
 		}
 
-		require_once self::getRootDir().'/include/translateDefines.inc.php';
+		require_once $this->root_dir.'/include/translateDefines.inc.php';
 	}
 
 	/**
@@ -823,7 +823,7 @@ class ZBase {
 	 * Initialize module manager and load all enabled and allowed modules according to user role settings.
 	 */
 	private function initModuleManager(): void {
-		$this->module_manager = new CModuleManager(self::getRootDir());
+		$this->module_manager = new CModuleManager($this->root_dir);
 
 		$db_modules = API::getApiService('module')->get([
 			'output' => ['moduleid', 'id', 'relative_path', 'config'],
