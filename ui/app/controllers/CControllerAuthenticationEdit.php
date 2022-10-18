@@ -176,7 +176,7 @@ class CControllerAuthenticationEdit extends CController {
 			}
 
 			if ($data['saml_provision_media']) {
-				$data['saml_provision_media'] = $this->extendProvisionMedia($data['saml_provision_media']);
+				$data['saml_provision_media'] = self::extendProvisionMedia($data['saml_provision_media']);
 			}
 
 			$data['ldap_servers'] = $this->getLdapServerUserGroupCount($this->getInput('ldap_servers', []));
@@ -367,7 +367,7 @@ class CControllerAuthenticationEdit extends CController {
 	 *
 	 * @return array
 	 */
-	private function extendProvisionMedia(array $provision_media): array {
+	private static function extendProvisionMedia(array &$provision_media): array {
 		if (!$provision_media) {
 			return $provision_media;
 		}
