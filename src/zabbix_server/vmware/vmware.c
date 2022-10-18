@@ -218,6 +218,21 @@ static zbx_hashset_t	evt_msg_strpool;
 
 static zbx_uint64_t	evt_req_chunk_size;
 
+/* the vmware resource pool chunk */
+typedef struct
+{
+	char			*id;
+	char			*first_parentid;
+	char			*name;
+	const char		*path;
+	const char		*parentid;
+	unsigned char		parent_is_rp;
+}
+zbx_vmware_rpool_chunk_t;
+
+ZBX_PTR_VECTOR_DECL(vmware_rpool_chunk, zbx_vmware_rpool_chunk_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk, zbx_vmware_rpool_chunk_t *)
+
 /*
  * SOAP support
  */
@@ -479,17 +494,6 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 #define ZBX_XPATH_GET_FOLDER_PARENTID(id)								\
 		ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_FOLDER, "[text()='" id "']") "/"		\
 		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type='Folder']"
-
-#define ZBX_XPATH_GET_RESOURCEPOOL_NAME(id)								\
-		ZBX_XPATH_GET_OBJECT_NAME(ZBX_VMWARE_SOAP_RESOURCEPOOL, id)
-
-#define ZBX_XPATH_GET_RESOURCEPOOL_PARENTID(id)								\
-		ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_RESOURCEPOOL, "[text()='" id "']") "/"	\
-		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type='ResourcePool']"
-
-#define ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID(id)							\
-		ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_RESOURCEPOOL, "[text()='" id "']") "/"	\
-		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type!='ResourcePool']"
 
 /* hypervisor hashset support */
 static zbx_hash_t	vmware_hv_hash(const void *data)
@@ -2228,6 +2232,22 @@ static void	vmware_datacenter_free(zbx_vmware_datacenter_t *datacenter)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: frees resources allocated to store rp_chunk data                  *
+ *                                                                            *
+ * Parameters: rp_chunk - [IN] the resourcepool chunk                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_rp_chunk_free(zbx_vmware_rpool_chunk_t *rp_chunk)
+{
+	zbx_free(rp_chunk->id);
+	zbx_free(rp_chunk->name);
+	zbx_free(rp_chunk->first_parentid);
+	/* path and parent are not cleared */
+	zbx_free(rp_chunk);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: frees resources allocated to store resourcepool data              *
  *                                                                            *
  * Parameters: resourcepool   - [IN] the resourcepool                         *
@@ -2237,9 +2257,7 @@ static void	vmware_resourcepool_free(zbx_vmware_resourcepool_t *resourcepool)
 {
 	zbx_free(resourcepool->id);
 	zbx_free(resourcepool->parentid);
-	zbx_free(resourcepool->first_parentid);
 	zbx_free(resourcepool->path);
-	zbx_free(resourcepool->name);
 	zbx_free(resourcepool);
 }
 
@@ -4096,7 +4114,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 		rpool_cmp.id = vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL];
 
 		if (FAIL != (i = zbx_vector_vmware_resourcepool_bsearch(rpools, &rpool_cmp,
-				vmware_resourcepool_compare_id)))
+				ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
 		{
 			rpools->values[i]->vm_num += 1;
 		}
@@ -5300,19 +5318,6 @@ clean:
 	xmlXPathFreeContext(xpathCtx);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, i);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: sorting function to sort Resource pool names vector by name       *
- *                                                                            *
- ******************************************************************************/
-int	vmware_resourcepool_compare_id(const void *r1, const void *r2)
-{
-	const zbx_vmware_resourcepool_t	*rp1 = *(const zbx_vmware_resourcepool_t * const *)r1;
-	const zbx_vmware_resourcepool_t	*rp2 = *(const zbx_vmware_resourcepool_t * const *)r2;
-
-	return strcmp(rp1->id, rp2->id);
 }
 
 /******************************************************************************
@@ -6649,13 +6654,19 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CURL *easyhandle,
-		xmlDoc *cluster_data, zbx_vector_ptr_t *clusters, zbx_vector_vmware_resourcepool_t *resourcepools,
+		xmlDoc *cluster_data, zbx_vector_ptr_t *clusters, zbx_vector_vmware_rpool_chunk_t *rp_chunks,
 		zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
+#define ZBX_XPATH_GET_RESOURCEPOOL_PARENTID								\
+		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type='ResourcePool']"
+#define ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID								\
+		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type!='ResourcePool']"
+
 	int			ret, i;
-	char			tmp[MAX_STRING_LEN * 2];
+	char			*id_esc, tmp[MAX_STRING_LEN * 2];
 	zbx_vmware_cluster_t	*cluster;
-	zbx_vector_str_t	rpools_uniq, rpools_all, ids;
+	zbx_vector_str_t	rp_ids, ids;
+	xmlNode			*node;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -6667,10 +6678,11 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 	for (i = 0; i < ids.values_num; i++)
 	{
 		char	*name;
-		xmlNode	*node;
 
+		id_esc = zbx_xml_escape_dyn(ids.values[i]);
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_CLUSTER, "[text()='%s']"),
-				ids.values[i]);
+				id_esc);
+		zbx_str_free(id_esc);
 
 		if (NULL == (node = zbx_xml_doc_get(cluster_data, tmp)) ||
 				NULL == (name = zbx_xml_node_read_value(cluster_data, node,
@@ -6697,77 +6709,66 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 		zbx_vector_ptr_append(clusters, cluster);
 	}
 
-	zbx_vector_str_create(&rpools_all);
-	zbx_xml_read_values(cluster_data, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_RESOURCEPOOL) , &rpools_all);
-	zbx_vector_str_create(&rpools_uniq);
-	zbx_vector_str_sort(&rpools_all, ZBX_DEFAULT_STR_COMPARE_FUNC);
-	zbx_vector_str_append_array(&rpools_uniq, rpools_all.values, rpools_all.values_num);
-	zbx_vector_str_uniq(&rpools_uniq, ZBX_DEFAULT_STR_COMPARE_FUNC);
-	zbx_vector_vmware_resourcepool_reserve(resourcepools,
-			(size_t)(resourcepools->values_num + rpools_uniq.values_num));
+	zbx_vector_str_create(&rp_ids);
+	zbx_xml_read_values(cluster_data, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_RESOURCEPOOL), &rp_ids);
+	zbx_vector_vmware_rpool_chunk_reserve(rp_chunks, (size_t)(rp_chunks->values_num + rp_ids.values_num));
 
-	for (i = 0; i < rpools_uniq.values_num; i++)
+	for (i = 0; i < rp_ids.values_num; i++)
 	{
-		char				*id_esc;
-		zbx_vmware_resourcepool_t	*rpool, rpool_cmp = {.id = rpools_uniq.values[i]};
+		zbx_vmware_rpool_chunk_t	*rp_chunk;
 
-		if (FAIL != zbx_vector_vmware_resourcepool_search(resourcepools, &rpool_cmp,
-				vmware_resourcepool_compare_id))
+		rp_chunk = (zbx_vmware_rpool_chunk_t *)zbx_malloc(NULL, sizeof(zbx_vmware_rpool_chunk_t));
+		rp_chunk->path = NULL;
+		rp_chunk->parentid = NULL;
+
+		id_esc = zbx_xml_escape_dyn(rp_ids.values[i]);
+		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_RESOURCEPOOL, "[text()='%s']"),
+				id_esc);
+		zbx_str_free(id_esc);
+
+		if (NULL == (node = zbx_xml_doc_get(cluster_data, tmp)) || NULL == (
+				rp_chunk->name = zbx_xml_node_read_value(cluster_data, node,
+				ZBX_XPATH_PROP_NAME_NODE("name"))))
 		{
+			zbx_free(rp_chunk);
 			continue;
 		}
 
-		rpool = (zbx_vmware_resourcepool_t *)zbx_malloc(NULL, sizeof(zbx_vmware_resourcepool_t));
-
-		id_esc = zbx_xml_escape_dyn(rpool_cmp.id);
-		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_RESOURCEPOOL_NAME("%s"), id_esc);
-
-		if (NULL == (rpool->name = zbx_xml_doc_read_value(cluster_data , tmp)))
+		if (NULL == (rp_chunk->first_parentid = zbx_xml_node_read_value(cluster_data , node,
+				ZBX_XPATH_GET_RESOURCEPOOL_PARENTID)))
 		{
-			zbx_free(id_esc);
-			zbx_free(rpool);
-			continue;
-		}
-
-		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_RESOURCEPOOL_PARENTID("%s"), id_esc);
-
-		if (NULL == (rpool->first_parentid = zbx_xml_doc_read_value(cluster_data , tmp)))
-		{
-			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID("%s"), id_esc);
-
-			if (NULL == (rpool->first_parentid = zbx_xml_doc_read_value(cluster_data , tmp)))
+			if (NULL == (rp_chunk->first_parentid = zbx_xml_node_read_value(cluster_data , node,
+					ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID)))
 			{
-				zbx_free(id_esc);
-				zbx_free(rpool->name);
-				zbx_free(rpool);
+				zbx_free(rp_chunk->name);
+				zbx_free(rp_chunk);
 				continue;
 			}
 
-			rpool->parent_is_rp = 0;
+			rp_chunk->parent_is_rp = 0;
 		}
 		else
-			rpool->parent_is_rp = 1;
+			rp_chunk->parent_is_rp = 1;
 
-		rpool->id = zbx_strdup(NULL, rpool_cmp.id);
-		rpool->parentid = rpool->path = NULL;
-		rpool->vm_num = 0;
-		zbx_vector_vmware_resourcepool_append(resourcepools, rpool);
-
-		zbx_free(id_esc);
+		rp_chunk->id = zbx_strdup(NULL, rp_ids.values[i]);
+		zbx_vector_vmware_rpool_chunk_append(rp_chunks, rp_chunk);
 	}
 
-	zbx_vector_str_clear_ext(&rpools_all, zbx_str_free);
-	zbx_vector_str_destroy(&rpools_all);
-	zbx_vector_str_destroy(&rpools_uniq);
+	zbx_vector_str_clear_ext(&rp_ids, zbx_str_free);
+	zbx_vector_str_destroy(&rp_ids);
 
 	ret = SUCCEED;
 out:
 	zbx_vector_str_clear_ext(&ids, zbx_str_free);
 	zbx_vector_str_destroy(&ids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s cl:%d rp:%d", __func__, zbx_result_string(ret),
+			clusters->values_num, rp_chunks->values_num);
 
 	return ret;
+
+#undef ZBX_XPATH_GET_RESOURCEPOOL_PARENTID
+#undef ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID
 }
 
 /******************************************************************************
@@ -6870,13 +6871,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 				"<ns0:propSet>"							\
 					"<ns0:type>ClusterComputeResource</ns0:type>"		\
 					"<ns0:pathSet>name</ns0:pathSet>"			\
-					"<ns0:pathSet>resourcePool</ns0:pathSet>"		\
 					"<ns0:pathSet>triggeredAlarmState</ns0:pathSet>"	\
-				"</ns0:propSet>"						\
-				"<ns0:propSet>"							\
-					"<ns0:type>ComputeResource</ns0:type>"			\
-					"<ns0:pathSet>resourcePool</ns0:pathSet>"		\
-					"<ns0:pathSet>name</ns0:pathSet>"			\
 				"</ns0:propSet>"						\
 				"<ns0:propSet>"							\
 					"<ns0:type>ResourcePool</ns0:type>"			\
@@ -7010,8 +7005,13 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 	int				i, ret = FAIL;
 	xmlDoc				*cluster_data = NULL;
 	zbx_property_collection_iter	*iter = NULL;
+	zbx_vector_vmware_rpool_chunk_t	rp_chunks;
+	zbx_vector_ptr_t		cl_chunks;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_vmware_rpool_chunk_create(&rp_chunks);
+	zbx_vector_ptr_create(&cl_chunks);
 
 	if (SUCCEED != zbx_property_collection_init(easyhandle, ZBX_POST_VCENTER_CLUSTER, "propertyCollector",
 			__func__, &iter, &cluster_data, error))
@@ -7019,7 +7019,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 		goto out;
 	}
 
-	if (SUCCEED != vmware_service_process_cluster_data(service, easyhandle, cluster_data, clusters, resourcepools,
+	if (SUCCEED != vmware_service_process_cluster_data(service, easyhandle, cluster_data, &cl_chunks, &rp_chunks,
 			alarms_data, error))
 	{
 		goto out;
@@ -7033,85 +7033,79 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 		if (SUCCEED != zbx_property_collection_next(__func__, iter, &cluster_data, error))
 			goto out;
 
-		if (SUCCEED != vmware_service_process_cluster_data(service, easyhandle, cluster_data, clusters,
-				resourcepools, alarms_data, error))
+		if (SUCCEED != vmware_service_process_cluster_data(service, easyhandle, cluster_data, &cl_chunks,
+				&rp_chunks, alarms_data, error))
 		{
 			goto out;
 		}
 	}
 
 	zbx_property_collection_free(iter);
+	zbx_vector_vmware_rpool_chunk_sort(&rp_chunks, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 
-	for (i = 0; i < clusters->values_num; i++)
+	for (i = 0; i < rp_chunks.values_num; i++)
 	{
-		zbx_vmware_cluster_t	*cluster = (zbx_vmware_cluster_t*)(clusters->values[i]);
+		int				k;
+		zbx_vmware_resourcepool_t	*rpool;
+		zbx_vmware_rpool_chunk_t	rp_parent, *rp_chunk = rp_chunks.values[i];
+
+		if (0 == rp_chunk->parent_is_rp)	/* skipped the top (default) resource pool name */
+			continue;
+
+		rpool = (zbx_vmware_resourcepool_t *)zbx_malloc(NULL, sizeof(zbx_vmware_resourcepool_t));
+		rpool->id = zbx_strdup(NULL, rp_chunk->id);
+		rpool->path = zbx_strdup(NULL, rp_chunk->name);
+		rpool->vm_num = 0;
+
+		rp_parent.id = rp_chunk->first_parentid;
+
+		while (FAIL != (k = zbx_vector_vmware_rpool_chunk_bsearch(&rp_chunks, &rp_parent,
+				ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
+		{
+			zbx_vmware_rpool_chunk_t	*rp_next = rp_chunks.values[k];
+
+			if (NULL != rp_next->path)
+				rpool->path = zbx_dsprintf(rpool->path, "%s/%s", rp_next->path, rpool->path);
+
+			if (0 == rp_next->parent_is_rp || NULL != rp_next->path)
+			{
+				rpool->parentid = zbx_strdup(NULL, 0 == rp_next->parent_is_rp ?
+						rp_next->first_parentid : rp_next->parentid);
+				zbx_vector_vmware_resourcepool_append(resourcepools, rpool);
+				rp_chunk->path = rpool->path;
+				rp_chunk->parentid = rpool->parentid;
+				break;
+			}
+
+			rpool->path = zbx_dsprintf(rpool->path, "%s/%s", rp_next->name, rpool->path);
+			rp_parent.id = rp_next->first_parentid;
+		}
+	}
+
+	zbx_vector_vmware_resourcepool_sort(resourcepools, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_reserve(clusters, (size_t)(clusters->values_alloc + cl_chunks.values_num));
+
+	for (i = cl_chunks.values_num - 1; i >= 0 ; i--)
+	{
+		zbx_vmware_cluster_t	*cluster = (zbx_vmware_cluster_t*)(cl_chunks.values[i]);
 
 		if (SUCCEED != vmware_service_get_cluster_status(easyhandle, cluster->id, cq_values, &cluster->status,
 				error))
 		{
-			do
-			{
-				vmware_cluster_free(cluster);
-				zbx_vector_ptr_remove(clusters, i++);
-			} while (i < clusters->values_num);
-
 			goto out;
 		}
-	}
 
-	for (i = 0; i < resourcepools->values_num; i++)
-	{
-		int				k;
-		zbx_vmware_resourcepool_t	rp_parent;
-
-		if (NULL != resourcepools->values[i]->path)
-			continue;
-
-		resourcepools->values[i]->path = zbx_strdup(NULL, resourcepools->values[i]->name);
-
-		if (0 == resourcepools->values[i]->parent_is_rp)
-		{
-			resourcepools->values[i]->parentid = zbx_strdup(NULL, resourcepools->values[i]->first_parentid);
-			continue;
-		}
-
-		rp_parent.id = resourcepools->values[i]->first_parentid;
-
-		while (FAIL != (k = zbx_vector_vmware_resourcepool_search(resourcepools, &rp_parent,
-				vmware_resourcepool_compare_id)))
-		{
-			zbx_vmware_resourcepool_t	*rpool = resourcepools->values[k];
-
-			if (0 == rpool->parent_is_rp)
-			{
-				resourcepools->values[i]->parentid = zbx_strdup(NULL, rpool->first_parentid);
-				break;
-			}
-
-			if (NULL != rpool->path)
-			{
-				resourcepools->values[i]->path = zbx_dsprintf(resourcepools->values[i]->path, "%s/%s",
-						rpool->path, resourcepools->values[i]->path);
-				resourcepools->values[i]->parentid = zbx_strdup(NULL, rpool->parentid);
-				break;
-			}
-
-			resourcepools->values[i]->path = zbx_dsprintf(resourcepools->values[i]->path, "%s/%s",
-					rpool->name, resourcepools->values[i]->path);
-
-			rp_parent.id = rpool->first_parentid;
-		}
-
-		if (NULL == resourcepools->values[i]->parentid)
-		{
-			vmware_resourcepool_free(resourcepools->values[i]);
-			zbx_vector_vmware_resourcepool_remove(resourcepools, i--);
-		}
+		zbx_vector_ptr_append(clusters, cluster);
+		zbx_vector_ptr_remove_noorder(&cl_chunks, i);
 	}
 
 	ret = SUCCEED;
 out:
 	zbx_xml_free_doc(cluster_data);
+	zbx_vector_vmware_rpool_chunk_clear_ext(&rp_chunks, vmware_rp_chunk_free);
+	zbx_vector_vmware_rpool_chunk_destroy(&rp_chunks);
+	zbx_vector_ptr_clear_ext(&cl_chunks, (zbx_clean_func_t)vmware_cluster_free);
+	zbx_vector_ptr_destroy(&cl_chunks);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found cl:%d rp:%d", __func__, zbx_result_string(ret),
 			clusters->values_num, resourcepools->values_num);

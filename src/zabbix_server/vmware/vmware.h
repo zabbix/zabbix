@@ -292,15 +292,11 @@ typedef struct
 {
 	char			*id;
 	char			*parentid;
-	char			*first_parentid;
-	char			*name;
 	char			*path;
-	unsigned char		parent_is_rp;
 	zbx_uint64_t		vm_num;
 }
 zbx_vmware_resourcepool_t;
 
-int	vmware_resourcepool_compare_id(const void *r1, const void *r2);
 ZBX_PTR_VECTOR_DECL(vmware_resourcepool, zbx_vmware_resourcepool_t *)
 
 /* the vmware eventlog state */
