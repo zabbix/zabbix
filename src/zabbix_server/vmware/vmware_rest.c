@@ -24,16 +24,12 @@
 extern int	CONFIG_VMWARE_TIMEOUT;
 #define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
 
-#define IS_VMWARE_API_VERSION_NEW	(702 <= service->major_version * 100 + service->minor_version * 10 + \
-		service->update_version)
-
 typedef struct
 {
 	char	*data;
 	size_t	alloc;
 	size_t	offset;
 	char	*url;
-
 }
 ZBX_HTTPPAGE;
 
@@ -239,7 +235,8 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
  *                                                                            *
  * Purpose: cURL handle prepare                                               *
  *                                                                            *
- * Parameters: service    - [IN] the vmware service                           *
+ * Parameters: url        - [IN] the vmware service url                       *
+ *             is_new_api - [IN] flag to use new api version syntax           *
  *             easyhandle - [OUT] cURL handle                                 *
  *             page       - [OUT] the response buffer for cURL                *
  *             headers    - [OUT] the request headers for cURL                *
@@ -248,7 +245,7 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
  * Return value: SUCCEED if the cURL prepared, FAIL otherwise                 *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_curl_init(zbx_vmware_service_t *service, CURL **easyhandle, ZBX_HTTPPAGE *page,
+static int	vmware_curl_init(const char *url, unsigned char is_new_api, CURL **easyhandle, ZBX_HTTPPAGE *page,
 		struct curl_slist **headers, char **error)
 {
 #	define INIT_PERF_REST_SIZE	2 * ZBX_KIBIBYTE
@@ -272,7 +269,7 @@ static int	vmware_curl_init(zbx_vmware_service_t *service, CURL **easyhandle, ZB
 
 	page->alloc = INIT_PERF_REST_SIZE;
 	page->data = (char *)zbx_malloc(NULL, page->alloc);
-	page->url = zbx_strdup(NULL, service->url);
+	page->url = zbx_strdup(NULL, url);
 	zbx_rtrim(page->url, "/");
 	url_sz = strlen(page->url);
 
@@ -282,7 +279,7 @@ static int	vmware_curl_init(zbx_vmware_service_t *service, CURL **easyhandle, ZB
 		goto out;
 	}
 
-	if (0 == IS_VMWARE_API_VERSION_NEW)
+	if (0 == is_new_api)
 	{
 		page->url = zbx_dsprintf(page->url, "%.*s%s", (int)(url_sz - ZBX_CONST_STRLEN("sdk")), page->url,
 				"rest/com/vmware");
@@ -406,6 +403,7 @@ static int	vmware_rest_response_open(const char *data, struct zbx_json_parse *jp
  * Purpose: authenticate rest service                                         *
  *                                                                            *
  * Parameters: service    - [IN] the vmware service                           *
+ *             is_new_api - [IN] flag to use new api version syntax           *
  *             easyhandle - [IN/OUT] cURL handle                              *
  *             headers    - [IN/OUT] the request headers for cURL             *
  *             page       - [IN/OUT] the response buffer for cURL             *
@@ -414,8 +412,8 @@ static int	vmware_rest_response_open(const char *data, struct zbx_json_parse *jp
  * Return value: SUCCEED if the rest authenticated, FAIL otherwise            *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service, CURL *easyhandle,
-		struct curl_slist **headers, ZBX_HTTPPAGE *page, char **error)
+static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service, unsigned char is_new_api,
+		CURL *easyhandle, struct curl_slist **headers, ZBX_HTTPPAGE *page, char **error)
 {
 	int		ret = FAIL;
 	char		tmp[MAX_STRING_LEN], *token;
@@ -424,7 +422,7 @@ static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
 
-	zbx_snprintf(tmp, sizeof(tmp), 0 != IS_VMWARE_API_VERSION_NEW ? "%s/session" : "%s/cis/session", page->url);
+	zbx_snprintf(tmp, sizeof(tmp), 0 != is_new_api ? "%s/session" : "%s/cis/session", page->url);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, tmp)) ||
@@ -449,7 +447,7 @@ static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	if (0 == IS_VMWARE_API_VERSION_NEW && NULL != (token = strchr(page->data, ':')))
+	if (0 == is_new_api && NULL != (token = strchr(page->data, ':')))
 	{
 		token++;
 		token[strlen(token) - 1] = '\0';
@@ -620,17 +618,17 @@ static int	vmware_rest_post(const char *fn_parent, CURL *easyhandle, const char 
  *                                                                            *
  * Purpose: get list of tags linked with object                               *
  *                                                                            *
- * Parameters: service    - [IN] the vmware service                           *
- *             obj_id     - [IN] the parent function name for Log records     *
+ * Parameters: obj_id     - [IN] the parent function name for Log records     *
  *             easyhandle - [IN] the CURL handle                              *
+ *             is_new_api - [IN] flag to use new api version syntax           *
  *             ids        - [OUT] the vector with tags id                     *
  *             error      - [OUT] the error message in the case of failure    *
  *                                                                            *
  * Return value: SUCCEED if the receive list of tags id, FAIL otherwise       *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_tags_linked_id(zbx_vmware_service_t *service, const zbx_vmware_obj_id_t *obj_id,
-		CURL *easyhandle, zbx_vector_str_t *ids, char **error)
+static int	vmware_tags_linked_id(const zbx_vmware_obj_id_t *obj_id, CURL *easyhandle, unsigned char is_new_api,
+		zbx_vector_str_t *ids, char **error)
 {
 	int			ret;
 	char			tmp[MAX_STRING_LEN], *url;
@@ -641,7 +639,7 @@ static int	vmware_tags_linked_id(zbx_vmware_service_t *service, const zbx_vmware
 
 	zbx_snprintf(tmp, sizeof(tmp),"{\"object_id\":{\"id\":\"%s\",\"type\":\"%s\"}}", obj_id->id, obj_id->type);
 
-	if (0 != IS_VMWARE_API_VERSION_NEW)
+	if (0 != is_new_api)
 		url = "/cis/tagging/tag-association?action=list-attached-tags";
 	else
 		url = "/cis/tagging/tag-association?~action=list-attached-tags";
@@ -650,7 +648,7 @@ static int	vmware_tags_linked_id(zbx_vmware_service_t *service, const zbx_vmware
 	{
 		struct zbx_json_parse	jp_step;
 
-		if (0 == IS_VMWARE_API_VERSION_NEW)
+		if (0 == is_new_api)
 		{
 			if (SUCCEED != (ret = zbx_json_brackets_by_name(&jp, "value", &jp_step)))
 				goto out;
@@ -671,9 +669,9 @@ out:
  *                                                                            *
  * Purpose: get tag details and save to cache vectors                         *
  *                                                                            *
- * Parameters: service    - [IN] the vmware service                           *
- *             tag_id     - [IN] the tag id                                   *
+ * Parameters: tag_id     - [IN] the tag id                                   *
  *             easyhandle - [IN] the CURL handle                              *
+ *             is_new_api - [IN] flag to use new api version syntax           *
  *             tags       - [OUT] the vector with tags info                   *
  *             categories - [OUT] the vector with categories info             *
  *             error      - [OUT] the error message in the case of failure    *
@@ -681,7 +679,7 @@ out:
  * Return value: SUCCEED if the receive tag details, FAIL otherwise           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_vectors_update(zbx_vmware_service_t *service, const char *tag_id, CURL *easyhandle,
+static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, unsigned char is_new_api,
 		zbx_vector_vmware_tag_t *tags, zbx_vector_vmware_key_value_t *categories, char **error)
 {
 	struct zbx_json_parse	jp, jp_data;
@@ -693,7 +691,7 @@ static int	vmware_vectors_update(zbx_vmware_service_t *service, const char *tag_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() tag_id:%s", __func__, tag_id);
 
-	if (0 == IS_VMWARE_API_VERSION_NEW)
+	if (0 == is_new_api)
 	{
 		url_tag = "/cis/tagging/tag/id:";
 		url_cat = "/cis/tagging/category/id:";
@@ -707,7 +705,7 @@ static int	vmware_vectors_update(zbx_vmware_service_t *service, const char *tag_
 	if (FAIL == vmware_rest_get(__func__, easyhandle, url_tag, tag_id, &jp_data, error))
 		return FAIL;
 
-	if (0 == IS_VMWARE_API_VERSION_NEW)
+	if (0 == is_new_api)
 	{
 		if (SUCCEED != zbx_json_brackets_by_name(&jp_data, "value", &jp))
 			goto json_err;
@@ -732,7 +730,7 @@ static int	vmware_vectors_update(zbx_vmware_service_t *service, const char *tag_
 		if (FAIL == vmware_rest_get(__func__, easyhandle, url_cat, cid, &jp_data, error))
 			return FAIL;
 
-		if (0 == IS_VMWARE_API_VERSION_NEW)
+		if (0 == is_new_api)
 		{
 			if (SUCCEED != zbx_json_brackets_by_name(&jp_data, "value", &jp))
 				goto json_err;
@@ -783,7 +781,7 @@ json_err:
  *                                                                            *
  * Purpose: create vector with tags details                                   *
  *                                                                            *
- * Parameters: service     - [IN] the vmware service                          *
+ * Parameters: is_new_api  - [IN] flag to use new api version syntax          *
  *             entity_tags - [IN/OUT] the tag entity                          *
  *             tags        - [IN/OUT] the vector with tags info               *
  *             categories  - [IN/OUT] the vector with categories info         *
@@ -792,7 +790,7 @@ json_err:
  * Return value: SUCCEED if the create tags vector, FAIL otherwise            *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_tags_get(zbx_vmware_service_t *service, zbx_vmware_entity_tags_t *entity_tags,
+static int	vmware_tags_get(unsigned char is_new_api, zbx_vmware_entity_tags_t *entity_tags,
 		zbx_vector_vmware_tag_t *tags, zbx_vector_vmware_key_value_t *categories, CURL *easyhandle)
 {
 	int			i, found_tags = 0;
@@ -802,7 +800,7 @@ static int	vmware_tags_get(zbx_vmware_service_t *service, zbx_vmware_entity_tags
 
 	zbx_vector_str_create(&tag_ids);
 
-	if (FAIL == vmware_tags_linked_id(service, entity_tags->obj_id, easyhandle, &tag_ids, &entity_tags->error))
+	if (FAIL == vmware_tags_linked_id(entity_tags->obj_id, easyhandle, is_new_api, &tag_ids, &entity_tags->error))
 		goto out;
 
 	for (i = 0; i < tag_ids.values_num; i++)
@@ -811,7 +809,7 @@ static int	vmware_tags_get(zbx_vmware_service_t *service, zbx_vmware_entity_tags
 		zbx_vmware_tag_t	*tag, cmp = {.id = tag_ids.values[i]};
 
 		if (FAIL == (j = zbx_vector_vmware_tag_bsearch(tags, &cmp, zbx_vmware_tag_id_compare)) &&
-				FAIL == (j = vmware_vectors_update(service, tag_ids.values[i], easyhandle, tags,
+				FAIL == (j = vmware_vectors_update(tag_ids.values[i], easyhandle, is_new_api, tags,
 				categories, &entity_tags->error)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() problem with tag_id:%s error:%s", __func__, tag_ids.values[i],
@@ -846,40 +844,49 @@ out:
  ******************************************************************************/
 int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
 {
-	int				i, found_tags = 0, ret = FAIL;
+	int				i, version, found_tags = 0, ret = FAIL;
+	char				*error = NULL;
+	unsigned char			is_new_api;
 	zbx_vector_vmware_entity_tags_t	entity_tags;
 	zbx_vector_vmware_tag_t		tags;
 	zbx_vector_vmware_key_value_t	categories;
 	CURL				*easyhandle = NULL;
 	struct curl_slist		*headers = NULL;
 	ZBX_HTTPPAGE			page = {.data = NULL, .url = NULL};
-	char				*error = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vc version:%s", __func__, service->version);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (65 > service->major_version * 10 + service->minor_version)
+	zbx_vmware_lock();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() vc version:%s", __func__, service->version);
+	version = service->major_version * 100 + service->minor_version * 10 + service->update_version;
+
+	if (650 > version)
 	{
 		error = zbx_strdup(error, "Tags are supported since vmware version 6.5.");
+		zbx_vmware_unlock();
 		goto out;
 	}
 
 	zbx_vector_vmware_tag_create(&tags);
 	zbx_vector_vmware_key_value_create(&categories);
 	zbx_vector_vmware_entity_tags_create(&entity_tags);
-
-	zbx_vmware_lock();
 	vmware_entry_tags_init(service->data, &entity_tags);
+
 	zbx_vmware_unlock();
 
+	is_new_api = (702 <= version) ? 1 : 0;
+
 	if (0 != entity_tags.values_num && (
-			SUCCEED != vmware_curl_init(service, &easyhandle, &page, &headers, &error) ||
-			SUCCEED != vmware_service_rest_authenticate(service, easyhandle, &headers, &page, &error)))
+			SUCCEED != vmware_curl_init(service->url, is_new_api, &easyhandle, &page, &headers, &error) ||
+			SUCCEED != vmware_service_rest_authenticate(service, is_new_api, easyhandle, &headers, &page,
+			&error)))
 	{
 		goto clean;
 	}
 
 	for (i = 0; i < entity_tags.values_num; i++)
-		found_tags += vmware_tags_get(service, entity_tags.values[i], &tags, &categories, easyhandle);
+		found_tags += vmware_tags_get(is_new_api, entity_tags.values[i], &tags, &categories, easyhandle);
 
 	if (NULL != headers)
 		vmware_service_rest_logout(easyhandle, &page);
