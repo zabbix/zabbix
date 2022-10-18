@@ -479,24 +479,22 @@ function getMenuPopupMapElementTrigger(options) {
 
 	// items problems
 	if (options.allowed_ui_latest_data && options.items.length) {
-		const latest_data = [];
+		const history = [];
 
 		for (const item of options.items) {
-			url = new Curl('zabbix.php', false);
-			url.setArgument('action', 'latest.view');
-			url.setArgument('hostids[]', item.params.hostid);
-			url.setArgument('name', item.params.name);
-			url.setArgument('filter_name', '')
+			url = new Curl('history.php', false);
+			url.setArgument('action', item.params.action);
+			url.setArgument('itemids[]', item.params.itemid);
 
-			latest_data.push({
+			history.push({
 				label: item.name,
 				url: url.getUrl()
 			});
 		};
 
 		items.push({
-			label: t('Latest data'),
-			items: latest_data
+			label: t('History'),
+			items: history
 		});
 	}
 
@@ -744,24 +742,22 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 	// items problems
 	if (options.allowed_ui_latest_data && options.items.length) {
-		const latest_data = [];
+		const history = [];
 
 		for (const item of options.items) {
-			url = new Curl('zabbix.php', false);
-			url.setArgument('action', 'latest.view');
-			url.setArgument('hostids[]', item.params.hostid);
-			url.setArgument('name', item.params.name);
-			url.setArgument('filter_name', '')
+			url = new Curl('history.php', false);
+			url.setArgument('action', item.params.action);
+			url.setArgument('itemids[]', item.params.itemid);
 
-			latest_data.push({
+			history.push({
 				label: item.name,
 				url: url.getUrl()
 			});
 		};
 
 		items.push({
-			label: t('Latest data'),
-			items: latest_data
+			label: t('History'),
+			items: history
 		});
 	}
 
