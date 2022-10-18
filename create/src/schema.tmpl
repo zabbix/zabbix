@@ -592,7 +592,7 @@ FIELD		|ldap_userdirectoryid	|t_id	|NULL |NULL	|0		|3|userdirectory	|userdirecto
 FIELD		|jit_provision_interval		|t_varchar(32)	|'1h'	|NOT NULL	|0
 FIELD		|saml_jit_status			|t_integer		|'0'	|NOT NULL	|0
 FIELD		|ldap_jit_status			|t_integer		|'0'	|NOT NULL	|0
-FIELD		|deprovisioned_groupid		|t_id			|NULL	|NULL		|0	|4|usrgrp	|usrgrpid|RESTRICT
+FIELD		|disabled_usrgrpid			|t_id			|NULL	|NULL		|0	|4|usrgrp	|usrgrpid|RESTRICT
 FIELD		|server_status		|t_shorttext	|''	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid

@@ -1942,7 +1942,7 @@ class CUser extends CApiService {
 
 		if (!$idp_user_data['usrgrps']) {
 			$users[0]['usrgrps'] = [[
-				'usrgrpid' => CAuthenticationHelper::get(CAuthenticationHelper::DEPROVISIONED_GROUPID)
+				'usrgrpid' => CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID)
 			]];
 			$users[0]['roleid'] = 0;
 			$user = [];
@@ -1971,7 +1971,7 @@ class CUser extends CApiService {
 			'deprovisioned' => false,
 			'userdirectoryid' => 0
 		];
-		$deprovision_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DEPROVISIONED_GROUPID);
+		$deprovision_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID);
 
 		$db_usrgrps = DBselect(
 			'SELECT g.usrgrpid,g.debug_mode,g.users_status,g.gui_access,g.userdirectoryid'.

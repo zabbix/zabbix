@@ -51,9 +51,9 @@ $auth_tab = (new CFormGrid())
 		]),
 		new CFormField(
 			(new CMultiSelect([
-				'name' => 'deprovisioned_groupid',
+				'name' => 'disabled_usrgrpid',
 				'object_name' => 'usersGroups',
-				'data' => $data['deprovisioned_group_ms'],
+				'data' => $data['disabled_usrgrpid_ms'],
 				'multiple' => false,
 				'popup' => [
 					'parameters' => [
@@ -61,7 +61,7 @@ $auth_tab = (new CFormGrid())
 						'srcfld1' => 'usrgrpid',
 						'srcfld2' => 'name',
 						'dstfrm' => $form->getId(),
-						'dstfld1' => 'deprovisioned_groupid',
+						'dstfld1' => 'disabled_usrgrpid',
 						'group_status' => GROUP_STATUS_DISABLED
 					]
 				]

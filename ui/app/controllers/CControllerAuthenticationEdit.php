@@ -34,7 +34,7 @@ class CControllerAuthenticationEdit extends CController {
 		$fields = [
 			'form_refresh' =>					'int32',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
-			'deprovisioned_groupid' =>			'id',
+			'disabled_usrgrpid' =>				'id',
 			'http_auth_enabled' =>				'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 			'http_strip_domains' =>				'db config.http_strip_domains',
@@ -105,7 +105,7 @@ class CControllerAuthenticationEdit extends CController {
 
 		$auth_params = [
 			CAuthenticationHelper::AUTHENTICATION_TYPE,
-			CAuthenticationHelper::DEPROVISIONED_GROUPID,
+			CAuthenticationHelper::DISABLED_USER_GROUPID,
 			CAuthenticationHelper::HTTP_AUTH_ENABLED,
 			CAuthenticationHelper::HTTP_LOGIN_FORM,
 			CAuthenticationHelper::HTTP_STRIP_DOMAINS,
@@ -129,7 +129,7 @@ class CControllerAuthenticationEdit extends CController {
 		if ($this->hasInput('form_refresh')) {
 			$config_fields = [
 				'authentication_type' => DB::getDefault('config', 'authentication_type'),
-				'deprovisioned_groupid' => 0,
+				'disabled_usrgrpid' => 0,
 				'http_auth_enabled' => DB::getDefault('config', 'http_auth_enabled'),
 				'http_login_form' => DB::getDefault('config', 'http_login_form'),
 				'http_strip_domains' => DB::getDefault('config', 'http_strip_domains'),
@@ -265,14 +265,14 @@ class CControllerAuthenticationEdit extends CController {
 				&& $data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED
 		);
 		$data['db_authentication_type'] = CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE);
-		$data['deprovisioned_group_ms'] = [];
+		$data['disabled_usrgrpid_ms'] = [];
 
-		if ($data['deprovisioned_groupid']) {
+		if ($data['disabled_usrgrpid']) {
 			$groups = API::UserGroup()->get([
 				'output' => ['usrgrpid', 'name'],
-				'usrgrpids' => [$data['deprovisioned_groupid']]
+				'usrgrpids' => [$data['disabled_usrgrpid']]
 			]);
-			$data['deprovisioned_group_ms'] = CArrayHelper::renameObjectsKeys($groups, ['usrgrpid' => 'id']);
+			$data['disabled_usrgrpid_ms'] = CArrayHelper::renameObjectsKeys($groups, ['usrgrpid' => 'id']);
 		}
 
 		$response = new CControllerResponseData($data);

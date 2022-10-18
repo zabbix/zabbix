@@ -38,7 +38,7 @@ class CAuthentication extends CApiService {
 	private $output_fields = ['authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
 		'http_case_sensitive', 'ldap_auth_enabled', 'ldap_case_sensitive', 'ldap_userdirectoryid', 'saml_auth_enabled',
 		'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules', 'jit_provision_interval', 'saml_jit_status',
-		'ldap_jit_status', 'deprovisioned_groupid'
+		'ldap_jit_status', 'disabled_usrgrpid'
 	];
 
 	/**
@@ -114,7 +114,7 @@ class CAuthentication extends CApiService {
 	protected function validateUpdate(array $auth): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'authentication_type' =>		['type' => API_INT32, 'in' => ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP],
-			'deprovisioned_groupid' =>		['type' => API_ID],
+			'disabled_usrgrpid' =>			['type' => API_ID],
 			'http_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
 			'http_login_form' =>			['type' => API_INT32, 'in' => ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP],
 			'http_strip_domains' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'http_strip_domains')],
@@ -158,17 +158,16 @@ class CAuthentication extends CApiService {
 		$db_auth = reset($db_auth);
 		$auth += $db_auth;
 
-		if ($auth['authentication_type'] == ZBX_AUTH_LDAP
-				&& $auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_DISABLED) {
+		if ($auth['authentication_type'] == ZBX_AUTH_LDAP && $auth['ldap_auth_enabled'] != ZBX_AUTH_LDAP_DISABLED) {
 			static::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect value for field "%1$s": %2$s.', '/authentication_type', _('LDAP must be enabled'))
 			);
 		}
 
-		if ($auth['deprovisioned_groupid']) {
+		if ($auth['disabled_usrgrpid']) {
 			$group = API::UserGroup()->get([
 				'output' => ['users_status'],
-				'usrgrpids' => [$auth['deprovisioned_groupid']]
+				'usrgrpids' => [$auth['disabled_usrgrpid']]
 			]);
 			$group = reset($group);
 

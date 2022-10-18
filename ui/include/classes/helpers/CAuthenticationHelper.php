@@ -25,7 +25,7 @@
 class CAuthenticationHelper extends CConfigGeneralHelper {
 
 	public const AUTHENTICATION_TYPE = 'authentication_type';
-	public const DEPROVISIONED_GROUPID = 'deprovisioned_groupid';
+	public const DISABLED_USER_GROUPID = 'disabled_usrgrpid';
 	public const HTTP_AUTH_ENABLED = 'http_auth_enabled';
 	public const HTTP_CASE_SENSITIVE = 'http_case_sensitive';
 	public const HTTP_LOGIN_FORM = 'http_login_form';

@@ -2749,7 +2749,7 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'deprovisioned_groupid' => [
+			'disabled_usrgrpid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
