@@ -2146,7 +2146,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$dashboardids = CDBHelper::getColumn("SELECT * from dashboard where name LIKE 'top_host_%'", 'dashboardid');
 		CDataHelper::call('dashboard.delete', $dashboardids);
 
-		$itemids = CDBHelper::getColumn("SELECT * from items where name LIKE 'top_hosts_trap%'", 'itemid');
+		$itemids = CDBHelper::getColumn("SELECT * FROM items WHERE name LIKE 'top_hosts_trap%'", 'itemid');
 		CDataHelper::call('item.delete', $itemids);
 	}
 }
