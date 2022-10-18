@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:27:28Z'
+  date: '2022-10-18T07:45:37Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -14,7 +14,7 @@ zabbix_export:
         Get GitLab metrics by HTTP agent from Prometheus metrics endpoint.
         
         To access the metrics, the client IP address must be explicitly allowed. See https://docs.gitlab.com/ee/administration/monitoring/ip_whitelist.html.
-        
+        Or second method, using token variable from http://your.gitlab.address/admin/health_check (fill {$GITLAB.HEALTH.TOKEN} macro with variable path like "?token=your_token").
         Don't forget change macros {$GITLAB.URL}.
         Some metrics may not be collected depending on your Gitlab instance version and configuration. See (Gitlab's documentation[)https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html] for further information about its metric collection.
         
@@ -262,7 +262,7 @@ zabbix_export:
               type: PROMETHEUS_TO_JSON
               parameters:
                 - ''
-          url: '{$GITLAB.URL}/-/metrics'
+          url: '{$GITLAB.URL}/-/metrics{$GITLAB.HEALTH.TOKEN}'
           tags:
             -
               tag: component
@@ -392,7 +392,7 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 30m
-          url: '{$GITLAB.URL}/-/liveness'
+          url: '{$GITLAB.URL}/-/liveness{$GITLAB.HEALTH.TOKEN}'
           tags:
             -
               tag: component
@@ -561,7 +561,7 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 30m
-          url: '{$GITLAB.URL}/-/readiness'
+          url: '{$GITLAB.URL}/-/readiness{$GITLAB.HEALTH.TOKEN}'
           tags:
             -
               tag: component
@@ -1330,7 +1330,7 @@ zabbix_export:
                 -
                   tag: scope
                   value: capacity
-          url: '{$GITLAB.URL}/-/metrics'
+          url: '{$GITLAB.URL}/-/metrics{$GITLAB.HEALTH.TOKEN}'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -1427,7 +1427,7 @@ zabbix_export:
                 -
                   tag: scope
                   value: capacity
-          url: '{$GITLAB.URL}/-/metrics'
+          url: '{$GITLAB.URL}/-/metrics{$GITLAB.HEALTH.TOKEN}'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -1446,6 +1446,9 @@ zabbix_export:
           tag: target
           value: gitlab
       macros:
+        -
+          macro: '{$GITLAB.HEALTH.TOKEN}'
+          description: 'Gitlab health token variable path. Example "?token=your_token"'
         -
           macro: '{$GITLAB.HTTP.FAIL.MAX.WARN}'
           value: '2'

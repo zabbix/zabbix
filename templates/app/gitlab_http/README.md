@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 The template to monitor GitLab by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -22,6 +22,7 @@ This template was tested on:
 
 This template works with self-hosted GitLab instances. Internal service metrics are collected from GitLab /-/metrics endpoint.
 To access the metrics, the client IP address must be [explicitly allowed](https://docs.gitlab.com/ee/administration/monitoring/ip_whitelist.html).
+Or second method, using token variable from http://your.gitlab.address/admin/health_check (fill {$GITLAB.HEALTH.TOKEN} macro with variable path like "?token=your_token").
 Don't forget to change the macros {$GITLAB.URL}.
 Also, see the Macros section for a list of macros used to set trigger values.
 
@@ -36,6 +37,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$GITLAB.HEALTH.TOKEN} |<p>Gitlab health token variable path. Example "?token=your_token"</p> |`` |
 |{$GITLAB.HTTP.FAIL.MAX.WARN} |<p>Maximum number of HTTP requests failures for trigger expression.</p> |`2` |
 |{$GITLAB.OPEN.FDS.MAX.WARN} |<p>Maximum percentage of used file descriptors for trigger expression.</p> |`90` |
 |{$GITLAB.PUMA.QUEUE.MAX.WARN} |<p>Maximum number of Puma queued requests for trigger expression.</p> |`1` |
@@ -137,7 +139,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 
