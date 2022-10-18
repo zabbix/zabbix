@@ -514,6 +514,7 @@ static int	DBpatch_6030060(void)
 	return ret;
 }
 
+static int	DBpatch_6030061(void)
 {
 	zbx_db_insert_t	db_insert;
 	int		i, ret = FAIL;
