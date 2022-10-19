@@ -5308,8 +5308,8 @@ static int	vmware_service_get_cluster_list(CURL *easyhandle, zbx_vector_ptr_t *c
 	{
 		char	*status;
 
-		zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_CLUSTER)"[.='%s']"
-				"/.." ZBX_XPATH_LN2("propSet", "val"), ids.values[i]);
+		zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_PROP_OBJECTS_ID(ZBX_VMWARE_SOAP_CLUSTER, "[text()='%s']")
+						"/" ZBX_XPATH_PROP_NAME_NODE("name"), ids.values[i]);
 
 		if (NULL == (name = zbx_xml_doc_read_value(cluster_data, xpath)))
 			continue;
