@@ -242,11 +242,13 @@ $ldap_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		(new CLabel(_('Provisioning period'), 'jit_provision_interval'))->addClass('ldap-jit-status'),
-		(new CFormField(
+		new CLabel(_('Provisioning period'), 'jit_provision_interval'),
+		new CFormField(
 			(new CTextBox('jit_provision_interval', $data['jit_provision_interval']))
 				->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
-		))->addClass('ldap-jit-status')
+				->setEnabled($data['ldap_jit_status'])
+				->addClass('ldap-jit-status')
+		)
 	]);
 
 // SAML authentication fields.

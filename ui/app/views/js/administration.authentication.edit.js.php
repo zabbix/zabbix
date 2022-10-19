@@ -49,7 +49,6 @@
 			this._renderProvisionMedia(saml_provision_media);
 
 			this.toggleSamlJitProvisioning(this.saml_provision_status.checked);
-			this.toggleProvisionPeriod(this.ldap_jit_status.checked);
 
 			if (document.getElementById('saml_auth_enabled') !== null
 					&& !document.getElementById('saml_auth_enabled').checked) {
@@ -123,7 +122,9 @@
 			});
 
 			this.ldap_jit_status.addEventListener('change', (e) => {
-				this.toggleProvisionPeriod(e.target.checked);
+				this.form.querySelectorAll('.ldap-jit-status').forEach(field => {
+					field.disabled = !e.target.checked;
+				});
 			});
 
 			this.saml_provision_groups_table.addEventListener('click', (e) => {
@@ -616,12 +617,6 @@
 
 		toggleSamlJitProvisioning(checked) {
 			for (const element of this.form.querySelectorAll('.saml-provision-status')) {
-				element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
-			}
-		}
-
-		toggleProvisionPeriod(checked) {
-			for (const element of this.form.querySelectorAll('.ldap-jit-status')) {
 				element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
 			}
 		}

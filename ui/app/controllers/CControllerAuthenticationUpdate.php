@@ -49,7 +49,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
 			'ldap_removed_userdirectoryids' =>	'array_id',
 			'ldap_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
-			'jit_provision_interval' =>			'required|db config.jit_provision_interval|time_unit_year '.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]),
+			'jit_provision_interval' =>			'db config.jit_provision_interval|time_unit_year '.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]),
 			'http_auth_enabled' =>				'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 			'http_login_form' =>				'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
 			'http_strip_domains' =>				'db config.http_strip_domains',
