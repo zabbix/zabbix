@@ -22,6 +22,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * @backup triggers
@@ -302,17 +303,25 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->zbxTestAssertVisibleId('comments');
 		$this->zbxTestAssertAttribute("//textarea[@id='comments']", 'rows', 7);
 
-		$this->zbxTestTextPresent('Menu entry name');
-		$this->zbxTestAssertVisibleId('url_name');
-		$this->zbxTestAssertAttribute("//input[@id='url_name']", 'maxlength', 64);
+		$form = $this->query('id:triggers-form')->asForm()->one();
+		$entry_name = $form->getField('Menu entry name');
+
+		foreach (['placeholder' => 'Trigger URL', 'maxlength' => 64] as $attribute => $value) {
+			$this->assertEquals($value, $entry_name->getAttribute($attribute));
+		}
 
 		// Check hintbox.
 		$this->query('class:icon-help-hint')->one()->click();
-		$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
+		$hint = $form->query('xpath:.//div[@class="hint-box"]')->waitUntilPresent()->one();
 
 		// Assert text.
-		$this->assertEquals("Menu entry name is used as a label for the trigger URL in the event context menu.",
-				$hint->one()->getText());
+		$this->assertEquals('Menu entry name is used as a label for the trigger URL in the event context menu.',
+				$hint->getText()
+		);
+
+		// Press Escape key to close hintbox.
+		$this->page->pressKey(WebDriverKeys::ESCAPE);
+		$hint->waitUntilNotVisible();
 
 		$this->zbxTestTextPresent('Menu entry URL');
 		$this->zbxTestAssertVisibleId('url');
