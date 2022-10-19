@@ -598,7 +598,7 @@ class CControllerMenuPopup extends CController {
 										)
 											? HISTORY_GRAPH
 											: HISTORY_VALUES,
-										'web' => $item['type'] == ITEM_TYPE_HTTPTEST
+										'is_webitem' => $item['type'] == ITEM_TYPE_HTTPTEST
 									]
 								];
 
@@ -713,7 +713,7 @@ class CControllerMenuPopup extends CController {
 						'action' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
 							? HISTORY_GRAPH
 							: HISTORY_VALUES,
-						'web' => $item['type'] == ITEM_TYPE_HTTPTEST
+						'is_webitem' => $item['type'] == ITEM_TYPE_HTTPTEST
 					]
 				];
 			}

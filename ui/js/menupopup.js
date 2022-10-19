@@ -109,7 +109,7 @@ function getMenuPopupHistory(options) {
 function getMenuPopupHost(options, trigger_element) {
 	const sections = [];
 	const items = [];
-	const config_urls = [];
+	const configuration = [];
 	let url;
 
 	// go to section
@@ -226,7 +226,7 @@ function getMenuPopupHost(options, trigger_element) {
 			url.setArgument('action', 'host.edit');
 			url.setArgument('hostid', options.hostid);
 
-			config_urls.push({
+			configuration.push({
 				label: t('Host'),
 				disabled: !options.isWriteable,
 				url: url.getUrl(),
@@ -244,7 +244,7 @@ function getMenuPopupHost(options, trigger_element) {
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
 
-			config_urls.push({
+			configuration.push({
 				label: t('Items'),
 				disabled: !options.isWriteable,
 				url: url.getUrl()
@@ -256,7 +256,7 @@ function getMenuPopupHost(options, trigger_element) {
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
 
-			config_urls.push({
+			configuration.push({
 				label: t('Triggers'),
 				disabled: !options.isWriteable,
 				url: url.getUrl()
@@ -268,7 +268,7 @@ function getMenuPopupHost(options, trigger_element) {
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
 
-			config_urls.push({
+			configuration.push({
 				label: t('Graphs'),
 				disabled: !options.isWriteable,
 				url: url.getUrl()
@@ -280,7 +280,7 @@ function getMenuPopupHost(options, trigger_element) {
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
 
-			config_urls.push({
+			configuration.push({
 				label: t('Discovery'),
 				disabled: !options.isWriteable,
 				url: url.getUrl()
@@ -292,7 +292,7 @@ function getMenuPopupHost(options, trigger_element) {
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
 
-			config_urls.push({
+			configuration.push({
 				label: t('Web'),
 				disabled: !options.isWriteable,
 				url: url.getUrl()
@@ -300,7 +300,7 @@ function getMenuPopupHost(options, trigger_element) {
 
 			sections.push({
 				label: t('Configuration'),
-				items: config_urls
+				items: configuration
 			});
 		}
 	}
@@ -528,7 +528,6 @@ function getMenuPopupMapElementTrigger(options) {
 			items: trigger_urls
 		});
 
-
 		if (options.items.length) {
 			for (const item of options.items) {
 				url = new Curl('items.php', false);
@@ -538,7 +537,7 @@ function getMenuPopupMapElementTrigger(options) {
 
 				item_urls.push({
 					label: item.name,
-					disabled: item.params.web,
+					disabled: item.params.is_webitem,
 					url: url.getUrl()
 				});
 			};
@@ -792,7 +791,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 				item_urls.push({
 					label: item.name,
-					disabled: item.params.web,
+					disabled: item.params.is_webitem,
 					url: url.getUrl()
 				});
 			}
@@ -843,7 +842,7 @@ function getMenuPopupTrigger(options, trigger_element) {
  */
 function getMenuPopupItem(options) {
 	const sections = [];
-	const action_urls = [];
+	const actions = [];
 	const items = [];
 	let url;
 
@@ -998,11 +997,11 @@ function getMenuPopupItem(options) {
 		};
 	}
 
-	action_urls.push(execute);
+	actions.push(execute);
 
 	sections.push({
 		label: t('Actions'),
-		items: action_urls
+		items: actions
 	});
 
 	return sections;
