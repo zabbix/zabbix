@@ -352,9 +352,21 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertVisibleId('comments');
 		$this->zbxTestAssertAttribute("//textarea[@id='comments']", 'rows', 7);
 
-		$this->zbxTestTextPresent('URL');
+		$this->zbxTestTextPresent('Menu entry name');
+		$this->zbxTestAssertVisibleId('url_name');
+		$this->zbxTestAssertAttribute("//input[@id='url_name']", 'maxlength', 64);
+
+		// Check hintbox.
+		$this->query('class:icon-help-hint')->one()->click();
+		$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
+
+		// Assert text.
+		$this->assertEquals("Menu entry name is used as a label for the trigger URL in the event context menu.",
+				$hint->one()->getText());
+
+		$this->zbxTestTextPresent('Menu entry URL');
 		$this->zbxTestAssertVisibleId('url');
-		$this->zbxTestAssertAttribute("//input[@id='url']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@id='url']", 'maxlength', 2048);
 
 		$this->zbxTestAssertElementPresentId('priority_0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_0'));
@@ -579,6 +591,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<5',
 					'type' => true,
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
+					'url_name' => 'Trigger context menu name for trigger URL.',
 					'url' => 'http://www.zabbix.com',
 					'severity' => 'High',
 					'status' => false
@@ -589,6 +602,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_CheckUrl',
 					'expression' => 'last(/Simple form test host/item-prototype-reuse,#1)<5',
+					'url_name' => 'MyTrigger: menu name',
 					'url' => 'index.php'
 				]
 			],
@@ -805,6 +819,10 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 		if (isset($data['comments'])) {
 			$this->zbxTestInputType('comments', $data['comments']);
+		}
+
+		if (isset($data['url_name'])) {
+			$this->zbxTestInputType('url_name', $data['url_name']);
 		}
 
 		if (isset($data['url'])) {
