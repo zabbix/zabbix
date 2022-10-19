@@ -32,15 +32,17 @@ class CModule {
 	public const TYPE_MODULE = 'module';
 	public const TYPE_WIDGET = 'widget';
 
-	private string $dir;
+	private string $root_path;
 	private string $relative_path;
 
 	protected array $manifest;
+	protected string $moduleid;
 
-	public function __construct(string $modules_dir, string $relative_path, array $manifest) {
-		$this->dir = $modules_dir.'/'.$relative_path;
+	public function __construct(string $root_path, string $relative_path, array $manifest, string $moduleid) {
+		$this->root_path = $root_path;
 		$this->relative_path = $relative_path;
 		$this->manifest = $manifest;
+		$this->moduleid = $moduleid;
 	}
 
 	public function init(): void {
@@ -63,7 +65,7 @@ class CModule {
 	}
 
 	public function getDir(): string {
-		return $this->dir;
+		return $this->root_path.'/'.$this->relative_path;
 	}
 
 	public function getRelativePath(): string {
@@ -98,11 +100,15 @@ class CModule {
 		$this->manifest['config'] = $config;
 
 		API::Module()->update([[
-			'moduleid' => $this->manifest['moduleid'],
+			'moduleid' => $this->moduleid,
 			'config' => $config
 		]]);
 
 		return $this;
+	}
+
+	public function getModuleId(): string {
+		return $this->moduleid;
 	}
 
 	/**

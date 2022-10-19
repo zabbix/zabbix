@@ -57,6 +57,11 @@ final class CModuleManager {
 	private array $manifests = [];
 
 	/**
+	 * DB moduleids of added modules.
+	 */
+	private array $moduleids = [];
+
+	/**
 	 * List of instantiated, initialized modules.
 	 */
 	private array $modules = [];
@@ -98,16 +103,13 @@ final class CModuleManager {
 			return null;
 		}
 
-		if ($moduleid !== null) {
-			$manifest['moduleid'] = $moduleid;
-		}
-
 		// Use override configuration, if supplied.
 		if (is_array($config)) {
 			$manifest['config'] = $config;
 		}
 
 		$this->manifests[$relative_path] = $manifest;
+		$this->moduleids[$relative_path] = $moduleid;
 
 		return $manifest;
 	}
@@ -140,7 +142,9 @@ final class CModuleManager {
 				}
 
 				/** @var CModule $instance */
-				$instance = new $module_class($this->root_path, $relative_path, $manifest);
+				$instance = new $module_class($this->root_path, $relative_path, $manifest,
+					$this->moduleids[$relative_path]
+				);
 
 				if ($instance instanceof $base_classname) {
 					$instance->init();
@@ -210,11 +214,7 @@ final class CModuleManager {
 
 		/** @var CWidget $widget */
 		foreach (APP::ModuleManager()->getWidgets($for_template_dashboard_only) as $widget) {
-			$widget_defaults[$widget->getId()] = $widget->getDefaults() + [
-				'iterator' => false,
-				'reference_field' => null,
-				'foreign_reference_fields' => []
-			];
+			$widget_defaults[$widget->getId()] = $widget->getDefaults();
 		}
 
 		return $widget_defaults;
