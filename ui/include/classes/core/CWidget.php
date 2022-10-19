@@ -75,7 +75,7 @@ class CWidget extends CModule {
 			: self::DEFAULT_FORM_CLASS;
 
 		$form_class = is_file($this->getDir().'/includes/'.$form_class.'.php')
-			? implode('\\', [$this->getRootNamespace(), $this->getNamespace(), 'Includes', $form_class])
+			? implode('\\', [$this->getNamespace(), 'Includes', $form_class])
 			: CWidgetForm::class;
 
 		$form = new $form_class($values, $templateid);

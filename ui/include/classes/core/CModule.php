@@ -47,10 +47,7 @@ class CModule {
 	}
 
 	public function getAssets(): array {
-		return $this->manifest['assets'] + [
-			'css' => [],
-			'js' => []
-		];
+		return $this->manifest['assets'];
 	}
 
 	public function getActions(): array {
@@ -79,10 +76,6 @@ class CModule {
 
 	public function getId(): string {
 		return $this->manifest['id'];
-	}
-
-	public function getRootNamespace(): string {
-		return $this->manifest['root_namespace'];
 	}
 
 	public function getNamespace(): string {

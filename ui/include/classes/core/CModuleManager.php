@@ -32,6 +32,11 @@ use Zabbix\Core\{
 final class CModuleManager {
 
 	/**
+	 * Lowest supported manifest version.
+	 */
+	private const MIN_MANIFEST_VERSION = 2;
+
+	/**
 	 * Highest supported manifest version.
 	 */
 	private const MAX_MANIFEST_VERSION = 2;
@@ -88,13 +93,13 @@ final class CModuleManager {
 			return null;
 		}
 
-		if ($moduleid !== null) {
-			$manifest['moduleid'] = $moduleid;
-		}
-
 		// Ignore module with an unexpected id.
 		if ($id !== null && $manifest['id'] !== $id) {
 			return null;
+		}
+
+		if ($moduleid !== null) {
+			$manifest['moduleid'] = $moduleid;
 		}
 
 		// Use override configuration, if supplied.
@@ -123,7 +128,7 @@ final class CModuleManager {
 
 			try {
 				if (is_file($this->root_path.'/'.$relative_path.'/'.$classname.'.php')) {
-					$module_class = implode('\\', [$manifest['root_namespace'], $manifest['namespace'], $classname]);
+					$module_class = implode('\\', [$manifest['namespace'], $classname]);
 
 					if (!class_exists($module_class)) {
 						$this->errors[] = _s('Wrong %1$s.php class name for module located at %2$s.', $classname,
@@ -184,7 +189,7 @@ final class CModuleManager {
 	}
 
 	/**
-	 * Get add initialized modules with type Widget.
+	 * Get initialized widget modules.
 	 */
 	public function getWidgets(bool $for_template_dashboard_only = false): array {
 		$widgets = [];
@@ -234,8 +239,7 @@ final class CModuleManager {
 		$namespaces = [];
 
 		foreach ($this->manifests as $relative_path => $manifest) {
-			$module_path = $this->root_path.'/'.$relative_path;
-			$namespaces[$manifest['root_namespace'].'\\'.$manifest['namespace']] = [$module_path];
+			$namespaces[$manifest['namespace']] = [$this->root_path.'/'.$relative_path];
 		}
 
 		return $namespaces;
@@ -250,16 +254,10 @@ final class CModuleManager {
 		/** @var CModule $module */
 		foreach ($this->modules as $module) {
 			foreach ($module->getActions() as $name => $data) {
-				$action_class = implode('\\', [$module->getRootNamespace(), $module->getNamespace(), 'Actions',
-					str_replace('/', '\\', $data['class'])
-				]);
-
-				if (!class_exists($action_class)) {
-					$action_class = $data['class'];
-				}
-
 				$actions[$name] = [
-					'class' => $action_class,
+					'class' => implode('\\', [$module->getNamespace(), 'Actions',
+						str_replace('/', '\\', $data['class'])
+					]),
 					'layout' => array_key_exists('layout', $data) ? $data['layout'] : 'layout.htmlpage',
 					'view' => array_key_exists('view', $data) ? $data['view'] : null
 				];
@@ -278,19 +276,7 @@ final class CModuleManager {
 				continue;
 			}
 
-			$module_assets = $module->getAssets();
-			$assets[$module->getId()] = [
-				'css' => [],
-				'js' => []
-			];
-
-			foreach ($module_assets['css'] as $css_file) {
-				$assets[$module->getId()]['css'][] = $css_file;
-			}
-
-			foreach ($module_assets['js'] as $js_file) {
-				$assets[$module->getId()]['js'][] = $js_file;
-			}
+			$assets[$module->getId()] = $module->getAssets();
 		}
 
 		return $assets;
@@ -389,8 +375,13 @@ final class CModuleManager {
 	 * @return array|null  Either manifest data or null if manifest file had errors.
 	 */
 	private function loadManifest(string $relative_path): ?array {
-		$module_path = $this->root_path.'/'.$relative_path;
-		$manifest_file_name = $module_path.'/manifest.json';
+		$relative_path_parts = explode('/', $relative_path, 2);
+
+		if (count($relative_path_parts) != 2) {
+			return null;
+		}
+
+		$manifest_file_name = $this->root_path.'/'.$relative_path.'/manifest.json';
 
 		if (!is_file($manifest_file_name) || !is_readable($manifest_file_name)) {
 			return null;
@@ -414,7 +405,8 @@ final class CModuleManager {
 		}
 
 		// Check manifest version.
-		if (!is_numeric($manifest['manifest_version']) || $manifest['manifest_version'] > self::MAX_MANIFEST_VERSION) {
+		if (!is_numeric($manifest['manifest_version']) || $manifest['manifest_version'] < self::MIN_MANIFEST_VERSION
+				|| $manifest['manifest_version'] > self::MAX_MANIFEST_VERSION) {
 			return null;
 		}
 
@@ -423,8 +415,7 @@ final class CModuleManager {
 			return null;
 		}
 
-		[$root_namespace] = explode('/', $relative_path, 2);
-		$manifest['root_namespace'] = ucfirst($root_namespace);
+		$manifest['namespace'] = ucfirst($relative_path_parts[0]).'\\'.$manifest['namespace'];
 
 		// Ensure empty defaults.
 		$manifest += [
@@ -436,6 +427,11 @@ final class CModuleManager {
 			'assets' => [],
 			'config' => [],
 			'widget' => []
+		];
+
+		$manifest['assets'] += [
+			'css' => [],
+			'js' => []
 		];
 
 		if ($manifest['type'] === CModule::TYPE_WIDGET) {

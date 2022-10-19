@@ -566,7 +566,20 @@ class ZBase {
 			}
 
 			if (!class_exists($action_class)) {
-				throw new Exception(_s('Class %1$s not found for action %2$s.', $action_class, $action_name));
+				$namespace_parts = explode('\\', $action_class);
+
+				if (count($namespace_parts) > 1) {
+					$action_class_fallback = end($namespace_parts);
+
+					if (!class_exists($action_class_fallback)) {
+						throw new Exception(_s('Class %1$s not found for action %2$s.', $action_class, $action_name));
+					}
+
+					$action_class = $action_class_fallback;
+				}
+				else {
+					throw new Exception(_s('Class %1$s not found for action %2$s.', $action_class, $action_name));
+				}
 			}
 
 			$action = new $action_class();
