@@ -35,11 +35,7 @@ class API {
 	 * @return HttpResponse
 	 */
 	public function execute(CApiClient $client, CHttpRequest $request): HttpResponse {
-		[$input, $auth, $class, $id] = $this->parseRequestData($request);
-
-		if ($id != null) {
-			$input['id'] = $id;
-		}
+		[$input, $auth, $class] = $this->parseRequestData($request);
 
 		/** @var CApiClientResponse $response */
 		$response = $client->callMethod($class, strtolower($request->method()), $input, $auth);
@@ -64,20 +60,30 @@ class API {
 		[, $auth] = explode('Bearer ', $request->header('AUTHORIZATION'), 2) + ['', ''];
 		[, $class, $id] = explode('/', $request->header('PATH-INFO'), 3) + ['', '', ''];
 
+		if ($id != null) {
+			$input['id'] = $id;
+		}
+
 		$class = '/' . strtolower($class);
+
+		if ($class === '/serviceproviderconfig' && $request->method() === 'GET') {
+			$auth = null;
+		}
 
 		if (array_key_exists('filter', $_GET)) {
 			[, $filter] = explode(' eq ', $_GET['filter']);
 			$input['userName'] = str_replace('"', '', $filter);
 		}
-		elseif (array_key_exists('startIndex', $_GET)) {
+
+		if (array_key_exists('startIndex', $_GET)) {
 			$input['startIndex'] = $_GET['startIndex'];
 		}
-		elseif (array_key_exists('count', $_GET)) {
+
+		if (array_key_exists('count', $_GET)) {
 			$input['count'] = $_GET['count'];
 		}
 
-		return [$input, $auth, $class, $id];
+		return [$input, $auth, $class];
 	}
 
 }

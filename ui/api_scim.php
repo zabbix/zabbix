@@ -24,27 +24,28 @@ require_once __DIR__.'/include/classes/core/CHttpRequest.php';
 require_once __DIR__.'/include/classes/core/APP.php';
 require_once __DIR__.'/include/debug.inc.php';
 
-use SCIM\User;
-use SCIM\Group;
-use SCIM\ServiceProviderConfig;
-use SCIM\Me;
-use SCIM\ResourceType;
-use SCIM\Schema;
-use SCIM\Bulk;
 use SCIM\API as SCIM;
+use SCIM\clients\ScimApiClient;
 use SCIM\HttpResponse;
+use SCIM\services\Bulk;
+use SCIM\services\Group;
+use SCIM\services\Me;
+use SCIM\services\ResourceType;
+use SCIM\services\Schema;
+use SCIM\services\ServiceProviderConfig;
+use SCIM\services\User;
 
 $request = new CHttpRequest(['PATH_INFO', 'QUERY_STRING']);
 
 try {
 	APP::getInstance()->run(APP::EXEC_MODE_API);
 	API::setWrapper();
-	$client = new CLocalApiClient();
+	$client = new ScimApiClient();
 	$client->setServiceFactory(new CRegistryFactory([
 		'user'						=> CUser::class,
 		'/users'					=> User::class,
 		'/groups'					=> Group::class,
-		'/serviceproviderconfigs'	=> ServiceProviderConfig::class,
+		'/serviceproviderconfig'	=> ServiceProviderConfig::class,
 		'/me'						=> Me::class,
 		'/resourcetypes'			=> ResourceType::class,
 		'/schemas'					=> Schema::class,

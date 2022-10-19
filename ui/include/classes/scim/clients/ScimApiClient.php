@@ -18,13 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-namespace SCIM;
+namespace SCIM\clients;
 
-use CApiService;
+use CLocalApiClient;
 
-class CScimApiService extends CApiService {
-	protected const SCIM_ERROR_BAD_REQUEST = 400;
-	protected const SCIM_ERROR_NOT_FOUND = 404;
-	protected const SCIM_METHOD_NOT_SUPPORTED = 405;
-	protected const SCIM_INTERNAL_ERROR = 500;
+class ScimApiClient extends CLocalApiClient {
+	protected function requiresAuthentication($api, $method) {
+		return !($api === '/serviceproviderconfig' && $method === 'get');
+	}
 }

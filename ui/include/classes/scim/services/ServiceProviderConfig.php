@@ -18,11 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-namespace SCIM;
+namespace SCIM\services;
 
-class ServiceProviderConfig extends CScimApiService {
+use SCIM\ScimApiService;
+
+class ServiceProviderConfig extends ScimApiService {
 	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'put' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'post' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'patch' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],

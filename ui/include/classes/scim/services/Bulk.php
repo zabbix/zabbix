@@ -18,9 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-namespace SCIM;
+namespace SCIM\services;
 
-class Me extends CScimApiService {
+use SCIM\ScimApiService;
+
+class Bulk extends ScimApiService {
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'put' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
@@ -54,3 +56,5 @@ class Me extends CScimApiService {
 		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
 	}
 }
+
+
