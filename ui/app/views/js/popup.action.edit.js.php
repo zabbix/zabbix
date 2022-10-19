@@ -157,12 +157,11 @@ window.action_edit_popup = new class {
 					return;
 				}
 				else {
-					element.label = num2letter(input.row_index);
-					input.row_index ++;
-
 					element.condition_name = this.condition_types[element.conditiontype] + ' ' +
 						this.condition_operators[element.operator] + ' '
 					element.data = element.name
+					element.label = num2letter(element.row_index);
+					input.row_index ++;
 
 				document
 						.querySelector('#conditionTable tbody')
@@ -180,7 +179,6 @@ window.action_edit_popup = new class {
 			}
 			else {
 				input.label = num2letter(input.row_index);
-				input.row_index ++;
 				let template;
 
 				switch(parseInt(input.conditiontype)) {
@@ -223,6 +221,10 @@ window.action_edit_popup = new class {
 					: null;
 
 				result.push(input.conditiontype === conditiontype && input.value === value && input.value2 === value2);
+
+				if (input.row_index == it.getAttribute('data-row_index')) {
+					input.row_index ++;
+				}
 			}
 
 			result.push(false);
