@@ -6644,7 +6644,7 @@ out:
  *             cluster_data  - [OUT] a pointer to the output variable         *
  *             clusters      - [OUT] a pointer to the resulting clusters      *
  *                              vector                                        *
- *             resourcepools - [OUT] a pointer to the resulting resource pool *
+ *             rp_chunks     - [OUT] a pointer to the resulting resource pool *
  *                              vector                                        *
  *             alarms_data   - [OUT] the vector with all alarms               *
  *             error         - [OUT] the error message in the case of failure *
@@ -6718,8 +6718,6 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 		zbx_vmware_rpool_chunk_t	*rp_chunk;
 
 		rp_chunk = (zbx_vmware_rpool_chunk_t *)zbx_malloc(NULL, sizeof(zbx_vmware_rpool_chunk_t));
-		rp_chunk->path = NULL;
-		rp_chunk->parentid = NULL;
 
 		id_esc = zbx_xml_escape_dyn(rp_ids.values[i]);
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_RESOURCEPOOL, "[text()='%s']"),
@@ -6751,6 +6749,7 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 			rp_chunk->parent_is_rp = 1;
 
 		rp_chunk->id = zbx_strdup(NULL, rp_ids.values[i]);
+		rp_chunk->path = rp_chunk->parentid = NULL;
 		zbx_vector_vmware_rpool_chunk_append(rp_chunks, rp_chunk);
 	}
 
@@ -7052,7 +7051,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 		if (0 == rp_chunk->parent_is_rp)	/* skipped the top (default) resource pool name */
 			continue;
 
-		rpool = (zbx_vmware_resourcepool_t *)zbx_malloc(NULL, sizeof(zbx_vmware_resourcepool_t));
+		rpool = (zbx_vmware_resourcepool_t*)zbx_malloc(NULL, sizeof(zbx_vmware_resourcepool_t));
 		rpool->id = zbx_strdup(NULL, rp_chunk->id);
 		rpool->path = zbx_strdup(NULL, rp_chunk->name);
 		rpool->vm_num = 0;
