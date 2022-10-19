@@ -113,7 +113,7 @@ class CControllerDashboardView extends CController {
 		$data = [
 			'dashboard' => $dashboard,
 			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(),
-			'widget_last_type' => array_key_exists($widget_last_type, $widget_known_types)
+			'widget_last_type' => in_array($widget_last_type, $widget_known_types, true)
 				? $widget_last_type
 				: $first_widget_type,
 			'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
