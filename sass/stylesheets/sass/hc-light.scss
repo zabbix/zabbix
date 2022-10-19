@@ -1314,19 +1314,6 @@ td.inactive-bg {
 	}
 }
 
-// Overrides.
-
-.overrides-options-list {
-	> li > div {
-		background-color: $ui-bg-selected-color !important;
-
-		> .subfilter-disable-btn {
-			border: none !important;
-			top: 0;
-		}
-	}
-}
-
 .totals-list {
 	> div {
 		border-top: 1px solid $ui-border-color;

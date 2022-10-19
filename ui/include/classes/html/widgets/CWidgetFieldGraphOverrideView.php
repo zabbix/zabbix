@@ -268,87 +268,81 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 			}
 		}
 
+		$host_pattern_field = (new CPatternSelect([
+			'name' => $this->field->getName().'['.$row_num.'][hosts][]',
+			'object_name' => 'hosts',
+			'data' => $value['hosts'],
+			'placeholder' => _('host pattern'),
+			'wildcard_allowed' => 1,
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'hosts',
+					'srcfld1' => 'hostid',
+					'dstfrm' => $this->form_name,
+					'dstfld1' => zbx_formatDomId($this->field->getName().'['.$row_num.'][hosts][]')
+				]
+			],
+			'add_post_js' => false
+		]))
+			->setEnabled(!$this->isDisabled())
+			->setAriaRequired($this->isRequired());
+
 		return (new CListItem([
-			/**
-			 * First line: host pattern field, item pattern field.
-			 * Contains also drag and drop button and delete button.
-			 */
-			(new CDiv([
-				(new CDiv())
-					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addStyle('position: absolute; margin-left: -25px;'),
-				(new CDiv([
-					(new CDiv(
-						(new CPatternSelect([
-							'name' => $this->field->getName().'['.$row_num.'][hosts][]',
-							'object_name' => 'hosts',
-							'data' => $value['hosts'],
-							'placeholder' => _('host pattern'),
-							'wildcard_allowed' => 1,
-							'popup' => [
-								'parameters' => [
-									'srctbl' => 'hosts',
-									'srcfld1' => 'hostid',
-									'dstfrm' => $this->form_name,
-									'dstfld1' => zbx_formatDomId($this->field->getName().'['.$row_num.'][hosts][]')
-								]
-							],
-							'add_post_js' => false
-						]))
-							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-							->setEnabled(!$this->isDisabled())
-							->setAriaRequired($this->isRequired())
-					))->addClass(ZBX_STYLE_COLUMN_50),
-					(new CDiv(
-						(new CPatternSelect([
-							'name' => $this->field->getName().'['.$row_num.'][items][]',
-							'object_name' => 'items',
-							'data' => $value['items'],
-							'placeholder' => _('item pattern'),
-							'multiple' => true,
-							'wildcard_allowed' => 1,
-							'popup' => [
-								'parameters' => [
-									'srctbl' => 'items',
-									'srcfld1' => 'itemid',
-									'real_hosts' => 1,
-									'numeric' => 1,
-									'dstfrm' => $this->form_name,
-									'dstfld1' => zbx_formatDomId($this->field->getName().'['.$row_num.'][items][]')
-								]
-							],
-							'add_post_js' => false
-						]))
-							->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-							->setEnabled(!$this->isDisabled())
-							->setAriaRequired($this->isRequired())
-					))->addClass(ZBX_STYLE_COLUMN_50)
-				]))
-					->addClass(ZBX_STYLE_COLUMNS)
-					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
-					->addClass(ZBX_STYLE_COLUMN_95),
-
-				(new CDiv(
-					(new CButton())
-						->setAttribute('title', _('Delete'))
-						->addClass(ZBX_STYLE_BTN_REMOVE)
-						->removeId()
-				))
-					->addClass(ZBX_STYLE_COLUMN_5)
+			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+			$host_pattern_field,
+			(new CPatternSelect([
+				'name' => $this->field->getName().'['.$row_num.'][hosts][]',
+				'object_name' => 'items',
+				'data' => $value['items'],
+				'placeholder' => _('item pattern'),
+				'wildcard_allowed' => 1,
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'items',
+						'srcfld1' => 'itemid',
+						'real_hosts' => 1,
+						'numeric' => 1,
+						'dstfrm' => $this->form_name,
+						'dstfld1' => zbx_formatDomId($this->field->getName().'['.$row_num.'][items][]')
+					],
+					'filter_preselect' => [
+						'id' => $host_pattern_field->getId(),
+						'submit_as' => 'host_pattern',
+						'submit_parameters' => [
+							'host_pattern_wildcard_allowed' => 1,
+							'host_pattern_multiple' => 1
+						],
+						'multiple' => true
+					]
+				],
+				'autosuggest' => [
+					'filter_preselect' => [
+						'id' => $host_pattern_field->getId(),
+						'submit_as' => 'host_pattern',
+						'submit_parameters' => [
+							'host_pattern_wildcard_allowed' => 1,
+							'host_pattern_multiple' => 1
+						],
+						'multiple' => true
+					]
+				],
+				'add_post_js' => false
 			]))
-				->addClass(ZBX_STYLE_COLUMNS),
-
-			// Selected override options.
+				->setEnabled(!$this->isDisabled())
+				->setAriaRequired($this->isRequired()),
+			(new CDiv(
+				(new CButton())
+					->setAttribute('title', _('Delete'))
+					->addClass(ZBX_STYLE_BTN_REMOVE)
+					->removeId()
+			))->addClass('dataset-actions'),
 			(new CList($inputs))
 				->addClass(ZBX_STYLE_OVERRIDES_OPTIONS_LIST)
-				->addItem((new CButton(null, (new CSpan())
-					->addClass(ZBX_STYLE_PLUS_ICON)
-					->addStyle('margin-right: 0px;')
-				))
-					->setAttribute('data-row', $row_num)
-					->addClass(ZBX_STYLE_BTN_ALT)
+				->addItem(
+					(new CButton(null, (new CSpan())->addClass(ZBX_STYLE_PLUS_ICON)))
+						->setAttribute('data-row', $row_num)
+						->addClass(ZBX_STYLE_BTN_ALT)
 				)
-		]))
-			->addClass(ZBX_STYLE_OVERRIDES_LIST_ITEM);
+		]))->addClass(ZBX_STYLE_OVERRIDES_LIST_ITEM);
 	}
 }

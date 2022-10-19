@@ -1831,10 +1831,81 @@ form.dashboard-widget-svggraph .single-item-table .single-item-table-row:last-ch
   padding-bottom: 0; }
 form.dashboard-widget-svggraph .single-item-table tfoot td {
   padding: 5px 5px 5px 10px; }
+form.dashboard-widget-svggraph .overrides-list {
+  margin: -5px 0 -5px 15px; }
+form.dashboard-widget-svggraph .overrides-list-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr 24px;
+  grid-gap: 5px 10px;
+  align-items: start;
+  padding: 5px 0; }
+  form.dashboard-widget-svggraph .overrides-list-item.sortable {
+    overflow: visible;
+    margin-top: -5px;
+    margin-bottom: -5px; }
+  form.dashboard-widget-svggraph .overrides-list-item .multiselect {
+    width: 100%; }
+  form.dashboard-widget-svggraph .overrides-list-item .btn-remove {
+    right: 0;
+    top: 0;
+    vertical-align: baseline; }
+form.dashboard-widget-svggraph .overrides-foot {
+  padding: 5px 0; }
+form.dashboard-widget-svggraph .overrides-options-list {
+  grid-column: 1 / -1;
+  padding: 0 24px 8px 0;
+  border-bottom: 1px solid #383838;
+  white-space: normal; }
+  form.dashboard-widget-svggraph .overrides-options-list > li {
+    display: inline-block;
+    margin-right: 5px;
+    margin-bottom: 2px;
+    line-height: 22px;
+    white-space: nowrap; }
+    form.dashboard-widget-svggraph .overrides-options-list > li .color-picker {
+      line-height: 22px; }
+    form.dashboard-widget-svggraph .overrides-options-list > li > div {
+      position: relative;
+      padding: 1px 18px 1px 1px;
+      background-color: #4f4f4f;
+      border-radius: 2px; }
+      form.dashboard-widget-svggraph .overrides-options-list > li > div > span {
+        color: white;
+        padding-left: 8px;
+        line-height: 22px; }
+      form.dashboard-widget-svggraph .overrides-options-list > li > div > input[type=text] {
+        border-style: none;
+        line-height: 22px;
+        min-height: 22px;
+        width: 85px; }
+      form.dashboard-widget-svggraph .overrides-options-list > li > div > .subfilter-disable-btn {
+        position: absolute;
+        right: 0;
+        top: 0;
+        min-height: 24px; }
+  form.dashboard-widget-svggraph .overrides-options-list .btn-alt .plus-icon {
+    margin-right: 0; }
+  form.dashboard-widget-svggraph .overrides-options-list .color-picker .color-picker-preview {
+    margin: 1px;
+    width: 20px;
+    min-height: 20px;
+    background-position: -323px -411px; }
 form.dashboard-widget-svggraph .no-items-message {
   display: none;
   line-height: 24px;
   color: #737373; }
+
+[theme="hc-dark"] form.dashboard-widget-svggraph .overrides-options-list > li > div {
+  border: 1px solid #69808d;
+  background-color: transparent !important; }
+  [theme="hc-dark"] form.dashboard-widget-svggraph .overrides-options-list > li > div > .subfilter-disable-btn {
+    border: none !important;
+    top: 0; }
+
+[theme="hc-light"] form.dashboard-widget-svggraph .overrides-options-list > li > div > .subfilter-disable-btn {
+  border: none !important;
+  top: 0; }
 
 form.dashboard-widget-tophosts #list_columns .text {
   max-width: 250px; }
@@ -6164,53 +6235,6 @@ svg {
 .confirmation-msg {
   white-space: normal;
   word-break: break-word; }
-
-.overrides-list {
-  display: table;
-  width: 90%;
-  max-width: 738px;
-  padding-left: 15px; }
-  .overrides-list .overrides-list-item {
-    display: table-row; }
-    .overrides-list .overrides-list-item .btn-remove {
-      position: relative;
-      right: -73px;
-      top: 3px; }
-
-.overrides-options-list {
-  white-space: normal;
-  padding: 5px 0 8px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #383838; }
-  .overrides-options-list > li {
-    display: inline-block;
-    margin: 2px 7px 2px 0;
-    white-space: nowrap;
-    vertical-align: middle; }
-    .overrides-options-list > li > div {
-      position: relative;
-      padding: 1px 18px 1px 1px;
-      background-color: #4f4f4f;
-      border-radius: 2px; }
-      .overrides-options-list > li > div > span {
-        color: white;
-        padding-left: 8px;
-        line-height: 22px; }
-      .overrides-options-list > li > div > input[type=text] {
-        border-style: none;
-        line-height: 22px;
-        min-height: 22px;
-        width: 85px; }
-      .overrides-options-list > li > div > .subfilter-disable-btn {
-        position: absolute;
-        right: 0;
-        top: 0;
-        min-height: 24px; }
-  .overrides-options-list .color-picker .color-picker-preview {
-    margin: 1px;
-    width: 20px;
-    min-height: 20px;
-    background-position: -323px -411px; }
 
 .list-accordion-foot > div {
   display: table-cell;
