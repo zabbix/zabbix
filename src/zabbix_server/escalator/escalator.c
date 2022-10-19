@@ -2695,7 +2695,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 					"acknowledgeid"
 				" from escalations"
 				" where %s and nextcheck<=%d"
-				" order by actionid,triggerid,itemid,escalationid", filter,
+				" order by actionid,triggerid,itemid,r_eventid is not null,escalationid", filter,
 				now + CONFIG_ESCALATOR_FREQUENCY);
 	zbx_free(filter);
 
