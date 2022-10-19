@@ -1658,31 +1658,155 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Check if session id is authenticated.
+	 * Check if authenticated by session id or by token.
 	 *
 	 * @param array  $session
-	 * @param string $session[]['sessionid']  (required) session id to be checked
-	 * @param bool   $session[]['extend']     (optional) extend session (update lastaccess time)
+	 * @param string $session[]['sessionid']  session id to be checked
+	 * @param string $session[]['token']      token to be checked
+	 * @param bool   $session[]['extend']     (optional with sessionid) extend session (update lastaccess time)
 	 *
 	 * @return array
 	 */
-	public function checkAuthentication(array $session): array {
+	public function checkAuthentication(array $session): array
+	{
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'sessionid' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('sessions', 'sessionid')],
-			'extend' =>	['type' => API_BOOLEAN, 'default' => true]
+			'sessionid' => ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sessions', 'sessionid')],
+			'extend' => ['type' => API_BOOLEAN, 'default' => true],
+			'token' => ['type' => API_STRING_UTF8, 'length' => 64]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $session, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$sessionid = $session['sessionid'];
+		$sessionid = array_key_exists('sessionid', $session) ? $session['sessionid'] : null;
+		$token = array_key_exists('token', $session) ? $session['token'] : null;
 
+		if (($token == null && $sessionid == null) || ($token && $sessionid)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Token or sessionid is expected'));
+		}
+
+		$time = time();
+
+		if ($token) {
+			$api_tokens = $this->tokenAuthentication($token, $time);
+			$userid = $api_tokens['userid'];
+		}
+
+		if ($sessionid) {
+			$db_session = $this->sessionidAuthentication($sessionid);
+			$userid = $db_session['userid'];
+		}
+
+		$db_users = DB::select('users', [
+			'output' => ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
+				'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
+			],
+			'userids' => $userid
+		]);
+
+		// If user not exists.
+		if (!$db_users) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
+		}
+
+		$db_user = $db_users[0];
+
+		$permissions = $this->getUserGroupsPermissions($userid);
+
+		$db_user = $this->addExtraFields($db_user, $permissions);
+		$this->setTimezone($db_user['timezone']);
+
+		if ($token) {
+			if ($permissions['users_status'] == GROUP_STATUS_DISABLED) {
+				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+			}
+
+			$db_user['token'] = $token;
+			$db_user['sessionid'] = $token;
+
+			DB::update('token', [
+				'values' => ['lastaccess' => $time],
+				'where' => ['tokenid' => $api_tokens['tokenid']]
+			]);
+		}
+
+		if ($sessionid) {
+			$db_user['sessionid'] = $sessionid;
+			$autologout = timeUnitToSeconds($db_user['autologout']);
+
+			// Check system permissions.
+			if (($autologout != 0 && $db_session['lastaccess'] + $autologout <= $time)
+				|| $permissions['users_status'] == GROUP_STATUS_DISABLED) {
+				DB::delete('sessions', [
+					'status' => ZBX_SESSION_PASSIVE,
+					'userid' => $db_user['userid']
+				]);
+				DB::update('sessions', [
+					'values' => ['status' => ZBX_SESSION_PASSIVE],
+					'where' => ['sessionid' => $sessionid]
+				]);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
+			}
+
+			if ($session['extend'] && $time != $db_session['lastaccess']) {
+				DB::update('sessions', [
+					'values' => ['lastaccess' => $time],
+					'where' => ['sessionid' => $sessionid]
+				]);
+			}
+		}
+
+		self::$userData = $db_user;
+
+		return $db_user;
+	}
+
+	/**
+	 * Authenticates user based on token.
+	 *
+	 * @param string $auth_token
+	 * @param int $time
+	 *
+	 * @throws APIException
+	 *
+	 * @return array
+	 */
+	protected function tokenAuthentication(string $auth_token, int $time) {
+		$api_tokens = DB::select('token', [
+			'output' => ['userid', 'expires_at', 'tokenid'],
+			'filter' => ['token' => hash('sha512', $auth_token), 'status' => ZBX_AUTH_TOKEN_ENABLED]
+		]);
+
+		if (!$api_tokens) {
+			usleep(10000);
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
+
+		$expires_at = $api_tokens['expires_at'];
+
+		if ($expires_at != 0 && $expires_at < $time) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('API token expired.'));
+		}
+
+		return $api_tokens;
+	}
+
+	/**
+	 * Authenticates user based on sessionid.
+	 *
+	 * @param string $sessionid
+	 *
+	 * @throws APIException
+	 *
+	 * @return array
+	 */
+	protected function sessionidAuthentication(string $sessionid) : array {
 		// access DB only once per page load
 		if (self::$userData !== null && self::$userData['sessionid'] === $sessionid) {
 			return self::$userData;
 		}
-
-		$time = time();
 
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid', 'lastaccess'],
@@ -1694,55 +1818,7 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
-		$db_session = $db_sessions[0];
-
-		$db_users = DB::select('users', [
-			'output' => ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-				'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
-			],
-			'userids' => $db_session['userid']
-		]);
-
-		// If user not exists.
-		if (!$db_users) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
-		}
-
-		$db_user = $db_users[0];
-		$db_user['sessionid'] = $sessionid;
-
-		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
-
-		$db_user = $this->addExtraFields($db_user, $permissions);
-		$this->setTimezone($db_user['timezone']);
-
-		$autologout = timeUnitToSeconds($db_user['autologout']);
-
-		// Check system permissions.
-		if (($autologout != 0 && $db_session['lastaccess'] + $autologout <= $time)
-				|| $permissions['users_status'] == GROUP_STATUS_DISABLED) {
-			DB::delete('sessions', [
-				'status' => ZBX_SESSION_PASSIVE,
-				'userid' => $db_user['userid']
-			]);
-			DB::update('sessions', [
-				'values' => ['status' => ZBX_SESSION_PASSIVE],
-				'where' => ['sessionid' => $sessionid]
-			]);
-
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
-		}
-
-		if ($session['extend'] && $time != $db_session['lastaccess']) {
-			DB::update('sessions', [
-				'values' => ['lastaccess' => $time],
-				'where' => ['sessionid' => $sessionid]
-			]);
-		}
-
-		self::$userData = $db_user;
-
-		return $db_user;
+		return $db_sessions[0];
 	}
 
 	/**
