@@ -408,7 +408,7 @@ class testFormUpdateProblem extends CWebTest {
 					'problems' => ['Trigger for text', 'Trigger for log'],
 					'fields' => [
 						'id:change_severity' => true,
-						'id:severity' => 'Not classified',
+						'id:severity' => 'Not classified'
 					],
 					'db_check' => [
 						[
