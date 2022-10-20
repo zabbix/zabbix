@@ -91,15 +91,16 @@ class CWidget extends CModule {
 				SEC_PER_MIN * 15 => _n('%1$s minute', '%1$s minutes', 15)
 			];
 
+			$default_refresh_rate = -1;
 			$default_refresh_rate_label = array_key_exists($this->getDefaultRefreshRate(), $refresh_rates)
 				? $refresh_rates[$this->getDefaultRefreshRate()]
 				: $this->getDefaultRefreshRate();
 
 			$form->addField(
-				new CWidgetFieldSelect('rf_rate', _('Refresh interval'), [
-						CWidgetFieldSelect::DEFAULT_VALUE => _('Default').' ('.$default_refresh_rate_label.')'
+				(new CWidgetFieldSelect('rf_rate', _('Refresh interval'), [
+						$default_refresh_rate => _('Default').' ('.$default_refresh_rate_label.')'
 					] + $refresh_rates
-				)
+				))->setDefault($default_refresh_rate)
 			);
 		}
 

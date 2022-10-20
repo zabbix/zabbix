@@ -25,7 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldSelect extends CWidgetField {
 
-	public const DEFAULT_VALUE = -1;
+	public const DEFAULT_VALUE = null;
 
 	private array $values;
 
