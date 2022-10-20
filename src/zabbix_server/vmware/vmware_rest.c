@@ -642,8 +642,8 @@ static int	vmware_tags_linked_id(const zbx_vmware_obj_id_t *obj_id, CURL *easyha
 		zbx_vector_str_t *ids, char **error)
 {
 	int			ret;
-	char			tmp[MAX_STRING_LEN], *url;
-	const char		*p = NULL;
+	char			tmp[MAX_STRING_LEN];
+	const char		*url, *p = NULL;
 	struct zbx_json_parse	jp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() obj_id:%s", __func__, obj_id->id);
@@ -695,8 +695,8 @@ static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, unsigned 
 {
 	struct zbx_json_parse	jp, jp_data;
 	int			i;
-	char			cid[VMWARE_SHORT_STR_LEN], name[MAX_STRING_LEN], desc[MAX_STRING_LEN], *url_tag,
-				*url_cat;
+	char			cid[VMWARE_SHORT_STR_LEN], name[MAX_STRING_LEN], desc[MAX_STRING_LEN];
+	const char		*url_tag, *url_cat;
 	zbx_vmware_key_value_t	cat_cmp;
 	zbx_vmware_tag_t	*tag;
 
