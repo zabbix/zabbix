@@ -412,7 +412,7 @@ final class CModuleManager {
 
 		// Check module type.
 		if (array_key_exists('type', $manifest)
-				&& !in_array($manifest['type'], [CModule::TYPE_MODULE, CModule::TYPE_WIDGET])) {
+				&& !in_array($manifest['type'], [CModule::TYPE_MODULE, CModule::TYPE_WIDGET], true)) {
 			return null;
 		}
 
