@@ -49,6 +49,42 @@
 
 			if ($(this).is('#http_auth_enabled')) {
 				fields = $form.find('[name^=http_]');
+				if (document.getElementById('http_auth_enabled').checked) {
+					overlayDialogue({
+						'title': <?= json_encode(_('Confirm changes')) ?>,
+						'class': 'position-middle',
+						'content': document.getElementsByTagName('span').innerHTML = <?= json_encode(_('Enable HTTP authentication for all users.')) ?>,
+						'buttons': [
+							{
+								'title': <?= json_encode(_('Cancel')) ?>,
+								'cancel': true,
+								'class': '<?= ZBX_STYLE_BTN_ALT ?>',
+								'action': function() {
+									for (let i = 0; i<fields.length; i++) {
+										if(fields[i] !== document.getElementById('http_auth_enabled')) {
+											(fields[i]).disabled = true;
+										}
+									}
+									document.getElementById('http_auth_enabled').checked = false;
+									document.getElementById('tab_http').setAttribute('data-indicator-value', '0');
+								}
+							},
+							{
+								'title': <?= json_encode(_('Ok')) ?>,
+								'focused': true,
+								'action': function() {
+									for (let i = 0; i<fields.length; i++) {
+										if(fields[i] !== document.getElementById('http_auth_enabled')) {
+											(fields[i]).disabled = false;
+										}
+									}
+									console.log(document.getElementById('tab_http'));
+									document.getElementById('http_auth_enabled').checked = true;
+								}
+							}
+						]
+					}, this);
+				}
 			}
 			else if ($(this).is('#ldap_configured')) {
 				fields = $form.find('[name^=ldap_],#bind-password-btn');
