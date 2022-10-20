@@ -142,9 +142,7 @@ final class CModuleManager {
 				}
 
 				/** @var CModule $instance */
-				$instance = new $module_class($this->root_path, $relative_path, $manifest,
-					$this->moduleids[$relative_path]
-				);
+				$instance = new $module_class($manifest, $this->moduleids[$relative_path], $relative_path);
 
 				if ($instance instanceof $base_classname) {
 					$instance->init();

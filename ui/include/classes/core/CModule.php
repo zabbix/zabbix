@@ -32,32 +32,17 @@ class CModule {
 	public const TYPE_MODULE = 'module';
 	public const TYPE_WIDGET = 'widget';
 
-	private string $root_path;
-	private string $relative_path;
-
 	protected array $manifest;
 	protected string $moduleid;
+	protected string $relative_path;
 
-	public function __construct(string $root_path, string $relative_path, array $manifest, string $moduleid) {
-		$this->root_path = $root_path;
-		$this->relative_path = $relative_path;
+	public function __construct(array $manifest, string $moduleid, string $relative_path) {
 		$this->manifest = $manifest;
 		$this->moduleid = $moduleid;
+		$this->relative_path = $relative_path;
 	}
 
 	public function init(): void {
-	}
-
-	public function getDir(): string {
-		return $this->root_path.'/'.$this->relative_path;
-	}
-
-	public function getRelativePath(): string {
-		return $this->relative_path;
-	}
-
-	public function getModuleId(): string {
-		return $this->moduleid;
 	}
 
 	public function getManifest(): array {
@@ -129,6 +114,14 @@ class CModule {
 	 */
 	public function getOption(string $name = null, $default = null) {
 		return array_key_exists($name, $this->manifest['config']) ? $this->manifest['config'][$name] : $default;
+	}
+
+	public function getModuleId(): string {
+		return $this->moduleid;
+	}
+
+	public function getRelativePath(): string {
+		return $this->relative_path;
 	}
 
 	public function getTranslationStrings(): array {

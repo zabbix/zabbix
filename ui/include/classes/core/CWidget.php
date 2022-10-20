@@ -28,7 +28,7 @@ use Zabbix\Widgets\CWidgetForm;
 use Zabbix\Widgets\Fields\CWidgetFieldSelect;
 
 /**
- * Base class for user modules. If Module.php is not provided by user module, this class will be instantiated instead.
+ * Base class for user widgets. If Widget.php is not provided by user widget, this class will be instantiated instead.
  */
 class CWidget extends CModule {
 
@@ -70,13 +70,11 @@ class CWidget extends CModule {
 	public const DYNAMIC_ITEM = 1;
 
 	final public function getForm(array $values, ?string $templateid): CWidgetForm {
-		$form_class = array_key_exists('form_class', $this->manifest['widget'])
-			? $this->manifest['widget']['form_class']
-			: self::DEFAULT_FORM_CLASS;
+		$form_class = implode('\\', [$this->getNamespace(), 'Includes', $this->manifest['widget']['form_class']]);
 
-		$form_class = is_file($this->getDir().'/includes/'.$form_class.'.php')
-			? implode('\\', [$this->getNamespace(), 'Includes', $form_class])
-			: CWidgetForm::class;
+		if (!class_exists($form_class)) {
+			$form_class = CWidgetForm::class;
+		}
 
 		$form = new $form_class($values, $templateid);
 

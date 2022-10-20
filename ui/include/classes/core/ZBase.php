@@ -599,15 +599,15 @@ class ZBase {
 				$modules = array_replace([$action_module->getId() => $action_module], $modules);
 
 				if ($action_module->getType() === CModule::TYPE_WIDGET) {
-					CView::registerDirectory($action_module->getDir().'/views');
-					CPartial::registerDirectory($action_module->getDir().'/partials');
+					CView::registerDirectory($this->root_dir.'/'.$action_module->getRelativePath().'/views');
+					CPartial::registerDirectory($this->root_dir.'/'.$action_module->getRelativePath().'/partials');
 				}
 			}
 
 			foreach (array_reverse($modules) as $module) {
 				if ($module->getType() === CModule::TYPE_MODULE) {
-					CView::registerDirectory($module->getDir().'/views');
-					CPartial::registerDirectory($module->getDir().'/partials');
+					CView::registerDirectory($this->root_dir.'/'.$module->getRelativePath().'/views');
+					CPartial::registerDirectory($this->root_dir.'/'.$module->getRelativePath().'/partials');
 				}
 			}
 
