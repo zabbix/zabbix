@@ -2236,8 +2236,9 @@ int	DBtrigger_exists(const char *table_name, const char *trigger_name)
 			"select 1"
 			" from information_schema.triggers"
 			" where event_object_table='%s'"
-			" and trigger_name='%s'",
-			table_name_esc, trigger_name_esc);
+			" and trigger_name='%s'"
+			" and trigger_schema='%s'",
+			table_name_esc, trigger_name_esc, zbx_db_get_schema_esc());
 #endif
 	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
 
