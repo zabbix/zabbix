@@ -34,11 +34,6 @@ class testTimescaleDb extends CIntegrationTest {
 	const TRAPNAME = 'trap_timescale';
 	const TABLENAME = 'history_uint';
 	const HIST_COUNT = 3000;
-	/*
-		storing old data deep in the past - 20 days, which is way longer that the minimum 7days,
-		and must be guaranteed to be compressed
-	*/
-	const COMPRESSION_OLDER_THAN = /*20 * 24 * 3600*/0;
 	static $db_extension = '';
 	private static $itemid;
 
@@ -129,11 +124,6 @@ class testTimescaleDb extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['itemids']));
 		self::$itemid = $response['result']['itemids'][0];
 
-		/*$response = $this->call('housekeeping.update',
-			['compression_status' => 0]
-		);
-		$this->assertArrayHasKey(0, $response['result']);*/
-
 		$this->clearChunks();
 
 		return true;
@@ -166,7 +156,7 @@ class testTimescaleDb extends CIntegrationTest {
 		$count_start = $this->getHistoryCount();
 		$this->assertNotEquals(-1, $count_start);
 
-		$c = time() - self::COMPRESSION_OLDER_THAN;
+		$c = time();
 		$n = 1;
 		for ($i = 0; $i < self::HIST_COUNT; $i++) {
 			$sender_data[$i] = ['value' => $c, 'clock' => $c, 'ns' => $n, 'host' => self::HOSTNAME,
@@ -189,18 +179,4 @@ class testTimescaleDb extends CIntegrationTest {
 
 		$this->clearChunks();
 	}
-
-	/**
-	 * Test compression TimescaleDb.
-	 *
-	 * @required-components server
-	 * @configurationDataProvider serverConfigurationProvider
-	 */
-	/*public function testTimescaleDb_checkCompression() {
-		$this->assertEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
-
-		$this->executeHousekeeper();
-
-		$this->getCheckCompression();
-	}*/
 }
