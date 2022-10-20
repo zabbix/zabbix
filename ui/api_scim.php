@@ -42,14 +42,13 @@ try {
 	API::setWrapper();
 	$client = new ScimApiClient();
 	$client->setServiceFactory(new CRegistryFactory([
-		'user'						=> CUser::class,
-		'/users'					=> User::class,
-		'/groups'					=> Group::class,
-		'/serviceproviderconfig'	=> ServiceProviderConfig::class,
-		'/me'						=> Me::class,
-		'/resourcetypes'			=> ResourceType::class,
-		'/schemas'					=> Schema::class,
-		'/bulk'						=> Bulk::class
+		'users'						=> User::class,
+		'groups'					=> Group::class,
+		'serviceproviderconfig'		=> ServiceProviderConfig::class,
+		'me'						=> Me::class,
+		'resourcetypes'				=> ResourceType::class,
+		'schemas'					=> Schema::class,
+		'bulk'						=> Bulk::class
 	]));
 	$scim = new SCIM();
 

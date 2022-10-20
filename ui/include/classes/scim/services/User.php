@@ -113,7 +113,7 @@ class User extends ScimApiService {
 				$this->data['itemsPerPage'] = $total_users;
 			}
 
-			$this->listResponse($userdirectoryid);
+			$this->listResponse($userdirectoryid, $this->data['startIndex'], $this->data['itemsPerPage']);
 
 			return $this->data;
 		}
@@ -376,18 +376,25 @@ class User extends ScimApiService {
 	 * Updates $this->data parameter with ListResponse data that is required by SCIM.
 	 *
 	 * @param string $userdirectoryid  SAML userdirectoryid
+	 * @param int    $start_index      Start index defined in request.
+	 * @param int    $items_per_page   Number of items to be shown on paged, defined in request.
 	 *
 	 * @return void
 	 */
-	private function listResponse(string $userdirectoryid): void {
+	private function listResponse(string $userdirectoryid, $start_index, $items_per_page): void {
 		$this->data['schemas'] = ['urn:ietf:params:scim:api:messages:2.0:ListResponse'];
 		$this->data['Resources'] = [];
 		$users = APIRPC::User()->get([
 			'filter' => ['userdirectoryid' => $userdirectoryid]
 		]);
 
-		foreach ($users as $user) {
-			$this->data['Resources'][] = $this->prepareData($user);
+		$users_to_show = range($start_index, ($start_index + $items_per_page - 1));
+
+		foreach ($users as $index => $user) {
+			++$index;
+			if (in_array($index, $users_to_show, false)) {
+				$this->data['Resources'][] = $this->prepareData($user);
+			}
 		}
 	}
 

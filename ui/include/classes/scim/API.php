@@ -64,9 +64,9 @@ class API {
 			$input['id'] = $id;
 		}
 
-		$class = '/' . strtolower($class);
+		$class = strtolower($class);
 
-		if ($class === '/serviceproviderconfig' && $request->method() === 'GET') {
+		if ($class === 'serviceproviderconfig' && $request->method() === 'GET') {
 			$auth = null;
 		}
 
@@ -77,7 +77,7 @@ class API {
 				[$filter_name, $operator, $filter_value] = $filter;
 			}
 
-			if ($class === '/users' && isset($filter_name, $operator, $filter_value) && $filter_name === 'userName'
+			if ($class === 'users' && isset($filter_name, $operator, $filter_value) && $filter_name === 'userName'
 					&& $operator === 'eq') {
 				$input['userName'] = str_replace('"', '', $filter_value);
 			}
