@@ -68,6 +68,7 @@ class User extends ScimApiService {
 			]);
 
 			if (!$user) {
+				$this->data['totalResults'] = 0;
 				$this->data['Resources'] = [];
 			}
 			else {
