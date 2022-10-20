@@ -410,6 +410,12 @@ final class CModuleManager {
 			return null;
 		}
 
+		// Check module type.
+		if (array_key_exists('type', $manifest)
+				&& !in_array($manifest['type'], [CModule::TYPE_MODULE, CModule::TYPE_WIDGET])) {
+			return null;
+		}
+
 		// Check manifest namespace syntax.
 		if (!preg_match('/^[0-9a-z_]+$/i', $manifest['namespace'])) {
 			return null;
