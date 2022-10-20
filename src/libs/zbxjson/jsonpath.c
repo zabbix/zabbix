@@ -1586,9 +1586,15 @@ out:
  ******************************************************************************/
 static char	*jsonpath_expression_to_str(zbx_jsonpath_expression_t *expression)
 {
-	int			i;
-	char			*str = NULL;
-	size_t			str_alloc = 0, str_offset = 0;
+	int	i;
+	char	*str = NULL;
+	size_t	str_alloc = 0, str_offset = 0;
+
+	if (0 == expression->tokens.values_num)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, "?");
+	}
 
 	for (i = 0; i < expression->tokens.values_num; i++)
 	{
@@ -1668,7 +1674,7 @@ static char	*jsonpath_expression_to_str(zbx_jsonpath_expression_t *expression)
  *                                                                            *
  * Purpose: set jsonpath expression error message                             *
  *                                                                            *
- * Parameters: expression - [IN] the jsonpath exprssion                       *
+ * Parameters: expression - [IN] the jsonpath expression                      *
  *                                                                            *
  * Comments: This function is used to set error message when expression       *
  *           evaluation fails                                                 *
