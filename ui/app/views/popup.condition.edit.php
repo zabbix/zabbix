@@ -31,7 +31,7 @@ $form = (new CForm())
 	->setName('popup.condition')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
-	->addVar('row_index', $data['row_index'])
+	->addVar('row_index', $data['row_index'] ? $data['row_index'] : 0)
 	->addVar('type', $data['type'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 

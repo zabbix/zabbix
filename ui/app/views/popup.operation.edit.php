@@ -54,7 +54,6 @@ $select_operationtype = (new CSelect(''))
 $form_grid->addItem([
 	(new CLabel(_('Operation'), $select_operationtype->getFocusableElementId()))->setId('operation-type-label'),
 	(new CFormField($select_operationtype))
-		//->setAttribute('value', $operationtype_value ?? 0)
 		->setId('operation-type')
 	]);
 
@@ -214,21 +213,24 @@ $form_grid->addItem([
 ]);
 
 $opcommand_hst_value = array_key_exists('0', $operation['opcommand_hst'])
-	? $operation['opcommand_hst']['0']['hostid']
+	? $operation['opcommand_hst']['0'][] = 'hostid'
 	: null;
 
 $multiselect_values_host = [];
 $multiselect_values_host_grp = [];
 
 foreach($operation['opcommand_hst'] as $host) {
-	if ($host[0]['hostid'] == 0) {
-		$multiselect_values_host = null;
+	if ($host !== null && array_key_exists('hostid', $host)) {
+		if ($host['hostid'] == 0) {
+			$multiselect_values_host = null;
+		}
+		else {
+			$hosts['id'] = $host[0]['hostid'];
+			$hosts['name'] = $host[0]['name'];
+			$multiselect_values_host[] = $hosts;
+		}
 	}
-	else {
-		$hosts['id'] = $host[0]['hostid'];
-		$hosts['name'] = $host[0]['name'];
-		$multiselect_values_host[] = $hosts;
-	}
+
 }
 
 if($operation['opcommand_grp']) {
@@ -240,6 +242,8 @@ if($operation['opcommand_grp']) {
 }
 
 if(array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand_grp', $operation)) {
+	$multiselect_values_host = [];
+
 	// Command execution targets row.
 	$form_grid->addItem([
 		(new CLabel(_('Target list')))
@@ -298,6 +302,9 @@ if(array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand_
 			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	]);
 }
+
+$multiselect_values_ophost_grp = [];
+$multiselect_values_optemplate = [];
 
 foreach ($operation['opgroup'] as $group) {
 	$host_group['id'] = $group[0]['groupid'];

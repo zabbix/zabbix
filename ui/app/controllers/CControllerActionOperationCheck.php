@@ -220,8 +220,10 @@ class CControllerActionOperationCheck extends CController {
 			$operation['opcommand']['scriptid'] = preg_replace('[\D]', '', $operation['operationtype']);
 			$operationtype = OPERATION_TYPE_COMMAND;
 
-			if (array_key_exists('current_host', $operation['opcommand_hst'][0]['hostid'])) {
-				$operation['opcommand_hst'][0]['hostid'] = 0;
+			if (array_key_exists('opcommand_hst', $operation)) {
+				if (array_key_exists('current_host', $operation['opcommand_hst'][0]['hostid'])) {
+					$operation['opcommand_hst'][0]['hostid'] = 0;
+				}
 			}
 		}
 		else {
