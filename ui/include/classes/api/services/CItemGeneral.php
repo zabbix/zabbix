@@ -2160,7 +2160,7 @@ abstract class CItemGeneral extends CApiService {
 		$flags = $item['flags'];
 		$key = $item['key_'];
 		$master_flags = $master_item_data['flags'];
-		$master_key = $master_item_data['key'];
+		$master_key = $master_item_data['key_'];
 		$is_template = $item['host_status'] == HOST_STATUS_TEMPLATE;
 		$host = $master_item_data['host'];
 

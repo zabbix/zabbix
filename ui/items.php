@@ -657,7 +657,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				}
 			}
 
-			if (array_key_exists('preprocessing', $item) && $item['preprocessing'] != $db_item['preprocessing']) {
+			if (array_key_exists('preprocessing', $item) && $item['preprocessing'] !== $db_item['preprocessing']) {
 				$upd_item['preprocessing'] = $item['preprocessing'];
 			}
 
@@ -670,11 +670,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				}
 			}
 
-			if (array_key_exists('query_fields', $item) && $item['query_fields'] != $db_item['query_fields']) {
+			if (array_key_exists('query_fields', $item) && $item['query_fields'] !== $db_item['query_fields']) {
 				$upd_item['query_fields'] = $item['query_fields'];
 			}
 
-			if (array_key_exists('headers', $item) && $item['headers'] != $db_item['headers']) {
+			if (array_key_exists('headers', $item) && $item['headers'] !== $db_item['headers']) {
 				$upd_item['headers'] = $item['headers'];
 			}
 

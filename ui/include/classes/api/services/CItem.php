@@ -1374,6 +1374,11 @@ class CItem extends CItemGeneral {
 		$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT];
 
 		foreach ($items as $i => $item) {
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				unset($items[$i]);
+				continue;
+			}
+
 			$check = false;
 
 			if (in_array($item['value_type'], $value_types)) {

@@ -2098,7 +2098,7 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			case ZBX_PREPROC_ERROR_FIELD_XML:
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			case ZBX_PREPROC_SCRIPT:
-				$step['params'] = $step['params'][0];
+				$step['params'] = CRLFtoLF($step['params'][0]);
 				break;
 
 			case ZBX_PREPROC_VALIDATE_RANGE:
@@ -2147,12 +2147,17 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 		}
 
 		$step += [
-			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+			'error_handler' => (string) ZBX_PREPROC_FAIL_DEFAULT,
 			'error_handler_params' => ''
 		];
 
-		// Remove fictional fields that don't belong to DB and API.
-		unset($step['sortorder'], $step['on_fail']);
+		// Ensure exact ordering of fields (and exclude helper fields) for exact matching to DB countepart on update.
+		$step = [
+			'type' => $step['type'],
+			'params' => $step['params'],
+			'error_handler' => $step['error_handler'],
+			'error_handler_params' => $step['error_handler_params']
+		];
 	}
 	unset($step);
 
