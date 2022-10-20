@@ -88,6 +88,13 @@ class testDashboardCopyWidgets extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		// Get fields from widget form to compare them with new widget after copying.
 		$fields = $dashboard->getWidget($name)->edit()->getFields();
+
+		// Take a screenshot to test draggable object position.
+		if (!$new_dashboard && $name === 'Test copy Map navigation tree') {
+//			$dashboard->getWidget($name)->edit();
+			$this->assertScreenshot($dashboard->query('xpath://li[@data-id="1"]')->waitUntilPresent()->one(), 'Map_navigation_tree');
+		}
+
 		// Add tag fields mapping to form for problem widgets.
 		if (stristr($name, 'Problem')) {
 			$fields->set('', $fields->get('')->asMultifieldTable(['mapping' => $mapping]));
