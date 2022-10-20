@@ -154,7 +154,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Author' => '1st Module author',
 					'Description' => '1st Module description',
 					'Directory' => 'modules/module_number_1',
-					'Namespace' => 'Example_A',
+					'Namespace' => 'Modules\Example_A',
 					'Homepage' => '1st module URL',
 					'Enabled' => false
 				]
@@ -167,7 +167,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Author' => '2nd Module author !@#$%^&*()_+',
 					'Description' => 'Module description !@#$%^&*()_+',
 					'Directory' => 'modules/module_number_2',
-					'Namespace' => 'Example_B',
+					'Namespace' => 'Modules\Example_B',
 					'Homepage' => '!@#$%^&*()_+',
 					'Enabled' => false
 				]
@@ -180,7 +180,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Author' => '-',
 					'Description' => '-',
 					'Directory' => 'modules/module_number_4',
-					'Namespace' => 'Example_A',
+					'Namespace' => 'Modules\Example_A',
 					'Homepage' => '-',
 					'Enabled' => false
 				]
@@ -193,7 +193,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Author' => '-',
 					'Description' => 'Adding top-level and sub-level menu',
 					'Directory' => 'modules/module_number_5',
-					'Namespace' => 'Example_E',
+					'Namespace' => 'Modules\Example_E',
 					'Homepage' => '-',
 					'Enabled' => false
 				]
@@ -206,7 +206,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Author' => 'Работник Заббикса',
 					'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Maps" из секции "Monitoring".',
 					'Directory' => 'modules/module_number_6',
-					'Namespace' => 'Example_F',
+					'Namespace' => 'Modules\Example_F',
 					'Homepage' => '-',
 					'Enabled' => false
 				]
@@ -309,7 +309,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'action' => 'forth.module'
 							]
 						],
-						'error_details' => 'Identical namespace (Example_A) is used by modules located at '.
+						'error_details' => 'Identical namespace (Modules\Example_A) is used by modules located at '.
 								'modules/module_number_1, modules/module_number_4.'
 					]
 				]
