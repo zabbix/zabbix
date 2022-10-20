@@ -321,7 +321,7 @@ window.action_edit_popup = new class {
 			if (operation.details.data.length > 1) {
 				operation_obj.usr_data = operation.details.data[0].join('');
 				operation_obj.usr_details = operation.details.type[0];
-				operation_obj.usrgrp_data = operation.details.data[1].join('');
+				operation_obj.usrgrp_data = operation.details.data[1].join(' ');
 				operation_obj.usrgrp_details = operation.details.type[1];
 				template = this.operation_template_usr_usrgrps_basic;
 			}
@@ -385,8 +385,10 @@ window.action_edit_popup = new class {
 						break;
 
 					default:
-						if (operation.details.data.length > 1) {
-							template = this.operation_template_usr_usrgrps_basic;
+						if (input.detail.operation.details.data) {
+							if (operation.details.data.length > 1) {
+								template = this.operation_template_usr_usrgrps_basic;
+							}
 						}
 						operation_obj.prefix = ''
 
