@@ -543,12 +543,10 @@ class CControllerAuthenticationUpdate extends CController {
 		unset($internal_auth_users[CWebUser::$data['userid']]);
 
 		if ($internal_auth_users) {
-			DBstart();
 			$result = DB::update('sessions', [
 				'values' => ['status' => ZBX_SESSION_PASSIVE],
 				'where' => ['userid' => array_keys($internal_auth_users)]
 			]);
-			$result = DBend($result);
 		}
 
 		return $result;
