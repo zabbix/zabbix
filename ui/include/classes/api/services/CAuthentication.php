@@ -158,7 +158,7 @@ class CAuthentication extends CApiService {
 		$db_auth = reset($db_auth);
 		$auth += $db_auth;
 
-		if ($auth['authentication_type'] == ZBX_AUTH_LDAP && $auth['ldap_auth_enabled'] != ZBX_AUTH_LDAP_DISABLED) {
+		if ($auth['authentication_type'] == ZBX_AUTH_LDAP && $auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_DISABLED) {
 			static::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect value for field "%1$s": %2$s.', '/authentication_type', _('LDAP must be enabled'))
 			);
