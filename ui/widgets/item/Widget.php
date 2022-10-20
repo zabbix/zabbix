@@ -52,8 +52,4 @@ class Widget extends CWidget {
 	public function getDefaultName(): string {
 		return _('Item value');
 	}
-
-	public function hasPadding(array $fields_values, int $view_mode): bool {
-		return false;
-	}
 }

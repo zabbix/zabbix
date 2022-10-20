@@ -45,8 +45,4 @@ class Widget extends CWidget {
 	public function getDefaultName(): string {
 		return _('Clock');
 	}
-
-	protected function hasPadding(array $values, int $view_mode): bool {
-		return $values['clock_type'] === self::TYPE_ANALOG;
-	}
 }

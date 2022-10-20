@@ -318,7 +318,6 @@ class CWidgetIterator extends CWidget {
 			name: data.name,
 			view_mode: this._view_mode,
 			fields: data.fields,
-			configuration: data.configuration,
 			defaults: data.defaults,
 			widgetid: data.widgetid,
 			is_new: false,

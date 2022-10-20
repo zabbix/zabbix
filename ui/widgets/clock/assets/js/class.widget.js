@@ -258,4 +258,8 @@ class CWidgetClock extends CWidget {
 
 		clock_time_zone.textContent = timezone_text;
 	}
+
+	_hasPadding() {
+		return this._fields.clock_type == CWidgetClock.TYPE_ANALOG;
+	}
 }

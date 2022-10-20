@@ -47,4 +47,8 @@ class CWidgetItem extends CWidget {
 
 		this._resize_observer.disconnect();
 	}
+
+	_hasPadding() {
+		return false;
+	}
 }

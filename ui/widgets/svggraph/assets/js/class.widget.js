@@ -154,4 +154,8 @@ class CWidgetSvgGraph extends CWidget {
 
 		return menu;
 	}
+
+	_hasPadding() {
+		return true;
+	}
 }

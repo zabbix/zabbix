@@ -75,7 +75,6 @@ class CRouter {
 		'dashboard.update'							=> ['CControllerDashboardUpdate',						'layout.json',			null],
 		'dashboard.view'							=> ['CControllerDashboardView',							'layout.htmlpage',		'monitoring.dashboard.view'],
 		'dashboard.widget.check'					=> ['CControllerDashboardWidgetCheck',					'layout.json',			null],
-		'dashboard.widget.configure'				=> ['CControllerDashboardWidgetConfigure',				'layout.json',			null],
 		'dashboard.widget.rfrate'					=> ['CControllerDashboardWidgetRfRate',					'layout.json',			null],
 		'dashboard.widgets.sanitize'				=> ['CControllerDashboardWidgetsSanitize',				'layout.json',			null],
 		'discovery.create'							=> ['CControllerDiscoveryCreate',						null,					null],

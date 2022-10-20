@@ -1,4 +1,3 @@
-<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,25 +18,10 @@
 **/
 
 
-namespace Widgets\Map;
+class CWidgetHostAvail extends CWidget {
 
-use Zabbix\Core\CWidget;
-
-use Zabbix\Widgets\Fields\CWidgetFieldReference;
-
-class Widget extends CWidget {
-
-	public const SOURCETYPE_MAP = 1;
-	public const SOURCETYPE_FILTER = 2;
-
-	public function getDefaults(): array {
-		return [
-			'reference_field' => CWidgetFieldReference::FIELD_NAME,
-			'foreign_reference_fields' => ['filter_widget_reference']
-		] + parent::getDefaults();
-	}
-
-	public function getDefaultName(): string {
-		return _('Map');
+	_hasPadding() {
+		return this._view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL
+			&& (this._fields.interface_type === undefined || this._fields.interface_type.length !== 1);
 	}
 }

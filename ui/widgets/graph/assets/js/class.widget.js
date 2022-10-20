@@ -72,14 +72,14 @@ class CWidgetGraph extends CWidget {
 		}
 	}
 
-	updateProperties({name, view_mode, fields, configuration}) {
+	updateProperties({name, view_mode, fields}) {
 		if (this._state === WIDGET_STATE_ACTIVE) {
 			this._stopUpdating(true);
 		}
 
 		this._is_graph_mode = false;
 
-		super.updateProperties({name, view_mode, fields, configuration});
+		super.updateProperties({name, view_mode, fields});
 	}
 
 	setEditMode() {
@@ -228,5 +228,9 @@ class CWidgetGraph extends CWidget {
 		});
 
 		return menu;
+	}
+
+	_hasPadding() {
+		return true;
 	}
 }

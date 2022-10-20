@@ -323,13 +323,12 @@ class CDashboardPage extends CBaseComponent {
 		return null;
 	}
 
-	addWidget({type, name, view_mode, fields, configuration, widgetid, pos, is_new, rf_rate, unique_id}) {
+	addWidget({type, name, view_mode, fields, widgetid, pos, is_new, rf_rate, unique_id}) {
 		const widget = this._createWidget(this._widget_defaults[type].js_class, {
 			type,
 			name,
 			view_mode,
 			fields,
-			configuration,
 			widgetid,
 			pos,
 			is_new,
@@ -406,13 +405,12 @@ class CDashboardPage extends CBaseComponent {
 		return this.addWidget(widget_data);
 	}
 
-	_createWidget(js_class, {type, name, view_mode, fields, configuration, widgetid, pos, is_new, rf_rate, unique_id}) {
+	_createWidget(js_class, {type, name, view_mode, fields, widgetid, pos, is_new, rf_rate, unique_id}) {
 		return new (eval(js_class))({
 			type,
 			name,
 			view_mode,
 			fields,
-			configuration,
 			defaults: this._widget_defaults[type],
 			widgetid,
 			pos,
@@ -443,7 +441,6 @@ class CDashboardPage extends CBaseComponent {
 			name,
 			view_mode,
 			fields: {},
-			configuration: {},
 			widgetid: null,
 			pos,
 			is_new: false,

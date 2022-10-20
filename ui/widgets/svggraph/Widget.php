@@ -43,8 +43,4 @@ class Widget extends CWidget {
 			]
 		];
 	}
-
-	public function hasPadding(array $fields_values, int $view_mode): bool {
-		return true;
-	}
 }

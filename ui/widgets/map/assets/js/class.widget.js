@@ -252,4 +252,8 @@ class CWidgetMap extends CWidget {
 
 		this._startUpdating();
 	}
+
+	_hasPadding() {
+		return true;
+	}
 }

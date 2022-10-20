@@ -59,10 +59,10 @@ class CWidgetGeoMap extends CWidget {
 		this._initial_load = false;
 	}
 
-	updateProperties({name, view_mode, fields, configuration}) {
+	updateProperties({name, view_mode, fields}) {
 		this._initial_load = true;
 
-		super.updateProperties({name, view_mode, fields, configuration});
+		super.updateProperties({name, view_mode, fields});
 	}
 
 	_setContents({name, body, messages, info, debug}) {

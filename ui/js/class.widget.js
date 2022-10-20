@@ -43,7 +43,6 @@ class CWidget extends CBaseComponent {
 		name,
 		view_mode,
 		fields,
-		configuration,
 		defaults,
 		widgetid = null,
 		pos = null,
@@ -67,7 +66,6 @@ class CWidget extends CBaseComponent {
 		this._name = name;
 		this._view_mode = view_mode;
 		this._fields = fields;
-		this._configuration = configuration;
 		this._defaults = defaults;
 		this._widgetid = widgetid;
 		this._pos = pos;
@@ -338,15 +336,17 @@ class CWidget extends CBaseComponent {
 		this._fields = fields;
 	}
 
-	_setConfiguration(configuration) {
-		this._configuration = configuration;
+	_hasPadding() {
+		return this._view_mode != ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
+	}
 
+	_updatePadding() {
 		if (this._state !== WIDGET_STATE_INITIAL) {
-			this._content_body.classList.toggle('no-padding', !this._configuration.padding);
+			this._content_body.classList.toggle('no-padding', !this._hasPadding());
 		}
 	}
 
-	updateProperties({name, view_mode, fields, configuration}) {
+	updateProperties({name, view_mode, fields}) {
 		if (name !== undefined) {
 			this._setName(name);
 		}
@@ -359,9 +359,7 @@ class CWidget extends CBaseComponent {
 			this._setFields(fields);
 		}
 
-		if (configuration !== undefined) {
-			this._setConfiguration(configuration);
-		}
+		this._updatePadding();
 
 		this._show_preloader_asap = true;
 
@@ -405,7 +403,6 @@ class CWidget extends CBaseComponent {
 			name: this._name,
 			view_mode: this._view_mode,
 			fields: this._fields,
-			configuration: this._configuration,
 			pos: is_single_copy
 				? {
 					width: this._pos.width,
@@ -872,7 +869,7 @@ class CWidget extends CBaseComponent {
 		this._content_body = document.createElement('div');
 		this._content_body.classList.add(this._css_classes.content);
 		this._content_body.classList.add(`dashboard-widget-${this._type}`);
-		this._content_body.classList.toggle('no-padding', !this._configuration.padding);
+		this._content_body.classList.toggle('no-padding', !this._hasPadding());
 
 		this._container.appendChild(this._content_body);
 

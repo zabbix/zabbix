@@ -1281,12 +1281,11 @@ class CDashboard extends CBaseComponent {
 
 		return Promise.resolve()
 			.then(() => this._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}))
-			.then(() => this._promiseDashboardWidgetConfigure({templateid, type, view_mode, fields}))
-			.then((configuration) => {
+			.then(() => {
 				overlayDialogueDestroy(overlay.dialogueid);
 
 				if (widget !== null && widget.getType() === type) {
-					widget.updateProperties({name, view_mode, fields, configuration});
+					widget.updateProperties({name, view_mode, fields});
 
 					return;
 				}
@@ -1300,7 +1299,6 @@ class CDashboard extends CBaseComponent {
 					name,
 					view_mode,
 					fields,
-					configuration,
 					widgetid: null,
 					pos: widget === null ? this._new_widget_pos_reserved : widget.getPos(),
 					is_new: widget === null,
@@ -1372,26 +1370,6 @@ class CDashboard extends CBaseComponent {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
-			});
-	}
-
-	_promiseDashboardWidgetConfigure({templateid, type, view_mode, fields}) {
-		const curl = new Curl('zabbix.php');
-
-		curl.setArgument('action', 'dashboard.widget.configure');
-
-		return fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({templateid, type, view_mode, fields})
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
-				return response.configuration;
 			});
 	}
 

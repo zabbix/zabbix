@@ -67,7 +67,6 @@
 			for (const page of dashboard.pages) {
 				for (const widget of page.widgets) {
 					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
-					widget.configuration = (typeof widget.configuration === 'object') ? widget.configuration : {};
 				}
 
 				ZABBIX.Dashboard.addDashboardPage(page);

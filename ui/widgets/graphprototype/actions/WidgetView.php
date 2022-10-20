@@ -154,7 +154,6 @@ class WidgetView extends CControllerWidgetIterator {
 				'type' => Cwidget::GRAPH,
 				'name' => $name,
 				'fields' => $child_fields,
-				'configuration' => $this->widget->getConfiguration($this->fields_values, $this->getInput('view_mode')),
 				'defaults' => $this->widget->getDefaults()
 			];
 		}

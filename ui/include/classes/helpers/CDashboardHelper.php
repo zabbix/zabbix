@@ -116,8 +116,7 @@ class CDashboardHelper {
 					],
 					'rf_rate' => $rf_rate,
 					'form' => $widget_form,
-					'fields' => $fields_orig,
-					'configuration' => $widget->getConfiguration($values, $widget_data['view_mode'])
+					'fields' => $fields_orig
 				];
 			}
 

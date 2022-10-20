@@ -31,9 +31,4 @@ class Widget extends CWidget {
 	public function getDefaultName(): string {
 		return _('Problems by severity');
 	}
-
-	public function hasPadding(array $fields_values, int $view_mode): bool {
-		return $view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL
-			&& $fields_values['show_type'] != self::SHOW_TOTALS;
-	}
 }

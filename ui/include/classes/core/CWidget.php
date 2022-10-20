@@ -95,7 +95,8 @@ class CWidget extends CModule {
 				: $this->getDefaultRefreshRate();
 
 			$form->addField(
-				(new CWidgetFieldSelect('rf_rate', _('Refresh interval'), [
+				(new CWidgetFieldSelect('rf_rate', _('Refresh interval'),
+					[
 						$default_refresh_rate => _('Default').' ('.$default_refresh_rate_label.')'
 					] + $refresh_rates
 				))->setDefault($default_refresh_rate)
@@ -126,12 +127,6 @@ class CWidget extends CModule {
 		];
 
 		return $actions;
-	}
-
-	public function getConfiguration(array $fields_values, int $view_mode): array {
-		return [
-			'padding' => $this->hasPadding($fields_values, $view_mode)
-		];
 	}
 
 	public function getDefaults(): array {
@@ -172,9 +167,5 @@ class CWidget extends CModule {
 
 	public function usesTimeSelector(array $fields_values): bool {
 		return (bool) $this->manifest['widget']['use_time_selector'];
-	}
-
-	protected function hasPadding(array $fields_values, int $view_mode): bool {
-		return $view_mode != ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
 	}
 }
