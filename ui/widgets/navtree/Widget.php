@@ -31,9 +31,9 @@ class Widget extends CWidget {
 	public const MAX_DEPTH = 10;
 
 	public function getDefaults(): array {
-		return parent::getDefaults() + [
+		return [
 			'reference_field' => CWidgetFieldReference::FIELD_NAME
-		];
+		] + parent::getDefaults();
 	}
 
 	public function getTranslationStrings(): array {

@@ -35,9 +35,9 @@ class Widget extends CWidget {
 	}
 
 	public function getDefaults(): array {
-		return parent::getDefaults() + [
+		return [
 			'reference_field' => CWidgetFieldReference::FIELD_NAME,
 			'foreign_reference_fields' => ['filter_widget_reference']
-		];
+		] + parent::getDefaults();
 	}
 }

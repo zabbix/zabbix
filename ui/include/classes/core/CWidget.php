@@ -134,14 +134,9 @@ class CWidget extends CModule {
 			'name' => $this->getDefaultName(),
 			'size' => $this->getDefaultSize(),
 			'js_class' => $this->getJSClass(),
-			'iterator' => $this->isIterator(),
 			'reference_field' => null,
 			'foreign_reference_fields' => []
 		];
-	}
-
-	public function isIterator(): bool {
-		return false;
 	}
 
 	public function isDeprecated(): bool {

@@ -28,8 +28,4 @@ class Widget extends CWidget {
 	public function hasPadding(array $fields_values, int $view_mode): bool {
 		return false;
 	}
-
-	public function isIterator(): bool {
-		return true;
-	}
 }

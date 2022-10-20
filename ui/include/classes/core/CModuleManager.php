@@ -425,8 +425,7 @@ final class CModuleManager {
 			'description' => '',
 			'actions' => [],
 			'assets' => [],
-			'config' => [],
-			'widget' => []
+			'config' => []
 		];
 
 		$manifest['assets'] += [
@@ -435,6 +434,10 @@ final class CModuleManager {
 		];
 
 		if ($manifest['type'] === CModule::TYPE_WIDGET) {
+			if (!array_key_exists('widget', $manifest)) {
+				$manifest['widget'] = [];
+			}
+
 			$manifest['widget'] += [
 				'name' => '',
 				'form_class' => CWidget::DEFAULT_FORM_CLASS,
