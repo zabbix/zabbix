@@ -349,7 +349,9 @@ svg a {
     top: 0;
     left: 0;
     transition: left .2s, top .2s; }
-    .sortable .sortable-list .sortable-item:not(.sortable-dragging) {
+  .sortable .sortable-item {
+    box-sizing: border-box; }
+    .sortable .sortable-item:not(.sortable-dragging) {
       transition: left .2s, top .2s; }
   .sortable.sortable-dragging .sortable-item {
     position: absolute; }
