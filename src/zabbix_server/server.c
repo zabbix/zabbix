@@ -1097,6 +1097,14 @@ int	main(int argc, char **argv)
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
+static void	zbx_db_version_info_clear(void)
+{
+	zbx_free(db_version_info.friendly_current_version);
+	zbx_free(db_version_info.extension);
+	zbx_free(db_version_info.ext_friendly_current_version);
+	zbx_free(db_version_info.ext_lic);
+}
+
 static void	zbx_check_db(void)
 {
 	struct zbx_json	db_version_json;
@@ -1151,14 +1159,9 @@ static void	zbx_check_db(void)
 
 	DBclose();
 
-	zbx_free(db_version_info.friendly_current_version);
-	zbx_free(db_version_info.extension);
-	zbx_free(db_version_info.ext_friendly_current_version);
-	zbx_free(db_version_info.ext_lic);
-
-	if(SUCCEED != result)
+	if (SUCCEED != result)
 	{
-		zbx_free(db_version_info.friendly_current_version);
+		zbx_db_version_info_clear();
 		exit(EXIT_FAILURE);
 	}
 }
@@ -1854,6 +1857,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 
+	zbx_db_version_info_clear();
+
 	if (SUCCEED == ZBX_EXIT_STATUS())
 		zbx_rtc_shutdown_subs(&rtc);
 
@@ -1928,8 +1933,6 @@ void	zbx_on_exit(int ret)
 #if defined(PS_OVERWRITE_ARGV)
 	setproctitle_free_env();
 #endif
-
-	zbx_free(db_version_info.friendly_current_version);
 
 	exit(EXIT_SUCCESS);
 }
