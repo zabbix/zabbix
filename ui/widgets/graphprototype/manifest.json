@@ -15,6 +15,12 @@
 		"js_class": "CWidgetGraphPrototype",
 		"use_time_selector": true
 	},
+	"actions": {
+		"widget.graphprototype.view": {
+			"layout": "layout.json",
+			"view": null
+		}
+	},
 	"assets": {
 		"js": ["class.widget.js"]
 	}

@@ -108,18 +108,24 @@ class CWidget extends CModule {
 	}
 
 	final public function getActions(): array {
-		return array_merge_recursive([
-			'widget.'.$this->getId().'.view' => [
-				'class' => 'WidgetView',
-				'view' => 'widget.view',
-				'layout' => 'layout.widget'
-			],
-			'widget.'.$this->getId().'.edit' => [
-				'class' => CControllerDashboardWidgetEdit::class,
-				'view' => 'widget.edit',
-				'layout' => 'layout.json'
-			]
-		], parent::getActions());
+		$actions = parent::getActions() + [
+			'widget.'.$this->getId().'.view' => [],
+			'widget.'.$this->getId().'.edit' => []
+		];
+
+		$actions['widget.'.$this->getId().'.view'] += [
+			'class' => 'WidgetView',
+			'view' => 'widget.view',
+			'layout' => 'layout.widget'
+		];
+
+		$actions['widget.'.$this->getId().'.edit'] += [
+			'class' => CControllerDashboardWidgetEdit::class,
+			'view' => 'widget.edit',
+			'layout' => 'layout.json'
+		];
+
+		return $actions;
 	}
 
 	public function getConfiguration(array $fields_values, int $view_mode): array {
