@@ -510,8 +510,8 @@ abstract class CGraphGeneral extends CApiService {
 			case 'CGraphPrototype':
 				$error_cannot_set = _('Cannot set "%1$s" for graph prototype "%2$s".');
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'discover' =>	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])],
-					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
+					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')],
+					'discover' =>	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
 				]];
 				break;
 
@@ -651,15 +651,15 @@ abstract class CGraphGeneral extends CApiService {
 			case 'CGraph':
 				$error_cannot_update = _('Cannot update "%1$s" for graph "%2$s".');
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
+					'name' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
 				]];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_update = _('Cannot update "%1$s" for graph prototype "%2$s".');
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'discover' => 	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])],
-					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')]
+					'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('graphs', 'name')],
+					'discover' => 	['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
 				]];
 				break;
 
