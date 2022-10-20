@@ -64,10 +64,15 @@ class User extends ScimApiService {
 
 		if (array_key_exists('userName', $options)) {
 			$user = APIRPC::User()->get([
-				'filter' => ['username' => $options['userName']]
+				'filter' => ['username' => $options['userName']],
+				'selectUsrgrps' => ['usrgrpid']
 			]);
 
-			if (!$user) {
+			$user_groups = array_column($user[0]['usrgrps'], 'usrgrpid');
+			$disabled_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID);
+
+			if (!$user || (count($user_groups) == 1 && $user_groups[0] == $disabled_groupid)) {
+				$user = [];
 				$this->data['totalResults'] = 0;
 				$this->data['Resources'] = [];
 			}
