@@ -60,7 +60,7 @@ class API {
 		[, $auth] = explode('Bearer ', $request->header('AUTHORIZATION'), 2) + ['', ''];
 		[, $class, $id] = explode('/', $request->header('PATH-INFO'), 3) + ['', '', ''];
 
-		if ($id != null) {
+		if ($id !== '') {
 			$input['id'] = $id;
 		}
 
