@@ -410,7 +410,7 @@ class CControllerActionOperationCheck extends CController {
 						if ($host_list) {
 							order_result($host_list);
 
-							$result['type'][] = _s('Run script "%1$s" on hosts', $scripts[$operation['opcommand']['scriptid']]['name'].': ');
+							$result['type'][] = _s('Run script "%1$s" on hosts: ', $scripts[$operation['opcommand']['scriptid']]['name']);
 							$result['data'][] = [implode(', ', $host_list)];
 						}
 					}
@@ -425,7 +425,7 @@ class CControllerActionOperationCheck extends CController {
 						}
 						order_result($host_group_list);
 
-						$result['type'][] = (_s('Run script "%1$s" on host groups', $scripts[$operation['opcommand']['scriptid']]['name']).': ');
+						$result['type'][] = (_s('Run script "%1$s" on host groups: ', $scripts[$operation['opcommand']['scriptid']]['name']));
 						$result['data'][] = [implode(', ', $host_group_list)];
 					}
 					break;
@@ -561,7 +561,7 @@ class CControllerActionOperationCheck extends CController {
 						if ($host_list) {
 							order_result($host_list);
 
-							$result['type'][] = _s('Run script "%1$s" on hosts', $scripts[$operation['opcommand']['scriptid']]['name'].': ');
+							$result['type'][] = _s('Run script "%1$s" on hosts: ', $scripts[$operation['opcommand']['scriptid']]['name']);
 							$result['data'][] = [implode(', ', $host_list)];
 						}
 					}
@@ -576,7 +576,7 @@ class CControllerActionOperationCheck extends CController {
 						}
 						order_result($host_group_list);
 
-						$result['type'][] = (_s('Run script "%1$s" on host groups', $scripts[$operation['opcommand']['scriptid']]['name']).': ');
+						$result['type'][] = (_s('Run script "%1$s" on host groups: ', $scripts[$operation['opcommand']['scriptid']]['name']));
 						$result['data'][] = [implode(', ', $host_group_list)];
 					}
 					break;
