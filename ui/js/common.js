@@ -531,15 +531,14 @@ function closeDialogHandler(event) {
  * @return {object|undefined|null}  Overlay object, if found.
  */
 function removeFromOverlaysStack(dialogueid, return_focus) {
-	var overlay = null;
-
 	if (return_focus !== false) {
 		return_focus = true;
 	}
 
-	overlay = overlays_stack.removeById(dialogueid);
+	const overlay = overlays_stack.removeById(dialogueid);
+
 	if (overlay && return_focus) {
-		jQuery(overlay.element).focus();
+		jQuery(overlay.element)[0].focus({preventScroll: true});
 	}
 
 	// Remove event listener.
