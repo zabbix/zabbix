@@ -9298,7 +9298,6 @@ static int	vmware_perf_available_update(zbx_vmware_service_t *service, CURL *eas
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() empty list for type:%s id:%s interval:%d begin time:%s", __func__,
 				type, id, refresh, begin_time);
-		goto out;
 	}
 
 	*perf = (zbx_vmware_perf_available_t *)zbx_malloc(NULL, sizeof(zbx_vmware_perf_available_t));
