@@ -1683,7 +1683,7 @@ class CUser extends CApiService {
 		$token = array_key_exists('token', $session) ? $session['token'] : null;
 
 		if (($token == null && $sessionid == null) || ($token && $sessionid)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Token or sessionid is expected'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Sessionid or token is expected.'));
 		}
 
 		$time = time();
@@ -1694,6 +1694,11 @@ class CUser extends CApiService {
 		}
 
 		if ($sessionid) {
+			// access DB only once per page load
+			if (self::$userData !== null && self::$userData['sessionid'] === $sessionid) {
+				return self::$userData;
+			}
+
 			$db_session = $this->sessionidAuthentication($sessionid);
 			$userid = $db_session['userid'];
 		}
@@ -1718,12 +1723,12 @@ class CUser extends CApiService {
 		$this->setTimezone($db_user['timezone']);
 
 		if ($token) {
+			$db_user['sessionid'] = $token;
+
+			// Check permissions.
 			if ($permissions['users_status'] == GROUP_STATUS_DISABLED) {
 				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 			}
-
-			$db_user['token'] = $token;
-			$db_user['sessionid'] = $token;
 
 			DB::update('token', [
 				'values' => ['lastaccess' => $time],
@@ -1773,7 +1778,7 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	protected function tokenAuthentication(string $auth_token, int $time) {
+	protected function tokenAuthentication(string $auth_token, int $time): array {
 		$api_tokens = DB::select('token', [
 			'output' => ['userid', 'expires_at', 'tokenid'],
 			'filter' => ['token' => hash('sha512', $auth_token), 'status' => ZBX_AUTH_TOKEN_ENABLED]
@@ -1784,6 +1789,7 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
+		$api_tokens = $api_tokens[0];
 		$expires_at = $api_tokens['expires_at'];
 
 		if ($expires_at != 0 && $expires_at < $time) {
@@ -1802,12 +1808,7 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	protected function sessionidAuthentication(string $sessionid) : array {
-		// access DB only once per page load
-		if (self::$userData !== null && self::$userData['sessionid'] === $sessionid) {
-			return self::$userData;
-		}
-
+	protected function sessionidAuthentication(string $sessionid): array {
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid', 'lastaccess'],
 			'sessionids' => $sessionid,
