@@ -48,28 +48,16 @@ class CModule {
 	public function init(): void {
 	}
 
-	public function getAssets(): array {
-		return $this->manifest['assets'];
-	}
-
-	public function getActions(): array {
-		return $this->manifest['actions'];
-	}
-
-	public function getTranslationStrings(): array {
-		return [];
-	}
-
-	public function getType(): string {
-		return $this->manifest['type'];
-	}
-
 	public function getDir(): string {
 		return $this->root_path.'/'.$this->relative_path;
 	}
 
 	public function getRelativePath(): string {
 		return $this->relative_path;
+	}
+
+	public function getModuleId(): string {
+		return $this->moduleid;
 	}
 
 	public function getManifest(): array {
@@ -80,16 +68,40 @@ class CModule {
 		return $this->manifest['id'];
 	}
 
-	public function getNamespace(): string {
-		return $this->manifest['namespace'];
-	}
-
 	public function getDefaultName(): string {
 		return _($this->manifest['name']);
 	}
 
+	public function getNamespace(): string {
+		return $this->manifest['namespace'];
+	}
+
 	public function getVersion(): string {
 		return $this->manifest['version'];
+	}
+
+	public function getType(): string {
+		return $this->manifest['type'];
+	}
+
+	public function getAuthor(): string {
+		return $this->manifest['author'];
+	}
+
+	public function getUrl(): string {
+		return $this->manifest['url'];
+	}
+
+	public function getDescription(): string {
+		return $this->manifest['description'];
+	}
+
+	public function getActions(): array {
+		return $this->manifest['actions'];
+	}
+
+	public function getAssets(): array {
+		return $this->manifest['assets'];
 	}
 
 	public function getConfig(): array {
@@ -107,10 +119,6 @@ class CModule {
 		return $this;
 	}
 
-	public function getModuleId(): string {
-		return $this->moduleid;
-	}
-
 	/**
 	 * Get module configuration option.
 	 *
@@ -121,6 +129,10 @@ class CModule {
 	 */
 	public function getOption(string $name = null, $default = null) {
 		return array_key_exists($name, $this->manifest['config']) ? $this->manifest['config'][$name] : $default;
+	}
+
+	public function getTranslationStrings(): array {
+		return [];
 	}
 
 	/**
