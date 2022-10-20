@@ -27,8 +27,8 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
-	public function hasPadding(array $fields_values, int $view_mode): bool {
-		return true;
+	public function getDefaultName(): string {
+		return _('Graph');
 	}
 
 	public function usesTimeSelector(array $fields_values): bool {
@@ -42,5 +42,9 @@ class Widget extends CWidget {
 				'Download image' => _s('Download image')
 			]
 		];
+	}
+
+	public function hasPadding(array $fields_values, int $view_mode): bool {
+		return true;
 	}
 }

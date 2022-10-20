@@ -19,26 +19,13 @@
 **/
 
 
-namespace Widgets\Graph;
+namespace Widgets\SystemInfo;
 
 use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
 	public function getDefaultName(): string {
-		return _('Graph (classic)');
-	}
-
-	public function getTranslationStrings(): array {
-		return [
-			'class.widget.js' => [
-				'Actions' => _s('Actions'),
-				'Download image' => _s('Download image')
-			]
-		];
-	}
-
-	public function hasPadding(array $fields_values, int $view_mode): bool {
-		return true;
+		return _('System information');
 	}
 }

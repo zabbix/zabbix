@@ -29,4 +29,8 @@ class Widget extends CWidget {
 
 	public const ORDER_TOP_N = 2;
 	public const ORDER_BOTTOM_N = 3;
+
+	public function getDefaultName(): string {
+		return _('Top hosts');
+	}
 }

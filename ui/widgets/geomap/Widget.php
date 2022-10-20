@@ -25,6 +25,10 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
+	public function getDefaultName(): string {
+		return _('Geomap');
+	}
+
 	public function getTranslationStrings(): array {
 		return [
 			'class.widget.js' => [

@@ -25,6 +25,10 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
+	public function getDefaultName(): string {
+		return _('URL');
+	}
+
 	public function hasPadding(array $fields_values, int $view_mode): bool {
 		return false;
 	}

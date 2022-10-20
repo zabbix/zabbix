@@ -36,6 +36,10 @@ class Widget extends CWidget {
 		] + parent::getDefaults();
 	}
 
+	public function getDefaultName(): string {
+		return _('Map navigation tree');
+	}
+
 	public function getTranslationStrings(): array {
 		return [
 			'class.widget.js' => [

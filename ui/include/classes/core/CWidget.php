@@ -144,8 +144,8 @@ class CWidget extends CModule {
 
 	public function getDefaultName(): string {
 		return $this->manifest['widget']['name'] !== ''
-			? _($this->manifest['widget']['name'])
-			: _($this->manifest['name']);
+			? $this->manifest['widget']['name']
+			: $this->getName();
 	}
 
 	public function getDefaultSize(): array {

@@ -310,7 +310,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 
 		/** @var CModule $module */
 		foreach (APP::ModuleManager()->getModules() as $module) {
-			$labels['modules'][$module->getManifest()['moduleid']] = $module->getDefaultName();
+			$labels['modules'][$module->getModuleId()] = $module->getName();
 		}
 
 		asort($labels['modules']);

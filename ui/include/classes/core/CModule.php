@@ -53,8 +53,8 @@ class CModule {
 		return $this->manifest['id'];
 	}
 
-	public function getDefaultName(): string {
-		return _($this->manifest['name']);
+	public function getName(): string {
+		return $this->manifest['name'];
 	}
 
 	public function getNamespace(): string {

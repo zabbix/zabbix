@@ -30,14 +30,18 @@ class Widget extends CWidget {
 	public const SOURCETYPE_MAP = 1;
 	public const SOURCETYPE_FILTER = 2;
 
-	public function hasPadding(array $fields_values, int $view_mode): bool {
-		return true;
-	}
-
 	public function getDefaults(): array {
 		return [
 			'reference_field' => CWidgetFieldReference::FIELD_NAME,
 			'foreign_reference_fields' => ['filter_widget_reference']
 		] + parent::getDefaults();
+	}
+
+	public function getDefaultName(): string {
+		return _('Map');
+	}
+
+	public function hasPadding(array $fields_values, int $view_mode): bool {
+		return true;
 	}
 }

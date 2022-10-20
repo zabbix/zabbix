@@ -247,7 +247,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		/** @var CModule $module */
 		foreach (APP::ModuleManager()->getModules() as $module) {
-			$data['modules'][$module->getManifest()['moduleid']] = $module->getDefaultName();
+			$data['modules'][$module->getModuleId()] = $module->getName();
 		}
 
 		asort($data['modules']);

@@ -25,6 +25,10 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
+	public function getDefaultName(): string {
+		return _('Host availability');
+	}
+
 	public function hasPadding(array $fields_values, int $view_mode): bool {
 		return $view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL
 			&& count($fields_values['interface_type']) != 1;

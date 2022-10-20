@@ -49,6 +49,10 @@ class Widget extends CWidget {
 	public const CHANGE_INDICATOR_DOWN = 2;
 	public const CHANGE_INDICATOR_UP_DOWN = 3;
 
+	public function getDefaultName(): string {
+		return _('Item value');
+	}
+
 	public function hasPadding(array $fields_values, int $view_mode): bool {
 		return false;
 	}
