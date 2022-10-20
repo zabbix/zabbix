@@ -291,7 +291,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
 			$host_pattern_field,
 			(new CPatternSelect([
-				'name' => $this->field->getName().'['.$row_num.'][hosts][]',
+				'name' => $this->field->getName().'['.$row_num.'][items][]',
 				'object_name' => 'items',
 				'data' => $value['items'],
 				'placeholder' => _('item pattern'),
