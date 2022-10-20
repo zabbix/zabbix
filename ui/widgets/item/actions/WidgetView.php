@@ -32,6 +32,8 @@ use API,
 
 use Widgets\Item\Widget;
 
+use Zabbix\Core\CWidget;
+
 class WidgetView extends CControllerDashboardWidgetView {
 
 	protected function init(): void {
@@ -66,7 +68,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$is_template_dashboard = $this->hasInput('templateid');
 		$is_dynamic = ($this->hasInput('dynamic_hostid')
-			&& ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::WIDGET_DYNAMIC_ITEM)
+			&& ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM)
 		);
 
 		$tmp_items = [];
@@ -157,7 +159,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 					case ITEM_VALUE_TYPE_UINT64:
 						// Override item units if needed.
 						if (array_key_exists(Widget::SHOW_VALUE, $show) && $this->fields_values['units_show'] == 1) {
-							$units = $this->fields_values['units'] === '' ? : $this->fields_values['units'];
+							$units = $this->fields_values['units'] === ''
+								? $items[$itemid]['units']
+								: $this->fields_values['units'];
 						}
 
 						// Apply unit conversion always because it will also convert values to scientific notation.
