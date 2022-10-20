@@ -56,7 +56,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Puma metrics discovery |<p>Discovery Puma specific metrics, when Puma is used.</p> |HTTP_AGENT |gitlab.puma.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `puma_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
+|PUMA metrics discovery |<p>Discovery of PUMA specific metrics when PUMA is used.</p> |HTTP_AGENT |gitlab.puma.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `puma_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
 |Unicorn metrics discovery |<p>DiscoveryUnicorn specific metrics, when Unicorn is used.</p> |HTTP_AGENT |gitlab.unicorn.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `unicorn_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
 
 ## Items collected
@@ -126,7 +126,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |GitLab: Gitlab instance is not able to accept traffic |<p>-</p> |`last(/GitLab by HTTP/gitlab.readiness)=0` |HIGH |<p>**Depends on**:</p><p>- GitLab: Liveness check was failed</p> |
 |GitLab: Liveness check was failed |<p>The application server is not running or Rails Controllers are deadlocked.</p> |`last(/GitLab by HTTP/gitlab.liveness)=0` |HIGH | |
-|GitLab: Version has changed |<p>GitLab version has changed. Ack to close.</p> |`last(/GitLab by HTTP/gitlab.deployments.version,#1)<>last(/GitLab by HTTP/gitlab.deployments.version,#2) and length(last(/GitLab by HTTP/gitlab.deployments.version))>0` |INFO |<p>Manual close: YES</p> |
+|GitLab: Version has changed |<p>The GitLab version has changed. Perform Ack to close.</p> |`last(/GitLab by HTTP/gitlab.deployments.version,#1)<>last(/GitLab by HTTP/gitlab.deployments.version,#2) and length(last(/GitLab by HTTP/gitlab.deployments.version))>0` |INFO |<p>Manual close: YES</p> |
 |GitLab: Too many Redis queues client exceptions |<p>"Too many  Redis client exceptions during the requests to  Redis instance queues."</p> |`min(/GitLab by HTTP/gitlab.redis.client_exceptions.queues.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}` |WARNING | |
 |GitLab: Too many Redis cache client exceptions |<p>"Too many  Redis client exceptions during the requests to  Redis instance cache."</p> |`min(/GitLab by HTTP/gitlab.redis.client_exceptions.cache.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}` |WARNING | |
 |GitLab: Too many Redis shared_state client exceptions |<p>"Too many  Redis client exceptions during the requests to  Redis instance shared_state."</p> |`min(/GitLab by HTTP/gitlab.redis.client_exceptions.shared_state.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}` |WARNING | |
