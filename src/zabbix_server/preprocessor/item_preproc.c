@@ -2152,10 +2152,11 @@ static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, ch
 	return SUCCEED;
 }
 
-static int	preproc_group_flat_json_parse_input_objects(const char *js, zbx_vector_flat_json_input_obj_t *parsed_objects, zbx_preproc_flat_json_t *fj)
+static int	preproc_group_flat_json_parse_input_objects(const char *js,
+		zbx_vector_flat_json_input_obj_t *parsed_objects, zbx_preproc_flat_json_t *fj)
 {
 	struct zbx_json_parse	jp, jp_obj;
-	char			*ptr;
+	const char		*ptr;
 
 	if (FAIL == zbx_json_brackets_open(js, &jp))
 		return FAIL;
@@ -2194,7 +2195,7 @@ static int	preproc_group_flat_json_params(const char *params, zbx_preproc_flat_j
 {
 	struct zbx_json_parse	jp, jp_list, jp_param;
 	char			index_name[MAX_STRING_LEN], key_name[MAX_STRING_LEN], value_name[MAX_STRING_LEN];
-	char			*ptr;
+	const char		*ptr;
 
 	if (FAIL == zbx_json_open(params, &jp))
 		return FAIL;
@@ -2224,7 +2225,7 @@ static int	preproc_group_flat_json_params(const char *params, zbx_preproc_flat_j
 
 		if (SUCCEED != zbx_json_brackets_open(ptr, &jp_param))
 			return FAIL;
-		
+
 		if (SUCCEED != zbx_json_value_by_name(&jp_param, "name", field_name, sizeof(field_name), NULL))
 			return FAIL;
 
@@ -2249,7 +2250,7 @@ static void	preproc_group_flat_json_serialize_result(zbx_preproc_flat_json_t *fj
 	zbx_preproc_flat_json_input_obj_t	*outval;
 
 	zbx_hashset_iter_reset(&fj->grouped_prefixes, &iter);
-	
+
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	while (NULL != (outobj = (zbx_preproc_flat_json_output_obj_t *)zbx_hashset_iter_next(&iter)))
@@ -2308,7 +2309,8 @@ static int	item_preproc_group_flat_json(zbx_variant_t *value, const char *params
 
 	// group by fields
 	// in this hashset, key = index in each resulting JSON object
-	zbx_hashset_create(&fj.grouped_prefixes, 100, flat_json_output_obj_hash_func, flat_json_output_obj_compare_func);
+	zbx_hashset_create(&fj.grouped_prefixes, 100, flat_json_output_obj_hash_func,
+			flat_json_output_obj_compare_func);
 
 	for (int i = 0; i < fj.field_list.values_num; i++)
 	{
@@ -2336,10 +2338,13 @@ static int	item_preproc_group_flat_json(zbx_variant_t *value, const char *params
 			if (NULL == (oobj_cached = zbx_hashset_search(&fj.grouped_prefixes, &oobj_local)))
 			{
 
-				ovalues = (zbx_vector_flat_json_input_obj_t *)zbx_malloc(NULL, sizeof(zbx_vector_flat_json_input_obj_t));
+				ovalues = (zbx_vector_flat_json_input_obj_t *)zbx_malloc(NULL,
+						sizeof(zbx_vector_flat_json_input_obj_t));
+
 				zbx_vector_flat_json_input_obj_create(ovalues);
 
-				value_elem = (zbx_preproc_flat_json_input_obj_t *)zbx_malloc(NULL, sizeof(zbx_preproc_flat_json_input_obj_t));
+				value_elem = (zbx_preproc_flat_json_input_obj_t *)zbx_malloc(NULL,
+						sizeof(zbx_preproc_flat_json_input_obj_t));
 				value_elem->key = fpj_ptr->field_name;
 				value_elem->value = iobj->value;
 				value_elem->value_type = iobj->value_type;
@@ -2353,7 +2358,9 @@ static int	item_preproc_group_flat_json(zbx_variant_t *value, const char *params
 			{
 				ovalues = oobj_cached->values;
 
-				value_elem = (zbx_preproc_flat_json_input_obj_t *)zbx_malloc(NULL, sizeof(zbx_preproc_flat_json_input_obj_t));
+				value_elem = (zbx_preproc_flat_json_input_obj_t *)zbx_malloc(NULL,
+						sizeof(zbx_preproc_flat_json_input_obj_t));
+
 				value_elem->key = fpj_ptr->field_name;
 				value_elem->value = iobj->value;
 				value_elem->value_type = iobj->value_type;
@@ -2368,7 +2375,6 @@ static int	item_preproc_group_flat_json(zbx_variant_t *value, const char *params
 	zbx_vector_flat_json_input_obj_clear_ext(&input_objects, flat_json_input_obj_free);
 	zbx_hashset_destroy(&fj.grouped_prefixes);
 
-	zabbix_log(1, "JSON = \n%s\n", result);
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, result);
 
