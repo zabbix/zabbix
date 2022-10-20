@@ -12034,6 +12034,9 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 	{
 		int	i;
 
+		if (HOST_STATUS_MONITORED != dc_host->status)
+			continue;
+
 		for (i = 0; i < dc_host->items.values_num; i++)
 		{
 			const ZBX_DC_INTERFACE	*dc_interface;
@@ -12046,9 +12049,6 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 				continue;
 
 			if (SUCCEED != zbx_is_counted_in_item_queue(dc_item->type, dc_item->key))
-				continue;
-
-			if (HOST_STATUS_MONITORED != dc_host->status)
 				continue;
 
 			if (SUCCEED == DCin_maintenance_without_data_collection(dc_host, dc_item))
