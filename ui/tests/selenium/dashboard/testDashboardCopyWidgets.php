@@ -91,7 +91,6 @@ class testDashboardCopyWidgets extends CWebTest {
 
 		// Take a screenshot to test draggable object position.
 		if (!$new_dashboard && $name === 'Test copy Map navigation tree') {
-//			$dashboard->getWidget($name)->edit();
 			$this->assertScreenshot($dashboard->query('xpath://li[@data-id="1"]')->waitUntilPresent()->one(), 'Map_navigation_tree');
 		}
 
