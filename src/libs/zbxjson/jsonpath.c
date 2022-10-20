@@ -232,6 +232,11 @@ static void	jsonpath_list_free(zbx_jsonpath_list_node_t *list)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create jsonpath and compile json path                             *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_jsonpath_t	*jsonpath_create_token_jsonpath(const char *text, size_t len)
 {
 	zbx_jsonpath_t	*path;
@@ -293,21 +298,26 @@ static zbx_jsonpath_token_t	*jsonpath_create_token(int type, const char *express
 	switch (token->type)
 	{
 		case ZBX_JSONPATH_TOKEN_CONST_STR:
-			token->data.text = jsonpath_unquote_dyn(expression + loc->l, loc->r - loc->l + 1);
+			token->text = jsonpath_unquote_dyn(expression + loc->l, loc->r - loc->l + 1);
+			token->path = NULL;
 			break;
 		case ZBX_JSONPATH_TOKEN_PATH_ABSOLUTE:
 		case ZBX_JSONPATH_TOKEN_PATH_RELATIVE:
-			if (NULL == (token->data.path = jsonpath_create_token_jsonpath(expression + loc->l,
+			if (NULL == (token->path = jsonpath_create_token_jsonpath(expression + loc->l,
 					loc->r - loc->l + 1)))
 			{
 				zbx_free(token);
 			}
+			else
+				token->text = jsonpath_strndup(expression + loc->l, loc->r - loc->l + 1);
 			break;
 		case ZBX_JSONPATH_TOKEN_CONST_NUM:
-			token->data.text = jsonpath_strndup(expression + loc->l, loc->r - loc->l + 1);
+			token->text = jsonpath_strndup(expression + loc->l, loc->r - loc->l + 1);
+			token->path = NULL;
 			break;
 		default:
-			token->data.text = NULL;
+			token->text = NULL;
+			token->path = NULL;
 	}
 
 	return token;
@@ -320,16 +330,12 @@ static zbx_jsonpath_token_t	*jsonpath_create_token(int type, const char *express
  ******************************************************************************/
 static void	jsonpath_token_free(zbx_jsonpath_token_t *token)
 {
-	switch (token->type)
+	zbx_free(token->text);
+
+	if (NULL != token->path)
 	{
-		case ZBX_JSONPATH_TOKEN_PATH_ABSOLUTE:
-		case ZBX_JSONPATH_TOKEN_PATH_RELATIVE:
-			zbx_jsonpath_clear(token->data.path);
-			zbx_free(token->data.path);
-			break;
-		default:
-			zbx_free(token->data.text);
-			break;
+		zbx_jsonpath_clear(token->path);
+		zbx_free(token->path);
 	}
 
 	zbx_free(token);
@@ -1597,7 +1603,7 @@ static char	*jsonpath_expression_to_str(zbx_jsonpath_expression_t *expression)
 			case ZBX_JSONPATH_TOKEN_PATH_RELATIVE:
 			case ZBX_JSONPATH_TOKEN_CONST_STR:
 			case ZBX_JSONPATH_TOKEN_CONST_NUM:
-				zbx_strcpy_alloc(&str, &str_alloc, &str_offset, token->data.text);
+				zbx_strcpy_alloc(&str, &str_alloc, &str_offset, token->text);
 				break;
 			case ZBX_JSONPATH_TOKEN_PAREN_LEFT:
 				zbx_strcpy_alloc(&str, &str_alloc, &str_offset, "(");
@@ -1927,7 +1933,7 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 		switch (token->type)
 		{
 			case ZBX_JSONPATH_TOKEN_PATH_ABSOLUTE:
-				if (FAIL == jsonpath_extract_value(jp_root, token->data.path, &value))
+				if (FAIL == jsonpath_extract_value(jp_root, token->path, &value))
 					zbx_variant_set_none(&value);
 				zbx_vector_var_append_ptr(&stack, &value);
 				break;
@@ -1936,16 +1942,16 @@ static int	jsonpath_match_expression(const struct zbx_json_parse *jp_root, const
 				if ('[' != *jp.start && '{' != *jp.start)
 					goto out;
 
-				if (FAIL == jsonpath_extract_value(&jp, token->data.path, &value))
+				if (FAIL == jsonpath_extract_value(&jp, token->path, &value))
 					zbx_variant_set_none(&value);
 				zbx_vector_var_append_ptr(&stack, &value);
 				break;
 			case ZBX_JSONPATH_TOKEN_CONST_STR:
-				zbx_variant_set_str(&value, zbx_strdup(NULL, token->data.text));
+				zbx_variant_set_str(&value, zbx_strdup(NULL, token->text));
 				zbx_vector_var_append_ptr(&stack, &value);
 				break;
 			case ZBX_JSONPATH_TOKEN_CONST_NUM:
-				zbx_variant_set_dbl(&value, atof(token->data.text));
+				zbx_variant_set_dbl(&value, atof(token->text));
 				zbx_vector_var_append_ptr(&stack, &value);
 				break;
 			case ZBX_JSONPATH_TOKEN_OP_NOT:

@@ -150,20 +150,12 @@ typedef enum
 }
 zbx_jsonpath_token_type_t;
 
-typedef union
+typedef struct
 {
+	unsigned char	type;
 	char		*text;
 	zbx_jsonpath_t	*path;
 }
-zbx_jsonpath_token_data_t;
-
-
-typedef struct
-{
-	unsigned char			type;
-	zbx_jsonpath_token_data_t	data;
-}
 zbx_jsonpath_token_t;
-
 
 #endif
