@@ -71,8 +71,19 @@ class API {
 		}
 
 		if (array_key_exists('filter', $_GET)) {
-			[, $filter] = explode(' eq ', $_GET['filter']);
-			$input['userName'] = str_replace('"', '', $filter);
+			$filter = explode(' ', $_GET['filter']);
+
+			if (count($filter) === 3) {
+				[$filter_name, $operator, $filter_value] = $filter;
+			}
+
+			if ($class === '/users' && isset($filter_name, $operator, $filter_value) && $filter_name === 'userName'
+					&& $operator === 'eq') {
+				$input['userName'] = str_replace('"', '', $filter_value);
+			}
+			else {
+				throw new Exception(_('This filter is not supported'), 400);
+			}
 		}
 
 		if (array_key_exists('startIndex', $_GET)) {
