@@ -73,21 +73,22 @@ window.action_edit_popup = new class {
 	}
 
 	_openEditOperationPopup(e, operation_data, row_id) {
-		if (JSON.parse(e.target.getAttribute('data'))) {
-			const data = JSON.parse(e.target.getAttribute('data'))
-			this.parameters = {
-				eventsource: this.eventsource,
-				recovery: this.recovery,
-				actionid: this.actionid,
-				data: data
-			}
-		}
-		else {
+		const data = JSON.parse(e.target.getAttribute('data_operation'));
+
+		if (data.operationid || data.operationid === 0) {
 			this.parameters = {
 				eventsource: this.eventsource,
 				recovery: operation_data.operationtype,
 				actionid: this.actionid,
 				data: operation_data.data
+			}
+		}
+		else  {
+			this.parameters = {
+				eventsource: this.eventsource,
+				recovery: this.recovery,
+				actionid: this.actionid,
+				data: data
 			}
 		}
 
@@ -307,10 +308,17 @@ window.action_edit_popup = new class {
 	* Add data to specific template based on operation recovery type, input data and eventsource.
 	*/
 	_createOperationsRow(input, row_id = null) {
+		if (this.recovery == undefined) {
+			this.recovery  = operation.recovery;
+		}
+
+		let row_index;
+		if (row_id !== null) {
+			row_index = row_id;
+		}
+
 		let operation = input.detail.operation;
 		let operation_obj = {...operation};
-
-		operation_obj.data_operation = JSON.stringify(operation);
 
 		let data = input.detail.operation.details.data ? input.detail.operation.details.data[0] : [];
 		operation_obj.data = data.join(' ');
@@ -326,7 +334,12 @@ window.action_edit_popup = new class {
 				template = this.operation_template_usr_usrgrps_basic;
 			}
 		}
-		let row_index;
+
+		if (row_id) {
+			document.getElementById(row_id).remove();
+		}
+		operation_obj.data_operation = JSON.stringify(operation);
+
 
 		switch (parseInt(this.recovery)) {
 			case <?=ACTION_RECOVERY_OPERATION?>:
@@ -616,7 +629,6 @@ window.action_edit_popup = new class {
 			</tr>
 		`);
 
-		// todo : rename templates
 		this.operation_template_basic = new Template(`
 			<tr id="#{prefix}operations_#{row_index}">
 				<td class="wordwrap">
@@ -628,7 +640,7 @@ window.action_edit_popup = new class {
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
 							<button
-							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation=#{data_operation}>
+							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation="#{data_operation}">
 							<?= _('Edit') ?>
 							</button>
 						</li>
@@ -654,7 +666,7 @@ window.action_edit_popup = new class {
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
 							<button
-							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation=#{data_operation}>
+							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation="#{data_operation}">
 							<?= _('Edit') ?>
 							</button>
 						</li>
@@ -680,7 +692,7 @@ window.action_edit_popup = new class {
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
 							<button
-							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation=#{data_operation}>
+							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation="#{data_operation}">
 							<?= _('Edit') ?>
 							</button>
 						</li>
@@ -709,7 +721,7 @@ window.action_edit_popup = new class {
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
 							<button
-							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation=#{data_operation}>
+							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation="#{data_operation}">
 							<?= _('Edit') ?>
 							</button>
 						</li>
