@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-18T07:45:37Z'
+  date: '2022-10-20T14:31:13Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1012,7 +1012,7 @@ zabbix_export:
               name: 'GitLab: Failed to fetch info data'
               event_name: 'GitLab: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for metrics for the last 30 minutes'
+              description: 'Zabbix has not received a metrics data for the last 30 minutes'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1448,39 +1448,39 @@ zabbix_export:
       macros:
         -
           macro: '{$GITLAB.HEALTH.TOKEN}'
-          description: 'Gitlab health token variable path. Example "?token=your_token"'
+          description: 'The token path for Gitlab health check. Example `?token=your_token`'
         -
           macro: '{$GITLAB.HTTP.FAIL.MAX.WARN}'
           value: '2'
-          description: 'Maximum number of HTTP requests failures for trigger expression.'
+          description: 'The maximum number of HTTP request failures for a trigger expression.'
         -
           macro: '{$GITLAB.OPEN.FDS.MAX.WARN}'
           value: '90'
-          description: 'Maximum percentage of used file descriptors for trigger expression.'
+          description: 'The maximum percentage of used file descriptors for a trigger expression.'
         -
           macro: '{$GITLAB.PUMA.QUEUE.MAX.WARN}'
           value: '1'
-          description: 'Maximum number of Puma queued requests for trigger expression.'
+          description: 'The maximum number of PUMA queued requests for a trigger expression.'
         -
           macro: '{$GITLAB.PUMA.UTILIZATION.MAX.WARN}'
           value: '90'
-          description: 'Maximum percentage of used Puma thread utilization for trigger expression.'
+          description: 'The maximum percentage of PUMA thread utilization for a trigger expression.'
         -
           macro: '{$GITLAB.REDIS.FAIL.MAX.WARN}'
           value: '2'
-          description: 'Maximum number of Redis client exceptions for trigger expression.'
+          description: 'The maximum number of Redis client exceptions for a trigger expression.'
         -
           macro: '{$GITLAB.UNICORN.QUEUE.MAX.WARN}'
           value: '1'
-          description: 'Maximum number of Unicorn queued requests for trigger expression.'
+          description: 'The maximum number of Unicorn queued requests for a trigger expression.'
         -
           macro: '{$GITLAB.UNICORN.UTILIZATION.MAX.WARN}'
           value: '90'
-          description: 'Maximum percentage of used Unicorn workers utilization for trigger expression.'
+          description: 'The maximum percentage of Unicorn workers utilization for a trigger expression.'
         -
           macro: '{$GITLAB.URL}'
           value: 'http://localhost'
-          description: 'GitLab instance URL'
+          description: 'URL of a GitLab instance.'
       valuemaps:
         -
           uuid: 3b40391bb8b6472e9c3fd8e1f001fe04
