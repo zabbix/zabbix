@@ -179,6 +179,7 @@ class User extends ScimApiService {
 		}
 		elseif ($db_user['userdirectoryid'] == $userdirectoryid) {
 			$user_data['userid'] = $db_user['userid'];
+			$user_data['usrgrps'] = [];
 			$user = APIRPC::User()->updateProvisionedUser($user_data);
 			$user['userid'] = $db_user['userid'];
 		}
