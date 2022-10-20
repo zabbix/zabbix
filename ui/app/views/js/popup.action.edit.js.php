@@ -59,8 +59,8 @@ window.action_edit_popup = new class {
 			else if (e.target.classList.contains('js-update-operations-create')) {
 				this._openOperationPopup(this.eventsource, <?= ACTION_UPDATE_OPERATION ?>, this.actionid);
 			}
-			else if (e.target.classList.contains('js-edit-button')) {
-				this._openEditOperationPopup(e, JSON.parse(e.target.getAttribute('data-operation')), $(e.target).closest('tr').attr('id'));
+			else if (e.target.classList.contains('js-edit-operation')) {
+				this._openEditOperationPopup(e, JSON.parse(e.target.getAttribute('data_operation')), $(e.target).closest('tr').attr('id'));
 			}
 			else if (e.target.classList.contains('js-remove')) {
 				e.target.closest('tr').remove();
@@ -164,8 +164,8 @@ window.action_edit_popup = new class {
 					input.row_index ++;
 
 				document
-						.querySelector('#conditionTable tbody')
-						.insertAdjacentHTML('beforeend', this.condition_default_template.evaluate(element))
+					.querySelector('#conditionTable tbody')
+					.insertAdjacentHTML('beforeend', this.condition_default_template.evaluate(element))
 				}
 				this._processTypeOfCalculation();
 			})
@@ -207,8 +207,10 @@ window.action_edit_popup = new class {
 		}
 	}
 
+	/**
+	* Check if row with the same conditiontype and value already exists.
+	*/
 	_checkConditionRow(input) {
-		// Check if row with the same conditiontype and value already exists.
 		let result = [];
 		[...document.getElementById('conditionTable').getElementsByTagName('tr')].map(it => {
 			const table_row = it.getElementsByTagName('td')[2];
@@ -252,220 +254,148 @@ window.action_edit_popup = new class {
 		return this.condition_name
 	}
 
-	_isActionOperation() {
-		return this.recovery == <?=ACTION_OPERATION?>;
+	/**
+	* Add hidden inputs to template for each possible eventsource/operation type/data combination.
+	*/
+	_prepareOperationsRow(operation, op_template) {
+		const template = document.createElement('template');
+		let prefix = operation.prefix;
+		template.innerHTML = op_template.evaluate(operation);
+		const row = template.content.firstElementChild;
+		const except_keys = [
+			'details', 'data_operation', 'prefix', 'row_index', 'data', 'steps', 'start_in', 'duration', 'usr_data',
+			'usrgrp_data', 'usr_details', 'usrgrp_details'
+		];
+
+		for (const [key, value] of Object.entries(operation)) {
+			if (!except_keys.includes(key)) {
+				let input = document.createElement('input');
+				let first = row.getElementsByTagName('td')[0];
+
+				if (is_array(value)) {
+					value.map((it, index) => {
+						let input = document.createElement('input');
+						input.setAttribute('type', 'hidden');
+						input.setAttribute('name', `${prefix}operations[${operation.row_index}][${key}][${index}][${Object.keys(it)[0]}]`)
+						input.setAttribute('id', `${prefix}operations_${operation.row_index}_${key}_${index}_${Object.keys(it)[0]}`)
+						input.setAttribute('value', it[Object.keys(it)[0]])
+						first.append(input);
+					})
+				}
+				else if (is_object(value) && !is_array(value)) {
+					input.setAttribute('type', 'hidden');
+					input.setAttribute('name', `${prefix}operations[${operation.row_index}][${key}][${Object.keys(value)[0]}]`)
+					input.setAttribute('id', `${prefix}operations_${operation.row_index}_${key}_${Object.keys(value)[0]}`)
+					input.setAttribute('value', value[Object.keys(value)[0]])
+					first.append(input);
+				}
+
+				else {
+					input.setAttribute('type', 'hidden');
+					input.setAttribute('id', `${prefix}operations_${operation.row_index}_${key}`);
+					input.setAttribute('name', `${prefix}operations[${operation.row_index}][${key}]`);
+					input.setAttribute('value', `${value}`);
+					first.append(input);
+				}
+			}
+		}
+
+		return row
 	}
 
-	_isRecoveryOperation() {
-		return this.recovery == <?=ACTION_RECOVERY_OPERATION?>;
-	}
-
-	_isUpdateOperation() {
-		return this.recovery == <?=ACTION_UPDATE_OPERATION?>;
-	}
-
-	_isTriggerOrInternalOrServiceEventSource() {
-		return this.eventsource == <?=EVENT_SOURCE_TRIGGERS?>
-			|| this.eventsource == <?=EVENT_SOURCE_INTERNAL?>
-			|| this.eventsource == <?=EVENT_SOURCE_SERVICE?>;
-	}
-
+	/**
+	* Add data to specific template based on operation recovery type, input data and eventsource.
+	*/
 	_createOperationsRow(input, row_id = null) {
-		const operation_data = input.detail.operation;
-		this.recovery = input.detail.operation.recovery;
+		let operation = input.detail.operation;
+		let operation_obj = {...operation};
 
-		let table_id;
-		let row_id_prefix;
+		operation_obj.data_operation = JSON.stringify(operation);
 
-		if (this._isRecoveryOperation()) {
-			table_id = 'rec-table';
-			row_id_prefix = 'recovery_operations_';
-		}
+		let data = input.detail.operation.details.data ? input.detail.operation.details.data[0] : [];
+		operation_obj.data = data.join(' ');
+		operation_obj.details = input.detail.operation.details.type;
+		let template = this.operation_template_basic;
 
-		else if (this._isUpdateOperation()) {
-			table_id = 'upd-table';
-			row_id_prefix = 'update_operations_';
-		}
-
-		else if (this._isActionOperation()) {
-			table_id = 'op-table';
-			row_id_prefix = 'operations_';
-		}
-
-		this.operation_row = document.createElement('tr');
-
-		const rows = operation_data.details.type.map((type, index) => {
-			const data = operation_data.details.data ? operation_data.details.data[index] : null;
-			return this._addDetailsColumnNew(type, data);
-		})
-
-		const details = document.createElement('span');
-		details.innerHTML = rows.join('<br>')
-
-		if (this._isActionOperation() && this._isTriggerOrInternalOrServiceEventSource()) {
-			this.operation_row.append(this._addColumn(operation_data.steps));
-		}
-
-		this.operation_row.append(details);
-
-		if (this._isActionOperation() && this._isTriggerOrInternalOrServiceEventSource()) {
-			this.operation_row.append(this._addColumn(operation_data.start_in));
-			this.operation_row.append(this._addColumn(operation_data.duration));
-		}
-
-		this.addOperationsData(input);
-		this.operation_row.append(this._createActionCell(input));
-		this.operation_row.setAttribute('class', 'operation-details-row');
-
-		this.operation_table = document.getElementById(table_id);
-		this.operation_row_count = this.operation_table.rows.length - 2;
-
-		this.operation_row.setAttribute('id', row_id_prefix + this.operation_row_count)
-
-		if (row_id) {
-			$(`#${row_id}`).replaceWith(this.operation_row);
-		}
-		else {
-			$(`#${table_id} tr:last`).before(this.operation_row);
-		}
-
-		this._createTableRowIds(this.operation_table, row_id_prefix);
-	}
-
-	_createTableRowIds(table, prefix = '') {
-		const rows = $(table).find('.operation-details-row');
-
-		rows.each(index => {
-			$(rows[index])
-				.attr('id', prefix.concat(index))
-		});
-	}
-
-	_addDetailsColumnNew(type, data = null) {
-		return `<b>${type}</b> ${data ? data.join(' ') : ''}`;
-	}
-
-	addOperationsData(input) {
-		this.recovery_prefix = '';
-
-		if (this.recovery === <?= ACTION_RECOVERY_OPERATION ?>) {
-			this.recovery_prefix = 'recovery_'
-		}
-		else if (this.recovery === <?= ACTION_UPDATE_OPERATION ?>) {
-			this.recovery_prefix = 'update_'
-		}
-
-		const form = document.forms['action.edit'];
-		const operation_input = document.createElement('input');
-
-		operation_input.setAttribute('type', 'hidden');
-		operation_input.setAttribute('name', `add_${this.recovery_prefix}operation`);
-		operation_input.setAttribute('value', '1');
-		form.appendChild(operation_input);
-
-		const except_keys = ['details', 'start_in', 'steps', 'duration'];
-
-		this.createHiddenInputFromObject(
-			input.detail.operation, `operations[${this.operation_row_count}]`, `operations_${this.operation_row_count}`,
-			except_keys
-		);
-		this.operation_row.append(
-			this._addHiddenOperationsFields('operationtype', input.detail.operation.operationtype)
-		);
-	}
-
-	createHiddenInputFromObject(obj, namePrefix, idPrefix, exceptKeys = []) {
-		this.recovery_prefix = '';
-
-		if (this.recovery == <?= ACTION_RECOVERY_OPERATION ?>) {
-			this.recovery_prefix = 'recovery_'
-		}
-		else if (this.recovery == <?= ACTION_UPDATE_OPERATION ?>) {
-			this.recovery_prefix = 'update_'
-		}
-
-		if (!obj || typeof obj !== 'object') {
-			return;
-		}
-
-		Object.keys(obj).map(key => {
-			if (exceptKeys.includes(key)) {
-				return;
+		if (input.detail.operation.details.data) {
+			if (operation.details.data.length > 1) {
+				operation_obj.usr_data = operation.details.data[0].join('');
+				operation_obj.usr_details = operation.details.type[0];
+				operation_obj.usrgrp_data = operation.details.data[1].join('');
+				operation_obj.usrgrp_details = operation.details.type[1];
+				template = this.operation_template_usr_usrgrps_basic;
 			}
-
-			if (typeof obj[key] === 'object') {
-				this.createHiddenInputFromObject(obj[key], `${namePrefix}[${key}]`, `${idPrefix}_${key}`);
-				return;
-			}
-
-			const input = document.createElement('input');
-			input.setAttribute('type', 'hidden');
-
-			input.setAttribute('name', namePrefix ? `${this.recovery_prefix}${namePrefix}[${key}]` : key);
-			input.setAttribute('id', idPrefix ? `${this.recovery_prefix}${idPrefix}_${key}` : key);
-
-			input.setAttribute('value', obj[key]);
-
-			this.operation_row.append(input);
-		})
-	}
-
-	_addHiddenOperationsFields(name, value) {
-		const input = document.createElement('input');
-		input.type = 'hidden';
-		input.id = `${this.recovery_prefix}operations_${this.operation_row_count}_${name}`;
-		input.name = `${this.recovery_prefix}operations[${this.operation_row_count}][${name}]`;
-		input.value = value;
-
-		return input;
-	}
-
-	_addUserFields(index, name, value, group) {
-		if (this.recovery == <?=ACTION_OPERATION?>) {
-			this.prefix = ''
 		}
-		else if (this.recovery == <?=ACTION_RECOVERY_OPERATION?>) {
-			this.prefix = 'recovery_'
+		let row_index;
+
+		switch (parseInt(this.recovery)) {
+			case <?=ACTION_RECOVERY_OPERATION?>:
+				row_index = 0;
+				while (document.querySelector(`#rec-table [id="recovery_operations_${row_index}"]`) !== null) {
+					row_index++;
+				}
+				operation_obj.row_index = row_index
+				operation_obj.prefix = 'recovery_';
+
+				document
+					.querySelector('#rec-table tbody')
+					.appendChild(this._prepareOperationsRow(operation_obj, template));
+				break;
+
+			case <?=ACTION_UPDATE_OPERATION?>:
+				row_index = 0;
+				while (document.querySelector(`#upd-table [id="update_operations_${row_index}"]`) !== null) {
+					row_index++;
+				}
+				operation_obj.row_index = row_index;
+				operation_obj.prefix = 'update_';
+
+				document
+					.querySelector('#upd-table tbody')
+					.appendChild(this._prepareOperationsRow(operation_obj, template));
+				break;
+
+			case <?=ACTION_OPERATION?>:
+				row_index = 0;
+				while (document.querySelector(`#op-table [id="operations_${row_index}"]`) !== null) {
+					row_index++;
+				}
+				operation_obj.row_index = row_index;
+
+				switch (parseInt(this.eventsource)) {
+					case <?= EVENT_SOURCE_TRIGGERS ?>:
+					case <?= EVENT_SOURCE_SERVICE ?>:
+					case <?= EVENT_SOURCE_INTERNAL ?>:
+
+						template = this.operation_template_additional
+						operation_obj.prefix = '';
+						operation_obj.steps = input.detail.operation.steps;
+						operation_obj.start_in = input.detail.operation.start_in;
+						operation_obj.duration = input.detail.operation.duration;
+
+						if (input.detail.operation.details.data) {
+							if (operation.details.data.length > 1) {
+								template = this.operation_template_usr_usrgrps_additional;
+							}
+						}
+
+						document
+							.querySelector('#op-table tbody')
+							.appendChild(this._prepareOperationsRow(operation_obj, template));
+						break;
+
+					default:
+						if (operation.details.data.length > 1) {
+							template = this.operation_template_usr_usrgrps_basic;
+						}
+						operation_obj.prefix = ''
+
+						document
+							.querySelector('#op-table tbody')
+							.appendChild(this._prepareOperationsRow(operation_obj, template));
+						break;
+				}
 		}
-		else if (this.recovery == <?=ACTION_UPDATE_OPERATION?>) {
-			this.prefix = 'update_'
-		}
-
-		const input = document.createElement('input');
-		input.type = 'hidden';
-		input.id = `${this.prefix}operations_${this.row_count}_${group}_${index}_${name}`;
-		input.name = `${this.prefix}operations[${this.row_count}][${group}][${index}][${name}]`;
-		input.value = value;
-
-		return input;
-	}
-
-	_addColumn(input) {
-		const cell = document.createElement('td');
-
-		cell.append(input);
-		return cell;
-	}
-
-	_createActionCell(input) {
-		const cell = document.createElement('td');
-		const remove_btn = document.createElement('button');
-		const edit_btn = document.createElement('button');
-
-		remove_btn.type = 'button';
-		remove_btn.textContent = <?= json_encode(_('Remove')) ?>;
-		remove_btn.classList.add('btn-link', 'js-remove');
-
-		edit_btn.type = 'button';
-		edit_btn.classList.add('btn-link', 'js-edit-button');
-		edit_btn.textContent = <?= json_encode(_('Edit')) ?>;
-		edit_btn.setAttribute('data', JSON.stringify(input.detail.operation))
-
-		cell.appendChild(edit_btn);
-		cell.append(' ');
-		cell.appendChild(remove_btn);
-
-		return cell;
 	}
 
 	submit() {
@@ -678,6 +608,111 @@ window.action_edit_popup = new class {
 							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
 							<input type="hidden" name="conditions[#{row_index}][value]" value="#{value}">
 							<input type="hidden" name="conditions[#{row_index}][value2]" value="#{value2}">
+						</li>
+					</ul>
+				</td>
+			</tr>
+		`);
+
+		// todo : rename templates
+		this.operation_template_basic = new Template(`
+			<tr id="#{prefix}operations_#{row_index}">
+				<td class="wordwrap">
+					<span>
+						<b> #{details}  </b> #{data}
+					</span>
+				</td>
+				<td>
+					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
+						<li>
+							<button
+							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation=#{data_operation}>
+							<?= _('Edit') ?>
+							</button>
+						</li>
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+						</li>
+					</ul>
+				</td>
+			</tr>
+		`);
+
+		this.operation_template_additional = new Template(`
+			<tr id="#{prefix}operations_#{row_index}">
+				<td> #{steps} </td>
+				<td class="wordwrap">
+					<span>
+						<b> #{details}  </b> #{data}
+					</span>
+				</td>
+				<td> #{start_in} </td>
+				<td> #{duration} </td>
+				<td>
+					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
+						<li>
+							<button
+							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation=#{data_operation}>
+							<?= _('Edit') ?>
+							</button>
+						</li>
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+						</li>
+					</ul>
+				</td>
+			</tr>
+		`);
+
+		this.operation_template_usr_usrgrps_basic = new Template(`
+			<tr id="#{prefix}operations_#{row_index}">
+				<td class="wordwrap">
+					<span>
+						<b> #{usr_details}  </b> #{usr_data}
+					</span> <br>
+					<span>
+						<b> #{usrgrp_details}  </b> #{usrgrp_data}
+					</span>
+				</td>
+				<td>
+					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
+						<li>
+							<button
+							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation=#{data_operation}>
+							<?= _('Edit') ?>
+							</button>
+						</li>
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+						</li>
+					</ul>
+				</td>
+			</tr>
+		`);
+
+		this.operation_template_usr_usrgrps_additional = new Template(`
+			<tr id="#{prefix}operations_#{row_index}">
+				<td> #{steps} </td>
+				<td class="wordwrap">
+					<span>
+						<b> #{usr_details}  </b> #{usr_data}
+					</span> <br>
+					<span>
+						<b> #{usrgrp_details}  </b> #{usrgrp_data}
+					</span>
+				</td>
+				<td> #{start_in} </td>
+				<td> #{duration} </td>
+				<td>
+					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
+						<li>
+							<button
+							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation=#{data_operation}>
+							<?= _('Edit') ?>
+							</button>
+						</li>
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
 						</li>
 					</ul>
 				</td>

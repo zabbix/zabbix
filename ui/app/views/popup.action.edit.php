@@ -198,8 +198,8 @@ if ($data['action']['operations']) {
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('js-edit-button')
-							->setAttribute('data-operation', json_encode([
+							->addClass('js-edit-operation')
+							->setAttribute('data_operation', json_encode([
 								'operationid' => $operationid,
 								'actionid' => $data['actionid'],
 								'eventsource' => $data['eventsource'],
@@ -227,8 +227,8 @@ if ($data['action']['operations']) {
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('js-edit-button')
-							->setAttribute('data-operation', json_encode([
+							->addClass('js-edit-operation')
+							->setAttribute('data_operation', json_encode([
 								'operationid' => $operationid,
 								'actionid' => $data['actionid'],
 								'eventsource' => $data['eventsource'],
@@ -316,8 +316,8 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('js-edit-button')
-							->setAttribute('data-operation', json_encode([
+							->addClass('js-edit-operation')
+							->setAttribute('data_operation', json_encode([
 								'operationid' => $operationid,
 								'actionid' => $data['actionid'],
 								'eventsource' => $data['eventsource'],
@@ -326,7 +326,7 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 							])),
 						[
 							(new CButton('remove', _('Remove')))
-								->setAttribute('data-operationid', $operationid)
+								->setAttribute('data_operationid', $operationid)
 								->addClass('js-remove')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
@@ -341,12 +341,17 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 		}
 	}
 
-	$operations_table->setFooter(
-		(new CSimpleButton(_('Add')))
-			->setAttribute('data-actionid', $data['actionid'])
-			->setAttribute('data-eventsource', $data['eventsource'])
-			->addClass('js-recovery-operations-create')
-			->addClass(ZBX_STYLE_BTN_LINK)
+	$operations_table->addItem(
+		(new CTag('tfoot', true))
+			->addItem(
+				(new CCol(
+					(new CSimpleButton(_('Add')))
+						->setAttribute('data-actionid', $data['actionid'])
+						->setAttribute('data-eventsource', $data['eventsource'])
+						->addClass('js-recovery-operations-create')
+						->addClass(ZBX_STYLE_BTN_LINK)
+				))->setColSpan(4)
+			)
 	);
 
 	$operations_tab->addItem([
@@ -388,8 +393,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					new CHorList([
 						(new CSimpleButton(_('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('js-edit-button')
-							->setAttribute('data-operation', json_encode([
+							->addClass('js-edit-operation')
+							->setAttribute('data_operation', json_encode([
 								'operationid' => $operationid,
 								'actionid' => $data['actionid'],
 								'eventsource' => $data['eventsource'],
@@ -398,7 +403,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 							])),
 						[
 							(new CButton('remove', _('Remove')))
-								->setAttribute('data-operationid', $operationid)
+								->setAttribute('data_operationid', $operationid)
 								->addClass('js-remove')
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->removeId(),
@@ -413,12 +418,17 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 		}
 	}
 
-	$operations_table->setFooter(
-		(new CSimpleButton(_('Add')))
-		->setAttribute('data-actionid', $data['actionid'])
-		->setAttribute('data-eventsource', $data['eventsource'])
-		->addClass('js-update-operations-create')
-		->addClass(ZBX_STYLE_BTN_LINK)
+	$operations_table->addItem(
+		(new CTag('tfoot', true))
+			->addItem(
+				(new CCol(
+					(new CSimpleButton(_('Add')))
+						->setAttribute('data-actionid', $data['actionid'])
+						->setAttribute('data-eventsource', $data['eventsource'])
+						->addClass('js-update-operations-create')
+						->addClass(ZBX_STYLE_BTN_LINK)
+				))->setColSpan(4)
+			)
 	);
 
 	$operations_tab->addItem([
