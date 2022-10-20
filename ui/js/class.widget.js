@@ -59,7 +59,6 @@ class CWidget extends CBaseComponent {
 		can_edit_dashboards,
 		time_period,
 		dynamic_hostid,
-		scope_id,
 		unique_id
 	}) {
 		super(document.createElement('div'));
@@ -92,7 +91,6 @@ class CWidget extends CBaseComponent {
 		this._can_edit_dashboards = can_edit_dashboards;
 		this._time_period = time_period;
 		this._dynamic_hostid = dynamic_hostid;
-		this._scope_id = scope_id;
 		this._unique_id = unique_id;
 
 		this._init();
