@@ -73,7 +73,6 @@ window.operation_popup = new class {
 				this._openConditionsPopup(e.target);
 			}
 			else if (e.target.classList.contains('element-table-remove')) {
-				this.row_count--;
 				this._processTypeOfCalculation();
 			}
 			else if (e.target.classList.contains('js-remove')) {
@@ -371,6 +370,9 @@ window.operation_popup = new class {
 
 	_addUser(values) {
 		values.forEach((value) => {
+			if (value.userid) {
+				value.id = value.userid;
+			}
 			document
 				.querySelector('#operation-message-user-table tbody')
 				.insertAdjacentHTML('beforeend', this.usr_template.evaluate(value))

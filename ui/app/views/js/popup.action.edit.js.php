@@ -308,6 +308,8 @@ window.action_edit_popup = new class {
 	* Add data to specific template based on operation recovery type, input data and eventsource.
 	*/
 	_createOperationsRow(input, row_id = null) {
+		let operation = input.detail.operation;
+
 		if (this.recovery == undefined) {
 			this.recovery  = operation.recovery;
 		}
@@ -317,9 +319,7 @@ window.action_edit_popup = new class {
 			row_index = row_id;
 		}
 
-		let operation = input.detail.operation;
 		let operation_obj = {...operation};
-
 		let data = input.detail.operation.details.data ? input.detail.operation.details.data[0] : [];
 		operation_obj.data = data.join(' ');
 		operation_obj.details = input.detail.operation.details.type;
