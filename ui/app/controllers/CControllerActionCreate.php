@@ -256,9 +256,7 @@ class CControllerActionCreate extends CController {
 		}
 
 		DBstart();
-
 		$result = API::Action()->create($action);
-
 		$result = DBend($result);
 
 		if ($result) {

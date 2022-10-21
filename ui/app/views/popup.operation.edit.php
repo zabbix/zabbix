@@ -230,7 +230,6 @@ foreach($operation['opcommand_hst'] as $host) {
 			$multiselect_values_host[] = $hosts;
 		}
 	}
-
 }
 
 if($operation['opcommand_grp']) {
@@ -340,8 +339,6 @@ $form_grid->addItem([
 	)->setId('operation-attr-hostgroups')
 ]);
 
-
-
 foreach ($operation['optemplate'] as $template) {
 	$templates['id'] = $template[0]['templateid'];
 	$templates['name'] = $template[0]['name'];
@@ -374,7 +371,6 @@ $form_grid->addItem([
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
 	)->setId('operation-attr-templates')
 ]);
-
 
 // Host inventory mode attribute row.
 $form_grid->addItem([
@@ -411,7 +407,6 @@ $conditions_table = (new CTable())
 	->setId('operation-condition-list')
 	->addStyle('width: 100%;')
 	->setHeader([_('Label'), _('Name'), _('Action')]);
-
 
 $conditions_table->addItem(
 	(new CTag('tfoot', true))

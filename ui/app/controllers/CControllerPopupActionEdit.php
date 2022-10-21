@@ -48,10 +48,7 @@ class CControllerPopupActionEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$eventsource = $this->getInput('eventsource');
-		$has_permission = false;
-
-		switch ($eventsource) {
+		switch ($this->getInput('eventsource')) {
 			case EVENT_SOURCE_TRIGGERS:
 				$has_permission = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
 				break;

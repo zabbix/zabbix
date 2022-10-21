@@ -248,7 +248,6 @@ class CControllerActionUpdate extends CController {
 			$action['notify_if_canceled'] = $this->getInput('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_FALSE);
 		}
 
-
 		switch ($eventsource) {
 			case EVENT_SOURCE_DISCOVERY:
 			case EVENT_SOURCE_AUTOREGISTRATION:
@@ -261,9 +260,7 @@ class CControllerActionUpdate extends CController {
 		}
 
 		DBstart();
-
 		$result = API::Action()->update($action);
-
 		$result = DBend($result);
 
 		if ($result) {

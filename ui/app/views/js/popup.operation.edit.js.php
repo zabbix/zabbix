@@ -456,7 +456,6 @@ window.operation_popup = new class {
 		this._processTypeOfCalculation();
 	}
 
-
 	submit() {
 		const actionid = this._createHiddenInput('actionid', this.actionid)
 		this.form.append(actionid);

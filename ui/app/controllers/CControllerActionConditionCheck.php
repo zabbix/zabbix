@@ -284,7 +284,6 @@ class CControllerActionConditionCheck extends CController {
 		if ($groups || $triggers || $hosts || $templates || $proxies || $drules || $dchecks || $services) {
 			$id = $condition['value'];
 
-
 			switch ($condition['condition_type']) {
 				case CONDITION_TYPE_HOST_GROUP:
 					foreach ($id as $groupid) {

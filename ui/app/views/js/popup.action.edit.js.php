@@ -340,7 +340,6 @@ window.action_edit_popup = new class {
 		}
 		operation_obj.data_operation = JSON.stringify(operation);
 
-
 		switch (parseInt(this.recovery)) {
 			case <?=ACTION_RECOVERY_OPERATION?>:
 				row_index = 0;
@@ -568,7 +567,9 @@ window.action_edit_popup = new class {
 				<td>
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove-condition"><?= _('Remove') ?></button>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove-condition">
+							<?= _('Remove') ?>
+							</button>
 						</li>
 						<li>
 							<input type="hidden" name="conditions[#{row_index}][conditiontype]" value="#{conditiontype}">
@@ -591,7 +592,9 @@ window.action_edit_popup = new class {
 				<td>
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove-condition"><?= _('Remove') ?></button>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove-condition">
+							<?= _('Remove') ?>
+							</button>
 						</li>
 						<li>
 							<input type="hidden" name="conditions[#{row_index}][conditiontype]" value="#{conditiontype}">
@@ -616,7 +619,9 @@ window.action_edit_popup = new class {
 				<td>
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove-condition"><?= _('Remove') ?></button>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove-condition">
+							<?= _('Remove') ?>
+							</button>
 						</li>
 						<li>
 							<input type="hidden" name="conditions[#{row_index}][conditiontype]" value="#{conditiontype}">
@@ -639,13 +644,15 @@ window.action_edit_popup = new class {
 				<td>
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
-							<button
-							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation="#{data_operation}">
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>
+							js-edit-operation" data_operation="#{data_operation}">
 							<?= _('Edit') ?>
 							</button>
 						</li>
 						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove">
+							<?= _('Remove') ?>
+							</button>
 						</li>
 					</ul>
 				</td>
@@ -692,12 +699,15 @@ window.action_edit_popup = new class {
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
 							<button
-							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation="#{data_operation}">
+							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation
+							data_operation="#{data_operation}">
 							<?= _('Edit') ?>
 							</button>
 						</li>
 						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove">
+							<?= _('Remove') ?>
+							</button>
 						</li>
 					</ul>
 				</td>
@@ -721,7 +731,8 @@ window.action_edit_popup = new class {
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
 							<button
-							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation="#{data_operation}">
+							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation"
+							data_operation="#{data_operation}">
 							<?= _('Edit') ?>
 							</button>
 						</li>
