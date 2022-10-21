@@ -86,7 +86,7 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 			(new CTextBox($this->field->getName().'['.$row_num.'][tag]', $tag['tag']))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 				->setAriaRequired($this->isRequired())
-				->setEnabled(!$this->isDisabled())
+				->setEnabled(!$this->isDisabled() || $row_num === '#{rowNum}')
 				->setAttribute('placeholder', _('tag')),
 			(new CSelect($this->field->getName().'['.$row_num.'][operator]'))
 				->addOptions(CSelect::createOptionsFromArray([
@@ -100,18 +100,18 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 				->setValue($tag['operator'])
 				->setFocusableElementId($this->field->getName().'-'.$row_num.'-operator-select')
 				->setId($this->field->getName().'_'.$row_num.'_operator')
-				->setDisabled($this->isDisabled()),
+				->setDisabled($this->isDisabled() && $row_num !== '#{rowNum}'),
 			(new CTextBox($this->field->getName().'['.$row_num.'][value]', $tag['value']))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 				->setAriaRequired($this->isRequired())
 				->setId($this->field->getName().'_'.$row_num.'_value')
-				->setEnabled(!$this->isDisabled())
+				->setEnabled(!$this->isDisabled() || $row_num === '#{rowNum}')
 				->setAttribute('placeholder', _('value')),
 			(new CCol(
 				(new CButton($this->field->getName().'['.$row_num.'][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
-					->setEnabled(!$this->isDisabled())
+					->setEnabled(!$this->isDisabled() || $row_num === '#{rowNum}')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->addClass('form_row');
 	}
