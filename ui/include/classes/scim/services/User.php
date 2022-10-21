@@ -323,16 +323,6 @@ class User extends ScimApiService {
 	}
 
 	/**
-	 * User patch endpoint is not supported.
-	 *
-	 * @return void
-	 * @throws APIException
-	 */
-	public function patch(): void {
-		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
-	}
-
-	/**
 	 * Deletes requested user based on userid.
 	 *
 	 * @param array  $options

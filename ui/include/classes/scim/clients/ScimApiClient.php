@@ -23,6 +23,25 @@ namespace SCIM\clients;
 use CLocalApiClient;
 
 class ScimApiClient extends CLocalApiClient {
+	/**
+	 * Returns true if the given endpoing is supported.
+	 *
+	 * @param string $endpoint
+	 *
+	 * @return bool
+	 */
+	public function isValidEndpoint($endpoint) {
+		return $this->serviceFactory->hasObject($endpoint);
+	}
+
+	/**
+	 * Returns true if calling the given method requires a valid authentication token.
+	 *
+	 * @param $api
+	 * @param $method
+	 *
+	 * @return bool
+	 */
 	protected function requiresAuthentication($api, $method) {
 		return !($api === '/serviceproviderconfig' && $method === 'get');
 	}

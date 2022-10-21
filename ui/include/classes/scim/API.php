@@ -21,21 +21,25 @@
 namespace SCIM;
 
 use Exception;
-use CApiClient;
 use CHttpRequest;
 use CApiClientResponse;
+use SCIM\clients\ScimApiClient;
 
 class API {
 	/**
 	 * Executes received request.
 	 *
-	 * @param CApiClient   $client   API client.
-	 * @param CHttpRequest $request  Request received.
+	 * @param ScimApiClient  $client   API client.
+	 * @param CHttpRequest   $request  Request received.
 	 *
 	 * @return HttpResponse
 	 */
-	public function execute(CApiClient $client, CHttpRequest $request): HttpResponse {
+	public function execute(ScimApiClient $client, CHttpRequest $request): HttpResponse {
 		[$input, $auth, $class] = $this->parseRequestData($request);
+
+		if (!$client->isValidEndpoint($class)) {
+			throw new Exception(_('The requested endpoint is not supported.'), 501);
+		}
 
 		/** @var CApiClientResponse $response */
 		$response = $client->callMethod($class, strtolower($request->method()), $input, $auth);

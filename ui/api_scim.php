@@ -44,11 +44,7 @@ try {
 	$client->setServiceFactory(new CRegistryFactory([
 		'users'						=> User::class,
 		'groups'					=> Group::class,
-		'serviceproviderconfig'		=> ServiceProviderConfig::class,
-		'me'						=> Me::class,
-		'resourcetypes'				=> ResourceType::class,
-		'schemas'					=> Schema::class,
-		'bulk'						=> Bulk::class
+		'serviceproviderconfig'		=> ServiceProviderConfig::class
 	]));
 	$scim = new SCIM();
 

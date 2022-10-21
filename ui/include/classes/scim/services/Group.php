@@ -276,17 +276,6 @@ class Group extends ScimApiService {
 	}
 
 	/**
-	 * Groups patch endpoint is not supported.
-	 *
-	 * @return void
-	 *
-	 * @throws APIException
-	 */
-	public function patch(): void {
-		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
-	}
-
-	/**
 	 * Deletes SCIM group from 'scim_group' table. Deletes the users that belong to this group from 'users_scim_groups'
 	 * table. Updates users' user groups mapping based on the remaining SCIM groups and SAML settings.
 	 *
