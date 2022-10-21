@@ -919,6 +919,9 @@ abstract class CItemGeneral extends CApiService {
 						$upd_item_indexes[$upd_item['hostid']][$interface_type][] = $i;
 						$interface_types[$interface_type] = true;
 					}
+					else {
+						$upd_items[$i]['interfaceid'] = $row['interfaceid'];
+					}
 				}
 			}
 		}
