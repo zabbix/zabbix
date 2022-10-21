@@ -672,6 +672,7 @@ class CImportDataAdapterTest extends TestCase {
 				'correlation_tag' => '',
 				'event_name' => '',
 				'opdata' => '',
+				'url_name' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
 				'description' => 'trigger'
@@ -691,6 +692,7 @@ class CImportDataAdapterTest extends TestCase {
 				'correlation_tag' => '',
 				'event_name' => '',
 				'opdata' => '',
+				'url_name' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
 				'description' => 'trigger2'
@@ -716,6 +718,7 @@ class CImportDataAdapterTest extends TestCase {
 				'correlation_tag' => '',
 				'event_name' => '',
 				'opdata' => '',
+				'url_name' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
 				'description' => 'trigger'
@@ -735,6 +738,7 @@ class CImportDataAdapterTest extends TestCase {
 				'correlation_tag' => '',
 				'event_name' => '',
 				'opdata' => '',
+				'url_name' => '',
 				'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				'comments' => '',
 				'description' => 'trigger2'
@@ -1130,6 +1134,7 @@ class CImportDataAdapterTest extends TestCase {
 							'correlation_tag' => '',
 							'event_name' => '',
 							'opdata' => '',
+							'url_name' => '',
 							'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 							'dependencies' => []
 						]
@@ -1533,6 +1538,7 @@ class CImportDataAdapterTest extends TestCase {
 							'correlation_tag' => '',
 							'event_name' => '',
 							'opdata' => '',
+							'url_name' => '',
 							'tags' => [],
 							'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 							'dependencies' => []
@@ -2270,6 +2276,7 @@ class CImportDataAdapterTest extends TestCase {
 					'correlation_tag' => '',
 					'event_name' => '',
 					'opdata' => '',
+					'url_name' => '',
 					'tags' => [],
 					'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 					'dependencies' => []
@@ -2289,6 +2296,7 @@ class CImportDataAdapterTest extends TestCase {
 					'correlation_tag' => '',
 					'event_name' => '',
 					'opdata' => '',
+					'url_name' => '',
 					'tags' => [],
 					'manual_close' => (string) ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 					'dependencies' => []
