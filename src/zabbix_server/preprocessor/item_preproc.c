@@ -2233,7 +2233,7 @@ static int	preproc_group_flat_json_params(const char *params, zbx_preproc_flat_j
 
 		if ((FAIL == zbx_json_brackets_open(ptr, &jp_param)) ||
 				(FAIL == zbx_json_value_by_name(&jp_param, "name", field_name, sizeof(field_name), NULL)) ||
-				(FAIL == zbx_json_value_by_name(&jp_param, "oid", prefix, sizeof(prefix), NULL)))
+				(FAIL == zbx_json_value_by_name(&jp_param, "prefix", prefix, sizeof(prefix), NULL)))
 		{
 			zbx_vector_flat_json_param_destroy(&fj->field_list);
 			return FAIL;
