@@ -416,7 +416,7 @@ static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service,
 		CURL *easyhandle, struct curl_slist **headers, ZBX_HTTPPAGE *page, char **error)
 {
 	int		ret = FAIL;
-	char		tmp[MAX_STRING_LEN], *token;
+	char		tmp[MAX_STRING_LEN];
 	CURLcode	err;
 	CURLoption	opt;
 
@@ -441,22 +441,37 @@ static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	if ('"' != page->data[0] && FAIL == vmware_rest_response_open(page->data, NULL, error))
+	if (0 == is_new_api)
 	{
-		*error = zbx_dsprintf(*error, "Authentication fail, %s.", *error);
-		goto out;
-	}
+		char			token[VMWARE_SHORT_STR_LEN];
+		struct zbx_json_parse	jp;
 
-	if (0 == is_new_api && NULL != (token = strchr(page->data, ':')))
-	{
-		token++;
-		token[strlen(token) - 1] = '\0';
+		if (FAIL == vmware_rest_response_open(page->data, &jp, error))
+		{
+			*error = zbx_dsprintf(*error, "Authentication fail, %s.", *error);
+			goto out;
+		}
+
+		if (SUCCEED != zbx_json_value_by_name(&jp, "value", token, sizeof(token), NULL))
+		{
+			*error = zbx_dsprintf(*error, "Authentication fail, Cannot read vmware response: %s.",
+					zbx_json_strerror());
+			goto out;
+		}
+
+		zbx_snprintf(tmp, sizeof(tmp),"vmware-api-session-id: %s", token);
 	}
 	else
-		token = page->data;
+	{
+		if ('"' != page->data[0] && FAIL == vmware_rest_response_open(page->data, NULL, error))
+		{
+			*error = zbx_dsprintf(*error, "Authentication fail, %s.", *error);
+			goto out;
+		}
 
-	zbx_lrtrim(token, "\"");
-	zbx_snprintf(tmp, sizeof(tmp),"vmware-api-session-id: %s", token);
+		zbx_lrtrim(page->data, "\"");
+		zbx_snprintf(tmp, sizeof(tmp),"vmware-api-session-id: %s", page->data);
+	}
 
 	*headers = curl_slist_append(*headers, tmp);
 
