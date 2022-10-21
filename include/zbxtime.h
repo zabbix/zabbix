@@ -81,4 +81,6 @@ int	zbx_calculate_sleeptime(int nextcheck, int max_sleeptime);
 char	*zbx_age2str(int age);
 char	*zbx_date2str(time_t date, const char *tz);
 char	*zbx_time2str(time_t time, const char *tz);
+int	zbx_iso8601_utc(const char *str, time_t *time);
+
 #endif /* ZABBIX_TIME_H */
