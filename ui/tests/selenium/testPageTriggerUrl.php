@@ -36,7 +36,8 @@ class testPageTriggerUrl extends CWebTest {
 					'trigger' => '1_trigger_High',
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100035',
-						'1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086',
+						'Acknowledge' => 'zabbix.php?action=popup&popup_action=acknowledge.edit&eventids%5B%5D=9004',
+						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
 						'Trigger' => 'triggers.php?form=update&triggerid=100035&context=host',
 						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
 						'Trigger URL' => 'tr_events.php?triggerid=100035&eventid=9003',
@@ -51,7 +52,8 @@ class testPageTriggerUrl extends CWebTest {
 					'trigger' => '1_trigger_Not_classified',
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100032',
-						'1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086',
+						'Acknowledge' => 'zabbix.php?action=popup&popup_action=acknowledge.edit&eventids%5B%5D=9000',
+						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
 						'Trigger' => 'triggers.php?form=update&triggerid=100032&context=host',
 						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
 						'Trigger URL' => 'tr_events.php?triggerid=100032&eventid=9000',
@@ -151,13 +153,9 @@ class testPageTriggerUrl extends CWebTest {
 			foreach ($data['links'] as $menu => $links) {
 				// Check 2-level menu links.
 				if (is_array($links)) {
-					$item_popup = $trigger_popup->query('xpath://ul[@class="menu-popup" and @role="menu"]')
-							->asPopupMenu()->waitUntilPresent()->one();
-					$this->assertEquals(array_keys($links), $item_popup->getItems()->asText());
-
-					foreach ($links as $item => $link) {
-						$this->assertStringContainsString($link, $item_popup->getItem($item)->getAttribute('href'));
-					}
+					$item_link = $trigger_popup->getItem($menu)->query('xpath:./../ul//a')->one();
+					$this->assertEquals(array_keys($links), [$item_link->getText()]);
+					$this->assertStringContainsString(array_values($links)[0], $item_link->getAttribute('href'));
 				}
 				// Check 1-level menu links.
 				else {
