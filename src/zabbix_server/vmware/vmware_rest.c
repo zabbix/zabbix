@@ -867,25 +867,25 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vmware_lock();
+	zbx_vector_vmware_entity_tags_create(&entity_tags);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() vc version:%s", __func__, service->version);
+	zbx_vmware_lock();
 	version = service->major_version * 100 + service->minor_version * 10 + service->update_version;
 
 	if (650 > version)
 	{
-		error = zbx_strdup(error, "Tags are supported since vmware version 6.5.");
 		zbx_vmware_unlock();
+		error = zbx_strdup(error, "Tags are supported since vmware version 6.5.");
 		goto out;
 	}
 
-	zbx_vector_vmware_tag_create(&tags);
-	zbx_vector_vmware_key_value_create(&categories);
-	zbx_vector_vmware_entity_tags_create(&entity_tags);
 	vmware_entry_tags_init(service->data, &entity_tags);
-
 	zbx_vmware_unlock();
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() vc version:%d", __func__, version);
+
+	zbx_vector_vmware_tag_create(&tags);
+	zbx_vector_vmware_key_value_create(&categories);
 	is_new_api = (702 <= version) ? 1 : 0;
 
 	if (0 != entity_tags.values_num && (
@@ -908,15 +908,16 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
 clean:
 	zbx_vector_vmware_tag_clear_ext(&tags, vmware_tag_free);
 	zbx_vector_vmware_key_value_clear_ext(&categories, vmware_key_value_free);
-	zbx_vector_vmware_entity_tags_clear_ext(&entity_tags, vmware_entity_tags_free);
 	zbx_vector_vmware_tag_destroy(&tags);
 	zbx_vector_vmware_key_value_destroy(&categories);
-	zbx_vector_vmware_entity_tags_destroy(&entity_tags);
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
 	zbx_free(page.data);
 	zbx_free(page.url);
 out:
+	zbx_vector_vmware_entity_tags_clear_ext(&entity_tags, vmware_entity_tags_free);
+	zbx_vector_vmware_entity_tags_destroy(&entity_tags);
+
 	if (FAIL == ret)
 	{
 		zbx_vmware_shared_tags_error_set(error, &service->data_tags);
