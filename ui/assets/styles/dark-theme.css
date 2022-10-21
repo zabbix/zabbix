@@ -1834,6 +1834,7 @@ form.dashboard-widget-svggraph .single-item-table .single-item-table-row:last-ch
 form.dashboard-widget-svggraph .single-item-table tfoot td {
   padding: 5px 5px 5px 10px; }
 form.dashboard-widget-svggraph .overrides-list {
+  position: relative;
   margin: -5px 0 -5px 15px; }
 form.dashboard-widget-svggraph .overrides-list-item {
   position: relative;

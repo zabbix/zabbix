@@ -58,7 +58,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		return $list;
 	}
 
-	public function getDataSetFooter(): CList {
+	public function getFooterView(): CList {
 		return (new CList())
 			->addClass(ZBX_STYLE_BTN_SPLIT)
 			->addItem([

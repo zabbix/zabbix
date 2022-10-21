@@ -76,7 +76,7 @@ function getDatasetTab(CWidgetFormView $form, array $fields): CFormGrid {
 		$form->makeCustomField($dataset, [
 			$dataset->getLabel(),
 			(new CFormField($dataset->getView()))->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION),
-			(new CFormField($dataset->getDataSetFooter()))->addClass(ZBX_STYLE_LIST_ACCORDION_FOOT)
+			(new CFormField($dataset->getFooterView()))->addClass(ZBX_STYLE_LIST_ACCORDION_FOOT)
 		])
 	);
 }
