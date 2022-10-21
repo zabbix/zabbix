@@ -1360,8 +1360,9 @@ class testDashboardItemValueWidget extends CWebTest {
 			CDataHelper::addItemData(42244, $index, time() + $index);
 			$this->page->refresh()->waitUntilReady();
 			$rgb = implode(', ', sscanf($threshold['color'], "%02x%02x%02x"));
-			$this->assertEquals('rgba('.$rgb.', 1)', $dashboard->getWidget($data['fields']['Name'])->getContent()
-					->query('class:dashboard-widget-item')->one()->getCSSValue('background-color')
+
+			$this->assertEquals('rgba('.$rgb.', 1)', $dashboard->getWidget($data['fields']['Name'])
+					->query('xpath:.//div[contains(@class, "dashboard-widget-item")]/div')->one()->getCSSValue('background-color')
 			);
 			$index++;
 		}
