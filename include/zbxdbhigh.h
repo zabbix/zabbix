@@ -225,6 +225,7 @@ typedef struct
 	char		*expression;
 	char		*recovery_expression;
 	char		*url;
+	char		*url_name;
 	char		*comments;
 	char		*correlation_tag;
 	char		*opdata;
