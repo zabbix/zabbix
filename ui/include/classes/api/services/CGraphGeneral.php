@@ -59,8 +59,7 @@ abstract class CGraphGeneral extends CApiService {
 			],
 			'graphids' => $graphids,
 			'editable' => true,
-			'preservekeys' => true,
-			'inherited' => false
+			'preservekeys' => true
 		]);
 
 		$updateDiscoveredValidator = new CUpdateDiscoveredValidator([
@@ -106,6 +105,16 @@ abstract class CGraphGeneral extends CApiService {
 
 		foreach ($graphs as &$graph) {
 			unset($graph['templateid']);
+
+			// Allow for template inherited graphs to update discover parameter.
+			if ($db_graphs[$graph['graphid']]['templateid'] != 0) {
+				if (array_key_exists('discover', $graph)) {
+					$graph = ['graphid' => $graph['graphid'], 'discover' => $graph['discover']];
+				}
+				else {
+					unset($graph);
+				}
+			}
 
 			$graph['gitems'] = isset($graph['gitems']) ? $graph['gitems'] : $db_graphs[$graph['graphid']]['gitems'];
 

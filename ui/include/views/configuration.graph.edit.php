@@ -109,7 +109,7 @@ $graphFormList
 			->setFocusableElementId('label-graphtype')
 			->setValue($data['graphtype'])
 			->addOptions(CSelect::createOptionsFromArray(graphType()))
-			->setDisabled($readonly)
+			->setReadonly($readonly)
 	)
 	->addRow(_('Show legend'),
 		(new CCheckBox('show_legend'))
@@ -496,10 +496,6 @@ if ($data['graphid'] != 0) {
 		($data['parent_discoveryid'] === null) ? _('Delete graph?') : _('Delete graph prototype?'),
 		url_params(['graphid', 'parent_discoveryid', 'hostid', 'context']), 'context'
 	);
-
-	if ($readonly) {
-		$updateButton->setEnabled(false);
-	}
 
 	if ($is_templated) {
 		$deleteButton->setEnabled(false);
