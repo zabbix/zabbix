@@ -54,7 +54,7 @@ static void	jsonpath_token_print(char **data, size_t *data_alloc, size_t *data_o
 		case ZBX_JSONPATH_TOKEN_PATH_RELATIVE:
 		case ZBX_JSONPATH_TOKEN_CONST_STR:
 		case ZBX_JSONPATH_TOKEN_CONST_NUM:
-			zbx_strcpy_alloc(data, data_alloc, data_offset, token->data);
+			zbx_strcpy_alloc(data, data_alloc, data_offset, token->text);
 			break;
 		case ZBX_JSONPATH_TOKEN_PAREN_LEFT:
 			zbx_strcpy_alloc(data, data_alloc, data_offset, "(");

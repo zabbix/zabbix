@@ -8,4 +8,6 @@ libzbxjson_a_SOURCES = \
 	json_parser.c \
 	json_parser.h \
 	jsonpath.c \
-	jsonpath.h
+	jsonpath.h \
+	jsonobj.c \
+	jsonobj.h

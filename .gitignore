@@ -219,6 +219,8 @@ tests/libs/zbxsysinfo/linux/SYSTEM_CPU_INTR
 tests/libs/zbxsysinfo/linux/SYSTEM_CPU_SWITCHES
 tests/libs/zbxsysinfo/linux/SYSTEM_HW_CHASSIS
 tests/libs/zbxsysinfo/linux/VFS_FS_DISCOVERY
+tests/libs/zbxsysinfo/zbx_execute_agent_check
+tests/libs/zbxsysinfo/zbx_execute_agent_check_http
 tests/libs/zbxsysinfo/parse_item_key
 tests/libs/zbxsysinfo/process
 tests/libs/zbxsysinfo/check_service_test

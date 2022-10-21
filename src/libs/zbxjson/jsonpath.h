@@ -20,7 +20,9 @@
 #ifndef ZABBIX_JSONPATH_H
 #define ZABBIX_JSONPATH_H
 
-#include "zbxalgo.h"
+#include "zbxjson.h"
+
+typedef struct zbx_jsonpath_token zbx_jsonpath_token_t;
 
 typedef enum
 {
@@ -78,10 +80,19 @@ typedef struct
 }
 zbx_jsonpath_range_t;
 
+typedef enum
+{
+	ZBX_JSONPATH_EXPRESSION_INDEX_TRUE,
+	ZBX_JSONPATH_EXPRESSION_INDEX_FALSE,
+}
+zbx_json_path_expression_index_t;
+
 /* expression tokens in postfix notation */
 typedef struct
 {
 	zbx_vector_ptr_t	tokens;
+	zbx_jsonpath_token_t	*index_token;	/* relative path token that is used to index parent object */
+	zbx_jsonpath_token_t	*value_token;	/* the index value token */
 }
 zbx_jsonpath_expression_t;
 
@@ -150,11 +161,11 @@ typedef enum
 }
 zbx_jsonpath_token_type_t;
 
-typedef struct
+struct zbx_jsonpath_token
 {
 	unsigned char	type;
-	char		*data;
-}
-zbx_jsonpath_token_t;
+	char		*text;
+	zbx_jsonpath_t	*path;
+};
 
 #endif

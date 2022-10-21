@@ -182,7 +182,7 @@ in:
   path: $.books[0, 2].title 
 out:
   return: SUCCEED
-  value: '["Sayings of the Century", "Moby Dick"]'
+  value: '["Moby Dick", "Sayings of the Century"]'
 ---
 test case: Query $.books[1]['author', "title"]
 include: &include zbx_jsonpath_query.inc.yaml
@@ -191,7 +191,7 @@ in:
   path: $.books[1]['author', "title"] 
 out:
   return: SUCCEED
-  value: '["Evelyn Waugh", "Sword of Honour"]'
+  value: '["Sword of Honour", "Evelyn Waugh"]'
 ---
 test case: Query $..id
 include: &include zbx_jsonpath_query.inc.yaml
@@ -209,7 +209,7 @@ in:
   path: $.services..price
 out:
   return: SUCCEED
-  value: '[5, 154.99, 46, 24.5, 99.49]'
+  value: '[154.99, 5, 46, 24.5, 99.49]'
 ---
 test case: Query $.books[?(@.id == 1 + 1)].title
 include: &include zbx_jsonpath_query.inc.yaml
@@ -612,7 +612,7 @@ in:
   path: $.services[?(@.active=="true")].servicegroup
 out:
   return: SUCCEED
-  value: '[1000,1001]'
+  value: '[1001,1000]'
 ---
 test case: Query $.services[?(@.active=="false")].servicegroup
 include: &include zbx_jsonpath_query.inc.yaml
@@ -731,7 +731,7 @@ in:
   path: $.*~
 out:
   return: SUCCEED
-  value: '["books","services","filters","closed message","tags"]'
+  value: '["filters", "services", "tags", "books", "closed message"]'
 ---
 test case: Query $.*~.first()
 include: &include zbx_jsonpath_query.inc.yaml
@@ -740,7 +740,7 @@ in:
   path: $.*~.first()
 out:
   return: SUCCEED
-  value: 'books'
+  value: 'filters'
 ---
 test case: Query $.services[?(@.servicegroup=="1002")]~
 include: &include zbx_jsonpath_query.inc.yaml
