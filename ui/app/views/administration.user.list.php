@@ -208,7 +208,6 @@ foreach ($data['users'] as $user) {
 
 	$provisioned = $user['userdirectoryid'] ? new CDiv(date(ZBX_DATE_TIME, $user['ts_provisioned'])) : '';
 	$checkbox = new CCheckBox('userids['.$userid.']', $userid);
-	$gui_access = new CSpan(user_auth_type2str($user['gui_access']));
 	$info = $users_groups ? '' : makeWarningIcon(_('User do not have user groups!'));
 	$username = new CLink($user['username'],
 		(new CUrl('zabbix.php'))
@@ -220,18 +219,21 @@ foreach ($data['users'] as $user) {
 		$checkbox->setAttribute('data-actions', 'ldap');
 	}
 
+	if ($user['userdirectoryid']) {
+		$idp = $data['idp_names'][$user['userdirectoryid']];
+		$provisioned->setHint($idp['idp_type'] == IDP_TYPE_SAML ? _('SAML') : $idp['name']);
+		$gui_access = new CSpan($idp['idp_type'] == IDP_TYPE_LDAP ? _('LDAP') : _('SAML'));
+	}
+	else {
+		$gui_access = new CSpan(user_auth_type2str($user['gui_access']));
+	}
+
 	if (!$user['roleid']) {
 		$info = makeErrorIcon(_('User do not have user role!'));
 		$gui_access = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_GREY);
 		$api_access = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
 	}
 	else {
-		if ($user['userdirectoryid']) {
-			$idp = $data['idp_names'][$user['userdirectoryid']];
-			$provisioned->setHint($idp['idp_type'] == IDP_TYPE_SAML ? _('SAML') : $idp['name']);
-			$gui_access = new CSpan($idp['idp_type'] == IDP_TYPE_LDAP ? _('LDAP') : _('SAML'));
-		}
-
 		switch ($user['gui_access']) {
 			case GROUP_GUI_ACCESS_INTERNAL:
 				$gui_access->addClass(ZBX_STYLE_ORANGE);
