@@ -4833,6 +4833,15 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 		zbx_vector_proxy_hostdata_ptr_destroy(&host_avails);
 	}
+	else
+	{
+		unsigned char	*data = NULL;
+		zbx_uint32_t	data_len;
+
+		data_len = zbx_availability_serialize_active_proxy_hb_update(&data, proxy->hostid);
+		zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_PROXY_HB_UPDATE, data, data_len, NULL);
+		zbx_free(data);
+	}
 
 out:
 	zbx_free(error_step);

@@ -1888,7 +1888,7 @@ zabbix_export:
           value: performance
     -
       uuid: 237760596cd647bca82044e843992d87
-      expression: 'min(/Windows memory by Zabbix agent active/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/Windows memory by Zabbix agent active/system.swap.size[,total])>0'
+      expression: 'max(/Windows memory by Zabbix agent active/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/Windows memory by Zabbix agent active/system.swap.size[,total])>0'
       name: 'High swap space usage'
       event_name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'

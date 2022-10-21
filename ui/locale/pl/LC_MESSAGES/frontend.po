@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-09-01 10:29+0000\n"
+"PO-Revision-Date: 2022-10-03 07:21+0000\n"
 "Last-Translator: Paweł Seledec <pawel.seledec@zetosoftware.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13843,6 +13843,10 @@ msgstr "Tylko super administratorzy mogą ustawić właściciela raportu."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Liczone są tylko wyzwalacze przypisane do włączonych hostów w zależności od włączonych pozycji"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -21461,6 +21465,10 @@ msgstr "spodziewano się wartości logicznej"
 msgid "a character string is expected"
 msgstr "oczekiwano ciągu znaków"
 
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr "oczekiwano ciągu znaków, liczby całkowitej lub wartości zmiennoprzecinkowej"
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "spodziewano się daty w formacie RRRR-MM-DD"
@@ -23678,7 +23686,7 @@ msgstr "przez"
 #: include/func.inc.php:659
 msgctxt "week short"
 msgid "w"
-msgstr ""
+msgstr "w"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

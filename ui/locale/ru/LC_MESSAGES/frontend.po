@@ -13843,6 +13843,10 @@ msgstr "Только супер администраторы могут зада
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Подсчитываются только триггеры у активированных узлов сети и которые зависят от активных элементов данных"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -21460,6 +21464,10 @@ msgstr "ожидается логическое значение"
 #: include/classes/validators/CNewValidator.php:332
 msgid "a character string is expected"
 msgstr "ожидается строка символов"
+
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"

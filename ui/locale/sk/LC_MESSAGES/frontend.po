@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-09-15 07:31+0000\n"
+"PO-Revision-Date: 2022-10-09 18:02+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13844,6 +13844,10 @@ msgstr "Vlastníka reportu môžu nastaviť iba superadministrátori."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Len spúšťače priradené k monitorovaným hostom alebo závislé na monitorovaných položkách sú započítané"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -21461,6 +21465,10 @@ msgstr "očakáva sa boolovská hodnota"
 #: include/classes/validators/CNewValidator.php:332
 msgid "a character string is expected"
 msgstr "reťazec znakov je očakávaný"
+
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr "očakáva sa reťazec znakov, celé číslo alebo hodnota s pohyblivou rádovou čiarkou"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"

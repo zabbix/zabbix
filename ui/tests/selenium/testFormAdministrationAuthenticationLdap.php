@@ -18,12 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup config, userdirectory, usrgrp
+ *
+ * @dataSource LoginUsers
  */
 class testFormAdministrationAuthenticationLdap extends CWebTest {
 
@@ -762,7 +766,8 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 		$this->assertEquals('0', $row->getColumn('User groups')->getText());
 
 		// Open existing User group and change it LDAP server.
-		$this->page->open('zabbix.php?action=usergroup.edit&usrgrpid=16')->waitUntilReady();
+		$usrgrpid = CDataHelper::get('LoginUsers.usrgrpids.LDAP user group');
+		$this->page->open('zabbix.php?action=usergroup.edit&usrgrpid='.$usrgrpid)->waitUntilReady();
 		$this->query('name:userdirectoryid')->asDropdown()->one()->fill($ldap_name);
 		$this->query('button:Update')->one()->click();
 
