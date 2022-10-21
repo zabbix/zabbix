@@ -345,8 +345,7 @@ class User extends ScimApiService {
 
 		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
 		$user_data = [
-			'userid' => $db_user[0]['userid'],
-			'username' => $options['userName'] // todo: userName probably not defined
+			'userid' => $db_user[0]['userid']
 		];
 		$user_data += $provisioning->getUserAttributes($options);
 		$user_data['medias'] = $provisioning->getUserMedias($options);
