@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -26,6 +27,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup role
  * @onBefore prepareRoleData
+ * @dataSource LoginUsers
  */
 class testPageUserRoles extends CWebTest {
 
@@ -172,8 +174,8 @@ class testPageUserRoles extends CWebTest {
 			],
 			[
 				'Name' => 'Super admin role',
-				'#' => 'Users 5',
-				'Users' => 'Admin (Zabbix Administrator), filter-create, filter-delete, filter-update, test-timezone'
+				'#' => 'Users 6',
+				'Users' => 'Admin (Zabbix Administrator), filter-create, filter-delete, filter-update, LDAP user, test-timezone'
 			],
 			[
 				'Name' => 'User role',

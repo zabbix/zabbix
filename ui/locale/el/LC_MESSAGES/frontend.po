@@ -13287,6 +13287,10 @@ msgstr ""
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Απαριθμώνται μόνο εναύσματα εκχωρημένα σε ενεργούς ξενιστές και εξαρτώμενα απο ενεργούς συλλέκτες"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"

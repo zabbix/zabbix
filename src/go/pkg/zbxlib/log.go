@@ -75,10 +75,15 @@ int	zbx_redirect_stdio(const char *filename)
 */
 import "C"
 
+import (
+	"git.zabbix.com/ap/plugin-support/log"
+)
+
 func SetLogLevel(level int) {
 	C.zbx_log_level = C.int(level)
 }
 
 func init() {
+	log.Tracef("Calling C function \"getpid()\"")
 	C.zbx_agent_pid = C.getpid()
 }
