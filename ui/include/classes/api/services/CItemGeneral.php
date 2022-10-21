@@ -1823,7 +1823,7 @@ abstract class CItemGeneral extends CApiService {
 		foreach ($root_itemids as $root_itemid) {
 			if (self::maxDependencyLevelExceeded($master_item_links, $root_itemid, $links_path)) {
 				[$is_update, $flags, $key, $master_flags, $master_key, $is_template, $host] =
-					self::getProblemCausedItemData($links_path, $items, $db_items);
+					self::getProblemCausedItemData($links_path, $items);
 
 				$error = self::getDependentItemError($is_update, $flags, $master_flags, $is_template);
 
@@ -1834,7 +1834,7 @@ abstract class CItemGeneral extends CApiService {
 
 			if (self::maxDependentItemCountExceeded($master_item_links, $root_itemid, $links_path)) {
 				[$is_update, $flags, $key, $master_flags, $master_key, $is_template, $host] =
-					self::getProblemCausedItemData($links_path, $items, $db_items);
+					self::getProblemCausedItemData($links_path, $items);
 
 				$error = self::getDependentItemError($is_update, $flags, $master_flags, $is_template);
 
@@ -2131,13 +2131,12 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @param array $links_path
 	 * @param array $items
-	 * @param array $db_items
 	 *
 	 * @return array
 	 *
 	 * @return int   Cumulative count of items under the root item.
 	 */
-	private static function getProblemCausedItemData(array $links_path, array $items, array $db_items): array {
+	private static function getProblemCausedItemData(array $links_path, array $items): array {
 		$items_by_masterid = [];
 
 		foreach ($items as $i => $item) {
