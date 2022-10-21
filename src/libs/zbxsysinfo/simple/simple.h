@@ -25,7 +25,6 @@
 extern char		*CONFIG_SOURCE_IP;
 extern ZBX_METRIC	parameters_simple[];
 
-int	check_service_default_addr(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf);
 int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_service(AGENT_REQUEST *request, AGENT_RESULT *result);
 
