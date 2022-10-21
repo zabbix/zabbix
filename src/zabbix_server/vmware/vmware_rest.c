@@ -411,9 +411,14 @@ static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	if ('"' != page->data[0] && FAIL == vmware_rest_response_open(page->data, NULL, error))
+	if (0 == page->offset)
 	{
-		*error = zbx_dsprintf(*error, "Authentication fail, %s.", *error);
+		*error = zbx_strdup(*error, "Cannot authenticate, received empty response.");
+		goto out;
+	}
+	else if ('"' != page->data[0] && FAIL == vmware_rest_response_open(page->data, NULL, error))
+	{
+		*error = zbx_dsprintf(*error, "Cannot authenticate, %s.", *error);
 		goto out;
 	}
 
@@ -508,6 +513,8 @@ static int	vmware_http_request(const char *fn_parent, CURL *easyhandle, const ch
 		*error = zbx_strdup(*error, curl_easy_strerror(err));
 		return FAIL;
 	}
+	else if (0 == page->offset)
+		*page->data = '\0';
 
 	if (NULL != fn_parent)
 		zabbix_log(LOG_LEVEL_TRACE, "%s() REST response: %s", fn_parent, page->data);
@@ -783,9 +790,9 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vc version:%s", __func__, service->version);
 
-	if (65 > service->major_version * 10 + service->minor_version)
+	if (702 > service->major_version * 100 + service->minor_version * 10 + service->patch_version)
 	{
-		error = zbx_strdup(error, "Tags are supported since vmware version 6.5.");
+		error = zbx_strdup(error, "Tags are supported since vmware version 7.0.2");
 		goto out;
 	}
 

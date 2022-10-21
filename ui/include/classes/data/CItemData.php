@@ -240,6 +240,7 @@ final class CItemData {
 			'vmware.datastore.alarms.get[<url>,<uuid>]',
 			'vmware.datastore.discovery[<url>]',
 			'vmware.datastore.hv.list[<url>,<datastore>]',
+			'vmware.datastore.perfcounter[<url>,<uuid>,<path>,<instance>]',
 			'vmware.datastore.property[<url>,<uuid>,<prop>]',
 			'vmware.datastore.read[<url>,<datastore>,<mode>]',
 			'vmware.datastore.size[<url>,<datastore>,<mode>]',
@@ -266,6 +267,7 @@ final class CItemData {
 			'vmware.hv.datastore.size[<url>,<uuid>,<datastore>,<mode>]',
 			'vmware.hv.datastore.write[<url>,<uuid>,<datastore>,<mode>]',
 			'vmware.hv.discovery[<url>]',
+			'vmware.hv.diskinfo.get[<url>,<uuid>]',
 			'vmware.hv.fullname[<url>,<uuid>]',
 			'vmware.hv.hw.cpu.freq[<url>,<uuid>]',
 			'vmware.hv.hw.cpu.model[<url>,<uuid>]',
@@ -1314,6 +1316,10 @@ final class CItemData {
 				'description' => _('VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
+			'vmware.datastore.perfcounter[<url>,<uuid>,<path>,<instance>]' => [
+				'description' => _('VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance'),
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			],
 			'vmware.datastore.property[<url>,<uuid>,<prop>]' => [
 				'description' => _('VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
@@ -1418,6 +1424,10 @@ final class CItemData {
 				'description' => _('Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
+			'vmware.hv.diskinfo.get[<url>,<uuid>]' => [
+				'description' => _('Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
 			'vmware.hv.fullname[<url>,<uuid>]' => [
 				'description' => _('VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
 				'value_type' => ITEM_VALUE_TYPE_STR
@@ -1492,7 +1502,7 @@ final class CItemData {
 			],
 			'vmware.hv.perfcounter[<url>,<uuid>,<path>,<instance>]' => [
 				'description' => _('VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance'),
-				'value_type' => null
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.hv.power[<url>,<uuid>,<max>]' => [
 				'description' => _('Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage'),
@@ -1664,7 +1674,7 @@ final class CItemData {
 			],
 			'vmware.vm.perfcounter[<url>,<uuid>,<path>,<instance>]' => [
 				'description' => _('VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance'),
-				'value_type' => null
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			'vmware.vm.powerstate[<url>,<uuid>]' => [
 				'description' => _('VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name'),
