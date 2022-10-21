@@ -20,7 +20,8 @@ Zabbix Agent 2 is installed, the plugin is ready to work.
 Now you need to make sure that a Docker instance is available.
 
 ## Configuration
-Open the Zabbix Agent 2 configuration file (zabbix_agent2.conf) and 
+Open the Zabbix Agent 2 docker configuration 
+file (zabbix_agent2.d/plugins.d/docker.conf) and 
 set the required parameters.
 
 **Plugins.Docker.Endpoint** — Docker API endpoint.
