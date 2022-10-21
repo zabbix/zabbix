@@ -2229,7 +2229,7 @@ static int	preproc_group_flat_json_params(const char *params, zbx_preproc_flat_j
 		if (SUCCEED != zbx_json_value_by_name(&jp_param, "name", field_name, sizeof(field_name), NULL))
 			return FAIL;
 
-		if (SUCCEED != zbx_json_value_by_name(&jp_param, "oid", prefix, sizeof(prefix), NULL))
+		if (SUCCEED != zbx_json_value_by_name(&jp_param, "prefix", prefix, sizeof(prefix), NULL))
 			return FAIL;
 
 		parsed_param = (zbx_preproc_flat_json_param_t *)zbx_malloc(NULL, sizeof(zbx_preproc_flat_json_param_t));
@@ -2373,6 +2373,10 @@ static int	item_preproc_group_flat_json(zbx_variant_t *value, const char *params
 
 	zbx_vector_flat_json_param_clear_ext(&fj.field_list, flat_json_param_free);
 	zbx_vector_flat_json_input_obj_clear_ext(&input_objects, flat_json_input_obj_free);
+	zbx_free(fj.index_name);
+	zbx_free(fj.key_name);
+	zbx_free(fj.value_name);
+	zabbix_log(1, "DBG json =\n%s\n", result);
 	zbx_hashset_destroy(&fj.grouped_prefixes);
 
 	zbx_variant_clear(value);
