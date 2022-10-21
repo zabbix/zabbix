@@ -659,7 +659,6 @@ class testDependentItems extends CAPITest {
 	 */
 	public function testDependentItems_main($expected_error, $method, $request_data) {
 		static $reg_child_number = '/("dependent[^"]+\.)(\d*)([^"]*")/';
-		shell_exec('export PHPUNIT_RUN=yes');
 
 		if ($expected_error === null || strrpos($expected_error, 'allowed count of dependent') === false) {
 			return $this->call($method, $request_data, $expected_error);
