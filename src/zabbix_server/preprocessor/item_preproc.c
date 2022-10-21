@@ -2169,7 +2169,10 @@ static int	preproc_group_flat_json_parse_input_objects(const char *js,
 		zbx_preproc_flat_json_input_obj_t	*obj;
 
 		if (FAIL == zbx_json_brackets_open(ptr, &jp_obj))
+		{
+			zbx_vector_flat_json_input_obj_clear_ext(parsed_objects, flat_json_input_obj_free);
 			return FAIL;
+		}
 
 		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_obj, fj->key_name, &key_field, &key_field_len, NULL))
 			continue;
@@ -2191,6 +2194,11 @@ static int	preproc_group_flat_json_parse_input_objects(const char *js,
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse preproc parameters from JSON to vector of k-v objects       *
+ *                                                                            *
+ ******************************************************************************/
 static int	preproc_group_flat_json_params(const char *params, zbx_preproc_flat_json_t *fj)
 {
 	struct zbx_json_parse	jp, jp_list, jp_param;
@@ -2223,14 +2231,13 @@ static int	preproc_group_flat_json_params(const char *params, zbx_preproc_flat_j
 		char				field_name[MAX_STRING_LEN], prefix[MAX_STRING_LEN];
 		zbx_preproc_flat_json_param_t	*parsed_param;
 
-		if (SUCCEED != zbx_json_brackets_open(ptr, &jp_param))
+		if ((FAIL == zbx_json_brackets_open(ptr, &jp_param)) ||
+				(FAIL == zbx_json_value_by_name(&jp_param, "name", field_name, sizeof(field_name), NULL)) ||
+				(FAIL == zbx_json_value_by_name(&jp_param, "oid", prefix, sizeof(prefix), NULL)))
+		{
+			zbx_vector_flat_json_param_destroy(&fj->field_list);
 			return FAIL;
-
-		if (SUCCEED != zbx_json_value_by_name(&jp_param, "name", field_name, sizeof(field_name), NULL))
-			return FAIL;
-
-		if (SUCCEED != zbx_json_value_by_name(&jp_param, "prefix", prefix, sizeof(prefix), NULL))
-			return FAIL;
+		}
 
 		parsed_param = (zbx_preproc_flat_json_param_t *)zbx_malloc(NULL, sizeof(zbx_preproc_flat_json_param_t));
 		parsed_param->field_name = zbx_strdup(NULL, field_name);
@@ -2242,6 +2249,11 @@ static int	preproc_group_flat_json_params(const char *params, zbx_preproc_flat_j
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: convert grouped prefixes hashset to resulting JSON                *
+ *                                                                            *
+ ******************************************************************************/
 static void	preproc_group_flat_json_serialize_result(zbx_preproc_flat_json_t *fj, char **result)
 {
 	struct zbx_json				json;
@@ -2270,9 +2282,12 @@ static void	preproc_group_flat_json_serialize_result(zbx_preproc_flat_json_t *fj
 				zbx_json_addstring(&json, outval->key, outval->value, ZBX_JSON_TYPE_STRING);
 			else
 				zbx_json_addraw(&json, outval->key, outval->value);
+
+			zbx_free(outval);
 		}
 
 		zbx_json_close(&json);
+		zbx_vector_flat_json_input_obj_destroy(outvals);
 	}
 
 	zbx_json_close(&json);
@@ -2303,6 +2318,9 @@ static int	item_preproc_group_flat_json(zbx_variant_t *value, const char *params
 
 	if (FAIL == preproc_group_flat_json_parse_input_objects(value->data.str, &input_objects, &fj))
 	{
+		zbx_vector_flat_json_input_obj_destroy(&input_objects);
+		zbx_vector_flat_json_param_clear_ext(&fj.field_list, flat_json_param_free);
+		zbx_vector_flat_json_param_destroy(&fj.field_list);
 		*errmsg = zbx_dsprintf(*errmsg, "failed to parse input json");
 		return FAIL;
 	}
@@ -2369,10 +2387,18 @@ static int	item_preproc_group_flat_json(zbx_variant_t *value, const char *params
 		}
 	}
 
+	if (0 == fj.grouped_prefixes.num_data)
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "no available objects for grouping were found");
+		return FAIL;
+	}
+
 	preproc_group_flat_json_serialize_result(&fj, &result);
 
 	zbx_vector_flat_json_param_clear_ext(&fj.field_list, flat_json_param_free);
+	zbx_vector_flat_json_param_destroy(&fj.field_list);
 	zbx_vector_flat_json_input_obj_clear_ext(&input_objects, flat_json_input_obj_free);
+	zbx_vector_flat_json_input_obj_destroy(&input_objects);
 	zbx_free(fj.index_name);
 	zbx_free(fj.key_name);
 	zbx_free(fj.value_name);
