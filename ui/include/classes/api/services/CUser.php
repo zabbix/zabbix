@@ -1672,7 +1672,7 @@ class CUser extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'sessionid' => ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sessions', 'sessionid')],
 			'extend' => ['type' => API_BOOLEAN, 'default' => true],
-			'token' => ['type' => API_STRING_UTF8, 'length' => 64]
+			'token' => ['type' => API_STRING_UTF8]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $session, '/', $error)) {
@@ -1682,23 +1682,27 @@ class CUser extends CApiService {
 		$sessionid = array_key_exists('sessionid', $session) ? $session['sessionid'] : null;
 		$token = array_key_exists('token', $session) ? $session['token'] : null;
 
-		if (($token == null && $sessionid == null) || ($token && $sessionid)) {
+		if (($token === null && $sessionid === null) || ($token !== null && $sessionid !== null)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Sessionid or token is expected.'));
+		}
+
+		if (strlen($token) != 64) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', 'token', _s('value must be %1$d characters long', 64));
 		}
 
 		$time = time();
 
-		if ($token) {
+		// access DB only once per page load
+		if (self::$userData !== null && self::$userData['sessionid'] === $sessionid) {
+			return self::$userData;
+		}
+
+		if ($token !== null) {
 			$api_tokens = $this->tokenAuthentication($token, $time);
 			$userid = $api_tokens['userid'];
 		}
 
-		if ($sessionid) {
-			// access DB only once per page load
-			if (self::$userData !== null && self::$userData['sessionid'] === $sessionid) {
-				return self::$userData;
-			}
-
+		if ($sessionid !== null) {
 			$db_session = $this->sessionidAuthentication($sessionid);
 			$userid = $db_session['userid'];
 		}
@@ -1722,7 +1726,7 @@ class CUser extends CApiService {
 		$db_user = $this->addExtraFields($db_user, $permissions);
 		$this->setTimezone($db_user['timezone']);
 
-		if ($token) {
+		if ($token !== null) {
 			$db_user['sessionid'] = $token;
 
 			// Check permissions.
@@ -1736,7 +1740,7 @@ class CUser extends CApiService {
 			]);
 		}
 
-		if ($sessionid) {
+		if ($sessionid !== null) {
 			$db_user['sessionid'] = $sessionid;
 			$autologout = timeUnitToSeconds($db_user['autologout']);
 
