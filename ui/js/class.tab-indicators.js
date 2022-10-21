@@ -859,15 +859,15 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 		let count = 0;
 
 		count += document
-			.querySelectorAll('#op-table tbody tr:not(:last-child)')
+			.querySelectorAll('#op-table tbody tr')
 			.length;
 
 		count += document
-			.querySelectorAll('#rec-table tbody tr:not(:last-child)')
+			.querySelectorAll('#rec-table tbody tr')
 			.length;
 
 		count += document
-			.querySelectorAll('#upd-table tbody tr:not(:last-child)')
+			.querySelectorAll('#upd-table tbody tr')
 			.length;
 
 		return count;
