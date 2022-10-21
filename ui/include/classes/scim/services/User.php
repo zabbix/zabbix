@@ -68,16 +68,20 @@ class User extends ScimApiService {
 				'selectUsrgrps' => ['usrgrpid']
 			]);
 
-			$user_groups = array_column($user[0]['usrgrps'], 'usrgrpid');
-			$disabled_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID);
-
-			if (!$user || (count($user_groups) == 1 && $user_groups[0] == $disabled_groupid)) {
-				$user = [];
+			if (!$user) {
 				$this->data['totalResults'] = 0;
 				$this->data['Resources'] = [];
 			}
 			else {
-				if ($user[0]['userdirectoryid'] != $userdirectoryid) {
+				$user_groups = array_column($user[0]['usrgrps'], 'usrgrpid');
+				$disabled_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID);
+
+				if ((count($user_groups) == 1 && $user_groups[0] == $disabled_groupid)) {
+					$user = [];
+					$this->data['totalResults'] = 0;
+					$this->data['Resources'] = [];
+				}
+				elseif ($user[0]['userdirectoryid'] != $userdirectoryid) {
 					self::exception(self::SCIM_ERROR_BAD_REQUEST,
 						_s('The username "%1$s" has already been taken by another user.', $options['userName'])
 					);
