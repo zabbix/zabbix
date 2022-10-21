@@ -54,7 +54,7 @@ class CControllerUserProvision extends CController {
 		if ($result) {
 			$users = API::User()->get([
 				'output' => ['username', 'name', 'surname'],
-				'userids' => $userids
+				'userids' => $provisionedids
 			]);
 
 			foreach ($users as $user) {

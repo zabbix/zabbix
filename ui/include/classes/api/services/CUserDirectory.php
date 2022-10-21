@@ -82,7 +82,10 @@ class CUserDirectory extends CApiService {
 			$db_userdirectories = [];
 
 			$options['output'] = array_merge(['idp_type'], array_intersect($request_output, $this->output_fields));
+			$ldap_output = array_intersect($request_output, $this->ldap_output_fields);
+			$saml_output = array_intersect($request_output, $this->saml_output_fields);
 		}
+
 
 		$result = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
 		while ($row = DBfetch($result)) {
@@ -94,41 +97,29 @@ class CUserDirectory extends CApiService {
 			$db_userdirectories_by_type[$row['idp_type']][] = $row['userdirectoryid'];
 		}
 
-		if ($db_userdirectories_by_type[IDP_TYPE_LDAP]) {
+		if ($db_userdirectories_by_type[IDP_TYPE_LDAP] && $ldap_output) {
 			$sql_parts = [
-				'select' => array_merge(
-					['userdirectoryid'], array_intersect($request_output, $this->ldap_output_fields)
-				),
+				'select' => array_merge(['userdirectoryid'], $ldap_output),
 				'from' => ['userdirectory_ldap'],
-				'where' => [
-					'userdirectoryid' => dbConditionInt('userdirectoryid', $db_userdirectories_by_type[IDP_TYPE_LDAP])
-				]
+				'userdirectoryids' => $db_userdirectories_by_type[IDP_TYPE_LDAP]
 			];
 
 			$result = DBselect($this->createSelectQueryFromParts($sql_parts));
 			while ($row = DBfetch($result)) {
-				$db_userdirectories[$row['userdirectoryid']] = array_merge(
-					$db_userdirectories[$row['userdirectoryid']], $row
-				);
+				$db_userdirectories[$row['userdirectoryid']] += $row;
 			}
 		}
 
-		if ($db_userdirectories_by_type[IDP_TYPE_SAML]) {
+		if ($db_userdirectories_by_type[IDP_TYPE_SAML] && $saml_output) {
 			$sql_parts = [
-				'select' => array_merge(
-					['userdirectoryid'], array_intersect($request_output, $this->saml_output_fields)
-				),
+				'select' => array_merge(['userdirectoryid'], $saml_output),
 				'from' => ['userdirectory_saml'],
-				'where' => [
-					'userdirectoryid' => dbConditionInt('userdirectoryid', $db_userdirectories_by_type[IDP_TYPE_SAML])
-				]
+				'userdirectoryids' => $db_userdirectories_by_type[IDP_TYPE_SAML]
 			];
 
 			$result = DBselect($this->createSelectQueryFromParts($sql_parts));
 			while ($row = DBfetch($result)) {
-				$db_userdirectories[$row['userdirectoryid']] = array_merge(
-					$db_userdirectories[$row['userdirectoryid']], $row
-				);
+				$db_userdirectories[$row['userdirectoryid']] += $row;
 			}
 		}
 
@@ -346,31 +337,28 @@ class CUserDirectory extends CApiService {
 			],
 			'preservekeys' => true
 		]);
+		$provision_usergroups = [];
 
-		$db_provision_usergroups = $user_groups_index !== false && $db_provision_idpgroups
-			? DB::select('userdirectory_usrgrp', [
+		if ($user_groups_index !== false && $db_provision_idpgroups) {
+			$db_provision_usergroups = DB::select('userdirectory_usrgrp', [
 				'output' => ['usrgrpid', 'userdirectory_idpgroupid'],
 				'filter' => [
 					'userdirectory_idpgroupid' => array_keys($db_provision_idpgroups)
 				]
-			])
-			: [];
+			]);
 
-		$provision_usergroups = [];
-		foreach ($db_provision_usergroups as $usrgrp) {
-			$provision_usergroups[$usrgrp['userdirectory_idpgroupid']][] = [
-				'usrgrpid' => $usrgrp['usrgrpid']
-			];
+			foreach ($db_provision_usergroups as $usrgrp) {
+				$provision_usergroups[$usrgrp['userdirectory_idpgroupid']][] = [
+					'usrgrpid' => $usrgrp['usrgrpid']
+				];
+			}
 		}
 
-		foreach ($db_provision_idpgroups as $db_provision_idpgroup) {
+		foreach ($db_provision_idpgroups as $provision_idpgroupid => $db_provision_idpgroup) {
 			$idpgroup = array_intersect_key($db_provision_idpgroup, array_flip($options['selectProvisionGroups']));
-			$provision_idpgroupid = $db_provision_idpgroup['userdirectory_idpgroupid'];
 
-			if ($user_groups_index !== false) {
-				$idpgroup['user_groups'] = array_key_exists($provision_idpgroupid, $provision_usergroups)
-					? $provision_usergroups[$provision_idpgroupid]
-					: [];
+			if ($user_groups_index !== false && array_key_exists($provision_idpgroupid, $provision_usergroups)) {
+				$idpgroup['user_groups'] = $provision_usergroups[$provision_idpgroupid];
 			}
 
 			$result[$db_provision_idpgroup['userdirectoryid']]['provision_groups'][] = $idpgroup;
@@ -413,9 +401,7 @@ class CUserDirectory extends CApiService {
 
 			if (array_key_exists('provision_media', $userdirectory)) {
 				foreach ($userdirectory['provision_media'] as $media) {
-					$userdirectory_media[] = [
-						'userdirectoryid' => $userdirectory['userdirectoryid']
-					] + $media;
+					$userdirectory_media[] = ['userdirectoryid' => $userdirectory['userdirectoryid']] + $media;
 				}
 			}
 
@@ -909,7 +895,7 @@ class CUserDirectory extends CApiService {
 			$mapping_roles = [];
 
 			if ($userdirectory['provision_groups']) {
-				$mapping_roles = API::Role()->get([
+				$mapping_roles = DB::select('role', [
 					'output' => ['roleid', 'name', 'type'],
 					'roleids' => array_column($userdirectory['provision_groups'], 'roleid', 'roleid'),
 					'preservekeys' => true
@@ -972,7 +958,7 @@ class CUserDirectory extends CApiService {
 			$userdirectory += reset($db_userdirectory);
 			$userdirectory += DB::select('userdirectory_ldap', [
 				'output' => ['bind_password'],
-				'filter' => ['userdirectoryid' => [$userdirectory['userdirectoryid']]]
+				'userdirectoryids' => [$userdirectory['userdirectoryid']]
 			])[0];
 
 			if ($userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
@@ -1005,7 +991,7 @@ class CUserDirectory extends CApiService {
 			'group_membership' =>	['type' => API_STRING_UTF8],
 			'user_username' =>		['type' => API_STRING_UTF8],
 			'user_lastname' =>		['type' => API_STRING_UTF8],
-			'idp_type' =>			['type' => API_INT32, 'in' => implode(',', [IDP_TYPE_LDAP])],
+			'idp_type' =>			['type' => API_INT32, 'in' => implode(',', [IDP_TYPE_LDAP]), 'default' => IDP_TYPE_LDAP],
 			'provision_media' =>	['type' => API_OBJECTS, 'fields' => [
 				'mediatypeid' =>		['type' => API_ID],
 				'attribute' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],

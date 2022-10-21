@@ -47,7 +47,8 @@ $auth_tab = (new CFormGrid())
 	])
 	->addItem([
 		new CLabel([
-			_('Deprovisioned users group')
+			_('Deprovisioned users group'),
+			makeHelpIcon(_('Only disabled group can be set for deprovisioned users.'))
 		]),
 		new CFormField(
 			(new CMultiSelect([

@@ -50,8 +50,6 @@ class CLdapAuthValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($value) {
-		$status = false;
-
 		$status = $this->ldap->checkCredentials($value['username'], $value['password']);
 
 		if (!$status) {

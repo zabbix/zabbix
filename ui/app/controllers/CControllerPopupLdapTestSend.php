@@ -75,7 +75,8 @@ class CControllerPopupLdapTestSend extends CController {
 	protected function doAction(): void {
 		$ldap_test_object = [
 			'provision_groups'	=> [],
-			'provision_media'	=> []
+			'provision_media'	=> [],
+			'provision_status'	=> JIT_PROVISIONING_DISABLED
 		];
 		$this->getInputs($ldap_test_object, ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn', 'bind_password',
 			'search_attribute', 'start_tls', 'search_filter','test_username', 'test_password', 'provision_status',

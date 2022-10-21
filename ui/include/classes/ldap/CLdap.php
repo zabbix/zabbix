@@ -175,13 +175,13 @@ class CLdap {
 	}
 
 	/**
-	 * Bind to LDAP server. Set $this->bound to type of successfull binding.
+	 * Bind to LDAP server. Set $this->bound to type of successful binding.
 	 * Arguments $user and $password are required when bind type BIND_DNSTRING is set.
 	 *
 	 * Bind types:
 	 * BIND_CONFIG_CREDENTIALS - Special configuration user is used to bind and search.
 	 * BIND_ANONYMOUS          - Anonymous user is used to bind and search.
-	 * BIND_DNSTRING           - Loging in user is used to bind and search.
+	 * BIND_DNSTRING           - Logging in user is used to bind and search.
 	 *
 	 * Both arguments $user and $password are required for bind type BIND_DNSTRING only.
 	 *

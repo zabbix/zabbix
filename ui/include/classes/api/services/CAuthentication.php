@@ -114,7 +114,6 @@ class CAuthentication extends CApiService {
 	protected function validateUpdate(array $auth): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'authentication_type' =>		['type' => API_INT32, 'in' => ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP],
-			'disabled_usrgrpid' =>			['type' => API_ID],
 			'http_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
 			'http_login_form' =>			['type' => API_INT32, 'in' => ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP],
 			'http_strip_domains' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'http_strip_domains')],
@@ -126,6 +125,7 @@ class CAuthentication extends CApiService {
 			'saml_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
 			'passwd_min_length' =>			['type' => API_INT32, 'in' => '1:70', 'default' => DB::getDefault('config', 'passwd_min_length')],
 			'passwd_check_rules' =>			['type' => API_INT32, 'in' => '0:'.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE), 'default' => DB::getDefault('config', 'passwd_check_rules')],
+			'disabled_usrgrpid' =>			['type' => API_ID],
 			'jit_provision_interval' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR])],
 			'saml_jit_status' =>			['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])],
 			'ldap_jit_status' =>			['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])]
@@ -138,10 +138,8 @@ class CAuthentication extends CApiService {
 		if (array_key_exists('ldap_userdirectoryid', $auth) && $auth['ldap_userdirectoryid'] != 0) {
 			$exists = API::UserDirectory()->get([
 				'countOutput' => true,
-				'userdirectoryids' => $auth['ldap_userdirectoryid'],
-				'filter' => [
-					'idp_type' => IDP_TYPE_LDAP
-				]
+				'userdirectoryids' => [$auth['ldap_userdirectoryid']],
+				'filter' => ['idp_type' => IDP_TYPE_LDAP]
 			]);
 
 			if (!$exists) {
@@ -165,11 +163,10 @@ class CAuthentication extends CApiService {
 		}
 
 		if ($auth['disabled_usrgrpid']) {
-			$group = API::UserGroup()->get([
+			[$group] = API::UserGroup()->get([
 				'output' => ['users_status'],
 				'usrgrpids' => [$auth['disabled_usrgrpid']]
 			]);
-			$group = reset($group);
 
 			if (!$group) {
 				static::exception(ZBX_API_ERROR_PERMISSIONS,

@@ -467,6 +467,7 @@ class CUser extends CApiService {
 				'countOutput' => true,
 				'userdirectoryids' => $userdirectoryids
 			]);
+
 			if ($provisioned_userdirectories != count($userdirectoryids)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
@@ -475,13 +476,12 @@ class CUser extends CApiService {
 		}
 
 		// Get readonly super admin role ID and name.
-		$db_roles = DBfetchArray(DBselect(
+		[$readonly_superadmin_role] = DBfetchArray(DBselect(
 			'SELECT roleid,name'.
 			' FROM role'.
 			' WHERE type='.USER_TYPE_SUPER_ADMIN.
 				' AND readonly=1'
 		));
-		$readonly_superadmin_role = reset($db_roles);
 
 		$superadminids_to_update = [];
 		$usernames = [];
@@ -1425,6 +1425,7 @@ class CUser extends CApiService {
 		]);
 
 		self::addAuditLog(CAudit::ACTION_LOGOUT, CAudit::RESOURCE_USER);
+
 		self::$userData = null;
 
 		return true;
@@ -1499,7 +1500,7 @@ class CUser extends CApiService {
 		try {
 			switch ($db_user['auth_type']) {
 				case ZBX_AUTH_LDAP:
-					if ($new_user && $db_user['roleid']) {
+					if ($new_user) {
 						break;
 					}
 
@@ -1561,7 +1562,7 @@ class CUser extends CApiService {
 			}
 		}
 		catch (APIException $e) {
-			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS && $db_user) {
+			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS && $db_user && !$db_user['deprovisioned']) {
 				$attempt_failed = $db_user['attempt_failed'] + 1;
 
 				DB::update('users', [
@@ -1701,6 +1702,12 @@ class CUser extends CApiService {
 
 		$autologout = timeUnitToSeconds($db_user['autologout']);
 
+		if (!$db_user['deprovisioned'] && CAuthenticationHelper::isTimeToProvision($db_user['ts_provisioned'])
+				&& CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])
+				&& !$this->provisionLdapUser($db_user)) {
+			$db_user['deprovisioned'] = true;
+		}
+
 		// Check system permissions.
 		if (($autologout != 0 && $db_session['lastaccess'] + $autologout <= $time)
 				|| $permissions['users_status'] == GROUP_STATUS_DISABLED
@@ -1714,7 +1721,7 @@ class CUser extends CApiService {
 				'where' => ['sessionid' => $sessionid]
 			]);
 
-			return [];
+			return self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
 		if ($session['extend'] && $time != $db_session['lastaccess']) {
@@ -1725,21 +1732,6 @@ class CUser extends CApiService {
 		}
 
 		self::$userData = $db_user;
-
-		if (CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])
-				&& CAuthenticationHelper::isTimeToProvision($db_user['ts_provisioned'])
-				&& !$this->provisionLdapUser($db_user)) {
-			DB::delete('sessions', [
-				'status' => ZBX_SESSION_PASSIVE,
-				'userid' => $db_user['userid']
-			]);
-			DB::update('sessions', [
-				'values' => ['status' => ZBX_SESSION_PASSIVE],
-				'where' => ['sessionid' => $sessionid]
-			]);
-
-			return [];
-		}
 
 		return $db_user;
 	}
@@ -1820,15 +1812,11 @@ class CUser extends CApiService {
 		$db_userdirectoryids = [];
 
 		if ($userdirectoryids) {
-			$db_userdirectoryids = API::UserDirectory()->get([
-				'output' => [],
+			$db_userdirectoryids = array_column(API::UserDirectory()->get([
+				'output' => ['userdirectoryid', 'idp_type'],
 				'userdirectoryids' => $userdirectoryids,
-				'filter' => [
-					'idp_type' => IDP_TYPE_LDAP,
-					'provision_status' => JIT_PROVISIONING_ENABLED
-				],
-				'preservekeys' => true
-			]);
+				'filter' => ['provision_status' => JIT_PROVISIONING_ENABLED]
+			]), 'idp_type', 'userdirectoryid');
 
 			if (array_diff_key($userdirectoryids, $db_userdirectoryids)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
@@ -1840,7 +1828,7 @@ class CUser extends CApiService {
 		if ($db_userdirectoryids) {
 			$db_user_userdirectory = array_column($db_users, 'userdirectoryid', 'userid');
 
-			foreach (array_keys($db_userdirectoryids) as $db_userdirectoryid) {
+			foreach (array_keys($db_userdirectoryids, IDP_TYPE_LDAP) as $db_userdirectoryid) {
 				$provisioning = CProvisioning::forUserDirectoryId($db_userdirectoryid);
 				$provision_users = array_keys($db_user_userdirectory, $db_userdirectoryid);
 				$provision_users = array_intersect_key($db_users, array_flip($provision_users));

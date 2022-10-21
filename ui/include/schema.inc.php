@@ -8947,18 +8947,12 @@ return [
 		]
 	],
 	'userdirectory_ldap' => [
-		'key' => 'userdirectory_ldapid',
+		'key' => 'userdirectoryid',
 		'fields' => [
-			'userdirectory_ldapid' => [
+			'userdirectoryid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'userdirectoryid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => NULL,
 				'ref_table' => 'userdirectory',
 				'ref_field' => 'userdirectoryid'
 			],
@@ -9055,18 +9049,12 @@ return [
 		]
 	],
 	'userdirectory_saml' => [
-		'key' => 'userdirectory_samlid',
+		'key' => 'userdirectoryid',
 		'fields' => [
-			'userdirectory_samlid' => [
+			'userdirectoryid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
-			],
-			'userdirectoryid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'default' => NULL,
 				'ref_table' => 'userdirectory',
 				'ref_field' => 'userdirectoryid'
 			],
