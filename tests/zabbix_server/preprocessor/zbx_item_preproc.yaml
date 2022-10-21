@@ -2245,4 +2245,245 @@ in:
 out:
   return: SUCCEED
   value: "O K"
+---
+test case: Group flat JSON 1
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      [
+        {"somekey": "1.3.6.1.2.1.2.2.1.1.1", "somevalue": "1", "status": 1 },
+        {"somekey": "1.3.6.1.2.1.2.2.1.1.2", "somevalue": "2" , "status": 2},
+        {"somekey": "1.3.6.1.2.1.2.2.1.2.1", "somevalue": "Port1" , "status": 3},
+        {"somekey": "1.3.6.1.2.1.2.2.1.2.2", "somevalue": "Port2" , "status": 1},
+        {"somekey": "1.3.6.1.2.1.2.2.1.8.1", "somevalue": "up" , "status": 1},
+        {"somekey": "1.3.6.1.2.1.2.2.1.8.2", "somevalue": "down" , "status": 1}
+      ]
+  step:
+    type: ZBX_PREPROC_GROUP_FLAT_JSON_DATA
+    params: |-
+      {
+        "index_name": "{#SNMPINDEX}",
+        "key_name": "somekey",
+        "value_name": "somevalue",
+        "row": [
+          {
+            "name": "GRPVAL1",
+            "prefix": "1.3.6.1.2.1.2.2.1.1"
+          },
+          {
+            "name": "GRPVAL2",
+            "prefix": "1.3.6.1.2.1.2.2.1.2"
+          }
+        ]
+      }
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","GRPVAL1":"2","GRPVAL2":"Port2"},{"{#SNMPINDEX}":"1","GRPVAL1":"1","GRPVAL2":"Port1"}]'
+---
+test case: Group flat JSON 2
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      [
+        {"somekey": "1.3.6.1.2.1.2.2.1.1.1", "somevalue": "1", "status": 1 },
+        {"somekey": "1.3.6.1.2.1.2.2.1.1.2", "somevalue": "2" , "status": 2},
+        {"somekey": "1.3.6.1.2.1.2.2.1.2.1", "somevalue": "Port1" , "status": 3},
+        {"somekey": "1.3.6.1.2.1.2.2.1.2.2", "somevalue": "Port2" , "status": 1},
+        {"somekey": "1.3.6.1.2.1.2.2.1.8.1", "somevalue": "up" , "status": 1},
+        {"somekey": "1.3.6.1.2.1.2.2.1.8.2", "somevalue": "down" , "status": 1}
+      ]
+  step:
+    type: ZBX_PREPROC_GROUP_FLAT_JSON_DATA
+    params: |-
+      {
+        "index_name": "{#SNMPINDEX}",
+        "key_name": "somekey",
+        "value_name": "somevalue",
+        "row": [
+          {
+            "name": "GRPVAL1",
+            "prefix": "1.3.6.1.2.1.2.2.1.1"
+          },
+          {
+            "name": "GRPVAL2",
+            "prefix": "1.3.6.1.2.1.2.2.1.2"
+          },
+          {
+            "name": "GRPVAL3",
+            "prefix": "1.3.6.2.2.1.2.2.1.2"
+          }
+        ]
+      }
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","GRPVAL1":"2","GRPVAL2":"Port2"},{"{#SNMPINDEX}":"1","GRPVAL1":"1","GRPVAL2":"Port1"}]'
+---
+test case: Group flat JSON 3
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      [
+        {"k": "1.1", "v": 1},
+        {"k": "1.2", "v": false},
+        {"k": "1.3", "v": true},
+        {"k": "1.4", "v": ""}
+      ]
+  step:
+    type: ZBX_PREPROC_GROUP_FLAT_JSON_DATA
+    params: |-
+      {
+        "index_name": "{#SNMPINDEX}",
+        "key_name": "k",
+        "value_name": "v",
+        "row": [
+          {
+            "name": "value",
+            "prefix": "1"
+          }
+        ]
+      }
+out:
+  return: SUCCEED
+  value: '[{"{#SNMPINDEX}":"2","value":false},{"{#SNMPINDEX}":"4","value":""},{"{#SNMPINDEX}":"3","value":true},{"{#SNMPINDEX}":"1","value":1}]'
+---
+test case: Group flat JSON 4
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      [
+        {"k": "1.1", "v": 1},
+        {"k": "1.2", "v": false},
+        {"k": "1.3", "v": true},
+        {"k": "1.4", "v": ""}
+      ]
+  step:
+    type: ZBX_PREPROC_GROUP_FLAT_JSON_DATA
+    params: |-
+      {
+        "index_name": "{#SNMPINDEX}",
+        "key_name": "not existent",
+        "value_name": "v",
+        "row": [
+          {
+            "name": "value",
+            "prefix": "1"
+          }
+        ]
+      }
+out:
+  return: FAIL
+---
+test case: Group flat JSON 5
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      [
+        {"k": "1.1", "v": 1},
+        {"k": "1.2", "v": false},
+        {"k": "1.3", "v": true},
+        {"k": "1.4", "v": ""}
+      ]
+  step:
+    type: ZBX_PREPROC_GROUP_FLAT_JSON_DATA
+    params: |-
+      {
+        "index_name": "{#SNMPINDEX}",
+        "key_name": "not exists",
+        "value_name": "not exists",
+        "row": [
+          {
+            "name": "value",
+            "prefix": "1"
+          }
+        ]
+      }
+out:
+  return: FAIL
+---
+test case: Group flat JSON 6
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      [
+        {"k": "1.1", "v": 1},
+        {"k": "1.2", "v": false},
+        {"k": "1.3", "v": true},
+        {"k": "1.4", "v": ""}
+      ]
+  step:
+    type: ZBX_PREPROC_GROUP_FLAT_JSON_DATA
+    params: |-
+      {
+        "index_name": "{#SNMPINDEX}",
+        "key_name": "k",
+        "value_name": "v",
+        "row": [
+          {
+            "name": "value",
+            "prefix": "not exists"
+          }
+        ]
+      }
+out:
+  return: FAIL
+---
+test case: Group flat JSON 7
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      broken json
+  step:
+    type: ZBX_PREPROC_GROUP_FLAT_JSON_DATA
+    params: |-
+      {
+        "index_name": "{#SNMPINDEX}",
+        "key_name": "k",
+        "value_name": "v",
+        "row": [
+          {
+            "name": "value",
+            "prefix": "not exists"
+          }
+        ]
+      }
+out:
+  return: FAIL
+---
+test case: Group flat JSON 8
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |
+      []
+  step:
+    type: ZBX_PREPROC_GROUP_FLAT_JSON_DATA
+    params: |-
+      {
+        "index_name": "{#SNMPINDEX}",
+        "key_name": "k",
+        "value_name": "v",
+        "row": [
+          {
+            "name": "value",
+            "prefix": "1"
+          }
+        ]
+      }
+out:
+  return: FAIL
 ...
