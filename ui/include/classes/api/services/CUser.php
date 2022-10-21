@@ -486,12 +486,13 @@ class CUser extends CApiService {
 		$superadminids_to_update = [];
 		$usernames = [];
 		$check_roleids = [];
+		$readonly_fields = array_fill_keys(['username', 'passwd'], 1);
 
 		foreach ($users as $i => &$user) {
 			$db_user = $db_users[$user['userid']];
 
 			if (array_key_exists('userdirectoryid', $user) && $user['userdirectoryid'] != 0) {
-				$provisioned_field = array_key_first(array_intersect_key(array_flip(self::PROVISIONED_FIELDS), $user));
+				$provisioned_field = array_key_first(array_intersect_key($readonly_fields, $user));
 
 				if ($provisioned_field !== null) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
