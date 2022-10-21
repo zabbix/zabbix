@@ -163,7 +163,6 @@ class CControllerPopupActionOperationEdit extends CController {
 			$result[] = $template;
 		}
 
-
 		if ($operation['opmessage_grp']) {
 			$i = 0;
 
@@ -177,12 +176,11 @@ class CControllerPopupActionOperationEdit extends CController {
 				]);
 
 				foreach ($user_groups as $user_group) {
-
 					$operation['opmessage_grp'][$i]['name'] = $user_group['name'];
 					$i++;
 				}
 			}
-			$result[] = $user_group;
+			$result['user_group'] = $user_group;
 		}
 
 		if ($operation['opmessage_usr']) {
@@ -194,7 +192,8 @@ class CControllerPopupActionOperationEdit extends CController {
 
 				$users = API::User()->get([
 					'output' => ['userid', 'username', 'name', 'surname'],
-					'userids' => $userids
+					'userids' => $userids,
+					'preservekeys' => true
 				]);
 
 				foreach ($users as $user) {
@@ -204,13 +203,13 @@ class CControllerPopupActionOperationEdit extends CController {
 					$i++;
 				}
 			}
-			$result[] = $fullnames[$opmessage_usr['userid']];
+			$result['users'] = $users;
 		}
 
 		return $result;
 	}
 
-	private function popupConfigOperationMessage(array $operation, int $eventsource): ?array {
+	private function popupConfigOperationMessage(array $operation): array {
 		$usergroups = [];
 		if ($operation['opmessage_grp']) {
 			$usergroups = API::UserGroup()->get([
@@ -229,7 +228,7 @@ class CControllerPopupActionOperationEdit extends CController {
 
 			foreach ($db_users as $db_user) {
 				$users[] = [
-					'id' => $db_user['userid'],
+					'userid' => $db_user['userid'],
 					'name' => getUserFullname($db_user)
 				];
 			}
@@ -241,8 +240,8 @@ class CControllerPopupActionOperationEdit extends CController {
 
 		return [
 			'custom_message' => ($operation['opmessage']['default_msg'] === '1'),
-			'subject' => $operation['opmessage']['subject'],
-			'body' => $operation['opmessage']['message'],
+			'subject' => array_key_exists('subject', $operation['opmessage']) ? $operation['opmessage']['subject'] : '',
+			'body' =>array_key_exists('message', $operation['opmessage']) ? $operation['opmessage']['message'] : '',
 			'mediatypeid' => $operation['opmessage']['mediatypeid'],
 			'mediatypes' => $mediatypes,
 			'usergroups' => $usergroups,

@@ -227,7 +227,7 @@ class CControllerActionOperationCheck extends CController {
 			}
 		}
 		else {
-			$operationtype = preg_replace('[\D]', '', $operation['operationtype']);
+			$operationtype = (int)preg_replace('[\D]', '', $operation['operationtype']);
 		}
 
 		if (array_key_exists('opmessage', $operation)) {
