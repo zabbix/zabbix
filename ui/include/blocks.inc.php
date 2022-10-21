@@ -705,7 +705,7 @@ function make_status_of_zbx() {
 		if ($config['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB && $config['compression_availability'] == 1) {
 			if ($config['hk_history_mode'] == 1 && $config['hk_history_global'] == 0) {
 				if (PostgresqlDbBackend::isCompressed([
-					'history', 'history_log', 'history_str',' history_text', 'history_uint'
+					'history', 'history_log', 'history_str', 'history_text', 'history_uint'
 				])) {
 					$table->addRow((new CRow([
 						_('Housekeeping'),

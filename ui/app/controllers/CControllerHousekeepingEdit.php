@@ -96,7 +96,7 @@ class CControllerHousekeepingEdit extends CController {
 
 			if ($data['hk_history_mode'] == 1 && $data['hk_history_global'] == 0) {
 				$hk_warnings['hk_needs_override_history'] = PostgresqlDbBackend::isCompressed([
-					'history', 'history_log', 'history_str',' history_text', 'history_uint'
+					'history', 'history_log', 'history_str', 'history_text', 'history_uint'
 				]);
 			}
 
