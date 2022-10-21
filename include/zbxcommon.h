@@ -289,99 +289,6 @@ typedef enum
 }
 zbx_dservice_type_t;
 
-/* item snmpv3 security levels */
-#define ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
-#define ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV	1
-#define ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV	2
-
-/* item snmpv3 authentication protocol */
-#define ITEM_SNMPV3_AUTHPROTOCOL_MD5		0
-#define ITEM_SNMPV3_AUTHPROTOCOL_SHA1		1
-#define ITEM_SNMPV3_AUTHPROTOCOL_SHA224		2
-#define ITEM_SNMPV3_AUTHPROTOCOL_SHA256		3
-#define ITEM_SNMPV3_AUTHPROTOCOL_SHA384		4
-#define ITEM_SNMPV3_AUTHPROTOCOL_SHA512		5
-
-/* item snmpv3 privacy protocol */
-#define ITEM_SNMPV3_PRIVPROTOCOL_DES		0
-#define ITEM_SNMPV3_PRIVPROTOCOL_AES128		1
-#define ITEM_SNMPV3_PRIVPROTOCOL_AES192		2
-#define ITEM_SNMPV3_PRIVPROTOCOL_AES256		3
-#define ITEM_SNMPV3_PRIVPROTOCOL_AES192C	4
-#define ITEM_SNMPV3_PRIVPROTOCOL_AES256C	5
-
-/* condition evaluation types */
-#define CONDITION_EVAL_TYPE_AND_OR		0
-#define CONDITION_EVAL_TYPE_AND			1
-#define CONDITION_EVAL_TYPE_OR			2
-#define CONDITION_EVAL_TYPE_EXPRESSION		3
-
-/* condition types */
-#define CONDITION_TYPE_HOST_GROUP		0
-#define CONDITION_TYPE_HOST			1
-#define CONDITION_TYPE_TRIGGER			2
-#define CONDITION_TYPE_TRIGGER_NAME		3
-#define CONDITION_TYPE_TRIGGER_SEVERITY		4
-/* #define CONDITION_TYPE_TRIGGER_VALUE		5	deprecated */
-#define CONDITION_TYPE_TIME_PERIOD		6
-#define CONDITION_TYPE_DHOST_IP			7
-#define CONDITION_TYPE_DSERVICE_TYPE		8
-#define CONDITION_TYPE_DSERVICE_PORT		9
-#define CONDITION_TYPE_DSTATUS			10
-#define CONDITION_TYPE_DUPTIME			11
-#define CONDITION_TYPE_DVALUE			12
-#define CONDITION_TYPE_HOST_TEMPLATE		13
-#define CONDITION_TYPE_EVENT_ACKNOWLEDGED	14
-/* #define CONDITION_TYPE_APPLICATION		15	deprecated */
-#define CONDITION_TYPE_SUPPRESSED		16
-#define CONDITION_TYPE_DRULE			18
-#define CONDITION_TYPE_DCHECK			19
-#define CONDITION_TYPE_PROXY			20
-#define CONDITION_TYPE_DOBJECT			21
-#define CONDITION_TYPE_HOST_NAME		22
-#define CONDITION_TYPE_EVENT_TYPE		23
-#define CONDITION_TYPE_HOST_METADATA		24
-#define CONDITION_TYPE_EVENT_TAG		25
-#define CONDITION_TYPE_EVENT_TAG_VALUE		26
-#define CONDITION_TYPE_SERVICE			27
-#define CONDITION_TYPE_SERVICE_NAME		28
-
-/* condition operators */
-#define CONDITION_OPERATOR_EQUAL		0
-#define CONDITION_OPERATOR_NOT_EQUAL		1
-#define CONDITION_OPERATOR_LIKE			2
-#define CONDITION_OPERATOR_NOT_LIKE		3
-#define CONDITION_OPERATOR_IN			4
-#define CONDITION_OPERATOR_MORE_EQUAL		5
-#define CONDITION_OPERATOR_LESS_EQUAL		6
-#define CONDITION_OPERATOR_NOT_IN		7
-#define CONDITION_OPERATOR_REGEXP		8
-#define CONDITION_OPERATOR_NOT_REGEXP		9
-#define CONDITION_OPERATOR_YES			10
-#define CONDITION_OPERATOR_NO			11
-#define CONDITION_OPERATOR_EXIST		12
-#define CONDITION_OPERATOR_NOT_EXIST		13
-
-/* maintenance tag operators */
-#define ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL	0
-#define ZBX_MAINTENANCE_TAG_OPERATOR_LIKE	2
-
-/* service problem tag operators */
-#define ZBX_SERVICE_TAG_OPERATOR_EQUAL	0
-#define ZBX_SERVICE_TAG_OPERATOR_LIKE	2
-
-/* maintenance tag evaluation types */
-#define MAINTENANCE_TAG_EVAL_TYPE_AND_OR	0
-#define MAINTENANCE_TAG_EVAL_TYPE_OR	2
-
-/* event type action condition values */
-#define EVENT_TYPE_ITEM_NOTSUPPORTED		0
-/* #define EVENT_TYPE_ITEM_NORMAL		1	 deprecated */
-#define EVENT_TYPE_LLDRULE_NOTSUPPORTED		2
-/* #define EVENT_TYPE_LLDRULE_NORMAL		3	 deprecated */
-#define EVENT_TYPE_TRIGGER_UNKNOWN		4
-/* #define EVENT_TYPE_TRIGGER_NORMAL		5	 deprecated */
-
 typedef enum
 {
 	SYSMAP_ELEMENT_TYPE_HOST = 0,
@@ -399,13 +306,6 @@ typedef enum
 	GRAPH_YAXIS_TYPE_ITEM_VALUE
 }
 zbx_graph_yaxis_types_t;
-
-/* special item key used for ICMP pings */
-#define SERVER_ICMPPING_KEY	"icmpping"
-/* special item key used for ICMP ping latency */
-#define SERVER_ICMPPINGSEC_KEY	"icmppingsec"
-/* special item key used for ICMP ping loss packages */
-#define SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
 
 /* runtime control options */
 #define ZBX_CONFIG_CACHE_RELOAD		"config_cache_reload"
@@ -954,34 +854,6 @@ typedef enum
 }
 zbx_task_t;
 
-/* runtime control commands */
-#define ZBX_RTC_UNKNOWN				0
-#define ZBX_RTC_LOG_LEVEL_INCREASE		1
-#define ZBX_RTC_LOG_LEVEL_DECREASE		2
-#define ZBX_RTC_HOUSEKEEPER_EXECUTE		3
-#define ZBX_RTC_CONFIG_CACHE_RELOAD		8
-#define ZBX_RTC_SNMP_CACHE_RELOAD		9
-#define ZBX_RTC_DIAGINFO			10
-#define ZBX_RTC_SECRETS_RELOAD			11
-#define ZBX_RTC_SERVICE_CACHE_RELOAD		12
-#define ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE	13
-#define ZBX_RTC_HA_STATUS			14
-#define ZBX_RTC_HA_REMOVE_NODE			15
-#define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
-#define ZBX_RTC_USER_PARAMETERS_RELOAD		17
-#define ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD	18
-#define ZBX_RTC_PROXYPOLLER_PROCESS		19
-
-/* internal rtc messages */
-#define ZBX_RTC_SUBSCRIBE			100
-#define ZBX_RTC_SHUTDOWN			101
-#define ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT	102
-
-/* runtime control notifications, must be less than 10000 */
-#define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
-
-#define ZBX_IPC_RTC_MAX				9999
-
 typedef enum
 {
 	HTTPTEST_AUTH_NONE = 0,
@@ -1153,16 +1025,6 @@ zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
 
 zbx_uint32_t	zbx_letoh_uint32(zbx_uint32_t data);
 zbx_uint32_t	zbx_htole_uint32(zbx_uint32_t data);
-
-int	is_hostname_char(unsigned char c);
-int	is_key_char(unsigned char c);
-int	is_function_char(unsigned char c);
-int	is_macro_char(unsigned char c);
-int	is_discovery_macro(const char *name);
-int	parse_key(const char **exp);
-int	parse_host_key(char *exp, char **host, char **key);
-void	make_hostname(char *host);
-int	zbx_check_hostname(const char *hostname, char **error);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 

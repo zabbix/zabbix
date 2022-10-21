@@ -1825,7 +1825,8 @@ function getTriggerFormData(array $data) {
 			$db_hosts = API::Host()->get([
 				'output' => [],
 				'selectTags' => ['tag', 'value'],
-				'hostids' => $data['hostid']
+				'hostids' => $data['hostid'],
+				'templated_hosts' => true
 			]);
 
 			if ($db_hosts) {
@@ -1888,6 +1889,7 @@ function getTriggerFormData(array $data) {
 			$data['priority'] = $trigger['priority'];
 			$data['status'] = $trigger['status'];
 			$data['comments'] = $trigger['comments'];
+			$data['url_name'] = $trigger['url_name'];
 			$data['url'] = $trigger['url'];
 
 			if ($data['parent_discoveryid'] !== null) {

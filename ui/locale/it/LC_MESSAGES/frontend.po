@@ -266,6 +266,16 @@ msgctxt "screen reader"
 msgid "%1$s, selected"
 msgstr "%1$s, selezionato"
 
+#: app/controllers/CControllerMediatypeEnable.php:93
+#, c-format
+msgid "%1$s. %2$s: %3$s. %4$s."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeEnable.php:108
+#, c-format
+msgid "%1$s: %2$s"
+msgstr ""
+
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
@@ -6465,6 +6475,14 @@ msgstr "Ellisse"
 msgid "Email"
 msgstr "Email"
 
+#: app/views/js/administration.mediatype.edit.js.php:397
+msgid "Email and password"
+msgstr ""
+
+#: app/views/administration.mediatype.edit.php:64
+msgid "Email provider"
+msgstr ""
+
 #: app/views/popup.generic.php:50
 msgid "Empty"
 msgstr "Svuota"
@@ -9092,6 +9110,11 @@ msgstr "Statistiche di traffico in ingresso sull'interfaccia di rete. Restituice
 #: include/classes/api/services/CService.php:1441
 #, c-format
 msgid "Incompatible \"propagation_rule\" and \"propagation_value\" parameters for service \"%1$s\"."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeEnable.php:97
+#: app/controllers/CControllerMediatypeEnable.php:108
+msgid "Incomplete configuration"
 msgstr ""
 
 #: include/classes/api/services/CMap.php:655
@@ -11924,6 +11947,10 @@ msgid_plural "Media types disabled"
 msgstr[0] "Tipo di supporto disabilitato"
 msgstr[1] "Tipo di supporto disabilitato"
 
+#: app/views/administration.user.edit.php:327
+msgid "Media type disabled by Administration."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
@@ -11958,6 +11985,10 @@ msgstr "Tipo Media con ID \"%1$s\" non e' valido."
 #: include/classes/helpers/CRoleHelper.php:428
 msgid "Media types"
 msgstr "Tipi di supporto"
+
+#: app/views/popup.media.php:75
+msgid "Media types disabled by Administration."
+msgstr ""
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -13359,6 +13390,10 @@ msgstr ""
 msgid "Not classified"
 msgstr "Non classificato"
 
+#: app/controllers/CControllerMediatypeEnable.php:95
+msgid "Not enabled"
+msgstr ""
+
 #: include/forms.inc.php:315
 msgid "Not inherited items"
 msgstr ""
@@ -13746,6 +13781,10 @@ msgstr "Solo i trigger assegnati agli host abilitati e dipendenti da item abilit
 
 #: app/views/administration.script.edit.php:193
 msgid "Open in a new window"
+msgstr ""
+
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
 msgstr ""
 
 #: include/httptest.inc.php:421
@@ -21365,6 +21404,10 @@ msgstr ""
 msgid "a character string is expected"
 msgstr "E' prevista una stringa di caratteri"
 
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr ""
@@ -22074,6 +22117,11 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
+msgstr ""
+
+#: app/views/administration.mediatype.list.php:98
+#: app/views/administration.mediatype.list.php:103
+msgid "email"
 msgstr ""
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78

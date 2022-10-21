@@ -250,7 +250,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 	DBfree_result(result);
 
 	if (0 < tag_filters.values_num)
-		condition.op = CONDITION_OPERATOR_EQUAL;
+		condition.op = ZBX_CONDITION_OPERATOR_EQUAL;
 	else
 		ret = SUCCEED;
 
@@ -270,13 +270,13 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 
 			if (NULL != tag_filter->value && 0 != strlen(tag_filter->value))
 			{
-				condition.conditiontype = CONDITION_TYPE_EVENT_TAG_VALUE;
+				condition.conditiontype = ZBX_CONDITION_TYPE_EVENT_TAG_VALUE;
 				condition.value2 = tag_filter->tag;
 				condition.value = tag_filter->value;
 			}
 			else
 			{
-				condition.conditiontype = CONDITION_TYPE_EVENT_TAG;
+				condition.conditiontype = ZBX_CONDITION_TYPE_EVENT_TAG;
 				condition.value = tag_filter->tag;
 			}
 
@@ -1801,7 +1801,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 	DB_ROW		row;
 	zbx_condition_t	condition;
 
-	int		ret = SUCCEED; /* SUCCEED required for CONDITION_EVAL_TYPE_AND_OR */
+	int		ret = SUCCEED; /* SUCCEED required for ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR */
 	int		cond, exit = 0;
 	unsigned char	old_type = 0xff;
 
@@ -1827,7 +1827,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 
 		switch (evaltype)
 		{
-			case CONDITION_EVAL_TYPE_AND_OR:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR:
 				if (old_type == condition.conditiontype)	/* OR conditions */
 				{
 					if (SUCCEED == check_action_condition(event, &condition))
@@ -1843,7 +1843,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 				}
 				old_type = condition.conditiontype;
 				break;
-			case CONDITION_EVAL_TYPE_AND:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND:
 				cond = check_action_condition(event, &condition);
 				/* Break if any of AND conditions is FALSE */
 				if (cond == FAIL)
@@ -1854,7 +1854,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 				else
 					ret = SUCCEED;
 				break;
-			case CONDITION_EVAL_TYPE_OR:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_OR:
 				cond = check_action_condition(event, &condition);
 				/* Break if any of OR conditions is TRUE */
 				if (cond == SUCCEED)

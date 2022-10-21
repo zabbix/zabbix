@@ -27,7 +27,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "history_compress.h"
-#include "../../libs/zbxdbcache/valuecache.h"
+#include "zbx_rtc_constants.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -1248,7 +1248,6 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		DBclose();
 
 		zbx_dc_cleanup_sessions();
-		zbx_vc_housekeeping_value_cache();
 
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"
 				" %d audit items, %d records in " ZBX_FS_DBL " sec, %s]",

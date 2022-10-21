@@ -83,7 +83,7 @@ static int	um_macro_compare_by_name_context(const void *d1, const void *d2)
 	if (0 != (ret = strcmp(m1->name, m2->name)))
 		return ret;
 
-	/* CONDITION_OPERATOR_EQUAL (0) has higher priority than CONDITION_OPERATOR_REGEXP (8) */
+	/* ZBX_CONDITION_OPERATOR_EQUAL (0) has higher priority than ZBX_CONDITION_OPERATOR_REGEXP (8) */
 	ZBX_RETURN_IF_NOT_EQUAL(m1->context_op, m2->context_op);
 
 	return zbx_strcmp_null(m1->context, m2->context);
@@ -439,6 +439,10 @@ static void	um_macro_kv_remove(zbx_um_macro_t *macro, zbx_dc_macro_kv_t *mkv)
 		if (0 == mkv->kv->macros.values_num)
 		{
 			zbx_vector_uint64_pair_destroy(&mkv->kv->macros);
+			dc_strpool_release(mkv->kv->key);
+			if (NULL != mkv->kv->value)
+				dc_strpool_release(mkv->kv->value);
+
 			zbx_hashset_remove_direct(&mkv->kv_path->kvs, mkv->kv);
 			if (0 == mkv->kv_path->kvs.num_data)
 				dc_kvs_path_remove(mkv->kv_path);
@@ -891,11 +895,11 @@ static int	um_macro_match(const zbx_um_macro_t *macro, const char *name, const c
 	{
 		switch (macro->context_op)
 		{
-			case CONDITION_OPERATOR_EQUAL:
+			case ZBX_CONDITION_OPERATOR_EQUAL:
 				if (0 == strcmp(macro->context, context))
 					return ZBX_UM_MATCH_FULL;
 				break;
-			case CONDITION_OPERATOR_REGEXP:
+			case ZBX_CONDITION_OPERATOR_REGEXP:
 				if (NULL != zbx_regexp_match(context, macro->context, NULL))
 					return ZBX_UM_MATCH_FULL;
 				break;

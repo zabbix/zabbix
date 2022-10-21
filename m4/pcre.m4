@@ -13,17 +13,14 @@
 
 AC_DEFUN([LIBPCRE_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <pcre.h>
-],
-[
+]], [[
 	const char* error = NULL;
 	int error_offset = -1;
 	pcre *regexp = pcre_compile("test", PCRE_UTF8, &error, &error_offset, NULL);
 	pcre_free(regexp);
-],
-found_libpcre="yes")
+]])],[found_libpcre="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBPCRE_CHECK_CONFIG],
@@ -40,7 +37,7 @@ AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 
 	AC_ARG_WITH([libpcre],[
 If you want to specify libpcre installation directories:
-AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base install directory (DIR), default is to search through a number of common places for the libpcre files.])],
+AS_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base install directory (DIR), default is to search through a number of common places for the libpcre files.])],
 	[
 		if test "$withval" != "no"; then
 			want_libpcre=yes
@@ -50,7 +47,7 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 		fi
 	])
 
-	AC_ARG_WITH([libpcre-include], AC_HELP_STRING([--with-libpcre-include@<:@=DIR@:>@], [use libpcre include headers from given path.]), [
+	AC_ARG_WITH([libpcre-include], AS_HELP_STRING([--with-libpcre-include@<:@=DIR@:>@], [use libpcre include headers from given path.]), [
 		want_libpcre="yes"
 		libpcre_include_dir="$withval"
 		if ! test -d "$libpcre_include_dir"; then
@@ -61,7 +58,7 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 		fi
 	])
 
-	AC_ARG_WITH([libpcre-lib], AC_HELP_STRING([--with-libpcre-lib@<:@=DIR@:>@], [use libpcre libraries from given path.]), [
+	AC_ARG_WITH([libpcre-lib], AS_HELP_STRING([--with-libpcre-lib@<:@=DIR@:>@], [use libpcre libraries from given path.]), [
 		want_libpcre="yes"
 		libpcre_lib_dir="$withval"
 		if ! test -d "$libpcre_lib_dir"; then

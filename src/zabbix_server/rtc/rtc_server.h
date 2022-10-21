@@ -17,39 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "rtc.h"
+#ifndef ZABBIX_RTC_SERVER_H
+#define ZABBIX_RTC_SERVER_H
 
-#include "zbxtypes.h"
-#include "proxy.h"
+#include "zbxrtc.h"
+#include "zbxipcservice.h"
 
-extern int	CONFIG_PROXYMODE;
-
-int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
-{
-	ZBX_UNUSED(opt);
-	ZBX_UNUSED(code);
-	ZBX_UNUSED(data);
-	ZBX_UNUSED(error);
-
-	return SUCCEED;
-}
-
-int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
-{
-	ZBX_UNUSED(rtc);
-	ZBX_UNUSED(data);
-	ZBX_UNUSED(result);
-
-	switch (code)
-	{
-		case ZBX_RTC_CONFIG_CACHE_RELOAD:
-			if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
-			{
-				rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
-				return SUCCEED;
-			}
-			return FAIL;
-	}
-
-	return FAIL;
-}
+int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result);
+int	rtc_process(const char *option, char **error);
+void	rtc_reset(zbx_rtc_t *rtc);
+int	rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error);
+#endif

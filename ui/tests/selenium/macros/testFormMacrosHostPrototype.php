@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormMacros.php';
 
 /**
@@ -46,8 +47,6 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	// Parent LLD for Host prototypes 'Discovery rule 1' host: 'Host for host prototype tests'.
 	const LLD_ID		= 90001;
 	const IS_PROTOTYPE	= true;
-
-	use MacrosTrait;
 
 	/**
 	 * The name of the host for updating macros, id=99200.
@@ -88,7 +87,8 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateMacrosData
+	 * @dataProvider getUpdateMacrosNormalData
+	 * @dataProvider getUpdateMacrosCommonData
 	 */
 	public function testFormMacrosHostPrototype_Update($data) {
 		$this->checkMacros($data, 'host prototype', $this->host_name_update, true, self::IS_PROTOTYPE, self::LLD_ID);
@@ -284,7 +284,8 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateVaultMacrosData
+	 * @dataProvider getUpdateVaultMacrosNormalData
+	 * @dataProvider getUpdateVaultMacrosCommonData
 	 */
 	public function testFormMacrosHostPrototype_UpdateVaultMacros($data) {
 		$this->updateVaultMacros($data, 'host_prototypes.php?form=update&context=host&parent_discoveryid=90003&hostid=90008',
