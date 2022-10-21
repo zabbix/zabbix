@@ -2662,6 +2662,9 @@ Changes for 5.0.29rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
+.........T [ZBX-21673] fixed read operations per second preprocessing in Ceph by Zabbix agent 2 template (drasihov)
+..F....... [ZBX-18478] fixed LDAP test button visibility in user authentication form (gcalenko)
 ..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
 A......... [ZBX-19224] added ability to unset headers in web scenario (rlataria)
 ..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
