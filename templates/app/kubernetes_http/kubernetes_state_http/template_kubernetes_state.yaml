@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-10-18T14:08:51Z'
+  date: '2022-10-21T14:16:10Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -636,13 +636,19 @@ zabbix_export:
                     result.response.items.forEach(function (ep) {
                         if (ep.metadata.name === Kube.params.state_endpoint_name && Array.isArray(ep.subsets)) {
                             if (typeof ep.subsets[0].addresses !== 'undefined') {
-                                var subset = ep.subsets[0];
-            
-                                endpoint = {
-                                    address: subset.addresses[0].ip,
-                                    port: port = subset.ports.filter(function (port) {
+                                var port, addr
+                                ep.subsets.forEach(function(subset){
+                                    var lp = subset.ports.filter(function (port) {
                                         return port.name === 'http';
-                                    })[0].port || 8080
+                                    })
+                                    if (lp.length) {
+                                        port = lp[0].port
+                                        addr = subset.addresses[0].ip
+                                    }
+                                })
+                                endpoint = {
+                                    address: addr || ep.subsets[0].addresses[0].ip,
+                                    port: port || 8080
                                 }
                             }
                         }

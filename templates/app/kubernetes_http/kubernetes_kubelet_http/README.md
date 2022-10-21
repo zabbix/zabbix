@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 The template to monitor Kubernetes Controller manager by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -54,7 +54,7 @@ There are no template links in this template.
 |Container memory discovery | |DEPENDENT |kube.kubelet.container.memory.cache.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Pods discovery | |DEPENDENT |kube.kubelet.pods.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |REST client requests discovery | |DEPENDENT |kube.kubelet.rest.requests.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON<p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
-|Runtime operations discovery | |DEPENDENT |kube.kubelet.runtime_operations_bucket.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "kubelet_runtime_operations_*", operation_type =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket` - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket` - DISCOVER</p> |
+|Runtime operations discovery | |DEPENDENT |kube.kubelet.runtime_operations_bucket.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `{__name__=~ "kubelet_runtime_operations_*", operation_type =~ ".*"}`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Overrides:**</p><p>bucket item<br> - {#TYPE} MATCHES_REGEX `buckets`<br>  - ITEM_PROTOTYPE LIKE `bucket`<br>  - DISCOVER</p><p>total item<br> - {#TYPE} MATCHES_REGEX `totals`<br>  - ITEM_PROTOTYPE NOT_LIKE `bucket`<br>  - DISCOVER</p> |
 
 ## Items collected
 
@@ -81,7 +81,7 @@ There are no template links in this template.
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Load average, 10s |<p>Pods cpu load average over the last 10 seconds.</p> |DEPENDENT |kube.pod.container_cpu_load_average_10s[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_cpu_load_average_10s{pod="{#NAME}", namespace="{#NAMESPACE}"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: System seconds, total |<p>The number of cores used for system time.</p> |DEPENDENT |kube.pod.container_cpu_system_seconds_total[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_cpu_system_seconds_total{pod="{#NAME}", namespace="{#NAMESPACE}"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: User seconds, total |<p>The number of cores used for user time.</p> |DEPENDENT |kube.pod.container_cpu_user_seconds_total[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_cpu_user_seconds_total{pod="{#NAME}", namespace="{#NAMESPACE}"}`: `function`: `sum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Load average, 10s |<p>Number of HTTP requests, partitioned by status code, method, and host.</p> |DEPENDENT |kube.kubelet.rest.requests["{#CODE}", "{#HOST}", "{#METHOD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `rest_client_requests_total{code="{#CODE}", host="{#HOST}", method="{#METHOD}"}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Kubernetes |Kubernetes: Host [{#HOST}] Request method [{#METHOD}] Code:[{#CODE}] |<p>Number of HTTP requests, partitioned by status code, method, and host.</p> |DEPENDENT |kube.kubelet.rest.requests["{#CODE}", "{#HOST}", "{#METHOD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `rest_client_requests_total{code="{#CODE}", host="{#HOST}", method="{#METHOD}"}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory page cache |<p>Number of bytes of page cache memory.</p> |DEPENDENT |kube.kubelet.container.memory.cache["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_memory_cache{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory max usage |<p>Maximum memory usage recorded in bytes.</p> |DEPENDENT |kube.kubelet.container.memory.max_usage["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_memory_max_usage_bytes{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |Kubernetes |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: RSS |<p>Size of RSS in bytes.</p> |DEPENDENT |kube.kubelet.container.memory.rss["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `container_memory_rss{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
@@ -96,7 +96,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 
