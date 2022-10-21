@@ -4325,6 +4325,14 @@ msgstr "Время ожидания соединения"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Превышено время ожидания %1$s секунд при подключении к Zabbix серверу \"%2$s\"."
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4335,6 +4343,16 @@ msgstr ""
 "Ошибка при подключении к Zabbix серверу \"%1$s\". Возможные причины:\n"
 "1. Некорректный IP/DNS сервера в \"zabbix.conf.php\";\n"
 "2. Некорректная настройка DNS сервера.\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4350,6 +4368,14 @@ msgstr ""
 "2. Настройки безопасности (например, SELinux) блокируют подключение;\n"
 "3. Демон Zabbix сервера не запущен;\n"
 "4. Брандмауэр блокирует TCP соединение.\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -10002,6 +10028,10 @@ msgstr "Инфо"
 msgctxt "compact table header"
 msgid "Info"
 msgstr "Инфо"
+
+#: include/classes/data/CItemData.php:1428
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -20200,6 +20230,10 @@ msgstr "Статистика пространства на VMware хранили
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "Список гипервизоров хранилища VMware, <url> - URL службы VMware, <datastore> - имя хранилища"
 
+#: include/classes/data/CItemData.php:1320
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr ""
@@ -21397,6 +21431,14 @@ msgstr "Диалог входа в систему Zabbix"
 #: app/views/administration.script.edit.php:127
 msgid "Zabbix server"
 msgstr "Zabbix сервер"
+
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:601
 #, c-format

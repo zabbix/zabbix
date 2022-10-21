@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-10-03 20:12+0000\n"
+"PO-Revision-Date: 2022-10-18 12:05+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -4244,6 +4244,14 @@ msgstr "תום זמן ההמתנה לחיבור"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "תוקף זמן החיבור על סך %1$s שניות חרג בעת החיבור לשרת ה־Zabbix‏ „%2$s”."
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4254,6 +4262,16 @@ msgstr ""
 "החיבור לשרת ה־Zabbix‏ „%1$s” נכשל. סיבות אפשריות:\n"
 "1. ה־IP/DNS של השרת תחת „zabbix.conf.php” שגוי;\n"
 "2. הגדרות שרת ה־DNS שגויות.\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4269,6 +4287,14 @@ msgstr ""
 "2. סביבת האבטחה (למשל, SELinux) חוסמת את החיבור;\n"
 "3. סוכן שרת ה־Zabbix לא פועל;\n"
 "4. חומת האש חוסמת חיבורי TCP.\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -9905,6 +9931,10 @@ msgctxt "compact table header"
 msgid "Info"
 msgstr "מידע"
 
+#: include/classes/data/CItemData.php:1428
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -13727,7 +13757,7 @@ msgstr "רק הקפצות שמוקצות למארחים מופעלים שתלו�
 
 #: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
 msgid "Open log"
-msgstr ""
+msgstr "פתיחת היומן"
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -20059,6 +20089,10 @@ msgstr "סטטיסטיקת נפח מאגר הנתונים של VMWare בבתים
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "רשימת מאגרי הנתונים של ה־Hypervisors של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <datastore> - שם מאגר הנתונים"
 
+#: include/classes/data/CItemData.php:1320
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr "מאפיין מאגרי נתונים של VMware, ‏<url> - כתובת שירות VMware,‏ <uuid> - שם מאגר נתונים, <prop> - נתיב מאפיין"
@@ -21254,6 +21288,14 @@ msgstr "טופס כניסה ל־Zabbix"
 #: app/views/administration.script.edit.php:127
 msgid "Zabbix server"
 msgstr "שרת Zabbix"
+
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:601
 #, c-format
