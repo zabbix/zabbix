@@ -443,7 +443,7 @@ static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service,
 
 	if (0 == is_new_api)
 	{
-		char			token[VMWARE_SHORT_STR_LEN];
+		char			token[MAX_STRING_LEN];
 		struct zbx_json_parse	jp;
 
 		if (FAIL == vmware_rest_response_open(page->data, &jp, error))
