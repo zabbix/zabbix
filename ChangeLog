@@ -1,11 +1,20 @@
 Changes for 6.2.4rc1
 
 New features:
+.......PS. [ZBXNEXT-6401] added new vmware keys vmware.datastore.perfcounter and vmware.hv.diskinfo.get (MVekslers)
+.........T [ZBX-21693] fixed repeated lines in templates (egordymov)
+.......PS. [ZBXNEXT-7816] added support of PostgreSQL 15 (vso)
+.......PS. [ZBXNEXT-7970] added support of TimescaleDB 2.8 (vso)
+.........T [ZBXNEXT-7902] added templates for Azure MySQL servers (vkhaliev)
 .........T [ZBX-21672] fixed event source in mediatypes (egordymov)
 A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 
 Bug fixes:
+..F....... [ZBX-20505] fixed subfilter counters displaying incorrect values in Monitoring => Graph view (rdetlavs)
+...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
+.........T [ZBX-21673] fixed read operations per second preprocessing in Ceph by Zabbix agent 2 template (drasihov)
+.......PS. [ZBX-21724] fixed updating of lastaccess for proxies in availman if active proxy is used (dgoloscapov)
 .........T [ZBX-21582] optimized HPE Synergy template to spread load across preprocessing workers (vkhaliev)
 ..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
 ..F....... [ZBX-21606] fixed "Allowed hosts" field in HTTP agent item (kkuzmina)
