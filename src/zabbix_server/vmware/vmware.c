@@ -3968,9 +3968,9 @@ static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr)
 	zbx_json_close(&json_data);
 	zbx_json_adduint64(&json_data, "count", count);
 	zbx_json_addstring(&json_data, "latestdate", ZBX_NULL2EMPTY_STR(latestdate), ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(&json_data, "latest_age", latest_age);
+	zbx_json_addint64(&json_data, "latestage", latest_age);
 	zbx_json_addstring(&json_data, "oldestdate", ZBX_NULL2EMPTY_STR(oldestdate), ZBX_JSON_TYPE_STRING);
-	zbx_json_addint64(&json_data, "oldest_age", oldest_age);
+	zbx_json_addint64(&json_data, "oldestage", oldest_age);
 	zbx_json_adduint64(&json_data, "size", size);
 	zbx_json_adduint64(&json_data, "uniquesize", uniquesize);
 	zbx_json_close(&json_data);
