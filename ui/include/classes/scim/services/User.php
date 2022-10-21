@@ -40,6 +40,7 @@ class User extends ScimApiService {
 	];
 
 	private const SCIM_USER_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User';
+	private const SCIM_LIST_RESPONSE_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:ListResponse';
 
 	protected array $data = [
 		'schemas' => [self::SCIM_USER_SCHEMA]
@@ -64,32 +65,34 @@ class User extends ScimApiService {
 
 		if (array_key_exists('userName', $options)) {
 			$user = APIRPC::User()->get([
-				'filter' => ['username' => $options['userName']],
-				'selectUsrgrps' => ['usrgrpid']
+				'output' => ['userid', 'username', 'userdirectoryid'],
+				'selectUsrgrps' => ['usrgrpid'],
+				'filter' => ['username' => $options['userName']]
 			]);
 
-			if (!$user) {
-				$this->data['totalResults'] = 0;
-				$this->data['Resources'] = [];
-			}
-			else {
+			if ($user) {
 				$user_groups = array_column($user[0]['usrgrps'], 'usrgrpid');
 				$disabled_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID);
 
 				if ((count($user_groups) == 1 && $user_groups[0] == $disabled_groupid)) {
-					$user = [];
-					$this->data['totalResults'] = 0;
-					$this->data['Resources'] = [];
+					$this->data += [
+						'totalResults' => 0,
+						'Resources' => []
+					];
+					return $this->data;
 				}
 				elseif ($user[0]['userdirectoryid'] != $userdirectoryid) {
 					self::exception(self::SCIM_ERROR_BAD_REQUEST,
-						_s('The username "%1$s" has already been taken by another user.', $options['userName'])
+						_s('User with username "%1$s" already exists.', $options['userName'])
 					);
 				}
+
+				$this->data = $this->prepareData($user[0]);
 			}
 		}
 		elseif (array_key_exists('id', $options)) {
 			$user = APIRPC::User()->get([
+				'output' => ['userid', 'username', 'userdirectoryid'],
 				'userids' => $options['id']
 			]);
 
@@ -102,34 +105,41 @@ class User extends ScimApiService {
 					_s('The user "%1$s" belongs to another userdirectory.', $options['id'])
 				);
 			}
+
+			$this->data = $this->prepareData($user[0]);
 		}
 		else {
-			$total_users = APIRPC::User()->get([
-				'countOutput' => true,
+			$userids = APIRPC::User()->get([
+				'output' => ['userid'],
 				'filter' => ['userdirectoryid' => $userdirectoryid]
 			]);
-			$this->data['totalResults'] = $total_users;
-			$this->data['startIndex'] = 1;
-			$this->data['itemsPerPage'] = 0;
+			$total_users = count($userids);
 
-			if (array_key_exists('startIndex', $options) && $options['startIndex'] > 0) {
-				$this->data['startIndex'] = $options['startIndex'];
+			$this->data = [
+				'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
+				'totalResults' => $total_users,
+				'startIndex' => max($options['startIndex'], 1),
+				'itemsPerPage' => min($total_users, max($options['count'], 0)),
+				'Resources' => []
+			];
+
+			if ($total_users != 0) {
+				$userids = array_slice($userids, $this->data['startIndex'] - 1, $this->data['itemsPerPage']);
+				$userids = array_column($userids, 'userid');
+
+				$users = $userids
+					? APIRPC::User()->get([
+						'output' => ['userid', 'username', 'userdirectoryid'],
+						'userids' => $userids
+					])
+					: [];
+
+				foreach ($users as $user) {
+					$user_data = $this->prepareData($user);
+					unset($user_data['schemas']);
+					$this->data['Resources'][] = $user_data;
+				}
 			}
-
-			if (array_key_exists('count', $options) && $options['count'] > 0 && $options['count'] < $total_users) {
-				$this->data['itemsPerPage'] = $options['count'];
-			}
-			elseif ($total_users > 0) {
-				$this->data['itemsPerPage'] = $total_users;
-			}
-
-			$this->listResponse($userdirectoryid, $this->data['startIndex'], $this->data['itemsPerPage']);
-
-			return $this->data;
-		}
-
-		if ($user) {
-			$this->data += $this->prepareData($user[0]);
 		}
 
 		return $this->data;
@@ -140,12 +150,12 @@ class User extends ScimApiService {
 	 *
 	 * @throws APIException if input is invalid.
 	 */
-	private function validateGet(array $options): void {
+	private function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'id' =>				['type' => API_ID],
-			'userName' =>		['type' => API_STRING_UTF8],
-			'startIndex' =>		['type' => API_STRING_UTF8],
-			'count' =>			['type' => API_STRING_UTF8]
+			'userName' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+			'startIndex' =>		['type' => API_INT32, 'default' => 1],
+			'count' =>			['type' => API_INT32, 'default' => 100]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -189,12 +199,8 @@ class User extends ScimApiService {
 		}
 		else {
 			self::exception(self::SCIM_ERROR_BAD_REQUEST,
-				_s('The username "%1$s" has already been taken by another user.', $options['userName'])
+				_s('User with username "%1$s" already exists.', $options['userName'])
 			);
-		}
-
-		if (!$user) {
-			self::exception(self::SCIM_INTERNAL_ERROR, _('Unable to create this user.'));
 		}
 
 		$this->setData($user['userid'], $userdirectoryid, $options);
@@ -208,9 +214,9 @@ class User extends ScimApiService {
 	 * @throws APIException if input is invalid.
 	 */
 	private function validatePost(array $options) {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
-			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'userName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
+			'userName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -238,10 +244,15 @@ class User extends ScimApiService {
 
 		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
 		$group_attribute = $provisioning->getGroupIdpAttributes()[0];
-		$user_group_names = [];
-		if (array_key_exists($group_attribute, $options)) {
-			$user_group_names = array_column($options[$group_attribute], 'display');
-		}
+
+		$user_group_names = array_key_exists($group_attribute, $options)
+			? array_column($options[$group_attribute], 'display')
+			: [];
+
+		// In case some IdPs do not send attribute 'active'.
+		$options += [
+			'active' => true
+		];
 
 		$user_data = [
 			'userid' => $db_user['userid'],
@@ -275,13 +286,13 @@ class User extends ScimApiService {
 	 *          ['userid']
 	 *          ['userdirectoryid']
 	 *
-	 * @throws APIException if input is invalid.
+	 * @throws APIException if input is invalid or user cannot be modified.
 	 */
 	private function validatePut(array $options): array {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-			'userName' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
+			'userName' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_REQUIRED, 'length' => DB::getFieldLength('users', 'username')],
 			'active' =>		['type' => API_BOOLEAN, 'flags' => API_NOT_EMPTY]
 		]];
 
@@ -335,7 +346,7 @@ class User extends ScimApiService {
 		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
 		$user_data = [
 			'userid' => $db_user[0]['userid'],
-			'username' => $options['userName']
+			'username' => $options['userName'] // todo: userName probably not defined
 		];
 		$user_data += $provisioning->getUserAttributes($options);
 		$user_data['medias'] = $provisioning->getUserMedias($options);
@@ -357,7 +368,7 @@ class User extends ScimApiService {
 	 */
 	private function validateDelete(array $options): array {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-			'id' =>	['type' => API_ID, 'flags' => API_REQUIRED, 'uniq' => true]
+			'id' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -384,32 +395,6 @@ class User extends ScimApiService {
 	}
 
 	/**
-	 * Updates $this->data parameter with ListResponse data that is required by SCIM.
-	 *
-	 * @param string $userdirectoryid  SAML userdirectoryid
-	 * @param int    $start_index      Start index defined in request.
-	 * @param int    $items_per_page   Number of items to be shown on paged, defined in request.
-	 *
-	 * @return void
-	 */
-	private function listResponse(string $userdirectoryid, $start_index, $items_per_page): void {
-		$this->data['schemas'] = ['urn:ietf:params:scim:api:messages:2.0:ListResponse'];
-		$this->data['Resources'] = [];
-		$users = APIRPC::User()->get([
-			'filter' => ['userdirectoryid' => $userdirectoryid]
-		]);
-
-		$users_to_show = range($start_index, ($start_index + $items_per_page - 1));
-
-		foreach ($users as $index => $user) {
-			++$index;
-			if (in_array($index, $users_to_show, false)) {
-				$this->data['Resources'][] = $this->prepareData($user);
-			}
-		}
-	}
-
-	/**
 	 * Updates $this->data parameter with the data that is required by SCIM.
 	 *
 	 * @param string $userid
@@ -420,6 +405,7 @@ class User extends ScimApiService {
 	 */
 	private function setData(string $userid, string $userdirectoryid, array $options = []): void {
 		$user = APIRPC::User()->get([
+			'output' => ['userid', 'username', 'userdirectoryid'],
 			'userids' => $userid,
 			'filter' => ['userdirectoryid' => $userdirectoryid]
 		]);
@@ -433,29 +419,31 @@ class User extends ScimApiService {
 	 * @param array  $user
 	 * @param string $user['userid']
 	 * @param string $user['username']
-	 * @param array  $options                                        Optional. User information sent in request from IdP.
+	 * @param array  $options                                     Optional. User information sent in request from IdP.
 	 *
-	 * @return array                                                 Returns array with data formatted according to SCIM.
-	 *                                                               Attributes might vary based on SAML settings.
+	 * @return array                                              Returns array with data formatted according to SCIM.
+	 *                                                            Attributes might vary based on SAML settings.
 	 *         ['id']
 	 *         ['userName']
 	 *         ['active']
-	 *         ['attribute']                                          Some other attributes set up in SAML settings.
+	 *         ['attribute']                                      Some other attributes set up in SAML settings.
 	 */
 	private function prepareData(array $user, array $options = []): array {
-		$data = [];
-		$data['id'] = $user['userid'];
-		$data['userName'] = $user['username'];
-		$data['active'] = true;
+		$data = [
+			'schemas'	=> [self::SCIM_USER_SCHEMA],
+			'id' 		=> $user['userid'],
+			'userName'	=> $user['username'],
+			'active'	=> true
+		];
 
 		$provisioning = CProvisioning::forUserDirectoryId($user['userdirectoryid']);
 		$user_attributes = $provisioning->getUserAttributes($options);
 		$data += $user_attributes;
 
 		$media_attributes = $provisioning->getUserIdpMediaAttributes();
-		foreach($media_attributes as $media) {
-			if (array_key_exists($media, $options)) {
-				$data[$media] = $options[$media];
+		foreach ($media_attributes as $media_attribute) {
+			if (array_key_exists($media_attribute, $options)) {
+				$data[$media_attribute] = $options[$media_attribute];
 			}
 		}
 
