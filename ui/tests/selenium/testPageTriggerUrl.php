@@ -23,10 +23,26 @@ require_once dirname(__FILE__) . '/../include/CWebTest.php';
 /**
  * Test checks link from trigger URL field on different pages.
  *
+ * @onBefore prepareTriggerData
+ *
  * @backup profiles
  * @backup problem
  */
 class testPageTriggerUrl extends CWebTest {
+
+	private static $custom_name = 'URL name for menu';
+
+	/**
+	 * Add URL name for trigger.
+	 */
+	public function prepareTriggerData() {
+		$response = CDataHelper::call('trigger.update', [
+			[
+				'triggerid' => '100032',
+				'url_name' => 'URL name for menu'
+			]
+		]);
+	}
 
 	public function getTriggerLinkData() {
 		return [
@@ -51,7 +67,7 @@ class testPageTriggerUrl extends CWebTest {
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100032',
 						'Configuration' => 'triggers.php?form=update&triggerid=100032',
-						'Trigger URL' => 'tr_events.php?triggerid=100032&eventid=9000',
+						self::$custom_name => 'tr_events.php?triggerid=100032&eventid=9000',
 						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101',
 						'1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'
 					],
@@ -114,7 +130,9 @@ class testPageTriggerUrl extends CWebTest {
 	 * Check trigger url on Event details page.
 	 */
 	public function testPageTriggerUrl_EventDetails($data) {
-		$this->page->login()->open($data['links']['Trigger URL']);
+		$option = array_key_exists('Trigger URL', $data['links']) ? 'Trigger URL' : self::$custom_name;
+
+		$this->page->login()->open($data['links'][$option]);
 		$this->query('link', $data['trigger'])->waitUntilPresent()->one()->click();
 		$this->checkTriggerUrl(false, $data);
 	}
@@ -127,6 +145,8 @@ class testPageTriggerUrl extends CWebTest {
 	 * @param boolean $popup_menu			trigger context menu popup exist
 	 */
 	private function checkTriggerUrl($trigger_overview, $data, $popup_menu = true) {
+		$option = array_key_exists('Trigger URL', $data['links']) ? 'Trigger URL' : self::$custom_name;
+
 		if ($popup_menu) {
 			// Check trigger popup menu.
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
@@ -146,16 +166,16 @@ class testPageTriggerUrl extends CWebTest {
 				$this->assertEquals(count($data['links']), $popup->getItems()->count());
 			}
 			// Open trigger link.
-			$popup->fill('Trigger URL');
+			$popup->fill($option);
 		}
 		else {
 			// Follow trigger link in overlay dialogue.
 			$hintbox = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one();
-			$hintbox->query('link', $data['links']['Trigger URL'])->one()->click();
+			$hintbox->query('link', $data['links'][$option])->one()->click();
 		}
 
 		// Check opened page.
 		$this->assertEquals('Event details', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
-		$this->assertStringContainsString($data['links']['Trigger URL'], $this->page->getCurrentUrl());
+		$this->assertStringContainsString($data['links'][$option], $this->page->getCurrentUrl());
 	}
 }

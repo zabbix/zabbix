@@ -1541,6 +1541,7 @@ static int	get_autoreg_value_by_event(const ZBX_DB_EVENT *event, char **replace_
 #define MVAR_STATUS				"{STATUS}"			/* deprecated */
 #define MVAR_TRIGGER_VALUE			"{TRIGGER.VALUE}"
 #define MVAR_TRIGGER_URL			"{TRIGGER.URL}"
+#define MVAR_TRIGGER_URL_NAME			"{TRIGGER.URL.NAME}"
 
 #define MVAR_TRIGGER_EVENTS_ACK			"{TRIGGER.EVENTS.ACK}"
 #define MVAR_TRIGGER_EVENTS_UNACK		"{TRIGGER.EVENTS.UNACK}"
@@ -3269,6 +3270,13 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 							NULL, NULL, NULL, tz, &replace_to, MACRO_TYPE_TRIGGER_URL,
 							error, maxerrlen);
 				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_URL_NAME))
+				{
+					replace_to = zbx_strdup(replace_to, event->trigger.url_name);
+					substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, NULL, NULL, tz, &replace_to, MACRO_TYPE_TRIGGER_URL,
+							error, maxerrlen);
+				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
 				{
 					replace_to = zbx_dsprintf(replace_to, "%d", c_event->trigger.value);
@@ -3543,6 +3551,13 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.url);
+					substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, NULL, NULL, tz, &replace_to, MACRO_TYPE_TRIGGER_URL,
+							error, maxerrlen);
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_URL_NAME))
+				{
+					replace_to = zbx_strdup(replace_to, event->trigger.url_name);
 					substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, NULL, NULL, tz, &replace_to, MACRO_TYPE_TRIGGER_URL,
 							error, maxerrlen);
