@@ -240,7 +240,7 @@ class testFormGraph extends CLegacyWebTest {
 
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('name');
-		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 128);
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'autofocus');
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='name']", 'readonly');
