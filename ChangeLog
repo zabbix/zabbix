@@ -1,11 +1,17 @@
 Changes for 6.0.10rc1
 
 New features:
+.......PS. [ZBXNEXT-7816] added support of PostgreSQL 15 (vso)
+.......PS. [ZBXNEXT-7970] added support of TimescaleDB 2.8 (vso)
 .........T [ZBX-21672] fixed event source in mediatypes (egordymov)
 ..F....... [ZBXNEXT-7567] implemented saving the state of the default filters in monitoring sections (acikuns)
 A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 
 Bug fixes:
+..F....... [ZBX-20505] fixed subfilter counters displaying incorrect values in Monitoring => Graph view (rdetlavs)
+...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
+.........T [ZBX-21673] fixed read operations per second preprocessing in Ceph by Zabbix agent 2 template (drasihov)
+..F....... [ZBX-18478] fixed LDAP test button visibility in user authentication form (gcalenko)
 .........T [ZBX-21582] optimized HPE Synergy template to spread load across preprocessing workers (vkhaliev)
 ..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
 ..F....... [ZBX-21606] fixed "Allowed hosts" field in HTTP agent item (kkuzmina)
