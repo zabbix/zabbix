@@ -56,7 +56,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|PUMA metrics discovery |<p>Discovery of PUMA specific metrics when PUMA is used.</p> |HTTP_AGENT |gitlab.puma.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `puma_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
+|Puma metrics discovery |<p>Discovery Puma specific metrics, when Puma is used.</p> |HTTP_AGENT |gitlab.puma.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `puma_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
 |Unicorn metrics discovery |<p>DiscoveryUnicorn specific metrics, when Unicorn is used.</p> |HTTP_AGENT |gitlab.unicorn.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `unicorn_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
 
 ## Items collected

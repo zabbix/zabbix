@@ -1111,11 +1111,11 @@ zabbix_export:
       discovery_rules:
         -
           uuid: acd3e31daa8f497bb1ce0f91d104d928
-          name: 'PUMA metrics discovery'
+          name: 'Puma metrics discovery'
           type: HTTP_AGENT
           key: gitlab.puma.discovery
           delay: 3h
-          description: 'Discovery of PUMA specific metrics when PUMA is used.'
+          description: 'Discovery Puma specific metrics, when Puma is used.'
           item_prototypes:
             -
               uuid: 6b6ebfe9326247c8a57fb8c96125bcee
@@ -1460,11 +1460,11 @@ zabbix_export:
         -
           macro: '{$GITLAB.PUMA.QUEUE.MAX.WARN}'
           value: '1'
-          description: 'The maximum number of PUMA queued requests for a trigger expression.'
+          description: 'The maximum number of Puma queued requests for a trigger expression.'
         -
           macro: '{$GITLAB.PUMA.UTILIZATION.MAX.WARN}'
           value: '90'
-          description: 'The maximum percentage of PUMA thread utilization for a trigger expression.'
+          description: 'The maximum percentage of Puma thread utilization for a trigger expression.'
         -
           macro: '{$GITLAB.REDIS.FAIL.MAX.WARN}'
           value: '2'
