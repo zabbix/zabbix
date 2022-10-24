@@ -61,7 +61,8 @@
 		_edit(parameters = {}) {
 			const overlay = PopUp('popup.action.edit', parameters, {
 				dialogueid: 'action-edit',
-				dialogue_class: 'modal-popup-large'
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
