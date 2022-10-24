@@ -253,6 +253,7 @@ void	zbx_jsonobj_clear(zbx_jsonobj_t *obj)
 	{
 		zbx_free(obj->index->path);
 		zbx_hashset_destroy(&obj->index->objects);
+		zbx_free(obj->index);
 	}
 }
 
