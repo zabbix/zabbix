@@ -70,6 +70,7 @@ class CProblem extends CApiService {
 			'eventid_till'				=> null,
 			'acknowledged'				=> null,
 			'suppressed'				=> null,
+			'symptom'					=> null,
 			'recent'					=> null,
 			'any'						=> null,	// (internal) true if need not filtered by r_eventid
 			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
@@ -253,11 +254,16 @@ class CProblem extends CApiService {
 		// suppressed
 		if ($options['suppressed'] !== null) {
 			$sqlParts['where'][] = (!$options['suppressed'] ? 'NOT ' : '').
-					'EXISTS ('.
-						'SELECT NULL'.
-						' FROM event_suppress es'.
-						' WHERE es.eventid=p.eventid'.
-					')';
+				'EXISTS ('.
+					'SELECT NULL'.
+					' FROM event_suppress es'.
+					' WHERE es.eventid=p.eventid'.
+				')';
+		}
+
+		// symptom
+		if ($options['symptom'] !== null) {
+			$sqlParts['where'][] = 'p.cause_eventid IS '.($options['symptom'] ? 'NOT ' : '').' NULL';
 		}
 
 		// tags

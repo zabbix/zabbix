@@ -221,7 +221,7 @@ class CControllerItemMassCheckNow extends CController {
 
 			foreach ($itemids as $itemid) {
 				$create_tasks[] = [
-					'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
+					'type' => ZBX_TM_TASK_CHECK_NOW,
 					'request' => [
 						'itemid' => $itemid
 					]

@@ -734,3 +734,110 @@ function getTagString(array $tag, $tag_name_format = TAG_NAME_FULL) {
 			return $tag['tag'].(($tag['value'] === '') ? '' : ': '.$tag['value']);
 	}
 }
+
+/**
+ * Validate if the given events can change the rank. Returns true if rank if changeable otherwise return false.
+ * For example function returns false if source and destination is the same no matter if cause or symptom. Returns false
+ * in case the given event ID is already a symptom of the same cause. So no changes were made, no rank change is
+ * possible. Returns true when it changes an existing cause to symptom event, and symptom event to a cause event.
+ * Basically events switch places. Returns true if a cause is moved under another cause, the whole tree is moved
+ * with it.
+ *
+ * @param array  $eventids        Array of event IDs that should be converted to symptom events.
+ * @param string $cause_eventid   Event ID that will be the new cause ID for given $eventids.
+ *
+ * @return bool                   Returns true, if ranks of given events are allowed to change or false if not.
+ */
+function validateEventRankChangeToSymptom(array $eventids, string $cause_eventid): bool {
+	$eventids = array_fill_keys($eventids, true);
+	$all_eventids = $eventids;
+	$all_eventids[$cause_eventid] = true;
+
+	// First get all the events that were given in the request to check permissions.
+	$events = API::Event()->get([
+		'output' => ['eventid', 'cause_eventid'],
+		'eventids' => array_keys($all_eventids),
+		'preservekeys' => true
+	]);
+
+	if (count($events) != count($all_eventids)) {
+		// In case one of the events are missing, no rank change can occur.
+		return false;
+	}
+
+	if (count($eventids) == 1 && bccomp(key($eventids), $cause_eventid) == 0) {
+		// No matter if cause or symptom, source and destination cannot be the same.
+		return false;
+	}
+
+	// Get all affected symptom events. Validation has already been done.
+	$symptom_events = API::Event()->get([
+		'output' => ['eventid', 'cause_eventid'],
+		'filter' => ['cause_eventid' => array_keys($all_eventids)],
+		'preservekeys' => true,
+		'nopermissions' => true
+	]);
+
+	// Get full tree of cause and symptom events.
+	$all_events = $events + $symptom_events;
+	$src_tree = [];
+
+	foreach ($all_events as $event) {
+		if ($event['cause_eventid'] == 0) {
+			if (!array_key_exists($event['eventid'], $src_tree)) {
+				$src_tree[$event['eventid']] = [];
+			}
+		}
+		else {
+			$src_tree[$event['cause_eventid']][$event['eventid']] = true;
+		}
+	}
+
+	// Start building the destination event list.
+	$rank_eventids = $eventids;
+
+	// Add symptoms from other cause events in case they should all be moved.
+	foreach ($eventids as $eventid => $foo) {
+		if (array_key_exists($eventid, $src_tree)) {
+			foreach ($src_tree[$eventid] as $s_eventid => $foo) {
+				$rank_eventids[$s_eventid] = true;
+			}
+		}
+	}
+
+	foreach ($eventids as $eventid => $foo) {
+		if (array_key_exists($eventid, $src_tree) && !array_key_exists($eventid, $rank_eventids)) {
+			// Given symptom event is not in the destination list.
+			return false;
+		}
+
+		// Remove already existing symptoms from destination. They should be left untouched.
+		if (array_key_exists($cause_eventid, $src_tree) && array_key_exists($eventid, $src_tree[$cause_eventid])) {
+			unset($rank_eventids[$eventid]);
+		}
+	}
+
+	foreach ($src_tree as $eventid => $s_eventids) {
+		foreach ($s_eventids as $s_eventid => $foo) {
+			if (bccomp($s_eventid, $cause_eventid) == 0 && !array_key_exists($eventid, $rank_eventids)) {
+				// Given symptom event parent is not in the destination list.
+				return false;
+			}
+		}
+	}
+
+	if (array_key_exists($cause_eventid, $src_tree) && !array_diff_key($rank_eventids, $src_tree[$cause_eventid])) {
+		// No changes were made, the source and resulting destination is the same.
+		return false;
+	}
+
+	// Remove self from destination.
+	unset($rank_eventids[$cause_eventid]);
+
+	if (!$rank_eventids) {
+		// Nothing to change, all given symptoms are already symptoms on the destination.
+		return false;
+	}
+
+	return true;
+}
