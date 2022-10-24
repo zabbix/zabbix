@@ -575,3 +575,41 @@ int	zbx_is_hex_string(const char *str)
 
 	return SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate and optionally convert a string to a number of type      *
+ *         'int'                                                              *
+ *                                                                            *
+ * Parameters: str   - [IN] string to check                                   *
+ *             value - [OUT] output buffer where to write the converted value *
+ *                     (optional, can be NULL)                                *
+ *                                                                            *
+ * Return value:  SUCCEED - the string can be converted to 'int' and          *
+ *                          was converted if 'value' is not NULL              *
+ *                FAIL - the string does not represent a valid 'int' or       *
+ *                       its value is outside of valid range                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_is_int(const char *str, int *value)
+{
+	const char	*ptr;
+	zbx_uint32_t	value_ui32;
+	int		sign;
+
+	if ('-' == *(ptr = str))
+	{
+		ptr++;
+		sign = -1;
+	}
+	else
+		sign = 1;
+
+	if (SUCCEED != zbx_is_uint31(ptr, &value_ui32))
+		return FAIL;
+
+	if (NULL != value)
+		*value = ((int)value_ui32 * sign);
+
+	return SUCCEED;
+}

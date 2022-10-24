@@ -10,8 +10,8 @@ endif
 
 if AGENT
 AGENT_tests = \
-	process \
-	process_http \
+	zbx_execute_agent_check \
+	zbx_execute_agent_check_http \
 	check_key_access_rules
 endif
 
@@ -48,7 +48,6 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/proxypoller/libzbxproxypoller.a \
-	$(top_srcdir)/src/zabbix_server/selfmon/libzbxselfmon.a \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_srcdir)/src/zabbix_server/taskmanager/libzbxtaskmanager.a \
 	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
@@ -182,15 +181,15 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
-process_SOURCES = \
-	process.c \
+zbx_execute_agent_check_SOURCES = \
+	zbx_execute_agent_check.c \
 	../../zbxmocktest.h
 
-process_LDADD = $(COMMON_LIB_FILES) \
+zbx_execute_agent_check_LDADD = $(COMMON_LIB_FILES) \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a
 
-process_WRAP_FUNCS = \
+zbx_execute_agent_check_WRAP_FUNCS = \
 	-Wl,--wrap=SYSTEM_LOCALTIME \
 	-Wl,--wrap=VFS_FILE_SIZE \
 	-Wl,--wrap=VFS_FILE_TIME \
@@ -205,30 +204,30 @@ process_WRAP_FUNCS = \
 	-Wl,--wrap=NET_TCP_PORT \
 	-Wl,--wrap=SYSTEM_USERS_NUM
 
-process_LDADD += @AGENT_LIBS@
+zbx_execute_agent_check_LDADD += @AGENT_LIBS@
 
-process_LDFLAGS = @AGENT_LDFLAGS@ $(process_WRAP_FUNCS)
+zbx_execute_agent_check_LDFLAGS = @AGENT_LDFLAGS@ $(zbx_execute_agent_check_WRAP_FUNCS)
 
-process_CFLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests
+zbx_execute_agent_check_CFLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests
 
-# process_http
+# zbx_execute_agent_check_http
 
-process_http_SOURCES = \
-	process_http.c \
+zbx_execute_agent_check_http_SOURCES = \
+	zbx_execute_agent_check_http.c \
 	../../zbxmocktest.h
 
-process_http_LDADD = $(COMMON_LIB_FILES)
+zbx_execute_agent_check_http_LDADD = $(COMMON_LIB_FILES)
 
-process_http_WRAP_FUNCS = \
+zbx_execute_agent_check_http_WRAP_FUNCS = \
 	-Wl,--wrap=WEB_PAGE_GET \
 	-Wl,--wrap=WEB_PAGE_PERF \
 	-Wl,--wrap=WEB_PAGE_REGEXP
 
-process_http_LDADD += @AGENT_LIBS@
+zbx_execute_agent_check_http_LDADD += @AGENT_LIBS@
 
-process_http_LDFLAGS = @AGENT_LDFLAGS@
+zbx_execute_agent_check_http_LDFLAGS = @AGENT_LDFLAGS@
 
-process_http_CFLAGS = $(process_http_WRAP_FUNCS) -I@top_srcdir@/tests
+zbx_execute_agent_check_http_CFLAGS = $(zbx_execute_agent_check_http_WRAP_FUNCS) -I@top_srcdir@/tests
 
 # check_key_access_rules
 

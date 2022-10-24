@@ -24,9 +24,7 @@
 #include "log.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
+#include "zbx_rtc_constants.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
@@ -50,9 +48,9 @@ static void	process_listener(zbx_socket_t *s)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", s->buffer);
 
-		init_result(&result);
+		zbx_init_agent_result(&result);
 
-		if (SUCCEED == process(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result))
+		if (SUCCEED == zbx_execute_agent_check(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result))
 		{
 			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
 			{
@@ -90,7 +88,7 @@ static void	process_listener(zbx_socket_t *s)
 			}
 		}
 
-		free_result(&result);
+		zbx_free_agent_result(&result);
 	}
 
 	if (FAIL == ret)
@@ -113,14 +111,11 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	int				ret;
 	zbx_socket_t			s;
 	zbx_thread_listener_args	*init_child_args_in;
-
-	assert(args);
-	assert(((zbx_thread_args_t *)args)->args);
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	init_child_args_in = (zbx_thread_listener_args *)((((zbx_thread_args_t *)args))->args);
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(init_child_args_in->zbx_get_program_type_cb_arg()),

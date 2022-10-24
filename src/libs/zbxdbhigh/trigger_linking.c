@@ -47,6 +47,7 @@ typedef struct
 	unsigned char	priority;
 	char		*comments;
 	char		*url;
+	char		*url_name;
 	char		*correlation_tag;
 	unsigned char	status;
 	unsigned char	type;
@@ -90,6 +91,8 @@ typedef struct
 	char		*comments;
 	char		*url_orig;
 	char		*url;
+	char		*url_name_orig;
+	char		*url_name;
 	unsigned char	status_orig;
 	unsigned char	status;
 	unsigned char	type_orig;
@@ -109,6 +112,7 @@ typedef struct
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE		__UINT64_C(0x00000400)
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID		__UINT64_C(0x00000800)
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE_STATUS		__UINT64_C(0x00001000)
+#define ZBX_FLAG_LINK_TRIGGER_UPDATE_URL_NAME		__UINT64_C(0x00002000)
 
 #define ZBX_FLAG_LINK_TRIGGER_UPDATE									\
 	(ZBX_FLAG_LINK_TRIGGER_UPDATE_RECOVERY_MODE | ZBX_FLAG_LINK_TRIGGER_UPDATE_CORRELATION_MODE |	\
@@ -117,7 +121,7 @@ typedef struct
 	ZBX_FLAG_LINK_TRIGGER_UPDATE_EVENT_NAME | ZBX_FLAG_LINK_TRIGGER_UPDATE_PRIORITY |		\
 	ZBX_FLAG_LINK_TRIGGER_UPDATE_COMMENTS | ZBX_FLAG_LINK_TRIGGER_UPDATE_URL |			\
 	ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE | ZBX_FLAG_LINK_TRIGGER_UPDATE_TEMPLATEID |			\
-	ZBX_FLAG_LINK_TRIGGER_UPDATE_STATUS)
+	ZBX_FLAG_LINK_TRIGGER_UPDATE_STATUS | ZBX_FLAG_LINK_TRIGGER_UPDATE_URL_NAME)
 
 	zbx_uint64_t	update_flags;
 }
@@ -180,6 +184,11 @@ static void	zbx_host_triggers_main_data_clean(zbx_hashset_t *h)
 
 		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_URL))
 			zbx_free(trigger_entry->url);
+
+		zbx_free(trigger_entry->url_name_orig);
+
+		if (0 != (trigger_entry->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_URL_NAME))
+			zbx_free(trigger_entry->url_name);
 
 	}
 
@@ -665,7 +674,7 @@ static int	get_templates_triggers_data(zbx_uint64_t hostid, const zbx_vector_uin
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select t.triggerid,t.description,t.expression,t.status,"
-				"t.type,t.priority,t.comments,t.url,t.flags,t.recovery_expression,t.recovery_mode,"
+				"t.type,t.priority,t.comments,t.url,t.url_name,t.flags,t.recovery_expression,t.recovery_mode,"
 				"t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,t.discover,t.event_name"
 			" from triggers t"
 			" where t.triggerid in (select distinct tg.triggerid"
@@ -689,21 +698,22 @@ static int	get_templates_triggers_data(zbx_uint64_t hostid, const zbx_vector_uin
 		ZBX_STR2UINT64(trigger_copy->triggerid, row[0]);
 		trigger_copy->description = zbx_strdup(NULL, row[1]);
 		trigger_copy->expression = zbx_strdup(NULL, row[2]);
-		trigger_copy->recovery_expression = zbx_strdup(NULL, row[9]);
+		trigger_copy->recovery_expression = zbx_strdup(NULL, row[10]);
 		trigger_copy->templateid = trigger_copy->triggerid;
-		trigger_copy->flags = (unsigned char)atoi(row[8]);
+		trigger_copy->flags = (unsigned char)atoi(row[9]);
 
-		trigger_copy->recovery_mode = (unsigned char)atoi(row[10]);
-		trigger_copy->correlation_tag = zbx_strdup(NULL, row[12]);
-		trigger_copy->manual_close = (unsigned char)atoi(row[13]);
-		trigger_copy->opdata = zbx_strdup(NULL, row[14]);
-		trigger_copy->discover = (unsigned char)atoi(row[15]);
-		trigger_copy->event_name = zbx_strdup(NULL, row[16]);
+		trigger_copy->recovery_mode = (unsigned char)atoi(row[11]);
+		trigger_copy->correlation_tag = zbx_strdup(NULL, row[13]);
+		trigger_copy->manual_close = (unsigned char)atoi(row[14]);
+		trigger_copy->opdata = zbx_strdup(NULL, row[15]);
+		trigger_copy->discover = (unsigned char)atoi(row[16]);
+		trigger_copy->event_name = zbx_strdup(NULL, row[17]);
 
 		trigger_copy->priority = (unsigned char)atoi(row[5]);
 		trigger_copy->comments = zbx_strdup(NULL, row[6]);
 		trigger_copy->url = zbx_strdup(NULL, row[7]);
-		trigger_copy->correlation_mode = (unsigned char)atoi(row[11]);
+		trigger_copy->url_name = zbx_strdup(NULL, row[8]);
+		trigger_copy->correlation_mode = (unsigned char)atoi(row[12]);
 		trigger_copy->status = (unsigned char)atoi(row[3]);
 		trigger_copy->type = (unsigned char)atoi(row[4]);
 
@@ -737,7 +747,7 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 		"select t.triggerid,t.description,t.expression,t.recovery_expression"
 			",t.flags,t.recovery_mode,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata"
-			",t.discover,t.event_name,t.priority,t.comments,t.url,t.templateid,t.type,t.status"
+			",t.discover,t.event_name,t.priority,t.comments,t.url,t.url_name,t.templateid,t.type,t.status"
 		" from triggers t"
 		" where t.triggerid in (select distinct tg.triggerid"
 			" from triggers tg,functions f,items i"
@@ -769,7 +779,7 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 		target_host_trigger_entry.description = zbx_strdup(NULL, row[1]);
 		target_host_trigger_entry.expression = zbx_strdup(NULL, row[2]);
 		target_host_trigger_entry.recovery_expression = zbx_strdup(NULL, row[3]);
-		ZBX_DBROW2UINT64(target_host_trigger_entry.templateid_orig, row[15]);
+		ZBX_DBROW2UINT64(target_host_trigger_entry.templateid_orig, row[16]);
 		target_host_trigger_entry.templateid = 0;
 		ZBX_STR2UINT64(target_host_trigger_entry.flags, row[4]);
 
@@ -793,9 +803,11 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 		target_host_trigger_entry.comments = NULL;
 		target_host_trigger_entry.url_orig = zbx_strdup(NULL, row[14]);
 		target_host_trigger_entry.url = NULL;
-		ZBX_STR2UCHAR(target_host_trigger_entry.type_orig, row[16]);
+		target_host_trigger_entry.url_name_orig = zbx_strdup(NULL, row[15]);
+		target_host_trigger_entry.url_name = NULL;
+		ZBX_STR2UCHAR(target_host_trigger_entry.type_orig, row[17]);
 		target_host_trigger_entry.type = 0;
-		ZBX_STR2UCHAR(target_host_trigger_entry.status_orig, row[17]);
+		ZBX_STR2UCHAR(target_host_trigger_entry.status_orig, row[18]);
 		target_host_trigger_entry.status = 0;
 
 		zbx_hashset_insert(zbx_host_triggers_main_data, &target_host_trigger_entry,
@@ -954,6 +966,12 @@ static void	mark_updates_for_host_trigger(zbx_trigger_copy_t *trigger_copy,
 		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_URL;
 	}
 
+	if (0 != strcmp(trigger_copy->url_name, main_found->url_name_orig))
+	{
+		main_found->url_name = zbx_strdup(NULL, trigger_copy->url_name);
+		main_found->update_flags |= ZBX_FLAG_LINK_TRIGGER_UPDATE_URL_NAME;
+	}
+
 	if (trigger_copy->type != main_found->type_orig)
 	{
 		main_found->type = trigger_copy->type;
@@ -1109,6 +1127,19 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 						(int)found->flags, found->url_orig, found->url);
 			}
 
+			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_URL_NAME))
+			{
+				char	*url_name_esc = DBdyn_escape_string(found->url_name);
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%surl_name='%s'", d,
+						url_name_esc);
+				d = ",";
+				zbx_free(url_name_esc);
+
+				zbx_audit_trigger_update_json_update_url_name(found->triggerid,
+						(int)found->flags, found->url_name_orig, found->url_name);
+			}
+
 			if (0 != (found->update_flags & ZBX_FLAG_LINK_TRIGGER_UPDATE_TYPE))
 			{
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stype='%d'", d,
@@ -1209,8 +1240,8 @@ static int	get_funcs_for_insert(zbx_uint64_t hostid, zbx_vector_uint64_t *insert
 				zbx_vector_uint64_append(&(found->itemids), itemid);
 				zbx_vector_str_append(&(found->functionids), zbx_strdup(NULL, row[1]));
 				zbx_vector_str_append(&(found->itemkeys), zbx_strdup(NULL, row[4]));
-				zbx_vector_str_append(&(found->names), DBdyn_escape_string(row[2]));
-				zbx_vector_str_append(&(found->parameters), DBdyn_escape_string(row[3]));
+				zbx_vector_str_append(&(found->names), zbx_strdup(NULL, row[2]));
+				zbx_vector_str_append(&(found->parameters), zbx_strdup(NULL, row[3]));
 			}
 			else
 			{
@@ -1225,8 +1256,8 @@ static int	get_funcs_for_insert(zbx_uint64_t hostid, zbx_vector_uint64_t *insert
 				zbx_vector_uint64_append(&(local_temp_t.itemids), itemid);
 				zbx_vector_str_append(&(local_temp_t.functionids), zbx_strdup(NULL, row[1]));
 				zbx_vector_str_append(&(local_temp_t.itemkeys), zbx_strdup(NULL, row[4]));
-				zbx_vector_str_append(&(local_temp_t.names), DBdyn_escape_string(row[2]));
-				zbx_vector_str_append(&(local_temp_t.parameters), DBdyn_escape_string(row[3]));
+				zbx_vector_str_append(&(local_temp_t.names),zbx_strdup(NULL, row[2]));
+				zbx_vector_str_append(&(local_temp_t.parameters), zbx_strdup(NULL, row[3]));
 
 				local_temp_t.triggerid = temp_t.triggerid;
 
@@ -1264,7 +1295,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 			&sql_update_triggers_expr_offset);
 
 	zbx_db_insert_prepare(&db_insert, "triggers", "triggerid", "description", "priority", "status", "comments",
-			"url", "type", "value", "state", "templateid", "flags", "recovery_mode", "correlation_mode",
+			"url", "url_name", "type", "value", "state", "templateid", "flags", "recovery_mode", "correlation_mode",
 			"correlation_tag", "manual_close", "opdata", "discover", "event_name", NULL);
 
 	zbx_db_insert_prepare(&db_insert_funcs, "functions", "functionid", "itemid", "triggerid", "name",
@@ -1280,12 +1311,12 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 		zbx_db_insert_add_values(&db_insert, triggerid, trigger_copy_template->description,
 				(int)trigger_copy_template->priority, (int)trigger_copy_template->status,
 				trigger_copy_template->comments, trigger_copy_template->url,
-				(int)trigger_copy_template->type, TRIGGER_VALUE_OK, TRIGGER_STATE_NORMAL,
-				trigger_copy_template->templateid, (int)trigger_copy_template->flags,
-				(int)trigger_copy_template->recovery_mode, (int)trigger_copy_template->correlation_mode,
-				trigger_copy_template->correlation_tag, (int)trigger_copy_template->manual_close,
-				trigger_copy_template->opdata, trigger_copy_template->discover,
-				trigger_copy_template->event_name);
+				trigger_copy_template->url_name, (int)trigger_copy_template->type, TRIGGER_VALUE_OK,
+				TRIGGER_STATE_NORMAL, trigger_copy_template->templateid,
+				(int)trigger_copy_template->flags, (int)trigger_copy_template->recovery_mode,
+				(int)trigger_copy_template->correlation_mode, trigger_copy_template->correlation_tag,
+				(int)trigger_copy_template->manual_close, trigger_copy_template->opdata,
+				trigger_copy_template->discover, trigger_copy_template->event_name);
 
 		zbx_vector_uint64_append(new_triggerids, triggerid);
 
@@ -1295,10 +1326,11 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 				trigger_copy_template->recovery_mode, trigger_copy_template->status,
 				trigger_copy_template->type, TRIGGER_VALUE_OK, TRIGGER_STATE_NORMAL,
 				trigger_copy_template->priority, trigger_copy_template->comments,
-				trigger_copy_template->url, trigger_copy_template->flags,
-				trigger_copy_template->correlation_mode, trigger_copy_template->correlation_tag,
-				trigger_copy_template->manual_close, trigger_copy_template->opdata,
-				trigger_copy_template->discover, trigger_copy_template->event_name);
+				trigger_copy_template->url, trigger_copy_template->url_name,
+				trigger_copy_template->flags, trigger_copy_template->correlation_mode,
+				trigger_copy_template->correlation_tag, trigger_copy_template->manual_close,
+				trigger_copy_template->opdata, trigger_copy_template->discover,
+				trigger_copy_template->event_name);
 
 		triggerid++;
 	}
@@ -1492,6 +1524,7 @@ static void	process_triggers(zbx_trigger_copy_t *trigger_copy_template, zbx_hash
 		trigger_copy_insert->priority = trigger_copy_template->priority;
 		trigger_copy_insert->comments =  zbx_strdup(NULL, trigger_copy_template->comments);
 		trigger_copy_insert->url = zbx_strdup(NULL, trigger_copy_template->url);
+		trigger_copy_insert->url_name = zbx_strdup(NULL, trigger_copy_template->url_name);
 		trigger_copy_insert->correlation_tag = zbx_strdup(NULL, trigger_copy_template->correlation_tag);
 		trigger_copy_insert->status = trigger_copy_template->status;
 		trigger_copy_insert->type = trigger_copy_template->type;
@@ -1505,6 +1538,7 @@ static void	trigger_copies_free(zbx_trigger_copy_t *trigger_copy)
 {
 	zbx_free(trigger_copy->comments);
 	zbx_free(trigger_copy->url);
+	zbx_free(trigger_copy->url_name);
 	zbx_free(trigger_copy->expression);
 	zbx_free(trigger_copy->recovery_expression);
 	zbx_free(trigger_copy->event_name);

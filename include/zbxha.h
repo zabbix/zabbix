@@ -20,6 +20,8 @@
 #ifndef ZABBIX_ZBXHA_H
 #define ZABBIX_ZBXHA_H
 
+#include "zbx_rtc_constants.h"
+
 #define ZBX_IPC_SERVICE_HA	"haservice"
 
 #define ZBX_IPC_SERVICE_HA_PAUSE		1
@@ -48,8 +50,6 @@
 #define ZBX_NODE_STATUS_ACTIVE		3
 
 #define ZBX_HA_DEFAULT_FAILOVER_DELAY	SEC_PER_MIN
-
-#define ZBX_HA_IS_CLUSTER()	(NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
 
 int	zbx_ha_get_nodes(char **nodes, char **error);
 int	zbx_ha_remove_node(const char *node, char **result, char **error);

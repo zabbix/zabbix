@@ -289,6 +289,7 @@ $fields = [
 	'subfilter_trends' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_tags' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'checkbox_hash' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'backurl' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>						[T_ZBX_STR, O_OPT, P_SYS,
 										IN('"delay","history","key_","name","status","trends","type"'),
@@ -506,6 +507,11 @@ if (hasRequest('preprocessing')) {
 		}
 	}
 	unset($step);
+}
+
+// Validate backurl.
+if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
+	access_deny();
 }
 
 /*
@@ -737,15 +743,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if ($db_item['logtimefmt'] !== getRequest('logtimefmt', '')) {
 						$item['logtimefmt'] = getRequest('logtimefmt', '');
 					}
-					if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
-						$item['interfaceid'] = getRequest('interfaceid', 0);
-					}
 					if ($db_item['params'] !== getRequest('params', '')) {
 						$item['params'] = getRequest('params', '');
 					}
 					if ($db_item['preprocessing'] !== $preprocessing) {
 						$item['preprocessing'] = $preprocessing;
 					}
+				}
+
+				if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
+					$item['interfaceid'] = getRequest('interfaceid', 0);
 				}
 
 				if ($db_item['delay'] != $delay) {
@@ -891,6 +898,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
 		uncheckTableRows(getRequest('checkbox_hash'));
+
+		if (hasRequest('backurl')) {
+			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response->redirect();
+		}
 	}
 }
 // cleaning history for one item

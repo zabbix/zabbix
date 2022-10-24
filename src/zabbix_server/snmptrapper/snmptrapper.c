@@ -37,9 +37,7 @@ static char	*buffer = NULL;
 static int	offset = 0;
 static int	force = 0;
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static void	DBget_lastsize(void)
 {
@@ -104,7 +102,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	for (i = 0; i < num; i++)
 	{
-		init_result(&results[i]);
+		zbx_init_agent_result(&results[i]);
 		errcodes[i] = FAIL;
 
 		items[i].key = zbx_strdup(items[i].key, items[i].key_orig);
@@ -122,9 +120,9 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 			continue;
 		}
 
-		init_request(&request);
+		zbx_init_agent_request(&request);
 
-		if (SUCCEED != parse_item_key(items[i].key, &request))
+		if (SUCCEED != zbx_parse_item_key(items[i].key, &request))
 			goto next;
 
 		if (0 != strcmp(get_rkey(&request), "snmptrap"))
@@ -163,17 +161,17 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		}
 
 		value_type = (ITEM_VALUE_TYPE_LOG == items[i].value_type ? ITEM_VALUE_TYPE_LOG : ITEM_VALUE_TYPE_TEXT);
-		set_result_type(&results[i], value_type, trap);
+		zbx_set_agent_result_type(&results[i], value_type, trap);
 		errcodes[i] = SUCCEED;
 		ret = SUCCEED;
 next:
-		free_request(&request);
+		zbx_free_agent_request(&request);
 	}
 
 	if (FAIL == ret && -1 != fb)
 	{
 		value_type = (ITEM_VALUE_TYPE_LOG == items[fb].value_type ? ITEM_VALUE_TYPE_LOG : ITEM_VALUE_TYPE_TEXT);
-		set_result_type(&results[fb], value_type, trap);
+		zbx_set_agent_result_type(&results[fb], value_type, trap);
 		errcodes[fb] = SUCCEED;
 		ret = SUCCEED;
 	}
@@ -207,7 +205,7 @@ next:
 		}
 
 		zbx_free(items[i].key);
-		free_result(&results[i]);
+		zbx_free_agent_result(&results[i]);
 	}
 
 	zbx_free(results);
@@ -589,18 +587,18 @@ static int	get_latest_data(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 {
-	double	sec;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	double			sec;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trapfile:'%s'", __func__, CONFIG_SNMPTRAP_FILE);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
@@ -625,7 +623,7 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 		zbx_setproctitle("%s [processed data in " ZBX_FS_DBL " sec, idle 1 sec]",
 				get_process_type_string(process_type), sec);
 
-		zbx_sleep_loop(1);
+		zbx_sleep_loop(info, 1);
 	}
 
 	zbx_free(buffer);

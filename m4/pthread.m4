@@ -12,18 +12,15 @@
 
 AC_DEFUN([LIBPTHREAD_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <pthread.h>
-],
-[
+]], [[
 	pthread_mutexattr_t	mta;
 	pthread_mutex_t		mutex;
 
 	pthread_mutexattr_init(&mta);
 	pthread_mutex_init(&mutex, &mta);
-],
-found_libpthread="yes")
+]])],[found_libpthread="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBPTHREAD_TRY_RUN],
@@ -73,7 +70,7 @@ AC_DEFUN([LIBPTHREAD_CHECK_CONFIG],
 [
 	AC_ARG_WITH([libpthread],[
 If you want to specify pthread installation directories:
-AC_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base install directory (DIR), default is to search through a number of common places for the libpthread files.])],
+AS_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base install directory (DIR), default is to search through a number of common places for the libpthread files.])],
 		[
 			test "x$withval" = "xyes" && withval=/usr
 			LIBPTHREAD_CFLAGS="-I$withval/include"
@@ -83,7 +80,7 @@ AC_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base 
 	)
 
 	AC_ARG_WITH([libpthread-include],
-		AC_HELP_STRING([--with-libpthread-include@<:@=DIR@:>@],
+		AS_HELP_STRING([--with-libpthread-include@<:@=DIR@:>@],
 			[use libpthread include headers from given path.]
 		),
 		[
@@ -93,7 +90,7 @@ AC_HELP_STRING([--with-libpthread@<:@=DIR@:>@], [use libpthread from given base 
 	)
 
 	AC_ARG_WITH([libpthread-lib],
-		AC_HELP_STRING([--with-libpthread-lib@<:@=DIR@:>@],
+		AS_HELP_STRING([--with-libpthread-lib@<:@=DIR@:>@],
 			[use libpthread libraries from given path.]
 		),
 		[

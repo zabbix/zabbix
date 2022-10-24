@@ -875,7 +875,7 @@ class testScripts extends CAPITest {
 
 			// script.delete
 			[
-				// IPMI tpye script with action scope that does not have action.
+				// IPMI type script with action scope that does not have action.
 				'name' => 'API test script.delete - single allowed',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
@@ -908,7 +908,7 @@ class testScripts extends CAPITest {
 				]
 			],
 			[
-				// IPMI tpye script with action scope that has action attached.
+				// IPMI type script with action scope that has action attached.
 				'name' => 'API test script.delete - not allowed due to action',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
@@ -3453,7 +3453,7 @@ class testScripts extends CAPITest {
 	 */
 	public static function getScriptGetInvalid() {
 		return [
-			// Check exepected params.
+			// Check expected params.
 			'Test script.get unexpected field' => [
 				'request' => [
 					'abc' => 'abc'
@@ -3546,26 +3546,6 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/filter": unexpected parameter "username".'
 			],
 
-			// Check "scriptid" in filter.
-			'Test script.get invalid parameter "scriptid" in filter (empty string)' => [
-				'request' => [
-					'filter' => [
-						'scriptid' => ''
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/scriptid": an array is expected.'
-			],
-			'Test script.get invalid parameter "scriptid" in filter (array)' => [
-				'request' => [
-					'filter' => [
-						'scriptid' => ['']
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/scriptid/1": a number is expected.'
-			],
-
 			// Check "name" in filter.
 			'Test script.get invalid parameter "name" in filter (bool)' => [
 				'request' => [
@@ -3588,66 +3568,6 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/filter/command": an array is expected.'
 			],
 
-			// Check "host_access" in filter.
-			'Test script.get invalid parameter "host_access" in filter (string)' => [
-				'request' => [
-					'filter' => [
-						'host_access' => 'abc'
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/host_access": an array is expected.'
-			],
-			'Test script.get invalid parameter "host_access" in filter (array)' => [
-				'request' => [
-					'filter' => [
-						'host_access' => ['abc']
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/host_access/1": an integer is expected.'
-			],
-
-			// Check "usrgrpid" in filter.
-			'Test script.get invalid parameter "usrgrpid" in filter (empty string)' => [
-				'request' => [
-					'filter' => [
-						'usrgrpid' => ''
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/usrgrpid": an array is expected.'
-			],
-			'Test script.get invalid parameter "usrgrpid" in filter (array)' => [
-				'request' => [
-					'filter' => [
-						'usrgrpid' => ['']
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/usrgrpid/1": a number is expected.'
-			],
-
-			// Check "groupid" in filter.
-			'Test script.get invalid parameter "groupid" in filter (empty string)' => [
-				'request' => [
-					'filter' => [
-						'groupid' => ''
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/groupid": an array is expected.'
-			],
-			'Test script.get invalid parameter "groupid" in filter (array)' => [
-				'request' => [
-					'filter' => [
-						'groupid' => ['']
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/groupid/1": a number is expected.'
-			],
-
 			// Check "confirmation" in filter.
 			'Test script.get invalid parameter "confirmation" in filter (bool)' => [
 				'request' => [
@@ -3659,38 +3579,6 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/filter/confirmation": an array is expected.'
 			],
 
-			// Check "type" in filter.
-			'Test script.get invalid parameter "type" in filter (string)' => [
-				'request' => [
-					'filter' => [
-						'type' => 'abc'
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/type": an array is expected.'
-			],
-			'Test script.get invalid parameter "type" in filter (array)' => [
-				'request' => [
-					'filter' => [
-						'type' => ['abc']
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/type/1": an integer is expected.'
-			],
-			'Test script.get invalid parameter "type" in filter' => [
-				'request' => [
-					'filter' => [
-						'type' => 999999
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/type/1": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
-						ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_WEBHOOK, ZBX_SCRIPT_TYPE_URL
-					]).'.'
-			],
-
 			// Check "url" in filter.
 			'Test script.get invalid parameter "url" in filter (bool)' => [
 				'request' => [
@@ -3700,98 +3588,6 @@ class testScripts extends CAPITest {
 				],
 				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/filter/url": an array is expected.'
-			],
-
-			// Check "new_window" in filter.
-			'Test script.get invalid parameter "new_window" in filter (string)' => [
-				'request' => [
-					'filter' => [
-						'new_window' => 'abc'
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/new_window": an array is expected.'
-			],
-			'Test script.get invalid parameter "new_window" in filter (array)' => [
-				'request' => [
-					'filter' => [
-						'new_window' => ['abc']
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/new_window/1": an integer is expected.'
-			],
-			'Test script.get invalid parameter "new_window" in filter' => [
-				'request' => [
-					'filter' => [
-						'new_window' => 999999
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/new_window/1": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES]).'.'
-			],
-
-			// Check "execute_on" in filter.
-			'Test script.get invalid parameter "execute_on" in filter (string)' => [
-				'request' => [
-					'filter' => [
-						'execute_on' => 'abc'
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/execute_on": an array is expected.'
-			],
-			'Test script.get invalid parameter "execute_on" in filter (array)' => [
-				'request' => [
-					'filter' => [
-						'execute_on' => ['abc']
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/execute_on/1": an integer is expected.'
-			],
-			'Test script.get invalid parameter "execute_on" in filter' => [
-				'request' => [
-					'filter' => [
-						'execute_on' => 999999
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/execute_on/1": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_EXECUTE_ON_AGENT, ZBX_SCRIPT_EXECUTE_ON_SERVER,
-						ZBX_SCRIPT_EXECUTE_ON_PROXY
-					]).'.'
-			],
-
-			// Check "scope" in filter.
-			'Test script.get invalid parameter "scope" in filter (string)' => [
-				'request' => [
-					'filter' => [
-						'scope' => 'abc'
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/scope": an array is expected.'
-			],
-			'Test script.get invalid parameter "scope" in filter (array)' => [
-				'request' => [
-					'filter' => [
-						'scope' => ['abc']
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/scope/1": an integer is expected.'
-			],
-			'Test script.get invalid parameter "scope" in filter' => [
-				'request' => [
-					'filter' => [
-						'scope' => 999999
-					]
-				],
-				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/filter/scope/1": value must be one of '.
-					implode(', ', [ZBX_SCRIPT_SCOPE_ACTION, ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]).'.'
 			],
 
 			// Check "menu_path" in filter.
@@ -3825,7 +3621,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search": unexpected parameter "scriptid".'
 			],
 
-			// Check "name" in seach.
+			// Check "name" in search.
 			'Test script.get invalid parameter "name" in search (bool)' => [
 				'request' => [
 					'search' => [
@@ -3836,7 +3632,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search/name": an array is expected.'
 			],
 
-			// Check "command" in seach.
+			// Check "command" in search.
 			'Test script.get invalid parameter "command" in search (bool)' => [
 				'request' => [
 					'search' => [
@@ -3847,7 +3643,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search/command": an array is expected.'
 			],
 
-			// Check "url" in seach.
+			// Check "url" in search.
 			'Test script.get invalid parameter "url" in search (bool)' => [
 				'request' => [
 					'search' => [
@@ -3858,7 +3654,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search/url": an array is expected.'
 			],
 
-			// Check "description" in seach.
+			// Check "description" in search.
 			'Test script.get invalid parameter "description" in search (bool)' => [
 				'request' => [
 					'search' => [
@@ -3869,7 +3665,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search/description": an array is expected.'
 			],
 
-			// Check "confirmation" in seach.
+			// Check "confirmation" in search.
 			'Test script.get invalid parameter "confirmation" in search (bool)' => [
 				'request' => [
 					'search' => [
@@ -3880,7 +3676,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search/confirmation": an array is expected.'
 			],
 
-			// Check "username" in seach.
+			// Check "username" in search.
 			'Test script.get invalid parameter "username" in search (bool)' => [
 				'request' => [
 					'search' => [
@@ -3891,7 +3687,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search/username": an array is expected.'
 			],
 
-			// Check "menu_path" in seach.
+			// Check "menu_path" in search.
 			'Test script.get invalid parameter "menu_path" in search (bool)' => [
 				'request' => [
 					'search' => [
@@ -4155,6 +3951,202 @@ class testScripts extends CAPITest {
 						'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}'
 					]
 				],
+				'expected_error' => null
+			],
+
+			// Check "scriptid" in filter.
+			'Test script.get invalid parameter "scriptid" in filter (empty string)' => [
+				'request' => [
+					'filter' => [
+						'scriptid' => ''
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+			'Test script.get invalid parameter "scriptid" in filter (array)' => [
+				'request' => [
+					'filter' => [
+						'scriptid' => ['']
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+
+			// Check "host_access" in filter.
+			'Test script.get invalid parameter "host_access" in filter (string)' => [
+				'request' => [
+					'filter' => [
+						'host_access' => 'abc'
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+			'Test script.get invalid parameter "host_access" in filter (array)' => [
+				'request' => [
+					'filter' => [
+						'host_access' => ['abc']
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+
+			// Check "usrgrpid" in filter.
+			'Test script.get invalid parameter "usrgrpid" in filter (empty string)' => [
+				'request' => [
+					'filter' => [
+						'usrgrpid' => ''
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+			'Test script.get invalid parameter "usrgrpid" in filter (array)' => [
+				'request' => [
+					'filter' => [
+						'usrgrpid' => ['']
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+
+			// Check "groupid" in filter.
+			'Test script.get invalid parameter "groupid" in filter (empty string)' => [
+				'request' => [
+					'filter' => [
+						'groupid' => ''
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+			'Test script.get invalid parameter "groupid" in filter (array)' => [
+				'request' => [
+					'filter' => [
+						'groupid' => ['']
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+
+			// Check "type" in filter.
+			'Test script.get invalid parameter "type" in filter (string)' => [
+				'request' => [
+					'filter' => [
+						'type' => 'abc'
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+			'Test script.get invalid parameter "type" in filter (array)' => [
+				'request' => [
+					'filter' => [
+						'type' => ['abc']
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+			'Test script.get invalid parameter "type" in filter' => [
+				'request' => [
+					'filter' => [
+						'type' => 999999
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+
+			// Check "new_window" in filter.
+			'Test script.get invalid parameter "new_window" in filter (string)' => [
+				'request' => [
+					'filter' => [
+						'new_window' => 'abc'
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+			'Test script.get invalid parameter "new_window" in filter (array)' => [
+				'request' => [
+					'filter' => [
+						'new_window' => ['abc']
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+			'Test script.get invalid parameter "new_window" in filter' => [
+				'request' => [
+					'filter' => [
+						'new_window' => 999999
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+
+			// Check "execute_on" in filter.
+			'Test script.get invalid parameter "execute_on" in filter (string)' => [
+				'request' => [
+					'filter' => [
+						'execute_on' => 'abc'
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+			'Test script.get invalid parameter "execute_on" in filter (array)' => [
+				'request' => [
+					'filter' => [
+						'execute_on' => ['abc']
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+			'Test script.get invalid parameter "execute_on" in filter' => [
+				'request' => [
+					'filter' => [
+						'execute_on' => 999999
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+
+			// Check "scope" in filter.
+			'Test script.get invalid parameter "scope" in filter (string)' => [
+				'request' => [
+					'filter' => [
+						'scope' => 'abc'
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+			'Test script.get invalid parameter "scope" in filter (array)' => [
+				'request' => [
+					'filter' => [
+						'scope' => ['abc']
+					]
+				],
+				'expected_results' => [],
+				'expected_error' => null
+			],
+			'Test script.get invalid parameter "scope" in filter' => [
+				'request' => [
+					'filter' => [
+						'scope' => 999999
+					]
+				],
+				'expected_results' => [],
 				'expected_error' => null
 			]
 		];
@@ -6478,7 +6470,7 @@ class testScripts extends CAPITest {
 								}
 							}
 							else {
-								// Chekc that parameters remain the same. Order is not important.
+								// Check that parameters remain the same. Order is not important.
 								$this->assertEqualsCanonicalizing($db_script['parameters'], $script_upd['parameters']);
 							}
 							break;

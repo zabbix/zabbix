@@ -46,9 +46,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxsysinfo.h"
-
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
+#include "zbx_rtc_constants.h"
 
 /******************************************************************************
  *                                                                            *
@@ -279,9 +277,9 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_free_result_ptr(AGENT_RESULT *result)
+void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 {
-	free_result(result);
+	zbx_free_agent_result(result);
 	zbx_free(result);
 }
 
@@ -447,7 +445,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 
 	for (i = 0; i < num; i++)
 	{
-		init_result(&results[i]);
+		zbx_init_agent_result(&results[i]);
 		errcodes[i] = SUCCEED;
 
 		if (MACRO_EXPAND_YES == expand_macros)
@@ -789,7 +787,7 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
 				break;
 		}
 
-		free_result(&results[i]);
+		zbx_free_agent_result(&results[i]);
 	}
 }
 
@@ -929,7 +927,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zbx_preprocessor_flush();
 	zbx_clean_items(items, num, results);
 	DCconfig_clean_items(items, NULL, num);
-	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_result_ptr);
+	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_agent_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
 
 	if (NULL != data)
@@ -955,20 +953,21 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	time_t			last_stat_time;
 	unsigned char		poller_type;
 	zbx_ipc_async_socket_t	rtc;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
 	poller_type = (poller_args_in->poller_type);
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(poller_args_in->zbx_get_program_type_cb_arg()), server_num,
 			get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	scriptitem_es_engine_init();
 
@@ -1026,7 +1025,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			last_stat_time = time(NULL);
 		}
 
-		if (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 #ifdef HAVE_NETSNMP
 			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)

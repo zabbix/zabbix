@@ -167,7 +167,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 				triggerids.values_num);
 
 		result = DBselect(
-				"select triggerid,description,expression,priority,comments,url,recovery_expression,"
+				"select triggerid,description,expression,priority,comments,url,url_name,recovery_expression,"
 					"recovery_mode,value,opdata,event_name"
 				" from triggers"
 				" where%s",
@@ -194,11 +194,12 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 					ZBX_STR2UCHAR(event->trigger.priority, row[3]);
 					event->trigger.comments = zbx_strdup(NULL, row[4]);
 					event->trigger.url = zbx_strdup(NULL, row[5]);
-					event->trigger.recovery_expression = zbx_strdup(NULL, row[6]);
-					ZBX_STR2UCHAR(event->trigger.recovery_mode, row[7]);
-					ZBX_STR2UCHAR(event->trigger.value, row[8]);
-					event->trigger.opdata = zbx_strdup(NULL, row[9]);
-					event->trigger.event_name = ('\0' != *row[10] ? zbx_strdup(NULL, row[10]) :
+					event->trigger.url_name = zbx_strdup(NULL, row[6]);
+					event->trigger.recovery_expression = zbx_strdup(NULL, row[7]);
+					ZBX_STR2UCHAR(event->trigger.recovery_mode, row[8]);
+					ZBX_STR2UCHAR(event->trigger.value, row[9]);
+					event->trigger.opdata = zbx_strdup(NULL, row[10]);
+					event->trigger.event_name = ('\0' != *row[11] ? zbx_strdup(NULL, row[11]) :
 							NULL);
 					event->trigger.cache = NULL;
 				}

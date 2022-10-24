@@ -60,8 +60,9 @@ $filter_column = (new CFormList())
 			'object_name' => 'hosts',
 			'data' => $data['multiSelectHostData'],
 			'popup' => [
-				'filter_preselect_fields' => [
-					'hostgroups' => 'groupids_'
+				'filter_preselect' => [
+					'id' => 'groupids_',
+					'submit_as' => 'groupid'
 				],
 				'parameters' => [
 					'srctbl' => 'hosts',

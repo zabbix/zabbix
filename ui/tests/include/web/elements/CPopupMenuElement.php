@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
@@ -31,7 +32,7 @@ class CPopupMenuElement extends CElement {
 	 * @inheritdoc
 	 */
 	public static function find() {
-		return (new CElementQuery('xpath://ul[contains(@class, "menu-popup-top")]'))->asPopupMenu();
+		return (new CElementQuery('xpath://ul[@role="menu"]'))->asPopupMenu();
 	}
 
 	/**

@@ -48,6 +48,9 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\file.o \
 	..\..\..\src\libs\zbxtime\time.o \
 	..\..\..\src\libs\zbxexpr\expr.o \
+	..\..\..\src\libs\zbxexpr\function.o \
+	..\..\..\src\libs\zbxexpr\host.o \
+	..\..\..\src\libs\zbxexpr\macro.o \
 	..\..\..\src\libs\zbxexpr\token.o \
 	..\..\..\src\libs\zbxcommon\components_strings_representations.o \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \

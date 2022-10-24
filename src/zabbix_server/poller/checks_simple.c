@@ -57,6 +57,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"datastore.discovery", VMCHECK_FUNC(check_vcenter_datastore_discovery)},
 	{"datastore.tags.get", VMCHECK_FUNC(check_vcenter_datastore_tags_get)},
 	{"datastore.read", VMCHECK_FUNC(check_vcenter_datastore_read)},
+	{"datastore.perfcounter", VMCHECK_FUNC(check_vcenter_datastore_perfcounter)},
 	{"datastore.property", VMCHECK_FUNC(check_vcenter_datastore_property)},
 	{"datastore.size", VMCHECK_FUNC(check_vcenter_datastore_size)},
 	{"datastore.write", VMCHECK_FUNC(check_vcenter_datastore_write)},
@@ -77,6 +78,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.datastore.list", VMCHECK_FUNC(check_vcenter_hv_datastore_list)},
 	{"hv.datastore.multipath", VMCHECK_FUNC(check_vcenter_hv_datastore_multipath)},
 	{"hv.discovery", VMCHECK_FUNC(check_vcenter_hv_discovery)},
+	{"hv.diskinfo.get", VMCHECK_FUNC(check_vcenter_hv_diskinfo_get)},
 	{"hv.fullname", VMCHECK_FUNC(check_vcenter_hv_fullname)},
 	{"hv.hw.cpu.num", VMCHECK_FUNC(check_vcenter_hv_hw_cpu_num)},
 	{"hv.hw.cpu.freq", VMCHECK_FUNC(check_vcenter_hv_hw_cpu_freq)},
@@ -205,9 +207,9 @@ int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' addr:'%s'", __func__, item->key_orig, item->interface.addr);
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key, &request))
+	if (SUCCEED != zbx_parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
@@ -254,7 +256,7 @@ int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	else
 	{
 		/* it will execute item from a loadable module if any */
-		if (SUCCEED == process(item->key, ZBX_PROCESS_MODULE_COMMAND, result))
+		if (SUCCEED == zbx_execute_agent_check(item->key, ZBX_PROCESS_MODULE_COMMAND, result))
 			ret = SUCCEED;
 	}
 
@@ -262,7 +264,7 @@ int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Simple check is not supported."));
 
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
