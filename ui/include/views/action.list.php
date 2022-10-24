@@ -112,7 +112,7 @@ $actionTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_items'))
-				->onClick("checkAll('".$actionForm->getName()."', 'all_items', 'g_actionid');")
+				->onClick("checkAll('".$actionForm->getName()."', 'all_items', 'actionids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $current_url->getUrl()),
 		_('Conditions'),
@@ -159,7 +159,7 @@ if ($this->data['actions']) {
 				->setAttribute('actionid', $action['actionid']);
 
 		$actionTable->addRow([
-			new CCheckBox('g_actionid['.$action['actionid'].']', $action['actionid']),
+			new CCheckBox('actionids['.$action['actionid'].']', $action['actionid']),
 			(new CLink($action['name']))
 				->addClass('js-action-edit')
 				->setAttribute('actionid', $action['actionid']),
@@ -173,7 +173,7 @@ if ($this->data['actions']) {
 $actionForm->addItem([
 	$actionTable,
 	$this->data['paging'],
-	new CActionButtonList('action', 'g_actionid', [
+	new CActionButtonList('action', 'actionids', [
 		'action.massenable' => [
 			'content' => (new CSimpleButton(_('Enable')))
 				->addClass(ZBX_STYLE_BTN_ALT)

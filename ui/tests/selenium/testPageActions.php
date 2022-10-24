@@ -243,7 +243,7 @@ class testPageActions extends CLegacyWebTest {
 
 		$this->zbxTestCheckHeader($this->event_sources[$action['eventsource']]);
 
-		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
+		$this->zbxTestCheckboxSelect('actionids_'.$action['actionid']);
 		$this->zbxTestClickButton('action.massdisable');
 
 		$this->zbxTestAcceptAlert();
@@ -274,7 +274,7 @@ class testPageActions extends CLegacyWebTest {
 
 		$this->zbxTestCheckHeader($this->event_sources[$action['eventsource']]);
 
-		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
+		$this->zbxTestCheckboxSelect('actionids_'.$action['actionid']);
 		$this->zbxTestClickButton('action.massenable');
 
 		$this->zbxTestAcceptAlert();
@@ -306,7 +306,7 @@ class testPageActions extends CLegacyWebTest {
 
 		$this->zbxTestCheckHeader($this->event_sources[$action['eventsource']]);
 
-		$this->zbxTestCheckboxSelect('g_actionid_'.$action['actionid']);
+		$this->zbxTestCheckboxSelect('actionids_'.$action['actionid']);
 		$this->zbxTestClickButton('action.massdelete');
 
 		$this->zbxTestAcceptAlert();

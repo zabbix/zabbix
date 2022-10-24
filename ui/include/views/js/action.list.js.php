@@ -74,7 +74,7 @@
 				location.href = location.href;
 			});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('g_actionid');
+				uncheckTableRows('action_' + this.eventsource);
 
 				postMessageOk(e.detail.title);
 
@@ -140,7 +140,7 @@
 			return fetch(url, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({g_actionid: actionids})
+				body: JSON.stringify({actionids: actionids})
 			})
 				.then((response) => response.json())
 				.then((response) => {
@@ -151,7 +151,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows(this.eventsource, response.keepids ?? []);
+						uncheckTableRows('action_' + this.eventsource, response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -160,7 +160,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						uncheckTableRows(this.eventsource);
+						uncheckTableRows('action_' + this.eventsource);
 					}
 
 					location.href = location.href;

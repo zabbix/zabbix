@@ -494,7 +494,7 @@ window.action_edit_popup = new class {
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData({g_actionid: [this.actionid]})
+			body: urlEncodeData({actionids: [this.actionid]})
 		})
 			.then((response) => response.json())
 			.then((response) => {
