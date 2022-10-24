@@ -429,11 +429,11 @@ class CUserDirectory extends CApiService {
 		}
 
 		if ($create_idps_ldap) {
-			DB::insert('userdirectory_ldap', $create_idps_ldap);
+			DB::insert('userdirectory_ldap', $create_idps_ldap, false);
 		}
 
 		if ($create_idps_saml) {
-			DB::insert('userdirectory_saml', $create_idps_saml);
+			DB::insert('userdirectory_saml', $create_idps_saml, false);
 		}
 
 		if ($userdirectory_media) {
