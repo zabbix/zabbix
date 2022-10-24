@@ -383,6 +383,24 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Resolve macros in trigger url name.
+	 *
+	 * @param array  $trigger
+	 * @param string $trigger['triggerid']
+	 * @param string $trigger['expression']
+	 * @param string $trigger['url_name']
+	 * @param string $trigger['eventid']
+	 * @param string $url
+	 *
+	 * @return bool
+	 */
+	public static function resolveTriggerUrlName(array $trigger, &$url_name) {
+		self::init();
+
+		return self::$macrosResolver->resolveTriggerUrlName($trigger, $url_name);
+	}
+
+	/**
 	 * Resolve macros in trigger expression.
 	 *
 	 * @param string $expression

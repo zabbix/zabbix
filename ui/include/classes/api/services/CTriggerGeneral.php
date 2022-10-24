@@ -125,7 +125,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$descriptions = [];
 		$triggerids = [];
 
-		$output = ['url', 'status', 'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag',
+		$output = ['url_name', 'url', 'status', 'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag',
 			'manual_close', 'opdata', 'event_name'
 		];
 		if ($this instanceof CTriggerPrototype) {
@@ -342,9 +342,9 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @return array
 	 */
 	private function getHostTriggersByTemplateId(array $tpl_triggerids, array $hostids = null) {
-		$output = 't.triggerid,t.expression,t.description,t.url,t.status,t.priority,t.comments,t.type,t.recovery_mode,'.
-			't.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,t.templateid,'.
-			't.event_name,i.hostid';
+		$output = 't.triggerid,t.expression,t.description,t.url_name,t.url,t.status,t.priority,t.comments,t.type,'.
+			't.recovery_mode,t.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,'.
+			't.templateid,t.event_name,i.hostid';
 		if ($this instanceof CTriggerPrototype) {
 			$output .= ',t.discover';
 		}
@@ -405,9 +405,9 @@ abstract class CTriggerGeneral extends CApiService {
 			'lldmacros' => $this instanceof CTriggerPrototype
 		]);
 
-		$output = 't.triggerid,t.expression,t.description,t.url,t.status,t.priority,t.comments,t.type,t.recovery_mode,'.
-			't.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,t.event_name,i.hostid,'.
-			'h.host';
+		$output = 't.triggerid,t.expression,t.description,t.url_name,t.url,t.status,t.priority,t.comments,t.type,'.
+			't.recovery_mode,t.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,'.
+			't.event_name,i.hostid,h.host';
 		if ($this instanceof CTriggerPrototype) {
 			$output .= ',t.discover';
 		}
@@ -888,6 +888,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param int    $triggers[]['priority']                     [IN] (optional)
 	 * @param int    $triggers[]['status']                       [IN] (optional)
 	 * @param int    $triggers[]['type']                         [IN] (optional)
+	 * @param string $triggers[]['url_name']                     [IN] (optional)
 	 * @param string $triggers[]['url']                          [IN] (optional)
 	 * @param int    $triggers[]['recovery_mode']                [IN/OUT] (optional)
 	 * @param string $triggers[]['recovery_expression']          [IN/OUT] (optional)
@@ -914,6 +915,7 @@ abstract class CTriggerGeneral extends CApiService {
 			'priority' =>				['type' => API_INT32, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED])],
 			'type' =>					['type' => API_INT32, 'in' => implode(',', [TRIGGER_MULT_EVENT_DISABLED, TRIGGER_MULT_EVENT_ENABLED])],
+			'url_name' =>				['type' => API_STRING_UTF8, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('triggers', 'url_name')],
 			'url' =>					['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('triggers', 'url')],
 			'recovery_mode' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]), 'default' => DB::getDefault('triggers', 'recovery_mode')],
 			'recovery_expression' =>	['type' => API_TRIGGER_EXPRESSION, 'flags' => API_ALLOW_LLD_MACRO, 'default' => DB::getDefault('triggers', 'recovery_expression')],
@@ -971,6 +973,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param int    $triggers[]['priority']                     [IN] (optional)
 	 * @param int    $triggers[]['status']                       [IN] (optional)
 	 * @param int    $triggers[]['type']                         [IN] (optional)
+	 * @param string $triggers[]['url_name']                     [IN] (optional)
 	 * @param string $triggers[]['url']                          [IN] (optional)
 	 * @param int    $triggers[]['recovery_mode']                [IN/OUT] (optional)
 	 * @param string $triggers[]['recovery_expression']          [IN/OUT] (optional)
@@ -991,6 +994,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $db_triggers[<tnum>]['opdata']              [OUT]
 	 * @param int    $db_triggers[<tnum>]['recovery_mode']       [OUT]
 	 * @param string $db_triggers[<tnum>]['recovery_expression'] [OUT]
+	 * @param string $db_triggers[<tnum>]['url_name']            [OUT]
 	 * @param string $db_triggers[<tnum>]['url']                 [OUT]
 	 * @param int    $db_triggers[<tnum>]['status']              [OUT]
 	 * @param int    $db_triggers[<tnum>]['discover']            [OUT]
@@ -1015,6 +1019,7 @@ abstract class CTriggerGeneral extends CApiService {
 			'priority' =>				['type' => API_INT32, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED])],
 			'type' =>					['type' => API_INT32, 'in' => implode(',', [TRIGGER_MULT_EVENT_DISABLED, TRIGGER_MULT_EVENT_ENABLED])],
+			'url_name' =>				['type' => API_STRING_UTF8, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('triggers', 'url_name')],
 			'url' =>					['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('triggers', 'url')],
 			'recovery_mode' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE])],
 			'recovery_expression' =>	['type' => API_TRIGGER_EXPRESSION, 'flags' => API_ALLOW_LLD_MACRO],
@@ -1041,8 +1046,8 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		$options = [
-			'output' => ['triggerid', 'description', 'expression', 'url', 'status', 'priority', 'comments', 'type',
-				'templateid', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
+			'output' => ['triggerid', 'description', 'expression', 'url_name', 'url', 'status', 'priority', 'comments',
+				'type', 'templateid', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
 				'manual_close', 'opdata', 'event_name'
 			],
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
@@ -1456,6 +1461,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $triggers[]['expression']          [IN]
 	 * @param int    $triggers[]['recovery_mode']       [IN]
 	 * @param string $triggers[]['recovery_expression'] [IN]
+	 * @param string $triggers[]['url_name']            [IN] (optional)
 	 * @param string $triggers[]['url']                 [IN] (optional)
 	 * @param int    $triggers[]['status']              [IN] (optional)
 	 * @param int    $triggers[]['priority']            [IN] (optional)
@@ -1527,6 +1533,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $triggers[<tnum>]['expression']                 [IN]
 	 * @param int    $triggers[<tnum>]['recovery_mode']              [IN]
 	 * @param string $triggers[<tnum>]['recovery_expression']        [IN]
+	 * @param string $triggers[<tnum>]['url_name']                   [IN] (optional)
 	 * @param string $triggers[<tnum>]['url']                        [IN] (optional)
 	 * @param int    $triggers[<tnum>]['status']                     [IN] (optional)
 	 * @param int    $triggers[<tnum>]['priority']                   [IN] (optional)
@@ -1544,6 +1551,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $db_triggers[<tnum>]['expression']              [IN]
 	 * @param int    $db_triggers[<tnum>]['recovery_mode']           [IN]
 	 * @param string $db_triggers[<tnum>]['recovery_expression']     [IN]
+	 * @param string $db_triggers[<tnum>]['url_name']                [IN]
 	 * @param string $db_triggers[<tnum>]['url']                     [IN]
 	 * @param int    $db_triggers[<tnum>]['status']                  [IN]
 	 * @param int    $db_triggers[<tnum>]['priority']                [IN]
@@ -1603,6 +1611,9 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 			if ($trigger['recovery_mode'] != $db_trigger['recovery_mode']) {
 				$upd_trigger['values']['recovery_mode'] = $trigger['recovery_mode'];
+			}
+			if (array_key_exists('url_name', $trigger) && $trigger['url_name'] !== $db_trigger['url_name']) {
+				$upd_trigger['values']['url_name'] = $trigger['url_name'];
 			}
 			if (array_key_exists('url', $trigger) && $trigger['url'] !== $db_trigger['url']) {
 				$upd_trigger['values']['url'] = $trigger['url'];
@@ -2225,8 +2236,8 @@ abstract class CTriggerGeneral extends CApiService {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$output = ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-			'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+		$output = ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url_name', 'url',
+			'status', 'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
 			'event_name'
 		];
 		if ($this instanceof CTriggerPrototype) {

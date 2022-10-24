@@ -666,7 +666,7 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataTrigger(array $data) {
 		$db_triggers = API::Trigger()->get([
-			'output' => ['expression', 'url', 'comments', 'manual_close'],
+			'output' => ['expression', 'url_name', 'url', 'comments', 'manual_close'],
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'selectItems' => ['itemid', 'hostid', 'name', 'value_type', 'type'],
 			'triggerids' => $data['triggerid'],
@@ -681,6 +681,12 @@ class CControllerMenuPopup extends CController {
 			}
 
 			$db_trigger['url'] = CMacrosResolverHelper::resolveTriggerUrl($db_trigger, $url) ? $url : '';
+
+			if ($db_trigger['url'] !== '') {
+				$db_trigger['url_name'] = CMacrosResolverHelper::resolveTriggerUrlName($db_trigger, $url_name)
+					? $url_name
+					: '';
+			}
 
 			$hosts = [];
 			$show_events = true;
@@ -810,7 +816,7 @@ class CControllerMenuPopup extends CController {
 
 			if ($db_trigger['url'] !== '') {
 				$urls = array_merge($urls, [[
-					'name' => _('Trigger URL'),
+					'name' => $db_trigger['url_name'] !== '' ? $db_trigger['url_name'] : _('Trigger URL'),
 					'url' => $db_trigger['url'],
 					'menu_path' => '',
 					'new_window' => ZBX_SCRIPT_URL_NEW_WINDOW_NO,

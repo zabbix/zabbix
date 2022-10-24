@@ -1890,6 +1890,7 @@ function getTriggerFormData(array $data) {
 			$data['priority'] = $trigger['priority'];
 			$data['status'] = $trigger['status'];
 			$data['comments'] = $trigger['comments'];
+			$data['url_name'] = $trigger['url_name'];
 			$data['url'] = $trigger['url'];
 
 			if ($data['parent_discoveryid'] !== null) {
