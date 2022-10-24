@@ -191,6 +191,34 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 		);
 	}
 
+	if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_HISTORY, $data['system_info'])) {
+		$info_table->addRow((new CRow([
+			_('Housekeeping'),
+			_('Override item history period'),
+			(new CCol([
+				_('This setting should be enabled, because history tables contain compressed chunks.'),
+				' ',
+				new CLink(_('Configuration').'&hellip;',
+					(new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')
+				)
+			]))->addClass(ZBX_STYLE_RED)
+		])));
+	}
+
+	if (array_key_exists(CHousekeepingHelper::OVERRIDE_NEEDED_TRENDS, $data['system_info'])) {
+		$info_table->addRow((new CRow([
+			_('Housekeeping'),
+			_('Override item trend period'),
+			(new CCol([
+				_('This setting should be enabled, because trend tables contain compressed chunks.'),
+				' ',
+				new CLink(_('Configuration').'&hellip;',
+					(new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')
+				)
+			]))->addClass(ZBX_STYLE_RED)
+		])));
+	}
+
 	if ($data['system_info']['ha_cluster_enabled']) {
 		$info_table->addRow([
 			_('High availability cluster'),
