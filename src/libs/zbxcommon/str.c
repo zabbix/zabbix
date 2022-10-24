@@ -6008,6 +6008,7 @@ static int zbx_iso8601_timezone(const char *zone, long int *offset)
  ******************************************************************************/
 int	zbx_iso8601_utc(const char *str, time_t *time)
 {
+	long int	offset;
 	struct tm	tm;
 
 	if ( 0 == isdigit(*str) || ZBX_CONST_STRLEN("1234-12-12T12:12:12") > strlen(str) ||
@@ -6037,10 +6038,9 @@ int	zbx_iso8601_utc(const char *str, time_t *time)
 
 	tm.tm_isdst = 0;
 
-#ifdef HAVE_TM_TM_GMTOFF
-	if (FAIL == zbx_iso8601_timezone(&str[19], &tm.tm_gmtoff))
+	if (FAIL == zbx_iso8601_timezone(&str[19], &offset))
 		return FAIL;
-#endif
+
 	if (NULL != time)
 	{
 		int	t;
@@ -6048,7 +6048,7 @@ int	zbx_iso8601_utc(const char *str, time_t *time)
 		if(FAIL == zbx_utc_time(tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, &t))
 			return FAIL;
 
-		*time = t - tm.tm_gmtoff;
+		*time = t - offset;
 	}
 
 	return SUCCEED;
