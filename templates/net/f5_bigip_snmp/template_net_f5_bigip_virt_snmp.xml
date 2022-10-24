@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-10-21T07:42:49Z</date>
+   <date>2022-10-24T13:16:44Z</date>
    <groups>
       <group>
          <name>Templates/Network devices</name>
@@ -3559,7 +3559,7 @@ The percentage of time Virtual Server was busy over the last 5 seconds.</descrip
             <macro>
                <macro>{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}</macro>
                <value>^/usr$</value>
-               <description>Partitions which low free space trigger should ignore</description>
+               <description>Partitions that low free space trigger should ignore.</description>
             </macro>
             <macro>
                <macro>{$BIGIP.MEMORY.UTIL.WARN.MAX}</macro>
