@@ -792,57 +792,137 @@ out:
 	return zbx_jsonpath_error(ptr);
 }
 
+/* value types on index stack */
+typedef enum
+{
+	ZBX_JSONPATH_CONST = 1,		/* constant value - string or number */
+	ZBX_JSONPATH_VALUE,		/* result of an operation after which cannot be used in index */
+	ZBX_JSONPATH_PATH,		/* relative jsonpath - @.a.b.c */
+	ZBX_JSONPATH_PATH_OP		/* result of an operation with jsonpath which still can be used in index */
+}
+zbx_jsonpath_index_value_type_t;
+
+typedef struct
+{
+	zbx_jsonpath_index_value_type_t	type;
+	zbx_jsonpath_token_t		*index_token;
+	zbx_jsonpath_token_t		*value_token;
+}
+zbx_jsonpath_index_value_t;
+
+ZBX_VECTOR_DECL(jpi_value, zbx_jsonpath_index_value_t)
+ZBX_VECTOR_IMPL(jpi_value, zbx_jsonpath_index_value_t)
+
 /******************************************************************************
  *                                                                            *
- * Purpose: prepare jsonpath expression index                                 *
+ * Purpose: analyze expression and set indexing fields if possible            *
  *                                                                            *
- * Parameters: exp - [IN] the jsonpath expression segment                     *
+ * Comments: Expression can be indexed if it contains relative json path      *
+ *           comparison with constant that is used in and operations.         *
+ *           This is tested by doing a pseudo evaluation by operand types     *
+ *           and checking the result type.                                    *
+ *                                                                            *
+ *           So expressions like ?(@.a.b == 1), ?(@.a == "A" and @.b == "B")  *
+ *           can be indexed (by @.a.b and by @.a) while expressions like      *
+ *           ?(@.a == @.b), ?(@.a == "A" or @.b == "B") cannot.               *
  *                                                                            *
  ******************************************************************************/
 static void	jsonpath_expression_prepare_index(zbx_jsonpath_expression_t *exp)
 {
-#define ZBX_FLAG_JSONPATH_REF	0x01
-#define ZBX_FLAG_JSONPATH_CONST	0x02
-#define ZBX_FLAG_JSONPATH_EQ	0x04
+	int				i;
+	zbx_vector_jpi_value_t		stack;
+	zbx_jsonpath_index_value_t	*left, *right;
 
-	zbx_uint32_t		flags = 0;
-	int			i;
-	zbx_jsonpath_token_t	*path_token = NULL, *value_token = NULL;
-
-	/* for now only simple match @.a == <const> is indexed */
-	if (3 != exp->tokens.values_num)
-		return;
+	zbx_vector_jpi_value_create(&stack);
 
 	for (i = 0; i < exp->tokens.values_num; i++)
 	{
-		zbx_jsonpath_token_t	*token = (zbx_jsonpath_token_t *)exp->tokens.values[i];
+		zbx_jsonpath_token_t		*token = (zbx_jsonpath_token_t *)exp->tokens.values[i];
+		zbx_jsonpath_index_value_t	jpi = {0};
 
 		switch (token->type)
 		{
+			case ZBX_JSONPATH_TOKEN_OP_NOT:
+				if (1 > stack.values_num)
+					goto out;
+				stack.values[stack.values_num - 1].type = ZBX_JSONPATH_VALUE;
+				stack.values[stack.values_num - 1].index_token = NULL;
+				stack.values[stack.values_num - 1].value_token = NULL;
+				continue;
 			case ZBX_JSONPATH_TOKEN_PATH_RELATIVE:
-				flags |= ZBX_FLAG_JSONPATH_REF;
-				path_token = token;
-				break;
+				jpi.index_token = token;
+				jpi.type = ZBX_JSONPATH_PATH;
+				zbx_vector_jpi_value_append(&stack, jpi);
+				continue;
+			case ZBX_JSONPATH_TOKEN_PATH_ABSOLUTE:
+				jpi.type = ZBX_JSONPATH_VALUE;
+				zbx_vector_jpi_value_append(&stack, jpi);
+				continue;
 			case ZBX_JSONPATH_TOKEN_CONST_STR:
 			case ZBX_JSONPATH_TOKEN_CONST_NUM:
-				flags |= ZBX_FLAG_JSONPATH_CONST;
-				value_token = token;
-				break;
+				jpi.value_token = token;
+				jpi.type = ZBX_JSONPATH_CONST;
+				zbx_vector_jpi_value_append(&stack, jpi);
+				continue;
+		}
+
+		if (2 > stack.values_num)
+			goto out;
+
+		left = &stack.values[stack.values_num - 2];
+		right = &stack.values[stack.values_num - 1];
+		stack.values_num--;
+
+		switch (token->type)
+		{
 			case ZBX_JSONPATH_TOKEN_OP_EQ:
-				flags |= ZBX_FLAG_JSONPATH_EQ;
+				if ((ZBX_JSONPATH_PATH == left->type || ZBX_JSONPATH_PATH == right->type) &&
+						(ZBX_JSONPATH_CONST == left->type || ZBX_JSONPATH_CONST == right->type))
+				{
+					left->type = ZBX_JSONPATH_PATH_OP;
+
+					if (ZBX_JSONPATH_CONST == left->type)
+						left->index_token = right->index_token;
+					else
+						left->value_token = right->value_token;
+				}
+				else
+					left->type = ZBX_JSONPATH_VALUE;
+				continue;
+			case ZBX_JSONPATH_TOKEN_OP_AND:
+				if (ZBX_JSONPATH_PATH == left->type)
+					left->type = ZBX_JSONPATH_VALUE;
+
+				if (ZBX_JSONPATH_PATH == right->type)
+					right->type = ZBX_JSONPATH_VALUE;
+
+				if (ZBX_JSONPATH_PATH_OP == left->type && ZBX_JSONPATH_PATH_OP == right->type)
+					continue;
+
+				if ((ZBX_JSONPATH_PATH_OP == left->type || ZBX_JSONPATH_PATH_OP == right->type) &&
+						(ZBX_JSONPATH_VALUE == left->type || ZBX_JSONPATH_VALUE == right->type))
+				{
+					if (ZBX_JSONPATH_PATH_OP != left->type)
+						*left = *right;
+				}
+				else
+					left->type = ZBX_JSONPATH_VALUE;
+				continue;
+			default:
+				left->type = ZBX_JSONPATH_VALUE;
+				left->index_token = NULL;
+				left->value_token = NULL;
 				break;
 		}
 	}
 
-	if ((ZBX_FLAG_JSONPATH_REF | ZBX_FLAG_JSONPATH_CONST | ZBX_FLAG_JSONPATH_EQ) == flags)
+	if (1 == stack.values_num && ZBX_JSONPATH_PATH_OP == stack.values[0].type)
 	{
-		exp->index_token = path_token;
-		exp->value_token = value_token;
+		exp->index_token = stack.values[0].index_token;
+		exp->value_token = stack.values[0].value_token;
 	}
-
-#undef ZBX_FLAG_JSONPATH_REF
-#undef ZBX_FLAG_JSONPATH_CONST
-#undef ZBX_FLAG_JSONPATH_EQ
+out:
+	zbx_vector_jpi_value_destroy(&stack);
 }
 
 /******************************************************************************
