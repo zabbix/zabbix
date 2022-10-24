@@ -92,17 +92,12 @@ class CControllerHousekeepingEdit extends CController {
 
 		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $config['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB
 				&& $config['compression_availability'] == 1) {
-			$hk_warnings = [];
-
-			if ($data['hk_history_mode'] == 1 && $data['hk_history_global'] == 0) {
-				$hk_warnings['hk_needs_override_history'] = PostgresqlDbBackend::isCompressed([
+			$hk_warnings = [
+				'hk_needs_override_history' => PostgresqlDbBackend::isCompressed([
 					'history', 'history_log', 'history_str', 'history_text', 'history_uint'
-				]);
-			}
-
-			if ($data['hk_trends_mode'] == 1 && $data['hk_trends_global'] == 0) {
-				$hk_warnings['hk_needs_override_trends'] = PostgresqlDbBackend::isCompressed(['trends', 'trends_uint']);
-			}
+				]),
+				'hk_needs_override_trends' => PostgresqlDbBackend::isCompressed(['trends', 'trends_uint'])
+			];
 
 			$data += array_filter($hk_warnings);
 		}
