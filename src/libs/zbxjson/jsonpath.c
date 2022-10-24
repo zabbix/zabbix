@@ -126,8 +126,8 @@ static void	zbx_vector_jsonobj_ref_add_string(zbx_vector_jsonobj_ref_t *refs, co
 	ref.external = 0;
 
 	ref.value = (zbx_jsonobj_t *)zbx_malloc(NULL, sizeof(zbx_jsonobj_t));
-	ref.value->type = ZBX_JSON_TYPE_STRING;
-	ref.value->data.string = zbx_strdup(NULL, str);
+	jsonobj_init(ref.value, ZBX_JSON_TYPE_STRING);
+	jsonobj_set_string(ref.value, zbx_strdup(NULL, str));
 
 	zbx_vector_jsonobj_ref_append(refs, ref);
 }
