@@ -5273,7 +5273,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 
 	zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
 	hvid_esc = zbx_xml_escape_dyn(hvid);
-	tmp = zbx_dsprintf(NULL, ZBX_POST_HV_DISK_INFO, pcollecter, scsi_req, hvid_esc);
+	tmp = zbx_dsprintf(NULL, ZBX_POST_HV_DISK_INFO, pcollecter, ZBX_NULL2EMPTY_STR(scsi_req), hvid_esc);
 	zbx_free(hvid_esc);
 	zbx_free(scsi_req);
 
