@@ -160,7 +160,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						['type' => 'Replace', 'parameter_1' => '   test text  ', 'parameter_2' => '   replacement 1  '],
 						['type' => 'Regular expression', 'parameter_1' => '       expression       ', 'parameter_2' => '   \1     '],
 						['type' => 'JSONPath', 'parameter_1' => '    $.data.test      '],
-						['type' => 'JavaScript', 'parameter_1' => "  Test line 1\r\n   Test line   2\r\n   Test line 3   "],
+						['type' => 'JavaScript', 'parameter_1' => "  Test line 1\n   Test line   2\n   Test line 3   "],
 						['type' => 'Does not match regular expression', 'parameter_1' => '    Pattern     '],
 						['type' => 'Check for error in JSON', 'parameter_1' => '    $.new.path    ']
 					]

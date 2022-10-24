@@ -2691,7 +2691,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						],
 						[
 							'type' => 'JavaScript',
-							'parameter_1' => "  Test line 1\r\n  Test line 2\r\nTest line 3  "
+							'parameter_1' => "  Test line 1\n  Test line 2\nTest line 3  "
 						]
 					]
 				]
