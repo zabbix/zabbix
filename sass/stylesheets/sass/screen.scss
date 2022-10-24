@@ -3084,7 +3084,7 @@ $form-icon-btn: (
 		margin: 0 10px;
 
 		.dashboard-widget-head {
-			margin-bottom: 14px;
+			margin-bottom: 12px;
 
 			.icon-doc-link {
 				margin-right: -26px;
@@ -3103,10 +3103,14 @@ $form-icon-btn: (
 			width: 100%;
 			max-height: calc(100vh - 220px);
 			max-width: inherit;
-			margin: 0 -10px 10px;
+			margin: 0 -10px 8px;
 			padding: 0 10px;
 			position: relative;
 			@extend %webkit-scrollbar;
+
+			> form {
+				padding: 2px 0;
+			}
 
 			.table-forms {
 				.table-forms-td-right {

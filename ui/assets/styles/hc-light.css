@@ -5070,7 +5070,7 @@ section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:
     overflow: hidden;
     margin: 0 10px; }
     .overlay-dialogue.modal .dashboard-widget-head {
-      margin-bottom: 14px; }
+      margin-bottom: 12px; }
       .overlay-dialogue.modal .dashboard-widget-head .icon-doc-link {
         margin-right: -26px; }
       .overlay-dialogue.modal .dashboard-widget-head .overlay-close-btn {
@@ -5083,9 +5083,11 @@ section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:
       width: 100%;
       max-height: calc(100vh - 220px);
       max-width: inherit;
-      margin: 0 -10px 10px;
+      margin: 0 -10px 8px;
       padding: 0 10px;
       position: relative; }
+      .overlay-dialogue.modal .overlay-dialogue-body > form {
+        padding: 2px 0; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
         padding-right: 8px; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field {
