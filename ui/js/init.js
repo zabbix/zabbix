@@ -154,12 +154,8 @@ jQuery(function($) {
 				sections = getMenuPopupItem(data);
 				break;
 
-			case 'item_configuration':
-				sections = getMenuPopupItemConfiguration(data);
-				break;
-
-			case 'item_prototype_configuration':
-				sections = getMenuPopupItemPrototypeConfiguration(data);
+			case 'item_prototype':
+				sections = getMenuPopupItemPrototype(data);
 				break;
 
 			case 'dropdown':
