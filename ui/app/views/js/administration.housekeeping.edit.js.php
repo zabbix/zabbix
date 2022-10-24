@@ -68,17 +68,19 @@ $schema = DB::getSchema('config');
 		});
 
 
-		$('#hk_history_mode, #hk_history_global').change(function() {
-			$('.js-hk-history-warning').toggle(
-				$('#hk_history_mode')[0].checked && !$('#hk_history_global')[0].checked
-			)
-		}).trigger('change');
+		$('#hk_history_mode, #hk_history_global')
+			.change(function() {
+				$('.js-hk-history-warning').toggle(
+					$('#hk_history_mode')[0].checked && !$('#hk_history_global')[0].checked
+				)
+			})
+			.trigger('change');
 
-		$('#hk_trends_mode, #hk_trends_global').change(() => {
-			$('.js-hk-trends-warning').toggle(
-				$('#hk_trends_mode')[0].checked && !$('#hk_trends_global')[0].checked
-			)
-		}).trigger('change');
+		$('#hk_trends_mode, #hk_trends_global')
+			.change(function() {
+				$('.js-hk-trends-warning').toggle($('#hk_trends_mode')[0].checked && !$('#hk_trends_global')[0].checked)
+			})
+			.trigger('change');
 
 		jQuery("#resetDefaults").click(function() {
 			overlayDialogue({
