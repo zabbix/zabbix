@@ -932,6 +932,8 @@ class CHttpTestManager {
 			}
 			unset($httptest);
 
+			self::getItemIds($httptests, true);
+
 			self::createStepItems($httptests, $stepids, $db_httptests);
 		}
 
