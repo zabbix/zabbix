@@ -67,18 +67,19 @@ $schema = DB::getSchema('config');
 			jQuery('#compress_older').prop('disabled', !this.checked);
 		});
 
-
-		$('#hk_history_mode, #hk_history_global')
+		jQuery('#hk_history_mode, #hk_history_global')
 			.change(function() {
-				$('.js-hk-history-warning').toggle(
-					$('#hk_history_mode')[0].checked && !$('#hk_history_global')[0].checked
-				)
+				jQuery('.js-hk-history-warning').toggle(
+					jQuery('#hk_history_mode:checked').length && !jQuery('#hk_history_global:checked').length
+				);
 			})
 			.trigger('change');
 
-		$('#hk_trends_mode, #hk_trends_global')
+		jQuery('#hk_trends_mode, #hk_trends_global')
 			.change(function() {
-				$('.js-hk-trends-warning').toggle($('#hk_trends_mode')[0].checked && !$('#hk_trends_global')[0].checked)
+				jQuery('.js-hk-trends-warning').toggle(
+					jQuery('#hk_trends_mode:checked').length && !jQuery('#hk_trends_global:checked').length
+				);
 			})
 			.trigger('change');
 
