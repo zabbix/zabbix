@@ -31,6 +31,9 @@ window.widget_problems_form = new class {
 		this._sort_triggers = document.getElementById('sort_triggers');
 		this._sort_triggers.addEventListener('change', () => this.updateForm());
 
+		this._show_timeline = document.getElementById('show_timeline');
+		this._show_timeline_value = this._show_timeline.checked;
+
 		this.updateForm();
 	}
 
@@ -43,9 +46,14 @@ window.widget_problems_form = new class {
 			radio.disabled = !show_tags;
 		}
 
-		const show_timeline = document.getElementById('show_timeline');
-
-		show_timeline.disabled = !this._sort_with_enabled_show_timeline[this._sort_triggers.value];
-		show_timeline.checked = !show_timeline.disabled;
+		if (this._sort_with_enabled_show_timeline[this._sort_triggers.value]) {
+			this._show_timeline.disabled = false;
+			this._show_timeline.checked = this._show_timeline_value;
+		}
+		else {
+			this._show_timeline.disabled = true;
+			this._show_timeline_value = this._show_timeline.checked;
+			this._show_timeline.checked = false;
+		}
 	}
 };
