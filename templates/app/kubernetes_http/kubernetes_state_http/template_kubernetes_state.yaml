@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-24T16:10:24Z'
+  date: '2022-10-24T16:15:07Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -754,7 +754,7 @@ zabbix_export:
                     name: Templates/Applications
               group_prototypes:
                 -
-                  name: 'Kubernetes/Components: {#COMPONENT.API}'
+                  name: '{#CLUSTER_HOSTNAME}: Kubernetes/Components: {#COMPONENT.SCHEDULER}'
               templates:
                 -
                   name: 'Kubernetes API server by HTTP'
@@ -855,7 +855,7 @@ zabbix_export:
                     name: Templates/Applications
               group_prototypes:
                 -
-                  name: 'Kubernetes/Components: {#COMPONENT.CONTROLLER}'
+                  name: '{#CLUSTER_HOSTNAME}: Kubernetes/Components: {#COMPONENT.SCHEDULER}'
               templates:
                 -
                   name: 'Kubernetes Controller manager by HTTP'
@@ -1951,7 +1951,7 @@ zabbix_export:
                     name: Templates/Applications
               group_prototypes:
                 -
-                  name: 'Kubernetes/Components: {#COMPONENT}'
+                  name: '{#CLUSTER_HOSTNAME}: Kubernetes/Components: {#COMPONENT.SCHEDULER}'
               templates:
                 -
                   name: 'Kubernetes Kubelet by HTTP'
@@ -3694,7 +3694,7 @@ zabbix_export:
                     name: Templates/Applications
               group_prototypes:
                 -
-                  name: 'Kubernetes/Components: {#COMPONENT.SCHEDULER}'
+                  name: '{#CLUSTER_HOSTNAME}: Kubernetes/Components: {#COMPONENT.SCHEDULER}'
               templates:
                 -
                   name: 'Kubernetes Scheduler by HTTP'
