@@ -1200,7 +1200,8 @@ jQuery(function($) {
 	}
 
 	var defaultOptions = {
-		closeCallback: function(){}
+		closeCallback: function(){},
+		background_layer: true
 	};
 
 	var methods = {
@@ -1218,9 +1219,22 @@ jQuery(function($) {
 					 * Please note that click event is also triggered by hitting spacebar on the keyboard,
 					 * in which case the number of mouse clicks (stored in event.originalEvent.detail) will be zero.
 					 */
-					of: (event.type === 'click' && event.originalEvent.detail) ? event : event.target,
+					of: (['click', 'mouseup', 'mousedown'].includes(event.type) && event.originalEvent.detail)
+						? event
+						: event.target,
 					my: 'left top',
-					at: 'left bottom'
+					at: 'left bottom',
+					using: (pos, data) => {
+						let max_left = data.horizontal === 'left'
+							? document.querySelector('.wrapper').clientWidth
+							: document.querySelector('.wrapper').clientWidth - data.element.width;
+
+						pos.top = Math.max(0, pos.top);
+						pos.left = Math.max(0, Math.min(max_left, pos.left));
+
+						data.element.element[0].style.top = `${pos.top}px`;
+						data.element.element[0].style.left = `${pos.left}px`;
+					}
 				}
 			}, defaultOptions, options || {});
 
@@ -1248,6 +1262,10 @@ jQuery(function($) {
 
 			$menu_popup.data('menu_popup', options);
 
+			if (options.background_layer) {
+				$('.wrapper').append($('<div>', {class: 'menu-popup-overlay'}));
+			}
+
 			$('.wrapper').append($menu_popup);
 
 			// Position the menu (before hiding).
@@ -1264,7 +1282,9 @@ jQuery(function($) {
 			// Need to be postponed.
 			setTimeout(function() {
 				$(document)
-					.on('click', {menu: $menu_popup, opener: $opener}, menuPopupDocumentCloseHandler)
+					.on('click dragstart contextmenu', {menu: $menu_popup, opener: $opener},
+						menuPopupDocumentCloseHandler
+					)
 					.on('keydown', {menu: $menu_popup}, menuPopupKeyDownHandler);
 			});
 
@@ -1283,7 +1303,7 @@ jQuery(function($) {
 				$('[aria-expanded="true"]', menu_popup).attr({'aria-expanded': 'false'});
 
 				$(document)
-					.off('click', menuPopupDocumentCloseHandler)
+					.off('click dragstart contextmenu', menuPopupDocumentCloseHandler)
 					.off('keydown', menuPopupKeyDownHandler);
 
 				var overlay = removeFromOverlaysStack('menu-popup', return_focus);
@@ -1291,6 +1311,10 @@ jQuery(function($) {
 				if (overlay && typeof overlay['element'] !== undefined) {
 					// Remove expanded attribute of the original opener.
 					$(overlay['element']).attr({'aria-expanded': 'false'});
+				}
+
+				if (options.background_layer) {
+					menu_popup.prev().remove();
 				}
 
 				menu_popup.remove();
