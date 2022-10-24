@@ -2051,7 +2051,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/reporter/Makefile
 	src/zabbix_server/rtc/Makefile
 	src/zabbix_server/scripts/Makefile
-	src/zabbix_server/selfmon/Makefile
 	src/zabbix_server/service/Makefile
 	src/zabbix_server/snmptrapper/Makefile
 	src/zabbix_server/stats/Makefile

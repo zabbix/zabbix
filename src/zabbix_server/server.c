@@ -50,7 +50,6 @@
 #include "snmptrapper/snmptrapper.h"
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
-#include "selfmon/selfmon.h"
 #include "vmware/vmware.h"
 #include "taskmanager/taskmanager.h"
 #include "preprocessor/preproc_manager.h"
@@ -80,6 +79,7 @@
 #include "zbxip.h"
 #include "zbxsysinfo.h"
 #include "zbx_rtc_constants.h"
+#include "zbxthreads.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -189,10 +189,6 @@ static unsigned char	get_program_type(void)
 {
 	return program_type;
 }
-
-ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
-ZBX_THREAD_LOCAL int		process_num	= 0;
-ZBX_THREAD_LOCAL int		server_num	= 0;
 
 int	CONFIG_ALERTER_FORKS		= 3;
 int	CONFIG_DISCOVERER_FORKS		= 1;
@@ -1356,16 +1352,17 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	for (i = 0; i < threads_num; i++)
 	{
-		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.process_type, &thread_args.process_num))
+		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.info.process_type,
+				&thread_args.info.process_num))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}
 
-		thread_args.server_num = i + 1;
+		thread_args.info.server_num = i + 1;
 		thread_args.args = NULL;
 
-		switch (thread_args.process_type)
+		switch (thread_args.info.process_type)
 		{
 			case ZBX_PROCESS_TYPE_SERVICEMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
@@ -1460,7 +1457,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(proxypoller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SELFMON:
-				zbx_thread_start(selfmon_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_selfmon_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_VMWARE:
 				zbx_thread_start(vmware_thread, &thread_args, &threads[i]);

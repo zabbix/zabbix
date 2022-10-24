@@ -23,7 +23,6 @@
 #include "zbxthreads.h"
 
 extern char		*CONFIG_SNMPTRAP_FILE;
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 
 ZBX_THREAD_ENTRY(snmptrapper_thread, args);
 
