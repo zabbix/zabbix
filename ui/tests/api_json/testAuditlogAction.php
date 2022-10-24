@@ -84,6 +84,7 @@ class testAuditlogAction extends testAuditlogCommon {
 						]
 					]
 				],
+				'pause_symptoms' => 0,
 				'pause_suppressed' => 0,
 				'notify_if_canceled' => 0
 			]
@@ -132,6 +133,7 @@ class testAuditlogAction extends testAuditlogCommon {
 				=> ['add', 'Custom update operation message subject'],
 			'action.update_operations['.$operationid[2]['operationid'].'].recovery' => ['add', '2'],
 			'action.update_operations['.$operationid[2]['operationid'].'].operationid' => ['add', $operationid[2]['operationid']],
+			'action.pause_symptoms' => ['add', '0'],
 			'action.pause_suppressed' => ['add', '0'],
 			'action.notify_if_canceled' => ['add', '0'],
 			'action.actionid' => ['add', $resourceid]
@@ -176,6 +178,7 @@ class testAuditlogAction extends testAuditlogCommon {
 						]
 					]
 				],
+				'pause_symptoms' => 1,
 				'pause_suppressed' => 1,
 				'notify_if_canceled' => 1
 			]

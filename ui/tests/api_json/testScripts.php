@@ -3759,7 +3759,7 @@ class testScripts extends CAPITest {
 					'selectActions' => ['abc']
 				],
 				'expected_results' => [],
-				'expected_error' => 'Invalid parameter "/selectActions/1": value must be one of "actionid", "name", "eventsource", "status", "esc_period", "pause_suppressed", "notify_if_canceled".'
+				'expected_error' => 'Invalid parameter "/selectActions/1": value must be one of "actionid", "name", "eventsource", "status", "esc_period", "pause_suppressed", "notify_if_canceled", "pause_symptoms".'
 			],
 
 			// Check common fields that are not flags, but require strict validation.

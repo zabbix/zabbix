@@ -487,6 +487,10 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
 	$operation_tab
+		->addRow(_('Pause operations for symptom problems'),
+			(new CCheckBox('pause_symptoms', ACTION_PAUSE_SYMPTOMS_TRUE))
+				->setChecked($data['action']['pause_symptoms'] == ACTION_PAUSE_SYMPTOMS_TRUE)
+		)
 		->addRow(_('Pause operations for suppressed problems'),
 			(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
 				->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)

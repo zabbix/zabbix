@@ -76,6 +76,10 @@ $fields = [
 	'add_operation' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_recovery_operation' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_update_operation' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'pause_symptoms' =>					[T_ZBX_STR, O_OPT, null,
+											IN([ACTION_PAUSE_SYMPTOMS_FALSE, ACTION_PAUSE_SYMPTOMS_TRUE]), null,
+											_('Pause operations for symptom problems')
+										],
 	'pause_suppressed' =>				[T_ZBX_STR, O_OPT, null,
 											IN([ACTION_PAUSE_SUPPRESSED_FALSE, ACTION_PAUSE_SUPPRESSED_TRUE]),
 											null,
@@ -268,6 +272,7 @@ if (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($eventsource == EVENT_SOURCE_TRIGGERS) {
+		$action['pause_symptoms'] = getRequest('pause_symptoms', ACTION_PAUSE_SYMPTOMS_FALSE);
 		$action['pause_suppressed'] = getRequest('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
 		$action['notify_if_canceled'] = getRequest('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_FALSE);
 	}
@@ -539,7 +544,7 @@ if (hasRequest('form')) {
 	if ($data['actionid']) {
 		$data['action'] = API::Action()->get([
 			'output' => ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed',
-				'notify_if_canceled'
+				'notify_if_canceled', 'pause_symptoms'
 			],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectOperations' => ['operationtype', 'esc_period', 'esc_step_from', 'esc_step_to', 'evaltype',
@@ -579,6 +584,7 @@ if (hasRequest('form')) {
 
 		if ($data['actionid'] && hasRequest('form_refresh')) {
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+				$data['action']['pause_symptoms'] = getRequest('pause_symptoms', ACTION_PAUSE_SYMPTOMS_FALSE);
 				$data['action']['pause_suppressed'] = getRequest('pause_suppressed', ACTION_PAUSE_SUPPRESSED_FALSE);
 				$data['action']['notify_if_canceled'] = getRequest('notify_if_canceled',
 					ACTION_NOTIFY_IF_CANCELED_FALSE
@@ -587,6 +593,9 @@ if (hasRequest('form')) {
 		}
 		else {
 			if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+				$data['action']['pause_symptoms'] = getRequest('pause_symptoms',
+					hasRequest('form_refresh') ? ACTION_PAUSE_SYMPTOMS_FALSE : ACTION_PAUSE_SYMPTOMS_TRUE
+				);
 				$data['action']['pause_suppressed'] = getRequest('pause_suppressed',
 					hasRequest('form_refresh') ? ACTION_PAUSE_SUPPRESSED_FALSE : ACTION_PAUSE_SUPPRESSED_TRUE
 				);
