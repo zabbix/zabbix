@@ -237,7 +237,7 @@ foreach ($data['items'] as $item) {
 
 	$wizard = (new CButton(null))
 		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
-		->setMenuPopup(CMenuPopupHelper::getItemConfiguration([
+		->setMenuPopup(CMenuPopupHelper::getItem([
 			'itemid' => $item['itemid'],
 			'context' => $data['context'],
 			'backurl' => $backurl

@@ -604,7 +604,7 @@ class testFormMacrosDiscoveredHost extends testFormMacros {
 	 */
 	public function testFormMacrosDiscoveredHost_CheckInheritedMacros() {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
-		$this->query('link', self::$hosts[8]['name'])->asPopupButton()->one()->select('Configuration');
+		$this->query('link', self::$hosts[8]['name'])->asPopupButton()->one()->select('Host');
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->selectTab('Macros');
 
