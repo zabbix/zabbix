@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-21T08:11:39Z'
+  date: '2022-10-24T13:30:53Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -3792,7 +3792,7 @@ zabbix_export:
         -
           macro: '{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}'
           value: ^/usr$
-          description: 'Partitions which low free space trigger should ignore'
+          description: 'Partitions that low free space trigger should ignore.'
         -
           macro: '{$BIGIP.MEMORY.UTIL.WARN.MAX}'
           value: '85'

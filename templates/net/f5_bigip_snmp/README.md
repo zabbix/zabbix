@@ -27,7 +27,7 @@ No specific Zabbix configuration is required.
 |{$BIGIP.FS.FREE.WARN.MIN} |<p>The warning threshold of the file system utilization in %.</p> |`10` |
 |{$BIGIP.LLD.FILTER.PART.NAME.MATCHES} |<p>Filter of discoverable mount point names.</p> |`.*` |
 |{$BIGIP.LLD.FILTER.PART.NAME.NOT_MATCHES} |<p>Filter to exclude discovered by mount point names.</p> |`CHANGE_IF_NEEDED` |
-|{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER} |<p>Partitions which low free space trigger should ignore</p> |`^/usr$` |
+|{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER} |<p>Partitions that low free space trigger should ignore.</p> |`^/usr$` |
 |{$BIGIP.MEMORY.UTIL.WARN.MAX} |<p>The warning threshold of the memory utilization in %.</p> |`85` |
 |{$BIGIP.MEMORY.UTIL.WARN.MIN} |<p>The recovery threshold of the memory utilization in %.</p> |`65` |
 |{$BIGIP.SWAP.UTIL.WARN.MAX} |<p>The warning threshold of the swap utilization in %.</p> |`85` |
