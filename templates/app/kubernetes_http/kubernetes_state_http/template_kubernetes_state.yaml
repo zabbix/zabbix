@@ -1,10 +1,7 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-24T13:21:56Z'
+  date: '2022-10-24T16:10:24Z'
   groups:
-    -
-      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd7
-      name: Applications
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -23,8 +20,6 @@ zabbix_export:
         
         Template tooling version used: 0.41
       groups:
-        -
-          name: Applications
         -
           name: Templates/Applications
       items:
@@ -710,11 +705,11 @@ zabbix_export:
               name: state_endpoint_name
               value: '{$KUBE.STATE.ENDPOINT.NAME}'
             -
-              name: api_endpoint
-              value: '{$KUBE.API.URL}/api'
-            -
               name: token
               value: '{$KUBE.API.TOKEN}'
+            -
+              name: api_endpoint
+              value: '{$KUBE.API.URL}/api'
           tags:
             -
               tag: component
@@ -756,7 +751,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Applications
+                    name: Templates/Applications
               group_prototypes:
                 -
                   name: 'Kubernetes/Components: {#COMPONENT.API}'
@@ -857,7 +852,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Applications
+                    name: Templates/Applications
               group_prototypes:
                 -
                   name: 'Kubernetes/Components: {#COMPONENT.CONTROLLER}'
@@ -1953,7 +1948,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Applications
+                    name: Templates/Applications
               group_prototypes:
                 -
                   name: 'Kubernetes/Components: {#COMPONENT}'
@@ -3696,7 +3691,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Applications
+                    name: Templates/Applications
               group_prototypes:
                 -
                   name: 'Kubernetes/Components: {#COMPONENT.SCHEDULER}'
