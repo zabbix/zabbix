@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-24T13:08:48Z'
+  date: '2022-10-24T13:21:56Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd7
@@ -451,7 +451,13 @@ zabbix_export:
             
                 var nodes = Kube.getNodes(),
                     kubeNodes = [];
+                    api_url = '{$KUBE.API.URL}',
+                    hostname = api_url.match(/\/\/(.+):/);
             
+                if (typeof hostname[1] === 'undefined') {
+                      Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
+                      throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
+                    };
                 for (idx in nodes.items) {
                     var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
                         return addr.type === 'InternalIP';
@@ -462,8 +468,9 @@ zabbix_export:
                     kubeNodes.push({
                         '{#NAME}': nodes.items[idx].metadata.name,
                         '{#IP}': internalIP,
-                        '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + internalIP + ':' + Kube.params.kubelet_port,
-                        '{#COMPONENT}': 'Kubelet'
+                        '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']')  + ':' + Kube.params.kubelet_port,
+                        '{#COMPONENT}': 'Kubelet',
+                        '{#CLUSTER_HOSTNAME}': hostname[1]
                     });
                 }
             
