@@ -199,7 +199,7 @@ function copyTriggersToHosts(array $dst_hostids, ?string $src_hostid, array $src
 	}
 
 	$options = [
-		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
+		'output' => ['triggerid', 'expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments', 'type',
 			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
 			'event_name'
 		],
@@ -258,8 +258,8 @@ function copyTriggersToHosts(array $dst_hostids, ?string $src_hostid, array $src
 
 	foreach ($dst_hosts as $dst_hostid => $dst_host) {
 		foreach ($src_triggers as $src_triggerid => $src_trigger) {
-			$dst_trigger = array_intersect_key($src_trigger, array_flip(['expression', 'description', 'url', 'status',
-				'priority', 'comments', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode',
+			$dst_trigger = array_intersect_key($src_trigger, array_flip(['expression', 'description', 'url_name', 'url',
+				'status', 'priority', 'comments', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode',
 				'correlation_tag', 'manual_close', 'opdata', 'event_name', 'tags'
 			]));
 

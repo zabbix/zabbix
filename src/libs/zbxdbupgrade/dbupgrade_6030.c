@@ -462,6 +462,20 @@ static int	DBpatch_6030059(void)
 	return DBset_default("media_type", &field);
 }
 
+static int DBpatch_6030060(void)
+{
+	const ZBX_FIELD	field = {"url_name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("triggers", &field);
+}
+
+static int DBpatch_6030061(void)
+{
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("triggers", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -528,5 +542,7 @@ DBPATCH_ADD(6030056, 0, 1)
 DBPATCH_ADD(6030057, 0, 1)
 DBPATCH_ADD(6030058, 0, 1)
 DBPATCH_ADD(6030059, 0, 1)
+DBPATCH_ADD(6030060, 0, 1)
+DBPATCH_ADD(6030061, 0, 1)
 
 DBPATCH_END()

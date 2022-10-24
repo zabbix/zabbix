@@ -1,10 +1,22 @@
 Changes for 6.4.0beta2
 
 New features:
+..F.....S. [ZBXNEXT-7972] implemented name for trigger URL (dpetra, kprutkovs)
+.......PS. [ZBXNEXT-6401] added new vmware keys vmware.datastore.perfcounter and vmware.hv.diskinfo.get (MVekslers)
+..F....... [ZBXNEXT-8038] improved layout for audit log report utilising two-column layout (kkuzmina)
+.........T [ZBX-21693] fixed repeated lines in templates (egordymov)
+.......PS. [ZBXNEXT-7816] added support of PostgreSQL 15 (vso)
+.......PS. [ZBXNEXT-7970] added support of TimescaleDB 2.8 (vso)
+.........T [ZBXNEXT-7902] added templates for Azure MySQL servers (vkhaliev)
 .........T [ZBX-21672] fixed event source in mediatypes (egordymov)
 ........S. [ZBXNEXT-7920] improved value cache not to drop items from cache when no new value has arrived in 24 hours (vso)
 
 Bug fixes:
+..F....... [ZBX-20505] fixed subfilter counters displaying incorrect values in Monitoring => Graph view (rdetlavs)
+........S. [ZBX-21733] improved performance of system information and queue calculation to reduce history syncer locking (vso)
+...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
+.........T [ZBX-21673] fixed read operations per second preprocessing in Ceph by Zabbix agent 2 template (drasihov)
+.......PS. [ZBX-21724] fixed updating of lastaccess for proxies in availman if active proxy is used (dgoloscapov)
 .........T [ZBX-21582] optimized HPE Synergy template to spread load across preprocessing workers (vkhaliev)
 ..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
 ..F....... [ZBX-21606] fixed "Allowed hosts" field in HTTP agent item (kkuzmina)
@@ -67,11 +79,20 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 Changes for 6.2.4rc1
 
 New features:
+.......PS. [ZBXNEXT-6401] added new vmware keys vmware.datastore.perfcounter and vmware.hv.diskinfo.get (MVekslers)
+.........T [ZBX-21693] fixed repeated lines in templates (egordymov)
+.......PS. [ZBXNEXT-7816] added support of PostgreSQL 15 (vso)
+.......PS. [ZBXNEXT-7970] added support of TimescaleDB 2.8 (vso)
+.........T [ZBXNEXT-7902] added templates for Azure MySQL servers (vkhaliev)
 .........T [ZBX-21672] fixed event source in mediatypes (egordymov)
 A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 
 Bug fixes:
+..F....... [ZBX-20505] fixed subfilter counters displaying incorrect values in Monitoring => Graph view (rdetlavs)
+...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
+.........T [ZBX-21673] fixed read operations per second preprocessing in Ceph by Zabbix agent 2 template (drasihov)
+.......PS. [ZBX-21724] fixed updating of lastaccess for proxies in availman if active proxy is used (dgoloscapov)
 .........T [ZBX-21582] optimized HPE Synergy template to spread load across preprocessing workers (vkhaliev)
 ..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
 ..F....... [ZBX-21606] fixed "Allowed hosts" field in HTTP agent item (kkuzmina)
@@ -491,11 +512,17 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.10rc1
 
 New features:
+.......PS. [ZBXNEXT-7816] added support of PostgreSQL 15 (vso)
+.......PS. [ZBXNEXT-7970] added support of TimescaleDB 2.8 (vso)
 .........T [ZBX-21672] fixed event source in mediatypes (egordymov)
 ..F....... [ZBXNEXT-7567] implemented saving the state of the default filters in monitoring sections (acikuns)
 A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 
 Bug fixes:
+..F....... [ZBX-20505] fixed subfilter counters displaying incorrect values in Monitoring => Graph view (rdetlavs)
+...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
+.........T [ZBX-21673] fixed read operations per second preprocessing in Ceph by Zabbix agent 2 template (drasihov)
+..F....... [ZBX-18478] fixed LDAP test button visibility in user authentication form (gcalenko)
 .........T [ZBX-21582] optimized HPE Synergy template to spread load across preprocessing workers (vkhaliev)
 ..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
 ..F....... [ZBX-21606] fixed "Allowed hosts" field in HTTP agent item (kkuzmina)
@@ -2662,6 +2689,9 @@ Changes for 5.0.29rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
+.........T [ZBX-21673] fixed read operations per second preprocessing in Ceph by Zabbix agent 2 template (drasihov)
+..F....... [ZBX-18478] fixed LDAP test button visibility in user authentication form (gcalenko)
 ..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
 A......... [ZBX-19224] added ability to unset headers in web scenario (rlataria)
 ..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
