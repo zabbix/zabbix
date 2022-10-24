@@ -117,6 +117,8 @@ class CHttpTestManager {
 		}
 		unset($httptest);
 
+		self::getItemIds($httptests, true);
+
 		self::createItems($httptests);
 		self::updateFields($httptests);
 		self::updateSteps($httptests);
@@ -160,6 +162,8 @@ class CHttpTestManager {
 		if ($upd_httptests) {
 			DB::update('httptest', $upd_httptests);
 		}
+
+		self::getItemIds($httptests, true);
 
 		self::updateItems($httptests, $db_httptests);
 		self::updateFields($httptests, $db_httptests);
@@ -1336,10 +1340,10 @@ class CHttpTestManager {
 
 	/**
 	 * Inherit passed http tests to hosts.
-	 * If $hostIds is empty that means that we need to inherit all $httpTests to hosts which are linked to templates
-	 * where $httpTests belong.
-	 *	 *
-	 * @param array $httpTests
+	 * If $hostids is empty that means that we need to inherit all $httptests to hosts which are linked to templates
+	 * where $httptests belong.
+	 *
+	 * @param array $httptests
 	 * @param array $hostIds
 	 *
 	 * @return bool
@@ -1357,10 +1361,11 @@ class CHttpTestManager {
 			}
 		}
 
-		self::$parent_itemids = self::getItemIds($httptests);
-		$preparedHttpTests = $this->prepareInheritedHttpTests($httptests, $template_hosts);
-		$inheritedHttpTests = $this->save($preparedHttpTests);
-		$this->inherit($inheritedHttpTests);
+		self::getItemIds($httptests);
+
+		$prepared_httptests = $this->prepareInheritedHttpTests($httptests, $template_hosts);
+		$inherited_httptests = $this->save($prepared_httptests);
+		$this->inherit($inherited_httptests);
 
 		return true;
 	}
@@ -1394,16 +1399,21 @@ class CHttpTestManager {
 	}
 
 	/**
-	 * Get item IDs array of the given web scenarios and their steps indexed by httptest ID and item key.
+	 * Index given web scenarios and their steps by httptest ID and item key.
 	 *
 	 * @param array $httptests
-	 *
-	 * @return array
+	 * @param bool  $parents   Index the parent httptests.
 	 */
-	private static function getItemIds(array $httptests): array {
-		$httptest_itemids = [];
+	private static function getItemIds(array $httptests, $parents = false): void {
+		$httptestids = $parents
+			? array_column($httptests, 'templateid', 'templateid')
+			: array_column($httptests, 'httptestid');
 
-		$httptestids = array_column($httptests, 'httptestid');
+		$httptestids = array_diff($httptestids, array_keys(self::$parent_itemids));
+
+		if (!$httptestids) {
+			return;
+		}
 
 		$result = DBselect(
 			'SELECT hti.httptestid,hti.itemid,i.key_'.
@@ -1413,7 +1423,7 @@ class CHttpTestManager {
 		);
 
 		while ($row = DBfetch($result)) {
-			$httptest_itemids[$row['httptestid']][$row['key_']] = $row['itemid'];
+			self::$parent_itemids[$row['httptestid']][$row['key_']] = $row['itemid'];
 		}
 
 		$result = DBselect(
@@ -1425,10 +1435,8 @@ class CHttpTestManager {
 		);
 
 		while ($row = DBfetch($result)) {
-			$httptest_itemids[$row['httptestid']][$row['key_']] = $row['itemid'];
+			self::$parent_itemids[$row['httptestid']][$row['key_']] = $row['itemid'];
 		}
-
-		return $httptest_itemids;
 	}
 
 	/**
@@ -1632,9 +1640,8 @@ class CHttpTestManager {
 			}
 
 			/*
-			 * Unset $http_tests and (later) put it back with actual httptestid as a key right after creating/updating
-			 * it. This is done in such a way because $http_tests array holds items with incremental keys which are not
-			 * a real httptestids.
+			 * Unset $http_tests and later put them back with actual httptestid as key right after creating/updating,
+			 * since initially the array holds items with incremental keys.
 			 */
 			unset($http_tests[$num]);
 		}

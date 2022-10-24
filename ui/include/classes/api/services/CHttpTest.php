@@ -525,7 +525,9 @@ class CHttpTest extends CApiService {
 			}
 		}
 
-		$httptests = $this->extendObjectsByKey($httptests, $db_httptests, 'httptestid', ['hostid', 'name']);
+		$httptests = $this->extendObjectsByKey($httptests, $db_httptests, 'httptestid',
+			['hostid', 'name', 'templateid']
+		);
 
 		// uniqueness
 		foreach ($httptests as &$httptest) {
@@ -620,7 +622,7 @@ class CHttpTest extends CApiService {
 	}
 
 	/**
-	 * @param array $db_items
+	 * @param array $db_httptests
 	 */
 	public static function deleteForce(array $db_httptests): void {
 		self::addInheritedHttptests($db_httptests);

@@ -3508,8 +3508,8 @@ class CApiInputValidator {
 	 * Try to parse delay/interval information and check that some polling can be performed during the schedule-week.
 	 *
 	 * Note: It is mainly assumed for macros to contain non-zero/empty values aimed at enabling polling.
-	 * In case of non-convertable entries (containing macros), we can only check for the edge case where
-	 * the whole week is blocked by convertable periods with an update interval of 0 ('zero-week' edge case).
+	 * In case of non-convertible entries (containing macros), we can only check for the edge case where
+	 * the whole week is blocked by convertible periods with an update interval of 0 ('zero-week' edge case).
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
