@@ -192,7 +192,7 @@ $actionForm->addItem([
 				->addClass('js-massdelete-action')
 				->addClass('no-chkbxrange')
 		]
-	], $data['eventsource'])
+	], 'action_'.$data['eventsource'])
 ]);
 
 $widget->addItem($actionForm);
