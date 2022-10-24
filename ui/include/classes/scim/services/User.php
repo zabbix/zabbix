@@ -175,7 +175,7 @@ class User extends ScimApiService {
 	public function post(array $options): array {
 		$this->validatePost($options);
 
-		$db_user = APIRPC::User()->get([
+		$db_users = APIRPC::User()->get([
 			'output' => ['userid', 'userdirectoryid'],
 			'filter' => ['username' => $options['userName']]
 		]);
@@ -187,15 +187,15 @@ class User extends ScimApiService {
 		$user_data += $provisioning->getUserAttributes($options);
 		$user_data['medias'] = $provisioning->getUserMedias($options);
 
-		if (!$db_user) {
+		if (!$db_users) {
 			$user_data['username'] = $options['userName'];
 			$user = APIRPC::User()->createProvisionedUser($user_data);
 		}
-		elseif ($db_user[0]['userdirectoryid'] == $userdirectoryid) {
-			$user_data['userid'] = $db_user[0]['userid'];
+		elseif ($db_users[0]['userdirectoryid'] == $userdirectoryid) {
+			$user_data['userid'] = $db_users[0]['userid'];
 			$user_data['usrgrps'] = [];
 			$user = APIRPC::User()->updateProvisionedUser($user_data);
-			$user['userid'] = $db_user[0]['userid'];
+			$user['userid'] = $db_users[0]['userid'];
 		}
 		else {
 			self::exception(self::SCIM_ERROR_BAD_REQUEST,
