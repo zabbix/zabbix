@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-21T12:05:01Z'
+  date: '2022-10-24T13:08:48Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd7
@@ -128,7 +128,14 @@ zabbix_export:
                 Kube.setParams(JSON.parse(value));
             
                 var nodes = Kube.getNodes(),
-                    controlPlaneNodes = [];
+                    controlPlaneNodes = [],
+                    api_url = '{$KUBE.API.URL}',
+                    hostname = api_url.match(/\/\/(.+):/);
+            
+                if (typeof hostname[1] === 'undefined') {
+                        Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
+                        throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
+                    };
             
                 for (idx in nodes.items) {
                     for (label in nodes.items[idx].metadata.labels) {
@@ -138,16 +145,16 @@ zabbix_export:
                             });
             
                             var internalIP = internalIPs.length && internalIPs[0].address;
-            
                             controlPlaneNodes.push({
                                 '{#NAME}': nodes.items[idx].metadata.name,
                                 '{#IP}': internalIP,
-                                '{#KUBE.API.SERVER.URL}': Kube.params.api_server_scheme + '://' + internalIP + ':' + Kube.params.api_server_port + '/metrics',
-                                '{#KUBE.CONTROLLER.SERVER.URL}': Kube.params.controller_scheme + '://' + internalIP + ':' + Kube.params.controller_port + '/metrics',
-                                '{#KUBE.SCHEDULER.SERVER.URL}': Kube.params.scheduler_scheme + '://' + internalIP + ':' + Kube.params.scheduler_port + '/metrics',
+                                '{#KUBE.API.SERVER.URL}': Kube.params.api_server_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.api_server_port + '/metrics',
+                                '{#KUBE.CONTROLLER.SERVER.URL}': Kube.params.controller_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.controller_port + '/metrics',
+                                '{#KUBE.SCHEDULER.SERVER.URL}': Kube.params.scheduler_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.scheduler_port + '/metrics',
                                 '{#COMPONENT.API}' : 'API',
                                 '{#COMPONENT.CONTROLLER}' : 'Controller manager',
-                                '{#COMPONENT.SCHEDULER}' : 'Scheduler'
+                                '{#COMPONENT.SCHEDULER}' : 'Scheduler',
+                                '{#CLUSTER_HOSTNAME}': hostname[1]
                             });
             
                             break;
@@ -696,11 +703,11 @@ zabbix_export:
               name: state_endpoint_name
               value: '{$KUBE.STATE.ENDPOINT.NAME}'
             -
-              name: token
-              value: '{$KUBE.API.TOKEN}'
-            -
               name: api_endpoint
               value: '{$KUBE.API.URL}/api'
+            -
+              name: token
+              value: '{$KUBE.API.TOKEN}'
           tags:
             -
               tag: component
