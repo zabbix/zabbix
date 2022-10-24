@@ -27,6 +27,7 @@ No specific Zabbix configuration is required.
 |{$BIGIP.FS.FREE.WARN.MIN} |<p>The warning threshold of the file system utilization in %.</p> |`10` |
 |{$BIGIP.LLD.FILTER.PART.NAME.MATCHES} |<p>Filter of discoverable mount point names.</p> |`.*` |
 |{$BIGIP.LLD.FILTER.PART.NAME.NOT_MATCHES} |<p>Filter to exclude discovered by mount point names.</p> |`CHANGE_IF_NEEDED` |
+|{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER} |<p>Partitions that low free space trigger should ignore.</p> |`^/usr$` |
 |{$BIGIP.MEMORY.UTIL.WARN.MAX} |<p>The warning threshold of the memory utilization in %.</p> |`85` |
 |{$BIGIP.MEMORY.UTIL.WARN.MIN} |<p>The recovery threshold of the memory utilization in %.</p> |`65` |
 |{$BIGIP.SWAP.UTIL.WARN.MAX} |<p>The warning threshold of the swap utilization in %.</p> |`85` |
@@ -43,7 +44,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|File system discovery |<p>A table containing entries of system disk usage information.</p> |SNMP |bigip.disktable.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- A: {#PART.NAME} MATCHES_REGEX `{$BIGIP.LLD.FILTER.PART.NAME.MATCHES}`</p><p>- B: {#PART.NAME} NOT_MATCHES_REGEX `{$BIGIP.LLD.FILTER.PART.NAME.NOT_MATCHES}`</p> |
+|File system discovery |<p>A table containing entries of system disk usage information.</p> |SNMP |bigip.disktable.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- A: {#PART.NAME} MATCHES_REGEX `{$BIGIP.LLD.FILTER.PART.NAME.MATCHES}`</p><p>- B: {#PART.NAME} NOT_MATCHES_REGEX `{$BIGIP.LLD.FILTER.PART.NAME.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Skip trigger for defined filesystems<br> - {#PART.NAME} MATCHES_REGEX `{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}`<br>  - TRIGGER_PROTOTYPE REGEXP `^F5 BIG-IP: Low free space in file system` - NO_DISCOVER</p> |
 |Memory discovery |<p>Containing system statistics information of the memory usage</p> |SNMP |bigip.memory.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |CPU discovery |<p>A table containing entries of system CPU usage information for a system.</p> |SNMP |bigip.cpu.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Network interface discovery |<p>A table containing statistic information of the interfaces on the device.</p> |SNMP |bigip.net.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
@@ -200,7 +201,7 @@ There are no template links in this template.
 |F5 BIG-IP: Power supply [{#POWER.INDEX}] is not present |<p>Please check the power supply unit</p> |`{TEMPLATE_NAME:bigip.chassis.power.status[{#POWER.INDEX}].last()}=2` |INFO | |
 |F5 BIG-IP: Less than {$BIGIP.CERT.MIN} days left until the certificate expires ({#CERT.NAME}) |<p>Please check certificate</p> |`{TEMPLATE_NAME:bigip.cert.expiration.date[{#CERT.NAME}].last()} - 86400 * {$BIGIP.CERT.MIN} < {TEMPLATE_NAME:bigip.cert.expiration.date[{#CERT.NAME}].now()}` |WARNING | |
 |F5 BIG-IP: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`{TEMPLATE_NAME:zabbix[host,snmp,available].max({$SNMP.TIMEOUT})}=0` |WARNING | |
-|F5 BIG-IP: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:bigip.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
+|F5 BIG-IP: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes.</p> |`{TEMPLATE_NAME:bigip.uptime.last()}<10m` |INFO |<p>Manual close: YES</p> |
 |F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.HIGH} °C |<p>-</p> |`{TEMPLATE_NAME:bigip.chassis.temp.value[{#TEMP.INDEX}].last()}>{$BIGIP.TEMP.HIGH}` |HIGH | |
 |F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.WARN} °C |<p>-</p> |`{TEMPLATE_NAME:bigip.chassis.temp.value[{#TEMP.INDEX}].last()}>{$BIGIP.TEMP.WARN}` |WARNING |<p>**Depends on**:</p><p>- F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.HIGH} °C</p> |
 
