@@ -290,10 +290,11 @@ static int	filter_evaluate_and_or_andor(const lld_filter_t *filter, const struct
 	char			*lastmacro = NULL;
 	lld_condition_t		*condition;
 	char			*ops[] = {NULL, "and", "or"}, error[256], value[16], id[ZBX_MAX_UINT64_LEN + 2], *p,
-				*expression = NULL, *eval_expr = NULL, *errmsg = NULL;
+				*expression = NULL, *errmsg = NULL;
 	size_t			expression_alloc = 0, expression_offset = 0, id_len, value_len;
-	size_t			eval_expr_alloc = 0, eval_expr_offset = 0;
 	zbx_vector_ptr_t	errmsgs;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&errmsgs);
 
@@ -325,19 +326,14 @@ static int	filter_evaluate_and_or_andor(const lld_filter_t *filter, const struct
 
 		zbx_snprintf_alloc(&expression, &expression_alloc, &expression_offset, "{" ZBX_FS_UI64 "}",
 				condition->id);
-	}
 
-	if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
-		zbx_chrcpy_alloc(&expression, &expression_alloc, &expression_offset, ')');
+		if (filter->conditions.values_num == i + 1)
+		{
+			if (CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
+				zbx_chrcpy_alloc(&expression, &expression_alloc, &expression_offset, ')');
 
-	zbx_strcpy_alloc(&eval_expr, &eval_expr_alloc, &eval_expr_offset, expression);
-
-	/* include trailing zero */
-	eval_expr_offset++;
-
-	for (i = 0; i < filter->conditions.values_num; i++)
-	{
-		condition = (lld_condition_t *)filter->conditions.values[i];
+			expression_offset++;
+		}
 
 		if (SUCCEED == (ret = filter_condition_match(jp_row, lld_macro_paths, condition, &res, &errmsg)))
 		{
@@ -355,18 +351,18 @@ static int	filter_evaluate_and_or_andor(const lld_filter_t *filter, const struct
 		value_len = strlen(value);
 		id_len = strlen(id);
 
-		for (p = strstr(eval_expr, id); NULL != p; p = strstr(p, id))
+		for (p = strstr(expression, id); NULL != p; p = strstr(p, id))
 		{
-			size_t	id_pos = p - eval_expr;
+			size_t	id_pos = p - expression;
 
-			zbx_replace_mem_dyn(&eval_expr, &eval_expr_alloc, &eval_expr_offset, id_pos, id_len,
+			zbx_replace_mem_dyn(&expression, &expression_alloc, &expression_offset, id_pos, id_len,
 					value, value_len);
 
-			p = eval_expr + id_pos + value_len - id_len;
+			p = expression + id_pos + value_len - id_len;
 		}
 	}
 
-	if (SUCCEED == zbx_evaluate(&result, eval_expr, error, sizeof(error), &errmsgs))
+	if (SUCCEED == zbx_evaluate(&result, expression, error, sizeof(error), &errmsgs))
 	{
 		ret = (SUCCEED != zbx_double_compare(result, 0) ? SUCCEED : FAIL);
 	}
@@ -377,7 +373,6 @@ static int	filter_evaluate_and_or_andor(const lld_filter_t *filter, const struct
 	}
 
 	zbx_free(expression);
-	zbx_free(eval_expr);
 	zbx_vector_ptr_clear_ext(&errmsgs, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&errmsgs);
 
