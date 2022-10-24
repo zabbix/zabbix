@@ -4259,6 +4259,14 @@ msgstr "Délai de connexion dépassé"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Délai d'attente de %1$s secondes dépassé lors de la connexion au serveur Zabbix \"%2$s\"."
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4269,6 +4277,16 @@ msgstr ""
 "La connexion au serveur Zabbix \"%1$s\" a échoué. Raisons possibles :\n"
 "1. IP du serveur ou DNS incorrect dans le fichier \"zabbix.conf.php\" ;\n"
 "2. Configuration incorrecte du serveur DNS.\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4284,6 +4302,14 @@ msgstr ""
 "2. L'environnement de sécurité (par exemple, SELinux) bloque la connexion ;\n"
 "3. Le démon du serveur Zabbix ne fonctionne pas ;\n"
 "4. Le pare-feu bloque la connexion TCP.\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -9950,6 +9976,10 @@ msgctxt "compact table header"
 msgid "Info"
 msgstr "Info"
 
+#: include/classes/data/CItemData.php:1429
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -12032,6 +12062,11 @@ msgstr "URL de l'entrée de menu"
 #: app/views/administration.mediatype.edit.php:248
 msgid "Menu entry name"
 msgstr "Nom de l'entrée de menu"
+
+#: include/views/configuration.trigger.prototype.edit.php:554
+#: include/views/configuration.triggers.edit.php:576
+msgid "Menu entry name is used as a label for the trigger URL in the event context menu."
+msgstr ""
 
 #: app/views/administration.script.edit.php:108
 msgid "Menu path"
@@ -20150,6 +20185,10 @@ msgstr "Statistiques de capacité du datastore VMware en octets ou en pourcentag
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "Liste des hyperviseurs du datastore VMware, <url> - URL du service VMware, <datastore> - nom du datastore"
 
+#: include/classes/data/CItemData.php:1321
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr "Propriété du datastore VMware, <url> - URL du service VMware, <uuid> - nom du datastore, <prop> - chemin de la propriété"
@@ -21345,6 +21384,14 @@ msgstr "Formulaire de connexion Zabbix"
 #: app/views/administration.script.edit.php:127
 msgid "Zabbix server"
 msgstr "Serveur Zabbix"
+
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:601
 #, c-format

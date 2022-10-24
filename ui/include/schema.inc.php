@@ -2827,12 +2827,6 @@ return [
 				'length' => 2048,
 				'default' => ''
 			],
-			'url_name' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => ''
-			],
 			'status' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -2945,6 +2939,12 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
+				'default' => ''
+			],
+			'url_name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
 				'default' => ''
 			]
 		]
