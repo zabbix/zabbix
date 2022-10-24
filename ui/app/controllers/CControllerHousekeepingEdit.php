@@ -125,7 +125,7 @@ class CControllerHousekeepingEdit extends CController {
 					$data['compression_availability'] = array_key_exists('compression_availability', $dbversion)
 						&& $dbversion['compression_availability'];
 
-					if ($data['compression_availability'] && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+					if ($data['compression_availability']) {
 						$data += CHousekeepingHelper::getWarnings($dbversion_status);
 					}
 
