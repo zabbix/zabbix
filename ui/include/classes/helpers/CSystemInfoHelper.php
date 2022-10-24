@@ -49,11 +49,12 @@ class CSystemInfoHelper {
 		foreach ($dbversion_status as $dbversion) {
 			if (array_key_exists('history_pk', $dbversion)) {
 				$data['history_pk'] = ($dbversion['history_pk'] == 1);
-			}
-			elseif ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
-				$data += CHousekeepingHelper::getWarnings($dbversion_status);
+
+				break;
 			}
 		}
+
+		$data += CHousekeepingHelper::getWarnings($dbversion_status);
 
 		$ha_cluster_enabled = false;
 

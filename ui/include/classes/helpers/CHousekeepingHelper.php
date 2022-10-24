@@ -88,17 +88,13 @@ class CHousekeepingHelper extends CConfigGeneralHelper {
 					&& $dbversion['compression_availability'];
 
 				if ($compression_available) {
-					if (self::get(self::HK_HISTORY_MODE) == 1 && self::get(self::HK_HISTORY_GLOBAL) == 0) {
-						$warnings[self::OVERRIDE_NEEDED_HISTORY] =
-							array_key_exists(self::DBVERSION_COMPRESSED_CHUNKS_HISTORY, $dbversion)
-								&& $dbversion[self::DBVERSION_COMPRESSED_CHUNKS_HISTORY] == 1;
-					}
+					$warnings[self::OVERRIDE_NEEDED_HISTORY] =
+						array_key_exists(self::DBVERSION_COMPRESSED_CHUNKS_HISTORY, $dbversion)
+							&& $dbversion[self::DBVERSION_COMPRESSED_CHUNKS_HISTORY] == 1;
 
-					if (self::get(self::HK_TRENDS_MODE) == 1 && self::get(self::HK_TRENDS_GLOBAL) == 0) {
-						$warnings[self::OVERRIDE_NEEDED_TRENDS] =
-							array_key_exists(self::DBVERSION_COMPRESSED_CHUNKS_TRENDS, $dbversion)
-								&& $dbversion[self::DBVERSION_COMPRESSED_CHUNKS_TRENDS] == 1;
-					}
+					$warnings[self::OVERRIDE_NEEDED_TRENDS] =
+						array_key_exists(self::DBVERSION_COMPRESSED_CHUNKS_TRENDS, $dbversion)
+							&& $dbversion[self::DBVERSION_COMPRESSED_CHUNKS_TRENDS] == 1;
 				}
 
 				break;

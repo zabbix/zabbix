@@ -135,13 +135,10 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	 * @return array
 	 */
 	public static function getDbVersionStatus(): array {
-		$dbversion_status = self::getGlobal(self::DBVERSION_STATUS);
-		$dbversion_status = ($dbversion_status === '' || $dbversion_status === null)
-			? []
-			: json_decode($dbversion_status, true);
+		$dbversion_status = json_decode((string) self::getGlobal(self::DBVERSION_STATUS), true);
 
-		if ($dbversion_status && !is_numeric(key($dbversion_status))) {
-			$dbversion_status = [$dbversion_status];
+		if (!is_array($dbversion_status)) {
+			return [];
 		}
 
 		return $dbversion_status;
