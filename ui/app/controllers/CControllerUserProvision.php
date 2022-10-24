@@ -62,7 +62,7 @@ class CControllerUserProvision extends CController {
 			}
 
 			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_('Provisioning successfull.'));
+			CMessageHelper::setSuccessTitle(_('Provisioning successful.'));
 		}
 		else {
 			CMessageHelper::setErrorTitle(
