@@ -1080,7 +1080,7 @@ class CHttpTestManager {
 						'status' => $item_status,
 						'tags' => $item_tags,
 						'delay' => $httptest['delay'],
-						'templateid' => array_key_exists('templateid', $httptest)
+						'templateid' => array_key_exists('templateid', $httptest) && $httptest['templateid'] != 0
 							? self::$parent_itemids[$httptest['templateid']][$item_key]
 							: 0
 					] + $type_item;
