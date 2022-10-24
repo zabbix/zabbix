@@ -29,7 +29,6 @@ import (
 	_ "zabbix.com/plugins/net/dns"
 	_ "zabbix.com/plugins/net/tcp"
 	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
 	_ "zabbix.com/plugins/redis"
 	_ "zabbix.com/plugins/smart"
 	_ "zabbix.com/plugins/system/sw"
