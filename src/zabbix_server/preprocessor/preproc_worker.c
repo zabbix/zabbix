@@ -30,9 +30,7 @@
 #include "preproc_history.h"
 #include "zbxtime.h"
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 #define ZBX_PREPROC_VALUE_PREVIEW_LEN		100
 
@@ -583,10 +581,10 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 	zbx_ipc_socket_t		socket;
 	zbx_ipc_message_t		message;
 	zbx_preproc_dep_request_t	dep_request;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
@@ -607,7 +605,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	memset(&dep_request, 0, sizeof(dep_request));
 	zbx_variant_set_none(&dep_request.value);
@@ -616,7 +614,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != zbx_ipc_socket_read(&socket, &message))
 		{
@@ -624,7 +622,7 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 			exit(EXIT_FAILURE);
 		}
 
-		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 		zbx_update_env(zbx_time());
 
 		switch (message.code)

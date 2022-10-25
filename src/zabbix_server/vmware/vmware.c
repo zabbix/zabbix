@@ -5275,7 +5275,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 
 	zbx_vector_str_clear_ext(&scsi_luns, zbx_str_free);
 	hvid_esc = zbx_xml_escape_dyn(hvid);
-	tmp = zbx_dsprintf(NULL, ZBX_POST_HV_DISK_INFO, pcollecter, scsi_req, hvid_esc);
+	tmp = zbx_dsprintf(NULL, ZBX_POST_HV_DISK_INFO, pcollecter, ZBX_NULL2EMPTY_STR(scsi_req), hvid_esc);
 	zbx_free(hvid_esc);
 	zbx_free(scsi_req);
 
@@ -7901,9 +7901,7 @@ static void	vmware_counters_add_new(zbx_vector_ptr_t *counters, zbx_uint64_t cou
  ******************************************************************************/
 static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyhandle, char **error)
 {
-#	define UNPARSED_SERVICE_MAJOR_VERSION_DELIM	"."
-
-	char			*subversion, *version = NULL, *fullname = NULL;
+	char			*version_without_major, *version_update, *version = NULL, *fullname = NULL;
 	zbx_vector_ptr_t	counters;
 	int			ret = FAIL;
 
@@ -7962,23 +7960,15 @@ static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyha
 
 	/* version should have the "x.y.z" format, but there is also an "x.y Un" format in nature */
 	/* according to https://www.vmware.com/support/policies/version.html */
-	if (NULL == (subversion = strstr(version, UNPARSED_SERVICE_MAJOR_VERSION_DELIM)))
+	if (NULL == (version_without_major = strchr(version, '.')) ||
+			NULL == (version_update = strpbrk(++version_without_major, ".U")))
 	{
 		*error = zbx_dsprintf(*error, "Invalid version: %s.", version);
 		goto unlock;
 	}
 
-	service->minor_version = (unsigned short)atoi(
-			ZBX_CONST_STRLEN(UNPARSED_SERVICE_MAJOR_VERSION_DELIM) + subversion);
-
-	if (NULL != (subversion = strstr(ZBX_CONST_STRLEN(UNPARSED_SERVICE_MAJOR_VERSION_DELIM) + subversion,
-			UNPARSED_SERVICE_MAJOR_VERSION_DELIM)))
-	{
-		service->patch_version = (unsigned short)atoi(
-				ZBX_CONST_STRLEN(UNPARSED_SERVICE_MAJOR_VERSION_DELIM) + subversion);
-	}
-	else
-		service->patch_version = 0;
+	service->minor_version = (unsigned short)atoi(version_without_major);
+	service->update_version = (unsigned short)atoi(++version_update);
 
 	ret = SUCCEED;
 unlock:

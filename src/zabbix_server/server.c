@@ -50,7 +50,6 @@
 #include "snmptrapper/snmptrapper.h"
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
-#include "selfmon/selfmon.h"
 #include "vmware/vmware.h"
 #include "taskmanager/taskmanager.h"
 #include "preprocessor/preproc_manager.h"
@@ -80,6 +79,7 @@
 #include "zbxip.h"
 #include "zbxsysinfo.h"
 #include "zbx_rtc_constants.h"
+#include "zbxthreads.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -189,10 +189,6 @@ static unsigned char	get_program_type(void)
 {
 	return program_type;
 }
-
-ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
-ZBX_THREAD_LOCAL int		process_num	= 0;
-ZBX_THREAD_LOCAL int		server_num	= 0;
 
 int	CONFIG_ALERTER_FORKS		= 3;
 int	CONFIG_DISCOVERER_FORKS		= 1;
@@ -338,6 +334,8 @@ int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
 char	*CONFIG_WEBSERVICE_URL	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
+
+struct zbx_db_version_info_t	db_version_info;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -1180,9 +1178,8 @@ int	main(int argc, char **argv)
 
 static void	zbx_check_db(void)
 {
-	struct zbx_db_version_info_t	db_version_info;
-	struct zbx_json			db_version_json;
-	int				result = SUCCEED;
+	struct zbx_json	db_version_json;
+	int		result = SUCCEED;
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
 	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
@@ -1217,6 +1214,12 @@ static void	zbx_check_db(void)
 			zabbix_log(LOG_LEVEL_WARNING, "database could be upgraded to use primary keys in history tables");
 		}
 
+#if defined(HAVE_POSTGRESQL)
+		if (0 == zbx_strcmp_null(db_version_info.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
+		{
+			zbx_tsdb_extract_compressed_chunk_flags(&db_version_info);
+		}
+#endif
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == result)
@@ -1227,13 +1230,10 @@ static void	zbx_check_db(void)
 	}
 
 	DBclose();
-	zbx_free(db_version_info.friendly_current_version);
-	zbx_free(db_version_info.extension);
-	zbx_free(db_version_info.ext_friendly_current_version);
-	zbx_free(db_version_info.ext_lic);
 
-	if(SUCCEED != result)
+	if (SUCCEED != result)
 	{
+		zbx_db_version_info_clear(&db_version_info);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -1283,6 +1283,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
+	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, &db_version_info};
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1356,16 +1357,17 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	for (i = 0; i < threads_num; i++)
 	{
-		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.process_type, &thread_args.process_num))
+		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.info.process_type,
+				&thread_args.info.process_num))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}
 
-		thread_args.server_num = i + 1;
+		thread_args.info.server_num = i + 1;
 		thread_args.args = NULL;
 
-		switch (thread_args.process_type)
+		switch (thread_args.info.process_type)
 		{
 			case ZBX_PROCESS_TYPE_SERVICEMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
@@ -1427,6 +1429,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(alerter_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HOUSEKEEPER:
+				thread_args.args = &housekeeper_args;
 				zbx_thread_start(housekeeper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TIMER:
@@ -1460,7 +1463,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(proxypoller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SELFMON:
-				zbx_thread_start(selfmon_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_selfmon_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_VMWARE:
 				zbx_thread_start(vmware_thread, &thread_args, &threads[i]);
@@ -2000,6 +2003,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zabbix_log(LOG_LEVEL_CRIT, "cannot pause HA manager: %s", error);
 		zbx_free(error);
 	}
+
+	zbx_db_version_info_clear(&db_version_info);
 
 	zbx_on_exit(ZBX_EXIT_STATUS());
 

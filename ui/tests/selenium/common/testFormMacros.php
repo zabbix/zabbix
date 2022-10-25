@@ -20,6 +20,8 @@
 
 
 require_once 'vendor/autoload.php';
+
+require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
@@ -508,7 +510,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			if ($host_type === 'host') {
 				$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 				$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
-				$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+				$column->query('link', $name)->asPopupButton()->one()->select('Host');
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
 			else {
@@ -602,7 +604,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		if ($host_type === 'host') {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
-			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
@@ -870,7 +872,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 					->getColumn('Name');
-			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
@@ -1005,7 +1007,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 					->getColumn('Name');
-			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
@@ -1161,7 +1163,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 					->getColumn('Name');
-			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 		}
 		else {
 			$this->page->open($link);
@@ -1219,7 +1221,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 					->getColumn('Name');
-			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
 		else {
@@ -1755,7 +1757,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		if ($source === 'hosts') {
 			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilReady()
 					->findRow('Name', $name, true)->getColumn('Name');
-			$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
+			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Macros');
 		}
 		else {

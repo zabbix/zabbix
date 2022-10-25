@@ -1968,7 +1968,7 @@ class testFormHost extends CWebTest {
 				->query($this->monitoring ? 'tag:a' : "xpath:.//a[@onclick]")->waitUntilClickable();
 
 		if ($this->monitoring) {
-			$host_link->asPopupButton()->one()->select('Configuration');
+			$host_link->asPopupButton()->one()->select('Host');
 		}
 		else {
 			$host_link->one()->click();
