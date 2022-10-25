@@ -5222,7 +5222,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 	zbx_free(hvid_esc);
 	zbx_free(scsi_req);
 
-	if (SUCCEED != (ret = zbx_property_collection_init(easyhandle, tmp, pcollecter, &iter, &doc, error)))
+	if (SUCCEED != (ret = zbx_property_collection_init(easyhandle, tmp, pcollecter, __func__, &iter, &doc, error)))
 		goto out;
 
 	updated += vmware_service_hv_disks_parse_info(doc, dss, disks_info);
@@ -5232,7 +5232,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 		zbx_xml_free_doc(doc);
 		doc = NULL;
 
-		if (SUCCEED != (ret = zbx_property_collection_next(iter, &doc, error)))
+		if (SUCCEED != (ret = zbx_property_collection_next(__func__, iter, &doc, error)))
 			goto out;
 
 		updated += vmware_service_hv_disks_parse_info(doc, dss, disks_info);
@@ -5249,7 +5249,8 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 			"<ns0:pathSet>config.vsanHostConfig.storageInfo.diskMapping</ns0:pathSet>", hvid_esc);
 	zbx_free(hvid_esc);
 
-	if (SUCCEED != (ret = zbx_property_collection_init(easyhandle, tmp, pcollecter, &iter, &doc_dinfo, &err)))
+	if (SUCCEED != (ret = zbx_property_collection_init(easyhandle, tmp, pcollecter, __func__, &iter, &doc_dinfo,
+			&err)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot get vsan disk_info:%s", __func__, err);
 		zbx_str_free(err);
@@ -5263,7 +5264,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 		zbx_xml_free_doc(doc_dinfo);
 		doc_dinfo = NULL;
 
-		if (SUCCEED != (ret = zbx_property_collection_next(iter, &doc_dinfo, error)))
+		if (SUCCEED != (ret = zbx_property_collection_next(__func__, iter, &doc_dinfo, error)))
 			goto out;
 
 		updated_vsan += vmware_service_hv_vsan_parse_info(doc_dinfo, vsan_uuid, disks_info);
