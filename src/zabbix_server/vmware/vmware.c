@@ -7467,7 +7467,7 @@ static int	vmware_service_get_cluster_state(CURL *easyhandle, const zbx_vector_v
 		ZBX_POST_VSPHERE_FOOTER
 
 	char			*tmp, *clusterid_esc, *cq_prop;
-	int			i, ret = FAIL;
+	int			i, ret;
 	xmlDoc			*doc = NULL;
 	zbx_vector_cq_value_t	cqvs;
 	zbx_vector_str_t	ids;
