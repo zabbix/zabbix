@@ -822,10 +822,8 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$ldap_userdirectories_delete = array_filter($db_userdirectories, function ($userdirectory) {
-			return $userdirectory['idp_type'] == IDP_TYPE_LDAP;
-		});
-
+		$ldap_userdirectories_delete = array_column($db_userdirectories, 'idp_type', 'userdirectoryid');
+		$ldap_userdirectories_delete = array_keys($ldap_userdirectories_delete, IDP_TYPE_LDAP);
 		$ldap_userdirectories_left = API::UserDirectory()->get([
 			'countOutput' => true,
 			'filter' => ['idp_type' => IDP_TYPE_LDAP]
