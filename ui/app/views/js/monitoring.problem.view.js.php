@@ -154,7 +154,7 @@
 				view.refreshNow();
 
 				clearMessages();
-				addMessage(makeMessageBox('good', [], response.message));
+				addMessage(makeMessageBox('good', [], response.success.title));
 			});
 
 			$(document).on('submit', '#problem_form', function(e) {

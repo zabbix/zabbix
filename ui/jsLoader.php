@@ -385,13 +385,16 @@ $translate_strings = [
 		'Last month graph' => _('Last month graph'),
 		'Last week graph' => _('Last week graph'),
 		'Problems' => _('Problems'),
+		'Problem' => _('Problem'),
+		'Mark as cause' => _('Mark as cause'),
+		'Mark selected as symptoms' => _('Mark selected as symptoms'),
 		'Scripts' => _('Scripts'),
 		'Submap' => _('Submap'),
 		'S_TRIGGER' => _('Trigger'),
 		'URL' => _('URL'),
 		'Values' => _('Values'),
 		'Web' => _('Web'),
-		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
+		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader'),
 	],
 	'init.js' => [
 		'Debug' => _('Debug'),

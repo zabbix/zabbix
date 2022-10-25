@@ -129,6 +129,15 @@ if ($data['has_ack_events']) {
 	);
 }
 
+if ($data['allowed_change_problem_ranking']) {
+	$form_list->addRow(
+		(new CLabel([_('Convert to cause'),
+			makeHelpIcon(_('Converts a symptom event back to cause event'))
+		])),
+		(new CCheckBox('change_rank', ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE))
+	);
+}
+
 $form_list
 	->addRow(_('Close problem'),
 		(new CCheckBox('close_problem', ZBX_PROBLEM_UPDATE_CLOSE))

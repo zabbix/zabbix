@@ -32,7 +32,7 @@ $this->addJsFile('class.calendar.js');
 
 	'$.subscribe("acknowledge.create", function(event, response, overlay) {'.
 		'clearMessages();'.
-		'addMessage(makeMessageBox("good", [], response.message, true, false));'.
+		'addMessage(makeMessageBox("good", [], response.success.title, true, false));'.
 	'});'
 ))
 	->setOnDocumentReady()
