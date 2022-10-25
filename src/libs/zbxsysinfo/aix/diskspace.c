@@ -89,7 +89,7 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 }
 
 static int	vfs_fs_used(const char *fs, AGENT_RESULT *result)
-
+{
 	zbx_uint64_t	value;
 	char		*error;
 
