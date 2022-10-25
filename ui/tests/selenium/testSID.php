@@ -248,13 +248,6 @@ class testSID extends CWebTest {
 				'json_output' => true
 			]],
 
-			// Dashboard widget configure.
-			[[
-				'link' => 'zabbix.php?action=dashboard.widget.configure&type=actionlog&view_mode=0&fields=%7B%22rf_rate'.
-					'%22%3A%22-1%22%2C%22sort_triggers%22%3A%224%22%2C%22show_lines%22%3A%2225%22%7D',
-				'json_output' => true
-			]],
-
 			// Dashboard widget refresh rate.
 			[[
 				'link' => 'zabbix.php?action=dashboard.widget.rfrate&widgetid=2002&rf_rate=120',
@@ -276,12 +269,6 @@ class testSID extends CWebTest {
 			// Template dashboard delete.
 			[[
 				'link' => 'zabbix.php?form_refresh=1&templateid=10076&dashboardids%5B146%5D=146&action=template.dashboard.delete'
-			]],
-
-			// Template dashboard widget edit.
-			[[
-				'link' => 'zabbix.php?action=dashboard.widget.edit&templateid=10076', // TODO AS: - need to fix
-				'json_output' => true
 			]],
 
 			// User token delete.
