@@ -465,11 +465,12 @@ static int	DBpatch_6030059(void)
 static int	DBpatch_6030060(void)
 {
 	const ZBX_TABLE table =
-		{"event_rank", "eventid", 0,
+		{"event_symptom", "eventid", 0,
 			{
-				{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"c_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"eventid", NULL, "events", "evendid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+						ZBX_FK_CASCADE_DELETE},
+				{"cause_eventid", NULL, "events", "evendid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"rank_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{0}
 			},
 			NULL
@@ -482,30 +483,42 @@ static int	DBpatch_6030061(void)
 {
 	const ZBX_FIELD	field = {"eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("event_rank", 1, &field);
+	return DBadd_foreign_key("event_symptom", 1, &field);
 }
 
 static int	DBpatch_6030062(void)
 {
-	const ZBX_TABLE table =
-		{"task_update_event_rank", "taskid", 0,
-			{
-				{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"acknowledgeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"c_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{0}
-			},
-			NULL
-		};
+	const ZBX_FIELD	field = {"cause_eventid", NULL, "events", "eventid", 0, 0, 0, 0};
 
-	return DBcreate_table(&table);
+	return DBadd_foreign_key("event_symptom", 2, &field);
 }
 
 static int	DBpatch_6030063(void)
 {
-	const ZBX_FIELD	field = {"taskid", NULL, "task", "taskid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD field = {"rank_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
-	return DBadd_foreign_key("task_update_event_rank", 1, &field);
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_6030064(void)
+{
+	const ZBX_FIELD field = {"cause_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_6030065(void)
+{
+	const ZBX_FIELD	field = {"cause_eventid", NULL, "events", "eventid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("problem", 3, &field);
+}
+
+static int	DBpatch_6030066(void)
+{
+	const ZBX_FIELD field = {"pause_symptoms", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("actions", &field);
 }
 
 #endif
@@ -578,5 +591,8 @@ DBPATCH_ADD(6030060, 0, 1)
 DBPATCH_ADD(6030061, 0, 1)
 DBPATCH_ADD(6030062, 0, 1)
 DBPATCH_ADD(6030063, 0, 1)
+DBPATCH_ADD(6030064, 0, 1)
+DBPATCH_ADD(6030065, 0, 1)
+DBPATCH_ADD(6030066, 0, 1)
 
 DBPATCH_END()
