@@ -439,7 +439,7 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
 			zbx_replace_mem_dyn(&expression, &expression_alloc, &expression_offset, id_pos, id_len,
 					value, value_len);
 
-			p = expression + id_pos + value_len - id_len;
+			p = expression + id_pos + value_len;
 		}
 	}
 
