@@ -434,6 +434,8 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.10rc1
 
 New features:
+.........T [ZBXNEXT-8018] added token authentication in Template GitLab by HTTP (atocko)
+..F.....S. [ZBXNEXT-7122] added detection of compressed chunks in history or trend tables, and warnings that suggest enabling housekeeping overrides accordingly (dgoloscapov, jfreibergs)
 .......PS. [ZBXNEXT-7816] added support of PostgreSQL 15 (vso)
 .......PS. [ZBXNEXT-7970] added support of TimescaleDB 2.8 (vso)
 .........T [ZBX-21672] fixed event source in mediatypes (egordymov)
@@ -441,6 +443,11 @@ New features:
 A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 
 Bug fixes:
+..F....... [ZBX-17300] fixed handling of context menu in Map builder (jfreibergs)
+.........T [ZBXNEXT-8035] added override for file system discovery trigger in f5 template (knaglis)
+..F....... [ZBX-21656] fixed clone buttons not working in Safari 16 on template editing form (averza)
+..F....... [ZBX-21449] fixed accessibility attributes (Sasha)
+.........T [ZBX-21461] fixed item "Checksum of /etc/passwd" (egordymov)
 ..F....... [ZBX-20505] fixed subfilter counters displaying incorrect values in Monitoring => Graph view (rdetlavs)
 ...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
 .........T [ZBX-21673] fixed read operations per second preprocessing in Ceph by Zabbix agent 2 template (drasihov)
