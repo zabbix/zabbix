@@ -1,7 +1,7 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-10-20T15:04:55Z'
-  groups:
+  version: '6.4'
+  date: '2022-10-25T10:16:23Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -20,7 +20,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -1115,7 +1115,7 @@ zabbix_export:
           type: HTTP_AGENT
           key: gitlab.puma.discovery
           delay: 3h
-          description: 'Discovery Puma specific metrics, when Puma is used.'
+          description: 'Discovery of Puma specific metrics when Puma is used.'
           item_prototypes:
             -
               uuid: 6b6ebfe9326247c8a57fb8c96125bcee

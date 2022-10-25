@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher.  
+For Zabbix version: 6.4 and higher.  
 This template is designed to monitor GitLab by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -25,7 +25,7 @@ To access metrics following two methods are available:
 1. Explicitly allow monitoring instance IP address in gitlab [whitelist configuration](https://docs.gitlab.com/ee/administration/monitoring/ip_whitelist.html).
 2. Get token from Gitlab `Admin -> Monitoring -> Health check` page: http://your.gitlab.address/admin/health_check; Use this token in macro `{$GITLAB.HEALTH.TOKEN}` as variable path, like: `?token=your_token`.
 Remember to change the macros `{$GITLAB.URL}`.
-Also, see the Macros section for a list of macros used to set trigger values.
+Also, see the Macros section for a list of [macros used](#Macros-used) to set trigger values.
 
 *NOTE.* Some metrics may not be collected depending on your Gitlab instance version and configuration. See [Gitlab's documentation](https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html) for further information about its metric collection.
 
@@ -41,8 +41,8 @@ No specific Zabbix configuration is required.
 |{$GITLAB.HEALTH.TOKEN} |<p>The token path for Gitlab health check. Example `?token=your_token`</p> |`` |
 |{$GITLAB.HTTP.FAIL.MAX.WARN} |<p>The maximum number of HTTP request failures for a trigger expression.</p> |`2` |
 |{$GITLAB.OPEN.FDS.MAX.WARN} |<p>The maximum percentage of used file descriptors for a trigger expression.</p> |`90` |
-|{$GITLAB.PUMA.QUEUE.MAX.WARN} |<p>The maximum number of PUMA queued requests for a trigger expression.</p> |`1` |
-|{$GITLAB.PUMA.UTILIZATION.MAX.WARN} |<p>The maximum percentage of PUMA thread utilization for a trigger expression.</p> |`90` |
+|{$GITLAB.PUMA.QUEUE.MAX.WARN} |<p>The maximum number of Puma queued requests for a trigger expression.</p> |`1` |
+|{$GITLAB.PUMA.UTILIZATION.MAX.WARN} |<p>The maximum percentage of Puma thread utilization for a trigger expression.</p> |`90` |
 |{$GITLAB.REDIS.FAIL.MAX.WARN} |<p>The maximum number of Redis client exceptions for a trigger expression.</p> |`2` |
 |{$GITLAB.UNICORN.QUEUE.MAX.WARN} |<p>The maximum number of Unicorn queued requests for a trigger expression.</p> |`1` |
 |{$GITLAB.UNICORN.UTILIZATION.MAX.WARN} |<p>The maximum percentage of Unicorn workers utilization for a trigger expression.</p> |`90` |
@@ -56,7 +56,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Puma metrics discovery |<p>Discovery Puma specific metrics, when Puma is used.</p> |HTTP_AGENT |gitlab.puma.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `puma_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
+|Puma metrics discovery |<p>Discovery of Puma specific metrics when Puma is used.</p> |HTTP_AGENT |gitlab.puma.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `puma_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
 |Unicorn metrics discovery |<p>DiscoveryUnicorn specific metrics, when Unicorn is used.</p> |HTTP_AGENT |gitlab.unicorn.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `unicorn_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
 
 ## Items collected
