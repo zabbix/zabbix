@@ -784,6 +784,34 @@ class testDashboardTopHostsWidget extends CWebTest {
 						'Invalid parameter "/1/thresholds/1/threshold": a number is expected.'
 					]
 				]
+			],
+			// #30 take a screenshot to check draggable element.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'main_fields' =>  [
+						'Name' => 'Screenshot'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Name' => 'This is item name',
+							'Item' => 'Available memory'
+						],
+						[
+							'Data' => 'Host name',
+							'Name' => 'This is host name',
+							'Base color' => [
+								'id:lbl_base_color' => '039BE5'
+							]
+						],
+						[
+							'Data' => 'Text',
+							'Name' => 'This is name for a text',
+							'Text' => 'Here is some text'
+						]
+					]
+				]
 			]
 		];
 	}
@@ -811,6 +839,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
+
+		// Take a screenshot to test draggable object position.
+		if (array_key_exists('Name', $data['main_fields']) && ($data['main_fields']['Name']) === 'Screenshot') {
+			$this->assertScreenshot($form->query('id:list_columns')->waitUntilPresent()->one(), 'Top_hosts_columns');
+		};
 
 		$form->fill($data['main_fields']);
 		$form->submit();
