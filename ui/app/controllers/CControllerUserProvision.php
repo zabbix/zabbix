@@ -51,7 +51,7 @@ class CControllerUserProvision extends CController {
 				->setArgument('page', CPagerHelper::loadPage('user.list', null))
 		);
 
-		if ($result) {
+		if ($provisionedids) {
 			$users = API::User()->get([
 				'output' => ['username', 'name', 'surname'],
 				'userids' => $provisionedids
