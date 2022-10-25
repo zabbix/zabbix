@@ -1595,7 +1595,7 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, $e->getMessage());
 		}
 
-		if ($db_user['deprovisioned']) {
+		if ($db_user['deprovisioned'] || $db_user['roleid'] == 0) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions for system access.'));
 		}
 
