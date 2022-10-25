@@ -283,6 +283,7 @@ typedef struct
 	char			*id;
 	char			*name;
 	char			*status;
+	zbx_vector_str_t	dss_uuid;
 	zbx_vector_str_t	alarm_ids;
 }
 zbx_vmware_cluster_t;

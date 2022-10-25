@@ -2473,6 +2473,8 @@ static void	vmware_cluster_free(zbx_vmware_cluster_t *cluster)
 	zbx_free(cluster->name);
 	zbx_free(cluster->id);
 	zbx_free(cluster->status);
+	zbx_vector_str_clear_ext(&cluster->dss_uuid, zbx_str_free);
+	zbx_vector_str_destroy(&cluster->dss_uuid);
 	zbx_vector_str_clear_ext(&cluster->alarm_ids, zbx_str_free);
 	zbx_vector_str_destroy(&cluster->alarm_ids);
 	zbx_free(cluster);
@@ -6695,6 +6697,7 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 		cluster->id = zbx_strdup(NULL, ids.values[i]);
 		cluster->name = name;
 		cluster->status = NULL;
+		zbx_vector_str_create(&cluster->dss_uuid);
 		zbx_vector_str_create(&cluster->alarm_ids);
 
 		if (SUCCEED != vmware_service_get_alarms_data(__func__, service, easyhandle, cluster_data,
@@ -6775,17 +6778,17 @@ out:
  * Purpose: retrieves status of the specified vmware cluster                  *
  *                                                                            *
  * Parameters: easyhandle   - [IN] the CURL handle                            *
- *             clusterid    - [IN] the cluster id                             *
+ *             datastores   - [IN] all available Datastores                   *
+ *             cluster      - [IN/OUT] the cluster                            *
  *             cq_values    - [IN/OUT] the vector with custom query entries   *
- *             status       - [OUT] a pointer to the output variable          *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the operation has completed successfully           *
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clusterid,
-		zbx_vector_cq_value_t *cq_values, char **status, char **error)
+static int	vmware_service_get_cluster_state(CURL *easyhandle, const zbx_vector_vmware_datastore_t *datastores,
+		zbx_vmware_cluster_t *cluster, zbx_vector_cq_value_t *cq_values, char **error)
 {
 #	define ZBX_POST_VMWARE_CLUSTER_STATUS 								\
 		ZBX_POST_VSPHERE_HEADER									\
@@ -6796,6 +6799,7 @@ static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clust
 					"<ns0:type>ClusterComputeResource</ns0:type>"			\
 					"<ns0:all>false</ns0:all>"					\
 					"<ns0:pathSet>summary.overallStatus</ns0:pathSet>"		\
+					"<ns0:pathSet>datastore</ns0:pathSet>"				\
 					"%s"								\
 				"</ns0:propSet>"							\
 				"<ns0:objectSet>"							\
@@ -6806,32 +6810,56 @@ static int	vmware_service_get_cluster_status(CURL *easyhandle, const char *clust
 		"</ns0:RetrievePropertiesEx>"								\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char			tmp[MAX_STRING_LEN], *clusterid_esc, buff[MAX_STRING_LEN];
-	int			ret = FAIL;
+	char			*tmp, *clusterid_esc, *cq_prop;
+	int			i, ret = FAIL;
 	xmlDoc			*doc = NULL;
-	zbx_vmware_cq_value_t	*cqv;
+	zbx_vector_cq_value_t	cqvs;
+	zbx_vector_str_t	ids;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clusterid:'%s'", __func__, cluster->id);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clusterid:'%s'", __func__, clusterid);
+	zbx_vector_str_create(&ids);
+	zbx_vector_cq_value_create(&cqvs);
+	clusterid_esc = zbx_xml_escape_dyn(cluster->id);
+	cq_prop = vmware_cq_prop_soap_request(cq_values, ZBX_VMWARE_SOAP_CLUSTER, cluster->id, &cqvs);
 
-	clusterid_esc = zbx_xml_escape_dyn(clusterid);
+	tmp = zbx_dsprintf(NULL, ZBX_POST_VMWARE_CLUSTER_STATUS, cq_prop, clusterid_esc);
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_CLUSTER_STATUS,
-			vmware_cq_prop_soap_request(cq_values, ZBX_VMWARE_SOAP_CLUSTER, clusterid, sizeof(buff), buff,
-			&cqv), clusterid_esc);
+	zbx_str_free(cq_prop);
+	zbx_str_free(clusterid_esc);
+	ret = zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, error);
+	zbx_str_free(tmp);
 
-	zbx_free(clusterid_esc);
-
-	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, error))
+	if (FAIL == ret)
 		goto out;
 
-	*status = zbx_xml_doc_read_value(doc, ZBX_XPATH_PROP_NAME("summary.overallStatus"));
+	cluster->status = zbx_xml_doc_read_value(doc, ZBX_XPATH_PROP_NAME("summary.overallStatus"));
 
-	if (NULL != cqv)
-		vmware_service_cq_prop_value(__func__, doc, cqv);
+	if (0 != cqvs.values_num)
+		vmware_service_cq_prop_value(__func__, doc, &cqvs);
 
-	ret = SUCCEED;
+	zbx_xml_read_values(doc, ZBX_XPATH_PROP_NAME("datastore") "/*", &ids);
+
+	for (i = 0; i < ids.values_num; i++)
+	{
+		int			j;
+		zbx_vmware_datastore_t	ds_cmp;
+
+		ds_cmp.id = ids.values[i];
+
+		if (FAIL == (j = zbx_vector_vmware_datastore_bsearch(datastores, &ds_cmp, vmware_ds_id_compare)))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Datastore \"%s\" not found on cluster \"%s\".", __func__,
+					ds_cmp.id, cluster->id);
+			continue;
+		}
+
+		zbx_vector_str_append(&cluster->dss_uuid, zbx_strdup(NULL, datastores->values[j]->uuid));
+	}
 out:
+	zbx_vector_cq_value_destroy(&cqvs);
+	zbx_vector_str_clear_ext(&ids, zbx_str_free);
+	zbx_vector_str_destroy(&ids);
 	zbx_xml_free_doc(doc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -6846,6 +6874,7 @@ out:
  *                                                                            *
  * Parameters: service       - [IN] the vmware service                        *
  *             easyhandle    - [IN] the CURL handle                           *
+ *             datastores    - [IN] all available Datastores                  *
  *             cq_values     - [IN/OUT] the vector with custom query entries  *
  *             clusters      - [OUT] a pointer to the resulting clusters      *
  *                              vector                                        *
@@ -6859,8 +6888,9 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_cq_value_t *cq_values, zbx_vector_ptr_t *clusters,
-		zbx_vector_vmware_resourcepool_t *resourcepools, zbx_vmware_alarms_data_t *alarms_data, char **error)
+		const zbx_vector_vmware_datastore_t *datastores, zbx_vector_cq_value_t *cq_values,
+		zbx_vector_ptr_t *clusters, zbx_vector_vmware_resourcepool_t *resourcepools,
+		zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
 #	define ZBX_POST_VCENTER_CLUSTER								\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -7088,11 +7118,8 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 	{
 		zbx_vmware_cluster_t	*cluster = (zbx_vmware_cluster_t*)(cl_chunks.values[i]);
 
-		if (SUCCEED != vmware_service_get_cluster_status(easyhandle, cluster->id, cq_values, &cluster->status,
-				error))
-		{
+		if (SUCCEED != vmware_service_get_cluster_state(easyhandle, datastores, cluster, cq_values, error))
 			goto out;
-		}
 
 		zbx_vector_ptr_append(clusters, cluster);
 		zbx_vector_ptr_remove_noorder(&cl_chunks, i);
@@ -7879,13 +7906,6 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service)
 		goto clean;
 	}
 
-	if (ZBX_VMWARE_TYPE_VCENTER == service->type &&
-			SUCCEED != vmware_service_get_clusters_and_resourcepools(service, easyhandle,
-			&prop_query_values, &data->clusters, &data->resourcepools, &alarms_data, &data->error))
-	{
-		goto clean;
-	}
-
 	zbx_vector_vmware_datastore_reserve(&data->datastores, (size_t)(dss.values_num + data->datastores.values_alloc));
 
 	for (i = 0; i < dss.values_num; i++)
@@ -7900,6 +7920,13 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service)
 	}
 
 	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_id_compare);
+
+	if (ZBX_VMWARE_TYPE_VCENTER == service->type &&
+			SUCCEED != vmware_service_get_clusters_and_resourcepools(service, easyhandle, &data->datastores,
+			&prop_query_values, &data->clusters, &data->resourcepools, &alarms_data, &data->error))
+	{
+		goto clean;
+	}
 
 	if (SUCCEED != zbx_hashset_reserve(&data->hvs, hvs.values_num))
 	{
