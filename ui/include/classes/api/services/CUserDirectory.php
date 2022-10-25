@@ -101,7 +101,7 @@ class CUserDirectory extends CApiService {
 			$sql_parts = [
 				'select' => array_merge(['userdirectoryid'], $ldap_output),
 				'from' => ['userdirectory_ldap'],
-				'userdirectoryids' => $db_userdirectories_by_type[IDP_TYPE_LDAP]
+				'where' => [dbConditionInt('userdirectoryid', $db_userdirectories_by_type[IDP_TYPE_LDAP])]
 			];
 
 			$result = DBselect($this->createSelectQueryFromParts($sql_parts));
@@ -114,7 +114,7 @@ class CUserDirectory extends CApiService {
 			$sql_parts = [
 				'select' => array_merge(['userdirectoryid'], $saml_output),
 				'from' => ['userdirectory_saml'],
-				'userdirectoryids' => $db_userdirectories_by_type[IDP_TYPE_SAML]
+				'where' => [dbConditionInt('userdirectoryid', $db_userdirectories_by_type[IDP_TYPE_SAML])]
 			];
 
 			$result = DBselect($this->createSelectQueryFromParts($sql_parts));
