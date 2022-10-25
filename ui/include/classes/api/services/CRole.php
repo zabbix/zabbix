@@ -1154,7 +1154,7 @@ class CRole extends CApiService {
 	 * @return array
 	 */
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
-		$sqlParts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
+		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			$sql_parts['from']['users'] = 'users u';
@@ -1162,7 +1162,7 @@ class CRole extends CApiService {
 			$sql_parts['where'][] = 'u.userid='.self::$userData['userid'];
 		}
 
-		return $sqlParts;
+		return $sql_parts;
 	}
 
 	/**
