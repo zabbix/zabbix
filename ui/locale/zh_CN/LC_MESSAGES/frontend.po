@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-08-29 12:14+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-10-19 00:43+0000\n"
+"Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -196,7 +196,7 @@ msgstr[0] "%2$s 中的 %1$s 处于问题状态"
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$s percentile: %2$s"
-msgstr ""
+msgstr "%1$s 百分位数：%2$s"
 
 #: jsLoader.php:348
 #, c-format
@@ -3904,7 +3904,7 @@ msgstr "压缩"
 #: app/views/administration.housekeeping.edit.php:174
 #: app/views/administration.housekeeping.edit.php:184
 msgid "Compression is not supported."
-msgstr ""
+msgstr "不支持压缩。"
 
 #: app/views/administration.mediatype.edit.php:321
 msgid "Concurrent sessions"
@@ -4168,6 +4168,14 @@ msgstr "连接超时"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "连接到 Zabbix 服务器“%2$s”时超时,已超 %1$s 秒。"
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4178,6 +4186,16 @@ msgstr ""
 "连接到Zabbix服务器 \"%1$s\" 失败. 可能的原因是:\n"
 "1.\"zabbix.conf.php\"中的服务器IP/DNS配置不正确；\n"
 "2.DNS服务器配置不正确。\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4193,6 +4211,14 @@ msgstr ""
 "2. 安全环境（例如SELinux）阻塞连接；\n"
 "3. Zabbix server 守护进程没有运行；\n"
 "4. 开启了防火墙阻止 TCP 连接。\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -5650,7 +5676,7 @@ msgstr "Web 场景详情"
 
 #: app/views/administration.housekeeping.edit.php:195
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "检测到 TimescaleDB 授权许可不支持压缩。 TimescaleDB 社区版支持压缩。"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -6725,7 +6751,7 @@ msgstr "错误！由于 %1$s 数据库服务器版本不受支持，无法启动
 #: app/partials/administration.system.info.php:159
 #: app/partials/administration.system.info.php:172
 msgid "Error! Unable to start Zabbix server."
-msgstr ""
+msgstr "错误！无法启动 Zabbix 服务器。"
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -9813,6 +9839,10 @@ msgctxt "compact table header"
 msgid "Info"
 msgstr "信息"
 
+#: include/classes/data/CItemData.php:1428
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -11359,7 +11389,7 @@ msgstr "M"
 #: include/func.inc.php:592 jsLoader.php:226
 msgctxt "month short"
 msgid "M"
-msgstr ""
+msgstr "月"
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
@@ -11977,7 +12007,7 @@ msgstr "所需的最低 PHP 版本为 %1$s。"
 #: app/views/administration.housekeeping.edit.php:175
 #, c-format
 msgid "Minimum required TimescaleDB version is %1$s."
-msgstr ""
+msgstr "所需 TimescaleDB 最低版本为 %1$s。"
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -13613,6 +13643,10 @@ msgstr "只允许超级管理员可以设置报告所有者。"
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "只计算指派给启用的主机的和相依于启用的项目的触发器"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr "打开日志"
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -14168,7 +14202,7 @@ msgstr "父图表"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
-msgstr ""
+msgstr "父主机值"
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -14485,7 +14519,7 @@ msgstr "位置"
 
 #: include/classes/widgets/views/widget.item.form.view.php:143
 msgid "Position is ignored for s, uptime and unixtime units."
-msgstr ""
+msgstr "对于 s、uptime 和 unixtime 单位，将被忽略。"
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -14497,7 +14531,7 @@ msgstr "发布类型"
 
 #: app/views/administration.housekeeping.edit.php:165
 msgid "PostgreSQL database server version is too old."
-msgstr ""
+msgstr "PostgreSQL 数据库服务器版本太旧。"
 
 #: include/classes/data/CItemData.php:1370
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -19080,11 +19114,11 @@ msgstr "无法覆盖已经存在的配置文件。"
 
 #: app/views/administration.housekeeping.edit.php:160
 msgid "Unable to retrieve TimescaleDB compression support status."
-msgstr ""
+msgstr "无法检索 TimescaleDB 压缩支持状态。"
 
 #: app/views/administration.housekeeping.edit.php:170
 msgid "Unable to retrieve TimescaleDB version."
-msgstr ""
+msgstr "无法检索 TimescaleDB 版本。"
 
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
@@ -19274,22 +19308,22 @@ msgstr "取消静音"
 #: app/partials/administration.system.info.php:160
 #, c-format
 msgid "Unsupported %1$s database server version. Must be at least %2$s."
-msgstr ""
+msgstr "不支持的 %1$s 数据库服务版本。最低版本为 %2$s。"
 
 #: app/partials/administration.system.info.php:173
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
-msgstr ""
+msgstr "不支持的 %1$s 数据库服务版本。不高于 %2$s。"
 
 #: app/views/administration.housekeeping.edit.php:179
 #, c-format
 msgid "Unsupported TimescaleDB version. Should be at least %1$s."
-msgstr ""
+msgstr "不受支持的 TimescaleDB 版本。最低版本为 %1$s。"
 
 #: app/views/administration.housekeeping.edit.php:189
 #, c-format
 msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
-msgstr ""
+msgstr "不受支持的 TimescaleDB 版本。不应高于 %1$s。"
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -19873,7 +19907,7 @@ msgstr "VMware缓存统计.可用的mode有:total, free, pfree, used and pused."
 
 #: include/classes/data/CItemData.php:1256
 msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "VMware 集群警报数据，返回 JSON，<url> - VMware服务URL，<id> - VMware集群 id"
 
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
@@ -19881,7 +19915,7 @@ msgstr "VMware 集群性能计数器，<url> - VMware 服务 URL，<id> - VMware
 
 #: include/classes/data/CItemData.php:1264
 msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
-msgstr ""
+msgstr "VMware 集群属性，<url> - VMware 服务 URL，<id> - VMware 集群 id，<prop> - 属性路径"
 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
@@ -19889,15 +19923,15 @@ msgstr "VMware集群状态, <url> - VMware 服务 URL, <name> - VMware 集群名
 
 #: include/classes/data/CItemData.php:1272
 msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "VMware 集群标签数组，<url> - VMware 服务 URL，<id> - VMware 集群 ID"
 
 #: include/classes/data/CItemData.php:1308
 msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
-msgstr ""
+msgstr "VMware 数据中心警报数据，返回 JSON，<url> - VMware 服务 URL，<id> - VMware 数据中心 ID"
 
 #: include/classes/data/CItemData.php:1316
 msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
-msgstr ""
+msgstr "VMware 数据中心标签数组，<url> - VMware 服务 URL，<id> - VMware 数据中心 ID。返回 JSON"
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -19909,7 +19943,7 @@ msgstr "VMware 数据中心及其 ID。返回 JSON"
 
 #: include/classes/data/CItemData.php:1276
 msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
-msgstr ""
+msgstr "VMware 数据存储警报数据，返回 JSON，<url> - VMware 服务 URL，<uuid> - VMware 数据存储名称"
 
 #: include/classes/data/CItemData.php:1242
 #: include/classes/data/CItemData.php:1298
@@ -19920,9 +19954,13 @@ msgstr "VMware数据存储容量统计信息，以字节为单位，以百分比
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "VMware 数据存储管理程序列表，<url> - VMware 服务 URL，<datastore> - 数据存储名称"
 
+#: include/classes/data/CItemData.php:1320
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
-msgstr ""
+msgstr "VMware 数据存储属性，<url> - VMware 服务 URL，<uuid> - 数据存储名称，<prop> - 属性路径"
 
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -19930,7 +19968,7 @@ msgstr "VMware 数据存储读取统计信息，<url> - VMware 服务 URL，<dat
 
 #: include/classes/data/CItemData.php:1300
 msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
-msgstr ""
+msgstr "VMware 数据存储标签数组，<url> - VMware 服务 URL，<uuid> - VMware 数据存储 uuid。返回 JSON"
 
 #: include/classes/data/CItemData.php:1246
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -19950,7 +19988,7 @@ msgstr "VMware hypervisor硬件供应商状态传感器，<url> - VMware 服务 
 
 #: include/classes/data/CItemData.php:1336
 msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMware hypervisor警报数据，返回 JSON，<url> - VMware 服务 URL，<uuid> - VMware hypervisor主机名"
 
 #: include/classes/data/CItemData.php:1350
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20022,7 +20060,7 @@ msgstr "VMware hypervisor 处理器使用率单位Hz, <url> - VMware 服务 URL,
 
 #: include/classes/data/CItemData.php:1472
 msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
-msgstr ""
+msgstr "VMware hypervisor属性，<url> - VMware 服务 URL，<uuid> - VMware hypervisor主机名，<prop> - 属性路径"
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -20038,7 +20076,7 @@ msgstr "VMware hypervisor 状态, <url> - VMware 服务 URL, <uuid> - VMware hyp
 
 #: include/classes/data/CItemData.php:1488
 msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "VMware hypervisor标签数组，<url> - VMware 服务 URL，<uuid> - VMware hypervisor主机名。返回 JSON"
 
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20070,11 +20108,11 @@ msgstr "VMware 服务版本, <url> - VMware 服务 URL"
 
 #: include/classes/data/CItemData.php:1248
 msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
-msgstr ""
+msgstr "VMware 虚拟中心报警数据，返回 JSON，<url> - VMware 服务 URL"
 
 #: include/classes/data/CItemData.php:1516
 msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
-msgstr ""
+msgstr "VMware 虚拟机告警数据，返回 JSON，<url> - VMware 服务 URL，<uuid> - VMware 虚拟机名称"
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20158,7 +20196,7 @@ msgstr "VMware 虚拟机处理器使用率，单位Hz, <url> - VMware 服务 URL
 
 #: include/classes/data/CItemData.php:1644
 msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
-msgstr ""
+msgstr "VMware 虚机属性，<url> - VMware 服务 URL，<uuid> - VMware 虚机主机名，<prop> - 属性路径"
 
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20178,7 +20216,7 @@ msgstr "VMware 虚拟机交换分区大小, <url> - VMware 服务 URL, <uuid> - 
 
 #: include/classes/data/CItemData.php:1684
 msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "VMware 虚拟机标签数组，<url> - VMware 服务 URL，<uuid> - VMware 虚拟机主机名。返回 JSON"
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
@@ -20543,12 +20581,12 @@ msgstr "告警信息"
 
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
-msgstr ""
+msgstr "警告！无法检索数据库版本。"
 
 #: app/partials/administration.system.info.php:166
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
-msgstr ""
+msgstr "警告！不支持的 %1$s 数据库服务器版本。最低版本为 %2$s。"
 
 #: app/partials/administration.system.info.php:167
 #, c-format
@@ -20558,7 +20596,7 @@ msgstr "警告！%1$s 数据库服务器版本不支持。至少应为 (%2$s)"
 #: app/partials/administration.system.info.php:179
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
-msgstr ""
+msgstr "警告！不支持的 %1$s 数据库服务器版本。不应高于 %2$s。"
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -21114,6 +21152,14 @@ msgstr "Zabbix 登录表单"
 msgid "Zabbix server"
 msgstr "zabbix服务器"
 
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:601
 #, c-format
 msgid ""
@@ -21180,6 +21226,10 @@ msgstr "需用布尔值"
 #: include/classes/validators/CNewValidator.php:332
 msgid "a character string is expected"
 msgstr "请在字符串中指定"
+
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr "需要字符串、整数或浮点数类型"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -23394,7 +23444,7 @@ msgstr "通过"
 #: include/func.inc.php:659
 msgctxt "week short"
 msgid "w"
-msgstr ""
+msgstr "周"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

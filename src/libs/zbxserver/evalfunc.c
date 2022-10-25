@@ -2823,7 +2823,7 @@ static int	evaluate_TREND(zbx_variant_t *value, const DC_ITEM *item, const char 
 		season_processed = (int)((double)season / 3600);
 
 		ret = trends_eval_stl(table, item->itemid, start, end, start_detect_period, end_detect_period,
-				(int)season_processed, deviations, dev_alg, (int)s_window, &value_dbl, error);
+				season_processed, deviations, dev_alg, (int)s_window, &value_dbl, error);
 
 		zbx_free(dev_alg);
 	}

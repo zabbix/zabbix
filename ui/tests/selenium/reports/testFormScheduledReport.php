@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @dataSource ScheduledReports
+ * @dataSource ScheduledReports, LoginUsers
  *
  * @backup report
  */

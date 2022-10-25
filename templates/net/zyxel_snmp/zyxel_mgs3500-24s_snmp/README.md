@@ -4,7 +4,7 @@
 ## Overview
 
 For Zabbix version: 6.2 and higher  
-hhttps://service-provider.zyxel.com/emea/en/products/carrier-and-access-switches/access-switches/mes3500-series
+https://service-provider.zyxel.com/emea/en/products/carrier-and-access-switches/access-switches/mes3500-series
 
 This template was tested on:
 

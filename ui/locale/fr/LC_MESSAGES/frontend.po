@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-09-14 18:36+0000\n"
+"PO-Revision-Date: 2022-10-18 17:07+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -4245,6 +4245,14 @@ msgstr "Délai de connexion dépassé"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Délai d'attente de %1$s secondes dépassé lors de la connexion au serveur Zabbix \"%2$s\"."
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4255,6 +4263,16 @@ msgstr ""
 "La connexion au serveur Zabbix \"%1$s\" a échoué. Raisons possibles :\n"
 "1. IP du serveur ou DNS incorrect dans le fichier \"zabbix.conf.php\" ;\n"
 "2. Configuration incorrecte du serveur DNS.\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4270,6 +4288,14 @@ msgstr ""
 "2. L'environnement de sécurité (par exemple, SELinux) bloque la connexion ;\n"
 "3. Le démon du serveur Zabbix ne fonctionne pas ;\n"
 "4. Le pare-feu bloque la connexion TCP.\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -9906,6 +9932,10 @@ msgctxt "compact table header"
 msgid "Info"
 msgstr "Info"
 
+#: include/classes/data/CItemData.php:1428
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -12554,7 +12584,7 @@ msgstr "Le champ de nom du formulaire ne doit pas dépasser 255 caractères."
 
 #: app/views/administration.module.edit.php:43
 msgid "Namespace"
-msgstr ""
+msgstr "Espace de noms"
 
 #: jsLoader.php:189
 msgid "Navigate to default view"
@@ -13726,6 +13756,10 @@ msgstr "Seuls les super-administrateurs peuvent définir le propriétaire du rap
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Seuls les déclencheurs assignés à des hôtes activés et dépendant d'éléments activés sont comptés"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr "Ouvrir le journal"
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -14226,7 +14260,7 @@ msgstr "La page a reçu des données incorrectes"
 #: include/classes/helpers/CPagerHelper.php:159
 msgctxt "page navigation"
 msgid "Pager"
-msgstr ""
+msgstr "Pager"
 
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.edit.php:105
@@ -18531,7 +18565,7 @@ msgstr "Haut"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
-msgstr ""
+msgstr "Top N"
 
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
@@ -20056,6 +20090,10 @@ msgstr "Statistiques de capacité du datastore VMware en octets ou en pourcentag
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "Liste des hyperviseurs du datastore VMware, <url> - URL du service VMware, <datastore> - nom du datastore"
 
+#: include/classes/data/CItemData.php:1320
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr "Propriété du datastore VMware, <url> - URL du service VMware, <uuid> - nom du datastore, <prop> - chemin de la propriété"
@@ -21252,6 +21290,14 @@ msgstr "Formulaire de connexion Zabbix"
 msgid "Zabbix server"
 msgstr "Serveur Zabbix"
 
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:601
 #, c-format
 msgid ""
@@ -21318,6 +21364,10 @@ msgstr "une valeur booléenne est attendue"
 #: include/classes/validators/CNewValidator.php:332
 msgid "a character string is expected"
 msgstr "une chaîne de caractères est attendue"
+
+#: include/classes/validators/CApiInputValidator.php:910
+msgid "a character string, integer or floating point value is expected"
+msgstr "une chaîne de caractères, un entier ou une valeur à virgule flottante est attendu"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"

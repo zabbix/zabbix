@@ -28,7 +28,7 @@
 
 static const char	copyright_message[] =
 	"Copyright (C) 2022 Zabbix SIA\n"
-	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
+	"License GPLv2+: GNU GPL version 2 or later <https://www.gnu.org/licenses/>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
 
@@ -5914,4 +5914,142 @@ void	zbx_rtrim_utf8(char *str, const char *charlist)
 	}
 
 	*last = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: convert string from iso8601 timezone info to offset in seconds    *
+ *                                                                            *
+ * Parameters: zone    - [IN] iso8601 timezone string                         *
+ *             offset  - [OUT] offset value                                   *
+ *                                                                            *
+ * Return value: SUCCEED   - the operation has completed successfully         *
+ *               FAIL      - the operation has failed                         *
+ *                                                                            *
+ ******************************************************************************/
+static int zbx_iso8601_timezone(const char *zone, long int *offset)
+{
+	int		m, h, sign = 0;
+	char		c;
+	const char	*ptr = zone;
+
+	if ('.' == *zone)	/* skip milliseconds */
+	{
+		for (ptr++; 0 != isdigit(*ptr); ptr++)
+			;
+	}
+
+	for (; ' ' == *ptr; ptr++)
+		;
+
+	*offset = 0;
+	c = *ptr;
+
+	if ('\0' == c || 'Z' == c || 'z' == c)
+		return SUCCEED;
+	else if ('-' == c)
+		sign = -1;
+	else if ('+' == c)
+		sign = +1;
+	else
+		return FAIL;
+
+	ptr++;
+
+	if (ZBX_CONST_STRLEN("00:00") > strlen(ptr) || ':' != ptr[2])
+		return FAIL;
+
+	if (0 == isdigit(*ptr) || 23 < (h = atoi(ptr)))
+		return FAIL;
+
+	if (0 == isdigit(ptr[3]) || 59 < (m = atoi(&ptr[3])))
+		return FAIL;
+
+	*offset = sign * (m + h * 60) * 60;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse string from iso8601 datetime (xml base) to UTC              *
+ *          without millisecond, supported formats:                           *
+ *              yyyy-mm-ddThh:mm:ss                                          *
+ *              yyyy-mm-ddThh:mm:ssZ                                          *
+ *              yyyy-mm-ddThh:mm:ss+hh:mm                                     *
+ *              yyyy-mm-ddThh:mm:ss-hh:mm                                     *
+ *              yyyy-mm-ddThh:mm:ss +hh:mm                                    *
+ *              yyyy-mm-ddThh:mm:ss -hh:mm                                    *
+ *              yyyy-mm-ddThh:mm:ss.ccc                                       *
+ *              yyyy-mm-ddThh:mm:ss.cccZ                                      *
+ *              yyyy-mm-ddThh:mm:ss.ccc+hh:mm                                 *
+ *              yyyy-mm-ddThh:mm:ss.ccc-hh:mm                                 *
+ *              yyyy-mm-ddThh:mm:ss.ccc +hh:mm                                *
+ *              yyyy-mm-ddThh:mm:ss.ccc -hh:mm                                *
+ *              yyyy-mm-dd hh:mm:ss                                          *
+ *              yyyy-mm-dd hh:mm:ssZ                                          *
+ *              yyyy-mm-dd hh:mm:ss+hh:mm                                     *
+ *              yyyy-mm-dd hh:mm:ss-hh:mm                                     *
+ *              yyyy-mm-dd hh:mm:ss +hh:mm                                    *
+ *              yyyy-mm-dd hh:mm:ss -hh:mm                                    *
+ *              yyyy-mm-dd hh:mm:ss.ccc                                       *
+ *              yyyy-mm-dd hh:mm:ss.cccZ                                      *
+ *              yyyy-mm-dd hh:mm:ss.ccc+hh:mm                                 *
+ *              yyyy-mm-dd hh:mm:ss.ccc-hh:mm                                 *
+ *              yyyy-mm-dd hh:mm:ss.ccc +hh:mm                                *
+ *              yyyy-mm-dd hh:mm:ss.ccc -hh:mm                                *
+ *                                                                            *
+ * Parameters: str  - [IN] iso8601 datetime string                            *
+ *             time - [OUT] parsed tm value                                   *
+ *                                                                            *
+ * Return value: SUCCEED   - the operation has completed successfully         *
+ *               FAIL      - the operation has failed                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_iso8601_utc(const char *str, time_t *time)
+{
+	long int	offset;
+	struct tm	tm;
+
+	if ( 0 == isdigit(*str) || ZBX_CONST_STRLEN("1234-12-12T12:12:12") > strlen(str) ||
+			('T' != str[10] && ' ' != str[10]) ||
+			'-' != str[4] || '-' != str[7] || ':' != str[13] || ':' != str[16])
+	{
+		return FAIL;
+	}
+
+	memset(&tm, 0 , sizeof (struct tm));
+	tm.tm_year = atoi(str);
+
+	if (0 == isdigit(str[5]) || 12 < (tm.tm_mon = atoi(&str[5])))
+		return FAIL;
+
+	if (0 == isdigit(str[8]) || 31 < (tm.tm_mday = atoi(&str[8])))
+		return FAIL;
+
+	if (0 == isdigit(str[11]) || 23 < (tm.tm_hour = atoi(&str[11])))
+		return FAIL;
+
+	if (0 == isdigit(str[14]) || 59 < (tm.tm_min = atoi(&str[14])))
+		return FAIL;
+
+	if (0 == isdigit(str[17]) || 59 < (tm.tm_sec = atoi(&str[17])))
+		return FAIL;
+
+	tm.tm_isdst = 0;
+
+	if (FAIL == zbx_iso8601_timezone(&str[19], &offset))
+		return FAIL;
+
+	if (NULL != time)
+	{
+		int	t;
+
+		if(FAIL == zbx_utc_time(tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, &t))
+			return FAIL;
+
+		*time = t - offset;
+	}
+
+	return SUCCEED;
 }

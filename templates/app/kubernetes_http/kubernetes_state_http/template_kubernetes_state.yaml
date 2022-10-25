@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-28T07:46:54Z'
+  date: '2022-10-18T14:08:51Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -306,7 +306,7 @@ zabbix_export:
               parameters:
                 - |
                   var output = [],
-                      conponent;
+                      component;
                   
                   value.split(/\n/).forEach(function (entry) {
                       if (component = entry.match(/^\[.+\](.+)\s(\w+)$/)) {

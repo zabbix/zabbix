@@ -62,6 +62,22 @@
 			$('#compress_older').prop('disabled', !this.checked);
 		});
 
+		$('#hk_history_mode, #hk_history_global')
+			.change(function() {
+				$('.js-hk-history-warning').toggle(document.getElementById('hk_history_mode').checked
+					&& !document.getElementById('hk_history_global').checked
+				)
+			})
+			.trigger('change');
+
+		$('#hk_trends_mode, #hk_trends_global')
+			.change(function() {
+				$('.js-hk-trends-warning').toggle(document.getElementById('hk_trends_mode').checked
+					&& !document.getElementById('hk_trends_global').checked
+				)
+			})
+			.trigger('change');
+
 		$("#resetDefaults").click(function() {
 			overlayDialogue({
 				'title': <?= json_encode(_('Reset confirmation')) ?>,
