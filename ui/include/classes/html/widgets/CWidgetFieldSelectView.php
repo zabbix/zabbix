@@ -23,17 +23,33 @@ use Zabbix\Widgets\Fields\CWidgetFieldSelect;
 
 class CWidgetFieldSelectView extends CWidgetFieldView {
 
+	protected ?CSelect $select = null;
+
 	public function __construct(CWidgetFieldSelect $field) {
 		$this->field = $field;
 	}
 
+	public function getLabel(): ?CLabel {
+		$label = parent::getLabel();
+
+		if ($label !== null) {
+			$label->setFor($this->getView()->getFocusableElementId());
+		}
+
+		return $label;
+	}
+
 	public function getView(): CSelect {
-		return (new CSelect($this->field->getName()))
-			->setId($this->field->getName())
-			->setFocusableElementId('label-'.$this->field->getName())
-			->setValue($this->field->getValue())
-			->addOptions(CSelect::createOptionsFromArray($this->field->getValues()))
-			->setDisabled($this->isDisabled())
-			->setAriaRequired($this->isRequired());
+		if ($this->select === null) {
+			$this->select = (new CSelect($this->field->getName()))
+				->setId($this->field->getName())
+				->setFocusableElementId('label-'.$this->field->getName())
+				->setValue($this->field->getValue())
+				->addOptions(CSelect::createOptionsFromArray($this->field->getValues()))
+				->setDisabled($this->isDisabled())
+				->setAriaRequired($this->isRequired());
+		}
+
+		return $this->select;
 	}
 }
