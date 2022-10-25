@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -1154,7 +1155,7 @@ class testFormUserRoles extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [],
-					'api_methods' => [],
+					'api_methods' => '',
 					'message_header' => 'User role updated'
 				]
 			],
@@ -1318,6 +1319,7 @@ class testFormUserRoles extends CWebTest {
 			$this->query('button:Delete')->one()->click();
 			$this->page->acceptAlert();
 			$this->page->waitUntilReady();
+
 			if ($role === 'Admin role') {
 				$this->assertMessage(TEST_BAD, 'Cannot delete user role', 'Cannot delete assigned user role "Admin role".');
 				$this->assertEquals($hash_before, CDBHelper::getHash(self::ROLE_SQL));
@@ -1589,7 +1591,9 @@ class testFormUserRoles extends CWebTest {
 
 			if (array_key_exists('api_methods', $data)) {
 				$api_methods = $this->query('xpath:(//div[@class="multiselect-control"])[3]')->asMultiselect()->one()->getValue();
-				rsort($api_methods);
+				if (is_array($api_methods)) {
+					rsort($api_methods);
+				}
 				$this->assertEquals($data['api_methods'], $api_methods);
 			}
 		}

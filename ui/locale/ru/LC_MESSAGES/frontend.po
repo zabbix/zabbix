@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-09-06 07:52+0000\n"
+"PO-Revision-Date: 2022-10-06 10:34+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13398,6 +13398,10 @@ msgstr "Только супер-администраторы могут зада
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Подсчитываются только триггеры у активированных узлов сети и которые зависят от активных элементов данных"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -16239,7 +16243,7 @@ msgstr "Услуга \"%1$s\" не может иметь теги проблем
 #: include/classes/helpers/CRoleHelper.php:352
 #: include/views/configuration.action.list.php:28
 msgid "Service actions"
-msgstr "Действия услуг"
+msgstr "Действия на услуги"
 
 #: app/controllers/CControllerServiceCreate.php:171
 msgid "Service created"
@@ -17808,6 +17812,16 @@ msgstr "В этом месяце"
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "Эта настройка применима только к числовым данным. Нечисловые данные всегда берутся из истории."
+
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
@@ -20569,6 +20583,10 @@ msgstr "ожидается логическое значение"
 msgid "a character string is expected"
 msgstr "ожидается строка символов"
 
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr "ожидается строка символов, целое число или число с плавающей точкой"
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "ожидается дата в ГГГГ-ММ-ДД формате"
@@ -22762,7 +22780,7 @@ msgstr "через"
 #: include/func.inc.php:659
 msgctxt "week short"
 msgid "w"
-msgstr ""
+msgstr "н"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

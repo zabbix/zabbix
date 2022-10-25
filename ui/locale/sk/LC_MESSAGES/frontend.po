@@ -13399,6 +13399,10 @@ msgstr "Vlastníka reportu môžu nastaviť iba superadministrátori."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Len spúšťače priradené k monitorovaným hostom alebo závislé na monitorovaných položkách sú započítané"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -17810,6 +17814,16 @@ msgstr "Tento mesiac zatiaľ"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "Toto nastavenie platí len pre číselné údaje. Nečíselné údaje budú vždy prevzaté z histórie."
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
@@ -20569,6 +20583,10 @@ msgstr "očakáva sa boolovská hodnota"
 #: include/classes/validators/CNewValidator.php:290
 msgid "a character string is expected"
 msgstr "reťazec znakov je očakávaný"
+
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
