@@ -22,6 +22,7 @@
 namespace Widgets\GraphPrototype\Actions;
 
 use API,
+	APP,
 	CControllerResponseData,
 	CControllerWidgetIterator,
 	CTableInfo;
@@ -29,6 +30,8 @@ use API,
 use Zabbix\Core\CWidget;
 
 class WidgetView extends CControllerWidgetIterator {
+
+	protected const GRAPH_WIDGET_ID = 'graph';
 
 	protected function init(): void {
 		parent::init();
@@ -142,20 +145,24 @@ class WidgetView extends CControllerWidgetIterator {
 
 		$children = [];
 
-		foreach ($graphs_collected as $graphid => $name) {
-			$child_fields = [
-				'source_type' => ZBX_WIDGET_FIELD_RESOURCE_GRAPH,
-				'graphid' => $graphid,
-				'show_legend' => $this->fields_values['show_legend']
-			];
+		$widget = APP::ModuleManager()->getModule(self::GRAPH_WIDGET_ID);
 
-			$children[] = [
-				'widgetid' => (string) $graphid,
-				'type' => Cwidget::GRAPH,
-				'name' => $name,
-				'fields' => $child_fields,
-				'defaults' => $this->widget->getDefaults()
-			];
+		if ($widget !== null) {
+			foreach ($graphs_collected as $graphid => $name) {
+				$child_fields = [
+					'source_type' => ZBX_WIDGET_FIELD_RESOURCE_GRAPH,
+					'graphid' => $graphid,
+					'show_legend' => $this->fields_values['show_legend']
+				];
+
+				$children[] = [
+					'widgetid' => (string) $graphid,
+					'type' => self::GRAPH_WIDGET_ID,
+					'name' => $name,
+					'fields' => $child_fields,
+					'defaults' => $widget->getDefaults()
+				];
+			}
 		}
 
 		if ($this->hasInput('name')) {
@@ -259,21 +266,24 @@ class WidgetView extends CControllerWidgetIterator {
 
 		$children = [];
 
-		foreach ($items_collected as $itemid => $name) {
-			$child_fields = [
-				'source_type' => ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH,
-				'itemid' => $itemid,
-				'show_legend' => $this->fields_values['show_legend']
-			];
+		$widget = APP::ModuleManager()->getModule(self::GRAPH_WIDGET_ID);
 
-			$children[] = [
-				'widgetid' => (string) $itemid,
-				'type' => CWidget::GRAPH,
-				'name' => $name,
-				'fields' => $child_fields,
-				'configuration' => $this->widget->getConfiguration($this->fields_values, $this->getInput('view_mode')),
-				'defaults' => $this->widget->getDefaults()
-			];
+		if ($widget !== null) {
+			foreach ($items_collected as $itemid => $name) {
+				$child_fields = [
+					'source_type' => ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH,
+					'itemid' => $itemid,
+					'show_legend' => $this->fields_values['show_legend']
+				];
+
+				$children[] = [
+					'widgetid' => (string) $itemid,
+					'type' => self::GRAPH_WIDGET_ID,
+					'name' => $name,
+					'fields' => $child_fields,
+					'defaults' => $widget->getDefaults()
+				];
+			}
 		}
 
 		if ($this->hasInput('name')) {
