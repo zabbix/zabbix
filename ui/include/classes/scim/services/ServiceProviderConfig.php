@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 namespace SCIM\services;
 
 use SCIM\ScimApiService;
@@ -36,7 +37,7 @@ class ServiceProviderConfig extends ScimApiService {
 	 *
 	 * @return array
 	 */
-	public function get(): array {
+	public function get(array $options = []): array {
 		return [
 			'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig'],
 			'patch' => ['supported' => false],
@@ -58,21 +59,5 @@ class ServiceProviderConfig extends ScimApiService {
 				'type' => 'oauthbearertoken'
 			]
 		];
-	}
-
-	public function put(): void {
-		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
-	}
-
-	public function post(): void {
-		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
-	}
-
-	public function patch(): void {
-		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
-	}
-
-	public function delete(): void {
-		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
 	}
 }

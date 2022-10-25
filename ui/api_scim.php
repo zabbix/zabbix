@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require __DIR__ . '/vendor/autoload.php';
 require_once __DIR__.'/include/func.inc.php';
 require_once __DIR__.'/include/classes/core/CHttpRequest.php';
@@ -27,11 +28,7 @@ require_once __DIR__.'/include/debug.inc.php';
 use SCIM\API as SCIM;
 use SCIM\clients\ScimApiClient;
 use SCIM\HttpResponse;
-use SCIM\services\Bulk;
 use SCIM\services\Group;
-use SCIM\services\Me;
-use SCIM\services\ResourceType;
-use SCIM\services\Schema;
 use SCIM\services\ServiceProviderConfig;
 use SCIM\services\User;
 

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 namespace SCIM;
 
 use Exception;
@@ -36,10 +37,6 @@ class API {
 	 */
 	public function execute(ScimApiClient $client, CHttpRequest $request): HttpResponse {
 		[$input, $auth, $class] = $this->parseRequestData($request);
-
-		if (!$client->isValidEndpoint($class)) {
-			throw new Exception(_('The requested endpoint is not supported.'), 501);
-		}
 
 		/** @var CApiClientResponse $response */
 		$response = $client->callMethod($class, strtolower($request->method()), $input, $auth);

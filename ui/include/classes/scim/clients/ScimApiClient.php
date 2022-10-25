@@ -18,20 +18,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 namespace SCIM\clients;
 
 use CLocalApiClient;
+use Exception;
 
 class ScimApiClient extends CLocalApiClient {
 	/**
-	 * Returns true if the given endpoing is supported.
+	 * Returns true if the given API is valid.
 	 *
-	 * @param string $endpoint
+	 * @param string $api
 	 *
 	 * @return bool
 	 */
-	public function isValidEndpoint($endpoint) {
-		return $this->serviceFactory->hasObject($endpoint);
+	protected function isValidApi($api) {
+		if (!$this->serviceFactory->hasObject($api)) {
+			throw new Exception(_('The requested endpoint is not supported.'), 501);
+		}
+
+		return true;
 	}
 
 	/**
@@ -43,6 +49,6 @@ class ScimApiClient extends CLocalApiClient {
 	 * @return bool
 	 */
 	protected function requiresAuthentication($api, $method) {
-		return !($api === '/serviceproviderconfig' && $method === 'get');
+		return !($api === 'serviceproviderconfig' && $method === 'get');
 	}
 }
