@@ -24,6 +24,8 @@ require_once dirname(__FILE__).'/../common/testItemTest.php';
 /**
  * "Test item" function tests.
  *
+ * @dataSource Proxies
+ *
  * @backup items
  */
 class testFormTestItem extends testItemTest{

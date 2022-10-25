@@ -274,7 +274,7 @@ $form_grid->addItem([
 			->setId('time')
 	),
 
-	($data['preproc_item'] instanceof CDiscoveryRule)
+	($data['test_type'] == CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD)
 		? null
 		: (new CFormField((new CCheckBox('not_supported'))->setLabel(_('Not supported'))))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),

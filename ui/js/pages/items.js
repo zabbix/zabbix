@@ -97,8 +97,8 @@ function organizeInterfaces(interface_ids_by_types, item_interface_types, item_t
 
 	const allowed_opt_interface = (interface_type == INTERFACE_TYPE_OPT);
 
-	$(interface_select_node.getOptionByValue(INTERFACE_TYPE_OPT)).attr('disabled', !allowed_opt_interface);
-	$interface_select.find('li[value="'+INTERFACE_TYPE_OPT+'"]')
+	$(interface_select_node.getOptionByValue(0)).attr('disabled', !allowed_opt_interface);
+	$interface_select.find('li[value="0"]')
 		.toggle(allowed_opt_interface)
 		.parents('li[optgroup]:first')
 			.toggle(allowed_opt_interface);
