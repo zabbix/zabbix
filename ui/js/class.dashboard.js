@@ -1133,11 +1133,6 @@ class CDashboard extends CBaseComponent {
 			properties.type = this._widget_last_type;
 		}
 
-		if (properties.type !== this._widget_last_type) {
-			this._widget_last_type = properties.type;
-			updateUserProfile('web.dashboard.last_widget_type', properties.type, [], PROFILE_TYPE_STR);
-		}
-
 		const overlay = PopUp(`widget.${properties.type}.edit`, {
 			templateid: this._data.templateid ?? undefined,
 			...properties
@@ -1234,6 +1229,11 @@ class CDashboard extends CBaseComponent {
 			unique_id: overlay.data.original_properties.unique_id ?? undefined,
 			dashboard_page_unique_id: overlay.data.original_properties.dashboard_page_unique_id ?? undefined
 		};
+
+		if (properties.type !== overlay.data.original_properties.type && properties.type !== this._widget_last_type) {
+			this._widget_last_type = properties.type;
+			updateUserProfile('web.dashboard.last_widget_type', properties.type, [], PROFILE_TYPE_STR);
+		}
 
 		if (properties.type === overlay.data.original_properties.type) {
 			properties.name = fields.name;
