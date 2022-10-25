@@ -1792,6 +1792,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '1'
+			],
+			'pause_symptoms' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
 			]
 		]
 	],
@@ -4914,7 +4920,7 @@ return [
 			]
 		]
 	],
-	'event_rank' => [
+	'event_symptom' => [
 		'key' => 'eventid',
 		'fields' => [
 			'eventid' => [
@@ -4924,12 +4930,14 @@ return [
 				'ref_table' => 'events',
 				'ref_field' => 'eventid'
 			],
-			'c_eventid' => [
+			'cause_eventid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
+				'length' => 20,
+				'ref_table' => 'events',
+				'ref_field' => 'eventid'
 			],
-			'userid' => [
+			'rank_userid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
@@ -6471,6 +6479,18 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'rank_userid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'cause_eventid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'events',
+				'ref_field' => 'eventid'
 			]
 		]
 	],
@@ -7058,32 +7078,6 @@ return [
 				'length' => 20,
 				'ref_table' => 'acknowledges',
 				'ref_field' => 'acknowledgeid'
-			]
-		]
-	],
-	'task_update_event_rank' => [
-		'key' => 'taskid',
-		'fields' => [
-			'taskid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'task',
-				'ref_field' => 'taskid'
-			],
-			'acknowledgeid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'acknowledges',
-				'ref_field' => 'acknowledgeid'
-			],
-			'c_eventid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'events',
-				'ref_field' => 'c_eventid'
 			]
 		]
 	],
