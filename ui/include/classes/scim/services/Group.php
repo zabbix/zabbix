@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 namespace SCIM\services;
 
 use API as APIRPC;
@@ -39,6 +40,7 @@ class Group extends ScimApiService {
 	];
 
 	private const SCIM_GROUP_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group';
+	private const SCIM_LIST_RESPONSE_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:ListResponse';
 
 	protected array $data = [
 		'schemas' => [self::SCIM_GROUP_SCHEMA]
@@ -57,31 +59,39 @@ class Group extends ScimApiService {
 
 		if (array_key_exists('id', $options)) {
 			$db_scim_group = DB::select('scim_groups', [
-				'scim_groupids' => $options['id'],
-				'output' => ['name']
+				'output' => ['name'],
+				'scim_groupids' => $options['id']
 			]);
 
 			if (!$db_scim_group) {
 				self::exception(self::SCIM_ERROR_NOT_FOUND, _('This group does not exist.'));
 			}
 
-			$users = $this->getUsersByGroupId($options['id']);
+			$users = $this->getUsersByGroupIds([$options['id']]);
 
-			$this->setData($options['id'], $db_scim_group[0]['name'], $users);
+			$this->setData($options['id'], $db_scim_group[0]['name'], $users[$options['id']]);
 		}
 		else {
 			$db_scim_groups = DB::select('scim_groups', [
-				'output' => ['name', 'scim_groupid']
+				'output' => ['name'],
+				'preservekeys' => true
 			]);
+			$total_groups = count($db_scim_groups);
 
-			$this->data['Resources'] = [];
+			$this->data = [
+				'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
+				'totalResults' => $total_groups,
+				'startIndex' => max($options['startIndex'], 1),
+				'itemsPerPage' => min($total_groups, max($options['count'], 0)),
+				'Resources' => []
+			];
 
 			if ($db_scim_groups) {
-				foreach ($db_scim_groups as $db_scim_group) {
-					$users = $this->getUsersByGroupId($db_scim_group['scim_groupid']);
+				$groups_users = $this->getUsersByGroupIds(array_keys($db_scim_groups));
 
+				foreach ($groups_users as $groupid => $group_users) {
 					$this->data['Resources'][] = $this->prepareData(
-						$db_scim_group['scim_groupid'], $db_scim_group['name'], $users
+						$groupid, $db_scim_groups[$groupid]['name'], $group_users
 					);
 				}
 			}
@@ -97,7 +107,9 @@ class Group extends ScimApiService {
 	 */
 	private function validateGet(array $options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'id' =>			['type' => API_ID],
+			'id' =>				['type' => API_ID],
+			'startIndex' =>		['type' => API_INT32, 'default' => 1],
+			'count' =>			['type' => API_INT32, 'default' => 100]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -160,11 +172,11 @@ class Group extends ScimApiService {
 	 * @throws APIException if input is invalid.
 	 */
 	private function validatePost(array $options): void {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
-			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'displayName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
+			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => self::SCIM_GROUP_SCHEMA],
+			'displayName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'members' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
-				'display' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'display' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'value' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
@@ -194,20 +206,21 @@ class Group extends ScimApiService {
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
 
-		[$db_scim_group] = DB::select('scim_groups', [
-			'scim_groupids' => $options['id'],
-			'output' => ['name']
+		$db_scim_groups = DB::select('scim_groups', [
+			'output' => ['name'],
+			'scim_groupids' => $options['id']
 		]);
 
-		if (!$db_scim_group) {
+		if (!$db_scim_groups) {
 			self::exception(self::SCIM_ERROR_NOT_FOUND, _('This group does not exist.'));
 		}
+		$db_scim_group = $db_scim_groups[0];
 
 		$scim_group_members = array_column($options['members'], 'value');
 
 		$db_scim_group_members = DB::select('users_scim_groups', [
-			'filter' => ['scim_groupid' => $options['id']],
-			'output' => ['userid']
+			'output' => ['userid'],
+			'filter' => ['scim_groupid' => $options['id']]
 		]);
 
 		$users_to_add = array_diff($scim_group_members, array_column($db_scim_group_members, 'userid'));
@@ -215,12 +228,12 @@ class Group extends ScimApiService {
 
 		if($users_to_add) {
 			foreach ($users_to_add as $userid) {
-				$user_group = DB::insert('users_scim_groups', [[
+				$scim_user_group = DB::insert('users_scim_groups', [[
 					'userid' => $userid,
 					'scim_groupid' => $options['id']
 				]]);
 
-				if (!$user_group) {
+				if (!$scim_user_group) {
 					self::exception(self::SCIM_INTERNAL_ERROR,
 						_s('Unable to add user "%1$s" to group "%2$s".', $userid, $options['displayName'])
 					);
@@ -229,7 +242,8 @@ class Group extends ScimApiService {
 				$this->updateProvisionedUsersGroup($userid, $userdirectoryid);
 			}
 		}
-		elseif($users_to_remove) {
+
+		if ($users_to_remove) {
 			DB::delete('users_scim_groups', [
 				'userid' => array_values($users_to_remove),
 				'scim_groupid' =>  $options['id']
@@ -257,11 +271,11 @@ class Group extends ScimApiService {
 	 * @throws APIException if input is invalid.
 	 */
 	private function validatePut($options) {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
-			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'displayName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
+			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => self::SCIM_GROUP_SCHEMA],
+			'displayName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'members' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
-				'display' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'display' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'value' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
@@ -288,15 +302,11 @@ class Group extends ScimApiService {
 		$this->validateDelete($options);
 
 		$db_scim_group_members = DB::select('users_scim_groups', [
-			'filter' => ['scim_groupid' => $options['id']],
-			'output' => ['userid']
+			'output' => ['userid'],
+			'filter' => ['scim_groupid' => $options['id']]
 		]);
 
-		$deleted_group = DB::delete('scim_groups', ['scim_groupid' => $options['id']]);
-
-		if (!$deleted_group) {
-			self::exception(self::SCIM_INTERNAL_ERROR, _s('Unable to delete group "%1$s".', $options['id']));
-		}
+		DB::delete('scim_groups', ['scim_groupid' => $options['id']]);
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
 
@@ -313,8 +323,8 @@ class Group extends ScimApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	private function validateDelete(array $options): void {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-			'id' =>	['type' => API_ID, 'flags' => API_REQUIRED, 'uniq' => true]
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+			'id' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => true]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -370,24 +380,35 @@ class Group extends ScimApiService {
 	/**
 	 * Based on SCIM group id, returns all the users that are included in this group. Checks table 'users_scim_groups'.
 	 *
-	 * @param string $groupid  SCIM group's ID.
+	 * @param array $groupids  SCIM groups' IDs.
 	 *
-	 * @return array
-	 *         []['userid']
-	 *         []['username']
+	 * @return array           Returns array where each group has its own array of users. Groupid is key, userid is key.
+	 *         [$groupid][$userid]['userid']
+	 *                   [$userid]['username']
 	 */
-	private function getUsersByGroupId(string $groupid): array {
-		$db_scim_group_members = DB::select('users_scim_groups', [
-			'filter' => ['scim_groupid' => $groupid],
-			'output' => ['userid']
+	private function getUsersByGroupIds(array $groupids): array {
+		$db_scim_groups_members = DB::select('users_scim_groups', [
+			'output' => ['userid', 'scim_groupid'],
+			'filter' => ['scim_groupid' => $groupids]
 		]);
 
 		$users = APIRPC::User()->get([
 			'output' => ['userid', 'username'],
-			'userids' => array_column($db_scim_group_members, 'userid')
+			'userids' => array_column($db_scim_groups_members, 'userid'),
+			'preservekeys' => true
 		]);
 
-		return $users;
+		foreach ($groupids as $groupid) {
+			$users_groups[$groupid] = [];
+
+			foreach ($db_scim_groups_members as $scim_group_member) {
+				if ($scim_group_member['scim_groupid'] == $groupid) {
+					$users_groups[$groupid][$scim_group_member['userid']] = $users[$scim_group_member['userid']];
+				}
+			}
+		}
+
+		return $users_groups;
 	}
 
 	/**
@@ -403,21 +424,21 @@ class Group extends ScimApiService {
 		$provisioning = CProvisioning::forUserDirectoryId($userdirectoryid);
 
 		$user_scim_groupids = DB::select('users_scim_groups', [
-			'filter' => ['userid' => $userid],
-			'output' => ['scim_groupid']
+			'output' => ['scim_groupid'],
+			'filter' => ['userid' => $userid]
 		]);
 
 		$user_scim_group_names = DB::select('scim_groups', [
-			'scim_groupids' => array_column($user_scim_groupids, 'scim_groupid'),
-			'output' => ['name']
+			'output' => ['name'],
+			'scim_groupids' => array_column($user_scim_groupids, 'scim_groupid')
 		]);
 
 		$group_rights = $provisioning->getUserGroupsAndRole(array_column($user_scim_group_names, 'name'));
 
 		$user_media = APIRPC::User()->get([
 			'output' => ['medias'],
-			'userids' => $userid,
 			'selectMedias' => ['mediatypeid', 'sendto'],
+			'userids' => $userid,
 			'filter' => ['userdirectoryid' => $userdirectoryid]
 		]);
 
