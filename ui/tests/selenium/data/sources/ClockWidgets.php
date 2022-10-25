@@ -27,6 +27,8 @@ class ClockWidgets {
 	 * @return array
 	 */
 
+	const INTERFACE_ID = 'select * from host';
+
 	public static function load() {
 		CDataHelper::call('hostgroup.create', [
 			[
@@ -38,7 +40,9 @@ class ClockWidgets {
 		CDataHelper::call('host.create', [
 			'host' => 'DEV-2236 host',
 			'groups' => [
-				['groupid' => $hostgrpid['DEV-2236 hostgroup']]
+				[
+					'groupid' => $hostgrpid['DEV-2236 hostgroup']
+				]
 			],
 			'interfaces' => [
 				'type'=> 1,
@@ -49,12 +53,13 @@ class ClockWidgets {
 				'port' => '10050'
 			]
 		]);
-		$hostid = CDataHelper::getIds('name');
-		$interfaceid = CDataHelper::getIds('interfaceid');
+		$hostid = CDataHelper::getIds('host');
+
+		$interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.$hostid['DEV-2236 host']);
 
 		CDataHelper::call('item.create', [
 			[
-				'hostid' => $hostid,
+				'hostid' => $hostid['DEV-2236 host'],
 				'name' => 'DEV-2236 item',
 				'key_' => 'system.localtime[local]',
 				'type' => 0,
@@ -68,8 +73,6 @@ class ClockWidgets {
 		CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'DEV-2236',
-			],
-			[
 				'widgets' => [
 					[
 						'type' => 'clock',
@@ -112,7 +115,7 @@ class ClockWidgets {
 							[
 								'type' => 4,
 								'name' => 'itemid',
-								'value' => $itemid
+								'value' => $itemid['DEV-2236 item']
 							],
 							[
 								'type' => 0,
@@ -130,5 +133,10 @@ class ClockWidgets {
 				]
 			]
 		]);
+		$dashboardids = CDataHelper::getIds('name');
+
+		return [
+			'dashboardids' => $dashboardids
+		];
 	}
 }
