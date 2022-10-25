@@ -1,6 +1,9 @@
 Changes for 6.4.0beta2
 
 New features:
+..F.....S. [ZBXNEXT-7122] added detection of compressed chunks in history or trend tables, and warnings that suggest enabling housekeeping overrides accordingly (dgoloscapov, jfreibergs)
+.........T [ZBXNEXT-8018] added token authentication in Template GitLab by HTTP (atocko)
+..F....... [ZBXNEXT-7512] implemented new context menu for host, item and trigger for monitoring section (rlataria)
 ..F.....S. [ZBXNEXT-7972] implemented name for trigger URL (dpetra, kprutkovs)
 .......PS. [ZBXNEXT-6401] added new vmware keys vmware.datastore.perfcounter and vmware.hv.diskinfo.get (MVekslers)
 ..F....... [ZBXNEXT-8038] improved layout for audit log report utilising two-column layout (kkuzmina)
@@ -12,6 +15,9 @@ New features:
 ........S. [ZBXNEXT-7920] improved value cache not to drop items from cache when no new value has arrived in 24 hours (vso)
 
 Bug fixes:
+..F....... [ZBX-17300] fixed handling of context menu in Map builder (jfreibergs)
+.........T [ZBXNEXT-8035] added override for file system discovery trigger in f5 template (knaglis)
+..F....... [ZBX-21656] fixed clone buttons not working in Safari 16 on template editing form (averza)
 ..F....... [ZBX-20505] fixed subfilter counters displaying incorrect values in Monitoring => Graph view (rdetlavs)
 ........S. [ZBX-21733] improved performance of system information and queue calculation to reduce history syncer locking (vso)
 ...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
