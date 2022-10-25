@@ -538,7 +538,9 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
 	const overlay = overlays_stack.removeById(dialogueid);
 
 	if (overlay && return_focus) {
-		jQuery(overlay.element)[0].focus({preventScroll: true});
+		if (jQuery(overlay.element)[0] !== undefined) {
+			jQuery(overlay.element)[0].focus({preventScroll: true});
+		}
 	}
 
 	// Remove event listener.
