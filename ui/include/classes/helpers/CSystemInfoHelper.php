@@ -44,18 +44,17 @@ class CSystemInfoHelper {
 		$db_backend = DB::getDbBackend();
 		$data['encoding_warning'] = $db_backend->checkEncoding() ? '' : $db_backend->getWarning();
 
-		$dbversion_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
+		$dbversion_status = CSettingsHelper::getDbVersionStatus();
 
-		if ($dbversion_status !== null && $dbversion_status !== '') {
-			$dbversion_status = json_decode($dbversion_status, true);
+		foreach ($dbversion_status as $dbversion) {
+			if (array_key_exists('history_pk', $dbversion)) {
+				$data['history_pk'] = ($dbversion['history_pk'] == 1);
 
-			if (array_key_exists('history_pk', $dbversion_status)) {
-				$data['history_pk'] = ($dbversion_status['history_pk'] == 1);
+				break;
 			}
 		}
-		else {
-			$dbversion_status = [];
-		}
+
+		$data += CHousekeepingHelper::getWarnings($dbversion_status);
 
 		$ha_cluster_enabled = false;
 

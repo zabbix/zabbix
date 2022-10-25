@@ -441,6 +441,12 @@ static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service,
 		goto out;
 	}
 
+	if (0 == page->offset)
+	{
+		*error = zbx_strdup(*error, "Cannot authenticate, received empty response.");
+		goto out;
+	}
+
 	if (0 == is_new_api)
 	{
 		char			token[MAX_STRING_LEN];
@@ -448,13 +454,13 @@ static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service,
 
 		if (FAIL == vmware_rest_response_open(page->data, &jp, error))
 		{
-			*error = zbx_dsprintf(*error, "Authentication fail, %s.", *error);
+			*error = zbx_dsprintf(*error, "Cannot authenticate: %s.", *error);
 			goto out;
 		}
 
 		if (SUCCEED != zbx_json_value_by_name(&jp, "value", token, sizeof(token), NULL))
 		{
-			*error = zbx_dsprintf(*error, "Authentication fail, Cannot read vmware response: %s.",
+			*error = zbx_dsprintf(*error, "Cannot authenticate, cannot read vmware response: %s.",
 					zbx_json_strerror());
 			goto out;
 		}
@@ -562,6 +568,8 @@ static int	vmware_http_request(const char *fn_parent, CURL *easyhandle, const ch
 		*error = zbx_strdup(*error, curl_easy_strerror(err));
 		return FAIL;
 	}
+	else if (0 == page->offset)
+		*page->data = '\0';
 
 	if (NULL != fn_parent)
 		zabbix_log(LOG_LEVEL_TRACE, "%s() REST response: %s", fn_parent, page->data);
