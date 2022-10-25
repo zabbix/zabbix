@@ -113,7 +113,9 @@ window.ldap_edit_popup = new class {
 	}
 
 	openTestPopup() {
-		const fields = this.preprocessFormFields(getFormFields(this.form));
+		let fields = {...{provision_status: <?= JIT_PROVISIONING_DISABLED ?>}, ...getFormFields(this.form)};
+		fields = this.preprocessFormFields(fields);
+
 		const test_overlay = PopUp('popup.ldap.test.edit', fields, {dialogueid: 'ldap_test_edit'});
 		test_overlay.xhr.then(() => this.overlay.unsetLoading());
 	}
@@ -177,7 +179,7 @@ window.ldap_edit_popup = new class {
 			delete fields.search_filter;
 		}
 
-		if (fields.provision_status != 1) {
+		if (fields.provision_status != <?= JIT_PROVISIONING_ENABLED ?>) {
 			delete fields.group_basedn;
 			delete fields.group_name;
 			delete fields.group_member;

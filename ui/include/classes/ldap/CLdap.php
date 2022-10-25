@@ -261,7 +261,7 @@ class CLdap {
 			// No need for user default attributes, only 'dn'.
 			$users = $this->search($this->cnf['base_dn'], $this->cnf['search_filter'], ['%{user}' => $user], ['dn']);
 
-			if (array_key_exists('count', $users) && $users['count'] != 1) {
+			if (!array_key_exists('count', $users) || $users['count'] != 1) {
 				// Multiple users matched criteria.
 				$this->error = static::ERR_USER_NOT_FOUND;
 
