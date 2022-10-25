@@ -56,14 +56,15 @@ class Manager extends CRegistryFactory {
 
 		if ($instance === null) {
 			$instance = self::getInstance()->getObject('history');
+			$dbversion_status = CSettingsHelper::getDbVersionStatus();
 
-			$dbversion_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
+			foreach ($dbversion_status as $dbversion) {
+				if (array_key_exists('history_pk', $dbversion)) {
+					if ($dbversion['history_pk'] == 1) {
+						$instance->setPrimaryKeysEnabled();
+					}
 
-			if ($dbversion_status !== null && $dbversion_status !== '') {
-				$dbversion_status = json_decode($dbversion_status, true);
-				if ($dbversion_status !== null && array_key_exists('history_pk', $dbversion_status)
-						&& $dbversion_status['history_pk'] == 1) {
-					$instance->setPrimaryKeysEnabled();
+					break;
 				}
 			}
 		}
