@@ -1357,6 +1357,8 @@ int	main(int argc, char **argv)
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_import_symbols();
 	zbx_win_exception_init(&get_progname);
+#else
+	ZBX_UNUSED(get_progname);
 #endif
 #ifdef _WINDOWS
 	if (ZBX_TASK_SHOW_USAGE != t.task && ZBX_TASK_SHOW_VERSION != t.task && ZBX_TASK_SHOW_HELP != t.task &&
