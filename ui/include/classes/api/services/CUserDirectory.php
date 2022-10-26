@@ -793,14 +793,36 @@ class CUserDirectory extends CApiService {
 		if ($mediatypeids) {
 			$mediatypeids = array_keys(array_flip($mediatypeids));
 
-			$mediatype_count = API::MediaType()->get([
-				'countOutput' => true,
-				'mediatypeids' => $mediatypeids
+			$db_mediatypes = API::MediaType()->get([
+				'output' => [],
+				'mediatypeids' => $mediatypeids,
+				'preservekeys' => true
 			]);
 
-			if ($mediatype_count != count($mediatypeids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
+			if (count($db_mediatypes) != count($mediatypeids)) {
+				$missing_mediatypeids = array_diff($mediatypeids, array_keys($db_mediatypes));
+				$missing_mediatypeid = reset($missing_mediatypeids);
+				$userdirectory_index = 0;
+				$media_index = 0;
+
+				foreach (array_values($userdirectories) as $usrdir_index => $userdirectory) {
+					if (!array_key_exists('provision_media', $userdirectory)) {
+						continue;
+					}
+
+					$mediaids = array_column($userdirectory['provision_media'], 'mediatypeid', null);
+					if (($found = array_search($missing_mediatypeid, $mediaids)) !== false) {
+						$userdirectory_index = $usrdir_index;
+						$media_index = $found;
+						break;
+					}
+				}
+
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.',
+						'/'.($userdirectory_index + 1).'/provision_media/'.($media_index + 1).'/mediatypeid',
+						_('referred object does not exist')
+					)
 				);
 			}
 		}
