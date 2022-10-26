@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:27:02Z'
+  date: '2022-10-18T21:10:39Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -64,7 +64,7 @@ zabbix_export:
               name: 'Ceph: Minimum monitor release version has changed'
               event_name: 'Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Ceph version has changed. Ack to close.'
+              description: 'A Ceph version has changed. Perform Ack to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -77,7 +77,7 @@ zabbix_export:
           key: ceph.num_mon
           delay: '0'
           history: 7d
-          description: 'Number of Monitors configured in Ceph cluster'
+          description: 'The number of Monitors configured in a Ceph cluster.'
           preprocessing:
             -
               type: JSONPATH
@@ -100,7 +100,7 @@ zabbix_export:
           key: ceph.num_osd
           delay: '0'
           history: 7d
-          description: 'Number of known storage daemons in Ceph cluster'
+          description: 'The number of the known storage daemons in a Ceph cluster.'
           preprocessing:
             -
               type: JSONPATH
@@ -126,7 +126,7 @@ zabbix_export:
           key: ceph.num_osd_in
           delay: '0'
           history: 7d
-          description: 'Total number of participating storage daemons in Ceph cluster'
+          description: 'The total number of the participating storage daemons in a Ceph cluster.'
           preprocessing:
             -
               type: JSONPATH
@@ -152,7 +152,7 @@ zabbix_export:
           key: ceph.num_osd_up
           delay: '0'
           history: 7d
-          description: 'Total number of online storage daemons in Ceph cluster'
+          description: 'The total number of the online storage daemons in a Ceph cluster.'
           preprocessing:
             -
               type: JSONPATH
@@ -178,7 +178,7 @@ zabbix_export:
           key: ceph.num_pg
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in Ceph cluster'
+          description: 'The total number of Placement Groups in a Ceph cluster.'
           preprocessing:
             -
               type: JSONPATH
@@ -204,7 +204,7 @@ zabbix_export:
           key: ceph.num_pg_temp
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in pg_temp state'
+          description: 'The total number of Placement Groups in a *pg_temp* state'
           preprocessing:
             -
               type: JSONPATH
@@ -223,7 +223,7 @@ zabbix_export:
           key: ceph.num_pools
           delay: '0'
           history: 7d
-          description: 'Total number of pools in Ceph cluster'
+          description: 'The total number of pools in a Ceph cluster.'
           preprocessing:
             -
               type: JSONPATH
@@ -274,7 +274,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Backfill full ratio setting of Ceph cluster as configured on OSDMap'
+          description: 'The backfill full ratio setting of the Ceph cluster as configured on OSDMap.'
           preprocessing:
             -
               type: JSONPATH
@@ -299,7 +299,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Average fill of OSDs'
+          description: 'The average fill of OSDs.'
           preprocessing:
             -
               type: JSONPATH
@@ -323,7 +323,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage fill of maximum filled OSD'
+          description: 'The percentage of the most filled OSD.'
           preprocessing:
             -
               type: JSONPATH
@@ -347,7 +347,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage fill of minimum filled OSD'
+          description: 'The percentage fill of the minimum filled OSD.'
           preprocessing:
             -
               type: JSONPATH
@@ -370,7 +370,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Full ratio setting of Ceph cluster as configured on OSDMap'
+          description: 'The full ratio setting of the Ceph cluster as configured on OSDMap.'
           preprocessing:
             -
               type: JSONPATH
@@ -395,7 +395,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Average apply latency of OSDs'
+          description: 'The average apply latency of OSDs.'
           preprocessing:
             -
               type: JSONPATH
@@ -419,7 +419,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Maximum apply latency of OSDs'
+          description: 'The maximum apply latency of OSDs.'
           preprocessing:
             -
               type: JSONPATH
@@ -443,7 +443,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Minimum apply latency of OSDs'
+          description: 'The minimum apply latency of OSDs.'
           preprocessing:
             -
               type: JSONPATH
@@ -467,7 +467,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Average commit latency of OSDs'
+          description: 'The average commit latency of OSDs.'
           preprocessing:
             -
               type: JSONPATH
@@ -491,7 +491,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Maximum commit latency of OSDs'
+          description: 'The maximum commit latency of OSDs.'
           preprocessing:
             -
               type: JSONPATH
@@ -515,7 +515,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ms
-          description: 'Minimum commit latency of OSDs'
+          description: 'The minimum commit latency of OSDs.'
           preprocessing:
             -
               type: JSONPATH
@@ -538,7 +538,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Near full ratio setting of Ceph cluster as configured on OSDMap'
+          description: 'The near full ratio setting of the Ceph cluster as configured on OSDMap.'
           preprocessing:
             -
               type: JSONPATH
@@ -562,7 +562,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Average amount of PGs on OSDs'
+          description: 'The average amount of Placement Groups on OSDs.'
           preprocessing:
             -
               type: JSONPATH
@@ -588,7 +588,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Maximum amount of PGs on OSDs'
+          description: 'The maximum amount of Placement Groups on OSDs.'
           preprocessing:
             -
               type: JSONPATH
@@ -614,7 +614,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Minimum amount of PGs on OSDs'
+          description: 'The minimum amount of Placement Groups on OSDs.'
           preprocessing:
             -
               type: JSONPATH
@@ -639,7 +639,7 @@ zabbix_export:
           key: ceph.overall_status
           delay: '0'
           history: 7d
-          description: 'Overall Ceph cluster status, eg 0 - HEALTH_OK, 1 - HEALTH_WARN or 2 - HEALTH_ERR'
+          description: 'The overall Ceph cluster status, eg 0 - HEALTH_OK, 1 - HEALTH_WARN or 2 - HEALTH_ERR.'
           valuemap:
             name: 'Ceph cluster status'
           preprocessing:
@@ -691,7 +691,7 @@ zabbix_export:
           key: ceph.pg_states.active
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in active state'
+          description: 'The total number of Placement Groups in an active state.'
           preprocessing:
             -
               type: JSONPATH
@@ -710,7 +710,7 @@ zabbix_export:
           key: ceph.pg_states.backfilling
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in backfilling state'
+          description: 'The total number of Placement Groups in a backfill state.'
           preprocessing:
             -
               type: JSONPATH
@@ -729,7 +729,7 @@ zabbix_export:
           key: ceph.pg_states.backfill_toofull
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in backfill_toofull state'
+          description: 'The total number of Placement Groups in a *backfill_toofull state*.'
           preprocessing:
             -
               type: JSONPATH
@@ -748,7 +748,7 @@ zabbix_export:
           key: ceph.pg_states.backfill_wait
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in backfill_wait state'
+          description: 'The total number of Placement Groups in a *backfill_wait* state.'
           preprocessing:
             -
               type: JSONPATH
@@ -767,7 +767,7 @@ zabbix_export:
           key: ceph.pg_states.clean
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in clean state'
+          description: 'The total number of Placement Groups in a clean state.'
           preprocessing:
             -
               type: JSONPATH
@@ -786,7 +786,7 @@ zabbix_export:
           key: ceph.pg_states.degraded
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in degraded state'
+          description: 'The total number of Placement Groups in a degraded state.'
           preprocessing:
             -
               type: JSONPATH
@@ -805,7 +805,7 @@ zabbix_export:
           key: ceph.pg_states.inconsistent
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in inconsistent state'
+          description: 'The total number of Placement Groups in an inconsistent state.'
           preprocessing:
             -
               type: JSONPATH
@@ -824,7 +824,7 @@ zabbix_export:
           key: ceph.pg_states.peering
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in peering state'
+          description: 'The total number of Placement Groups in a peering state.'
           preprocessing:
             -
               type: JSONPATH
@@ -843,7 +843,7 @@ zabbix_export:
           key: ceph.pg_states.recovering
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in recovering state'
+          description: 'The total number of Placement Groups in a recovering state.'
           preprocessing:
             -
               type: JSONPATH
@@ -862,7 +862,7 @@ zabbix_export:
           key: ceph.pg_states.recovery_wait
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in recovery_wait state'
+          description: 'The total number of Placement Groups in a *recovery_wait* state.'
           preprocessing:
             -
               type: JSONPATH
@@ -881,7 +881,7 @@ zabbix_export:
           key: ceph.pg_states.remapped
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in remapped state'
+          description: 'The total number of Placement Groups in a remapped state.'
           preprocessing:
             -
               type: JSONPATH
@@ -900,7 +900,7 @@ zabbix_export:
           key: ceph.pg_states.scrubbing
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in scrubbing state'
+          description: 'The total number of Placement Groups in a scrubbing state.'
           preprocessing:
             -
               type: JSONPATH
@@ -919,7 +919,7 @@ zabbix_export:
           key: ceph.pg_states.undersized
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in undersized state'
+          description: 'The total number of Placement Groups in an undersized state.'
           preprocessing:
             -
               type: JSONPATH
@@ -938,7 +938,7 @@ zabbix_export:
           key: ceph.pg_states.unknown
           delay: '0'
           history: 7d
-          description: 'Total number of Placement Groups in unknown state'
+          description: 'The total number of Placement Groups in an unknown state.'
           preprocessing:
             -
               type: JSONPATH
@@ -975,7 +975,7 @@ zabbix_export:
               expression: 'last(/Ceph by Zabbix agent 2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"])=0'
               name: 'Ceph: Can not connect to cluster'
               priority: AVERAGE
-              description: 'Connection to Ceph RESTful module is broken (if there is any error presented including AUTH and configuration issues).'
+              description: 'The connection to the Ceph RESTful module is broken (if there is any error presented including *AUTH* and the configuration issues).'
               tags:
                 -
                   tag: scope
@@ -989,7 +989,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Global read Bytes per second'
+          description: 'The global read bytes per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -1017,12 +1017,16 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ops
-          description: 'Global read operations per second'
+          description: 'The global read operations per second.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - $.rd_ops
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
           master_item:
             key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
           tags:
@@ -1051,7 +1055,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'Total bytes available in Ceph cluster'
+          description: 'The total bytes available in a Ceph cluster.'
           preprocessing:
             -
               type: JSONPATH
@@ -1074,7 +1078,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'Total (RAW) capacity of Ceph cluster in bytes'
+          description: 'The total (RAW) capacity of a Ceph cluster in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -1096,7 +1100,7 @@ zabbix_export:
           key: ceph.total_objects
           delay: '0'
           history: 7d
-          description: 'Total number of objects in Ceph cluster'
+          description: 'The total number of objects in a Ceph cluster.'
           preprocessing:
             -
               type: JSONPATH
@@ -1116,7 +1120,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'Total bytes used in Ceph cluster'
+          description: 'The total bytes used in a Ceph cluster.'
           preprocessing:
             -
               type: JSONPATH
@@ -1168,7 +1172,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: ops
-          description: 'Global write operations per second'
+          description: 'The global write operations per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -1264,7 +1268,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: ms
-              description: 'Time taken to flush an update to disks.'
+              description: 'The time taken to flush an update to disks.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1295,7 +1299,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: ms
-              description: 'Time taken to commit an operation to the journal.'
+              description: 'The time taken to commit an operation to the journal.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1383,7 +1387,7 @@ zabbix_export:
                   name: 'Ceph: OSD osd.{#OSDNAME} is down'
                   priority: AVERAGE
                   description: |
-                    OSD osd.{#OSDNAME} is marked "down" in the osdmap.
+                    OSD osd.{#OSDNAME} is marked "down" in the *osdmap*.
                     The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.
                   tags:
                     -
@@ -1442,7 +1446,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Total bytes used in pool.'
+              description: 'The total bytes used in a pool.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1493,7 +1497,7 @@ zabbix_export:
               key: 'ceph.pool["{#POOLNAME}",objects]'
               delay: '0'
               history: 7d
-              description: 'Number of objects in the pool.'
+              description: 'The number of objects in the pool.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1519,7 +1523,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '%'
-              description: 'Percentage of storage used per pool'
+              description: 'The percentage of the storage used per pool.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1546,7 +1550,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: Bps
-              description: 'Per-pool read Bytes/second'
+              description: 'The read rate per pool (bytes per second).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1577,7 +1581,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: ops
-              description: 'Per-pool read operations/second'
+              description: 'The read rate per pool (operations per second).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1607,7 +1611,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Bytes used in pool including copies made.'
+              description: 'Bytes used in pool including the copies made.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1634,7 +1638,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: Bps
-              description: 'Per-pool write Bytes/second'
+              description: 'The write rate per pool (bytes per second).'
               preprocessing:
                 -
                   type: JSONPATH
@@ -1665,7 +1669,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: ops
-              description: 'Per-pool write operations/second'
+              description: 'The write rate per pool (operations per second).'
               preprocessing:
                 -
                   type: JSONPATH
