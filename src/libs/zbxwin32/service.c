@@ -23,7 +23,7 @@
 #include "cfg.h"
 #include "log.h"
 #include "zbxconf.h"
-#include "perfmon.h"
+#include "zbxwin32.h"
 
 #define EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
 

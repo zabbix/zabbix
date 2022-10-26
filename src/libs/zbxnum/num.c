@@ -294,7 +294,7 @@ int	zbx_is_double(const char *str, double *value)
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-int	_wis_uint(const wchar_t *wide_string)
+int	zbx_wis_uint(const wchar_t *wide_string)
 {
 	const wchar_t	*wide_char = wide_string;
 

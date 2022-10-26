@@ -24,7 +24,7 @@
 #include "zbxalgo.h"
 
 #ifdef _WINDOWS
-#	include "perfmon.h"
+#	include "zbxwin32.h"
 
 typedef struct
 {

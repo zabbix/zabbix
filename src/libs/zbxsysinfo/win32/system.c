@@ -23,7 +23,7 @@
 #include "cfg.h"
 #include "zbxtime.h"
 
-#include "perfmon.h"
+#include "zbxwin32.h"
 
 #pragma comment(lib, "user32.lib")
 

@@ -23,7 +23,7 @@ package zbxlib
 #include "zbxstr.h"
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
-#include "perfmon.h"
+#include "zbxwin32.h"
 #include "../src/zabbix_agent/metrics.h"
 
 #cgo LDFLAGS: -Wl,--start-group
@@ -121,12 +121,12 @@ int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_FAIL;
 }
 
-DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
+DWORD	zbx_get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
 {
 	return 0;
 }
 
-DWORD	get_builtin_object_index(zbx_builtin_counter_ref_t object_ref)
+DWORD	zbx_get_builtin_object_index(zbx_builtin_counter_ref_t object_ref)
 {
 	return 0;
 }

@@ -24,7 +24,7 @@
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxsysinfo.h"
-#	include "perfmon.h"
+#	include "zbxwin32.h"
 #	pragma comment(lib, "user32.lib")
 #endif
 
@@ -82,8 +82,8 @@ int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	ZBX_UNUSED(request);
 
 	zbx_snprintf(counter_path, sizeof(counter_path), "\\%u\\%u",
-			(unsigned int)get_builtin_object_index(PCI_TOTAL_SESSIONS),
-			(unsigned int)get_builtin_counter_index(PCI_TOTAL_SESSIONS));
+			(unsigned int)zbx_get_builtin_object_index(PCI_TOTAL_SESSIONS),
+			(unsigned int)zbx_get_builtin_counter_index(PCI_TOTAL_SESSIONS));
 
 	request_tmp.nparam = 1;
 	request_tmp.params = zbx_malloc(NULL, request_tmp.nparam * sizeof(char *));

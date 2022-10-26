@@ -17,10 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PERFMON_H
-#define ZABBIX_PERFMON_H
+#ifndef ZABBIX_WIN32_H
+#define ZABBIX_WIN32_H
 
+#include "config.h"
 #include "zbxsysinc.h"
+#include "zbxtypes.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 #	error "This module is only available for Windows OS"
@@ -80,22 +82,26 @@ typedef struct perf_counter_data
 }
 zbx_perf_counter_data_t;
 
+zbx_uint64_t	zbx_get_cluster_size(const char *path, char **error);
+
 PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENTS *cpe, char *counterpath);
 PDH_STATUS	zbx_PdhOpenQuery(const char *function, PDH_HQUERY query);
 PDH_STATUS	zbx_PdhAddCounter(const char *function, zbx_perf_counter_data_t *counter, PDH_HQUERY query,
 		const char *counterpath, zbx_perf_counter_lang_t lang, PDH_HCOUNTER *handle);
 PDH_STATUS	zbx_PdhCollectQueryData(const char *function, const char *counterpath, PDH_HQUERY query);
-PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpath, PDH_HCOUNTER handle, PPDH_RAW_COUNTER value);
+PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpath, PDH_HCOUNTER handle,
+		PPDH_RAW_COUNTER value);
 
-PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath, zbx_perf_counter_lang_t lang, double *value);
-wchar_t		*get_counter_name(DWORD pdhIndex);
-int		check_counter_path(char *counterPath, int convert_from_numeric);
-int		init_builtin_counter_indexes(void);
-DWORD 		get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref);
-DWORD 		get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref);
-wchar_t		*get_all_counter_names(HKEY reg_key, wchar_t *reg_value_name);
+PDH_STATUS	zbx_calculate_counter_value(const char *function, const char *counterpath,
+		zbx_perf_counter_lang_t lang, double *value);
+wchar_t		*zbx_get_counter_name(DWORD pdhIndex);
+int		zbx_check_counter_path(char *counterPath, int convert_from_numeric);
+int		zbx_init_builtin_counter_indexes(void);
+DWORD 		zbx_get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref);
+DWORD 		zbx_get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref);
+wchar_t		*zbx_get_all_counter_names(HKEY reg_key, wchar_t *reg_value_name);
 
-#define	get_builtin_object_name(ctr)	get_counter_name(get_builtin_object_index(ctr))
-#define	get_builtin_counter_name(ctr)	get_counter_name(get_builtin_counter_index(ctr))
+#define	get_builtin_object_name(ctr)	zbx_get_counter_name(zbx_get_builtin_object_index(ctr))
+#define	get_builtin_counter_name(ctr)	zbx_get_counter_name(zbx_get_builtin_counter_index(ctr))
 
-#endif /* ZABBIX_PERFMON_H */
+#endif /* ZABBIX_WIN32_H */

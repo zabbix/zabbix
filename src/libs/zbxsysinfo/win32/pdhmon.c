@@ -103,7 +103,7 @@ static int perf_counter_ex(const char *function, AGENT_REQUEST *request, AGENT_R
 		goto out;
 	}
 
-	if (FAIL == check_counter_path(counterpath, PERF_COUNTER_LANG_DEFAULT == lang))
+	if (FAIL == zbx_check_counter_path(counterpath, PERF_COUNTER_LANG_DEFAULT == lang))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid performance counter path."));
 		goto out;

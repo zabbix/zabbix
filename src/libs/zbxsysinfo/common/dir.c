@@ -28,7 +28,7 @@
 #include "log.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-#	include "disk.h"
+#	include "zbxwin32.h"
 #endif
 
 /******************************************************************************
@@ -590,7 +590,7 @@ static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE tim
 			goto err2;
 		}
 
-		if (SIZE_MODE_DISK == mode && 0 == (cluster_size = get_cluster_size(item->path, &error)))
+		if (SIZE_MODE_DISK == mode && 0 == (cluster_size = zbx_get_cluster_size(item->path, &error)))
 		{
 			SET_MSG_RESULT(result, error);
 			list.values_num++;

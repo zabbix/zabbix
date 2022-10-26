@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxwin32.h"
+
 #include "zbxstr.h"
 #include "log.h"
 
@@ -32,7 +34,7 @@
  *               On error, 0 is returned.                                     *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	get_cluster_size(const char *path, char **error)
+zbx_uint64_t	zbx_get_cluster_size(const char *path, char **error)
 {
 	wchar_t 	*disk = NULL, *wpath = NULL;
 	unsigned long	sectors_per_cluster, bytes_per_sector, path_length;
