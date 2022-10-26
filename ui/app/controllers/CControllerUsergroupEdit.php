@@ -141,7 +141,8 @@ class CControllerUsergroupEdit extends CController {
 
 		if ($data['can_update_group']) {
 			$userdirectories = API::UserDirectory()->get([
-				'output' => ['userdirectoryid', 'name']
+				'output' => ['userdirectoryid', 'name'],
+				'filter' => ['idp_type' => IDP_TYPE_LDAP]
 			]);
 			CArrayHelper::sort($userdirectories, ['name']);
 			$data['userdirectories'] = array_column($userdirectories, 'name', 'userdirectoryid');

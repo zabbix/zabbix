@@ -1330,6 +1330,7 @@ class CUserGroup extends CApiService {
 		$db_userdirectories = API::UserDirectory()->get([
 			'output' => [],
 			'userdirectoryids' => $userdirectoryids,
+			'filter' => ['idp_type' => IDP_TYPE_LDAP],
 			'preservekeys' => true
 		]);
 
