@@ -147,7 +147,7 @@
 
 					const message_box = makeMessageBox('bad', messages, title)[0];
 
-					this.form.parentNode.insertBefore(message_box, this.form);
+					addMessage(message_box);
 				})
 				.finally(() => {
 					this._unsetLoading();
