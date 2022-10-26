@@ -302,7 +302,18 @@ static zbx_tfc_data_t	*tfc_index_add(zbx_tfc_data_t *data_local)
 
 	if (NULL == (data = (zbx_tfc_data_t *)zbx_hashset_insert(&cache->index, data_local, sizeof(zbx_tfc_data_t))))
 	{
-		cache->slots_num = cache->index.num_data;
+		if (cache->slots_num != cache->index.num_data)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "estimated trends function cache slot count %d for %d bytes was "
+					"too large, setting it to %d", cache->slots_num, CONFIG_TREND_FUNC_CACHE_SIZE,
+					cache->index.num_data);
+
+			cache->slots_num = cache->index.num_data;
+
+			if (cache->slots_num < cache->free_slot)
+				cache->free_slot = cache->slots_num;
+		}
+
 		tfc_reserve_slot();
 
 		if (NULL == (data = (zbx_tfc_data_t *)zbx_hashset_insert(&cache->index, data_local,
