@@ -64,49 +64,46 @@ class User extends ScimApiService {
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryId();
 
 		if (array_key_exists('userName', $options)) {
-			$user = APIRPC::User()->get([
+			$users = APIRPC::User()->get([
 				'output' => ['userid', 'username', 'userdirectoryid'],
 				'selectUsrgrps' => ['usrgrpid'],
 				'filter' => ['username' => $options['userName']]
 			]);
 
-			if ($user) {
-				$user_groups = array_column($user[0]['usrgrps'], 'usrgrpid');
-				$disabled_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID);
+			$user_groups = $users ? array_column($users[0]['usrgrps'], 'usrgrpid') : [];
+			$disabled_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID);
 
-				if ((count($user_groups) == 1 && $user_groups[0] == $disabled_groupid)) {
-					$this->data += [
-						'totalResults' => 0,
-						'Resources' => []
-					];
-					return $this->data;
-				}
-				elseif ($user[0]['userdirectoryid'] != $userdirectoryid) {
-					self::exception(self::SCIM_ERROR_BAD_REQUEST,
-						_s('User with username "%1$s" already exists.', $options['userName'])
-					);
-				}
-
-				$this->data = $this->prepareData($user[0]);
+			if (!$users || (count($user_groups) == 1 && $user_groups[0] == $disabled_groupid)) {
+				$this->data += [
+					'totalResults' => 0,
+					'Resources' => []
+				];
+			}
+			elseif ($users[0]['userdirectoryid'] != $userdirectoryid) {
+				self::exception(self::SCIM_ERROR_BAD_REQUEST,
+					_s('User with username "%1$s" already exists.', $options['userName'])
+				);
+			}
+			else {
+				$this->data = $this->prepareData($users[0]);
 			}
 		}
 		elseif (array_key_exists('id', $options)) {
-			$user = APIRPC::User()->get([
+			$users = APIRPC::User()->get([
 				'output' => ['userid', 'username', 'userdirectoryid'],
 				'userids' => $options['id']
 			]);
 
-			if (!$user) {
+			if (!$users) {
 				self::exception(self::SCIM_ERROR_NOT_FOUND, _('This user does not exist.'));
 			}
-
-			if ($user[0]['userdirectoryid'] != $userdirectoryid) {
+			elseif ($users[0]['userdirectoryid'] != $userdirectoryid) {
 				self::exception(self::SCIM_ERROR_BAD_REQUEST,
 					_s('The user "%1$s" belongs to another userdirectory.', $options['id'])
 				);
 			}
 
-			$this->data = $this->prepareData($user[0]);
+			$this->data = $this->prepareData($users[0]);
 		}
 		else {
 			$userids = APIRPC::User()->get([
