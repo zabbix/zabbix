@@ -443,7 +443,7 @@ if ($data['action'] === 'user.edit') {
 	]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 	if ($data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
-		$permissions_form_list->addRow((new CLabel(_('Role')))->setAsteriskMark(),
+		$permissions_form_list->addRow((new CLabel(_('Role'))),
 			(new CDiv([
 				$role_multiselect,
 				new CDiv(_('User cannot change own role.'))
@@ -453,7 +453,7 @@ if ($data['action'] === 'user.edit') {
 		);
 	}
 	else {
-		$permissions_form_list->addRow((new CLabel(_('Role'), 'roleid_ms'))->setAsteriskMark(), $role_multiselect);
+		$permissions_form_list->addRow((new CLabel(_('Role'), 'roleid_ms')), $role_multiselect);
 	}
 
 	if ($data['roleid']) {
