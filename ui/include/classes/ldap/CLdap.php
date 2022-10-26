@@ -261,7 +261,7 @@ class CLdap {
 			// No need for user default attributes, only 'dn'.
 			$users = $this->search($this->cnf['base_dn'], $this->cnf['search_filter'], ['%{user}' => $user], ['dn']);
 
-			if (!array_key_exists('count', $users) || $users['count'] != 1) {
+			if ($users['count'] != 1) {
 				// Multiple users matched criteria.
 				$this->error = static::ERR_USER_NOT_FOUND;
 
@@ -299,7 +299,7 @@ class CLdap {
 		$results = $this->search($this->cnf['group_basedn'], $this->cnf['group_filter'], $placeholders, $attributes);
 		$groups = [];
 
-		if (!array_key_exists('count', $results)) {
+		if ($results['count'] == 0) {
 			return $groups;
 		}
 
@@ -341,28 +341,40 @@ class CLdap {
 		$results = $this->search($this->cnf['base_dn'], $this->cnf['search_filter'], $placeholders, $attributes);
 		$user = [];
 
-		if ($results) {
-			$count = $results[0]['count'];
+		if ($results['count'] == 0) {
+			return $user;
+		}
 
-			for ($i = 0; $i < $count; $i++) {
-				$key = strtolower($results[0][$i]);
-				$value = $results[0][$key];
+		$results = $results[0];
 
-				if ($key === strtolower($this->cnf['group_membership'])) {
-					$groups = [];
-					unset($value['count']);
+		if ($results['count'] == 0) {
+			return $user;
+		}
 
-					foreach ($value as $group_dn) {
-						[$group_name] = explode(',', $group_dn, 2);
-						[, $group_name] = explode('=', $group_name, 2);
-						$groups[] = $group_name;
+		for ($i = 0; $i < $results['count']; $i++) {
+			$key = $results[$i];
+			[$key => $value] = $results;
+
+			if (strtolower($key) === strtolower($this->cnf['group_membership'])) {
+				$groups = [];
+				$regex = '/'.preg_quote($this->cnf['group_name'], '/').'=(?<groupname>[^,]+)/';
+				unset($value['count']);
+
+				/**
+				 * Extract group names from their DN strings.
+				 * For DN string "cn=zabbix-admins,ou=Group,dc=example,dc=org" and "Group name attribute" set to "cn"
+				 * will store string "zabbix-admins" in $groups array.
+				 */
+				foreach ($value as $group_dn) {
+					if (preg_match($regex, $group_dn, $match)) {
+						$groups[] = $match['groupname'];
 					}
+				}
 
-					$user[$key] = $groups;
-				}
-				else {
-					$user[$key] = $value[0];
-				}
+				$user[$key] = $groups;
+			}
+			else {
+				$user[$key] = $value[0];
 			}
 		}
 
@@ -431,6 +443,7 @@ class CLdap {
 		$base = $this->makeFilter($dn, $placeholders, LDAP_ESCAPE_DN);
 		$filter = $this->makeFilter($filter, $placeholders, LDAP_ESCAPE_FILTER);
 		$resource = @ldap_search($this->ds, $base, $filter, $attributes);
+		$results = false;
 
 		if ($resource !== false) {
 			$results = @ldap_get_entries($this->ds, $resource);
@@ -439,7 +452,8 @@ class CLdap {
 
 		if ($resource === false || $results === false) {
 			$this->error = static::ERR_QUERY_FAILED;
-			$results = [];
+
+			return ['count' => 0];
 		}
 
 		return $results;
