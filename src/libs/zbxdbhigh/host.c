@@ -842,6 +842,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 			type = (unsigned char)atoi(trow[0]);
 			type = get_interface_type_by_item_type(type);
 
+			if (INTERFACE_TYPE_UNKNOWN == type)
+				continue;
+
 			if (INTERFACE_TYPE_ANY == type)
 			{
 				for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
