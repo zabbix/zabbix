@@ -41,7 +41,8 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 			'oldtag' =>			'string',
 			'newtag' =>			'string',
 			'value' =>			'string',
-			'groupids' =>		'array_id'
+			'groupids' =>		'array_id',
+			'row_index' =>		'int32'
 		];
 	}
 
@@ -90,23 +91,24 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 				'newtag' => $this->hasInput('newtag') ? $this->getInput('newtag') : '',
 				'value' => $this->hasInput('value') ? $this->getInput('value') : '',
 				'groupids' => $this->hasInput('groupids') ? $this->getGroupId() : '',
-				'operator_name' => $this->getLabelByOperator()
+				'operator_name' => $this->getLabelByOperator(),
+				'row_index' => $this->hasInput('row_index') ? $this->getInput('row_index') : 0
 			]
 		];
 	}
 
 	protected function getGroupId() {
 		$groups = API::HostGroup()->get([
-			'output' => ['name'],
+			'output' => ['groupid','name'],
 			'groupids' => $this->getInput('groupids'),
 			'preservekeys' => true
 		]);
 
 		foreach($groups as $group){
-			$group_name[] = $group['name'];
+			$group_data[$group['groupid']] = $group['name'];
 		}
 
-		return $group_name;
+		return $group_data;
 	}
 
 	protected function getLabelByOperator(int $operator = null): array {
@@ -126,6 +128,7 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 		return [
 			'title' => _('New condition'),
 			'command' => '',
+			'row_index' => $this->hasInput('row_index')? $this->getInput('row_index') : 0,
 			'message' => '',
 			'errors' => null,
 			'action' => $this->getAction(),

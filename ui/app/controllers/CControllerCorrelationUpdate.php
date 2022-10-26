@@ -98,6 +98,11 @@ class CControllerCorrelationUpdate extends CController {
 			unset($condition);
 		}
 
+		foreach($correlation['filter']['conditions'] as &$condition){
+			unset($condition['row_index']);
+		}
+		unset($condition);
+
 		if ($this->hasInput('op_close_old')) {
 			$correlation['operations'][] = ['type' => ZBX_CORR_OPERATION_CLOSE_OLD];
 		}

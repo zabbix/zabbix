@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('configuration.correlation.edit.js.php');
@@ -96,19 +97,24 @@ if ($data['conditions']) {
 	}
 }
 
-$condition_table->addRow([
-	(new CSimpleButton(_('Add')))
-		->onClick(
-			'return PopUp("popup.condition.event.corr", '.
-				json_encode(['type' => ZBX_POPUP_CONDITION_TYPE_EVENT_CORR]).',
-				{dialogue_class: "modal-popup-medium", dialogueid: "event_corr_condition"}
-			);'
+$condition_table->addItem(
+	(new CTag('tfoot', true))
+		->addItem(
+			(new CCol(
+				(new CSimpleButton(_('Add')))
+					->onClick(
+						'return PopUp("popup.condition.event.corr", '.
+							json_encode(['type' => ZBX_POPUP_CONDITION_TYPE_EVENT_CORR]).',
+							{dialogue_class: "modal-popup-medium", dialogueid: "event_corr_condition"}
+						);'
+					)
+					->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColSpan(4)
 		)
-		->addClass(ZBX_STYLE_BTN_LINK)
-]);
+);
 
 $form_list
-	->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'), [
+	->addRow((new CLabel(_('Type of calculation'), 'label-evaltype'))->setId('label-evaltype'), [
 		(new CSelect('evaltype'))
 			->setId('evaltype')
 			->setValue($data['evaltype'])
@@ -119,8 +125,10 @@ $form_list
 				CONDITION_EVAL_TYPE_OR => _('Or'),
 				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
 			])),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan())->setId('condition_label'),
+		(new CDiv())
+			->setId('formula-div')
+			->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CSpan())->setId('expression'),
 		(new CTextBox('formula', $data['formula']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setId('formula')
@@ -133,6 +141,7 @@ $form_list
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 			->setAriaRequired()
 	);
+
 
 $form_list
 	->addRow(_('Description'),
