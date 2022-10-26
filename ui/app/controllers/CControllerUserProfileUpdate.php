@@ -94,18 +94,8 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
-		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$user['medias'] = [];
-
-			foreach ($this->getInput('medias', []) as $media) {
-				$user['medias'][] = [
-					'mediatypeid' => $media['mediatypeid'],
-					'sendto' => $media['sendto'],
-					'active' => $media['active'],
-					'severity' => $media['severity'],
-					'period' => $media['period']
-				];
-			}
+		if (CWebUser::$data['userdirectoryid'] == 0 && CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
+			$user['medias'] = $this->getInputUserMedia();
 		}
 
 		DBstart();

@@ -95,22 +95,23 @@ class CControllerUserUpdate extends CControllerUserUpdateGeneral {
 		$this->getInputs($user, ['userid', 'username', 'name', 'surname', 'lang', 'timezone', 'theme', 'autologin',
 			'autologout', 'refresh', 'rows_per_page', 'url', 'roleid'
 		]);
-		$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
 
 		if ($this->getInput('password1', '') !== '' || ($this->hasInput('password1') && !$this->allow_empty_password)) {
 			$user['passwd'] = $this->getInput('password1');
 		}
 
-		$user['medias'] = [];
+		[$db_user] = API::User()->get([
+			'output' => ['userdirectoryid'],
+			'userids' => [$user['userid']]
+		]);
 
-		foreach ($this->getInput('medias', []) as $media) {
-			$user['medias'][] = [
-				'mediatypeid' => $media['mediatypeid'],
-				'sendto' => $media['sendto'],
-				'active' => $media['active'],
-				'severity' => $media['severity'],
-				'period' => $media['period']
-			];
+		if ($db_user['userdirectoryid']) {
+			$provisioned_fields = ['username', 'name', 'surname', 'roleid', 'passwd'];
+			$user = array_diff_key($user, array_fill_keys($provisioned_fields, ''));
+		}
+		else {
+			$user['usrgrps'] = zbx_toObject($this->getInput('user_groups', []), 'usrgrpid');
+			$user['medias'] = $this->getInputUserMedia();
 		}
 
 		$result = (bool) API::User()->update($user);
