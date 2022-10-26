@@ -93,6 +93,8 @@ class CControllerPopupActionOperationEdit extends CController {
 
 		$media_types = $this->popupConfigOperationMessage($operation, $eventsource)['mediatypes'];
 		$media_type[] = '- '._('All').' -';
+		$disabled_media = [];
+
 		foreach($media_types as $type) {
 			$media_type[$type['mediatypeid']] = $type['name'];
 			if ($type['status'] == MEDIA_TYPE_STATUS_DISABLED) {
