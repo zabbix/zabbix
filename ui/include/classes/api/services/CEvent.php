@@ -748,7 +748,7 @@ class CEvent extends CApiService {
 
 		if ($has_change_rank_to_symptom_action && $is_rank_change_allowed) {
 			/*
-			 * Destination event was symptom, so convert it to cause. Do add extra messages or change severity etc,
+			 * Destination event was symptom, so convert it to cause. Do not add extra messages or change severity etc,
 			 * because these events were not specifially selected.
 			 */
 			if ($dst_events[0]['cause_eventid'] != 0) {

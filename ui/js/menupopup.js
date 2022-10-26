@@ -642,8 +642,6 @@ function getMenuPopupTrigger(options, trigger_element) {
 		let items = [];
 		// Must be synced with PHP ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE.
 		const ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE = 0x80;
-		// Must be synced with PHP ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM.
-		const ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM = 0x100;
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'popup.acknowledge.create');
@@ -686,44 +684,66 @@ function getMenuPopupTrigger(options, trigger_element) {
 			disabled: !options.mark_as_cause
 		};
 
-		items[items.length] = {
-			label: t('Mark selected as symptoms'),
-			clickCallback: function () {
-				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+		let is_dashboard = false;
+		const current_url = new Curl();
 
-				fetch(curl.getUrl(), {
-					method: 'POST',
-					headers: {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'},
-					body: urlEncodeData({
-						eventids: options.eventids,
-						cause_eventid: options.eventid,
-						change_rank: ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM
+		Object.entries(current_url.getArguments()).forEach(([key, value]) => {
+			if (key === 'action' && value === 'dashboard.view') {
+				is_dashboard = true;
+
+				return;
+			}
+		})
+
+		// Dashboard does not have checkboxes, so it is not possible to mark problems and change rank to symptom.
+		if (!is_dashboard) {
+			// Must be synced with PHP ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM.
+			const ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM = 0x100;
+
+			items[items.length] = {
+				label: t('Mark selected as symptoms'),
+				clickCallback: function () {
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+					fetch(curl.getUrl(), {
+						method: 'POST',
+						headers: {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'},
+						body: urlEncodeData({
+							eventids: options.eventids,
+							cause_eventid: options.eventid,
+							change_rank: ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM
+						})
 					})
-				})
-					.then((response) => response.json())
-					.then((response) => {
-						clearMessages();
+						.then((response) => response.json())
+						.then((response) => {
+							clearMessages();
 
-						// Show message directly that comes from controller.
-						if ('error' in response) {
-							addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true,
-								true
-							));
-						}
-						else if('success' in response) {
-							addMessage(makeMessageBox('good', [], response.success.title, true, false));
-						}
-					})
-					.catch(() => {
-						const title = t('Unexpected server error.');
-						const message_box = makeMessageBox('bad', [], title)[0];
+							// Show message directly that comes from controller.
+							if ('error' in response) {
+								addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true,
+									true
+								));
+							}
+							else if('success' in response) {
+								addMessage(makeMessageBox('good', [], response.success.title, true, false));
 
-						clearMessages();
-						addMessage(message_box);
-					});
-			},
-			disabled: !options.mark_selected_as_symptoms
-		};
+								const uncheckids = Object.keys(chkbxRange.getSelectedIds());
+								uncheckTableRows('problem', []);
+								chkbxRange.checkObjects('eventids', uncheckids, false);
+								chkbxRange.update('eventids');
+							}
+						})
+						.catch(() => {
+							const title = t('Unexpected server error.');
+							const message_box = makeMessageBox('bad', [], title)[0];
+
+							clearMessages();
+							addMessage(message_box);
+						});
+				},
+				disabled: !options.mark_selected_as_symptoms
+			};
+		}
 
 		sections[sections.length] = {
 			label: t('Problem'),
