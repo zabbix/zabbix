@@ -1479,29 +1479,24 @@ class CHost extends CHostGeneral {
 		}
 
 		// delete the items
-		$db_items = DB::select('items', [
-			'output' => ['itemid', 'name'],
-			'filter' => [
-				'hostid' => $hostids,
-				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
-				'type' => CItem::SUPPORTED_ITEM_TYPES
-			],
+		$del_items = API::Item()->get([
+			'output' => [],
+			'templateids' => $hostids,
+			'nopermissions' => true,
 			'preservekeys' => true
 		]);
-
-		if ($db_items) {
-			CItem::deleteForce($db_items);
+		if ($del_items) {
+			CItemManager::delete(array_keys($del_items));
 		}
 
-		// delete web scenarios
-		$db_httptests = DB::select('httptest', [
-			'output' => ['httptestid', 'name'],
-			'filter' => ['hostid' => $hostids],
-			'preservekeys' => true
-		]);
-
-		if ($db_httptests) {
-			CHttpTest::deleteForce($db_httptests);
+		// delete web tests
+		$delHttptests = [];
+		$dbHttptests = get_httptests_by_hostid($hostids);
+		while ($dbHttptest = DBfetch($dbHttptests)) {
+			$delHttptests[$dbHttptest['httptestid']] = $dbHttptest['httptestid'];
+		}
+		if (!empty($delHttptests)) {
+			API::HttpTest()->delete($delHttptests, true);
 		}
 
 		// delete host from maps
