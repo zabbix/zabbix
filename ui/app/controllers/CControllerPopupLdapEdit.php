@@ -168,10 +168,14 @@ class CControllerPopupLdapEdit extends CController {
 			'preservekeys' => true
 		]);
 
-		foreach ($provision_media as &$media) {
-			$media['mediatype_name'] = $mediatypes[$media['mediatypeid']]['name'];
+		foreach ($provision_media as $index => $media) {
+			if (!array_key_exists($media['mediatypeid'], $mediatypes)) {
+				unset($provision_media[$index]);
+				continue;
+			}
+
+			$provision_media[$index]['mediatype_name'] = $mediatypes[$media['mediatypeid']]['name'];
 		}
-		unset($media);
 	}
 
 	private function validateProvisionGroups(): bool {

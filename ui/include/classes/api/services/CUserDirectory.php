@@ -485,6 +485,7 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		self::checkMediaTypes($userdirectories);
 		self::checkDuplicates($userdirectories);
 		self::checkSamlExists($userdirectories);
 	}
@@ -648,6 +649,7 @@ class CUserDirectory extends CApiService {
 
 		$userdirectories = array_column($userdirectories, null, 'userdirectoryid');
 
+		self::checkMediaTypes($userdirectories);
 		self::checkDuplicates($userdirectories, $db_userdirectories);
 		self::addAffectedObjects($userdirectories, $db_userdirectories);
 	}
@@ -774,6 +776,33 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('User directory "%1$s" already exists.', $duplicates[0]['name'])
 			);
+		}
+	}
+
+	private static function checkMediaTypes(array $userdirectories): void {
+		$mediatypeids = [];
+
+		foreach ($userdirectories as $userdirectory) {
+			if (!array_key_exists('provision_media', $userdirectory) || !$userdirectory['provision_media']) {
+				continue;
+			}
+
+			$mediatypeids = array_merge($mediatypeids, array_column($userdirectory['provision_media'], 'mediatypeid'));
+		}
+
+		if ($mediatypeids) {
+			$mediatypeids = array_keys(array_flip($mediatypeids));
+
+			$mediatype_count = API::MediaType()->get([
+				'countOutput' => true,
+				'mediatypeids' => $mediatypeids
+			]);
+
+			if ($mediatype_count != count($mediatypeids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
 		}
 	}
 

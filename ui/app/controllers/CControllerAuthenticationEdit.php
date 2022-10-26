@@ -175,9 +175,7 @@ class CControllerAuthenticationEdit extends CController {
 				self::extendProvisionGroups($data['saml_provision_groups']);
 			}
 
-			if ($data['saml_provision_media']) {
-				$data['saml_provision_media'] = self::extendProvisionMedia($data['saml_provision_media']);
-			}
+			self::extendProvisionMedia($data['saml_provision_media']);
 
 			$data['ldap_servers'] = $this->getLdapServerUserGroupCount($this->getInput('ldap_servers', []));
 			$data['ldap_default_row_index'] = $this->getInput('ldap_default_row_index', 0);
@@ -364,12 +362,10 @@ class CControllerAuthenticationEdit extends CController {
 	 * Adds missing information that is necessary for provision media rendering in the view.
 	 *
 	 * @param array $provision_media
-	 *
-	 * @return array
 	 */
-	private static function extendProvisionMedia(array &$provision_media): array {
+	private static function extendProvisionMedia(array &$provision_media): void {
 		if (!$provision_media) {
-			return $provision_media;
+			return;
 		}
 
 		$db_media = API::MediaType()->get([
@@ -378,10 +374,13 @@ class CControllerAuthenticationEdit extends CController {
 			'preservekeys' => true
 		]);
 
-		foreach ($provision_media as &$media) {
-			$media['mediatype_name'] = $db_media[$media['mediatypeid']]['name'];
-		}
+		foreach ($provision_media as $index => $media) {
+			if (!array_key_exists($media['mediatypeid'], $db_media)) {
+				unset($provision_media[$index]);
+				continue;
+			}
 
-		return $provision_media;
+			$provision_media[$index]['mediatype_name'] = $db_media[$media['mediatypeid']]['name'];
+		}
 	}
 }
