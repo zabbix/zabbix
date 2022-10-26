@@ -18370,6 +18370,16 @@ msgstr "Até agora neste mês"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr ""
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:135
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:164
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."

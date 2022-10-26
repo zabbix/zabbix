@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-10-18 17:07+0000\n"
+"PO-Revision-Date: 2022-10-24 18:51+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -4252,6 +4252,9 @@ msgid ""
 "1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
+"La connexion au serveur Zabbix \"%1$s\" a échoué. Raisons possibles:\n"
+"1. \"NodeAddress\" ou \"ListenPort\" incorrect dans \"zabbix_server.conf\" ou surcharge de IP/DNS du serveur incorrect dans \"zabbix.conf.php\" ;\n"
+"2. Configuration incorrecte du serveur DNS.\n"
 
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
@@ -4273,6 +4276,11 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Connexion au serveur Zabbix \"%1$s\" refusée. Raisons possibles:\n"
+"1. \"NodeAddress\" ou \"ListenPort\" incorrect dans \"zabbix_server.conf\" ou surcharge de IP/DNS du serveur incorrect dans \"zabbix.conf.php\" ;\n"
+"2. L'environnement de sécurité (par exemple, SELinux) bloque la connexion ;\n"
+"3. Le démon du serveur Zabbix ne fonctionne pas ;\n"
+"4. Le pare-feu bloque la connexion TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4296,6 +4304,9 @@ msgid ""
 "1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
+"La connexion au serveur Zabbix \"%1$s\" a expiré. Raisons possibles:\n"
+"1. \"NodeAddress\" ou \"ListenPort\" incorrect dans \"zabbix_server.conf\" ou surcharge de IP/DNS du serveur incorrect dans \"zabbix.conf.php\" ;\n"
+"2. Le pare-feu bloque la connexion TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -9934,7 +9945,7 @@ msgstr "Info"
 
 #: include/classes/data/CItemData.php:1428
 msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "Informations sur les disques internes de l'hyperviseur requis pour vmware.datastore.perfcounter, <url> - URL du service VMware, <uuid> - Nom d'hôte de l'hyperviseur VMware. Retourne un JSON"
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -18367,6 +18378,16 @@ msgstr "Ce mois-ci jusqu'à présent"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "Ce paramètre s'applique uniquement aux données numériques. Les données non numériques seront toujours extraites de l'historique."
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:135
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:164
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
@@ -20092,7 +20113,7 @@ msgstr "Liste des hyperviseurs du datastore VMware, <url> - URL du service VMwar
 
 #: include/classes/data/CItemData.php:1320
 msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
+msgstr "Compteur de performances du datastore VMware, <url> - URL du service VMware, <id> - uuid du datastore VMware, <chemin> - chemin du compteur de performances, <instance> - instance du compteur de performances"
 
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
@@ -21297,6 +21318,9 @@ msgid ""
 "1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
+"Le serveur Zabbix \"%1$s\" est inaccessible. Raisons possibles:\n"
+"1. \"NodeAddress\" ou \"ListenPort\" incorrect dans \"zabbix_server.conf\" ou surcharge de IP/DNS du serveur incorrect dans \"zabbix.conf.php\" ;\n"
+"2. Configuration réseau incorrecte.\n"
 
 #: include/classes/server/CZabbixServer.php:601
 #, c-format

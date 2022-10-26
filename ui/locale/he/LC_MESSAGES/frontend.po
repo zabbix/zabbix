@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-10-18 12:05+0000\n"
-"Last-Translator: Yaron <sh.yaron@gmail.com>\n"
+"PO-Revision-Date: 2022-10-26 09:50+0000\n"
+"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -4251,6 +4251,9 @@ msgid ""
 "1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
+"החיבור לשרת ה־Zabbix‏ „%1$s” נכשל. סיבות אפשריות:\n"
+"1. „NodeAddress” או „ListenPort” שגויים ב־„zabbix_server.conf” או דריסת IP/DNS ב־„zabbix.conf.php”;\n"
+"2. הגדרות DNS שגויות בשרת.\n"
 
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
@@ -4272,6 +4275,11 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
+"החיבור לשרת ה־Zabbix‏ „%1$s” סורב. סיבות אפשריות:\n"
+"1. „NodeAddress” או „ListenPort” שגויים ב־„zabbix_server.conf” או דריסת IP/DNS ב־„zabbix.conf.php”;\n"
+"2. סביבת אבטחת מידע (למשל SELinux) חוסמת את החיבור;\n"
+"3. סוכן שרת ה־Zabbix לא פעיל;\n"
+"4. חומת אש חוסמת את חיבור ה־TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4295,6 +4303,9 @@ msgid ""
 "1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
+"הזמן שהוקצה לחיבור לשרת ה־Zabbix‏ „%1$s” תם. סיבות אפשריות:\n"
+"1. „NodeAddress” או „ListenPort” שגויים ב־„zabbix_server.conf” או דריסת IP/DNS ב־„zabbix.conf.php”;\n"
+"2. חומת אש חוסמת את חיבור ה־TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -9933,7 +9944,7 @@ msgstr "מידע"
 
 #: include/classes/data/CItemData.php:1428
 msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr " מידע על כוננים פנימיים של hypervisor שנחוץ לטובת vmware.datastore.perfcounter,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־VMware hypervisor. מחזירה JSON"
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -18366,6 +18377,16 @@ msgstr "החודש הזה עד כה"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "הגדרה זו חלה רק על נתונים מספריים. נתונים בלתי מספריים תמיד יימשכו מההיסטוריה."
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:135
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:164
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
@@ -20091,7 +20112,7 @@ msgstr "רשימת מאגרי הנתונים של ה־Hypervisors של VMware,�
 
 #: include/classes/data/CItemData.php:1320
 msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
+msgstr "מודד ביצועי מאגרי נתונים של VMware,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה מאגר נתונים VMware,‏ <path> - נתיב מודד ביצועים, <instance> - מופע של מודד ביצועים"
 
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
@@ -21296,6 +21317,9 @@ msgid ""
 "1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
+"לא ניתן לגשת לשרת ה־Zabbix‏ „%1$s”. סיבות אפשריות:\n"
+"1. „NodeAddress” או „ListenPort” שגויים ב־„zabbix_server.conf” או דריסת IP/DNS ב־„zabbix.conf.php”;\n"
+"2. הגדרות רשת שגויות.\n"
 
 #: include/classes/server/CZabbixServer.php:601
 #, c-format
