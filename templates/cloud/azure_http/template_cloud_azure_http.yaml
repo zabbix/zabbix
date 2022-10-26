@@ -535,16 +535,36 @@ zabbix_export:
           description: 'The list of the virtual machines is provided by the subscription.'
           host_prototypes:
             -
-              uuid: 3afcb840e8004822a2dada2a89971f69
-              expression: 'last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}'
-              name: 'Azure MySQL: Storage space is critically low'
-              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
-              priority: AVERAGE
-              description: 'Critical utilization of the storage space.'
+              uuid: d08c0ee33c924b28bf1fed571da6c7f4
+              host: 'Azure virtual machine {#NAME}'
+              name: 'Azure virtual machine {#NAME}'
+              group_links:
+                -
+                  group:
+                    name: 'Virtual machines'
+              templates:
+                -
+                  name: 'Azure virtual machine by HTTP'
+              macros:
+                -
+                  macro: '{$AZURE.RESOURCE_ID}'
+                  value: '{#ID}'
               tags:
                 -
-                  tag: scope
-                  value: capacity
+                  tag: location
+                  value: '{#LOCATION}'
+                -
+                  tag: os
+                  value: '{#OS}'
+                -
+                  tag: resource-group
+                  value: '{#GROUP}'
+                -
+                  tag: size
+                  value: '{#SIZE}'
+          master_item:
+            key: azure.get.resources
+          lld_macro_paths:
             -
               lld_macro: '{#GROUP}'
               path: $.resourceGroup
