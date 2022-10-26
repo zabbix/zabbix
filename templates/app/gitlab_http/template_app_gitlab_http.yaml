@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:33:21Z'
+  date: '2022-10-25T08:37:51Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -14,13 +14,13 @@ zabbix_export:
         Get GitLab metrics by HTTP agent from Prometheus metrics endpoint.
         
         To access the metrics, the client IP address must be explicitly allowed. See https://docs.gitlab.com/ee/administration/monitoring/ip_whitelist.html.
-        
+        Or second method, using token variable from http://your.gitlab.address/admin/health_check (fill {$GITLAB.HEALTH.TOKEN} macro with variable path like "?token=your_token").
         Don't forget change macros {$GITLAB.URL}.
         Some metrics may not be collected depending on your Gitlab instance version and configuration. See (Gitlab's documentation[)https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html] for further information about its metric collection.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -219,7 +219,7 @@ zabbix_export:
               name: 'GitLab: Version has changed'
               event_name: 'GitLab: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'GitLab version has changed. Ack to close.'
+              description: 'The GitLab version has changed. Perform Ack to close.'
               manual_close: 'YES'
               tags:
                 -
@@ -262,7 +262,7 @@ zabbix_export:
               type: PROMETHEUS_TO_JSON
               parameters:
                 - ''
-          url: '{$GITLAB.URL}/-/metrics'
+          url: '{$GITLAB.URL}/-/metrics{$GITLAB.HEALTH.TOKEN}'
           tags:
             -
               tag: component
@@ -392,7 +392,7 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 30m
-          url: '{$GITLAB.URL}/-/liveness'
+          url: '{$GITLAB.URL}/-/liveness{$GITLAB.HEALTH.TOKEN}'
           tags:
             -
               tag: component
@@ -561,7 +561,7 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 30m
-          url: '{$GITLAB.URL}/-/readiness'
+          url: '{$GITLAB.URL}/-/readiness{$GITLAB.HEALTH.TOKEN}'
           tags:
             -
               tag: component
@@ -1012,7 +1012,7 @@ zabbix_export:
               name: 'GitLab: Failed to fetch info data'
               event_name: 'GitLab: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for metrics for the last 30 minutes'
+              description: 'Zabbix has not received a metrics data for the last 30 minutes'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1330,7 +1330,7 @@ zabbix_export:
                 -
                   tag: scope
                   value: capacity
-          url: '{$GITLAB.URL}/-/metrics'
+          url: '{$GITLAB.URL}/-/metrics{$GITLAB.HEALTH.TOKEN}'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -1427,7 +1427,7 @@ zabbix_export:
                 -
                   tag: scope
                   value: capacity
-          url: '{$GITLAB.URL}/-/metrics'
+          url: '{$GITLAB.URL}/-/metrics{$GITLAB.HEALTH.TOKEN}'
           preprocessing:
             -
               type: PROMETHEUS_TO_JSON
@@ -1447,37 +1447,40 @@ zabbix_export:
           value: gitlab
       macros:
         -
+          macro: '{$GITLAB.HEALTH.TOKEN}'
+          description: 'The token path for Gitlab health check. Example `?token=your_token`'
+        -
           macro: '{$GITLAB.HTTP.FAIL.MAX.WARN}'
           value: '2'
-          description: 'Maximum number of HTTP requests failures for trigger expression.'
+          description: 'The maximum number of HTTP request failures for a trigger expression.'
         -
           macro: '{$GITLAB.OPEN.FDS.MAX.WARN}'
           value: '90'
-          description: 'Maximum percentage of used file descriptors for trigger expression.'
+          description: 'The maximum percentage of used file descriptors for a trigger expression.'
         -
           macro: '{$GITLAB.PUMA.QUEUE.MAX.WARN}'
           value: '1'
-          description: 'Maximum number of Puma queued requests for trigger expression.'
+          description: 'The maximum number of Puma queued requests for a trigger expression.'
         -
           macro: '{$GITLAB.PUMA.UTILIZATION.MAX.WARN}'
           value: '90'
-          description: 'Maximum percentage of used Puma thread utilization for trigger expression.'
+          description: 'The maximum percentage of Puma thread utilization for a trigger expression.'
         -
           macro: '{$GITLAB.REDIS.FAIL.MAX.WARN}'
           value: '2'
-          description: 'Maximum number of Redis client exceptions for trigger expression.'
+          description: 'The maximum number of Redis client exceptions for a trigger expression.'
         -
           macro: '{$GITLAB.UNICORN.QUEUE.MAX.WARN}'
           value: '1'
-          description: 'Maximum number of Unicorn queued requests for trigger expression.'
+          description: 'The maximum number of Unicorn queued requests for a trigger expression.'
         -
           macro: '{$GITLAB.UNICORN.UTILIZATION.MAX.WARN}'
           value: '90'
-          description: 'Maximum percentage of used Unicorn workers utilization for trigger expression.'
+          description: 'The maximum percentage of Unicorn workers utilization for a trigger expression.'
         -
           macro: '{$GITLAB.URL}'
           value: 'http://localhost'
-          description: 'GitLab instance URL'
+          description: 'URL of a GitLab instance.'
       valuemaps:
         -
           uuid: 3b40391bb8b6472e9c3fd8e1f001fe04

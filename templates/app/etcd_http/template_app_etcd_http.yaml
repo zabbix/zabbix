@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-07-21T13:37:51Z'
+  date: '2022-10-18T14:10:24Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1068,8 +1068,8 @@ zabbix_export:
             -
               uuid: 6843369969f5410a840494104d71fe1f
               expression: 'last(/Etcd by HTTP/etcd.uptime)<10m'
-              name: 'Etcd: has been restarted'
-              event_name: 'Etcd: has been restarted (uptime < 10m)'
+              name: 'Etcd: Host has been restarted'
+              event_name: 'Etcd: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
@@ -1250,7 +1250,7 @@ zabbix_export:
                    if (!(code in lookup)) {
                     lookup[code] = 1;
                     result.push({ "{#GRPC.CODE}": code});
-                  }
+                    }
                   }
                   return JSON.stringify(result);
             -

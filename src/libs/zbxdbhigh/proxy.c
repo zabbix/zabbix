@@ -4342,7 +4342,6 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminating string */
 	zbx_vector_ptr_t	autoreg_hosts;
-	zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4351,7 +4350,8 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
-		unsigned int	connection_type;
+		unsigned int		connection_type;
+		zbx_conn_flags_t	flags = ZBX_CONN_DEFAULT;
 
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
@@ -4832,6 +4832,15 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 		}
 
 		zbx_vector_proxy_hostdata_ptr_destroy(&host_avails);
+	}
+	else
+	{
+		unsigned char	*data = NULL;
+		zbx_uint32_t	data_len;
+
+		data_len = zbx_availability_serialize_active_proxy_hb_update(&data, proxy->hostid);
+		zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_PROXY_HB_UPDATE, data, data_len, NULL);
+		zbx_free(data);
 	}
 
 out:

@@ -316,7 +316,7 @@ static void	apply_loess_smoothing(const zbx_vector_history_record_t *y, int n, i
 		{
 			int	nsh;
 
-			nsh = (int)((length + 1) / 2);
+			nsh = (length + 1) / 2;
 			nleft = 1;
 			nright = length;
 
@@ -345,7 +345,7 @@ static void	apply_loess_smoothing(const zbx_vector_history_record_t *y, int n, i
 		{
 			int	nsh;
 
-			nsh = (int)((length + 1) / 2);
+			nsh = (length + 1) / 2;
 
 			for (i = 1; i < n + 1; i = i + newnj)
 			{
@@ -395,7 +395,7 @@ static void	apply_loess_smoothing(const zbx_vector_history_record_t *y, int n, i
 				ys->values[j].value.dbl = ys->values[i].value.dbl + (delta * (j - i));
 		}
 
-		k = (int)(((n - 1)/newnj) * newnj + 1);
+		k = ((n - 1)/newnj) * newnj + 1;
 
 		if (k != n)
 		{

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:37:58Z'
+  date: '2022-06-07T20:51:03Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -2139,7 +2139,7 @@ zabbix_export:
           value: performance
     -
       uuid: ac93631f79584e2d9909f4bb2f12c866
-      expression: 'min(/Windows by Zabbix agent active/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/Windows by Zabbix agent active/system.swap.size[,total])>0'
+      expression: 'max(/Windows by Zabbix agent active/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/Windows by Zabbix agent active/system.swap.size[,total])>0'
       name: 'High swap space usage'
       event_name: 'High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
       opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'

@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  * @backup token
  *
  * @onBefore prepareTokenData
+ * @dataSource LoginUsers
  */
 class testFormApiTokensAdministrationGeneral extends testFormApiTokens {
 

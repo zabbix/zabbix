@@ -1,13 +1,17 @@
-name: SonarCloud C Build
+name: SonarCloud Build
 
 on:
+  push:
+    branches:
+      - "master"
+      - "release/*"
   schedule:
     - cron: "0 0 * * *"
 
 jobs:
 
-  SonarCloud-C:
-    name: SonarCloud-C
+  SonarCloud:
+    name: SonarCloud
     runs-on: ubuntu-latest
     env:
       SONAR_SCANNER_VERSION: 4.7.0.2747
