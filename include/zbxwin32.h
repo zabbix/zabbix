@@ -23,10 +23,14 @@
 #include "config.h"
 #include "zbxsysinc.h"
 #include "zbxtypes.h"
+#include "zbxcommon.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 #	error "This module is only available for Windows OS"
 #endif
+
+#define	get_builtin_object_name(ctr)	zbx_get_counter_name(zbx_get_builtin_object_index(ctr))
+#define	get_builtin_counter_name(ctr)	zbx_get_counter_name(zbx_get_builtin_counter_index(ctr))
 
 /* this struct must be only modified along with mapping builtin_counter_ref[] in perfmon.c */
 typedef enum
@@ -101,7 +105,7 @@ DWORD 		zbx_get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref);
 DWORD 		zbx_get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref);
 wchar_t		*zbx_get_all_counter_names(HKEY reg_key, wchar_t *reg_value_name);
 
-#define	get_builtin_object_name(ctr)	zbx_get_counter_name(zbx_get_builtin_object_index(ctr))
-#define	get_builtin_counter_name(ctr)	zbx_get_counter_name(zbx_get_builtin_counter_index(ctr))
+void		zbx_win_exception_init(zbx_get_progname_f get_progname);
+int		zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep);
 
 #endif /* ZABBIX_WIN32_H */

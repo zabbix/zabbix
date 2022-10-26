@@ -31,8 +31,6 @@
 
 #define ZBX_LSHIFT(value, bits)	(((unsigned __int64)value) << bits)
 
-extern const char	*progname;
-
 #ifdef _M_X64
 
 #define ZBX_IMAGE_FILE_MACHINE	IMAGE_FILE_MACHINE_AMD64
@@ -104,6 +102,8 @@ static void	print_fatal_info(CONTEXT *pctx)
 
 #endif
 
+static zbx_get_progname_f get_progname_cb = NULL;
+
 typedef BOOL (WINAPI *SymGetLineFromAddrW64_func_t)(HANDLE, DWORD64, PDWORD, PIMAGEHLP_LINE64);
 typedef BOOL (WINAPI *SymFromAddr_func_t)(HANDLE a, DWORD64 b , PDWORD64 c, PSYMBOL_INFO d);
 
@@ -156,7 +156,7 @@ static void	print_backtrace(CONTEXT *pctx)
 
 		process_name = zbx_unicode_to_utf8(szProcessName);
 
-		if (NULL != (ptr = strstr(process_name, progname)))
+		if (NULL != (ptr = strstr(process_name, get_progname_cb())))
 			zbx_strncpy_alloc(&process_path, &path_alloc, &path_offset, process_name, ptr - process_name);
 	}
 
@@ -231,6 +231,11 @@ static void	print_backtrace(CONTEXT *pctx)
 	zbx_free(process_path);
 	zbx_free(process_name);
 	zbx_free(pSym);
+}
+
+void	zbx_win_exception_init(zbx_get_progname_f get_progname)
+{
+	get_progname_cb = get_progname;
 }
 
 int	zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep)

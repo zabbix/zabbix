@@ -26,7 +26,7 @@
 
 #include "zbxthreads.h"
 
-extern ZBX_THREAD_HANDLE	*threads;
+typedef void	(*zbx_on_exit_t)(int);
 
 void	zbx_service_start(int flags);
 
@@ -35,7 +35,6 @@ int	ZabbixRemoveService(void);
 int	ZabbixStartService(void);
 int	ZabbixStopService(void);
 
-typedef void	(*zbx_on_exit_t)(int);
 void	zbx_set_parent_signal_handler(zbx_on_exit_t zbx_on_exit_cb_arg);
 
 int	ZBX_IS_RUNNING(void);

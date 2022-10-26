@@ -86,6 +86,7 @@ int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 #include "stats.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
+#	include "zbxwin32.h"
 #else
 #	include "zbxnix.h"
 #endif
@@ -242,6 +243,11 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
+static const char	*get_progname(void)
+{
+	return progname;
+}
+
 static zbx_thread_activechk_args	*config_active_args = NULL;
 
 int	CONFIG_ALERTER_FORKS		= 0;
@@ -283,7 +289,6 @@ char	*opt = NULL;
 
 #ifdef _WINDOWS
 void	zbx_co_uninitialize();
-int	zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep);
 #endif
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
@@ -1351,6 +1356,7 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_import_symbols();
+	zbx_win_exception_init(&get_progname);
 #endif
 #ifdef _WINDOWS
 	if (ZBX_TASK_SHOW_USAGE != t.task && ZBX_TASK_SHOW_VERSION != t.task && ZBX_TASK_SHOW_HELP != t.task &&

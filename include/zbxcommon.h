@@ -834,6 +834,7 @@ void	zbx_version(void);
 
 const char	*get_program_name(const char *path);
 typedef unsigned char	(*zbx_get_program_type_f)(void);
+typedef const char	*(*zbx_get_progname_f)(void);
 
 typedef enum
 {
