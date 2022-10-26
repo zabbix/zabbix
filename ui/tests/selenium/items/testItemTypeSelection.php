@@ -49,7 +49,7 @@ class testItemTypeSelection extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Character',
-						'Key' => 'agent.hostmetadata[{#KEY}]'
+						'Key' => 'agent.hostmetadata'
 					],
 					'type' => 'Character'
 				]
@@ -58,7 +58,7 @@ class testItemTypeSelection extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Numeric unsigned',
-						'Key' => 'agent.ping[{#KEY}]'
+						'Key' => 'agent.ping'
 					],
 					'type' => 'Numeric (unsigned)'
 				]
@@ -68,7 +68,7 @@ class testItemTypeSelection extends CWebTest {
 
 					'fields' => [
 						'Name' => 'Numeric float',
-						'Key' => 'net.udp.service.perf[service,{#KEY}]'
+						'Key' => 'net.udp.service.perf[service]'
 					],
 					'type' => 'Numeric (float)'
 				]
@@ -78,7 +78,7 @@ class testItemTypeSelection extends CWebTest {
 					'fields' => [
 						'Type' => 'Zabbix agent (active)',
 						'Name' => 'Log',
-						'Key' => 'eventlog[name,{#KEY}]'
+						'Key' => 'eventlog[name]'
 					],
 					'type' => 'Log'
 				]
@@ -87,7 +87,7 @@ class testItemTypeSelection extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Log',
-						'Key' => 'eventlog[agent,{#KEY}]'
+						'Key' => 'eventlog[agent]'
 					],
 					'type' => 'Numeric (unsigned)'
 				]
@@ -96,7 +96,7 @@ class testItemTypeSelection extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Text',
-						'Key' => 'net.if.discovery[{#KEY}]'
+						'Key' => 'net.if.discovery'
 					],
 					'type' => 'Text'
 				]
@@ -105,7 +105,7 @@ class testItemTypeSelection extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Custom key',
-						'Key' => 'custom.key[{#KEY}]'
+						'Key' => 'custom.key'
 					],
 					'type' => 'Numeric (unsigned)'
 				]
@@ -114,7 +114,7 @@ class testItemTypeSelection extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Custom key 2',
-						'Key' => 'custom.key2[{#KEY}]',
+						'Key' => 'custom.key2',
 						'Type of information' => 'Text'
 					],
 					'type' => 'Text',
@@ -125,7 +125,7 @@ class testItemTypeSelection extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Test Info Hint',
-						'Key' => 'net.if.list[{#KEY}]',
+						'Key' => 'net.if.list',
 						'Type of information' => 'Log'
 					],
 					'hint' => true,

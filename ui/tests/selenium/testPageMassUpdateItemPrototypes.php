@@ -62,7 +62,8 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'snmptrap[{#KEY1}]',
 				'type' => 17,
 				'value_type' => 0,
-				'interfaceid' => self::SNMP2_INTERFACE_ID
+				'interfaceid' => self::SNMP2_INTERFACE_ID,
+				'delay' => '3m'
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -71,7 +72,8 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'snmptrap[{#KEY2}]',
 				'type' => 17,
 				'value_type' => 1,
-				'interfaceid' => self::SNMP2_INTERFACE_ID
+				'interfaceid' => self::SNMP2_INTERFACE_ID,
+				'delay' => '4m'
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -134,7 +136,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'hostid' => self::HOSTID,
 				'ruleid' => self::RULEID,
 				'name' => '12_SSH_Agent',
-				'key_' => 'ssh.run[{#KEY2}]',
+				'key_' => 'ssh.run[{#KEY}]',
 				'type' => 13,
 				'value_type' => 1,
 				'interfaceid' => self::AGENT_INTERFACE_ID,
@@ -167,7 +169,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'hostid' => self::HOSTID,
 				'ruleid' => self::RULEID,
 				'name' => '14_DB_Monitor',
-				'key_' => 'db.odbc.select[{#KEY2}]',
+				'key_' => 'db.odbc.select[{#KEY}]',
 				'type' => 11,
 				'value_type' => 0,
 				'delay' => '90s',
@@ -221,7 +223,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'hostid' => self::HOSTID,
 				'ruleid' => self::RULEID,
 				'name' => '17_Script',
-				'key_' => 'script1[{#KEY}]',
+				'key_' => 'script1',
 				'type' => 21,
 				'value_type' => 0,
 				'delay' => '15s',
@@ -232,7 +234,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'hostid' => self::HOSTID,
 				'ruleid' => self::RULEID,
 				'name' => '18_Script',
-				'key_' => 'script2[{#KEY}]',
+				'key_' => 'script2',
 				'type' => 21,
 				'value_type' => 0,
 				'delay' => '14s',
@@ -273,19 +275,6 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 						'Create enabled' => ['id' => 'status', 'value' => 'Yes'],
 						'Discover' => ['id' => 'discover', 'value' => 'Yes']
 					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'names' => [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Dependent item']
-					],
-					'details' => 'Invalid parameter "/1/master_itemid": an item/item prototype ID is expected.'
 				]
 			]
 		];

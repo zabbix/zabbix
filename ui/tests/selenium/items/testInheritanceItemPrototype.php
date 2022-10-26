@@ -69,18 +69,16 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'testInheritanceItemPrototype6',
-					'key' => 'item-prototype-test6[{#KEY}]'
+					'key' => 'item-prototype-test6'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'testInheritanceItemPrototype5',
-					'key' => 'item-prototype-test5[{#KEY}]',
+					'key' => 'item-prototype-test5',
 					'errors' => [
-						'Cannot inherit item prototype with key "item-prototype-test5[{#KEY}]" of template '.
-							'"Inheritance test template" to host "Template inheritance test host", because an item '.
-							'with the same key is already inherited from template "Inheritance test template 2".'
+						'Item prototype "item-prototype-test5" already exists on "Template inheritance test host", inherited from another template'
 					]
 				]
 			]

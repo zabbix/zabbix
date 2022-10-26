@@ -262,8 +262,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{#METRICNAME}==1']
 
 					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": invalid Prometheus pattern.',
-					'lld_error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			]
 		]);

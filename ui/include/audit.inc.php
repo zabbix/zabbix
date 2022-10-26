@@ -1,4 +1,4 @@
-<?php declare(strict_types = 0);
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,21 +19,25 @@
 **/
 
 
-/**
- * Converter for converting import data from 6.2 to 6.4.
- */
-class C62ImportConverter extends CConverter {
+// function add_audit($action, $resourcetype, $note) {
+// 	if (mb_strlen($note) > 128) {
+// 		$note = mb_substr($note, 0, 125).'...';
+// 	}
 
-	/**
-	 * Convert import data from 6.2 to 6.4 version.
-	 *
-	 * @param array $data
-	 *
-	 * @return array
-	 */
-	public function convert(array $data): array {
-		$data['zabbix_export']['version'] = '6.4';
+// 	$values = [
+// 		'userid' => CWebUser::$data['userid'],
+// 		'clock' => time(),
+// 		'ip' => substr(CWebUser::getIp(), 0, 39),
+// 		'action' => $action,
+// 		'resourcetype' => $resourcetype,
+// 		'note' => $note
+// 	];
 
-		return $data;
-	}
-}
+// 	try {
+// 		DB::insert('auditlog', [$values]);
+// 		return true;
+// 	}
+// 	catch (DBException $e) {
+// 		return false;
+// 	}
+// }
