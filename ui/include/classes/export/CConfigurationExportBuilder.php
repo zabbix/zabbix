@@ -960,6 +960,7 @@ class CConfigurationExportBuilder {
 				'opdata' => $trigger['opdata'],
 				'correlation_mode' => $trigger['correlation_mode'],
 				'correlation_tag' => $trigger['correlation_tag'],
+				'url_name' => $trigger['url_name'],
 				'url' => $trigger['url'],
 				'status' => $trigger['status'],
 				'priority' => $trigger['priority'],

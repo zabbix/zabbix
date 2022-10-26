@@ -198,6 +198,10 @@ class testWebScenario extends CAPITest {
 						[
 							'name' => 'header_name-symbols☺æų""\\//!@#$%^&*()_+',
 							'value' => 'header_value-symbols☺æų""\\//!@#$%^&*()_+'
+						],
+						[
+							'name' => 'header_name-without-value',
+							'value' => ''
 						]
 					],
 					'variables' => [
@@ -701,27 +705,6 @@ class testWebScenario extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/delay": a time unit is expected.'
 			],
 			// Check web headers.
-			[
-				'httptest' => [
-					'name' => 'Api web with wrong headers',
-					'headers' => [
-						['name' => '☺', 'value' => '']
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/headers/1/value": cannot be empty.'
-			],
-			[
-				'httptest' => [
-					'name' => 'Api web with empty headers value',
-					'headers' => [
-						[
-							'name' => 'login',
-							'value' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/headers/1/value": cannot be empty.'
-			],
 			[
 				'httptest' => [
 					'name' => 'Api web with empty headers name',
@@ -1605,12 +1588,6 @@ class testWebScenario extends CAPITest {
 				]
 			]
 		], null);
-
-		$itemids = array_keys(array_fill(150151, 9, 0));
-
-		DBexecute('UPDATE items SET name=REPLACE(name, '.zbx_dbstr('"Webtest key_name"').', '.zbx_dbstr('"$1"').') WHERE '.dbConditionInt('itemid', $itemids));
-		DBexecute('UPDATE items SET name=REPLACE(name, '.zbx_dbstr('"Webstep name 1"').', '.zbx_dbstr('"$2"').') WHERE '.dbConditionInt('itemid', $itemids));
-		DBexecute('UPDATE items SET name=REPLACE(name, '.zbx_dbstr('"Webstep name 2"').', '.zbx_dbstr('"$2"').') WHERE '.dbConditionInt('itemid', $itemids));
 	}
 
 	/**

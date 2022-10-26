@@ -44,6 +44,7 @@ class testTriggerLinking extends CIntegrationTest {
 	const TRIGGER_STATUS = 1;
 	const TRIGGER_COMMENTS_PRE = 'strata_comment';
 	const TRIGGER_URL_PRE = 'strata_url';
+	const TRIGGER_URL_NAME_PRE = 'strata_url_name';
 	const TRIGGER_TYPE = 1;
 	const TRIGGER_RECOVERY_MODE = 1;
 	const TRIGGER_CORRELATION_MODE = 1;
@@ -154,6 +155,7 @@ class testTriggerLinking extends CIntegrationTest {
 				'status' => self::TRIGGER_STATUS,
 				'comments' => self::TRIGGER_COMMENTS_PRE . "_" . self::$stringids[$i],
 				'url' => self::TRIGGER_URL_PRE . "_" . self::$stringids[$i],
+				'url_name' => self::TRIGGER_URL_NAME_PRE . "_" . self::$stringids[$i],
 				'type' => self::TRIGGER_TYPE,
 				'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
 				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
@@ -238,6 +240,7 @@ class testTriggerLinking extends CIntegrationTest {
 				'templateid',
 				'comments',
 				'url',
+				'url_name',
 				'type',
 				'flags',
 				'recovery_mode',
@@ -273,6 +276,7 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertEquals($entry['status'],      self::TRIGGER_STATUS, $ep);
 			$this->assertEquals($entry['comments'],    self::TRIGGER_COMMENTS_PRE . "_" . self::$stringids[$i], $ep);
 			$this->assertEquals($entry['url'],         self::TRIGGER_URL_PRE . "_" . self::$stringids[$i], $ep);
+			$this->assertEquals($entry['url_name'],         self::TRIGGER_URL_NAME_PRE . "_" . self::$stringids[$i], $ep);
 			$this->assertEquals($entry['type'],        self::TRIGGER_TYPE, $ep);
 
 			$this->assertEquals($entry['recovery_mode'],    self::TRIGGER_RECOVERY_MODE, $ep);

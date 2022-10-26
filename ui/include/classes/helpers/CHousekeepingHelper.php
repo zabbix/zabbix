@@ -46,6 +46,12 @@ class CHousekeepingHelper extends CConfigGeneralHelper {
 	public const HK_TRENDS_GLOBAL = 'hk_trends_global';
 	public const HK_TRENDS_MODE = 'hk_trends_mode';
 
+	public const OVERRIDE_NEEDED_HISTORY =	'hk_needs_override_history';
+	public const OVERRIDE_NEEDED_TRENDS =	'hk_needs_override_trends';
+
+	private const DBVERSION_COMPRESSED_CHUNKS_HISTORY = 'compressed_chunks_history';
+	private const DBVERSION_COMPRESSED_CHUNKS_TRENDS = 'compressed_chunks_trends';
+
 	/**
 	 * Housekeeping API object parameters array.
 	 *
@@ -66,5 +72,35 @@ class CHousekeepingHelper extends CConfigGeneralHelper {
 				throw new Exception(_('Unable to load housekeeping API parameters.'));
 			}
 		}
+	}
+
+	/**
+	 * @param array $dbversion_status
+	 *
+	 * @return array
+	 */
+	public static function getWarnings(array $dbversion_status): array {
+		$warnings = [];
+
+		foreach ($dbversion_status as $dbversion) {
+			if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
+				$compression_available = array_key_exists('compression_availability', $dbversion)
+					&& $dbversion['compression_availability'];
+
+				if ($compression_available) {
+					$warnings[self::OVERRIDE_NEEDED_HISTORY] =
+						array_key_exists(self::DBVERSION_COMPRESSED_CHUNKS_HISTORY, $dbversion)
+							&& $dbversion[self::DBVERSION_COMPRESSED_CHUNKS_HISTORY] == 1;
+
+					$warnings[self::OVERRIDE_NEEDED_TRENDS] =
+						array_key_exists(self::DBVERSION_COMPRESSED_CHUNKS_TRENDS, $dbversion)
+							&& $dbversion[self::DBVERSION_COMPRESSED_CHUNKS_TRENDS] == 1;
+				}
+
+				break;
+			}
+		}
+
+		return array_filter($warnings);
 	}
 }

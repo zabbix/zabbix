@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-09-16 02:58+0000\n"
+"PO-Revision-Date: 2022-10-13 07:32+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -65,7 +65,7 @@ msgstr "\"%1$s\" 的值必须小于或等于 \"%2$s\" 的值"
 #: include/classes/import/validators/C10XmlValidator.php:383
 #: include/classes/import/validators/C10XmlValidator.php:405
 msgid "\"host:key\" pair is expected"
-msgstr "期望“主机:键值” 对形式"
+msgstr "需要“主机:键值” 对形式"
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
@@ -258,12 +258,12 @@ msgstr "%1$s, 已选择"
 #: app/controllers/CControllerMediatypeEnable.php:93
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
-msgstr ""
+msgstr "%1$s. %2$s: %3$s. %4$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
@@ -4182,6 +4182,14 @@ msgstr "连接超时"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "连接到 Zabbix 服务器“%2$s”时超时,已超 %1$s 秒。"
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4192,6 +4200,16 @@ msgstr ""
 "连接到Zabbix服务器 \"%1$s\" 失败. 可能的原因是:\n"
 "1.\"zabbix.conf.php\"中的服务器IP/DNS配置不正确；\n"
 "2.DNS服务器配置不正确。\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4207,6 +4225,14 @@ msgstr ""
 "2. 安全环境（例如SELinux）阻塞连接；\n"
 "3. Zabbix server 守护进程没有运行；\n"
 "4. 开启了防火墙阻止 TCP 连接。\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -4702,7 +4728,7 @@ msgstr "严重"
 
 #: app/views/proxy.list.php:66
 msgid "Current"
-msgstr ""
+msgstr "当前"
 
 #: app/partials/popup.operations.php:172
 msgid "Current host"
@@ -6402,11 +6428,11 @@ msgstr "电子邮件"
 
 #: app/views/js/administration.mediatype.edit.js.php:397
 msgid "Email and password"
-msgstr ""
+msgstr "邮箱和密码"
 
 #: app/views/administration.mediatype.edit.php:64
 msgid "Email provider"
-msgstr ""
+msgstr "邮箱提供商"
 
 #: app/views/popup.generic.php:50
 msgid "Empty"
@@ -9030,7 +9056,7 @@ msgstr "服务“%1$s”的“propagation_rule”和“propagation_value”参�
 #: app/controllers/CControllerMediatypeEnable.php:97
 #: app/controllers/CControllerMediatypeEnable.php:108
 msgid "Incomplete configuration"
-msgstr ""
+msgstr "配置不完整"
 
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
@@ -9856,6 +9882,10 @@ msgstr "信息"
 msgctxt "compact table header"
 msgid "Info"
 msgstr "信息"
+
+#: include/classes/data/CItemData.php:1429
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -11225,7 +11255,7 @@ msgstr "位于给定键的 Windows 注册表值或键的列表。返回 JSON。"
 
 #: include/classes/data/CItemData.php:1831
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
-msgstr ""
+msgstr "Zabbix 代理列表，包括名称、模式、加密、压缩、版本、上次看到、主机数、项目数、每秒所需值 (vps) 和兼容性（当前/过期/不支持）。返回 JSON。"
 
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
@@ -11851,7 +11881,7 @@ msgstr[0] "消息介质类型已禁用"
 
 #: app/views/administration.user.edit.php:327
 msgid "Media type disabled by Administration."
-msgstr ""
+msgstr "媒介类型已被管理禁用。"
 
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
@@ -11889,7 +11919,7 @@ msgstr "媒介"
 
 #: app/views/popup.media.php:75
 msgid "Media types disabled by Administration."
-msgstr ""
+msgstr "媒介类型已被管理禁用。"
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -11925,6 +11955,11 @@ msgstr "菜单条目 URL"
 #: app/views/administration.mediatype.edit.php:248
 msgid "Menu entry name"
 msgstr "菜单条目名"
+
+#: include/views/configuration.trigger.prototype.edit.php:554
+#: include/views/configuration.triggers.edit.php:576
+msgid "Menu entry name is used as a label for the trigger URL in the event context menu."
+msgstr ""
 
 #: app/views/administration.script.edit.php:108
 msgid "Menu path"
@@ -13288,7 +13323,7 @@ msgstr "未分类"
 
 #: app/controllers/CControllerMediatypeEnable.php:95
 msgid "Not enabled"
-msgstr ""
+msgstr "未启用"
 
 #: include/forms.inc.php:315
 msgid "Not inherited items"
@@ -13677,6 +13712,10 @@ msgstr "只计算指派给启用的主机的和相依于启用的项目的触发
 msgid "Open in a new window"
 msgstr "在新窗口中打开"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr "打开日志"
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -13894,7 +13933,7 @@ msgstr "其它"
 
 #: app/views/proxy.list.php:67
 msgid "Outdated"
-msgstr ""
+msgstr "过时"
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -14937,12 +14976,12 @@ msgstr "agent代理程序已添加"
 #: app/views/proxy.list.php:114
 #, c-format
 msgid "Proxy version is not supported by server version %1$s."
-msgstr ""
+msgstr "server版本 %1$s 不支持proxy版本。"
 
 #: app/views/proxy.list.php:107
 #, c-format
 msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
-msgstr ""
+msgstr "proxy版本已过时，server版本 %1$s 只能使用数据收集和远程执行。"
 
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
@@ -15599,7 +15638,7 @@ msgstr "要求的字串"
 
 #: app/views/proxy.list.php:93
 msgid "Required vps"
-msgstr ""
+msgstr "所需 vps"
 
 #: app/views/popup.service.edit.php:305 app/views/popup.services.php:51
 #: include/classes/html/CFilter.php:215 include/classes/html/CTabFilter.php:102
@@ -20010,6 +20049,10 @@ msgstr "VMware数据存储容量统计信息，以字节为单位，以百分比
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "VMware 数据存储管理程序列表，<url> - VMware 服务 URL，<datastore> - 数据存储名称"
 
+#: include/classes/data/CItemData.php:1321
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr "VMware 数据存储属性，<url> - VMware 服务 URL，<uuid> - 数据存储名称，<prop> - 属性路径"
@@ -21204,6 +21247,14 @@ msgstr "Zabbix 登录表单"
 msgid "Zabbix server"
 msgstr "zabbix服务器"
 
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:601
 #, c-format
 msgid ""
@@ -21273,7 +21324,7 @@ msgstr "请在字符串中指定"
 
 #: include/classes/validators/CApiInputValidator.php:910
 msgid "a character string, integer or floating point value is expected"
-msgstr ""
+msgstr "需要字符串、整数或浮点数类型"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -21989,7 +22040,7 @@ msgstr "e() - 返回自然常数（欧拉数）"
 #: app/views/administration.mediatype.list.php:98
 #: app/views/administration.mediatype.list.php:103
 msgid "email"
-msgstr ""
+msgstr "电子邮件"
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
@@ -22667,7 +22718,7 @@ msgstr "无"
 #: include/classes/api/services/CItemGeneral.php:2595
 #: include/classes/api/services/CItemGeneral.php:2617
 msgid "nonempty key and value pair expected"
-msgstr "期望非空键和值对"
+msgstr "需要非空键和值对"
 
 #: include/actions.inc.php:31
 msgid "not in"
@@ -23212,7 +23263,7 @@ msgstr "表达式宏意外结束"
 
 #: include/classes/parsers/CItemKey.php:55
 msgid "unexpected end of key"
-msgstr "非期望的关键字结束"
+msgstr "键值意外结束"
 
 #: include/classes/parsers/CUserMacroParser.php:38
 msgid "unexpected end of macro"

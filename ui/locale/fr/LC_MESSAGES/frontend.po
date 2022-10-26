@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-09-23 18:29+0000\n"
+"PO-Revision-Date: 2022-10-10 18:42+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -270,12 +270,12 @@ msgstr "%1$s, sélectionné"
 #: app/controllers/CControllerMediatypeEnable.php:93
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
-msgstr ""
+msgstr "%1$s. %2$s : %3$s. %4$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s : %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
@@ -4259,6 +4259,14 @@ msgstr "Délai de connexion dépassé"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Délai d'attente de %1$s secondes dépassé lors de la connexion au serveur Zabbix \"%2$s\"."
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4269,6 +4277,16 @@ msgstr ""
 "La connexion au serveur Zabbix \"%1$s\" a échoué. Raisons possibles :\n"
 "1. IP du serveur ou DNS incorrect dans le fichier \"zabbix.conf.php\" ;\n"
 "2. Configuration incorrecte du serveur DNS.\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4284,6 +4302,14 @@ msgstr ""
 "2. L'environnement de sécurité (par exemple, SELinux) bloque la connexion ;\n"
 "3. Le démon du serveur Zabbix ne fonctionne pas ;\n"
 "4. Le pare-feu bloque la connexion TCP.\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -6486,11 +6512,11 @@ msgstr "Courriel"
 
 #: app/views/js/administration.mediatype.edit.js.php:397
 msgid "Email and password"
-msgstr ""
+msgstr "E-mail et mot de passe"
 
 #: app/views/administration.mediatype.edit.php:64
 msgid "Email provider"
-msgstr ""
+msgstr "Fournisseur de messagerie"
 
 #: app/views/popup.generic.php:50
 msgid "Empty"
@@ -9123,7 +9149,7 @@ msgstr "Paramètres \"propagation_rule\" et \"propagation_value\" incompatibles 
 #: app/controllers/CControllerMediatypeEnable.php:97
 #: app/controllers/CControllerMediatypeEnable.php:108
 msgid "Incomplete configuration"
-msgstr ""
+msgstr "Paramétrage incomplet"
 
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
@@ -9949,6 +9975,10 @@ msgstr "Info"
 msgctxt "compact table header"
 msgid "Info"
 msgstr "Info"
+
+#: include/classes/data/CItemData.php:1429
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -11957,7 +11987,7 @@ msgstr[1] "Types de média désactivés"
 
 #: app/views/administration.user.edit.php:327
 msgid "Media type disabled by Administration."
-msgstr ""
+msgstr "Type de média désactivé par l'administration."
 
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
@@ -11996,7 +12026,7 @@ msgstr "Types de média"
 
 #: app/views/popup.media.php:75
 msgid "Media types disabled by Administration."
-msgstr ""
+msgstr "Types de média désactivés par l'administration."
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -12032,6 +12062,11 @@ msgstr "URL de l'entrée de menu"
 #: app/views/administration.mediatype.edit.php:248
 msgid "Menu entry name"
 msgstr "Nom de l'entrée de menu"
+
+#: include/views/configuration.trigger.prototype.edit.php:554
+#: include/views/configuration.triggers.edit.php:576
+msgid "Menu entry name is used as a label for the trigger URL in the event context menu."
+msgstr ""
 
 #: app/views/administration.script.edit.php:108
 msgid "Menu path"
@@ -12610,7 +12645,7 @@ msgstr "Le champ de nom du formulaire ne doit pas dépasser 255 caractères."
 
 #: app/views/administration.module.edit.php:43
 msgid "Namespace"
-msgstr ""
+msgstr "Espace de noms"
 
 #: jsLoader.php:189
 msgid "Navigate to default view"
@@ -13400,7 +13435,7 @@ msgstr "Non classé"
 
 #: app/controllers/CControllerMediatypeEnable.php:95
 msgid "Not enabled"
-msgstr ""
+msgstr "Non activé"
 
 #: include/forms.inc.php:315
 msgid "Not inherited items"
@@ -13789,6 +13824,10 @@ msgstr "Seuls les déclencheurs assignés à des hôtes activés et dépendant d
 #: app/views/administration.script.edit.php:193
 msgid "Open in a new window"
 msgstr "Ouvrir dans une nouvelle fenêtre"
+
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr "Ouvrir le journal"
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -14294,7 +14333,7 @@ msgstr "La page a reçu des données incorrectes"
 #: include/classes/helpers/CPagerHelper.php:159
 msgctxt "page navigation"
 msgid "Pager"
-msgstr ""
+msgstr "Pager"
 
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.edit.php:105
@@ -18619,7 +18658,7 @@ msgstr "Haut"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
-msgstr ""
+msgstr "Top N"
 
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
@@ -20146,6 +20185,10 @@ msgstr "Statistiques de capacité du datastore VMware en octets ou en pourcentag
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "Liste des hyperviseurs du datastore VMware, <url> - URL du service VMware, <datastore> - nom du datastore"
 
+#: include/classes/data/CItemData.php:1321
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr "Propriété du datastore VMware, <url> - URL du service VMware, <uuid> - nom du datastore, <prop> - chemin de la propriété"
@@ -21342,6 +21385,14 @@ msgstr "Formulaire de connexion Zabbix"
 msgid "Zabbix server"
 msgstr "Serveur Zabbix"
 
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:601
 #, c-format
 msgid ""
@@ -21411,7 +21462,7 @@ msgstr "une chaîne de caractères est attendue"
 
 #: include/classes/validators/CApiInputValidator.php:910
 msgid "a character string, integer or floating point value is expected"
-msgstr ""
+msgstr "une chaîne de caractères, un entier ou une valeur à virgule flottante est attendu"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -22127,7 +22178,7 @@ msgstr "e() - Retourne le nombre d'Euler"
 #: app/views/administration.mediatype.list.php:98
 #: app/views/administration.mediatype.list.php:103
 msgid "email"
-msgstr ""
+msgstr "courriel"
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34

@@ -26,10 +26,9 @@
 #include "zbxrtc.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbx_rtc_constants.h"
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static int	hk_period;
 
@@ -148,15 +147,15 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	double			sec, time_slept, time_now;
 	char			sleeptext[25];
 	zbx_ipc_async_socket_t	rtc;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	unsigned char		process_type = info->process_type;
+	int			server_num = info->server_num;
+	int			process_num = info->process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	if (0 == CONFIG_HOUSEKEEPING_FREQUENCY)
 	{
@@ -182,7 +181,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		sec = zbx_time();
 
-		while (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 			switch (rtc_cmd)
 			{

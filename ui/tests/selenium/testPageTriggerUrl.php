@@ -18,15 +18,31 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 
 /**
  * Test checks link from trigger URL field on different pages.
  *
- * @backup profiles
- * @backup problem
+ * @onBefore prepareTriggerData
+ *
+ * @backup profiles, problem
  */
 class testPageTriggerUrl extends CWebTest {
+
+	private static $custom_name = 'URL name for menu';
+
+	/**
+	 * Add URL name for trigger.
+	 */
+	public function prepareTriggerData() {
+		$response = CDataHelper::call('trigger.update', [
+			[
+				'triggerid' => '100032',
+				'url_name' => 'URL name for menu'
+			]
+		]);
+	}
 
 	public function getTriggerLinkData() {
 		return [
@@ -36,11 +52,13 @@ class testPageTriggerUrl extends CWebTest {
 					'trigger' => '1_trigger_High',
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100035',
-						'Configuration' => 'triggers.php?form=update&triggerid=100035',
+						'Acknowledge' => 'zabbix.php?action=popup&popup_action=acknowledge.edit&eventids%5B%5D=9004',
+						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
+						'Trigger' => 'triggers.php?form=update&triggerid=100035&context=host',
+						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
 						'Trigger URL' => 'tr_events.php?triggerid=100035&eventid=9003',
 						'Unique webhook url' => 'zabbix.php?action=mediatype.list&ddreset=1',
-						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101',
-						'1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'
+						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101'
 					],
 					'background' => "high-bg"
 				]
@@ -50,10 +68,12 @@ class testPageTriggerUrl extends CWebTest {
 					'trigger' => '1_trigger_Not_classified',
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100032',
-						'Configuration' => 'triggers.php?form=update&triggerid=100032',
-						'Trigger URL' => 'tr_events.php?triggerid=100032&eventid=9000',
-						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101',
-						'1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'
+						'Acknowledge' => 'zabbix.php?action=popup&popup_action=acknowledge.edit&eventids%5B%5D=9000',
+						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
+						'Trigger' => 'triggers.php?form=update&triggerid=100032&context=host',
+						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
+						'URL name for menu' => 'tr_events.php?triggerid=100032&eventid=9000',
+						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101'
 					],
 					'background' => 'na-bg'
 				]
@@ -62,8 +82,9 @@ class testPageTriggerUrl extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getTriggerLinkData
 	 * Check trigger url in Problems widget.
+	 *
+	 * @dataProvider getTriggerLinkData
 	 */
 	public function testPageTriggerUrl_ProblemsWidget($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
@@ -77,31 +98,33 @@ class testPageTriggerUrl extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getTriggerLinkData
 	 * Check trigger url in Trigger overview widget.
+	 *
+	 * @dataProvider getTriggerLinkData
 	 */
 	public function testPageTriggerUrl_TriggerOverviewWidget($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1020');
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget('Group to check Overview');
 
-		$table = $widget->getContent()->asTable();
 		// Get row of trigger "1_trigger_Not_classified".
-		$row = $table->findRow('Triggers', $data['trigger']);
+		$row = $widget->getContent()->asTable()->findRow('Triggers', $data['trigger']);
+
 		// Open trigger context menu.
 		$row->query('xpath://td[contains(@class, "'.$data['background'].'")]')->one()->click();
 		$this->checkTriggerUrl(true, $data);
 	}
 
 	/**
-	 * @dataProvider getTriggerLinkData
 	 * Check trigger url on Problems page.
+	 *
+	 * @dataProvider getTriggerLinkData
 	 */
 	public function testPageTriggerUrl_ProblemsPage($data) {
 		$this->page->login()->open('zabbix.php?action=problem.view');
-		$table = $this->query('class:list-table')->asTable()->one();
+
 		// Open trigger context menu.
-		$table->query('link', $data['trigger'])->one()->click();
+		$this->query('class:list-table')->asTable()->one()->query('link', $data['trigger'])->one()->click();
 		$this->checkTriggerUrl(false, $data);
 	}
 
@@ -110,11 +133,14 @@ class testPageTriggerUrl extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getTriggerLinkData
 	 * Check trigger url on Event details page.
+	 *
+	 * @dataProvider getTriggerLinkData
 	 */
 	public function testPageTriggerUrl_EventDetails($data) {
-		$this->page->login()->open($data['links']['Trigger URL']);
+		$option = array_key_exists('Trigger URL', $data['links']) ? 'Trigger URL' : self::$custom_name;
+
+		$this->page->login()->open($data['links'][$option]);
 		$this->query('link', $data['trigger'])->waitUntilPresent()->one()->click();
 		$this->checkTriggerUrl(false, $data);
 	}
@@ -127,35 +153,49 @@ class testPageTriggerUrl extends CWebTest {
 	 * @param boolean $popup_menu			trigger context menu popup exist
 	 */
 	private function checkTriggerUrl($trigger_overview, $data, $popup_menu = true) {
+		$option = array_key_exists('Trigger URL', $data['links']) ? 'Trigger URL' : self::$custom_name;
+
 		if ($popup_menu) {
 			// Check trigger popup menu.
-			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-			$this->assertTrue($popup->hasTitles(['TRIGGER', 'LINKS', 'HISTORY']));
-			// Check Url of each link.
-			foreach ($data['links'] as $link => $url) {
-				$this->assertTrue($popup->hasItems($link));
-				$this->assertStringContainsString($url, $popup->getItem($link)->getAttribute('href'));
-			}
+			$trigger_popup = $this->query('xpath://ul[@role="menu" and @tabindex="0"]')->asPopupMenu()
+					->waitUntilPresent()->one();
+			$this->assertTrue($trigger_popup->hasTitles(['VIEW', 'CONFIGURATION', 'LINKS']));
+
+			// Check Url for main links.
 			if ($trigger_overview) {
-				$this->assertTrue($popup->hasItems('Acknowledge'));
-				// Check that only the links from data provider plus Acknowledge link persist in the popup.
-				$this->assertEquals(count($data['links'])+1, $popup->getItems()->count());
+				$array = $data['links'];
+				array_shift($array);
+				$data['links'] = ['Problems' => $data['links']['Problems'],	'Acknowledge' => ''] + $array;
 			}
-			else {
-				// Check that only the expected links ar present in the popup.
-				$this->assertEquals(count($data['links']), $popup->getItems()->count());
+
+			$this->assertEquals(array_keys($data['links']), $trigger_popup->getItems()->asText());
+
+			foreach ($data['links'] as $menu => $links) {
+				// Check 2-level menu links.
+				if (is_array($links)) {
+					$item_link = $trigger_popup->getItem($menu)->query('xpath:./../ul//a')->one();
+					$this->assertEquals(array_keys($links), [$item_link->getText()]);
+					$this->assertStringContainsString(array_values($links)[0], $item_link->getAttribute('href'));
+				}
+				// Check 1-level menu links.
+				else {
+					if ($menu !== 'Acknowledge') {
+						$this->assertStringContainsString($links, $trigger_popup->getItem($menu)->getAttribute('href'));
+					}
+				}
 			}
+
 			// Open trigger link.
-			$popup->fill('Trigger URL');
+			$trigger_popup->fill($option);
 		}
 		else {
 			// Follow trigger link in overlay dialogue.
 			$hintbox = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one();
-			$hintbox->query('link', $data['links']['Trigger URL'])->one()->click();
+			$hintbox->query('link', $data['links'][$option])->one()->click();
 		}
 
 		// Check opened page.
 		$this->assertEquals('Event details', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
-		$this->assertStringContainsString($data['links']['Trigger URL'], $this->page->getCurrentUrl());
+		$this->assertStringContainsString($data['links'][$option], $this->page->getCurrentUrl());
 	}
 }

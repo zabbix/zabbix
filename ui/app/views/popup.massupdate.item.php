@@ -302,7 +302,7 @@ $item_form_list
 		(new CVisibilityBox('visible[trends]', 'trends_div', _('Original')))->setLabel(_('Trend storage period')),
 		(new CDiv([
 			(new CRadioButtonList('trends_mode', ITEM_STORAGE_CUSTOM))
-				->addValue(_('Do not keep trends'), ITEM_STORAGE_CUSTOM)
+				->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
 				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
 				->setModern(true),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

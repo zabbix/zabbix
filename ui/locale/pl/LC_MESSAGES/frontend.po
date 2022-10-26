@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-09-23 21:29+0000\n"
+"PO-Revision-Date: 2022-10-12 22:06+0000\n"
 "Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -285,12 +285,12 @@ msgstr "%1$s, wybrano"
 #: app/controllers/CControllerMediatypeEnable.php:93
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
-msgstr ""
+msgstr "%1$s. %2$s: %3$s. %4$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
@@ -4339,6 +4339,14 @@ msgstr "Limit czasu połączenia"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Podczas próby połączenia do serwera Zabbix \"%2$s\" przekroczono maksymalny czas połączenia %1$s sekund."
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4349,6 +4357,16 @@ msgstr ""
 "Błąd połączenia z serwerem Zabbix \"%1$s\" . Możliwe przyczyny:\n"
 "1. Nieprawidłowy serwer IP/DNS w pliku \"zabbix.conf.php\";\n"
 "2. Nieprawidłowa konfiguracja serwera DNS.\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4364,6 +4382,14 @@ msgstr ""
 "2. Zasady bezpieczeństwa (na przykład, SELinux) blokują połączenie;\n"
 "3. Proces Zabbix nie został uruchomiony;\n"
 "4. Zapora sieciowa blokuje połączenia TCP.\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -4865,7 +4891,7 @@ msgstr "Krytyczny"
 
 #: app/views/proxy.list.php:66
 msgid "Current"
-msgstr ""
+msgstr "Aktualny"
 
 #: app/partials/popup.operations.php:172
 msgid "Current host"
@@ -6573,11 +6599,11 @@ msgstr "Email"
 
 #: app/views/js/administration.mediatype.edit.js.php:397
 msgid "Email and password"
-msgstr ""
+msgstr "E-mail i hasło"
 
 #: app/views/administration.mediatype.edit.php:64
 msgid "Email provider"
-msgstr ""
+msgstr "Dostawca poczty e-mail"
 
 #: app/views/popup.generic.php:50
 msgid "Empty"
@@ -9220,7 +9246,7 @@ msgstr "Niekompatybilne parametry \"propagation_rule\" i \"propagation_value\" w
 #: app/controllers/CControllerMediatypeEnable.php:97
 #: app/controllers/CControllerMediatypeEnable.php:108
 msgid "Incomplete configuration"
-msgstr ""
+msgstr "Niekompletna konfiguracja"
 
 #: include/classes/api/services/CMap.php:655
 #: include/classes/api/services/CMap.php:1138
@@ -10046,6 +10072,10 @@ msgstr "Info"
 msgctxt "compact table header"
 msgid "Info"
 msgstr "Info"
+
+#: include/classes/data/CItemData.php:1429
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -11435,7 +11465,7 @@ msgstr "Lista wartości lub kluczy rejestru systemu Windows znajdujących się p
 
 #: include/classes/data/CItemData.php:1831
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON."
-msgstr ""
+msgstr "Lista serwerów proxy Zabbix z nazwą, trybem, szyfrowaniem, kompresją, wersją, czasem ostatniego połączenia, liczbą hostów, liczbą pozycji, wymaganymi wartościami na sekundę (vps) i kompatybilnością (bieżąca/przestarzała/nieobsługiwana). Zwraca JSON."
 
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
@@ -12067,7 +12097,7 @@ msgstr[2] "Wyłączono typy mediów"
 
 #: app/views/administration.user.edit.php:327
 msgid "Media type disabled by Administration."
-msgstr ""
+msgstr "Typ mediów wyłączony przez administrację."
 
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
@@ -12107,7 +12137,7 @@ msgstr "Typy mediów"
 
 #: app/views/popup.media.php:75
 msgid "Media types disabled by Administration."
-msgstr ""
+msgstr "Typy mediów wyłączone przez administrację."
 
 #: include/classes/api/services/CMediatype.php:827
 #, c-format
@@ -12143,6 +12173,11 @@ msgstr "UWL wejścia do menu"
 #: app/views/administration.mediatype.edit.php:248
 msgid "Menu entry name"
 msgstr "Nazwa wejścia do menu"
+
+#: include/views/configuration.trigger.prototype.edit.php:554
+#: include/views/configuration.triggers.edit.php:576
+msgid "Menu entry name is used as a label for the trigger URL in the event context menu."
+msgstr ""
 
 #: app/views/administration.script.edit.php:108
 msgid "Menu path"
@@ -13516,7 +13551,7 @@ msgstr "Niesklasyfikowany"
 
 #: app/controllers/CControllerMediatypeEnable.php:95
 msgid "Not enabled"
-msgstr ""
+msgstr "Nie włączone"
 
 #: include/forms.inc.php:315
 msgid "Not inherited items"
@@ -13907,6 +13942,10 @@ msgstr "Liczone są tylko wyzwalacze przypisane do włączonych hostów w zależ
 msgid "Open in a new window"
 msgstr "Otwórz w nowym oknie"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr "Otwórz dziennik"
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -14124,7 +14163,7 @@ msgstr "Inni"
 
 #: app/views/proxy.list.php:67
 msgid "Outdated"
-msgstr ""
+msgstr "Przestarzały"
 
 #: include/classes/data/CItemData.php:934
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -15174,7 +15213,7 @@ msgstr "Wersja serwera proxy nie jest obsługiwana przez serwer w wersji %1$s."
 #: app/views/proxy.list.php:107
 #, c-format
 msgid "Proxy version is outdated, only data collection and remote execution is available with server version %1$s."
-msgstr ""
+msgstr "Wersja proxy jest nieaktualna, w przypadku wersji serwera %1$s dostępne są tylko zbieranie danych i zdalne polecenia."
 
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:401
@@ -20286,6 +20325,10 @@ msgstr "Statystyki pojemności magazynu danych VMware w bajtach lub procentach o
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "Lista hipernadzorców magazynu danych VMware, <url> - URL usługi VMware, <datastore> - nazwa magazynu danych"
 
+#: include/classes/data/CItemData.php:1321
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr "Właściwość magazynu danych VMware, <url> - adres URL usługi VMware, <uuid> - nazwa magazynu danych, <prop> - ścieżka właściwości"
@@ -21484,6 +21527,14 @@ msgstr "Formularz logowania Zabbix"
 msgid "Zabbix server"
 msgstr "Serwer Zabbix"
 
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:601
 #, c-format
 msgid ""
@@ -21553,7 +21604,7 @@ msgstr "oczekiwano ciągu znaków"
 
 #: include/classes/validators/CApiInputValidator.php:910
 msgid "a character string, integer or floating point value is expected"
-msgstr ""
+msgstr "oczekiwany jest ciąg znaków, liczba całkowita lub wartość zmiennoprzecinkowa"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -22269,7 +22320,7 @@ msgstr "e() - Liczba Eulera"
 #: app/views/administration.mediatype.list.php:98
 #: app/views/administration.mediatype.list.php:103
 msgid "email"
-msgstr ""
+msgstr "e-mail"
 
 #: app/views/popup.lldoperation.php:64 app/views/popup.valuemap.edit.php:78
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34

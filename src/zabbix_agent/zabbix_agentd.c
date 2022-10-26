@@ -18,12 +18,14 @@
 **/
 
 #include "log.h"
-#include "zbxconf.h"
-#include "zbxgetopt.h"
-#include "zbxcomms.h"
 #include "modbtype.h"
-#include "zbxstr.h"
+#include "zbxcomms.h"
+#include "zbxconf.h"
+#include "zbxexpr.h"
+#include "zbxgetopt.h"
 #include "zbxip.h"
+#include "zbxstr.h"
+#include "zbxthreads.h"
 
 static char	*CONFIG_PID_FILE = NULL;
 
@@ -240,10 +242,6 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
-ZBX_THREAD_LOCAL unsigned char	process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
-ZBX_THREAD_LOCAL int		process_num;
-ZBX_THREAD_LOCAL int		server_num	= 0;
-
 static zbx_thread_activechk_args	*config_active_args = NULL;
 
 int	CONFIG_ALERTER_FORKS		= 0;
@@ -285,6 +283,7 @@ char	*opt = NULL;
 
 #ifdef _WINDOWS
 void	zbx_co_uninitialize();
+int	zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep);
 #endif
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
@@ -1078,6 +1077,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	int		i, j = 0, ret = SUCCEED;
 #ifdef _WINDOWS
 	DWORD		res;
+
+	AddVectoredExceptionHandler(1, (PVECTORED_EXCEPTION_HANDLER)&zbx_win_exception_filter);
 #endif
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1207,20 +1208,22 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	for (i = 0; i < threads_num; i++)
 	{
 		zbx_thread_args_t		*thread_args;
+		zbx_thread_info_t		*thread_info;
 		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_program_type};
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
+		thread_info = &thread_args->info;
 
-		if (FAIL == get_process_info_by_thread(i + 1, &thread_args->process_type, &thread_args->process_num))
+		if (FAIL == get_process_info_by_thread(i + 1, &thread_info->process_type, &thread_info->process_num))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}
 
-		thread_args->server_num = i + 1;
+		thread_info->server_num = i + 1;
 		thread_args->args = NULL;
 
-		switch (thread_args->process_type)
+		switch (thread_info->process_type)
 		{
 			case ZBX_PROCESS_TYPE_COLLECTOR:
 				zbx_thread_start(collector_thread, thread_args, &threads[i]);

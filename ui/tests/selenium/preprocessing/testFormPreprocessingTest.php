@@ -162,9 +162,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Left trim', 'parameter_1' => ''],
 						['type' => 'XML XPath', 'parameter_1' => ''],
 						['type' => 'JSONPath', 'parameter_1' => ''],
-						['type' => 'Custom multiplier', 'parameter_1' => ''],
 						['type' => 'JavaScript', 'parameter_1' => ''],
-						['type' => 'In range', 'parameter_1' => '', 'parameter_2' => ''],
 						['type' => 'Matches regular expression', 'parameter_1' => ''],
 						['type' => 'Does not match regular expression', 'parameter_1' => ''],
 						['type' => 'Check for error in JSON', 'parameter_1' => ''],
@@ -173,7 +171,27 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => ''],
 						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'value']
 					],
-					'error' => 'Incorrect value for field "params":'
+					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'preprocessing' => [
+						['type' => 'In range', 'parameter_1' => '', 'parameter_2' => '']
+
+					],
+					'error' => 'Invalid parameter "/1/params": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'preprocessing' => [
+						['type' => 'Custom multiplier', 'parameter_1' => '']
+
+					],
+					'error' => 'Invalid parameter "/1/params/1": a floating point value is expected.'
 				]
 			],
 			[
@@ -184,7 +202,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Check for error using regular expression', 'parameter_1' => 'path']
 
 					],
-					'error' => 'Incorrect value for field "params": second parameter is expected.'
+					'error' => 'Invalid parameter "/1/params/2": cannot be empty.'
 				]
 			],
 			[
@@ -195,7 +213,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Regular expression', 'parameter_1' => '', 'parameter_2' => '1'],
 						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'label', 'parameter_3' => 'label']
 					],
-					'error' => 'Incorrect value for field "params": first parameter is expected.'
+					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
 				]
 			]
 		];
@@ -331,7 +349,8 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Simple change'],
 						['type' => 'Change per second']
 					],
-					'error' => 'Only one change step is allowed.'
+					'error' => 'Invalid parameter "/2": only one object can exist within '.
+							'the combinations of (type)=((9, 10)).'
 				]
 			],
 			[
@@ -341,7 +360,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Discard unchanged'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
 					],
-					'error' => 'Only one throttling step is allowed.'
+					'error' => 'Invalid parameter "/2": only one object can exist within the combinations of (type)=((19, 20)).'
 				]
 			],
 			[
@@ -352,7 +371,7 @@ class testFormPreprocessingTest extends CWebTest {
 								'parameter_3' => 'label_name'],
 						['type' => 'Prometheus to JSON', 'parameter_1' => '']
 					],
-					'error' => 'Only one Prometheus step is allowed.'
+					'error' => 'Invalid parameter "/2": only one object can exist within the combinations of (type)=((22, 23)).'
 				]
 			],
 			[
@@ -376,7 +395,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => ''],
 						['type' => 'Prometheus pattern', 'parameter_1' => '', 'parameter_2' => 'value']
 					],
-					'error' => 'Incorrect value for field "params":'
+					'error' => 'Invalid parameter "/1/params/1": cannot be empty.'
 				]
 			],
 			[
@@ -386,7 +405,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Regular expression', 'parameter_1' => 'expr', 'parameter_2' => 'output'],
 						['type' => 'Trim', 'parameter_1' => '']
 					],
-					'error' => 'Incorrect value for field "params":'
+					'error' => 'Invalid parameter "/2/params/1": cannot be empty.'
 				]
 			],
 						[
@@ -399,7 +418,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'JavaScript', 'parameter_1' => 'Script'],
 						['type' => 'Check for error in XML', 'parameter_1' => '']
 					],
-					'error' => 'Incorrect value for field "params":'
+					'error' => 'Invalid parameter "/5/params/1": cannot be empty.'
 				]
 			]
 		];
@@ -528,15 +547,6 @@ class testFormPreprocessingTest extends CWebTest {
 			case TEST_BAD:
 				$message = $dialog->query('tag:output')->asMessage()->waitUntilPresent()->one();
 				$this->assertTrue($message->isBad());
-
-				// Workaround for single step which has different message.
-				$this->assertTrue($message->hasLine(
-						($id !== null && $data['preprocessing'][$id]['type'] === 'Discard unchanged with heartbeat')
-						? 'Invalid parameter "params":'
-						: $data['error']
-					)
-				);
-
 				$dialog->close();
 				break;
 
@@ -629,7 +639,7 @@ class testFormPreprocessingTest extends CWebTest {
 				// Check Zabbix server down message.
 				$message = $form->getOverlayMessage();
 				$this->assertTrue($message->isBad());
-				$this->assertTrue($message->hasLine('Connection to Zabbix server "localhost" refused. Possible reasons:'));
+				$this->assertTrue($message->hasLine('Connection to Zabbix server "localhost:10051" refused. Possible reasons:'));
 				$dialog->close();
 				break;
 
