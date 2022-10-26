@@ -72,15 +72,10 @@ class API {
 		}
 
 		if (array_key_exists('filter', $_GET)) {
-			$filter = explode(' ', $_GET['filter']);
+			preg_match('/^userName eq \"(.*)\"$/', $_GET['filter'], $filter_value);
 
-			if (count($filter) === 3) {
-				[$filter_name, $operator, $filter_value] = $filter;
-			}
-
-			if ($class === 'users' && isset($filter_name, $operator, $filter_value) && $filter_name === 'userName'
-					&& $operator === 'eq') {
-				$input['userName'] = str_replace('"', '', $filter_value);
+			if (count($filter_value) === 2) {
+				$input['userName'] = $filter_value[1];
 			}
 			else {
 				throw new Exception(_('This filter is not supported'), 400);
