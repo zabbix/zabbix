@@ -23,6 +23,9 @@ use Zabbix\Core\CWidget;
 
 class CControllerFavouriteDelete extends CController {
 
+	private const WIDGET_FAV_GRAPHS = 'favgraphs';
+	private const WIDGET_FAV_MAPS = 'favmaps';
+
 	protected function checkInput() {
 		$fields = [
 			'object' =>		'fatal|required|in itemid,sysmapid',
@@ -48,10 +51,10 @@ class CControllerFavouriteDelete extends CController {
 			'sysmapid' => 'web.favorite.sysmapids'
 		];
 
-		$widgetids = [
-			'graphid' => CWidget::FAV_GRAPHS,
-			'itemid' => CWidget::FAV_GRAPHS,
-			'sysmapid' => CWidget::FAV_MAPS
+		$affected_widget_types = [
+			'graphid' => self::WIDGET_FAV_GRAPHS,
+			'itemid' => self::WIDGET_FAV_GRAPHS,
+			'sysmapid' => self::WIDGET_FAV_MAPS
 		];
 
 		$object = $this->getInput('object');
@@ -75,7 +78,8 @@ class CControllerFavouriteDelete extends CController {
 				}
 				else {
 					ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {
-						if (widget.getType() === "'.$widgetids[$object].'") {
+						if (widget.getType() === "'.$affected_widget_types[$object].'"
+								&& widget.getState() === WIDGET_STATE_ACTIVE) {
 							widget._startUpdating();
 						}
 					});

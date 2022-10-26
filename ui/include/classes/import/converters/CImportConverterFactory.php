@@ -22,23 +22,29 @@
 /**
  * Factory for creating import conversions.
  */
-class CImportConverterFactory extends CRegistryFactory {
+final class CImportConverterFactory extends CRegistryFactory {
+
+	private const SEQUENTIAL_CONVERTERS = [
+		'1.0' => 'C10ImportConverter',
+		'2.0' => 'C20ImportConverter',
+		'3.0' => 'C30ImportConverter',
+		'3.2' => 'C32ImportConverter',
+		'3.4' => 'C34ImportConverter',
+		'4.0' => 'C40ImportConverter',
+		'4.2' => 'C42ImportConverter',
+		'4.4' => 'C44ImportConverter',
+		'5.0' => 'C50ImportConverter',
+		'5.2' => 'C52ImportConverter',
+		'5.4' => 'C54ImportConverter',
+		'6.0' => 'C60ImportConverter',
+		'6.2' => 'C62ImportConverter'
+	];
 
 	public function __construct() {
-		parent::__construct([
-			'1.0' => 'C10ImportConverter',
-			'2.0' => 'C20ImportConverter',
-			'3.0' => 'C30ImportConverter',
-			'3.2' => 'C32ImportConverter',
-			'3.4' => 'C34ImportConverter',
-			'4.0' => 'C40ImportConverter',
-			'4.2' => 'C42ImportConverter',
-			'4.4' => 'C44ImportConverter',
-			'5.0' => 'C50ImportConverter',
-			'5.2' => 'C52ImportConverter',
-			'5.4' => 'C54ImportConverter',
-			'6.0' => 'C60ImportConverter',
-			'6.2' => 'C62ImportConverter'
-		]);
+		parent::__construct(self::SEQUENTIAL_CONVERTERS);
+	}
+
+	public static function getSequentialVersions() {
+		return array_keys(self::SEQUENTIAL_CONVERTERS);
 	}
 }

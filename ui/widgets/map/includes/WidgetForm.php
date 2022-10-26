@@ -42,6 +42,8 @@ use Zabbix\Core\CWidget;
  */
 class WidgetForm extends CWidgetForm {
 
+	private const WIDGET_NAV_TREE = 'navtree';
+
 	public function addFields(): self {
 		$this
 			->addField(
@@ -65,7 +67,7 @@ class WidgetForm extends CWidgetForm {
 		}
 		else {
 			$this->addField(
-				(new CWidgetFieldWidgetSelect('filter_widget_reference', _('Filter'), CWidget::NAV_TREE))
+				(new CWidgetFieldWidgetSelect('filter_widget_reference', _('Filter'), self::WIDGET_NAV_TREE))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			);
 		}

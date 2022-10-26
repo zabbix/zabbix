@@ -1601,6 +1601,14 @@ define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
 
 define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
 
+// Dashboard widget types supported in templates (used only in import converters).
+define('WIDGET_CLOCK',				'clock');
+define('WIDGET_GRAPH',				'graph');
+define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
+define('WIDGET_ITEM',				'item');
+define('WIDGET_PLAIN_TEXT',			'plaintext');
+define('WIDGET_URL',				'url');
+
 // event details sections
 define('SECTION_HAT_TRIGGERDETAILS',	'hat_triggerdetails');
 define('SECTION_HAT_EVENTDETAILS',		'hat_eventdetails');
