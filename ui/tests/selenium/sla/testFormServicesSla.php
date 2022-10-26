@@ -906,6 +906,11 @@ class testFormServicesSla extends CWebTest {
 		$this->checkActionCancellation('update');
 	}
 
+	/**
+	 * Check cancellation of create and update actions
+	 *
+	 * @param string	$action		action to be checked
+	 */
 	public function checkActionCancellation($action = 'create') {
 		$new_values = [
 			'Name' => 'New name to Cancel',
