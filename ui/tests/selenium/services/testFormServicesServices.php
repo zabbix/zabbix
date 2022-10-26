@@ -331,8 +331,8 @@ class testFormServicesServices extends CWebTest {
 
 		// Check possible children count in table.
 		$this->assertEquals(count(self::$serviceids), $children_dialog->query('class:list-table')->asTable()->one()
-				->getRows()->count())
-		;
+				->getRows()->count()
+		);
 
 		foreach (['Add', 'Cancel'] as $button) {
 			$this->assertTrue($dialog->getFooter()->query('button', $button)->one()->isClickable());
@@ -988,9 +988,7 @@ class testFormServicesServices extends CWebTest {
 		$original_values['Name'] = $name;
 
 		// If the date changed since the data source was executed, "Created at" for clone will differ from the original.
-		if ($original_values['Created at'] !== date('Y-m-d', strtotime('today'))) {
-			$original_values['Created at'] = date('Y-m-d', strtotime('today'));
-		}
+		$original_values['Created at'] = date('Y-m-d', strtotime('today'));
 
 		$this->assertEquals($original_values, $form->getFields()->asValues());
 
@@ -1229,7 +1227,8 @@ class testFormServicesServices extends CWebTest {
 
 		// Check that service linking is disappeared from DB.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
-				self::$serviceids['Parent for deletion from row'].' AND servicedownid ='.self::$serviceids['Child 2'])
+				zbx_dbstr(self::$serviceids['Parent for deletion from row']).' AND servicedownid ='.
+				zbx_dbstr(self::$serviceids['Child 2']))
 		);
 	}
 
@@ -1257,7 +1256,8 @@ class testFormServicesServices extends CWebTest {
 		}
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
-				self::$serviceids['Parent for child deletion from row'].' AND servicedownid ='.self::$serviceids['Child 1'])
+				zbx_dbstr(self::$serviceids['Parent for child deletion from row']).' AND servicedownid ='.
+				zbx_dbstr(self::$serviceids['Child 1']))
 		);
 	}
 

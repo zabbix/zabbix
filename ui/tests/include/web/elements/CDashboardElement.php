@@ -290,8 +290,8 @@ class CDashboardElement extends CElement {
 	 * @param integer	$index		expected number of pages with the provided name
 	 */
 	public function selectPage($name, $index = 1) {
-		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($name);
-		$this->query('xpath:('.$selection.'])['.$index.']')->waitUntilClickable()->one()->click();
-		$this->query('xpath:'.$selection.']/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
+		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($name).']';
+		$this->query('xpath:('.$selection.')['.$index.']')->waitUntilClickable()->one()->click();
+		$this->query('xpath:'.$selection.'/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
 	}
 }

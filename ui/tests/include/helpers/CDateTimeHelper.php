@@ -93,6 +93,7 @@ class CDateTimeHelper {
 				$moment = strtotime($moment);
 			}
 		}
+		unset($moment);
 
 		return ((date('Y', $to) - date('Y', $from)) * 12) + ((date('m', $to) - date('m', $from)));
 	}

@@ -401,7 +401,7 @@ class Services {
 		]);
 
 		// Set service into Disaster (status 5) state.
-		DBexecute("UPDATE services SET status=5 WHERE name='Service with problem'");
+		DBexecute("UPDATE services SET status=5 WHERE serviceid=".zbx_dbstr($serviceids['Service with problem']));
 
 		return ['serviceids' => $serviceids];
 	}

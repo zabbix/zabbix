@@ -39,6 +39,14 @@ class testDashboardSlaReportWidget extends testSlaReport {
 	private static $update_widget = 'Update widgets';
 	private static $delete_widget = 'Widget for delete';
 
+	private static $default_values = [
+		'SLA' => '',
+		'Service' => '',
+		'From' => '',
+		'To' => '',
+		'Show periods' => 20
+	];
+
 	/*
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
 	 * because it can change.
@@ -522,8 +530,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		}
 		else {
 			$form = $dashboard->getWidget(self::$update_widget)->edit();
-			// Clean-up values in fields after previous cases before filling in the form.
-			$data['fields'] = $this->cleanupFormBeforeFill($data['fields'], $form);
+			// Assign default values for the fields originally not mentioned in data provider.
+			$data['fields'] = array_merge(self::$default_values, $data['fields']);
 		}
 
 		/**
@@ -531,7 +539,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		 * by the creation date or current date. So to use the $reporting_periods array, Show periods should be filled.
 		 */
 		if (!array_key_exists('error', $data)
-				&& !array_key_exists('Service', $data['fields'])
+				&& CTestArrayHelper::get($data['fields'], 'Service', '') === ''
 				&& !array_key_exists('no_data', $data)
 				&& in_array($data['reporting_period'], ['Monthly', 'Quarterly', 'Annually'])) {
 			$data['fields']['Show periods'] = count(self::$reporting_periods[$data['reporting_period']]);
@@ -566,38 +574,13 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				self::$update_widget = $data['fields']['Name'];
 			}
 
-			if (array_key_exists('Service', $data['fields'])) {
-				$this->checkLayoutWithService($data, true);
-			}
-			else {
+			if (CTestArrayHelper::get($data['fields'], 'Service', '') === '') {
 				$this->checkLayoutWithoutService($data, true);
 			}
-		}
-	}
-
-	/**
-	 * Clear multiselects and add default data to data provider before filling in new data in the form.
-	 * This is needed in update scenarios to overwrite the data left from previous test case.
-	 *
-	 * @param	array			$fields		Array containing all the fields to be filled in the form.
-	 * @param	CFormElement	$form		Form that should be filled in.
-	 * @return	array
-	 */
-	private function cleanupFormBeforeFill($fields, $form) {
-		foreach (['SLA', 'Service', 'Show periods', 'From', 'To'] as $field) {
-			if (!array_key_exists($field, $fields)) {
-				if (in_array($field, ['SLA', 'Service'])) {
-					$form->getField($field)->clear();
-				}
-				else {
-					$default_value = ($field === 'Show periods') ? 20 : '';
-
-					$fields[$field] = $default_value;
-				}
+			else {
+				$this->checkLayoutWithService($data, true);
 			}
 		}
-
-		return $fields;
 	}
 
 	public function getSlaWidgetDataWithCustomDates() {
@@ -2250,7 +2233,9 @@ class testDashboardSlaReportWidget extends testSlaReport {
 
 		// Edit widget.
 		$form = $dashboard->getWidget(self::$update_widget)->edit();
-		$data['fields'] = $this->cleanupFormBeforeFill($data['fields'], $form);
+
+		// Assign default values for the fields originally not mentioned in data provider.
+		$data['fields'] = array_merge(self::$default_values, $data['fields']);
 
 		// Convert From and To field values to date if it is populated as string and not as a dynamic date.
 		if (!array_key_exists('expected_periods', $data) && !array_key_exists('equivalent_timestamps', $data)) {
@@ -2275,7 +2260,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 
 		$table = CDashboardElement::find()->one()->getWidget(self::$update_widget)->query('class:list-table')->asTable()->one();
 
-		if (array_key_exists('Service', $data['fields'])) {
+		if (CTestArrayHelper::get($data['fields'], 'Service') !== '') {
 			$this->assertTableDataColumn($expected_periods, self::$period_headers[$data['reporting_period']]);
 		}
 		else {

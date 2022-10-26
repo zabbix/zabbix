@@ -285,18 +285,18 @@ class testSlaReport extends CWebTest {
 					for ($i = 0; $i <= $months; $i++) {
 						$month = strtotime('this month '.-$i.' month');
 						$period_values[$i]['value'] = date('Y-m', $month);
-						$period_values[$i]['start'] = strtotime(date('Y-m', time()).' '.-$i.' month');
-						$period_values[$i]['end'] = strtotime(date('Y-m', time()).' '.(-$i+1).' month - 1 second');
+						$period_values[$i]['start'] = strtotime(date('Y-m').' '.-$i.' month');
+						$period_values[$i]['end'] = strtotime(date('Y-m').' '.(-$i+1).' month - 1 second');
 					}
 					break;
 
 				case 'Quarterly':
 					$quarters = ['01 – 03', '04 – 06', '07 – 09', '10 – 12'];
-					$current_year = date('Y', time());
-					$current_month = date('m', time());
+					$current_year = date('Y');
+					$current_month = date('m');
 
 					$i = 0;
-					for ($year = date('Y', self::SLA_CREATION_TIME); $year <= date('Y', time()); $year++) {
+					for ($year = date('Y', self::SLA_CREATION_TIME); $year <= date('Y'); $year++) {
 						foreach ($quarters as $quarter) {
 							// Get the last and the first month of the quarter under attention.
 							$period_end = ltrim(stristr($quarter, '– '), '– ');
@@ -322,7 +322,7 @@ class testSlaReport extends CWebTest {
 
 				case 'Annually':
 					// Get the number of Years to be displayed as difference between this year and SLA creation year.
-					$years = (date('Y', time()) - date('Y', self::SLA_CREATION_TIME));
+					$years = (date('Y') - date('Y', self::SLA_CREATION_TIME));
 
 					for ($i = 0; $i <= $years; $i++) {
 						$year = strtotime('this year '.-$i.' years');
@@ -346,26 +346,22 @@ class testSlaReport extends CWebTest {
 	public function checkLayoutWithService($data, $widget = false) {
 		$creation_day = date('Y-m-d', self::$actual_creation_time);
 
-		if ($widget) {
-			$table = CDashboardElement::find()->one()->getWidget($data['fields']['Name'])->query('class:list-table')->asTable()->one();
-		}
-		else {
-			$table = $this->query('class:list-table')->asTable()->one();
-		}
+		$table = ($widget)
+			? CDashboardElement::find()->one()->getWidget($data['fields']['Name'])->query('class:list-table')->asTable()->one()
+			: $this->query('class:list-table')->asTable()->one();
 
-		// If data should be displayed get the timestamp when screen was loaded and the reference reporting periods.
-		if (!CTestArrayHelper::get($data, 'no_data')) {
-			$load_time = time();
-			$reference_periods = self::$reporting_periods[$data['reporting_period']];
-		}
-		else {
-			// Check empty result if non-related SLA + Service or disabled SLA (in widget) is selected and proceed with next test.
+		// Check empty result if non-related SLA + Service or disabled SLA (in widget) is selected and proceed with next test.
+		if (CTestArrayHelper::get($data, 'no_data')) {
 			$string = (array_key_exists('expected', $data)) ? $data['expected'] : 'No data found.';
 			$this->assertEquals([$string], $table->getRows()->asText());
 			$this->assertFalse($table->query('xpath://div[@class="table-stats"]')->one(false)->isValid());
 
 			return;
 		}
+
+		// Get the timestamp when screen was loaded and the reference reporting periods.
+		$load_time = time();
+		$reference_periods = self::$reporting_periods[$data['reporting_period']];
 
 		// Check table headers text and check that none of them are clickable.
 		$this->assertEquals([self::$period_headers[$data['reporting_period']], 'SLO', 'SLI', 'Uptime', 'Downtime',
@@ -387,7 +383,7 @@ class testSlaReport extends CWebTest {
 			 * If the date has changed since data source was executed, then downtimes will be divided into 2 days.
 			 * Such case is covered in the else statement.
 			 */
-			if (date('Y-m-d', time()) === $creation_day) {
+			if (date('Y-m-d') === $creation_day) {
 				foreach ($data['downtimes'] as $downtime_name) {
 					/**
 					 * A second or two can pass from Downtime duration calculation till report is loaded.
@@ -409,7 +405,7 @@ class testSlaReport extends CWebTest {
 				$this->checkDowntimePresent($row, $downtime_values);
 			}
 			else {
-				foreach ([date('Y-m-d', time()), $creation_day] as $day) {
+				foreach ([date('Y-m-d'), $creation_day] as $day) {
 					if ($day === $creation_day) {
 						foreach ($data['downtimes'] as $downtime_name) {
 							/**
@@ -585,6 +581,8 @@ class testSlaReport extends CWebTest {
 			foreach ($downtime_values as $downtime_array) {
 				if (in_array($downtime, $downtime_array)) {
 					$match_found = true;
+
+					break;
 				}
 			}
 

@@ -732,7 +732,6 @@ class testPageServicesSla extends CWebTest {
 		else {
 			// Using column Name check that only the expected SLAs are returned in the list.
 			$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));
-
 		}
 
 		// Reset the filter and check that all SLAs are displayed.

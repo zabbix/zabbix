@@ -82,21 +82,14 @@ class testFormServicesSla extends CWebTest {
 			$this->assertEquals('form-label-asterisk', $form->getLabel($sla_label)->getAttribute('class'));
 		}
 
-		// Check radio buttons and their values.
+		// Check radio buttons and their labels.
 		$radio_buttons = [
-			[
-				'name' => 'Reporting period',
-				'values' => ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Annually']
-			],
-			[
-				'name' => 'Schedule',
-				'values' => ['24x7', 'Custom']
-			]
+			'Reporting period' => ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Annually'],
+			'Schedule' => ['24x7', 'Custom']
 		];
 
-		foreach ($radio_buttons as $radio_params) {
-			$radio_element = $form->getField($radio_params['name']);
-			$this->assertEquals($radio_params['values'], $radio_element->getLabels()->asText());
+		foreach ($radio_buttons as $name => $labels) {
+			$this->assertEquals($labels, $form->getField($name)->getLabels()->asText());
 		}
 
 		// Check that schedule table is not visible if the 24x7 schedule is selected.
@@ -117,7 +110,6 @@ class testFormServicesSla extends CWebTest {
 			'Friday' => true,
 			'Saturday' => false
 		];
-		$this->assertEquals(array_keys($days), $schedule_table->query("xpath:.//label")->all()->asText());
 		$form->checkValue($days);
 
 		// Check the default status of the SLA.
@@ -248,7 +240,7 @@ class testFormServicesSla extends CWebTest {
 
 		// Check that all three fields are marked as mandatory.
 		foreach ($downtime_labels as $downtime_label) {
-			$this->assertEquals('form-label-asterisk', $downtimes_form->getLabel($downtime_label)->getAttribute('class'));
+			$downtimes_form->isRequired($downtime_label);
 		}
 
 		$duration_field = $downtimes_form->getField('Duration');
@@ -294,8 +286,6 @@ class testFormServicesSla extends CWebTest {
 		$downtimes_form->getField('Name')->fill('!@#$%^&*()_+123Zabbix');
 		$downtimes_form->submit();
 		$downtimes_dialog->waitUntilNotVisible();
-
-		$downtimes_table->invalidate();
 
 		$table_data = [
 			[
@@ -904,29 +894,19 @@ class testFormServicesSla extends CWebTest {
 
 		// Check that the records associated with the deleted SLA are not present in all SLA related tables.
 		foreach (['sla', 'sla_excluded_downtime', 'sla_schedule', 'sla_service_tag'] as $table) {
-			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM '.$table.' WHERE slaid='.$id_to_delete));
+			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM '.$table.' WHERE slaid='.zbx_dbstr($id_to_delete)));
 		}
 	}
 
-	public function getCancelData() {
-		return [
-			[
-				[
-					'action' => 'create'
-				]
-			],
-			[
-				[
-					'action' => 'update'
-				]
-			]
-		];
+	public function testFormServicesSla_CancelCreate() {
+		$this->checkActionCancellation();
 	}
 
-	/**
-	 * @dataProvider getCancelData
-	 */
-	public function testFormServicesSla_Cancel($data) {
+	public function testFormServicesSla_CancelUpdate() {
+		$this->checkActionCancellation('update');
+	}
+
+	public function checkActionCancellation($action = 'create') {
 		$new_values = [
 			'Name' => 'New name to Cancel',
 			'SLO' => '77.777',
@@ -939,7 +919,7 @@ class testFormServicesSla extends CWebTest {
 			'Enabled' => false
 		];
 		$old_hash = CDBHelper::getHash(self::$sla_sql);
-		$locator = ($data['action'] === 'create') ? 'button:Create SLA' : 'link:'.self::$update_sla;
+		$locator = ($action === 'create') ? 'button:Create SLA' : 'link:'.self::$update_sla;
 
 		$this->page->login()->open('zabbix.php?action=sla.list');
 		$this->query($locator)->one()->click();
@@ -1028,10 +1008,7 @@ class testFormServicesSla extends CWebTest {
 			$downtimes_table = $this->query('id:excluded-downtimes')->asMultifieldTable()->waitUntilVisible()->one();
 
 			// Remove all excluded downtimes if required or proceed with adding or updating downtimes.
-			if (CTestArrayHelper::get($data, 'downtime_action') === 'remove') {
-				$downtimes_table->clear();
-			}
-			else {
+			if (CTestArrayHelper::get($data, 'downtime_action') !== 'remove') {
 				foreach ($data['excluded_downtimes'] as $downtime) {
 					$button = (CTestArrayHelper::get($data, 'downtime_action') === 'edit') ? 'Edit' : 'Add';
 					$downtimes_table->query('button', $button)->waitUntilCLickable()->one()->click();
@@ -1049,6 +1026,9 @@ class testFormServicesSla extends CWebTest {
 						$this->assertTrue($downtimes_table->findRow('Name', $name)->isValid());
 					}
 				}
+			}
+			else {
+				$downtimes_table->clear();
 			}
 
 			// Excluded downtimes ar validated in their configuration dialog, so the error message should be checked here.
@@ -1106,10 +1086,7 @@ class testFormServicesSla extends CWebTest {
 				$downtimes_table = $this->query('id:excluded-downtimes')->asMultifieldTable()->waitUntilVisible()->one();
 
 				// Check that downtimes were removed or check downtime configuration.
-				if (CTestArrayHelper::get($data, 'downtime_action') === 'remove') {
-					$this->assertEquals([], $downtimes_table->getRows()->asText());
-				}
-				else {
+				if (CTestArrayHelper::get($data, 'downtime_action') !== 'remove') {
 					foreach ($data['excluded_downtimes'] as $downtime) {
 						$expected = [
 							'Start time' => $downtime['Start time'],
@@ -1131,6 +1108,9 @@ class testFormServicesSla extends CWebTest {
 						$downtimes_form->submit();
 					}
 				}
+				else {
+					$this->assertEquals([], $downtimes_table->getRows()->asText());
+				}
 			}
 		}
 	}
@@ -1148,14 +1128,9 @@ class testFormServicesSla extends CWebTest {
 			$field = $form->getField($input['field']);
 
 			// Check the attribute value or confirm that it doesn't exist.
-			foreach (['maxlength', 'placeholder', 'value', 'disabled'] as $attribute) {
-				if (array_key_exists($attribute, $input)) {
-					$this->assertEquals($input[$attribute], $field->getAttribute($attribute));
-				}
-				else {
-					$this->assertFalse($field->isAttributePresent($attribute));
-				}
-			}
+			$attributes = ['maxlength', 'placeholder', 'value', 'disabled'];
+			$this->assertTrue($field->isAttributePresent(array_intersect_key($input, $attributes)));
+			$this->assertFalse($field->isAttributePresent(array_diff_key($input, $attributes)));
 		}
 	}
 

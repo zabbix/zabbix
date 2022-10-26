@@ -713,7 +713,8 @@ class testPageServicesServices extends CWebTest {
 
 		// Check parent-child linking in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
-				$parentid.' AND servicedownid ='.zbx_dbstr($childid)));
+				zbx_dbstr($parentid).' AND servicedownid ='.zbx_dbstr($childid))
+		);
 	}
 
 	public function testPageServicesServices_CancelDeleteFromRow() {
