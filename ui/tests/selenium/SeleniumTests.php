@@ -23,7 +23,8 @@ require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
-require_once dirname(__FILE__).'/testPageProblems.php';
+require_once dirname(__FILE__).'/problems/testFormUpdateProblem.php';
+require_once dirname(__FILE__).'/problems/testPageProblems.php';
 require_once dirname(__FILE__).'/testPageActions.php';
 require_once dirname(__FILE__).'/testPageAdministrationDMProxies.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
@@ -233,6 +234,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageDashboardWidgets');
 		$suite->addTestSuite('testPageEventCorrelation');
 		$suite->addTestSuite('testPageGraphPrototypes');
+		$suite->addTestSuite('testFormUpdateProblem');
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageHostGraph');

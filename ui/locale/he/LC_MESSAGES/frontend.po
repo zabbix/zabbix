@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-10-03 20:13+0000\n"
+"PO-Revision-Date: 2022-10-12 08:31+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -13285,7 +13285,7 @@ msgstr "רק הקפצות שמוקצות למארחים מופעלים שתלו�
 
 #: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
 msgid "Open log"
-msgstr ""
+msgstr "פתיחת היומן"
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -17685,6 +17685,16 @@ msgstr "החודש הזה עד כה"
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "הגדרה זו חלה רק על נתונים מספריים. נתונים בלתי מספריים תמיד יימשכו מההיסטוריה."
+
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109

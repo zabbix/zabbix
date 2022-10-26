@@ -22,6 +22,8 @@
 
 #include "dbcache.h"
 #include "zbxvariant.h"
+#include "zbxeval.h"
+#include "zbxdb.h"
 
 #define MACRO_TYPE_MESSAGE_NORMAL	0x00000001
 #define MACRO_TYPE_MESSAGE_RECOVERY	0x00000002
@@ -142,5 +144,4 @@ int	xml_xpath_check(const char *xpath, char *error, size_t errlen);
 
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error);
-
 #endif
