@@ -244,16 +244,25 @@ $form_grid->addItem(
 );
 
 $modules = [];
+
 foreach ($data['labels']['modules'] as $moduleid => $module_name) {
-	$modules[] = new CDiv(
+	$module = new CDiv(
 		(new CCheckBox('modules['.$moduleid.']', 1))
 			->setChecked(
-				array_key_exists($moduleid, $data['rules']['modules']) ? $data['rules']['modules'][$moduleid] : true
+				array_key_exists($moduleid, $data['rules']['modules'])
+					? $data['rules']['modules'][$moduleid]
+					: !array_key_exists($moduleid, $data['disabled_moduleids'])
 			)
 			->setReadonly($data['readonly'])
 			->setLabel($module_name)
 			->setUncheckedValue(0)
 	);
+
+	if (array_key_exists($moduleid, $data['disabled_moduleids'])) {
+		$module->addItem((new CSpan([' (', _('Disabled'), ')']))->addClass(ZBX_STYLE_RED));
+	}
+
+	$modules[] = $module;
 }
 
 if ($modules) {

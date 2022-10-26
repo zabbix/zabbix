@@ -19,8 +19,6 @@
 **/
 
 
-use Zabbix\Core\CModule;
-
 /**
  * Class containing operations with user edit form.
  */
@@ -115,6 +113,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'new_media' => [],
 			'roleid' => '',
 			'role' => [],
+			'modules_rules' => [],
 			'user_type' => '',
 			'sid' => $this->getUserSID(),
 			'form_refresh' => 0,
@@ -177,7 +176,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$roles = API::Role()->get([
 				'output' => ['name', 'type'],
 				'selectRules' => ['services.read.mode', 'services.read.list', 'services.read.tag',
-					'services.write.mode', 'services.write.list', 'services.write.tag'
+					'services.write.mode', 'services.write.list', 'services.write.tag', 'modules'
 				],
 				'roleids' => $data['roleid']
 			]);
@@ -219,6 +218,10 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 					'serviceids' => array_column($role['rules']['services.write.list'], 'serviceid')
 				]);
 				$data['service_write_tag'] = $role['rules']['services.write.tag'];
+
+				foreach ($role['rules']['modules'] as $rule) {
+					$data['modules_rules'][$rule['moduleid']] = $rule['status'];
+				}
 			}
 		}
 
@@ -245,12 +248,31 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		$data['modules'] = [];
 
-		/** @var CModule $module */
-		foreach (APP::ModuleManager()->getModules() as $module) {
-			$data['modules'][$module->getModuleId()] = $module->getName();
+		$db_modules = API::Module()->get([
+			'output' => ['moduleid', 'relative_path', 'status']
+		]);
+
+		if ($db_modules) {
+			$module_manager = new CModuleManager(APP::getRootDir());
+
+			foreach ($db_modules as $db_module) {
+				$manifest = $module_manager->addModule($db_module['relative_path']);
+
+				if ($manifest !== null) {
+					$data['modules'][$db_module['moduleid']] = $manifest['name'];
+				}
+			}
 		}
 
-		asort($data['modules']);
+		natcasesort($data['modules']);
+
+		$disabled_modules = array_filter($db_modules,
+			static function(array $db_module): bool {
+				return $db_module['status'] == MODULE_STATUS_DISABLED;
+			}
+		);
+
+		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
 
 		$data['mediatypes'] = API::MediaType()->get([
 			'output' => ['status'],

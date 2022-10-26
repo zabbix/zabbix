@@ -700,7 +700,7 @@ class CRole extends CApiService {
 			return;
 		}
 
-		$unavailable_moduleids = array_diff(array_keys($moduleids), self::getEnabledModuleIds());
+		$unavailable_moduleids = array_diff(array_keys($moduleids), self::getModuleIds());
 
 		if ($unavailable_moduleids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -1036,7 +1036,7 @@ class CRole extends CApiService {
 
 		$index = 0;
 
-		foreach (self::getEnabledModuleIds() as $moduleid) {
+		foreach (self::getModuleIds() as $moduleid) {
 			if (array_key_exists($moduleid, $new_modules_rules)) {
 				$module_status = $new_modules_rules[$moduleid]['status'];
 			}
@@ -1417,7 +1417,7 @@ class CRole extends CApiService {
 		if (in_array('modules', $output, true)) {
 			$modules = [];
 
-			foreach (self::getEnabledModuleIds() as $moduleid) {
+			foreach (self::getModuleIds() as $moduleid) {
 				$modules[$moduleid] = [
 					'moduleid' => $moduleid,
 					'status' => $modules_default_access
@@ -1520,12 +1520,9 @@ class CRole extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function getEnabledModuleIds(): array {
+	private static function getModuleIds(): array {
 		$modules = API::getApiService('module')->get([
 			'output' => [],
-			'filter' => [
-				'status' => MODULE_STATUS_ENABLED
-			],
 			'preservekeys' => true
 		], false);
 

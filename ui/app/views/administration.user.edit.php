@@ -618,9 +618,10 @@ if ($data['action'] === 'user.edit') {
 
 			foreach ($data['modules'] as $moduleid => $module_name) {
 				$elements[] = (new CSpan($module_name))->addClass(
-					CRoleHelper::checkAccess('modules.module.'.$moduleid, $data['roleid'])
-						? ZBX_STYLE_STATUS_GREEN
-						: ZBX_STYLE_STATUS_GREY
+					array_key_exists($moduleid, $data['disabled_moduleids'])
+							|| $data['modules_rules'][$moduleid] == MODULE_STATUS_DISABLED
+						? ZBX_STYLE_STATUS_GREY
+						: ZBX_STYLE_STATUS_GREEN
 				);
 			}
 

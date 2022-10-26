@@ -166,6 +166,9 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 
 		$role['rules'] = $this->getRulesInput((int) $role['type']);
 
+//		var_dump($role['rules']);
+//		exit;
+
 		$result = API::Role()->update($role);
 
 		if ($result) {
