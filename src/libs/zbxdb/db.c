@@ -2594,6 +2594,9 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 			{
 				zbx_json_addstring(json, "compression_availability", "false", ZBX_JSON_TYPE_INT);
 			}
+
+			zbx_json_addint64(json, "compressed_chunks_history", info->history_compressed_chunks);
+			zbx_json_addint64(json, "compressed_chunks_trends", info->trends_compressed_chunks);
 		}
 #endif
 		zbx_json_close(json);
@@ -2868,6 +2871,59 @@ out:
 }
 
 #ifdef HAVE_POSTGRESQL
+static int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
+{
+	DB_RESULT	result;
+	int		ret;
+
+	if (1 == ZBX_DB_TSDB_V1) {
+		result = zbx_db_select("select null from timescaledb_information.compressed_chunk_stats where hypertable_name in (%s) and "
+			"compression_status='Compressed'", table_names);
+	}
+	else
+	{
+		result = zbx_db_select("select null from timescaledb_information.chunks where hypertable_name in (%s) and "
+			"is_compressed='t'", table_names);
+	}
+
+	if ((DB_RESULT)ZBX_DB_DOWN == result)
+	{
+		ret = FAIL;
+		goto out;
+	}
+
+	if (NULL != zbx_db_fetch(result))
+		ret = SUCCEED;
+	else
+		ret = FAIL;
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info)
+{
+#define ZBX_TSDB1_HISTORY_TABLES "'history_uint'::regclass,'history_log'::regclass,'history_str'::regclass,'history_text'::regclass,'history'::regclass"
+#define ZBX_TSDB2_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history'"
+#define ZBX_TSDB1_TRENDS_TABLES "'trends'::regclass,'trends_uint'::regclass"
+#define ZBX_TSDB2_TRENDS_TABLES "'trends','trends_uint'"
+	const char	*history_tables, *trends_tables;
+
+	history_tables = (1 == ZBX_DB_TSDB_V1 ? ZBX_TSDB1_HISTORY_TABLES : ZBX_TSDB2_HISTORY_TABLES);
+	trends_tables = (1 == ZBX_DB_TSDB_V1 ? ZBX_TSDB1_TRENDS_TABLES : ZBX_TSDB2_TRENDS_TABLES);
+
+	version_info->history_compressed_chunks = (SUCCEED == zbx_tsdb_table_has_compressed_chunks(history_tables)) ?
+			1 : 0;
+
+	version_info->trends_compressed_chunks = (SUCCEED == zbx_tsdb_table_has_compressed_chunks(trends_tables)) ?
+			1 : 0;
+
+#undef ZBX_TSDB1_HISTORY_TABLES
+#undef ZBX_TSDB2_HISTORY_TABLES
+#undef ZBX_TSDB1_TRENDS_TABLES
+#undef ZBX_TSDB2_TRENDS_TABLES
+}
 /***************************************************************************************************************
  *                                                                                                             *
  * Purpose: retrieves TimescaleDB extension info, including license string and numeric version value           *
@@ -2875,7 +2931,7 @@ out:
  **************************************************************************************************************/
 void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 {
-	int	tsdb_ver;
+	int		tsdb_ver;
 
 	if (0 != zbx_strcmp_null(version_info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		return;
@@ -2900,6 +2956,8 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 
 	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT <= tsdb_ver)
 		version_info->ext_lic = zbx_tsdb_get_license();
+
+	zbx_tsdb_extract_compressed_chunk_flags(version_info);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: [%d], license: [%s]", tsdb_ver,
 		ZBX_NULL2EMPTY_STR(version_info->ext_lic));
@@ -3023,4 +3081,5 @@ int	zbx_tsdb_get_compression_availability(void)
 {
 	return ZBX_TIMESCALE_COMPRESSION_AVAILABLE;
 }
+
 #endif

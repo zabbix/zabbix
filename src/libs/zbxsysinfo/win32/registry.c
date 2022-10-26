@@ -20,6 +20,7 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
+#include "zbxstr.h"
 #include "base64.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"

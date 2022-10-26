@@ -81,26 +81,26 @@ class CConfigurationExport {
 			'item' => ['hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
 				'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'inventory_link', 'flags',
-				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
-				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
-				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps', 'uuid'
+				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url_name', 'url', 'query_fields',
+				'parameters', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers',
+				'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
+				'verify_peer', 'verify_host', 'allow_traps', 'uuid'
 			],
 			'drule' => ['itemid', 'hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'formula', 'valuemapid', 'params', 'ipmi_sensor', 'authtype',
 				'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'inventory_link',
-				'flags', 'filter', 'lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields',
-				'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
-				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps', 'parameters', 'uuid'
+				'flags', 'filter', 'lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url_name', 'url',
+				'query_fields', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers',
+				'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
+				'verify_peer', 'verify_host', 'allow_traps', 'parameters', 'uuid'
 			],
 			'item_prototype' => ['hostid', 'type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
 				'password', 'publickey', 'privatekey', 'interfaceid', 'description', 'inventory_link', 'flags',
-				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'parameters', 'posts',
-				'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode',
-				'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-				'verify_host', 'allow_traps', 'discover', 'uuid'
+				'logtimefmt', 'jmx_endpoint', 'master_itemid', 'timeout', 'url_name', 'url', 'query_fields',
+				'parameters', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers',
+				'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
+				'verify_peer', 'verify_host', 'allow_traps', 'discover', 'uuid'
 			]
 		];
 	}
@@ -840,7 +840,7 @@ class CConfigurationExport {
 
 		// gather trigger prototypes
 		$triggers = API::TriggerPrototype()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
+			'output' => ['expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments', 'type', 'flags',
 				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
 				'discover', 'event_name', 'uuid'
 			],
@@ -1046,7 +1046,7 @@ class CConfigurationExport {
 		$hostIds = array_merge($hostIds, $templateIds);
 
 		$triggers = API::Trigger()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
+			'output' => ['expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments', 'type', 'flags',
 				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
 				'event_name', 'uuid'
 			],

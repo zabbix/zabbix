@@ -873,6 +873,14 @@ int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsu
 	return SUCCEED;
 }
 
+void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info)
+{
+	zbx_free(version_info->friendly_current_version);
+	zbx_free(version_info->extension);
+	zbx_free(version_info->ext_friendly_current_version);
+	zbx_free(version_info->ext_lic);
+}
+
 #ifdef HAVE_POSTGRESQL
 /******************************************************************************
  *                                                                            *

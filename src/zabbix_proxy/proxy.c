@@ -44,22 +44,21 @@
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
 #include "taskmanager/taskmanager.h"
-#include "../zabbix_server/selfmon/selfmon.h"
 #include "../zabbix_server/vmware/vmware.h"
 #include "setproctitle.h"
-#include "zbxcrypto.h"
 #include "zbxcomms.h"
 #include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "../zabbix_server/preprocessor/preproc_worker.h"
-#include "zbxavailability.h"
 #include "../libs/zbxvault/vault.h"
 #include "zbxdiag.h"
 #include "diag/diag_proxy.h"
 #include "zbxrtc.h"
+#include "rtc/rtc_proxy.h"
 #include "../zabbix_server/availability/avail_manager.h"
 #include "zbxstats.h"
 #include "stats/zabbix_stats.h"
 #include "zbxip.h"
+#include "zbxthreads.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -152,10 +151,6 @@ static unsigned char	get_program_type(void)
 {
 	return program_type;
 }
-
-ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
-ZBX_THREAD_LOCAL int		process_num	= 0;
-ZBX_THREAD_LOCAL int		server_num	= 0;
 
 int	CONFIG_PROXYMODE		= ZBX_PROXYMODE_ACTIVE;
 int	CONFIG_DATASENDER_FORKS		= 1;
@@ -1110,7 +1105,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != (ret = zbx_rtc_process(t.opts, &error)))
+		if (SUCCEED != (ret = rtc_process(t.opts, &error)))
 		{
 			zbx_error("Cannot perform runtime control command: %s", error);
 			zbx_free(error);
@@ -1409,21 +1404,22 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	for (i = 0; i < threads_num; i++)
 	{
-		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.process_type, &thread_args.process_num))
+		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.info.process_type,
+				&thread_args.info.process_num))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}
 
-		thread_args.server_num = i + 1;
+		thread_args.info.server_num = i + 1;
 		thread_args.args = NULL;
 
-		switch (thread_args.process_type)
+		switch (thread_args.info.process_type)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				thread_args.args = &proxyconfig_args;
 				zbx_thread_start(proxyconfig_thread, &thread_args, &threads[i]);
-				if (FAIL == zbx_rtc_wait_config_sync(&rtc))
+				if (FAIL == zbx_rtc_wait_config_sync(&rtc, rtc_process_request_ex))
 					goto out;
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
@@ -1470,7 +1466,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(snmptrapper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SELFMON:
-				zbx_thread_start(selfmon_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_selfmon_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_VMWARE:
 				zbx_thread_start(vmware_thread, &thread_args, &threads[i]);
@@ -1516,7 +1512,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (NULL != message)
 		{
-			zbx_rtc_dispatch(&rtc, client, message);
+			zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_ex);
 			zbx_ipc_message_free(message);
 		}
 

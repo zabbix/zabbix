@@ -717,6 +717,7 @@ void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger)
 	zbx_free(trigger->recovery_expression);
 	zbx_free(trigger->comments);
 	zbx_free(trigger->url);
+	zbx_free(trigger->url_name);
 	zbx_free(trigger->opdata);
 	zbx_free(trigger->event_name);
 
