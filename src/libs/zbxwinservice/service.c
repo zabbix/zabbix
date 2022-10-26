@@ -23,7 +23,6 @@
 #include "cfg.h"
 #include "log.h"
 #include "zbxconf.h"
-#include "zbxwin32.h"
 
 #define EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
 
@@ -140,7 +139,7 @@ static VOID WINAPI	ServiceEntry(DWORD argc, wchar_t **argv)
 	MAIN_ZABBIX_ENTRY(0);
 }
 
-void	service_start(int flags)
+void	zbx_service_start(int flags)
 {
 	int				ret;
 	static SERVICE_TABLE_ENTRY	serviceTable[2];
@@ -424,7 +423,7 @@ int	ZabbixStopService(void)
 	return ret;
 }
 
-void	set_parent_signal_handler(zbx_on_exit_t zbx_on_exit_cb_arg)
+void	zbx_set_parent_signal_handler(zbx_on_exit_t zbx_on_exit_cb_arg)
 {
 	zbx_on_exit_cb = zbx_on_exit_cb_arg;
 	signal(SIGINT, parent_signal_handler);
