@@ -1,6 +1,7 @@
 Changes for 6.2.4rc1
 
 New features:
+.......PS. [ZBXNEXT-7953] added VMware tags support for vSphere versions older than 7U2 (asestakovs)
 ..F.....S. [ZBXNEXT-7122] added detection of compressed chunks in history or trend tables, and warnings that suggest enabling housekeeping overrides accordingly (dgoloscapov, jfreibergs)
 .........T [ZBXNEXT-8018] added token authentication in Template GitLab by HTTP (atocko)
 .......PS. [ZBXNEXT-6401] added new vmware keys vmware.datastore.perfcounter and vmware.hv.diskinfo.get (MVekslers)
