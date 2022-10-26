@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-13T13:25:35Z'
+  date: '2022-10-26T10:46:26Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -18,11 +18,11 @@ zabbix_export:
       template: 'Azure by HTTP'
       name: 'Azure by HTTP'
       description: |
-        The template to monitor Microsoft Azure by HTTP.
+        This template is designed to monitor Microsoft Azure by HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
-          1. Create an Azure service principal via Azure CLI for your subscription.
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
@@ -67,7 +67,7 @@ zabbix_export:
               name: 'Azure: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Zabbix has received errors in requests to API.'
+              description: 'Zabbix has received errors in response to API requests.'
               tags:
                 -
                   tag: scope
@@ -206,7 +206,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The JSON with result of API requests.'
+          description: 'The result of API requests is in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             -
@@ -266,7 +266,7 @@ zabbix_export:
                 value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'A list of the MySQL servers in the subscription.'
+          description: 'The list of the MySQL servers is provided by the subscription.'
           host_prototypes:
             -
               uuid: 55b87078c14c4561b53e64af5ed77d61
@@ -399,7 +399,7 @@ zabbix_export:
                 value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'A list of the PostgreSQL servers in the subscription.'
+          description: 'The list of the PostgreSQL servers is provided by the subscription.'
           host_prototypes:
             -
               uuid: 54f0e0ec288f4feb9a2dc58a8726bd1d
@@ -532,7 +532,7 @@ zabbix_export:
                 value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'A list of the virtual machines in the subscription.'
+          description: 'The list of the virtual machines is provided by the subscription.'
           host_prototypes:
             -
               uuid: d08c0ee33c924b28bf1fed571da6c7f4
@@ -609,23 +609,23 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
-          description: 'Response timeout for API.'
+          description: 'A response timeout for API.'
         -
           macro: '{$AZURE.MYSQL.DB.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro used in MySQL servers discovery rules.'
+          description: 'This macro is used in MySQL servers discovery rule.'
         -
           macro: '{$AZURE.MYSQL.DB.LOCATION.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro used in MySQL servers discovery rules.'
+          description: 'This macro is used in MySQL servers discovery rule.'
         -
           macro: '{$AZURE.MYSQL.DB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro used in MySQL servers discovery rules.'
+          description: 'This macro is used in MySQL servers discovery rule.'
         -
           macro: '{$AZURE.MYSQL.DB.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro used in MySQL servers discovery rules.'
+          description: 'This macro is used in MySQL servers discovery rule.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -633,27 +633,27 @@ zabbix_export:
         -
           macro: '{$AZURE.PGSQL.DB.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro used in PostgreSQL servers discovery rules.'
+          description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
           macro: '{$AZURE.PGSQL.DB.LOCATION.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro used in PostgreSQL servers discovery rules.'
+          description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
           macro: '{$AZURE.PGSQL.DB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro used in PostgreSQL servers discovery rules.'
+          description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
           macro: '{$AZURE.PGSQL.DB.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro used in PostgreSQL servers discovery rules.'
+          description: 'This macro is used in PostgreSQL servers discovery rule.'
         -
           macro: '{$AZURE.RESOURCE_GROUP.MATCHES}'
           value: '.*'
-          description: 'This macro used in discovery rules.'
+          description: 'This macro is used in discovery rules.'
         -
           macro: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro used in discovery rules.'
+          description: 'This macro is used in discovery rules.'
         -
           macro: '{$AZURE.SUBSCRIPTION_ID}'
           description: 'Microsoft Azure subscription ID.'
@@ -663,29 +663,29 @@ zabbix_export:
         -
           macro: '{$AZURE.VM.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro used in virtual machines discovery rule.'
+          description: 'This macro is used in virtual machines discovery rule.'
         -
           macro: '{$AZURE.VM.LOCATION.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro used in virtual machines discovery rule.'
+          description: 'This macro is used in virtual machines discovery rule.'
         -
           macro: '{$AZURE.VM.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro used in virtual machines discovery rule.'
+          description: 'This macro is used in virtual machines discovery rule.'
         -
           macro: '{$AZURE.VM.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro used in virtual machines discovery rule.'
+          description: 'This macro is used in virtual machines discovery rule.'
     -
       uuid: ec92c7b0b1d14946b6ac61de89357199
       template: 'Azure MySQL flexible server by HTTP'
       name: 'Azure MySQL flexible server by HTTP'
       description: |
-        The template to monitor Microsoft Azure MySQL flexible servers by HTTP.
+        This template is designed to monitor Microsoft Azure MySQL flexible servers by HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
-          1. Create an Azure service principal via Azure CLI for your subscription.
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
@@ -707,7 +707,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Summary description of the availability status.'
+          description: 'The summary description of the availability status.'
           preprocessing:
             -
               type: JSONPATH
@@ -730,7 +730,7 @@ zabbix_export:
           key: azure.db.mysql.availability.state
           delay: '0'
           history: 7d
-          description: 'Availability status of the resource.'
+          description: 'The availability status of the resource.'
           valuemap:
             name: 'Azure resource health state'
           preprocessing:
@@ -819,7 +819,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Aborted connections count.'
+          description: 'The count of aborted connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -831,6 +831,18 @@ zabbix_export:
             -
               tag: component
               value: network
+          triggers:
+            -
+              uuid: 3346ea2331c14fa18658eb33e461ec7c
+              expression: 'min(/Azure MySQL flexible server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED_CONN.MAX.WARN}'
+              name: 'Azure MySQL: Server has aborted connections'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The number of failed attempts to connect to the MySQL server is more than {$AZURE.DB.ABORTED_CONN.MAX.WARN}.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 71b33f0a5d37498dbb57d185ac0f2741
           name: 'Azure MySQL: Connections active'
@@ -839,7 +851,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Active connections count.'
+          description: 'The count of active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -859,7 +871,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Total connections count.'
+          description: 'The count of total connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -879,7 +891,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'CPU credits consumed.'
+          description: 'Consumed CPU credits.'
           preprocessing:
             -
               type: JSONPATH
@@ -900,7 +912,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'CPU credits remaining.'
+          description: 'Remaining CPU credits.'
           preprocessing:
             -
               type: JSONPATH
@@ -922,7 +934,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Host CPU percent.'
+          description: 'The CPU percent of a host.'
           preprocessing:
             -
               type: JSONPATH
@@ -941,7 +953,7 @@ zabbix_export:
               name: 'Azure MySQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'CPU utilization is too high. the system might be slow to respond.'
+              description: 'CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope
@@ -978,7 +990,7 @@ zabbix_export:
               name: 'Azure MySQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Zabbix has received errors in requests to API.'
+              description: 'Zabbix has received errors in response to API requests.'
               tags:
                 -
                   tag: scope
@@ -1137,7 +1149,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The JSON with result of API requests.'
+          description: 'The result of API requests is in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             -
@@ -1168,7 +1180,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'IO Percent.'
+          description: 'The IO percent.'
           preprocessing:
             -
               type: JSONPATH
@@ -1189,7 +1201,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Host memory percent.'
+          description: 'The memory percent of a host.'
           preprocessing:
             -
               type: JSONPATH
@@ -1210,7 +1222,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Host network egress in bytes.'
+          description: 'Network egress of a host in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -1235,7 +1247,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Host network ingress in bytes.'
+          description: 'Network ingress of a host in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -1259,7 +1271,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Queries count.'
+          description: 'The count of queries.'
           preprocessing:
             -
               type: JSONPATH
@@ -1302,7 +1314,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Backup storage used in bytes.'
+          description: 'The backup storage used in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -1323,7 +1335,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Storage limit in bytes.'
+          description: 'The storage limit in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -1363,7 +1375,7 @@ zabbix_export:
               name: 'Azure MySQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Critical storage space utilization.'
+              description: 'Critical utilization of the storage space.'
               tags:
                 -
                   tag: scope
@@ -1374,7 +1386,7 @@ zabbix_export:
               name: 'Azure MySQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'High storage space utilization.'
+              description: 'High utilization of the storage space.'
               tags:
                 -
                   tag: scope
@@ -1414,7 +1426,11 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'Response timeout for API.'
+          description: 'A response timeout for API.'
+        -
+          macro: '{$AZURE.DB.ABORTED_CONN.MAX.WARN}'
+          value: '25'
+          description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
@@ -1462,11 +1478,11 @@ zabbix_export:
       template: 'Azure MySQL single server by HTTP'
       name: 'Azure MySQL single server by HTTP'
       description: |
-        The template to monitor Microsoft Azure MySQL single servers by HTTP.
+        This template is designed to monitor Microsoft Azure MySQL single servers by HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
-          1. Create an Azure service principal via Azure CLI for your subscription.
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
@@ -1488,7 +1504,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Summary description of the availability status.'
+          description: 'The summary description of the availability status.'
           preprocessing:
             -
               type: JSONPATH
@@ -1511,7 +1527,7 @@ zabbix_export:
           key: azure.db.mysql.availability.state
           delay: '0'
           history: 7d
-          description: 'Availability status of the resource.'
+          description: 'The availability status of the resource.'
           valuemap:
             name: 'Azure resource health state'
           preprocessing:
@@ -1600,7 +1616,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Active connections count.'
+          description: 'The count of active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -1620,7 +1636,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Failed connections count.'
+          description: 'The count of failed connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -1633,6 +1649,18 @@ zabbix_export:
             -
               tag: component
               value: network
+          triggers:
+            -
+              uuid: 5b3a09ca04704e6a9972ee4865d358cd
+              expression: 'min(/Azure MySQL single server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED_CONN.MAX.WARN}'
+              name: 'Azure MySQL: Server has failed connections'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The number of failed attempts to connect to the MySQL server is more than {$AZURE.DB.FAILED_CONN.MAX.WARN}.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: d0b5864a56094166b76fbc58a5e05c7c
           name: 'Azure MySQL: Percentage CPU'
@@ -1642,7 +1670,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Host CPU percent.'
+          description: 'The CPU percent of a host.'
           preprocessing:
             -
               type: JSONPATH
@@ -1661,7 +1689,7 @@ zabbix_export:
               name: 'Azure MySQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'CPU utilization is too high. the system might be slow to respond.'
+              description: 'CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope
@@ -1698,7 +1726,7 @@ zabbix_export:
               name: 'Azure MySQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Zabbix has received errors in requests to API.'
+              description: 'Zabbix has received errors in response to API requests.'
               tags:
                 -
                   tag: scope
@@ -1856,7 +1884,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The JSON with result of API requests.'
+          description: 'The result of API requests is in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             -
@@ -1887,7 +1915,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'IO Percent.'
+          description: 'The IO percent.'
           preprocessing:
             -
               type: JSONPATH
@@ -1908,7 +1936,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Host memory percent.'
+          description: 'The memory percent of a host.'
           preprocessing:
             -
               type: JSONPATH
@@ -1941,7 +1969,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network out across active connections.'
+          description: 'Network outbound traffic across the active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -1967,7 +1995,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network in across active connections.'
+          description: 'Network inbound traffic across the active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -2015,7 +2043,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Backup storage used in bytes.'
+          description: 'The backup storage used in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -2036,7 +2064,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Storage limit in bytes.'
+          description: 'The storage limit in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -2076,7 +2104,7 @@ zabbix_export:
               name: 'Azure MySQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Critical storage space utilization.'
+              description: 'Critical utilization of the storage space.'
               tags:
                 -
                   tag: scope
@@ -2087,7 +2115,7 @@ zabbix_export:
               name: 'Azure MySQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'High storage space utilization.'
+              description: 'High utilization of the storage space.'
               tags:
                 -
                   tag: scope
@@ -2101,7 +2129,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Server log storage limit in bytes.'
+          description: 'The storage limit of server log in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -2122,7 +2150,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Server log storage utilization in %.'
+          description: 'The storage utilization by a server log in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -2143,7 +2171,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used server log storage space in bytes.'
+          description: 'The storage space used by a server log in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -2190,11 +2218,15 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'Response timeout for API.'
+          description: 'A response timeout for API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
           description: 'The critical threshold of the CPU utilization in %.'
+        -
+          macro: '{$AZURE.DB.FAILED_CONN.MAX.WARN}'
+          value: '25'
+          description: 'The number of failed attempts to connect to the MySQL server for trigger expression.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
@@ -2242,11 +2274,11 @@ zabbix_export:
       template: 'Azure PostgreSQL flexible server by HTTP'
       name: 'Azure PostgreSQL flexible server by HTTP'
       description: |
-        The template to monitor Microsoft Azure PostgreSQL flexible servers by HTTP.
+        This template is designed to monitor Microsoft Azure PostgreSQL flexible servers by HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
-          1. Create an Azure service principal via Azure CLI for your subscription.
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
@@ -2268,7 +2300,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Summary description of the availability status.'
+          description: 'The summary description of the availability status.'
           preprocessing:
             -
               type: JSONPATH
@@ -2291,7 +2323,7 @@ zabbix_export:
           key: azure.db.pgsql.availability.state
           delay: '0'
           history: 7d
-          description: 'Availability status of the resource.'
+          description: 'The availability status of the resource.'
           valuemap:
             name: 'Azure resource health state'
           preprocessing:
@@ -2380,7 +2412,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Active connections count.'
+          description: 'The count of active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -2400,7 +2432,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Failed connections count.'
+          description: 'The count of failed connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -2421,7 +2453,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Succeeded connections count.'
+          description: 'The count of succeeded connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -2441,7 +2473,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Total number of credits consumed by the database server.'
+          description: 'The total number of credits consumed by the database server.'
           preprocessing:
             -
               type: JSONPATH
@@ -2462,7 +2494,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Total number of credits available to burst.'
+          description: 'The total number of credits available to burst.'
           preprocessing:
             -
               type: JSONPATH
@@ -2484,7 +2516,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Host CPU percent.'
+          description: 'The CPU percent of a host.'
           preprocessing:
             -
               type: JSONPATH
@@ -2503,7 +2535,7 @@ zabbix_export:
               name: 'Azure PostgreSQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'CPU utilization is too high. the system might be slow to respond.'
+              description: 'CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope
@@ -2540,7 +2572,7 @@ zabbix_export:
               name: 'Azure PostgreSQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Zabbix has received errors in requests to API.'
+              description: 'Zabbix has received errors in response to API requests.'
               tags:
                 -
                   tag: scope
@@ -2712,7 +2744,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The JSON with result of API requests.'
+          description: 'The result of API requests is in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             -
@@ -2743,7 +2775,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes read per second from the data disk during monitoring period.'
+          description: 'Bytes read per second from the data disk during the monitoring period.'
           preprocessing:
             -
               type: JSONPATH
@@ -2765,7 +2797,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes written per second to the data disk during monitoring period.'
+          description: 'Bytes written per second to the data disk during the monitoring period.'
           preprocessing:
             -
               type: JSONPATH
@@ -2786,7 +2818,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of outstanding I/O operations to the data disk.'
+          description: 'The number of outstanding I/O operations to the data disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -2829,7 +2861,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!ops'
-          description: 'Number of data disk I/O read operations per second.'
+          description: 'The number of data disk I/O read operations per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -2851,7 +2883,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!ops'
-          description: 'Number of data disk I/O write operations per second.'
+          description: 'The number of data disk I/O write operations per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -2873,7 +2905,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Host memory percent.'
+          description: 'The memory percent of a host.'
           preprocessing:
             -
               type: JSONPATH
@@ -2906,7 +2938,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network out across active connections.'
+          description: 'Network outbound traffic across the active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -2931,7 +2963,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network in across active connections.'
+          description: 'Network inbound traffic across the active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -2956,7 +2988,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Backup storage used in bytes.'
+          description: 'The backup storage used in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3018,7 +3050,7 @@ zabbix_export:
               name: 'Azure PostgreSQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Critical storage space utilization.'
+              description: 'Critical utilization of the storage space.'
               tags:
                 -
                   tag: scope
@@ -3029,7 +3061,7 @@ zabbix_export:
               name: 'Azure PostgreSQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'High storage space utilization.'
+              description: 'High utilization of the storage space.'
               tags:
                 -
                   tag: scope
@@ -3043,7 +3075,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Transaction log storage used in bytes.'
+          description: 'The storage space used by a transaction log in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3110,7 +3142,7 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'Response timeout for API.'
+          description: 'A response timeout for API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
@@ -3162,11 +3194,11 @@ zabbix_export:
       template: 'Azure PostgreSQL single server by HTTP'
       name: 'Azure PostgreSQL single server by HTTP'
       description: |
-        The template to monitor Microsoft Azure PostgreSQL servers by HTTP.
+        This template is designed to monitor Microsoft Azure PostgreSQL servers by HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
-          1. Create an Azure service principal via Azure CLI for your subscription.
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
@@ -3188,7 +3220,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Summary description of the availability status.'
+          description: 'The summary description of the availability status.'
           preprocessing:
             -
               type: JSONPATH
@@ -3211,7 +3243,7 @@ zabbix_export:
           key: azure.db.pgsql.availability.state
           delay: '0'
           history: 7d
-          description: 'Availability status of the resource.'
+          description: 'The availability status of the resource.'
           valuemap:
             name: 'Azure resource health state'
           preprocessing:
@@ -3300,7 +3332,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Active connections count.'
+          description: 'The count of active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -3320,7 +3352,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Failed connections count.'
+          description: 'The count of failed connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -3342,7 +3374,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Host CPU percent.'
+          description: 'The CPU percent of a host.'
           preprocessing:
             -
               type: JSONPATH
@@ -3361,7 +3393,7 @@ zabbix_export:
               name: 'Azure PostgreSQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'CPU utilization is too high. the system might be slow to respond.'
+              description: 'CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope
@@ -3398,7 +3430,7 @@ zabbix_export:
               name: 'Azure PostgreSQL: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Zabbix has received errors in requests to API.'
+              description: 'Zabbix has received errors in response to API requests.'
               tags:
                 -
                   tag: scope
@@ -3557,7 +3589,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The JSON with result of API requests.'
+          description: 'The result of API requests is in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             -
@@ -3588,7 +3620,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'IO Percent.'
+          description: 'The IO Percent.'
           preprocessing:
             -
               type: JSONPATH
@@ -3609,7 +3641,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Host memory percent.'
+          description: 'The memory percent of a host.'
           preprocessing:
             -
               type: JSONPATH
@@ -3642,7 +3674,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network out across active connections.'
+          description: 'Network outbound traffic across the active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -3668,7 +3700,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: bps
-          description: 'Network in across active connections.'
+          description: 'Network inbound traffic across the active connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -3738,7 +3770,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Backup storage used in bytes.'
+          description: 'The backup storage used in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3759,7 +3791,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Storage limit in bytes.'
+          description: 'The storage limit in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3799,7 +3831,7 @@ zabbix_export:
               name: 'Azure PostgreSQL: Storage space is critically low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Critical storage space utilization.'
+              description: 'Critical utilization of the storage space.'
               tags:
                 -
                   tag: scope
@@ -3810,7 +3842,7 @@ zabbix_export:
               name: 'Azure PostgreSQL: Storage space is low'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'High storage space utilization.'
+              description: 'High utilization of the storage space.'
               tags:
                 -
                   tag: scope
@@ -3824,7 +3856,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Server log storage limit in bytes.'
+          description: 'The storage limit of a server log in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3845,7 +3877,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Server log storage utilization in %.'
+          description: 'The storage utilization by a server log in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -3866,7 +3898,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used server log storage space in bytes.'
+          description: 'The storage space used by a server log in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3913,7 +3945,7 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'Response timeout for API.'
+          description: 'A response timeout for API.'
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
@@ -3965,11 +3997,11 @@ zabbix_export:
       template: 'Azure virtual machine by HTTP'
       name: 'Azure virtual machine by HTTP'
       description: |
-        The template to monitor Microsoft Azure virtual machines by HTTP.
+        This template is designed to monitor Microsoft Azure virtual machines by HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
-          1. Create an Azure service principal via Azure CLI for your subscription.
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
@@ -3991,7 +4023,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Summary description of the availability status.'
+          description: 'The summary description of the availability status.'
           preprocessing:
             -
               type: JSONPATH
@@ -4014,7 +4046,7 @@ zabbix_export:
           key: azure.vm.availability.state
           delay: '0'
           history: 7d
-          description: 'Availability status of the resource.'
+          description: 'The availability status of the resource.'
           valuemap:
             name: 'Azure resource health state'
           preprocessing:
@@ -4143,7 +4175,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Total number of credits consumed by the Virtual Machine. Only available on B-series burstable VMs.'
+          description: 'The total number of credits consumed by the Virtual Machine. Only available on B-series burstable VMs.'
           preprocessing:
             -
               type: JSONPATH
@@ -4164,7 +4196,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Total number of credits available to burst. Only available on B-series burstable VMs.'
+          description: 'The total number of credits available to burst. Only available on B-series burstable VMs.'
           preprocessing:
             -
               type: JSONPATH
@@ -4205,7 +4237,7 @@ zabbix_export:
               name: 'Azure: High CPU utilization'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'CPU utilization is too high. the system might be slow to respond.'
+              description: 'CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope
@@ -4219,7 +4251,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of data disk bandwidth consumed per minute.'
+          description: 'The percentage of the Data Disk bandwidth consumed per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -4241,7 +4273,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of data disk I/Os consumed per minute.'
+          description: 'The percentage of the Data Disk I/Os consumed per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -4306,7 +4338,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Data Disk Queue Depth(or Queue Length).'
+          description: 'The queue depth (or queue length) of the Data Disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -4328,7 +4360,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes/Sec read from a single disk during monitoring period.'
+          description: 'Bytes/Sec read from a single disk during the monitoring period.'
           preprocessing:
             -
               type: JSONPATH
@@ -4350,7 +4382,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Read IOPS from a single disk during monitoring period.'
+          description: 'The read IOPS from a single disk during the monitoring period.'
           preprocessing:
             -
               type: JSONPATH
@@ -4416,7 +4448,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of Data Disk burst bandwidth credits used so far.'
+          description: 'The percentage of the Data Disk burst bandwidth credits used so far.'
           preprocessing:
             -
               type: JSONPATH
@@ -4438,7 +4470,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of Data Disk burst I/O credits used so far.'
+          description: 'The percentage of the Data Disk burst I/O credits used so far.'
           preprocessing:
             -
               type: JSONPATH
@@ -4460,7 +4492,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes/Sec written to a single disk during monitoring period.'
+          description: 'Bytes/Sec written to a single disk during the monitoring period.'
           preprocessing:
             -
               type: JSONPATH
@@ -4482,7 +4514,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Write IOPS from a single disk during monitoring period.'
+          description: 'The write IOPS from a single disk during the monitoring period.'
           preprocessing:
             -
               type: JSONPATH
@@ -4527,7 +4559,7 @@ zabbix_export:
               name: 'Azure: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Zabbix has received errors in requests to API.'
+              description: 'Zabbix has received errors in response to API requests.'
               tags:
                 -
                   tag: scope
@@ -4720,7 +4752,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The JSON with result of API requests.'
+          description: 'The result of API requests is in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             -
@@ -4751,7 +4783,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes read from disk during monitoring period (1 minute).'
+          description: 'Bytes read from the disk during the monitoring period (1 minute).'
           preprocessing:
             -
               type: JSONPATH
@@ -4776,7 +4808,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Disk read IOPS.'
+          description: 'The count of read operations from the disk per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -4797,7 +4829,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes written to disk during monitoring period (1 minute).'
+          description: 'Bytes written to the disk during the monitoring period (1 minute).'
           preprocessing:
             -
               type: JSONPATH
@@ -4822,7 +4854,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Disk write IOPS.'
+          description: 'The count of write operations to the disk per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -4842,7 +4874,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Inbound Flows are number of current flows in the inbound direction (traffic going into the VM).'
+          description: 'Inbound Flows are number of the current flows in the inbound direction (traffic going into the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -4863,7 +4895,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The maximum creation rate of inbound flows (traffic going into the VM).'
+          description: 'The maximum creation rate of the inbound flows (traffic going into the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -4884,7 +4916,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Outbound Flows are number of current flows in the outbound direction (traffic going out of the VM).'
+          description: 'Outbound Flows are number of the current flows in the outbound direction (traffic going out of the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -4905,7 +4937,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The maximum creation rate of outbound flows (traffic going out of the VM).'
+          description: 'The maximum creation rate of the outbound flows (traffic going out of the VM).'
           preprocessing:
             -
               type: JSONPATH
@@ -4926,7 +4958,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'Amount of physical memory, in bytes, immediately available for allocation to a process or for system use in the Virtual Machine.'
+          description: 'The amount of physical memory, in bytes, immediately available for allocation to a process or for system use in the Virtual Machine.'
           preprocessing:
             -
               type: JSONPATH
@@ -4999,7 +5031,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of operating system disk bandwidth consumed per minute.'
+          description: 'The percentage of the operating system disk bandwidth consumed per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -5021,7 +5053,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of operating system disk I/Os consumed per minute.'
+          description: 'The percentage of the operating system disk I/Os consumed per minute.'
           preprocessing:
             -
               type: JSONPATH
@@ -5086,7 +5118,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'OS Disk Queue Depth(or Queue Length).'
+          description: 'The OS disk queue depth (or queue length).'
           preprocessing:
             -
               type: JSONPATH
@@ -5108,7 +5140,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes/Sec read from a single disk during monitoring period for OS disk.'
+          description: 'Bytes/Sec read from a single disk during the monitoring period for OS disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -5130,7 +5162,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Read IOPS from a single disk during monitoring period for OS disk.'
+          description: 'The read IOPS from a single disk during the monitoring period for OS disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -5196,7 +5228,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Percentage of OS Disk burst bandwidth credits used so far.'
+          description: 'The percentage of the OS Disk burst bandwidth credits used so far.'
           preprocessing:
             -
               type: JSONPATH
@@ -5240,7 +5272,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'Bytes/Sec written to a single disk during monitoring period for OS disk.'
+          description: 'Bytes/Sec written to a single disk during the monitoring period for OS disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -5262,7 +5294,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!iops'
-          description: 'Write IOPS from a single disk during monitoring period for OS disk.'
+          description: 'The write IOPS from a single disk during the monitoring period for OS disk.'
           preprocessing:
             -
               type: JSONPATH
@@ -5283,7 +5315,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: 'Premium data disk cache read hit.'
+          description: 'Premium Data Disk cache read hit.'
           preprocessing:
             -
               type: JSONPATH
@@ -5304,7 +5336,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: 'Premium data disk cache read miss.'
+          description: 'Premium Data Disk cache read miss.'
           preprocessing:
             -
               type: JSONPATH
@@ -5367,7 +5399,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: 'Percentage of uncached disk bandwidth consumed by the VM.'
+          description: 'The percentage of the uncached disk bandwidth consumed by the VM.'
           preprocessing:
             -
               type: JSONPATH
@@ -5387,7 +5419,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: 'Percentage of uncached disk IOPS consumed by the VM.'
+          description: 'The percentage of the uncached disk IOPS consumed by the VM.'
           preprocessing:
             -
               type: JSONPATH
@@ -5413,7 +5445,7 @@ zabbix_export:
         -
           macro: '{$AZURE.DATA.TIMEOUT}'
           value: 60s
-          description: 'Response timeout for API.'
+          description: 'A response timeout for API.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
