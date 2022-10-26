@@ -43,7 +43,7 @@ class CControllerUserProvision extends CController {
 		$userids = $this->getInput('userids');
 
 		$result = API::User()->provision($userids);
-		$provisionedids = $result['userids'];
+		$provisionedids = $result ? $result['userids'] : [];
 
 		$response = new CControllerResponseRedirect(
 			(new CUrl('zabbix.php'))

@@ -136,4 +136,20 @@ abstract class CControllerUserUpdateGeneral extends CController {
 
 		return true;
 	}
+
+	/**
+	 * Get user medias data from form input.
+	 *
+	 * @return array of user medias sent by form.
+	 */
+	protected function getInputUserMedia(): array {
+		$medias = [];
+		$media_fields = array_fill_keys(['mediatypeid', 'sendto', 'active', 'severity', 'period'], '');
+
+		foreach ($this->getInput('medias', []) as $media) {
+			$medias[] = array_intersect_key($media, $media_fields);
+		}
+
+		return $medias;
+	}
 }
