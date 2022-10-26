@@ -1,6 +1,8 @@
 Changes for 6.4.0beta2
 
 New features:
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6980] implemented audit logging of item and item prototype API objects (agriscenko, jfreibergs, vmaksimovs)
+.......PS. [ZBXNEXT-7953] added VMware tags support for vSphere versions older than 7U2 (asestakovs)
 ..F.....S. [ZBXNEXT-7122] added detection of compressed chunks in history or trend tables, and warnings that suggest enabling housekeeping overrides accordingly (dgoloscapov, jfreibergs)
 .........T [ZBXNEXT-8018] added token authentication in Template GitLab by HTTP (atocko)
 ..F....... [ZBXNEXT-7512] implemented new context menu for host, item and trigger for monitoring section (rlataria)
