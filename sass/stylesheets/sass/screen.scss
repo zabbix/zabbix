@@ -6,8 +6,8 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20220722';
-$browser-sprite-path: '../img/browser-sprite.png?20220722';
+$sprite-path: '../img/icon-sprite.svg?20221026';
+$browser-sprite-path: '../img/browser-sprite.png?20221026';
 
 @import "utils/mixins";
 
@@ -5356,6 +5356,8 @@ a.icon-count {
 .icon-action-unack,
 .icon-action-suppress,
 .icon-action-unsuppress,
+.icon-action-cause,
+.icon-action-symptom,
 .icon-invisible,
 .icon-problem-generated,
 .icon-problem-recovery,
@@ -5486,6 +5488,14 @@ button {
 
 .icon-action-unsuppress::before {
 	background-position: -89px -836px;
+}
+
+.icon-action-cause::before {
+	background-position: -123px -693px;
+}
+
+.icon-action-symptom::before {
+	background-position: -122px -656px;
 }
 
 .icon-invisible::before {

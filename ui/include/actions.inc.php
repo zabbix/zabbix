@@ -2203,12 +2203,24 @@ function makeActionTableIcon(array $action) {
 				]);
 			}
 
+			if (($action['action']
+					& ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) {
+				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_CAUSE, 'title' => _('Cause')]);
+			}
+
+			if (($action['action']
+					& ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) {
+				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM, 'title' => _('Symptom')]);
+			}
+
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
 				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_ACK, 'title' => _('Acknowledged')]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) {
-				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_UNACK, 'title' => _('Unacknowledged')]);
+				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_UNACK,
+					'title' => _('Unacknowledged')
+				]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
