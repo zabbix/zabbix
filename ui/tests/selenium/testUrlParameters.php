@@ -1008,14 +1008,14 @@ class testUrlParameters extends CLegacyWebTest {
 					[
 						'url' => 'hostinventoriesoverview.php?filter_groups%5B%5D=abc&filter_groupby=&filter_set=1',
 						'text_present' => [
-							'Page received incorrect data',
+							'Zabbix has received an incorrect request.',
 							'Field "filter_groups" is not integer.'
 						]
 					],
 					[
 						'url' => 'hostinventoriesoverview.php?filter_groups%5B%5D=&filter_groupby=&filter_set=1',
 						'text_present' => [
-							'Page received incorrect data',
+							'Zabbix has received an incorrect request.',
 							'Field "filter_groups" is not integer.'
 						]
 					],
@@ -1054,14 +1054,14 @@ class testUrlParameters extends CLegacyWebTest {
 					[
 						'url' => 'hostinventories.php?filter_groups%5B%5D=abc&filter_set=1',
 						'text_present' => [
-							'Page received incorrect data',
+							'Zabbix has received an incorrect request.',
 							'Field "filter_groups" is not integer.'
 						]
 					],
 					[
 						'url' => 'hostinventories.php?filter_groups%5B%5D=&filter_set=1',
 						'text_present' => [
-							'Page received incorrect data',
+							'Zabbix has received an incorrect request.',
 							'Field "filter_groups" is not integer.'
 						]
 					],
