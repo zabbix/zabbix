@@ -27,26 +27,32 @@
 
 #pragma comment(lib, "DbgHelp.lib")
 
-#define STACKWALK_MAX_NAMELEN	4096
-
-#define ZBX_LSHIFT(value, bits)	(((unsigned __int64)value) << bits)
-
-#ifdef _M_X64
-
-#define ZBX_IMAGE_FILE_MACHINE	IMAGE_FILE_MACHINE_AMD64
+typedef BOOL (WINAPI *SymGetLineFromAddrW64_func_t)(HANDLE, DWORD64, PDWORD, PIMAGEHLP_LINE64);
+typedef BOOL (WINAPI *SymFromAddr_func_t)(HANDLE a, DWORD64 b , PDWORD64 c, PSYMBOL_INFO d);
 
 static void	print_register(const char *name, unsigned __int64 value)
 {
+#ifdef _M_X64
 	zabbix_log(LOG_LEVEL_CRIT, "%-7s = %16I64x = %20I64u = %20I64d", name, value, value, value);
+#else
+	zabbix_log(LOG_LEVEL_CRIT, "%-7s = %16lx = %20lu = %20ld", name, value, value, value);
+#endif
 }
 
 static void	print_fatal_info(CONTEXT *pctx)
 {
 	zabbix_log(LOG_LEVEL_CRIT, "====== Fatal information: ======");
 
+#ifdef _M_X64
 	zabbix_log(LOG_LEVEL_CRIT, "Program counter: 0x%08lx", pctx->Rip);
+#else
+	zabbix_log(LOG_LEVEL_CRIT, "Program counter: 0x%04x", pctx->Eip);
+#endif
 	zabbix_log(LOG_LEVEL_CRIT, "=== Registers: ===");
 
+#define ZBX_LSHIFT(value, bits)	(((unsigned __int64)value) << bits)
+
+#ifdef _M_X64
 	print_register("r8", pctx->R8);
 	print_register("r9", pctx->R9);
 	print_register("r10", pctx->R10);
@@ -68,24 +74,7 @@ static void	print_fatal_info(CONTEXT *pctx)
 	print_register("rsp", pctx->Rsp);
 	print_register("efl", pctx->EFlags);
 	print_register("csgsfs", ZBX_LSHIFT(pctx->SegCs, 24) | ZBX_LSHIFT(pctx->SegGs, 16) | ZBX_LSHIFT(pctx->SegFs, 8));
-}
-
 #else
-
-#define ZBX_IMAGE_FILE_MACHINE	IMAGE_FILE_MACHINE_I386
-
-static void	print_register(const char *name, unsigned __int32 value)
-{
-	zabbix_log(LOG_LEVEL_CRIT, "%-7s = %16lx = %20lu = %20ld", name, value, value, value);
-}
-
-static void	print_fatal_info(CONTEXT *pctx)
-{
-	zabbix_log(LOG_LEVEL_CRIT, "====== Fatal information: ======");
-
-	zabbix_log(LOG_LEVEL_CRIT, "Program counter: 0x%04x", pctx->Eip);
-	zabbix_log(LOG_LEVEL_CRIT, "=== Registers: ===");
-
 	print_register("edi", pctx->Edi);
 	print_register("esi", pctx->Esi);
 	print_register("ebp", pctx->Ebp);
@@ -98,14 +87,12 @@ static void	print_fatal_info(CONTEXT *pctx)
 	print_register("esp", pctx->Esp);
 	print_register("efl", pctx->EFlags);
 	print_register("csgsfs", ZBX_LSHIFT(pctx->SegCs, 24) | ZBX_LSHIFT(pctx->SegGs, 16) | ZBX_LSHIFT(pctx->SegFs, 8));
-}
-
 #endif
 
-static zbx_get_progname_f get_progname_cb = NULL;
+#undef ZBX_LSHIFT
+}
 
-typedef BOOL (WINAPI *SymGetLineFromAddrW64_func_t)(HANDLE, DWORD64, PDWORD, PIMAGEHLP_LINE64);
-typedef BOOL (WINAPI *SymFromAddr_func_t)(HANDLE a, DWORD64 b , PDWORD64 c, PSYMBOL_INFO d);
+static zbx_get_progname_f get_progname_cb = NULL;
 
 void	zbx_backtrace(void)
 {
@@ -183,6 +170,12 @@ static void	print_backtrace(CONTEXT *pctx)
 	scount = s;
 	ctxcount = ctx;
 
+#ifdef _M_X64
+#define ZBX_IMAGE_FILE_MACHINE	IMAGE_FILE_MACHINE_AMD64
+#else
+#define ZBX_IMAGE_FILE_MACHINE	IMAGE_FILE_MACHINE_I386
+#endif
+
 	/* get number of frames, ctxcount may be modified during StackWalk64() calls */
 	while (TRUE == StackWalk64(ZBX_IMAGE_FILE_MACHINE, hProcess, hThread, &scount, &ctxcount, NULL, NULL, NULL,
 			NULL))
@@ -224,6 +217,8 @@ static void	print_backtrace(CONTEXT *pctx)
 		if (0 == s.AddrReturn.Offset)
 			break;
 	}
+
+#undef ZBX_IMAGE_FILE_MACHINE
 
 	SymCleanup(hProcess);
 
