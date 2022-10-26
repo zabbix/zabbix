@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-10-26T10:46:26Z'
+  date: '2022-10-26T11:27:07Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -2447,9 +2447,9 @@ zabbix_export:
               value: network
         -
           uuid: f422f01bf1c9484e880581f31f70e120
-          name: 'Azure PostgreSQL: Connections succeded'
+          name: 'Azure PostgreSQL: Connections succeeded'
           type: DEPENDENT
-          key: azure.db.pgsql.connections.succeded
+          key: azure.db.pgsql.connections.succeeded
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -5768,7 +5768,7 @@ zabbix_export:
           color: 2774A4
           item:
             host: 'Azure PostgreSQL flexible server by HTTP'
-            key: azure.db.pgsql.connections.succeded
+            key: azure.db.pgsql.connections.succeeded
         -
           sortorder: '2'
           color: F63100
