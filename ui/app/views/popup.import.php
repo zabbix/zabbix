@@ -88,7 +88,7 @@ $rules_table->addRow([
 		->onClick('toggleAll("create");')
 		: null,
 	$col_delete ? (new CCol((new CCheckBox('delete_all'))
-			->setChecked(false)
+			->setChecked(true)
 			->onClick('updateWarning(this, '.json_encode(
 					_('Template and host properties that are inherited through template linkage will be unlinked and cleared.')
 				).');'

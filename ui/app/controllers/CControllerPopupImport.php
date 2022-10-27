@@ -68,33 +68,33 @@ class CControllerPopupImport extends CController {
 			case 'host':
 				$rules['host_groups'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['hosts'] = ['updateExisting' => true, 'createMissing' => true];
-				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
+				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => true];
+				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
-					'deleteMissing' => false
+					'deleteMissing' => true
 				];
-				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
+				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
+				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				break;
 
 			case 'template':
 				$rules['host_groups'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['template_groups'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['templates'] = ['updateExisting' => true, 'createMissing' => true];
-				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				$rules['templateDashboards'] = ['updateExisting' => true, 'createMissing' => true,
-					'deleteMissing' => false
+					'deleteMissing' => true
 				];
-				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
-				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => true];
+				$rules['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				$rules['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
-					'deleteMissing' => false
+					'deleteMissing' => true
 				];
-				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
-				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+				$rules['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
+				$rules['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
+				$rules['httptests'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => true];
 				break;
 
 			case 'mediatype':
