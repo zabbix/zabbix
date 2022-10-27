@@ -1,19 +1,20 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-01-28 12:08+0300\n"
-"Last-Translator: cesar.fernandez <cesar.fernandez@mrinformatica.es>\n"
+"PO-Revision-Date: 2022-10-18 06:44+0000\n"
+"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1643364496.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -312,11 +313,11 @@ msgstr "(Sólo los súper administradores pueden crear grupos)"
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(creado por detección de host)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
-msgstr ""
+msgstr "(vinculado por descubrimiento de host)"
 
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
@@ -349,11 +350,11 @@ msgstr "100 disparadores más ocupados"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:184
 msgid "12-hour"
-msgstr ""
+msgstr "12 horas"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:183
 msgid "24-hour"
-msgstr ""
+msgstr "24-horas"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
@@ -717,7 +718,7 @@ msgstr "Activo"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "Cheques activos"
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -912,11 +913,11 @@ msgstr "Agregar equipo"
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
 msgid "Add host trigger"
-msgstr ""
+msgstr "Agregar  disparadores de host"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr ""
+msgstr "Agregar columna de elementos"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
@@ -1139,7 +1140,7 @@ msgstr "Todos los tableros"
 
 #: app/views/monitoring.charts.view.php:83
 msgid "All graphs"
-msgstr ""
+msgstr "Todos los gráficos"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
 #: app/views/administration.user.edit.php:429
@@ -1308,7 +1309,7 @@ msgstr "Aplicar permisos y filtros de etiquetas a todos los subgrupos"
 
 #: app/partials/configuration.templategroup.edit.html.php:47
 msgid "Apply permissions to all subgroups"
-msgstr ""
+msgstr "Aplicar permisos a todos los subgrupos"
 
 #: include/views/configuration.maintenance.list.php:71
 #: include/views/configuration.maintenance.list.php:105
@@ -1318,7 +1319,7 @@ msgstr "Acercamiento"
 
 #: include/classes/widgets/CWidgetHelper.php:1443
 msgid "Approximation"
-msgstr ""
+msgstr "Aproximación"
 
 #: include/func.inc.php:239
 msgid "Apr"
@@ -1400,7 +1401,7 @@ msgstr "En (horas:minutos)"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:125
 msgid "At least one LDAP server must exist."
-msgstr ""
+msgstr "Debe existir al menos un servidor LDAP."
 
 #: app/views/administration.userrole.edit.php:117
 msgid "At least one UI element must be checked."
@@ -1451,7 +1452,7 @@ msgstr "Al menos debe existir una operación."
 #: include/classes/api/services/CHostGroup.php:1594
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
-msgstr ""
+msgstr "Al menos un parámetro \"%1$s\" o \"%2$s\" debe estar habilitado."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
@@ -1661,15 +1662,15 @@ msgstr "Promedio"
 
 #: include/classes/data/CItemData.php:1522
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Número promedio de solicitudes de lectura pendientes en el disco virtual durante el intervalo de recopilación, <url>: URL del servicio de VMware, <uuid>: nombre de host de la máquina virtual de VMware, <instancia>: instancia del dispositivo de disco"
 
 #: include/classes/data/CItemData.php:1542
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Número promedio de solicitudes de escritura excesivas en el disco virtual durante el intervalo de recopilación, <url>: URL del servicio de VMware, <uuid>: nombre la máquina virtual de VMware, <instance>: instancia del dispositivo de disco"
 
 #: app/views/administration.authentication.edit.php:93
 msgid "Avoid easy-to-guess passwords"
-msgstr ""
+msgstr "Evite contraseñas fáciles de adivinar"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:307
 msgid "Axes"
@@ -1739,7 +1740,7 @@ msgstr "Bits a desplazar"
 
 #: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
-msgstr ""
+msgstr "Funciones bit a bit"
 
 #: app/views/administration.user.list.php:144
 msgid "Blocked"
@@ -1754,14 +1755,14 @@ msgstr "Azul"
 #: include/views/configuration.item.edit.php:458
 #: include/views/configuration.item.prototype.edit.php:436
 msgid "Body"
-msgstr ""
+msgstr "Cuerpo"
 
 #: app/views/popup.httpstep.php:162
 #: include/views/configuration.host.discovery.edit.php:402
 #: include/views/configuration.item.edit.php:460
 #: include/views/configuration.item.prototype.edit.php:438
 msgid "Body and headers"
-msgstr ""
+msgstr "Cuerpo y cabeceras"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:131
 #: include/classes/widgets/forms/CWidgetFormItem.php:212
@@ -1785,7 +1786,7 @@ msgstr "Borde"
 
 #: include/views/js/monitoring.sysmaps.js.php:613
 msgid "Border color"
-msgstr ""
+msgstr "Color de borde"
 
 #: include/views/js/monitoring.sysmaps.js.php:591
 msgid "Border type"
@@ -1797,7 +1798,7 @@ msgstr "Ancho del borde"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
-msgstr ""
+msgstr "Ambas contraseñas deben ser iguales."
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:108
 #: include/classes/widgets/forms/CWidgetFormItem.php:189
@@ -1859,40 +1860,40 @@ msgstr "Carga de CPU. Devuelve un decimal"
 
 #: include/classes/data/CItemData.php:1422
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
-msgstr ""
+msgstr "Tiempo de CPU dedicado a esperar el intercambio (swap-in), <url>: URL de servicio de VMware, <uuid>: nombre de la máquina virtual de VMware, <instance>: instancia de CPU"
 
 #: include/classes/data/CItemData.php:1274
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "El uso de la CPU como porcentaje durante el intervalo depende de la administración de energía o HT, <url>: URL del servicio de VMware, <uuid>: nombre del hipervisor de VMware"
 
 #: include/classes/data/CItemData.php:1266
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Uso de la CPU como porcentaje durante el intervalo, <url>: URL del servicio de VMware, <uuid>: nombre del hipervisor de VMware"
 
 #: include/classes/data/CItemData.php:1426
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Uso de la CPU como porcentaje durante el intervalo, <url>: URL del servicio de VMware, <uuid>: nombre de la máquina virtual de VMware"
 
 #: include/classes/data/CItemData.php:1429
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
-msgstr ""
+msgstr "Uso de CPU en hercios durante el intervalo en el grupo de recursos de VMware, <url>: URL del servicio de VMware, <rpid>: ID del grupo de recursos de VMware"
 
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
-msgstr ""
+msgstr "Porcentaje de utilización de CPU. Devuelve un número con coma flotante"
 
 #: app/views/popup.itemtestedit.view.php:300
 msgid "CRLF"
-msgstr ""
+msgstr "CRLF"
 
 #: include/items.inc.php:1828
 msgid "CSV to JSON"
-msgstr ""
+msgstr "CSV a JSON"
 
 #: include/classes/validators/CApiInputValidator.php:2717
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
-msgstr ""
+msgstr "Se esperaba CUID"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:179
 #: include/views/configuration.graph.edit.php:254
@@ -1901,7 +1902,7 @@ msgstr "Calculado"
 
 #: jsLoader.php:232
 msgid "Calendar"
-msgstr ""
+msgstr "Calendario"
 
 #: include/hosts.inc.php:60
 msgid "Callback"
@@ -1944,7 +1945,7 @@ msgstr "Cancelar"
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:140
 msgid "Cannot add API token"
-msgstr ""
+msgstr "No se puede habilitar el token de API "
 
 #: include/classes/api/services/CGraph.php:517
 #: include/classes/api/services/CGraph.php:531
@@ -1970,7 +1971,7 @@ msgstr "No se pudo agregar la correlación"
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr ""
+msgstr "No se puede agregar la página del panel: se ha agregado el número máximo de %1$d páginas del panel."
 
 #: include/classes/api/services/CTrigger.php:979
 #: include/classes/api/services/CTriggerPrototype.php:788
@@ -2007,7 +2008,7 @@ msgstr "No se pudo agregar el equipo"
 #: app/controllers/CControllerHostGroupCreate.php:40
 #: app/controllers/CControllerHostGroupCreate.php:70
 msgid "Cannot add host group"
-msgstr ""
+msgstr "No se puede agregar el grupo de host"
 
 #: host_prototypes.php:304
 msgid "Cannot add host prototype"
@@ -2034,7 +2035,7 @@ msgstr "No se pudo agregar el periodo de mantenimiento"
 #: include/classes/api/services/CMap.php:1559
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "No se puede añadir el elemento al mapa \"%1$s\" debido a una referencia circular."
 
 #: app/controllers/CControllerMediatypeCreate.php:76
 #: app/controllers/CControllerMediatypeCreate.php:165
@@ -2045,8 +2046,8 @@ msgstr "No se pudo agregar el tipo de medios"
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se pueden añadir los módulos: %1$s."
+msgstr[1] "No se pueden añadir los módulos: %1$s."
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -2074,7 +2075,7 @@ msgstr "No se pudo agregar la expresión regular"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr ""
+msgstr "No se puede añadir el informe programado"
 
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
@@ -2092,7 +2093,7 @@ msgstr "No se pudo agregar la plantilla"
 #: app/controllers/CControllerTemplateGroupCreate.php:40
 #: app/controllers/CControllerTemplateGroupCreate.php:70
 msgid "Cannot add template group"
-msgstr ""
+msgstr "No se puede agregar un grupo de plantillas"
 
 #: triggers.php:306
 msgid "Cannot add trigger"
@@ -2110,7 +2111,7 @@ msgstr "No se pudo agregar el usuario"
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:101
 msgid "Cannot add user group"
-msgstr ""
+msgstr "No se puede añadir el grupo de usuarios"
 
 #: httpconf.php:198
 msgid "Cannot add web scenario"
@@ -2118,31 +2119,31 @@ msgstr "No se pudo agregar el escenario web"
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "No se puede añadir el widget: no hay suficiente espacio libre en el panel."
 
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "No puede ser eliminado"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
-msgstr ""
+msgstr "No se pudo asociar anónimamente al servidor LDAP."
 
 #: include/classes/validators/CLdapAuthValidator.php:78
 msgid "Cannot bind to LDAP server."
-msgstr ""
+msgstr "No se puede unir al servidor LDAP."
 
 #: include/forms.inc.php:1932 include/forms.inc.php:1939
 #: include/forms.inc.php:1949 include/forms.inc.php:1983
 #: include/forms.inc.php:1990 include/forms.inc.php:2000
 #, c-format
 msgid "Cannot build expression tree: %1$s."
-msgstr ""
+msgstr "No se puede construir el árbol de expresión: %1$s."
 
 #: include/classes/api/services/CRole.php:792
 msgid "Cannot change the user type of own role."
-msgstr ""
+msgstr "No se puede cambiar el tipo de usuario de la función propia."
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
@@ -2169,7 +2170,7 @@ msgstr "No se pudo cerrar el problema: %1$s."
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Cannot connect to LDAP server."
-msgstr ""
+msgstr "No es posible conectarse al servidor LDAP."
 
 #: include/classes/setup/CSetupWizard.php:593
 msgid "Cannot connect to the database."
@@ -2177,7 +2178,7 @@ msgstr "No se pudo conectar a la base de datos."
 
 #: include/views/js/configuration.httpconf.edit.js.php:182
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "No se pueden convertir datos POST:"
 
 #: graphs.php:390
 msgid "Cannot copy graph"
@@ -2200,7 +2201,7 @@ msgstr[1] "No se pudieron copiar los iniciadores"
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "No se puede copiar el activador \"%1$s\", porque tiene varios hosts en la expresión."
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2210,7 +2211,7 @@ msgstr "No se puede copiar el disparador \"%1$s:%2$s\" porque tiene varios equip
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
 msgid "Cannot create SLA"
-msgstr ""
+msgstr "No se puede crear SLA"
 
 #: include/classes/api/services/CHostPrototype.php:1110
 #, c-format
@@ -2245,22 +2246,22 @@ msgstr "No se puede crear la asignación de icono"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
-msgstr ""
+msgstr "No se puede crear la solicitud"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
-msgstr ""
+msgstr "No se puede crear un informe programado"
 
 #: app/controllers/CControllerServiceCreate.php:96
 #: app/controllers/CControllerServiceCreate.php:184
 msgid "Cannot create service"
-msgstr ""
+msgstr "No se puede crear el servicio"
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
 #, c-format
 msgid "Cannot create service \"%1$s\": %2$s."
-msgstr ""
+msgstr "No se puede crear el servicio \"%1$s\": %2$s."
 
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Cannot create the configuration file."
@@ -2269,24 +2270,24 @@ msgstr "No se pudo crear el archivo de configuración."
 #: app/controllers/CControllerUserroleCreate.php:103
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
-msgstr ""
+msgstr "No se puede crear el rol de usuario"
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede eliminar el token de API"
+msgstr[1] "No se pueden borrar los tokens de API"
 
 #: app/controllers/CControllerSlaDelete.php:79
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede eliminar SLA"
+msgstr[1] "No se puede eliminar SLA"
 
 #: include/classes/api/services/CUser.php:1257
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr "No se puede borrar el usuario \"%1$s\", prueba deshabilitandolo primero."
+msgstr "No se puede borrar el usuario \"%1$s\", prueba deshabilitándolo primero."
 
 #: actionconf.php:323
 msgid "Cannot delete action"
@@ -2295,10 +2296,9 @@ msgstr "No es posible eliminar la acción"
 #: include/classes/api/services/CRole.php:375
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
-msgstr ""
+msgstr "No se puede eliminar el rol de usuario asignado \"%1$s\"."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
-#, fuzzy
 msgid "Cannot delete correlation"
 msgid_plural "Cannot delete correlations"
 msgstr[0] "No se pudo borrar la correlación"
@@ -2313,7 +2313,7 @@ msgstr[1] "No pude borrar los tableros"
 
 #: include/classes/api/services/CUserDirectory.php:383
 msgid "Cannot delete default user directory."
-msgstr ""
+msgstr "No se puede eliminar el directorio de usuario predeterminado."
 
 #: include/classes/api/services/CTrigger.php:882
 #: include/classes/api/services/CTriggerPrototype.php:570
@@ -2321,7 +2321,6 @@ msgid "Cannot delete dependency"
 msgstr "No es posible eliminar la dependecia"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "No es posible eliminar la regla"
@@ -2361,26 +2360,26 @@ msgstr "No se pudo eliminar el equipo"
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede eliminar el host %1$s porque el mantenimiento \"%2$s\" debe contener al menos un host o grupo de hosts."
+msgstr[1] "No se puede eliminar los hosts %1$s porque el mantenimiento \"%2$s\" debe contener al menos un host o grupo de hosts."
 
 #: app/controllers/CControllerHostGroupDelete.php:75
 msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede eliminar el grupo de host"
+msgstr[1] "No se puede eliminar el grupo de host"
 
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se pueden eliminar el grupo de host %1$s porque el mantenimiento \"%2$s\" debe contener al menos un host o grupo de hosts."
+msgstr[1] "No se pueden eliminar los grupos de hosts %1$s porque el mantenimiento \"%2$s\" debe contener al menos un host o grupo de hosts."
 
 #: app/controllers/CControllerHostGroupDelete.php:39
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
-msgstr ""
+msgstr "No se pueden eliminar grupos de host"
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2397,7 +2396,7 @@ msgstr "No es posible eliminar la imágen"
 #: include/classes/api/services/CHostInterface.php:636
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "No es posible eliminar la interfaz para el host descubierto \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1142
 msgid "Cannot delete inventory."
@@ -2433,8 +2432,8 @@ msgstr[1] "No es posible eliminar el tipo de medio"
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es posible eliminar el módulo: %1$s."
+msgstr[1] "No es posible eliminar los módulos: %1$s."
 
 #: sysmaps.php:261
 msgid "Cannot delete network map"
@@ -2442,7 +2441,7 @@ msgstr "No es posible eliminar el mapa de red"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
-msgstr ""
+msgstr "No se pueden eliminar servidores proxy"
 
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
@@ -4250,12 +4249,30 @@ msgstr ""
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Se alcanzó el tiempo de espera de %1$s segundos al intentar conectarse al servidor Zabbix \"%2$s\"."
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
 msgstr ""
 
 #: include/classes/server/CZabbixServer.php:597
@@ -4266,6 +4283,14 @@ msgid ""
 "2. Security environment (for example, SELinux) is blocking the connection;\n"
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
 msgstr ""
 
 #: include/classes/server/CZabbixServer.php:605
@@ -9908,6 +9933,10 @@ msgctxt "compact table header"
 msgid "Info"
 msgstr "Información"
 
+#: include/classes/data/CItemData.php:1428
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -13727,6 +13756,10 @@ msgstr ""
 #: app/partials/administration.system.info.php:68
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Sólo cuentan los iniciadores asignados a equipos habilitados y que dependan de monitores habilitados"
+
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -18336,6 +18369,16 @@ msgstr ""
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr ""
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:135
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:164
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
@@ -20059,6 +20102,10 @@ msgstr ""
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1320
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr ""
@@ -21254,6 +21301,14 @@ msgstr ""
 #: app/views/administration.script.edit.php:127
 msgid "Zabbix server"
 msgstr "Servidor Zabbix"
+
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:601
 #, c-format

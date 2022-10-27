@@ -3,11 +3,11 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
-The template to monitor GitLab by Zabbix that works without any external scripts.
+For Zabbix version: 6.2 and higher.  
+This template is designed to monitor GitLab by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `GitLab by HTTP` — collects metrics by HTTP agent from GitLab /metrics endpoint.
+The template `GitLab by HTTP` — collects metrics by an HTTP agent from the GitLab `/-/metrics` endpoint.
 See https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html.
 
 
@@ -20,10 +20,12 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-This template works with self-hosted GitLab instances. Internal service metrics are collected from GitLab /-/metrics endpoint.
-To access the metrics, the client IP address must be [explicitly allowed](https://docs.gitlab.com/ee/administration/monitoring/ip_whitelist.html).
-Don't forget to change the macros {$GITLAB.URL}.
-Also, see the Macros section for a list of macros used to set trigger values.
+This template works with self-hosted GitLab instances. Internal service metrics are collected from the GitLab `/-/metrics` endpoint.
+To access metrics following two methods are available:
+1. Explicitly allow monitoring instance IP address in gitlab [whitelist configuration](https://docs.gitlab.com/ee/administration/monitoring/ip_whitelist.html).
+2. Get token from Gitlab `Admin -> Monitoring -> Health check` page: http://your.gitlab.address/admin/health_check; Use this token in macro `{$GITLAB.HEALTH.TOKEN}` as variable path, like: `?token=your_token`.
+Remember to change the macros `{$GITLAB.URL}`.
+Also, see the Macros section for a list of [macros used](#Macros-used) to set trigger values.
 
 *NOTE.* Some metrics may not be collected depending on your Gitlab instance version and configuration. See [Gitlab's documentation](https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html) for further information about its metric collection.
 
@@ -36,14 +38,15 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$GITLAB.HTTP.FAIL.MAX.WARN} |<p>Maximum number of HTTP requests failures for trigger expression.</p> |`2` |
-|{$GITLAB.OPEN.FDS.MAX.WARN} |<p>Maximum percentage of used file descriptors for trigger expression.</p> |`90` |
-|{$GITLAB.PUMA.QUEUE.MAX.WARN} |<p>Maximum number of Puma queued requests for trigger expression.</p> |`1` |
-|{$GITLAB.PUMA.UTILIZATION.MAX.WARN} |<p>Maximum percentage of used Puma thread utilization for trigger expression.</p> |`90` |
-|{$GITLAB.REDIS.FAIL.MAX.WARN} |<p>Maximum number of Redis client exceptions for trigger expression.</p> |`2` |
-|{$GITLAB.UNICORN.QUEUE.MAX.WARN} |<p>Maximum number of Unicorn queued requests for trigger expression.</p> |`1` |
-|{$GITLAB.UNICORN.UTILIZATION.MAX.WARN} |<p>Maximum percentage of used Unicorn workers utilization for trigger expression.</p> |`90` |
-|{$GITLAB.URL} |<p>GitLab instance URL</p> |`http://localhost` |
+|{$GITLAB.HEALTH.TOKEN} |<p>The token path for Gitlab health check. Example `?token=your_token`</p> |`` |
+|{$GITLAB.HTTP.FAIL.MAX.WARN} |<p>The maximum number of HTTP request failures for a trigger expression.</p> |`2` |
+|{$GITLAB.OPEN.FDS.MAX.WARN} |<p>The maximum percentage of used file descriptors for a trigger expression.</p> |`90` |
+|{$GITLAB.PUMA.QUEUE.MAX.WARN} |<p>The maximum number of Puma queued requests for a trigger expression.</p> |`1` |
+|{$GITLAB.PUMA.UTILIZATION.MAX.WARN} |<p>The maximum percentage of Puma thread utilization for a trigger expression.</p> |`90` |
+|{$GITLAB.REDIS.FAIL.MAX.WARN} |<p>The maximum number of Redis client exceptions for a trigger expression.</p> |`2` |
+|{$GITLAB.UNICORN.QUEUE.MAX.WARN} |<p>The maximum number of Unicorn queued requests for a trigger expression.</p> |`1` |
+|{$GITLAB.UNICORN.UTILIZATION.MAX.WARN} |<p>The maximum percentage of Unicorn workers utilization for a trigger expression.</p> |`90` |
+|{$GITLAB.URL} |<p>URL of a GitLab instance.</p> |`http://localhost` |
 
 ## Template links
 
@@ -53,7 +56,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Puma metrics discovery |<p>Discovery Puma specific metrics, when Puma is used.</p> |HTTP_AGENT |gitlab.puma.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `puma_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
+|Puma metrics discovery |<p>Discovery of Puma specific metrics when Puma is used.</p> |HTTP_AGENT |gitlab.puma.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `puma_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
 |Unicorn metrics discovery |<p>DiscoveryUnicorn specific metrics, when Unicorn is used.</p> |HTTP_AGENT |gitlab.unicorn.discovery<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `unicorn_workers`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p> |
 
 ## Items collected
@@ -123,11 +126,11 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |GitLab: Gitlab instance is not able to accept traffic |<p>-</p> |`last(/GitLab by HTTP/gitlab.readiness)=0` |HIGH |<p>**Depends on**:</p><p>- GitLab: Liveness check was failed</p> |
 |GitLab: Liveness check was failed |<p>The application server is not running or Rails Controllers are deadlocked.</p> |`last(/GitLab by HTTP/gitlab.liveness)=0` |HIGH | |
-|GitLab: Version has changed |<p>GitLab version has changed. Ack to close.</p> |`last(/GitLab by HTTP/gitlab.deployments.version,#1)<>last(/GitLab by HTTP/gitlab.deployments.version,#2) and length(last(/GitLab by HTTP/gitlab.deployments.version))>0` |INFO |<p>Manual close: YES</p> |
+|GitLab: Version has changed |<p>The GitLab version has changed. Perform Ack to close.</p> |`last(/GitLab by HTTP/gitlab.deployments.version,#1)<>last(/GitLab by HTTP/gitlab.deployments.version,#2) and length(last(/GitLab by HTTP/gitlab.deployments.version))>0` |INFO |<p>Manual close: YES</p> |
 |GitLab: Too many Redis queues client exceptions |<p>"Too many  Redis client exceptions during the requests to  Redis instance queues."</p> |`min(/GitLab by HTTP/gitlab.redis.client_exceptions.queues.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}` |WARNING | |
 |GitLab: Too many Redis cache client exceptions |<p>"Too many  Redis client exceptions during the requests to  Redis instance cache."</p> |`min(/GitLab by HTTP/gitlab.redis.client_exceptions.cache.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}` |WARNING | |
 |GitLab: Too many Redis shared_state client exceptions |<p>"Too many  Redis client exceptions during the requests to  Redis instance shared_state."</p> |`min(/GitLab by HTTP/gitlab.redis.client_exceptions.shared_state.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}` |WARNING | |
-|GitLab: Failed to fetch info data |<p>Zabbix has not received data for metrics for the last 30 minutes</p> |`nodata(/GitLab by HTTP/gitlab.ruby.threads_running,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- GitLab: Liveness check was failed</p> |
+|GitLab: Failed to fetch info data |<p>Zabbix has not received a metrics data for the last 30 minutes</p> |`nodata(/GitLab by HTTP/gitlab.ruby.threads_running,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- GitLab: Liveness check was failed</p> |
 |GitLab: Current number of open files is too high |<p>-</p> |`min(/GitLab by HTTP/gitlab.ruby.file_descriptors.max,5m)/last(/GitLab by HTTP/gitlab.ruby.process_max_fds)*100>{$GITLAB.OPEN.FDS.MAX.WARN}` |WARNING | |
 |GitLab: Too many HTTP requests failures |<p>"Too many requests failed on GitLab instance with 5xx HTTP code"</p> |`min(/GitLab by HTTP/gitlab.http.requests.5xx.rate,5m)>{$GITLAB.HTTP.FAIL.MAX.WARN}` |WARNING | |
 |GitLab: Puma instance thread utilization is too high |<p>-</p> |`min(/GitLab by HTTP/gitlab.puma.active_connections[{#SINGLETON}],5m)/last(/GitLab by HTTP/gitlab.puma.max_threads[{#SINGLETON}])*100>{$GITLAB.PUMA.UTILIZATION.MAX.WARN}` |WARNING | |
@@ -137,7 +140,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
 

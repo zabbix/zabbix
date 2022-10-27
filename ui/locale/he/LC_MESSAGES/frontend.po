@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-07-10 09:03+0000\n"
-"Last-Translator: Yaron <sh.yaron@gmail.com>\n"
+"PO-Revision-Date: 2022-10-26 09:50+0000\n"
+"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -202,7 +202,7 @@ msgstr[1] "%1$s מתוך %2$s רכיבים נמצאים במצב תקלה"
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$s percentile: %2$s"
-msgstr ""
+msgstr "האחוזון ה־%1$s:‏ %2$s"
 
 #: jsLoader.php:348
 #, c-format
@@ -4244,6 +4244,17 @@ msgstr "תום זמן ההמתנה לחיבור"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "תוקף זמן החיבור על סך %1$s שניות חרג בעת החיבור לשרת ה־Zabbix‏ „%2$s”."
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+"החיבור לשרת ה־Zabbix‏ „%1$s” נכשל. סיבות אפשריות:\n"
+"1. „NodeAddress” או „ListenPort” שגויים ב־„zabbix_server.conf” או דריסת IP/DNS ב־„zabbix.conf.php”;\n"
+"2. הגדרות DNS שגויות בשרת.\n"
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4254,6 +4265,21 @@ msgstr ""
 "החיבור לשרת ה־Zabbix‏ „%1$s” נכשל. סיבות אפשריות:\n"
 "1. ה־IP/DNS של השרת תחת „zabbix.conf.php” שגוי;\n"
 "2. הגדרות שרת ה־DNS שגויות.\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
+"החיבור לשרת ה־Zabbix‏ „%1$s” סורב. סיבות אפשריות:\n"
+"1. „NodeAddress” או „ListenPort” שגויים ב־„zabbix_server.conf” או דריסת IP/DNS ב־„zabbix.conf.php”;\n"
+"2. סביבת אבטחת מידע (למשל SELinux) חוסמת את החיבור;\n"
+"3. סוכן שרת ה־Zabbix לא פעיל;\n"
+"4. חומת אש חוסמת את חיבור ה־TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4269,6 +4295,17 @@ msgstr ""
 "2. סביבת האבטחה (למשל, SELinux) חוסמת את החיבור;\n"
 "3. סוכן שרת ה־Zabbix לא פועל;\n"
 "4. חומת האש חוסמת חיבורי TCP.\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
+"הזמן שהוקצה לחיבור לשרת ה־Zabbix‏ „%1$s” תם. סיבות אפשריות:\n"
+"1. „NodeAddress” או „ListenPort” שגויים ב־„zabbix_server.conf” או דריסת IP/DNS ב־„zabbix.conf.php”;\n"
+"2. חומת אש חוסמת את חיבור ה־TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -9905,6 +9942,10 @@ msgctxt "compact table header"
 msgid "Info"
 msgstr "מידע"
 
+#: include/classes/data/CItemData.php:1428
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr " מידע על כוננים פנימיים של hypervisor שנחוץ לטובת vmware.datastore.perfcounter,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־VMware hypervisor. מחזירה JSON"
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -11461,7 +11502,7 @@ msgstr "ב׳"
 #: include/func.inc.php:592 jsLoader.php:226
 msgctxt "month short"
 msgid "M"
-msgstr ""
+msgstr "ח׳"
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
@@ -13725,6 +13766,10 @@ msgstr "רק מנהלי על יכולים להגדיר בעלות על דוח."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "רק הקפצות שמוקצות למארחים מופעלים שתלויות בפריטים פעילים נספרות"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr "פתיחת היומן"
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -14280,7 +14325,7 @@ msgstr "תרשימי הורה"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
-msgstr ""
+msgstr "ערך מארח הורה"
 
 #: include/views/configuration.item.edit.php:57
 #: include/views/configuration.item.prototype.edit.php:55
@@ -18332,6 +18377,16 @@ msgstr "החודש הזה עד כה"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "הגדרה זו חלה רק על נתונים מספריים. נתונים בלתי מספריים תמיד יימשכו מההיסטוריה."
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:135
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:164
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
@@ -20008,7 +20063,7 @@ msgstr "סטטיסטיקת זיכרון מטמון של VMware. המצבים ה�
 
 #: include/classes/data/CItemData.php:1256
 msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "מצב נתוני התראות בקלאסטר VMware,‏ מחזירה JSON,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה קלאסטר VMware"
 
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
@@ -20016,7 +20071,7 @@ msgstr "מודד ביצועי קלאסטר VMware,‏ <url> - כתובת שיר�
 
 #: include/classes/data/CItemData.php:1264
 msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
-msgstr ""
+msgstr "עדיפות קלאסטר VMware,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה קלאסטר VMware,‏ <prop> - נתיב מאפיין"
 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
@@ -20024,15 +20079,15 @@ msgstr "מצב קלאסטר VMware,‏ <url> - כתובת שירות VMware,‏ 
 
 #: include/classes/data/CItemData.php:1272
 msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "מערך תגיות לקלאסטר VMware,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה קלאסטר VMware"
 
 #: include/classes/data/CItemData.php:1308
 msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
-msgstr ""
+msgstr "נתוני התראות חוות שרתי VMware, מחזירה JSON,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה חוות שרתי VMware"
 
 #: include/classes/data/CItemData.php:1316
 msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
-msgstr ""
+msgstr "מערך תגיות חוות שרתי VMware,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה חוות שרתי VMware, מחזירה JSON"
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -20044,7 +20099,7 @@ msgstr "חוות (datacenters) של VMware והמזהים שלהם. מחזירה
 
 #: include/classes/data/CItemData.php:1276
 msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
-msgstr ""
+msgstr "נתוני התראות מאגרי נתונים של VMware, מחזירה JSON,‏ <url> - כתובת שירות VMware,‏ <uuid> - מזהה מאגר נתונים של VMware"
 
 #: include/classes/data/CItemData.php:1242
 #: include/classes/data/CItemData.php:1298
@@ -20055,9 +20110,13 @@ msgstr "סטטיסטיקת נפח מאגר הנתונים של VMWare בבתים
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "רשימת מאגרי הנתונים של ה־Hypervisors של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <datastore> - שם מאגר הנתונים"
 
+#: include/classes/data/CItemData.php:1320
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr "מודד ביצועי מאגרי נתונים של VMware,‏ <url> - כתובת שירות VMware,‏ <id> - מזהה מאגר נתונים VMware,‏ <path> - נתיב מודד ביצועים, <instance> - מופע של מודד ביצועים"
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
-msgstr ""
+msgstr "מאפיין מאגרי נתונים של VMware, ‏<url> - כתובת שירות VMware,‏ <uuid> - שם מאגר נתונים, <prop> - נתיב מאפיין"
 
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -20065,7 +20124,7 @@ msgstr "סטטיסטיקת קריאה ממאגרי נתונים של VMware,‏ 
 
 #: include/classes/data/CItemData.php:1300
 msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
-msgstr ""
+msgstr "מערך תגיות מאגרי נתונים של VMware, ‏<url> - כתובת שירות VMware,‏ <uuid> - מזהה ייחודי למאגר נתונים של VMware. מחזירה JSON"
 
 #: include/classes/data/CItemData.php:1246
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
@@ -20085,7 +20144,7 @@ msgstr "חיישני מצב יצרן חומרה של VMware hypervisor,‏ <url>
 
 #: include/classes/data/CItemData.php:1336
 msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "נתוני התראות של ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
 #: include/classes/data/CItemData.php:1350
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20157,7 +20216,7 @@ msgstr "ניצול תהליך hypervisor של VMware בהרץ,‏ <url> כתוב
 
 #: include/classes/data/CItemData.php:1472
 msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
-msgstr ""
+msgstr "מאפיין hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware,‏ <prop> - נתיב מאפיין"
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -20173,7 +20232,7 @@ msgstr "מצב ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VM
 
 #: include/classes/data/CItemData.php:1488
 msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "מערך תגיות ב־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware. מחזירה JSON"
 
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -20205,11 +20264,11 @@ msgstr "גרסת שירות ה־VMware,‏ <url> - כתובת שירות ה־VMw
 
 #: include/classes/data/CItemData.php:1248
 msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
-msgstr ""
+msgstr "נתוני התראות של מרכז VMware וירטואלי, מחזירה JSON,‏ <url> - כתובת שירות VMware"
 
 #: include/classes/data/CItemData.php:1516
 msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
-msgstr ""
+msgstr "נתוני התראות מכונה וירטואלית ב־VMware,‏ מחזירה JSON,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המכונה הווירטואלית ב־VMware"
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20293,7 +20352,7 @@ msgstr "ניצולת מעבד במכונה וירטואלית של VMWare בהר
 
 #: include/classes/data/CItemData.php:1644
 msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
-msgstr ""
+msgstr "מאפיין מכונה וירטואלית ב־VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - מכונה וירטואלית ב־VMware,‏ <prop> - נתיב המאפיין"
 
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20313,7 +20372,7 @@ msgstr "גודל זיכרון החלפה במכונה וירטואלית של VM
 
 #: include/classes/data/CItemData.php:1684
 msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "מערך תגיות של מכונה וירטואלית ב־VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - מכונה וירטואלית ב־VMware. מחזירה JSON"
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
@@ -21251,6 +21310,17 @@ msgstr "טופס כניסה ל־Zabbix"
 msgid "Zabbix server"
 msgstr "שרת Zabbix"
 
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
+"לא ניתן לגשת לשרת ה־Zabbix‏ „%1$s”. סיבות אפשריות:\n"
+"1. „NodeAddress” או „ListenPort” שגויים ב־„zabbix_server.conf” או דריסת IP/DNS ב־„zabbix.conf.php”;\n"
+"2. הגדרות רשת שגויות.\n"
+
 #: include/classes/server/CZabbixServer.php:601
 #, c-format
 msgid ""
@@ -21320,7 +21390,7 @@ msgstr "אמור להיות מחרוזת תווים"
 
 #: include/classes/validators/CApiInputValidator.php:910
 msgid "a character string, integer or floating point value is expected"
-msgstr ""
+msgstr "אמור להיות מחרוזת תווים, מספר שלם וחיובי או שבר עשרוני"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -23537,7 +23607,7 @@ msgstr "דרך"
 #: include/func.inc.php:659
 msgctxt "week short"
 msgid "w"
-msgstr ""
+msgstr "שב׳"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

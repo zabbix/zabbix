@@ -63,6 +63,47 @@ void	DBclose(void)
 	zbx_db_close();
 }
 
+#if defined(HAVE_POSTGRESQL)
+int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
+{
+	DB_RESULT	result;
+	int		ret;
+
+	if (1 == ZBX_DB_TSDB_V1) {
+		result = DBselect("select null from timescaledb_information.compressed_chunk_stats where hypertable_name in (%s) and "
+			"compression_status='Compressed'", table_names);
+	}
+	else
+	{
+		result = DBselect("select null from timescaledb_information.chunks where hypertable_name in (%s) and "
+			"is_compressed='t'", table_names);
+	}
+
+	if (NULL != DBfetch(result))
+		ret = SUCCEED;
+	else
+		ret = FAIL;
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+void	zbx_tsdb_update_dbversion_info(struct zbx_db_version_info_t *db_version_info)
+{
+	const char	*history_tables, *trends_tables;
+
+	history_tables = (1 == ZBX_DB_TSDB_V1 ? ZBX_TSDB1_HISTORY_TABLES : ZBX_TSDB2_HISTORY_TABLES);
+	trends_tables = (1 == ZBX_DB_TSDB_V1 ? ZBX_TSDB1_TRENDS_TABLES : ZBX_TSDB2_TRENDS_TABLES);
+
+	db_version_info->history_compressed_chunks = (SUCCEED ==
+			zbx_tsdb_table_has_compressed_chunks(history_tables)) ? 1 : 0;
+
+	db_version_info->trends_compressed_chunks = (SUCCEED ==
+			zbx_tsdb_table_has_compressed_chunks(trends_tables)) ? 1 : 0;
+}
+#endif
+
 int	zbx_db_validate_config_features(void)
 {
 	int	err = 0;

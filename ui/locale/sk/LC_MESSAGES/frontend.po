@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-09-15 07:31+0000\n"
+"PO-Revision-Date: 2022-10-09 18:02+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -4326,6 +4326,14 @@ msgstr "Spojenie vypršalo"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Časový limit spojenie %1$s sekúnd vypršal pri spájaní so Zabbix serverom \"%2$s\"."
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4336,6 +4344,16 @@ msgstr ""
 "Spojenie so Zabbix serverom \"%s\" zlyhalo. Možné dôvody:\n"
 "1. Nesprávne nastavenie IP/DNS Zabbix servera v súbore \"zabbix.conf.php\";\n"
 "2. Nesprávne nastavenie DNS servera.\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4351,6 +4369,14 @@ msgstr ""
 "2. Bezpečnostné nastavenia (napríklad SELinux) blokujú spojenie;\n"
 "3. Zabbix server démon nie je spustený;\n"
 "4. Firewall blokuje TCP spojenie.\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -10004,6 +10030,10 @@ msgctxt "compact table header"
 msgid "Info"
 msgstr "Info"
 
+#: include/classes/data/CItemData.php:1428
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -13843,6 +13873,10 @@ msgstr "Vlastníka reportu môžu nastaviť iba superadministrátori."
 #: app/partials/administration.system.info.php:68
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Len spúšťače priradené k monitorovaným hostom alebo závislé na monitorovaných položkách sú započítané"
+
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -18464,6 +18498,16 @@ msgstr "Tento mesiac zatiaľ"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "Toto nastavenie platí len pre číselné údaje. Nečíselné údaje budú vždy prevzaté z histórie."
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:135
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:164
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
@@ -20197,6 +20241,10 @@ msgstr "Štatistika kapacity dátového úložiska VMware v bajtoch alebo v perc
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "Zoznam hypervízorov datastoru VMware, <url> – adresa URL služby VMware, <datastore> – názov datastoru"
 
+#: include/classes/data/CItemData.php:1320
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr "Vlastnosť úložiska údajov VMware, <url> – adresa URL služby VMware, <uuid> – názov úložiska údajov, <prop> – cesta k vlastnosti"
@@ -21395,6 +21443,14 @@ msgstr "Prihlasovací formulár Zabbix"
 msgid "Zabbix server"
 msgstr "Zabbix server"
 
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:601
 #, c-format
 msgid ""
@@ -21464,7 +21520,7 @@ msgstr "reťazec znakov je očakávaný"
 
 #: include/classes/validators/CApiInputValidator.php:910
 msgid "a character string, integer or floating point value is expected"
-msgstr ""
+msgstr "očakáva sa reťazec znakov, celé číslo alebo hodnota s pohyblivou rádovou čiarkou"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
