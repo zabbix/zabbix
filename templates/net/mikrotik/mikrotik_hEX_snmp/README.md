@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 The template for monitoring Ethernet router MikroTik hEX.
 
 5x Gigabit Ethernet, Dual Core 880MHz CPU, 256MB RAM, USB, microSD, RouterOS L4
@@ -160,7 +160,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 
 ## References

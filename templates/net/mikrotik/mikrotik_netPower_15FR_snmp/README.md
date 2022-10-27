@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 The template for monitoring Switch MikroTik netPower 15FR.
 
 An outdoor 18 port switch with 15 reverse PoE ports and SFP. Cut costs, not speed – choose GPEN over GPON!
@@ -160,7 +160,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 
 ## References

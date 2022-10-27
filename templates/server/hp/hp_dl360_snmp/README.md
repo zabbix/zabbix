@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 This is a template for monitoring HPE ProLiant DL360 servers with HP iLO version 4 and later via Zabbix SNMP agent that works without any external scripts.
 
 ## Setup
@@ -171,5 +171,5 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 

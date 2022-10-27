@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 The template for monitoring Switch MikroTik CRS326-24G-2S+RM.
 
 24 Gigabit port switch with 2 x SFP+ cages in 1U rackmount case, Dual boot (RouterOS or SwitchOS)
@@ -160,7 +160,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 
 ## References

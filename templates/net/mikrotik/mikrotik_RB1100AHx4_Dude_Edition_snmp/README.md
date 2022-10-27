@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 The template for monitoring Ethernet router MikroTik RB1100AHx4 Dude Edition.
 
 Powerful 1U rackmount router with 13x Gigabit Ethernet ports, 60GB M.2 drive for Dude database
@@ -160,7 +160,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 
 ## References

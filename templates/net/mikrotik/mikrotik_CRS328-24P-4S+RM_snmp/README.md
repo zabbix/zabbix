@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 The template for monitoring Switch MikroTik CRS328-24P-4S+RM.
 
 24 port Gigabit Ethernet router/switch with four 10Gbps SFP+ ports in 1U rackmount case, Dual Boot and PoE output, 500W
@@ -160,7 +160,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 
 ## References

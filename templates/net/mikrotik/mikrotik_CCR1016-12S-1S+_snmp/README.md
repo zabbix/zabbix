@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 The template for monitoring Ethernet router MikroTik CCR1016-12S-1S+.
 
 1U rackmount, 12xSFP cage, 1xSFP+ cage, 16 cores x 1.2GHz CPU, 2GB RAM, LCD panel, Dual Power supplies, RouterOS L6
@@ -160,7 +160,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 
 ## References

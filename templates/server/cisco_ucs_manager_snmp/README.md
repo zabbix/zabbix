@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 Cisco UCS® Manager provides unified, embedded management of all software and hardware
  components of the Cisco Unified Computing System™ (Cisco UCS) across multiple chassis
  and rack servers. It enables server, fabric, and storage provisioning as well as,
@@ -179,7 +179,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco).
 

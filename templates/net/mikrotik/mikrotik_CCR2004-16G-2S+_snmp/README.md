@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 The template for monitoring Ethernet router MikroTik CCR2004-16G-2S+.
 
 This powerful and affordable router crushes all previous CCR models in single-core performance. 16x Gigabit Ethernet ports, 2x10G SFP+ cages, active cooling and the best single-core performance per watt & best overall performance per watt among all the CCR devices.
@@ -160,7 +160,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 
 ## References

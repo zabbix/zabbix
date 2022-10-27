@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 ![Product picture](images/pic.png?raw=true)
 > Courtesy of Cisco Systems, Inc. Unauthorized use not permitted.
 
@@ -139,7 +139,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418396-discussion-thread-for-official-zabbix-templates-for-cisco).
 
