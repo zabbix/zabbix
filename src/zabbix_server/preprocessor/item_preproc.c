@@ -2402,7 +2402,6 @@ static int	item_preproc_group_flat_json(zbx_variant_t *value, const char *params
 	zbx_free(fj.index_name);
 	zbx_free(fj.key_name);
 	zbx_free(fj.value_name);
-	zabbix_log(1, "DBG json =\n%s\n", result);
 	zbx_hashset_destroy(&fj.grouped_prefixes);
 
 	zbx_variant_clear(value);

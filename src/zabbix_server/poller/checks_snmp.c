@@ -1999,9 +1999,6 @@ static int	zbx_snmp_process_snmp_get(struct snmp_session *ss, const DC_ITEM *ite
 		goto out;
 	}
 
-	//if (SUCCEED != (ret = zbx_snmp_ddata_init(&data, item->snmp_oid, error, max_error_len)))
-		//goto out;
-
 	if (0 == data.request.nparam || (1 == data.request.nparam && '\0' == *(data.request.params[0])))
 	{
 		zbx_strlcpy(error, "Invalid parameters: at least one OID is expected.", max_error_len);
@@ -2056,7 +2053,6 @@ static int	zbx_snmp_process_snmp_get(struct snmp_session *ss, const DC_ITEM *ite
 			if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 			{
 				ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, max_error_len);
-				zabbix_log(1, "Bad snmp errcode received");
 				goto out;
 			}
 
@@ -2088,7 +2084,6 @@ static int	zbx_snmp_process_snmp_get(struct snmp_session *ss, const DC_ITEM *ite
 					{
 						if (-1 == zbx_snmp_print_oid(printed_oid, sizeof(printed_oid), var->name, var->name_length, ZBX_OID_INDEX_NUMERIC))
 						{
-							zabbix_log(1, "Failed to print oid name, variable was ignored");
 							continue;
 						}
 						else
@@ -2129,8 +2124,6 @@ out:
 
 	if (SUCCEED != (*errcode = ret))
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
-
-	zabbix_log(1, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 #undef SNMP_BULKWALK_MAXVARS
