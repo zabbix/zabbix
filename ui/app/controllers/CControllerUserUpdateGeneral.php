@@ -88,7 +88,7 @@ abstract class CControllerUserUpdateGeneral extends CController {
 				]
 			]);
 		}
-		else if ($this->getInput('user_groups', [])) {
+		elseif ($this->getInput('user_groups', [])) {
 			$usrgrps = API::UserGroup()->get([
 				'output' => ['gui_access'],
 				'usrgrpids' => $this->getInput('user_groups'),

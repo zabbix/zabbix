@@ -315,10 +315,9 @@ class CUserGroup extends CApiService {
 		}
 
 		$enabled_groupids = array_keys(array_column($usrgrps, 'users_status', 'usrgrpid'), GROUP_STATUS_ENABLED);
+		$disabled_user_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID);
 
-		if ($enabled_groupids
-				&& in_array(CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID),
-				$enabled_groupids)) {
+		if ($enabled_groupids && in_array($disabled_user_groupid, $enabled_groupids)) {
 			static::exception(ZBX_API_ERROR_PARAMETERS, _('Deprovisioned users group cannot be enabled.'));
 		}
 

@@ -105,7 +105,7 @@ class Group extends ScimApiService {
 	 *
 	 * @throws APIException if input is invalid.
 	 */
-	private function validateGet(array $options): void {
+	private function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'id' =>				['type' => API_ID],
 			'startIndex' =>		['type' => API_INT32, 'default' => 1],
@@ -121,7 +121,7 @@ class Group extends ScimApiService {
 	 * Receives information on new SCIM group and its members. Creates new entries in 'scim_groups' and
 	 * 'users_scim_groups' tables, updates users' user groups mapping based on the SCIM groups and SAML settings.
 	 *
-	 * @param array $options                         Array with data from request.
+	 * @param array  $options                        Array with data from request.
 	 * @param string $options['displayName']         SCIM group name.
 	 * @param array  $options['members']             Array with SCIM group members.
 	 * @param string $options['members'][]['value']  Userid.
@@ -324,7 +324,7 @@ class Group extends ScimApiService {
 	 */
 	private function validateDelete(array $options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-			'id' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => true]
+			'id' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {

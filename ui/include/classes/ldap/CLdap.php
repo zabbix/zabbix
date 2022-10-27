@@ -360,7 +360,7 @@ class CLdap {
 				$regex = '/'.preg_quote($this->cnf['group_name'], '/').'=(?<groupname>[^,]+)/';
 				unset($value['count']);
 
-				/**
+				/*
 				 * Extract group names from their DN strings.
 				 * For DN string "cn=zabbix-admins,ou=Group,dc=example,dc=org" and "Group name attribute" set to "cn"
 				 * will store string "zabbix-admins" in $groups array.

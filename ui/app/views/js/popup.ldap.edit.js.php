@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * @var CView $this
+ */
 ?>
 
 window.ldap_edit_popup = new class {

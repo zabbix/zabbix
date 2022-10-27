@@ -114,9 +114,7 @@ class CControllerAuthenticationUpdate extends CController {
 				|| $data['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED);
 
 		if (!$is_valid) {
-			CMessageHelper::setErrorTitle(_s('Incorrect value for field "%1$s": %2$s.', 'authentication_type',
-				_('LDAP is not configured')
-			));
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'authentication_type', _('LDAP is not configured')));
 		}
 
 		return $is_valid;
@@ -136,11 +134,13 @@ class CControllerAuthenticationUpdate extends CController {
 
 			if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
 				error($ldap_status['error']);
+
 				return false;
 			}
 
 			if (!$ldap_servers) {
 				error(_('At least one LDAP server must exist.'));
+
 				return false;
 			}
 		}
@@ -149,6 +149,7 @@ class CControllerAuthenticationUpdate extends CController {
 				&& (!$this->hasInput('ldap_default_row_index')
 					|| !array_key_exists($this->getInput('ldap_default_row_index'), $ldap_servers))) {
 			error(_('Default LDAP server must be specified.'));
+
 			return false;
 		}
 
@@ -161,11 +162,13 @@ class CControllerAuthenticationUpdate extends CController {
 			if (!array_key_exists('provision_groups', $ldap_server)
 					|| !$this->validateProvisionGroups($ldap_server['provision_groups'])) {
 				error(_('Invalid LDAP JIT provisioning user group mapping configuration.'));
+
 				return false;
 			}
 			if (array_key_exists('provision_media', $ldap_server)
 					&& !$this->validateProvisionMedia($ldap_server['provision_media'])) {
 				error(_('Invalid LDAP JIT provisioning media type mapping configuration.'));
+
 				return false;
 			}
 		}
@@ -186,6 +189,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
 		if ($openssl_status['result'] != CFrontendSetup::CHECK_OK) {
 			error($openssl_status['error']);
+
 			return false;
 		}
 
@@ -201,10 +205,12 @@ class CControllerAuthenticationUpdate extends CController {
 
 			if (!$this->validateProvisionGroups($this->getInput('saml_provision_groups', []))) {
 				error(_('Invalid SAML JIT provisioning user group mapping configuration.'));
+
 				return false;
 			}
 			if (!$this->validateProvisionMedia($this->getInput('saml_provision_media', []))) {
 				error(_('Invalid SAML JIT provisioning media type mapping configuration.'));
+
 				return false;
 			}
 		}
@@ -212,6 +218,7 @@ class CControllerAuthenticationUpdate extends CController {
 		foreach ($saml_fields as $field_name => $field_value) {
 			if ($field_value === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty')));
+
 				return false;
 			}
 		}

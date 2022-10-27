@@ -178,7 +178,7 @@ class CAuthentication extends CApiService {
 				static::exception(ZBX_API_ERROR_PARAMETERS, _('Deprovisioned users group cannot be enabled.'));
 			}
 		}
-		else if ($auth['ldap_jit_status'] == JIT_PROVISIONING_ENABLED
+		elseif ($auth['ldap_jit_status'] == JIT_PROVISIONING_ENABLED
 				|| $auth['saml_jit_status'] == JIT_PROVISIONING_ENABLED) {
 			static::exception(ZBX_API_ERROR_PARAMETERS, _('Deprovisioned users group cannot be empty.'));
 		}

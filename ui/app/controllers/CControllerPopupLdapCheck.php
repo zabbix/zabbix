@@ -69,6 +69,7 @@ class CControllerPopupLdapCheck extends CController {
 				error(_('Invalid user group mapping configuration.'));
 				$ret = false;
 			}
+
 			if ($ret && !$this->validateProvisionMedia()) {
 				error(_('Invalid media type mapping configuration.'));
 				$ret = false;
@@ -159,10 +160,10 @@ class CControllerPopupLdapCheck extends CController {
 
 		foreach ($this->getInput('provision_media') as $media) {
 			if (!is_array($media)
-				|| !array_key_exists('name', $media) || !is_string($media['name']) || $media['name'] === ''
-				|| !array_key_exists('attribute', $media) || !is_string($media['attribute'])
-				|| $media['attribute'] === ''
-				|| !array_key_exists('mediatypeid', $media) || !ctype_digit($media['mediatypeid'])) {
+					|| !array_key_exists('name', $media) || !is_string($media['name']) || $media['name'] === ''
+					|| !array_key_exists('attribute', $media) || !is_string($media['attribute'])
+					|| $media['attribute'] === ''
+					|| !array_key_exists('mediatypeid', $media) || !ctype_digit($media['mediatypeid'])) {
 				return false;
 			}
 		}

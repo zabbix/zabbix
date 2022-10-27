@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 namespace SCIM\services;
 
 use API as APIRPC;
@@ -359,21 +360,21 @@ class User extends ScimApiService {
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
 
-		[$db_user] = APIRPC::User()->get([
+		$db_users = APIRPC::User()->get([
 			'output' => ['userid', 'userdirectoryid'],
 			'userids' => $options['id']
 		]);
 
-		if (!$db_user) {
+		if (!$db_users) {
 			self::exception(self::SCIM_ERROR_NOT_FOUND, _('This user does not exist.'));
 		}
-		elseif ($db_user['userdirectoryid'] != $userdirectoryid) {
+		elseif ($db_users[0]['userdirectoryid'] != $userdirectoryid) {
 			self::exception(self::SCIM_ERROR_BAD_REQUEST,
 				_s('The user "%1$s" belongs to another userdirectory.', $options['id'])
 			);
 		}
 
-		return $db_user;
+		return $db_users[0];
 	}
 
 	/**

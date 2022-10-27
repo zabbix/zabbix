@@ -1452,11 +1452,8 @@ class CUser extends CApiService {
 		$new_user = [];
 		$ldap_userdirectoryid = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
 		$default_auth_type = CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE);
-		$user_data = $this->findAccessibleUser(
-			$user['username'],
-			CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE,
-			$default_auth_type, true
-		);
+		$sensitive = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE;
+		$user_data = $this->findAccessibleUser($user['username'], $sensitive, $default_auth_type, true);
 
 		if (!array_key_exists('db_user', $user_data) && $user['username'] !== ZBX_GUEST_USER
 				&& $default_auth_type == ZBX_AUTH_LDAP
@@ -1511,13 +1508,15 @@ class CUser extends CApiService {
 						self::exception(ZBX_API_ERROR_INTERNAL, _('LDAP authentication is disabled.'));
 					}
 
-					$id = $db_user['userdirectoryid'] != 0 ? $db_user['userdirectoryid'] : $ldap_userdirectoryid;
+					$userdirectoryid = $db_user['userdirectoryid'] != 0
+						? $db_user['userdirectoryid']
+						: $ldap_userdirectoryid;
 					$exists = false;
 
-					if ($id != 0) {
+					if ($userdirectoryid != 0) {
 						$exists = API::UserDirectory()->get([
 							'countOutput' => true,
-							'userdirectoryids' => $id,
+							'userdirectoryids' => $userdirectoryid,
 							'filter' => ['idp_type' => IDP_TYPE_LDAP]
 						]) > 0;
 					}
@@ -1527,7 +1526,7 @@ class CUser extends CApiService {
 					}
 
 					$idp_user_data = API::UserDirectory()->test([
-						'userdirectoryid' => $id,
+						'userdirectoryid' => $userdirectoryid,
 						'test_username' => $user['username'],
 						'test_password' => $user['password']
 					]);
