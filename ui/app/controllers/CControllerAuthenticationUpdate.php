@@ -401,15 +401,6 @@ class CControllerAuthenticationUpdate extends CController {
 				$ldap_server = array_diff_key($ldap_server, array_flip(self::PROVISION_ENABLED_FIELDS));
 			}
 
-			if (array_key_exists('provision_groups', $ldap_server)) {
-				CArrayHelper::sort($ldap_server['provision_groups'], ['sortorder']);
-				$ldap_server['provision_groups'] = array_values($ldap_server['provision_groups']);
-
-				$ldap_server['provision_groups'] = array_map(function ($group) {
-					return array_intersect_key($group, array_flip(['name', 'roleid', 'user_groups']));
-				}, $ldap_server['provision_groups']);
-			}
-
 			if (array_key_exists('userdirectoryid', $ldap_server)) {
 				$userdirectoryid_map[$row_index] = $ldap_server['userdirectoryid'];
 				$upd_ldap_servers[] = $ldap_server;
@@ -488,21 +479,6 @@ class CControllerAuthenticationUpdate extends CController {
 		if (!array_key_exists('provision_status', $saml_data)
 				|| $saml_data['provision_status'] != JIT_PROVISIONING_ENABLED) {
 			$saml_data = array_diff_key($saml_data, array_flip(self::PROVISION_ENABLED_FIELDS));
-		}
-
-		if (array_key_exists('provision_groups', $saml_data) && $saml_data['provision_groups']) {
-			CArrayHelper::sort($saml_data['provision_groups'], ['sortorder']);
-			$saml_data['provision_groups'] = array_values($saml_data['provision_groups']);
-
-			foreach ($saml_data['provision_groups'] as $index => $group) {
-				if (array_key_exists('enabled', $group) && $group['enabled'] == 0) {
-					unset($saml_data['provision_groups'][$index]);
-					continue;
-				}
-
-				$group_props = ['name', 'user_groups', 'roleid'];
-				$saml_data['provision_groups'][$index] = array_intersect_key($group, array_flip($group_props));
-			}
 		}
 
 		$db_saml = API::UserDirectory()->get([
