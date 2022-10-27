@@ -55,7 +55,7 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 			continue
 		}
 
-		if bytes.Total > 0 && inodes.Total > 0 {
+		if bytes.Total > 0 {
 			fsmap[*info.FsName] = &FsInfoNew{info.FsName, info.FsType, nil, bytes, inodes}
 		}
 	}
@@ -136,6 +136,8 @@ func getFsStats(path string) (stats *FsStats, err error) {
 }
 
 func getFsInode(path string) (stats *FsStats, err error) {
+	var pfree, pused float64
+
 	fs := unix.Statfs_t{}
 	err = unix.Statfs(path, &fs)
 	if err != nil {
@@ -145,12 +147,21 @@ func getFsInode(path string) (stats *FsStats, err error) {
 	total := fs.Files
 	free := fs.Ffree
 	used := fs.Files - fs.Ffree
+
+	if 0 < total {
+		pfree = 100 * float64(free) / float64(total)
+		pused = 100 * float64(total-free) / float64(total)
+	} else {
+		pfree = 100.0
+		pused = 0.0
+	}
+
 	stats = &FsStats{
 		Total: total,
 		Free:  free,
 		Used:  used,
-		PFree: 100 * float64(free) / float64(total),
-		PUsed: 100 * float64(total-free) / float64(total),
+		PFree: pfree,
+		PUsed: pused,
 	}
 
 	return

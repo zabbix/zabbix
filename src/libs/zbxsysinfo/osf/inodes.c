@@ -74,13 +74,7 @@ static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 #ifdef HAVE_SYS_STATVFS_H
 		total -= s.f_ffree - s.f_favail;
 #endif
-		if (0 != total)
-			SET_DBL_RESULT(result, (double)(100.0 * s.ZBX_FFREE) / total);
-		else
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
-			return SYSINFO_RET_FAIL;
-		}
+		SET_DBL_RESULT(result, 0 != total ? (double)(100.0 * s.ZBX_FFREE) / total : 100.0);
 	}
 	else if (0 == strcmp(mode, "pused"))
 	{
@@ -88,15 +82,7 @@ static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 #ifdef HAVE_SYS_STATVFS_H
 		total -= s.f_ffree - s.f_favail;
 #endif
-		if (0 != total)
-		{
-			SET_DBL_RESULT(result, 100.0 - (double)(100.0 * s.ZBX_FFREE) / total);
-		}
-		else
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
-			return SYSINFO_RET_FAIL;
-		}
+		SET_DBL_RESULT(result, 0 != total ? 100.0 - (double)(100.0 * s.ZBX_FFREE) / total : 0.0);
 	}
 	else
 	{
