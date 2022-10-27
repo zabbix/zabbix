@@ -279,6 +279,8 @@ int	CONFIG_AVAILMAN_FORKS		= 0;
 int	CONFIG_SERVICEMAN_FORKS		= 0;
 int	CONFIG_TRIGGERHOUSEKEEPER_FORKS = 0;
 
+static char	*config_file		= NULL;
+
 char	*opt = NULL;
 
 #ifdef _WINDOWS
@@ -346,8 +348,8 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		switch (ch)
 		{
 			case 'c':
-				if (NULL == CONFIG_FILE)
-					CONFIG_FILE = strdup(zbx_optarg);
+				if (NULL == config_file)
+					config_file = strdup(zbx_optarg);
 				break;
 #ifndef _WINDOWS
 			case 'R':
@@ -525,13 +527,13 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		goto out;
 	}
 
-	if (NULL == CONFIG_FILE)
-		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
+	if (NULL == config_file)
+		config_file = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 out:
 	if (FAIL == ret)
 	{
 		zbx_free(TEST_METRIC);
-		zbx_free(CONFIG_FILE);
+		zbx_free(config_file);
 	}
 
 	return ret;
@@ -735,6 +737,7 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 				hostnames->values[i] : "");
 		config_active_args[forks].zbx_config_tls = zbx_config_tls;
 		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
+		config_active_args[forks].config_file = config_file;
 	}
 
 	return SUCCEED;
@@ -951,7 +954,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS_EN);
 #endif
-	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
+	parse_cfg_file(config_file, cfg, requirement, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 
 	zbx_finalize_key_access_rules_configuration();
 
@@ -1029,7 +1032,7 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 	switch (t->task)
 	{
 		case ZBX_TASK_INSTALL_SERVICE:
-			ret = ZabbixCreateService(name, t->flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS);
+			ret = ZabbixCreateService(name, t->flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS, config_file);
 			break;
 		case ZBX_TASK_UNINSTALL_SERVICE:
 			ret = ZabbixRemoveService();
@@ -1119,7 +1122,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
+	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
 
 #if !defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
@@ -1209,7 +1212,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zbx_thread_args_t		*thread_args;
 		zbx_thread_info_t		*thread_info;
-		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_program_type};
+		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_program_type,
+								config_file};
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 		thread_info = &thread_args->info;
