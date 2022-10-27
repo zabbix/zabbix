@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 The template to monitor Cisco Meraki dashboard by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.  
 
@@ -66,15 +66,15 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 
 # Cisco Meraki organization by HTTP
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 
 ## Setup
 
@@ -151,13 +151,13 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 # Cisco Meraki device by HTTP
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 
 ## Setup
 
@@ -193,8 +193,8 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |Meraki |Meraki: status |<p>Device operational status</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p> |DEPENDENT |meraki.device.status<p>**Preprocessing**:</p><p>- JSONPATH: `$.device[0].status`</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 |Meraki |Meraki: public ip |<p>Device public ip</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p> |DEPENDENT |meraki.device.public.ip<p>**Preprocessing**:</p><p>- JSONPATH: `$.device[0].publicIp`</p> |
-|Meraki |Uplink [{#IP}]: [{#UPLINK}]: Loss, % |<p>Loss percent of the device uplink. </p><p>Network: {#NETWORK.ID}. </p><p>Device serial: {$SERIAL}.</p> |DEPENDENT |meraki.device.loss.pct[{#IP},{#UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL[?(@.ip == '{#IP}' && @.uplink== '{#UPLINK}')].timeSeries.[0].lossPercent.first()`</p><p>- JAVASCRIPT: `return value === "" ? -1 : value `</p> |
-|Meraki |Uplink [{#IP}]: [{#UPLINK}]: Latency |<p>Latency of the device uplink. </p><p>Network: {#NETWORK.ID}. </p><p>Device serial: {$SERIAL}.</p> |DEPENDENT |meraki.device.latency[{#IP},{#UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL[?(@.ip == '{#IP}' && @.uplink== '{#UPLINK}')].timeSeries.[0].latencyMs.first()`</p><p>- JAVASCRIPT: `return value === "" ? -1000 : value `</p><p>- MULTIPLIER: `0.001`</p> |
+|Meraki |Uplink [{#IP}]: [{#UPLINK}]: Loss, % |<p>Loss percent of the device uplink. </p><p>Network: {#NETWORK.ID}. </p><p>Device serial: {#SERIAL}.</p> |DEPENDENT |meraki.device.loss.pct[{#IP},{#UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL[?(@.ip == '{#IP}' && @.uplink== '{#UPLINK}')].timeSeries.[0].lossPercent.first()`</p><p>- JAVASCRIPT: `return value === "" ? -1 : value `</p> |
+|Meraki |Uplink [{#IP}]: [{#UPLINK}]: Latency |<p>Latency of the device uplink. </p><p>Network: {#NETWORK.ID}. </p><p>Device serial: {#SERIAL}.</p> |DEPENDENT |meraki.device.latency[{#IP},{#UPLINK}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.uplinksLL[?(@.ip == '{#IP}' && @.uplink== '{#UPLINK}')].timeSeries.[0].latencyMs.first()`</p><p>- JAVASCRIPT: `return value === "" ? -1000 : value `</p><p>- MULTIPLIER: `0.001`</p> |
 |Zabbix raw items |Meraki: Get device data |<p>Item for gathering device data from Meraki API.</p> |SCRIPT |meraki.get.device<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Zabbix raw items |Meraki: Device data item errors |<p>Item for gathering errors of the device item.</p> |DEPENDENT |meraki.get.device.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
@@ -209,5 +209,5 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 

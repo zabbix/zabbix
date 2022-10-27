@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-07T10:13:00Z'
+  date: '2022-10-27T12:20:58Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -92,12 +92,12 @@ zabbix_export:
                     request.setProxy(params.httpproxy);
                 }
             
-                organizations = getHttpData(params.url + '/organizations');
+                organizations = getHttpData(params.url + 'organizations');
             
                 if (Array.isArray(organizations) && organizations.length > 0) {
                     for (i in organizations) {
                         if ('id' in organizations[i]) {
-                            organization_devices = getHttpData(params.url + '/organizations/' + encodeURIComponent(organizations[i].id) + '/devices');
+                            organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(organizations[i].id) + '/devices');
             
                             if (Array.isArray(organization_devices) && organization_devices.length > 0) {
                                 for (j in organization_devices) {
@@ -496,8 +496,8 @@ zabbix_export:
                     request.setProxy(params.httpproxy);
                 }
             
-                device = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/devices/statuses?serials[]=' + encodeURIComponent(params.serial));
-                uplinksLL = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/devices/uplinksLossAndLatency?timespan=60');
+                device = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/statuses?serials[]=' + encodeURIComponent(params.serial));
+                uplinksLL = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/uplinksLossAndLatency?timespan=60');
             
                 if (uplinksLL.length > 0) {
                     uplinks = uplinksLL.filter(function(device) {
@@ -591,7 +591,7 @@ zabbix_export:
               description: |
                 Latency of the device uplink. 
                 Network: {#NETWORK.ID}. 
-                Device serial: {$SERIAL}.
+                Device serial: {#SERIAL}.
               preprocessing:
                 -
                   type: JSONPATH
@@ -612,8 +612,14 @@ zabbix_export:
                   tag: component
                   value: network
                 -
+                  tag: ip
+                  value: '{#IP}'
+                -
                   tag: network
                   value: '{#NETWORK.ID}'
+                -
+                  tag: serial-number
+                  value: '{#SERIAL}'
                 -
                   tag: uplink
                   value: '{#UPLINK}'
@@ -639,7 +645,7 @@ zabbix_export:
               description: |
                 Loss percent of the device uplink. 
                 Network: {#NETWORK.ID}. 
-                Device serial: {$SERIAL}.
+                Device serial: {#SERIAL}.
               preprocessing:
                 -
                   type: JSONPATH
@@ -656,8 +662,14 @@ zabbix_export:
                   tag: component
                   value: network
                 -
+                  tag: ip
+                  value: '{#IP}'
+                -
                   tag: network
                   value: '{#NETWORK.ID}'
+                -
+                  tag: serial-number
+                  value: '{#SERIAL}'
                 -
                   tag: uplink
                   value: '{#UPLINK}'
@@ -702,6 +714,9 @@ zabbix_export:
             -
               lld_macro: '{#NETWORK.ID}'
               path: $.networkId
+            -
+              lld_macro: '{#SERIAL}'
+              path: $.serial
             -
               lld_macro: '{#UPLINK}'
               path: $.uplink
@@ -910,9 +925,9 @@ zabbix_export:
                     request.setProxy(params.httpproxy);
                 }
             
-                networks = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/networks');
+                networks = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/networks');
             
-                responseUplinks = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/appliance/uplink/statuses');
+                responseUplinks = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/appliance/uplink/statuses');
             
                 if (typeof responseUplinks !== 'undefined' && Array.isArray(responseUplinks)) {
                     for (var i in responseUplinks) {
@@ -1072,7 +1087,7 @@ zabbix_export:
                     request.setProxy(params.httpproxy);
                 }
             
-                vpnStats = getHttpData(params.url + '/organizations/' + encodeURIComponent(params.organizationId) + '/appliance/vpn/stats');
+                vpnStats = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/appliance/vpn/stats');
             
                 for (i in vpnStats) {
                     if (typeof vpnStats[i].merakiVpnPeers !== 'undefined' && Array.isArray(vpnStats[i].merakiVpnPeers)) {
@@ -1181,6 +1196,8 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: 'Meraki license expire time in seconds left.'
+          valuemap:
+            name: 'License status'
           preprocessing:
             -
               type: JSONPATH
@@ -1404,6 +1421,9 @@ zabbix_export:
               tags:
                 -
                   tag: component
+                  value: network
+                -
+                  tag: component
                   value: uplink
                 -
                   tag: interface
@@ -1434,6 +1454,12 @@ zabbix_export:
             -
               lld_macro: '{#NETWORK.NAME}'
               path: $.networkName
+            -
+              lld_macro: '{#PRIVATE.IP}'
+              path: $.ip
+            -
+              lld_macro: '{#PUBLIC.IP}'
+              path: $.publicIp
             -
               lld_macro: '{#UPLINK.DEVICE.SERIAL}'
               path: $.serial
