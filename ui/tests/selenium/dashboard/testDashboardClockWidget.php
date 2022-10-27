@@ -20,7 +20,6 @@
 
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/FilterTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 
@@ -43,8 +42,6 @@ class testDashboardClockWidget extends CWebTest {
 	' INNER JOIN widget w'.
 	' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 	' wf.value_itemid, wf.value_graphid';
-
-	use FilterTrait;
 
 	public static function getCreateData() {
 		return [
