@@ -518,7 +518,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 --------------------------------------------------------------------------------
 Changes for 6.0.10rc2
 
-6.0.10rc2 was released as 6.0.10rc1 including missed templates
+6.0.10rc2 was released as 6.0.10rc1 including missing templates
 
 --------------------------------------------------------------------------------
 Changes for 6.0.10rc1
@@ -2705,7 +2705,7 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 --------------------------------------------------------------------------------
 Changes for 5.0.29rc2
 
-5.0.28rc2 was released as 5.0.29rc1 including missed templates
+5.0.28rc2 was released as 5.0.29rc1 including missing templates
 
 --------------------------------------------------------------------------------
 Changes for 5.0.29rc1
