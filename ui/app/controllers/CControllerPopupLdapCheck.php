@@ -138,7 +138,7 @@ class CControllerPopupLdapCheck extends CController {
 	private function validateProvisionGroups(): bool {
 		$groups = $this->getInput('provision_groups', []);
 
-		foreach ($groups as $index => $group) {
+		foreach ($groups as $group) {
 			if (!is_array($group)) {
 				return false;
 			}
