@@ -1245,8 +1245,6 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c)
 
 	switch (value_type)
 	{
-		double	dbl_tmp;
-
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_trim_integer(c);
 			zbx_del_zeros(c);
@@ -1258,6 +1256,9 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c)
 			}
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
+		{
+			double	dbl_tmp;
+
 			zbx_trim_float(c);
 
 			if (SUCCEED == zbx_is_double(c, &dbl_tmp))
@@ -1266,6 +1267,7 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c)
 				ret = SUCCEED;
 			}
 			break;
+		}
 		case ITEM_VALUE_TYPE_STR:
 			zbx_replace_invalid_utf8(c);
 			SET_STR_RESULT(result, zbx_strdup(NULL, c));

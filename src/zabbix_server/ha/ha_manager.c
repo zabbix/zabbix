@@ -1997,6 +1997,4 @@ pause:
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager has been stopped");
 
 	exit(EXIT_SUCCESS);
-
-	return 0;
 }
