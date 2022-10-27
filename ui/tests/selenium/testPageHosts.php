@@ -225,6 +225,24 @@ class testPageHosts extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount($sql), "Chuck Norris: all hosts activated but DB does not match");
 	}
 
+	public function testPageHosts_MassValuemappingScreenshot() {
+		$this->page->login()->open(self::HOST_LIST_PAGE);
+		$form = $this->query('name:hosts')->asForm()->one();
+		$id = CDBHelper::getValue('SELECT hostid FROM hosts where name='.zbx_dbstr($this->HostName));
+		$form->query('id:hostids_'.$id)->asCheckbox()->one()->check();
+		$form->query('button:Mass update')->one()->click();
+		$update_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$update_form->selectTab('Value mapping');
+		$update_form->query('id:visible_valuemaps')->asCheckbox()->one()->check();
+		$update_form->query('id:valuemap_add')->one()->click();
+		$mapping_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+		// Take a screenshot to test draggable object position.
+		$this->page->removeFocus();
+		// It is necessary because of unexpected viewport shift.
+		$this->page->updateViewport();
+		$this->assertScreenshot($mapping_form->query('id:mappings_table')->waitUntilPresent()->one(), 'Mass_value_mapping_host');
+	}
+
 	public function testPageHosts_FilterByName() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$filter = $this->query('name:zbx_filter')->asForm()->one();

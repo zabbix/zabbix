@@ -843,7 +843,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		// Take a screenshot to test draggable object position.
 		if (array_key_exists('Name', $data['main_fields']) && ($data['main_fields']['Name']) === 'Screenshot') {
 			$this->assertScreenshot($form->query('id:list_columns')->waitUntilPresent()->one(), 'Top_hosts_columns');
-		};
+		}
 
 		$form->fill($data['main_fields']);
 		$form->submit();

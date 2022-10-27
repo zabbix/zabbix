@@ -434,6 +434,25 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->resetFilter();
 	}
 
+	public function testPageTemplates_MassValuemappingScreenshot() {
+		$this->page->login()->open('templates.php');
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->getField('Name')->fill($this->templateName);
+		$filter->submit();
+		$form = $this->query('name:templates')->asForm()->one();
+		$id = CDBHelper::getValue('SELECT hostid FROM hosts where host='.zbx_dbstr($this->templateName));
+		$form->query('id:templates_'.$id)->asCheckbox()->one()->check();
+		$form->query('button:Mass update')->one()->click();
+		$update_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$update_form->selectTab('Value mapping');
+		$update_form->query('id:visible_valuemaps')->asCheckbox()->one()->check();
+		$update_form->query('id:valuemap_add')->one()->click();
+		$mapping_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+		// Take a screenshot to test draggable object position.
+		$this->page->removeFocus();
+		$this->assertScreenshot($mapping_form->query('id:mappings_table')->waitUntilPresent()->one(), 'Mass_value_mapping_template');
+	}
+
 	private function resetFilter() {
 		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$filter->query('button:Reset')->one()->click();

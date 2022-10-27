@@ -245,7 +245,8 @@ class testFormValueMappings extends CWebTest {
 							'newvalue' => 'default value'
 						]
 					],
-					'screenshot_id' => 'ValuemapScreenshot1'
+					'screenshot_id' => 'ValuemapScreenshot1',
+					'screenshot_mappings' => true
 				]
 			],
 			// Successful creation/update of value mapping with empty value field.
@@ -856,6 +857,11 @@ class testFormValueMappings extends CWebTest {
 				$mapping_table->query('button:Add')->one()->click();
 			}
 			$mapping_table->fill($data['mappings']);
+				// Take a screenshot to test draggable object position.
+				if (CTestArrayHelper::get($data, 'screenshot_mappings') && $action === 'create') {
+				$this->page->removeFocus();
+				$this->assertScreenshot($mapping_table, 'Value_mappings'.$source);
+				}
 		}
 		$dialog->submit();
 
