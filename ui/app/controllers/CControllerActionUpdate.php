@@ -146,7 +146,7 @@ class CControllerActionUpdate extends CController {
 						$operation['opmessage']['default_msg'] = 1;
 				}
 
-				if($operation['opmessage']['default_msg'] == 1) {
+				if ($operation['opmessage']['default_msg'] == 1) {
 					unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
 				}
 			}

@@ -170,9 +170,7 @@ class CControllerActionCreate extends CController {
 
 						if ($operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
 							if (!array_key_exists('opmessage', $operation)) {
-								if (!array_key_exists('default_msg', $operation['opmessage'])) {
-									$operation['opmessage']['default_msg'] = 0;
-								}
+								$operation['opmessage']['default_msg'] = 1;
 							}
 						}
 						break;
@@ -186,7 +184,7 @@ class CControllerActionCreate extends CController {
 
 				if (array_key_exists('opmessage', $operation)) {
 					if (!array_key_exists('default_msg', $operation['opmessage'])) {
-						$operation['opmessage']['default_msg'] = 0;
+						$operation['opmessage']['default_msg'] = 1;
 					}
 
 					if ($operation['opmessage']['default_msg'] == 1) {

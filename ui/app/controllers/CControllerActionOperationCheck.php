@@ -221,8 +221,10 @@ class CControllerActionOperationCheck extends CController {
 			$operationtype = OPERATION_TYPE_COMMAND;
 
 			if (array_key_exists('opcommand_hst', $operation)) {
-				if (array_key_exists('current_host', $operation['opcommand_hst'][0]['hostid'])) {
-					$operation['opcommand_hst'][0]['hostid'] = 0;
+				foreach ($operation['opcommand_hst'] as $host) {
+					if (is_array($host['hostid']) && array_key_exists('current_host', $host['hostid'])) {
+						$operation['opcommand_hst'][0]['hostid'] = 0;
+					}
 				}
 			}
 		}
@@ -262,42 +264,13 @@ class CControllerActionOperationCheck extends CController {
 
 		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_SERVICE, EVENT_SOURCE_INTERNAL])
 				&& $operation['recovery'] == ACTION_OPERATION) {
-			$data['operation']['start_in'] = $this->createStartInColumn($operation);
-
-			if ($operation['recovery'] == ACTION_OPERATION &&
-					($eventsource == EVENT_SOURCE_TRIGGERS
-					|| $eventsource == EVENT_SOURCE_INTERNAL
-					|| $eventsource == EVENT_SOURCE_SERVICE)) {
 				$data['operation']['duration'] = $this->createDurationColumn($operation['esc_period']);
 				$data['operation']['steps'] = $this->createStepsColumn($operation);
-			}
 		}
 
 		$data['operation']['details'] = $this->getData($operationtype, [$action], $operation['recovery']);
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
-	}
-
-	protected function createStartInColumn($operation): string {
-		$operation_type = $this->getInput('operation')['recovery'];
-		$previous_operations = [];
-
-		if ($operation_type == ACTION_OPERATION && $this->getInput('actionid')) {
-			$allOperations = API::Action()->get([
-				'selectOperations' => ['operationtype', 'esc_period', 'esc_step_from', 'esc_step_to', 'evaltype'],
-				'actionids' => $this->getInput('actionid')
-			]);
-			$previous_operations = $allOperations[0]['operations'];
-		}
-
-		$delays = count_operations_delay($previous_operations, $operation['esc_period']);
-
-		return ($delays[$operation['esc_step_from']] === null)
-			? _('Unknown')
-			: ($delays[$operation['esc_step_from']] != 0
-				? convertUnits(['value' => $delays[$operation['esc_step_from']], 'units' => 'uptime'])
-				: _('Immediately')
-			);
 	}
 
 	protected function createStepsColumn($operation): string {
