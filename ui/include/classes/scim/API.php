@@ -72,7 +72,7 @@ class API {
 		}
 
 		if (array_key_exists('filter', $_GET)) {
-			preg_match('/^userName eq "(?<value>(?:[^"]|^\\")*)"$/', $_GET['filter'], $filter_value);
+			preg_match('/^userName eq "(?<value>(?:[^"]|\\\\")*)"$/', $_GET['filter'], $filter_value);
 
 			if (array_key_exists('value', $filter_value)) {
 				$input['userName'] = $filter_value[1];
