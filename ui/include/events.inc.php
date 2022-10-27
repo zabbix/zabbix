@@ -736,108 +736,74 @@ function getTagString(array $tag, $tag_name_format = TAG_NAME_FULL) {
 }
 
 /**
- * Validate if the given events can change the rank. Returns true if rank if changeable otherwise return false.
- * For example function returns false if source and destination is the same no matter if cause or symptom. Returns false
- * in case the given event ID is already a symptom of the same cause. So no changes were made, no rank change is
- * possible. Returns true when it changes an existing cause to symptom event, and symptom event to a cause event.
- * Basically events switch places. Returns true if a cause is moved under another cause, the whole tree is moved
- * with it.
+ * Validate if the given events can change the rank by moving to a new cause. Linking a cause event with its symptoms
+ * (or only cause or only symptoms) to another different cause or symptom is allowed and will switch to the new cause as
+ * a result. Linking a cause to one of its own symptoms is also allowed and will simply switch the cause and symptom as
+ * a result. Linking a symptom to same cause is not allowed and that event ID is skipped. Linking a symptom to symptom
+ * of same cause is also not allowed and is skipped.
  *
  * @param array  $eventids        Array of event IDs that should be converted to symptom events.
  * @param string $cause_eventid   Event ID that will be the new cause ID for given $eventids.
  *
- * @return bool                   Returns true, if ranks of given events are allowed to change or false if not.
+ * @return array                  Returns event IDs that are allowed to change rank.
  */
-function validateEventRankChangeToSymptom(array $eventids, string $cause_eventid): bool {
+function validateEventRankChangeToSymptom(array $eventids, string $cause_eventid): array {
 	$eventids = array_fill_keys($eventids, true);
 	$all_eventids = $eventids;
 	$all_eventids[$cause_eventid] = true;
 
-	// First get all the events that were given in the request to check permissions.
+	// Get all the events that were given in the request to check permissions.
 	$events = API::Event()->get([
 		'output' => ['eventid', 'cause_eventid'],
 		'eventids' => array_keys($all_eventids),
 		'preservekeys' => true
 	]);
 
+	// Early return. In case one of the events are missing, no rank change can occur.
 	if (count($events) != count($all_eventids)) {
-		// In case one of the events are missing, no rank change can occur.
-		return false;
+		return [];
 	}
 
+	// Early return. No matter if cause or symptom, source and destination cannot be the same.
 	if (count($eventids) == 1 && bccomp(key($eventids), $cause_eventid) == 0) {
-		// No matter if cause or symptom, source and destination cannot be the same.
-		return false;
+		return [];
 	}
 
-	// Get all affected symptom events. Validation has already been done.
-	$symptom_events = API::Event()->get([
-		'output' => ['eventid', 'cause_eventid'],
-		'filter' => ['cause_eventid' => array_keys($all_eventids)],
-		'preservekeys' => true,
-		'nopermissions' => true
-	]);
+	$dst_event = $events[$cause_eventid];
 
-	// Get full tree of cause and symptom events.
-	$all_events = $events + $symptom_events;
-	$src_tree = [];
+	foreach ($eventids as $eventid => $foo) {
+		$event = $events[$eventid];
 
-	foreach ($all_events as $event) {
+		// Given cause is being moved.
 		if ($event['cause_eventid'] == 0) {
-			if (!array_key_exists($event['eventid'], $src_tree)) {
-				$src_tree[$event['eventid']] = [];
+			// Destination is cause. Cause is moved to same cause. Skip this event ID.
+			if ($dst_event['cause_eventid'] == 0 && bccomp($eventid, $dst_event['eventid']) == 0) {
+				unset($eventids[$eventid]);
 			}
 		}
+		// Given symptom is moved.
 		else {
-			$src_tree[$event['cause_eventid']][$event['eventid']] = true;
-		}
-	}
+			// Destination is cause.
+			if ($dst_event['cause_eventid'] == 0) {
+				// Symptom current cause is the same as new cause. Skip this event ID.
+				if (bccomp($event['cause_eventid'], $dst_event['eventid']) == 0) {
+					unset($eventids[$eventid]);
+				}
+			}
+			// Destination is symptom.
+			else {
+				// Symptom destination is self. Skip this Event ID.
+				if (bccomp($eventid, $dst_event['eventid']) == 0) {
+					unset($eventids[$eventid]);
+				}
 
-	// Start building the destination event list.
-	$rank_eventids = $eventids;
-
-	// Add symptoms from other cause events in case they should all be moved.
-	foreach ($eventids as $eventid => $foo) {
-		if (array_key_exists($eventid, $src_tree)) {
-			foreach ($src_tree[$eventid] as $s_eventid => $foo) {
-				$rank_eventids[$s_eventid] = true;
+				// If given symptom cause is not also in the list, skip this Event ID.
+				if (!array_key_exists($event['cause_eventid'], $eventids)) {
+					unset($eventids[$eventid]);
+				}
 			}
 		}
 	}
 
-	foreach ($eventids as $eventid => $foo) {
-		if (array_key_exists($eventid, $src_tree) && !array_key_exists($eventid, $rank_eventids)) {
-			// Given symptom event is not in the destination list.
-			return false;
-		}
-
-		// Remove already existing symptoms from destination. They should be left untouched.
-		if (array_key_exists($cause_eventid, $src_tree) && array_key_exists($eventid, $src_tree[$cause_eventid])) {
-			unset($rank_eventids[$eventid]);
-		}
-	}
-
-	foreach ($src_tree as $eventid => $s_eventids) {
-		foreach ($s_eventids as $s_eventid => $foo) {
-			if (bccomp($s_eventid, $cause_eventid) == 0 && !array_key_exists($eventid, $rank_eventids)) {
-				// Given symptom event parent is not in the destination list.
-				return false;
-			}
-		}
-	}
-
-	if (array_key_exists($cause_eventid, $src_tree) && !array_diff_key($rank_eventids, $src_tree[$cause_eventid])) {
-		// No changes were made, the source and resulting destination is the same.
-		return false;
-	}
-
-	// Remove self from destination.
-	unset($rank_eventids[$cause_eventid]);
-
-	if (!$rank_eventids) {
-		// Nothing to change, all given symptoms are already symptoms on the destination.
-		return false;
-	}
-
-	return true;
+	return array_keys($eventids);
 }

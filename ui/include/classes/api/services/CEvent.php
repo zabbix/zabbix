@@ -611,8 +611,7 @@ class CEvent extends CApiService {
 				]);
 			}
 
-			// Check if events allowed to change rank.
-			$is_rank_change_allowed = validateEventRankChangeToSymptom($data['eventids'], $data['cause_eventid']);
+			$update_symptom_eventids = validateEventRankChangeToSymptom($data['eventids'], $data['cause_eventid']);
 		}
 
 		$ack_eventids = [];
@@ -621,7 +620,6 @@ class CEvent extends CApiService {
 		$acknowledges = [];
 		$suppress_eventids = [];
 		$unsuppress_eventids = [];
-		$update_symptom_eventids = [];
 
 		foreach ($events as $eventid => $event) {
 			$action = ZBX_PROBLEM_UPDATE_NONE;
@@ -678,62 +676,20 @@ class CEvent extends CApiService {
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE action flag.
-			if (($data['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) {
-				// This is a symptom event and can be converted to cause. Else it is already cause and skip converting.
-				if ($event['cause_eventid'] != 0) {
-					$action |= ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE;
-				}
+			if (($data['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
+					&& $event['cause_eventid'] != 0) {
+				$action |= ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE;
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM action flag.
-			if ($has_change_rank_to_symptom_action && $is_rank_change_allowed) {
-				/*
-				 * Current event is a cause event, but destination new cause is completely different cause or symptom,
-				 * so convert this cause event to symptom event and add it to acknowledges list.
-				 */
-				if ($event['cause_eventid'] == 0 && bccomp($data['cause_eventid'], $eventid) != 0) {
-					$action |= ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM;
-					// Add the new cause as value.
-					$update_symptom_eventids[$eventid] = $data['cause_eventid'];
-
-					// Since current even is cause, all of the following symptoms should also be moved to new cause.
-					foreach ($related_symptom_events as $s_event) {
-						if (bccomp($s_event['cause_eventid'], $eventid) == 0) {
-							// Add the new cause as value.
-							$update_symptom_eventids[$s_event['eventid']] = $data['cause_eventid'];
-
-							/*
-							 * Create acknowledges for related symptoms as well. Without that, it is not possible.
-							 * Do add extra messages or change severity etc, because these events were not specifially
-							 * selected. Only change the rank.
-							 */
-							$acknowledges[$s_event['eventid']] = [
-								'userid' => self::$userData['userid'],
-								'eventid' => $s_event['eventid'],
-								'clock' => $time,
-								'message' => '',
-								'action' => ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM,
-								'old_severity' => 0,
-								'new_severity'=> 0,
-								'suppress_until' => 0
-							];
-						}
-					}
-				}
-				/*
-				 * Current event is already symptom, but the cause has changed. Regardless of that, we need to create
-				 * acknowledgement for this event as well. So "convert" it again, and add it to acknowledges list.
-				 */
-				elseif ($event['cause_eventid'] != 0 && bccomp($event['cause_eventid'], $data['cause_eventid']) != 0) {
-					$action |= ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM;
-					// Add the new cause as value.
-					$update_symptom_eventids[$eventid] = $data['cause_eventid'];
-				}
+			if ($has_change_rank_to_symptom_action && $update_symptom_eventids
+					&& in_array($eventid, $update_symptom_eventids)) {
+				$action |= ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM;
 			}
 
 			// For some of selected events action might not be performed, as event is already with given change.
 			if ($action != ZBX_PROBLEM_UPDATE_NONE) {
-				$acknowledges[$eventid] = [
+				$acknowledges[] = [
 					'userid' => self::$userData['userid'],
 					'eventid' => $eventid,
 					'clock' => $time,
@@ -741,37 +697,13 @@ class CEvent extends CApiService {
 					'action' => $action,
 					'old_severity' => $old_severity,
 					'new_severity' => $new_severity,
-					'suppress_until' => $suppress_until
+					'suppress_until' => $suppress_until,
+					'cause_eventid' => $has_change_rank_to_symptom_action && $update_symptom_eventids
+						? $data['cause_eventid']
+						: null
 				];
 			}
 		}
-
-		if ($has_change_rank_to_symptom_action && $is_rank_change_allowed) {
-			/*
-			 * Destination event was symptom, so convert it to cause. Do not add extra messages or change severity etc,
-			 * because these events were not specifially selected.
-			 */
-			if ($dst_events[0]['cause_eventid'] != 0) {
-				$acknowledges[$data['cause_eventid']] = [
-					'userid' => self::$userData['userid'],
-					'eventid' => $data['cause_eventid'],
-					'clock' => $time,
-					'message' => '',
-					'action' => ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE,
-					'old_severity' => 0,
-					'new_severity'=> 0,
-					'suppress_until' => 0
-				];
-
-				// In case given event was symptom, but is actually the new destination, remove from symptom list.
-				if (array_key_exists($data['cause_eventid'], $update_symptom_eventids)) {
-					unset($update_symptom_eventids[$data['cause_eventid']]);
-				}
-			}
-		}
-
-		// When finished dealing with unique acknowledges, use simple indexes it is compatible with $acknowledgeids.
-		$acknowledges = array_values($acknowledges);
 
 		// Make changes in problem and events tables.
 		if ($acknowledges) {
@@ -955,46 +887,40 @@ class CEvent extends CApiService {
 			}
 
 			/*
-			 * Create tasks for event rank change actions - convert cause to symptoms or update symptoms by chaning
+			 * Create tasks for event rank change actions - convert cause to symptoms or update symptoms by changing
 			 * cause to a different cause.
 			 */
-			if ($update_symptom_eventids) {
-				$tasks = [];
-				$task_update_event_rank = [];
+			$tasks = [];
+			$task_update_event_rank = [];
 
-				foreach ($acknowledgeids as $k => $id) {
-					$acknowledgement = $acknowledges[$k];
+			foreach ($acknowledgeids as $k => $id) {
+				$acknowledgement = $acknowledges[$k];
 
-					if (($acknowledgement['action']
-							& ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) {
-						foreach ($update_symptom_eventids as $eventid => $cause_eventid) {
-							if (bccomp($eventid, $acknowledgement['eventid'])) {
-								$tasks[$k] = [
-									'type' => ZBX_TM_TASK_DATA,
-									'status' => ZBX_TM_STATUS_NEW,
-									'clock' => $time
-								];
+				if (($acknowledgement['action']
+						& ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) {
+					$tasks[$k] = [
+						'type' => ZBX_TM_TASK_DATA,
+						'status' => ZBX_TM_STATUS_NEW,
+						'clock' => $time
+					];
 
-								$task_update_event_rank[$k] = [
-									'taskid' => $id,
-									'type' => ZBX_TM_DATA_TYPE_RANK_EVENT,
-									'data' => json_encode([
-										'acknowledgeid' => $id,
-										'cause_eventid' => $cause_eventid
-									])
-								];
-							}
-						}
-					}
+					$task_update_event_rank[$k] = [
+						'taskid' => $id,
+						'type' => ZBX_TM_DATA_TYPE_RANK_EVENT,
+						'data' => json_encode([
+							'acknowledgeid' => $id,
+							'cause_eventid' => $data['cause_eventid']
+						])
+					];
 				}
+			}
 
-				if ($tasks) {
-					$taskids = DB::insertBatch('task', $tasks);
-					$task_update_event_rank = array_replace_recursive($task_update_event_rank,
-						zbx_toObject($taskids, 'taskid', true)
-					);
-					DB::insertBatch('task_data', $task_update_event_rank, false);
-				}
+			if ($tasks) {
+				$taskids = DB::insertBatch('task', $tasks);
+				$task_update_event_rank = array_replace_recursive($task_update_event_rank,
+					zbx_toObject($taskids, 'taskid', true)
+				);
+				DB::insertBatch('task_data', $task_update_event_rank, false);
 			}
 		}
 
