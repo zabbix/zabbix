@@ -1,3 +1,8 @@
+Changes for 6.0.10rc2
+
+6.0.10rc2 was released as 6.0.10rc1 including missed templates
+
+--------------------------------------------------------------------------------
 Changes for 6.0.10rc1
 
 New features:
@@ -2178,6 +2183,11 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.29rc2
+
+5.0.28rc2 was released as 5.0.29rc1 including missed templates
 
 --------------------------------------------------------------------------------
 Changes for 5.0.29rc1
