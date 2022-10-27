@@ -82,17 +82,20 @@ window.action_edit_popup = new class {
 				actionid: this.actionid,
 				data: operation_data.data
 			}
+			this.recovery = operation_data.operationtype;
 		}
 		else  {
 			this.parameters = {
 				eventsource: this.eventsource,
-				recovery: this.recovery,
+				recovery: operation_data.recovery,
 				actionid: this.actionid,
 				data: data
 			}
+			this.recovery = operation_data.recovery;
 		}
 
 		const overlay = PopUp('popup.action.operation.edit', this.parameters, {
+			recovery: this.recovery,
 			dialogueid: 'operations',
 			dialogue_class: 'modal-popup-medium'
 		});
@@ -284,11 +287,14 @@ window.action_edit_popup = new class {
 					})
 				}
 				else if (is_object(value) && !is_array(value)) {
-					input.setAttribute('type', 'hidden');
-					input.setAttribute('name', `${prefix}operations[${operation.row_index}][${key}][${Object.keys(value)[0]}]`)
-					input.setAttribute('id', `${prefix}operations_${operation.row_index}_${key}_${Object.keys(value)[0]}`)
-					input.setAttribute('value', value[Object.keys(value)[0]])
-					first.append(input);
+					for (const [id, val] of Object.entries(value)) {
+						let input = document.createElement('input');
+						input.setAttribute('type', 'hidden');
+						input.setAttribute('name', `${prefix}operations[${operation.row_index}][${key}][${id}]`)
+						input.setAttribute('id', `${prefix}operations_${operation.row_index}_${key}_${id}`)
+						input.setAttribute('value', val)
+						first.append(input);
+					}
 				}
 
 				else {
@@ -391,31 +397,64 @@ window.action_edit_popup = new class {
 							}
 						}
 
-						document
-							.querySelector('#op-table tbody')
-							.appendChild(this._prepareOperationsRow(operation_obj, template));
+						let new_step_from = operation_obj.esc_step_from;
+						let new_step_to = operation_obj.esc_step_to
+						const new_combined = new_step_from === new_step_to ? parseInt(`${new_step_from}0`) : parseInt(`${new_step_from}${new_step_to}`);
+						let result = [];
+
+						let rows = document.querySelector('#op-table tbody').getElementsByTagName('tr');
+						if (rows.length == 0) {
+							document
+								.querySelector('#op-table tbody')
+								.appendChild(this._prepareOperationsRow(operation_obj, template));
+						}
+						else {
+							Array.from(rows).forEach(row => {
+								let esc_step_from = row.getElementsByTagName('td')[0].getElementsByTagName('input')[3].value;
+								let esc_step_to = row.getElementsByTagName('td')[0].getElementsByTagName('input')[4].value;
+								row_id = row.id;
+
+								const existing_combined = esc_step_from === esc_step_to
+									? parseInt(`${esc_step_from}0`)
+									: parseInt(`${esc_step_from}${esc_step_to}`);
+
+								if (new_combined < existing_combined) {
+									result.push(row_id);
+								}
+							})
+
+							if (result.length > 0) {
+								document.getElementById(result[0]).before(this._prepareOperationsRow(operation_obj, template));
+							}
+							else {
+								document
+									.querySelector('#op-table tbody')
+									.appendChild(this._prepareOperationsRow(operation_obj, template));
+							}
+						}
 						break;
 
 					default:
+						operation_obj.prefix = ''
 						if (input.detail.operation.details.data) {
 							if (operation.details.data.length > 1) {
 								template = this.operation_template_usr_usrgrps_basic;
 							}
 						}
-						operation_obj.prefix = ''
 
 						document
 							.querySelector('#op-table tbody')
 							.appendChild(this._prepareOperationsRow(operation_obj, template));
 						break;
 				}
+				break;
 		}
 	}
 
 	submit() {
 		const fields = getFormFields(this.form);
-
 		fields.name = fields.name.trim();
+
 		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', this.actionid !== 0 ? 'action.update' : 'action.create');
 
@@ -699,7 +738,7 @@ window.action_edit_popup = new class {
 					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
 						<li>
 							<button
-							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation
+							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation"
 							data_operation="#{data_operation}">
 							<?= _('Edit') ?>
 							</button>
