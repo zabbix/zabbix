@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-10-10 18:42+0000\n"
+"PO-Revision-Date: 2022-10-25 19:44+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -17690,12 +17690,12 @@ msgstr "Ce paramètre s'applique uniquement aux données numériques. Les donné
 #: app/partials/administration.system.info.php:199
 #: app/views/administration.housekeeping.edit.php:134
 msgid "This setting should be enabled, because history tables contain compressed chunks."
-msgstr ""
+msgstr "Ce paramètre doit être activé, car les tables d'historique contiennent des blocs compressés."
 
 #: app/partials/administration.system.info.php:213
 #: app/views/administration.housekeeping.edit.php:163
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
-msgstr ""
+msgstr "Ce paramètre doit être activé, car les tableaux de tendance contiennent des blocs compressés."
 
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109

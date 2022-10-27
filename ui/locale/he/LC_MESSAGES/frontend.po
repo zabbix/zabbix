@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-10-12 08:31+0000\n"
+"PO-Revision-Date: 2022-10-26 09:06+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -17689,12 +17689,12 @@ msgstr "הגדרה זו חלה רק על נתונים מספריים. נתוני
 #: app/partials/administration.system.info.php:199
 #: app/views/administration.housekeeping.edit.php:134
 msgid "This setting should be enabled, because history tables contain compressed chunks."
-msgstr ""
+msgstr "יש להפעיל את ההגדרה הזאת כיוון שטבלאות ההיסטוריה מכילות חלקים דחוסים."
 
 #: app/partials/administration.system.info.php:213
 #: app/views/administration.housekeeping.edit.php:163
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
-msgstr ""
+msgstr "יש להפעיל את ההגדרה הזאת כיוון שטבלאות המגמות מכילות חלקים דחוסים."
 
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
