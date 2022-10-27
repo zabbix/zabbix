@@ -55,6 +55,7 @@
 #define ZBX_TM_DATA_TYPE_PROXY_HOSTNAME			3
 #define ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD	4
 #define ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION		5
+#define ZBX_TM_DATA_TYPE_RANK_EVENT			6
 
 /* the time period after which finished (done/expired) tasks are removed */
 #define ZBX_TM_CLEANUP_TASK_AGE			SEC_PER_DAY
