@@ -163,21 +163,19 @@ class CAuthentication extends CApiService {
 		}
 
 		if ($auth['disabled_usrgrpid']) {
-			[$group] = API::UserGroup()->get([
+			$groups = API::UserGroup()->get([
 				'output' => ['users_status'],
 				'usrgrpids' => [$auth['disabled_usrgrpid']]
 			]);
 
-			if (!$group) {
+			if (!$groups) {
 				static::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
 
-			if ($group['users_status'] != GROUP_STATUS_DISABLED) {
-				static::exception(ZBX_API_ERROR_PARAMETERS,
-					_('Deprovisioned users group cannot be enabled.')
-				);
+			if ($groups[0]['users_status'] != GROUP_STATUS_DISABLED) {
+				static::exception(ZBX_API_ERROR_PARAMETERS, _('Deprovisioned users group cannot be enabled.'));
 			}
 		}
 		else if ($auth['ldap_jit_status'] == JIT_PROVISIONING_ENABLED
