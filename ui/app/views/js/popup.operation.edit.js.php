@@ -138,7 +138,8 @@ window.operation_popup = new class {
 	_allInvolvedRecoveryFields() {
 		const fields = [
 			'operation-message-custom-label', 'operation-message-custom', 'operation-message-subject',
-			'operation-message-body', 'opmessage', 'operation-message-subject-label', 'operation_opmessage_default_msg'
+			'operation-message-body', 'opmessage', 'operation-message-subject-label', 'operation_opmessage_default_msg',
+			'operation-message-mediatype-only'
 		]
 
 		this._enableFormFields(fields);
