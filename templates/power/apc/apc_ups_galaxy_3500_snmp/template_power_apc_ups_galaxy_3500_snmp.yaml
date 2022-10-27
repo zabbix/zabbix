@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-10-12T14:11:36Z'
+  date: '2022-10-27T05:26:56Z'
   template_groups:
     -
       uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
@@ -1637,6 +1637,136 @@ zabbix_export:
           macro: '{$UPS.OUTPUT.MAX.WARN}'
           value: '80'
           description: 'Maximum output load in % for trigger expression.'
+      dashboards:
+        -
+          uuid: 23bf458b1bbc4ae0b145597292d098cb
+          name: 'UPS Summary'
+          pages:
+            -
+              widgets:
+                -
+                  type: PLAIN_TEXT
+                  width: '8'
+                  height: '5'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        host: 'APC UPS Galaxy 3500 by SNMP'
+                        key: 'system.net.uptime[sysUpTime.0]'
+                -
+                  type: PLAIN_TEXT
+                  x: '8'
+                  width: '8'
+                  height: '5'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        host: 'APC UPS Galaxy 3500 by SNMP'
+                        key: 'input.fail[upsAdvInputLineFailCause]'
+                -
+                  type: PLAIN_TEXT
+                  x: '16'
+                  width: '8'
+                  height: '5'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        host: 'APC UPS Galaxy 3500 by SNMP'
+                        key: 'output.status[upsBasicOutputStatus]'
+                -
+                  type: PLAIN_TEXT
+                  'y': '5'
+                  width: '8'
+                  height: '5'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        host: 'APC UPS Galaxy 3500 by SNMP'
+                        key: 'battery.status[upsBasicBatteryStatus]'
+                -
+                  type: PLAIN_TEXT
+                  x: '8'
+                  'y': '5'
+                  width: '8'
+                  height: '5'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        host: 'APC UPS Galaxy 3500 by SNMP'
+                        key: 'battery.runtime_remaining[upsAdvBatteryRunTimeRemaining]'
+                -
+                  type: PLAIN_TEXT
+                  x: '16'
+                  'y': '5'
+                  width: '8'
+                  height: '5'
+                  fields:
+                    -
+                      type: ITEM
+                      name: itemids
+                      value:
+                        host: 'APC UPS Galaxy 3500 by SNMP'
+                        key: 'battery.last_replace_date[upsBasicBatteryLastReplaceDate]'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '10'
+                  width: '8'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'APC UPS Galaxy 3500 by SNMP'
+                        name: 'Capacity of the UPS batteries'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '8'
+                  'y': '10'
+                  width: '8'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'APC UPS Galaxy 3500 by SNMP'
+                        name: Voltage
+                -
+                  type: GRAPH_CLASSIC
+                  x: '16'
+                  'y': '10'
+                  width: '8'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'APC UPS Galaxy 3500 by SNMP'
+                        name: Output
       valuemaps:
         -
           uuid: 30a78904cbc94fc58609dc1a11aa48ef
