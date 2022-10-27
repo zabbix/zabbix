@@ -91,7 +91,7 @@ class CControllerPopupActionOperationEdit extends CController {
 			$operation_type[$type['value']] = $type['name'];
 		}
 
-		$media_types = $this->popupConfigOperationMessage($operation, $eventsource)['mediatypes'];
+		$media_types = $this->popupConfigOperationMessage($operation)['mediatypes'];
 		$media_type[] = '- '._('All').' -';
 		$disabled_media = [];
 
