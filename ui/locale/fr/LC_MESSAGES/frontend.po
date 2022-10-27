@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2022-10-10 18:43+0000\n"
+"PO-Revision-Date: 2022-10-25 19:44+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -16951,12 +16951,12 @@ msgstr "Cette ligne de l'écran n'est pas vide. L'effacer ?"
 #: app/views/administration.housekeeping.edit.php:134
 #: include/blocks.inc.php:714
 msgid "This setting should be enabled, because history tables contain compressed chunks."
-msgstr ""
+msgstr "Ce paramètre doit être activé, car les tables d'historique contiennent des blocs compressés."
 
 #: app/views/administration.housekeeping.edit.php:164
 #: include/blocks.inc.php:730
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
-msgstr ""
+msgstr "Ce paramètre doit être activé, car les tableaux de tendance contiennent des blocs compressés."
 
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2022-10-15 04:11+0000\n"
+"PO-Revision-Date: 2022-10-25 11:36+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -16848,12 +16848,12 @@ msgstr "スクリーンの行は空ではありません。削除しますか？
 #: app/views/administration.housekeeping.edit.php:134
 #: include/blocks.inc.php:714
 msgid "This setting should be enabled, because history tables contain compressed chunks."
-msgstr ""
+msgstr "ヒストリテーブルには圧縮されたチャンクが含まれているため、この設定を有効にする必要があります。"
 
 #: app/views/administration.housekeeping.edit.php:164
 #: include/blocks.inc.php:730
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
-msgstr ""
+msgstr "トレンドテーブルには圧縮されたチャンクが含まれているため、この設定を有効にする必要があります。"
 
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"
