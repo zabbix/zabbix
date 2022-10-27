@@ -21,7 +21,7 @@
 
 class CDocHelper {
 
-	const ADMINISTRATION_AUDITACTS_LIST =						'web_interface/frontend_sections/reports/action_log';
+	const ADMINISTRATION_ACTIONLOG_LIST =						'web_interface/frontend_sections/reports/action_log';
 	const ADMINISTRATION_AUDITLOG_EDIT =						'web_interface/frontend_sections/administration/audit_log';
 	const ADMINISTRATION_AUTOREG_EDIT =							'web_interface/frontend_sections/administration/general#autoregistration';
 	const ADMINISTRATION_GEOMAPS_EDIT =							'web_interface/frontend_sections/administration/general#geographical-maps';

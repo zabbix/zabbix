@@ -21,46 +21,47 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-$auditWidget = (new CWidget())
+
+$this->addJsFile('gtlc.js');
+$this->addJsFile('class.calendar.js');
+
+$filter = (new CFilter())
+	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', $data['action']));
+
+$widget = (new CWidget())
 	->setTitle(_('Action log'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUDITACTS_LIST));
-
-// create filter
-$filterColumn = new CFormList();
-$filterColumn->addRow(new CLabel(_('Recipients'), 'filter_userids__ms'), [
-	(new CMultiSelect([
-		'name' => 'filter_userids[]',
-		'object_name' => 'users',
-		'data' => $data['filter_userids'],
-		'placeholder' => '',
-		'popup' => [
-			'parameters' => [
-				'srctbl' => 'users',
-				'srcfld1' => 'userid',
-				'srcfld2' => 'fullname',
-				'dstfrm' => 'zbx_filter',
-				'dstfld1' => 'filter_userids_'
-			]
-		]
-	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-]);
-
-$auditWidget->addItem(
-	(new CFilter())
-		->setResetUrl(new CUrl('auditacts.php'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_ACTIONLOG_LIST))
+	->addItem($filter
+		->addVar('action', $data['action'])
 		->setProfile($data['timeline']['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
-		->addFilterTab(_('Filter'), [$filterColumn])
-);
+		->addFilterTab(_('Filter'), [
+			(new CFormList())
+				->addRow(new CLabel(_('Recipients'), 'filter_userids__ms'), [
+					(new CMultiSelect([
+						'name' => 'filter_userids[]',
+						'object_name' => 'users',
+						'data' => $data['userids'],
+						'placeholder' => '',
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'users',
+								'srcfld1' => 'userid',
+								'srcfld2' => 'fullname',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_userids_'
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				])
+		])
+	);
 
-// create form
-$auditForm = (new CForm('get'))->setName('auditForm');
-
-// create table
-$auditTable = (new CTableInfo())
+$table = (new CTableInfo())
 	->setHeader([
 		_('Time'),
 		_('Action'),
@@ -116,7 +117,7 @@ foreach ($this->data['alerts'] as $alert) {
 		? makeEventDetailsTableUser($alert + ['action_type' => ZBX_EVENT_HISTORY_ALERT], $data['users'])
 		: zbx_nl2br($alert['sendto']);
 
-	$auditTable->addRow([
+	$table->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
 		$this->data['actions'][$alert['actionid']]['name'],
 		($mediatype) ? $mediatype['name'] : '',
@@ -127,21 +128,26 @@ foreach ($this->data['alerts'] as $alert) {
 	]);
 }
 
-// append table to form
-$auditForm->addItem([$auditTable, $this->data['paging']]);
-
-// append navigation bar js
-$objData = [
+$obj = [
 	'id' => 'timeline_1',
 	'domid' => 'events',
 	'loadSBox' => 0,
 	'loadImage' => 0,
 	'dynamic' => 0
 ];
-zbx_add_post_js('timeControl.addObject("events", '.zbx_jsvalue($data['timeline']).', '.zbx_jsvalue($objData).');');
-zbx_add_post_js('timeControl.processObjects();');
 
-// append form to widget
-$auditWidget->addItem($auditForm);
+(new CScriptTag('timeControl.addObject("actionlog", '.json_encode($data['timeline']).', '.json_encode($obj).');'.
+	'timeControl.processObjects();')
+)->show();
 
-$auditWidget->show();
+$widget
+	->addItem(
+		(new CForm('get'))
+			->setName('auditForm')
+			->addItem([$table, $data['paging']])
+	)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();
