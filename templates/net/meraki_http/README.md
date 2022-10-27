@@ -55,7 +55,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Zabbix raw items |Meraki: Get data |<p>Item for gathering all the organizations and devices from Meraki API"</p> |SCRIPT |meraki.get.data<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |Meraki: Get data |<p>Item for gathering all the organizations and devices from Meraki API.</p> |SCRIPT |meraki.get.data<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Zabbix raw items |Meraki: Data item errors |<p>Item for gathering all the data item errors.</p> |DEPENDENT |meraki.get.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.error`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Triggers
