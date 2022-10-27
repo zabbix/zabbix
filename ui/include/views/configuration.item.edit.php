@@ -612,7 +612,7 @@ if ($data['display_interfaces']) {
 			$item_tab->addItem([
 				(new CLabel(_('Host interface'), 'interface'))->setId('js-item-interface-label'),
 				(new CFormField(
-					(new CTextBox('interface', interfaceType2str(INTERFACE_TYPE_OPT), true))
+					(new CTextBox('interface', _('None'), true))
 						->setAttribute('disabled', 'disabled')
 				))->setId('js-item-interface-field')
 			]);
@@ -656,9 +656,12 @@ $item_tab->addItem([
 
 $item_tab
 	->addItem([
-		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setId('js-item-impi-sensor-label'),
+		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))
+			->setAsteriskMark()
+			->setId('js-item-impi-sensor-label'),
 		(new CFormField((new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 		))->setId('js-item-impi-sensor-field')
 	])
 	->addItem([

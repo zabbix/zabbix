@@ -48,7 +48,7 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Prometeus LLD macro in parameters 1',
-						'Key' => 'parameters-macro-1'
+						'Key' => 'parameters-macro-1[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -64,7 +64,7 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Prometeus LLD macro in parameters 2',
-						'Key' => 'parameters-macro-2'
+						'Key' => 'parameters-macro-2[{#KEY}]'
 					],
 					'preprocessing' => [
 						[
@@ -80,7 +80,7 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Prometheus to JSON LLD macro in parameter 1 ',
-						'Key' => 'json-parameter-macro-1'
+						'Key' => 'json-parameter-macro-1[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{#METRICNAME}==1']
@@ -92,7 +92,7 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Prometeus to Json LLD macro in parameter 2',
-						'Key' => 'json-parameters-macro-2'
+						'Key' => 'json-parameters-macro-2[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus to JSON', 'parameter_1' => '{label_name="{#LABELVALUE}"}']

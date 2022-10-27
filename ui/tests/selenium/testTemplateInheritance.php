@@ -83,8 +83,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 				'testInheritance',
 				'key-item-inheritance',
 				[
-					'Item "key-item-inheritance" already exists on "Template inheritance test host", inherited from '.
-					'another template.'
+					'Cannot inherit LLD rule with key "key-item-inheritance" of template "Inheritance test template" '.
+						'to host "Template inheritance test host", because a discovered item with the same key already exists.'
 				]
 			],
 			// Item added to Template inheritance test host
@@ -346,7 +346,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestContentControlButtonClickTextWait('Create item prototype');
 
 		$this->zbxTestInputTypeWait('name', 'Test LLD item');
-		$this->zbxTestInputType('key', 'test-lld-item');
+		$this->zbxTestInputType('key', 'test-lld-item[{#KEY}]');
 		$this->zbxTestDropdownSelect('type', 'Simple check');
 		$this->zbxTestDropdownSelect('value_type', 'Numeric (unsigned)');
 		$this->zbxTestInputType('units', 'units');
@@ -375,7 +375,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait('Test LLD item');
 
 		$this->zbxTestAssertElementValue('name', 'Test LLD item');
-		$this->zbxTestAssertElementValue('key', 'test-lld-item');
+		$this->zbxTestAssertElementValue('key', 'test-lld-item[{#KEY}]');
 		$this->zbxTestDropdownAssertSelected('type', 'Simple check');
 		$this->zbxTestDropdownAssertSelected('value_type', 'Numeric (unsigned)');
 		$this->zbxTestAssertElementValue('units', 'units');
@@ -407,7 +407,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
 
 		$this->zbxTestInputTypeByXpath("//input[@name='description']", 'Test LLD trigger');
-		$this->zbxTestInputType('expression', 'last(/Inheritance test template/item-discovery-prototype,#1)=0');
+		$this->zbxTestInputType('expression', 'last(/Inheritance test template/item-discovery-prototype[{#KEY}],#1)=0');
 		$this->zbxTestCheckboxSelect('type_1');
 		$this->zbxTestInputType('comments', 'comments');
 		$this->zbxTestInputType('url', 'zabbix.php');
@@ -436,7 +436,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('description'));
 		$getName = $this->zbxTestGetValue("//input[@name='description']");
 		$this->assertEquals($getName, 'Test LLD trigger');
-		$this->zbxTestAssertElementValue('expression', 'last(/Template inheritance test host/item-discovery-prototype,#1)=0');
+		$this->zbxTestAssertElementValue('expression', 'last(/Template inheritance test host/item-discovery-prototype[{#KEY}],#1)=0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
 		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
 		$this->zbxTestAssertElementText('//*[@name="comments"]', 'comments');

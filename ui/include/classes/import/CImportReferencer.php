@@ -1000,7 +1000,7 @@ class CImportReferencer {
 			'output' => ['name', 'uuid'],
 			'filter' => [
 				'uuid' => array_column($this->template_groups, 'uuid'),
-				'name' => array_column($this->template_groups, 'name')
+				'name' => array_keys($this->template_groups)
 			],
 			'searchByAny' => true,
 			'preservekeys' => true
@@ -1023,7 +1023,7 @@ class CImportReferencer {
 			'output' => ['name', 'uuid'],
 			'filter' => [
 				'uuid' => array_column($this->host_groups, 'uuid'),
-				'name' => array_column($this->host_groups, 'name')
+				'name' => array_keys($this->host_groups)
 			],
 			'searchByAny' => true,
 			'preservekeys' => true

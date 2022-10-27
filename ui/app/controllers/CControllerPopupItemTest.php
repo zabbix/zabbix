@@ -247,9 +247,9 @@ abstract class CControllerPopupItemTest extends CController {
 	protected $is_item_testable;
 
 	/**
-	 * @var object
+	 * @var string
 	 */
-	protected $preproc_item;
+	protected $test_type;
 
 	/**
 	 * @var array
@@ -329,26 +329,6 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		return $ret;
-	}
-
-	/**
-	 * Function returns instance of item, item prototype or discovery rule class.
-	 *
-	 * @param int $test_type
-	 *
-	 * @return CItem|CItemPrototype|CDiscoveryRule
-	 */
-	protected static function getPreprocessingItemClassInstance($test_type) {
-		switch ($test_type) {
-			case self::ZBX_TEST_TYPE_ITEM:
-				return new CItem;
-
-			case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
-				return new CItemPrototype;
-
-			case self::ZBX_TEST_TYPE_LLD:
-				return new CDiscoveryRule;
-		}
 	}
 
 	/**
@@ -929,7 +909,7 @@ abstract class CControllerPopupItemTest extends CController {
 				'supported_macros' => array_diff_key($this->macros_by_item_props['key'],
 					['support_user_macros' => true, 'support_lld_macros' => true]
 				),
-				'support_lldmacros' => ($this->preproc_item instanceof CItemPrototype),
+				'support_lldmacros' => ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
 				'texts_support_macros' => [$inputs['key']],
 				'texts_support_lld_macros' => [$inputs['key']],
 				'texts_support_user_macros' => [$inputs['key']],
@@ -1025,7 +1005,7 @@ abstract class CControllerPopupItemTest extends CController {
 	protected function resolvePreprocessingStepMacros(array $steps) {
 		// Resolve macros used in parameter fields.
 		$macros_posted = $this->getInput('macros', []);
-		$macros_types = ($this->preproc_item instanceof CItemPrototype)
+		$macros_types = ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE)
 			? ['usermacros' => true, 'lldmacros' => true]
 			: ['usermacros' => true];
 
@@ -1069,7 +1049,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 		$expression_parser = new CExpressionParser([
 			'usermacros' => true,
-			'lldmacros' => ($this->preproc_item instanceof CItemPrototype),
+			'lldmacros' => ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
 			'calculated' => true,
 			'host_macro' => true,
 			'empty_host' => true
@@ -1200,7 +1180,7 @@ abstract class CControllerPopupItemTest extends CController {
 				'macros_n' => []
 			];
 
-			if ($this->preproc_item instanceof CItemPrototype) {
+			if ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE) {
 				$types += ['lldmacros' => true];
 			}
 
