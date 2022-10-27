@@ -78,7 +78,7 @@ class CControllerActionDelete extends CController {
 
 		if ($result) {
 
-			$output['success']['title'] = (_n('Selected action deleted', 'Selected actions deleted', $actions_count));
+			$output['success']['title'] = (_n('Action deleted', 'Actions deleted', $actions_count));
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -86,7 +86,7 @@ class CControllerActionDelete extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => (_n('Cannot delete selected action', 'Cannot delete selected actions', $actions_count)),
+				'title' => (_n('Cannot delete action', 'Cannot delete actions', $actions_count)),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
