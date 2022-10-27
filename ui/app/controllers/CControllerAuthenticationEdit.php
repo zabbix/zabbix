@@ -168,13 +168,7 @@ class CControllerAuthenticationEdit extends CController {
 			$data['saml_provision_groups'] = $this->getInput('saml_provision_groups', []);
 			$data['saml_provision_media'] = $this->getInput('saml_provision_media', []);
 
-			if ($data['saml_provision_groups']) {
-				CArrayHelper::sort($data['saml_provision_groups'], ['sortorder']);
-				$data['saml_provision_groups'] = array_values($data['saml_provision_groups']);
-
-				self::extendProvisionGroups($data['saml_provision_groups']);
-			}
-
+			self::extendProvisionGroups($data['saml_provision_groups']);
 			self::extendProvisionMedia($data['saml_provision_media']);
 
 			$data['ldap_servers'] = $this->getLdapServerUserGroupCount($this->getInput('ldap_servers', []));
@@ -312,6 +306,10 @@ class CControllerAuthenticationEdit extends CController {
 	 * @param array $provision_groups
 	 */
 	private static function extendProvisionGroups(array &$provision_groups): void {
+		if (!$provision_groups) {
+			return;
+		}
+
 		$roleids = [];
 		$usrgrpids = [];
 
