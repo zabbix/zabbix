@@ -26,9 +26,6 @@ class ClockWidgets {
 	 *
 	 * @return array
 	 */
-
-	const INTERFACE_ID = 'select * from host';
-
 	public static function load() {
 		CDataHelper::call('hostgroup.create', [
 			[
