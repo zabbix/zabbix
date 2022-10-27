@@ -41,6 +41,7 @@ abstract class CControllerProblem extends CController {
 		'evaltype' => TAG_EVAL_TYPE_AND_OR,
 		'tags' => [],
 		'show_tags' => SHOW_TAGS_3,
+		'show_symptoms' => 0,
 		'show_suppressed' => 0,
 		'unacknowledged' => 0,
 		'compact_view' => 0,

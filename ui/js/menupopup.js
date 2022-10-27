@@ -637,66 +637,64 @@ function getMenuPopupTrigger(options, trigger_element) {
 		};
 	}
 
-	// Change problem rank to cause or symptom.
-	if (options.allowed_actions_change_problem_ranking) {
+	// Check if user role allows to change event rank and if one of the options to show individual menu are true.
+	if (options.allowed_actions_change_problem_ranking
+			&& ((typeof options.show_rank_change_cause !== 'undefined' && options.show_rank_change_cause)
+				|| (typeof options.show_rank_change_symptom !== 'undefined' && options.show_rank_change_symptom))) {
 		let items = [];
-		// Must be synced with PHP ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE.
-		const ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE = 0x80;
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'popup.acknowledge.create');
 
-		items[items.length] = {
-			label: t('Mark as cause'),
-			clickCallback: function () {
-				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+		/*
+		 * Some widets cannot show symptoms. So it is not possible to convert to symptoms cause if only cause evets are
+		 * displayed.
+		 */
+		if (typeof options.show_rank_change_cause !== 'undefined' && options.show_rank_change_cause) {
+			// Must be synced with PHP ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE.
+			const ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE = 0x80;
 
-				fetch(curl.getUrl(), {
-					method: 'POST',
-					headers: {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'},
-					body: urlEncodeData({
-						eventids: [options.eventid],
-						change_rank: ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
+			items[items.length] = {
+				label: t('Mark as cause'),
+				clickCallback: function () {
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+					fetch(curl.getUrl(), {
+						method: 'POST',
+						headers: {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8'},
+						body: urlEncodeData({
+							eventids: [options.eventid],
+							change_rank: ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
+						})
 					})
-				})
-					.then((response) => response.json())
-					.then((response) => {
-						clearMessages();
+						.then((response) => response.json())
+						.then((response) => {
+							clearMessages();
 
-						// Show message directly that comes from controller.
-						if ('error' in response) {
-							addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true,
-								true
-							));
-						}
-						else if('success' in response) {
-							addMessage(makeMessageBox('good', [], response.success.title, true, false));
-						}
-					})
-					.catch(() => {
-						const title = t('Unexpected server error.');
-						const message_box = makeMessageBox('bad', [], title)[0];
+							// Show message directly that comes from controller.
+							if ('error' in response) {
+								addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true,
+									true
+								));
+							}
+							else if('success' in response) {
+								addMessage(makeMessageBox('good', [], response.success.title, true, false));
+							}
+						})
+						.catch(() => {
+							const title = t('Unexpected server error.');
+							const message_box = makeMessageBox('bad', [], title)[0];
 
-						clearMessages();
-						addMessage(message_box);
-					});
-			},
-			disabled: !options.mark_as_cause
-		};
+							clearMessages();
+							addMessage(message_box);
+						});
+				},
+				disabled: !options.mark_as_cause
+			};
+		}
 
-		let is_dashboard = false;
-		const current_url = new Curl();
-
-		Object.entries(current_url.getArguments()).forEach(([key, value]) => {
-			if (key === 'action' && value === 'dashboard.view') {
-				is_dashboard = true;
-
-				return;
-			}
-		})
-
-		// Dashboard does not have checkboxes, so it is not possible to mark problems and change rank to symptom.
-		if (!is_dashboard) {
+		// Dashboard does not have checkboxes. So it is not possible to mark problems and change rank to symptom.
+		if (typeof options.show_rank_change_symptom !== 'undefined' && options.show_rank_change_symptom) {
 			// Must be synced with PHP ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM.
 			const ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM = 0x100;
 

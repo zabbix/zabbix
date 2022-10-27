@@ -83,6 +83,8 @@ class CControllerMenuPopup extends CController {
 					'triggerid' => 'required|db triggers.triggerid',
 					'eventid' => 'db events.eventid',
 					'acknowledge' => 'in 0,1',
+					'show_rank_change_cause' => 'in 0,1',
+					'show_rank_change_symptom' => 'in 0,1',
 					'ids' => 'array_db events.eventid'
 				];
 				break;
@@ -743,12 +745,20 @@ class CControllerMenuPopup extends CController {
 						// Can change rank to cause if event is not already cause.
 						$menu_data['mark_as_cause'] = ($event['cause_eventid'] != 0);
 
-						// Check if selected can change rank to symptom for given cause.
-						$menu_data['mark_selected_as_symptoms'] = (array_key_exists('ids', $data) && $data['ids'])
-							? validateEventRankChangeToSymptom($data['ids'], $data['eventid'])
+						// Check if selected events can change rank to symptom for given cause.
+						$menu_data['mark_selected_as_symptoms'] = array_key_exists('ids', $data) && $data['ids']
+							? (bool) validateEventRankChangeToSymptom($data['ids'], $data['eventid'])
 							: false;
 
 						$menu_data['eventids'] = array_key_exists('ids', $data) ? $data['ids'] : [];
+
+						// Show individual menus depending on location.
+						$menu_data['show_rank_change_cause'] = array_key_exists('show_rank_change_cause', $data)
+							? $data['show_rank_change_cause']
+							: false;
+						$menu_data['show_rank_change_symptom'] = array_key_exists('show_rank_change_symptom', $data)
+							? $data['show_rank_change_symptom']
+							: false;
 					}
 				}
 			}

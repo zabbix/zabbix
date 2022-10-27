@@ -46,6 +46,7 @@ $options = [
 			'show_tags' => $data['filter']['show_tags'],
 			'tag_name_format' => $data['filter']['tag_name_format'],
 			'tag_priority' => $data['filter']['tag_priority'],
+			'show_symptoms' => $data['filter']['show_symptoms'],
 			'show_suppressed' => $data['filter']['show_suppressed'],
 			'unacknowledged' => $data['filter']['unacknowledged'],
 			'compact_view' => $data['filter']['compact_view'],
