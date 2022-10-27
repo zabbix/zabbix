@@ -378,13 +378,13 @@ class Group extends ScimApiService {
 	}
 
 	/**
-	 * Based on SCIM group id, returns all the users that are included in this group. Checks table 'users_scim_groups'.
+	 * Based on SCIM group id, returns all the users that are included in this group.
 	 *
-	 * @param array $groupids  SCIM groups' IDs.
+	 * @param array $groupids    SCIM groups' IDs.
 	 *
-	 * @return array           Returns array where each group has its own array of users. Groupid is key, userid is key.
-	 *         [$groupid][$userid]['userid']
-	 *                   [$userid]['username']
+	 * @return array    Returns array where each group has its own array of users. Groupid is key, userid is key.
+	 *                  [<groupid>][<userid>]['userid']
+	 *                  [<groupid>][<userid>]['username']
 	 */
 	private function getUsersByGroupIds(array $groupids): array {
 		$db_scim_groups_members = DB::select('users_scim_groups', [
@@ -392,15 +392,18 @@ class Group extends ScimApiService {
 			'filter' => ['scim_groupid' => $groupids]
 		]);
 
+		if (!$db_scim_groups_members) {
+			return [];
+		}
+
 		$users = APIRPC::User()->get([
 			'output' => ['userid', 'username'],
 			'userids' => array_column($db_scim_groups_members, 'userid'),
 			'preservekeys' => true
 		]);
 
+		$users_groups = array_fill_keys($groupids, []);
 		foreach ($groupids as $groupid) {
-			$users_groups[$groupid] = [];
-
 			foreach ($db_scim_groups_members as $scim_group_member) {
 				if ($scim_group_member['scim_groupid'] == $groupid) {
 					$users_groups[$groupid][$scim_group_member['userid']] = $users[$scim_group_member['userid']];
