@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 The template for monitoring Switch MikroTik CRS112-8G-4S-IN.
 
 8x Gigabit Ethernet Smart Switch, 4x SFP cages, 400MHz CPU, 128MB RAM, desktop case, RouterOS L5
@@ -160,7 +160,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 
 ## References

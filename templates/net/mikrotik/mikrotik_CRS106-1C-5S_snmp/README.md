@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 The template for monitoring Switch MikroTik CRS106-1C-5S.
 
 Smart Switch, 5x SFP cages, 1x Combo port (SFP or Gigabit Ethernet), 400MHz CPU, 128MB RAM, desktop case, RouterOS L5
@@ -160,7 +160,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 
 ## References

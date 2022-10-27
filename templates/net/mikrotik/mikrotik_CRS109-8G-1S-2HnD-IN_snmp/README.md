@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 The template for monitoring Switch MikroTik CRS109-8G-1S-2HnD-IN.
 
 8x Gigabit Smart Switch, 1x SFP cage, LCD, 802.11b/g/n Dual Chain wireless, 600MHz CPU, 128MB RAM, Metal desktop case, RouterOS L5, supports 10-57V, 802.3af/at compliant
@@ -160,7 +160,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 
 ## References

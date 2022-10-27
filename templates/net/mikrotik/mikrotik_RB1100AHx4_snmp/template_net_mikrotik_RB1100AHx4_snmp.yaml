@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-14T19:50:45Z'
+  date: '2022-10-27T12:57:24Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -9,7 +9,7 @@ zabbix_export:
     -
       uuid: 3dfd1a55987848e5aa6ffe92c228f63b
       template: 'MikroTik RB1100AHx4 by SNMP'
-      name: 'MikroTik RB1100AHx4n by SNMP'
+      name: 'MikroTik RB1100AHx4 by SNMP'
       description: |
         The template for monitoring Ethernet router MikroTik RB1100AHx4.
         Powerful 1U rackmount router with 13x Gigabit Ethernet ports

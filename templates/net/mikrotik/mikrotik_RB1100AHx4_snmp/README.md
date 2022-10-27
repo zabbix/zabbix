@@ -1,9 +1,9 @@
 
-# MikroTik RB1100AHx4n by SNMP
+# MikroTik RB1100AHx4 by SNMP
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 The template for monitoring Ethernet router MikroTik RB1100AHx4.
 
 Powerful 1U rackmount router with 13x Gigabit Ethernet ports
@@ -160,7 +160,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 
 ## References

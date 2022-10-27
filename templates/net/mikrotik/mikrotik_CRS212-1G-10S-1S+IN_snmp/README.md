@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.0 and higher.  
 The template for monitoring Switch MikroTik CRS212-1G-10S-1S+IN.
 
 Smart Switch, 1x Gigabit LAN, 10x SFP cages, 1x SFP+ cage, LCD, 400MHz CPU, 64MB RAM, Metal desktop case, RouterOS L5
@@ -160,7 +160,7 @@ There are no template links in this template.
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
 
 ## References
