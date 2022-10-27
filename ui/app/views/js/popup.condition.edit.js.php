@@ -134,12 +134,19 @@ window.condition_popup = new class {
 		const $host_ms = $('#host_new_condition');
 		const $hostgroup_ms = $('#hostgroup_new_condition');
 		const $template_ms = $('#template_new_condition');
+		const $event_ms = $('#event_hostgroup_new_condition');
 
-		let multiselects = [$trigger_ms, $discovery_rule_ms, $host_ms, $hostgroup_ms, $template_ms]
+		let multiselects = [$trigger_ms, $discovery_rule_ms, $host_ms, $hostgroup_ms, $template_ms, $event_ms]
 		multiselects.forEach((multiselect) => {
 			multiselect.on('change', () => {
+				if (this.form.querySelectorAll('[name^="value["]')) {
+					multiselect.multiSelect('setDisabledEntries',
+						[... this.form.querySelectorAll('[name^="value["]')].map((input) => input.value)
+					);
+				}
+				if (this.form.querySelectorAll('[name^="groupids[]"]'))
 				multiselect.multiSelect('setDisabledEntries',
-					[... this.form.querySelectorAll('[name^="value["]')].map((input) => input.value)
+					[... this.form.querySelectorAll('[name^="groupids[]"]')].map((input) => input.value)
 				);
 			});
 		})

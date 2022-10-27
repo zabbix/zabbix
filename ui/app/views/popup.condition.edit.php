@@ -101,10 +101,13 @@ switch ($data['type']) {
 							'srctbl' => 'host_groups',
 							'srcfld1' => 'groupid',
 							'dstfrm' => $form->getName(),
-							'dstfld1' => 'groupids_'
+							'dstfld1' => 'event_hostgroup_new_condition',
+							'editable' => true
 						]
 					]
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
+				]))
+					->setId('event_hostgroup_new_condition')
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 				$inline_js .= $hostgroup_multiselect->getPostJS();
 
