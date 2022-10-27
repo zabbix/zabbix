@@ -149,7 +149,7 @@ class User extends ScimApiService {
 	 */
 	private function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'id' =>				['type' => API_ID, 'flags' => API_NOT_EMPTY],
+			'id' =>				['type' => API_ID],
 			'userName' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
 			'startIndex' =>		['type' => API_INT32, 'default' => 1],
 			'count' =>			['type' => API_INT32, 'default' => 100]
@@ -284,7 +284,7 @@ class User extends ScimApiService {
 	private function validatePut(array $options): array {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => self::SCIM_USER_SCHEMA],
-			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'userName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
 			'active' =>		['type' => API_BOOLEAN, 'flags' => API_NOT_EMPTY]
 		]];
@@ -350,7 +350,7 @@ class User extends ScimApiService {
 	 */
 	private function validateDelete(array $options): array {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-			'id' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+			'id' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
