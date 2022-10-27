@@ -238,14 +238,6 @@ static int	load_config_user_params(const char *config_file)
 	return parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_NO_EXIT_FAILURE);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: reload user parameters                                            *
- *                                                                            *
- * Parameters: process_type - process type                                    *
- *             process_num - process number                                   *
- *                                                                            *
- ******************************************************************************/
 void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file)
 {
 	char		*error = NULL;
