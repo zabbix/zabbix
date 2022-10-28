@@ -1377,14 +1377,9 @@ class CItem extends CItemGeneral {
 		$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT];
 
 		foreach ($items as $i => $item) {
-			if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				unset($items[$i]);
-				continue;
-			}
-
 			$check = false;
 
-			if (in_array($item['value_type'], $value_types)) {
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL && in_array($item['value_type'], $value_types)) {
 				if (array_key_exists('inventory_link', $item)) {
 					if (!array_key_exists('itemid', $item)) {
 						if ($item['inventory_link'] != 0) {
