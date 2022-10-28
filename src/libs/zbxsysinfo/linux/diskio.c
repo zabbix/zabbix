@@ -371,7 +371,8 @@ int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 									char	*p;
 
 									/* dismiss trailing \n */
-									p = tmp + strlen(tmp) - 1;
+									size_t l = strlen(tmp);
+									p = tmp + l - 1;
 									if ('\n' == *p)
 										*p = '\0';
 
