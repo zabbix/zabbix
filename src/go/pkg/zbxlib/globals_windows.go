@@ -115,7 +115,7 @@ char	*strerror_from_system(unsigned long error)
 	return utf8_string;
 }
 
-int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported."));
 	return SYSINFO_RET_FAIL;

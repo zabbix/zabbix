@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxstr.h"
 #include "base64.h"
@@ -406,7 +407,7 @@ out:
 	return ret;
 }
 
-int	REGISTRY_DATA(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	registry_data(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*regkey, *value_name;
 
@@ -432,7 +433,7 @@ int	REGISTRY_DATA(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	REGISTRY_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	registry_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*pkey, *pmode, *regexp;
 	int	mode;

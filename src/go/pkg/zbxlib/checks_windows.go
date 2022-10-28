@@ -27,30 +27,30 @@ package zbxlib
 #include "zbxsysinfo.h"
 #include "module.h"
 
-int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_localtime(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_boottime(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_service(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	get_sensor(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_intr(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_chassis(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_devices(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_macaddr(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_dir_get(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 */
 import "C"
 
@@ -61,9 +61,9 @@ import (
 func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	switch key {
 	case "system.localtime":
-		cfunc = unsafe.Pointer(C.SYSTEM_LOCALTIME)
+		cfunc = unsafe.Pointer(C.system_localtime)
 	case "vfs.dir.get":
-		cfunc = unsafe.Pointer(C.VFS_DIR_GET)
+		cfunc = unsafe.Pointer(C.vfs_dir_get)
 	}
 
 	return

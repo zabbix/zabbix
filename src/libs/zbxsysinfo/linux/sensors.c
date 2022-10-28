@@ -400,7 +400,7 @@ out:
 #endif
 }
 
-int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	get_sensor(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*device, *name, *function;
 	int	do_task, cnt = 0;

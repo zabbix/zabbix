@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "system.h"
+#include "../sysinfo.h"
 #include "zbxsysinfo_common.h"
 
+#include "system.h"
 #include "zbxtime.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
@@ -33,7 +34,7 @@
  * Comments: Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
-int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_localtime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*type, buf[32];
 	long		milliseconds;
@@ -72,7 +73,7 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_users_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	char		counter_path[64];
@@ -89,7 +90,7 @@ int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	request_tmp.params = zbx_malloc(NULL, request_tmp.nparam * sizeof(char *));
 	request_tmp.params[0] = counter_path;
 
-	ret = PERF_COUNTER(&request_tmp, result);
+	ret = perf_counter(&request_tmp, result);
 
 	zbx_free(request_tmp.params);
 
@@ -97,6 +98,6 @@ int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #else
 	ZBX_UNUSED(request);
 
-	return EXECUTE_INT("who | wc -l", result);
+	return execute_int("who | wc -l", result);
 #endif
 }

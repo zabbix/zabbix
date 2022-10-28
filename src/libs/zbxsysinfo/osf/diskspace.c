@@ -76,7 +76,7 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 #undef ZBX_BSIZE
 }
 
-static int	VFS_FS_USED(const char *fs, AGENT_RESULT *result)
+static int	vfs_fs_used(const char *fs, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -92,7 +92,7 @@ static int	VFS_FS_USED(const char *fs, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_FS_FREE(const char *fs, AGENT_RESULT *result)
+static int	vfs_fs_free(const char *fs, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -108,7 +108,7 @@ static int	VFS_FS_FREE(const char *fs, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_FS_TOTAL(const char *fs, AGENT_RESULT *result)
+static int	vfs_fs_total(const char *fs, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -124,7 +124,7 @@ static int	VFS_FS_TOTAL(const char *fs, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_FS_PFREE(const char *fs, AGENT_RESULT *result)
+static int	vfs_fs_pfree(const char *fs, AGENT_RESULT *result)
 {
 	double	value;
 	char	*error;
@@ -140,7 +140,7 @@ static int	VFS_FS_PFREE(const char *fs, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_FS_PUSED(const char *fs, AGENT_RESULT *result)
+static int	vfs_fs_pused(const char *fs, AGENT_RESULT *result)
 {
 	double	value;
 	char	*error;
@@ -156,7 +156,7 @@ static int	VFS_FS_PUSED(const char *fs, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_fs_size_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*fsname, *mode;
 
@@ -176,22 +176,22 @@ static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
-		return VFS_FS_TOTAL(fsname, result);
+		return vfs_fs_total(fsname, result);
 	if (0 == strcmp(mode, "free"))
-		return VFS_FS_FREE(fsname, result);
+		return vfs_fs_free(fsname, result);
 	if (0 == strcmp(mode, "pfree"))
-		return VFS_FS_PFREE(fsname, result);
+		return vfs_fs_pfree(fsname, result);
 	if (0 == strcmp(mode, "used"))
-		return VFS_FS_USED(fsname, result);
+		return vfs_fs_used(fsname, result);
 	if (0 == strcmp(mode, "pused"))
-		return VFS_FS_PUSED(fsname, result);
+		return vfs_fs_pused(fsname, result);
 
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 
 	return SYSINFO_RET_FAIL;
 }
 
-int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_size, request, result);
+	return zbx_execute_threaded_metric(vfs_fs_size_local, request, result);
 }
