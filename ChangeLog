@@ -3,6 +3,7 @@ Changes for 6.4.0beta3
 New features:
 
 Bug fixes:
+........S. [ZBX-21463] fixed Zabbix server to not attach interface to script items during linking (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0beta2
