@@ -44,6 +44,7 @@ $operationtype_value = $operation['opcommand']['scriptid'] !== '0'
 	: 'cmd['.$operationtype.']';
 
 // Operation type row.
+if (count($data['operation_types']) > 1) {
 $select_operationtype = (new CSelect(''))
 	->setFocusableElementId('operationtype')
 	->addOptions(CSelect::createOptionsFromArray($data['operation_types']))
@@ -51,11 +52,26 @@ $select_operationtype = (new CSelect(''))
 	->setId('operation-type-select')
 	->setName('operation[operationtype]');
 
-$form_grid->addItem([
-	(new CLabel(_('Operation'), $select_operationtype->getFocusableElementId()))->setId('operation-type-label'),
-	(new CFormField($select_operationtype))
-		->setId('operation-type')
+	$form_grid->addItem([
+		(new CLabel(_('Operation'), $select_operationtype
+			->getFocusableElementId()))->setId('operation-type-label'),
+		(new CFormField($select_operationtype))
+			->setId('operation-type')
 	]);
+}
+else {
+	$form_grid->addItem([
+		(new CLabel(_('Operation'), 'operation-type'))->setId('operation-type-label'),
+		(new CFormField([
+			new CLabel($data['operation_types']),
+			(new CInput('hidden', $data['operation_types']))
+				->setId('operation-type-select')
+				->setAttribute('value', $operationtype_value)
+				->setName('operation[operationtype]')
+		]))
+			->setId('operation-type')
+	]);
+}
 
 // Operation escalation steps row.
 $step_from = (new CNumericBox('operation[esc_step_from]', 1, 5))

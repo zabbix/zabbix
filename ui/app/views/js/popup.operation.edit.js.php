@@ -52,7 +52,7 @@ window.operation_popup = new class {
 	_loadViews() {
 		this._customMessageFields();
 		this._removeAllFields();
-		const operation_type = document.getElementById('operation-type-select').value;
+		const operation_type = document.getElementById('operation-type-select').getAttribute('value');
 		this._changeView(operation_type)
 
 		document.querySelector('#operation-type-select').onchange = () => {
