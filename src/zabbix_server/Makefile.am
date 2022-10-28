@@ -15,7 +15,6 @@ SUBDIRS = \
 	trapper \
 	escalator \
 	proxypoller \
-	selfmon \
 	vmware \
 	taskmanager \
 	ipmi \
@@ -27,6 +26,7 @@ SUBDIRS = \
 	lld \
 	reporter \
 	service \
+	rtc \
 	ha \
 	proxyconfigread
 
@@ -71,7 +71,6 @@ zabbix_server_LDADD = \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
 	proxyconfigread/libzbxproxyconfigread.a \
-	selfmon/libzbxselfmon.a \
 	vmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager.a \
 	odbc/libzbxodbc.a \
@@ -136,7 +135,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_builddir)/src/libs/zbxha/libzbxha.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_service.a \
-	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_server.a \
+	rtc/libzbxrtc_server.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc.a \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a \

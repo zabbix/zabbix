@@ -469,13 +469,17 @@ class testUserRolesPermissions extends CWebTest {
 	 */
 	public function testUserRolesPermissions_ScriptAction($data) {
 		$context_before = [
-			'Inventory',
-			'Latest data',
-			'Problems',
-			'Graphs',
 			'Dashboards',
+			'Problems',
+			'Latest data',
+			'Graphs',
 			'Web',
-			'Configuration',
+			'Inventory',
+			'Host',
+			'Items',
+			'Triggers',
+			'Discovery',
+			'Web',
 			'Detect operating system',
 			'Ping',
 			'Script for Clone',
@@ -484,13 +488,17 @@ class testUserRolesPermissions extends CWebTest {
 			'Traceroute'
 		];
 		$context_after = [
-			'Inventory',
-			'Latest data',
-			'Problems',
-			'Graphs',
 			'Dashboards',
+			'Problems',
+			'Latest data',
+			'Graphs',
 			'Web',
-			'Configuration'
+			'Inventory',
+			'Host',
+			'Items',
+			'Triggers',
+			'Discovery',
+			'Web'
 		];
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 
@@ -501,12 +509,12 @@ class testUserRolesPermissions extends CWebTest {
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 			if ($action_status) {
 				$this->assertTrue($popup->hasItems($context_before));
-				$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
+				$this->assertEquals(['VIEW', 'CONFIGURATION', 'SCRIPTS'], $popup->getTitles()->asText());
 				$this->changeRoleRule(['Execute scripts' => false]);
 			}
 			else {
 				$this->assertTrue($popup->hasItems($context_after));
-				$this->assertEquals(['HOST'], $popup->getTitles()->asText());
+				$this->assertEquals(['VIEW', 'CONFIGURATION'], $popup->getTitles()->asText());
 				$this->changeRoleRule(['Execute scripts' => true]);
 			}
 		}

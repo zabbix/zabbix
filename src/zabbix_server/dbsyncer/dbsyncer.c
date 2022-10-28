@@ -27,9 +27,7 @@
 #include "zbxexport.h"
 
 extern int				CONFIG_HISTSYNCER_FREQUENCY;
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 static sigset_t				orig_mask;
 
 /******************************************************************************
@@ -83,21 +81,22 @@ static void	db_trigger_queue_cleanup(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 {
-	int		sleeptime = -1, total_values_num = 0, values_num, more, total_triggers_num = 0, triggers_num;
-	double		sec, total_sec = 0.0;
-	time_t		last_stat_time;
-	char		*stats = NULL;
-	const char	*process_name;
-	size_t		stats_alloc = 0, stats_offset = 0;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	int			sleeptime = -1, total_values_num = 0, values_num, more, total_triggers_num = 0,
+				triggers_num;
+	double			sec, total_sec = 0.0;
+	time_t			last_stat_time;
+	char			*stats = NULL;
+	const char		*process_name;
+	size_t			stats_alloc = 0, stats_offset = 0;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type), server_num,
 			(process_name = get_process_type_string(process_type)), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -181,7 +180,7 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		if (!ZBX_IS_RUNNING())
 			break;
 
-		zbx_sleep_loop(sleeptime);
+		zbx_sleep_loop(info, sleeptime);
 	}
 
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */

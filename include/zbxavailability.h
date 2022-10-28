@@ -31,7 +31,7 @@
 #define ZBX_IPC_AVAILMAN_ACTIVE_STATUS		4
 #define ZBX_IPC_AVAILMAN_CONFSYNC_DIFF		5
 #define ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA	6
-#define ZBX_IPC_AVAILMAN_PROXY_FLUSH_ALL_HOSTS	7
+#define ZBX_IPC_AVAILMAN_ACTIVE_PROXY_HB_UPDATE	7
 #define ZBX_AVAIL_SERVER_CONN_TIMEOUT		3600
 
 /* agent (ZABBIX, SNMP, IPMI, JMX) availability data */
@@ -145,4 +145,8 @@ void		zbx_availability_deserialize_proxy_hostdata(const unsigned char *data, zbx
 
 zbx_uint32_t	zbx_availability_serialize_hostids(unsigned char **data, zbx_vector_uint64_t *hostids);
 void	zbx_availability_deserialize_hostids(const unsigned char *data, zbx_vector_uint64_t *hostids);
+
+zbx_uint32_t	zbx_availability_serialize_active_proxy_hb_update(unsigned char **data, zbx_uint64_t hostid);
+void	zbx_availability_deserialize_active_proxy_hb_update(const unsigned char *data, zbx_uint64_t *hostid);
+
 #endif /* ZABBIX_AVAILABILITY_H */

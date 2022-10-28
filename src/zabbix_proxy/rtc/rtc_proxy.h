@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_SELFMON_H
-#define ZABBIX_SELFMON_H
+#ifndef ZABBIX_RTC_PROXY_H
+#define ZABBIX_RTC_PROXY_H
 
-#include "zbxthreads.h"
+#include "zbxrtc.h"
 
-ZBX_THREAD_ENTRY(selfmon_thread, args);
-
+int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result);
+int	rtc_process(const char *option, char **error);
 #endif

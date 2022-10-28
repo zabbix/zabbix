@@ -17,33 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package postgres
+#ifndef ZABBIX_RTC_SERVER_H
+#define ZABBIX_RTC_SERVER_H
 
-import (
-	"context"
-	"fmt"
-)
+#include "zbxrtc.h"
+#include "zbxipcservice.h"
 
-const (
-	pingFailed = 0
-	pingOk     = 1
-)
-
-// pingHandler queries 'SELECT 1' and returns pingOk if a connection is alive or pingFailed otherwise.
-func pingHandler(ctx context.Context, conn PostgresClient,
-	_ string, _ map[string]string, _ ...string) (interface{}, error) {
-	var res int
-
-	row, err := conn.QueryRow(ctx, fmt.Sprintf("SELECT %d", pingOk))
-	if err != nil {
-		return pingFailed, nil
-	}
-
-	err = row.Scan(&res)
-
-	if err != nil || res != pingOk {
-		return pingFailed, nil
-	}
-
-	return pingOk, nil
-}
+int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result);
+int	rtc_process(const char *option, char **error);
+void	rtc_reset(zbx_rtc_t *rtc);
+int	rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error);
+#endif

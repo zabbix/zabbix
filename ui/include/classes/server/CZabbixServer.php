@@ -592,21 +592,22 @@ class CZabbixServer {
 			}
 
 			if (!$socket = @fsockopen($this->host, $this->port, $errorCode, $errorMsg, $this->connect_timeout)) {
+				$host_port = $this->host.':'.$this->port;
 				switch ($errorMsg) {
 					case 'Connection refused':
-						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" refused. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $this->host);
+						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" refused. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Security environment (for example, SELinux) is blocking the connection;\n3. Zabbix server daemon not running;\n4. Firewall is blocking TCP connection.\n", $host_port);
 						break;
 
 					case 'No route to host':
-						$dErrorMsg = _s("Zabbix server \"%1\$s\" cannot be reached. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $this->host);
+						$dErrorMsg = _s("Zabbix server \"%1\$s\" cannot be reached. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Incorrect network configuration.\n", $host_port);
 						break;
 
 					case 'Connection timed out':
-						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" timed out. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $this->host);
+						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" timed out. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Firewall is blocking TCP connection.\n", $host_port);
 						break;
 
 					default:
-						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $this->host);
+						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $host_port);
 				}
 
 				$this->error = $dErrorMsg.$errorMsg;
