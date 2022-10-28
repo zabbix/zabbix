@@ -18,10 +18,11 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "log.h"
 
-int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_LIBPERFSTAT
 #define ZBX_PERFSTAT_PAGE_SHIFT	12	/* 4 KB */

@@ -18,10 +18,11 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "log.h"
 
-int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 	char		*swapdev, *mode;
@@ -260,7 +261,7 @@ static int	get_swap_stat(const char *swapdev, swap_stat_t *result)
 	return ret;
 }
 
-int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*swapdev, *mode;
 	swap_stat_t	ss;
@@ -303,7 +304,7 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*swapdev, *mode;
 	swap_stat_t	ss;

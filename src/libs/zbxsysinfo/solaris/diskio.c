@@ -107,7 +107,7 @@ clean:
 	return ret;
 }
 
-static int	VFS_DEV_READ_BYTES(const char *devname, AGENT_RESULT *result)
+static int	vfs_dev_read_bytes(const char *devname, AGENT_RESULT *result)
 {
 	zbx_kstat_t	zk;
 	char		*error;
@@ -123,7 +123,7 @@ static int	VFS_DEV_READ_BYTES(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_DEV_READ_OPERATIONS(const char *devname, AGENT_RESULT *result)
+static int	vfs_dev_read_operations(const char *devname, AGENT_RESULT *result)
 {
 	zbx_kstat_t	zk;
 	char		*error;
@@ -139,7 +139,7 @@ static int	VFS_DEV_READ_OPERATIONS(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_DEV_WRITE_BYTES(const char *devname, AGENT_RESULT *result)
+static int	vfs_dev_write_bytes(const char *devname, AGENT_RESULT *result)
 {
 	zbx_kstat_t	zk;
 	char		*error;
@@ -155,7 +155,7 @@ static int	VFS_DEV_WRITE_BYTES(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
+static int	vfs_dev_write_operations(const char *devname, AGENT_RESULT *result)
 {
 	zbx_kstat_t	zk;
 	char		*error;
@@ -210,24 +210,24 @@ static int	process_mode_function(AGENT_REQUEST *request, AGENT_RESULT *result, c
 	return SYSINFO_RET_FAIL;
 }
 
-int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
-		{"bytes",	VFS_DEV_READ_BYTES},
-		{"operations",	VFS_DEV_READ_OPERATIONS},
+		{"bytes",	vfs_dev_read_bytes},
+		{"operations",	vfs_dev_read_operations},
 		{NULL,		NULL}
 	};
 
 	return process_mode_function(request, result, fl);
 }
 
-int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const MODE_FUNCTION	fl[] =
 	{
-		{"bytes",	VFS_DEV_WRITE_BYTES},
-		{"operations",	VFS_DEV_WRITE_OPERATIONS},
+		{"bytes",	vfs_dev_write_bytes},
+		{"operations",	vfs_dev_write_operations},
 		{NULL,		NULL}
 	};
 
