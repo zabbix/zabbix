@@ -607,7 +607,7 @@ out:
 }
 #endif /* HAVE_LIBMODBUS */
 
-int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	modbus_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_LIBMODBUS
 	char			*tmp, *err = NULL;

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-10-20 09:58+0000\n"
+"PO-Revision-Date: 2022-10-23 19:45+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -6587,19 +6587,19 @@ msgstr "Ativar autenticação HTTP"
 
 #: app/views/administration.authentication.edit.php:156
 msgid "Enable LDAP authentication"
-msgstr ""
+msgstr "Ativar autenticação LDAP"
 
 #: app/views/administration.authentication.edit.php:215
 msgid "Enable SAML authentication"
-msgstr ""
+msgstr "Ativar autenticação SAML"
 
 #: app/views/administration.audit.settings.edit.php:44
 msgid "Enable audit logging"
-msgstr ""
+msgstr "Ativar registo de auditoria"
 
 #: app/views/administration.housekeeping.edit.php:161
 msgid "Enable compression"
-msgstr ""
+msgstr "Ativar compressão"
 
 #: app/views/administration.script.edit.php:251
 msgid "Enable confirmation"
@@ -6623,7 +6623,7 @@ msgstr "Activar host"
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:78
 #: include/classes/widgets/forms/CWidgetFormUrl.php:42
 msgid "Enable host selection"
-msgstr ""
+msgstr "Ativar seleção de servidor"
 
 #: app/views/configuration.host.list.php:286
 msgid "Enable host?"
@@ -6640,7 +6640,7 @@ msgstr "Activar hosts monitorizados pelos proxies seleccionados?"
 
 #: app/views/js/proxy.list.js.php:122
 msgid "Enable hosts monitored by selected proxy?"
-msgstr ""
+msgstr "Ativar servidores monitorados pelo proxy selecionado?"
 
 #: app/views/administration.audit.settings.edit.php:48
 #: app/views/administration.housekeeping.edit.php:44
@@ -6654,15 +6654,15 @@ msgstr "Ativar a limpeza de dados interna"
 #: app/views/administration.token.list.php:198
 #: app/views/administration.user.token.list.php:150
 msgid "Enable selected API tokens?"
-msgstr ""
+msgstr "Ativar tokens de API selecionados?"
 
 #: app/views/js/sla.list.js.php:106
 msgid "Enable selected SLA?"
-msgstr ""
+msgstr "Ativar SLA selecionado?"
 
 #: app/views/js/sla.list.js.php:105
 msgid "Enable selected SLAs?"
-msgstr ""
+msgstr "Ativar SLAs selecionados?"
 
 #: include/views/configuration.action.list.php:170
 msgid "Enable selected actions?"
@@ -6696,11 +6696,11 @@ msgstr "Activar tipos de média seleccionados?"
 
 #: app/views/administration.module.list.php:124
 msgid "Enable selected modules?"
-msgstr ""
+msgstr "Ativar módulos selecionados?"
 
 #: app/views/reports.scheduledreport.list.php:86
 msgid "Enable selected scheduled reports?"
-msgstr ""
+msgstr "Ativar relatórios programados selecionados?"
 
 #: include/views/configuration.triggers.list.php:345
 msgid "Enable selected triggers?"
@@ -6715,7 +6715,7 @@ msgstr "Ativar os cenários web selecionados?"
 #: include/views/configuration.item.edit.php:936
 #: include/views/configuration.item.prototype.edit.php:846
 msgid "Enable trapping"
-msgstr ""
+msgstr "Ativar captura"
 
 #: app/partials/administration.system.info.php:181
 #: app/partials/configuration.filter.items.php:187
@@ -6775,7 +6775,7 @@ msgstr "Activado"
 
 #: app/views/administration.authentication.edit.php:299
 msgid "Encrypt"
-msgstr ""
+msgstr "Encriptar"
 
 #: app/partials/configuration.host.edit.html.php:527
 #: app/views/administration.proxy.edit.php:145
@@ -6787,19 +6787,19 @@ msgstr "Encriptação"
 
 #: app/views/administration.autoreg.edit.php:44
 msgid "Encryption level"
-msgstr ""
+msgstr "Nível de encriptação"
 
 #: app/partials/scheduledreport.formgrid.html.php:160
 msgid "End date"
-msgstr ""
+msgstr "Data final"
 
 #: app/views/popup.itemtestedit.view.php:296
 msgid "End of line sequence"
-msgstr ""
+msgstr "Sequência de fim de linha"
 
 #: include/locales.inc.php:33
 msgid "English (en_GB)"
-msgstr ""
+msgstr "Inglês (en_GB)"
 
 #: include/locales.inc.php:33
 msgid "English (en_US)"
@@ -6817,7 +6817,7 @@ msgstr "Inglês (en_US)"
 #: include/classes/api/services/CValueMap.php:451
 #, c-format
 msgid "Entry with UUID \"%1$s\" already exists."
-msgstr ""
+msgstr "A entrada com UUID \"%1$s\" já existe."
 
 #: app/partials/monitoring.host.filter.php:47
 #: app/partials/monitoring.host.filter.php:196
@@ -6834,7 +6834,7 @@ msgstr ""
 #: include/views/configuration.maintenance.edit.php:181
 #: include/views/js/configuration.maintenance.edit.js.php:34
 msgid "Equals"
-msgstr ""
+msgstr "Igual"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: app/views/popup.testtriggerexpr.php:50
@@ -6848,12 +6848,12 @@ msgstr "Erro"
 #: app/views/monitoring.widget.slareport.view.php:101
 #: app/views/slareport.list.php:167
 msgid "Error budget"
-msgstr ""
+msgstr "Erro de orçamento"
 
 #: app/views/monitoring.widget.slareport.view.php:101
 msgctxt "compact table header"
 msgid "Error budget"
-msgstr ""
+msgstr "Erro de orçamento"
 
 #: include/db.inc.php:518
 #, c-format
@@ -6862,19 +6862,19 @@ msgstr "Erro no pedido de pesquisa para a tabela \"%1$s\"."
 
 #: include/func.inc.php:1709 jsLoader.php:228
 msgid "Error message"
-msgstr ""
+msgstr "Mensagem de erro"
 
 #: app/partials/administration.system.info.php:161
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
-msgstr ""
+msgstr "Erro! Não foi possível iniciar o servidor Zabbix devido à versão não suportada do servidor da base de dados %1$s. Deve ser pelo menos (%2$s)"
 
 #: app/partials/administration.system.info.php:140
 #: app/partials/administration.system.info.php:147
 #: app/partials/administration.system.info.php:159
 #: app/partials/administration.system.info.php:172
 msgid "Error! Unable to start Zabbix server."
-msgstr ""
+msgstr "Erro! Não foi possível iniciar o servidor Zabbix."
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -6884,7 +6884,7 @@ msgstr "Erro: %1$s"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1091
 msgid "Evaluation period"
-msgstr ""
+msgstr "Periodo de avaliação"
 
 #: include/events.inc.php:180
 msgid "Event"
@@ -6921,11 +6921,11 @@ msgstr "Geração de eventos"
 
 #: include/actions.inc.php:363
 msgid "Event is acknowledged"
-msgstr ""
+msgstr "O evento está reconhecido"
 
 #: include/actions.inc.php:363
 msgid "Event is not acknowledged"
-msgstr ""
+msgstr "O evento não está reconhecido"
 
 #: tr_events.php:187
 msgid "Event list [previous 20]"
@@ -6938,7 +6938,7 @@ msgstr "Monitoração do log de eventos. Retorna: log"
 #: include/views/configuration.trigger.prototype.edit.php:80
 #: include/views/configuration.triggers.edit.php:102
 msgid "Event name"
-msgstr ""
+msgstr "Nome do evento"
 
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
@@ -6951,8 +6951,8 @@ msgstr "Tipo do evento"
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:168
 msgid "Event updated"
 msgid_plural "Events updated"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Evento atualizado"
+msgstr[1] "Eventos atualizados"
 
 #: app/views/administration.housekeeping.edit.php:42
 msgid "Events and alerts"
@@ -6968,16 +6968,16 @@ msgstr "Semanalmente"
 
 #: app/views/administration.geomaps.edit.php:33
 msgid "Example"
-msgstr ""
+msgstr "Exemplo"
 
 #: app/views/administration.miscconfig.edit.php:37
 msgid "Example: https://localhost/zabbix/ui/"
-msgstr ""
+msgstr "Exemplo: https://localhost/zabbix/ui/"
 
 #: app/partials/massupdate.macros.tab.php:103
 #: app/partials/massupdate.valuemaps.tab.php:77
 msgid "Except selected"
-msgstr ""
+msgstr "Exceto selecionado"
 
 #: app/partials/js/scheduledreport.subscription.js.php:170
 #: app/partials/js/scheduledreport.subscription.js.php:185
@@ -6994,18 +6994,18 @@ msgstr "Eliminar grupos de hosts"
 
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:94
 msgid "Excluded downtime"
-msgstr ""
+msgstr "Tempo de inatividade excluído"
 
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:168
 msgid "Excluded downtimes"
-msgstr ""
+msgstr "Tempos de inatividade excluídos"
 
 #: app/views/monitoring.widget.slareport.view.php:102
 msgctxt "compact table header"
 msgid "Excluded downtimes"
-msgstr ""
+msgstr "Tempos de inatividade excluídos"
 
 #: app/controllers/CControllerAuditLogList.php:197 jsLoader.php:219
 msgid "Execute"
@@ -7013,7 +7013,7 @@ msgstr "Executar"
 
 #: include/classes/data/CItemData.php:1586
 msgid "Execute WMI query and return the JSON document with all selected objects"
-msgstr ""
+msgstr "Executa a consulta WMI e retorna o documento JSON com todos os objetos selecionados"
 
 #: include/classes/data/CItemData.php:1582
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
@@ -7024,7 +7024,7 @@ msgstr "Executa requisição WMI retornando o primeiro objeto seleccionado. Reto
 #: include/views/configuration.item.edit.php:1059
 #: include/views/configuration.item.list.php:311
 msgid "Execute now"
-msgstr ""
+msgstr "Executar agora"
 
 #: app/views/administration.script.edit.php:123
 #: app/views/administration.script.list.php:79
@@ -7033,7 +7033,7 @@ msgstr "Executar em"
 
 #: include/classes/helpers/CRoleHelper.php:465
 msgid "Execute scripts"
-msgstr ""
+msgstr "Executar scripts"
 
 #: include/actions.inc.php:2127
 #: include/views/administration.auditacts.list.php:80
@@ -7062,7 +7062,7 @@ msgstr "Confirmação de execução"
 #: include/classes/widgets/CWidgetHelper.php:659
 #: include/classes/widgets/CWidgetHelper.php:725
 msgid "Exists"
-msgstr ""
+msgstr "Existe"
 
 #: include/classes/html/CCollapsibleUiWidget.php:60
 #: include/classes/widgets/CWidgetHelper.php:1152 jsLoader.php:309
@@ -7077,7 +7077,7 @@ msgstr "Expandir macros"
 #: app/partials/layout.htmlpage.aside.php:42
 #: app/partials/layout.htmlpage.aside.php:44
 msgid "Expand sidebar"
-msgstr ""
+msgstr "Expandir barra lateral"
 
 #: include/views/monitoring.sysmap.edit.php:154
 msgid "Expand single problem"
@@ -7086,7 +7086,7 @@ msgstr "Expandir problemas singulares"
 #: app/partials/scheduledreport.table.html.php:92
 #: app/views/reports.scheduledreport.list.php:64
 msgid "Expired"
-msgstr ""
+msgstr "Expirado"
 
 #: include/views/configuration.maintenance.list.php:72
 #: include/views/configuration.maintenance.list.php:102
@@ -7097,18 +7097,18 @@ msgstr "Expirado"
 #: app/partials/scheduledreport.table.html.php:95
 #, c-format
 msgid "Expired on %1$s."
-msgstr ""
+msgstr "Expirado em %1$s."
 
 #: app/views/administration.token.list.php:132
 #: app/views/administration.user.token.list.php:93
 #: app/views/popup.token.edit.php:102 app/views/popup.token.view.php:60
 msgid "Expires at"
-msgstr ""
+msgstr "Expira em"
 
 #: app/views/administration.token.list.php:59
 #: app/views/administration.user.token.list.php:42
 msgid "Expires in less than"
-msgstr ""
+msgstr "Expira em menos de"
 
 #: app/views/popup.generic.php:503 include/graphs.inc.php:27
 msgid "Exploded"
@@ -7120,7 +7120,7 @@ msgstr "Exportar"
 
 #: app/controllers/CControllerExport.php:113
 msgid "Export failed"
-msgstr ""
+msgstr "Falha na exportação"
 
 #: app/views/monitoring.problem.view.php:100
 msgid "Export to CSV"
@@ -7170,7 +7170,7 @@ msgstr "Tipo de expressão"
 
 #: app/views/popup.testtriggerexpr.php:29
 msgid "Expression variable elements"
-msgstr ""
+msgstr "Elementos variáveis da expressão"
 
 #: app/views/administration.regex.edit.php:113
 #: app/views/administration.regex.edit.php:140
@@ -7204,7 +7204,7 @@ msgstr "Falha"
 #: app/partials/administration.system.info.php:182
 #, c-format
 msgid "Fail-over delay: %1$s"
-msgstr ""
+msgstr "Atraso de failover: %1$s"
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
@@ -7214,11 +7214,11 @@ msgstr "Falhou"
 #: app/views/monitoring.widget.web.view.php:34
 msgctxt "compact table header"
 msgid "Failed"
-msgstr ""
+msgstr "Falhou"
 
 #: app/controllers/CControllerAuditLogList.php:192
 msgid "Failed login"
-msgstr ""
+msgstr "Falha no login"
 
 #: app/controllers/CControllerDashboardUpdate.php:146
 #: app/controllers/CControllerTemplateDashboardUpdate.php:140
@@ -7234,15 +7234,15 @@ msgstr "Falha ao processar a URL."
 
 #: jsLoader.php:137
 msgid "Failed to paste dashboard page."
-msgstr ""
+msgstr "Falha ao colar a página no painel."
 
 #: jsLoader.php:138
 msgid "Failed to paste widget."
-msgstr ""
+msgstr "Falha ao colar o widget."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:390
 msgid "Failed to select default LDAP server."
-msgstr ""
+msgstr "Falha ao selecionar o servidor LDAP padrão."
 
 #: app/controllers/CControllerDashboardUpdate.php:141
 #: app/controllers/CControllerTemplateDashboardUpdate.php:135
@@ -7253,20 +7253,20 @@ msgstr "Falha ao atualizar o dashboard"
 
 #: jsLoader.php:139
 msgid "Failed to update dashboard page properties."
-msgstr ""
+msgstr "Falha ao atualizar as propriedades da página do painel."
 
 #: jsLoader.php:140
 msgid "Failed to update dashboard properties."
-msgstr ""
+msgstr "Falha ao atualizar as propriedades do painel."
 
 #: app/controllers/CControllerDashboardShareUpdate.php:110
 #: app/views/js/popup.dashboard.share.edit.js.php:83
 msgid "Failed to update dashboard sharing."
-msgstr ""
+msgstr "Falha ao atualizar a partilha do painel."
 
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
-msgstr ""
+msgstr "Falha ao atualizar as propriedades do widget."
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
@@ -7278,11 +7278,11 @@ msgstr "Erro fatal, favor reportar ao time Zabbix"
 
 #: include/classes/widgets/CWidgetConfig.php:56
 msgid "Favorite graphs"
-msgstr ""
+msgstr "Gráficos favoritos"
 
 #: include/classes/widgets/CWidgetConfig.php:57
 msgid "Favorite maps"
-msgstr ""
+msgstr "Mapas favoritos"
 
 #: include/func.inc.php:237
 msgid "Feb"
@@ -7345,11 +7345,11 @@ msgstr "O campo \"%1$s\" não é deve estar faltando."
 
 #: include/classes/data/CItemData.php:1150
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
-msgstr ""
+msgstr "O checksum do arquivo, calculada pelo algoritmo cksum do UNIX. Retorna inteiro para crc32 (padrão) e string para md5, sha256"
 
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
-msgstr ""
+msgstr "O arquivo está vazio"
 
 #: include/classes/helpers/CUploadFile.php:156
 #, c-format
@@ -7358,7 +7358,7 @@ msgstr "O ficheiro é demasiado grande, o tamanho máximo para upload é de %1$s
 
 #: include/classes/data/CItemData.php:1170
 msgid "File owner information. Returns string"
-msgstr ""
+msgstr "Informações do proprietário do arquivo. Retorna a string"
 
 #: include/classes/data/CItemData.php:1186
 msgid "File size in bytes (default) or in newlines. Returns integer"
@@ -18457,6 +18457,16 @@ msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr ""
+
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr ""
 
 #: include/views/configuration.item.edit.php:125

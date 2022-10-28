@@ -429,7 +429,7 @@ out:
 }
 #endif
 
-int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	web_page_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*hostname, *path_str, *port_str, *buffer = NULL, *error = NULL;
 	int	ret;
@@ -455,7 +455,7 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	web_page_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*hostname, *path_str, *port_str, *error = NULL;
 	double	start_time;
@@ -481,7 +481,7 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	web_page_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*hostname, *path_str, *port_str, *buffer = NULL, *error = NULL, *regexp, *length_str;
 	const char	*output;

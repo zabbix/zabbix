@@ -18,10 +18,11 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "stats.h"
 
-int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_stat(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*section, *type;
 #define ZBX_MAX_WAIT_VMSTAT	2	/* maximum seconds to wait for vmstat data on the first call */
