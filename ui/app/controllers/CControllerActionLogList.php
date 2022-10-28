@@ -27,6 +27,10 @@ class CControllerActionLogList extends CController {
 			'filter_rst' =>				'in 1',
 			'filter_set' =>				'in 1',
 			'filter_userids' =>			'array_db users.userid',
+			'filter_actionids' =>		'array_db actions.actionid',
+			'filter_mediatypeids' =>	'array_db media_type.mediatypeid',
+			'filter_statuses' =>		'array_db alerts.status',
+			'filter_messages' =>		'string',
 			'from' =>					'range_time',
 			'to' =>						'range_time'
 		];
@@ -58,6 +62,7 @@ class CControllerActionLogList extends CController {
 			'from' => null,
 			'to' => null
 		];
+
 		$this->getInputs($timeselector_options, ['from', 'to']);
 		updateTimeSelectorPeriod($timeselector_options);
 
@@ -65,6 +70,13 @@ class CControllerActionLogList extends CController {
 			'page' => $this->getInput('page', 1),
 			'userids' => CProfile::getArray('web.actionlog.filter.userids', []),
 			'users' => [],
+			'actionids' => CProfile::getArray('web.actionlog.filter.actionids', []),
+			'actions' => [],
+			'mediatypeids' => CProfile::getArray('web.actionlog.filter.mediatypeids', []),
+			'media_types' => [],
+			'actionlog_statuses' => CProfile::getArray('web.actionlog.filter.statuses', []),
+			'statuses' => self::getStatusList(),
+			'messages' => CProfile::get('web.actionlog.filter.messages', ''),
 			'alerts' => [],
 			'action' => $this->getAction(),
 			'timeline' => getTimeSelectorPeriod($timeselector_options),
@@ -81,47 +93,90 @@ class CControllerActionLogList extends CController {
 			]);
 
 			$userids = array_column($data['users'], 'userid');
-
 			$data['userids'] = $this->sanitizeUsersForMultiselect($data['users']);
 		}
 
-		if (!$data['userids'] || $data['users']) {
-			$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
-			foreach (eventSourceObjects() as $eventSource) {
-				$data['alerts'] = array_merge($data['alerts'], API::Alert()->get([
-					'output' => ['alertid', 'actionid', 'userid', 'clock', 'sendto', 'subject', 'message', 'status',
-						'retries', 'error', 'alerttype'
-					],
-					'selectMediatypes' => ['mediatypeid', 'name', 'maxattempts'],
-					'userids' => $userids ? $userids : null,
-					// API::Alert operates with 'open' time interval therefore before call have to alter 'from' and 'to' values.
-					'time_from' => $data['timeline']['from_ts'] - 1,
-					'time_till' => $data['timeline']['to_ts'] + 1,
-					'eventsource' => $eventSource['source'],
-					'eventobject' => $eventSource['object'],
-					'sortfield' => 'alertid',
-					'sortorder' => ZBX_SORT_DOWN,
-					'limit' => $limit
-				]));
-			}
+		$actionids = [];
 
-			CArrayHelper::sort($data['alerts'], [
-				['field' => 'alertid', 'order' => ZBX_SORT_DOWN]
+		if ($data['actionids']) {
+			$data['actions'] = API::Action()->get([
+				'output' => ['actionid', 'name'],
+				'actionids' => $data['actionids'],
+				'preservekeys' => true
 			]);
 
-			$data['alerts'] = array_slice($data['alerts'], 0, CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1);
+			$actionids = array_column($data['actions'], 'actionid');
+			$data['actionids'] = $this->sanitizeDataForMultiselect($data['actions'], 'actions');
+		}
 
-			$data['paging'] = CPagerHelper::paginate($data['page'], $data['alerts'], ZBX_SORT_DOWN,
-				(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
-			);
+		$mediatypeids = [];
 
-			if (!$data['userids']) {
-				$data['users'] = API::User()->get([
-					'output' => ['userid', 'username', 'name', 'surname'],
-					'userids' => array_column($data['alerts'], 'userid'),
-					'preservekeys' => true
-				]);
-			}
+		if ($data['mediatypeids']) {
+			$data['media_types'] = API::MediaType()->get([
+				'output' => ['mediatypeid', 'name', 'maxattempts'],
+				'mediatypeids' => $data['mediatypeids'],
+				'preservekeys' => true
+			]);
+
+			$mediatypeids = array_column($data['media_types'], 'mediatypeid');
+
+			// Sanitize mediatypeids for multiselect.
+			$data['mediatypeids'] = array_map(function (array $value): array {
+				return ['id' => $value['mediatypeid'], 'name' => $value['name'], 'maxattempts' => $value['maxattempts']];
+			}, $data['media_types']);
+
+			CArrayHelper::sort($data['mediatypeids'], ['name']);
+		}
+
+		$search_strings = [];
+
+		if ($data['messages']) {
+			$search_strings = explode(' ', $data['messages']);
+		}
+
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+		foreach (eventSourceObjects() as $eventSource) {
+			$data['alerts'] = array_merge($data['alerts'], API::Alert()->get([
+				'output' => ['alertid', 'actionid', 'userid', 'clock', 'sendto', 'subject', 'message', 'status',
+					'retries', 'error', 'alerttype'
+				],
+				'filter' => ['status' => $data['actionlog_statuses']],
+				'selectMediatypes' => ['mediatypeid', 'name', 'maxattempts'],
+				'userids' => $userids ? $userids : null,
+				'actionids' => $actionids ? $actionids : null,
+				'mediatypeids' => $mediatypeids ? $mediatypeids : null,
+				'search' => [
+					 'subject' => $search_strings,
+					 'message' => $search_strings
+				 ],
+				'searchByAny' => true,
+				// API::Alert operates with 'open' time interval therefore before call have to alter 'from' and 'to' values.
+				'time_from' => $data['timeline']['from_ts'] - 1,
+				'time_till' => $data['timeline']['to_ts'] + 1,
+				'eventsource' => $eventSource['source'],
+				'eventobject' => $eventSource['object'],
+				'sortfield' => 'alertid',
+				'sortorder' => ZBX_SORT_DOWN,
+				'limit' => $limit
+			]));
+		}
+
+		CArrayHelper::sort($data['alerts'], [
+			['field' => 'alertid', 'order' => ZBX_SORT_DOWN]
+		]);
+
+		$data['alerts'] = array_slice($data['alerts'], 0, CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1);
+
+		$data['paging'] = CPagerHelper::paginate($data['page'], $data['alerts'], ZBX_SORT_DOWN,
+			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
+		);
+
+		if (!$data['userids']) {
+			$data['users'] = API::User()->get([
+				'output' => ['userid', 'username', 'name', 'surname'],
+				'userids' => array_column($data['alerts'], 'userid'),
+				'preservekeys' => true
+			]);
 		}
 
 		if ($data['alerts']) {
@@ -141,14 +196,36 @@ class CControllerActionLogList extends CController {
 		$this->disableSIDValidation();
 	}
 
+	/**
+	 * Return associated list of available statuses and labels.
+	 *
+	 * @return array
+	 */
+	private static function getStatusList(): array {
+		return [
+			ALERT_STATUS_NOT_SENT => _('In progress'),
+			ALERT_STATUS_SENT => _('Sent/Executed'),
+			ALERT_STATUS_FAILED => _('Failed')
+		];
+	}
+
 	private function updateProfiles(): void {
 		CProfile::updateArray('web.actionlog.filter.userids', $this->getInput('filter_userids', []), PROFILE_TYPE_ID);
+		CProfile::updateArray('web.actionlog.filter.actionids', $this->getInput('filter_actionids', []),
+			PROFILE_TYPE_ID);
+		CProfile::updateArray('web.actionlog.filter.mediatypeids', $this->getInput('filter_mediatypeids', []),
+			PROFILE_TYPE_ID);
+		CProfile::updateArray('web.actionlog.filter.statuses', $this->getInput('filter_statuses', []), PROFILE_TYPE_ID);
+		CProfile::update('web.actionlog.filter.messages', $this->getInput('filter_messages', ''),PROFILE_TYPE_STR);
 	}
 
 	private function deleteProfiles(): void {
 		CProfile::deleteIdx('web.actionlog.filter.userids');
+		CProfile::deleteIdx('web.actionlog.filter.actionids');
+		CProfile::deleteIdx('web.actionlog.filter.mediatypeids');
+		CProfile::deleteIdx('web.actionlog.filter.statuses');
+		CProfile::deleteIdx('web.actionlog.filter.messages');
 	}
-
 
 	private function sanitizeUsersForMultiselect(array $users): array {
 		$users = array_map(function(array $value): array {
@@ -160,4 +237,37 @@ class CControllerActionLogList extends CController {
 		return $users;
 	}
 
+	/**
+	 * Sanitizes data for multiselect fields.
+	 *
+	 * @param array $data
+	 * @param string $type  defines data type ('users', 'actions', 'media_types').
+	 *
+	 * @return array
+	 */
+
+	private function sanitizeDataForMultiselect(array $data, string $type): array {
+		function users(array $value): array {
+			return ['id' => $value['userid'], 'name' => getUserFullname($value)];
+		}
+
+		function actions(array $value): array {
+			return ['id' => $value['actionid'], 'name' => $value['name']];
+		}
+
+		function media_types(array $value): array {
+			return ['id' => $value['mediatypeid'], 'name' => $value['name'], 'maxattempts' => $value['maxattempts']];
+		}
+
+		$data = array_map($type, $data);
+		CArrayHelper::sort($data, ['name']);
+
+		return $data;
+	}
 }
+/*
+			$data['mediatypeids'] = array_map(function (array $value): array {
+				return ['id' => $value['mediatypeid'], 'name' => $value['name'], 'maxattempts' => $value['maxattempts']];
+			}, $data['media_types']);
+
+			CArrayHelper::sort($data['mediatypeids'], ['name']);

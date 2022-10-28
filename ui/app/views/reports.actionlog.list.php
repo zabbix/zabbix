@@ -31,6 +31,23 @@ $this->addJsFile('class.calendar.js');
 $filter = (new CFilter())
 	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', $data['action']));
 
+$filter_status_options = [];
+
+foreach ($data['statuses'] as $value => $name) {
+	$filter_status_options[] = [
+		'name' => $name,
+		'value' => $value,
+		'checked' => in_array($value, $data['actionlog_statuses'])
+	];
+}
+
+$filter_actions = (new CCheckBoxList('filter_statuses'))
+	->setId('filter_status')
+	->addClass(ZBX_STYLE_COLUMNS)
+	->addClass(ZBX_STYLE_COLUMNS_3)
+	->setWidth(360)//TODO is this ok?
+	->setOptions($filter_status_options);
+
 $widget = (new CWidget())
 	->setTitle(_('Action log'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_ACTIONLOG_LIST))
@@ -58,6 +75,46 @@ $widget = (new CWidget())
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				])
+				->addRow(new CLabel(_('Actions'), 'filter_actionids__ms'), [
+					(new CMultiSelect([
+						'name' => 'filter_actionids[]',
+						'object_name' => 'actions',
+						'data' => $data['actionids'],
+						'placeholder' => '',
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'actions',
+								'srcfld1' => 'actionid',
+								'srcfld2' => 'name',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_actionids_'
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				])
+				->addRow(new CLabel(_('Media types'), 'filter_mediatypeids__ms'), [
+					(new CMultiSelect([
+						'name' => 'filter_mediatypeids[]',
+						'object_name' => 'media_types',
+						'data' => $data['mediatypeids'],
+						'placeholder' => '',
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'media_types',
+								'srcfld1' => 'mediatypeid',
+								'srcfld2' => 'name',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_mediatypeids_'
+							]
+						]
+					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				]),
+			(new CFormList())
+				->addRow(_('Status'), $filter_actions)
+				->addRow(_('Search string'),
+					(new CTextBox('filter_messages', $data['messages']))
+					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
 		])
 	);
 
@@ -65,7 +122,7 @@ $table = (new CTableInfo())
 	->setHeader([
 		_('Time'),
 		_('Action'),
-		_('Type'),
+		_('Media type'),
 		_('Recipient'),
 		_('Message'),
 		_('Status'),
