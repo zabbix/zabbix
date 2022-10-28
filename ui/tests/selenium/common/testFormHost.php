@@ -1903,13 +1903,14 @@ class testFormHost extends CWebTest {
 	 * @return CFormElement
 	 */
 	public function filterAndSelectHost($host) {
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
 		$this->query('button:Reset')->one()->click();
+		$table->waitUntilReloaded();
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
-		$host_link = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()
-				->findRow('Name', $host)->getColumn('Name')->query('tag:a')->waitUntilClickable();
+		$host_link = $table->findRow('Name', $host)->getColumn('Name')->query('tag:a')->waitUntilClickable();
 
 		if ($this->monitoring) {
 			$host_link->asPopupButton()->one()->select('Configuration');

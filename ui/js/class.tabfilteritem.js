@@ -42,6 +42,8 @@ class CTabFilterItem extends CBaseComponent {
 		this._parent = options.parent || null;
 		this._idx_namespace = options.idx_namespace;
 		this._index = options.index;
+		this._unsaved = false;
+		this._unsaved_indicator = null;
 		this._content_container = options.container;
 		this._data = options.data || {};
 		this._template = options.template;
@@ -65,6 +67,20 @@ class CTabFilterItem extends CBaseComponent {
 		if (this._data.filter_show_counter) {
 			this.setCounter('');
 		}
+	}
+
+	/**
+	 * Initialize indicator DOM node for tab unsaved state.
+	 */
+	initUnsavedIndicator() {
+		let green_dot = document.createElement('span');
+
+		green_dot.setAttribute('data-indicator-value', '1');
+		green_dot.setAttribute('data-indicator', 'mark');
+		green_dot.classList.toggle('display-none', !this._unsaved);
+		this._target.appendChild(green_dot);
+
+		this._unsaved_indicator = green_dot;
 	}
 
 	/**
@@ -166,6 +182,7 @@ class CTabFilterItem extends CBaseComponent {
 		}
 
 		let edit = document.createElement('a');
+
 		edit.classList.add(TABFILTERITEM_STYLE_EDIT_BTN);
 		edit.addEventListener('click', () => this.openPropertiesDialog({}, this._target));
 		this._target.parentNode.appendChild(edit);
@@ -322,6 +339,7 @@ class CTabFilterItem extends CBaseComponent {
 		}
 
 		this._target.text = data.filter_name;
+		this.initUnsavedIndicator();
 		this.setBrowserLocationToApplyUrl();
 	}
 
@@ -424,8 +442,6 @@ class CTabFilterItem extends CBaseComponent {
 	/**
 	 * Checks difference between original form values and to be posted values.
 	 * Updates this._unsaved according to check results
-	 *
-	 * @param {URLSearchParams} search_params  Filter field values to compare against.
 	 */
 	updateUnsavedState() {
 		let search_params = this.getFilterParams(),
@@ -445,7 +461,10 @@ class CTabFilterItem extends CBaseComponent {
 		src_query.sort();
 		search_params.sort();
 		this._unsaved = (src_query.toString() !== search_params.toString());
-		this._target.parentNode.classList.toggle(TABFILTERITEM_STYLE_UNSAVED, this._unsaved);
+
+		if (this._unsaved_indicator) {
+			this._unsaved_indicator.classList.toggle('display-none', !this._unsaved);
+		}
 	}
 
 	/**
@@ -467,7 +486,10 @@ class CTabFilterItem extends CBaseComponent {
 		src_query.sort();
 
 		this._src_url = src_query.toString();
-		this._target.parentNode.classList.remove(TABFILTERITEM_STYLE_UNSAVED);
+
+		if (this._unsaved_indicator) {
+			this._unsaved_indicator.classList.add('display-none');
+		}
 	}
 
 	/**
