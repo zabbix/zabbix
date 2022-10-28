@@ -50,7 +50,6 @@ extern char	*CONFIG_LOG_TYPE_STR;
 extern int	CONFIG_LOG_TYPE;
 extern char	*CONFIG_LOG_FILE;
 extern int	CONFIG_LOG_FILE_SIZE;
-extern int	CONFIG_ALLOW_ROOT;
 extern int	CONFIG_TIMEOUT;
 
 struct cfg_line

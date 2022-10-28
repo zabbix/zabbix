@@ -279,6 +279,8 @@ int	CONFIG_AVAILMAN_FORKS		= 0;
 int	CONFIG_SERVICEMAN_FORKS		= 0;
 int	CONFIG_TRIGGERHOUSEKEEPER_FORKS = 0;
 
+static int	config_allow_root = 0;
+
 char	*opt = NULL;
 
 #ifdef _WINDOWS
@@ -884,7 +886,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
-		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
+		{"AllowRoot",			&config_allow_root,			TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"User",			&CONFIG_USER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1488,7 +1490,7 @@ int	main(int argc, char **argv)
 #if defined(ZABBIX_SERVICE)
 	service_start(t.flags);
 #elif defined(ZABBIX_DAEMON)
-	zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
+	zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
 #endif
 	exit(EXIT_SUCCESS);
 }
