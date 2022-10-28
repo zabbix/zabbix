@@ -220,6 +220,7 @@ typedef struct
 	char		*expression;
 	char		*recovery_expression;
 	char		*url;
+	char		*url_name;
 	char		*comments;
 	char		*correlation_tag;
 	char		*opdata;
@@ -234,7 +235,6 @@ typedef struct
 	void		*cache;
 }
 ZBX_DB_TRIGGER;
-
 
 /* temporary cache of trigger related data */
 typedef struct
@@ -640,6 +640,10 @@ typedef struct
 }
 zbx_item_diff_t;
 
+void	zbx_db_trigger_get_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_get_recovery_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
+
 typedef struct
 {
 	zbx_uint64_t			hostid;
@@ -783,6 +787,13 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 		zbx_vector_ptr_t *ops);
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
+
+void	zbx_db_trigger_get_all_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+void	zbx_db_trigger_get_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+int	zbx_db_trigger_get_all_hostids(const ZBX_DB_TRIGGER *trigger, const zbx_vector_uint64_t **hostids);
+int	zbx_db_trigger_get_constant(const ZBX_DB_TRIGGER *trigger, int index, char **out);
+int	zbx_db_trigger_get_itemid(const ZBX_DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
+void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
 
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
 

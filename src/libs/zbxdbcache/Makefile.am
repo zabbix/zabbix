@@ -11,7 +11,6 @@ libzbxdbcache_a_SOURCES = \
 	dbsync.c \
 	dbsync.h \
 	lld_macro.c \
-	trigger.c \
 	valuecache.c \
 	valuecache.h \
 	user_macro.c \

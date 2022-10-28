@@ -1533,6 +1533,168 @@ static void	DCsync_trends(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+#define ZBX_FLAGS_TRIGGER_CREATE_NOTHING		0x00
+#define ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT		0x01
+#define ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT		0x02
+#define ZBX_FLAGS_TRIGGER_CREATE_EVENT										\
+		(ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT | ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT)
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: 1) calculate changeset of trigger fields to be updated            *
+ *          2) generate events                                                *
+ *                                                                            *
+ * Parameters: trigger - [IN] the trigger to process                          *
+ *             diffs   - [OUT] the vector with trigger changes                *
+ *                                                                            *
+ * Return value: SUCCEED - trigger processed successfully                     *
+ *               FAIL    - no changes                                         *
+ *                                                                            *
+ * Comments: Trigger dependency checks will be done during event processing.  *
+ *                                                                            *
+ * Event generation depending on trigger value/state changes:                 *
+ *                                                                            *
+ * From \ To  | OK         | OK(?)      | PROBLEM    | PROBLEM(?) | NONE      *
+ *----------------------------------------------------------------------------*
+ * OK         | .          | I          | E          | I          | .         *
+ *            |            |            |            |            |           *
+ * OK(?)      | I          | .          | E,I        | -          | I         *
+ *            |            |            |            |            |           *
+ * PROBLEM    | E          | I          | E(m)       | I          | .         *
+ *            |            |            |            |            |           *
+ * PROBLEM(?) | E,I        | -          | E(m),I     | .          | I         *
+ *                                                                            *
+ * Legend:                                                                    *
+ *        'E' - trigger event                                                 *
+ *        'I' - internal event                                                *
+ *        '.' - nothing                                                       *
+ *        '-' - should never happen                                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs)
+{
+	const char		*new_error;
+	int			new_state, new_value, ret = FAIL;
+	zbx_uint64_t		flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET, event_flags = ZBX_FLAGS_TRIGGER_CREATE_NOTHING;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() triggerid:" ZBX_FS_UI64 " value:%d(%d) new_value:%d",
+			__func__, trigger->triggerid, trigger->value, trigger->state, trigger->new_value);
+
+	if (TRIGGER_VALUE_UNKNOWN == trigger->new_value)
+	{
+		new_state = TRIGGER_STATE_UNKNOWN;
+		new_value = trigger->value;
+	}
+	else
+	{
+		new_state = TRIGGER_STATE_NORMAL;
+		new_value = trigger->new_value;
+	}
+	new_error = (NULL == trigger->new_error ? "" : trigger->new_error);
+
+	if (trigger->state != new_state)
+	{
+		flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE;
+		event_flags |= ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT;
+	}
+
+	if (0 != strcmp(trigger->error, new_error))
+		flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR;
+
+	if (TRIGGER_STATE_NORMAL == new_state)
+	{
+		if (TRIGGER_VALUE_PROBLEM == new_value)
+		{
+			if (TRIGGER_VALUE_OK == trigger->value || TRIGGER_TYPE_MULTIPLE_TRUE == trigger->type)
+				event_flags |= ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT;
+		}
+		else if (TRIGGER_VALUE_OK == new_value)
+		{
+			if (TRIGGER_VALUE_PROBLEM == trigger->value || 0 == trigger->lastchange)
+				event_flags |= ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT;
+		}
+	}
+
+	/* check if there is something to be updated */
+	if (0 == (flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE) && 0 == (event_flags & ZBX_FLAGS_TRIGGER_CREATE_EVENT))
+		goto out;
+
+	if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT))
+	{
+		zbx_add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+				&trigger->timespec, new_value, trigger->description,
+				trigger->expression, trigger->recovery_expression,
+				trigger->priority, trigger->type, &trigger->tags,
+				trigger->correlation_mode, trigger->correlation_tag, trigger->value, trigger->opdata,
+				trigger->event_name, NULL);
+	}
+
+	if (0 != (event_flags & ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT))
+	{
+		zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+				&trigger->timespec, new_state, NULL, trigger->expression,
+				trigger->recovery_expression, 0, 0, &trigger->tags, 0, NULL, 0, NULL, NULL,
+				new_error);
+	}
+
+	zbx_append_trigger_diff(diffs, trigger->triggerid, trigger->priority, flags, trigger->value, new_state,
+			trigger->timespec.sec, new_error);
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s flags:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
+			flags);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Comments: helper function for zbx_process_triggers()                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
+{
+	const DC_TRIGGER	*t1 = *(const DC_TRIGGER * const *)d1;
+	const DC_TRIGGER	*t2 = *(const DC_TRIGGER * const *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(t1->topoindex, t2->topoindex);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process triggers - calculates property changeset and generates    *
+ *          events                                                            *
+ *                                                                            *
+ * Parameters: triggers     - [IN] the triggers to process                    *
+ *             trigger_diff - [OUT] the trigger changeset                     *
+ *                                                                            *
+ * Comments: The trigger_diff changeset must be cleaned by the caller:        *
+ *                zbx_vector_ptr_clear_ext(trigger_diff,                      *
+ *                              (zbx_clean_func_t)zbx_trigger_diff_free);     *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_diff)
+{
+	int	i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, triggers->values_num);
+
+	if (0 == triggers->values_num)
+		goto out;
+
+	zbx_vector_ptr_sort(triggers, zbx_trigger_topoindex_compare);
+
+	for (i = 0; i < triggers->values_num; i++)
+		zbx_process_trigger((struct _DC_TRIGGER *)triggers->values[i], trigger_diff);
+
+	zbx_vector_ptr_sort(trigger_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: re-calculate and update values of triggers related to the items   *
