@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-10-26 09:06+0000\n"
+"PO-Revision-Date: 2022-10-27 12:50+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12901,12 +12901,12 @@ msgstr "כלום"
 
 #: report4.php:24
 msgid "Notification report"
-msgstr "דוח התרעות"
+msgstr "דוח התראות"
 
 #: include/classes/helpers/CMenuHelper.php:154
 #: include/classes/helpers/CRoleHelper.php:389 report4.php:64
 msgid "Notifications"
-msgstr "התרעות"
+msgstr "התראות"
 
 #: actionconf.php:87 include/views/configuration.action.edit.php:479
 msgid "Notify about canceled escalations"
@@ -12915,7 +12915,7 @@ msgstr "להודיע על הסלמות מבוטלות"
 #: include/actions.inc.php:865 include/actions.inc.php:1038
 #: include/actions.inc.php:1039
 msgid "Notify all involved"
-msgstr "לשלוח התרעות לכל המעורבים"
+msgstr "לשלוח התראות לכל המעורבים"
 
 #: include/func.inc.php:246
 msgid "Nov"
