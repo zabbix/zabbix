@@ -53,6 +53,7 @@
 		let labels = jQuery('#condition_table .label')
 
 		jQuery('#evaltype').closest('li').toggle(labels.length > 1);
+		document.querySelector('#expression').style.display = show_formula ? 'none' : '';
 		document.querySelector('#evaltype').style.display = labels.length > 1 ? '' : 'none';
 		jQuery('#condition_label').toggle(!show_formula);
 		document.querySelector('#formula').style.display = show_formula ? '' : 'none';
@@ -289,6 +290,7 @@
 							<input type="hidden" name="conditions[#{row_index}][type]" value="#{conditiontype}">
 							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
 							<input type="hidden" name="conditions[#{row_index}][tag]" value="#{tag}">
+							<input type="hidden" name="conditions[#{row_index}][formulaid]" value="#{label}">
 						</li>
 					</ul>
 				</td>
@@ -315,6 +317,7 @@
 							<input type="hidden" name="conditions[#{row_index}][type]" value="#{conditiontype}">
 							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
 							<input type="hidden" name="conditions[#{row_index}][groupid]" value="#{groupid}">
+							<input type="hidden" name="conditions[#{row_index}][formulaid]" value="#{label}">
 						</li>
 					</ul>
 				</td>
@@ -344,6 +347,7 @@
 							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
 							<input type="hidden" name="conditions[#{row_index}][oldtag]" value="#{oldtag}">
 							<input type="hidden" name="conditions[#{row_index}][newtag]" value="#{newtag}">
+							<input type="hidden" name="conditions[#{row_index}][formulaid]" value="#{label}">
 						</li>
 					</ul>
 				</td>
@@ -371,6 +375,7 @@
 							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
 							<input type="hidden" name="conditions[#{row_index}][tag]" value="#{tag}">
 							<input type="hidden" name="conditions[#{row_index}][value]" value="#{value}">
+							<input type="hidden" name="conditions[#{row_index}][formulaid]" value="#{label}">
 						</li>
 					</ul>
 				</td>
