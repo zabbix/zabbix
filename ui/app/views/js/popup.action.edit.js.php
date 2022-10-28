@@ -187,6 +187,10 @@ window.action_edit_popup = new class {
 
 				switch(parseInt(input.conditiontype)) {
 					case <?= CONDITION_TYPE_SUPPRESSED ?>:
+						input.condition_name = input.operator == <?= CONDITION_OPERATOR_YES ?>
+						? <?= json_encode(_('Problem is suppressed')) ?>
+						: <?= json_encode(_('Problem is not suppressed')) ?>
+
 						template =  this.condition_suppressed_template;
 						break;
 
@@ -596,11 +600,12 @@ window.action_edit_popup = new class {
 	}
 
 	_processTypeOfCalculation() {
-		this.show_formula = document.querySelector('#evaltype').value === <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
+		this.show_formula = document.querySelector('#evaltype').value == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
 		let row_count = document.getElementById('conditionTable').rows.length -2;
 
 		document.querySelector('#formula').style.display = this.show_formula ? '' : 'none';
-		document.querySelector('#expression').style.display = '';
+		document.querySelector('#formula').removeAttribute('readonly');
+		document.querySelector('#expression').style.display = this.show_formula ? 'none' : '';
 		document.querySelector('#label-evaltype').style.display = row_count > 1 ? '' : 'none';
 		document.querySelector('#evaltype-formfield').style.display = row_count > 1 ? '' : 'none';
 
@@ -656,6 +661,7 @@ window.action_edit_popup = new class {
 							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
 							<input type="hidden" name="conditions[#{row_index}][value]" value="#{value}">
 							<input type="hidden" name="conditions[#{row_index}][value2]" value="#{value2}">
+							<input type="hidden" name="conditions[#{row_index}][formulaid]" value="#{label}">
 						</li>
 					</ul>
 				</td>
@@ -681,6 +687,7 @@ window.action_edit_popup = new class {
 							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
 							<input type="hidden" name="conditions[#{row_index}][value]" value="#{value}">
 							<input type="hidden" name="conditions[#{row_index}][value2]" value="#{value2}">
+							<input type="hidden" name="conditions[#{row_index}][formulaid]" value="#{label}">
 						</li>
 					</ul>
 				</td>
@@ -708,6 +715,7 @@ window.action_edit_popup = new class {
 							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
 							<input type="hidden" name="conditions[#{row_index}][value]" value="#{value}">
 							<input type="hidden" name="conditions[#{row_index}][value2]" value="#{value2}">
+							<input type="hidden" name="conditions[#{row_index}][formulaid]" value="#{label}">
 						</li>
 					</ul>
 				</td>

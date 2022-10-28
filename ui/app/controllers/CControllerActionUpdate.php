@@ -107,7 +107,8 @@ class CControllerActionUpdate extends CController {
 			if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 				if (count($filter['conditions']) > 1) {
 					$filter['formula'] = $this->getInput('formula');
-				} else {
+				}
+				else {
 					// If only one or no conditions are left, reset the evaltype to "and/or".
 					$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
 				}

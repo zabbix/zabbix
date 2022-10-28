@@ -102,6 +102,10 @@ class CControllerPopupActionEdit extends CController {
 		$eventsource = $this->getInput('eventsource', EVENT_SOURCE_TRIGGERS);
 
 		if ($this->action !== null) {
+			$formula = array_key_exists('formula', $this->action['filter'])
+				? $this->action['filter']['formula']
+				: '';
+
 			sortOperations($eventsource, $this->action['operations']);
 			$data = [
 				'eventsource' => $eventsource,
@@ -118,7 +122,7 @@ class CControllerPopupActionEdit extends CController {
 					'pause_suppressed' => $this->action['pause_suppressed'],
 					'notify_if_canceled' =>  $this->action['notify_if_canceled']
 				],
-				'formula' => $this->getInput('formula', ''),
+				'formula' => $formula,
 				'allowedOperations' => getAllowedOperations($eventsource)
 			];
 			foreach ($data['action']['filter']['conditions'] as  $row_index => &$condition) {
