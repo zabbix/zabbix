@@ -61,7 +61,7 @@ There are no template links in this template.
 |OS |Process [{#NAME}]: Number of page faults |<p>The number of page faults {#NAME}.</p> |DEPENDENT |custom.proc.page[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.page_faults`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |OS |Process [{#NAME}]: Size of locked memory |<p>The size of locked memory {#NAME}.</p> |DEPENDENT |custom.proc.mem.locked[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.lck`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |OS |Process [{#NAME}]: Swap space used |<p>The swap space used by {#NAME}.</p> |DEPENDENT |custom.proc.swap[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.swap`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Zabbix raw items |OS: Get process summary |<p>Summary metrics data for all processes.</p> |ZABBIX_PASSIVE |proc.get[,,,summary] |
+|Zabbix raw items |OS: Get process summary |<p>The summary of data metrics for all processes.</p> |ZABBIX_PASSIVE |proc.get[,,,summary] |
 
 ## Triggers
 
