@@ -1078,7 +1078,13 @@ static int	housekeeping_problems(int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
-	rc = DBexecute("delete from problem where r_clock<>0 and r_clock<%d", now - SEC_PER_DAY);
+	rc = DBexecute(
+			"delete from problem p1"
+			" where p1.r_clock<>0 and p1.r_clock<%d and not exists("
+				" select cause_eventid"
+				" from problem p2"
+				" where p2.cause_eventid=p1.eventid"
+			")", now - SEC_PER_DAY);
 
 	if (ZBX_DB_OK <= rc)
 		deleted = rc;
