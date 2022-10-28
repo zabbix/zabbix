@@ -229,21 +229,19 @@ static int	prepare_mode_parameter(const AGENT_REQUEST *request, AGENT_RESULT *re
 	return SUCCEED;
 }
 
-static int	etype_to_mask(const char *etype)
-{
-	static const char	*template_list = ZBX_FT_TEMPLATE;
-	const char		*tmp;
-	int			ret = 1;
+static int	etype_to_mask(const char *etype) {
+	static const char	*template_list[] = {ZBX_FT_FILE_STR, ZBX_FT_DIR_STR, ZBX_FT_SYM_STR, ZBX_FT_SOCK_STR,
+						ZBX_FT_BDEV_STR, ZBX_FT_CDEV_STR, ZBX_FT_FIFO_STR, ZBX_FT_ALL_STR,
+						ZBX_FT_DEV_STR};
+	size_t			i;
 
-	for (tmp = template_list; '\0' != *tmp; tmp += strlen(tmp) + 1)
+	for (i = 0; i < sizeof(template_list) / sizeof(template_list[0]); i++)
 	{
-		if (0 == strcmp(etype, tmp))
+		if (0 == strcmp(etype, template_list[i]))
 			break;
-
-		ret <<= 1;
 	}
 
-	return ret;
+	return (1 << i);
 }
 
 int	zbx_etypes_to_mask(const char *etypes, AGENT_RESULT *result)

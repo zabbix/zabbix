@@ -40,10 +40,19 @@
 #define ZBX_FT_FIFO		0x040
 #define ZBX_FT_ALL		0x080
 #define ZBX_FT_DEV		0x100
-#define ZBX_FT_OVERFLOW	0x200
-#define ZBX_FT_TEMPLATE	"file\0dir\0sym\0sock\0bdev\0cdev\0fifo\0all\0dev\0"
+#define ZBX_FT_OVERFLOW		0x200
 #define ZBX_FT_ALLMASK	(ZBX_FT_FILE | ZBX_FT_DIR | ZBX_FT_SYM | ZBX_FT_SOCK | ZBX_FT_BDEV | ZBX_FT_CDEV | ZBX_FT_FIFO)
 #define ZBX_FT_DEV2		(ZBX_FT_BDEV | ZBX_FT_CDEV)
+
+#define ZBX_FT_FILE_STR		"file"
+#define ZBX_FT_DIR_STR		"dir"
+#define ZBX_FT_SYM_STR		"sym"
+#define ZBX_FT_SOCK_STR		"sock"
+#define ZBX_FT_BDEV_STR		"bdev"
+#define ZBX_FT_CDEV_STR		"cdev"
+#define ZBX_FT_FIFO_STR		"fifo"
+#define ZBX_FT_ALL_STR		"all"
+#define ZBX_FT_DEV_STR		"dev"
 
 typedef struct
 {
