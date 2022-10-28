@@ -414,6 +414,10 @@ final class CModuleManager {
 			return null;
 		}
 
+		if (trim($manifest['id']) === '' || trim($manifest['name']) === '') {
+			return null;
+		}
+
 		// Check manifest namespace syntax.
 		if (!preg_match('/^[0-9a-z_]+$/i', $manifest['namespace'])) {
 			return null;
