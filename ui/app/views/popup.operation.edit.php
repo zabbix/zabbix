@@ -214,7 +214,7 @@ $form_grid->addItem([
 $form_grid->addItem([
 	(new CLabel(_('Subject')))->setId('operation-message-subject-label'),
 	(new CTextBox('operation[opmessage][subject]'))
-		->setAttribute('value',  $operation['opmessage']['subject'] ?? '')
+		->setAttribute('value', $operation['opmessage']['default_msg'] == 1 ? '' : $operation['opmessage']['subject'])
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setId('operation-message-subject')
 ]);
@@ -223,7 +223,7 @@ $form_grid->addItem([
 $form_grid->addItem([
 	(new CLabel(_('Message')))->setId('operation-message-label'),
 	(new CTextArea('operation[opmessage][message]'))
-		->setValue( $operation['opmessage']['message'] ?? '')
+		->setValue($operation['opmessage']['default_msg'] == 1 ? '' : $operation['opmessage']['message'])
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setId('operation-message-body')
 ]);

@@ -145,12 +145,12 @@ class CControllerActionUpdate extends CController {
 				if (array_key_exists('opmessage', $operation)) {
 					if (!array_key_exists('default_msg', $operation['opmessage'])) {
 						$operation['opmessage']['default_msg'] = 1;
-				}
+					}
 
-				if ($operation['opmessage']['default_msg'] == 1) {
-					unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
+					if ($operation['opmessage']['default_msg'] == 1) {
+						unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
+					}
 				}
-			}
 
 				if ($operation ['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE
 					&& !array_key_exists('opmessage', $operation)) {
