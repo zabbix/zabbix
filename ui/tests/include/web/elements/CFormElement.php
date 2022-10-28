@@ -114,9 +114,11 @@ class CFormElement extends CElement {
 	/**
 	 * Get collection of form label elements.
 	 *
+	 * @param CElementFilter $filter    condition to be filtered by
+	 *
 	 * @return CElementCollection
 	 */
-	public function getLabels() {
+	public function getLabels($filter = null) {
 		$labels = $this->query('xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT.'/label')->all();
 
 		foreach ($labels as $key => $label) {
@@ -129,7 +131,11 @@ class CFormElement extends CElement {
 		}
 
 		if ($this->filter !== null) {
-			return $labels->filter($this->filter);
+			$labels = $labels->filter($this->filter);
+		}
+
+		if ($filter !== null) {
+			$labels = $labels->filter(new CElementFilter($filter));
 		}
 
 		return $labels;
@@ -205,9 +211,11 @@ class CFormElement extends CElement {
 	/**
 	 * Get collection of element fields indexed by label name.
 	 *
+	 * @param CElementFilter $filter    condition to be filtered by
+	 *
 	 * @return CElementCollection
 	 */
-	public function getFields() {
+	public function getFields($filter = null) {
 		$fields = [];
 
 		foreach ($this->getLabels() as $label) {
@@ -222,6 +230,10 @@ class CFormElement extends CElement {
 		}
 
 		$this->fields = new CElementCollection($fields);
+
+		if ($filter !== null) {
+			$this->fields = $this->fields->filter(new CElementFilter($filter));
+		}
 
 		return $this->fields;
 	}
@@ -526,5 +538,16 @@ class CFormElement extends CElement {
 				$form->waitUntilReloaded();
 			}
 		};
+	}
+
+	/**
+	 * Get form fields values.
+	 *
+	 * @param CElementFilter $filter    condition to be filtered by
+	 *
+	 * @return array
+	 */
+	public function getValues($filter = null) {
+		return $this->getFields($filter)->asValues();
 	}
 }

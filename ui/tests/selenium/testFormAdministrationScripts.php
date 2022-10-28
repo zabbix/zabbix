@@ -793,7 +793,88 @@ class testFormAdministrationScripts extends CWebTest {
 						'Username' => ''
 					]
 				]
-			]
+			],
+			// URL type.
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/url": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'Url empty for host action',
+						'Scope' => 'Manual host action',
+						'Type' => 'URL',
+						'URL' => ''
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/url": cannot be empty.',
+					'fields' =>  [
+						'Name' => 'Url empty for event action',
+						'Scope' => 'Manual event action',
+						'Type' => 'URL',
+						'URL' => '     '
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/url": unacceptable URL.',
+					'fields' =>  [
+						'Name' => 'invalid uri schema',
+						'Scope' => 'Manual event action',
+						'Type' => 'URL',
+						'URL' => 'htt://zabbix.com'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'details' => 'Invalid parameter "/1/menu_path": directory cannot be empty.',
+					'fields' =>  [
+						'Name' => 'invalid menu path',
+						'Scope' => 'Manual event action',
+						'Type' => 'URL',
+						'URL' => 'zabbix.com',
+						'Menu path' => '/ /'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Name' => 'type URL for manual host action',
+						'Scope' => 'Manual host action',
+						'Menu path' => 'top_menu/sub_menu/',
+						'Type' => 'URL',
+						'URL' => 'http://zabbix.com',
+						'Open in a new window' => false,
+						'Description' => 'selected Url type',
+						'Host group' => 'Selected',
+						'User group' => 'Zabbix administrators',
+						'xpath://div[@id="groupid"]/..' => 'Zabbix servers',
+						'Required host permissions' => 'Write',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'open url?'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' =>  [
+						'Name' => 'type URL for manual event action',
+						'Scope' => 'Manual event action',
+						'Type' => 'URL',
+						'URL' => 'zabbix.php?action=script.list'
+					]
+				]
+			],
 		];
 	}
 
@@ -993,6 +1074,20 @@ class testFormAdministrationScripts extends CWebTest {
 				'username' => 'TELNET_username',
 				'password' => 'TELNET_password',
 				'command' => 'test'
+			],
+			[
+				'name' => 'type URL, manual host event for clone',
+				'type' => 6,
+				'scope' => 2,
+				'new_window' => 0,
+				'menu_path' => 'menu/path',
+				'url' => 'sysmaps.php'
+			],
+			[
+				'name' => 'type URL, manual action event for clone',
+				'type' => 6,
+				'scope' => 4,
+				'url' => 'zabbix.com'
 			]
 		]);
 		$this->assertArrayHasKey('scriptids', $response);
@@ -1045,5 +1140,123 @@ class testFormAdministrationScripts extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script deleted');
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr(self::NAME_DELETE)));
+	}
+
+	/**
+	 * Check the default values, visible and required fields in the script form based on the selected scope and type.
+	 */
+	public function testFormAdministrationScripts_Layout() {
+		$common_all_scopes = [
+			'fields' => ['Name', 'Scope', 'Type', 'Description', 'Host group'],
+			'required' => ['Name'],
+			'default' => ['Host group' => 'All']
+		];
+		$common_manual_scope = [
+			'fields' => ['Menu path', 'User group', 'Required host permissions', 'Enable confirmation', 'Confirmation text'],
+			'default' => ['User group' => 'All', 'Required host permissions' => 'Read', 'Enable confirmation' => false]
+		];
+		$types = [
+			'Webhook' => [
+				'fields' => ['Parameters', 'Script', 'Timeout'],
+				'required' => ['Script', 'Timeout'],
+				'default' => ['Timeout' => '30s']
+			],
+			'Script' => [
+				'fields' => ['Execute on', 'Commands'],
+				'required' => ['Commands'],
+				'default' => ['Execute on' => 'Zabbix agent']
+			],
+			'SSH' => [
+				'fields' => ['Authentication method', 'Username', 'Password', 'Port', 'Commands'],
+				'required' => ['Username', 'Commands'],
+				'default' => ['Authentication method' => 'Password'],
+				'fields_public_key' => ['Authentication method', 'Username', 'Public key file', 'Private key file',
+					'Key passphrase', 'Port', 'Commands'],
+				'required_public_key' => ['Username', 'Public key file', 'Private key file', 'Commands'],
+			],
+			'Telnet' => [
+				'fields' => ['Username', 'Password', 'Port', 'Commands'],
+				'required' => ['Username', 'Commands'],
+				'default' => []
+			],
+			'IPMI' => [
+				'fields' => ['Command'],
+				'required' => ['Command'],
+				'default' => []
+			],
+			'URL' => [
+				'fields' => ['URL', 'Open in a new window'],
+				'required' => ['URL'],
+				'default' => ['Open in a new window' => true]
+			]
+		];
+
+		$this->page->login()->open('zabbix.php?action=script.edit');
+		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one()->waitUntilVisible();
+		$form->checkValue(['Scope' => 'Action operation', 'Type' => 'Webhook']);
+
+		foreach (['Action operation', 'Manual host action', 'Manual event action'] as $scope) {
+			// Merge all common fields based on scope type, manual or action operation.
+			if ($scope === 'Action operation') {
+				$scope_fields = $common_all_scopes['fields'];
+				$scope_default = $common_all_scopes['default'];
+			}
+			else {
+				$form->fill(['Scope' => $scope]);
+				$scope_fields = array_merge($common_all_scopes['fields'], $common_manual_scope['fields']);
+				$scope_default = array_merge($common_all_scopes['default'], $common_manual_scope['default']);
+			}
+
+			foreach ($types as $type => $type_fields) {
+				// Type 'URL' not visible for 'Action operation'.
+				if ($scope === 'Action operation' && $type === 'URL') {
+					continue;
+				}
+
+				$form->fill(['Type' => $type]);
+
+				// Check visible fields.
+				$this->compareArrays(array_merge($scope_fields, $type_fields['fields']),
+						$form->getLabels(CElementFilter::VISIBLE)->asText()
+				);
+
+				// Check defaul values.
+				$form->checkValue(array_merge($scope_default, $type_fields['default']));
+
+				// TODO: Check required fields.
+				// $this->compareArrays(array_merge($common_all_scopes['required'], $type_fields['required']),
+				// 		$form->getLabels(CElementFilter::REQUIRED)->asText()
+				// );
+
+				if ($type === 'SSH') {
+					$form->fill(['Authentication method' => 'Public key']);
+
+					// Check visible fields for different authentication method.
+					$this->compareArrays(array_merge($scope_fields, $type_fields['fields_public_key']),
+							$form->getLabels(CElementFilter::VISIBLE)->asText()
+					);
+
+					// TODO: Check required fields for different authentication method.
+					// $this->compareArrays(array_merge($common_all_scopes['required'], $type_fields['required_public_key']),
+					// 		$form->getLabels(CElementFilter::REQUIRED)->asText()
+					// );
+
+					// Reset the value of the "Authentication method" field.
+					$form->fill(['Authentication method' => 'Password']);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Sort arrays to compare if they are equal.
+	 *
+	 * @param array $expected	expected fields from data provider
+	 * @param array $actual		actual fields on page
+	 */
+	private function compareArrays($expected, $actual) {
+		sort($expected);
+		sort($actual);
+		$this->assertEquals(json_encode($expected), json_encode($actual));
 	}
 }

@@ -336,7 +336,7 @@ class CElementCollection implements Iterator {
 	public function filter($filter) {
 		$elements = [];
 		foreach ($this->elements as $key => $element) {
-			if ($filter->match($element)) {
+			if ($filter->match($element, $key)) {
 				$elements[$key] = $element;
 			}
 		}

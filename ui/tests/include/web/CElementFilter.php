@@ -43,6 +43,7 @@ class CElementFilter {
 	const NOT_CLICKABLE = 'not clickable';
 	const SELECTED = 'selected';
 	const NOT_SELECTED = 'not selected';
+	const KEY = 'key';
 
 	private $type;
 	private $params = [];
@@ -129,10 +130,16 @@ class CElementFilter {
 	 * Determine whether this element matches the filter or not.
 	 *
 	 * @param CElement $element		element to be checked
+	 * TODO
+	 * @param $key
 	 *
 	 * @return boolean
 	 */
-	public function match($element) {
+	public function match($element, $key = null) {
+		if ($this->type === self::KEY) {
+			return in_array($key, $this->params);
+		}
+
 		$method = self::getConditionCallable($this->type);
 
 		$callable = call_user_func_array([$element, $method], $this->params);
