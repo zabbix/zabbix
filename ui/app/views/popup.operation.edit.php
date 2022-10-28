@@ -228,19 +228,20 @@ $form_grid->addItem([
 		->setId('operation-message-body')
 ]);
 
-$opcommand_hst_value = array_key_exists('0', $operation['opcommand_hst'])
-	? $operation['opcommand_hst']['0'][] = 'hostid'
-	: null;
+$opcommand_hst_value = null;
+if (array_key_exists('0', $operation['opcommand_hst'])) {
+	if (array_key_exists('hostid', $operation['opcommand_hst'][0])) {
+		$opcommand_hst_value = $operation['opcommand_hst'][0]['hostid'];
+	}
+}
 
 $multiselect_values_host = [];
 $multiselect_values_host_grp = [];
+$hosts = [];
 
 foreach($operation['opcommand_hst'] as $host) {
-	if ($host !== null && array_key_exists('hostid', $host)) {
-		if ($host['hostid'] == 0) {
-			$multiselect_values_host = null;
-		}
-		else {
+	if (array_key_exists(0, $host)) {
+		if (is_array($host[0])) {
 			$hosts['id'] = $host[0]['hostid'];
 			$hosts['name'] = $host[0]['name'];
 			$multiselect_values_host[] = $hosts;
@@ -257,8 +258,6 @@ if($operation['opcommand_grp']) {
 }
 
 if(array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand_grp', $operation)) {
-	$multiselect_values_host = [];
-
 	// Command execution targets row.
 	$form_grid->addItem([
 		(new CLabel(_('Target list')))
@@ -270,7 +269,7 @@ if(array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand_
 				->addItem([
 					new CLabel(_('Current host')),
 					(new CFormField((new CCheckBox('operation[opcommand_hst][][hostid][current_host]', '0'))
-						->setChecked($opcommand_hst_value == 0 && $opcommand_hst_value !== null)
+						->setChecked($opcommand_hst_value === '0')
 					))->setId('operation-command-checkbox')
 				])
 				->addItem([

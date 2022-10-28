@@ -268,7 +268,8 @@ window.action_edit_popup = new class {
 		const row = template.content.firstElementChild;
 		const except_keys = [
 			'details', 'data_operation', 'prefix', 'row_index', 'data', 'steps', 'start_in', 'duration', 'usr_data',
-			'usrgrp_data', 'usr_details', 'usrgrp_details'
+			'usrgrp_data', 'usr_details', 'usrgrp_details', 'current', 'host_details', 'host_data', 'hostgr_details',
+			'hostgr_data'
 		];
 
 		for (const [key, value] of Object.entries(operation)) {
@@ -280,8 +281,14 @@ window.action_edit_popup = new class {
 					value.map((it, index) => {
 						let input = document.createElement('input');
 						input.setAttribute('type', 'hidden');
-						input.setAttribute('name', `${prefix}operations[${operation.row_index}][${key}][${index}][${Object.keys(it)[0]}]`)
-						input.setAttribute('id', `${prefix}operations_${operation.row_index}_${key}_${index}_${Object.keys(it)[0]}`)
+						input.setAttribute(
+							'name',
+							`${prefix}operations[${operation.row_index}][${key}][${index}][${Object.keys(it)[0]}]`
+						)
+						input.setAttribute(
+							'id',
+							`${prefix}operations_${operation.row_index}_${key}_${index}_${Object.keys(it)[0]}`
+						)
 						input.setAttribute('value', it[Object.keys(it)[0]])
 						first.append(input);
 					})
@@ -332,10 +339,24 @@ window.action_edit_popup = new class {
 		let template = this.operation_template_basic;
 
 		if (input.detail.operation.details.data) {
-			if (operation.details.data.length > 1) {
+			if (operation.details.type.length > 2 && operation.details.data.length == 2) {
+				operation_obj.current = operation.details.type[0];
+				operation_obj.host_data = operation.details.data[0].join('');
+				operation_obj.host_details = operation.details.type[1];
+				operation_obj.hostgr_data = operation.details.data[1].join('');
+				operation_obj.hostgr_details = operation.details.type[2];
+				template = this.operation_template_scripts_basic;
+			}
+			else if (operation.details.data.length > 1) {
 				operation_obj.usr_data = operation.details.data[0].join('');
 				operation_obj.usr_details = operation.details.type[0];
 				operation_obj.usrgrp_data = operation.details.data[1].join(' ');
+				operation_obj.usrgrp_details = operation.details.type[1];
+				template = this.operation_template_usr_usrgrps_basic;
+			}
+			else if (operation.details.type.length > 1) {
+				operation_obj.usr_details = operation.details.type[0];
+				operation_obj.usrgrp_data = operation.details.data[0].join('');
 				operation_obj.usrgrp_details = operation.details.type[1];
 				template = this.operation_template_usr_usrgrps_basic;
 			}
@@ -392,17 +413,31 @@ window.action_edit_popup = new class {
 						operation_obj.duration = input.detail.operation.duration;
 
 						if (input.detail.operation.details.data) {
-							if (operation.details.data.length > 1) {
+							if (operation.details.type.length > 2 && operation.details.data.length == 2) {
+								template = this.operation_template_scripts_additional;
+							}
+							else if (operation.details.data.length > 1) {
+								template = this.operation_template_usr_usrgrps_additional;
+							}
+							else if (operation.details.type.length > 1) {
+								operation_obj.usr_details = operation.details.type[0];
+								operation_obj.usrgrp_data = operation.details.data[0].join('');
+								operation_obj.usrgrp_details = operation.details.type[1];
+								template = this.operation_template_usr_usrgrps_basic;
 								template = this.operation_template_usr_usrgrps_additional;
 							}
 						}
 
 						let new_step_from = operation_obj.esc_step_from;
 						let new_step_to = operation_obj.esc_step_to
-						const new_combined = new_step_from === new_step_to ? parseInt(`${new_step_from}0`) : parseInt(`${new_step_from}${new_step_to}`);
-						let result = [];
 
+						const new_combined = new_step_from === new_step_to
+							? parseInt(`${new_step_from}0`)
+							: parseInt(`${new_step_from}${new_step_to}`);
+
+						let result = [];
 						let rows = document.querySelector('#op-table tbody').getElementsByTagName('tr');
+
 						if (rows.length == 0) {
 							document
 								.querySelector('#op-table tbody')
@@ -410,8 +445,12 @@ window.action_edit_popup = new class {
 						}
 						else {
 							Array.from(rows).forEach(row => {
-								let esc_step_from = row.getElementsByTagName('td')[0].getElementsByTagName('input')[3].value;
-								let esc_step_to = row.getElementsByTagName('td')[0].getElementsByTagName('input')[4].value;
+								let esc_step_from = row
+									.getElementsByTagName('td')[0]
+									.getElementsByTagName('input')[3].value;
+								let esc_step_to = row
+									.getElementsByTagName('td')[0]
+									.getElementsByTagName('input')[4].value;
 								row_id = row.id;
 
 								const existing_combined = esc_step_from === esc_step_to
@@ -424,7 +463,9 @@ window.action_edit_popup = new class {
 							})
 
 							if (result.length > 0) {
-								document.getElementById(result[0]).before(this._prepareOperationsRow(operation_obj, template));
+								document
+									.getElementById(result[0])
+									.before(this._prepareOperationsRow(operation_obj, template));
 							}
 							else {
 								document
@@ -762,6 +803,71 @@ window.action_edit_popup = new class {
 					</span> <br>
 					<span>
 						<b> #{usrgrp_details}  </b> #{usrgrp_data}
+					</span>
+				</td>
+				<td> #{start_in} </td>
+				<td> #{duration} </td>
+				<td>
+					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
+						<li>
+							<button
+							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation"
+							data_operation="#{data_operation}">
+							<?= _('Edit') ?>
+							</button>
+						</li>
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+						</li>
+					</ul>
+				</td>
+			</tr>
+		`);
+
+		this.operation_template_scripts_basic = new Template(`
+			<tr id="#{prefix}operations_#{row_index}">
+				<td class="wordwrap">
+					<span>
+						<b>#{current} </b>
+					</span> <br>
+					<span>
+						<b>#{host_details}  </b> #{host_data}
+					</span> <br>
+					<span>
+						<b> #{hostgr_details}  </b> #{hostgr_data}
+					</span>
+				</td>
+				<td>
+					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
+						<li>
+							<button
+							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation"
+							data_operation="#{data_operation}">
+							<?= _('Edit') ?>
+							</button>
+						</li>
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove">
+							<?= _('Remove') ?>
+							</button>
+						</li>
+					</ul>
+				</td>
+			</tr>
+		`);
+
+		this.operation_template_scripts_additional = new Template(`
+			<tr id="#{prefix}operations_#{row_index}">
+				<td> #{steps} </td>
+				<td class="wordwrap">
+						<span>
+						<b>#{current} </b>
+					</span> <br>
+					<span>
+						<b>#{host_details}  </b> #{host_data}
+					</span> <br>
+					<span>
+						<b> #{hostgr_details}  </b> #{hostgr_data}
 					</span>
 				</td>
 				<td> #{start_in} </td>

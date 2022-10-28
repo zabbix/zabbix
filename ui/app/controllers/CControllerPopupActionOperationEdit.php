@@ -119,19 +119,13 @@ class CControllerPopupActionOperationEdit extends CController {
 	private function getData(&$operation) {
 		$result = [];
 
-		if (array_key_exists('0', $operation['opcommand_hst'])) {
-			if ($operation['opcommand_hst'][0]['hostid'] == 0) {
-				$host = '';
-				$result[] = $host;
-			}
-			else if ($operation['opcommand_hst'][0]['hostid'] !== '0') {
-				foreach($operation['opcommand_hst'] as &$host) {
-					$host = API::Host()->get([
+		foreach ($operation['opcommand_hst'] as &$opcommand_host) {
+			if ($opcommand_host['hostid'] !== '0') {
+				$opcommand_host = API::Host()->get([
 						'output' => ['hostid', 'name'],
-						'hostids' => $host['hostid']
+						'hostids' => $opcommand_host['hostid']
 					]);
-				}
-				$result[] = $host;
+				$result[] = $opcommand_host[0];
 			}
 		}
 
