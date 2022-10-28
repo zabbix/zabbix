@@ -93,7 +93,7 @@ class CControllerActionLogList extends CController {
 			]);
 
 			$userids = array_column($data['users'], 'userid');
-			$data['userids'] = $this->sanitizeUsersForMultiselect($data['users']);
+			$data['userids'] = $this->prepareDataForMultiselect($data['users'], 'users');
 		}
 
 		$actionids = [];
@@ -106,7 +106,7 @@ class CControllerActionLogList extends CController {
 			]);
 
 			$actionids = array_column($data['actions'], 'actionid');
-			$data['actionids'] = $this->sanitizeDataForMultiselect($data['actions'], 'actions');
+			$data['actionids'] = $this->prepareDataForMultiselect($data['actions'], 'actions');
 		}
 
 		$mediatypeids = [];
@@ -119,13 +119,7 @@ class CControllerActionLogList extends CController {
 			]);
 
 			$mediatypeids = array_column($data['media_types'], 'mediatypeid');
-
-			// Sanitize mediatypeids for multiselect.
-			$data['mediatypeids'] = array_map(function (array $value): array {
-				return ['id' => $value['mediatypeid'], 'name' => $value['name'], 'maxattempts' => $value['maxattempts']];
-			}, $data['media_types']);
-
-			CArrayHelper::sort($data['mediatypeids'], ['name']);
+			$data['mediatypeids'] = $this->prepareDataForMultiselect($data['media_types'], 'media_types');
 		}
 
 		$search_strings = [];
@@ -227,16 +221,6 @@ class CControllerActionLogList extends CController {
 		CProfile::deleteIdx('web.actionlog.filter.messages');
 	}
 
-	private function sanitizeUsersForMultiselect(array $users): array {
-		$users = array_map(function(array $value): array {
-			return ['id' => $value['userid'], 'name' => getUserFullname($value)];
-		}, $users);
-
-		CArrayHelper::sort($users, ['name']);
-
-		return $users;
-	}
-
 	/**
 	 * Sanitizes data for multiselect fields.
 	 *
@@ -246,28 +230,35 @@ class CControllerActionLogList extends CController {
 	 * @return array
 	 */
 
-	private function sanitizeDataForMultiselect(array $data, string $type): array {
-		function users(array $value): array {
-			return ['id' => $value['userid'], 'name' => getUserFullname($value)];
+	private function prepareDataForMultiselect(array $data, string $type): array {
+		$prepared_data = [];
+
+		foreach ($data as $value) {
+			switch ($type) {
+				case 'users':
+					$prepared_data[$value['userid']] = [
+						'id' => $value['userid'],
+						'name' => getUserFullname($value)
+					];
+					break;
+				case 'actions':
+					$prepared_data[$value['actionid']] = [
+						'id' => $value['actionid'],
+						'name' => $value['name']
+					];
+					break;
+				case 'media_types':
+					$prepared_data[$value['mediatypeid']] = [
+						'id' => $value['mediatypeid'],
+						'name' => $value['name'],
+						'maxattempts' => $value['maxattempts']
+					];
+					break;
+			}
 		}
 
-		function actions(array $value): array {
-			return ['id' => $value['actionid'], 'name' => $value['name']];
-		}
+		CArrayHelper::sort($prepared_data, ['name']);
 
-		function media_types(array $value): array {
-			return ['id' => $value['mediatypeid'], 'name' => $value['name'], 'maxattempts' => $value['maxattempts']];
-		}
-
-		$data = array_map($type, $data);
-		CArrayHelper::sort($data, ['name']);
-
-		return $data;
+		return $prepared_data;
 	}
 }
-/*
-			$data['mediatypeids'] = array_map(function (array $value): array {
-				return ['id' => $value['mediatypeid'], 'name' => $value['name'], 'maxattempts' => $value['maxattempts']];
-			}, $data['media_types']);
-
-			CArrayHelper::sort($data['mediatypeids'], ['name']);
