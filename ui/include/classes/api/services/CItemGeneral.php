@@ -1217,13 +1217,15 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * @param array      $items
 	 * @param array|null $db_items
+	 * @param array|null $upd_itemids
 	 */
-	protected static function updateParameters(array &$items, array $db_items = null): void {
+	protected static function updateParameters(array &$items, array $db_items = null,
+			array &$upd_itemids = null): void {
 		$ins_item_parameters = [];
 		$upd_item_parameters = [];
 		$del_item_parameterids = [];
 
-		foreach ($items as &$item) {
+		foreach ($items as $i => &$item) {
 			$update = false;
 
 			if ($db_items === null) {
@@ -1251,6 +1253,7 @@ abstract class CItemGeneral extends CApiService {
 				continue;
 			}
 
+			$changed = false;
 			$db_item_parameters = ($db_items !== null)
 				? array_column($db_items[$item['itemid']]['parameters'], null, 'name')
 				: [];
@@ -1268,17 +1271,30 @@ abstract class CItemGeneral extends CApiService {
 							'values' => $upd_item_parameter,
 							'where' => ['item_parameterid' => $db_item_parameter['item_parameterid']]
 						];
+						$changed = true;
 					}
 				}
 				else {
 					$ins_item_parameters[] = ['itemid' => $item['itemid']] + $item_parameter;
+					$changed = true;
 				}
 			}
 			unset($item_parameter);
 
-			$del_item_parameterids = array_merge($del_item_parameterids,
-				array_column($db_item_parameters, 'item_parameterid')
-			);
+			if ($db_item_parameters) {
+				$del_item_parameterids =
+					array_merge($del_item_parameterids, array_column($db_item_parameters, 'item_parameterid'));
+				$changed = true;
+			}
+
+			if ($db_items !== null) {
+				if ($changed) {
+					$upd_itemids[$i] = $item['itemid'];
+				}
+				else {
+					unset($item['parameters']);
+				}
+			}
 		}
 		unset($item);
 
@@ -1312,17 +1328,20 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * @param array      $items
 	 * @param array|null $db_items
+	 * @param array|null $upd_itemids
 	 */
-	protected static function updatePreprocessing(array &$items, array $db_items = null): void {
+	protected static function updatePreprocessing(array &$items, array $db_items = null,
+			array &$upd_itemids = null): void {
 		$ins_item_preprocs = [];
 		$upd_item_preprocs = [];
 		$del_item_preprocids = [];
 
-		foreach ($items as &$item) {
+		foreach ($items as $i => &$item) {
 			if (!array_key_exists('preprocessing', $item)) {
 				continue;
 			}
 
+			$changed = false;
 			$db_item_preprocs = ($db_items !== null)
 				? array_column($db_items[$item['itemid']]['preprocessing'], null, 'step')
 				: [];
@@ -1344,15 +1363,30 @@ abstract class CItemGeneral extends CApiService {
 							'values' => $upd_item_preproc,
 							'where' => ['item_preprocid' => $db_item_preproc['item_preprocid']]
 						];
+						$changed = true;
 					}
 				}
 				else {
 					$ins_item_preprocs[] = ['itemid' => $item['itemid']] + $item_preproc;
+					$changed = true;
 				}
 			}
 			unset($item_preproc);
 
-			$del_item_preprocids = array_merge($del_item_preprocids, array_column($db_item_preprocs, 'item_preprocid'));
+			if ($db_item_preprocs) {
+				$del_item_preprocids =
+					array_merge($del_item_preprocids, array_column($db_item_preprocs, 'item_preprocid'));
+				$changed = true;
+			}
+
+			if ($db_items !== null) {
+				if ($changed) {
+					$upd_itemids[$i] = $item['itemid'];
+				}
+				else {
+					unset($item['preprocessing']);
+				}
+			}
 		}
 		unset($item);
 
@@ -1386,16 +1420,18 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * @param array      $items
 	 * @param array|null $db_items
+	 * @param array|null $upd_itemids
 	 */
-	protected static function updateTags(array &$items, array $db_items = null): void {
+	protected static function updateTags(array &$items, array $db_items = null, array &$upd_itemids = null): void {
 		$ins_tags = [];
 		$del_itemtagids = [];
 
-		foreach ($items as &$item) {
+		foreach ($items as $i => &$item) {
 			if (!array_key_exists('tags', $item)) {
 				continue;
 			}
 
+			$changed = false;
 			$db_tags = ($db_items !== null) ? $db_items[$item['itemid']]['tags'] : [];
 
 			foreach ($item['tags'] as &$tag) {
@@ -1410,11 +1446,24 @@ abstract class CItemGeneral extends CApiService {
 				}
 				else {
 					$ins_tags[] = ['itemid' => $item['itemid']] + $tag;
+					$changed = true;
 				}
 			}
 			unset($tag);
 
-			$del_itemtagids = array_merge($del_itemtagids, array_keys($db_tags));
+			if ($db_tags) {
+				$del_itemtagids = array_merge($del_itemtagids, array_keys($db_tags));
+				$changed = true;
+			}
+
+			if ($db_items !== null) {
+				if ($changed) {
+					$upd_itemids[$i] = $item['itemid'];
+				}
+				else {
+					unset($item['tags']);
+				}
+			}
 		}
 		unset($item);
 

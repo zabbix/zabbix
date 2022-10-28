@@ -491,10 +491,12 @@ class CItemPrototype extends CItemGeneral {
 	public function update(array $items): array {
 		$this->validateUpdate($items, $db_items);
 
+		$itemids = array_column($items, 'itemid');
+
 		self::updateForce($items, $db_items);
 		self::inherit($items, $db_items);
 
-		return ['itemids' => array_column($items, 'itemid')];
+		return ['itemids' => $itemids];
 	}
 
 	/**
@@ -669,15 +671,19 @@ class CItemPrototype extends CItemGeneral {
 	 * @param array $items
 	 * @param array $db_items
 	 */
-	public static function updateForce(array &$items, array $db_items): void {
+	public static function updateForce(array &$items, array &$db_items): void {
 		// Helps to avoid deadlocks.
 		CArrayHelper::sort($items, ['itemid'], ZBX_SORT_DOWN);
 
 		self::addFieldDefaultsByType($items, $db_items);
 
 		$upd_items = [];
+		$upd_itemids = [];
 
-		foreach ($items as $item) {
+		$internal_fields = array_flip(['itemid', 'type', 'key_', 'hostid', 'flags', 'host_status']);
+		$nested_object_fields = array_flip(['tags', 'preprocessing', 'parameters']);
+
+		foreach ($items as $i => &$item) {
 			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
 
 			if ($upd_item) {
@@ -685,17 +691,28 @@ class CItemPrototype extends CItemGeneral {
 					'values' => $upd_item,
 					'where' => ['itemid' => $item['itemid']]
 				];
+
+				$item = array_intersect_key($item, $internal_fields + $upd_item + $nested_object_fields);
+
+				$upd_itemids[$i] = $item['itemid'];
+			}
+			else {
+				$item = array_intersect_key($item, $internal_fields + $nested_object_fields);
 			}
 		}
+		unset($item);
 
 		if ($upd_items) {
 			DB::update('items', $upd_items);
 		}
 
-		self::updateTags($items, $db_items);
-		self::updatePreprocessing($items, $db_items);
-		self::updateParameters($items, $db_items);
+		self::updateTags($items, $db_items, $upd_itemids);
+		self::updatePreprocessing($items, $db_items, $upd_itemids);
+		self::updateParameters($items, $db_items, $upd_itemids);
 		self::updateDiscoveredItems($items, $db_items);
+
+		$items = array_intersect_key($items, $upd_itemids);
+		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM_PROTOTYPE, $items, $db_items);
 	}
