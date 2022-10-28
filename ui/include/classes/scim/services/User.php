@@ -305,7 +305,7 @@ class User extends ScimApiService {
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
 
 		if (!$db_user) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, _('This user does not exist.'));
+			self::exception(self::SCIM_ERROR_NOT_FOUND, _('No permissions to referred object or it does not exist!'));
 		}
 		elseif ($db_user['userdirectoryid'] != $userdirectoryid) {
 			self::exception(self::SCIM_ERROR_BAD_REQUEST,
@@ -366,7 +366,7 @@ class User extends ScimApiService {
 		]);
 
 		if (!$db_users) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, _('This user does not exist.'));
+			self::exception(self::SCIM_ERROR_NOT_FOUND, _('No permissions to referred object or it does not exist!'));
 		}
 		elseif ($db_users[0]['userdirectoryid'] != $userdirectoryid) {
 			self::exception(self::SCIM_ERROR_BAD_REQUEST,

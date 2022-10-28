@@ -64,7 +64,7 @@ class Group extends ScimApiService {
 			]);
 
 			if (!$db_scim_group) {
-				self::exception(self::SCIM_ERROR_NOT_FOUND, _('This group does not exist.'));
+				self::exception(self::SCIM_ERROR_NOT_FOUND, _('No permissions to referred object or it does not exist!'));
 			}
 
 			$users = $this->getUsersByGroupIds([$options['id']]);
@@ -135,7 +135,7 @@ class Group extends ScimApiService {
 		[$scim_groupid] = DB::insert('scim_groups', [['name' => $options['displayName']]]);
 
 		if (!$scim_groupid) {
-			self::exception(self::SCIM_INTERNAL_ERROR, _s('Unable to create group "%1$s".', $options['displayName']));
+			self::exception(self::SCIM_INTERNAL_ERROR, _s('Cannot create group "%1$s".', $options['displayName']));
 		}
 
 		$scim_group_members = array_column($options['members'], 'value');
@@ -148,7 +148,7 @@ class Group extends ScimApiService {
 
 			if (!$user_group) {
 				self::exception(self::SCIM_INTERNAL_ERROR,
-					_s('Unable to add user "%1$s" to group "%2$s".', $memberid, $options['displayName'])
+					_s('Cannot add user "%1$s" to group "%2$s".', $memberid, $options['displayName'])
 				);
 			}
 
@@ -212,7 +212,7 @@ class Group extends ScimApiService {
 		]);
 
 		if (!$db_scim_groups) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, _('This group does not exist.'));
+			self::exception(self::SCIM_ERROR_NOT_FOUND, _('No permissions to referred object or it does not exist!'));
 		}
 		$db_scim_group = $db_scim_groups[0];
 
@@ -235,7 +235,7 @@ class Group extends ScimApiService {
 
 				if (!$scim_user_group) {
 					self::exception(self::SCIM_INTERNAL_ERROR,
-						_s('Unable to add user "%1$s" to group "%2$s".', $userid, $options['displayName'])
+						_s('Cannot add user "%1$s" to group "%2$s".', $userid, $options['displayName'])
 					);
 				}
 
