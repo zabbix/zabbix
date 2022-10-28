@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.4'
-  date: '2022-08-23T13:59:43Z'
+  date: '2022-10-28T12:24:22Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -680,7 +680,7 @@ zabbix_export:
           name: 'Checksum of /etc/passwd'
           type: ZABBIX_ACTIVE
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
-          delay: 1h
+          delay: 15m
           history: 7d
           trends: '0'
           value_type: CHAR
@@ -789,7 +789,7 @@ zabbix_export:
                   tag: scope
                   value: performance
         -
-          uuid: 086b2ca542f24b4089a1fc43eeea2f42
+          uuid: 090fb1a5698e4e7080abf379b377b6f5
           name: 'Active agent availability'
           type: INTERNAL
           key: 'zabbix[host,active_agent,available]'
@@ -811,7 +811,7 @@ zabbix_export:
               value: network
           triggers:
             -
-              uuid: 153cc67416614c13878a6f5655d99b09
+              uuid: a022259fc3cf454f93bc82cca27391f1
               expression: 'min(/Linux by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
               name: 'Zabbix agent: active checks are not available'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -2298,7 +2298,7 @@ zabbix_export:
               value: '826'
               newvalue: 'Vsock monitor header'
         -
-          uuid: c75840508f98402498289c5f99e0d59e
+          uuid: d4a5821461a243c9bf320ea58be1af23
           name: zabbix.host.active_agent.available
           mappings:
             -
