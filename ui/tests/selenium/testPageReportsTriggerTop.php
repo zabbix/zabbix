@@ -99,7 +99,7 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 		foreach ($item_names as $i => $item) {
 			$triggers_data[] = [
 				'description' => 'Reports trigger '.$i,
-				'expression' => 'last(/Host for Reports Trigger/'.$item.')=0',
+				'expression' => '{Host for Reports Trigger:'.$item.'.last()}=0',
 				'priority' => $i
 			];
 		}
