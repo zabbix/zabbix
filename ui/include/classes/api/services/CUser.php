@@ -1721,7 +1721,7 @@ class CUser extends CApiService {
 				'where' => ['sessionid' => $sessionid]
 			]);
 
-			return self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
 		if ($session['extend'] && $time != $db_session['lastaccess']) {
