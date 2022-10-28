@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-29 12:11+0000\n"
-"Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
+"PO-Revision-Date: 2022-10-26 08:28+0000\n"
+"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -119,7 +119,7 @@ msgstr "%1$s (rok %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s – vyvoláno modulem umístěným na %2$s."
 
 #: include/classes/api/services/CItemGeneral.php:2654
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -285,17 +285,17 @@ msgstr "%1$s, vybrané"
 #: app/controllers/CControllerMediatypeEnable.php:93
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
-msgstr ""
+msgstr "%1$s. %2$s: %3$s. %4$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "%1$s. percentil: %2$s"
 
 #: include/func.inc.php:1947
 #, c-format
@@ -453,7 +453,7 @@ msgstr "API token"
 #: include/classes/api/services/CToken.php:299
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr ""
+msgstr "Token API \"%1$s\" již existuje pro uživatelské ID \"%2$s\"."
 
 #: app/controllers/CControllerTokenCreate.php:109
 #: app/controllers/CControllerTokenCreate.php:131
@@ -554,7 +554,7 @@ msgstr "Potvrzeno"
 #: app/views/monitoring.widget.problems.view.php:81
 msgctxt "compact table header"
 msgid "Ack"
-msgstr ""
+msgstr "Potvrzeno"
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
@@ -652,7 +652,7 @@ msgstr "Akce"
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "Akce"
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
@@ -671,7 +671,7 @@ msgstr "Akce byla přidána"
 #: include/classes/core/ZBase.php:500
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "Třída akcí %1$s musí rozšířit třídu %2$s."
 
 #: actionconf.php:323
 msgid "Action deleted"
@@ -728,7 +728,7 @@ msgstr "Akce"
 #: app/views/monitoring.widget.problems.view.php:82
 msgctxt "compact table header"
 msgid "Actions"
-msgstr ""
+msgstr "Akce"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -1094,7 +1094,7 @@ msgstr "Agent šifrování"
 
 #: include/classes/data/CItemData.php:810
 msgid "Agent host metadata. Returns string"
-msgstr ""
+msgstr "Metadata hostitele agenta. Vrátí řetězec"
 
 #: include/classes/data/CItemData.php:814
 msgid "Agent host name. Returns string"
@@ -1133,7 +1133,7 @@ msgstr "Poplašná zpráva"
 #: include/classes/helpers/CMenuHelper.php:283
 #: include/classes/helpers/CRoleHelper.php:338
 msgid "Alerts"
-msgstr ""
+msgstr "Upozornění"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
@@ -1241,11 +1241,11 @@ msgstr "Eventuálně to můžete nainstalovat manuálně:"
 
 #: include/classes/data/CItemData.php:1442
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Množství fyzické paměti hosta, která je odložena do odkládacího prostoru, <url> - URL služby VMware, <uuid> - název hostitele virtuálního počítače VMware"
 
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Množství fyzické paměti hostitele spotřebované pro zálohování stránek fyzické paměti hosta, <url> – URL služby VMware, <uuid> – název hostitele virtuálního počítače VMware"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
@@ -1371,7 +1371,7 @@ msgstr "Jste si jistí, že to chcete smazat?"
 
 #: include/classes/html/CButtonQMessage.php:52
 msgid "Are you sure you want to perform this action?"
-msgstr ""
+msgstr "Opravdu chcete provést tuto akci?"
 
 #: include/views/js/monitoring.sysmaps.js.php:122
 msgid "Area size"
@@ -1444,7 +1444,7 @@ msgstr "Musí být zaškrtnut alespoň jeden prvek uživatelského rozhraní."
 #: include/classes/api/services/CRole.php:487
 #, c-format
 msgid "At least one UI element must be enabled for user role \"%1$s\"."
-msgstr ""
+msgstr "Pro uživatelskou roli \"%1$s\" musí být povolen alespoň jeden prvek uživatelského rozhraní."
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
@@ -1454,11 +1454,11 @@ msgstr "Alespoň jedna akce je povinná."
 #: include/classes/api/services/CUser.php:1286
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
-msgstr ""
+msgstr "Musí existovat alespoň jeden aktivní uživatel s rolí \"%1$s\"."
 
 #: include/classes/api/services/CMaintenance.php:683
 msgid "At least one day of the week or day of the month must be specified."
-msgstr ""
+msgstr "Musí být uveden alespoň jeden den v týdnu nebo den v měsíci."
 
 #: include/classes/api/services/CMaintenance.php:382
 #: include/classes/api/services/CMaintenance.php:574
@@ -1469,11 +1469,11 @@ msgstr "Minimálně jedna skupina hostů musí být vybrána."
 #: include/classes/api/services/CHostGroup.php:1111
 #: include/classes/api/services/CHostGroup.php:1268
 msgid "At least one host or template must be specified."
-msgstr ""
+msgstr "Musí být zadán alespoň jeden hostitel nebo šablona."
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr ""
+msgstr "Měl by být podporován alespoň jeden z MySQL, PostgreSQL nebo Oracle."
 
 #: app/views/configuration.correlation.edit.php:161
 msgid "At least one operation must be selected."
@@ -1486,11 +1486,11 @@ msgstr "Minimálně jedna operace musí existovat."
 #: include/classes/api/services/CHostGroup.php:1594
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
-msgstr ""
+msgstr "Musí být povolen alespoň jeden parametr \"%1$s\" nebo \"%2$s\"."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
-msgstr ""
+msgstr "Alespoň jedna operace aktualizace nebo zpráva je povinná"
 
 #: app/views/popup.acknowledge.edit.php:105
 msgid "At least one update operation or message must exist."
@@ -1502,7 +1502,7 @@ msgstr "Minimálně jeden uživatel nebo skupina uživatelů musí být vybrána
 
 #: include/classes/api/services/CReport.php:343
 msgid "At least one user or user group must be specified."
-msgstr ""
+msgstr "Musí být zadán alespoň jeden uživatel nebo skupina uživatelů."
 
 #: app/views/administration.mediatype.edit.php:342
 msgid "Attempt interval"
@@ -1516,7 +1516,7 @@ msgstr "Pokusy"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
-msgstr ""
+msgstr "Atribuce"
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1688,7 +1688,7 @@ msgstr "Dostupný"
 #: app/views/monitoring.widget.hostavail.view.php:37
 msgctxt "compact table header"
 msgid "Available"
-msgstr ""
+msgstr "Dostupný"
 
 #: app/views/administration.trigdisplay.edit.php:128 jsLoader.php:179
 msgid "Average"
@@ -1696,11 +1696,11 @@ msgstr "Střední"
 
 #: include/classes/data/CItemData.php:1522
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Průměrný počet nevyřízených požadavků na čtení na virtuální disk během intervalu sběru, <url> - URL služby VMware, <uuid> - název hostitele virtuálního počítače VMware, <instance> - instance diskového zařízení"
 
 #: include/classes/data/CItemData.php:1542
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Průměrný počet nevyřízených požadavků na zápis na virtuální disk během intervalu sběru, <url> - URL služby VMware, <uuid> - název hostitele virtuálního počítače VMware, <instance> - instance diskového zařízení"
 
 #: app/views/administration.authentication.edit.php:93
 msgid "Avoid easy-to-guess passwords"
@@ -1894,23 +1894,23 @@ msgstr "CPU load. Vrátí desetinné číslo"
 
 #: include/classes/data/CItemData.php:1422
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
-msgstr ""
+msgstr "Čas CPU strávený čekáním na swap-in, <url> - URL služby VMware, <uuid> - název hostitele virtuálního počítače VMware, <instance> - instance CPU"
 
 #: include/classes/data/CItemData.php:1274
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Využití CPU v procentech během intervalu závisí na správě napájení nebo HT, <url> - URL služby VMware, <uuid> - název hostitele hypervisoru VMware"
 
 #: include/classes/data/CItemData.php:1266
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Využití procesoru v procentech během intervalu, <url> – URL služby VMware, <uuid> – název hostitele hypervisoru VMware"
 
 #: include/classes/data/CItemData.php:1426
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Využití procesoru v procentech během intervalu, <url> - URL služby VMware, <uuid> - název hostitele virtuálního počítače VMware"
 
 #: include/classes/data/CItemData.php:1429
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
-msgstr ""
+msgstr "Využití CPU v hertzech během intervalu ve fondu zdrojů VMware, <url> - URL služby VMware, <rpid> - ID fondu prostředků VMware"
 
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
@@ -2005,7 +2005,7 @@ msgstr "Nelze přidat korelaci"
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr ""
+msgstr "Nelze přidat stránku dashboard panelu: byl přidán maximální počet %1$d stránek dashboard panelu."
 
 #: include/classes/api/services/CTrigger.php:979
 #: include/classes/api/services/CTriggerPrototype.php:788
@@ -2174,11 +2174,11 @@ msgstr "Není možné navázat na LDAP server."
 #: include/forms.inc.php:1990 include/forms.inc.php:2000
 #, c-format
 msgid "Cannot build expression tree: %1$s."
-msgstr ""
+msgstr "Nelze sestavit strom výrazů: %1$s."
 
 #: include/classes/api/services/CRole.php:792
 msgid "Cannot change the user type of own role."
-msgstr ""
+msgstr "Nelze změnit typ uživatele vlastní role."
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
@@ -2239,7 +2239,7 @@ msgstr[2] "Nelze kopírovat spoušťěče"
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Nelze zkopírovat spouštěč \"%1$s\", protože má ve výrazu více hostitelů."
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2336,7 +2336,7 @@ msgstr "Nelze smazat akci"
 #: include/classes/api/services/CRole.php:375
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
-msgstr ""
+msgstr "Nelze smazat přiřazenou uživatelskou roli \"%1$s\"."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2404,9 +2404,9 @@ msgstr "Nelze smazat hostitele"
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Hostitele %1$s nelze smazat, protože údržba \"%2$s\" musí obsahovat alespoň jednoho hostitele nebo skupinu hostitelů."
+msgstr[1] "Hostitelé %1$s nelze smazat, protože údržba \"%2$s\" musí obsahovat alespoň jednoho hostitele nebo skupinu hostitelů."
+msgstr[2] "Hostitelé %1$s nelze smazat, protože údržba \"%2$s\" musí obsahovat alespoň jednoho hostitele nebo skupinu hostitelů."
 
 #: app/controllers/CControllerHostGroupDelete.php:75
 msgid "Cannot delete host group"
@@ -2480,9 +2480,9 @@ msgstr[2] "Není možné smazat typy médií"
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nelze odstranit modul: %1$s."
+msgstr[1] "Nelze odstranit moduly: %1$s"
+msgstr[2] "Nelze odstranit moduly: %1$s"
 
 #: sysmaps.php:261
 msgid "Cannot delete network map"
@@ -2545,7 +2545,7 @@ msgstr[2] "Nelze smazat služby"
 #: include/classes/api/services/CService.php:470
 #, c-format
 msgid "Cannot delete service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Nelze smazat službu \"%1$s\": %2$s."
 
 #: templates.php:462 templates.php:476 templates.php:542
 msgid "Cannot delete template"
@@ -2903,7 +2903,7 @@ msgstr "Nelze najít rozhraní \"%1$s\" použité pro položku \"%2$s\" na \"%3$
 #: include/classes/import/CConfigurationImport.php:1105
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Nelze najít rozhraní \"%1$s\" použité pro prototyp položky \"%2$s\" pravidla zjišťování \"%3$s\" na \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1601
 #, c-format
@@ -4339,6 +4339,14 @@ msgstr "Vypršel časový limit připojení"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Časový limit připojení %1$s sekund vypršel při připojení k Zabbix serveru \"%2$s\"."
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4349,6 +4357,16 @@ msgstr ""
 "Připojení k Zabbix serveru \"%s\" selhalo. Možné důvody:\n"
 "1. Špatné nastavení IP/DNS v souboru \"zabbix.conf.php\";\n"
 "2. Špatné nastavení DNS serveru.\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4364,6 +4382,14 @@ msgstr ""
 "2. Bezpečnostní prostředí (například SELinux) blokuje připojení;\n"
 "3. Neběží démon serveru Zabbix;\n"
 "4. Firewall blokuje připojení TCP.\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -10047,6 +10073,10 @@ msgctxt "compact table header"
 msgid "Info"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1429
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -12143,6 +12173,11 @@ msgstr "Položka menu URL adresa"
 #: app/views/administration.mediatype.edit.php:248
 msgid "Menu entry name"
 msgstr "Položka menu jméno"
+
+#: include/views/configuration.trigger.prototype.edit.php:554
+#: include/views/configuration.triggers.edit.php:576
+msgid "Menu entry name is used as a label for the trigger URL in the event context menu."
+msgstr ""
 
 #: app/views/administration.script.edit.php:108
 msgid "Menu path"
@@ -18553,6 +18588,16 @@ msgstr ""
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr ""
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
@@ -20290,6 +20335,10 @@ msgstr "VMware statistika datového úložiště kapacity v bytech nebo v procen
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1321
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr ""
@@ -21487,6 +21536,14 @@ msgstr "Přihlašovací formulář Zabbixu"
 #: app/views/administration.script.edit.php:127
 msgid "Zabbix server"
 msgstr "Zabbix server"
+
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:601
 #, c-format

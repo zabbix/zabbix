@@ -16,18 +16,19 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+#include "rtc_server.h"
 
 #include "log.h"
-#include "zbxdiag.h"
-#include "zbxjson.h"
 #include "zbxha.h"
+#include "zbxdiag.h"
 #include "zbxtypes.h"
 #include "zbxcommon.h"
-
-#include "rtc.h"
 #include "zbxservice.h"
+#include "zbx_rtc_constants.h"
+#include "zbxjson.h"
+#include "zbxtime.h"
 
-int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
+static int	rtc_parse_options_ex(const char *opt, zbx_uint32_t *code, char **data, char **error)
 {
 	const char	*param;
 
@@ -483,10 +484,10 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
 			zbx_service_reload_cache();
 			return SUCCEED;
 		case ZBX_RTC_SECRETS_RELOAD:
-			rtc_notify(rtc, ZBX_PROCESS_TYPE_CONFSYNCER, 0, ZBX_RTC_SECRETS_RELOAD, NULL, 0);
+			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_CONFSYNCER, 0, ZBX_RTC_SECRETS_RELOAD, NULL, 0);
 			return SUCCEED;
 		case ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE:
-			rtc_notify(rtc, ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER, 0, ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE,
+			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER, 0, ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE,
 					NULL, 0);
 			return SUCCEED;
 		case ZBX_RTC_DIAGINFO:
@@ -502,13 +503,78 @@ int	rtc_process_request_ex(zbx_rtc_t *rtc, int code, const unsigned char *data, 
 			rtc_ha_remove_node((const char *)data, result);
 			return SUCCEED;
 		case ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD:
-			rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD, data,
+			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD, data,
 					(zbx_uint32_t)strlen((const char *)data) + 1);
 			return SUCCEED;
 		case ZBX_RTC_PROXYPOLLER_PROCESS:
-			rtc_notify(rtc, ZBX_PROCESS_TYPE_PROXYPOLLER, 0, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
+			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_PROXYPOLLER, 0, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
 			return SUCCEED;
 	}
 
 	return FAIL;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process runtime control option and print result                   *
+ *                                                                            *
+ * Parameters: option   - [IN] runtime control option                         *
+ *             error    - [OUT] error message                                 *
+ *                                                                            *
+ * Return value: SUCCEED - the runtime control option was processed           *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	rtc_process(const char *option, char **error)
+{
+	zbx_uint32_t	code = ZBX_RTC_UNKNOWN;
+	char		*data = NULL;
+
+	if (SUCCEED != zbx_rtc_parse_options(option, &code, &data, error))
+		return FAIL;
+
+	if (ZBX_RTC_UNKNOWN == code)
+	{
+		if (SUCCEED != rtc_parse_options_ex(option, &code, &data, error))
+			return FAIL;
+
+		if (ZBX_RTC_UNKNOWN == code)
+		{
+			*error = zbx_dsprintf(NULL, "unknown option \"%s\"", option);
+			return FAIL;
+		}
+	}
+
+	return zbx_rtc_async_exchange(&data, code, error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: reset the RTC service state by removing subscriptions and hooks   *
+ *                                                                            *
+ ******************************************************************************/
+void	rtc_reset(zbx_rtc_t *rtc)
+{
+	int	i;
+
+	for (i = 0; i < rtc->subs.values_num; i++)
+	{
+		zbx_ipc_client_close(rtc->subs.values[i]->client);
+		zbx_free(rtc->subs.values[i]);
+	}
+	zbx_vector_rtc_sub_clear(&rtc->subs);
+
+	for (i = 0; i < rtc->hooks.values_num; i++)
+		zbx_free(rtc->hooks.values[i]);
+
+	zbx_vector_rtc_hook_clear(&rtc->hooks);
+}
+
+int	rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error)
+{
+	if (FAIL == zbx_ipc_async_socket_open(asocket, ZBX_IPC_SERVICE_RTC, timeout, error))
+		return FAIL;
+
+	return SUCCEED;
+}
+

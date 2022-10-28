@@ -121,7 +121,16 @@ foreach ($data['items'] as $itemid => $item) {
 
 	$item_name = (new CDiv([
 		(new CLinkAction($item['name']))
-			->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $itemid])),
+			->setMenuPopup(
+				CMenuPopupHelper::getItem([
+					'itemid' => $itemid,
+					'context' => 'host',
+					'backurl' => (new CUrl('zabbix.php'))
+						->setArgument('action', 'latest.view')
+						->setArgument('context','host')
+						->getUrl()
+				])
+			),
 		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
 	]))->addClass(ZBX_STYLE_ACTION_CONTAINER);
 

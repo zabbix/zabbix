@@ -22,6 +22,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * @backup triggers
@@ -302,9 +303,29 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->zbxTestAssertVisibleId('comments');
 		$this->zbxTestAssertAttribute("//textarea[@id='comments']", 'rows', 7);
 
-		$this->zbxTestTextPresent('URL');
+		$form = $this->query('id:triggers-form')->asForm()->one();
+		$entry_name = $form->getField('Menu entry name');
+
+		foreach (['placeholder' => 'Trigger URL', 'maxlength' => 64] as $attribute => $value) {
+			$this->assertEquals($value, $entry_name->getAttribute($attribute));
+		}
+
+		// Check hintbox.
+		$this->query('class:icon-help-hint')->one()->click();
+		$hint = $form->query('xpath:.//div[@class="hint-box"]')->waitUntilPresent()->one();
+
+		// Assert text.
+		$this->assertEquals('Menu entry name is used as a label for the trigger URL in the event context menu.',
+				$hint->getText()
+		);
+
+		// Press Escape key to close hintbox.
+		$this->page->pressKey(WebDriverKeys::ESCAPE);
+		$hint->waitUntilNotVisible();
+
+		$this->zbxTestTextPresent('Menu entry URL');
 		$this->zbxTestAssertVisibleId('url');
-		$this->zbxTestAssertAttribute("//input[@id='url']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@id='url']", 'maxlength', 2048);
 
 		$this->zbxTestAssertElementPresentId('priority_0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_0'));
@@ -592,6 +613,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<5',
 					'type' => true,
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process.',
+					'url_name' => 'Trigger context menu name for trigger URL.',
 					'url' => 'http://www.zabbix.com',
 					'severity' => 'High',
 					'status' => false
@@ -602,6 +624,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expected' => TEST_GOOD,
 					'description' => 'MyTrigger_CheckURL',
 					'expression' => 'last(/Simple form test host/test-item-reuse,#1)<4',
+					'url_name' => 'MyTrigger: menu name',
 					'url' => 'triggers.php'
 				]
 			],
@@ -846,6 +869,11 @@ class testFormTrigger extends CLegacyWebTest {
 		}
 		$comments = $this->zbxTestGetValue("//textarea[@id='comments']");
 
+		if (isset($data['url_name'])) {
+			$this->zbxTestInputType('url_name', $data['url_name']);
+		}
+		$url_name = $this->zbxTestGetValue("//input[@id='url_name']");
+
 		if (isset($data['url'])) {
 			$this->zbxTestInputType('url', $data['url']);
 		}
@@ -953,6 +981,8 @@ class testFormTrigger extends CLegacyWebTest {
 				}
 
 				$this->zbxTestAssertElementValue('comments', $comments);
+
+				$this->zbxTestAssertElementValue('url_name', $url_name);
 
 				$this->zbxTestAssertElementValue('url', $url);
 

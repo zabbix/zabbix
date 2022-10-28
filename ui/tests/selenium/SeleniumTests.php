@@ -111,6 +111,10 @@ require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItemPrototyp
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
 
+// Problems.
+require_once dirname(__FILE__).'/problems/testFormUpdateProblem.php';
+require_once dirname(__FILE__).'/problems/testPageProblems.php';
+
 // Proxies.
 require_once dirname(__FILE__).'/proxies/testFormAdministrationProxies.php';
 require_once dirname(__FILE__).'/proxies/testPageAdministrationProxies.php';
@@ -162,7 +166,7 @@ require_once dirname(__FILE__).'/users/testPageUsers.php';
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
-require_once dirname(__FILE__).'/testPageProblems.php';
+
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
@@ -349,6 +353,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormPreprocessingLowLevelDiscovery');
 		$suite->addTestSuite('testFormPreprocessingTest');
 
+		// Problems.
+		$suite->addTestSuite('testPageProblems');
+		$suite->addTestSuite('testFormUpdateProblem');
+
 		// Proxies.
 		$suite->addTestSuite('testFormAdministrationProxies');
 		$suite->addTestSuite('testPageAdministrationProxies');
@@ -409,7 +417,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationScripts');
 		$suite->addTestSuite('testPageEventCorrelation');
 		$suite->addTestSuite('testPageGraphPrototypes');
-		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageHostGraph');
 		$suite->addTestSuite('testPageInventory');

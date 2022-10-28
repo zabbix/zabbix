@@ -181,8 +181,8 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 #define ZBX_POSTGRESQL_MIN_VERSION_FRIENDLY		"10.9"
 #define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION		130000
 #define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_FRIENDLY	"13.0"
-#define ZBX_POSTGRESQL_MAX_VERSION			149999
-#define ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY		"14.x"
+#define ZBX_POSTGRESQL_MAX_VERSION			159999
+#define ZBX_POSTGRESQL_MAX_VERSION_FRIENDLY		"15.x"
 
 #define ZBX_ORACLE_MIN_VERSION				1201000200
 #define ZBX_ORACLE_MIN_VERSION_FRIENDLY			"Database 12c Release 12.01.00.02.x"
@@ -206,8 +206,8 @@ int		zbx_db_strlen_n(const char *text_loc, size_t maxlen);
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION 			20001
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY 		"2.0.1"
 #define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT	20000
-#define ZBX_TIMESCALE_MAX_VERSION				20799
-#define ZBX_TIMESCALE_MAX_VERSION_FRIENDLY			"2.7"
+#define ZBX_TIMESCALE_MAX_VERSION				20899
+#define ZBX_TIMESCALE_MAX_VERSION_FRIENDLY			"2.8"
 #define ZBX_TIMESCALE_LICENSE_APACHE				"apache"
 #define ZBX_TIMESCALE_LICENSE_APACHE_FRIENDLY			"TimescaleDB Apache 2 Edition"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
@@ -295,6 +295,9 @@ struct zbx_db_version_info_t
 
 	char			*ext_lic;
 	zbx_db_ext_err_code_t	ext_err_code;
+
+	int			history_compressed_chunks;
+	int			trends_compressed_chunks;
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
@@ -302,6 +305,7 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info);
 void	zbx_tsdb_set_compression_availability(int compression_availabile);
 int	zbx_tsdb_get_compression_availability(void);
+void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info);
 #endif
 
 #ifdef HAVE_MYSQL
