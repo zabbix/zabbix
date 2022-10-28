@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:36:52Z'
+  date: '2022-10-28T15:25:13Z'
   template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -14,7 +14,7 @@ zabbix_export:
         MIBs used:
         UCD-DISKIO-MIB
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Modules
@@ -142,7 +142,7 @@ zabbix_export:
         HOST-RESOURCES-MIB
         UCD-SNMP-MIB
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Modules
@@ -655,7 +655,7 @@ zabbix_export:
         HOST-RESOURCES-MIB
         UCD-SNMP-MIB
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Modules
@@ -941,7 +941,7 @@ zabbix_export:
         
           Description: Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Modules
