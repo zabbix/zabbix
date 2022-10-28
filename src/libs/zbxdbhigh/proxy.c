@@ -20,23 +20,6 @@
 #include "zbxdbhigh.h"
 
 #include "log.h"
-#include "zbxsysinfo.h"
-#include "zbxserver.h"
-#include "zbxtasks.h"
-#include "zbxdiscovery.h"
-#include "zbxalgo.h"
-#include "preproc.h"
-#include "zbxcrypto.h"
-#include "../zbxkvs/kvs.h"
-#include "zbxlld.h"
-#include "events.h"
-#include "../zbxvault/vault.h"
-#include "zbxavailability.h"
-#include "zbxcommshigh.h"
-#include "zbxnum.h"
-#include "zbxtime.h"
-#include "zbxip.h"
-#include "version.h"
 #include "zbxversion.h"
 
 void	calc_timestamp(const char *line, int *timestamp, const char *format)
