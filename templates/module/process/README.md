@@ -35,8 +35,8 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$PROC.NAME.MATCHES} |<p>This macro is used in the discovery of processes. Can be overridden on a host-level or on a linked template-level.</p> |`<CHANGE VALUE>` |
-|{$PROC.NAME.NOT_MATCHES} |<p>This macro is used in the discovery of processes. Can be overridden on a host-level or on a linked template-level.</p> |`<CHANGE VALUE>` |
+|{$PROC.NAME.MATCHES} |<p>This macro is used in the discovery of processes. It can be overridden on a host-level or on a linked template-level.</p> |`<CHANGE VALUE>` |
+|{$PROC.NAME.NOT_MATCHES} |<p>This macro is used in the discovery of processes. It can be overridden on a host-level or on a linked template-level.</p> |`<CHANGE VALUE>` |
 
 ## Template links
 
