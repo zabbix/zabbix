@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-26T07:19:51Z'
+  date: '2022-10-28T13:02:38Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -387,7 +387,7 @@ zabbix_export:
                       };
                   
                       if (typeof input !== 'object' || typeof input.items === 'undefined') {
-                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + input);
+                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + value);
                           throw 'Incorrect JSON. Check debug log for more information.';
                       }
                   
@@ -1899,7 +1899,7 @@ zabbix_export:
                           output = [];
                   
                       if (typeof input !== 'object' || typeof input.items === 'undefined') {
-                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + input);
+                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + value);
                           throw 'Incorrect JSON. Check debug log for more information.';
                       }
                   
