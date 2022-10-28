@@ -63,7 +63,15 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 		// Create host for items and triggers.
 		$hosts = CDataHelper::call('host.create', [
 			'host' => 'Host for Reports Trigger',
-			'groups' => [['groupid' => $groupid]]
+			'groups' => [['groupid' => $groupid]],
+			'interfaces' => [
+				'type'=> 1,
+				'main' => 1,
+				'useip' => 1,
+				'ip' => '192.168.3.1',
+				'dns' => '',
+				'port' => '10050'
+			]
 		]);
 
 		$this->assertArrayHasKey('hostids', $hosts);
