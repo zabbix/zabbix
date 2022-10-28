@@ -371,7 +371,7 @@ class CLdap {
 					}
 				}
 
-				$user[$key] = $groups;
+				$user[$this->cnf['group_membership']] = $groups;
 			}
 			else {
 				$user[$key] = $value[0];

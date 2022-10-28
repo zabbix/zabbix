@@ -241,15 +241,17 @@ class CProvisioning {
 	 */
 	public function getUserAttributes(array $idp_user): array {
 		$user = [];
+		$user_idp_fields = array_filter([
+			'name' => $this->userdirectory['user_username'],
+			'surname' => $this->userdirectory['user_lastname']
+		], 'strlen');
 
-		if ($this->userdirectory['user_username'] !== ''
-				&& array_key_exists($this->userdirectory['user_username'], $idp_user)) {
-			$user['name'] = $idp_user[$this->userdirectory['user_username']];
-		}
+		foreach ($user_idp_fields as $user_field => $idp_field) {
+			$value = array_intersect_key($idp_user, [$idp_field => '', strtolower($idp_field) => '']);
 
-		if ($this->userdirectory['user_lastname'] !== ''
-				&& array_key_exists($this->userdirectory['user_lastname'], $idp_user)) {
-			$user['surname'] = $idp_user[$this->userdirectory['user_lastname']];
+			if ($value) {
+				$user[$user_field] = reset($value);
+			}
 		}
 
 		return $user;
