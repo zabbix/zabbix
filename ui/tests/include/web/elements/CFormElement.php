@@ -536,6 +536,6 @@ class CFormElement extends CElement {
 	 * @return boolean
 	 */
 	public function isRequired($label) {
-		return $this->getLabel($label)->isAttributePresent(['class' => 'form-label-asterisk']);
+		return $this->getLabel($label)->hasClass('form-label-asterisk');
 	}
 }
