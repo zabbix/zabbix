@@ -24,6 +24,7 @@ package udp
 
 import (
 	"errors"
+	"os"
 	"net"
 	"strconv"
 
@@ -157,7 +158,7 @@ func netStatUdpCount(laddres net.IP, lNet *net.IPNet, lport int, raddres net.IP,
 
 		return true
 	})
-	if err != nil {
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return 0, err
 	}
 

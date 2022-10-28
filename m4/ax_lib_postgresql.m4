@@ -52,7 +52,7 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
     PG_CONFIG="no"
 
     AC_ARG_WITH([postgresql],
-        AC_HELP_STRING([--with-postgresql@<:@=ARG@:>@],
+        AS_HELP_STRING([--with-postgresql@<:@=ARG@:>@],
             [use PostgreSQL library @<:@default=no@:>@, optionally specify path to pg_config]
         ),
         [
@@ -99,18 +99,14 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
             LIBS="${LIBS} ${POSTGRESQL_LIBS}"
 
             AC_MSG_CHECKING([for PostgreSQL libraries])
-            AC_TRY_LINK(
-[
+            AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <libpq-fe.h>
-],
-[
+]], [[
 PGconn	*conn;
 conn = PQsetdbLogin(NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-],
-            AC_DEFINE([HAVE_POSTGRESQL], [1], [Define to 1 if PostgreSQL libraries are available])
+]])],[AC_DEFINE(HAVE_POSTGRESQL, 1, Define to 1 if PostgreSQL libraries are available)
             found_postgresql="yes"
-            AC_MSG_RESULT(yes),
-            AC_MSG_RESULT(no))
+            AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
             CFLAGS="${_save_postgresql_cflags}"
             LDFLAGS="${_save_postgresql_ldflags}"

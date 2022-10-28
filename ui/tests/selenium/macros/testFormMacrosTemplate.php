@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../common/testFormMacros.php';
 
 /**
@@ -42,8 +43,6 @@ class testFormMacrosTemplate extends testFormMacros {
 			]
 		]);
 	}
-
-	use MacrosTrait;
 
 	/**
 	 * The name of the template for updating macros, id=40000.
@@ -84,7 +83,8 @@ class testFormMacrosTemplate extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateMacrosData
+	 * @dataProvider getUpdateMacrosNormalData
+	 * @dataProvider getUpdateMacrosCommonData
 	 */
 	public function testFormMacrosTemplate_Update($data) {
 		$this->checkMacros($data, 'template', $this->template_name_update, true);
@@ -272,7 +272,8 @@ class testFormMacrosTemplate extends testFormMacros {
 	}
 
 	/**
-	 * @dataProvider getUpdateVaultMacrosData
+	 * @dataProvider getUpdateVaultMacrosNormalData
+	 * @dataProvider getUpdateVaultMacrosCommonData
 	 */
 	public function testFormMacrosTemplate_UpdateVaultMacros($data) {
 		$this->updateVaultMacros($data, 'templates.php?form=update&templateid=99014', 'templates');

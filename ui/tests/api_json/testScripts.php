@@ -875,7 +875,7 @@ class testScripts extends CAPITest {
 
 			// script.delete
 			[
-				// IPMI tpye script with action scope that does not have action.
+				// IPMI type script with action scope that does not have action.
 				'name' => 'API test script.delete - single allowed',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
@@ -908,7 +908,7 @@ class testScripts extends CAPITest {
 				]
 			],
 			[
-				// IPMI tpye script with action scope that has action attached.
+				// IPMI type script with action scope that has action attached.
 				'name' => 'API test script.delete - not allowed due to action',
 				'type' => ZBX_SCRIPT_TYPE_IPMI,
 				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
@@ -3453,7 +3453,7 @@ class testScripts extends CAPITest {
 	 */
 	public static function getScriptGetInvalid() {
 		return [
-			// Check exepected params.
+			// Check expected params.
 			'Test script.get unexpected field' => [
 				'request' => [
 					'abc' => 'abc'
@@ -3621,7 +3621,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search": unexpected parameter "scriptid".'
 			],
 
-			// Check "name" in seach.
+			// Check "name" in search.
 			'Test script.get invalid parameter "name" in search (bool)' => [
 				'request' => [
 					'search' => [
@@ -3632,7 +3632,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search/name": an array is expected.'
 			],
 
-			// Check "command" in seach.
+			// Check "command" in search.
 			'Test script.get invalid parameter "command" in search (bool)' => [
 				'request' => [
 					'search' => [
@@ -3643,7 +3643,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search/command": an array is expected.'
 			],
 
-			// Check "url" in seach.
+			// Check "url" in search.
 			'Test script.get invalid parameter "url" in search (bool)' => [
 				'request' => [
 					'search' => [
@@ -3654,7 +3654,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search/url": an array is expected.'
 			],
 
-			// Check "description" in seach.
+			// Check "description" in search.
 			'Test script.get invalid parameter "description" in search (bool)' => [
 				'request' => [
 					'search' => [
@@ -3665,7 +3665,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search/description": an array is expected.'
 			],
 
-			// Check "confirmation" in seach.
+			// Check "confirmation" in search.
 			'Test script.get invalid parameter "confirmation" in search (bool)' => [
 				'request' => [
 					'search' => [
@@ -3676,7 +3676,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search/confirmation": an array is expected.'
 			],
 
-			// Check "username" in seach.
+			// Check "username" in search.
 			'Test script.get invalid parameter "username" in search (bool)' => [
 				'request' => [
 					'search' => [
@@ -3687,7 +3687,7 @@ class testScripts extends CAPITest {
 				'expected_error' => 'Invalid parameter "/search/username": an array is expected.'
 			],
 
-			// Check "menu_path" in seach.
+			// Check "menu_path" in search.
 			'Test script.get invalid parameter "menu_path" in search (bool)' => [
 				'request' => [
 					'search' => [
@@ -6470,7 +6470,7 @@ class testScripts extends CAPITest {
 								}
 							}
 							else {
-								// Chekc that parameters remain the same. Order is not important.
+								// Check that parameters remain the same. Order is not important.
 								$this->assertEqualsCanonicalizing($db_script['parameters'], $script_upd['parameters']);
 							}
 							break;

@@ -172,7 +172,9 @@ class CDashboardElement extends CElement {
 		$controls = $this->getControls();
 
 		if ($controls->query('xpath:.//nav[@class="dashboard-edit"]')->one()->isDisplayed()) {
-			$controls->query('id:dashboard-save')->one()->waitUntilClickable()->click(true);
+			$button = $controls->query('id:dashboard-save')->one()->waitUntilClickable();
+			$button->getLocationOnScreenOnceScrolledIntoView();
+			$button->click();
 			$controls->query('xpath:.//nav[@class="dashboard-edit"]')->waitUntilNotVisible();
 		}
 
@@ -279,5 +281,17 @@ class CDashboardElement extends CElement {
 		$this->query('xpath://ul[@role="menu"]')->asPopupMenu()->one()->select('Add page');
 
 		return $this;
+	}
+
+	/**
+	 * Select dashboard page by name.
+	 *
+	 * @param string	$name		page name to be selected
+	 * @param integer	$index		expected number of pages with the provided name
+	 */
+	public function selectPage($name, $index = 1) {
+		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($name).']';
+		$this->query('xpath:('.$selection.')['.$index.']')->waitUntilClickable()->one()->click();
+		$this->query('xpath:'.$selection.'/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
 	}
 }

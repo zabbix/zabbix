@@ -175,7 +175,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, zbx_uint64_t *hostid,
 		zbx_uint64_t *revision, char *error)
 {
-#define PROXY_AUTO_REGISTRATION_HEARTBEAT	120
+#define AUTO_REGISTRATION_HEARTBEAT	120
 	char	*ch_error;
 	int	ret = FAIL, heartbeat;
 
@@ -196,11 +196,6 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		goto out;
 	}
 
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		heartbeat = PROXY_AUTO_REGISTRATION_HEARTBEAT;
-	else
-		heartbeat = 0;
-
 	/* if host does not exist then check autoregistration connection permissions */
 	if (0 == *hostid)
 	{
@@ -211,7 +206,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 			if (SUCCEED == zbx_autoreg_host_check_permissions(host, ip, port, sock))
 			{
 				if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface,
-						(int)time(NULL), heartbeat))
+						(int)time(NULL), AUTO_REGISTRATION_HEARTBEAT))
 				{
 					db_register_host(host, ip, port, sock->connection_type, host_metadata, flag,
 							interface);
@@ -221,6 +216,11 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 
 		goto out;
 	}
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		heartbeat = AUTO_REGISTRATION_HEARTBEAT;
+	else
+		heartbeat = 0;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER) || 0 != DCget_auto_registration_action_count())
 	{

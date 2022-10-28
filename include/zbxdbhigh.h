@@ -796,6 +796,7 @@ int	zbx_db_trigger_get_itemid(const ZBX_DB_TRIGGER *trigger, int index, zbx_uint
 void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
 
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
+void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
 
 #define ZBX_MAX_HRECORDS	1000
 #define ZBX_MAX_HRECORDS_TOTAL	10000

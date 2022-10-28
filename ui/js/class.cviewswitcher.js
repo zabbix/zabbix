@@ -146,7 +146,7 @@ CViewSwitcher.prototype = {
 			return null;
 		}
 
-		switch (obj.tagName.toLowerCase) {
+		switch (obj.tagName.toLowerCase()) {
 			case 'select':
 				return (obj.selectedIndex > -1) ? obj.options[obj.selectedIndex].value : null;
 

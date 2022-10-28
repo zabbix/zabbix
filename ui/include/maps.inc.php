@@ -715,11 +715,14 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		$problems_by_trigger[$problem['objectid']][] = $problem;
 	}
 
-	foreach ($selements as &$selement) {
-		$selement['triggers'] = array_map(function ($trigger) use ($problems_by_trigger, $selement) {
+	foreach ($selements as $num => $selement) {
+		foreach ($selement['triggers'] as $trigger) {
+			if ($trigger['status'] == TRIGGER_STATUS_DISABLED) {
+				continue;
+			}
+
 			$filtered_problems = $problems_by_trigger[$trigger['triggerid']];
 
-			// Check if $filtered_problems tags match $selement filter tags.
 			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
 					|| $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
 				$filtered_problems = getProblemsMatchingTags($filtered_problems, $selement['tags'],
@@ -727,12 +730,9 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				);
 			}
 
-			$trigger['problems'] = $filtered_problems;
-
-			return $trigger;
-		}, $selement['triggers']);
+			$selements[$num]['triggers'][$trigger['triggerid']]['problems'] = $filtered_problems;
+		}
 	}
-	unset($selement);
 
 	$info = [];
 
@@ -804,41 +804,39 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 				continue;
 			}
 
-			if (array_key_exists('problems', $trigger)) {
-				foreach ($trigger['problems'] as $problem) {
-					if ($problem['r_clock'] == 0) {
-						$i['problem']++;
+			foreach ($trigger['problems'] as $problem) {
+				if ($problem['r_clock'] == 0) {
+					$i['problem']++;
 
-						if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
-							$i['problem_unack']++;
-						}
+					if ($problem['acknowledged'] == EVENT_NOT_ACKNOWLEDGED) {
+						$i['problem_unack']++;
+					}
 
-						if (!$critical_problem || $critical_problem['severity'] < $problem['severity']) {
-							$critical_problem = $problem;
-						}
-						elseif ($critical_problem['severity'] === $problem['severity']) {
-							if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
-								if ($critical_problem['objectid'] === $problem['objectid']
-										&& $critical_problem['eventid'] < $problem['eventid']) {
-									$critical_problem = $problem;
-								}
-								elseif (array_search($critical_problem['objectid'], $trigger_order)
-										> array_search($problem['objectid'], $trigger_order)) {
-									$critical_problem = $problem;
-								}
+					if (!$critical_problem || $critical_problem['severity'] < $problem['severity']) {
+						$critical_problem = $problem;
+					}
+					elseif ($critical_problem['severity'] === $problem['severity']) {
+						if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+							if ($critical_problem['objectid'] === $problem['objectid']
+									&& $critical_problem['eventid'] < $problem['eventid']) {
+								$critical_problem = $problem;
 							}
-							elseif ($critical_problem['eventid'] < $problem['eventid']) {
+							elseif (array_search($critical_problem['objectid'], $trigger_order)
+									> array_search($problem['objectid'], $trigger_order)) {
 								$critical_problem = $problem;
 							}
 						}
+						elseif ($critical_problem['eventid'] < $problem['eventid']) {
+							$critical_problem = $problem;
+						}
 					}
+				}
 
-					if ($problem['r_clock'] > $lately_changed) {
-						$lately_changed = $problem['r_clock'];
-					}
-					elseif ($problem['clock'] > $lately_changed) {
-						$lately_changed = $problem['clock'];
-					}
+				if ($problem['r_clock'] > $lately_changed) {
+					$lately_changed = $problem['r_clock'];
+				}
+				elseif ($problem['clock'] > $lately_changed) {
+					$lately_changed = $problem['clock'];
 				}
 			}
 

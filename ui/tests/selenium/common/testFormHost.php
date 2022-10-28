@@ -1968,7 +1968,7 @@ class testFormHost extends CWebTest {
 				->query($this->monitoring ? 'tag:a' : "xpath:.//a[@onclick]")->waitUntilClickable();
 
 		if ($this->monitoring) {
-			$host_link->asPopupButton()->one()->select('Configuration');
+			$host_link->asPopupButton()->one()->select('Host');
 		}
 		else {
 			$host_link->one()->click();
@@ -2094,12 +2094,16 @@ class testFormHost extends CWebTest {
 
 					$expected_tags = [
 						[
-							'tag' => 'discovered',
-							'value' => 'true'
+							'tag' => 'action',
+							'value' => 'update'
 						],
 						[
-							'tag' => 'host',
-							'value' => 'no'
+							'tag' => 'tag without value',
+							'value' => ''
+						],
+						[
+							'tag' => 'test',
+							'value' => 'update'
 						]
 					];
 					$tags_table->checkValue($expected_tags);

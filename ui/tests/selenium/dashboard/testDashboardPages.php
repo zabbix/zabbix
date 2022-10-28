@@ -18,9 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+
+use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * @backup dashboard
@@ -554,6 +557,11 @@ class testDashboardPages extends CWebTest {
 		// Check that Delete option is disabled when one page left.
 		$page_menu = $this->getPageMenu('Page 1');
 		$this->assertTrue($page_menu->query('xpath:.//a[@aria-label="Actions, Delete"]')->one()->isEnabled(false));
+
+		// Press Escape key to close page menu before saving the dashboard.
+		$this->page->pressKey(WebDriverKeys::ESCAPE);
+		$page_menu->waitUntilNotVisible();
+
 		$dashboard->save();
 		$this->assertEquals(['Page 1'], $this->getPagesTitles());
 	}
@@ -679,25 +687,11 @@ class testDashboardPages extends CWebTest {
 
 		$value = $this->query('xpath:('.$selector.']/../../div)['.$index.']')->waitUntilVisible()->one()->getAttribute('class');
 		if ($value !== 'selected-tab') {
-			$this->selectPage($page_name, $index);
+			CDashboardElement::find()->one()->selectPage($page_name, $index);
 		}
 		$this->query('xpath:('.$selector.']/following-sibling::button)['.$index.']')->waitUntilClickable()->one()->click();
 
 		return CPopupMenuElement::find()->waitUntilVisible()->one();
-	}
-
-	/**
-	 * Select page by name.
-	 *
-	 * @param string $page_name		page name where to open menu
-	 * @param integer $index		number of page that has duplicated name
-	 */
-	private function selectPage($page_name, $index = 1) {
-		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name);
-		$this->query('xpath:('.$selection.'])['.$index.']')
-				->one()->click()->waitUntilReady();
-		$this->query('xpath:'.$selection.']/../../div[@class="selected-tab"]')
-				->one()->waitUntilPresent();
 	}
 
 	/**

@@ -93,6 +93,18 @@ ZBX_DC_FUNCTION;
 
 typedef struct
 {
+	zbx_vector_uint64_pair_t	dep_itemids;
+}
+ZBX_DC_MASTERITEM;
+
+typedef struct
+{
+	zbx_vector_ptr_t	preproc_ops;
+}
+ZBX_DC_PREPROCITEM;
+
+typedef struct
+{
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		interfaceid;
@@ -121,6 +133,8 @@ typedef struct
 	unsigned char		queue_priority;
 	unsigned char		update_triggers;
 	zbx_uint64_t		templateid;
+	ZBX_DC_PREPROCITEM	*preproc_item;
+	ZBX_DC_MASTERITEM	*master_item;
 
 	zbx_vector_ptr_t	tags;
 }
@@ -260,21 +274,6 @@ ZBX_DC_CALCITEM;
 
 typedef struct
 {
-	zbx_uint64_t			itemid;
-	zbx_vector_uint64_pair_t	dep_itemids;
-}
-ZBX_DC_MASTERITEM;
-
-typedef struct
-{
-	zbx_uint64_t		itemid;
-	int			update_time;
-	zbx_vector_ptr_t	preproc_ops;
-}
-ZBX_DC_PREPROCITEM;
-
-typedef struct
-{
 	zbx_uint64_t	itemid;
 	const char	*timeout;
 	const char	*url;
@@ -391,7 +390,7 @@ typedef struct
 						/* 'config->interfaces' hashset */
 
 	zbx_vector_dc_httptest_ptr_t	httptests;
-	zbx_vector_dc_item_ptr_t	active_items;
+	zbx_vector_dc_item_ptr_t	items;
 }
 ZBX_DC_HOST;
 
@@ -603,6 +602,7 @@ typedef struct
 							/* disabled then trigger is counted as disabled) */
 	double		required_performance;		/* required performance of server (values per second) */
 	time_t		last_update;
+	int		sync_ts;
 }
 ZBX_DC_STATUS;
 
@@ -879,8 +879,6 @@ typedef struct
 	zbx_hashset_t		simpleitems;
 	zbx_hashset_t		jmxitems;
 	zbx_hashset_t		calcitems;
-	zbx_hashset_t		masteritems;
-	zbx_hashset_t		preprocitems;
 	zbx_hashset_t		httpitems;
 	zbx_hashset_t		scriptitems;
 	zbx_hashset_t		functions;

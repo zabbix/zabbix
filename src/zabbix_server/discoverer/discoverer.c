@@ -33,10 +33,9 @@
 #include "zbxtime.h"
 #include "zbxip.h"
 #include "zbxsysinfo.h"
+#include "zbx_rtc_constants.h"
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 
@@ -835,16 +834,16 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	double				sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time, nextcheck = 0;
 	zbx_ipc_async_socket_t		rtc;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(discoverer_args_in->zbx_get_program_type_cb_arg()), server_num,
 			get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -906,7 +905,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			last_stat_time = time(NULL);
 		}
 
-		if (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 #ifdef HAVE_NETSNMP
 			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/testDocumentationLinks.php';
 require_once dirname(__FILE__).'/testGeneric.php';
 require_once dirname(__FILE__).'/testExecuteNow.php';
@@ -25,7 +26,8 @@ require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
-require_once dirname(__FILE__).'/testPageProblems.php';
+require_once dirname(__FILE__).'/problems/testFormUpdateProblem.php';
+require_once dirname(__FILE__).'/problems/testPageProblems.php';
 require_once dirname(__FILE__).'/testPageActions.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
@@ -114,6 +116,7 @@ require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosAdministrationGeneral.php';
+require_once dirname(__FILE__).'/macros/testFormMacrosDiscoveredHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
@@ -129,9 +132,13 @@ require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
 require_once dirname(__FILE__).'/services/testFormServicesServices.php';
 require_once dirname(__FILE__).'/services/testPageServicesServices.php';
 require_once dirname(__FILE__).'/services/testPageServicesServicesMassUpdate.php';
+require_once dirname(__FILE__).'/sla/testFormServicesSla.php';
+require_once dirname(__FILE__).'/sla/testPageServicesSla.php';
+require_once dirname(__FILE__).'/sla/testPageServicesSlaReport.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
+require_once dirname(__FILE__).'/tags/testFormTagsDiscoveredHost.php';
 require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
 require_once dirname(__FILE__).'/tags/testFormTagsHostPrototype.php';
 require_once dirname(__FILE__).'/tags/testFormTagsServices.php';
@@ -193,8 +200,10 @@ require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardItemValueWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardSlaReportWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardTopHostsWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardTriggerOverviewWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
 require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
@@ -236,6 +245,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageEventCorrelation');
 		$suite->addTestSuite('testPageGraphPrototypes');
 		$suite->addTestSuite('testPageProblems');
+		$suite->addTestSuite('testFormUpdateProblem');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageHostGraph');
 		$suite->addTestSuite('testPageHostInterfaces');
@@ -255,8 +265,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMassUpdateItems');
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMonitoringHosts');
-		$suite->addTestSuite('testPageServicesServices');
-		$suite->addTestSuite('testPageServicesServicesMassUpdate');
 		$suite->addTestSuite('testPageNetworkDiscovery');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
@@ -269,6 +277,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageReportsSystemInformation');
 		$suite->addTestSuite('testPageReportsTriggerTop');
 		$suite->addTestSuite('testPageSearch');
+		$suite->addTestSuite('testPageServicesServices');
+		$suite->addTestSuite('testPageServicesServicesMassUpdate');
+		$suite->addTestSuite('testPageServicesSla');
+		$suite->addTestSuite('testPageServicesSlaReport');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageTemplates');
 		$suite->addTestSuite('testPageUserGroups');
@@ -321,12 +333,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormLowLevelDiscovery');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormMacrosAdministrationGeneral');
+		$suite->addTestSuite('testFormMacrosDiscoveredHost');
 		$suite->addTestSuite('testFormMacrosHost');
 		$suite->addTestSuite('testFormMacrosHostPrototype');
 		$suite->addTestSuite('testFormMacrosTemplate');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
-		$suite->addTestSuite('testFormServicesServices');
 		$suite->addTestSuite('testFormNetworkDiscovery');
 		$suite->addTestSuite('testFormPreprocessingCloneHost');
 		$suite->addTestSuite('testFormPreprocessingCloneTemplate');
@@ -334,9 +346,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormPreprocessingItemPrototype');
 		$suite->addTestSuite('testFormPreprocessingLowLevelDiscovery');
 		$suite->addTestSuite('testFormPreprocessingTest');
+		$suite->addTestSuite('testFormServicesServices');
+		$suite->addTestSuite('testFormServicesSla');
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTabIndicators');
+		$suite->addTestSuite('testFormTagsDiscoveredHost');
 		$suite->addTestSuite('testFormTagsHost');
 		$suite->addTestSuite('testFormTagsHostPrototype');
 		$suite->addTestSuite('testFormTagsServices');
@@ -397,8 +412,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
+		$suite->addTestSuite('testDashboardSlaReportWidget');
 		$suite->addTestSuite('testDashboardSystemInformationWidget');
 		$suite->addTestSuite('testDashboardTopHostsWidget');
+		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardPages');
 		$suite->addTestSuite('testDashboardViewMode');
 		$suite->addTestSuite('testFormTemplateDashboards');
