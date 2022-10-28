@@ -906,7 +906,7 @@ class CItem extends CItemGeneral {
 		$db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
-			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+			], array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])),
 			'filter' => [
 				'hostid' => $templateids,
 				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
