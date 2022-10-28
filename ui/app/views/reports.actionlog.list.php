@@ -45,7 +45,7 @@ $filter_actions = (new CCheckBoxList('filter_statuses'))
 	->setId('filter_status')
 	->addClass(ZBX_STYLE_COLUMNS)
 	->addClass(ZBX_STYLE_COLUMNS_3)
-	->setWidth(360)//TODO is this ok?
+	->setWidth(360)
 	->setOptions($filter_status_options);
 
 $widget = (new CWidget())
