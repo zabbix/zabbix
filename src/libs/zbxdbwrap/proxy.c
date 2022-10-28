@@ -41,7 +41,6 @@
 #include "zbxversion.h"
 
 extern char	*CONFIG_SERVER;
-extern char	*CONFIG_VAULTDBPATH;
 
 /* the space reserved in json buffer to hold at least one record plus service data */
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
@@ -121,90 +120,6 @@ static zbx_history_table_t	areg = {
 		{NULL}
 		}
 };
-
-/******************************************************************************
- *                                                                            *
- * Purpose:                                                                   *
- *     Check access rights to a passive proxy for the given connection and    *
- *     send a response if denied.                                             *
- *                                                                            *
- * Parameters:                                                                *
- *     sock           - [IN] connection socket context                        *
- *     send_response  - [IN] to send or not to send a response to server.     *
- *                          Value: ZBX_SEND_RESPONSE or                       *
- *                          ZBX_DO_NOT_SEND_RESPONSE                          *
- *     req            - [IN] request, included into error message             *
- *     zbx_config_tls - [IN] configured requirements to allow access          *
- *                                                                            *
- * Return value:                                                              *
- *     SUCCEED - access is allowed                                            *
- *     FAIL    - access is denied                                             *
- *                                                                            *
- ******************************************************************************/
-int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		const zbx_config_tls_t *zbx_config_tls)
-{
-	char	*msg = NULL;
-
-	if (FAIL == zbx_tcp_check_allowed_peers(sock, CONFIG_SERVER))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: %s", req, sock->peer,
-				zbx_socket_strerror());
-
-		if (ZBX_SEND_RESPONSE == send_response)
-			zbx_send_proxy_response(sock, FAIL, "connection is not allowed", CONFIG_TIMEOUT);
-
-		return FAIL;
-	}
-
-	if (0 == (zbx_config_tls->accept_modes & sock->connection_type))
-	{
-		msg = zbx_dsprintf(NULL, "%s over connection of type \"%s\" is not allowed", req,
-				zbx_tcp_connection_type_name(sock->connection_type));
-
-		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" by proxy configuration parameter \"TLSAccept\"",
-				msg, sock->peer);
-
-		if (ZBX_SEND_RESPONSE == send_response)
-			zbx_send_proxy_response(sock, FAIL, msg, CONFIG_TIMEOUT);
-
-		zbx_free(msg);
-		return FAIL;
-	}
-
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
-	{
-		if (SUCCEED == zbx_check_server_issuer_subject(sock, zbx_config_tls->server_cert_issuer,
-				zbx_config_tls->server_cert_subject, &msg))
-		{
-			return SUCCEED;
-		}
-
-		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: %s", req, sock->peer, msg);
-
-		if (ZBX_SEND_RESPONSE == send_response)
-			zbx_send_proxy_response(sock, FAIL, "certificate issuer or subject mismatch", CONFIG_TIMEOUT);
-
-		zbx_free(msg);
-		return FAIL;
-	}
-	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
-	{
-		if (0 != (ZBX_PSK_FOR_PROXY & zbx_tls_get_psk_usage()))
-			return SUCCEED;
-
-		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: it used PSK which is not"
-				" configured for proxy communication with server", req, sock->peer);
-
-		if (ZBX_SEND_RESPONSE == send_response)
-			zbx_send_proxy_response(sock, FAIL, "wrong PSK used", CONFIG_TIMEOUT);
-
-		return FAIL;
-	}
-#endif
-	return SUCCEED;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -424,6 +339,90 @@ int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *pro
 
 /******************************************************************************
  *                                                                            *
+ * Purpose:                                                                   *
+ *     Check access rights to a passive proxy for the given connection and    *
+ *     send a response if denied.                                             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     sock           - [IN] connection socket context                        *
+ *     send_response  - [IN] to send or not to send a response to server.     *
+ *                          Value: ZBX_SEND_RESPONSE or                       *
+ *                          ZBX_DO_NOT_SEND_RESPONSE                          *
+ *     req            - [IN] request, included into error message             *
+ *     zbx_config_tls - [IN] configured requirements to allow access          *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - access is allowed                                            *
+ *     FAIL    - access is denied                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
+		const zbx_config_tls_t *zbx_config_tls)
+{
+	char	*msg = NULL;
+
+	if (FAIL == zbx_tcp_check_allowed_peers(sock, CONFIG_SERVER))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: %s", req, sock->peer,
+				zbx_socket_strerror());
+
+		if (ZBX_SEND_RESPONSE == send_response)
+			zbx_send_proxy_response(sock, FAIL, "connection is not allowed", CONFIG_TIMEOUT);
+
+		return FAIL;
+	}
+
+	if (0 == (zbx_config_tls->accept_modes & sock->connection_type))
+	{
+		msg = zbx_dsprintf(NULL, "%s over connection of type \"%s\" is not allowed", req,
+				zbx_tcp_connection_type_name(sock->connection_type));
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" by proxy configuration parameter \"TLSAccept\"",
+				msg, sock->peer);
+
+		if (ZBX_SEND_RESPONSE == send_response)
+			zbx_send_proxy_response(sock, FAIL, msg, CONFIG_TIMEOUT);
+
+		zbx_free(msg);
+		return FAIL;
+	}
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+	{
+		if (SUCCEED == zbx_check_server_issuer_subject(sock, zbx_config_tls->server_cert_issuer,
+				zbx_config_tls->server_cert_subject, &msg))
+		{
+			return SUCCEED;
+		}
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: %s", req, sock->peer, msg);
+
+		if (ZBX_SEND_RESPONSE == send_response)
+			zbx_send_proxy_response(sock, FAIL, "certificate issuer or subject mismatch", CONFIG_TIMEOUT);
+
+		zbx_free(msg);
+		return FAIL;
+	}
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	{
+		if (0 != (ZBX_PSK_FOR_PROXY & zbx_tls_get_psk_usage()))
+			return SUCCEED;
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: it used PSK which is not"
+				" configured for proxy communication with server", req, sock->peer);
+
+		if (ZBX_SEND_RESPONSE == send_response)
+			zbx_send_proxy_response(sock, FAIL, "wrong PSK used", CONFIG_TIMEOUT);
+
+		return FAIL;
+	}
+#endif
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - no interface availability has been changed           *
  *                                                                            *
@@ -549,166 +548,6 @@ out:
 	zbx_free(tmp);
 
 	return ret;
-}
-
-typedef struct
-{
-	zbx_uint64_t	id;
-	zbx_uint64_t	itemid;
-	zbx_uint64_t	lastlogsize;
-	size_t		source_offset;
-	size_t		value_offset;
-	int		clock;
-	int		ns;
-	int		timestamp;
-	int		severity;
-	int		logeventid;
-	int		mtime;
-	unsigned char	state;
-	unsigned char	flags;
-}
-zbx_history_data_t;
-
-/******************************************************************************
- *                                                                            *
- * Purpose: read proxy history data from the database                         *
- *                                                                            *
- * Parameters: lastid             - [IN] the id of last processed proxy       *
- *                                       history record                       *
- *             data               - [IN/OUT] the proxy history data buffer    *
- *             data_alloc         - [IN/OUT] the size of proxy history data   *
- *                                           buffer                           *
- *             string_buffer      - [IN/OUT] the string buffer                *
- *             string_buffer_size - [IN/OUT] the size of string buffer        *
- *             more               - [OUT] set to ZBX_PROXY_DATA_MORE if there *
- *                                        might be more data to read          *
- *                                                                            *
- * Return value: The number of records read.                                  *
- *                                                                            *
- ******************************************************************************/
-static int	proxy_get_history_data(zbx_uint64_t lastid, zbx_history_data_t **data, size_t *data_alloc,
-		char **string_buffer, size_t *string_buffer_alloc, int *more)
-{
-
-	DB_RESULT		result;
-	DB_ROW			row;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0, data_num = 0;
-	size_t			string_buffer_offset = 0;
-	zbx_uint64_t		id;
-	int			retries = 1, total_retries = 10;
-	struct timespec		t_sleep = { 0, 100000000L }, t_rem;
-	zbx_history_data_t	*hd;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
-
-try_again:
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select id,itemid,clock,ns,timestamp,source,severity,"
-				"value,logeventid,state,lastlogsize,mtime,flags"
-			" from proxy_history"
-			" where id>" ZBX_FS_UI64
-			" order by id",
-			lastid);
-
-	result = DBselectN(sql, ZBX_MAX_HRECORDS - data_num);
-
-	zbx_free(sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(id, row[0]);
-
-		if (1 < id - lastid)
-		{
-			/* At least one record is missing. It can happen if some DB syncer process has */
-			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
-			if (0 < retries--)
-			{
-				/* limit the number of total retries to avoid being stuck */
-				/* in history full of 'holes' for a long time             */
-				if (0 >= total_retries--)
-					break;
-
-				DBfree_result(result);
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
-						" Waiting " ZBX_FS_DBL " sec, retrying.",
-						__func__, id - lastid - 1,
-						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
-				nanosleep(&t_sleep, &t_rem);
-				goto try_again;
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. No more retries.",
-						__func__, id - lastid - 1);
-			}
-		}
-
-		retries = 1;
-
-		if (*data_alloc == data_num)
-		{
-			*data_alloc *= 2;
-			*data = (zbx_history_data_t *)zbx_realloc(*data, sizeof(zbx_history_data_t) * *data_alloc);
-		}
-
-		hd = *data + data_num++;
-		hd->id = id;
-		ZBX_STR2UINT64(hd->itemid, row[1]);
-		ZBX_STR2UCHAR(hd->flags, row[12]);
-		hd->clock = atoi(row[2]);
-		hd->ns = atoi(row[3]);
-
-		if (PROXY_HISTORY_FLAG_NOVALUE != (hd->flags & PROXY_HISTORY_MASK_NOVALUE))
-		{
-			ZBX_STR2UCHAR(hd->state, row[9]);
-
-			if (0 == (hd->flags & PROXY_HISTORY_FLAG_NOVALUE))
-			{
-				size_t	len1, len2;
-
-				hd->timestamp = atoi(row[4]);
-				hd->severity = atoi(row[6]);
-				hd->logeventid = atoi(row[8]);
-
-				len1 = strlen(row[5]) + 1;
-				len2 = strlen(row[7]) + 1;
-
-				if (*string_buffer_alloc < string_buffer_offset + len1 + len2)
-				{
-					while (*string_buffer_alloc < string_buffer_offset + len1 + len2)
-						*string_buffer_alloc += ZBX_KIBIBYTE;
-
-					*string_buffer = (char *)zbx_realloc(*string_buffer, *string_buffer_alloc);
-				}
-
-				hd->source_offset = string_buffer_offset;
-				memcpy(*string_buffer + hd->source_offset, row[5], len1);
-				string_buffer_offset += len1;
-
-				hd->value_offset = string_buffer_offset;
-				memcpy(*string_buffer + hd->value_offset, row[7], len2);
-				string_buffer_offset += len2;
-			}
-
-			if (0 != (hd->flags & PROXY_HISTORY_FLAG_META))
-			{
-				ZBX_STR2UINT64(hd->lastlogsize, row[10]);
-				hd->mtime = atoi(row[11]);
-			}
-		}
-
-		lastid = id;
-	}
-	DBfree_result(result);
-
-	if (ZBX_MAX_HRECORDS != data_num && 1 == retries)
-		*more = ZBX_PROXY_DATA_DONE;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data_num:" ZBX_FS_SIZE_T, __func__, data_num);
-
-	return data_num;
 }
 
 static void	proxy_get_lastid(const char *table_name, const char *lastidfield, zbx_uint64_t *lastid)
@@ -884,116 +723,163 @@ try_again:
 			(zbx_fs_size_t)j->buffer_offset);
 }
 
-int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+typedef struct
 {
-	int		records_num = 0;
 	zbx_uint64_t	id;
-
-	proxy_get_lastid(dht.table, dht.lastidfield, &id);
-
-	/* get history data in batches by ZBX_MAX_HRECORDS records and stop if: */
-	/*   1) there are no more data to read                                  */
-	/*   2) we have retrieved more than the total maximum number of records */
-	/*   3) we have gathered more than half of the maximum packet size      */
-	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
-	{
-		proxy_get_history_data_simple(j, ZBX_PROTO_TAG_DISCOVERY_DATA, &dht, lastid, &id, &records_num, more);
-
-		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL <= records_num)
-			break;
-	}
-
-	if (0 != records_num)
-		zbx_json_close(j);
-
-	return records_num;
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	lastlogsize;
+	size_t		source_offset;
+	size_t		value_offset;
+	int		clock;
+	int		ns;
+	int		timestamp;
+	int		severity;
+	int		logeventid;
+	int		mtime;
+	unsigned char	state;
+	unsigned char	flags;
 }
-
-int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
-{
-	int		records_num = 0;
-	zbx_uint64_t	id;
-
-	proxy_get_lastid(areg.table, areg.lastidfield, &id);
-
-	/* get history data in batches by ZBX_MAX_HRECORDS records and stop if: */
-	/*   1) there are no more data to read                                  */
-	/*   2) we have retrieved more than the total maximum number of records */
-	/*   3) we have gathered more than half of the maximum packet size      */
-	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
-	{
-		proxy_get_history_data_simple(j, ZBX_PROTO_TAG_AUTOREGISTRATION, &areg, lastid, &id, &records_num,
-				more);
-
-		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL <= records_num)
-			break;
-	}
-
-	if (0 != records_num)
-		zbx_json_close(j);
-
-	return records_num;
-}
-
-int	proxy_get_host_active_availability(struct zbx_json *j)
-{
-	zbx_ipc_message_t	response;
-	int			records_num = 0;
-
-	zbx_ipc_message_init(&response);
-	zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA, 0, 0, &response);
-
-	if (0 != response.size)
-	{
-		zbx_vector_proxy_hostdata_ptr_t	hostdata;
-
-		zbx_vector_proxy_hostdata_ptr_create(&hostdata);
-		zbx_availability_deserialize_hostdata(response.data, &hostdata);
-		zbx_availability_serialize_json_hostdata(&hostdata, j);
-
-		records_num = hostdata.values_num;
-
-		zbx_vector_proxy_hostdata_ptr_clear_ext(&hostdata, (zbx_proxy_hostdata_ptr_free_func_t)zbx_ptr_free);
-		zbx_vector_proxy_hostdata_ptr_destroy(&hostdata);
-	}
-
-	zbx_ipc_message_clean(&response);
-
-	return records_num;
-}
+zbx_history_data_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get the number of values waiting to be sent to the server         *
+ * Purpose: read proxy history data from the database                         *
  *                                                                            *
- * Return value: the number of history values                                 *
+ * Parameters: lastid             - [IN] the id of last processed proxy       *
+ *                                       history record                       *
+ *             data               - [IN/OUT] the proxy history data buffer    *
+ *             data_alloc         - [IN/OUT] the size of proxy history data   *
+ *                                           buffer                           *
+ *             string_buffer      - [IN/OUT] the string buffer                *
+ *             string_buffer_size - [IN/OUT] the size of string buffer        *
+ *             more               - [OUT] set to ZBX_PROXY_DATA_MORE if there *
+ *                                        might be more data to read          *
+ *                                                                            *
+ * Return value: The number of records read.                                  *
  *                                                                            *
  ******************************************************************************/
-int	proxy_get_history_count(void)
+static int	proxy_get_history_data(zbx_uint64_t lastid, zbx_history_data_t **data, size_t *data_alloc,
+		char **string_buffer, size_t *string_buffer_alloc, int *more)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	id;
-	int		count = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0, data_num = 0;
+	size_t			string_buffer_offset = 0;
+	zbx_uint64_t		id;
+	int			retries = 1, total_retries = 10;
+	struct timespec		t_sleep = { 0, 100000000L }, t_rem;
+	zbx_history_data_t	*hd;
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
-	proxy_get_lastid("proxy_history", "history_lastid", &id);
-
-	result = DBselect(
-			"select count(*)"
+try_again:
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select id,itemid,clock,ns,timestamp,source,severity,"
+				"value,logeventid,state,lastlogsize,mtime,flags"
 			" from proxy_history"
-			" where id>" ZBX_FS_UI64,
-			id);
+			" where id>" ZBX_FS_UI64
+			" order by id",
+			lastid);
 
-	if (NULL != (row = DBfetch(result)))
-		count = atoi(row[0]);
+	result = DBselectN(sql, ZBX_MAX_HRECORDS - data_num);
 
+	zbx_free(sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(id, row[0]);
+
+		if (1 < id - lastid)
+		{
+			/* At least one record is missing. It can happen if some DB syncer process has */
+			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
+			if (0 < retries--)
+			{
+				/* limit the number of total retries to avoid being stuck */
+				/* in history full of 'holes' for a long time             */
+				if (0 >= total_retries--)
+					break;
+
+				DBfree_result(result);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
+						" Waiting " ZBX_FS_DBL " sec, retrying.",
+						__func__, id - lastid - 1,
+						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
+				nanosleep(&t_sleep, &t_rem);
+				goto try_again;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. No more retries.",
+						__func__, id - lastid - 1);
+			}
+		}
+
+		retries = 1;
+
+		if (*data_alloc == data_num)
+		{
+			*data_alloc *= 2;
+			*data = (zbx_history_data_t *)zbx_realloc(*data, sizeof(zbx_history_data_t) * *data_alloc);
+		}
+
+		hd = *data + data_num++;
+		hd->id = id;
+		ZBX_STR2UINT64(hd->itemid, row[1]);
+		ZBX_STR2UCHAR(hd->flags, row[12]);
+		hd->clock = atoi(row[2]);
+		hd->ns = atoi(row[3]);
+
+		if (PROXY_HISTORY_FLAG_NOVALUE != (hd->flags & PROXY_HISTORY_MASK_NOVALUE))
+		{
+			ZBX_STR2UCHAR(hd->state, row[9]);
+
+			if (0 == (hd->flags & PROXY_HISTORY_FLAG_NOVALUE))
+			{
+				size_t	len1, len2;
+
+				hd->timestamp = atoi(row[4]);
+				hd->severity = atoi(row[6]);
+				hd->logeventid = atoi(row[8]);
+
+				len1 = strlen(row[5]) + 1;
+				len2 = strlen(row[7]) + 1;
+
+				if (*string_buffer_alloc < string_buffer_offset + len1 + len2)
+				{
+					while (*string_buffer_alloc < string_buffer_offset + len1 + len2)
+						*string_buffer_alloc += ZBX_KIBIBYTE;
+
+					*string_buffer = (char *)zbx_realloc(*string_buffer, *string_buffer_alloc);
+				}
+
+				hd->source_offset = string_buffer_offset;
+				memcpy(*string_buffer + hd->source_offset, row[5], len1);
+				string_buffer_offset += len1;
+
+				hd->value_offset = string_buffer_offset;
+				memcpy(*string_buffer + hd->value_offset, row[7], len2);
+				string_buffer_offset += len2;
+			}
+
+			if (0 != (hd->flags & PROXY_HISTORY_FLAG_META))
+			{
+				ZBX_STR2UINT64(hd->lastlogsize, row[10]);
+				hd->mtime = atoi(row[11]);
+			}
+		}
+
+		lastid = id;
+	}
 	DBfree_result(result);
 
-	DBclose();
+	if (ZBX_MAX_HRECORDS != data_num && 1 == retries)
+		*more = ZBX_PROXY_DATA_DONE;
 
-	return count;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() data_num:" ZBX_FS_SIZE_T, __func__, data_num);
+
+	return data_num;
 }
 
 /******************************************************************************
@@ -1179,6 +1065,84 @@ int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() lastid:" ZBX_FS_UI64 " records_num:%d size:~" ZBX_FS_SIZE_T " more:%d",
 			__func__, *lastid, records_num, j->buffer_offset, *more);
+
+	return records_num;
+}
+
+int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+{
+	int		records_num = 0;
+	zbx_uint64_t	id;
+
+	proxy_get_lastid(dht.table, dht.lastidfield, &id);
+
+	/* get history data in batches by ZBX_MAX_HRECORDS records and stop if: */
+	/*   1) there are no more data to read                                  */
+	/*   2) we have retrieved more than the total maximum number of records */
+	/*   3) we have gathered more than half of the maximum packet size      */
+	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
+	{
+		proxy_get_history_data_simple(j, ZBX_PROTO_TAG_DISCOVERY_DATA, &dht, lastid, &id, &records_num, more);
+
+		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL <= records_num)
+			break;
+	}
+
+	if (0 != records_num)
+		zbx_json_close(j);
+
+	return records_num;
+}
+
+int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+{
+	int		records_num = 0;
+	zbx_uint64_t	id;
+
+	proxy_get_lastid(areg.table, areg.lastidfield, &id);
+
+	/* get history data in batches by ZBX_MAX_HRECORDS records and stop if: */
+	/*   1) there are no more data to read                                  */
+	/*   2) we have retrieved more than the total maximum number of records */
+	/*   3) we have gathered more than half of the maximum packet size      */
+	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
+	{
+		proxy_get_history_data_simple(j, ZBX_PROTO_TAG_AUTOREGISTRATION, &areg, lastid, &id, &records_num,
+				more);
+
+		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL <= records_num)
+			break;
+	}
+
+	if (0 != records_num)
+		zbx_json_close(j);
+
+	return records_num;
+}
+
+int	proxy_get_host_active_availability(struct zbx_json *j)
+{
+	zbx_ipc_message_t	response;
+	int			records_num = 0;
+
+	zbx_ipc_message_init(&response);
+	zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA, 0, 0, &response);
+
+	if (0 != response.size)
+	{
+		zbx_vector_proxy_hostdata_ptr_t	hostdata;
+
+		zbx_vector_proxy_hostdata_ptr_create(&hostdata);
+		zbx_availability_deserialize_hostdata(response.data, &hostdata);
+		zbx_availability_serialize_json_hostdata(&hostdata, j);
+
+		records_num = hostdata.values_num;
+
+		zbx_vector_proxy_hostdata_ptr_clear_ext(&hostdata, (zbx_proxy_hostdata_ptr_free_func_t)zbx_ptr_free);
+		zbx_vector_proxy_hostdata_ptr_destroy(&hostdata);
+	}
+
+	zbx_ipc_message_clean(&response);
 
 	return records_num;
 }
@@ -2778,6 +2742,40 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the number of values waiting to be sent to the server         *
+ *                                                                            *
+ * Return value: the number of history values                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	proxy_get_history_count(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	id;
+	int		count = 0;
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	proxy_get_lastid("proxy_history", "history_lastid", &id);
+
+	result = DBselect(
+			"select count(*)"
+			" from proxy_history"
+			" where id>" ZBX_FS_UI64,
+			id);
+
+	if (NULL != (row = DBfetch(result)))
+		count = atoi(row[0]);
+
+	DBfree_result(result);
+
+	DBclose();
+
+	return count;
 }
 
 /******************************************************************************
