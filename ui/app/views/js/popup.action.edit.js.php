@@ -449,12 +449,8 @@ window.action_edit_popup = new class {
 						}
 						else {
 							Array.from(rows).forEach(row => {
-								let esc_step_from = row
-									.getElementsByTagName('td')[0]
-									.getElementsByTagName('input')[3].value;
-								let esc_step_to = row
-									.getElementsByTagName('td')[0]
-									.getElementsByTagName('input')[4].value;
+								let esc_step_from = row.querySelector("input[id*='esc_step_from']").value;
+								let esc_step_to = row.querySelector("input[id*='esc_step_to']").value;
 								row_id = row.id;
 
 								const existing_combined = esc_step_from === esc_step_to
