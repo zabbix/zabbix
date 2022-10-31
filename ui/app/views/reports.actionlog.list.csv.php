@@ -56,7 +56,6 @@ foreach ($data['alerts'] as $alert) {
 	$recipients_name = '';
 	$recipients_surname = '';
 
-
 	if (isset($alert['userid']) && $alert['userid']) {
 		$recipients_username = $data['users'][$alert['userid']]['username'];
 		$recipients_name = $data['users'][$alert['userid']]['name'];
