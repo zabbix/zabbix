@@ -52,11 +52,151 @@ $form_list = (new CFormList())
 			->setAttribute('autofocus', 'autofocus')
 	);
 
+$remove_button = (new CButton(null, _('Remove')))
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->addClass('js-remove');
+
+$condition_tag_template = (new CScriptTemplate('condition-tag-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol('#{label}'))
+			->addClass('label')
+			->setAttribute('data-conditiontype', '#{conditiontype}')
+			->setAttribute('data-formulaid', '#{label}'),
+		(new CCol([
+			'#{condition_name}', ' ',
+			(new CLabel('#{data}'))->addStyle('font-style: italic')
+		]))
+			->addClass('wordwrap')
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		(new CCol([
+			$remove_button,
+			(new CInput('hidden'))
+				->setAttribute('value', '#{conditiontype}')
+				->setName('conditions[#{row_index}][type]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{operator}')
+				->setName('conditions[#{row_index}][operator]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{tag}')
+				->setName('conditions[#{row_index}][tag]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{label}')
+				->setName('conditions[#{row_index}][formulaid]')
+		]))
+	]))->setAttribute('data-row_index','#{row_index}')
+);
+
+$condition_hostgroup_template = (new CScriptTemplate('condition-hostgr-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol('#{label}'))
+			->addClass('label')
+			->setAttribute('data-conditiontype', '#{conditiontype}')
+			->setAttribute('data-formulaid', '#{label}'),
+		(new CCol([
+			'#{condition_name}', ' ',
+			(new CLabel('#{data}'))->addStyle('font-style: italic')
+		]))
+			->addClass('wordwrap')
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		(new CCol([
+			$remove_button,
+			(new CInput('hidden'))
+				->setAttribute('value', '#{conditiontype}')
+				->setName('conditions[#{row_index}][type]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{operator}')
+				->setName('conditions[#{row_index}][operator]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{groupid}')
+				->setName('conditions[#{row_index}][groupid]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{label}')
+				->setName('conditions[#{row_index}][formulaid]')
+		]))
+	]))->setAttribute('data-row_index','#{row_index}')
+);
+
+$condition_tag_pair_template = (new CScriptTemplate('condition-tag-pair-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol('#{label}'))
+			->addClass('label')
+			->setAttribute('data-conditiontype', '#{conditiontype}')
+			->setAttribute('data-formulaid', '#{label}'),
+		(new CCol([
+			'#{condition_name}', ' ',
+			(new CLabel('#{data}'))->addStyle('font-style: italic'), ' ',
+			'#{condition_operator}', ' ',  '#{condition_name2}', ' ',
+			(new CLabel('#{data_new_tag}'))->addStyle('font-style: italic')
+		]))
+			->addClass('wordwrap')
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		(new CCol([
+			$remove_button,
+			(new CInput('hidden'))
+				->setAttribute('value', '#{conditiontype}')
+				->setName('conditions[#{row_index}][type]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{operator}')
+				->setName('conditions[#{row_index}][operator]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{oldtag}')
+				->setName('conditions[#{row_index}][oldtag]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{newtag}')
+				->setName('conditions[#{row_index}][newtag]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{label}')
+				->setName('conditions[#{row_index}][formulaid]')
+		]))
+	]))->setAttribute('data-row_index','#{row_index}')
+);
+
+$condition_old_new_tag_template = (new CScriptTemplate('condition-old-new-tag-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol('#{label}'))
+			->addClass('label')
+			->setAttribute('data-conditiontype', '#{conditiontype}')
+			->setAttribute('data-formulaid', '#{label}'),
+		(new CCol([
+			'#{condition_name}', ' ',
+			(new CLabel('#{tag}'))->addStyle('font-style: italic'), ' ',
+			'#{condition_operator}', ' ',
+			(new CLabel('#{value}'))->addStyle('font-style: italic')
+		]))
+			->addClass('wordwrap')
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		(new CCol([
+			$remove_button,
+			(new CInput('hidden'))
+				->setAttribute('value', '#{conditiontype}')
+				->setName('conditions[#{row_index}][type]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{operator}')
+				->setName('conditions[#{row_index}][operator]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{tag}')
+				->setName('conditions[#{row_index}][tag]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{value}')
+				->setName('conditions[#{row_index}][value]'),
+			(new CInput('hidden'))
+				->setAttribute('value', '#{label}')
+				->setName('conditions[#{row_index}][formulaid]')
+		]))
+	]))->setAttribute('data-row_index','#{row_index}')
+);
+
 // Create condition table.
 $condition_table = (new CTable(_('No conditions defined.')))
 	->setId('condition_table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Label'), _('Name'), _('Action')]);
+	->setHeader([_('Label'), _('Name'), _('Action')])
+	->addItem([
+		$condition_tag_template,
+		$condition_hostgroup_template,
+		$condition_tag_pair_template,
+		$condition_old_new_tag_template
+	]);
 
 $i = 0;
 

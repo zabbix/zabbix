@@ -119,10 +119,11 @@
 						element.label = num2letter(element.row_index);
 						element.groupid = key;
 						input.row_index ++;
+						let template = new Template(document.getElementById('condition-hostgr-row-tmpl').innerHTML)
 
 						document
 							.querySelector('#condition_table tbody')
-							.insertAdjacentHTML('beforeend', initHostGroupTemplate().evaluate(element))
+							.insertAdjacentHTML('beforeend', template.evaluate(element))
 					}
 					this.processTypeOfCalculation();
 				}
@@ -141,7 +142,7 @@
 				switch (parseInt(input.type)) {
 					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG?>:
 					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG?>:
-						template = initTagTemplate();
+						template = new Template(document.getElementById('condition-tag-row-tmpl').innerHTML);
 						break;
 
 					case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?> :
@@ -149,7 +150,7 @@
 						input.condition_operator = getConditionName(input)[2];
 						input.data_old_tag = getConditionName(input)[3];
 						input.data_new_tag = getConditionName(input)[4];
-						template = initTagPairTemplate();
+						template = new Template(document.getElementById('condition-tag-pair-row-tmpl').innerHTML);
 						break;
 
 					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
@@ -158,7 +159,7 @@
 						input.condition_operator = getConditionName(input)[1];
 						input.tag = getConditionName(input)[2];
 						input.value = getConditionName(input)[3];
-						template = initOldNewTagTemplate();
+						template = new Template(document.getElementById('condition-old-new-tag-row-tmpl').innerHTML);
 						break;
 				}
 				input.condition_name = getConditionName(input)[0];
@@ -269,118 +270,6 @@
 				value2 = input.value;
 				return [condition_name, operator, value, value2];
 		}
-	}
-
-	function initTagTemplate() {
-		return new Template(`
-			<tr data-row_index="#{row_index}">
-				<td class="label" data-conditiontype="#{conditiontype}" data-formulaid= "#{label}">#{label}</td>
-				<td
-					class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{condition_name}
-					<em> #{data} </em>
-				</td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove">
-							<?= _('Remove') ?>
-							</button>
-						</li>
-						<li>
-							<input type="hidden" name="conditions[#{row_index}][type]" value="#{conditiontype}">
-							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
-							<input type="hidden" name="conditions[#{row_index}][tag]" value="#{tag}">
-							<input type="hidden" name="conditions[#{row_index}][formulaid]" value="#{label}">
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-	}
-
-	function initHostGroupTemplate() {
-		return new Template(`
-			<tr data-row_index="#{row_index}">
-				<td class="label" data-conditiontype="#{conditiontype}" data-formulaid= "#{label}">#{label}</td>
-				<td
-					class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{condition_name}
-					<em> #{data} </em>
-				</td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove">
-							<?= _('Remove') ?>
-							</button>
-						</li>
-						<li>
-							<input type="hidden" name="conditions[#{row_index}][type]" value="#{conditiontype}">
-							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
-							<input type="hidden" name="conditions[#{row_index}][groupid]" value="#{groupid}">
-							<input type="hidden" name="conditions[#{row_index}][formulaid]" value="#{label}">
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-	}
-
-	function initTagPairTemplate() {
-		return new Template(`
-			<tr data-row_index="#{row_index}">
-				<td class="label" data-conditiontype="#{conditiontype}" data-formulaid= "#{label}">#{label}</td>
-				<td
-					class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{condition_name}
-					<em> #{data_old_tag} </em>
-					#{condition_operator} #{condition_name2}
-					<em> #{data_new_tag} </em>
-				</td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove">
-							<?= _('Remove') ?>
-							</button>
-						</li>
-						<li>
-							<input type="hidden" name="conditions[#{row_index}][type]" value="#{conditiontype}">
-							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
-							<input type="hidden" name="conditions[#{row_index}][oldtag]" value="#{oldtag}">
-							<input type="hidden" name="conditions[#{row_index}][newtag]" value="#{newtag}">
-							<input type="hidden" name="conditions[#{row_index}][formulaid]" value="#{label}">
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-	}
-
-	function initOldNewTagTemplate() {
-		return new Template(`
-			<tr data-row_index="#{row_index}">
-				<td class="label" data-conditiontype="#{conditiontype}" data-formulaid= "#{label}">#{label}</td>
-				<td
-					class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{condition_name}
-					<em> #{tag} </em> #{condition_operator} <em> #{value} </em>
-				</td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove">
-							<?= _('Remove') ?>
-							</button>
-						</li>
-						<li>
-							<input type="hidden" name="conditions[#{row_index}][type]" value="#{conditiontype}">
-							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
-							<input type="hidden" name="conditions[#{row_index}][tag]" value="#{tag}">
-							<input type="hidden" name="conditions[#{row_index}][value]" value="#{value}">
-							<input type="hidden" name="conditions[#{row_index}][formulaid]" value="#{label}">
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
 	}
 
 	jQuery(document).ready(function() {
