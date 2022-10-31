@@ -368,6 +368,7 @@ class CUser extends CApiService {
 			$this->checkRoles(array_keys($roleids));
 		}
 
+		$this->checkUserdirectories($users);
 		$this->checkUserGroups($users, []);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -576,6 +577,8 @@ class CUser extends CApiService {
 		if ($check_roleids) {
 			$this->checkRoles($check_roleids);
 		}
+
+		$this->checkUserdirectories($users);
 		$this->checkUserGroups($users, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
@@ -699,7 +702,38 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Check for valid user groups. Check is it allowed to have 'password' field empty.
+	 * Check user directories, used in users data, exist.
+	 *
+	 * @param array $users
+	 * @param int   $users[]['userdirectoryid']  (optional)
+	 *
+	 * @throws APIException  if user directory do not exists.
+	 */
+	private function checkUserdirectories(array $users) {
+		$userdirectoryids = array_column($users, 'userdirectoryid', 'userdirectoryid');
+		unset($userdirectoryids[0]);
+
+		if (!$userdirectoryids) {
+			return;
+		}
+
+		$db_userdirectoryids = API::UserDirectory()->get([
+			'output' => [],
+			'userdirectoryids' => $userdirectoryids,
+			'preservekeys' => true
+		]);
+		$ids = array_diff_key($userdirectoryids, $db_userdirectoryids);
+
+		if ($ids) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User directory with ID "%1$s" is not available.',
+				reset($ids))
+			);
+		}
+	}
+
+	/**
+	 * Check for valid user groups.
+	 * Check is it allowed to have 'password' field empty.
 	 *
 	 * @param array $users
 	 * @param array $users[]['passwd']          (optional)
@@ -740,18 +774,23 @@ class CUser extends CApiService {
 		}
 
 		foreach ($users as $user) {
-			if (array_key_exists('userid', $user) && array_key_exists($user['userid'], $db_users)) {
-				$user += $db_users[$user['userid']];
-			}
-
-			if ($user['userdirectoryid']) {
+			// It is allowed to do not have password for provisioned user.
+			if (array_key_exists('userdirectoryid', $user) && $user['userdirectoryid']) {
 				continue;
 			}
 
-			$user += ['passwd' => ''];
+			if (array_key_exists('passwd', $user)) {
+				$passwd = $user['passwd'];
+			}
+			elseif (array_key_exists('userid', $user) && array_key_exists($user['userid'], $db_users)) {
+				$passwd = $db_users[$user['userid']]['passwd'];
+			}
+			else {
+				$passwd = '';
+			}
 
-			// Do not allow empty password for not provisioned users with GROUP_GUI_ACCESS_INTERNAL.
-			if ($user['passwd'] === '' && self::hasInternalAuth($user, $db_usrgrps)) {
+			// Do not allow empty password for users with GROUP_GUI_ACCESS_INTERNAL.
+			if ($passwd === '' && self::hasInternalAuth($user, $db_usrgrps)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect value for field "%1$s": %2$s.', 'passwd', _('cannot be empty'))
 				);
@@ -796,9 +835,13 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Returns true if user has internal authentication type.
+	 * Check does the user belong to at least one group with GROUP_GUI_ACCESS_INTERNAL frontend access.
+	 * Check does the user belong to at least one group with GROUP_GUI_ACCESS_SYSTEM when default frontend access
+	 * is set to GROUP_GUI_ACCESS_INTERNAL.
+	 * If user is without user gorups default frontend access method is checked.
 	 *
 	 * @param array  $user
+	 * @param array  $user['usrgrps']                     (optional)
 	 * @param string $user['usrgrps'][]['usrgrpid']
 	 * @param array  $db_usrgrps
 	 * @param int    $db_usrgrps[usrgrpid]['gui_access']
@@ -811,7 +854,7 @@ class CUser extends CApiService {
 				? GROUP_GUI_ACCESS_INTERNAL
 				: GROUP_GUI_ACCESS_LDAP;
 
-		if (!$user['usrgrps']) {
+		if (!array_key_exists('usrgrps', $user) || !$user['usrgrps']) {
 			return $system_gui_access == GROUP_GUI_ACCESS_INTERNAL;
 		}
 
@@ -1970,9 +2013,12 @@ class CUser extends CApiService {
 				' AND ug.userid='.$userid
 		);
 
+		$has_user_groups = false;
 		$userdirectoryids = [];
 
 		while ($db_usrgrp = DBfetch($db_usrgrps)) {
+			$has_user_groups = true;
+
 			if ($db_usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 				$permissions['debug_mode'] = GROUP_DEBUG_MODE_ENABLED;
 			}
@@ -1999,6 +2045,10 @@ class CUser extends CApiService {
 			))) {
 				$userdirectoryids[$db_usrgrp['userdirectoryid']] = true;
 			}
+		}
+
+		if (!$has_user_groups) {
+			$permissions['gui_access'] = GROUP_GUI_ACCESS_INTERNAL;
 		}
 
 		if ($userdirectoryids) {
