@@ -1014,7 +1014,7 @@ class testFormItem extends CLegacyWebTest {
 					'delay' => 0,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
+						'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
 					]
 				]
 			],
@@ -1040,7 +1040,7 @@ class testFormItem extends CLegacyWebTest {
 					'delay' => 86401,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": value must be one of 0-86400.'
+						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
 					]
 				]
 			],
@@ -1150,7 +1150,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -1189,7 +1189,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": must have at least one interval greater than 0.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -1220,7 +1220,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -1259,7 +1259,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -1288,7 +1288,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -1306,7 +1306,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -1322,7 +1322,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -1338,7 +1338,7 @@ class testFormItem extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
@@ -1422,7 +1422,7 @@ class testFormItem extends CLegacyWebTest {
 					'history' => ' ',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/history": cannot be empty'
+						'Incorrect value for field "history": a time unit is expected.'
 					]
 				]
 			],
@@ -1435,7 +1435,7 @@ class testFormItem extends CLegacyWebTest {
 					'history' => 3599,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
+						'Incorrect value for field "history": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -1448,7 +1448,7 @@ class testFormItem extends CLegacyWebTest {
 					'history' => 788400001,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
+						'Incorrect value for field "history": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
@@ -1461,7 +1461,7 @@ class testFormItem extends CLegacyWebTest {
 					'history' => '-1',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
+						'Incorrect value for field "history": a time unit is expected.'
 					]
 				]
 			],
@@ -1474,7 +1474,7 @@ class testFormItem extends CLegacyWebTest {
 					'trends' => ' ',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/trends": cannot be empty.'
+						'Incorrect value for field "trends": a time unit is expected.'
 					]
 				]
 			],
@@ -1487,7 +1487,7 @@ class testFormItem extends CLegacyWebTest {
 					'trends' => '-1',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
+						'Incorrect value for field "trends": a time unit is expected.'
 					]
 				]
 			],
@@ -1500,7 +1500,7 @@ class testFormItem extends CLegacyWebTest {
 					'trends' => 788400001,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
+						'Incorrect value for field "trends": value must be one of 0, 86400-788400000.'
 					]
 				]
 			],
@@ -1513,7 +1513,7 @@ class testFormItem extends CLegacyWebTest {
 					'trends' => 86399,
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
+						'Incorrect value for field "trends": value must be one of 0, 86400-788400000.'
 					]
 				]
 			],
@@ -1705,7 +1705,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-ipmi-agent-error',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Invalid parameter "/1/ipmi_sensor": cannot be empty.'
+						'Incorrect value for field "ipmi_sensor": cannot be empty.'
 					]
 				]
 			],
@@ -2024,7 +2024,6 @@ class testFormItem extends CLegacyWebTest {
 			}
 		}
 		if (isset($data['formCheck'])) {
-			$this->page->waitUntilReady();
 			$this->zbxTestClickXpath("//form[@name='items']//a[text()='$name']");
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 			$this->zbxTestAssertElementValue('name', $name);

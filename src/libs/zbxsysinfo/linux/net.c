@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxjson.h"
 #include "log.h"
@@ -415,7 +416,7 @@ out:
 	return ret;
 }
 
-int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_stat_t	ns;
 	char		*if_name, *mode, *error;
@@ -460,7 +461,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_stat_t	ns;
 	char		*if_name, *mode, *error;
@@ -505,7 +506,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_stat_t	ns;
 	char		*if_name, *mode, *error;
@@ -546,7 +547,7 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	net_stat_t	ns;
 	char		*if_name, *error;
@@ -570,7 +571,7 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		line[MAX_STRING_LEN], *p;
 	FILE		*f;
@@ -613,7 +614,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		pattern[64], *port_str, *buffer = NULL;
 	unsigned short	port;
@@ -714,7 +715,7 @@ out:
 	return ret;
 }
 
-int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		pattern[64], *port_str, *buffer = NULL;
 	unsigned short	port;
@@ -1160,12 +1161,12 @@ err:
 	return ret;
 }
 
-int	NET_TCP_SOCKET_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_tcp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return net_socket_count(NET_CONN_TYPE_TCP, request, result);
 }
 
-int	NET_UDP_SOCKET_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_udp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return net_socket_count(NET_CONN_TYPE_UDP, request, result);
 }

@@ -532,24 +532,19 @@ class CTemplate extends CHostGeneral {
 			'nopermissions' => true,
 			'preservekeys' => true
 		]);
-
 		if ($del_rules) {
 			CDiscoveryRuleManager::delete(array_keys($del_rules));
 		}
 
 		// delete the items
-		$db_items = DB::select('items', [
-			'output' => ['itemid', 'name'],
-			'filter' => [
-				'hostid' => $templateids,
-				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
-				'type' => CItem::SUPPORTED_ITEM_TYPES
-			],
+		$del_items = API::Item()->get([
+			'output' => [],
+			'templateids' => $templateids,
+			'nopermissions' => true,
 			'preservekeys' => true
 		]);
-
-		if ($db_items) {
-			CItem::deleteForce($db_items);
+		if ($del_items) {
+			CItemManager::delete(array_keys($del_items));
 		}
 
 		// delete host from maps
@@ -621,15 +616,15 @@ class CTemplate extends CHostGeneral {
 			'operationid'=>$delOperationids
 		]);
 
-		// delete web scenarios
-		$db_httptests = DB::select('httptest', [
-			'output' => ['httptestid', 'name'],
-			'filter' => ['hostid' => $templateids],
+		// http tests
+		$delHttpTests = API::HttpTest()->get([
+			'templateids' => $templateids,
+			'output' => ['httptestid'],
+			'nopermissions' => 1,
 			'preservekeys' => true
 		]);
-
-		if ($db_httptests) {
-			CHttpTest::deleteForce($db_httptests);
+		if (!empty($delHttpTests)) {
+			API::HttpTest()->delete(array_keys($delHttpTests), true);
 		}
 
 		// Get host prototype operations from LLD overrides where this template is linked.

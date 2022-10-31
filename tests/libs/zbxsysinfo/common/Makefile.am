@@ -1,8 +1,8 @@
 if AGENT
 AGENT_tests = \
-	SYSTEM_LOCALTIME \
-	WEB_PAGE_GET \
-	VFS_FILE_EXISTS
+	system_localtime \
+	web_page_get \
+	vfs_file_exists
 endif
 
 noinst_PROGRAMS = $(AGENT_tests)
@@ -57,61 +57,61 @@ COMMON_LIB_FILES = \
 
 COMMON_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests
 
-SYSTEM_LOCALTIME_SOURCES = \
-	SYSTEM_LOCALTIME.c \
+system_localtime_SOURCES = \
+	system_localtime.c \
 	$(COMMON_SRC_FILES)
 
-SYSTEM_LOCALTIME_WRAP_FUNCS = \
+system_localtime_WRAP_FUNCS = \
 	-Wl,--wrap=time \
 	-Wl,--wrap=gettimeofday
 
-SYSTEM_LOCALTIME_LDADD = \
+system_localtime_LDADD = \
 	$(COMMON_LIB_FILES)
 
-SYSTEM_LOCALTIME_LDADD += @AGENT_LIBS@
+system_localtime_LDADD += @AGENT_LIBS@
 
-SYSTEM_LOCALTIME_LDFLAGS = @AGENT_LDFLAGS@ $(SYSTEM_LOCALTIME_WRAP_FUNCS)
+system_localtime_LDFLAGS = @AGENT_LDFLAGS@ $(system_localtime_WRAP_FUNCS)
 
-SYSTEM_LOCALTIME_CFLAGS = $(COMMON_COMPILER_FLAGS)
+system_localtime_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-WEB_PAGE_GET_SOURCES = \
-	WEB_PAGE_GET.c \
+web_page_get_SOURCES = \
+	web_page_get.c \
 	$(COMMON_SRC_FILES)
 
 if HAVE_LIBCURL
-WEB_PAGE_GET_WRAP_FUNCS = \
+web_page_get_WRAP_FUNCS = \
 	-Wl,--wrap=curl_easy_init \
 	-Wl,--wrap=curl_easy_setopt \
 	-Wl,--wrap=curl_easy_perform \
 	-Wl,--wrap=curl_easy_cleanup
 else
-WEB_PAGE_GET_WRAP_FUNCS = \
+web_page_get_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_tcp_connect \
 	-Wl,--wrap=zbx_tcp_send_ext \
 	-Wl,--wrap=zbx_tcp_recv_raw_ext \
 	-Wl,--wrap=zbx_tcp_close
 endif
 
-WEB_PAGE_GET_LDADD = \
+web_page_get_LDADD = \
 	$(COMMON_LIB_FILES)
 
-WEB_PAGE_GET_LDADD += @AGENT_LIBS@
+web_page_get_LDADD += @AGENT_LIBS@
 
-WEB_PAGE_GET_LDFLAGS = @AGENT_LDFLAGS@ $(WEB_PAGE_GET_WRAP_FUNCS)
+web_page_get_LDFLAGS = @AGENT_LDFLAGS@ $(web_page_get_WRAP_FUNCS)
 
-WEB_PAGE_GET_CFLAGS = $(COMMON_COMPILER_FLAGS)
+web_page_get_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-VFS_FILE_EXISTS_SOURCES = \
-	VFS_FILE_EXISTS.c \
+vfs_file_exists_SOURCES = \
+	vfs_file_exists.c \
 	$(COMMON_SRC_FILES)
 
-VFS_FILE_EXISTS_LDADD = \
+vfs_file_exists_LDADD = \
 	$(COMMON_LIB_FILES)
 
-VFS_FILE_EXISTS_LDADD += @AGENT_LIBS@
+vfs_file_exists_LDADD += @AGENT_LIBS@
 
-VFS_FILE_EXISTS = @AGENT_LDFLAGS@
+vfs_file_exists = @AGENT_LDFLAGS@
 
-VFS_FILE_EXISTS_CFLAGS = $(COMMON_COMPILER_FLAGS) -I$(top_srcdir)/src/libs/zbxsysinfo/common/
+vfs_file_exists_CFLAGS = $(COMMON_COMPILER_FLAGS) -I$(top_srcdir)/src/libs/zbxsysinfo/common/
 
 endif

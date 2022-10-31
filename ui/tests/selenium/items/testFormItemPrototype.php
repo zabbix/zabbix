@@ -77,7 +77,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'host' => 'Simple form test host',
-					'key' => 'item-prototype-form1[{#KEY}]'
+					'key' => 'item-prototype-form1'
 				]
 			],
 			[
@@ -280,13 +280,13 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'template' => 'Inheritance test template',
-					'key' => 'item-prototype-test1[{#KEY}]'
+					'key' => 'item-prototype-test1'
 				]
 			],
 			[
 				[
 					'host' => 'Template inheritance test host',
-					'key' => 'item-prototype-test1[{#KEY}]'
+					'key' => 'item-prototype-test1'
 				]
 			],
 			[
@@ -484,7 +484,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				[
 					'host' => 'Template inheritance test host',
 					'hostTemplate' => 'Inheritance test template',
-					'key' => 'item-prototype-preprocessing[{#KEY}]',
+					'key' => 'item-prototype-preprocessing',
 					'preprocessing' => true
 				]
 			]
@@ -514,6 +514,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					' AND key_='.zbx_dbstr($data['key'])
 			);
 			$template_info = DBfetch($dbResult);
+
 			$this->assertNotEquals($template_info, null);
 
 			$itemid = $template_info['itemid'];
@@ -1073,18 +1074,17 @@ class testFormItemPrototype extends CLegacyWebTest {
 	// Returns create data
 	public static function create() {
 		return [
-			// #0
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Checksum of $1',
-					'key' => 'vfs.file.cksum[/sbin/shutdown,{#KEY}]',
+					'key' => 'vfs.file.cksum[/sbin/shutdown]',
 					'dbName' => 'Checksum of $1',
 					'dbCheck' => true,
 					'formCheck' =>true
 				]
 			],
-			// #1
+			// Duplicate item
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1092,34 +1092,22 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'key' => 'vfs.file.cksum[/sbin/shutdown]',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/key_": must contain at least one low-level discovery macro.'
+						'Item with key "vfs.file.cksum[/sbin/shutdown]" already exists on'
 					]
 				]
 			],
-			// #2 Duplicate item
+			// Item name is missing
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Checksum of $1',
-					'key' => 'vfs.file.cksum[/sbin/shutdown,{#KEY}]',
-					'error_msg' => 'Cannot add item prototype',
-					'errors' => [
-						'Item prototype with key "vfs.file.cksum[/sbin/shutdown,{#KEY}]" already exists on host'
-					]
-				]
-			],
-			// #3 Item name is missing
-			[
-				[
-					'expected' => TEST_BAD,
-					'key' =>'item-name-missing[{#KEY}]',
+					'key' =>'item-name-missing',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
 						'Incorrect value for field "Name": cannot be empty.'
 					]
 				]
 			],
-			// #4 Item key is missing
+			// Item key is missing
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1130,25 +1118,25 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #5 Empty timedelay
+			// Empty timedelay
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item delay',
-					'key' => 'item-delay-test[{#KEY}]',
+					'key' => 'item-delay-test',
 					'delay' => 0,
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
+						'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
 					]
 				]
 			],
-			// #6 Incorrect timedelay
+			// Incorrect timedelay
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item delay',
-					'key' => 'item-delay-test[{#KEY}]',
+					'key' => 'item-delay-test',
 					'delay' => '-30',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
@@ -1156,25 +1144,25 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #7 Incorrect timedelay
+			// Incorrect timedelay
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item delay',
-					'key' => 'item-delay-test[{#KEY}]',
+					'key' => 'item-delay-test',
 					'delay' => 86401,
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/delay": value must be one of 0-86400.'
+						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
 					]
 				]
 			],
-			// #8 Empty time flex period
+			// Empty time flex period
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-test[{#KEY}]',
+					'key' => 'item-flex-test',
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '']
 					],
@@ -1184,12 +1172,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #9 Incorrect flex period
+			// Incorrect flex period
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-test[{#KEY}]',
+					'key' => 'item-flex-test',
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '1-11,00:00-24:00']
 					],
@@ -1199,12 +1187,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #10 Incorrect flex period
+			// Incorrect flex period
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-test[{#KEY}]',
+					'key' => 'item-flex-test',
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '1-7,00:00-25:00', 'instantCheck' => true]
 					],
@@ -1214,12 +1202,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #11 Incorrect flex period
+			// Incorrect flex period
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-test[{#KEY}]',
+					'key' => 'item-flex-test',
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '1-7,24:00-00:00']
 					],
@@ -1229,12 +1217,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #12 Incorrect flex period
+			// Incorrect flex period
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-test[{#KEY}]',
+					'key' => 'item-flex-test',
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '1,00:00-24:00;2,00:00-24:00']
 					],
@@ -1244,12 +1232,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #13 Multiple flex periods
+			// Multiple flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-test[{#KEY}]',
+					'key' => 'item-flex-test',
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '1,00:00-24:00'],
 						['flexDelay' => 50, 'flexTime' => '2,00:00-24:00'],
@@ -1258,12 +1246,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #14 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-delay[{#KEY}]',
+					'key' => 'item-flex-delay',
 					'flexPeriod' => [
 						['flexDelay' => 0, 'flexTime' => '1,00:00-24:00'],
 						['flexDelay' => 0, 'flexTime' => '2,00:00-24:00'],
@@ -1275,16 +1263,16 @@ class testFormItemPrototype extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
-			// #15 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex1',
-					'key' => 'item-flex-delay1[{#KEY}]',
+					'key' => 'item-flex-delay1',
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '1,00:00-24:00'],
 						['flexDelay' => 50, 'flexTime' => '2,00:00-24:00'],
@@ -1296,12 +1284,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #16 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-delay[{#KEY}]',
+					'key' => 'item-flex-delay',
 					'delay' => 0,
 					'flexPeriod' => [
 						['flexDelay' => 0, 'flexTime' => '1,00:00-24:00'],
@@ -1314,16 +1302,16 @@ class testFormItemPrototype extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/delay": must have at least one interval greater than 0.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
-			// #17 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex2',
-					'key' => 'item-flex-delay2[{#KEY}]',
+					'key' => 'item-flex-delay2',
 					'delay' => 0,
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '1-5,00:00-24:00'],
@@ -1333,78 +1321,78 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #18 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-delay[{#KEY}]',
+					'key' => 'item-flex-delay',
 					'flexPeriod' => [
 						['flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'],
 						['flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00']
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
-			// #19 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-delay3[{#KEY}]',
+					'key' => 'item-flex-delay3',
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '1-5,00:00-24:00'],
 						['flexDelay' => 50, 'flexTime' => '6-7,00:00-24:00']
 					]
 				]
 			],
-			// #20 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-delay4[{#KEY}]',
+					'key' => 'item-flex-delay4',
 					'delay' => 0,
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '1-7,00:00-24:00']
 					]
 				]
 			],
-			// #21 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-delay[{#KEY}]',
+					'key' => 'item-flex-delay',
 					'flexPeriod' => [
 						['flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00']
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
-			// #22 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-delay5[{#KEY}]',
+					'key' => 'item-flex-delay5',
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '1-7,00:00-24:00']
 					]
 				]
 			],
-			// #23 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-delay[{#KEY}]',
+					'key' => 'item-flex-delay',
 					'flexPeriod' => [
 						['flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00'],
 						['flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00'],
@@ -1413,16 +1401,16 @@ class testFormItemPrototype extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
-			// #24 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-delay[{#KEY}]',
+					'key' => 'item-flex-delay',
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '1-5,00:00-24:00'],
 						['flexDelay' => 50, 'flexTime' => '6-7,00:00-24:00'],
@@ -1431,48 +1419,48 @@ class testFormItemPrototype extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
-			// #25 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-delay[{#KEY}]',
+					'key' => 'item-flex-delay',
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '1-7,00:00-24:00'],
 						['flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00']
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
-			// #26 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-delay[{#KEY}]',
+					'key' => 'item-flex-delay',
 					'flexPeriod' => [
 						['flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00'],
 						['flexDelay' => 50, 'flexTime' => '1-7,00:00-24:00']
 					],
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
+						'Item will not be refreshed. Please enter a correct update interval.'
 					]
 				]
 			],
-			// #27 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-delay6[{#KEY}]',
+					'key' => 'item-flex-delay6',
 					'flexPeriod' => [
 						['flexDelay' => 0, 'flexTime' => '1,00:00-24:00', 'remove' => true],
 						['flexDelay' => 0, 'flexTime' => '2,00:00-24:00', 'remove' => true],
@@ -1491,24 +1479,24 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #28 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex',
-					'key' => 'item-flex-delay7[{#KEY}]',
+					'key' => 'item-flex-delay7',
 					'flexPeriod' => [
 						['flexDelay' => 0, 'flexTime' => '1-7,00:00-24:00', 'remove' => true],
 						['flexDelay' => 50, 'flexTime' => '1-7,00:00-24:00']
 					]
 				]
 			],
-			// #29 Delay combined with flex periods
+			// Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex Check',
-					'key' => 'item-flex-delay8[{#KEY}]',
+					'key' => 'item-flex-delay8',
 					'flexPeriod' => [
 						['flexDelay' => 0, 'flexTime' => '1-5,00:00-24:00', 'remove' => true],
 						['flexDelay' => 0, 'flexTime' => '6-7,00:00-24:00', 'remove' => true],
@@ -1519,12 +1507,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #30 Seven flexfields - save OK
+			// Seven flexfields - save OK
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Item flex-maximum save OK',
-					'key' => 'item-flex-maximum-save[{#KEY}]',
+					'key' => 'item-flex-maximum-save',
 					'flexPeriod' => [
 						['flexDelay' => 50, 'flexTime' => '1-7,00:00-24:00'],
 						['flexDelay' => 50, 'flexTime' => '1-7,00:00-24:00'],
@@ -1538,366 +1526,367 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #31 History
+			// History
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item history',
-					'key' => 'item-history-empty[{#KEY}]',
+					'key' => 'item-history-empty',
 					'history' => ' ',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/history": cannot be empty.'
+						'Incorrect value for field "history": a time unit is expected.'
 					]
 				]
 			],
-			// #32 History
+			// History
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item history',
-					'key' => 'item-history-test[{#KEY}]',
+					'key' => 'item-history-test',
 					'history' => 3599,
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
+						'Incorrect value for field "history": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
-			// #33 History
+			// History
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item history',
-					'key' => 'item-history-test[{#KEY}]',
+					'key' => 'item-history-test',
 					'history' => 788400001,
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
+						'Incorrect value for field "history": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
-			// #34 History
+			// History
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item history',
-					'key' => 'item-history-test[{#KEY}]',
+					'key' => 'item-history-test',
 					'history' => '-1',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
+						'Incorrect value for field "history": a time unit is expected.'
 					]
 				]
 			],
-			// #35 Trends
+			// Trends
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item trends',
-					'key' => 'item-trends-empty[{#KEY}]',
+					'key' => 'item-trends-empty',
 					'trends' => ' ',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/trends": cannot be empty.'
+						'Incorrect value for field "trends": a time unit is expected.'
 					]
 				]
 			],
-			// #36 Trends
+			// Trends
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item trends',
-					'key' => 'item-trends-test[{#KEY}]',
+					'key' => 'item-trends-test',
 					'trends' => '-1',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
+						'Incorrect value for field "trends": a time unit is expected.'
 					]
 				]
 			],
-			// #37 Trends
+			// Trends
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item trends',
-					'key' => 'item-trends-test[{#KEY}]',
+					'key' => 'item-trends-test',
 					'trends' => 86399,
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
+						'Incorrect value for field "trends": value must be one of 0, 86400-788400000.'
 					]
 				]
 			],
-			// #38 Trends
+			// Trends
 			[
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Item trends',
-					'key' => 'item-trends-test[{#KEY}]',
+					'key' => 'item-trends-test',
 					'trends' => 788400001,
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
+						'Incorrect value for field "trends": value must be one of 0, 86400-788400000.'
 					]
 				]
 			],
-			// #39
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => '!@#$%^&*()_+-=[]{};:"|,./<>?',
-					'key' => 'item-symbols-test[{#KEY}]',
+					'key' => 'item-symbols-test',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #40
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'itemSimple',
-					'key' => 'key-template-simple[{#KEY}]',
+					'key' => 'key-template-simple',
 					'formCheck' => true,
 					'dbCheck' => true
 				]
 			],
-			// #41
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'itemName',
-					'key' => 'key-template-item[{#KEY}]',
+					'key' => 'key-template-item',
 					'formCheck' => true
 				]
 			],
-			//#42
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'itemTrigger',
-					'key' => 'key-template-trigger[{#KEY}]',
+					'key' => 'key-template-trigger',
 					'formCheck' => true,
 					'dbCheck' => true,
 					'remove' => true
 				]
 			],
-			// #43
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'itemRemove',
-					'key' => 'key-template-remove[{#KEY}]',
+					'key' => 'key-template-remove',
 					'formCheck' => true,
 					'dbCheck' => true,
 					'remove' => true]
 			],
-			// #44 List of all item types
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'itemInheritance',
+					'key' => 'test-item-reuse',
+					'error_msg' => 'Cannot add item prototype',
+					'errors' => [
+						'Item with key "test-item-reuse" already exists on "Simple form test host".'
+					]
+				]
+			],
+			// List of all item types
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Zabbix agent',
 					'name' => 'Zabbix agent',
-					'key' => 'item-zabbix-agent[{#KEY}]',
+					'key' => 'item-zabbix-agent',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #45 Update and custom intervals are hidden if item key is mqtt.get
+			// Update and custom intervals are hidden if item key is mqtt.get
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Zabbix agent (active)',
 					'name' => 'Zabbix agent (active) mqtt',
-					'key' => 'mqtt.get[{#KEY}]',
+					'key' => 'mqtt.get[0]',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #46
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Zabbix agent (active)',
 					'name' => 'Zabbix agent (active)',
-					'key' => 'item-zabbix-agent-active[{#KEY}]',
+					'key' => 'item-zabbix-agent-active',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #47
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Simple check',
 					'name' => 'Simple check',
-					'key' => 'item-simple-check[{#KEY}]',
+					'key' => 'item-simple-check',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #48
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'SNMP agent',
 					'name' => 'SNMP agent',
-					'key' => 'item-snmp-agent[{#KEY}]',
+					'key' => 'item-snmp-agent',
 					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #49
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'SNMP trap',
 					'name' => 'SNMP trap',
-					'key' => 'snmptrap.fallback[{#KEY}]',
+					'key' => 'snmptrap.fallback',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #50
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Zabbix internal',
 					'name' => 'Zabbix internal',
-					'key' => 'item-zabbix-internal[{#KEY}]',
+					'key' => 'item-zabbix-internal',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #51
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Zabbix trapper',
 					'name' => 'Zabbix trapper',
-					'key' => 'item-zabbix-trapper[{#KEY}]',
+					'key' => 'item-zabbix-trapper',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #52
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Zabbix trapper',
 					'name' => 'Zabbix trapper with macro in allowed hosts field',
-					'key' => 'item-zabbix-trapper-macro[{#KEY}]',
+					'key' => 'item-zabbix-trapper-macro',
 					'allowed_hosts' => '{$TEST}',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #53
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Zabbix trapper',
 					'name' => 'Zabbix trapper with macro and ip in allowed hosts field',
-					'key' => 'item-zabbix-trapper-macro-ip[{#KEY}]',
+					'key' => 'item-zabbix-trapper-macro-ip',
 					'allowed_hosts' => '{$MACRO},127.0.0.1',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #54
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'External check',
 					'name' => 'External check',
-					'key' => 'item-external-check[{#KEY}]',
+					'key' => 'item-external-check',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #55
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
-					'key' => 'item-database-monitor[{#KEY}]',
+					'key' => 'item-database-monitor',
 					'params_ap' => 'SELECT * FROM items',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #56
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent',
-					'key' => 'item-ipmi-agent[{#KEY}]',
+					'key' => 'item-ipmi-agent',
 					'ipmi_sensor' => 'ipmi_sensor',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #57
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent with spaces',
-					'key' => 'item-ipmi-agent-spaces[{#KEY}]',
+					'key' => 'item-ipmi-agent-spaces',
 					'ipmi_sensor' => '   ipmi_sensor   ',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #58
+			// IPMI sensor is optional if item key is ipmi.get
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'IPMI agent',
+					'name' => 'IPMI agent with ipmi.get',
+					'key' => 'ipmi.get',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent',
-					'key' => 'item-ssh-agent[{#KEY}]',
+					'key' => 'item-ssh-agent',
 					'username' => 'zabbix',
 					'params_es' => 'executed script',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #59
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent',
-					'key' => 'item-telnet-agent[{#KEY}]',
+					'key' => 'item-telnet-agent',
 					'username' => 'zabbix',
 					'params_es' => 'executed script',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #60
 			[
 				[
 					'expected' => TEST_BAD,
 					'type' => 'IPMI agent',
 					'name' => 'IPMI agent error',
-					'key' => 'item-ipmi-agent-error[{#KEY}]',
+					'key' => 'item-ipmi-agent-error',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'Invalid parameter "/1/ipmi_sensor": cannot be empty.'
+						'Incorrect value for field "ipmi_sensor": cannot be empty.'
 					]
 				]
 			],
-			// #61
 			[
 				[
 					'expected' => TEST_BAD,
 					'type' => 'SSH agent',
 					'name' => 'SSH agent error',
-					'key' => 'item-ssh-agent-error[{#KEY}]',
+					'key' => 'item-ssh-agent-error',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
 						'Incorrect value for field "User name": cannot be empty.',
@@ -1905,13 +1894,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #62
 			[
 				[
 					'expected' => TEST_BAD,
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent error',
-					'key' => 'item-telnet-agent-error[{#KEY}]',
+					'key' => 'item-telnet-agent-error',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
 						'Incorrect value for field "User name": cannot be empty.',
@@ -1919,45 +1907,42 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #63
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
-					'key' => 'proto-jmx-agent[{#KEY}]',
+					'key' => 'proto-jmx-agent',
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
 				]
 			],
-			// #64
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Calculated',
 					'name' => 'Calculated',
-					'key' => 'item-calculated[{#KEY}]',
+					'key' => 'item-calculated',
 					'params_f' => '"formula"',
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
 				]
 			],
-			// #65
 			[
 				[
 					'expected' => TEST_BAD,
 					'type' => 'Calculated',
 					'name' => 'Calculated',
-					'key' => 'item-calculated[{#KEY}]',
+					'key' => 'item-calculated',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
 						'Incorrect value for field "Formula": cannot be empty.'
 					]
 				]
 			],
-			// #66 Empty SQL query
+			// Empty SQL query
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1969,7 +1954,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #67 Default
+			// Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1982,7 +1967,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #68 Default
+			// Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1996,7 +1981,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #69 Default
+			// Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2010,7 +1995,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #70 Default
+			// Default
 			[
 				[
 					'expected' => TEST_BAD,

@@ -117,7 +117,6 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			$result = DBend(true);
 		}
 		catch (Exception $e) {
-			$result = false;
 			DBend(false);
 		}
 
@@ -206,7 +205,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			return false;
 		}
 
-		if (!copyItemsToHosts('hostids', [$src_hostid], false, [$hostid])) {
+		if (!copyItems($src_hostid, $hostid, true)) {
 			return false;
 		}
 

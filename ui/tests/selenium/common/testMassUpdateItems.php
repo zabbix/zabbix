@@ -111,7 +111,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'SNMP agent']
 					],
-					'details' => 'Invalid parameter "/1/snmp_oid": cannot be empty.'
+					'details' => 'Item uses incorrect interface type.'
 				]
 			],
 			[
@@ -124,7 +124,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'TELNET agent']
 					],
-					'details' => 'Invalid parameter "/2/username": cannot be empty.'
+					'details' => 'No authentication user name specified.'
 				]
 			],
 			[
@@ -138,7 +138,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051']
 					],
-					'details' => 'Invalid parameter "/1/username": cannot be empty.'
+					'details' => 'No authentication user name specified.'
 				]
 			],
 			[
@@ -153,7 +153,7 @@ class testMassUpdateItems extends CWebTest{
 						'Authentication method' => ['id' => 'authtype', 'value' => 'Password'],
 						'User name' => ['id' => 'username', 'value' => '']
 					],
-					'details' => 'Invalid parameter "/1/username": cannot be empty.'
+					'details' => 'No authentication user name specified.'
 				]
 			],
 			[
@@ -170,7 +170,7 @@ class testMassUpdateItems extends CWebTest{
 						'Public key file' => ['id' => 'publickey', 'value' => '/path/file1'],
 						'Private key file' => ['id' => 'privatekey', 'value' => '/path/file2']
 					],
-					'details' => 'Invalid parameter "/1/username": cannot be empty.'
+					'details' => 'No authentication user name specified.'
 				]
 			],
 			[
@@ -187,7 +187,7 @@ class testMassUpdateItems extends CWebTest{
 						'Public key file' => ['id' => 'publickey', 'value' => ''],
 						'Private key file' => ['id' => 'privatekey', 'value' => '/path/file2']
 					],
-					'details' => 'Invalid parameter "/1/publickey": cannot be empty.'
+					'details' => 'No public key file specified.'
 				]
 			],
 			[
@@ -204,7 +204,7 @@ class testMassUpdateItems extends CWebTest{
 						'Public key file' => ['id' => 'publickey', 'value' => '/path/file1'],
 						'Private key file' => ['id' => 'privatekey', 'value' => '']
 					],
-					'details' => 'Invalid parameter "/1/privatekey": cannot be empty.'
+					'details' => 'No private key file specified.'
 				]
 			],
 			[
@@ -222,7 +222,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'history', 'value' => '3599']
 						]
 					],
-					'details' => 'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
+					'details' => 'Incorrect value for field "history": value must be one of 0, 3600-788400000.'
 				]
 			],
 			[
@@ -240,7 +240,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'history', 'value' => '1']
 						]
 					],
-					'details' => 'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
+					'details' => 'Incorrect value for field "history": value must be one of 0, 3600-788400000.'
 				]
 			],
 			[
@@ -258,7 +258,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'history', 'value' => '']
 						]
 					],
-					'details' => 'Invalid parameter "/1/history": cannot be empty.'
+					'details' => 'Incorrect value for field "history": a time unit is expected.'
 				]
 			],
 			[
@@ -276,7 +276,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'history', 'value' => '25y']
 						]
 					],
-					'details' => 'Invalid parameter "/1/history": a time unit is expected.'
+					'details' => 'Incorrect value for field "history": a time unit is expected.'
 				]
 			],
 			[
@@ -294,7 +294,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'trends', 'value' => '']
 						]
 					],
-					'details' => 'Invalid parameter "/1/trends": cannot be empty.'
+					'details' => 'Incorrect value for field "trends": a time unit is expected.'
 				]
 			],
 			[
@@ -312,7 +312,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'trends', 'value' => '86399']
 						]
 					],
-					'details' => 'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
+					'details' => 'Incorrect value for field "trends": value must be one of 0, 86400-788400000.'
 				]
 			],
 			[
@@ -330,7 +330,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'trends', 'value' => '1']
 						]
 					],
-					'details' => 'Invalid parameter "/1/trends": value must be one of 0, 86400-788400000.'
+					'details' => 'Incorrect value for field "trends": value must be one of 0, 86400-788400000.'
 				]
 			],
 			[
@@ -348,7 +348,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'trends', 'value' => '25y']
 						]
 					],
-					'details' => 'Invalid parameter "/1/trends": a time unit is expected.'
+					'details' => 'Incorrect value for field "trends": a time unit is expected.'
 				]
 			],
 			[
@@ -362,7 +362,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Zabbix trapper'],
 						'Allowed hosts' => ['id' => 'trapper_hosts', 'value' => 'Zabbix server']
 					],
-					'details' => 'Invalid parameter "/1/trapper_hosts": invalid address range "Zabbix server".'
+					'details' => 'Incorrect value for field "trapper_hosts": invalid address range "Zabbix server".'
 				]
 			],
 			[
@@ -376,7 +376,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Update interval' => ['Delay' => '']
 					],
-					'details' => 'Invalid parameter "/1/delay": cannot be empty.'
+					'details' => 'Incorrect value for field "delay": invalid delay.'
 				]
 			],
 			[
@@ -390,7 +390,8 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Update interval' => ['Delay' => '0']
 					],
-					'details' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
+					'details' => 'Item will not be refreshed. Specified update interval requires having at least '.
+							'one either flexible or scheduling interval.'
 				]
 			],
 			[
@@ -404,7 +405,8 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Update interval' => ['Delay' => '86401']
 					],
-					'details' => 'Invalid parameter "/1/delay": value must be one of 0-86400.'
+					'details' => 'Item will not be refreshed. Update interval should be between 1s and 1d. '.
+							'Also Scheduled/Flexible intervals can be used.'
 				]
 			],
 			[
@@ -495,7 +497,7 @@ class testMassUpdateItems extends CWebTest{
 							]
 						]
 					],
-					'details' => 'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+					'details' => 'Invalid parameter "headers": nonempty key and value pair expected.'
 				]
 			],
 			[
@@ -518,7 +520,7 @@ class testMassUpdateItems extends CWebTest{
 							]
 						]
 					],
-					'details' => 'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+					'details' => 'Invalid parameter "headers": nonempty key and value pair expected.'
 				]
 			],
 			[
@@ -535,7 +537,7 @@ class testMassUpdateItems extends CWebTest{
 						'Request body type' => ['id' => 'post_type', 'value' => 'JSON data'],
 						'Request body' => ['id' => 'posts', 'value' => '"request": "active checks", "host": "host"']
 					],
-					'details' => 'Invalid parameter "/1/posts": JSON is expected.'
+					'details' => 'Invalid parameter "posts": JSON is expected.'
 				]
 			],
 			[
@@ -552,7 +554,7 @@ class testMassUpdateItems extends CWebTest{
 						'Request body type' => ['id' => 'post_type', 'value' => 'XML data'],
 						'Request body' => ['id' => 'posts', 'value' => 'xml version="1.0" encoding="UTF-8"?<zabbix_export></zabbix_export>']
 					],
-					'details' => 'Invalid parameter "/1/posts": (4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
+					'details' => 'Invalid parameter "posts": (4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
 				]
 			],
 			[
@@ -569,7 +571,7 @@ class testMassUpdateItems extends CWebTest{
 						'Request body type' => ['id' => 'post_type', 'value' => 'XML data'],
 						'Request body' => ['id' => 'posts', 'value' => '']
 					],
-					'details' => 'Invalid parameter "/1/posts": cannot be empty.'
+					'details' => 'Invalid parameter "posts": XML is expected.'
 				]
 			],
 			[
@@ -584,7 +586,7 @@ class testMassUpdateItems extends CWebTest{
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
 						'URL' => ['id' => 'url', 'value' => '']
 					],
-					'details' => 'Invalid parameter "/1/url": cannot be empty.'
+					'details' => 'Invalid parameter "/url": cannot be empty.'
 				]
 			],
 			[
@@ -599,7 +601,7 @@ class testMassUpdateItems extends CWebTest{
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.4:10054'],
 						'JMX endpoint' => ['id' => 'jmx_endpoint', 'value' => '']
 					],
-					'details' => 'Invalid parameter "/1/jmx_endpoint": cannot be empty.'
+					'details' => 'Incorrect value for field "jmx_endpoint": cannot be empty.'
 				]
 			],
 			[
@@ -619,7 +621,7 @@ class testMassUpdateItems extends CWebTest{
 						'User name' => ['id' => 'username', 'value' => 'new_test_name'],
 						'Password' => ['id' => 'password', 'value' => '']
 					],
-					'details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
+					'details' => 'Incorrect value for field "username": both username and password should be either present or empty.'
 				]
 			],
 			[
@@ -639,7 +641,7 @@ class testMassUpdateItems extends CWebTest{
 						'User name' => ['id' => 'username', 'value' => ''],
 						'Password' => ['id' => 'password', 'value' => 'new_test_password']
 					],
-					'details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
+					'details' => 'Incorrect value for field "username": both username and password should be either present or empty.'
 				]
 			],
 			[
@@ -653,8 +655,21 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'SNMP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5:10055']
 					],
-					'details' => 'Invalid parameter "/1/snmp_oid": cannot be empty.',
+					'details' => 'No SNMP OID specified.',
 					'interface_text_part' => 'SNMPv3, Context name: zabbix'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names' => [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Dependent item']
+					],
+					'details' => 'Incorrect value for field "master_itemid": cannot be empty.'
 				]
 			],
 			[
@@ -1111,32 +1126,31 @@ class testMassUpdateItems extends CWebTest{
 					]
 				]
 			],
-			// TODO: uncomment or delete after discussion
-//			[
-//				[
-//					'names' => [
-//						'1_Item',
-//						'2_Item'
-//					],
-//					'change' => [
-//						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
-//						'User name' => ['id' => 'username', 'value' => 'telnet_name'],
-//						'Password' => ['id' => 'password', 'value' => 'telnet_password']
-//					]
-//				]
-//			],
-//			[
-//				[
-//					'names' => [
-//						'1_Item',
-//						'2_Item'
-//					],
-//					'change' => [
-//						'Type' => ['id' => 'type', 'value' => 'Calculated'],
-//						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (float)']
-//					]
-//				]
-//			],
+			[
+				[
+					'names' => [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
+						'User name' => ['id' => 'username', 'value' => 'telnet_name'],
+						'Password' => ['id' => 'password', 'value' => 'telnet_password']
+					]
+				]
+			],
+			[
+				[
+					'names' => [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Calculated'],
+						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (float)']
+					]
+				]
+			],
 			[
 				[
 					'names' => [
@@ -1496,7 +1510,7 @@ class testMassUpdateItems extends CWebTest{
 					'Preprocessing steps' => [
 						['type' => 'Custom multiplier', 'parameter_1' => 'abc']
 					],
-					'details' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
+					'details' => 'Incorrect value for field "params": a numeric value is expected.'
 				]
 			],
 			[
@@ -1510,8 +1524,7 @@ class testMassUpdateItems extends CWebTest{
 						['type' => 'Simple change'],
 						['type' => 'Simple change']
 					],
-					'details' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within the '.
-							'combinations of (type)=((9, 10)).'
+					'details' => 'Only one change step is allowed.'
 				]
 			],
 			[
@@ -1524,8 +1537,7 @@ class testMassUpdateItems extends CWebTest{
 					'Preprocessing steps' => [
 						['type' => 'In range', 'parameter_1' => '8', 'parameter_2' => '-8']
 					],
-					'details' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be less than or equal to '.
-							'the value of parameter "/1/preprocessing/1/params/1".'
+					'details' => 'Incorrect value for field "params": "min" value must be less than or equal to "max" value.'
 				]
 			],
 			[
@@ -1538,7 +1550,7 @@ class testMassUpdateItems extends CWebTest{
 					'Preprocessing steps' => [
 						['type' => 'Check for error using regular expression', 'parameter_1' => 'test']
 					],
-					'details' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
+					'details' => 'Incorrect value for field "params": second parameter is expected.'
 				]
 			],
 			[
@@ -1552,8 +1564,7 @@ class testMassUpdateItems extends CWebTest{
 						['type' => 'Discard unchanged'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
 					],
-					'details' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within the '.
-							'combinations of (type)=((19, 20)).'
+					'details' => 'Only one throttling step is allowed.'
 				]
 			],
 			[
@@ -1566,7 +1577,7 @@ class testMassUpdateItems extends CWebTest{
 					'Preprocessing steps' => [
 						['type' => 'Regular expression']
 					],
-					'details' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+					'details' => 'Incorrect value for field "params": first parameter is expected.'
 				]
 			],
 			[
@@ -1584,7 +1595,7 @@ class testMassUpdateItems extends CWebTest{
 							'error_handler' => 'Set error to'
 						]
 					],
-					'details' => 'Invalid parameter "/1/preprocessing/1/error_handler_params": cannot be empty.'
+					'details' => 'Incorrect value for field "error_handler_params": cannot be empty.'
 				]
 			],
 			[

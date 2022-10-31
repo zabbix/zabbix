@@ -227,7 +227,7 @@ static char	*get_commandline(struct kinfo_proc *proc)
 }
 #undef ARGV_START_SIZE
 
-int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int     proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_SIZE	1
 #define ZBX_RSS		2
@@ -491,7 +491,7 @@ out:
 #undef ZBX_SSIZE
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *args;
 	int			proccount = 0, invalid_user = 0, zbx_proc_stat;
@@ -688,7 +688,7 @@ static char	*get_state(struct kinfo_proc *proc)
 	return state;
 }
 
-int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char				*procname, *proccomm, *param, *args;
 	int				count, i, mib[4], mibs, zbx_proc_mode, pagesize, invalid_user = 0;
