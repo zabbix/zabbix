@@ -243,6 +243,7 @@ ZBX_DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 		event->name = zbx_strdup(NULL, (NULL != event_name ? event_name : trigger_description));
 		event->trigger.cache = NULL;
 		event->trigger.url = NULL;
+		event->trigger.url_name = NULL;
 		event->trigger.comments = NULL;
 
 		zbx_substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,

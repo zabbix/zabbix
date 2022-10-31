@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-09-29 21:13+0000\n"
-"Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
+"PO-Revision-Date: 2022-10-27 16:27+0000\n"
+"Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -4339,6 +4339,17 @@ msgstr "Limit czasu połączenia"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Podczas próby połączenia do serwera Zabbix \"%2$s\" przekroczono maksymalny czas połączenia %1$s sekund."
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+"Połączenie z serwerem Zabbix \"%1$s\" nie powiodło się. Możliwe przyczyny:\n"
+"1. Nieprawidłowy \"NodeAddress\" lub \"ListenPort\" w \"zabbix_server.conf\" lub nadpisanie adresu IP/DNS serwera w \"zabbix.conf.php\";\n"
+"2. Nieprawidłowa konfiguracja serwera DNS.\n"
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4349,6 +4360,21 @@ msgstr ""
 "Błąd połączenia z serwerem Zabbix \"%1$s\" . Możliwe przyczyny:\n"
 "1. Nieprawidłowy serwer IP/DNS w pliku \"zabbix.conf.php\";\n"
 "2. Nieprawidłowa konfiguracja serwera DNS.\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
+"Połączenie z serwerem Zabbix \"%1$s\" odrzucone. Możliwe przyczyny:\n"
+"1. Nieprawidłowy \"NodeAddress\" lub \"ListenPort\" w \"zabbix_server.conf\" lub nadpisanie adresu IP/DNS serwera w \"zabbix.conf.php\";\n"
+"2. Zabezpieczenia systemowe (na przykład SELinux) blokuje połączenie;\n"
+"3. Demon serwera Zabbix nie działa;\n"
+"4. Zapora sieciowa blokuje połączenie TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4364,6 +4390,17 @@ msgstr ""
 "2. Zasady bezpieczeństwa (na przykład, SELinux) blokują połączenie;\n"
 "3. Proces Zabbix nie został uruchomiony;\n"
 "4. Zapora sieciowa blokuje połączenia TCP.\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
+"Przekroczono limit czasu połączenie z serwerem Zabbix \"%1$s\". Możliwe przyczyny:\n"
+"1. Nieprawidłowy \"NodeAddress\" lub \"ListenPort\" w \"zabbix_server.conf\" lub nadpisanie adresu IP/DNS serwera w \"zabbix.conf.php\";\n"
+"2. Zapora sieciowa blokuje połączenie TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -10047,6 +10084,10 @@ msgctxt "compact table header"
 msgid "Info"
 msgstr "Info"
 
+#: include/classes/data/CItemData.php:1429
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr "Informacje o dyskach wewnętrznych hiperwizora wymaganych dla vmware.datastore.perfcounter, <url> - URL usługi VMware, <uuid> - nazwa hosta hiperwizora VMware. Zwraca JSON"
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -12144,6 +12185,11 @@ msgstr "UWL wejścia do menu"
 msgid "Menu entry name"
 msgstr "Nazwa wejścia do menu"
 
+#: include/views/configuration.trigger.prototype.edit.php:554
+#: include/views/configuration.triggers.edit.php:576
+msgid "Menu entry name is used as a label for the trigger URL in the event context menu."
+msgstr "Nazwa elementu menu jest używana jako etykieta adresu URL wyzwalacza w menu kontekstowym zdarzenia."
+
 #: app/views/administration.script.edit.php:108
 msgid "Menu path"
 msgstr "Ścieżka menu"
@@ -13909,7 +13955,7 @@ msgstr "Otwórz w nowym oknie"
 
 #: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
 msgid "Open log"
-msgstr ""
+msgstr "Otwórz dziennik"
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -18553,6 +18599,16 @@ msgstr "To ustawienie dotyczy tylko danych liczbowych."
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "To ustawienie dotyczy jedynie danych liczbowych. Dane nieliczbowe będą zawsze pobierane z historii."
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr "To ustawienie powinno być włączone, ponieważ tabele historii zawierają skompresowane dane."
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr "To ustawienie powinno być włączone, ponieważ tabele trendu zawierają skompresowane dane."
+
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
@@ -20290,6 +20346,10 @@ msgstr "Statystyki pojemności magazynu danych VMware w bajtach lub procentach o
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "Lista hipernadzorców magazynu danych VMware, <url> - URL usługi VMware, <datastore> - nazwa magazynu danych"
 
+#: include/classes/data/CItemData.php:1321
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr "Licznik wydajności magazynu danych VMware, <url> - URL usługi VMware, <id> - identyfikator uuid magazynu dancyh VMware, <path> - ścieżka licznika wydajności, <instance> - instancja licznika wydajności"
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr "Właściwość magazynu danych VMware, <url> - adres URL usługi VMware, <uuid> - nazwa magazynu danych, <prop> - ścieżka właściwości"
@@ -21487,6 +21547,17 @@ msgstr "Formularz logowania Zabbix"
 #: app/views/administration.script.edit.php:127
 msgid "Zabbix server"
 msgstr "Serwer Zabbix"
+
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
+"Nie można połączyć się z serwerem Zabbix \"%1$s\". Możliwe przyczyny:\n"
+"1. Nieprawidłowy \"NodeAddress\" lub \"ListenPort\" w \"zabbix_server.conf\" lub nadpisanie adresu IP/DNS serwera w \"zabbix.conf.php\";\n"
+"2. Nieprawidłowa konfiguracja sieci.\n"
 
 #: include/classes/server/CZabbixServer.php:601
 #, c-format

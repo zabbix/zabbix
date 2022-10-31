@@ -370,8 +370,8 @@ static int	update_event_names(void)
 	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
-			"select triggerid,description,expression,priority,comments,url,recovery_expression,"
-				"recovery_mode,value"
+			"select triggerid,description,expression,priority,comments,url,url_name,"
+				"recovery_expression,recovery_mode,value"
 			" from triggers"
 			" order by triggerid");
 
@@ -385,9 +385,10 @@ static int	update_event_names(void)
 		ZBX_STR2UCHAR(trigger.priority, row[3]);
 		trigger.comments = zbx_strdup(NULL, row[4]);
 		trigger.url = zbx_strdup(NULL, row[5]);
-		trigger.recovery_expression = zbx_strdup(NULL, row[6]);
-		ZBX_STR2UCHAR(trigger.recovery_mode, row[7]);
-		ZBX_STR2UCHAR(trigger.value, row[8]);
+		trigger.url_name = zbx_strdup(NULL, row[6]);
+		trigger.recovery_expression = zbx_strdup(NULL, row[7]);
+		ZBX_STR2UCHAR(trigger.recovery_mode, row[8]);
+		ZBX_STR2UCHAR(trigger.value, row[9]);
 
 		preprocess_trigger_name(&trigger, &historical);
 

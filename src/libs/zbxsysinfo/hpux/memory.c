@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "log.h"
 
@@ -42,7 +43,7 @@ struct pst_dynamic	pdy;
 		return SYSINFO_RET_FAIL;									\
 	}
 
-static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
+static int	vm_memory_total(AGENT_RESULT *result)
 {
 	ZBX_PSTAT_GETSTATIC();
 
@@ -51,7 +52,7 @@ static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_FREE(AGENT_RESULT *result)
+static int	vm_memory_free(AGENT_RESULT *result)
 {
 	ZBX_PSTAT_GETSTATIC();
 	ZBX_PSTAT_GETDYNAMIC();
@@ -61,7 +62,7 @@ static int	VM_MEMORY_FREE(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_ACTIVE(AGENT_RESULT *result)
+static int	vm_memory_active(AGENT_RESULT *result)
 {
 	ZBX_PSTAT_GETSTATIC();
 	ZBX_PSTAT_GETDYNAMIC();
@@ -71,7 +72,7 @@ static int	VM_MEMORY_ACTIVE(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_USED(AGENT_RESULT *result)
+static int	vm_memory_used(AGENT_RESULT *result)
 {
 	ZBX_PSTAT_GETSTATIC();
 	ZBX_PSTAT_GETDYNAMIC();
@@ -81,7 +82,7 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
+static int	vm_memory_pused(AGENT_RESULT *result)
 {
 	ZBX_PSTAT_GETSTATIC();
 	ZBX_PSTAT_GETDYNAMIC();
@@ -97,7 +98,7 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
+static int	vm_memory_available(AGENT_RESULT *result)
 {
 	ZBX_PSTAT_GETSTATIC();
 	ZBX_PSTAT_GETDYNAMIC();
@@ -107,7 +108,7 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
+static int	vm_memory_pavailable(AGENT_RESULT *result)
 {
 	ZBX_PSTAT_GETSTATIC();
 	ZBX_PSTAT_GETDYNAMIC();
@@ -123,7 +124,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
 	char	*mode;
@@ -137,19 +138,19 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 0);
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
-		ret = VM_MEMORY_TOTAL(result);
+		ret = vm_memory_total(result);
 	else if (0 == strcmp(mode, "free"))
-		ret = VM_MEMORY_FREE(result);
+		ret = vm_memory_free(result);
 	else if (0 == strcmp(mode, "active"))
-		ret = VM_MEMORY_ACTIVE(result);
+		ret = vm_memory_active(result);
 	else if (0 == strcmp(mode, "used"))
-		ret = VM_MEMORY_USED(result);
+		ret = vm_memory_used(result);
 	else if (0 == strcmp(mode, "pused"))
-		ret = VM_MEMORY_PUSED(result);
+		ret = vm_memory_pused(result);
 	else if (0 == strcmp(mode, "available"))
-		ret = VM_MEMORY_AVAILABLE(result);
+		ret = vm_memory_available(result);
 	else if (0 == strcmp(mode, "pavailable"))
-		ret = VM_MEMORY_PAVAILABLE(result);
+		ret = vm_memory_pavailable(result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));

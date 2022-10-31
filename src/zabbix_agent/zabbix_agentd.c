@@ -18,13 +18,14 @@
 **/
 
 #include "log.h"
-#include "zbxconf.h"
-#include "zbxgetopt.h"
-#include "zbxcomms.h"
 #include "modbtype.h"
-#include "zbxstr.h"
-#include "zbxip.h"
+#include "zbxcomms.h"
+#include "zbxconf.h"
 #include "zbxexpr.h"
+#include "zbxgetopt.h"
+#include "zbxip.h"
+#include "zbxstr.h"
+#include "zbxthreads.h"
 
 static char	*CONFIG_PID_FILE = NULL;
 
@@ -241,10 +242,6 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
-ZBX_THREAD_LOCAL unsigned char	process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
-ZBX_THREAD_LOCAL int		process_num;
-ZBX_THREAD_LOCAL int		server_num	= 0;
-
 static zbx_thread_activechk_args	*config_active_args = NULL;
 
 int	CONFIG_ALERTER_FORKS		= 0;
@@ -281,6 +278,9 @@ int	CONFIG_HISTORYPOLLER_FORKS	= 0;
 int	CONFIG_AVAILMAN_FORKS		= 0;
 int	CONFIG_SERVICEMAN_FORKS		= 0;
 int	CONFIG_TRIGGERHOUSEKEEPER_FORKS = 0;
+
+static char	*config_file		= NULL;
+static int	config_allow_root	= 0;
 
 char	*opt = NULL;
 
@@ -349,8 +349,8 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		switch (ch)
 		{
 			case 'c':
-				if (NULL == CONFIG_FILE)
-					CONFIG_FILE = strdup(zbx_optarg);
+				if (NULL == config_file)
+					config_file = strdup(zbx_optarg);
 				break;
 #ifndef _WINDOWS
 			case 'R':
@@ -528,13 +528,13 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		goto out;
 	}
 
-	if (NULL == CONFIG_FILE)
-		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
+	if (NULL == config_file)
+		config_file = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 out:
 	if (FAIL == ret)
 	{
 		zbx_free(TEST_METRIC);
-		zbx_free(CONFIG_FILE);
+		zbx_free(config_file);
 	}
 
 	return ret;
@@ -738,6 +738,7 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 				hostnames->values[i] : "");
 		config_active_args[forks].zbx_config_tls = zbx_config_tls;
 		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
+		config_active_args[forks].config_file = config_file;
 	}
 
 	return SUCCEED;
@@ -887,7 +888,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
-		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
+		{"AllowRoot",			&config_allow_root,			TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"User",			&CONFIG_USER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -954,7 +955,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS_EN);
 #endif
-	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
+	parse_cfg_file(config_file, cfg, requirement, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 
 	zbx_finalize_key_access_rules_configuration();
 
@@ -1032,7 +1033,7 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 	switch (t->task)
 	{
 		case ZBX_TASK_INSTALL_SERVICE:
-			ret = ZabbixCreateService(name, t->flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS);
+			ret = ZabbixCreateService(name, t->flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS, config_file);
 			break;
 		case ZBX_TASK_UNINSTALL_SERVICE:
 			ret = ZabbixRemoveService();
@@ -1122,7 +1123,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
+	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
 
 #if !defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
@@ -1211,20 +1212,23 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	for (i = 0; i < threads_num; i++)
 	{
 		zbx_thread_args_t		*thread_args;
-		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_program_type};
+		zbx_thread_info_t		*thread_info;
+		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_program_type,
+								config_file};
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
+		thread_info = &thread_args->info;
 
-		if (FAIL == get_process_info_by_thread(i + 1, &thread_args->process_type, &thread_args->process_num))
+		if (FAIL == get_process_info_by_thread(i + 1, &thread_info->process_type, &thread_info->process_num))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}
 
-		thread_args->server_num = i + 1;
+		thread_info->server_num = i + 1;
 		thread_args->args = NULL;
 
-		switch (thread_args->process_type)
+		switch (thread_info->process_type)
 		{
 			case ZBX_PROCESS_TYPE_COLLECTOR:
 				zbx_thread_start(collector_thread, thread_args, &threads[i]);
@@ -1489,7 +1493,7 @@ int	main(int argc, char **argv)
 #if defined(ZABBIX_SERVICE)
 	service_start(t.flags);
 #elif defined(ZABBIX_DAEMON)
-	zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
+	zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
 #endif
 	exit(EXIT_SUCCESS);
 }

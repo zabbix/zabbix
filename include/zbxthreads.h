@@ -84,7 +84,13 @@ typedef struct
 	int		server_num;
 	int		process_num;
 	unsigned char	process_type;
-	void		*args;
+}
+zbx_thread_info_t;
+
+typedef struct
+{
+	zbx_thread_info_t	info;
+	void			*args;
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	ZBX_THREAD_ENTRY_POINTER(entry);
 #endif
