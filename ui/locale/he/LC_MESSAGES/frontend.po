@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2022-10-03 20:12+0000\n"
+"PO-Revision-Date: 2022-10-27 12:50+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12489,16 +12489,16 @@ msgstr "אין פעולות לביצוע."
 
 #: report4.php:24
 msgid "Notification report"
-msgstr "דוח התרעות"
+msgstr "דוח התראות"
 
 #: include/menu.inc.php:92 report4.php:64
 msgid "Notifications"
-msgstr "התרעות"
+msgstr "התראות"
 
 #: include/actions.inc.php:801 include/actions.inc.php:1064
 #: include/actions.inc.php:1065
 msgid "Notify all involved"
-msgstr "לשלוח התרעות לכל המעורבים"
+msgstr "לשלוח התראות לכל המעורבים"
 
 #: include/func.inc.php:249
 msgid "Nov"
@@ -12918,7 +12918,7 @@ msgstr "רק הקפצות שמוקצות למארחים מופעלים שתלו�
 
 #: app/views/popup.mediatypetest.edit.php:52
 msgid "Open log"
-msgstr ""
+msgstr "פתיחת היומן"
 
 #: include/httptest.inc.php:430
 msgid "Opera"
@@ -16946,6 +16946,16 @@ msgstr "עמודת מסך זו אינה ריקה. למחוק אותה?"
 #: include/classes/screens/CScreenBuilder.php:559
 msgid "This screen row is not empty. Delete it?"
 msgstr "שורת מסך זו אינה ריקה. למחוק אותה?"
+
+#: app/views/administration.housekeeping.edit.php:134
+#: include/blocks.inc.php:714
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr "יש להפעיל את ההגדרה הזאת כיוון שטבלאות ההיסטוריה מכילות חלקים דחוסים."
+
+#: app/views/administration.housekeeping.edit.php:164
+#: include/blocks.inc.php:730
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr "יש להפעיל את ההגדרה הזאת כיוון שטבלאות המגמות מכילות חלקים דחוסים."
 
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"
