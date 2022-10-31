@@ -759,4 +759,15 @@ in:
 out:
   return: SUCCEED
   value: '["1","2","3"]'
+---
+test case: Query $.books[?(@.category=="reference")].price
+include: &include zbx_jsonobj_query.inc.yaml
+in:
+  data: *include
+  path: $.books[?(@.category=="reference")].price
+out:
+  return: SUCCEED
+  value: '[8.95]'
 ...
+
+

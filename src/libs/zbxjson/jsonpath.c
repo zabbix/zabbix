@@ -1494,17 +1494,30 @@ static int	jsonpath_parse_dot_segment(const char *start, zbx_jsonpath_t *jsonpat
 		if (')' == *end)
 		{
 			if (ZBX_CONST_STRLEN("min") == len && 0 == strncmp(start, "min", len))
+			{
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_MIN;
+			}
 			else if (ZBX_CONST_STRLEN("max") == len && 0 == strncmp(start, "max", len))
+			{
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_MAX;
+			}
 			else if (ZBX_CONST_STRLEN("avg") == len && 0 == strncmp(start, "avg", len))
+			{
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_AVG;
+			}
 			else if (ZBX_CONST_STRLEN("length") == len && 0 == strncmp(start, "length", len))
+			{
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_LENGTH;
+			}
 			else if (ZBX_CONST_STRLEN("first") == len && 0 == strncmp(start, "first", len))
+			{
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_FIRST;
+				jsonpath->first_match = 1;
+			}
 			else if (ZBX_CONST_STRLEN("sum") == len && 0 == strncmp(start, "sum", len))
+			{
 				segment->data.function.type = ZBX_JSONPATH_FUNCTION_SUM;
+			}
 			else
 				return zbx_jsonpath_error(start);
 
@@ -1604,11 +1617,9 @@ static int	jsonpath_query_next_segment(zbx_jsonpath_context_t *ctx, const char *
 	if (++path_depth == ctx->path->segments_num ||
 			ZBX_JSONPATH_SEGMENT_FUNCTION == ctx->path->segments[path_depth].type)
 	{
-		if (ZBX_JSONPATH_SEGMENT_FUNCTION == ctx->path->segments[path_depth].type &&
-				ZBX_JSONPATH_FUNCTION_FIRST == ctx->path->segments[path_depth].data.function.type)
-		{
+		if (1 == ctx->path->first_match)
 			ctx->found = 1;
-		}
+
 		zbx_vector_jsonobj_ref_add_object(&ctx->objects, name, obj);
 		return SUCCEED;
 	}
@@ -2755,6 +2766,7 @@ int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath)
 	memset(&jpquery, 0, sizeof(zbx_jsonpath_t));
 	jsonpath_reserve(&jpquery, 4);
 	jpquery.definite = 1;
+	jpquery.first_match = 0;
 
 	for (ptr++; '\0' != *ptr; ptr = next)
 	{
@@ -2822,7 +2834,10 @@ int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath)
 		ret = zbx_jsonpath_error(ptr);
 
 	if (SUCCEED == ret)
+	{
+		jpquery.first_match |= jpquery.definite;
 		*jsonpath = jpquery;
+	}
 	else
 		zbx_jsonpath_clear(&jpquery);
 
