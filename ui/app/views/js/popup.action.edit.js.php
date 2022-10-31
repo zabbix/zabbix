@@ -154,6 +154,7 @@ window.action_edit_popup = new class {
 	}
 
 	_createConditionsRow(input) {
+		let template;
 		if (is_array(input.value)) {
 			input.value.forEach((value, index) => {
 				let element = {...input, name: input.name[index], value: input.value[index]};
@@ -169,10 +170,11 @@ window.action_edit_popup = new class {
 					element.data = element.name
 					element.label = num2letter(element.row_index);
 					input.row_index ++;
+					template = new Template(document.getElementById('condition-row-tmpl').innerHTML)
 
 				document
 					.querySelector('#conditionTable tbody')
-					.insertAdjacentHTML('beforeend', this.condition_default_template.evaluate(element))
+					.insertAdjacentHTML('beforeend', template.evaluate(element))
 				}
 				this._processTypeOfCalculation();
 			})
@@ -186,7 +188,6 @@ window.action_edit_popup = new class {
 			}
 			else {
 				input.label = num2letter(input.row_index);
-				let template;
 
 				switch(parseInt(input.conditiontype)) {
 					case <?= CONDITION_TYPE_SUPPRESSED ?>:
@@ -194,13 +195,13 @@ window.action_edit_popup = new class {
 						? <?= json_encode(_('Problem is suppressed')) ?>
 						: <?= json_encode(_('Problem is not suppressed')) ?>
 
-						template =  this.condition_suppressed_template;
+						template = new Template(document.getElementById('condition-suppressed-row-tmpl').innerHTML);
 						break;
 
 					case <?= CONDITION_TYPE_EVENT_TAG_VALUE ?>:
 						input.operator_name = this.condition_operators[input.operator]
 
-						template =  this.condition_tag_value_template;
+						template = new Template(document.getElementById('condition-tag-value-row-tmpl').innerHTML);
 						break;
 
 					default:
@@ -208,7 +209,7 @@ window.action_edit_popup = new class {
 							this.condition_operators[input.operator] + ' '
 						input.data = input.name
 
-						template = this.condition_default_template;
+						template = new Template(document.getElementById('condition-row-tmpl').innerHTML);
 				}
 				document
 					.querySelector('#conditionTable tbody')
@@ -651,83 +652,6 @@ window.action_edit_popup = new class {
 	}
 
 	_initTemplates() {
-		this.condition_suppressed_template = new Template(`
-			<tr data-row_index="#{row_index}">
-				<td class="label" data-conditiontype="#{conditiontype}" data-formulaid= "#{label}">#{label}</td>
-				<td class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{condition_name} </td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove-condition">
-							<?= _('Remove') ?>
-							</button>
-						</li>
-						<li>
-							<input type="hidden" name="conditions[#{row_index}][conditiontype]" value="#{conditiontype}">
-							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
-							<input type="hidden" name="conditions[#{row_index}][value]" value="#{value}">
-							<input type="hidden" name="conditions[#{row_index}][value2]" value="#{value2}">
-							<input type="hidden" name="conditions[#{row_index}][formulaid]" value="#{label}">
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-
-		this.condition_default_template = new Template(`
-			<tr data-row_index="#{row_index}">
-				<td class="label" data-conditiontype="#{conditiontype}" data-formulaid= "#{label}">#{label}</td>
-				<td
-					class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{condition_name}
-					<em> #{data} </em>
-				</td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove-condition">
-							<?= _('Remove') ?>
-							</button>
-						</li>
-						<li>
-							<input type="hidden" name="conditions[#{row_index}][conditiontype]" value="#{conditiontype}">
-							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
-							<input type="hidden" name="conditions[#{row_index}][value]" value="#{value}">
-							<input type="hidden" name="conditions[#{row_index}][value2]" value="#{value2}">
-							<input type="hidden" name="conditions[#{row_index}][formulaid]" value="#{label}">
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-
-		this.condition_tag_value_template = new Template(`
-			<tr data-row_index="#{row_index}">
-				<td class="label" data-conditiontype="#{conditiontype}" data-formulaid= "#{label}">#{label}</td>
-				<td
-					class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;"> Value of Tag
-					<em> #{value2} </em>
-					#{operator_name}
-					<em> #{value} </em>
-				</td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove-condition">
-							<?= _('Remove') ?>
-							</button>
-						</li>
-						<li>
-							<input type="hidden" name="conditions[#{row_index}][conditiontype]" value="#{conditiontype}">
-							<input type="hidden" name="conditions[#{row_index}][operator]" value="#{operator}">
-							<input type="hidden" name="conditions[#{row_index}][value]" value="#{value}">
-							<input type="hidden" name="conditions[#{row_index}][value2]" value="#{value2}">
-							<input type="hidden" name="conditions[#{row_index}][formulaid]" value="#{label}">
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-
 		this.operation_template_basic = new Template(`
 			<tr id="#{prefix}operations_#{row_index}">
 				<td class="wordwrap">

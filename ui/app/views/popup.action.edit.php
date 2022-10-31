@@ -52,6 +52,75 @@ $formula = (new CTextBox('formula', $data['formula'], DB::getFieldLength('action
 	->setId('formula')
 	->setAttribute('placeholder', 'A or (B and C) &hellip;');
 
+$condition_hidden_data = (new CCol([
+	(new CButton(null, _('Remove')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('js-remove-condition'),
+	(new CInput('hidden'))
+		->setAttribute('value', '#{conditiontype}')
+		->setName('conditions[#{row_index}][conditiontype]'),
+	(new CInput('hidden'))
+		->setAttribute('value', '#{operator}')
+		->setName('conditions[#{row_index}][operator]'),
+	(new CInput('hidden'))
+		->setAttribute('value', '#{value}')
+		->setName('conditions[#{row_index}][value]'),
+	(new CInput('hidden'))
+		->setAttribute('value', '#{value2}')
+		->setName('conditions[#{row_index}][value2]'),
+	(new CInput('hidden'))
+		->setAttribute('value', '#{label}')
+		->setName('conditions[#{row_index}][formulaid]'),
+]));
+
+$condition_suppressed_template = (new CScriptTemplate('condition-suppressed-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol('#{label}'))
+		->addClass('label')
+		->setAttribute('data-conditiontype', '#{conditiontype}')
+		->setAttribute('data-formulaid', '#{label}'),
+		(new CCol('#{condition_name}'))
+			->addClass('wordwrap')
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		$condition_hidden_data
+	]))->setAttribute('data-row_index','#{row_index}')
+);
+
+$condition_template_default = (new CScriptTemplate('condition-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol('#{label}'))
+			->addClass('label')
+			->setAttribute('data-conditiontype', '#{conditiontype}')
+			->setAttribute('data-formulaid', '#{label}'),
+		(new CCol([
+			'#{condition_name}',
+			(new CLabel('#{data}'))->addStyle('font-style: italic')
+		]))
+			->addClass('wordwrap')
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		$condition_hidden_data
+
+	]))->setAttribute('data-row_index','#{row_index}')
+);
+
+$condition_tag_value_template = (new CScriptTemplate('condition-tag-value-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol('#{label}'))
+			->addClass('label')
+			->setAttribute('data-conditiontype', '#{conditiontype}')
+			->setAttribute('data-formulaid', '#{label}'),
+		(new CCol([
+			_('Value of tag'), ' ',
+			(new CLabel('#{value2}'))->addStyle('font-style: italic'), ' ',
+			'#{operator_name}', ' ',
+			(new CLabel('#{value}'))->addStyle('font-style: italic'),
+		]))
+			->addClass('wordwrap')
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		$condition_hidden_data
+	]))->setAttribute('data-row_index','#{row_index}')
+);
+
 $action_tab
 	->addItem([
 		(new CLabel(_('Type of calculation'), 'label-evaltype'))->setId('label-evaltype'),
@@ -74,10 +143,12 @@ $action_tab
 				DB::getFieldLength('actions', 'formula')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setId('formula')
-				->setAttribute('placeholder', 'A or (B and C) &hellip;')
+				->setAttribute('placeholder', 'A or (B and C) &hellip;'),
+			$condition_suppressed_template,
+			$condition_template_default,
+			$condition_tag_value_template
 		]))->setId('evaltype-formfield')
-	])
-	->setId('actionCalculationRow');
+	])->setId('actionCalculationRow');
 
 $condition_table->addItem(
 	(new CTag('tfoot', true))
