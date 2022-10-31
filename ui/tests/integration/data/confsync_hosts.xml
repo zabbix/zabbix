@@ -16,6 +16,9 @@
         <host>
             <host>Host1</host>
             <name>Host1</name>
+            <proxy>
+                <name>Proxy</name>
+            </proxy>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -31,6 +34,9 @@
         <host>
             <host>Host2</host>
             <name>Host2</name>
+            <proxy>
+                <name>Proxy</name>
+            </proxy>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -51,6 +57,9 @@
         <host>
             <host>Host3</host>
             <name>Host3</name>
+            <proxy>
+                <name>Proxy</name>
+            </proxy>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -66,10 +75,10 @@
             <inventory_mode>DISABLED</inventory_mode>
         </host>
         <host>
-            <host>Host4_ActiveProxy</host>
-            <name>Host4_ActiveProxy</name>
+            <host>Host4</host>
+            <name>Host4</name>
             <proxy>
-                <name>ProxyA</name>
+                <name>Proxy</name>
             </proxy>
             <groups>
                 <group>
@@ -79,10 +88,10 @@
             <inventory_mode>DISABLED</inventory_mode>
         </host>
         <host>
-            <host>Host5_PassiveProxy</host>
-            <name>Host5_PassiveProxy</name>
+            <host>Host5</host>
+            <name>Host5</name>
             <proxy>
-                <name>ProxyP</name>
+                <name>Proxy</name>
             </proxy>
             <groups>
                 <group>
@@ -94,6 +103,9 @@
         <host>
             <host>HostInventory</host>
             <name>HostInventory</name>
+            <proxy>
+                <name>Proxy</name>
+            </proxy>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -175,6 +187,9 @@
         <host>
             <host>HostInventoryAutomatic</host>
             <name>HostInventoryAutomatic</name>
+            <proxy>
+                <name>Proxy</name>
+            </proxy>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -217,6 +232,9 @@
         <host>
             <host>HostMultilevelTmpl</host>
             <name>HostMultilevelTmpl</name>
+            <proxy>
+                <name>Proxy</name>
+            </proxy>
             <templates>
                 <template>
                     <name>bbbtmpl</name>
@@ -246,6 +264,9 @@
         <host>
             <host>HostWithDiscovery</host>
             <name>HostWithDiscovery</name>
+            <proxy>
+                <name>Proxy</name>
+            </proxy>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -343,6 +364,9 @@
         <host>
             <host>HostWithItems</host>
             <name>HostWithItems</name>
+            <proxy>
+                <name>Proxy</name>
+            </proxy>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -730,6 +754,9 @@
         <host>
             <host>HostWithMacros</host>
             <name>HostWithMacros</name>
+            <proxy>
+                <name>Proxy</name>
+            </proxy>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -782,6 +809,9 @@
         <host>
             <host>HostWithTags</host>
             <name>HostWithTags</name>
+            <proxy>
+                <name>Proxy</name>
+            </proxy>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -812,6 +842,9 @@
         <host>
             <host>HostWithTemplate</host>
             <name>HostWithTemplate</name>
+            <proxy>
+                <name>Proxy</name>
+            </proxy>
             <templates>
                 <template>
                     <name>SampleTemplate</name>
@@ -827,6 +860,9 @@
         <host>
             <host>HostWithWebScenario</host>
             <name>HostWithWebScenario</name>
+            <proxy>
+                <name>Proxy</name>
+            </proxy>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -895,6 +931,9 @@
         <host>
             <host>HostWithComprehensiveTemplate</host>
             <name>HostWithComprehensiveTemplate</name>
+            <proxy>
+                <name>Proxy</name>
+            </proxy>
             <templates>
                 <template>
                     <name>ComprehensiveTemplate</name>
