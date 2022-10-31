@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testCalculatedFormula.php';
 
 /**
@@ -25,7 +26,7 @@ require_once dirname(__FILE__).'/../common/testCalculatedFormula.php';
  */
 class testFormulaCalculatedItemPrototype extends testCalculatedFormula {
 
-	public $url = 'disc_prototypes.php?form=create&parent_discoveryid=43700&context=host';
+	public $url = 'disc_prototypes.php?form=create&parent_discoveryid=44000&context=host';
 
 	public function getItemPrototypeValidationData() {
 		return [

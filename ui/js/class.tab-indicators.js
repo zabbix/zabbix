@@ -122,8 +122,9 @@ class TabIndicators {
 
 			if (indicator_item instanceof TabIndicatorItem) {
 				indicator_item
-					.addAttributes(element)
-					.initObserver(element);
+					.setElement(element)
+					.addAttributes()
+					.initObserver();
 			}
 		}
 	}
@@ -255,6 +256,29 @@ class TabIndicatorItem {
 
 	constructor(type) {
 		this._type = type;
+		this._element = null;
+	}
+
+	/**
+	 * Get element
+	 *
+	 * @returns {HTMLElement} element  tab element
+	 */
+	getElement() {
+		return this._element;
+	}
+
+	/**
+	 * Set element
+	 *
+	 * @param {HTMLElement} element  tab element
+	 *
+	 * @return {TabIndicatorItem}
+	 */
+	setElement(element) {
+		this._element = element;
+
+		return this;
 	}
 
 	/**
@@ -277,29 +301,25 @@ class TabIndicatorItem {
 
 	/**
 	 * Init observer for html changes.
-	 *
-	 * @param {HTMLElement} element
 	 */
-	initObserver(element) {
+	initObserver() {
 		throw 'Fatal error: cannot call abstract method.';
 	}
 
 	/**
 	 * Add tab indicator attribute to tab element.
 	 *
-	 * @param {HTMLElement} element  tab element
-	 *
 	 * @return {TabIndicatorItem}
 	 */
-	addAttributes(element) {
-		element.setAttribute(TAB_INDICATOR_ATTR_TYPE, this.getType());
+	addAttributes() {
+		this._element.setAttribute(TAB_INDICATOR_ATTR_TYPE, this.getType());
 
 		switch (this.getType()) {
 			case TAB_INDICATOR_TYPE_COUNT:
-				element.setAttribute(TAB_INDICATOR_ATTR_VALUE, this.getValue().toString());
+				this._element.setAttribute(TAB_INDICATOR_ATTR_VALUE, this.getValue().toString());
 				break;
 			case TAB_INDICATOR_TYPE_MARK:
-				element.setAttribute(TAB_INDICATOR_ATTR_VALUE, !!this.getValue() ? '1' : '0');
+				this._element.setAttribute(TAB_INDICATOR_ATTR_VALUE, !!this.getValue() ? '1' : '0');
 				break;
 		}
 
@@ -331,18 +351,12 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	/**
-	 * @inheritdoc
-	 * This observer yet init in include\views\js\common.template.edit.js.php.
-	 *
-	 * @param {HTMLElement} element
-	 */
-	initObserver(element) {
-		const target_node = document.querySelector('#tbl_macros');
+	initObserver() {
+		const target_node = document.getElementById('macros_container');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -364,7 +378,7 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return [...document.querySelectorAll('#tags-table .form_row')]
+		return [...document.querySelectorAll(this.getElement().getAttribute('href') + ' .tags-table .form_row')]
 			.filter((row) => {
 				const tag = row.querySelector('textarea[name$="[tag]"]');
 				const type = row.querySelector('input[name$="[type]"]');
@@ -378,12 +392,12 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
-		const target_node = document.querySelector('#tags-table');
+	initObserver() {
+		const target_node = document.querySelector(this.getElement().getAttribute('href') + ' .tags-table');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -412,12 +426,12 @@ class HttpTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#http_auth_enabled');
 
 		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -439,12 +453,12 @@ class LdapTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#ldap_configured');
 
 		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -466,12 +480,12 @@ class SamlTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#saml_auth_enabled');
 
 		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -493,10 +507,10 @@ class InventoryTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		for (const input of document.querySelectorAll('[name=inventory_mode]')) {
 			input.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -514,32 +528,16 @@ class IpmiTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const ipmi_authtype = document.getElementById('ipmi_authtype');
 
-		if (ipmi_authtype !== null) {
-			if (ipmi_authtype.type === 'select-multiple') {
-				const options = ipmi_authtype.selectedOptions;
-
-				if (options.length > 1 || options[0].value != IpmiTabIndicatorItem.IPMI_AUTHTYPE_DEFAULT) {
-					return true;
-				}
-			}
-			else if (ipmi_authtype.value != IpmiTabIndicatorItem.IPMI_AUTHTYPE_DEFAULT) {
-				return true;
-			}
+		if (ipmi_authtype !== null
+				&& ipmi_authtype.value != IpmiTabIndicatorItem.IPMI_AUTHTYPE_DEFAULT) {
+			return true;
 		}
 
 		const ipmi_privilege = document.getElementById('ipmi_privilege');
 
-		if (ipmi_privilege !== null) {
-			if (ipmi_privilege.type === 'select-multiple') {
-				const options = ipmi_privilege.selectedOptions;
-
-				if (options.length > 1 || options[0].value != IpmiTabIndicatorItem.IPMI_PRIVILEGE_USER) {
-					return true;
-				}
-			}
-			else if (ipmi_privilege.value != IpmiTabIndicatorItem.IPMI_PRIVILEGE_USER) {
-				return true;
-			}
+		if (ipmi_privilege !== null
+				&& ipmi_privilege.value != IpmiTabIndicatorItem.IPMI_PRIVILEGE_USER) {
+			return true;
 		}
 
 		for (const input of document.querySelectorAll('#ipmi_username, #ipmi_password')) {
@@ -551,11 +549,11 @@ class IpmiTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		for (const input of document.querySelectorAll(
 				'#ipmi_authtype, #ipmi_privilege, #ipmi_username, #ipmi_password')) {
 			input.addEventListener('change', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -580,12 +578,12 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 		return tls_in_psk || tls_in_cert;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const tls_in_psk_node = document.querySelector('[name=tls_in_psk]');
 
 		if (tls_in_psk_node !== null) {
 			['click', 'change'].forEach(event =>
-				tls_in_psk_node.addEventListener(event, () => this.addAttributes(element))
+				tls_in_psk_node.addEventListener(event, () => this.addAttributes())
 			);
 		}
 
@@ -593,13 +591,13 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 
 		if (tls_in_cert_node !== null) {
 			['click', 'change'].forEach(event =>
-				tls_in_cert_node.addEventListener(event, () => this.addAttributes(element))
+				tls_in_cert_node.addEventListener(event, () => this.addAttributes())
 			);
 		}
 
 		for (const input of document.querySelectorAll('[name=tls_connect]')) {
 			input.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -617,12 +615,12 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#preprocessing');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -645,12 +643,12 @@ class DependencyTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#dependency-table tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -673,12 +671,12 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#lld_macro_paths');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -703,12 +701,12 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#conditions');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -733,12 +731,12 @@ class OverridesTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('.lld-overrides-table tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -761,12 +759,12 @@ class StepsTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('.httpconf-steps-dynamic-row tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -797,24 +795,24 @@ class HttpAuthTabIndicatorItem extends TabIndicatorItem {
 			|| document.querySelector('#ssl_key_password').value !== '';
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const auth_node = document.querySelector('#authentication');
 
 		if (auth_node !== null) {
 			auth_node.addEventListener('change', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 
 		for (const input of document.querySelectorAll('#verify_peer, #verify_host')) {
 			input.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 
 		for (const input of document.querySelectorAll('#ssl_cert_file, #ssl_key_file, #ssl_key_password')) {
 			input.addEventListener('change', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -844,12 +842,12 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 		return count;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node_op = document.querySelector('#op-table tbody');
 
 		if (target_node_op !== null) {
 			const observer_op = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer_op.observe(target_node_op, {
@@ -862,7 +860,7 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 
 		if (target_node_rec !== null) {
 			const observer_rec = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer_rec.observe(target_node_rec, {
@@ -875,7 +873,7 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 
 		if (target_node_upd !== null) {
 			const observer_upd = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer_upd.observe(target_node_upd, {
@@ -898,12 +896,12 @@ class ExcludedDowntimesTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#excluded-downtimes tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -927,12 +925,12 @@ class ChildServicesTabIndicatorItem extends TabIndicatorItem {
 			.tabIndicator;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#children');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -955,12 +953,12 @@ class TimeTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#time-table tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -983,9 +981,9 @@ class TagFilterTabIndicatorItem extends TabIndicatorItem {
 			.length > 0;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes(element);
+			this.addAttributes();
 		});
 	}
 }
@@ -1000,12 +998,12 @@ class MediaTabIndicatorItem extends TabIndicatorItem {
 		return document.querySelectorAll('#media-table tbody tr').length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#media-table tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -1051,10 +1049,10 @@ class MediatypeOptionsTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		for (const input of document.querySelectorAll('#maxsessions_type, #maxattempts, #attempt_interval')) {
 			input.addEventListener('change', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -1072,12 +1070,12 @@ class MessageTemplateTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#message-templates tbody');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -1104,12 +1102,12 @@ class FrontendMessageTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#messages_enabled');
 
 		if (target_node !== null) {
 			target_node.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 	}
@@ -1132,10 +1130,10 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 			|| document.querySelectorAll('#user-share-table tbody tr:not(:last-child)').length > 0;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		for (const input of document.querySelectorAll('[name=private]')) {
 			input.addEventListener('click', () => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 		}
 
@@ -1143,7 +1141,7 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 
 		if (target_node_group !== null) {
 			const observer_group = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer_group.observe(target_node_group, {
@@ -1156,7 +1154,7 @@ class SharingTabIndicatorItem extends TabIndicatorItem {
 
 		if (target_node_user !== null) {
 			const observer_user = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer_user.observe(target_node_user, {
@@ -1197,9 +1195,9 @@ class GraphAxesTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes(element);
+			this.addAttributes();
 		});
 	}
 }
@@ -1216,12 +1214,12 @@ class GraphDatasetTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#data_sets');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -1248,9 +1246,9 @@ class GraphOptionsTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes(element);
+			this.addAttributes();
 		});
 	}
 }
@@ -1271,9 +1269,9 @@ class GraphTimeTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes(element);
+			this.addAttributes();
 		});
 	}
 }
@@ -1302,9 +1300,9 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes(element);
+			this.addAttributes();
 		});
 	}
 }
@@ -1325,9 +1323,9 @@ class GraphProblemsTabIndicatorItem extends TabIndicatorItem {
 		return false;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes(element);
+			this.addAttributes();
 		});
 	}
 }
@@ -1344,12 +1342,12 @@ class GraphOverridesTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('.overrides-list');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {
@@ -1372,9 +1370,9 @@ class PermissionsTabIndicatorItem extends TabIndicatorItem {
 			.length > 1;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes(element);
+			this.addAttributes();
 		});
 	}
 }
@@ -1391,12 +1389,12 @@ class ValuemapsTabIndicatorItem extends TabIndicatorItem {
 			.length;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		const target_node = document.querySelector('#valuemap-table');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
-				this.addAttributes(element);
+				this.addAttributes();
 			});
 
 			observer.observe(target_node, {

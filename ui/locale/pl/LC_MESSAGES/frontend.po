@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-08-03 20:13+0000\n"
-"Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
+"PO-Revision-Date: 2022-10-27 16:28+0000\n"
+"Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -5581,7 +5581,7 @@ msgstr "Szczegóły scenariusza sieci www"
 
 #: app/views/administration.housekeeping.edit.php:194
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "Wykryta licencja TimescaleDB nie obsługuje kompresji. Kompresja jest obsługiwana w TimescaleDB Community Edition."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -11870,7 +11870,7 @@ msgid "Module added: %1$s."
 msgid_plural "Modules added: %1$s."
 msgstr[0] "Dodany moduł: %1$s."
 msgstr[1] "Dodane moduły: %1$s."
-msgstr[2] "Dodanych modułów: %1$s."
+msgstr[2] "Dodane moduły: %1$s."
 
 #: app/controllers/CControllerModuleScan.php:113
 #, c-format
@@ -11878,7 +11878,7 @@ msgid "Module deleted: %1$s."
 msgid_plural "Modules deleted: %1$s."
 msgstr[0] "Usunięty moduł: %1$s."
 msgstr[1] "Usunięte moduły: %1$s."
-msgstr[2] "Usuniętych modułów: %1$s."
+msgstr[2] "Usunięte moduły: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
@@ -11886,15 +11886,15 @@ msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
 msgstr[0] "Wyłączony moduł: %1$s."
 msgstr[1] "Wyłączone moduły: %1$s."
-msgstr[2] "Wyłączonych modułów: %1$s."
+msgstr[2] "Wyłączone moduły: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Włączony moduł: %1$s."
-msgstr[1] "Wyłączony moduł: %1$s."
-msgstr[2] "Wyłączonych modułów: %1$s."
+msgstr[1] "Włączone moduły: %1$s."
+msgstr[2] "Włączone moduły: %1$s."
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -13398,6 +13398,10 @@ msgstr "Tylko super administratorzy mogą ustawić właściciela raportu."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Liczone są tylko wyzwalacze przypisane do włączonych hostów w zależności od włączonych pozycji"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr "Otwórz dziennik"
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -13943,7 +13947,7 @@ msgstr "Nadrzędne wykresy"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
-msgstr ""
+msgstr "Wartość nadrzędnego hosta"
 
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
@@ -17809,6 +17813,16 @@ msgstr "Ten miesiąc jak dotąd"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "To ustawienie dotyczy jedynie danych liczbowych: Dane nieliczbowe będą zawsze pobierane z historii."
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr "To ustawienie powinno być włączone, ponieważ tabele historii zawierają skompresowane dane."
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr "To ustawienie powinno być włączone, ponieważ tabele trendu zawierają skompresowane dane."
+
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
@@ -20569,6 +20583,10 @@ msgstr "spodziewano się wartości logicznej"
 msgid "a character string is expected"
 msgstr "oczekiwano ciągu znaków"
 
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr "oczekiwany jest ciąg znaków, liczba całkowita lub wartość zmiennoprzecinkowa"
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "spodziewano się daty w formacie RRRR-MM-DD"
@@ -22758,6 +22776,11 @@ msgstr "varsamp() - Wariancja próby"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "przez"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr "w"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

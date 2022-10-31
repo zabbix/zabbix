@@ -55,20 +55,8 @@ class CToken extends CApiService {
 			'token' =>					['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'length' => 64, 'default' => null],
 			'valid_at' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'expired_at' =>				['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'filter' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'tokenid' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'userid' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'lastaccess' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'status' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [ZBX_AUTH_TOKEN_ENABLED, ZBX_AUTH_TOKEN_DISABLED])],
-				'expires_at' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'created_at' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'creator_userid' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
-			'search' =>					['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'name' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'description' =>			['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['tokenid', 'name', 'userid', 'lastaccess', 'status', 'expires_at', 'created_at', 'creator_userid']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name', 'description']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],

@@ -1,25 +1,26 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2013-01-09 22:10+0300\n"
-"Last-Translator: Robert <szenasy.robert@gmail.com>\n"
+"PO-Revision-Date: 2022-09-15 17:07+0000\n"
+"Last-Translator: Roland <roland.rabai@rsoe.hu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1357762227.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr ""
+msgstr "\"%1$s\" dátum értékének korábbinak kell lennie mint \"%2$s\"."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -60,7 +61,7 @@ msgstr ""
 #: include/classes/import/validators/C10XmlValidator.php:378
 #: include/classes/import/validators/C10XmlValidator.php:399
 msgid "\"host:key\" pair is expected"
-msgstr ""
+msgstr "\"host:key\" párost várok"
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
@@ -1314,12 +1315,14 @@ msgstr ""
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
 msgstr[0] ""
+msgstr[1] ""
 
 #: include/maintenances.inc.php:50
 #, c-format
 msgid "At %1$s:%2$s every day"
 msgid_plural "At %1$s:%2$s every %3$s days"
 msgstr[0] ""
+msgstr[1] ""
 
 #: include/maintenances.inc.php:112
 #, c-format
@@ -1671,7 +1674,7 @@ msgstr "Zárolva"
 
 #: include/classes/core/ZBase.php:358
 msgid "Blue"
-msgstr ""
+msgstr "Kék"
 
 #: app/views/popup.httpstep.php:160
 #: include/views/configuration.host.discovery.edit.php:399
@@ -1775,7 +1778,7 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1073
 msgid "CPU information. Returns string or integer"
-msgstr ""
+msgstr "CPU információ. Karakterláncot vagy egész számot ad vissza"
 
 #: include/classes/data/CItemData.php:1049
 msgid "CPU load. Returns float"
@@ -13277,6 +13280,10 @@ msgstr ""
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Csak az engedélyezett hosztokhoz rendelt, engedélyezett elemekhez tartozó triggerekből számítva"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr ""
@@ -17678,6 +17685,16 @@ msgstr ""
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr ""
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
@@ -20423,6 +20440,10 @@ msgstr ""
 msgid "a character string is expected"
 msgstr ""
 
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr ""
@@ -22610,6 +22631,11 @@ msgstr ""
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "keresztűl"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

@@ -27,12 +27,34 @@ $widget = (new CWidget())->setTitle(_('Host groups'));
 
 $form = (new CForm())
 	->setName('hostgroupForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('groupid', $data['groupid'])
 	->addVar('form', $data['form']);
 
-$form_list = (new CFormList('hostgroupFormList'))
-	->addRow(
+$form_list = (new CFormList('hostgroupFormList'));
+
+if ($data['groupid'] != 0 && $data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+	$name = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
+
+	if ($data['group']['discoveryRule']) {
+		if ($data['allowed_ui_conf_hosts'] && $data['group']['is_discovery_rule_editable']) {
+			$name = (new CLink($data['group']['discoveryRule']['name'],
+					(new CUrl('host_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('parent_discoveryid', $data['group']['discoveryRule']['itemid'])
+						->setArgument('hostid', $data['group']['hostPrototype']['hostid'])
+						->setArgument('context', 'host')
+				));
+		}
+		else {
+			$name = new CSpan($data['group']['discoveryRule']['name']);
+		}
+	}
+
+	$form_list->addRow(_('Discovered by'), $name);
+}
+
+$form_list->addRow(
 		(new CLabel(_('Group name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['name'], $data['groupid'] && $data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED))
 			->setAttribute('autofocus', 'autofocus')

@@ -250,7 +250,7 @@ $tags_tab = (new CFormGrid())
 				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 				->addItem([
 					renderTagTable($data['form']['tags'])
-						->setId('tags-table')
+						->addClass('tags-table')
 						->setHeader((new CRowHeader([_('Name'), _('Value'), _('Action')]))->addClass(ZBX_STYLE_GREY)),
 					(new CScriptTemplate('tag-row-tmpl'))
 						->addItem(renderTagTableRow('#{rowNum}', '', '', ['add_post_js' => false]))

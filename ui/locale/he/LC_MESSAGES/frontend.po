@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-07-05 20:03+0000\n"
+"PO-Revision-Date: 2022-10-27 12:50+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -3814,7 +3814,7 @@ msgstr "דחיסה"
 #: app/views/administration.housekeeping.edit.php:173
 #: app/views/administration.housekeeping.edit.php:183
 msgid "Compression is not supported."
-msgstr ""
+msgstr "אין תמיכה בדחיסה."
 
 #: app/views/administration.mediatype.edit.php:319
 msgid "Concurrent sessions"
@@ -5498,7 +5498,7 @@ msgstr "פרטי תרחיש רשת"
 
 #: app/views/administration.housekeeping.edit.php:194
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "רישיון ה־TimescaleDB שהתגלה לא תומך בדחיסה. דחיסה נתמכת במהדורה הקהילתית של TimescaleDB."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -11061,7 +11061,7 @@ msgstr "ב׳"
 #: include/func.inc.php:592 jsLoader.php:223
 msgctxt "month short"
 msgid "M"
-msgstr ""
+msgstr "ח׳"
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
@@ -11666,7 +11666,7 @@ msgstr "גרסת ה־PHP הנמוכה ביותר הנדרשת היא %1$s."
 #: app/views/administration.housekeeping.edit.php:174
 #, c-format
 msgid "Minimum required TimescaleDB version is %1$s."
-msgstr ""
+msgstr "גרסת ה־TimeScaleDB הנמוכה ביותר הנדרשת היא %1$s."
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -12901,12 +12901,12 @@ msgstr "כלום"
 
 #: report4.php:24
 msgid "Notification report"
-msgstr "דוח התרעות"
+msgstr "דוח התראות"
 
 #: include/classes/helpers/CMenuHelper.php:154
 #: include/classes/helpers/CRoleHelper.php:389 report4.php:64
 msgid "Notifications"
-msgstr "התרעות"
+msgstr "התראות"
 
 #: actionconf.php:87 include/views/configuration.action.edit.php:479
 msgid "Notify about canceled escalations"
@@ -12915,7 +12915,7 @@ msgstr "להודיע על הסלמות מבוטלות"
 #: include/actions.inc.php:865 include/actions.inc.php:1038
 #: include/actions.inc.php:1039
 msgid "Notify all involved"
-msgstr "לשלוח התרעות לכל המעורבים"
+msgstr "לשלוח התראות לכל המעורבים"
 
 #: include/func.inc.php:246
 msgid "Nov"
@@ -13282,6 +13282,10 @@ msgstr "רק מנהלי על יכולים להגדיר בעלות על דוח."
 #: app/partials/administration.system.info.php:68
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "רק הקפצות שמוקצות למארחים מופעלים שתלויות בפריטים פעילים נספרות"
+
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr "פתיחת היומן"
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -13828,7 +13832,7 @@ msgstr "תרשימי הורה"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
-msgstr ""
+msgstr "ערך מארח הורה"
 
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
@@ -14157,7 +14161,7 @@ msgstr "סוג Post"
 
 #: app/views/administration.housekeeping.edit.php:164
 msgid "PostgreSQL database server version is too old."
-msgstr ""
+msgstr "גרסת שרת מסד הנתונים מסוג PostgreSQL ישנה מדי."
 
 #: include/classes/data/CItemData.php:1377
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -17682,6 +17686,16 @@ msgstr "החודש הזה עד כה"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "הגדרה זו חלה רק על נתונים מספריים. נתונים בלתי מספריים תמיד יימשכו מההיסטוריה."
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr "יש להפעיל את ההגדרה הזאת כיוון שטבלאות ההיסטוריה מכילות חלקים דחוסים."
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr "יש להפעיל את ההגדרה הזאת כיוון שטבלאות המגמות מכילות חלקים דחוסים."
+
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
@@ -18535,11 +18549,11 @@ msgstr "לא ניתן לשכתב על קובץ התצורה הקיים."
 
 #: app/views/administration.housekeeping.edit.php:159
 msgid "Unable to retrieve TimescaleDB compression support status."
-msgstr ""
+msgstr "לא ניתן למשוך את מצב התמיכה של TimescaleDB בדחיסה."
 
 #: app/views/administration.housekeeping.edit.php:169
 msgid "Unable to retrieve TimescaleDB version."
-msgstr ""
+msgstr "לא ניתן לקבל את גרסת TimescaleDB."
 
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
@@ -18727,12 +18741,12 @@ msgstr "גרסת שרת מסד נתונים %1$s אינה נתמכת. אמורה
 #: app/views/administration.housekeeping.edit.php:178
 #, c-format
 msgid "Unsupported TimescaleDB version. Should be at least %1$s."
-msgstr ""
+msgstr "גרסת TimescaleDB לא נתמכת. אמורה להיות %1$s לפחות."
 
 #: app/views/administration.housekeeping.edit.php:188
 #, c-format
 msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
-msgstr ""
+msgstr "גרסת TimescaleDB לא נתמכת. אמורה להיות מעל %1$s."
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -20429,6 +20443,10 @@ msgstr "אמור להיות ערך בוליאני"
 #: include/classes/validators/CNewValidator.php:290
 msgid "a character string is expected"
 msgstr "אמור להיות מחרוזת תווים"
+
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr "אמור להיות מחרוזת תווים, מספר שלם וחיובי או שבר עשרוני"
 
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
@@ -22617,6 +22635,11 @@ msgstr "varsamp()‎ - סטיית דגימה"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "דרך"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr "שב׳"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

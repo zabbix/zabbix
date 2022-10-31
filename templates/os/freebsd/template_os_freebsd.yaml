@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-06-06T06:58:28Z'
+  date: '2022-08-22T14:06:18Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -783,8 +783,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'FreeBSD by Zabbix agent'
                         name: 'CPU load'
-                        host: 'FreeBSD by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -799,8 +799,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'FreeBSD by Zabbix agent'
                         name: 'CPU utilization'
-                        host: 'FreeBSD by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -815,8 +815,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Memory usage'
                         host: 'FreeBSD by Zabbix agent'
+                        name: 'Memory usage'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -832,8 +832,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Swap usage'
                         host: 'FreeBSD by Zabbix agent'
+                        name: 'Swap usage'
       valuemaps:
         -
           uuid: 9c02af203e354ac6ac87a742e85f683b

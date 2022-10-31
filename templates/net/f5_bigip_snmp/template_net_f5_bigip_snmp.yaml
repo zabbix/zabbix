@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:27:26Z'
+  date: '2022-10-24T13:30:53Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -466,10 +466,10 @@ zabbix_export:
             -
               uuid: 551fd3b77d144ed58f138865e4862901
               expression: 'last(/F5 Big-IP SNMP/bigip.uptime)<10m'
-              name: 'F5 BIG-IP: has been restarted'
-              event_name: 'F5 BIG-IP: has been restarted (uptime < 10m)'
+              name: 'F5 BIG-IP: Host has been restarted'
+              event_name: 'F5 BIG-IP: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1957,6 +1957,22 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+          overrides:
+            -
+              name: 'Skip trigger for defined filesystems'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#PART.NAME}'
+                    value: '{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}'
+                    formulaid: A
+              operations:
+                -
+                  operationobject: TRIGGER_PROTOTYPE
+                  operator: REGEXP
+                  value: '^F5 BIG-IP: Low free space in file system'
+                  discover: NO_DISCOVER
         -
           uuid: 8aeb7920d1fe4ba4884f92e45e711228
           name: 'Memory discovery'
@@ -3773,6 +3789,10 @@ zabbix_export:
           macro: '{$BIGIP.LLD.FILTER.PART.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered by mount point names.'
+        -
+          macro: '{$BIGIP.LLD.OVERRIDE.PART.FILTER_LOW_SPACE_TRIGGER}'
+          value: ^/usr$
+          description: 'Partitions that low free space trigger should ignore.'
         -
           macro: '{$BIGIP.MEMORY.UTIL.WARN.MAX}'
           value: '85'

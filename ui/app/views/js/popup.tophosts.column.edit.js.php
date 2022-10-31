@@ -37,7 +37,16 @@ window.tophosts_column_edit_form = new class {
 			template: '#thresholds-row-tmpl',
 			dataCallback: (row_data) => {
 				if (!('color' in row_data)) {
-					row_data.color = colorPalette.getNextColor();
+					const colors = this._$widget_form[0].querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
+					const used_colors = [];
+
+					for (const color of colors) {
+						if (color.value !== '') {
+							used_colors.push(color.value);
+						}
+					}
+
+					row_data.color = colorPalette.getNextColor(used_colors);
 				}
 			}
 		});

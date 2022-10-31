@@ -181,7 +181,7 @@ $form = (new CForm())
 		->setArgument('action', 'miscconfig.update')
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addItem(
 		(new CTabView())
 			->addTab('other', _('Other parameters'), $from_list)

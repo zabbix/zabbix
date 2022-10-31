@@ -433,7 +433,7 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-			// Name -numbers only
+			// Name - numbers only
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -443,7 +443,7 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-			// Name -symbols only
+			// Name - symbols only
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -453,7 +453,7 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-			// Name-spaces
+			// Name- spaces
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -463,7 +463,7 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-			// Max -64 symbols
+			// Max - 64 symbols
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -547,7 +547,7 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-			// Username/password -64 max allowed
+			// Username/password - 64 max allowed
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -694,74 +694,74 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-			// Http proxy -just numbers
+			// Http proxy - just numbers
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Http proxy -just numbers',
+					'name' => 'Http proxy - just numbers',
 					'http_proxy' => '1234567890',
 					'add_step' => [
-						['step' => 'Http proxy -just numbers']
+						['step' => 'Http proxy - just numbers']
 					]
 				]
 			],
-			// Http proxy -symbols
+			// Http proxy - symbols
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Http proxy -symbols',
+					'name' => 'Http proxy - symbols',
 					'http_proxy' => '!@#$%^&*()_+{}:"|<>?,./',
 					'add_step' => [
-						['step' => 'Http proxy -symbols']
+						['step' => 'Http proxy - symbols']
 					]
 				]
 			],
-			// Http proxy -max allowed length
+			// Http proxy - max allowed length
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Http proxy -max allowed length',
+					'name' => 'Http proxy - max allowed length',
 					'http_proxy' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
 						'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
 						'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
 						'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
 						'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop123456789012345',
 					'add_step' => [
-						['step' => 'Http proxy -max allowed length']
+						['step' => 'Http proxy - max allowed length']
 					]
 				]
 			],
-			// Variables -just numbers
+			// Variables - just numbers
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Variables -just numbers',
+					'name' => 'Variables - just numbers',
 					'variables' => [
 						['name' => '{1234567890}']
 					],
 					'add_step' => [
-						['step' => 'Variables -just numbers']
+						['step' => 'Variables - just numbers']
 					]
 				]
 			],
-			// Variables -symbols
+			// Variables - symbols
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Variables -symbols',
+					'name' => 'Variables - symbols',
 					'variables' => [
 						['name' => '{!@#$%^&*()_+:"|<>?,./}']
 					],
 					'add_step' => [
-						['step' => 'Variables -symbols']
+						['step' => 'Variables - symbols']
 					]
 				]
 			],
-			// Variables -255 max allowed
+			// Variables - 255 max allowed
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Variables -255 length',
+					'name' => 'Variables - 255 length',
 					'variables' => [
 						['name' => '{qwertyuiopqwertyuiopqwertyuiopqwertyui'.
 							'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
@@ -770,20 +770,20 @@ class testFormWeb extends CLegacyWebTest {
 							'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop123456789012}']
 					],
 					'add_step' => [
-						['step' => 'Variables -255 length']
+						['step' => 'Variables - 255 length']
 					]
 				]
 			],
-			// Variables -without {}
+			// Variables - without {}
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Variables -without {}',
+					'name' => 'Variables - without {}',
 					'variables' => [
 						['name' => 'test']
 					],
 					'add_step' => [
-						['step' => 'Variables -without {}']
+						['step' => 'Variables - without {}']
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
@@ -791,16 +791,16 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-			// Variables -without {}
+			// Variables - without {}
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Variables -without {}',
+					'name' => 'Variables - without {}',
 					'variables' => [
 						['name' => '{test']
 					],
 					'add_step' => [
-						['step' => 'Variables -without {}']
+						['step' => 'Variables - without {}']
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
@@ -808,16 +808,16 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-			// Variables -without {}
+			// Variables - without {}
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Variables -without {}',
+					'name' => 'Variables - without {}',
 					'variables' => [
 						['name' => 'test}']
 					],
 					'add_step' => [
-						['step' => 'Variables -without {}']
+						['step' => 'Variables - without {}']
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
@@ -825,17 +825,17 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-			// Variables -with the same names
+			// Variables - with the same names
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Variables -with the same names',
+					'name' => 'Variables - with the same names',
 					'variables' => [
 						['name' => '{test}'],
 						['name' => '{test}']
 					],
 					'add_step' => [
-						['step' => 'Variables -with the same names']
+						['step' => 'Variables - with the same names']
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
@@ -843,30 +843,30 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-			// Variables -two different
+			// Variables - two different
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Variables -two different',
+					'name' => 'Variables - two different',
 					'variables' => [
 						['name' => '{test1}', 'value' => 'test1'],
 						['name' => '{test2}', 'value' => 'test1']
 					],
 					'add_step' => [
-						['step' => 'Variables -two different']
+						['step' => 'Variables - two different']
 					]
 				]
 			],
-			// Variables -empty name
+			// Variables - empty name
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Variables -two different',
+					'name' => 'Variables - two different',
 					'variables' => [
 						['value' => 'test']
 					],
 					'add_step' => [
-						['step' => 'Variables -two different']
+						['step' => 'Variables - two different']
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
@@ -874,37 +874,37 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-			// Headers -just numbers
+			// Headers - just numbers
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Headers -just numbers',
+					'name' => 'Headers - just numbers',
 					'headers' => [
 						['name' => '1234567890', 'value' => '123456']
 					],
 					'add_step' => [
-						['step' => 'Headers -just numbers']
+						['step' => 'Headers - just numbers']
 					]
 				]
 			],
-			// Headers -just symbols
+			// Headers - just symbols
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Headers -just symbols',
+					'name' => 'Headers - just symbols',
 					'headers' => [
 						['name' => '!@#$%^&*()_+:"{}|<>?,./', 'value' => '!@#$%^&*()_+:"{}|<>?,./']
 					],
 					'add_step' => [
-						['step' => 'Headers -just symbols']
+						['step' => 'Headers - just symbols']
 					]
 				]
 			],
-			// Headers -255 length
+			// Headers - 255 length
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Headers -255 length',
+					'name' => 'Headers - 255 length',
 					'headers' => [
 						['name' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
 							'opqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwe.'.
@@ -918,51 +918,47 @@ class testFormWeb extends CLegacyWebTest {
 							'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop12345678901234']
 					],
 					'add_step' => [
-						['step' => 'Headers -255 length']
+						['step' => 'Headers - 255 length']
 					]
 				]
 			],
-			// Headers -two different
+			// Headers - two different
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Headers -two different',
+					'name' => 'Headers - two different',
 					'headers' => [
 						['name' => 'test', 'value' => 'test_value'],
 						['name' => 'test', 'value' => 'test_value']
 					],
 					'add_step' => [
-						['step' => 'Headers -two different']
+						['step' => 'Headers - two different']
 					]
 				]
 			],
-			// Headers -empty value
+			// Headers - empty value
 			[
 				[
-					'expected' => TEST_BAD,
-					'name' => 'Headers -empty value',
+					'expected' => TEST_GOOD,
+					'name' => 'Headers - empty value',
 					'headers' => [
 						['name' => 'test']
 					],
 					'add_step' => [
-						['step' => 'Headers -empty value']
-					],
-					'error_msg' => 'Cannot add web scenario',
-					'errors' => [
-						'Invalid parameter "/1/headers/1/value": cannot be empty.'
+						['step' => 'Headers - empty value']
 					]
 				]
 			],
-			// Headers -empty name
+			// Headers - empty name
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Headers -empty name',
+					'name' => 'Headers - empty name',
 					'headers' => [
 						['value' => 'test']
 					],
 					'add_step' => [
-						['step' => 'Headers -empty name']
+						['step' => 'Headers - empty name']
 					],
 					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
@@ -1011,7 +1007,7 @@ class testFormWeb extends CLegacyWebTest {
 					]
 				]
 			],
-			// testing created items using triggers -multiple steps added
+			// testing created items using triggers - multiple steps added
 			[
 				[
 					'expected' => TEST_GOOD,

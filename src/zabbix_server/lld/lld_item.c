@@ -652,6 +652,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 			continue;
 		}
 
+		item = (zbx_lld_item_t *)items->values[index];
 		item_param = zbx_item_param_create(row[2], row[3]);
 		ZBX_STR2UINT64(item_param->item_parameterid, row[0]);
 		zbx_vector_item_param_ptr_append(&item->item_params, item_param);
@@ -3650,7 +3651,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 
 		for (j = 0; j < item->item_params.values_num; j++)
 		{
-			item_param = (zbx_item_param_t *)item->item_params.values[j];
+			item_param = item->item_params.values[j];
 
 			if (0 != (item_param->flags & ZBX_FLAG_ITEM_PARAM_DELETE))
 			{
@@ -3711,7 +3712,7 @@ static int	lld_items_param_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 		{
 			char	delim = ' ';
 
-			item_param = (zbx_item_param_t *)item->item_params.values[j];
+			item_param = item->item_params.values[j];
 
 			if (0 == item_param->item_parameterid)
 			{

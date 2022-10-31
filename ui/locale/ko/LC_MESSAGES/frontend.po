@@ -1,19 +1,20 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2016-01-22 16:15+0300\n"
-"Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
+"PO-Revision-Date: 2022-09-02 13:59+0000\n"
+"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1453472100.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -64,11 +65,11 @@ msgstr "\"host:key\"의 페어로 지정해 주십시오"
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
-msgstr ""
+msgstr "의존 아이템과 마스터아이템의 hostid를 일치시켜주세요"
 
 #: include/classes/api/services/CItemGeneral.php:2306
 msgid "\"ruleid\" of dependent item and master item should match"
-msgstr ""
+msgstr "의존 아이템과 마스터 아이템의 ruleid를 일치시켜 주십시오"
 
 #: include/forms.inc.php:1334
 #: include/views/configuration.host.discovery.edit.php:900
@@ -103,7 +104,7 @@ msgstr[0] "%3$d%2$s건 중 %1$d건의 장애를 표시하고 있습니다."
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d개의 장애가 선택되었습니다."
 
 #: chart4.php:94
 #, c-format
@@ -131,7 +132,7 @@ msgstr[0] "액션 %1$s건"
 #: jsLoader.php:328
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s자"
 
 #: jsLoader.php:329
 #, c-format
@@ -149,13 +150,13 @@ msgstr[0] "%1$s 이벤트"
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
+msgstr[0] "%1$s 메인터넌스중인 호스트"
 
 #: include/func.inc.php:2549
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
+msgstr[0] "%1$s시간"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:126
 #: app/controllers/CControllerWidgetPlainTextView.php:127
@@ -311,7 +312,7 @@ msgstr "상위 100 발생 트리거"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
-msgstr ""
+msgstr "24/7"
 
 #: app/views/administration.queue.overview.php:48
 #: app/views/administration.queue.overview.proxy.php:48
@@ -370,48 +371,48 @@ msgstr "오버라이드 추가"
 
 #: app/views/administration.user.list.php:114
 msgid "API access"
-msgstr ""
+msgstr "API 액세스"
 
 #: app/controllers/CControllerPopupGeneric.php:333
 #: app/views/administration.userrole.edit.php:285
 msgid "API methods"
-msgstr ""
+msgstr "API 메소드"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "API token"
-msgstr ""
+msgstr "API 토큰"
 
 #: include/classes/api/services/CToken.php:299
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr ""
+msgstr "API 토큰\"%1$s\"는 \"%2$s\"에 이미 존재합니다."
 
 #: app/controllers/CControllerTokenCreate.php:98
 msgid "API token added"
-msgstr ""
+msgstr "API 토큰을 추가하였습니다"
 
 #: app/controllers/CControllerTokenDelete.php:61
 msgid "API token deleted"
 msgid_plural "API tokens deleted"
-msgstr[0] ""
+msgstr[0] "API 토큰을 삭제하였습니다"
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
-msgstr[0] ""
+msgstr[0] "API 토큰을 비활성화 하였습니다"
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
-msgstr[0] ""
+msgstr[0] "API 토큰을 활성화 하였습니다"
 
 #: include/classes/api/clients/CLocalApiClient.php:198
 msgid "API token expired."
-msgstr ""
+msgstr "API 토큰이 만료되었습니다."
 
 #: app/controllers/CControllerTokenUpdate.php:114
 msgid "API token updated"
-msgstr ""
+msgstr "API 토큰을 갱신하였습니다"
 
 #: app/controllers/CControllerTokenEdit.php:107
 #: app/controllers/CControllerTokenList.php:193
@@ -429,7 +430,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:397 include/html.inc.php:820
 #: include/html.inc.php:900
 msgid "API tokens"
-msgstr ""
+msgstr "API 토큰"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:251
 msgid "Above value"
@@ -914,11 +915,11 @@ msgstr "호스트그룹을 추가"
 
 #: app/partials/scheduledreport.subscription.php:42
 msgid "Add user"
-msgstr ""
+msgstr "사용자 추가"
 
 #: app/partials/scheduledreport.subscription.php:46
 msgid "Add user group"
-msgstr ""
+msgstr "유저 그룹 추가"
 
 #: app/views/js/configuration.dashboard.edit.js.php:198
 #: app/views/js/monitoring.dashboard.view.js.php:286
@@ -929,7 +930,7 @@ msgstr "위젯을 추가"
 #: app/controllers/CControllerAuditLogList.php:356
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
-msgstr ""
+msgstr "추가되었습니다"
 
 #: jsLoader.php:340
 #, c-format
@@ -1324,7 +1325,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "하나 이상의 액션이 필수입니다."
 
 #: include/classes/api/services/CUser.php:614
 #: include/classes/api/services/CUser.php:1286
@@ -1345,15 +1346,15 @@ msgstr "적어도 1개의 호스트 그룹 혹은 호스트가 선택되어 있�
 #: include/classes/api/services/CHostGroup.php:1111
 #: include/classes/api/services/CHostGroup.php:1268
 msgid "At least one host or template must be specified."
-msgstr ""
+msgstr "적어도 1개의 호스트 혹은 템플릿을 지정할 필요가 있습니다."
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr ""
+msgstr "최소 하나의 MySQL, PostgreSQL, Oracle 혹은 IBM DB2가 필요합니다."
 
 #: app/views/configuration.correlation.edit.php:159
 msgid "At least one operation must be selected."
-msgstr ""
+msgstr "최소 하나 이상의 실행내용이 설정되어 있어야 합니다."
 
 #: include/views/configuration.action.edit.php:520
 msgid "At least one operation must exist."
@@ -1361,7 +1362,7 @@ msgstr "최소 하나 이상의 액션처리가 설정되어 있어야 합니다
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
-msgstr ""
+msgstr "최소 하나 이상의 갱신시 실행내용이나 메시지가 필요합니다."
 
 #: app/views/popup.acknowledge.edit.php:105
 msgid "At least one update operation or message must exist."
@@ -1373,7 +1374,7 @@ msgstr "최소 하나 이상의 유저 혹은 유저 그룹을 선택할 필요�
 
 #: include/classes/api/services/CReport.php:343
 msgid "At least one user or user group must be specified."
-msgstr ""
+msgstr "최소 하나 이상의 유저 혹은 유저 그룹을 지정할 필요가 있습니다."
 
 #: app/views/administration.mediatype.edit.php:340
 msgid "Attempt interval"
@@ -13164,6 +13165,10 @@ msgstr ""
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "활성화된 호스트와 아이템의 트리거만 카운트"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -17552,6 +17557,16 @@ msgstr "이번 달의 지금까지"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr ""
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
@@ -20285,6 +20300,10 @@ msgstr ""
 msgid "a character string is expected"
 msgstr "문자열로 지정해 주십시오"
 
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr ""
@@ -22471,6 +22490,11 @@ msgstr ""
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "via"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr ""
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

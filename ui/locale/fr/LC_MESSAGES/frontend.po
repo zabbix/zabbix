@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-07-29 21:52+0000\n"
+"PO-Revision-Date: 2022-10-25 19:44+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -12130,7 +12130,7 @@ msgstr "Le champ de nom du formulaire ne doit pas dépasser 255 caractères."
 
 #: app/views/administration.module.edit.php:43
 msgid "Namespace"
-msgstr ""
+msgstr "Espace de noms"
 
 #: jsLoader.php:189
 msgid "Navigate to default view"
@@ -13284,6 +13284,10 @@ msgstr "Seuls les super-administrateurs peuvent définir le propriétaire du rap
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Seuls les déclencheurs assignés à des hôtes activés et dépendant d'éléments activés sont comptés"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr "Ouvrir le journal"
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -13779,7 +13783,7 @@ msgstr "La page a reçu des données incorrectes"
 #: include/classes/helpers/CPagerHelper.php:159
 msgctxt "page navigation"
 msgid "Pager"
-msgstr ""
+msgstr "Pager"
 
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.edit.php:103
@@ -13829,7 +13833,7 @@ msgstr "Graphique parent"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
-msgstr ""
+msgstr "Valeur de l'hôte parent"
 
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
@@ -17683,6 +17687,16 @@ msgstr "Ce mois-ci jusqu'à présent"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "Ce paramètre s'applique uniquement aux données numériques. Les données non numériques seront toujours extraites de l'historique."
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr "Ce paramètre doit être activé, car les tables d'historique contiennent des blocs compressés."
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr "Ce paramètre doit être activé, car les tableaux de tendance contiennent des blocs compressés."
+
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
@@ -17872,7 +17886,7 @@ msgstr "Haut"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
-msgstr ""
+msgstr "Top N"
 
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
@@ -20431,6 +20445,10 @@ msgstr "une valeur booléenne est attendue"
 msgid "a character string is expected"
 msgstr "une chaîne de caractères est attendue"
 
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr "une chaîne de caractères, un entier ou une valeur à virgule flottante est attendu"
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "une date au format AAAA-MM-JJ est attendue"
@@ -22618,6 +22636,11 @@ msgstr "varsamp() - Variance de l'échantillon"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "via"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr "S"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"

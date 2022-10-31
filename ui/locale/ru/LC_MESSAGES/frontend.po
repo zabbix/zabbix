@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-06-02 13:08+0000\n"
-"Last-Translator: Marina <marina.generalova@zabbix.com>\n"
+"PO-Revision-Date: 2022-10-06 10:34+0000\n"
+"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr "Дата \"%1$s\" должна быть меньше чем \"%2$s\" дата."
+msgstr "Дата \"%1$s\" должна быть меньше \"%2$s\" даты."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -44,7 +44,7 @@ msgstr "\"%1$s\" вместо \"%2$s\""
 #: include/classes/import/validators/C60XmlValidator.php:2050
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr "\"%1$s\" ожидалось"
+msgstr "\"%1$s\" ожидается"
 
 #: include/classes/api/services/CReport.php:229
 #: include/classes/api/services/CReport.php:636
@@ -1762,7 +1762,7 @@ msgstr "По нижнему краю"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr "N нижних значений"
+msgstr "Bottom N"
 
 #: jsLoader.php:276
 msgid "Bring forward"
@@ -2143,7 +2143,7 @@ msgstr[2] "Не удалось скопировать триггеры"
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Не удалось скопировать триггер \"%1$s\", так как в его выражении имеется несколько узлов сети."
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2290,17 +2290,17 @@ msgstr "Не удалось удалить узел сети"
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось удалить узел сети %1$s, так как обслуживание \"%2$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
+msgstr[1] "Не удалось удалить узлы сети %1$s, так как обслуживание \"%2$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
+msgstr[2] "Не удалось удалить узлы сети %1$s, так как обслуживание \"%2$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
 
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось удалить группу узлов сети %1$s, так как обслуживание \"%2$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
+msgstr[1] "Не удалось удалить группы узлов сети %1$s, так как обслуживание \"%2$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
+msgstr[2] "Не удалось удалить группы узлов сети %1$s, так как обслуживание \"%2$s\" должно содержать по крайней мере один узел сети или группу узлов сети."
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2854,7 +2854,7 @@ msgstr "Не удалось присоединить шаблон"
 #: include/classes/api/services/CHostBase.php:520
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "Не удалось присоединить шаблон \"%1$s\" к узлу сети \"%2$s\", так как родительский шаблон \"%3$s\" будет присоединен дважды."
 
 #: include/classes/api/services/CHostBase.php:678
 #: include/classes/api/services/CHostBase.php:755
@@ -2870,12 +2870,12 @@ msgstr "Не удалось присоединить \"%1$s\" шаблон к у
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "Не удалось присоединить шаблон \"%1$s\" к узлу сети \"%2$s\", так как родительский шаблон \"%3$s\" будет присоединен дважды."
 
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "Не удалось присоединить шаблон \"%1$s\" к прототипу узлов сети \"%2$s\", так как родительский шаблон \"%3$s\" будет присоединен дважды."
 
 #: include/classes/api/services/CHostBase.php:675
 #: include/classes/api/services/CHostBase.php:752
@@ -2891,17 +2891,17 @@ msgstr "Не удалось присоединить \"%1$s\" шаблон к п
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "Не удалось присоединить шаблон \"%1$s\" к прототипу узлов сети \"%2$s\", так как родительский шаблон \"%3$s\" будет присоединен дважды."
 
 #: include/classes/api/services/CHostBase.php:381
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" because circular linkage (%3$s) will occurs."
-msgstr ""
+msgstr "Не удалось присоединить шаблон \"%1$s\" к шаблону \"%2$s\", так как появится циклическая связь (%3$s)."
 
 #: include/classes/api/services/CHostBase.php:514
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "Не удалось присоединить шаблон \"%1$s\" к шаблону \"%2$s\", так как родительский шаблон \"%3$s\" будет присоединен дважды."
 
 #: include/classes/api/services/CHostBase.php:672
 #: include/classes/api/services/CHostBase.php:749
@@ -2917,12 +2917,12 @@ msgstr "Не удалось присоединить \"%1$s\" шаблон к ш
 #: include/classes/api/services/CHostBase.php:502
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "Не удалось присоединить шаблон \"%1$s\" к шаблону \"%2$s\", так как появится циклическая связь (%3$s)."
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "Не удалось присоединить шаблон \"%1$s\" к шаблону \"%2$s\", так как родительский шаблон \"%3$s\" будет присоединен дважды."
 
 #: include/classes/api/services/CHostBase.php:705
 #, c-format
@@ -3108,22 +3108,22 @@ msgstr "Не удалось отсоединить шаблон"
 #: include/classes/api/services/CHostBase.php:331
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "Не удалось отсоединить шаблон \"%1$s\" от узла сети \"%2$s\" из-за наличия зависимости триггера \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:415
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on host \"%4$s\"."
-msgstr ""
+msgstr "Не удалось отсоединить шаблон \"%1$s\" от шаблона \"%2$s\" из-за зависимости триггера \"%3$s\" на узле сети \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:414
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on template \"%4$s\"."
-msgstr ""
+msgstr "Не удалось отсоединить шаблон \"%1$s\" от шаблона \"%2$s\" из-за зависимости триггера \"%3$s\" на шаблоне \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:330
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "Не удалось отсоединить шаблон \"%1$s\" от шаблона \"%2$s\" из-за наличия зависимости триггера \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
@@ -3708,7 +3708,7 @@ msgstr "Класс %1$s не найден для действия %2$s."
 
 #: include/classes/core/ZBase.php:494
 msgid "Class not found."
-msgstr ""
+msgstr "Класс не найден."
 
 #: include/views/configuration.httpconf.list.php:217
 #: include/views/configuration.item.list.php:297
@@ -3837,7 +3837,7 @@ msgstr "Цвет (ОК)"
 #: include/classes/widgets/forms/CWidgetForm.php:71
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:114
 msgid "Columns"
-msgstr "Столбцов"
+msgstr "Колонки"
 
 #: app/views/js/administration.regex.edit.js.php:66
 msgid "Combined result"
@@ -3893,7 +3893,7 @@ msgstr "Сжатие"
 #: app/views/administration.housekeeping.edit.php:173
 #: app/views/administration.housekeeping.edit.php:183
 msgid "Compression is not supported."
-msgstr ""
+msgstr "Сжатия не поддерживается."
 
 #: app/views/administration.mediatype.edit.php:319
 msgid "Concurrent sessions"
@@ -4115,7 +4115,7 @@ msgstr "Поздравляем! Вы успешно установили Zabbix 
 #: include/views/inventory.host.view.php:81
 #: include/views/js/monitoring.sysmaps.js.php:770
 msgid "Connect to"
-msgstr "Подключаться через"
+msgstr "Подключение через"
 
 #: include/classes/widgets/CWidgetHelper.php:934
 #: include/classes/widgets/CWidgetHelper.php:1009
@@ -4720,7 +4720,7 @@ msgstr "Другое при ошибке"
 
 #: include/classes/helpers/CSlaHelper.php:247
 msgid "Custom schedule"
-msgstr ""
+msgstr "Пользовательское расписание"
 
 #: include/items.inc.php:1860
 msgid "Custom scripts"
@@ -5023,7 +5023,7 @@ msgstr "День месяца"
 
 #: include/classes/api/services/CMaintenance.php:689
 msgid "Day of the week and day of the month cannot be specified simultaneously."
-msgstr ""
+msgstr "Нельзя указать одновременно день недели и день месяца."
 
 #: app/views/popup.maintenance.period.php:96
 #: app/views/popup.maintenance.period.php:115
@@ -5034,7 +5034,7 @@ msgstr "День недели"
 #: app/views/popup.maintenance.period.php:165
 #: app/views/popup.sla.excludeddowntime.edit.php:63
 msgid "Days"
-msgstr "Дни"
+msgstr "Дней"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:391
 msgid "Debug"
@@ -5525,7 +5525,7 @@ msgstr "Состояние развертывания"
 
 #: include/classes/widgets/CWidgetHelper.php:62
 msgid "Deprecated"
-msgstr ""
+msgstr "Устарело"
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -5581,7 +5581,7 @@ msgstr "Подробности о веб-сценарии"
 
 #: app/views/administration.housekeeping.edit.php:194
 msgid "Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition."
-msgstr ""
+msgstr "Обнаруженная лицензия TimescaleDB не поддерживает сжатие. Сжатие поддерживается в TimescaleDB Community Edition."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1101
 msgid "Detection period"
@@ -5984,7 +5984,7 @@ msgstr "Статистика записи на диск. Возвращает ц
 
 #: app/views/popup.tophosts.column.edit.php:147
 msgid "Display"
-msgstr "Дисплей"
+msgstr "Отображение"
 
 #: app/views/administration.trigdisplay.edit.php:89
 msgid "Display OK triggers for"
@@ -6247,7 +6247,7 @@ msgstr "Изменить виджет"
 
 #: app/views/popup.sla.edit.php:113 app/views/sla.list.php:89
 msgid "Effective date"
-msgstr ""
+msgstr "Действительно с"
 
 #: app/partials/hostmacros.inherited.list.html.php:49
 msgid "Effective value"
@@ -6555,7 +6555,7 @@ msgstr "Конец строки"
 
 #: include/locales.inc.php:33
 msgid "English (en_GB)"
-msgstr ""
+msgstr "Английский (en_GB)"
 
 #: include/locales.inc.php:33
 msgid "English (en_US)"
@@ -6625,7 +6625,7 @@ msgstr "Ошибка! Zabbix сервер не может стартовать �
 #: app/partials/administration.system.info.php:159
 #: app/partials/administration.system.info.php:172
 msgid "Error! Unable to start Zabbix server."
-msgstr ""
+msgstr "Ошибка! Не удалось запустить Zabbix сервер."
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
@@ -6746,13 +6746,13 @@ msgstr "Исключить группы узлов сети"
 
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:94
 msgid "Excluded downtime"
-msgstr "Исключенное время простоя"
+msgstr "Исключение времени простоя"
 
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:167
 msgid "Excluded downtimes"
-msgstr "Исключенное время простоя"
+msgstr "Исключения времени простоя"
 
 #: app/controllers/CControllerAuditLogList.php:197 jsLoader.php:219
 msgid "Execute"
@@ -7927,7 +7927,7 @@ msgstr "Очистка истории может занять продолжит
 
 #: app/views/popup.tophosts.column.edit.php:159
 msgid "History data"
-msgstr ""
+msgstr "Данные истории"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:47
 msgid "History data selection"
@@ -8242,12 +8242,12 @@ msgstr[2] "Прототипы узлов сети обновлен"
 #: include/classes/api/services/CHostPrototype.php:999
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
-msgstr ""
+msgstr "Прототип узла сети с именем узла сети \"%1$s\" уже существует в правиле обнаружения \"%2$s\" узла сети \"%3$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:996
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
-msgstr ""
+msgstr "Прототип узла сети с именем узла сети \"%1$s\" уже существует в правиле обнаружения \"%2$s\" шаблона \"%3$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:978
 #, c-format
@@ -8739,7 +8739,7 @@ msgstr "По диапазону"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:363
 msgid "Inaccessible SLA"
-msgstr ""
+msgstr "Недоступный SLA"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
@@ -9248,7 +9248,7 @@ msgstr "Получен некорректный ответ от Zabbix серв�
 #: app/controllers/CControllerSlaCreateUpdate.php:111
 #, c-format
 msgid "Incorrect schedule: %1$s."
-msgstr ""
+msgstr "Некорректное расписание: %1$s."
 
 #: include/classes/api/services/CEvent.php:491
 #: include/classes/api/services/CProblem.php:356
@@ -9631,7 +9631,7 @@ msgstr "Увеличение на"
 
 #: app/views/popup.tophosts.column.edit.php:152
 msgid "Indicators"
-msgstr ""
+msgstr "Индикаторы"
 
 #: include/locales.inc.php:47
 msgid "Indonesian (id_ID)"
@@ -11166,7 +11166,7 @@ msgstr "Пн"
 #: include/func.inc.php:592 jsLoader.php:223
 msgctxt "month short"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:91
 msgid "MAC address A"
@@ -11299,7 +11299,7 @@ msgstr "Управление API токенами"
 
 #: include/classes/helpers/CRoleHelper.php:472
 msgid "Manage SLA"
-msgstr ""
+msgstr "Управление SLA"
 
 #: include/classes/helpers/CRoleHelper.php:471
 msgid "Manage scheduled reports"
@@ -11775,7 +11775,7 @@ msgstr "Минимально требуемая версия PHP - %1$s."
 #: app/views/administration.housekeeping.edit.php:174
 #, c-format
 msgid "Minimum required TimescaleDB version is %1$s."
-msgstr ""
+msgstr "Минимально требуемая версия TimescaleDB - %1$s."
 
 #: include/classes/setup/CFrontendSetup.php:193
 #, c-format
@@ -12309,7 +12309,7 @@ msgstr "Никогда"
 
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
 msgid "New SLA"
-msgstr ""
+msgstr "Новый SLA"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
@@ -12350,7 +12350,7 @@ msgstr "Значение тега нового события"
 
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:94
 msgid "New excluded downtime"
-msgstr ""
+msgstr "Новое исключение времени простоя"
 
 #: app/views/configuration.host.edit.php:65 app/views/popup.host.edit.php:97
 msgid "New host"
@@ -13073,7 +13073,7 @@ msgstr "Количество элементов данных в истории �
 
 #: include/classes/data/CItemData.php:1668
 msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
-msgstr ""
+msgstr "Количество элементов данных в очереди, которые задерживаются от и до секунд, включительно."
 
 #: include/classes/data/CItemData.php:1685
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -13398,6 +13398,10 @@ msgstr "Только супер-администраторы могут зада
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Подсчитываются только триггеры у активированных узлов сети и которые зависят от активных элементов данных"
 
+#: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:421
 msgid "Opera"
 msgstr "Opera"
@@ -13528,7 +13532,7 @@ msgstr "Порядок"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:145
 msgid "Order column"
-msgstr ""
+msgstr "Сортировка по колонке"
 
 #: app/partials/massupdate.macros.tab.php:119
 #: app/partials/massupdate.valuemaps.tab.php:89
@@ -13943,7 +13947,7 @@ msgstr "Родительские графики"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
-msgstr ""
+msgstr "Значение родительского узла сети"
 
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
@@ -14260,7 +14264,7 @@ msgstr "Расположение"
 
 #: include/classes/widgets/views/widget.item.form.view.php:142
 msgid "Position is ignored for s, uptime and unixtime units."
-msgstr ""
+msgstr "Позиция игнорируется для единиц измерения s, uptime и unixtime."
 
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
@@ -14272,7 +14276,7 @@ msgstr "Тип Post"
 
 #: app/views/administration.housekeeping.edit.php:164
 msgid "PostgreSQL database server version is too old."
-msgstr ""
+msgstr "Версия базы данных PostgreSQL слишком старая."
 
 #: include/classes/data/CItemData.php:1377
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -14635,11 +14639,11 @@ msgstr "Файл публичного ключа"
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
-msgstr ""
+msgstr "Квартал"
 
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
-msgstr "Ежеквартальный"
+msgstr "Ежеквартально"
 
 #: app/views/popup.httpstep.php:64
 #: include/views/configuration.host.discovery.edit.php:181
@@ -15542,7 +15546,7 @@ msgstr "SLA"
 #: include/classes/api/services/CSla.php:555
 #, c-format
 msgid "SLA \"%1$s\" SLO must have no more than 4 fractional digits."
-msgstr ""
+msgstr "SLA \"%1$s\" SLO должно содержать не более 4 цифр дробной части."
 
 #: include/classes/api/services/CSla.php:539
 #, c-format
@@ -15567,20 +15571,20 @@ msgstr[2] "SLA удалены"
 #: app/controllers/CControllerSlaDisable.php:73
 msgid "SLA disabled"
 msgid_plural "SLAs disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "SLA отключен"
+msgstr[1] "SLA отключены"
+msgstr[2] "SLAs отключено"
 
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
 msgid_plural "SLAs enabled"
-msgstr[0] ""
-msgstr[1] "SLA включено"
+msgstr[0] "SLA включено"
+msgstr[1] "SLA включены"
 msgstr[2] "SLA включено"
 
 #: app/views/monitoring.widget.slareport.view.php:33
 msgid "SLA is disabled."
-msgstr ""
+msgstr "SLA отключен."
 
 #: app/views/sla.list.php:93 app/views/sla.list.php:121
 #: app/views/slareport.list.php:92 include/classes/helpers/CMenuHelper.php:94
@@ -15857,7 +15861,7 @@ msgstr "Теги сценария"
 #: app/views/popup.sla.edit.php:97 app/views/sla.list.php:92
 #: include/views/configuration.maintenance.edit.php:45
 msgid "Schedule"
-msgstr "Запланировано"
+msgstr "Расписание"
 
 #: app/views/administration.queue.details.php:45
 msgid "Scheduled check"
@@ -16080,7 +16084,7 @@ msgstr "Выбрать"
 
 #: app/views/slareport.list.php:103
 msgid "Select SLA to display SLA report."
-msgstr ""
+msgstr "Выберите SLA для отображения отчета по SLA."
 
 #: app/views/popup.massupdate.item.php:438 app/views/popup.triggerexpr.php:83
 #: include/views/configuration.graph.edit.php:217
@@ -16239,7 +16243,7 @@ msgstr "Услуга \"%1$s\" не может иметь теги проблем
 #: include/classes/helpers/CRoleHelper.php:352
 #: include/views/configuration.action.list.php:28
 msgid "Service actions"
-msgstr "Действия услуг"
+msgstr "Действия на услуги"
 
 #: app/controllers/CControllerServiceCreate.php:171
 msgid "Service created"
@@ -16284,7 +16288,7 @@ msgstr "Значение тега услуги"
 
 #: app/views/popup.sla.edit.php:122 app/views/sla.list.php:60
 msgid "Service tags"
-msgstr "Сервисные теги"
+msgstr "Теги сервисов"
 
 #: app/views/popup.condition.common.php:564 include/actions.inc.php:56
 msgid "Service type"
@@ -16864,12 +16868,12 @@ msgstr "Время начала"
 #: include/classes/api/services/CSla.php:578
 #, c-format
 msgid "Start time must be less than end time for SLA \"%1$s\"."
-msgstr ""
+msgstr "Время начала должно быть меньше чем время завершения для SLA \"%1$s\"."
 
 #: include/classes/api/services/CSla.php:605
 #, c-format
 msgid "Start time must be less than end time for excluded downtime \"%2$s\" of SLA \"%1$s\"."
-msgstr ""
+msgstr "Время начало должно быть меньше времени завершения для исключения времени простоя \"%2$s\" в SLA \"%1$s\"."
 
 #: include/classes/validators/CLdapAuthValidator.php:81
 msgid "Starting TLS failed."
@@ -17489,7 +17493,7 @@ msgstr "Значение шаблона"
 #: include/classes/api/services/CHostGeneral.php:126
 #, c-format
 msgid "Template with host name \"%1$s\" already exists."
-msgstr ""
+msgstr "Шаблон с именем узла сети \"%1$s\" уже существует."
 
 #: include/classes/api/services/CHost.php:2067
 #: include/classes/api/services/CHost.php:2353
@@ -17506,7 +17510,7 @@ msgstr "Шаблон с таким же видимым именем \"%1$s\" у�
 #: include/classes/api/services/CHostGeneral.php:146
 #, c-format
 msgid "Template with visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "Шаблон с видимым именем \"%1$s\" уже существует."
 
 #: app/controllers/CControllerPopupGeneric.php:121
 #: app/controllers/CControllerPopupImportCompare.php:132
@@ -17544,7 +17548,7 @@ msgstr "Шаблоны \"%1$s\" отсоединены от узлов сети 
 
 #: app/partials/configuration.host.edit.html.php:215
 msgid "Templates linked by host discovery cannot be unlinked."
-msgstr ""
+msgstr "Шаблоны присоединенные обнаружением узлов сети нельзя отсоединить."
 
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
@@ -17637,7 +17641,7 @@ msgstr "Текст"
 
 #: app/views/popup.tophosts.column.edit.php:75
 msgid "Text, supports {INVENTORY.*}, {HOST.*} macros"
-msgstr ""
+msgstr "Текст, поддерживает макросы {INVENTORY.*}, {HOST.*}"
 
 #: include/classes/api/clients/CLocalApiClient.php:89
 #, c-format
@@ -17676,17 +17680,17 @@ msgstr "Склонированный шаблон содержит пользо�
 #: include/classes/api/services/CTriggerGeneral.php:2245
 #, c-format
 msgid "The dependency of trigger \"%1$s\" on trigger \"%2$s\" already exists."
-msgstr ""
+msgstr "Зависимость триггера \"%1$s\" от триггера \"%2$s\" уже существует."
 
 #: include/classes/api/services/CTriggerGeneral.php:2249
 #, c-format
 msgid "The dependency of trigger prototype \"%1$s\" on trigger \"%2$s\" already exists."
-msgstr ""
+msgstr "Зависимость прототипа триггеров \"%1$s\" от триггера \"%2$s\" уже существует."
 
 #: include/classes/api/services/CTriggerGeneral.php:2250
 #, c-format
 msgid "The dependency of trigger prototype \"%1$s\" on trigger prototype \"%2$s\" already exists."
-msgstr ""
+msgstr "Зависимость прототипа триггеров \"%1$s\" от прототипа триггеров \"%2$s\" уже существует."
 
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
@@ -17807,6 +17811,16 @@ msgstr "В этом месяце"
 
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr "Эта настройка применима только к числовым данным. Нечисловые данные всегда берутся из истории."
+
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr ""
 
 #: include/views/configuration.item.edit.php:123
@@ -17837,7 +17851,7 @@ msgstr "Порог"
 
 #: app/views/popup.tophosts.column.edit.php:232
 msgid "Thresholds"
-msgstr ""
+msgstr "Пороги"
 
 #: include/items.inc.php:1892 include/items.inc.php:1896
 msgid "Throttling"
@@ -17998,11 +18012,11 @@ msgstr "По верхнему краю"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
-msgstr "N верхних значений"
+msgstr "Top N"
 
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
-msgstr ""
+msgstr "Топ узлов сети"
 
 #: app/views/administration.queue.overview.proxy.php:97
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -18123,57 +18137,57 @@ msgstr "Триггер \"%1$s\" принадлежит шаблонам с ра�
 #: include/triggers.inc.php:372 include/triggers.inc.php:433
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
-msgstr ""
+msgstr "Триггер \"%1$s\" не может зависеть от несуществующего триггера \"%2$s\" на узле сети \"%3$s\"."
 
 #: include/triggers.inc.php:373 include/triggers.inc.php:434
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
-msgstr ""
+msgstr "Триггер \"%1$s\" не может зависеть от несуществующего триггера \"%2$s\" на шаблоне \"%3$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2728
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "Триггер \"%1$s\" не может зависеть от триггера \"%2$s\" с узла сети \"%3$s\", так как зависимости от триггеров с дочерних шаблонов или узлов сети не разрешены."
 
 #: include/classes/api/services/CTriggerGeneral.php:2727
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "Триггер \"%1$s\" не может зависеть от триггера \"%2$s\" с шаблона \"%3$s\", так как зависимости от триггеров с дочерних шаблонов или узлов сети не разрешены."
 
 #: include/classes/api/services/CTriggerGeneral.php:2621
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr ""
+msgstr "Триггер \"%1$s\" не может зависеть от триггера \"%2$s\" с шаблона \"%3$s\", так как зависимости от триггеров с родительских шаблонов или узлов сети не разрешены."
 
 #: include/classes/api/services/CTriggerGeneral.php:2354
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr ""
+msgstr "Триггер \"%1$s\" не может зависеть от триггера \"%2$s\", так как появится циклическая зависимость (%3$s) для узла сети \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2349
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr ""
+msgstr "Триггер \"%1$s\" не может зависеть от триггера \"%2$s\", так как появится циклическая зависимость (%3$s) для шаблона \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2365
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "Триггер \"%1$s\" не может зависеть от триггера \"%2$s\", так как появится циклическая зависимость (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:2472
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr ""
+msgstr "Триггер \"%1$s\" не может зависеть от триггера \"%2$s\", так как зависимости триггеров с узлов сети от триггеров с шаблонов не разрешены."
 
 #: include/classes/api/services/CTriggerGeneral.php:2857
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
-msgstr ""
+msgstr "Триггер \"%1$s\" не может зависеть от триггера \"%2$s\", так как шаблон \"%3$s\" не присоединен к узлу сети \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2856
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
-msgstr ""
+msgstr "Триггер \"%1$s\" не может зависеть от триггера \"%2$s\", так как шаблон \"%3$s\" не присоединен к шаблону \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1800
 #, c-format
@@ -18283,62 +18297,62 @@ msgstr "Прототип триггера \"%1$s\" принадлежит шаб
 #: include/classes/api/services/CDiscoveryRule.php:916
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
-msgstr ""
+msgstr "Прототип триггеров \"%1$s\" не может зависеть от несуществующего триггера \"%2$s\" на узле сети \"%3$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:915
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
-msgstr ""
+msgstr "Прототип триггеров \"%1$s\" не может зависеть от несуществующего триггера \"%2$s\" шаблона \"%3$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2733
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "Прототип триггеров \"%1$s\" не может зависеть от триггера \"%2$s\" с узла сети \"%3$s\", так как зависимости от триггеров с дочерних шаблонов или узлов сети не разрешены."
 
 #: include/classes/api/services/CTriggerGeneral.php:2732
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "Прототип триггеров \"%1$s\" не может зависеть от триггера \"%2$s\" с шаблона \"%3$s\", так как зависимости от триггеров с дочерних шаблонов или узлов сети не разрешены."
 
 #: include/classes/api/services/CTriggerGeneral.php:2622
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr ""
+msgstr "Прототип триггеров \"%1$s\" не может зависеть от триггера \"%2$s\" с шаблона \"%3$s\", так как зависимости от триггеров с родительских шаблонов не разрешены."
 
 #: include/classes/api/services/CTriggerGeneral.php:2473
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr ""
+msgstr "Прототип триггеров \"%1$s\" не может зависеть от триггера \"%2$s\", так как зависимости триггеров с узлов сети от триггеров с шаблонов не разрешены."
 
 #: include/classes/api/services/CTriggerGeneral.php:2862
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
-msgstr ""
+msgstr "Прототип триггеров \"%1$s\" не может зависеть от триггера \"%2$s\", так как шаблон \"%3$s\" не присоединен к узлу сети \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2861
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
-msgstr ""
+msgstr "Прототип триггеров \"%1$s\" не может зависеть от триггера \"%2$s\", так как шаблон \"%3$s\" не присоединен к шаблону \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2355
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr ""
+msgstr "Прототип триггеров \"%1$s\" не может зависеть от прототипа триггеров \"%2$s\", так как появится циклическая зависимость (%3$s) для узла сети \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2350
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr ""
+msgstr "Прототип триггеров \"%1$s\" не может зависеть от прототипа триггеров \"%2$s\", так как появится циклическая зависимость (%3$s) для шаблона \"%4$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:2366
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "Прототип триггеров \"%1$s\" не может зависеть от прототипа триггеров \"%2$s\", так как появится циклическая зависимость (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:1325
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
-msgstr ""
+msgstr "Прототип триггеров \"%1$s\" не может зависеть от прототипа триггеров \"%2$s\", так как зависимости прототипов триггеров с другого LLD правила не разрешены."
 
 #: include/classes/api/services/CTriggerGeneral.php:1716
 #, c-format
@@ -18666,11 +18680,11 @@ msgstr "Не удалось перезаписать существующий ф
 
 #: app/views/administration.housekeeping.edit.php:159
 msgid "Unable to retrieve TimescaleDB compression support status."
-msgstr ""
+msgstr "Не удалось получить состояние поддержки сжатия в TimescaleDB."
 
 #: app/views/administration.housekeeping.edit.php:169
 msgid "Unable to retrieve TimescaleDB version."
-msgstr ""
+msgstr "Не удалось получить версию TimescaleDB данных."
 
 #: app/partials/administration.system.info.php:156
 msgid "Unable to retrieve database version."
@@ -18848,22 +18862,22 @@ msgstr "Включить звук"
 #: app/partials/administration.system.info.php:160
 #, c-format
 msgid "Unsupported %1$s database server version. Must be at least %2$s."
-msgstr ""
+msgstr "Версия %1$s сервера базы данных не поддерживается. Необходима как минимум версия %2$s."
 
 #: app/partials/administration.system.info.php:173
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
-msgstr ""
+msgstr "Версия %1$s сервера базы данных не поддерживается. Необходима версия не выше %2$s."
 
 #: app/views/administration.housekeeping.edit.php:178
 #, c-format
 msgid "Unsupported TimescaleDB version. Should be at least %1$s."
-msgstr ""
+msgstr "Неподдерживаемая версия TimescaleDB. Версия должна быть по крайней мере %1$s."
 
 #: app/views/administration.housekeeping.edit.php:188
 #, c-format
 msgid "Unsupported TimescaleDB version. Should not be higher than %1$s."
-msgstr ""
+msgstr "Неподдерживаемая версия TimescaleDB. Необходима версия не выше %1$s."
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -18978,7 +18992,7 @@ msgstr "Обновить"
 
 #: app/views/popup.tophosts.column.edit.php:249
 msgid "Update column"
-msgstr ""
+msgstr "Обновление колонки"
 
 #: app/partials/massupdate.macros.tab.php:86
 #: app/partials/massupdate.valuemaps.tab.php:33 app/views/popup.import.php:129
@@ -19056,7 +19070,7 @@ msgstr "Использовать умолчание"
 
 #: app/partials/configuration.host.edit.html.php:216
 msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
-msgstr ""
+msgstr "Используйте диалог настройки прототипа узлов сети чтобы автоматически удалить присоединенные шаблоны при следующем цикле обнаружения."
 
 #: app/views/administration.user.edit.php:296 app/views/popup.media.php:88
 msgid "Use if severity"
@@ -19964,12 +19978,12 @@ msgstr "Предупреждающее сообщение"
 
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
-msgstr ""
+msgstr "Внимание! Не удалось получить версию базы данных."
 
 #: app/partials/administration.system.info.php:166
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
-msgstr ""
+msgstr "Внимание! Версия %1$s сервера базы данных не поддерживается. Необходима как минимум версия %2$s."
 
 #: app/partials/administration.system.info.php:167
 #, c-format
@@ -19979,7 +19993,7 @@ msgstr "Внимание! Ваш сервер базы данных версии
 #: app/partials/administration.system.info.php:179
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
-msgstr ""
+msgstr "Внимание! Версия %1$s сервера базы данных не поддерживается. Необходима версия не выше %2$s."
 
 #: jsLoader.php:301
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -20166,7 +20180,7 @@ msgstr "С проблемами"
 
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
-msgstr ""
+msgstr "С этой настройкой в этой колонке будут отображаться только числовые элементы данных."
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"
@@ -20569,6 +20583,10 @@ msgstr "ожидается логическое значение"
 msgid "a character string is expected"
 msgstr "ожидается строка символов"
 
+#: include/classes/validators/CApiInputValidator.php:854
+msgid "a character string, integer or floating point value is expected"
+msgstr "ожидается строка символов, целое число или число с плавающей точкой"
+
 #: include/classes/validators/CApiInputValidator.php:2560
 msgid "a date in YYYY-MM-DD format is expected"
 msgstr "ожидается дата в ГГГГ-ММ-ДД формате"
@@ -20585,7 +20603,7 @@ msgstr "ожидается дата"
 #: app/controllers/CControllerSlaReportList.php:171
 #, c-format
 msgid "a date not later than %1$s is expected"
-msgstr ""
+msgstr "ожидается дата не позднее %1$s"
 
 #: app/views/administration.authentication.edit.php:79
 msgid "a digit"
@@ -20658,7 +20676,7 @@ msgstr "ожидается время"
 #: app/controllers/CControllerSlaExcludedDowntimeValidate.php:95
 #, c-format
 msgid "a time not later than %1$s is expected"
-msgstr ""
+msgstr "ожидается время не позднее %1$s"
 
 #: include/classes/validators/CApiInputValidator.php:1846
 #: include/classes/validators/CNewValidator.php:252
@@ -21048,7 +21066,7 @@ msgstr "не может быть пустым"
 #: include/classes/validators/CApiInputValidator.php:2982
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
-msgstr ""
+msgstr "не может быть меньше или равно значению параметра \"%1$s\""
 
 #: include/classes/api/services/CHostBase.php:57
 #: include/classes/api/services/CTemplate.php:1019
@@ -21066,11 +21084,11 @@ msgstr "не удалось сконвертировать в JSON, значен
 
 #: include/classes/api/services/CHostPrototype.php:2167
 msgid "cannot delete templated host prototype"
-msgstr ""
+msgstr "не удалось удалить прототип узлов сети унаследованный из шаблона"
 
 #: include/classes/api/services/CHostPrototype.php:1197
 msgid "cannot have more than one default interface of the same type"
-msgstr ""
+msgstr "не может быть более одного интерфейса по умолчанию одного типа."
 
 #: include/classes/helpers/CElasticsearchHelper.php:87
 msgid "cannot perform Scroll API request, data could be truncated"
@@ -21083,12 +21101,12 @@ msgstr "не удалось обновить свойство у правила 
 #: include/classes/validators/CApiInputValidator.php:3031
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of discovered object"
-msgstr ""
+msgstr "не удалось обновить параметр \"%1$s\" доступный только для чтения у обнаруженного объекта"
 
 #: include/classes/validators/CApiInputValidator.php:3025
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of inherited object"
-msgstr ""
+msgstr "не удалось обновить параметр \"%1$s\" доступный только для чтения у унаследованного объекта"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
@@ -21130,7 +21148,7 @@ msgstr "цвет"
 
 #: app/controllers/CControllerSlaCreateUpdate.php:62
 msgid "comma separated list of time periods is expected for scheduled week days"
-msgstr ""
+msgstr "для запланированных дней недели ожидается список периодов времени, разделенных запятой"
 
 #: app/partials/monitoring.latest.filter.php:176
 #: app/partials/monitoring.problem.filter.php:236
@@ -22758,6 +22776,11 @@ msgstr "varsamp() - Выборочная дисперсия"
 #: include/actions.inc.php:783 include/actions.inc.php:801
 msgid "via"
 msgstr "через"
+
+#: include/func.inc.php:659
+msgctxt "week short"
+msgid "w"
+msgstr "н"
 
 #: include/classes/api/services/CTask.php:443
 msgid "wrong discovery rule type"
