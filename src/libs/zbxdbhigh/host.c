@@ -3299,6 +3299,14 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 						new_snmp++;
 			}
 		}
+
+		for (j = 0; j < del_interfaceids->values_num; j++)
+		{
+			zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype->hostid,
+					host_prototype->host);
+			zbx_audit_host_prototype_update_json_delete_interface(host_prototype->hostid,
+					del_interfaceids->values[j]);
+		}
 	}
 
 	if (0 != new_hosts)
