@@ -100,7 +100,7 @@ class testItemState extends CIntegrationTest {
 
 		// Create items
 		foreach (self::$items as $key => $item) {
-			$items[] = [
+			$new_item = [
 				'name' => $key,
 				'key_' => $item['key'],
 				'type' => $item['type'],
@@ -110,6 +110,14 @@ class testItemState extends CIntegrationTest {
 				'delay' => '1s',
 				'status' => ITEM_STATUS_DISABLED
 			];
+
+			if ($new_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
+				$new_item['interfaceid'] = 0;
+			} else {
+				$new_item['interfaceid'] = self::$interfaceid;
+			}
+
+			$items[] = $new_item;
 		}
 
 		$response = $this->call('item.create', $items);
