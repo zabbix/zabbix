@@ -17,16 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxstr.h"
 #include "zbxthreads.h"
-#include "perfstat.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "log.h"
 
-int	USER_PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
+#include "perfstat.h"
+
+int	user_perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
 	char	*counter, *error = NULL;
@@ -84,19 +86,19 @@ static int perf_counter_ex(const char *function, AGENT_REQUEST *request, AGENT_R
 		goto out;
 	}
 
-	strscpy(counterpath, tmp);
+	zbx_strscpy(counterpath, tmp);
 
 	if (NULL == (tmp = get_rparam(request, 1)) || '\0' == *tmp)
 	{
 		interval = 1;
 	}
-	else if (FAIL == is_uint31(tmp, &interval))
+	else if (FAIL == zbx_is_uint31(tmp, &interval))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 		goto out;
 	}
 
-	if (1 > interval || MAX_COLLECTOR_PERIOD < interval)
+	if (1 > interval || ZBX_MAX_COLLECTOR_PERIOD < interval)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Interval out of range."));
 		goto out;
@@ -123,12 +125,12 @@ out:
 	return ret;
 }
 
-int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return perf_counter_ex(__func__, request, result, PERF_COUNTER_LANG_DEFAULT);
 }
 
-int	PERF_COUNTER_EN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_counter_en(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return perf_counter_ex(__func__, request, result, PERF_COUNTER_LANG_EN);
 }
@@ -253,12 +255,12 @@ err:
 	return ret;
 }
 
-int	PERF_INSTANCE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_instance_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return perf_instance_discovery_ex(__func__, request, result, PERF_COUNTER_LANG_DEFAULT);
 }
 
-int	PERF_INSTANCE_DISCOVERY_EN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_instance_discovery_en(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return perf_instance_discovery_ex(__func__, request, result, PERF_COUNTER_LANG_EN);
 }

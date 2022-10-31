@@ -18,10 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormHost.php';
 
 /**
- * @dataSource DiscoveredHosts
+ * @dataSource DiscoveredHosts, Proxies
  *
  * @backup hosts
  *
@@ -73,7 +74,7 @@ class testFormHostMonitoring extends testFormHost {
 		$this->cloneHost($data, 'Clone');
 
 		// Check that items aren't cloned from original host.
-		$this->assertItemsDBCount($data['Host name'], 0);
+		$this->assertItemsDBCount($data['fields']['Host name'], 0);
 	}
 
 	/**
@@ -83,7 +84,7 @@ class testFormHostMonitoring extends testFormHost {
 		$this->cloneHost($data, 'Full clone');
 
 		// Check that items cloned from original host.
-		$this->assertItemsDBCount($data['Host name'], 3);
+		$this->assertItemsDBCount($data['fields']['Host name'], $data['items']);
 	}
 
 	/**

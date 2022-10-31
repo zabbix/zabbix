@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 #include "zbxmockhelper.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxcomms.h"
 
 void	zbx_mock_test_entry(void **state)

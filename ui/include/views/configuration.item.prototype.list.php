@@ -28,8 +28,8 @@ require_once dirname(__FILE__).'/js/configuration.item.prototype.list.js.php';
 $widget = (new CWidget())
 	->setTitle(_('Item prototypes'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_ITEM_PROTOTYPE_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATES_ITEM_PROTOTYPE_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_ITEM_PROTOTYPE_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATES_ITEM_PROTOTYPE_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,
@@ -151,7 +151,7 @@ foreach ($data['items'] as $item) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
-	$item_menu = CMenuPopupHelper::getItemPrototypeConfiguration([
+	$item_menu = CMenuPopupHelper::getItemPrototype([
 		'itemid' => $item['itemid'],
 		'context' => $data['context'],
 		'backurl' => (new CUrl('disc_prototypes.php'))

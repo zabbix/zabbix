@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:37:38Z'
+  version: '6.4'
+  date: '2022-08-16T11:21:59Z'
   template_groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -14,12 +14,13 @@ zabbix_export:
         Template Server HP iLO
         
         MIBs used:
+        HOST-RESOURCES-MIB
         CPQHLTH-MIB
         SNMPv2-MIB
         CPQSINFO-MIB
         CPQIDA-MIB
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Server hardware'
@@ -265,6 +266,34 @@ zabbix_export:
                   tag: scope
                   value: notice
         -
+          uuid: 02e21fa19e814d529ae24f89e3bbf947
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'system.hw.uptime[hrSystemUptime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 84ed489ba1be43738be79f8a71b60381
           name: 'System location'
           type: SNMP_AGENT
@@ -326,6 +355,28 @@ zabbix_export:
                 -
                   tag: scope
                   value: security
+        -
+          uuid: 05166eb015534cae9798f9266d3d0a6b
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.net.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
         -
           uuid: d02b8e2d5c7a4afabc2fbadc8674288c
           name: 'System object ID'
@@ -403,45 +454,6 @@ zabbix_export:
                 -
                   tag: scope
                   value: performance
-        -
-          uuid: 05166eb015534cae9798f9266d3d0a6b
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'system.uptime[sysUpTime.0]'
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 261749b9936c4a26b48d660f01435fb7
-              expression: 'last(/HP iLO SNMP/system.uptime[sysUpTime.0])<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes.'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'No SNMP data collection'
-                  expression: 'max(/HP iLO SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
         -
           uuid: e5ebd75f34f24502b3cdc2a707fb24c5
           name: 'SNMP agent availability'
@@ -2742,3 +2754,20 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: 261749b9936c4a26b48d660f01435fb7
+      expression: '(last(/HP iLO SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP iLO SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP iLO SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP iLO SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        -
+          name: 'No SNMP data collection'
+          expression: 'max(/HP iLO SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        -
+          tag: scope
+          value: notice

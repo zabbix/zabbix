@@ -222,6 +222,23 @@ $form_grid->addItem([
 	(new CFormField(CWidgetHelper::getColor($fields['bg_color'], true)))->addClass('js-row-bg-color')
 ]);
 
+// Thresholds.
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['thresholds'])
+		->addItem(
+			(new CSpan([
+				'&nbsp;',
+				makeWarningIcon(_('This setting applies only to numeric data.'))
+			]))->setId('item-value-thresholds-warning'))
+		->addClass('js-row-thresholds'),
+	(new CFormField(CWidgetHelper::getThresholds($fields['thresholds'])))->addClass('js-row-thresholds')
+]);
+$scripts[] = $fields['thresholds']->getJavascript();
+
+$thresholds_tmpl_id = sprintf(CWidgetFieldThresholds::THRESHOLDS_ROW_TMPL_ID, $fields['thresholds']->getName());
+$jq_templates[$thresholds_tmpl_id] = CWidgetHelper::getThresholdsTemplate($fields['thresholds']->getName())
+	->toString();
+
 // Dynamic item.
 if ($data['templateid'] === null) {
 	$form_grid->addItem([
@@ -233,10 +250,13 @@ if ($data['templateid'] === null) {
 $form->addItem($form_grid);
 
 $scripts[] = '
-	widget_item_form.init();
+	widget_item_form.init('.json_encode([
+		'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE
+	]).');
 ';
 
 return [
 	'form' => $form,
-	'scripts' => $scripts
+	'scripts' => $scripts,
+	'jq_templates' => $jq_templates
 ];

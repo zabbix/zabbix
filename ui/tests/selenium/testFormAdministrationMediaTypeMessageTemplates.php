@@ -461,7 +461,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 			$message = preg_replace('/[\r\n ]+/', ' ', $template['Message']);
 			$this->assertEquals($message, $row->getColumn('Template')->getText());
 
-			// Check that it is no logner possible to add same type of message template.
+			// Check that it is no longer possible to add same type of message template.
 			$templates_list->invalidate();
 			if ($i === $last) {
 				$this->assertFalse($templates_list->query('button:Add (message type limit reached)')->one()->isEnabled());

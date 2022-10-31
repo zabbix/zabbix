@@ -29,8 +29,8 @@ if (!empty($this->data['parent_discoveryid'])) {
 	$widget = (new CWidget())
 		->setTitle(_('Graph prototypes'))
 		->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-			? CDocHelper::CONFIGURATION_HOST_GRAPH_PROTOTYPE_LIST
-			: CDocHelper::CONFIGURATION_TEMPLATES_GRAPH_PROTOTYPE_LIST
+			? CDocHelper::DATA_COLLECTION_HOST_GRAPH_PROTOTYPE_LIST
+			: CDocHelper::DATA_COLLECTION_TEMPLATES_GRAPH_PROTOTYPE_LIST
 		))
 		->setControls(
 			(new CTag('nav', true,
@@ -51,8 +51,8 @@ else {
 	$widget = (new CWidget())
 		->setTitle(_('Graphs'))
 		->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-			? CDocHelper::CONFIGURATION_HOST_GRAPH_LIST
-			: CDocHelper::CONFIGURATION_TEMPLATE_GRAPH_LIST
+			? CDocHelper::DATA_COLLECTION_HOST_GRAPH_LIST
+			: CDocHelper::DATA_COLLECTION_TEMPLATE_GRAPH_LIST
 		))
 		->setControls(
 			(new CTag('nav', true,
@@ -116,9 +116,10 @@ else {
 							'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 							'data' => $data['filter']['hosts'],
 							'popup' => [
-								'filter_preselect_fields' => $data['context'] === 'host'
-									? ['hostgroups' => 'filter_groupids_']
-									: ['templategroups' => 'filter_groupids_'],
+								'filter_preselect' => [
+									'id' => 'filter_groupids_',
+									'submit_as' => 'groupid'
+								],
 								'parameters' => [
 									'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 									'srcfld1' => 'hostid',

@@ -1749,7 +1749,7 @@ static int	DBpatch_3030139(void)
 
 static int	DBpatch_3030140(void)
 {
-	/* CONDITION_TYPE_TIME_PERIOD */
+	/* ZBX_CONDITION_TYPE_TIME_PERIOD */
 	return DBpatch_trailing_semicolon_remove("conditions", "conditionid", "value", " where conditiontype=6");
 }
 

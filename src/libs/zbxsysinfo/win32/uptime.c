@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "perfmon.h"
-#include "sysinfo.h"
 
-int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		counter_path[64];
 	AGENT_REQUEST	request_tmp;
@@ -36,7 +36,7 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	request_tmp.params = zbx_malloc(NULL, request_tmp.nparam * sizeof(char *));
 	request_tmp.params[0] = counter_path;
 
-	ret = PERF_COUNTER(&request_tmp, result);
+	ret = perf_counter(&request_tmp, result);
 
 	zbx_free(request_tmp.params);
 
@@ -47,13 +47,13 @@ int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	/* result must be integer to correctly interpret it in frontend (uptime) */
-	if (!GET_UI64_RESULT(result))
+	if (!ZBX_GET_UI64_RESULT(result))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid result. Unsigned integer is expected."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	UNSET_RESULT_EXCLUDING(result, AR_UINT64);
+	ZBX_UNSET_RESULT_EXCLUDING(result, AR_UINT64);
 
 	return SYSINFO_RET_OK;
 }

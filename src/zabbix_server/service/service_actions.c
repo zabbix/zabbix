@@ -33,7 +33,7 @@ static int	condition_match_service(const zbx_service_action_condition_t *conditi
 {
 	zbx_uint64_t	serviceid;
 
-	if (SUCCEED != is_uint64(condition->value, &serviceid) || serviceid != update->service->serviceid)
+	if (SUCCEED != zbx_is_uint64(condition->value, &serviceid) || serviceid != update->service->serviceid)
 		return FAIL;
 
 	return SUCCEED;
@@ -58,7 +58,7 @@ static int	condition_match_service_name(const zbx_service_action_condition_t *co
  *             name  - [IN] the target tag name                               *
  *             value - [IN] the target tag value (NULL if only tag name are   *
  *                          being matched                                     *
- *             op    - [IN] the matching operator (CONDITION_OPERATOR_*)      *
+ *             op    - [IN] the matching operator (ZBX_CONDITION_OPERATOR_*)  *
  *                                                                            *
  * Return value: SUCCEED - the tags matches                                   *
  *               FAIL    - otherwise                                          *
@@ -71,7 +71,7 @@ static int	match_tags(const zbx_vector_ptr_t *tags, const char *name, const char
 {
 	int	i, ret, expected_ret;
 
-	if (CONDITION_OPERATOR_EQUAL == op || CONDITION_OPERATOR_LIKE == op)
+	if (ZBX_CONDITION_OPERATOR_EQUAL == op || ZBX_CONDITION_OPERATOR_LIKE == op)
 	{
 		expected_ret = SUCCEED;
 		ret = FAIL;
@@ -137,16 +137,16 @@ static const char	*service_update_match_condition(const zbx_service_update_t *up
 
 	switch (condition->conditiontype)
 	{
-		case CONDITION_TYPE_SERVICE:
+		case ZBX_CONDITION_TYPE_SERVICE:
 			ret = condition_match_service(condition, update);
 			break;
-		case CONDITION_TYPE_SERVICE_NAME:
+		case ZBX_CONDITION_TYPE_SERVICE_NAME:
 			ret = condition_match_service_name(condition, update);
 			break;
-		case CONDITION_TYPE_EVENT_TAG:
+		case ZBX_CONDITION_TYPE_EVENT_TAG:
 			ret = condition_match_service_tag(condition, update);
 			break;
-		case CONDITION_TYPE_EVENT_TAG_VALUE:
+		case ZBX_CONDITION_TYPE_EVENT_TAG_VALUE:
 			ret = condition_match_service_tag_value(condition, update);
 			break;
 		default:
@@ -180,7 +180,7 @@ static int	service_update_match_action(const zbx_service_update_t *update, const
 		switch (token.type)
 		{
 			case ZBX_TOKEN_OBJECTID:
-				if (SUCCEED == is_uint64_n(action->formula + token.data.objectid.name.l,
+				if (SUCCEED == zbx_is_uint64_n(action->formula + token.data.objectid.name.l,
 						token.data.objectid.name.r - token.data.objectid.name.l + 1, &id))
 				{
 					zbx_strncpy_alloc(&expr, &expr_alloc, &expr_offset,

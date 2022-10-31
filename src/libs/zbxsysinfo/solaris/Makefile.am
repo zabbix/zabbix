@@ -5,6 +5,8 @@ noinst_LIBRARIES = libspecsysinfo.a libspechostnamesysinfo.a
 libspecsysinfo_a_CFLAGS = -I$(top_srcdir)/src/zabbix_agent
 
 libspecsysinfo_a_SOURCES = \
+	zbx_sysinfo_kstat.c \
+	zbx_sysinfo_kstat.h \
 	boottime.c \
 	cpu.c \
 	diskio.c \

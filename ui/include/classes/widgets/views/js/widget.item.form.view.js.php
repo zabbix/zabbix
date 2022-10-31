@@ -22,7 +22,7 @@
 
 window.widget_item_form = new class {
 
-	init() {
+	init({thresholds_colors}) {
 		this.form = document.getElementById('widget-dialogue-form');
 
 		this.show_description = document.getElementById(`show_${<?= WIDGET_ITEM_SHOW_DESCRIPTION ?>}`);
@@ -33,10 +33,12 @@ window.widget_item_form = new class {
 		this.advance_configuration = document.getElementById('adv_conf');
 		this.units_show = document.getElementById('units_show');
 
+		jQuery('#itemid').on('change', () => this.updateWarningIcon());
+
 		for (const colorpicker of this.form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
 				appendTo: ".overlay-dialogue-body",
-				use_default: true,
+				use_default: !colorpicker.name.includes('thresholds'),
 				onUpdate: ['up_color', 'down_color', 'updown_color'].includes(colorpicker.name)
 					? (color) => this.setIndicatorColor(colorpicker.name, color)
 					: null
@@ -60,7 +62,10 @@ window.widget_item_form = new class {
 			checkbox.addEventListener('change', () => this.updateForm());
 		}
 
+		colorPalette.setThemeColors(thresholds_colors);
+
 		this.updateForm();
+		this.updateWarningIcon();
 	}
 
 	updateForm() {
@@ -69,6 +74,7 @@ window.widget_item_form = new class {
 		const show_time_row = this.advance_configuration.checked && this.show_time.checked;
 		const show_change_indicator_row = this.advance_configuration.checked && this.show_change_indicator.checked;
 		const show_bg_color_row = this.advance_configuration.checked;
+		const show_thresholds_row = this.advance_configuration.checked;
 
 		for (const element of this.form.querySelectorAll('.js-row-description')) {
 			element.style.display = show_description_row ? '' : 'none';
@@ -107,6 +113,13 @@ window.widget_item_form = new class {
 		for (const element of this.form.querySelectorAll('.js-row-bg-color input')) {
 			element.disabled = !show_bg_color_row;
 		}
+
+		for (const element of this.form.querySelectorAll('.js-row-thresholds')) {
+			element.style.display = show_thresholds_row ? '' : 'none';
+		}
+		for (const element of this.form.querySelectorAll('.js-row-thresholds input')) {
+			element.disabled = !show_thresholds_row;
+		}
 	}
 
 	setIndicatorColor(name, color) {
@@ -118,5 +131,34 @@ window.widget_item_form = new class {
 
 		document.getElementById(indicator_ids[name])
 			.querySelector("polygon").style.fill = (color !== '') ? `#${color}` : '';
+	}
+
+	updateWarningIcon() {
+		document.getElementById('item-value-thresholds-warning').style.display = 'none';
+
+		const ms_item_data = $('#itemid').multiSelect('getData');
+
+		if (ms_item_data.length > 0) {
+			const curl = new Curl('jsrpc.php', false);
+			curl.setArgument('method', 'item_value_type.get');
+			curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
+			curl.setArgument('itemid', ms_item_data[0].id);
+
+			fetch(curl.getUrl())
+				.then((response) => response.json())
+				.then((response) => {
+					switch (response.result) {
+						case '<?= ITEM_VALUE_TYPE_FLOAT ?>':
+						case '<?= ITEM_VALUE_TYPE_UINT64 ?>':
+							document.getElementById('item-value-thresholds-warning').style.display = 'none';
+							break;
+						default:
+							document.getElementById('item-value-thresholds-warning').style.display = '';
+					}
+				})
+				.catch((exception) => {
+					console.log('Could not get value data type of the item:', exception);
+				});
+		}
 	}
 };

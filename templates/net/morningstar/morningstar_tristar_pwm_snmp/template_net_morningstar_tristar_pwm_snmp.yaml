@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:36:27Z'
+  version: '6.4'
+  date: '2022-08-16T10:54:50Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -14,7 +14,7 @@ zabbix_export:
         MIBs used:
         TRISTAR
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Network devices'
@@ -533,14 +533,38 @@ zabbix_export:
                   tag: scope
                   value: notice
         -
-          uuid: 642eec19ba5d450186590e9f5bba36db
-          name: 'Status: Uptime'
+          uuid: 6903297e21e14aa8b5eed4eb0f7e1e01
+          name: 'Status: Uptime (hardware)'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: status.uptime
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: status.hw.uptime
           history: 7d
           units: uptime
-          description: 'Device uptime in seconds'
+          description: 'The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: status
+        -
+          uuid: 642eec19ba5d450186590e9f5bba36db
+          name: 'Status: Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: status.net.uptime
+          history: 7d
+          units: uptime
+          description: 'The time (in hundredths of a second) since the network management portion of the system was last re-initialized.'
           preprocessing:
             -
               type: MULTIPLIER
@@ -552,24 +576,12 @@ zabbix_export:
               value: status
           triggers:
             -
-              uuid: f0549419f015448497cd7d15a2bf96fa
-              expression: 'last(/Morningstar TriStar PWM SNMP/status.uptime)<10m'
-              name: 'Status: Device has been restarted'
-              event_name: 'Status: Device has been restarted (uptime < 10m)'
-              priority: INFO
-              description: 'Uptime is less than 10 minutes'
-              manual_close: 'YES'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-            -
               uuid: 64aa2a79fe854def8e179a4d27790417
-              expression: 'nodata(/Morningstar TriStar PWM SNMP/status.uptime,5m)=1'
+              expression: 'nodata(/Morningstar TriStar PWM SNMP/status.net.uptime,5m)=1'
               name: 'Status: Failed to fetch data'
               event_name: 'Status: Failed to fetch data (or no data for 5m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 5 minutes'
+              description: 'Zabbix has not received data for items for the last 5 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1349,6 +1361,19 @@ zabbix_export:
             -
               value: '8'
               newvalue: Equalize
+  triggers:
+    -
+      uuid: f0549419f015448497cd7d15a2bf96fa
+      expression: '(last(/Morningstar TriStar PWM SNMP/status.hw.uptime)>0 and last(/Morningstar TriStar PWM SNMP/status.hw.uptime)<10m) or (last(/Morningstar TriStar PWM SNMP/status.hw.uptime)=0 and last(/Morningstar TriStar PWM SNMP/status.net.uptime)<10m)'
+      name: 'Status: Device has been restarted'
+      event_name: 'Status: Device has been restarted (uptime < 10m)'
+      priority: INFO
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: ce3aa40eac5f4ee199ed214752304e19

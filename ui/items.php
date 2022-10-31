@@ -289,6 +289,7 @@ $fields = [
 	'subfilter_trends' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_tags' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'checkbox_hash' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'backurl' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>						[T_ZBX_STR, O_OPT, P_SYS,
 										IN('"delay","history","key_","name","status","trends","type"'),
@@ -506,6 +507,11 @@ if (hasRequest('preprocessing')) {
 		}
 	}
 	unset($step);
+}
+
+// Validate backurl.
+if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
+	access_deny();
 }
 
 /*
@@ -737,30 +743,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if ($db_item['logtimefmt'] !== getRequest('logtimefmt', '')) {
 						$item['logtimefmt'] = getRequest('logtimefmt', '');
 					}
-					if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
-						$item['interfaceid'] = getRequest('interfaceid', 0);
-					}
-					if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
-						$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
-					}
-					if ($db_item['username'] !== getRequest('username', '')) {
-						$item['username'] = getRequest('username', '');
-					}
-					if ($db_item['password'] !== getRequest('password', '')) {
-						$item['password'] = getRequest('password', '');
-					}
-					if ($db_item['publickey'] !== getRequest('publickey', '')) {
-						$item['publickey'] = getRequest('publickey', '');
-					}
-					if ($db_item['privatekey'] !== getRequest('privatekey', '')) {
-						$item['privatekey'] = getRequest('privatekey', '');
-					}
 					if ($db_item['params'] !== getRequest('params', '')) {
 						$item['params'] = getRequest('params', '');
 					}
 					if ($db_item['preprocessing'] !== $preprocessing) {
 						$item['preprocessing'] = $preprocessing;
 					}
+				}
+
+				if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
+					$item['interfaceid'] = getRequest('interfaceid', 0);
 				}
 
 				if ($db_item['delay'] != $delay) {
@@ -794,6 +786,41 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['templateid'] == 0 && $type == ITEM_TYPE_HTTPAGENT) {
 					$item = prepareItemHttpAgentFormData($http_item) + $item;
 				}
+			}
+
+			if ($type == ITEM_TYPE_HTTPAGENT) {
+				if ($db_item['authtype'] != getRequest('http_authtype', ITEM_AUTHTYPE_PASSWORD)) {
+					$item['authtype'] = getRequest('http_authtype', ITEM_AUTHTYPE_PASSWORD);
+				}
+
+				if ($db_item['username'] !== getRequest('http_username', '')) {
+					$item['username'] = getRequest('http_username', '');
+				}
+
+				if ($db_item['password'] !== getRequest('http_password', '')) {
+					$item['password'] = getRequest('http_password', '');
+				}
+			}
+			else {
+				if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
+					$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
+				}
+
+				if ($db_item['username'] !== getRequest('username', '')) {
+					$item['username'] = getRequest('username', '');
+				}
+
+				if ($db_item['password'] !== getRequest('password', '')) {
+					$item['password'] = getRequest('password', '');
+				}
+			}
+
+			if ($db_item['publickey'] !== getRequest('publickey', '')) {
+				$item['publickey'] = getRequest('publickey', '');
+			}
+
+			if ($db_item['privatekey'] !== getRequest('privatekey', '')) {
+				$item['privatekey'] = getRequest('privatekey', '');
 			}
 
 			if ($db_item['status'] != getRequest('status', ITEM_STATUS_DISABLED)) {
@@ -871,6 +898,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if ($result) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
 		uncheckTableRows(getRequest('checkbox_hash'));
+
+		if (hasRequest('backurl')) {
+			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response->redirect();
+		}
 	}
 }
 // cleaning history for one item
@@ -1330,19 +1362,19 @@ else {
 				if ($update_interval_parser->parse($delay) == CParser::PARSE_SUCCESS) {
 					$delay = $update_interval_parser->getDelay();
 
-					$delay = ($delay[0] !== '{') ? convertUnitsS(timeUnitToSeconds($delay)) : $delay;
+					$delay = ($delay[0] !== '{') ? convertSecondsToTimeUnits(timeUnitToSeconds($delay)) : $delay;
 				}
 			}
 
 			$history = $item['history'];
-			$history = ($history[0] !== '{') ? convertUnitsS(timeUnitToSeconds($history)) : $history;
+			$history = ($history[0] !== '{') ? convertSecondsToTimeUnits(timeUnitToSeconds($history)) : $history;
 
 			// Hide trend (zero values) for non-numeric item types.
 			$trends = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
 				? $item['trends']
 				: '';
 			$trends = ($trends !== '' && $trends[0] !== '{')
-				? convertUnitsS(timeUnitToSeconds($trends))
+				? convertSecondsToTimeUnits(timeUnitToSeconds($trends))
 				: $trends;
 
 			$item['subfilters'] = [

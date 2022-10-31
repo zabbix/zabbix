@@ -28,7 +28,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 
 DIR	*__wrap_opendir(const char *name)
 {

@@ -112,7 +112,7 @@ void	zbx_mock_test_entry(void **state)
 
 	params = zbx_mock_get_parameter_string("in.params");
 
-	if (2 != num_param(params))
+	if (2 != zbx_num_param(params))
 	{
 		fail_msg("invalid number of parameters");
 		goto out;

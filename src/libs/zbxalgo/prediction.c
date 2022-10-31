@@ -876,7 +876,7 @@ int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, unsigned *k, char **error)
 	{
 		*fit = FIT_POLYNOMIAL;
 
-		if (SUCCEED != is_uint_range(fit_str + strlen("polynomial"), k, 1, 6))
+		if (SUCCEED != zbx_is_uint_range(fit_str + strlen("polynomial"), k, 1, 6))
 		{
 			*error = zbx_strdup(*error, "polynomial degree is invalid");
 			return FAIL;
@@ -1150,7 +1150,7 @@ out:
 double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, zbx_fit_t fit, unsigned k)
 {
 	zbx_matrix_t	*coefficients = NULL;
-	double		current, result;
+	double		current, result = -1.0;
 	int		res;
 
 	if (1 == n)

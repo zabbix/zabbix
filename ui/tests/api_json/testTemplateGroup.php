@@ -424,7 +424,7 @@ class testTemplateGroup extends CAPITest {
 				'user' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'templategroup' => [
 					'groupid' => '52001',
-					'name' => 'API template group update as zabbix user without peremissions'
+					'name' => 'API template group update as zabbix user without permissions'
 				],
 				'expected_error' => 'No permissions to call "templategroup.update".'
 			],

@@ -667,7 +667,7 @@ static int	expression_extract_functionid(const char *expression, zbx_eval_token_
 			*functionid = token->value.data.ui64;
 			return SUCCEED;
 		case ZBX_VARIANT_NONE:
-			if (SUCCEED != is_uint64_n(expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
+			if (SUCCEED != zbx_is_uint64_n(expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
 					functionid))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -887,7 +887,7 @@ void	zbx_get_serialized_expression_functionids(const char *expression, const uns
 
 		if (ZBX_EVAL_TOKEN_FUNCTIONID == type)
 		{
-			if (SUCCEED == is_uint64_n(expression + loc_l + 1, loc_r - loc_l - 1, &functionid))
+			if (SUCCEED == zbx_is_uint64_n(expression + loc_l + 1, loc_r - loc_l - 1, &functionid))
 				zbx_vector_uint64_append(functionids, functionid);
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -960,7 +960,7 @@ void	zbx_eval_replace_functionid(zbx_eval_context_t *ctx, zbx_uint64_t old_funct
 			if (ZBX_VARIANT_NONE != token->value.type)
 				continue;
 
-			if (SUCCEED != is_uint64_n(ctx->expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
+			if (SUCCEED != zbx_is_uint64_n(ctx->expression + token->loc.l + 1, token->loc.r - token->loc.l - 1,
 					&token_functionid))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;

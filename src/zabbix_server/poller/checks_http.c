@@ -249,7 +249,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if (FAIL == is_time_suffix(item->timeout, &timeout_seconds, strlen(item->timeout)))
+	if (FAIL == zbx_is_time_suffix(item->timeout, &timeout_seconds, strlen(item->timeout)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid timeout: %s", item->timeout));
 		goto clean;
@@ -350,7 +350,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 		goto clean;
 	}
 
-	if ('\0' != *item->status_codes && FAIL == int_in_list(item->status_codes, response_code))
+	if ('\0' != *item->status_codes && FAIL == zbx_int_in_list(item->status_codes, response_code))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
 				" required status codes \"%s\"", response_code, item->status_codes));

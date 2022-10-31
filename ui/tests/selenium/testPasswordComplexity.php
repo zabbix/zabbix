@@ -93,7 +93,7 @@ class testPasswordComplexity extends CWebTest {
 		$this->page->assertTitle('Configuration of authentication');
 		$form = $this->query('id:authentication-form')->asForm()->one();
 
-		// Check authentication swithcher options and default value.
+		// Check authentication switcher options and default value.
 		$auth_radio = $form->getField('Default authentication')->asSegmentedRadio();
 		$this->assertEquals(['Internal', 'LDAP'], $auth_radio->getLabels()->asText());
 		$this->assertEquals('Internal', $auth_radio->getSelected());

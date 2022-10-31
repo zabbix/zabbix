@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxjson.h"
 #include "zbxdbcache/user_macro.h"
 #include "zbxalgo.h"

@@ -44,6 +44,8 @@ class CDBHelper {
 	 */
 	static $backups = [];
 
+	static $db_extension;
+
 	/**
 	 * Perform select query and check the result.
 	 *
@@ -260,6 +262,14 @@ class CDBHelper {
 		$suffix = '_tmp'.count(self::$backups);
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
+			if (self::$db_extension == null) {
+				$res = DBfetch(DBselect('SELECT db_extension FROM config'));
+
+				if ($res) {
+					self::$db_extension = $res['db_extension'];
+				}
+			}
+
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
 			}
@@ -277,6 +287,10 @@ class CDBHelper {
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
 			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=5 --dbname='.$DB['DATABASE'];
 			$cmd .= ' --table='.implode(' --table=', $tables).' --file='.$file;
+
+			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+				$cmd .= ' 2>/dev/null';
+			}
 
 			exec($cmd, $output, $result_code);
 
@@ -333,18 +347,29 @@ class CDBHelper {
 			$cmd = 'pg_restore';
 
 			if ($DB['SERVER'] !== 'v') {
-				$cmd .= ' --host='.$DB['SERVER'];
+				$server = ' --host='.$DB['SERVER'];
 			}
+			$cmd .= $server;
 
+			$port = '';
 			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
-				$cmd .= ' --port='.$DB['PORT'];
+				$port .= ' --port='.$DB['PORT'];
 			}
+			$cmd .= $port;
 
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
 			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=5 --clean --dbname='.$DB['DATABASE'];
 			$cmd .= ' '.$file;
 
-			exec($cmd, $output, $result_code);
+			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+				$cmd_tdb = 'psql --username='.$DB['USER'].$server.$port.' --dbname='.$DB['DATABASE'].' --command="SELECT timescaledb_pre_restore();"; ';
+				$cmd_tdb .= $cmd .' 2>/dev/null; ';
+				$cmd_tdb .= 'psql --username='.$DB['USER'].$server.$port.' --dbname='.$DB['DATABASE'].' --command="SELECT timescaledb_post_restore();" ';
+				exec($cmd_tdb, $output, $result_code);
+			}
+			else {
+				exec($cmd, $output, $result_code);
+			}
 
 			if ($result_code != 0) {
 				throw new Exception('Failed to restore "'.$file.'".');
@@ -446,13 +471,13 @@ class CDBHelper {
 	 * Returns comma-delimited list of the fields.
 	 *
 	 * @param string $table_name
-	 * @param array  $exlude_fields
+	 * @param array  $exclude_fields
 	 */
-	public static function getTableFields($table_name, array $exlude_fields = []) {
+	public static function getTableFields($table_name, array $exclude_fields = []) {
 		$field_names = [];
 
 		foreach (DB::getSchema($table_name)['fields'] as $field_name => $field) {
-			if (!in_array($field_name, $exlude_fields, true)) {
+			if (!in_array($field_name, $exclude_fields, true)) {
 				$field_names[] = $field_name;
 			}
 		}

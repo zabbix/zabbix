@@ -21,12 +21,14 @@
 #define ZABBIX_ZBXCRYPTO_H
 
 #include "zbxtypes.h"
+#include "zbxhash.h"
 
 int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
 int	zbx_bin2hex(const unsigned char *bin, size_t bin_len, char *out, size_t out_len);
 
+#define ZBX_SESSION_TOKEN_SIZE	(ZBX_MD5_DIGEST_SIZE * 2)
+
 char	*zbx_create_token(zbx_uint64_t seed);
-size_t	zbx_get_token_len(void);
 char	*zbx_gen_uuid4(const char *seed);
 
 typedef enum

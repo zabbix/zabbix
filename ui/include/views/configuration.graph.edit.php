@@ -28,13 +28,13 @@ $widget = new CWidget();
 if ($data['parent_discoveryid'] === null) {
 	$widget
 		->setTitle(_('Graphs'))
-		->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_GRAPH_EDIT))
+		->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_GRAPH_EDIT))
 		->setNavigation(getHostNavigation('graphs', $data['hostid']));
 }
 else {
 	$widget
 		->setTitle(_('Graph prototypes'))
-		->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_PROTOTYPE_GRAPH_EDIT))
+		->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_PROTOTYPE_GRAPH_EDIT))
 		->setNavigation(getHostNavigation('graphs', $data['hostid'], $data['parent_discoveryid']));
 }
 
@@ -46,7 +46,7 @@ $url = (new CUrl('graphs.php'))
 // Create form.
 $graphForm = (new CForm('post', $url))
 	->setName('graphForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);
 

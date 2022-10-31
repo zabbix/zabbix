@@ -19,7 +19,7 @@
 
 #include "zbxnix.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "log.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)

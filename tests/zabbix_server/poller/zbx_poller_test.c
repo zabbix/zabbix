@@ -20,7 +20,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
-#include "common.h"
+#include "zbxcommon.h"
 
 #include "test_get_value_ssh.h"
 #include "../../../src/zabbix_server/poller/checks_ssh.h"

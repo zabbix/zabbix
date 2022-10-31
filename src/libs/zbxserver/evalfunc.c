@@ -196,7 +196,7 @@ static int	is_blacklisted_unit(const char *unit)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = str_in_list("%,ms,rpm,RPM", unit, ',');
+	ret = zbx_str_in_list("%,ms,rpm,RPM", unit, ',');
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -229,7 +229,7 @@ static void	add_value_units_no_kmgt(char *value, size_t max_len, const char *uni
 	if (SUCCEED != zbx_double_compare(round(value_double), value_double))
 	{
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(2), value_double);
-		del_zeros(tmp);
+		zbx_del_zeros(tmp);
 	}
 	else
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(0), value_double);
@@ -268,33 +268,33 @@ static void	add_value_units_with_kmgt(char *value, size_t max_len, const char *u
 
 	if (value_double < base)
 	{
-		strscpy(kmgt, "");
+		zbx_strscpy(kmgt, "");
 	}
 	else if (value_double < base * base)
 	{
-		strscpy(kmgt, "K");
+		zbx_strscpy(kmgt, "K");
 		value_double /= base;
 	}
 	else if (value_double < base * base * base)
 	{
-		strscpy(kmgt, "M");
+		zbx_strscpy(kmgt, "M");
 		value_double /= base * base;
 	}
 	else if (value_double < base * base * base * base)
 	{
-		strscpy(kmgt, "G");
+		zbx_strscpy(kmgt, "G");
 		value_double /= base * base * base;
 	}
 	else
 	{
-		strscpy(kmgt, "T");
+		zbx_strscpy(kmgt, "T");
 		value_double /= base * base * base * base;
 	}
 
 	if (SUCCEED != zbx_double_compare(round(value_double), value_double))
 	{
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(2), value_double);
-		del_zeros(tmp);
+		zbx_del_zeros(tmp);
 	}
 	else
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_FS_DBL_EXT(0), value_double);
@@ -444,14 +444,14 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 
 				zbx_trim_str_list(input_ptr, ',');
 				zbx_trim_str_list(input_ptr, '-');
-				num = num_param(input_ptr);
+				num = zbx_num_param(input_ptr);
 
 				for (j = 0; j < num; j++)
 				{
 					int	found = 0;
 					char	*ptr, *range_str;
 
-					range_str = ptr = get_param_dyn(input_ptr, j + 1, NULL);
+					range_str = ptr = zbx_get_param_dyn(input_ptr, j + 1, NULL);
 
 					if (1 < strlen(ptr) && '-' == *ptr)
 						ptr++;
@@ -546,7 +546,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		del_zeros(row[1]);
+		zbx_del_zeros(row[1]);
 
 		valuemap = (zbx_valuemaps_t *)zbx_malloc(NULL, sizeof(zbx_valuemaps_t));
 		zbx_strlcpy_utf8(valuemap->value, row[0], ZBX_VALUEMAP_STRING_LEN);
@@ -588,7 +588,7 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 			replace_value_by_map(value, max_len, valuemapid, value_type);
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
-			del_zeros(value);
+			zbx_del_zeros(value);
 			ZBX_FALLTHROUGH;
 		case ITEM_VALUE_TYPE_UINT64:
 			if (SUCCEED != replace_value_by_map(value, max_len, valuemapid, value_type))
@@ -653,19 +653,19 @@ static int	get_function_parameter_period(const char *parameters, int Nparam, int
 		if ('#' == *parameter)
 		{
 			*type = ZBX_VALUE_NVALUES;
-			if (SUCCEED == is_uint31(parameter + 1, value) && 0 < *value)
+			if (SUCCEED == zbx_is_uint31(parameter + 1, value) && 0 < *value)
 				ret = SUCCEED;
 		}
 		else if ('-' == *parameter)
 		{
-			if (SUCCEED == is_time_suffix(parameter + 1, value, ZBX_LENGTH_UNLIMITED))
+			if (SUCCEED == zbx_is_time_suffix(parameter + 1, value, ZBX_LENGTH_UNLIMITED))
 			{
 				*value = -(*value);
 				*type = ZBX_VALUE_SECONDS;
 				ret = SUCCEED;
 			}
 		}
-		else if (SUCCEED == is_time_suffix(parameter, value, ZBX_LENGTH_UNLIMITED))
+		else if (SUCCEED == zbx_is_time_suffix(parameter, value, ZBX_LENGTH_UNLIMITED))
 		{
 			*type = ZBX_VALUE_SECONDS;
 			ret = SUCCEED;
@@ -770,7 +770,7 @@ static int	evaluate_LOGEVENTID(zbx_variant_t *value, const DC_ITEM *item, const 
 		goto out;
 	}
 
-	if (2 < (nparams = num_param(parameters)))
+	if (2 < (nparams = zbx_num_param(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -867,7 +867,7 @@ static int	evaluate_LOGSOURCE(zbx_variant_t *value, const DC_ITEM *item, const c
 		goto out;
 	}
 
-	if (2 < (nparams = num_param(parameters)))
+	if (2 < (nparams = zbx_num_param(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -955,7 +955,7 @@ static int	evaluate_LOGSEVERITY(zbx_variant_t *value, const DC_ITEM *item, const
 		goto out;
 	}
 
-	if (1 < num_param(parameters))
+	if (1 < zbx_num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1222,7 +1222,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, const DC_ITEM *item, const char 
 
 	numeric_search = (ITEM_VALUE_TYPE_UINT64 == item->value_type || ITEM_VALUE_TYPE_FLOAT == item->value_type);
 
-	if (3 < (nparams = num_param(parameters)))
+	if (3 < (nparams = zbx_num_param(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1318,7 +1318,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, const DC_ITEM *item, const char 
 			{
 				if (OP_BITAND != op)
 				{
-					if (SUCCEED != str2uint64(pattern, ZBX_UNIT_SYMBOLS, &pattern_ui64))
+					if (SUCCEED != zbx_str2uint64(pattern, ZBX_UNIT_SYMBOLS, &pattern_ui64))
 					{
 						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
 								" value", pattern);
@@ -1328,7 +1328,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, const DC_ITEM *item, const char 
 				}
 				else
 				{
-					if (SUCCEED != is_uint64(pattern, &pattern_ui64))
+					if (SUCCEED != zbx_is_uint64(pattern, &pattern_ui64))
 					{
 						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
 								" value", pattern);
@@ -1337,7 +1337,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, const DC_ITEM *item, const char 
 
 					if (NULL != pattern2)
 					{
-						if (SUCCEED != is_uint64(pattern2, &pattern2_ui64))
+						if (SUCCEED != zbx_is_uint64(pattern2, &pattern2_ui64))
 						{
 							*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric"
 									" unsigned value", pattern2);
@@ -1357,7 +1357,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, const DC_ITEM *item, const char 
 					goto out;
 				}
 
-				arg3_dbl = str2double(pattern);
+				arg3_dbl = zbx_str2double(pattern);
 			}
 		}
 	}
@@ -1554,7 +1554,7 @@ static int	evaluate_SUM(zbx_variant_t *value, const DC_ITEM *item, const char *p
 		goto out;
 	}
 
-	if (1 != num_param(parameters))
+	if (1 != zbx_num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1645,7 +1645,7 @@ static int	evaluate_AVG(zbx_variant_t *value, const DC_ITEM *item, const char *p
 		goto out;
 	}
 
-	if (1 != num_param(parameters))
+	if (1 != zbx_num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1789,7 +1789,7 @@ static int	evaluate_MIN_or_MAX(zbx_variant_t *value, const DC_ITEM *item, const 
 		goto out;
 	}
 
-	if (1 != num_param(parameters))
+	if (1 != zbx_num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1900,7 +1900,7 @@ static int	evaluate_PERCENTILE(zbx_variant_t  *value, const DC_ITEM *item, const
 		goto out;
 	}
 
-	if (2 != num_param(parameters))
+	if (2 != zbx_num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -1997,7 +1997,7 @@ static int	evaluate_NODATA(zbx_variant_t *value, const DC_ITEM *item, const char
 
 	zbx_history_record_vector_create(&values);
 
-	if (2 < (num = num_param(parameters)))
+	if (2 < (num = zbx_num_param(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -2183,7 +2183,7 @@ static int	evaluate_FUZZYTIME(zbx_variant_t *value, const DC_ITEM *item, const c
 		goto out;
 	}
 
-	if (1 < num_param(parameters))
+	if (1 < zbx_num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -2268,7 +2268,7 @@ static int	evaluate_BITAND(zbx_variant_t *value, const DC_ITEM *item, const char
 		goto clean;
 	}
 
-	if (2 < num_param(parameters))
+	if (2 < zbx_num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto clean;
@@ -2341,7 +2341,7 @@ static int	evaluate_FORECAST(zbx_variant_t *value, const DC_ITEM *item, const ch
 		goto out;
 	}
 
-	if (2 > (nparams = num_param(parameters)) || nparams > 4)
+	if (2 > (nparams = zbx_num_param(parameters)) || nparams > 4)
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -2497,7 +2497,7 @@ static int	evaluate_TIMELEFT(zbx_variant_t *value, const DC_ITEM *item, const ch
 		goto out;
 	}
 
-	if (2 > (nparams = num_param(parameters)) || nparams > 3)
+	if (2 > (nparams = zbx_num_param(parameters)) || nparams > 3)
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -2704,13 +2704,13 @@ static int	evaluate_TREND(zbx_variant_t *value, const DC_ITEM *item, const char 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 != strcmp(func, "stl") && 1 != num_param(parameters))
+	if (0 != strcmp(func, "stl") && 1 != zbx_num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
 	}
 
-	if (0 == strcmp(func, "stl") && (3 > num_param(parameters) || 6 < num_param(parameters)))
+	if (0 == strcmp(func, "stl") && (3 > zbx_num_param(parameters) || 6 < zbx_num_param(parameters)))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -2827,7 +2827,7 @@ static int	evaluate_TREND(zbx_variant_t *value, const DC_ITEM *item, const char 
 		season_processed = (int)((double)season / 3600);
 
 		ret = trends_eval_stl(table, item->itemid, start, end, start_detect_period, end_detect_period,
-				(int)season_processed, deviations, dev_alg, (int)s_window, &value_dbl, error);
+				season_processed, deviations, dev_alg, (int)s_window, &value_dbl, error);
 
 		zbx_free(dev_alg);
 	}
@@ -2859,7 +2859,7 @@ static int	validate_params_and_get_data(const DC_ITEM *item, const char *paramet
 		return FAIL;
 	}
 
-	if (1 != num_param(parameters))
+	if (1 != zbx_num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		return FAIL;
@@ -2923,7 +2923,7 @@ static int	evaluate_FIRST(zbx_variant_t *value, const DC_ITEM *item, const char 
 
 	zbx_history_record_vector_create(&values);
 
-	if (1 != num_param(parameters))
+	if (1 != zbx_num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -3039,7 +3039,7 @@ static int	evaluate_MONO(zbx_variant_t *value, const DC_ITEM *item, const char *
 		goto out;
 	}
 
-	num = num_param(parameters);
+	num = zbx_num_param(parameters);
 
 	if (1 > num || 2 < num )
 	{
@@ -3180,7 +3180,7 @@ static int	evaluate_RATE(zbx_variant_t *value, const DC_ITEM *item, const char *
 		goto out;
 	}
 
-	if (1 != num_param(parameters))
+	if (1 != zbx_num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;
@@ -3360,7 +3360,7 @@ static int	evaluate_CHANGECOUNT(zbx_variant_t *value, const DC_ITEM *item, const
 
 	zbx_history_record_vector_create(&values);
 
-	nparams = num_param(parameters);
+	nparams = zbx_num_param(parameters);
 	if (1 > nparams || 2 < nparams)
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
@@ -3522,7 +3522,7 @@ static int	evaluate_BASELINE(zbx_variant_t *value, const DC_ITEM *item, const ch
 	zbx_vector_dbl_create(&values);
 	zbx_vector_uint64_create(&index);
 
-	if (3 != num_param(parameters))
+	if (3 != zbx_num_param(parameters))
 	{
 		*error = zbx_strdup(*error, "invalid number of parameters");
 		goto out;

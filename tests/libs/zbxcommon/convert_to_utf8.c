@@ -43,7 +43,7 @@ void	zbx_mock_test_entry(void **state)
 
 	encoding  = zbx_mock_get_parameter_string("in.encoding");
 
-	result_buffer = convert_to_utf8(in_buffer, in_buffer_length, encoding);
+	result_buffer = zbx_convert_to_utf8(in_buffer, in_buffer_length, encoding);
 
 	zbx_free(in_buffer);
 

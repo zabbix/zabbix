@@ -33,7 +33,7 @@ $widget = new CWidget();
 
 if ($data['action'] === 'user.edit') {
 	$widget_name = _('Users');
-	$doc_url = CDocHelper::ADMINISTRATION_USER_EDIT;
+	$doc_url = CDocHelper::USERS_USER_EDIT;
 }
 else {
 	$widget_name = _('User profile').NAME_DELIMITER;
@@ -41,7 +41,7 @@ else {
 		? $data['name'].' '.$data['surname']
 		: $data['username'];
 	$widget->setTitleSubmenu(getUserSettingsSubmenu());
-	$doc_url = CDocHelper::ADMINISTRATION_USERPROFILE_EDIT;
+	$doc_url = CDocHelper::USERS_USERPROFILE_EDIT;
 }
 
 $widget
@@ -57,7 +57,7 @@ if ($data['form_refresh'] == 0) {
 $user_form = (new CForm())
 	->setId('user-form')
 	->setName('user_form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('action', $data['action'])
 	->addVar('userid', $data['userid']);
 
@@ -284,7 +284,9 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
-		(new CTextBox('url', $data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('url', $data['url']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('maxlength', DB::getFieldLength('users', 'url'))
 	);
 
 $tabs->addTab('userTab', _('User'), $user_form_list);
@@ -300,17 +302,34 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), _('Status'), _('Action')]);
 
 	foreach ($data['medias'] as $index => $media) {
-		if ($media['active'] == MEDIA_STATUS_ACTIVE) {
-			$status = (new CLink(_('Enabled'), '#'))
-				->onClick('return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);')
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_GREEN);
+		if ($data['mediatypes'][$media['mediatypeid']]['status'] == MEDIA_TYPE_STATUS_ACTIVE) {
+			$media_name = $media['name'];
+
+			if ($media['active'] == MEDIA_STATUS_ACTIVE) {
+				$status = (new CLink(_('Enabled'), '#'))
+					->onClick('return create_var("'.$user_form->getName().'","disable_media",'.$index.', true);')
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_GREEN);
+			}
+			else {
+				$status = (new CLink(_('Disabled'), '#'))
+					->onClick('return create_var("'.$user_form->getName().'","enable_media",'.$index.', true);')
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_RED);
+			}
 		}
 		else {
-			$status = (new CLink(_('Disabled'), '#'))
-				->onClick('return create_var("'.$user_form->getName().'","enable_media",'.$index.', true);')
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_RED);
+			$media_name = new CDiv([
+				$media['name'],
+				(new CSpan([
+					' ',
+					makeWarningIcon(
+						_('Media type disabled by Administration.')
+					)
+				]))
+			]);
+
+			$status = (new CDiv(_('Disabled')))->addClass(ZBX_STYLE_RED);
 		}
 
 		$parameters = [
@@ -347,7 +366,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 
 		$media_table_info->addRow(
 			(new CRow([
-				$media['name'],
+				$media_name,
 				$media['sendto'],
 				(new CDiv($media['period']))
 					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')

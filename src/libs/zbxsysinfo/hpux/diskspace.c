@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "zbxjson.h"
 #include "log.h"
 #include "zbxalgo.h"
@@ -74,9 +75,11 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 	}
 
 	return SYSINFO_RET_OK;
+#undef ZBX_STATFS
+#undef ZBX_BSIZE
 }
 
-static int	VFS_FS_USED(const char *fs, AGENT_RESULT *result)
+static int	vfs_fs_used(const char *fs, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -92,7 +95,7 @@ static int	VFS_FS_USED(const char *fs, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_FS_FREE(const char *fs, AGENT_RESULT *result)
+static int	vfs_fs_free(const char *fs, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -108,7 +111,7 @@ static int	VFS_FS_FREE(const char *fs, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_FS_TOTAL(const char *fs, AGENT_RESULT *result)
+static int	vfs_fs_total(const char *fs, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -124,7 +127,7 @@ static int	VFS_FS_TOTAL(const char *fs, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_FS_PFREE(const char *fs, AGENT_RESULT *result)
+static int	vfs_fs_pfree(const char *fs, AGENT_RESULT *result)
 {
 	double	value;
 	char	*error;
@@ -140,7 +143,7 @@ static int	VFS_FS_PFREE(const char *fs, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_FS_PUSED(const char *fs, AGENT_RESULT *result)
+static int	vfs_fs_pused(const char *fs, AGENT_RESULT *result)
 {
 	double	value;
 	char	*error;
@@ -156,7 +159,7 @@ static int	VFS_FS_PUSED(const char *fs, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_fs_size_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*fsname, *mode;
 
@@ -176,27 +179,27 @@ static int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
-		return VFS_FS_TOTAL(fsname, result);
+		return vfs_fs_total(fsname, result);
 	if (0 == strcmp(mode, "free"))
-		return VFS_FS_FREE(fsname, result);
+		return vfs_fs_free(fsname, result);
 	if (0 == strcmp(mode, "pfree"))
-		return VFS_FS_PFREE(fsname, result);
+		return vfs_fs_pfree(fsname, result);
 	if (0 == strcmp(mode, "used"))
-		return VFS_FS_USED(fsname, result);
+		return vfs_fs_used(fsname, result);
 	if (0 == strcmp(mode, "pused"))
-		return VFS_FS_PUSED(fsname, result);
+		return vfs_fs_pused(fsname, result);
 
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 
 	return SYSINFO_RET_FAIL;
 }
 
-int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_size, request, result);
+	return zbx_execute_threaded_metric(vfs_fs_size_local, request, result);
 }
 
-int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct mntent	*mt;
 	FILE		*f;
@@ -217,6 +220,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSNAME, mt->mnt_dir, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSTYPE, mt->mnt_type, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSOPTIONS, mt->mnt_opts, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&j);
 	}
 
@@ -231,7 +235,7 @@ int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct mntent		*mt;
 	FILE			*f;
@@ -284,6 +288,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		mntpoint->inodes.not_used = inot_used;
 		mntpoint->inodes.pfree = ipfree;
 		mntpoint->inodes.pused = ipused;
+		mntpoint->options = zbx_strdup(NULL, mt->mnt_opts);
 
 		zbx_vector_ptr_append(&mntpoints, mntpoint);
 	}
@@ -324,6 +329,7 @@ static int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PFREE, mntpoint->inodes.pfree);
 			zbx_json_addfloat(&j, ZBX_SYSINFO_TAG_PUSED, mntpoint->inodes.pused);
 			zbx_json_close(&j);
+			zbx_json_addstring(&j, ZBX_SYSINFO_TAG_FSOPTIONS, mntpoint->options);
 			zbx_json_close(&j);
 		}
 	}
@@ -344,8 +350,7 @@ out:
 	return ret;
 }
 
-int	VFS_FS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_get, request, result);
-
+	return zbx_execute_threaded_metric(vfs_fs_get_local, request, result);
 }

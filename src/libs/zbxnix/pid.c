@@ -20,7 +20,7 @@
 #include "zbxnix.h"
 #include "pid.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "log.h"
 
 static FILE	*fpid = NULL;

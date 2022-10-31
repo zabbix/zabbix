@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
@@ -88,6 +89,45 @@ class testFormFilter extends CWebTest {
 				$this->assertEquals($this->query('xpath://li/ul[@class="ui-sortable-container ui-sortable"]/li')->count(), 1);
 				break;
 		}
+	}
+
+	/**
+	 * Create, remember and check filter.
+	 *
+	 * @param array  $data				given data provider
+	 * @param string $table_selector	selector of a table with filtered data
+	 */
+	public function checkRememberedFilters($data, $table_selector = 'class:list-table') {
+		$this->page->login()->open($this->url.'&filter_reset=1')->waitUntilReady();
+
+		// Checking if home tab is selected.
+		$xpath = 'xpath://li[@data-target="tabfilter_0"]';
+		if ($this->query($xpath)->one()->getAttribute('class') === 'tabfilter-item-label') {
+			$this->query($xpath.'/a')->waitUntilClickable()->one()->click();
+			$this->page->waitUntilReady();
+		}
+
+		$home_form = $this->query('xpath://div[@id="tabfilter_0"]/form')->asForm()->one();
+		$home_form->fill($data);
+
+		$result_table = $this->query($table_selector)->asTable()->waitUntilPresent()->one();
+		$this->query('name:filter_apply')->waitUntilClickable()->one()->click();
+		$result_table->waitUntilReloaded();
+		$filter_result = $result_table->getRows()->asText();
+
+		// Go to another page, to check saved filter after.
+		$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
+
+		// Open filter page again.
+		$this->page->open($this->url)->waitUntilReady();
+
+		// Check that filter form fields and table result match.
+		$home_form->invalidate()->checkValue($data);
+		$this->assertEquals($filter_result, $result_table->getRows()->asText());
+
+		// Reset filter not to interfere next tests.
+		$this->query('name:filter_reset')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 	}
 
 	/**
@@ -228,6 +268,7 @@ class testFormFilter extends CWebTest {
 
 		// Checking if home tab is selected.
 		$xpath = 'xpath://li[@data-target="tabfilter_0"]';
+
 		if ($this->query($xpath)->one()->getAttribute('class') === 'tabfilter-item-label') {
 			$this->query($xpath.'/a')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
@@ -237,12 +278,13 @@ class testFormFilter extends CWebTest {
 			$home_form = $this->query('xpath://div[@id="tabfilter_0"]/form')->asForm()->one();
 			$home_form->fill($data['filter_form']);
 		}
-		$result_table = $this->query($table_selector)->one();
 
+		$result_table = $this->query($table_selector)->one();
 		$this->query('button:Save as')->one()->click();
 		$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 		$dialog->fill($data['filter']);
 		$dialog->submit();
+
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			COverlayDialogElement::ensureNotPresent();
 			$result_table->waitUntilReloaded();

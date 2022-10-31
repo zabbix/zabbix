@@ -20,7 +20,7 @@
 #ifndef ZABBIX_LLD_PROTOCOL_H
 #define ZABBIX_LLD_PROTOCOL_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "lld_manager.h"
 
 #define ZBX_IPC_SERVICE_LLD	"lld"

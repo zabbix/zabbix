@@ -17,17 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "stats.h"
 
-#define ZBX_MAX_WAIT_VMSTAT	2	/* maximum seconds to wait for vmstat data on the first call */
-
-int	SYSTEM_STAT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_stat(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*section, *type;
+#define ZBX_MAX_WAIT_VMSTAT	2	/* maximum seconds to wait for vmstat data on the first call */
 	int	wait = ZBX_MAX_WAIT_VMSTAT;
-
+#undef ZBX_MAX_WAIT_VMSTAT
 	if (!VMSTAT_COLLECTOR_STARTED(collector))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));

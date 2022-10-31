@@ -21,7 +21,7 @@
 
 #include "zbxconf.h"
 #include "log.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "logfiles/logfiles.h"
 #include "zbxcommshigh.h"
 #include "zbxthreads.h"
@@ -29,9 +29,8 @@
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbx_rtc_constants.h"
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern ZBX_THREAD_LOCAL char		*CONFIG_HOSTNAME;
 extern int				CONFIG_HEARTBEAT_FREQUENCY;
 
@@ -272,16 +271,16 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 	else						/* log.count[] */
 		max_num_parameters = 6;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED == parse_item_key(itemkey, &request) && 0 < get_rparams_num(&request) &&
+	if (SUCCEED == zbx_parse_item_key(itemkey, &request) && 0 < get_rparams_num(&request) &&
 			max_num_parameters >= get_rparams_num(&request) && NULL != (skip = get_rparam(&request, 4)) &&
 			0 == strcmp(skip, "skip"))
 	{
 		ret = SUCCEED;
 	}
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }
@@ -296,9 +295,6 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *             port                  - port number on host                    *
  *             config_revision_local - revision of processed configuration    *
  *                                                                            *
- * Return value: returns SUCCEED on successful parsing,                       *
- *               FAIL on an incorrect format of string                        *
- *                                                                            *
  * Comments:                                                                  *
  *    String represented as "ZBX_EOF" termination list                        *
  *    With '\n' delimiter between elements.                                   *
@@ -306,7 +302,7 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *           <key>:<refresh time>:<last log size>:<modification time>         *
  *                                                                            *
  ******************************************************************************/
-static int	parse_list_of_checks(char *str, const char *host, unsigned short port,
+static void	parse_list_of_checks(char *str, const char *host, unsigned short port,
 		zbx_uint32_t *config_revision_local)
 {
 	const char		*p;
@@ -351,7 +347,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	{
 		config_revision = 0;
 	}
-	else if (FAIL == is_uint32(tmp, &config_revision))
+	else if (FAIL == zbx_is_uint32(tmp, &config_revision))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "\"%s\" is not a valid revision", tmp);
 		goto out;
@@ -403,7 +399,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		delay = atoi(tmp);
 
 		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, tmp, sizeof(tmp), NULL) ||
-				SUCCEED != is_uint64(tmp, &lastlogsize))
+				SUCCEED != zbx_is_uint64(tmp, &lastlogsize))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"", ZBX_PROTO_TAG_LASTLOGSIZE);
 			continue;
@@ -532,8 +528,6 @@ out:
 	zbx_free(name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
 }
 
 /*********************************************************************************
@@ -564,10 +558,10 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
 		config_type = "interface";
 	}
 
-	init_result(&result);
+	zbx_init_agent_result(&result);
 
-	if (SUCCEED == process(config, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result) &&
-			NULL != (value = GET_STR_RESULT(&result)) && NULL != *value)
+	if (SUCCEED == zbx_execute_agent_check(config, ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, &result) &&
+			NULL != (value = ZBX_GET_STR_RESULT(&result)) && NULL != *value)
 	{
 		if (SUCCEED != zbx_is_utf8(*value))
 		{
@@ -595,7 +589,7 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get host %s using \"%s\" item specified by"
 				" \"%s\" configuration parameter",config_type, config,config_name);
 
-	free_result(&result);
+	zbx_free_agent_result(&result);
 }
 
 /******************************************************************************
@@ -1164,16 +1158,16 @@ static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metr
 	AGENT_RESULT	result;
 	char		**pvalue;
 
-	init_result(&result);
+	zbx_init_agent_result(&result);
 
-	if (SUCCEED != (ret = process(metric->key, 0, &result)))
+	if (SUCCEED != (ret = zbx_execute_agent_check(metric->key, 0, &result)))
 	{
-		if (NULL != (pvalue = GET_MSG_RESULT(&result)))
+		if (NULL != (pvalue = ZBX_GET_MSG_RESULT(&result)))
 			*error = zbx_strdup(*error, *pvalue);
 		goto out;
 	}
 
-	if (NULL != (pvalue = GET_TEXT_RESULT(&result)))
+	if (NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", metric->key, *pvalue);
 
@@ -1181,7 +1175,7 @@ static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metr
 				NULL, NULL, NULL, NULL, metric->flags, zbx_config_tls);
 	}
 out:
-	free_result(&result);
+	zbx_free_agent_result(&result);
 
 	return ret;
 }
@@ -1442,18 +1436,15 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	time_t				nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0,
 					heartbeat_nextcheck = 0;
 	zbx_uint32_t			config_revision_local = 0;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
-	assert(args);
-	assert(((zbx_thread_args_t *)args)->args);
 	activechks_args_in = (zbx_thread_activechk_args *)((((zbx_thread_args_t *)args))->args);
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(activechks_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
-
 
 	zbx_vector_ptr_create(&activechk_args.addrs);
 
@@ -1482,7 +1473,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		if (1 == need_update_userparam)
 		{
 			zbx_setproctitle("active checks #%d [reloading user parameters]", process_num);
-			reload_user_parameters(process_type, process_num);
+			reload_user_parameters(process_type, process_num, activechks_args_in->config_file);
 			need_update_userparam = 0;
 		}
 #endif

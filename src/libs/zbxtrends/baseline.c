@@ -19,7 +19,7 @@
 #include "zbxtrends.h"
 #include "trends.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "log.h"
 
 /******************************************************************************

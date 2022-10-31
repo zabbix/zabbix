@@ -41,7 +41,7 @@ void	zbx_vc_test_get_value_setup(zbx_mock_handle_t *handle, zbx_uint64_t *itemid
 	zbx_vcmock_set_time(*handle, "time");
 	zbx_vcmock_set_mode(*handle, "cache mode");
 
-	if (FAIL == is_uint64(zbx_mock_get_object_member_string(*handle, "itemid"), itemid))
+	if (FAIL == zbx_is_uint64(zbx_mock_get_object_member_string(*handle, "itemid"), itemid))
 		fail_msg("Invalid itemid value");
 
 	*value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(*handle, "value type"));

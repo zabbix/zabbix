@@ -17,11 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "log.h"
 
-int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 /*
  *  FreeBSD 7.0 i386
@@ -43,6 +44,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 1);
 
 	sz = ARRSIZE(mib);
+
 	if (-1 == sysctlnametomib("vm.swap_info", mib, &sz))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain \"vm.swap_info\" system parameter: %s",
@@ -96,6 +98,7 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 #else
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for \"xswdev\" structure."));
+
 	return SYSINFO_RET_FAIL;
 #endif
 }

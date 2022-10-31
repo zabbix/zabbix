@@ -20,24 +20,28 @@
 #include "zbxtasks.h"
 #include "zbxnum.h"
 #include "zbxdbhigh.h"
+#include "zbxversion.h"
 
 /******************************************************************************
  *                                                                            *
  * Purpose: get tasks scheduled to be executed on the server                  *
  *                                                                            *
- * Parameters: tasks        - [OUT] the tasks to execute                      *
- *             proxy_hostid - [IN] (ignored)                                  *
+ * Parameters: tasks         - [OUT] the tasks to execute                     *
+ *             proxy_hostid  - [IN] (ignored)                                 *
+ *             compatibility - [IN] (ignored)                                 *
  *                                                                            *
  * Comments: This function is used by proxy to get tasks to be sent to the    *
  *           server.                                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
+void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid,
+		zbx_proxy_compatibility_t compatibility)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	ZBX_UNUSED(proxy_hostid);
+	ZBX_UNUSED(compatibility);
 
 	result = DBselect(
 			"select t.taskid,t.type,t.clock,t.ttl,"

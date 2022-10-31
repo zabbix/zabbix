@@ -17,29 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 #include "../common/zbxsysinfo_common.h"
 
-static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
+static int	vm_memory_total(AGENT_RESULT *result)
 {
-	return EXECUTE_INT("vmstat -s | awk 'BEGIN{pages=0}{gsub(\"[()]\",\"\");if($4==\"pagesize\")pgsize=($6);if(($2==\"inactive\"||$2==\"active\"||$2==\"wired\")&&$3==\"pages\")pages+=$1}END{printf (pages*pgsize)}'", result);
+	return execute_int("vmstat -s | awk 'BEGIN{pages=0}{gsub(\"[()]\",\"\");if($4==\"pagesize\")pgsize=($6);if(($2==\"inactive\"||$2==\"active\"||$2==\"wired\")&&$3==\"pages\")pages+=$1}END{printf (pages*pgsize)}'", result);
 }
 
-static int	VM_MEMORY_FREE(AGENT_RESULT *result)
+static int	vm_memory_free(AGENT_RESULT *result)
 {
-	return EXECUTE_INT("vmstat -s | awk '{gsub(\"[()]\",\"\");if($4==\"pagesize\")pgsize=($6);if($2==\"free\"&&$3==\"pages\")pages=($1)}END{printf (pages*pgsize)}'", result);
+	return execute_int("vmstat -s | awk '{gsub(\"[()]\",\"\");if($4==\"pagesize\")pgsize=($6);if($2==\"free\"&&$3==\"pages\")pages=($1)}END{printf (pages*pgsize)}'", result);
 }
 
-static int	VM_MEMORY_USED(AGENT_RESULT *result)
+static int	vm_memory_used(AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	AGENT_RESULT	result_tmp;
 	zbx_uint64_t	free, total;
 
-	init_result(&result_tmp);
+	zbx_init_agent_result(&result_tmp);
 
-	if (SYSINFO_RET_OK != VM_MEMORY_FREE(&result_tmp))
+	if (SYSINFO_RET_OK != vm_memory_free(&result_tmp))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, result_tmp.msg));
 		goto clean;
@@ -47,7 +47,7 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 
 	free = result_tmp.ui64;
 
-	if (SYSINFO_RET_OK != VM_MEMORY_TOTAL(&result_tmp))
+	if (SYSINFO_RET_OK != vm_memory_total(&result_tmp))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, result_tmp.msg));
 		goto clean;
@@ -59,20 +59,20 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 clean:
-	free_result(&result_tmp);
+	zbx_free_agent_result(&result_tmp);
 
 	return ret;
 }
 
-static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
+static int	vm_memory_pused(AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	AGENT_RESULT	result_tmp;
 	zbx_uint64_t	free, total;
 
-	init_result(&result_tmp);
+	zbx_init_agent_result(&result_tmp);
 
-	if (SYSINFO_RET_OK != VM_MEMORY_FREE(&result_tmp))
+	if (SYSINFO_RET_OK != vm_memory_free(&result_tmp))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, result_tmp.msg));
 		goto clean;
@@ -80,7 +80,7 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 
 	free = result_tmp.ui64;
 
-	if (SYSINFO_RET_OK != VM_MEMORY_TOTAL(&result_tmp))
+	if (SYSINFO_RET_OK != vm_memory_total(&result_tmp))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, result_tmp.msg));
 		goto clean;
@@ -98,25 +98,25 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 clean:
-	free_result(&result_tmp);
+	zbx_free_agent_result(&result_tmp);
 
 	return ret;
 }
 
-static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
+static int	vm_memory_available(AGENT_RESULT *result)
 {
-	return VM_MEMORY_FREE(result);
+	return vm_memory_free(result);
 }
 
-static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
+static int	vm_memory_pavailable(AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	AGENT_RESULT	result_tmp;
 	zbx_uint64_t	free, total;
 
-	init_result(&result_tmp);
+	zbx_init_agent_result(&result_tmp);
 
-	if (SYSINFO_RET_OK != VM_MEMORY_FREE(&result_tmp))
+	if (SYSINFO_RET_OK != vm_memory_free(&result_tmp))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, result_tmp.msg));
 		goto clean;
@@ -124,7 +124,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 
 	free = result_tmp.ui64;
 
-	if (SYSINFO_RET_OK != VM_MEMORY_TOTAL(&result_tmp))
+	if (SYSINFO_RET_OK != vm_memory_total(&result_tmp))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, result_tmp.msg));
 		goto clean;
@@ -142,12 +142,12 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 clean:
-	free_result(&result_tmp);
+	zbx_free_agent_result(&result_tmp);
 
 	return ret;
 }
 
-int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*mode;
 	int	ret = SYSINFO_RET_FAIL;
@@ -161,17 +161,17 @@ int     VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 0);
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
-		ret = VM_MEMORY_TOTAL(result);
+		ret = vm_memory_total(result);
 	else if (0 == strcmp(mode, "free"))
-		ret = VM_MEMORY_FREE(result);
+		ret = vm_memory_free(result);
 	else if (0 == strcmp(mode, "used"))
-		ret = VM_MEMORY_USED(result);
+		ret = vm_memory_used(result);
 	else if (0 == strcmp(mode, "pused"))
-		ret = VM_MEMORY_PUSED(result);
+		ret = vm_memory_pused(result);
 	else if (0 == strcmp(mode, "available"))
-		ret = VM_MEMORY_AVAILABLE(result);
+		ret = vm_memory_available(result);
 	else if (0 == strcmp(mode, "pavailable"))
-		ret = VM_MEMORY_PAVAILABLE(result);
+		ret = vm_memory_pavailable(result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));

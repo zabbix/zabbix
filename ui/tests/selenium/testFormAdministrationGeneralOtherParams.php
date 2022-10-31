@@ -412,7 +412,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Ivalid empty values.
+			// Invalid empty values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -495,7 +495,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Ivalid zero values.
+			// Invalid zero values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -521,7 +521,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					]
 				]
 			],
-			// Ivalid zero values in seconds with "s".
+			// Invalid zero values in seconds with "s".
 			[
 				[
 					'expected' => TEST_BAD,

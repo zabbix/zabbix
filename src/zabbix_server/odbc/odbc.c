@@ -17,19 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_UNIXODBC
 
 #include "odbc.h"
 
-#include <sql.h>
-#include <sqlext.h>
-
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
+#include "zbxexpr.h"
+
+#include <sql.h>
+#include <sqlext.h>
 
 struct zbx_odbc_data_source
 {
@@ -628,7 +629,7 @@ static int	odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, int 
 				if (0 != isalpha((unsigned char)*p))
 					*p = toupper((unsigned char)*p);
 
-				if (SUCCEED != is_macro_char(*p))
+				if (SUCCEED != zbx_is_macro_char(*p))
 				{
 					*error = zbx_dsprintf(*error, "Cannot convert column #%d name to macro.", i + 1);
 					goto out;

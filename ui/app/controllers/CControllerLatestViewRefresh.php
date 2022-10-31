@@ -25,16 +25,25 @@
 class CControllerLatestViewRefresh extends CControllerLatestView {
 
 	protected function doAction(): void {
-
-		if ($this->getInput('filter_counters', 0)) {
+		if ($this->getInput('filter_counters', 0) != 0) {
 			$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
 			$filters = $this->hasInput('counter_index')
 				? [$profile->getTabFilter($this->getInput('counter_index'))]
 				: $profile->getTabsWithDefaults();
 
 			$filter_counters = [];
+
 			foreach ($filters as $index => $tabfilter) {
-				$filter_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
+				if (!$tabfilter['filter_show_counter']) {
+					$filter_counters[$index] = 0;
+
+					continue;
+				}
+
+				$prepared_data = $this->prepareData($tabfilter, $tabfilter['sort'], $tabfilter['sortorder']);
+				$subfilters_fields = self::getSubfilterFields($tabfilter);
+				self::getSubfilters($subfilters_fields, $prepared_data);
+				$filter_counters[$index] = count(self::applySubfilters($prepared_data['items']));
 			}
 
 			$this->setResponse(
@@ -52,7 +61,7 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 			$prepared_data = $this->prepareData($filter, $filter['sort'], $filter['sortorder']);
 
 			// Prepare subfilter data.
-			$subfilters_fields = self::getSubfilterFields($filter, (count($filter['hostids']) == 1));
+			$subfilters_fields = self::getSubfilterFields($filter);
 			$subfilters = self::getSubfilters($subfilters_fields, $prepared_data);
 			$prepared_data['items'] = self::applySubfilters($prepared_data['items']);
 

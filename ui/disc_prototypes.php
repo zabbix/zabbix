@@ -268,13 +268,13 @@ if (!$discoveryRule) {
 
 $itemPrototypeId = getRequest('itemid');
 if ($itemPrototypeId) {
-	$item_prorotypes = API::ItemPrototype()->get([
+	$item_prototypes = API::ItemPrototype()->get([
 		'output' => [],
 		'itemids' => $itemPrototypeId,
 		'editable' => true
 	]);
 
-	if (!$item_prorotypes) {
+	if (!$item_prototypes) {
 		access_deny();
 	}
 }
@@ -524,6 +524,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'itemid', 'delay', 'delay_flex', 'history', 'trends', 'history_mode', 'trends_mode', 'allow_traps',
 					'description', 'status', 'discover', 'tags'
 				], true);
+
+				if ($db_item['type'] != ITEM_TYPE_HTTPAGENT) {
+					$allowed_fields += array_fill_keys([
+						'authtype', 'username', 'password', 'params', 'publickey', 'privatekey', 'interfaceid'
+					], true);
+				}
 
 				foreach ($item as $field => $value) {
 					if (!array_key_exists($field, $allowed_fields)) {

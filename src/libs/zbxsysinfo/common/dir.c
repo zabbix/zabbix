@@ -18,7 +18,8 @@
 **/
 
 #include "dir.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxstr.h"
 #include "zbxnum.h"
@@ -169,7 +170,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 	{
 		*max_depth = TRAVERSAL_DEPTH_UNLIMITED; /* <max_depth> default value */
 	}
-	else if (SUCCEED != is_uint31(max_depth_str, max_depth))
+	else if (SUCCEED != zbx_is_uint31(max_depth_str, max_depth))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid %s parameter.", (4 == depth_param ?
 						"fifth" : "sixth")));
@@ -252,13 +253,13 @@ int	zbx_etypes_to_mask(const char *etypes, AGENT_RESULT *result)
 	if (NULL == etypes || '\0' == *etypes)
 		return 0;
 
-	num = num_param(etypes);
+	num = zbx_num_param(etypes);
 	for (n = 1; n <= num; n++)
 	{
 		char	*etype;
 		int	type;
 
-		if (NULL == (etype = get_param_dyn(etypes, n, NULL)))
+		if (NULL == (etype = zbx_get_param_dyn(etypes, n, NULL)))
 			continue;
 
 		if (ZBX_FT_OVERFLOW & (type = etype_to_mask(etype)))
@@ -286,7 +287,7 @@ static int	parse_size_parameter(char *text, zbx_uint64_t *size_out)
 	if (NULL == text || '\0' == *text)
 		return SUCCEED;
 
-	return str2uint64(text, "KMGT", size_out);
+	return zbx_str2uint64(text, "KMGT", size_out);
 }
 
 static int	parse_age_parameter(char *text, time_t *time_out, time_t now)
@@ -296,7 +297,7 @@ static int	parse_age_parameter(char *text, time_t *time_out, time_t now)
 	if (NULL == text || '\0' == *text)
 		return SUCCEED;
 
-	if (SUCCEED != str2uint64(text, "smhdw", &seconds))
+	if (SUCCEED != zbx_str2uint64(text, "smhdw", &seconds))
 		return FAIL;
 
 	*time_out = now - (time_t)seconds;
@@ -511,7 +512,7 @@ static int	link_processed(DWORD attrib, wchar_t *wpath, zbx_vector_ptr_t *descri
 	return FAIL;
 }
 
-static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
+static int	vfs_dir_size_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	char			*dir = NULL;
 	int			mode, max_depth, ret = SYSINFO_RET_FAIL;
@@ -688,7 +689,7 @@ err1:
 	return ret;
 }
 #else /* not _WINDOWS or __MINGW32__ */
-static int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_dir_size_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*dir = NULL;
 	int			mode, max_depth, ret = SYSINFO_RET_FAIL;
@@ -837,9 +838,9 @@ err1:
 }
 #endif
 
-int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dir_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_dir_size, request, result);
+	return zbx_execute_threaded_metric(vfs_dir_size_local, request, result);
 }
 
 #define EVALUATE_DIR_ENTITY()											\
@@ -1049,12 +1050,12 @@ err1:
 	return ret;
 }
 
-static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
+static int	vfs_dir_count_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	return vfs_dir_info(request, result, timeout_event, 1);
 }
 
-static int	vfs_dir_get(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
+static int	vfs_dir_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
 	return vfs_dir_info(request, result, timeout_event, 0);
 }
@@ -1194,23 +1195,23 @@ err1:
 	return ret;
 }
 
-static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_dir_count_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return vfs_dir_info(request, result, 1);
 }
 
-static int	vfs_dir_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_dir_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return vfs_dir_info(request, result, 0);
 }
 #endif
 
-int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_dir_count, request, result);
+	return zbx_execute_threaded_metric(vfs_dir_count_local, request, result);
 }
 
-int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dir_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_dir_get, request, result);
+	return zbx_execute_threaded_metric(vfs_dir_get_local, request, result);
 }

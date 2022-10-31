@@ -58,9 +58,9 @@ class CWebTest extends CTest {
 	// Shared page instance.
 	private static $shared_page = null;
 	// Enable suppressing of browser errors on test case level.
-	private $supress_case_errors = false;
+	private $suppress_case_errors = false;
 	// Enable suppressing of browser errors on test suite level.
-	private static $supress_suite_errors = false;
+	private static $suppress_suite_errors = false;
 
 	// Instance of web page.
 	protected $page = null;
@@ -120,7 +120,7 @@ class CWebTest extends CTest {
 			$errors = "Severe browser errors:\n".implode("\n", array_unique($errors));
 
 			if (!$this->hasFailed() && $this->getStatus() !== null) {
-				if (!$this->supress_case_errors) {
+				if (!$this->suppress_case_errors) {
 					$this->captureScreenshot();
 					$this->fail($errors);
 				}
@@ -163,14 +163,14 @@ class CWebTest extends CTest {
 		parent::onBeforeTestSuite();
 
 		// Browser errors are not ignored by default.
-		self::$supress_suite_errors = false;
+		self::$suppress_suite_errors = false;
 
 		// Test suite level annotations.
 		$class_annotations = $this->getAnnotationsByType($this->annotations, 'class');
 
 		// Suppress browser error on a test case level.
-		$supress_suite_errors = $this->getAnnotationsByType($class_annotations, 'ignoreBrowserErrors');
-		self::$supress_suite_errors = ($supress_suite_errors !== null);
+		$suppress_suite_errors = $this->getAnnotationsByType($class_annotations, 'ignoreBrowserErrors');
+		self::$suppress_suite_errors = ($suppress_suite_errors !== null);
 
 		// Browsers supported by test suite.
 		$browsers = $this->getAnnotationTokensByName($class_annotations, 'browsers');
@@ -211,13 +211,13 @@ class CWebTest extends CTest {
 		$method_annotations = $this->getAnnotationsByType($this->annotations, 'method');
 		if ($method_annotations !== null) {
 			// Suppress browser error on a test case level.
-			$supress_case_errors = $this->getAnnotationsByType($method_annotations, 'ignoreBrowserErrors');
-			$this->supress_case_errors = ($supress_case_errors !== null);
+			$suppress_case_errors = $this->getAnnotationsByType($method_annotations, 'ignoreBrowserErrors');
+			$this->suppress_case_errors = ($suppress_case_errors !== null);
 		}
 
 		// Errors on a test case level should be suppressed if suite level error suppression is enabled.
-		if (self::$supress_suite_errors) {
-			$this->supress_case_errors = self::$supress_suite_errors;
+		if (self::$suppress_suite_errors) {
+			$this->suppress_case_errors = self::$suppress_suite_errors;
 		}
 
 		// Browsers supported by test case.

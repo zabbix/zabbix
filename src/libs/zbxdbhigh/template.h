@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TEMPLATE_H
 #define ZABBIX_TEMPLATE_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxdbhigh.h"
 #include "zbxtypes.h"
 #include "zbxalgo.h"

@@ -28,12 +28,12 @@ $this->includeJsFile('administration.userrole.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('User roles'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_USERROLE_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERROLE_EDIT));
 
 $form = (new CForm())
 	->setId('userrole-form')
 	->setName('user_role_form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 if ($data['roleid'] !== null) {
 	$form->addVar('roleid', $data['roleid']);

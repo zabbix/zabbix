@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -116,6 +117,10 @@ class testUserRolesPermissions extends CWebTest {
 	}
 
 	public function prepareServiceData() {
+		// Remove all unnecessary services before proceeding with execution.
+		DBExecute('DELETE FROM services');
+
+		// Create services for Service permission checks.
 		CDataHelper::call('service.create', [
 			[
 				'name' => 'Parent 1',
@@ -468,13 +473,17 @@ class testUserRolesPermissions extends CWebTest {
 	 */
 	public function testUserRolesPermissions_ScriptAction($data) {
 		$context_before = [
-			'Inventory',
-			'Latest data',
-			'Problems',
-			'Graphs',
 			'Dashboards',
+			'Problems',
+			'Latest data',
+			'Graphs',
 			'Web',
-			'Configuration',
+			'Inventory',
+			'Host',
+			'Items',
+			'Triggers',
+			'Discovery',
+			'Web',
 			'Detect operating system',
 			'Ping',
 			'Script for Clone',
@@ -483,13 +492,17 @@ class testUserRolesPermissions extends CWebTest {
 			'Traceroute'
 		];
 		$context_after = [
-			'Inventory',
-			'Latest data',
-			'Problems',
-			'Graphs',
 			'Dashboards',
+			'Problems',
+			'Latest data',
+			'Graphs',
 			'Web',
-			'Configuration'
+			'Inventory',
+			'Host',
+			'Items',
+			'Triggers',
+			'Discovery',
+			'Web'
 		];
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 
@@ -500,12 +513,12 @@ class testUserRolesPermissions extends CWebTest {
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 			if ($action_status) {
 				$this->assertTrue($popup->hasItems($context_before));
-				$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
+				$this->assertEquals(['VIEW', 'CONFIGURATION', 'SCRIPTS'], $popup->getTitles()->asText());
 				$this->changeRoleRule(['Execute scripts' => false]);
 			}
 			else {
 				$this->assertTrue($popup->hasItems($context_after));
-				$this->assertEquals(['HOST'], $popup->getTitles()->asText());
+				$this->assertEquals(['VIEW', 'CONFIGURATION'], $popup->getTitles()->asText());
 				$this->changeRoleRule(['Execute scripts' => true]);
 			}
 		}
@@ -784,6 +797,86 @@ class testUserRolesPermissions extends CWebTest {
 						'Event correlation'
 					],
 					'link' => ['zabbix.php?action=discovery.list']
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
+					'page' => 'Trigger actions',
+					'actions' => true,
+					'displayed_ui' => [
+						'Service actions',
+						'Discovery actions',
+						'Autoregistration actions',
+						'Internal actions',
+						'Media types',
+						'Scripts'
+					],
+					'link' => ['actionconf.php?eventsource=0']
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
+					'page' => 'Service actions',
+					'actions' => true,
+					'displayed_ui' => [
+						'Trigger actions',
+						'Discovery actions',
+						'Autoregistration actions',
+						'Internal actions',
+						'Media types',
+						'Scripts'
+					],
+					'link' => ['actionconf.php?eventsource=4']
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
+					'page' => 'Discovery actions',
+					'actions' => true,
+					'displayed_ui' => [
+						'Trigger actions',
+						'Service actions',
+						'Autoregistration actions',
+						'Internal actions',
+						'Media types',
+						'Scripts'
+					],
+					'link' => ['actionconf.php?eventsource=1']
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
+					'page' => 'Autoregistration actions',
+					'actions' => true,
+					'displayed_ui' => [
+						'Trigger actions',
+						'Service actions',
+						'Discovery actions',
+						'Internal actions',
+						'Media types',
+						'Scripts'
+					],
+					'link' => ['actionconf.php?eventsource=2']
+				]
+			],
+			[
+				[
+					'section' => 'Alerts',
+					'page' => 'Internal actions',
+					'actions' => true,
+					'displayed_ui' => [
+						'Trigger actions',
+						'Service actions',
+						'Discovery actions',
+						'Autoregistration actions',
+						'Media types',
+						'Scripts'
+					],
+					'link' => ['actionconf.php?eventsource=3']
 				]
 			],
 			[
@@ -1128,6 +1221,10 @@ class testUserRolesPermissions extends CWebTest {
 				$this->assertEquals($action_status, $submenu->query('link', $data['page'])->one(false)->isValid());
 			}
 			else {
+				if (array_key_exists('actions', $data)) {
+					$menu->query('xpath:.//ul/li/a[text()="Actions"]')->waitUntilClickable()->one()->click();
+				}
+
 				$this->assertEquals($action_status, $menu->exists($data['page']));
 			}
 
@@ -1141,6 +1238,14 @@ class testUserRolesPermissions extends CWebTest {
 				}
 				else {
 					$this->changeRoleRule([$data['section'] => $data['displayed_ui']]);
+					$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
+				}
+
+				if (array_key_exists('actions', $data)) {
+					$this->changeRoleRule([$data['section'] => $data['displayed_ui']]);
+					$this->page->open('actionconf.php'.(($data['page'] === 'Trigger actions') ? '?eventsource=1' : ''))->waitUntilReady();
+					$popup_menu = $this->query('id:page-title-general')->asPopupButton()->one()->getMenu();
+					$this->assertNotContains($data['page'], $popup_menu->getItems()->asText());
 					$this->page->open('zabbix.php?action=dashboard.view')->waitUntilReady();
 				}
 			}
@@ -1357,11 +1462,13 @@ class testUserRolesPermissions extends CWebTest {
 			$form->fill($data['service_list']);
 		}
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'User role updated');
 		$this->page->logout();
 
 		// Login as user that belongs to the updated row and check access to services based on applied configuration.
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=service.list')->waitUntilReady();
+		$this->assertEquals('user_for_role', $this->query('xpath://a[text()="User settings"]')->one()->getAttribute('title'));
 
 		$services_mode = $this->query('id:list_mode')->asSegmentedRadio()->one(false);
 
@@ -1422,7 +1529,7 @@ class testUserRolesPermissions extends CWebTest {
 							'items' => ['I5-agent-txt', 'I4-trap-log'],
 							'message' => 'Request sent successfully. Some items are filtered due to access permissions or type.'
 						],
-						// Dependet items.
+						// Dependent items.
 						[
 							'expected' => TEST_GOOD,
 							'items' => ['I1-lvl2-dep-log'],
@@ -1447,7 +1554,7 @@ class testUserRolesPermissions extends CWebTest {
 						[
 							'items' => ['I5-agent-txt', 'I4-trap-log']
 						],
-						// Dependet items.
+						// Dependent items.
 						[
 							'items' => ['I1-lvl2-dep-log']
 						],
@@ -1465,7 +1572,7 @@ class testUserRolesPermissions extends CWebTest {
 						[
 							'items' => ['I4-trap-log']
 						],
-						// Dependet items.
+						// Dependent items.
 						[
 							'expected' => TEST_GOOD,
 							'items' => ['I1-lvl2-dep-log', 'I4-trap-log'],

@@ -57,16 +57,12 @@ foreach ($submenu_source as $value => $label) {
 	$submenu[$url] = $label;
 }
 
-$data['eventsource'] == EVENT_SOURCE_SERVICE
-	? $doc_url = CDocHelper::CONFIGURATION_SERVICES_ACTION_LIST
-	: $doc_url = CDocHelper::CONFIGURATION_ACTION_LIST;
-
 $current_url = (new CUrl('actionconf.php'))->setArgument('eventsource', $data['eventsource']);
 
 $widget = (new CWidget())
 	->setTitle($title)
 	->setTitleSubmenu(['main_section' => ['items' => $submenu]])
-	->setDocUrl(CDocHelper::getUrl($doc_url))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_ACTION_LIST))
 	->setControls((new CTag('nav', true,
 		(new CForm('get'))
 			->cleanItems()

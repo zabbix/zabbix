@@ -3,18 +3,18 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 The updated template for monitoring the Mellanox network switches over SNMP agent. All items collected in one template without any linked templates.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 Refer to the vendor documentation.
 
 ## Zabbix configuration
 
-The template uses context macros for the temperature trigger expression. By default, it uses a macro value like {$TEMP.MAX.CRIT}. To adjust the threshold for a certain sensor you can define context macros on the host level, with a value corresponding to your device specifications, for example: {$TEMP.MAX.CRIT:"MGMT/BOARD_MONITOR"}. Please, read https://www.zabbix.com/documentation/6.2/manual/config/macros/user_macros_context for more detailed info on user context macros.
+The template uses context macros for the temperature trigger expression. By default, it uses a macro value like {$TEMP.MAX.CRIT}. To adjust the threshold for a certain sensor you can define context macros on the host level, with a value corresponding to your device specifications, for example: {$TEMP.MAX.CRIT:"MGMT/BOARD_MONITOR"}. Please, read https://www.zabbix.com/documentation/6.4/manual/config/macros/user_macros_context for more detailed info on user context macros.
 
 ### Macros used
 
@@ -105,7 +105,8 @@ There are no template links in this template.
 |Network interfaces |Interface {#IFNAME}({#IFALIAS}): Interface type |<p>MIB: IF-MIB</p><p>The type of interface.</p><p>Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),</p><p>through updating the syntax of the IANAifType textual convention.</p> |SNMP |net.if.type[ifType.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Network interfaces |Interface {#IFNAME}({#IFALIAS}): Speed |<p>MIB: IF-MIB</p><p>An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.</p> |SNMP |net.if.speed[ifHighSpeed.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1000000`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Power supply |{#ENT_NAME}: Power supply status |<p>MIB: ENTITY-STATE-MIB</p> |SNMP |sensor.psu.status[entStateOper.{#SNMPINDEX}] |
-|Status |Uptime |<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p> |SNMP |system.uptime[sysUpTime.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |Uptime (network) |<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p> |SNMP |system.net.uptime[sysUpTime.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |Uptime (hardware) |<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p> |SNMP |system.hw.uptime[hrSystemUptime.0]<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `0.01`</p> |
 |Status |SNMP agent availability |<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p> |INTERNAL |zabbix[host,snmp,available] |
 |Status |ICMP ping |<p>-</p> |SIMPLE |icmpping |
 |Status |ICMP loss |<p>-</p> |SIMPLE |icmppingloss |
@@ -130,7 +131,7 @@ There are no template links in this template.
 |Interface {#IFNAME}({#IFALIAS}): High error rate |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</p> |`min(/Mellanox SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/Mellanox SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`max(/Mellanox SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8 and max(/Mellanox SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFNAME}({#IFALIAS}): Link down</p> |
 |Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before |<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</p> |`change(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and ( last(/Mellanox SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/Mellanox SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/Mellanox SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/Mellanox SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/Mellanox SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/Mellanox SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2) `<p>Recovery expression:</p>`(change(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Mellanox SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or (last(/Mellanox SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2) ` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFNAME}({#IFALIAS}): Link down</p> |
 |{#ENT_NAME}: Power supply is in critical state |<p>Please check the power supply unit for errors</p> |`count(/Mellanox SNMP/sensor.psu.status[entStateOper.{#SNMPINDEX}],#1,"eq","{$PSU.STATUS.CRIT}")=1` |AVERAGE | |
-|has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Mellanox SNMP/system.uptime[sysUpTime.0])<10m` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- No SNMP data collection</p> |
+|Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`(last(/Mellanox SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Mellanox SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Mellanox SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Mellanox SNMP/system.net.uptime[sysUpTime.0])<10m)` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- No SNMP data collection</p> |
 |No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/Mellanox SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
 |Unavailable by ICMP ping |<p>Last three attempts returned timeout.  Please check device connectivity.</p> |`max(/Mellanox SNMP/icmpping,#3)=0` |HIGH | |
 |High ICMP ping loss |<p>-</p> |`min(/Mellanox SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Mellanox SNMP/icmppingloss,5m)<100` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |

@@ -20,12 +20,12 @@
 #ifndef ZABBIX_CHECKS_IPMI_H
 #define ZABBIX_CHECKS_IPMI_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_OPENIPMI
 
 #include "dbcache.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 int	zbx_init_ipmi_handler(void);
 void	zbx_free_ipmi_handler(void);

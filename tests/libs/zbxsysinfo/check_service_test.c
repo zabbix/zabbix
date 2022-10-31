@@ -22,7 +22,8 @@
 #include "zbxmockutil.h"
 
 #include "../../../src/libs/zbxsysinfo/simple/simple.h"
-#include "../../../include/sysinfo.h"
+#include "../../../include/zbxsysinfo.h"
+#include "../../../src/libs/zbxsysinfo/sysinfo.h"
 
 int	__wrap_tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)
@@ -52,8 +53,8 @@ void	zbx_mock_test_entry(void **state)
 	default_addr = zbx_mock_get_parameter_string("in.interface");
 	ip = zbx_mock_get_parameter_string("in.ip");
 
-	init_result(&result);
-	init_request(&request);
+	zbx_init_agent_result(&result);
+	zbx_init_agent_request(&request);
 	*key = '\0';
 	strcat(key, "net.tcp.service[smtp");
 
@@ -64,14 +65,14 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	strcat(key, "]");
-	parse_item_key(key, &request);
+	zbx_parse_item_key(key, &request);
 
-	returned_code = check_service(&request, default_addr, &result, 0);
+	returned_code = zbx_check_service_default_addr(&request, default_addr, &result, 0);
 	if (SUCCEED != returned_code && NULL != result.msg && '\0' != *(result.msg))
 		printf("check_service_test error: %s\n", result.msg);
 
 	zbx_mock_assert_result_eq("Return value", expected_code, returned_code);
 
-	free_result(&result);
-	free_request(&request);
+	zbx_free_agent_result(&result);
+	zbx_free_agent_request(&request);
 }

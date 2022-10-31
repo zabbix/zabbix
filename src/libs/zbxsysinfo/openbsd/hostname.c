@@ -17,7 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "log.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
@@ -26,9 +28,9 @@
 
 ZBX_METRIC	parameter_hostname =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
-	{"system.hostname",     CF_HAVEPARAMS,  SYSTEM_HOSTNAME,        NULL};
+	{"system.hostname",     CF_HAVEPARAMS,  system_hostname,        NULL};
 
-int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct utsname	name;
 	char		*hostname;

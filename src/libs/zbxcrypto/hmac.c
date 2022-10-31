@@ -19,8 +19,7 @@
 
 #include "zbxcrypto.h"
 
-#include "zbxhash.h"
-#include "common.h"
+#include "zbxcommon.h"
 
 static void	*hmac_hash_init(zbx_crypto_hash_t type)
 {

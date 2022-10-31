@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
 #include "log.h"
 
 #ifdef HAVE_LIBPERFSTAT
@@ -36,43 +37,47 @@ static perfstat_memory_total_t	m;
 		return SYSINFO_RET_FAIL;								\
 	}
 
-static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
+static int	vm_memory_total(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_total << ZBX_PERFSTAT_PAGE_SHIFT);	/* total real memory in pages */
+	/* total real memory in pages */
+	SET_UI64_RESULT(result, m.real_total << ZBX_PERFSTAT_PAGE_SHIFT);
 
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_PINNED(AGENT_RESULT *result)
+static int	vm_memory_pinned(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_pinned << ZBX_PERFSTAT_PAGE_SHIFT);	/* real memory which is pinned in pages */
+	/* real memory which is pinned in pages */
+	SET_UI64_RESULT(result, m.real_pinned << ZBX_PERFSTAT_PAGE_SHIFT);
 
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_FREE(AGENT_RESULT *result)
+static int	vm_memory_free(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_free << ZBX_PERFSTAT_PAGE_SHIFT);	/* free real memory in pages */
+	/* free real memory in pages */
+	SET_UI64_RESULT(result, m.real_free << ZBX_PERFSTAT_PAGE_SHIFT);
 
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_USED(AGENT_RESULT *result)
+static int	vm_memory_used(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
-	SET_UI64_RESULT(result, m.real_inuse << ZBX_PERFSTAT_PAGE_SHIFT);	/* real memory which is in use in pages */
+	/* real memory which is in use in pages */
+	SET_UI64_RESULT(result, m.real_inuse << ZBX_PERFSTAT_PAGE_SHIFT);
 
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
+static int	vm_memory_pused(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
@@ -87,7 +92,7 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
+static int	vm_memory_available(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
@@ -96,7 +101,7 @@ static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
+static int	vm_memory_pavailable(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
@@ -111,7 +116,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
+static int	vm_memory_cached(AGENT_RESULT *result)
 {
 	ZBX_PERFSTAT_MEMORY_TOTAL();
 
@@ -122,7 +127,7 @@ static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 
 #endif
 
-int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_LIBPERFSTAT
 	int	ret;
@@ -137,21 +142,21 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 0);
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
-		ret = VM_MEMORY_TOTAL(result);
+		ret = vm_memory_total(result);
 	else if (0 == strcmp(mode, "pinned"))
-		ret = VM_MEMORY_PINNED(result);
+		ret = vm_memory_pinned(result);
 	else if (0 == strcmp(mode, "free"))
-		ret = VM_MEMORY_FREE(result);
+		ret = vm_memory_free(result);
 	else if (0 == strcmp(mode, "used"))
-		ret = VM_MEMORY_USED(result);
+		ret = vm_memory_used(result);
 	else if (0 == strcmp(mode, "pused"))
-		ret = VM_MEMORY_PUSED(result);
+		ret = vm_memory_pused(result);
 	else if (0 == strcmp(mode, "available"))
-		ret = VM_MEMORY_AVAILABLE(result);
+		ret = vm_memory_available(result);
 	else if (0 == strcmp(mode, "pavailable"))
-		ret = VM_MEMORY_PAVAILABLE(result);
+		ret = vm_memory_pavailable(result);
 	else if (0 == strcmp(mode, "cached"))
-		ret = VM_MEMORY_CACHED(result);
+		ret = vm_memory_cached(result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
@@ -161,6 +166,7 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 #else
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Agent was compiled without support for Perfstat API."));
+
 	return SYSINFO_RET_FAIL;
 #endif
 }

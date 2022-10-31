@@ -24,7 +24,7 @@
 #endif
 
 /* Has to be rewritten to avoid malloc */
-char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2)
+char	*zbx_string_replace(const char *str, const char *sub_str1, const char *sub_str2)
 {
 	char		*t, *new_str = NULL;
 	const char	*p, *q, *r;
@@ -64,7 +64,7 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 	return new_str;
 }
 
-int	is_ascii_string(const char *str)
+int	zbx_is_ascii_string(const char *str)
 {
 	while ('\0' != *str)
 	{
@@ -240,7 +240,7 @@ char	*zbx_str_printable_dyn(const char *text)
  * Comments: 10.0100 => 10.01, 10. => 10                                      *
  *                                                                            *
  ******************************************************************************/
-void	del_zeros(char *s)
+void	zbx_del_zeros(char *s)
 {
 	int	trim = 0;
 	size_t	len = 0;
@@ -395,9 +395,9 @@ int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charli
  * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
  *                                                                            *
  ******************************************************************************/
-int	str_in_list(const char *list, const char *value, char delimiter)
+int	zbx_str_in_list(const char *list, const char *value, char delimiter)
 {
-	return str_n_in_list(list, value, strlen(value), delimiter);
+	return zbx_str_n_in_list(list, value, strlen(value), delimiter);
 }
 
 /******************************************************************************
@@ -412,7 +412,7 @@ int	str_in_list(const char *list, const char *value, char delimiter)
  * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
  *                                                                            *
  ******************************************************************************/
-int	str_n_in_list(const char *list, const char *value, size_t len, char delimiter)
+int	zbx_str_n_in_list(const char *list, const char *value, size_t len, char delimiter)
 {
 	const char	*end;
 	size_t		token_len, next = 1;
@@ -455,7 +455,7 @@ int	str_n_in_list(const char *list, const char *value, size_t len, char delimite
  * Comments: allocates memory                                                 *
  *                                                                            *
  ******************************************************************************/
-char	*str_linefeed(const char *src, size_t maxline, const char *delim)
+char	*zbx_str_linefeed(const char *src, size_t maxline, const char *delim)
 {
 	size_t		src_size, dst_size, delim_size, left;
 	int		feeds;		/* number of feeds */
@@ -1124,7 +1124,7 @@ void	zbx_strupper(char *str)
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
+char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding)
 {
 #define STATIC_SIZE	1024
 	wchar_t		wide_string_static[STATIC_SIZE], *wide_string = NULL;
@@ -1166,7 +1166,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 		return utf8_string;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "convert_to_utf8() in_size:%d encoding:'%s' codepage:%u", in_size, encoding,
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_convert_to_utf8() in_size:%d encoding:'%s' codepage:%u", in_size, encoding,
 			codepage);
 
 	if (65001 == codepage)
@@ -1241,7 +1241,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	return utf8_string;
 }
 #elif defined(HAVE_ICONV)
-char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
+char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding)
 {
 	iconv_t		cd;
 	size_t		in_size_left, out_size_left, sz, out_alloc = 0;
@@ -1601,7 +1601,7 @@ void	zbx_replace_invalid_utf8(char *text)
 
 #undef ZBX_UTF8_REPLACE_CHAR
 
-void	dos2unix(char *str)
+void	zbx_dos2unix(char *str)
 {
 	char	*o = str;
 

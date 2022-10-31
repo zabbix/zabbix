@@ -106,7 +106,7 @@ typedef long	ssize_t;
 #	endif
 
 #	define zbx_uint64_t	uint64_t
-#	if __WORDSIZE == 64
+#	if __WORDSIZE == 64 || defined(__64BIT__)
 #		if defined(__APPLE__) && defined(__MACH__)	/* OS X */
 #			define ZBX_FS_UI64	"%llu"
 #			define ZBX_FS_UO64	"%llo"
@@ -129,7 +129,7 @@ typedef long	ssize_t;
 #	endif
 
 #	define zbx_int64_t	int64_t
-#	if __WORDSIZE == 64
+#	if __WORDSIZE == 64 || defined(__64BIT__)
 #		if defined(__APPLE__) && defined(__MACH__)	/* OS X */
 #			define ZBX_FS_I64	"%lld"
 #			define ZBX_FS_O64	"%llo"

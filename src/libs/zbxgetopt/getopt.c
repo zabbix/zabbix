@@ -51,7 +51,7 @@ they can distinguish the relative order of options and other arguments.
 #undef BAD_OPTION
 
 #include "zbxgetopt.h"
-#include "common.h"
+#include "zbxcommon.h"
 
 /*
 Index in ARGV of the next element to be scanned.

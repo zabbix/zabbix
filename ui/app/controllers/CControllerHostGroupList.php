@@ -111,12 +111,20 @@ class CControllerHostGroupList extends CController {
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'selectGroupDiscovery' => ['ts_delete'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectHostPrototype' => ['hostid'],
 			'groupids' => $groupids,
 			'limitSelects' => $limit
 		]);
 		CArrayHelper::sort($data['groups'], [['field' => $sort_field, 'order' => $sort_order]]);
 
 		foreach ($data['groups'] as &$group) {
+			$group['is_discovery_rule_editable'] = $group['discoveryRule']
+				&& API::DiscoveryRule()->get([
+					'output' => [],
+					'itemids' => $group['discoveryRule']['itemid'],
+					'editable' => true
+				]);
+
 			CArrayHelper::sort($group['hosts'], ['name']);
 		}
 		unset($group);

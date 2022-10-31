@@ -230,7 +230,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	}
 
 	/**
-	 * @backup items
+	 * @backupOnce items
 	 *
 	 * @dataProvider getCheckNowData
 	 */
@@ -423,7 +423,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Last error message of scenario "Web scenario for execute now".: DR5-web-dep',
 						'Zabbix server health: Zabbix stats cluster: High availability cluster node discovery',
 						'Linux by Zabbix agent: Mounted filesystem discovery',
-						'Linux by Zabbix agent: Network interface discovery'
+						'Linux by Zabbix agent: Network interface discovery',
+						'Zabbix server health: Zabbix stats proxy: Zabbix proxy discovery'
 					]
 				]
 			],

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
@@ -29,7 +30,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testItemTest extends CWebTest {
 
-	const HOST_ID = 99136;		// 'Test item host' monitored by 'Active proxy 1'
+	const HOST_ID = 99136;		// 'Test item host' monitored by 'Proxy for Discovery rule'
 	const TEMPLATE_ID = 99137;	// 'Test Item Template'
 
 	use PreprocessingTrait;
@@ -889,7 +890,7 @@ class testItemTest extends CWebTest {
 				if ($is_host || array_key_exists('interface', $data) || in_array($data['fields']['Type'],
 						['Zabbix internal', 'External check', 'Database monitor', 'HTTP agent', 'JMX agent',
 						'Calculated'])) {
-					$details = 'Connection to Zabbix server "localhost" refused. Possible reasons:';
+					$details = 'Connection to Zabbix server "localhost:10051" refused. Possible reasons:';
 				}
 				else {
 					$details = ($data['fields']['Type'] === 'SNMP agent')

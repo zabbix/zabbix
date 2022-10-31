@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.4 and higher  
 Cisco UCS® Manager provides unified, embedded management of all software and hardware
  components of the Cisco Unified Computing System™ (Cisco UCS) across multiple chassis
  and rack servers. It enables server, fabric, and storage provisioning as well as,
@@ -15,7 +15,7 @@ You can download UCS MIB files there ftp://ftp.cisco.com/pub/mibs/ucs-mibs/.
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 1\. Create a host for Cisco USC Manager IP as SNMPv2 interface.
 
@@ -128,7 +128,8 @@ There are no template links in this template.
 |Physical disks |{#DISK_LOCATION}: Physical disk media type |<p>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB</p><p>Cisco UCS storage:LocalDisk:deviceType managed object property. Actually returns 'HDD' or 'SSD'.</p> |SNMP |cisco.ucs.hw.physicaldisk.media_type[cucsStorageLocalDiskDeviceType.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Physical disks |{#DISK_LOCATION}: Disk size |<p>MIB: CISCO-UNIFIED-COMPUTING-STORAGE-MIB</p><p>Cisco UCS storage:LocalDisk:size managed object property. In MB.</p> |SNMP |cisco.ucs.hw.physicaldisk.size[cucsStorageLocalDiskSize.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1048576`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Power supply |{#PSU_LOCATION}: Power supply status |<p>MIB: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB</p><p>Cisco UCS equipment:Psu:operState managed object property</p> |SNMP |cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Status |Uptime |<p>MIB: SNMPv2-MIB</p><p>The time in seconds since the network management</p><p>portion of the system was last re-initialized.</p> |SNMP |cisco.ucs.uptime[sysUpTime.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |Uptime (network) |<p>MIB: SNMPv2-MIB</p><p>The time in seconds since the network management</p><p>portion of the system was last re-initialized.</p> |SNMP |cisco.ucs.net.uptime[sysUpTime.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
+|Status |Uptime (hardware) |<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized.</p><p>Note that this is different from sysUpTime in the SNMPv2-MIB</p><p>[RFC1907] because sysUpTime is the uptime of the</p><p>network management portion of the system.</p> |SNMP |cisco.ucs.hw.uptime[hrSystemUptime.0]<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `0.01`</p> |
 |Status |SNMP agent availability |<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p> |INTERNAL |zabbix[host,snmp,available]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Status |{#UNIT_LOCATION}: Overall system health status |<p>MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB</p><p>Cisco UCS compute:RackUnit:operState managed object property</p> |SNMP |cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 |Temperature |{#SENSOR_LOCATION}.Ambient: Temperature |<p>MIB: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB</p><p>Temperature readings of testpoint: {#SENSOR_LOCATION}.Ambient</p> |SNMP |cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
@@ -160,7 +161,7 @@ There are no template links in this template.
 |{#DISK_LOCATION}: Disk has been replaced |<p>Disk serial number has changed. Ack to close</p> |`last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}]))>0` |INFO |<p>Manual close: YES</p> |
 |{#PSU_LOCATION}: Power supply is in critical state |<p>Please check the power supply unit for errors</p> |`last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"inoperable"}` |AVERAGE | |
 |{#PSU_LOCATION}: Power supply is in warning state |<p>Please check the power supply unit for errors</p> |`last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}])={$PSU.STATUS.WARN:"degraded"}` |WARNING |<p>**Depends on**:</p><p>- {#PSU_LOCATION}: Power supply is in critical state</p> |
-|has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Cisco UCS Manager SNMP/cisco.ucs.uptime[sysUpTime.0])<10m` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- No SNMP data collection</p> |
+|Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`(last(/Cisco UCS Manager SNMP/cisco.ucs.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco UCS Manager SNMP/cisco.ucs.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco UCS Manager SNMP/cisco.ucs.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco UCS Manager SNMP/cisco.ucs.net.uptime[sysUpTime.0])<10m)` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- No SNMP data collection</p> |
 |No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/Cisco UCS Manager SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
 |{#UNIT_LOCATION}: System status is in critical state |<p>Please check the device for errors</p> |`last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"computeFailed"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"configFailure"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"unconfigFailure"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"inoperable"}` |HIGH | |
 |{#UNIT_LOCATION}: System status is in warning state |<p>Please check the device for warnings</p> |`last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"testFailed"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"thermalProblem"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"powerProblem"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"voltageProblem"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"diagnosticsFailed"}` |WARNING |<p>**Depends on**:</p><p>- {#UNIT_LOCATION}: System status is in critical state</p> |

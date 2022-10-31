@@ -26,7 +26,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Item prototypes'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_ITEM_PROTOTYPE_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_PROTOTYPE_EDIT));
 
 if (!empty($data['hostid'])) {
 	$widget->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
@@ -40,7 +40,7 @@ $url = (new CUrl('disc_prototypes.php'))
 $form = (new CForm('post', $url))
 	->setId('item-prototype-form')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('parent_discoveryid', $data['parent_discoveryid']);
 
@@ -598,7 +598,7 @@ if ($data['display_interfaces']) {
 		->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
 		->setFocusableElementId('interfaceid')
 		->setAriaRequired()
-		->setReadonly($readonly);
+		->setReadonly(($data['type'] == ITEM_TYPE_HTTPAGENT) ? $readonly : false);
 
 	$item_tab->addItem([
 		(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
@@ -888,7 +888,8 @@ $item_tabs = (new CTabView())
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
 			'readonly' => false,
-			'tabs_id' => 'tabs'
+			'tabs_id' => 'tabs',
+			'tags_tab_id' => 'tags-tab'
 		]),
 		TAB_INDICATOR_TAGS
 	)

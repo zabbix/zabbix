@@ -280,7 +280,7 @@ static void	file_write(const char *buf, size_t count, zbx_export_file_t *file)
 	{
 		char	filename_old[MAX_STRING_LEN];
 
-		strscpy(filename_old, file->name);
+		zbx_strscpy(filename_old, file->name);
 		zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
 
 		if (0 == access(filename_old, F_OK) && 0 != remove(filename_old))

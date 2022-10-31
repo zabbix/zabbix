@@ -26,6 +26,8 @@
 #include "zbxself.h"
 #include "preproc.h"
 #include "zbxtime.h"
+#include "zbxnum.h"
+#include "zbxsysinfo.h"
 
 /* defines for `fping' and `fping6' to successfully process pings */
 #define MIN_COUNT	1
@@ -35,9 +37,7 @@
 #define MAX_SIZE	65507
 #define MIN_TIMEOUT	50
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -72,7 +72,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	}
 	else
 	{
-		init_result(&value);
+		zbx_init_agent_result(&value);
 
 		if (NULL != value_ui64)
 			SET_UI64_RESULT(&value, *value_ui64);
@@ -83,7 +83,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 		zbx_preprocess_item_value(item.itemid, item.host.hostid, item.value_type, item.flags, &value, ts,
 				item.state, NULL);
 
-		free_result(&value);
+		zbx_free_agent_result(&value);
 	}
 clean:
 	DCrequeue_items(&item.itemid, &ts->sec, &errcode, 1);
@@ -162,8 +162,8 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 							break;
 					}
 
-					if (0 < value_dbl && ZBX_FLOAT_PRECISION > value_dbl)
-						value_dbl = ZBX_FLOAT_PRECISION;
+					if (0 < value_dbl && zbx_get_float_epsilon() > value_dbl)
+						value_dbl = zbx_get_float_epsilon();
 
 					process_value(item->itemid, NULL, &value_dbl, ts, SUCCEED, NULL);
 					break;
@@ -180,30 +180,31 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *icmpping, char **addr, int *count,
-		int *interval, int *size, int *timeout, icmppingsec_type_t *type, char *error, int max_error_len)
+static int	zbx_parse_key_params(const char *key, const char *host_addr, icmpping_t *icmpping, char **addr,
+		int *count, int *interval, int *size, int *timeout, icmppingsec_type_t *type, char *error,
+		int max_error_len)
 {
 	const char	*tmp;
 	int		ret = NOTSUPPORTED;
 	AGENT_REQUEST	request;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(key, &request))
+	if (SUCCEED != zbx_parse_item_key(key, &request))
 	{
 		zbx_snprintf(error, max_error_len, "Invalid item key format.");
 		goto out;
 	}
 
-	if (0 == strcmp(get_rkey(&request), SERVER_ICMPPING_KEY))
+	if (0 == strcmp(get_rkey(&request), ZBX_SERVER_ICMPPING_KEY))
 	{
 		*icmpping = ICMPPING;
 	}
-	else if (0 == strcmp(get_rkey(&request), SERVER_ICMPPINGLOSS_KEY))
+	else if (0 == strcmp(get_rkey(&request), ZBX_SERVER_ICMPPINGLOSS_KEY))
 	{
 		*icmpping = ICMPPINGLOSS;
 	}
-	else if (0 == strcmp(get_rkey(&request), SERVER_ICMPPINGSEC_KEY))
+	else if (0 == strcmp(get_rkey(&request), ZBX_SERVER_ICMPPINGSEC_KEY))
 	{
 		*icmpping = ICMPPINGSEC;
 	}
@@ -223,7 +224,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	{
 		*count = 3;
 	}
-	else if (FAIL == is_uint31(tmp, count) || MIN_COUNT > *count || *count > MAX_COUNT)
+	else if (FAIL == zbx_is_uint31(tmp, count) || MIN_COUNT > *count || *count > MAX_COUNT)
 	{
 		zbx_snprintf(error, max_error_len, "Number of packets \"%s\" is not between %d and %d.",
 				tmp, MIN_COUNT, MAX_COUNT);
@@ -234,7 +235,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	{
 		*interval = 0;
 	}
-	else if (FAIL == is_uint31(tmp, interval) || MIN_INTERVAL > *interval)
+	else if (FAIL == zbx_is_uint31(tmp, interval) || MIN_INTERVAL > *interval)
 	{
 		zbx_snprintf(error, max_error_len, "Interval \"%s\" should be at least %d.", tmp, MIN_INTERVAL);
 		goto out;
@@ -244,7 +245,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	{
 		*size = 0;
 	}
-	else if (FAIL == is_uint31(tmp, size) || MIN_SIZE > *size || *size > MAX_SIZE)
+	else if (FAIL == zbx_is_uint31(tmp, size) || MIN_SIZE > *size || *size > MAX_SIZE)
 	{
 		zbx_snprintf(error, max_error_len, "Packet size \"%s\" is not between %d and %d.",
 				tmp, MIN_SIZE, MAX_SIZE);
@@ -255,7 +256,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	{
 		*timeout = 0;
 	}
-	else if (FAIL == is_uint31(tmp, timeout) || MIN_TIMEOUT > *timeout)
+	else if (FAIL == zbx_is_uint31(tmp, timeout) || MIN_TIMEOUT > *timeout)
 	{
 		zbx_snprintf(error, max_error_len, "Timeout \"%s\" should be at least %d.", tmp, MIN_TIMEOUT);
 		goto out;
@@ -301,7 +302,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 
 	ret = SUCCEED;
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }
@@ -410,7 +411,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 
 		if (SUCCEED == rc)
 		{
-			rc = parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr, &count,
+			rc = zbx_parse_key_params(items[i].key, items[i].interface.addr, &icmpping, &addr, &count,
 					&interval, &size, &timeout, &type, error, sizeof(error));
 		}
 
@@ -487,7 +488,7 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_pinger_hosts(icmpitem_t *items, int items_count)
+static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process_num, int process_type)
 {
 	int			i, first_index = 0, ping_result;
 	char			error[ZBX_ITEM_ERROR_LEN_MAX];
@@ -540,15 +541,15 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 	double			sec;
 	static icmpitem_t	*items = NULL;
 	static int		items_alloc = 4;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	if (NULL == items)
 		items = (icmpitem_t *)zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);
@@ -561,19 +562,19 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 		zbx_setproctitle("%s #%d [getting values]", get_process_type_string(process_type), process_num);
 
 		get_pinger_hosts(&items, &items_alloc, &items_count);
-		process_pinger_hosts(items, items_count);
+		process_pinger_hosts(items, items_count, process_num, process_type);
 		sec = zbx_time() - sec;
 		itc = items_count;
 
 		free_hosts(&items, &items_count);
 
 		nextcheck = DCconfig_get_poller_nextcheck(ZBX_POLLER_TYPE_PINGER);
-		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
+		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), process_num, itc, sec, sleeptime);
 
-		zbx_sleep_loop(sleeptime);
+		zbx_sleep_loop(info, sleeptime);
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

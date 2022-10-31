@@ -61,7 +61,7 @@ $filter = (new CFilter())
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_serviceid',
-						'object_name' => 'service',
+						'object_name' => 'services',
 						'data' => $data['service'] !== null
 							? [CArrayHelper::renameKeys($data['service'], ['serviceid' => 'id'])]
 							: [],
@@ -90,7 +90,7 @@ $filter = (new CFilter())
 
 $widget = (new CWidget())
 	->setTitle(_('SLA report'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::SLAREPORT_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICES_SLAREPORT_LIST))
 	->addItem($filter);
 
 $report = new CTableInfo();

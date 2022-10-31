@@ -114,9 +114,6 @@ static void	zbx_tag_filter_free(zbx_tag_filter_t *tag_filter)
 	zbx_free(tag_filter);
 }
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
-
 static void	add_message_alert(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event, zbx_uint64_t actionid,
 		int esc_step, zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
 		const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service,
@@ -250,7 +247,7 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 	DBfree_result(result);
 
 	if (0 < tag_filters.values_num)
-		condition.op = CONDITION_OPERATOR_EQUAL;
+		condition.op = ZBX_CONDITION_OPERATOR_EQUAL;
 	else
 		ret = SUCCEED;
 
@@ -270,13 +267,13 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 
 			if (NULL != tag_filter->value && 0 != strlen(tag_filter->value))
 			{
-				condition.conditiontype = CONDITION_TYPE_EVENT_TAG_VALUE;
+				condition.conditiontype = ZBX_CONDITION_TYPE_EVENT_TAG_VALUE;
 				condition.value2 = tag_filter->tag;
 				condition.value = tag_filter->value;
 			}
 			else
 			{
-				condition.conditiontype = CONDITION_TYPE_EVENT_TAG;
+				condition.conditiontype = ZBX_CONDITION_TYPE_EVENT_TAG;
 				condition.value = tag_filter->tag;
 			}
 
@@ -1380,7 +1377,7 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 
 		ZBX_DBROW2UINT64(script.scriptid, row[4]);
 
-		if (SUCCEED != is_time_suffix(row[15], &script.timeout, ZBX_LENGTH_UNLIMITED))
+		if (SUCCEED != zbx_is_time_suffix(row[15], &script.timeout, ZBX_LENGTH_UNLIMITED))
 		{
 			zbx_strlcpy(error, "Invalid timeout value in script configuration.", sizeof(error));
 			rc = FAIL;
@@ -1409,7 +1406,7 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 		{
 			/* service event cannot have target, force execution on Zabbix server */
 			script.execute_on = ZBX_SCRIPT_EXECUTE_ON_SERVER;
-			strscpy(host.host, "Zabbix server");
+			zbx_strscpy(host.host, "Zabbix server");
 		}
 		else
 		{
@@ -1443,19 +1440,19 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 			{
 				/* target is from "Host" list or "Host group" list */
 
-				strscpy(host.host, row[2]);
+				zbx_strscpy(host.host, row[2]);
 				host.tls_connect = (unsigned char)atoi(row[17]);
 #ifdef HAVE_OPENIPMI
 				host.ipmi_authtype = (signed char)atoi(row[18]);
 				host.ipmi_privilege = (unsigned char)atoi(row[19]);
-				strscpy(host.ipmi_username, row[20]);
-				strscpy(host.ipmi_password, row[21]);
+				zbx_strscpy(host.ipmi_username, row[20]);
+				zbx_strscpy(host.ipmi_password, row[21]);
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
-				strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
+				zbx_strscpy(host.tls_issuer, row[18 + ZBX_IPMI_FIELDS_NUM]);
+				zbx_strscpy(host.tls_subject, row[19 + ZBX_IPMI_FIELDS_NUM]);
+				zbx_strscpy(host.tls_psk_identity, row[20 + ZBX_IPMI_FIELDS_NUM]);
+				zbx_strscpy(host.tls_psk, row[21 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 			}
 		}
@@ -1801,7 +1798,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 	DB_ROW		row;
 	zbx_condition_t	condition;
 
-	int		ret = SUCCEED; /* SUCCEED required for CONDITION_EVAL_TYPE_AND_OR */
+	int		ret = SUCCEED; /* SUCCEED required for ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR */
 	int		cond, exit = 0;
 	unsigned char	old_type = 0xff;
 
@@ -1827,7 +1824,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 
 		switch (evaltype)
 		{
-			case CONDITION_EVAL_TYPE_AND_OR:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR:
 				if (old_type == condition.conditiontype)	/* OR conditions */
 				{
 					if (SUCCEED == check_action_condition(event, &condition))
@@ -1843,7 +1840,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 				}
 				old_type = condition.conditiontype;
 				break;
-			case CONDITION_EVAL_TYPE_AND:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND:
 				cond = check_action_condition(event, &condition);
 				/* Break if any of AND conditions is FALSE */
 				if (cond == FAIL)
@@ -1854,7 +1851,7 @@ static int	check_operation_conditions(const ZBX_DB_EVENT *event, zbx_uint64_t op
 				else
 					ret = SUCCEED;
 				break;
-			case CONDITION_EVAL_TYPE_OR:
+			case ZBX_ACTION_CONDITION_EVAL_TYPE_OR:
 				cond = check_action_condition(event, &condition);
 				/* Break if any of OR conditions is TRUE */
 				if (cond == SUCCEED)
@@ -1918,7 +1915,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const ZBX_D
 		tmp = zbx_strdup(NULL, row[2]);
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp,
 				MACRO_TYPE_COMMON, NULL, 0);
-		if (SUCCEED != is_time_suffix(tmp, &esc_period, ZBX_LENGTH_UNLIMITED))
+		if (SUCCEED != zbx_is_time_suffix(tmp, &esc_period, ZBX_LENGTH_UNLIMITED))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid step duration \"%s\" for operation of action \"%s\","
 					" using default operation step duration of the action", tmp, action->name);
@@ -3267,6 +3264,7 @@ out:
  * Parameters: now               - [IN] the current time                      *
  *             nextcheck         - [IN/OUT] time of the next invocation       *
  *             escalation_source - [IN] type of escalations to be handled     *
+ *             process_num       - [IN] process number                        *
  *                                                                            *
  * Return value: the count of deleted escalations                             *
  *                                                                            *
@@ -3278,7 +3276,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	process_escalations(int now, int *nextcheck, unsigned int escalation_source,
-		const char *default_timezone)
+		const char *default_timezone, int process_num)
 {
 	int			ret = 0;
 	DB_RESULT		result;
@@ -3438,16 +3436,16 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	double				sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time;
 	zbx_config_t			cfg;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(escalator_args_in->zbx_get_program_type_cb_arg()), server_num,
 			get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -3476,18 +3474,18 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 		nextcheck = time(NULL) + CONFIG_ESCALATOR_FREQUENCY;
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_TRIGGER,
-				cfg.default_timezone);
+				cfg.default_timezone, process_num);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_ITEM,
-				cfg.default_timezone);
+				cfg.default_timezone, process_num);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_SERVICE,
-				cfg.default_timezone);
+				cfg.default_timezone, process_num);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_DEFAULT,
-				cfg.default_timezone);
+				cfg.default_timezone, process_num);
 
 		zbx_config_clean(&cfg);
 		total_sec += zbx_time() - sec;
 
-		sleeptime = calculate_sleeptime(nextcheck, CONFIG_ESCALATOR_FREQUENCY);
+		sleeptime = zbx_calculate_sleeptime(nextcheck, CONFIG_ESCALATOR_FREQUENCY);
 
 		now = time(NULL);
 
@@ -3513,7 +3511,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 			last_stat_time = now;
 		}
 
-		zbx_sleep_loop(sleeptime);
+		zbx_sleep_loop(info, sleeptime);
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

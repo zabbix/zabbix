@@ -248,6 +248,9 @@ class CItemManager {
 			DB::insertBatch('housekeeper', $ins_housekeeper);
 		}
 
+		DB::delete('httpstepitem', ['itemid' => $del_itemids]);
+		DB::delete('httptestitem', ['itemid' => $del_itemids]);
+
 		DB::delete('item_tag', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
 		DB::update('items', [

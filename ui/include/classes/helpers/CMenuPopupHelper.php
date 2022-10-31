@@ -90,13 +90,12 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for Ajax map element menu popup.
 	 *
-	 * @param string $sysmapid                   Map ID.
-	 * @param array  $selement                   Map element data (ID, type, URLs, etc...).
-	 * @param string $selement[selementid_orig]  Map element ID.
-	 * @param string $selement[elementtype]      Map element type (host, map, trigger, host group, image).
-	 * @param string $selement[urls]             Map element URLs.
-	 * @param int    $severity_min               Minimum severity.
-	 * @param string $hostid                     Host ID.
+	 * @param string $sysmapid                     Map ID.
+	 * @param array  $selement                     Map element data (ID, type, URLs, etc...).
+	 * @param string $selement['selementid_orig']  Map element ID.
+	 * @param string $selement['unique_id']        Map element unique ID.
+	 * @param int    $severity_min                 Minimum severity.
+	 * @param string $hostid                       Host ID.
 	 *
 	 * @return array
 	 */
@@ -105,9 +104,7 @@ class CMenuPopupHelper {
 			'type' => 'map_element',
 			'data' => [
 				'sysmapid' => $sysmapid,
-				'selementid' => $selement['selementid_orig'],
-				'elementtype' => $selement['elementtype'],
-				'urls' => $selement['urls']
+				'selementid' => $selement['selementid_orig']
 			]
 		];
 
@@ -165,32 +162,15 @@ class CMenuPopupHelper {
 	 * Prepare data for item latest data popup menu.
 	 *
 	 * @param array  $data
-	 * @param string $data['itemid']   Item ID.
+	 * @param string $data['itemid']
+	 * @param string $data['backurl']
+	 * @param string $data['context']
 	 *
 	 * @return array
 	 */
 	public static function getItem(array $data): array {
 		return [
 			'type' => 'item',
-			'data' => [
-				'itemid' => $data['itemid']
-			]
-		];
-	}
-
-	/**
-	 * Prepare data for item configuration popup menu.
-	 *
-	 * @param array  $data
-	 * @param string $data['itemid']   Item ID.
-	 * @param string $data['context']  Additional parameter in URL to identify main section.
-	 * @param string $data['backurl']  Url from where the function was called.
-	 *
-	 * @return array
-	 */
-	public static function getItemConfiguration(array $data): array {
-		return [
-			'type' => 'item_configuration',
 			'data' => [
 				'itemid' => $data['itemid'],
 				'backurl' => $data['backurl']
@@ -203,15 +183,15 @@ class CMenuPopupHelper {
 	 * Prepare data for item prototype configuration popup menu.
 	 *
 	 * @param array  $data
-	 * @param string $data['itemid']   Item ID.
-	 * @param string $data['context']  Additional parameter in URL to identify main section.
-	 * @param string $data['backurl']  Url from where the function was called.
+	 * @param string $data['itemid']
+	 * @param string $data['backurl']
+	 * @param string $data['context']
 	 *
 	 * @return array
 	 */
-	public static function getItemPrototypeConfiguration(array $data): array {
+	public static function getItemPrototype(array $data): array {
 		return [
-			'type' => 'item_prototype_configuration',
+			'type' => 'item_prototype',
 			'data' => [
 				'itemid' => $data['itemid'],
 				'backurl' => $data['backurl']

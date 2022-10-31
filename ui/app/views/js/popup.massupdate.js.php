@@ -116,10 +116,10 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		obj = tags_elem.originalObject;
 	}
 
-	$(obj.querySelector('#tags-table')).dynamicRows({template: '#tag-row-tmpl'});
-	$(obj.querySelector('#tags-table'))
+	$(obj.querySelector('.tags-table')).dynamicRows({template: '#tag-row-tmpl'});
+	$(obj.querySelector('.tags-table'))
 		.on('click', 'button.element-table-add', () => {
-			$('#tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
+			$('.tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 		})
 		.on('resize', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', () => {
 			$(window).resize();

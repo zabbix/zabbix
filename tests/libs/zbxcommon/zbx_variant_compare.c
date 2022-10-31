@@ -72,7 +72,7 @@ static void	mock_read_variant(const char *path, zbx_variant_t *variant)
 	{
 		zbx_uint64_t	value_ui64;
 
-		if (SUCCEED != is_uint64(value, &value_ui64))
+		if (SUCCEED != zbx_is_uint64(value, &value_ui64))
 			fail_msg("Cannot convert value %s to uint64", value);
 
 		zbx_variant_set_ui64(variant, value_ui64);

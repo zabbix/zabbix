@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SYSINFO_COMMON_MODBTYPE_H
 #define ZABBIX_SYSINFO_COMMON_MODBTYPE_H
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 extern int	CONFIG_TIMEOUT;
 
@@ -123,7 +123,7 @@ typedef enum
 	ZBX_MODBUS_ENDIANNESS_MLE
 } modbus_endianness_t;
 
-int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	modbus_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	zbx_init_modbus(char **error);
 void	zbx_deinit_modbus(void);
 

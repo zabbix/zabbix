@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
@@ -930,7 +931,7 @@ class testFormAdministrationScripts extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
 		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
 		$form->fill([
-			'Name' => 'Cancelled cript',
+			'Name' => 'Cancelled script',
 			'Type' => 'Script',
 			'Execute on' => 'Zabbix server',
 			'Commands' => 'Script command',
@@ -978,6 +979,7 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				'name' => 'SSH_api_clone_2',
 				'type' => 2,
+				'scope' => 1,
 				'authtype' => '1',
 				'username' => 'SSH_username',
 				'privatekey' => 'private_key',
@@ -987,6 +989,7 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				'name' => 'TELNET_api_clone',
 				'type' => 3,
+				'scope' => 1,
 				'username' => 'TELNET_username',
 				'password' => 'TELNET_password',
 				'command' => 'test'

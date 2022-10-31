@@ -843,7 +843,7 @@ static void	dbpatch_replace_functionids(char **expression, const zbx_vector_ptr_
 		switch (token.type)
 		{
 			case ZBX_TOKEN_OBJECTID:
-				if (SUCCEED == is_uint64_n(*expression + token.loc.l + 1,
+				if (SUCCEED == zbx_is_uint64_n(*expression + token.loc.l + 1,
 						token.loc.r - token.loc.l - 1, &index) &&
 						(int)index < functions->values_num)
 				{

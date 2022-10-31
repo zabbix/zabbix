@@ -501,7 +501,7 @@ int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *
 		offset--;
 	buf[offset] = '\0';
 
-	SET_STR_RESULT(result, convert_to_utf8(buf, offset, encoding));
+	SET_STR_RESULT(result, zbx_convert_to_utf8(buf, offset, encoding));
 	ret = SUCCEED;
 fail:
 	zbx_free(command_lf);

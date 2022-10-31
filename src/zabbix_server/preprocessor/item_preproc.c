@@ -156,7 +156,7 @@ static int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant
 			zbx_variant_set_dbl(value, value_dbl);
 			break;
 		case ZBX_VARIANT_UI64:
-			if (SUCCEED == is_uint64(params, &multiplier_ui64))
+			if (SUCCEED == zbx_is_uint64(params, &multiplier_ui64))
 				value_ui64 = value_num.data.ui64 * multiplier_ui64;
 			else
 				value_ui64 = (double)value_num.data.ui64 * atof(params);
@@ -610,15 +610,16 @@ static int	is_boolean(const char *str, zbx_uint64_t *value)
 	{
 		char	tmp[16];
 
-		strscpy(tmp, str);
+		zbx_strscpy(tmp, str);
 		zbx_strlower(tmp);
 
-		if (SUCCEED == (res = str_in_list("true,t,yes,y,on,up,running,enabled,available,ok,master", tmp, ',')))
+		if (SUCCEED == (res = zbx_str_in_list("true,t,yes,y,on,up,running,enabled,available,ok,master", tmp,
+				',')))
 		{
 			*value = 1;
 		}
-		else if (SUCCEED == (res = str_in_list("false,f,no,n,off,down,unused,disabled,unavailable,err,slave",
-				tmp, ',')))
+		else if (SUCCEED == (res = zbx_str_in_list(
+				"false,f,no,n,off,down,unused,disabled,unavailable,err,slave", tmp, ',')))
 		{
 			*value = 0;
 		}
@@ -741,7 +742,7 @@ static int	item_preproc_2dec(zbx_variant_t *value, unsigned char op_type, char *
 		case ZBX_PREPROC_HEX2DEC:
 			if (SUCCEED != is_uhex(value->data.str))
 			{
-				if (SUCCEED != is_hex_string(value->data.str))
+				if (SUCCEED != zbx_is_hex_string(value->data.str))
 				{
 					*errmsg = zbx_strdup(NULL, "invalid value format");
 					return FAIL;
@@ -1481,7 +1482,7 @@ static int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_tim
 {
 	int	ret, timeout, period = 0;
 
-	if (FAIL == is_time_suffix(params, &timeout, strlen(params)))
+	if (FAIL == zbx_is_time_suffix(params, &timeout, strlen(params)))
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "invalid time period: %s", params);
 		zbx_variant_clear(history_value);
@@ -2077,7 +2078,7 @@ static int	item_preproc_str_replace(zbx_variant_t *value, const char *params, ch
 		return FAIL;
 	}
 
-	new_string = string_replace(value->data.str, search_str, replace_str);
+	new_string = zbx_string_replace(value->data.str, search_str, replace_str);
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, new_string);
 

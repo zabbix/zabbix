@@ -25,13 +25,10 @@
 
 extern unsigned char	program_type;
 
-char	*CONFIG_FILE		= NULL;
-
 char	*CONFIG_LOG_TYPE_STR	= NULL;
 int	CONFIG_LOG_TYPE		= LOG_TYPE_UNDEFINED;
 char	*CONFIG_LOG_FILE	= NULL;
 int	CONFIG_LOG_FILE_SIZE	= 1;
-int	CONFIG_ALLOW_ROOT	= 0;
 int	CONFIG_TIMEOUT		= 3;
 
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,
@@ -453,7 +450,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 				switch (cfg[i].type)
 				{
 					case TYPE_INT:
-						if (FAIL == str2uint64(value, "KMGT", &var))
+						if (FAIL == zbx_str2uint64(value, "KMGT", &var))
 							goto incorrect_config;
 
 						if (cfg[i].min > var || (0 != cfg[i].max && var > cfg[i].max))
@@ -472,7 +469,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 						zbx_strarr_add((char ***)cfg[i].variable, value);
 						break;
 					case TYPE_UINT64:
-						if (FAIL == str2uint64(value, "KMGT", &var))
+						if (FAIL == zbx_str2uint64(value, "KMGT", &var))
 							goto incorrect_config;
 
 						if (cfg[i].min > var || (0 != cfg[i].max && var > cfg[i].max))
@@ -660,13 +657,13 @@ int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *n
 			addr = zbx_malloc(NULL, sizeof(zbx_addr_t));
 			addr->ip = NULL;
 
-			if (SUCCEED != parse_serveractive_element(str, &addr->ip, &addr->port, port))
+			if (SUCCEED != zbx_parse_serveractive_element(str, &addr->ip, &addr->port, port))
 			{
 				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\" is "
 						"invalid", name, str);
 				ret = FAIL;
 			}
-			else if (FAIL == is_supported_ip(addr->ip) && FAIL == zbx_validate_hostname(addr->ip))
+			else if (FAIL == zbx_is_supported_ip(addr->ip) && FAIL == zbx_validate_hostname(addr->ip))
 			{
 				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\""
 						" is invalid", name, str);

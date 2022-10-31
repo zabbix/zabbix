@@ -32,8 +32,7 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Dashboards',
-					'page' => 'Dashboards',
-					'header' => 'Global view'
+					'page' => 'Dashboards'
 				]
 			],
 			[

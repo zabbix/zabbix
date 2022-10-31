@@ -29,7 +29,7 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Scripts'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_SCRIPT_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_SCRIPT_LIST))
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit'))
@@ -169,6 +169,10 @@ foreach ($data['scripts'] as $script) {
 
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
 			$type = _('Webhook');
+			break;
+
+		case ZBX_SCRIPT_TYPE_URL:
+			$type = _('URL');
 			break;
 	}
 

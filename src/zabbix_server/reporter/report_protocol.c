@@ -33,7 +33,7 @@ static int	json_uint_by_tag(const struct zbx_json_parse *jp, const char *tag, zb
 		return FAIL;
 	}
 
-	if (SUCCEED != is_uint64(buf, value))
+	if (SUCCEED != zbx_is_uint64(buf, value))
 	{
 		*error = zbx_dsprintf(*error, "invalid tag %s value: %s", tag, buf);
 		return FAIL;

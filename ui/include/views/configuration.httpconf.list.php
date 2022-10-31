@@ -52,9 +52,10 @@ $filter_column_left = (new CFormList())
 			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 			'data' => $data['filter']['hosts'],
 			'popup' => [
-				'filter_preselect_fields' => $data['context'] === 'host'
-					? ['hostgroups' => 'filter_groupids_']
-					: ['templategroups' => 'filter_groupids_'],
+				'filter_preselect' => [
+					'id' => 'filter_groupids_',
+					'submit_as' => 'groupid'
+				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
@@ -90,8 +91,8 @@ $filter = (new CFilter())
 $widget = (new CWidget())
 	->setTitle(_('Web monitoring'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_HTTPCONF_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATES_HTTPCONF_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_HTTPCONF_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATES_HTTPCONF_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,

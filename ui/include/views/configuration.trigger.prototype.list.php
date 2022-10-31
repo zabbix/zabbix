@@ -28,8 +28,8 @@ require_once dirname(__FILE__).'/js/configuration.trigger.prototype.list.js.php'
 $widget = (new CWidget())
 	->setTitle(_('Trigger prototypes'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_TRIGGER_PROTOTYPE_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATES_TRIGGER_PROTOTYPE_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_TRIGGER_PROTOTYPE_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATES_TRIGGER_PROTOTYPE_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,

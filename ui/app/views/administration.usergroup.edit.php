@@ -28,12 +28,12 @@ $this->includeJsFile('administration.usergroup.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('User groups'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_USERGROUP_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERGROUP_EDIT));
 
 $form = (new CForm())
 	->setId('user-group-form')
 	->setName('user_group_form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 if ($data['usrgrpid'] != 0) {
 	$form->addVar('usrgrpid', $data['usrgrpid']);

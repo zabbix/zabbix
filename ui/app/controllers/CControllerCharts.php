@@ -217,16 +217,15 @@ abstract class CControllerCharts extends CController {
 	}
 
 	/**
-	 * Find what subfilters are available based on items selected using the main filter.
+	 * Find what subfilters are available based on hosts selected using the main filter.
 	 *
 	 * @param array  $graphs                           [IN/OUT] Result of host/simple graphs matching primary filter.
 	 * @param string $graphs[]['graphid']              [IN] Host graph graphid.
-	 * @param string $graphs[]['itemid']               [IN] Simple graph itemid.
 	 * @param array  $graphs[]['tags']                 [IN] Item tags array.
 	 * @param string $graphs[]['tags'][]['tag']        [IN] Tag name.
 	 * @param string $graphs[]['tags'][]['value']      [IN] Tag value.
-	 * @param array  $graphs[]['matching_subfilters']  [OUT] Flag for each of subfilter group showing either item fits
-	 *                                                 fits its subfilter requirements.
+	 * @param array  $graphs[]['matching_subfilters']  [OUT] Flag for each of subfilter group showing either graph fits
+	 *                                                 its subfilter requirements.
 	 * @param bool   $graphs[]['has_data']             [OUT] Flag either item has data.
 	 * @param array  $subfilters                       Selected subfilters.
 	 *
@@ -243,7 +242,21 @@ abstract class CControllerCharts extends CController {
 		 */
 		foreach ($graphs as $graph) {
 			// Calculate the counters of tag existence subfilter options.
+			$graph_tagnames = [];
+			$selected_tagnames =
+				array_intersect(array_keys($subfilters['tagnames']), array_column($graph['tags'], 'tag'));
+
 			foreach ($graph['tags'] as $tag) {
+				if (array_key_exists($tag['tag'], $graph_tagnames)) {
+					continue;
+				}
+
+				$graph_tagnames[$tag['tag']] = [];
+
+				if ($selected_tagnames && !in_array($tag['tag'], $selected_tagnames)) {
+					continue;
+				}
+
 				$graph_matches = true;
 				foreach ($graph['matching_subfilters'] as $filter_name => $match) {
 					if ($filter_name === 'tagnames') {
@@ -261,7 +274,25 @@ abstract class CControllerCharts extends CController {
 			}
 
 			// Calculate the same for the tag/value pair subfilter options.
+			$selected_tagvalues = [];
+
+			if ($subfilters['tags']) {
+				foreach ($graph['tags'] as $tag) {
+					if (array_key_exists($tag['tag'], $subfilters['tags'])
+							&& array_key_exists($tag['value'], $subfilters['tags'][$tag['tag']])) {
+						$selected_tagvalues[$tag['tag']][$tag['value']] = [];
+					}
+				}
+			}
+
 			foreach ($graph['tags'] as $tag) {
+				if ($selected_tagvalues) {
+					if (!(array_key_exists($tag['tag'], $selected_tagvalues)
+							&& array_key_exists($tag['value'], $selected_tagvalues[$tag['tag']]))) {
+						continue;
+					}
+				}
+
 				$graph_matches = true;
 				foreach ($graph['matching_subfilters'] as $filter_name => $match) {
 					if ($filter_name === 'tags') {

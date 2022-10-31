@@ -91,7 +91,7 @@ else {
 
 $output = [
 	'header' => ($data['hostid'] == 0) ? _('New host') : _('Host'),
-	'doc_url' => CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_EDIT),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_EDIT),
 	'body' => (new CPartial('configuration.host.edit.html', $data))->getOutput(),
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('popup.host.edit.js.php').

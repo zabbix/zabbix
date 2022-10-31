@@ -20,7 +20,7 @@
 #ifndef ZABBIX_MUTEXS_H
 #define ZABBIX_MUTEXS_H
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #ifdef _WINDOWS
 #	define ZBX_MUTEX_NULL		NULL

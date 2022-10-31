@@ -21,14 +21,9 @@
 
 #include "../../../src/zabbix_server/poller/checks_ssh.h"
 
-int	__wrap_ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
-{
-	ZBX_UNUSED(item);
-	ZBX_UNUSED(result);
-	ZBX_UNUSED(encoding);
+#include "zbxsysinfo.h"
 
-	return SYSINFO_RET_OK;
-}
+int	__wrap_ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding);
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error)
@@ -36,7 +31,7 @@ int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error)
 	AGENT_RESULT	result;
 	int		ret;
 
-	init_result(&result);
+	zbx_init_agent_result(&result);
 	ret = get_value_ssh(item, &result);
 
 	if (NULL != result.msg && '\0' != *(result.msg))
@@ -45,8 +40,17 @@ int	zbx_get_value_ssh_test_run(DC_ITEM *item, char **error)
 		zbx_strlcpy(*error, result.msg, strlen(result.msg) * sizeof(char));
 	}
 
-	free_result(&result);
+	zbx_free_agent_result(&result);
 
 	return ret;
 }
 #endif /*POLLER_GET_VALUE_SSH_TEST_H*/
+
+int	__wrap_ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
+{
+	ZBX_UNUSED(item);
+	ZBX_UNUSED(result);
+	ZBX_UNUSED(encoding);
+
+	return SYSINFO_RET_OK;
+}

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:38:06Z'
+  version: '6.4'
+  date: '2022-08-16T10:57:07Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -16,6 +16,7 @@ zabbix_export:
         MIBs used:
         RFC1213-MIB
          ZYXEL-MES3528-MIB
+        HOST-RESOURCES-MIB
         ZYXEL-MES3528-MIB
         IF-MIB
         
@@ -27,7 +28,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Network devices'
@@ -164,6 +165,37 @@ zabbix_export:
                   tag: scope
                   value: notice
         -
+          uuid: 9293989c2bd14bc4a12cdd40a9c7f229
+          name: 'ZYXEL MES-3528: Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.25.1.1.0
+          key: zyxel.3528.hw.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized.
+            Note that this is different from sysUpTime in the SNMPv2-MIB
+            [RFC1907] because sysUpTime is the uptime of the
+            network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 679445d352f14db4b5401efa5661447d
           name: 'ZYXEL MES-3528: Location'
           type: SNMP_AGENT
@@ -279,6 +311,30 @@ zabbix_export:
               tag: component
               value: inventory
         -
+          uuid: 351295fe155543c18930541c20ccac58
+          name: 'ZYXEL MES-3528: Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.3.0
+          key: zyxel.3528.net.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: RFC1213-MIB
+            The time (in hundredths of a second) since the
+            network management portion of the system was last
+            re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: ea25cf79e45f40398580afd48e0bb9c8
           name: 'ZYXEL MES-3528: Hardware serial number'
           type: SNMP_AGENT
@@ -309,43 +365,6 @@ zabbix_export:
               event_name: 'ZYXEL MES-3528: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
-              manual_close: 'YES'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-        -
-          uuid: 351295fe155543c18930541c20ccac58
-          name: 'ZYXEL MES-3528: Uptime'
-          type: SNMP_AGENT
-          snmp_oid: .1.3.6.1.2.1.1.3.0
-          key: zyxel.3528.uptime
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: RFC1213-MIB
-            The time (in hundredths of a second) since the
-            network management portion of the system was last
-            re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: d138c874f4de4f3a97a0c615d589826a
-              expression: 'last(/ZYXEL MES-3528 SNMP/zyxel.3528.uptime)<10m'
-              name: 'ZYXEL MES-3528: has been restarted'
-              event_name: 'ZYXEL MES-3528: has been restarted (uptime < 10m)'
-              priority: INFO
-              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1492,6 +1511,19 @@ zabbix_export:
             -
               value: '3'
               newvalue: nonoperational
+  triggers:
+    -
+      uuid: d138c874f4de4f3a97a0c615d589826a
+      expression: '(last(/ZYXEL MES-3528 SNMP/zyxel.3528.hw.uptime)>0 and last(/ZYXEL MES-3528 SNMP/zyxel.3528.hw.uptime)<10m) or (last(/ZYXEL MES-3528 SNMP/zyxel.3528.hw.uptime)=0 and last(/ZYXEL MES-3528 SNMP/zyxel.3528.net.uptime)<10m)'
+      name: 'ZYXEL MES-3528: Host has been restarted'
+      event_name: 'ZYXEL MES-3528: {HOST.NAME} has been restarted (uptime < 10m)'
+      priority: INFO
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: 6a05d499aec2421e9a7e758fba82255a

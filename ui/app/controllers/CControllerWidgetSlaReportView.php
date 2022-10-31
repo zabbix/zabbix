@@ -73,9 +73,17 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 				]);
 
 				if ($fields['serviceid'] && !$data['services']) {
-					$data['has_permissions_error'] = true;
+					$service_accessible = API::Service()->get([
+						'output' => [],
+						'serviceids' => $fields['serviceid']
+					]);
+
+					if (!$service_accessible) {
+						$data['has_permissions_error'] = true;
+					}
 				}
-				else {
+
+				if (!$data['has_permissions_error']) {
 					$timezone = new DateTimeZone($data['sla']['timezone'] !== ZBX_DEFAULT_TIMEZONE
 						? $data['sla']['timezone']
 						: CTimezoneHelper::getSystemTimezone()
@@ -86,6 +94,12 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 					if ($fields['date_from'] !== ''
 							&& $range_time_parser->parse($fields['date_from']) == CParser::PARSE_SUCCESS) {
 						$period_from = $range_time_parser->getDateTime(true, $timezone)->getTimestamp();
+
+						if ($period_from < 0 || $period_from > ZBX_MAX_DATE) {
+							$period_from = null;
+
+							error(_s('Incorrect value for field "%1$s": %2$s.', _s('From'), _('a date is expected')));
+						}
 					}
 					else {
 						$period_from = null;
@@ -94,6 +108,12 @@ class CControllerWidgetSlaReportView extends CControllerWidget {
 					if ($fields['date_to'] !== ''
 							&& $range_time_parser->parse($fields['date_to']) == CParser::PARSE_SUCCESS) {
 						$period_to = $range_time_parser->getDateTime(false, $timezone)->getTimestamp();
+
+						if ($period_to < 0 || $period_to > ZBX_MAX_DATE) {
+							$period_to = null;
+
+							error(_s('Incorrect value for field "%1$s": %2$s.', _s('To'), _('a date is expected')));
+						}
 					}
 					else {
 						$period_to = null;

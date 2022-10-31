@@ -19,7 +19,7 @@
 
 #include "ssh_run.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 
 /* the size of temporary buffer used to read from data channel */
 #define DATA_BUFFER_SIZE	4096
@@ -251,7 +251,7 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		}
 	}
 
-	dos2unix(item->params);	/* CR+LF (Windows) => LF (Unix) */
+	zbx_dos2unix(item->params);	/* CR+LF (Windows) => LF (Unix) */
 	/* request a shell on a channel and execute command */
 	while (0 != (rc = libssh2_channel_exec(channel, item->params)))
 	{
@@ -289,7 +289,7 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		zbx_str_memcpy_alloc(&buffer, &buf_size, &offset, tmp_buf, rc);
 	}
 
-	output = convert_to_utf8(buffer, offset, encoding);
+	output = zbx_convert_to_utf8(buffer, offset, encoding);
 	zbx_rtrim(output, ZBX_WHITESPACE);
 	zbx_replace_invalid_utf8(output);
 
@@ -550,7 +550,7 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	}
 
 	/* request a shell on a channel and execute command */
-	dos2unix(item->params);	/* CR+LF (Windows) => LF (Unix) */
+	zbx_dos2unix(item->params);	/* CR+LF (Windows) => LF (Unix) */
 
 	while (SSH_OK != (rc = ssh_channel_request_exec(channel, item->params)))
 	{
@@ -585,7 +585,7 @@ int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 		zbx_str_memcpy_alloc(&buffer, &buf_size, &offset, tmp_buf, rc);
 	}
 
-	output = convert_to_utf8(buffer, offset, encoding);
+	output = zbx_convert_to_utf8(buffer, offset, encoding);
 	zbx_rtrim(output, ZBX_WHITESPACE);
 	zbx_replace_invalid_utf8(output);
 

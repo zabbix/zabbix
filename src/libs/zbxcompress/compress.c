@@ -19,7 +19,7 @@
 
 #include "zbxcompress.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 
 #ifdef HAVE_ZLIB
 #include "zlib.h"

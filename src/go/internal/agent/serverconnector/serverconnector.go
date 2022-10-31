@@ -44,8 +44,6 @@ import (
 	"zabbix.com/pkg/zbxcomms"
 )
 
-const hostMetadataLen = 255
-const hostInterfaceLen = 255
 const defaultAgentPort = 10050
 
 type Connector struct {
@@ -163,13 +161,13 @@ func (c *Connector) refreshActiveChecks() {
 	defer log.Debugf("[%d] End of refreshActiveChecks() from %s", c.clientID, c.addresses)
 
 	if a.HostInterface, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second, "HostInterface",
-		c.options.HostInterface, c.options.HostInterfaceItem, hostInterfaceLen, agent.LocalChecksClientID); err != nil {
+		c.options.HostInterface, c.options.HostInterfaceItem, agent.HostInterfaceLen, agent.LocalChecksClientID); err != nil {
 		log.Errf("cannot get host interface: %s", err)
 		return
 	}
 
 	if a.HostMetadata, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second, "HostMetadata",
-		c.options.HostMetadata, c.options.HostMetadataItem, hostMetadataLen, agent.LocalChecksClientID); err != nil {
+		c.options.HostMetadata, c.options.HostMetadataItem, agent.HostMetadataLen, agent.LocalChecksClientID); err != nil {
 		log.Errf("cannot get host metadata: %s", err)
 		return
 	}
@@ -485,7 +483,7 @@ func processConfigItem(taskManager scheduler.Scheduler, timeout time.Duration, n
 			return "", fmt.Errorf("value is not a UTF-8 string")
 		}
 
-		if len(value) > length {
+		if utf8.RuneCountInString(value) > length {
 			log.Warningf("the returned value of \"%s\" item specified by \"%sItem\" configuration parameter"+
 				" is too long, using first %d characters", item, name, length)
 

@@ -17,8 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 #include "../common/zbxsysinfo_common.h"
+#include "zbx_sysinfo_kstat.h"
 
 #include "zbxjson.h"
 #include "log.h"
@@ -88,7 +90,7 @@ clean:
 	return ret;
 }
 
-static int	NET_IF_IN_BYTES(const char *if_name, AGENT_RESULT *result)
+static int	net_if_in_bytes(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -109,7 +111,7 @@ static int	NET_IF_IN_BYTES(const char *if_name, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	NET_IF_IN_PACKETS(const char *if_name, AGENT_RESULT *result)
+static int	net_if_in_packets(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -130,7 +132,7 @@ static int	NET_IF_IN_PACKETS(const char *if_name, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	NET_IF_IN_ERRORS(const char *if_name, AGENT_RESULT *result)
+static int	net_if_in_errors(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -146,7 +148,7 @@ static int	NET_IF_IN_ERRORS(const char *if_name, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	NET_IF_OUT_BYTES(const char *if_name, AGENT_RESULT *result)
+static int	net_if_out_bytes(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -167,7 +169,7 @@ static int	NET_IF_OUT_BYTES(const char *if_name, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	NET_IF_OUT_PACKETS(const char *if_name, AGENT_RESULT *result)
+static int	net_if_out_packets(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -188,7 +190,7 @@ static int	NET_IF_OUT_PACKETS(const char *if_name, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	NET_IF_OUT_ERRORS(const char *if_name, AGENT_RESULT *result)
+static int	net_if_out_errors(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -204,7 +206,7 @@ static int	NET_IF_OUT_ERRORS(const char *if_name, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	NET_IF_TOTAL_BYTES(const char *if_name, AGENT_RESULT *result)
+static int	net_if_total_bytes(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value_in, value_out;
 	char		*error;
@@ -227,7 +229,7 @@ static int	NET_IF_TOTAL_BYTES(const char *if_name, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	NET_IF_TOTAL_PACKETS(const char *if_name, AGENT_RESULT *result)
+static int	net_if_total_packets(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value_in, value_out;
 	char		*error;
@@ -250,7 +252,7 @@ static int	NET_IF_TOTAL_PACKETS(const char *if_name, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	NET_IF_TOTAL_ERRORS(const char *if_name, AGENT_RESULT *result)
+static int	net_if_total_errors(const char *if_name, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value_in, value_out;
 	char		*error;
@@ -267,7 +269,7 @@ static int	NET_IF_TOTAL_ERRORS(const char *if_name, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*if_name, *error;
@@ -297,7 +299,7 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*port_str, command[64];
 	unsigned short	port;
@@ -311,7 +313,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	port_str = get_rparam(request, 0);
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
@@ -319,7 +321,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_snprintf(command, sizeof(command), "netstat -an -P tcp | grep '\\.%hu[^.].*LISTEN' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(command, result)))
+	if (SYSINFO_RET_FAIL == (res = execute_int(command, result)))
 		return res;
 
 	if (1 < result->ui64)
@@ -328,7 +330,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return res;
 }
 
-int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*port_str, command[64];
 	unsigned short	port;
@@ -342,7 +344,7 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	port_str = get_rparam(request, 0);
 
-	if (NULL == port_str || SUCCEED != is_ushort(port_str, &port))
+	if (NULL == port_str || SUCCEED != zbx_is_ushort(port_str, &port))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
@@ -350,7 +352,7 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_snprintf(command, sizeof(command), "netstat -an -P udp | grep '\\.%hu[^.].*Idle' | wc -l", port);
 
-	if (SYSINFO_RET_FAIL == (res = EXECUTE_INT(command, result)))
+	if (SYSINFO_RET_FAIL == (res = execute_int(command, result)))
 		return res;
 
 	if (1 < result->ui64)
@@ -359,7 +361,7 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return res;
 }
 
-int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *mode;
 	int	ret;
@@ -380,11 +382,11 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
-		ret = NET_IF_IN_BYTES(if_name, result);
+		ret = net_if_in_bytes(if_name, result);
 	else if (0 == strcmp(mode, "packets"))
-		ret = NET_IF_IN_PACKETS(if_name, result);
+		ret = net_if_in_packets(if_name, result);
 	else if (0 == strcmp(mode, "errors"))
-		ret = NET_IF_IN_ERRORS(if_name, result);
+		ret = net_if_in_errors(if_name, result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -394,7 +396,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *mode;
 	int	ret;
@@ -415,11 +417,11 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
-		ret = NET_IF_OUT_BYTES(if_name, result);
+		ret = net_if_out_bytes(if_name, result);
 	else if (0 == strcmp(mode, "packets"))
-		ret = NET_IF_OUT_PACKETS(if_name, result);
+		ret = net_if_out_packets(if_name, result);
 	else if (0 == strcmp(mode, "errors"))
-		ret = NET_IF_OUT_ERRORS(if_name, result);
+		ret = net_if_out_errors(if_name, result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -429,7 +431,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *mode;
 	int	ret;
@@ -450,11 +452,11 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
-		ret = NET_IF_TOTAL_BYTES(if_name, result);
+		ret = net_if_total_bytes(if_name, result);
 	else if (0 == strcmp(mode, "packets"))
-		ret = NET_IF_TOTAL_PACKETS(if_name, result);
+		ret = net_if_total_packets(if_name, result);
 	else if (0 == strcmp(mode, "errors"))
-		ret = NET_IF_TOTAL_ERRORS(if_name, result);
+		ret = net_if_total_errors(if_name, result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -464,7 +466,7 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct if_nameindex	*ni;
 	struct zbx_json		j;

@@ -138,7 +138,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 
 	ZBX_STR2UCHAR(script->host_access, row[1]);
 
-	if (SUCCEED != is_time_suffix(row[6], &script->timeout, ZBX_LENGTH_UNLIMITED))
+	if (SUCCEED != zbx_is_time_suffix(row[6], &script->timeout, ZBX_LENGTH_UNLIMITED))
 	{
 		zbx_strlcpy(error, "Invalid timeout value in script configuration.", error_len);
 		goto fail;
@@ -530,7 +530,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	/* extract and validate other JSON elements */
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SCRIPTID, tmp, sizeof(tmp), NULL) ||
-			FAIL == is_uint64(tmp, &scriptid))
+			FAIL == zbx_is_uint64(tmp, &scriptid))
 	{
 		result = zbx_dsprintf(result, "Failed to parse command request tag: %s.", ZBX_PROTO_TAG_SCRIPTID);
 		goto finish;
@@ -558,7 +558,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 
 	if (1 == got_hostid)
 	{
-		if (SUCCEED != is_uint64(tmp_hostid, &hostid))
+		if (SUCCEED != zbx_is_uint64(tmp_hostid, &hostid))
 		{
 			result = zbx_dsprintf(result, "Failed to parse value of command request tag %s.",
 					ZBX_PROTO_TAG_HOSTID);
@@ -573,7 +573,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	}
 	else
 	{
-		if (SUCCEED != is_uint64(tmp_eventid, &eventid))
+		if (SUCCEED != zbx_is_uint64(tmp_eventid, &eventid))
 		{
 			result = zbx_dsprintf(result, "Failed to parse value of command request tag %s.",
 					ZBX_PROTO_TAG_EVENTID);

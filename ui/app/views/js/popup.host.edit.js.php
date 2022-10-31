@@ -39,7 +39,7 @@ window.host_edit_popup = {
 		host_edit.init({form_name, host_interfaces, host_is_discovered});
 
 		if (warning !== null) {
-			const message_box = makeMessageBox('warning', warning, null, true, false)[0];
+			const message_box = makeMessageBox('warning', [warning], null, true, false)[0];
 
 			this.form.parentNode.insertBefore(message_box, this.form);
 		}

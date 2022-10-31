@@ -113,7 +113,7 @@ static void	um_mock_host_init(zbx_um_mock_host_t *host, zbx_mock_handle_t handle
 		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(htemplate, &template)))
 			fail_msg("Cannot read templateid: %s", zbx_mock_error_string(err));
 
-		if (SUCCEED != is_uint64(template, &templateid))
+		if (SUCCEED != zbx_is_uint64(template, &templateid))
 			fail_msg("Invalid templateid: %s", template);
 
 		zbx_vector_uint64_append(&host->templateids, templateid);

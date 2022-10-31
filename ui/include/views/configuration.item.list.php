@@ -28,8 +28,8 @@ require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 $widget = (new CWidget())
 	->setTitle(_('Items'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
-		? CDocHelper::CONFIGURATION_HOST_ITEM_LIST
-		: CDocHelper::CONFIGURATION_TEMPLATE_ITEM_LIST
+		? CDocHelper::DATA_COLLECTION_HOST_ITEM_LIST
+		: CDocHelper::DATA_COLLECTION_TEMPLATE_ITEM_LIST
 	))
 	->setControls(
 		(new CTag('nav', true,
@@ -237,7 +237,7 @@ foreach ($data['items'] as $item) {
 
 	$wizard = (new CButton(null))
 		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
-		->setMenuPopup(CMenuPopupHelper::getItemConfiguration([
+		->setMenuPopup(CMenuPopupHelper::getItem([
 			'itemid' => $item['itemid'],
 			'context' => $data['context'],
 			'backurl' => $backurl

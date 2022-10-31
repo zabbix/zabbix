@@ -1362,12 +1362,6 @@ class CApiInputValidatorTest extends TestCase {
 				'0'
 			],
 			[
-				['type' => API_ID, 'flags' => API_NOT_EMPTY],
-				0,
-				'/1/id',
-				'Invalid parameter "/1/id": cannot be empty.'
-			],
-			[
 				['type' => API_ID],
 				12345,
 				'/1/id',
@@ -1426,12 +1420,6 @@ class CApiInputValidatorTest extends TestCase {
 				null,
 				'/1/id',
 				'Invalid parameter "/1/id": a number is expected.'
-			],
-			[
-				['type' => API_ID, 'flags' => API_ALLOW_NULL],
-				null,
-				'/1/id',
-				null
 			],
 			[
 				['type' => API_ID],
@@ -2283,7 +2271,7 @@ class CApiInputValidatorTest extends TestCase {
 					['type' => '2', 'value' => '125']
 				],
 				'/',
-				'Incorrect validation rules.'
+				'Incorrect API_MULTIPLE validation rules.'
 			],
 			[
 				['type' => API_OBJECTS, 'fields' => [
@@ -5531,6 +5519,30 @@ class CApiInputValidatorTest extends TestCase {
 				['with_hosts' => true],
 				true,
 				'Parameter "/real_hosts" is deprecated.'
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => '3', 'name2' => '2', 'value' => ['1', '2', '3', '4', '1']],
+				'/',
+				'Invalid parameter "/": unexpected parameter "name2".'
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => '3', 'name' => null, 'value' => ['1', '2', '3', '4', '1']],
+				'/',
+				['type' => ['3'], 'name' => null, 'value' => ['1', '2', '3', '4', '1']]
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => '3', 'name' => '2', 'value' => ['1', '2', '3', null, '1']],
+				'/',
+				'Invalid parameter "/value/4": a character string, integer or floating point value is expected.'
+			],
+			[
+				['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'fields' => ['type', 'name', 'value']],
+				['type' => 3, 'name' => 2, 'value' => ['1', 2.5, '3', '4', '1']],
+				'/',
+				['type' => [3], 'name' => [2], 'value' => ['1', 2.5, '3', '4', '1']]
 			]
 		];
 	}
@@ -5649,7 +5661,7 @@ class CApiInputValidatorTest extends TestCase {
 	 * @param array       $rule
 	 * @param mixed       $data
 	 * @param string      $path
-	 * @param mixed       $exprected
+	 * @param mixed       $expected
 	 * @param bool        $float_ieee754
 	 * @param string|null $deprecation_message
 	 */
@@ -5686,7 +5698,7 @@ class CApiInputValidatorTest extends TestCase {
 	 * @param array  $rule
 	 * @param mixed  $data
 	 * @param string $path
-	 * @param mixed  $exprected
+	 * @param mixed  $expected
 	 */
 	public function testApiInputLegacyValidator(array $rule, $data, $path, $expected) {
 		$this->testApiInputValidator($rule, $data, $path, $expected, false);
@@ -6184,8 +6196,8 @@ class CApiInputValidatorTest extends TestCase {
 	 * @param array  $rule
 	 * @param mixed  $data
 	 * @param string $path
-	 * @param bool   $rc_exprected
-	 * @param mixed  $error_exprected
+	 * @param bool   $rc_expected
+	 * @param mixed  $error_expected
 	 */
 	public function testApiUniqueness(array $rule, $data, $path, $rc_expected, $error_expected) {
 		$rc = CApiInputValidator::validateUniqueness($rule, $data, $path, $error);

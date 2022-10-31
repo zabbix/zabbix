@@ -19,7 +19,7 @@
 
 #include "json_parser.h"
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "json.h"
 
 static zbx_int64_t	json_parse_object(const char *start, char **error);

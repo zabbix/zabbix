@@ -348,7 +348,7 @@ int	main(int argc, char **argv)
 					source_ip = zbx_strdup(NULL, zbx_optarg);
 				break;
 			case 't':
-				if (FAIL == is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &CONFIG_GET_TIMEOUT,
+				if (FAIL == zbx_is_uint_n_range(zbx_optarg, ZBX_MAX_UINT64_LEN, &CONFIG_GET_TIMEOUT,
 						sizeof(CONFIG_GET_TIMEOUT), CONFIG_GET_TIMEOUT_MIN,
 						CONFIG_GET_TIMEOUT_MAX))
 				{

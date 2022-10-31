@@ -22,6 +22,9 @@
 
 #include "zbxalgo.h"
 
+#define ZBX_IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
+#define ZBX_IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
+
 #ifdef _WINDOWS
 #	define zbx_socket_last_error()		WSAGetLastError()
 
@@ -85,6 +88,15 @@ typedef struct
 
 zbx_config_tls_t	*zbx_config_tls_new(void);
 void	zbx_config_tls_free(zbx_config_tls_t *zbx_config_tls);
+
+
+typedef struct
+{
+	zbx_config_tls_t	*zbx_config_tls;
+	const char		*hostname;
+	const int		proxymode;
+}
+zbx_config_comms_args_t;
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 

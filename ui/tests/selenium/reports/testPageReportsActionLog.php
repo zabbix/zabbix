@@ -18,15 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 class testPageReportsActionLog extends CLegacyWebTest {
 
 	public function testPageReportsActionLog_CheckLayout() {
-		// from: 2012-02-20 09:00:00
-		// to: 2014-02-19 09:00:00
 		// dates can be in relative format, example: now-1y/y, now-1w, now
-		$this->zbxTestLogin('auditacts.php?from=2012-02-20+09%3A00%3A00&to=2014-02-19+09%3A00%3A00');
+		$this->zbxTestLogin('auditacts.php?from=now-2y&to=now');
 		$this->zbxTestCheckTitle('Action log');
 		$this->zbxTestAssertElementPresentId('config');
 		$this->zbxTestCheckHeader('Action log');

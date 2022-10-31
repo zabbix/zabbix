@@ -28,7 +28,7 @@ $this->includeJsFile('configuration.correlation.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Event correlation rules'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_CORRELATION_EDIT));
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_EDIT));
 
 $form = (new CForm())
 	->setId('correlation.edit')
@@ -37,7 +37,7 @@ $form = (new CForm())
 		->setArgument('action', 'correlation.condition.add')
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
 
 if ($data['correlationid'] != 0) {
 	$form->addVar('correlationid', $data['correlationid']);

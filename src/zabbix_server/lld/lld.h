@@ -20,7 +20,7 @@
 #ifndef ZABBIX_LLD_H
 #define ZABBIX_LLD_H
 
-#include "common.h"
+#include "zbxcommon.h"
 #include "zbxjson.h"
 #include "zbxdbhigh.h"
 
