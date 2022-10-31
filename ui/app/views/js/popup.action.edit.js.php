@@ -402,12 +402,12 @@ window.action_edit_popup = new class {
 
 				index = parseInt(row_index) -1;
 				index >= 0
-					? $(`#rec-table > tbody tr:eq(${index})`).after(this._prepareOperationsRow(operation_obj, template))
-					: $(`#rec-table tbody`).prepend(this._prepareOperationsRow(operation_obj, template))
+					? $(`#upd-table > tbody tr:eq(${index})`).after(this._prepareOperationsRow(operation_obj, template))
+					: $(`#upd-table tbody`).prepend(this._prepareOperationsRow(operation_obj, template))
 				break;
 
 			case <?=ACTION_OPERATION?>:
-				row_index = 0;
+				row_index = operation_obj.row_index;
 				while (document.querySelector(`#op-table [id="operations_${row_index}"]`) !== null) {
 					row_index++;
 				}
@@ -491,9 +491,11 @@ window.action_edit_popup = new class {
 							}
 						}
 
-						document
-							.querySelector('#op-table tbody')
-							.appendChild(this._prepareOperationsRow(operation_obj, template));
+						index = parseInt(row_index) -1;
+						index >= 0
+							? $(`#op-table > tbody tr:eq(${index})`)
+								.after(this._prepareOperationsRow(operation_obj, template))
+							: $(`#op-table tbody`).prepend(this._prepareOperationsRow(operation_obj, template))
 						break;
 				}
 				break;
