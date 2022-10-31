@@ -37,7 +37,6 @@ window.operation_popup = new class {
 
 		this._loadViews();
 		this._processTypeOfCalculation();
-		this._initTemplates();
 
 		if (data?.opconditions) {
 			data?.opconditions.map(row => this._createOperationConditionsRow(row, 0))
@@ -363,21 +362,25 @@ window.operation_popup = new class {
 	}
 
 	_addUserGroup(values) {
+		let template = new Template(document.getElementById('operation-usergroup-row-tmpl').innerHTML);
+
 		values.forEach((value) => {
 			document
 				.querySelector('#operation-message-user-groups-table tbody')
-				.insertAdjacentHTML('beforeend', this.usrgrp_template.evaluate(value))
+				.insertAdjacentHTML('beforeend', template.evaluate(value))
 		});
 	}
 
 	_addUser(values) {
+		let template = new Template(document.getElementById('operation-user-row-tmpl').innerHTML);
+
 		values.forEach((value) => {
 			if (value.userid) {
 				value.id = value.userid;
 			}
 			document
 				.querySelector('#operation-message-user-table tbody')
-				.insertAdjacentHTML('beforeend', this.usr_template.evaluate(value))
+				.insertAdjacentHTML('beforeend', template.evaluate(value))
 		});
 	}
 
@@ -450,10 +453,11 @@ window.operation_popup = new class {
 
 		input.label = num2letter(row_index);
 		input.row_index = row_index;
+		let template = new Template(document.getElementById('operation-condition-row-tmpl').innerHTML);
 
 		document
 			.querySelector('#operation-condition-list tbody')
-			.insertAdjacentHTML('beforeend', this.op_condition_template.evaluate(input))
+			.insertAdjacentHTML('beforeend', template.evaluate(input))
 
 		this._processTypeOfCalculation();
 	}
@@ -576,48 +580,5 @@ window.operation_popup = new class {
 			}
 		}
 		default_msg.dispatchEvent(new Event('change'));
-	}
-
-	_initTemplates() {
-		this.op_condition_template = new Template(`
-			<tr data-id="#{row_index}">
-				<td>
-					<span  class="label" data-conditiontype="#{conditiontype}" data-formulaid= "#{label}" >#{label}</span>
-				</td>
-				<td>
-					<span>#{name}</span>
-				</td>
-				<td class="<?= ZBX_STYLE_NOWRAP ?>">
-					<input type="hidden" name="operation[opconditions][#{row_index}][conditiontype]" value="#{conditiontype}" />
-					<input type="hidden" name="operation[opconditions][#{row_index}][operator]" value="#{operator}" />
-					<input type="hidden" name="operation[opconditions][#{row_index}][value]" value="#{value}" />
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-				</td>
-			</tr>
-		`);
-
-		this.usrgrp_template = new Template(`
-			<tr data-id="#{usrgrpid}">
-				<td>
-					<span>#{name}</span>
-				</td>
-				<td class="<?= ZBX_STYLE_NOWRAP ?>">
-					<input name="operation[opmessage_grp][][usrgrpid]" type="hidden" value="#{usrgrpid}" />
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-				</td>
-			</tr>
-		`);
-
-		this.usr_template =  new Template(`
-			<tr data-id="#{id}">
-				<td>
-					<span>#{name}</span>
-				</td>
-				<td class="<?= ZBX_STYLE_NOWRAP ?>">
-					<input name="operation[opmessage_usr][][userid]" type="hidden" value="#{id}" />
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-				</td>
-			</tr>
-		`);
 	}
 }

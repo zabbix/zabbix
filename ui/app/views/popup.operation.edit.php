@@ -131,9 +131,23 @@ $usergroup_table->addItem(
 
 $form_grid->addItem([
 	(new CLabel(_('Send to user groups')))->setId('operation-message-user-groups-label'),
-	(new CFormField(
-		$usergroup_table
-	))
+	(new CFormField([
+		$usergroup_table,
+		(new CScriptTemplate('operation-usergroup-row-tmpl'))->addItem(
+			(new CRow([
+				new CCol('#{name}'),
+				(new CCol([
+					(new CButton(null, _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('js-remove'),
+					(new CInput('hidden'))
+						->setAttribute('value', '#{usrgrpid}')
+						->setName('operation[opmessage_grp][][usrgrpid]'),
+				]))
+			]))
+				->setAttribute('data-id','#{usrgrpid}')
+		)
+	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->setId('operation-message-user-groups')
@@ -158,7 +172,23 @@ $user_table->addItem(
 // Message recipient (users) row.
 $form_grid->addItem([
 	(new CLabel(_('Send to users')))->setId('operation-message-users-label'),
-	(new CFormField($user_table))
+	(new CFormField([
+		$user_table,
+		(new CScriptTemplate('operation-user-row-tmpl'))->addItem(
+			(new CRow([
+				new CCol('#{name}'),
+				(new CCol([
+					(new CButton(null, _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('js-remove'),
+					(new CInput('hidden'))
+						->setAttribute('value', '#{id}')
+						->setName('operation[opmessage_usr][][userid]'),
+				]))
+			]))
+				->setAttribute('data-id','#{usrgrpid}')
+		)
+	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->setId('operation-message-users')
@@ -439,9 +469,35 @@ $conditions_table->addItem(
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS && $data['recovery'] == ACTION_OPERATION) {
 	$form_grid->addItem([
 		(new CLabel(_('Conditions')))->setId('operation-condition-list-label'),
-		(new CFormField(
-			$conditions_table
-		))
+		(new CFormField([
+			$conditions_table,
+			(new CScriptTemplate('operation-condition-row-tmpl'))->addItem(
+				(new CRow([
+					(new CCol('#{label}'))
+						->setAttribute('data-conditiontype', '#{conditiontype}')
+						->setAttribute('data-formulaid', '#{label}')
+						->addClass('label'),
+					new CCol('#{name}'),
+					(new CCol([
+						(new CButton(null, _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('js-remove'),
+						(new CInput('hidden'))
+							->setAttribute('value', '#{conditiontype}')
+							->setName('operation[opconditions][#{row_index}][conditiontype]'),
+						(new CInput('hidden'))
+							->setAttribute('value', '#{operator}')
+							->setName('operation[opconditions][#{row_index}][operator]'),
+						(new CInput('hidden'))
+							->setAttribute('value', '#{value}')
+							->setName('operation[opconditions][#{row_index}][value]')
+					])
+					)
+				]))
+					->setAttribute('data-id','#{row_index}')
+					->addClass('form_row')
+			)
+		]))
 			->setId('operation-condition-table')
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
