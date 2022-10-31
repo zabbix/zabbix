@@ -63,10 +63,9 @@ $condition_tag_template = (new CScriptTemplate('condition-tag-row-tmpl'))->addIt
 			->setAttribute('data-conditiontype', '#{conditiontype}')
 			->setAttribute('data-formulaid', '#{label}'),
 		(new CCol([
-			'#{condition_name}', ' ',
-			(new CLabel('#{data}'))->addStyle('font-style: italic')
+			'#{condition_name}', ' ', new CTag('em', true, '#{data}')
 		]))
-			->addClass('wordwrap')
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		(new CCol([
 			$remove_button,
@@ -93,10 +92,9 @@ $condition_hostgroup_template = (new CScriptTemplate('condition-hostgr-row-tmpl'
 			->setAttribute('data-conditiontype', '#{conditiontype}')
 			->setAttribute('data-formulaid', '#{label}'),
 		(new CCol([
-			'#{condition_name}', ' ',
-			(new CLabel('#{data}'))->addStyle('font-style: italic')
+			'#{condition_name}', ' ', new CTag('em', true, '#{data}')
 		]))
-			->addClass('wordwrap')
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		(new CCol([
 			$remove_button,
@@ -123,12 +121,10 @@ $condition_tag_pair_template = (new CScriptTemplate('condition-tag-pair-row-tmpl
 			->setAttribute('data-conditiontype', '#{conditiontype}')
 			->setAttribute('data-formulaid', '#{label}'),
 		(new CCol([
-			'#{condition_name}', ' ',
-			(new CLabel('#{data}'))->addStyle('font-style: italic'), ' ',
-			'#{condition_operator}', ' ',  '#{condition_name2}', ' ',
-			(new CLabel('#{data_new_tag}'))->addStyle('font-style: italic')
+			'#{condition_name}', ' ', new CTag('em', true, '#{data_old_tag}'), ' ', '#{condition_operator}', ' ',
+			'#{condition_name2}', ' ', new CTag('em', true, '#{data_new_tag}')
 		]))
-			->addClass('wordwrap')
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		(new CCol([
 			$remove_button,
@@ -158,12 +154,10 @@ $condition_old_new_tag_template = (new CScriptTemplate('condition-old-new-tag-ro
 			->setAttribute('data-conditiontype', '#{conditiontype}')
 			->setAttribute('data-formulaid', '#{label}'),
 		(new CCol([
-			'#{condition_name}', ' ',
-			(new CLabel('#{tag}'))->addStyle('font-style: italic'), ' ',
-			'#{condition_operator}', ' ',
-			(new CLabel('#{value}'))->addStyle('font-style: italic')
+			'#{condition_name}', ' ', new CTag('em', true, '#{tag}'), ' ',
+			'#{condition_operator}', ' ', new CTag('em', true, '#{value}')
 		]))
-			->addClass('wordwrap')
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		(new CCol([
 			$remove_button,

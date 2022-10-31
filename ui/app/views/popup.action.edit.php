@@ -80,7 +80,7 @@ $condition_suppressed_template = (new CScriptTemplate('condition-suppressed-row-
 		->setAttribute('data-conditiontype', '#{conditiontype}')
 		->setAttribute('data-formulaid', '#{label}'),
 		(new CCol('#{condition_name}'))
-			->addClass('wordwrap')
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		$condition_hidden_data
 	]))->setAttribute('data-row_index','#{row_index}')
@@ -93,10 +93,9 @@ $condition_template_default = (new CScriptTemplate('condition-row-tmpl'))->addIt
 			->setAttribute('data-conditiontype', '#{conditiontype}')
 			->setAttribute('data-formulaid', '#{label}'),
 		(new CCol([
-			'#{condition_name}',
-			(new CLabel('#{data}'))->addStyle('font-style: italic')
+			'#{condition_name}', new CTag('em', true, '#{data}')
 		]))
-			->addClass('wordwrap')
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		$condition_hidden_data
 
@@ -110,12 +109,10 @@ $condition_tag_value_template = (new CScriptTemplate('condition-tag-value-row-tm
 			->setAttribute('data-conditiontype', '#{conditiontype}')
 			->setAttribute('data-formulaid', '#{label}'),
 		(new CCol([
-			_('Value of tag'), ' ',
-			(new CLabel('#{value2}'))->addStyle('font-style: italic'), ' ',
-			'#{operator_name}', ' ',
-			(new CLabel('#{value}'))->addStyle('font-style: italic'),
+			_('Value of tag'), ' ', new CTag('em', true, '#{value2}'), ' ',
+			'#{operator_name}', ' ', new CTag('em', true, '#{value}')
 		]))
-			->addClass('wordwrap')
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		$condition_hidden_data
 	]))->setAttribute('data-row_index','#{row_index}')
@@ -341,22 +338,24 @@ $operations_table->addItem(
 
 // Operations templates.
 $operation_row_buttons = (new CCol([
-	(new CButton(null, _('Edit')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('js-edit-operation')
-		->setAttribute('data_operation', '#{data_operation}'),
-	(new CButton(null, _('Remove')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('js-remove')
-]))->addClass(ZBX_STYLE_ACTION_BUTTONS);
+	(new CList([
+		(new CButton(null, _('Edit')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('js-edit-operation')
+			->setAttribute('data_operation', '#{data_operation}'),
+		(new CButton(null, _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('js-remove')
+	]))	->addClass(ZBX_STYLE_HOR_LIST)
+]))
+;
 
 $operation_basic_template = (new CScriptTemplate('operation-basic-row-tmpl'))->addItem(
 	(new CRow([
 		(new CCol([
-			(new CLabel('#{details}'))->addStyle('font-weight: bold'), ' ',
-			'#{data}'
+			new CTag('b', true, '#{details}'), ' ', '#{data}'
 		]))
-			->addClass('wordwrap')
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		$operation_row_buttons
 	]))->setAttribute('id','#{prefix}operations_#{row_index}')
@@ -366,10 +365,9 @@ $operation_additional_template = (new CScriptTemplate('operation-additional-row-
 	(new CRow([
 		(new CCol('#{steps}')),
 		(new CCol([
-			(new CLabel('#{details}'))->addStyle('font-weight: bold'), ' ',
-			'#{data}'
+			new CTag('b', true, '#{details}'), ' ', '#{data}',
 		]))
-			->addClass('wordwrap')
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		(new CCol('#{start_in}')),
 		(new CCol('#{duration}')),
@@ -381,28 +379,26 @@ $operation_usr_usrgrp_template = (new CScriptTemplate('operation-usr-usrgrp-row-
 	(new CRow([
 		(new CCol([
 			(new CFormField([
-				(new CLabel('#{usr_details}'))->addStyle('font-weight: bold'), ' ',
-				'#{usr_data}']))->addItem(new CTag('br')),
-				(new CLabel('#{usrgrp_details}'))->addStyle('font-weight: bold'), ' ',
-				'#{usrgrp_data}'
+				new CTag('b', true, '#{usr_details}'), ' ', '#{usr_data}'
+			]))->addItem(new CTag('br')),
+			new CTag('b', true, '#{usrgrp_details}'), ' ', '#{usrgrp_data}'
 		]))
-			->addClass('wordwrap')
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		$operation_row_buttons
 	]))->setAttribute('id','#{prefix}operations_#{row_index}')
 );
 
-$operation_usr_usrtgrp_additional_template = (new CScriptTemplate('operation-usr-usrgrp-additional-row-tmpl'))->addItem(
+$operation_usr_usrgrp_additional_template = (new CScriptTemplate('operation-usr-usrgrp-additional-row-tmpl'))->addItem(
 	(new CRow([
 		new CCol('#{steps}'),
 		(new CCol([
 			(new CFormField([
-				(new CLabel('#{usr_details}'))->addStyle('font-weight: bold'), ' ',
-				'#{usr_data}']))->addItem(new CTag('br')),
-			(new CLabel('#{usrgrp_details}'))->addStyle('font-weight: bold'), ' ',
-			'#{usrgrp_data}'
+				new CTag('b', true, '#{usr_details}'), ' ', '#{usr_data}'
+			]))->addItem(new CTag('br')),
+			new CTag('b', true, '#{usrgrp_details}'), ' ', '#{usrgrp_data}'
 		]))
-			->addClass('wordwrap')
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		new CCol('#{start_in}'),
 		new CCol('#{duration}'),
@@ -414,16 +410,13 @@ $operation_script_additional_template = (new CScriptTemplate('operation-script-a
 	(new CRow([
 		new CCol('#{steps}'),
 		(new CCol([
-			(new CFormField((new CLabel('#{current}'))->addStyle('font-weight: bold')))->addItem(new CTag('br')),
+			(new CFormField(new CTag('b', true, '#{current}')))->addItem(new CTag('br')),
 			(new CFormField([
-				(new CLabel('#{host_details}'))->addStyle('font-weight: bold'), ' ',
-				'#{host_data}'
+				new CTag('b', true, '#{host_details}'), ' ', '#{host_data}'
 			]))->addItem(new CTag('br')),
-
-			(new CLabel('#{hostgr_details}'))->addStyle('font-weight: bold'), ' ',
-			'#{hostgr_data}'
+			new CTag('b', true, '#{hostgr_details}'), ' ', '#{hostgr_data}'
 		]))
-			->addClass('wordwrap')
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		new CCol('#{start_in}'),
 		new CCol('#{duration}'),
@@ -434,16 +427,13 @@ $operation_script_additional_template = (new CScriptTemplate('operation-script-a
 $operation_script_template = (new CScriptTemplate('operation-script-row-tmpl'))->addItem(
 	(new CRow([
 		(new CCol([
-			(new CFormField((new CLabel('#{current}'))->addStyle('font-weight: bold')))->addItem(new CTag('br')),
+			(new CFormField(new CTag('b', true, '#{current}')))->addItem(new CTag('br')),
 			(new CFormField([
-				(new CLabel('#{host_details}'))->addStyle('font-weight: bold'), ' ',
-				'#{host_data}'
+				new CTag('b', true, '#{host_details}'), ' ', '#{host_data}'
 			]))->addItem(new CTag('br')),
-
-			(new CLabel('#{hostgr_details}'))->addStyle('font-weight: bold'), ' ',
-			'#{hostgr_data}'
+			new CTag('b', true, '#{hostgr_details}'), ' ', '#{hostgr_data}'
 		]))
-			->addClass('wordwrap')
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		$operation_row_buttons
 	]))->setAttribute('id','#{prefix}operations_#{row_index}')
@@ -456,7 +446,7 @@ $operations_tab->addItem([
 		$operation_basic_template,
 		$operation_additional_template,
 		$operation_usr_usrgrp_template,
-		$operation_usr_usrtgrp_additional_template,
+		$operation_usr_usrgrp_additional_template,
 		$operation_script_template,
 		$operation_script_additional_template
 	]))
