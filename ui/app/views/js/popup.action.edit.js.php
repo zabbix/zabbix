@@ -81,7 +81,7 @@ window.action_edit_popup = new class {
 				recovery: operation_data.operationtype,
 				actionid: this.actionid,
 				data: operation_data.data,
-				row_index: row_index,
+				row_index: row_index
 			}
 			this.recovery = operation_data.operationtype;
 		}
@@ -334,12 +334,13 @@ window.action_edit_popup = new class {
 			this.recovery  = operation.recovery;
 		}
 
+		let operation_obj = {...operation};
+
 		let row_index;
 		if (row_id !== null) {
-			row_index = row_id;
+			operation_obj.row_index = row_id;
 		}
 
-		let operation_obj = {...operation};
 		let data = input.detail.operation.details.data ? input.detail.operation.details.data[0] : [];
 		operation_obj.data = data.join(' ');
 		operation_obj.details = input.detail.operation.details.type;
@@ -373,12 +374,18 @@ window.action_edit_popup = new class {
 		if (row_id) {
 			document.getElementById(row_id).remove();
 		}
+
 		operation_obj.data_operation = JSON.stringify(operation);
 		let index;
+		let input_index;
+
+		if (row_id !== null) {
+			index = operation.row_index;
+		}
 
 		switch (parseInt(this.recovery)) {
 			case <?=ACTION_RECOVERY_OPERATION?>:
-				row_index = operation_obj.row_index;
+				row_index = 0;
 
 				while (document.querySelector(`#rec-table [id="recovery_operations_${row_index}"]`) !== null) {
 					row_index++;
@@ -386,14 +393,23 @@ window.action_edit_popup = new class {
 				operation_obj.row_index = row_index
 				operation_obj.prefix = 'recovery_';
 
-				index = parseInt(row_index) -1;
-				index >= 0
-					? $(`#rec-table > tbody tr:eq(${index})`).after(this._prepareOperationsRow(operation_obj, template))
-					: $(`#rec-table tbody`).prepend(this._prepareOperationsRow(operation_obj, template))
+				if (index) {
+					input_index = parseInt(index) -1;
+					input_index >= 0
+						? $(`#rec-table > tbody tr:eq(${input_index})`)
+							.after(this._prepareOperationsRow(operation_obj, template))
+						: $(`#rec-table tbody`).prepend(this._prepareOperationsRow(operation_obj, template));
+				}
+				else {
+					document
+						.querySelector('#rec-table tbody')
+						.appendChild(this._prepareOperationsRow(operation_obj, template));
+				}
+
 				break;
 
 			case <?=ACTION_UPDATE_OPERATION?>:
-				row_index = operation_obj.row_index;
+				row_index = 0;
 
 				while (document.querySelector(`#upd-table [id="update_operations_${row_index}"]`) !== null) {
 					row_index++;
@@ -401,17 +417,26 @@ window.action_edit_popup = new class {
 				operation_obj.row_index = row_index;
 				operation_obj.prefix = 'update_';
 
-				index = parseInt(row_index) -1;
-				index >= 0
-					? $(`#upd-table > tbody tr:eq(${index})`).after(this._prepareOperationsRow(operation_obj, template))
-					: $(`#upd-table tbody`).prepend(this._prepareOperationsRow(operation_obj, template))
+				if (index) {
+					input_index = parseInt(index) -1;
+					input_index >= 0
+						? $(`#upd-table > tbody tr:eq(${input_index})`)
+							.after(this._prepareOperationsRow(operation_obj, template))
+						: $(`#upd-table tbody`).prepend(this._prepareOperationsRow(operation_obj, template))
+				}
+				else {
+					document
+						.querySelector('#upd-table tbody')
+						.appendChild(this._prepareOperationsRow(operation_obj, template));
+				}
 				break;
 
 			case <?=ACTION_OPERATION?>:
-				row_index = operation_obj.row_index;
+				row_index = 0;
 				while (document.querySelector(`#op-table [id="operations_${row_index}"]`) !== null) {
 					row_index++;
 				}
+
 				operation_obj.row_index = row_index;
 
 				switch (parseInt(this.eventsource)) {
@@ -493,6 +518,7 @@ window.action_edit_popup = new class {
 						break;
 
 					default:
+						operation_obj.row_index = row_index;
 						operation_obj.prefix = ''
 						if (input.detail.operation.details.data) {
 							if (operation.details.data.length > 1) {
@@ -502,11 +528,18 @@ window.action_edit_popup = new class {
 							}
 						}
 
-						index = parseInt(row_index) -1;
-						index >= 0
-							? $(`#op-table > tbody tr:eq(${index})`)
-								.after(this._prepareOperationsRow(operation_obj, template))
-							: $(`#op-table tbody`).prepend(this._prepareOperationsRow(operation_obj, template))
+						if (index) {
+							input_index = parseInt(index) -1;
+							input_index >= 0
+								? $(`#op-table > tbody tr:eq(${input_index})`)
+									.after(this._prepareOperationsRow(operation_obj, template))
+								: $(`#op-table tbody`).prepend(this._prepareOperationsRow(operation_obj, template))
+						}
+						else {
+							document
+								.querySelector('#op-table tbody')
+								.appendChild(this._prepareOperationsRow(operation_obj, template));
+						}
 						break;
 				}
 				break;
