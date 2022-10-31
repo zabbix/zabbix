@@ -521,6 +521,13 @@ static int	DBpatch_6030066(void)
 	return DBadd_field("actions", &field);
 }
 
+static int	DBpatch_6030067(void)
+{
+	const ZBX_FIELD field = {"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -594,5 +601,6 @@ DBPATCH_ADD(6030063, 0, 1)
 DBPATCH_ADD(6030064, 0, 1)
 DBPATCH_ADD(6030065, 0, 1)
 DBPATCH_ADD(6030066, 0, 1)
+DBPATCH_ADD(6030067, 0, 1)
 
 DBPATCH_END()
