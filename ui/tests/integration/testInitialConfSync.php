@@ -1105,7 +1105,7 @@ class testInitialConfSync extends CIntegrationTest
 					break;
 				}
 			}
-			
+
 			if (!$exists)
 				array_push($results, $pair);
 		}
@@ -1418,7 +1418,7 @@ class testInitialConfSync extends CIntegrationTest
 			]
 		]);
 		$this->assertArrayHasKey("regexpids", $response['result']);
-	}	
+	}
 
 	public function loadInitialConfiguration()
 	{
