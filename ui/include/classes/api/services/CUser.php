@@ -459,23 +459,6 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$provisioned_userdirectories = [];
-		$userdirectoryids = array_column($users, 'userdirectoryid', 'userdirectoryid');
-		unset($userdirectoryids[0]);
-
-		if ($userdirectoryids) {
-			$provisioned_userdirectories = API::UserDirectory()->get([
-				'countOutput' => true,
-				'userdirectoryids' => $userdirectoryids
-			]);
-
-			if ($provisioned_userdirectories != count($userdirectoryids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
-
 		// Get readonly super admin role ID and name.
 		[$readonly_superadmin_role] = DBfetchArray(DBselect(
 			'SELECT roleid,name'.
