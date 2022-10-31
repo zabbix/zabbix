@@ -59,6 +59,28 @@ class testDashboardTopHostsWidget extends CWebTest {
 		];
 	}
 
+	/**
+	 * Get threshold table element with mapping set.
+	 *
+	 * @return CMultifieldTable
+	 */
+	protected function getTreshholdTable() {
+		return $this->query('id:thresholds_table')->asMultifieldTable([
+			'mapping' => [
+				'' => [
+					'name' => 'color',
+					'selector' => 'class:color-picker',
+					'class' => 'CColorPickerElement'
+				],
+				'Threshold' => [
+					'name' => 'threshold',
+					'selector' => 'xpath:./input',
+					'class' => 'CElement'
+				]
+			]
+		])->waitUntilVisible()->one();
+	}
+
 	public static function getCreateData() {
 		return [
 			// #0 minimum needed values to create and submit widget.
@@ -265,9 +287,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Base color' => [
-								'id:lbl_base_color' => '039BE5'
-							]
+							'Base color' => '039BE5'
 						]
 					]
 				]
@@ -285,7 +305,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => '5'
+									'threshold' => '5'
 								]
 							]
 						]
@@ -305,13 +325,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => '1'
+									'threshold' => '1'
 								],
 								[
-									'value' => '100'
+									'threshold' => '100'
 								],
 								[
-									'value' => '1000'
+									'threshold' => '1000'
 								]
 							]
 						]
@@ -331,19 +351,19 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => '1',
+									'threshold' => '1',
 									'color' => 'FFEB3B'
 								],
 								[
-									'value' => '100',
+									'threshold' => '100',
 									'color' => 'AAAAAA'
 								],
 								[
-									'value' => '1000',
+									'threshold' => '1000',
 									'color' => 'AAAAAA'
 								],
 								[
-									'value' => '10000',
+									'threshold' => '10000',
 									'color' => ''
 								]
 							]
@@ -362,9 +382,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Host name',
 							'Name' => 'This is host name',
-							'Base color' => [
-								'id:lbl_base_color' => '039BE5'
-							]
+							'Base color' => '039BE5'
 						],
 						[
 							'Data' => 'Host name'
@@ -397,9 +415,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Data' => 'Text',
 							'Text' => 'Here is some text 3',
 							'Name' => 'Text column name 2',
-							'Base color' => [
-								'id:lbl_base_color' => '039BE5'
-							]
+							'Base color' => '039BE5'
 						],
 						[
 							'Data' => 'Item value',
@@ -486,9 +502,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Host name',
-							'Base color' => [
-								'id:lbl_base_color' => '!@#$%^'
-							]
+							'Base color' => '!@#$%^'
 						]
 					],
 					'column_error' => [
@@ -524,9 +538,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Text',
 							'Text' => 'Here is some text',
-							'Base color' => [
-								'id:lbl_base_color' => '!@#$%^'
-							]
+							'Base color' => '!@#$%^'
 						]
 					],
 					'column_error' => [
@@ -699,9 +711,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Base color' => [
-								'id:lbl_base_color' => '!@#$%^'
-							]
+							'Base color' => '!@#$%^'
 						]
 					],
 					'column_error' => [
@@ -722,7 +732,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => '1',
+									'threshold' => '1',
 									'color' => '!@#$%^'
 								]
 							]
@@ -746,11 +756,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => '1',
+									'threshold' => '1',
 									'color' => '4000FF'
 								],
 								[
-									'value' => '2',
+									'threshold' => '2',
 									'color' => '!@#$%^'
 								]
 							]
@@ -774,7 +784,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => 'zzz',
+									'threshold' => 'zzz',
 									'color' => '4000FF'
 								]
 							]
@@ -908,7 +918,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => '100',
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'threshold' => '100',
 									'color' => '#$@#$@'
 								]
 							]
@@ -965,13 +977,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory',
 							'Thresholds' => [
 								[
-									'value' => '     '
+									'threshold' => '     '
 								]
 							]
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1/thresholds/1/threshold": a number is expected.'
+						'Invalid parameter "/1/thresholds/3/threshold": a number is expected.'
 					]
 				]
 			],
@@ -1105,9 +1117,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Item value',
 							'Item' => 'Available memory',
-							'Base color' => [
-								'id:lbl_base_color' => '#$%$@@'
-							]
+							'Base color' => '#$%$@@'
 						]
 					],
 					'column_error' => [
@@ -1142,9 +1152,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Name' => 'Text column changed',
 							'Data' => 'Text',
 							'Text' => 'some text',
-							'Base color' => [
-								'id:lbl_base_color' => '039BE5'
-							]
+							'Base color' => '039BE5'
 						]
 					]
 				]
@@ -1160,9 +1168,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Name' => 'Host name column update',
 							'Data' => 'Host name',
-							'Base color' => [
-								'id:lbl_base_color' => 'FF8F00'
-							]
+							'Base color' => 'FF8F00'
 						]
 					]
 				]
@@ -1253,16 +1259,18 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '100',
 							'Aggregation function' => 'avg',
 							'Aggregation interval' => '20h',
-							'Base color' => [
-								'id:lbl_base_color' => '039BE5'
-							],
+							'Base color' => '039BE5',
 							'Thresholds' => [
 								[
-									'value' => '1',
+									'action' => USER_ACTION_UPDATE,
+									'index' => 0,
+									'threshold' => '1',
 									'color' => 'FFEB3B'
 								],
 								[
-									'value' => '100',
+									'action' => USER_ACTION_UPDATE,
+									'index' => 1,
+									'threshold' => '100',
 									'color' => 'AAAAAA'
 								]
 							]
@@ -1497,31 +1505,14 @@ class testDashboardTopHostsWidget extends CWebTest {
 				$form_header = $this->query('xpath://div[@class="overlay-dialogue modal modal-popup"]//h4')->one()->getText();
 				$this->assertEquals('Update column', $form_header);
 
-				// Check base color.
-				if (array_key_exists('Base color', $values)) {
-					foreach ($values['Base color'] as $selector => $color) {
-						$this->assertEquals('#'.$color, $this->query($selector)->one()->getAttribute('title'));
-					}
-
-					unset($values['Base color']);
-				}
-
 				// Check Thresholds values.
 				if (array_key_exists('Thresholds', $values)) {
-					foreach ($values['Thresholds'] as $tid => $threshold) {
-						$this->assertEquals($threshold['value'], $column_form->query('id:thresholds_'.$tid.'_threshold')
-								->one()->getAttribute('value')
-						);
-
-						// Check color in Thresholds.
-						if (array_key_exists('color', $threshold)) {
-							$color_hex = ($threshold['color'] !== '') ? '#'.$threshold['color'] : 'Use default';
-							$this->assertEquals($color_hex, $column_form->query('id:lbl_thresholds_'.$tid.'_color')
-									->one()->getAttribute('title')
-							);
-						}
+					foreach($values['Thresholds'] as &$threshold) {
+						unset($threshold['action'], $threshold['index']);
 					}
+					unset($threshold);
 
+					$this->getTreshholdTable()->checkValue($values['Thresholds']);
 					unset($values['Thresholds']);
 				}
 
@@ -1555,32 +1546,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$form->query($selector)->waitUntilClickable()->one()->click();
 			$column_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
 
-			// Fill Base color.
-			if (array_key_exists('Base color', $values)) {
-				foreach ($values['Base color'] as $selector => $color) {
-					$column_form->query($selector)->one()->click();
-					$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($color);
-				}
-
-				unset($values['Base color']);
-			}
-
 			// Fill Thresholds values.
 			if (array_key_exists('Thresholds', $values)) {
-				foreach ($values['Thresholds'] as $tid => $threshold) {
-					if ($action === 'create' || $column_form->query('xpath:.//table[@id="thresholds_table"]/tbody/tr')->all()->count() < 2) {
-						$column_form->query('button:Add')->one()->click();
-					}
-
-					$column_form->query('id:thresholds_'.$tid.'_threshold')->one()->fill($threshold['value']);
-
-					// Fill Threshold colors.
-					if (array_key_exists('color', $threshold)) {
-						$column_form->query('id:lbl_thresholds_'.$tid.'_color')->one()->click();
-						$this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one()->fill($threshold['color']);
-					}
-				}
-
+				$this->getTreshholdTable()->fill($values['Thresholds']);
 				unset($values['Thresholds']);
 			}
 
@@ -1637,7 +1605,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => ''
+									'threshold' => ''
 								]
 							]
 						]
@@ -1660,7 +1628,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => '500'
+									'threshold' => '500'
 								]
 							]
 						]
@@ -1683,7 +1651,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => ''
+									'threshold' => ''
 								]
 							]
 						]
@@ -1706,7 +1674,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => '1500'
+									'threshold' => '1500'
 								]
 							]
 						]
@@ -1733,7 +1701,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => '1500'
+									'threshold' => '1500'
 								]
 							]
 						],
@@ -1745,7 +1713,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => ''
+									'threshold' => ''
 								]
 							]
 						],
@@ -1757,7 +1725,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => '500'
+									'threshold' => '500'
 								]
 							]
 						],
@@ -1769,7 +1737,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Max' => '2000',
 							'Thresholds' => [
 								[
-									'value' => ''
+									'threshold' => ''
 								]
 							]
 						]
@@ -1933,7 +1901,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'trap_text',
 							'Thresholds' => [
 								[
-									'value' => '10'
+									'threshold' => '10'
 								]
 							]
 						]
@@ -2028,7 +1996,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'trap_log',
 							'Thresholds' => [
 								[
-									'value' => '10'
+									'threshold' => '10'
 								]
 							]
 						]
@@ -2123,7 +2091,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'trap_char',
 							'Thresholds' => [
 								[
-									'value' => '10'
+									'threshold' => '10'
 								]
 							]
 						]
