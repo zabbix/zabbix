@@ -339,9 +339,128 @@ $operations_table->addItem(
 		)
 );
 
+// Operations templates.
+$operation_row_buttons = (new CCol([
+	(new CButton(null, _('Edit')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('js-edit-operation')
+		->setAttribute('data_operation', '#{data_operation}'),
+	(new CButton(null, _('Remove')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('js-remove')
+]))->addClass(ZBX_STYLE_ACTION_BUTTONS);
+
+
+$operation_basic_template = (new CScriptTemplate('operation-basic-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol([
+			(new CLabel('#{details}'))->addStyle('font-weight: bold'), ' ',
+			'#{data}'
+		]))
+			->addClass('wordwrap')
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		$operation_row_buttons
+	]))->setAttribute('id','#{prefix}operations_#{row_index}')
+);
+
+$operation_additional_template = (new CScriptTemplate('operation-additional-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol('#{steps}')),
+		(new CCol([
+			(new CLabel('#{details}'))->addStyle('font-weight: bold'), ' ',
+			'#{data}'
+		]))
+			->addClass('wordwrap')
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		(new CCol('#{start_in}')),
+		(new CCol('#{duration}')),
+		$operation_row_buttons
+	]))->setAttribute('id','#{prefix}operations_#{row_index}')
+);
+
+$operation_usr_usrgrp_template = (new CScriptTemplate('operation-usr-usrgrp-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol([
+			(new CFormField([
+				(new CLabel('#{usr_details}'))->addStyle('font-weight: bold'), ' ',
+				'#{usr_data}']))->addItem(new CTag('br')),
+				(new CLabel('#{usrgrp_details}'))->addStyle('font-weight: bold'), ' ',
+				'#{usrgrp_data}'
+		]))
+			->addClass('wordwrap')
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		$operation_row_buttons
+	]))->setAttribute('id','#{prefix}operations_#{row_index}')
+);
+
+$operation_usr_usrtgrp_additional_template = (new CScriptTemplate('operation-usr-usrgrp-additional-row-tmpl'))->addItem(
+	(new CRow([
+		new CCol('#{steps}'),
+		(new CCol([
+			(new CFormField([
+				(new CLabel('#{usr_details}'))->addStyle('font-weight: bold'), ' ',
+				'#{usr_data}']))->addItem(new CTag('br')),
+			(new CLabel('#{usrgrp_details}'))->addStyle('font-weight: bold'), ' ',
+			'#{usrgrp_data}'
+		]))
+			->addClass('wordwrap')
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		new CCol('#{start_in}'),
+		new CCol('#{duration}'),
+		$operation_row_buttons
+	]))->setAttribute('id','#{prefix}operations_#{row_index}')
+);
+
+$operation_script_additional_template = (new CScriptTemplate('operation-script-additional-row-tmpl'))->addItem(
+	(new CRow([
+		new CCol('#{steps}'),
+		(new CCol([
+			(new CFormField((new CLabel('#{current}'))->addStyle('font-weight: bold')))->addItem(new CTag('br')),
+			(new CFormField([
+				(new CLabel('#{host_details}'))->addStyle('font-weight: bold'), ' ',
+				'#{host_data}'
+			]))->addItem(new CTag('br')),
+
+			(new CLabel('#{hostgr_details}'))->addStyle('font-weight: bold'), ' ',
+			'#{hostgr_data}'
+		]))
+			->addClass('wordwrap')
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		new CCol('#{start_in}'),
+		new CCol('#{duration}'),
+		$operation_row_buttons
+	]))->setAttribute('id','#{prefix}operations_#{row_index}')
+);
+
+$operation_script_template = (new CScriptTemplate('operation-script-row-tmpl'))->addItem(
+	(new CRow([
+		(new CCol([
+			(new CFormField((new CLabel('#{current}'))->addStyle('font-weight: bold')))->addItem(new CTag('br')),
+			(new CFormField([
+				(new CLabel('#{host_details}'))->addStyle('font-weight: bold'), ' ',
+				'#{host_data}'
+			]))->addItem(new CTag('br')),
+
+			(new CLabel('#{hostgr_details}'))->addStyle('font-weight: bold'), ' ',
+			'#{hostgr_data}'
+		]))
+			->addClass('wordwrap')
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+		$operation_row_buttons
+	]))->setAttribute('id','#{prefix}operations_#{row_index}')
+);
+
 $operations_tab->addItem([
 	new CLabel(_('Operations')),
-	(new CFormField($operations_table))
+	(new CFormField([
+		$operations_table,
+		$operation_basic_template,
+		$operation_additional_template,
+		$operation_usr_usrgrp_template,
+		$operation_usr_usrtgrp_additional_template,
+		$operation_script_template,
+		$operation_script_additional_template
+	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 ]);

@@ -34,7 +34,6 @@ window.action_edit_popup = new class {
 
 		this._initActionButtons();
 		this._processTypeOfCalculation();
-		this._initTemplates();
 
 		if(typeof(conditions) === 'object') {
 			conditions = Object.values(conditions)
@@ -344,7 +343,8 @@ window.action_edit_popup = new class {
 		let data = input.detail.operation.details.data ? input.detail.operation.details.data[0] : [];
 		operation_obj.data = data.join(' ');
 		operation_obj.details = input.detail.operation.details.type;
-		let template = this.operation_template_basic;
+
+		let template = new Template(document.getElementById('operation-basic-row-tmpl').innerHTML);
 
 		if (input.detail.operation.details.data) {
 			if (operation.details.type.length > 2 && operation.details.data.length == 2) {
@@ -353,20 +353,20 @@ window.action_edit_popup = new class {
 				operation_obj.host_details = operation.details.type[1];
 				operation_obj.hostgr_data = operation.details.data[1].join('');
 				operation_obj.hostgr_details = operation.details.type[2];
-				template = this.operation_template_scripts_basic;
+				template = new Template(document.getElementById('operation-script-row-tmpl').innerHTML);
 			}
 			else if (operation.details.data.length > 1) {
 				operation_obj.usr_data = operation.details.data[0].join('');
 				operation_obj.usr_details = operation.details.type[0];
 				operation_obj.usrgrp_data = operation.details.data[1].join(' ');
 				operation_obj.usrgrp_details = operation.details.type[1];
-				template = this.operation_template_usr_usrgrps_basic;
+				template = new Template(document.getElementById('operation-usr-usrgrp-row-tmpl').innerHTML);
 			}
 			else if (operation.details.type.length > 1) {
 				operation_obj.usr_details = operation.details.type[0];
 				operation_obj.usrgrp_data = operation.details.data[0].join('');
 				operation_obj.usrgrp_details = operation.details.type[1];
-				template = this.operation_template_usr_usrgrps_basic;
+				template = new Template(document.getElementById('operation-usr-usrgrp-row-tmpl').innerHTML);
 			}
 		}
 
@@ -419,7 +419,7 @@ window.action_edit_popup = new class {
 					case <?= EVENT_SOURCE_SERVICE ?>:
 					case <?= EVENT_SOURCE_INTERNAL ?>:
 
-						template = this.operation_template_additional
+						template = new Template(document.getElementById('operation-additional-row-tmpl').innerHTML);
 						operation_obj.prefix = '';
 						operation_obj.steps = input.detail.operation.steps;
 						operation_obj.start_in = input.detail.operation.start_in;
@@ -427,17 +427,25 @@ window.action_edit_popup = new class {
 
 						if (input.detail.operation.details.data) {
 							if (operation.details.type.length > 2 && operation.details.data.length == 2) {
-								template = this.operation_template_scripts_additional;
+								template = new Template(
+									document.getElementById('operation-script-additional-row-tmpl').innerHTML
+								)
 							}
 							else if (operation.details.data.length > 1) {
-								template = this.operation_template_usr_usrgrps_additional;
+								template = new Template(
+									document.getElementById('operation-usr-usrgrp-additional-row-tmpl').innerHTML
+								);
 							}
 							else if (operation.details.type.length > 1) {
 								operation_obj.usr_details = operation.details.type[0];
 								operation_obj.usrgrp_data = operation.details.data[0].join('');
 								operation_obj.usrgrp_details = operation.details.type[1];
-								template = this.operation_template_usr_usrgrps_basic;
-								template = this.operation_template_usr_usrgrps_additional;
+								template = new Template(
+									document.getElementById('operation-usr-usrgrp-row-tmpl').innerHTML
+								)
+								template = new Template(
+									document.getElementById('operation-usr-usrgrp-additional-row-tmpl').innerHTML
+								);
 							}
 						}
 
@@ -488,7 +496,9 @@ window.action_edit_popup = new class {
 						operation_obj.prefix = ''
 						if (input.detail.operation.details.data) {
 							if (operation.details.data.length > 1) {
-								template = this.operation_template_usr_usrgrps_basic;
+								template = new Template(
+									document.getElementById('operation-usr-usrgrp-row-tmpl').innerHTML
+								)
 							}
 						}
 
@@ -649,182 +659,5 @@ window.action_edit_popup = new class {
 			document.getElementById('expression')
 				.innerHTML = getConditionFormula(conditions, + document.querySelector('#evaltype').value);
 		};
-	}
-
-	_initTemplates() {
-		this.operation_template_basic = new Template(`
-			<tr id="#{prefix}operations_#{row_index}">
-				<td class="wordwrap">
-					<span>
-						<b> #{details}  </b> #{data}
-					</span>
-				</td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>
-							js-edit-operation" data_operation="#{data_operation}">
-							<?= _('Edit') ?>
-							</button>
-						</li>
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove">
-							<?= _('Remove') ?>
-							</button>
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-
-		this.operation_template_additional = new Template(`
-			<tr id="#{prefix}operations_#{row_index}">
-				<td> #{steps} </td>
-				<td class="wordwrap">
-					<span>
-						<b> #{details}  </b> #{data}
-					</span>
-				</td>
-				<td> #{start_in} </td>
-				<td> #{duration} </td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button
-							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation" data_operation="#{data_operation}">
-							<?= _('Edit') ?>
-							</button>
-						</li>
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-
-		this.operation_template_usr_usrgrps_basic = new Template(`
-			<tr id="#{prefix}operations_#{row_index}">
-				<td class="wordwrap">
-					<span>
-						<b> #{usr_details}  </b> #{usr_data}
-					</span> <br>
-					<span>
-						<b> #{usrgrp_details}  </b> #{usrgrp_data}
-					</span>
-				</td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button
-							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation"
-							data_operation="#{data_operation}">
-							<?= _('Edit') ?>
-							</button>
-						</li>
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove">
-							<?= _('Remove') ?>
-							</button>
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-
-		this.operation_template_usr_usrgrps_additional = new Template(`
-			<tr id="#{prefix}operations_#{row_index}">
-				<td> #{steps} </td>
-				<td class="wordwrap">
-					<span>
-						<b> #{usr_details}  </b> #{usr_data}
-					</span> <br>
-					<span>
-						<b> #{usrgrp_details}  </b> #{usrgrp_data}
-					</span>
-				</td>
-				<td> #{start_in} </td>
-				<td> #{duration} </td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button
-							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation"
-							data_operation="#{data_operation}">
-							<?= _('Edit') ?>
-							</button>
-						</li>
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-
-		this.operation_template_scripts_basic = new Template(`
-			<tr id="#{prefix}operations_#{row_index}">
-				<td class="wordwrap">
-					<span>
-						<b>#{current} </b>
-					</span> <br>
-					<span>
-						<b>#{host_details}  </b> #{host_data}
-					</span> <br>
-					<span>
-						<b> #{hostgr_details}  </b> #{hostgr_data}
-					</span>
-				</td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button
-							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation"
-							data_operation="#{data_operation}">
-							<?= _('Edit') ?>
-							</button>
-						</li>
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove">
-							<?= _('Remove') ?>
-							</button>
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-
-		this.operation_template_scripts_additional = new Template(`
-			<tr id="#{prefix}operations_#{row_index}">
-				<td> #{steps} </td>
-				<td class="wordwrap">
-						<span>
-						<b>#{current} </b>
-					</span> <br>
-					<span>
-						<b>#{host_details}  </b> #{host_data}
-					</span> <br>
-					<span>
-						<b> #{hostgr_details}  </b> #{hostgr_data}
-					</span>
-				</td>
-				<td> #{start_in} </td>
-				<td> #{duration} </td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button
-							type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit-operation"
-							data_operation="#{data_operation}">
-							<?= _('Edit') ?>
-							</button>
-						</li>
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
 	}
 }
