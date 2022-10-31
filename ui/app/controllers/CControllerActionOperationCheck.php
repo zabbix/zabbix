@@ -519,7 +519,7 @@ class CControllerActionOperationCheck extends CController {
 
 				case OPERATION_TYPE_COMMAND:
 					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
-						$result['type'][] = _s('Run script "%1$s" on Zabbix server', $data['scripts'][$operation['opcommand']['scriptid']]['name']);
+						$result['type'][] = _s('Run script "%1$s" on Zabbix server', $scripts[$operation['opcommand']['scriptid']]['name']);
 						break;
 					}
 
