@@ -811,8 +811,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Host name',
 							'Name' => 'This is host name',
-							'Base color' => [
-								'id:lbl_base_color' => '039BE5'
 							]
 						],
 						[
