@@ -408,12 +408,6 @@ final class CModuleManager {
 			return null;
 		}
 
-		// Check module type.
-		if (array_key_exists('type', $manifest)
-				&& !in_array($manifest['type'], [CModule::TYPE_MODULE, CModule::TYPE_WIDGET], true)) {
-			return null;
-		}
-
 		if (trim($manifest['id']) === '' || trim($manifest['name']) === '') {
 			return null;
 		}
@@ -424,6 +418,12 @@ final class CModuleManager {
 		}
 
 		$manifest['namespace'] = ucfirst($relative_path_parts[0]).'\\'.$manifest['namespace'];
+
+		// Check module type.
+		if (array_key_exists('type', $manifest)
+				&& !in_array($manifest['type'], [CModule::TYPE_MODULE, CModule::TYPE_WIDGET], true)) {
+			return null;
+		}
 
 		// Ensure empty defaults.
 		$manifest += [

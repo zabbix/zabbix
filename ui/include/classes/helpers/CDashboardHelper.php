@@ -19,7 +19,10 @@
 **/
 
 
-use Zabbix\Core\CModule;
+use Zabbix\Core\{
+	CModule,
+	CWidget
+};
 
 class CDashboardHelper {
 
@@ -72,6 +75,7 @@ class CDashboardHelper {
 			CArrayHelper::sort($page['widgets'], ['y', 'x']);
 
 			foreach ($page['widgets'] as $widget_data) {
+				/** @var CWidget $widget */
 				$widget = APP::ModuleManager()->getModule($widget_data['type']);
 
 				if ($widget === null || $widget->getType() !== CModule::TYPE_WIDGET

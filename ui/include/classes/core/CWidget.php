@@ -51,27 +51,14 @@ class CWidget extends CModule {
 		$form = new $form_class($values, $templateid);
 
 		if ($templateid === null) {
-			$refresh_rates = [
-				0 => _('No refresh'),
-				SEC_PER_MIN / 6 => _n('%1$s second', '%1$s seconds', 10),
-				SEC_PER_MIN / 2 => _n('%1$s second', '%1$s seconds', 30),
-				SEC_PER_MIN => _n('%1$s minute', '%1$s minutes', 1),
-				SEC_PER_MIN * 2 => _n('%1$s minute', '%1$s minutes', 2),
-				SEC_PER_MIN * 10 => _n('%1$s minute', '%1$s minutes', 10),
-				SEC_PER_MIN * 15 => _n('%1$s minute', '%1$s minutes', 15)
-			];
-
-			$default_refresh_rate = -1;
-			$default_refresh_rate_label = array_key_exists($this->getDefaultRefreshRate(), $refresh_rates)
-				? $refresh_rates[$this->getDefaultRefreshRate()]
-				: $this->getDefaultRefreshRate();
+			$refresh_rates = self::getRefreshRates();
 
 			$form->addField(
 				(new CWidgetFieldSelect('rf_rate', _('Refresh interval'),
 					[
-						$default_refresh_rate => _('Default').' ('.$default_refresh_rate_label.')'
+						-1 => _('Default').' ('.$refresh_rates[$this->getDefaultRefreshRate()].')'
 					] + $refresh_rates
-				))->setDefault($default_refresh_rate)
+				))->setDefault(-1)
 			);
 		}
 
@@ -122,7 +109,29 @@ class CWidget extends CModule {
 	}
 
 	public function getDefaultSize(): array {
-		return $this->manifest['widget']['size'];
+		$size = $this->manifest['widget']['size'];
+
+		if (!array_key_exists('width', $size) || !array_key_exists('height', $size)) {
+			return self::DEFAULT_SIZE;
+		}
+
+		if ($size['width'] < 1) {
+			$size['width'] = 1;
+		}
+
+		if ($size['width'] > DASHBOARD_MAX_COLUMNS) {
+			$size['width'] = DASHBOARD_MAX_COLUMNS;
+		}
+
+		if ($size['height'] < DASHBOARD_WIDGET_MIN_ROWS) {
+			$size['height'] = DASHBOARD_WIDGET_MIN_ROWS;
+		}
+
+		if ($size['height'] > DASHBOARD_WIDGET_MAX_ROWS) {
+			$size['height'] = DASHBOARD_WIDGET_MAX_ROWS;
+		}
+
+		return $size;
 	}
 
 	public function getJSClass(): string {
@@ -130,7 +139,9 @@ class CWidget extends CModule {
 	}
 
 	public function getDefaultRefreshRate(): int {
-		return (int) $this->manifest['widget']['refresh_rate'];
+		return array_key_exists($this->manifest['widget']['refresh_rate'], self::getRefreshRates())
+			? (int) $this->manifest['widget']['refresh_rate']
+			: self::DEFAULT_REFRESH_RATE;
 	}
 
 	public function hasTemplateSupport(): bool {
@@ -139,5 +150,17 @@ class CWidget extends CModule {
 
 	public function usesTimeSelector(array $fields_values): bool {
 		return (bool) $this->manifest['widget']['use_time_selector'];
+	}
+
+	private static function getRefreshRates(): array {
+		return [
+			0 => _('No refresh'),
+			10 => _n('%1$s second', '%1$s seconds', 10),
+			30 => _n('%1$s second', '%1$s seconds', 30),
+			60 => _n('%1$s minute', '%1$s minutes', 1),
+			120 => _n('%1$s minute', '%1$s minutes', 2),
+			600 => _n('%1$s minute', '%1$s minutes', 10),
+			900 => _n('%1$s minute', '%1$s minutes', 15)
+		];
 	}
 }
