@@ -576,7 +576,6 @@ class CItem extends CItemGeneral {
 
 		$ins_items_rtdata = [];
 		$host_statuses = [];
-		$flags = [];
 
 		foreach ($items as &$item) {
 			$item['itemid'] = array_shift($itemids);
@@ -586,8 +585,7 @@ class CItem extends CItemGeneral {
 			}
 
 			$host_statuses[] = $item['host_status'];
-			$flags[] = $item['flags'];
-			unset($item['host_status'], $item['flags']);
+			unset($item['host_status']);
 		}
 		unset($item);
 
@@ -603,7 +601,6 @@ class CItem extends CItemGeneral {
 
 		foreach ($items as &$item) {
 			$item['host_status'] = array_shift($host_statuses);
-			$item['flags'] = array_shift($flags);
 		}
 		unset($item);
 	}
