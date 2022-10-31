@@ -29,7 +29,8 @@ class CControllerActionOperationCheck extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'operation' =>	'array',
-			'actionid' =>	'db actions.actionid'
+			'actionid' =>	'db actions.actionid',
+			'row_index' =>	'int32'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateOperation();
@@ -261,6 +262,7 @@ class CControllerActionOperationCheck extends CController {
 		];
 
 		$data['operation'] = $operation;
+		$data['operation']['row_index'] = $this->getInput('row_index');
 
 		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_SERVICE, EVENT_SOURCE_INTERNAL])
 				&& $operation['recovery'] == ACTION_OPERATION) {

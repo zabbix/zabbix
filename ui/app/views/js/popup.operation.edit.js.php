@@ -29,6 +29,7 @@ window.operation_popup = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.actionid = actionid;
+		this.row_index = data.row_index;
 
 		if (document.getElementById('operation-condition-list')) {
 			this.condition_count = (document.getElementById('operation-condition-list').rows.length - 2);
@@ -458,11 +459,12 @@ window.operation_popup = new class {
 	}
 
 	submit() {
-		const actionid = this._createHiddenInput('actionid', this.actionid)
-		this.form.append(actionid);
+		this.form.append(this._createHiddenInput('row_index', this.row_index));
+		this.form.append(this._createHiddenInput('actionid', this.actionid));
 
 		let curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', 'action.operation.check');
+
 		const fields = getFormFields(this.form);
 
 		this._post(curl.getUrl(), fields);

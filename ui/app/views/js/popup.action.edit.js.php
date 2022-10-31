@@ -73,6 +73,7 @@ window.action_edit_popup = new class {
 	}
 
 	_openEditOperationPopup(e, operation_data, row_id) {
+		const row_index = e.target.closest('tr').rowIndex -1;
 		const data = JSON.parse(e.target.getAttribute('data_operation'));
 
 		if (data.operationid || data.operationid === 0) {
@@ -80,7 +81,8 @@ window.action_edit_popup = new class {
 				eventsource: this.eventsource,
 				recovery: operation_data.operationtype,
 				actionid: this.actionid,
-				data: operation_data.data
+				data: operation_data.data,
+				row_index: row_index,
 			}
 			this.recovery = operation_data.operationtype;
 		}
@@ -89,7 +91,8 @@ window.action_edit_popup = new class {
 				eventsource: this.eventsource,
 				recovery: operation_data.recovery,
 				actionid: this.actionid,
-				data: data
+				data: data,
+				row_index: row_index
 			}
 			this.recovery = operation_data.recovery;
 		}
@@ -370,32 +373,37 @@ window.action_edit_popup = new class {
 			document.getElementById(row_id).remove();
 		}
 		operation_obj.data_operation = JSON.stringify(operation);
+		let index;
 
 		switch (parseInt(this.recovery)) {
 			case <?=ACTION_RECOVERY_OPERATION?>:
-				row_index = 0;
+				row_index = operation_obj.row_index;
+
 				while (document.querySelector(`#rec-table [id="recovery_operations_${row_index}"]`) !== null) {
 					row_index++;
 				}
 				operation_obj.row_index = row_index
 				operation_obj.prefix = 'recovery_';
 
-				document
-					.querySelector('#rec-table tbody')
-					.appendChild(this._prepareOperationsRow(operation_obj, template));
+				index = parseInt(row_index) -1;
+				index >= 0
+					? $(`#rec-table > tbody tr:eq(${index})`).after(this._prepareOperationsRow(operation_obj, template))
+					: $(`#rec-table tbody`).prepend(this._prepareOperationsRow(operation_obj, template))
 				break;
 
 			case <?=ACTION_UPDATE_OPERATION?>:
-				row_index = 0;
+				row_index = operation_obj.row_index;
+
 				while (document.querySelector(`#upd-table [id="update_operations_${row_index}"]`) !== null) {
 					row_index++;
 				}
 				operation_obj.row_index = row_index;
 				operation_obj.prefix = 'update_';
 
-				document
-					.querySelector('#upd-table tbody')
-					.appendChild(this._prepareOperationsRow(operation_obj, template));
+				index = parseInt(row_index) -1;
+				index >= 0
+					? $(`#rec-table > tbody tr:eq(${index})`).after(this._prepareOperationsRow(operation_obj, template))
+					: $(`#rec-table tbody`).prepend(this._prepareOperationsRow(operation_obj, template))
 				break;
 
 			case <?=ACTION_OPERATION?>:

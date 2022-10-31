@@ -34,7 +34,8 @@ class CControllerPopupActionOperationEdit extends CController {
 			'operation' =>		'array',
 			'operationid' =>	'string',
 			'data' =>			'array',
-			'operationtype' =>	'int32'
+			'operationtype' =>	'int32',
+			'row_index' =>		'int32'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateInputConstraints();
@@ -103,6 +104,7 @@ class CControllerPopupActionOperationEdit extends CController {
 		}
 
 		$this->getData($operation);
+		$operation['row_index'] = $this->hasInput('row_index') ? $this->getInput('row_index') : 0;
 
 		$data = [
 			'eventsource' => $eventsource,
@@ -113,6 +115,7 @@ class CControllerPopupActionOperationEdit extends CController {
 			'mediatype_options' => CSelect::createOptionsFromArray($media_type),
 			'disabled_media' => $disabled_media
 		];
+
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
