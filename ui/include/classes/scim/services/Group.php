@@ -449,7 +449,7 @@ class Group extends ScimApiService {
 			'userid' => $userid,
 			'roleid' => array_key_exists('roleid', $group_rights) ? $group_rights['roleid'] : '0',
 			'usrgrps' => array_key_exists('usrgrps', $group_rights) ? $group_rights['usrgrps'] : [],
-			'medias' => $user_media[0]['medias']
+			'medias' => $user_media ? $user_media[0]['medias'] : []
 		]);
 	}
 }
