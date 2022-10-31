@@ -59,7 +59,8 @@ window.operation_popup = new class {
 			const operation_type = document.getElementById('operation-type-select').value;
 
 			this._removeAllFields();
-			this._changeView(operation_type)
+			this._changeView(operation_type);
+			this._processTypeOfCalculation();
 		}
 
 		this.dialogue.addEventListener('click', (e) => {
@@ -228,8 +229,8 @@ window.operation_popup = new class {
 				]
 
 				this._customMessageFields();
-				this._processTypeOfCalculation();
 				break;
+
 			case <?= EVENT_SOURCE_INTERNAL ?>:
 			case <?= EVENT_SOURCE_SERVICE?>:
 				this.fields = [
@@ -239,8 +240,10 @@ window.operation_popup = new class {
 					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
 					'operation-message-body'
 				]
+
 				this._customMessageFields();
 				break;
+
 			case <?= EVENT_SOURCE_DISCOVERY ?>:
 			case <?= EVENT_SOURCE_AUTOREGISTRATION ?>:
 				this.fields = [
@@ -249,6 +252,7 @@ window.operation_popup = new class {
 					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
 					'operation-message-notice'
 				]
+
 				this._customMessageFields();
 				break;
 		}
