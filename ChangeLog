@@ -14,8 +14,6 @@ A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field 
 Bug fixes:
 ..F....... [ZBX-17300] fixed handling of context menu in Map builder (jfreibergs)
 ..F....... [ZBX-21656] fixed clone buttons not working in Safari 16 on template editing form (averza)
-..F....... [ZBX-21449] fixed accessibility attributes (Sasha)
-.........T [ZBX-21461] fixed item "Checksum of /etc/passwd" (egordymov)
 ..F....... [ZBX-20505] fixed subfilter counters displaying incorrect values in Monitoring => Graph view (rdetlavs)
 ...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
 .........T [ZBX-21673] fixed read operations per second preprocessing in Ceph by Zabbix agent 2 template (drasihov)
@@ -451,8 +449,6 @@ Bug fixes:
 ..F....... [ZBX-17300] fixed handling of context menu in Map builder (jfreibergs)
 .........T [ZBXNEXT-8035] added override for file system discovery trigger in f5 template (knaglis)
 ..F....... [ZBX-21656] fixed clone buttons not working in Safari 16 on template editing form (averza)
-..F....... [ZBX-21449] fixed accessibility attributes (Sasha)
-.........T [ZBX-21461] fixed item "Checksum of /etc/passwd" (egordymov)
 ..F....... [ZBX-20505] fixed subfilter counters displaying incorrect values in Monitoring => Graph view (rdetlavs)
 ...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
 .........T [ZBX-21673] fixed read operations per second preprocessing in Ceph by Zabbix agent 2 template (drasihov)
