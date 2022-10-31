@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-15T08:18:35Z'
+  date: '2022-08-15T17:45:38Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -241,6 +241,33 @@ zabbix_export:
                   tag: scope
                   value: notice
         -
+          uuid: 24df0110b0d541118d6609c3f3922fe5
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: system.hw.uptime
+          history: 7d
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: b6d1ee7b8b3e42e380f6aa44bf39c008
           name: 'System location'
           type: SNMP_AGENT
@@ -299,6 +326,27 @@ zabbix_export:
                 -
                   tag: scope
                   value: notice
+        -
+          uuid: a9070d15765c4acaa856dde8ece57340
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: system.net.uptime
+          history: 7d
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
         -
           uuid: d791eebac4884924b7f40c08174aef00
           name: 'System object ID'
@@ -359,40 +407,6 @@ zabbix_export:
                 -
                   name: 'System name has changed'
                   expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-24PS SNMP/system.name,#2) and length(last(/Cisco Catalyst 3750V2-24PS SNMP/system.name))>0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
-        -
-          uuid: a9070d15765c4acaa856dde8ece57340
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: system.uptime
-          history: 7d
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: a9633d3df8724c7cba6dfc6ec790c1fd
-              expression: 'last(/Cisco Catalyst 3750V2-24PS SNMP/system.uptime)<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes'
-              manual_close: 'YES'
               tags:
                 -
                   tag: scope
@@ -2500,3 +2514,16 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: a9633d3df8724c7cba6dfc6ec790c1fd
+      expression: '(last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.uptime)>0 and last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.uptime)<10m) or (last(/Cisco Catalyst 3750V2-24PS SNMP/system.hw.uptime)=0 and last(/Cisco Catalyst 3750V2-24PS SNMP/system.net.uptime)<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      tags:
+        -
+          tag: scope
+          value: notice

@@ -36,7 +36,7 @@ $autoreg_form = (new CForm())
 		->setArgument('action', 'autoreg.edit')
 		->getUrl()
 	)
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('tls_accept', $data['tls_accept']);
 
 $autoreg_tab = (new CFormList())

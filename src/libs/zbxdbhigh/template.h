@@ -28,9 +28,6 @@
 typedef struct _zbx_template_item_preproc_t zbx_template_item_preproc_t;
 ZBX_PTR_VECTOR_DECL(item_preproc_ptr, zbx_template_item_preproc_t *)
 
-typedef struct _zbx_template_item_param_t zbx_template_item_param_t;
-ZBX_PTR_VECTOR_DECL(item_param_ptr, zbx_template_item_param_t *)
-
 typedef struct _zbx_template_lld_macro_t zbx_template_lld_macro_t;
 ZBX_PTR_VECTOR_DECL(lld_macro_ptr, zbx_template_lld_macro_t *)
 

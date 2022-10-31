@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.0.7rc1');
-define('ZABBIX_API_VERSION',	'6.0.7');
+define('ZABBIX_VERSION',		'6.0.10rc2');
+define('ZABBIX_API_VERSION',	'6.0.10');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
 define('ZABBIX_DB_VERSION',		6000000);
@@ -50,6 +50,8 @@ define('ZBX_MIN_PERIOD',		60); // 1 minute
 
 define('ZBX_MIN_INT32',			-2147483648);
 define('ZBX_MAX_INT32',			2147483647);
+define('ZBX_MIN_INT64',			'-9223372036854775808');
+define('ZBX_MAX_INT64',			'9223372036854775807');
 define('ZBX_MAX_UINT64',		'18446744073709551615');
 
 // Double precision 64-bit float.
@@ -1364,6 +1366,7 @@ define('API_BOOLEAN',				4);
 define('API_FLAG',					5);
 define('API_FLOAT',					6);
 define('API_UINT64',				7);
+define('API_FILTER_VALUE',			58);
 // arrays
 define('API_OBJECT',				8);
 define('API_IDS',					9);
@@ -1374,6 +1377,7 @@ define('API_FLOATS',				13);
 define('API_UINTS64',				14);
 define('API_CUIDS',					44);
 define('API_USER_MACROS',			52);
+define('API_FILTER_VALUES',			57);
 // specific types
 define('API_HG_NAME',				15);
 define('API_SCRIPT_MENU_PATH',		16);
@@ -1413,6 +1417,7 @@ define('API_UNEXPECTED',			51);
 define('API_INT32_RANGES',			53);
 define('API_LAT_LNG_ZOOM',			54);
 define('API_TIMESTAMP',				55);
+define('API_FILTER',				56);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1704,6 +1709,7 @@ define('TAB_INDICATOR_ENCRYPTION', 'encryption');
 define('TAB_INDICATOR_EXCLUDED_DOWNTIMES', 'excluded-downtimes');
 define('TAB_INDICATOR_FILTERS', 'filters');
 define('TAB_INDICATOR_FRONTEND_MESSAGE', 'frontend-message');
+define('TAB_INDICATOR_GRAPH_AXES', 'graph-axes');
 define('TAB_INDICATOR_GRAPH_DATASET', 'graph-dataset');
 define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
 define('TAB_INDICATOR_GRAPH_OPTIONS', 'graph-options');
@@ -1712,9 +1718,11 @@ define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
 define('TAB_INDICATOR_GRAPH_TIME', 'graph-time');
 define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
 define('TAB_INDICATOR_INVENTORY', 'inventory');
+define('TAB_INDICATOR_IPMI', 'ipmi');
 define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');
 define('TAB_INDICATOR_MACROS', 'macros');
 define('TAB_INDICATOR_MEDIA', 'media');
+define('TAB_INDICATOR_MEDIATYPE_OPTIONS', 'mediatype-options');
 define('TAB_INDICATOR_MESSAGE_TEMPLATE', 'message-template');
 define('TAB_INDICATOR_OPERATIONS', 'operations');
 define('TAB_INDICATOR_OVERRIDES', 'overrides');

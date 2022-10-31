@@ -527,6 +527,7 @@ func (m *Manager) init() {
 
 			if metric.Plugin.IsExternal() {
 				ext := metric.Plugin.(*external.Plugin)
+				metric.Plugin.SetCapacity(1)
 				log.Infof("using plugin '%s' (%s) providing following interfaces: %s", metric.Plugin.Name(),
 					ext.Path, interfaces)
 			} else {

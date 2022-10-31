@@ -109,7 +109,7 @@ class testFormTagsHostPrototype extends testFormTags {
 		$table->findRow('Name', $this->template, true)->getColumn('Hosts')->children()->one()->click();
 		$this->query('link', $data['name'].' {#KEY}')->waitUntilPresent()->one()->click();
 		$form->selectTab('Tags');
-		$tags_table = $this->query('id:tags-table')->asMultifieldTable()->waitUntilVisible()->one();
+		$tags_table = $this->query('class:tags-table')->asMultifieldTable()->waitUntilVisible()->one();
 		$tags_table->checkValue($data['tags']);
 
 		// Check disabled fields.

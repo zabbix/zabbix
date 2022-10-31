@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:36:08Z'
+  date: '2022-08-16T04:05:43Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -15,6 +15,7 @@ zabbix_export:
         
         MIBs used:
         RFC1213-MIB
+        HOST-RESOURCES-MIB
         ADSL-LINE-MIB
         ZYXEL-IES5000-MIB
         IF-MIB
@@ -86,6 +87,37 @@ zabbix_export:
             -
               tag: component
               value: inventory
+        -
+          uuid: 006a65489cfc4231acad12cdb501a55c
+          name: 'ZYXEL IES-6000: Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.25.1.1.0
+          key: zyxel.ies6000.hw.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized.
+            Note that this is different from sysUpTime in the SNMPv2-MIB
+            [RFC1907] because sysUpTime is the uptime of the
+            network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
         -
           uuid: 631f2bc2963c4abb8d01b5cca6179d77
           name: 'ZYXEL IES-6000: Location'
@@ -203,10 +235,10 @@ zabbix_export:
               value: inventory
         -
           uuid: e79a790f3ca54943997f1d0b3e74943d
-          name: 'ZYXEL IES-6000: Uptime'
+          name: 'ZYXEL IES-6000: Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: .1.3.6.1.2.1.1.3.0
-          key: zyxel.ies6000.uptime
+          key: zyxel.ies6000.net.uptime
           delay: 30s
           history: 2w
           trends: 0d
@@ -225,19 +257,6 @@ zabbix_export:
             -
               tag: component
               value: system
-          triggers:
-            -
-              uuid: 7a52520cc3dc4350bd7aa14260899f1c
-              expression: 'last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.uptime)<10m'
-              name: 'ZYXEL IES-6000: has been restarted'
-              event_name: 'ZYXEL IES-6000: has been restarted (uptime < 10m)'
-              priority: INFO
-              description: 'Uptime is less than 10 minutes'
-              manual_close: 'YES'
-              tags:
-                -
-                  tag: scope
-                  value: notice
       discovery_rules:
         -
           uuid: 6023c8a68b5547dcab838414cbf544ea
@@ -2602,3 +2621,16 @@ zabbix_export:
             -
               value: '7'
               newvalue: lowerLayerDown
+  triggers:
+    -
+      uuid: 7a52520cc3dc4350bd7aa14260899f1c
+      expression: '(last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.hw.uptime)>0 and last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.hw.uptime)<10m) or (last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.hw.uptime)=0 and last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.uptime)<10m)'
+      name: 'ZYXEL IES-6000: Host has been restarted'
+      event_name: 'ZYXEL IES-6000: {HOST.NAME} has been restarted (uptime < 10m)'
+      priority: INFO
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      tags:
+        -
+          tag: scope
+          value: notice

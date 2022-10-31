@@ -27,7 +27,6 @@
 $form = (new CForm())
 	->setId('massupdate-form')
 	->setName('massupdate-form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('ids', $data['ids'])
 	->addVar('action', $data['action'])
 	->addVar('prototype', $data['prototype'])
@@ -480,7 +479,7 @@ $tags_form_list = (new CFormList('tags-form-list'))
 				->addStyle('margin-bottom: 10px;'),
 			renderTagTable([['tag' => '', 'value' => '']])
 				->setHeader([_('Name'), _('Value'), _('Action')])
-				->setId('tags-table')
+				->addClass('tags-table')
 		]))->setId('tags-div')
 	);
 

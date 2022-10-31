@@ -3174,7 +3174,8 @@ abstract class CTriggerGeneral extends CApiService {
 			foreach ($triggerids_up as $triggerid_up => $add) {
 				if ($add) {
 					if ($trigger_flags[$triggerid] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						if ($trigger_flags[$triggerid_up] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						if (array_key_exists($triggerid_up, $trigger_flags)
+								&& $trigger_flags[$triggerid_up] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 							$ins_dependencies[$triggerid_up][$triggerid] = true;
 						}
 					}
