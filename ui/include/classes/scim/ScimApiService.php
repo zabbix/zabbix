@@ -43,22 +43,22 @@ abstract class ScimApiService extends CApiService {
 	 * @return array
 	 */
 	public function get(array $options): array {
-		self::exception(self::SCIM_ERROR_BAD_REQUEST, _('The endpoint does not support the provided method.'));
+		self::exception(self::SCIM_ERROR_BAD_REQUEST, 'The endpoint does not support the provided method.');
 	}
 
 	public function put(array $options): array {
-		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
+		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, 'The endpoint does not support the provided method.');
 	}
 
 	public function post(array $options): array {
-		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
+		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, 'The endpoint does not support the provided method.');
 	}
 
 	public function patch(array $options): array {
-		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
+		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, 'The endpoint does not support the provided method.');
 	}
 
 	public function delete(array $options): array {
-		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, _('The endpoint does not support the provided method.'));
+		self::exception(self::SCIM_METHOD_NOT_SUPPORTED, 'The endpoint does not support the provided method.');
 	}
 }

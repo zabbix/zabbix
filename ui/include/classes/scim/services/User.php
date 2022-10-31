@@ -82,7 +82,7 @@ class User extends ScimApiService {
 			}
 			elseif ($users[0]['userdirectoryid'] != $userdirectoryid) {
 				self::exception(self::SCIM_ERROR_BAD_REQUEST,
-					_s('User with username "%1$s" already exists.', $options['userName'])
+					'User with username '.$options["userName"].' already exists.'
 				);
 			}
 			else {
@@ -96,11 +96,11 @@ class User extends ScimApiService {
 			]);
 
 			if (!$users) {
-				self::exception(self::SCIM_ERROR_NOT_FOUND, _('This user does not exist.'));
+				self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
 			}
 			elseif ($users[0]['userdirectoryid'] != $userdirectoryid) {
 				self::exception(self::SCIM_ERROR_BAD_REQUEST,
-					_s('The user "%1$s" belongs to another userdirectory.', $options['id'])
+					'The user '.$options['id'].' belongs to another userdirectory.'
 				);
 			}
 
@@ -197,7 +197,7 @@ class User extends ScimApiService {
 		}
 		else {
 			self::exception(self::SCIM_ERROR_BAD_REQUEST,
-				_s('User with username "%1$s" already exists.', $options['userName'])
+				'User with username '.$options['userName'].' already exists.'
 			);
 		}
 
@@ -295,7 +295,7 @@ class User extends ScimApiService {
 		}
 
 		if (!in_array(self::SCIM_USER_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, _('Incorrect schema was sent in the request.'));
+			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
 		}
 
 		[$db_user] = APIRPC::User()->get([
@@ -305,11 +305,11 @@ class User extends ScimApiService {
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
 
 		if (!$db_user) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, _('No permissions to referred object or it does not exist!'));
+			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
 		}
 		elseif ($db_user['userdirectoryid'] != $userdirectoryid) {
 			self::exception(self::SCIM_ERROR_BAD_REQUEST,
-				_s('The user "%1$s" belongs to another userdirectory.', $options['id'])
+				'The user '.$options['id'].' belongs to another userdirectory.'
 			);
 		}
 
@@ -366,11 +366,11 @@ class User extends ScimApiService {
 		]);
 
 		if (!$db_users) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, _('No permissions to referred object or it does not exist!'));
+			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
 		}
 		elseif ($db_users[0]['userdirectoryid'] != $userdirectoryid) {
 			self::exception(self::SCIM_ERROR_BAD_REQUEST,
-				_s('The user "%1$s" belongs to another userdirectory.', $options['id'])
+				'The user '.$options['id'].' belongs to another userdirectory.'
 			);
 		}
 
