@@ -1489,7 +1489,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'Service' => 'Simple actions service',
-						'From' => 'today - 6 months'
+						'From' => 'first day of this month - 6 months'
 					],
 					'reporting_period' => 'Quarterly'
 				]
@@ -1619,7 +1619,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				[
 					'fields' => [
 						'SLA' => 'SLA Quarterly',
-						'From' => 'today - 3 months',
+						'From' => 'first day of this month - 3 months',
 						'Show periods' => 4
 					],
 					'reporting_period' => 'Quarterly'
@@ -1629,7 +1629,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				[
 					'fields' => [
 						'SLA' => 'SLA Quarterly',
-						'To' => 'today - 1 month'
+						'To' => 'first day of this month - 1 month'
 					],
 					'reporting_period' => 'Quarterly'
 				]
@@ -2330,7 +2330,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 
 			case 'Monthly':
 				for ($i = 0; $i < $show_periods; $i++) {
-					$period_values[] = date('Y-m', strtotime($to_date.' '.-$i.' month'));
+					$period_values[] = date('Y-m', strtotime(date('Y-m-01', strtotime($to_date)).' '.-$i.' month'));
 				}
 				break;
 

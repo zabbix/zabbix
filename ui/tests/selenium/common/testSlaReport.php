@@ -283,7 +283,7 @@ class testSlaReport extends CWebTest {
 					$months = ($months > 20) ? 20 : $months;
 
 					for ($i = 0; $i <= $months; $i++) {
-						$month = strtotime('this month '.-$i.' month');
+						$month = strtotime('first day of this month '.-$i.' month');
 						$period_values[$i]['value'] = date('Y-m', $month);
 						$period_values[$i]['start'] = strtotime(date('Y-m').' '.-$i.' month');
 						$period_values[$i]['end'] = strtotime(date('Y-m').' '.(-$i+1).' month - 1 second');
