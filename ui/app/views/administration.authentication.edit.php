@@ -411,7 +411,7 @@ $saml_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Allow JIT provisioning'), 'saml_provision_status'),
+		new CLabel(_('Configure JIT provisioning'), 'saml_provision_status'),
 		new CFormField(
 			(new CCheckBox('saml_provision_status'))
 				->setChecked($data['saml_provision_status'] == JIT_PROVISIONING_ENABLED)

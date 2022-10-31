@@ -112,7 +112,7 @@ $form = (new CForm('post', $form_action))
 			)
 		])
 		->addItem([
-			new CLabel(_('Allow JIT provisioning'), 'provision_status'),
+			new CLabel(_('Configure JIT provisioning'), 'provision_status'),
 			new CFormField(
 				(new CCheckBox('provision_status', JIT_PROVISIONING_ENABLED))
 					->setChecked($data['provision_status'] == JIT_PROVISIONING_ENABLED)
