@@ -811,7 +811,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Data' => 'Host name',
 							'Name' => 'This is host name',
-							]
 						],
 						[
 							'Data' => 'Text',
