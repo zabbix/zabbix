@@ -446,7 +446,7 @@ $saml_tab = (new CFormGrid())
 		))->addClass('saml-provision-status')
 	])
 	->addItem([
-		(new CLabel(_('User lastname attribute'), 'saml_user_lastname'))->addClass('saml-provision-status'),
+		(new CLabel(_('User last name attribute'), 'saml_user_lastname'))->addClass('saml-provision-status'),
 		(new CFormField(
 			(new CTextBox('saml_user_lastname', $data['saml_user_lastname'], false,
 				DB::getFieldLength('userdirectory_saml', 'user_lastname')
