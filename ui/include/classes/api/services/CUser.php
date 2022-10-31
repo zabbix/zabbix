@@ -725,8 +725,8 @@ class CUser extends CApiService {
 		$ids = array_diff_key($userdirectoryids, $db_userdirectoryids);
 
 		if ($ids) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('User directory with ID "%1$s" is not available.',
-				reset($ids))
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('User directory with ID "%1$s" is not available.', reset($ids))
 			);
 		}
 	}
