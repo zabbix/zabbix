@@ -1595,7 +1595,9 @@ class CUser extends CApiService {
 		}
 
 		if ($db_user['deprovisioned'] || $db_user['roleid'] == 0) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions for system access.'));
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect user name or password or account is temporarily blocked.')
+			);
 		}
 
 		// Start session.
