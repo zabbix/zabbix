@@ -1031,16 +1031,29 @@ static int	housekeeping_audit(int now)
 
 static int	housekeeping_events(int now)
 {
-#define ZBX_HK_EVENT_RULE	" and not exists (select null from problem where events.eventid=problem.eventid)" \
-				" and not exists (select null from problem where events.eventid=problem.r_eventid)"
+#define ZBX_HK_EVENT_RULE		" and not exists(" \
+						"select null" \
+						" from problem" \
+						" where events.eventid=problem.eventid" \
+					")" \
+					" and not exists(" \
+						"select null" \
+						" from problem" \
+						" where events.eventid=problem.r_eventid" \
+					")"
+#define ZBX_HK_TRIGGER_EVENT_RULE	" and not exists(" \
+						"select null" \
+						" from event_symptom" \
+						" where events.eventid=event_symptom.cause_eventid" \
+					")"
 
 	static zbx_hk_rule_t	rules[] = {
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_trigger},
+			ZBX_HK_EVENT_RULE ZBX_HK_TRIGGER_EVENT_RULE, 0, &cfg.hk.events_trigger},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE ZBX_HK_TRIGGER_EVENT_RULE, 0, &cfg.hk.events_internal},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_ITEM)
 			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
@@ -1070,6 +1083,7 @@ static int	housekeeping_events(int now)
 
 	return deleted;
 #undef ZBX_HK_EVENT_RULE
+#undef ZBX_HK_TRIGGER_EVENT_RULE
 }
 
 static int	housekeeping_problems(int now)
@@ -1081,7 +1095,7 @@ static int	housekeeping_problems(int now)
 	rc = DBexecute(
 			"delete from problem p1"
 			" where p1.r_clock<>0 and p1.r_clock<%d and not exists("
-				" select cause_eventid"
+				"select cause_eventid"
 				" from problem p2"
 				" where p2.cause_eventid=p1.eventid"
 			")", now - SEC_PER_DAY);
