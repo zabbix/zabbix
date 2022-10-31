@@ -36,8 +36,13 @@ $csv[] = array_filter([
 	_('Time'),
 	_('Action'),
 	_('Media type'),
-	_('Recipient'),
+	_("Recipient's Zabbix username"),
+	_("Recipient's name"),
+	_("Recipient's surname"),
+	_('Email or username'),
+	_('Subject'),
 	_('Message'),
+	_('Command'),
 	_('Status'),
 	_('Info')
 ]);
@@ -47,17 +52,16 @@ foreach ($data['alerts'] as $alert) {
 
 	$mediatype = array_pop($alert['mediatypes']);
 
-	$recipients_full_name = (isset($alert['userid']) && $alert['userid'])
-		? getUserFullname($data['users'][$alert['userid']])
-		: '';
+	$recipients_username = '';
+	$recipients_name = '';
+	$recipients_surname = '';
 
-	$recipient = (isset($alert['userid']) && $alert['userid'])
-		? $recipients_full_name.PHP_EOL.$alert['sendto']
-		: $alert['sendto'];
 
-	$message = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
-		? _('Subject').':'.PHP_EOL.$alert['subject'].PHP_EOL._('Message').':'.PHP_EOL.$alert['message']
-		: _('Command').':'.PHP_EOL.$alert['message'];
+	if (isset($alert['userid']) && $alert['userid']) {
+		$recipients_username = $data['users'][$alert['userid']]['username'];
+		$recipients_name = $data['users'][$alert['userid']]['name'];
+		$recipients_surname = $data['users'][$alert['userid']]['surname'];
+	}
 
 	if ($alert['status'] == ALERT_STATUS_SENT) {
 		$status = ($alert['alerttype'] == ALERT_TYPE_MESSAGE) ? _('Sent') : _('Executed');
@@ -73,8 +77,13 @@ foreach ($data['alerts'] as $alert) {
 	$row[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']);
 	$row[] = $data['actions'][$alert['actionid']]['name'];
 	$row[] = $mediatype ? $mediatype['name'] : '';
-	$row[] = $recipient;
-	$row[] = $message;
+	$row[] = $recipients_username;
+	$row[] = $recipients_name;
+	$row[] = $recipients_surname;
+	$row[] = $alert['sendto'];
+	$row[] = ($alert['alerttype'] == ALERT_TYPE_MESSAGE) ? $alert['subject'] : '';
+	$row[] = ($alert['alerttype'] == ALERT_TYPE_MESSAGE) ? $alert['message'] : '';
+	$row[] = ($alert['alerttype'] == ALERT_TYPE_COMMAND) ? $alert['message'] : '';
 	$row[] = $status;
 	$row[] = $alert['error'];
 
