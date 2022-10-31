@@ -566,12 +566,9 @@ $item_tab
 
 $item_tab
 	->addItem([
-		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))
-			->setAsteriskMark()
-			->setId('js-item-impi-sensor-label'),
+		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setId('js-item-impi-sensor-label'),
 		(new CFormField((new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $data['limited'], 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
 		))->setId('js-item-impi-sensor-field')
 	])
 	// Append authentication method to form list.
