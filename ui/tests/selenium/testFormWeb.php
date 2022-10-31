@@ -973,6 +973,23 @@ class testFormWeb extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
+					'name' => 'Headers -screenshot',
+					'headers' => [
+						['name' => 'header name', 'value' => 'header value'],
+						['name' => 'Content-Type', 'value' => 'application/json'],
+						['name' => 'Any name', 'value' => 'Any value']
+					],
+					'add_step' => [
+						['step' => 'Headers -screenshot'],
+						['step' => 'Headers -screenshot2'],
+						['step' => 'Headers -screenshot3']
+					]
+				]
+			],
+			// Headers -empty value
+			[
+				[
+					'expected' => TEST_GOOD,
 					'name' => 'Headers - empty value',
 					'headers' => [
 						['name' => 'test']
