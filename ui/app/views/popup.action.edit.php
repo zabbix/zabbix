@@ -350,7 +350,6 @@ $operation_row_buttons = (new CCol([
 		->addClass('js-remove')
 ]))->addClass(ZBX_STYLE_ACTION_BUTTONS);
 
-
 $operation_basic_template = (new CScriptTemplate('operation-basic-row-tmpl'))->addItem(
 	(new CRow([
 		(new CCol([
