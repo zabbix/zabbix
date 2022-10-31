@@ -19,6 +19,10 @@
 **/
 
 
+/**
+ * Controller for the "Action log" page and Action log CSV export.
+ */
+
 class CControllerActionLogList extends CController {
 
 	protected function checkInput(): bool {
@@ -183,6 +187,11 @@ class CControllerActionLogList extends CController {
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Action log'));
+
+		if ($data['action'] === 'actionlog.csv') {
+			$response->setFileName('zbx_actionlog_export.csv');
+		}
+
 		$this->setResponse($response);
 	}
 
@@ -222,10 +231,10 @@ class CControllerActionLogList extends CController {
 	}
 
 	/**
-	 * Sanitizes data for multiselect fields.
+	 * Prepare data for multiselect fields.
 	 *
 	 * @param array $data
-	 * @param string $type  defines data type ('users', 'actions', 'media_types').
+	 * @param string $type  Defines data type ('users', 'actions', 'media_types').
 	 *
 	 * @return array
 	 */

@@ -57,6 +57,7 @@ class CRouter {
 		// action									controller												layout					view
 		'action.operation.get'						=> ['CControllerActionOperationGet',					'layout.json',			null],
 		'action.operation.validate'					=> ['CControllerActionOperationValidate',				'layout.json',			null],
+		'actionlog.csv'								=> ['CControllerActionLogList',							'layout.csv',			'reports.actionlog.list.csv'],
 		'actionlog.list'							=> ['CControllerActionLogList',							'layout.htmlpage',		'reports.actionlog.list'],
 		'audit.settings.edit'						=> ['CControllerAuditSettingsEdit',						'layout.htmlpage',		'administration.audit.settings.edit'],
 		'audit.settings.update'						=> ['CControllerAuditSettingsUpdate',					null,					null],

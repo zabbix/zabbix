@@ -24,7 +24,6 @@
  * @var array $data
  */
 
-
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.calendar.js');
 
@@ -51,6 +50,15 @@ $filter_actions = (new CCheckBoxList('filter_statuses'))
 $widget = (new CWidget())
 	->setTitle(_('Action log'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_ACTIONLOG_LIST))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					(new CRedirectButton(_('Export to CSV'), (new CUrl())->setArgument('action', 'actionlog.csv')))
+						->setId('export_csv')
+				)
+		))->setAttribute('aria-label', _('Content controls'))
+	)
 	->addItem($filter
 		->addVar('action', $data['action'])
 		->setProfile($data['timeline']['profileIdx'])
@@ -153,7 +161,6 @@ foreach ($this->data['alerts'] as $alert) {
 			bold(_('Subject').':'),
 			BR(),
 			(new CDiv($alert['subject']))->addClass(ZBX_STYLE_WORDBREAK),
-			BR(),
 			BR(),
 			bold(_('Message').':'),
 			BR(),
