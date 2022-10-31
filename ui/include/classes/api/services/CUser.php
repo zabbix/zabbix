@@ -2297,15 +2297,16 @@ class CUser extends CApiService {
 			case GROUP_GUI_ACCESS_INTERNAL:
 				$db_user['auth_type'] = ZBX_AUTH_INTERNAL;
 				$userdirectoryid = $db_user['userdirectoryid'] == 0
-					? $group_attrs['userdirectoryid'] : $db_user['userdirectoryid'];
+					? $group_attrs['userdirectoryid']
+					: $db_user['userdirectoryid'];
 
 				if ($userdirectoryid != 0) {
-					[$userdirectory] = DB::select('userdirectory', [
+					$userdirectories = DB::select('userdirectory', [
 						'output' => ['idp_type'],
 						'userdirectoryids' => [$userdirectoryid]
 					]);
 
-					if ($userdirectory && $userdirectory['idp_type'] == IDP_TYPE_LDAP) {
+					if ($userdirectories && $userdirectories[0]['idp_type'] == IDP_TYPE_LDAP) {
 						$db_user['auth_type'] = ZBX_AUTH_LDAP;
 					}
 				}
