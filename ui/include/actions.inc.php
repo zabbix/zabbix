@@ -774,8 +774,8 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 							$user_names_list = [];
 
 							foreach ($operation['opmessage_usr'] as $user) {
-								if (isset($fullnames[$user['userid']])) {
-									$user_names_list[] = $fullnames[$user['userid']];
+								if (array_key_exists($user['userid'], $operation_values['users']['fullnames'])){
+									$user_names_list[] =$operation_values['users']['fullnames'][$user['userid']];
 								}
 							}
 
@@ -787,6 +787,7 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 							];
 							$result[$i][$j][] = BR();
 						}
+
 
 						if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
 							$user_groups_list = [];
