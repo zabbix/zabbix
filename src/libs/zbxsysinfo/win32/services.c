@@ -254,7 +254,7 @@ static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVIC
 	}
 }
 
-int	service_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_service_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
 	SC_HANDLE			h_mgr;
@@ -391,7 +391,7 @@ next:
 	return SYSINFO_RET_OK;
 }
 
-int	service_info(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_service_info(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_SRV_PARAM_STATE		0x01
 #define ZBX_SRV_PARAM_DISPLAYNAME	0x02
@@ -550,7 +550,7 @@ int	service_info(AGENT_REQUEST *request, AGENT_RESULT *result)
 #undef ZBX_NON_EXISTING_SRV
 }
 
-int	service_state(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_service_state(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SC_HANDLE	mgr, service;
 	char		*name;
@@ -699,7 +699,7 @@ static int	check_service_state(SC_HANDLE h_srv, int service_state)
 	return FAIL;
 }
 
-int	services(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_services(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int				start_type, service_state;
 	char				*type, *state, *exclude, *buf = NULL, *utf8;
