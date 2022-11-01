@@ -557,7 +557,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				continue;
 			}
 			$operation += [
-				'opconditions'	=> []
+				'opconditions' => []
 			];
 			$details = new CSpan($operation_descriptions[0][$operationid]);
 			$operation_for_popup = array_merge($operation, ['id' => $operationid]);

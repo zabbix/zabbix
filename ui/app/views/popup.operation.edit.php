@@ -430,7 +430,7 @@ $form_grid->addItem([
 
 // Conditions type of calculation row.
 $select_operation_evaltype = (new CSelect('operation[evaltype]'))
-	->setValue((string) CONDITION_EVAL_TYPE_AND_OR)
+	->setValue($data['operation']['evaltype'])
 	->setId('operation-evaltype')
 	->setFocusableElementId('operation-evaltype')
 	->addOption(new CSelectOption(CONDITION_EVAL_TYPE_AND_OR, _('And/Or')))

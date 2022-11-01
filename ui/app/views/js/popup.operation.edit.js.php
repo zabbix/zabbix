@@ -39,7 +39,9 @@ window.operation_popup = new class {
 		this._processTypeOfCalculation();
 
 		if (data?.opconditions) {
-			data?.opconditions.map(row => this._createOperationConditionsRow(row, 0))
+			data?.opconditions.map((row, index) => {
+				this._createOperationConditionsRow(row, index);
+			})
 		}
 		if (data?.opmessage_grp) {
 			this._addUserGroup(data.opmessage_grp, data.opmessage_grp.length);
@@ -78,6 +80,7 @@ window.operation_popup = new class {
 			}
 			else if (e.target.classList.contains('js-remove')) {
 				e.target.closest('tr').remove();
+				this._processTypeOfCalculation();
 			}
 		});
 	}
@@ -445,23 +448,56 @@ window.operation_popup = new class {
 		});
 	}
 
+	/**
+	 * Check if row with the same conditiontype and value already exists.
+	 */
+	_checkConditionRow(input) {
+		let result = [];
+		[...document.getElementById('operation-condition-list').getElementsByTagName('tr')].map(it => {
+			const table_row = it.getElementsByTagName('td')[2];
+
+			if (table_row !== undefined) {
+				let conditiontype = table_row.getElementsByTagName('input')[0].value;
+				let value = table_row.getElementsByTagName('input')[2].value;
+
+				result.push(input.conditiontype === conditiontype && input.value === value);
+
+				if (input.row_index == it.getAttribute('data-row_index')) {
+					input.row_index ++;
+				}
+			}
+
+			result.push(false);
+		});
+
+		return result;
+	}
+
 	_createOperationConditionsRow(input, row_index) {
-		if (input.conditiontype == <?= CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
-			if (input.value == 1) {
-				input.name = <?= json_encode(_('Event is acknowledged')) ?> + ' '
-			}
-			else if (input.value == 0) {
-				input.name = <?= json_encode(_('Event is not acknowledged')) ?> + ' '
-			}
+		let has_row = this._checkConditionRow(input);
+
+		const result = [has_row.some(it => it === true)]
+		if (result[0] === true) {
+			return;
 		}
+		else {
+			if (input.conditiontype == <?= CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
+				if (input.value == 1) {
+					input.name = <?= json_encode(_('Event is acknowledged')) ?> + ' '
+				}
+				else if (input.value == 0) {
+					input.name = <?= json_encode(_('Event is not acknowledged')) ?> + ' '
+				}
+			}
 
-		input.label = num2letter(row_index);
-		input.row_index = row_index;
-		let template = new Template(document.getElementById('operation-condition-row-tmpl').innerHTML);
+			input.label = num2letter(row_index);
+			input.row_index = row_index;
+			let template = new Template(document.getElementById('operation-condition-row-tmpl').innerHTML);
 
-		document
-			.querySelector('#operation-condition-list tbody')
-			.insertAdjacentHTML('beforeend', template.evaluate(input))
+			document
+				.querySelector('#operation-condition-list tbody')
+				.insertAdjacentHTML('beforeend', template.evaluate(input))
+		}
 
 		this._processTypeOfCalculation();
 	}

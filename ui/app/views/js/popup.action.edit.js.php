@@ -285,28 +285,32 @@ window.action_edit_popup = new class {
 				let first = row.getElementsByTagName('td')[0];
 
 				if (is_array(value)) {
-					value.map((it, index) => {
-						let input = document.createElement('input');
-						input.setAttribute('type', 'hidden');
-						input.setAttribute(
-							'name',
-							`${prefix}operations[${operation.row_index}][${key}][${index}][${Object.keys(it)[0]}]`
-						)
-						input.setAttribute(
-							'id',
-							`${prefix}operations_${operation.row_index}_${key}_${index}_${Object.keys(it)[0]}`
-						)
-						input.setAttribute('value', it[Object.keys(it)[0]])
-						first.append(input);
+					value.map((element, index) => {
+						for (const element_id in element) {
+							if (element.hasOwnProperty(element_id)) {
+								let input = document.createElement('input');
+								input.setAttribute('type', 'hidden');
+								input.setAttribute(
+									'name',
+									`${prefix}operations[${operation.row_index}][${key}][${index}][${element_id}]`
+								);
+								input.setAttribute(
+									'id',
+									`${prefix}operations_${operation.row_index}_${key}_${index}_${element_id}`
+								);
+								input.setAttribute('value', element[element_id]);
+								first.append(input);
+							}
+						}
 					})
 				}
 				else if (is_object(value) && !is_array(value)) {
 					for (const [id, val] of Object.entries(value)) {
 						let input = document.createElement('input');
 						input.setAttribute('type', 'hidden');
-						input.setAttribute('name', `${prefix}operations[${operation.row_index}][${key}][${id}]`)
-						input.setAttribute('id', `${prefix}operations_${operation.row_index}_${key}_${id}`)
-						input.setAttribute('value', val)
+						input.setAttribute('name', `${prefix}operations[${operation.row_index}][${key}][${id}]`);
+						input.setAttribute('id', `${prefix}operations_${operation.row_index}_${key}_${id}`);
+						input.setAttribute('value', val);
 						first.append(input);
 					}
 				}
