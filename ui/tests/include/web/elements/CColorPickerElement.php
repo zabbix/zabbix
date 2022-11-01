@@ -22,8 +22,6 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
 
-use Facebook\WebDriver\WebDriverKeys;
-
 /**
  * Color picker element.
  */
@@ -35,7 +33,7 @@ class CColorPickerElement extends CElement {
 	 * @return type
 	 */
 	public function getInput() {
-		return $this->query('xpath:.//input')->waitUntilVisible()->one();
+		return $this->query('xpath:.//input')->one();
 	}
 
 	/**
@@ -46,9 +44,26 @@ class CColorPickerElement extends CElement {
 	 * @param string $color		color code
 	 */
 	public function overwrite($color) {
-		$this->getInput()->overwrite($color);
+		$this->query('xpath:./button['.CXPathHelper::fromClass('color-picker-preview').']')->one()->click();
+		$overlay = (new CElementQuery('id:color_picker'))->waitUntilVisible()->asOverlayDialog()->one();
+
+		if ($color === null) {
+			$overlay->query('button:Use default')->one()->click();
+		}
+		else {
+			$overlay->query('xpath:.//div[@class="color-picker-input"]/input')->one()->overwrite($color);
+		}
+
+		$overlay->query('class:overlay-close-btn')->one()->click()->waitUntilNotVisible();
 
 		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function isEnabled($enabled = true) {
+		return $this->getInput()->isEnabled($enabled);
 	}
 
 	/**
@@ -83,6 +98,6 @@ class CColorPickerElement extends CElement {
 	 * @param string $color		color code
 	 */
 	public function fill($color) {
-		$this->overwrite($color)->close();
+		$this->overwrite($color);
 	}
 }

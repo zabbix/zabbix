@@ -18,12 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup services
+ *
+ * @dataSource Services
  *
  * @onBefore prepareServicesData
  */
@@ -36,11 +39,8 @@ class testFormServicesServices extends CWebTest {
 
 	private static $service_sql = 'SELECT * FROM services ORDER BY serviceid';
 	private static $update_service = 'Update service';
-
-	private static $parentid;
-	private static $childid;
-	private static $parentid_2;
-	private static $childid_2;
+	private static $delete_service = 'Service for delete';
+	private static $serviceids;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -52,164 +52,7 @@ class testFormServicesServices extends CWebTest {
 	}
 
 	public static function prepareServicesData() {
-		CDataHelper::call('service.create', [
-			[
-				'name' => 'Update service',
-				'algorithm' => 1,
-				'sortorder' => 0,
-				'status_rules' => [
-					[
-						'type' => 1,
-						'limit_value' => 50,
-						'limit_status' => 3,
-						'new_status' => 4
-					],
-					[
-						'type' => 7,
-						'limit_value' => 33,
-						'limit_status' => 2,
-						'new_status' => 5
-					]
-				]
-			],
-			[
-				'name' => 'Parent1',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Parent2',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Parent3 with problem tags',
-				'algorithm' => 1,
-				'sortorder' => 0,
-				'problem_tags' => [
-					[
-						'tag' => 'test123',
-						'value' => 'test456'
-					],
-					[
-						'tag' => 'test',
-						'value' => 'test789'
-					]
-				]
-			],
-			[
-				'name' => 'Parent4',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Parent5',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Child1',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Child2 with tags',
-				'algorithm' => 1,
-				'sortorder' => 0,
-				'problem_tags' => [
-					[
-						'tag' => 'test1',
-						'value' => 'value1'
-					],
-					[
-						'tag' => 'test2',
-						'value' => 'value2'
-					]
-				]
-			],
-			[
-				'name' => 'Child3',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Child4',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Clone_parent',
-				'algorithm' => 1,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Clone1',
-				'algorithm' => 0,
-				'weight' => 56,
-				'propagation_rule' => 1,
-				'propagation_value' => 3,
-				'sortorder' => 0,
-				'problem_tags' => [
-					[
-						'tag' => 'problem_tag_clone',
-						'value' => 'problem_value_clone'
-					]
-				],
-				'tags' => [
-					[
-						'tag' => 'tag_clone',
-						'value' => 'value_clone'
-					]
-				]
-			],
-			[
-				'name' => 'Clone2',
-				'algorithm' => 1,
-				'sortorder' => 0
-			]
-		]);
-
-		$services = CDataHelper::getIds('name');
-
-		CDataHelper::call('service.update', [
-			[
-				'serviceid' => $services['Child3'],
-				'parents' => [
-					[
-						'serviceid' => $services['Parent2']
-					]
-				]
-			],
-			[
-				'serviceid' => $services['Child4'],
-				'parents' => [
-					[
-						'serviceid' => $services['Parent4']
-					]
-				]
-			],
-			[
-				'serviceid' => $services['Clone1'],
-				'parents' => [
-					[
-						'serviceid' => $services['Clone_parent']
-					]
-				]
-			],
-			[
-				'serviceid' => $services['Clone2'],
-				'parents' => [
-					[
-						'serviceid' => $services['Clone_parent']
-					]
-				]
-			]
-		]);
-
-		self::$parentid = $services['Parent2'];
-		self::$childid = $services['Child3'];
-		self::$parentid_2 = $services['Parent4'];
-		self::$childid_2 = $services['Child4'];
+		self::$serviceids = CDataHelper::get('Services.serviceids');
 	}
 
 	/**
@@ -466,7 +309,7 @@ class testFormServicesServices extends CWebTest {
 		$this->assertFalse($children_dialog->query('id:serviceid_all')->asCheckbox()->one()->isChecked());
 
 		// Enter and submit filtering data.
-		$children_dialog->query('id:services-filter-name')->one()->fill('Parent1');
+		$children_dialog->query('id:services-filter-name')->one()->fill('Parent for 2 levels of child services');
 		$this->assertTrue($children_dialog->query('button:Cancel')->one()->isCLickable());
 		$children_dialog->query('button:Filter')->waitUntilClickable()->one()->click();
 		$children_dialog->waitUntilReady();
@@ -475,7 +318,8 @@ class testFormServicesServices extends CWebTest {
 		// Check filtering result.
 		$result = [
 			[
-				'Name' => 'Parent1',
+				'Name' => 'Parent for 2 levels of child services',
+				'Tags' => 'test: test123',
 				'Problem tags' => ''
 			]
 		];
@@ -486,7 +330,9 @@ class testFormServicesServices extends CWebTest {
 		$children_dialog->waitUntilReady();
 
 		// Check possible children count in table.
-		$this->assertEquals(13, $children_dialog->query('class:list-table')->asTable()->one()->getRows()->count());
+		$this->assertEquals(count(self::$serviceids), $children_dialog->query('class:list-table')->asTable()->one()
+				->getRows()->count()
+		);
 
 		foreach (['Add', 'Cancel'] as $button) {
 			$this->assertTrue($dialog->getFooter()->query('button', $button)->one()->isClickable());
@@ -757,7 +603,7 @@ class testFormServicesServices extends CWebTest {
 					],
 					'children' => [
 						'Child services' => [
-							'Service' => 'Child4',
+							'Service' => 'Child 1',
 							'Problem tags' => '',
 							'Action' => 'Remove'
 						]
@@ -768,7 +614,7 @@ class testFormServicesServices extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Child1'
+						'Name' => 'Service for duplitate check'
 					],
 					'duplicate' => true
 				]
@@ -778,7 +624,7 @@ class testFormServicesServices extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'With parent',
-						'Parent services' => 'Parent1'
+						'Parent services' => 'Parent for 2 levels of child services'
 					],
 					'update_duplicate' => true
 				]
@@ -1008,7 +854,7 @@ class testFormServicesServices extends CWebTest {
 			}
 
 			// Open just created or updated Service and check that all fields present correctly in form.
-			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+			$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
 
 			// If it is child service, we need to open parent firstly.
 			if (array_key_exists('Parent services', $data['fields'])) {
@@ -1029,7 +875,9 @@ class testFormServicesServices extends CWebTest {
 				$this->assertTableData([$data['children']['Child services']], 'id:children');
 			}
 			else {
-				$table->findRow('Name', $data['fields']['Name'])->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
+				// There are 3 tables with class list-table, so it is specifified that is should be in the service list.
+				$table = $this->query('xpath://form[@name="service_list"]//table')->asTable()->one()->waitUntilPresent();
+				$table->findRow('Name', $data['fields']['Name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
 						->one()->click();
 				COverlayDialogElement::find()->one()->waitUntilReady();
 			}
@@ -1062,17 +910,22 @@ class testFormServicesServices extends CWebTest {
 			// Service with children.
 			[
 				[
-					'name' => 'Clone_parent',
+					'name' => 'Clone parent',
 					'children' => [
 						'Child services' => [
 							[
-								'Service' => 'Clone1',
+								'Service' => 'Clone child 1',
 								'Problem tags' => 'problem_tag_clone: problem_value_clone',
 								'Action' => 'Remove'
 							],
 							[
-								'Service' => 'Clone2',
+								'Service' => 'Clone child 2',
 								'Problem tags' => '',
+								'Action' => 'Remove'
+							],
+							[
+								'Service' => 'Clone child 3',
+								'Problem tags' => 'test1: value1',
 								'Action' => 'Remove'
 							]
 
@@ -1083,8 +936,8 @@ class testFormServicesServices extends CWebTest {
 			// Service with parent.
 			[
 				[
-					'name' => 'Clone1',
-					'parent' => 'Clone_parent'
+					'name' => 'Clone child 1',
+					'parent' => 'Clone parent'
 				]
 			]
 		];
@@ -1133,6 +986,10 @@ class testFormServicesServices extends CWebTest {
 		$table->findRow('Name', $name, true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		$form->invalidate();
 		$original_values['Name'] = $name;
+
+		// If the date changed since the data source was executed, "Created at" for clone will differ from the original.
+		$original_values['Created at'] = date('Y-m-d', strtotime('today'));
+
 		$this->assertEquals($original_values, $form->getFields()->asValues());
 
 		// Check Child services were not cloned.
@@ -1169,13 +1026,13 @@ class testFormServicesServices extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
-		$table->findRow('Name', 'Child2 with tags', true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
+		$table->findRow('Name', 'Simple actions service', true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()
 				->one()->click();
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$dialog->asForm()->fill([
 			'Name' => 'Updated name',
-			'Parent services' => 'Parent2',
+			'Parent services' => 'Parent for deletion from row',
 			'Sort order (0->999)' => '85',
 			'id:advanced_configuration' => true,
 			'Status propagation rule' => 'Increase by',
@@ -1194,13 +1051,13 @@ class testFormServicesServices extends CWebTest {
 			// Service without children.
 			[
 				[
-					'name' => 'Child2 with tags'
+					'name' => 'Simple actions service'
 				]
 			],
 			// Service with children.
 			[
 				[
-					'name' => 'Parent1'
+					'name' => 'Parent for 2 levels of child services'
 				]
 			]
 		];
@@ -1230,7 +1087,7 @@ class testFormServicesServices extends CWebTest {
 		return [
 			[
 				[
-					'parent' => 'Parent3 with problem tags',
+					'parent' => 'Service with problem tags',
 					'enabled' => false
 				]
 			],
@@ -1238,17 +1095,17 @@ class testFormServicesServices extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'circular' => true,
-					'parent' => 'Child3',
+					'parent' => 'Child 2',
 					'fields' => [
 						'Name' => 'Circular dependency'
 					],
-					'Child services' => 'Parent2',
+					'Child services' => 'Parent for deletion from row',
 					'error' => 'Services form a circular dependency.'
 				]
 			],
 			[
 				[
-					'parent' => 'Parent5',
+					'parent' => 'Parent for child creation',
 					'fields' => [
 						'Name' => 'With parent without tags'
 					]
@@ -1337,8 +1194,8 @@ class testFormServicesServices extends CWebTest {
 	}
 
 	public function testFormServicesServices_DeleteChild() {
-		$parent = 'Parent2';
-		$child = 'Child3';
+		$parent = 'Parent for deletion from row';
+		$child = 'Child 2';
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
@@ -1370,13 +1227,14 @@ class testFormServicesServices extends CWebTest {
 
 		// Check that service linking is disappeared from DB.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
-				self::$parentid.' AND servicedownid ='.self::$childid)
+				zbx_dbstr(self::$serviceids['Parent for deletion from row']).' AND servicedownid ='.
+				zbx_dbstr(self::$serviceids['Child 2']))
 		);
 	}
 
 	public function testFormServicesServices_DeleteParent() {
-		$parent = 'Parent4';
-		$child = 'Child4';
+		$parent = 'Parent for child deletion from row';
+		$child = 'Child 1';
 
 		$this->page->login()->open('zabbix.php?action=service.list.edit');
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
@@ -1398,8 +1256,26 @@ class testFormServicesServices extends CWebTest {
 		}
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services_links WHERE serviceupid='.
-				self::$parentid_2.' AND servicedownid ='.self::$childid_2)
+				zbx_dbstr(self::$serviceids['Parent for child deletion from row']).' AND servicedownid ='.
+				zbx_dbstr(self::$serviceids['Child 1']))
 		);
+	}
+
+	public function testFormServicesServices_DeleteService() {
+		$this->page->login()->open('zabbix.php?action=service.list.edit');
+		$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
+		$table->findRow('Name', self::$delete_service)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
+
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->page->acceptAlert();
+		$dialog->ensureNotPresent();
+
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Service deleted');
+		$this->assertFalse($this->query('link', self::$delete_service)->one(false)->isValid());
+
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name='.zbx_dbstr(self::$delete_service)));
 	}
 
 	/**
