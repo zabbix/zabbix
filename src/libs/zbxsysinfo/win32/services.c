@@ -657,7 +657,7 @@ static int	check_service_starttype(SC_HANDLE h_srv, int start_type)
 						 */
 #define ZBX_SRV_STATE_ALL		0x007f  /* ZBX_SRV_STATE_STOPPED | ZBX_SRV_STATE_STARTED
 						 */
-static int	check_service_state(SC_HANDLE h_srv, int service_state)
+static int	check_service_state_local(SC_HANDLE h_srv, int service_state)
 {
 	SERVICE_STATUS	status;
 
@@ -776,7 +776,7 @@ int	check_services(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (SUCCEED == check_service_starttype(h_srv, start_type))
 			{
-				if (SUCCEED == check_service_state(h_srv, service_state))
+				if (SUCCEED == check_service_state_local(h_srv, service_state))
 				{
 					utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
 
