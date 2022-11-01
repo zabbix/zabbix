@@ -36,7 +36,8 @@ class testAgentItems extends CIntegrationTest {
 	const TEST_FILE_BASE_NAME = 'test_file';
 	const TEST_LINK_BASE_NAME = 'test_link';
 	const TEST_FILE_NAME = '/tmp/'.self::TEST_FILE_BASE_NAME;
-	const TEST_FILE_NAME_ACCESS = '/tmp/'.self::TEST_FILE_BASE_NAME.'_access_test';
+	const TEST_FILE_NAME_ACCESS1 = '/tmp/'.self::TEST_FILE_BASE_NAME.'_access_test1';
+	const TEST_FILE_NAME_ACCESS2 = '/tmp/'.self::TEST_FILE_BASE_NAME.'_access_test2';
 	const TEST_LINK_NAME = '/tmp/'.self::TEST_LINK_BASE_NAME;
 	const TEST_LINK_NAME2 = '/tmp/'.self::TEST_LINK_BASE_NAME.'2';
 	const TEST_DIR_NAME = '/tmp/dir';
@@ -197,7 +198,7 @@ class testAgentItems extends CIntegrationTest {
 			'result' => 'b73a96d498012c84fc2ffa1df3c4461689cb90456ee300654723205c26ec4988'
 		],
 		[
-			'key' => 'vfs.file.get['.self::TEST_FILE_NAME.']',
+			'key' => 'vfs.file.get['.self::TEST_FILE_NAME_ACCESS1.']',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
@@ -215,14 +216,14 @@ class testAgentItems extends CIntegrationTest {
 						'modify' => '2021-03-29T14:59:09+0300'
 					],
 					'timestamp' => [
-						'access' => 'stat -c %X '.self::TEST_FILE_NAME_ACCESS,
+						'access' => 'stat -c %X '.self::TEST_FILE_NAME_ACCESS1,
 						'modify' => self::TEST_MOD_TIMESTAMP,
 						'change' => 'stat -c %Z '.self::TEST_FILE_NAME
 					]
 				]
 		],
 		[
-			'key' => 'vfs.file.get['.self::TEST_FILE_NAME.']',
+			'key' => 'vfs.file.get['.self::TEST_FILE_NAME_ACCESS2.']',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
@@ -240,7 +241,7 @@ class testAgentItems extends CIntegrationTest {
 						'modify' => '2021-03-29T14:59:09+03:00'
 					],
 					'timestamp' => [
-						'access' => 'stat -c %X '.self::TEST_FILE_NAME_ACCESS,
+						'access' => 'stat -c %X '.self::TEST_FILE_NAME_ACCESS2,
 						'modify' => self::TEST_MOD_TIMESTAMP,
 						'change' => 'stat -c %Z '.self::TEST_FILE_NAME
 					]
@@ -709,8 +710,10 @@ class testAgentItems extends CIntegrationTest {
 		// Write test file
 		$this->assertTrue(@file_put_contents(self::TEST_FILE_NAME, "1st line\n2nd line\n3rd line\n") !== false);
 		$this->assertTrue(@touch(self::TEST_FILE_NAME, self::TEST_MOD_TIMESTAMP));
-		$this->assertTrue(@file_put_contents(self::TEST_FILE_NAME_ACCESS, "1st line\n2nd line\n3rd line\n") !== false);
-		$this->assertTrue(@touch(self::TEST_FILE_NAME_ACCESS, self::TEST_MOD_TIMESTAMP));
+		$this->assertTrue(@file_put_contents(self::TEST_FILE_NAME_ACCESS1, "1st line\n2nd line\n3rd line\n") !== false);
+		$this->assertTrue(@touch(self::TEST_FILE_NAME_ACCESS1, self::TEST_MOD_TIMESTAMP));
+		$this->assertTrue(@file_put_contents(self::TEST_FILE_NAME_ACCESS2, "1st line\n2nd line\n3rd line\n") !== false);
+		$this->assertTrue(@touch(self::TEST_FILE_NAME_ACCESS2, self::TEST_MOD_TIMESTAMP));
 		$this->assertTrue(@file_put_contents(self::TEST_DIR_FILE_NAME, "1st line\n2nd line\n3rd line\n") !== false);
 		$this->assertTrue(@touch(self::TEST_DIR_FILE_NAME, self::TEST_MOD_TIMESTAMP));
 
@@ -730,7 +733,9 @@ class testAgentItems extends CIntegrationTest {
 
 		$this->assertTrue(@touch(self::TEST_DIR_DIR1_NAME, self::TEST_MOD_TIMESTAMP));
 
-		$this->assertTrue(@exec('touch -h -a -m -t 202103291459.09 '.self::TEST_FILE_NAME_ACCESS) !== false);
+		$this->assertTrue(@exec('touch -h -a -m -t 202103291459.09 '.self::TEST_FILE_NAME_ACCESS1) !== false);
+		$this->assertTrue(@exec('touch -h -a -m -t 202103291459.09 '.self::TEST_FILE_NAME_ACCESS2) !== false);
+
 		return true;
 	}
 
