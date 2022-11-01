@@ -1806,8 +1806,18 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 function filter_messages(): array {
 	if (!CSettingsHelper::getGlobal(CSettingsHelper::SHOW_TECHNICAL_ERRORS)
 			&& CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !CWebUser::getDebugMode()) {
+
+		$type = CMessageHelper::getType();
+		$title = CMessageHelper::getTitle();
 		$messages = CMessageHelper::getMessages();
-		CMessageHelper::clear(false);
+		CMessageHelper::clear();
+
+		if ($type === CMessageHelper::MESSAGE_TYPE_SUCCESS) {
+			CMessageHelper::setSuccessTitle($title);
+		}
+		else {
+			CMessageHelper::setErrorTitle($title);
+		}
 
 		$generic_exists = false;
 		foreach ($messages as $message) {
