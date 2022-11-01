@@ -205,11 +205,11 @@ class testAgentItems extends CIntegrationTest {
 			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
 			'result' => [
 					'type' => 'file',
-					'permissions' => 'stat -c %04a '.self::TEST_FILE_NAME_ACCESS,
-					'user' => 'stat -c %U '.self::TEST_FILE_NAME_ACCESS,
-					'group' => 'stat -c %G '.self::TEST_FILE_NAME_ACCESS,
-					'uid' => 'stat -c %u '.self::TEST_FILE_NAME_ACCESS,
-					'gid' => 'stat -c %g '.self::TEST_FILE_NAME_ACCESS,
+					'permissions' => 'stat -c %04a '.self::TEST_FILE_NAME,
+					'user' => 'stat -c %U '.self::TEST_FILE_NAME,
+					'group' => 'stat -c %G '.self::TEST_FILE_NAME,
+					'uid' => 'stat -c %u '.self::TEST_FILE_NAME,
+					'gid' => 'stat -c %g '.self::TEST_FILE_NAME,
 					'size' => 27,
 					'time' => [
 						'modify' => '2021-03-29T14:59:09+0300'
@@ -217,7 +217,7 @@ class testAgentItems extends CIntegrationTest {
 					'timestamp' => [
 						'access' => 'stat -c %X '.self::TEST_FILE_NAME_ACCESS,
 						'modify' => self::TEST_MOD_TIMESTAMP,
-						'change' => 'stat -c %Z '.self::TEST_FILE_NAME_ACCESS
+						'change' => 'stat -c %Z '.self::TEST_FILE_NAME
 					]
 				]
 		],
@@ -230,11 +230,11 @@ class testAgentItems extends CIntegrationTest {
 			'fields_exec' => ['permissions', 'user', 'group', 'uid', 'gid', 'access', 'change'],
 			'result' => [
 					'type' => 'file',
-					'permissions' => 'stat -c %04a '.self::TEST_FILE_NAME_ACCESS,
-					'user' => 'stat -c %U '.self::TEST_FILE_NAME_ACCESS,
-					'group' => 'stat -c %G '.self::TEST_FILE_NAME_ACCESS,
-					'uid' => 'stat -c %u '.self::TEST_FILE_NAME_ACCESS,
-					'gid' => 'stat -c %g '.self::TEST_FILE_NAME_ACCESS,
+					'permissions' => 'stat -c %04a '.self::TEST_FILE_NAME,
+					'user' => 'stat -c %U '.self::TEST_FILE_NAME,
+					'group' => 'stat -c %G '.self::TEST_FILE_NAME,
+					'uid' => 'stat -c %u '.self::TEST_FILE_NAME,
+					'gid' => 'stat -c %g '.self::TEST_FILE_NAME,
 					'size' => 27,
 					'time' => [
 						'modify' => '2021-03-29T14:59:09+03:00'
@@ -242,7 +242,7 @@ class testAgentItems extends CIntegrationTest {
 					'timestamp' => [
 						'access' => 'stat -c %X '.self::TEST_FILE_NAME_ACCESS,
 						'modify' => self::TEST_MOD_TIMESTAMP,
-						'change' => 'stat -c %Z '.self::TEST_FILE_NAME_ACCESS
+						'change' => 'stat -c %Z '.self::TEST_FILE_NAME
 					]
 				]
 		],
