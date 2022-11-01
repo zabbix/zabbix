@@ -3,9 +3,9 @@
 #include "zbxmockhelper.h"
 #include "zbxmockutil.h"
 
-#include "zbxcommon.h"
 #include "module.h"
 #include "zbxsysinfo.h"
+#include "../../../../src/libs/zbxsysinfo/sysinfo.h"
 
 static int	read_yaml_ret(void)
 {
@@ -43,7 +43,7 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED != zbx_parse_item_key(itemkey, &request))
 		fail_msg("Invalid item key format '%s'", itemkey);
 
-	if (read_yaml_ret() != (ret = SYSTEM_CPU_INTR(&request, &result)))
+	if (read_yaml_ret() != (ret = system_cpu_intr(&request, &result)))
 		fail_msg("unexpected return code '%s'", zbx_sysinfo_ret_string(ret));
 
 	if (SYSINFO_RET_OK == ret)

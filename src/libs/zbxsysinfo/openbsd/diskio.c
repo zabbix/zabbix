@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "log.h"
 #include "zbxstr.h"
@@ -97,7 +98,7 @@ static int	get_disk_stats(const char *devname, zbx_uint64_t *rbytes, zbx_uint64_
 	return ret;
 }
 
-static int	VFS_DEV_READ_BYTES(const char *devname, AGENT_RESULT *result)
+static int	vfs_dev_read_bytes(const char *devname, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -113,7 +114,7 @@ static int	VFS_DEV_READ_BYTES(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_DEV_READ_OPERATIONS(const char *devname, AGENT_RESULT *result)
+static int	vfs_dev_read_operations(const char *devname, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -129,7 +130,7 @@ static int	VFS_DEV_READ_OPERATIONS(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_DEV_WRITE_BYTES(const char *devname, AGENT_RESULT *result)
+static int	vfs_dev_write_bytes(const char *devname, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -145,7 +146,7 @@ static int	VFS_DEV_WRITE_BYTES(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
+static int	vfs_dev_write_operations(const char *devname, AGENT_RESULT *result)
 {
 	zbx_uint64_t	value;
 	char		*error;
@@ -161,7 +162,7 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *devname, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*devname, *mode;
 	int	ret;
@@ -176,9 +177,9 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 1);
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "operations"))
-		ret = VFS_DEV_READ_OPERATIONS(devname, result);
+		ret = vfs_dev_read_operations(devname, result);
 	else if (0 == strcmp(mode, "bytes"))
-		ret = VFS_DEV_READ_BYTES(devname, result);
+		ret = vfs_dev_read_bytes(devname, result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -188,7 +189,7 @@ int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*devname, *mode;
 	int	ret;
@@ -203,9 +204,9 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 1);
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "operations"))
-		ret = VFS_DEV_WRITE_OPERATIONS(devname, result);
+		ret = vfs_dev_write_operations(devname, result);
 	else if (0 == strcmp(mode, "bytes"))
-		ret = VFS_DEV_WRITE_BYTES(devname, result);
+		ret = vfs_dev_write_bytes(devname, result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));

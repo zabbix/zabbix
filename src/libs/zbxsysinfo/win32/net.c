@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxstr.h"
 #include "zbxnum.h"
@@ -426,7 +427,7 @@ clean:
 	return ret;
 }
 
-int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	zbx_ifrow_t	ifrow = {NULL, NULL};
@@ -476,7 +477,7 @@ clean:
 	return ret;
 }
 
-int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	zbx_ifrow_t	ifrow = {NULL, NULL};
@@ -526,7 +527,7 @@ clean:
 	return ret;
 }
 
-int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	zbx_ifrow_t	ifrow = {NULL, NULL};
@@ -578,7 +579,7 @@ clean:
 	return ret;
 }
 
-int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DWORD		dwSize, dwRetVal, i;
 	int		ret = SYSINFO_RET_FAIL;
@@ -678,7 +679,7 @@ static char	*get_if_adminstatus_string(DWORD status)
 	}
 }
 
-int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_list(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DWORD		dwSize, dwRetVal, i, j;
 	char		*buf = NULL;
@@ -784,7 +785,7 @@ clean:
 	return ret;
 }
 
-int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	MIB_TCPTABLE	*pTcpTable = NULL;
 	DWORD		dwSize, dwRetVal;

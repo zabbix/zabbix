@@ -17,14 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "NET_IF_COMMON.h"
+#include "net_if_common.h"
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
 #include "zbxsysinfo.h"
+#include "../../../../src/libs/zbxsysinfo/sysinfo.h"
 #include "zbxnum.h"
 
-void	zbx_mock_test_entry_NET_IF_COMMON(void **state, int net_if_func)
+void	zbx_mock_test_entry_net_if_common(void **state, int net_if_func)
 {
 	AGENT_REQUEST		request;
 	AGENT_RESULT 		param_result;
@@ -82,11 +83,11 @@ void	zbx_mock_test_entry_NET_IF_COMMON(void **state, int net_if_func)
 		fail_msg("Cannot parse item key: %s", init_param);
 
 	if (ZABBIX_MOCK_NET_IF_IN == net_if_func)
-		actual_result = NET_IF_IN(&request, &param_result);
+		actual_result = net_if_in(&request, &param_result);
 	else if (ZABBIX_MOCK_NET_IF_OUT == net_if_func)
-		actual_result = NET_IF_OUT(&request, &param_result);
+		actual_result = net_if_out(&request, &param_result);
 	else if (ZABBIX_MOCK_NET_IF_TOTAL == net_if_func)
-		actual_result = NET_IF_TOTAL(&request, &param_result);
+		actual_result = net_if_total(&request, &param_result);
 	else
 		fail_msg("invalid net_if_func");
 

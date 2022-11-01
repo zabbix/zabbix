@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 /* Solaris. */
 #if !defined(HAVE_SYSINFO_FREESWAP)
@@ -85,7 +86,7 @@ point them all to the same buffer */
 #endif
 #endif
 
-static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
+static int	system_swap_used(AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_FREESWAP
 	struct sysinfo	info;
@@ -126,7 +127,7 @@ static int	SYSTEM_SWAP_USED(AGENT_RESULT *result)
 #endif
 }
 
-static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
+static int	system_swap_free(AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_FREESWAP
 	struct sysinfo	info;
@@ -165,7 +166,7 @@ static int	SYSTEM_SWAP_FREE(AGENT_RESULT *result)
 #endif
 }
 
-static int	SYSTEM_SWAP_TOTAL(AGENT_RESULT *result)
+static int	system_swap_total(AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_TOTALSWAP
 	struct sysinfo	info;
@@ -196,7 +197,7 @@ static int	SYSTEM_SWAP_TOTAL(AGENT_RESULT *result)
 #endif
 }
 
-static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
+static int	system_swap_pfree(AGENT_RESULT *result)
 {
 	AGENT_RESULT	result_tmp;
 	zbx_uint64_t	tot_val = 0;
@@ -204,7 +205,7 @@ static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
 
 	zbx_init_agent_result(&result_tmp);
 
-	if (SYSINFO_RET_OK != SYSTEM_SWAP_TOTAL(&result_tmp) || !(result_tmp.type & AR_UINT64))
+	if (SYSINFO_RET_OK != system_swap_total(&result_tmp) || !(result_tmp.type & AR_UINT64))
 		return SYSINFO_RET_FAIL;
 	tot_val = result_tmp.ui64;
 
@@ -215,7 +216,7 @@ static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SYSINFO_RET_OK != SYSTEM_SWAP_FREE(&result_tmp) || !(result_tmp.type & AR_UINT64))
+	if (SYSINFO_RET_OK != system_swap_free(&result_tmp) || !(result_tmp.type & AR_UINT64))
 		return SYSINFO_RET_FAIL;
 	free_val = result_tmp.ui64;
 
@@ -226,7 +227,7 @@ static int	SYSTEM_SWAP_PFREE(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
+static int	system_swap_pused(AGENT_RESULT *result)
 {
 	AGENT_RESULT	result_tmp;
 	zbx_uint64_t	tot_val = 0;
@@ -234,7 +235,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 
 	zbx_init_agent_result(&result_tmp);
 
-	if (SYSINFO_RET_OK != SYSTEM_SWAP_TOTAL(&result_tmp) || !(result_tmp.type & AR_UINT64))
+	if (SYSINFO_RET_OK != system_swap_total(&result_tmp) || !(result_tmp.type & AR_UINT64))
 		return SYSINFO_RET_FAIL;
 	tot_val = result_tmp.ui64;
 
@@ -245,7 +246,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SYSINFO_RET_OK != SYSTEM_SWAP_FREE(&result_tmp) || !(result_tmp.type & AR_UINT64))
+	if (SYSINFO_RET_OK != system_swap_free(&result_tmp) || !(result_tmp.type & AR_UINT64))
 		return SYSINFO_RET_FAIL;
 	free_val = result_tmp.ui64;
 
@@ -256,7 +257,7 @@ static int	SYSTEM_SWAP_PUSED(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*swapdev, *mode;
 	int	ret = SYSINFO_RET_FAIL;
@@ -271,15 +272,15 @@ int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "free"))
-		ret = SYSTEM_SWAP_FREE(result);
+		ret = system_swap_free(result);
 	else if (0 == strcmp(mode, "used"))
-		ret = SYSTEM_SWAP_USED(result);
+		ret = system_swap_used(result);
 	else if (0 == strcmp(mode, "total"))
-		ret = SYSTEM_SWAP_TOTAL(result);
+		ret = system_swap_total(result);
 	else if (0 == strcmp(mode, "pfree"))
-		ret = SYSTEM_SWAP_PFREE(result);
+		ret = system_swap_pfree(result);
 	else if (0 == strcmp(mode, "pused"))
-		ret = SYSTEM_SWAP_PUSED(result);
+		ret = system_swap_pused(result);
 	else
 		ret = SYSINFO_RET_FAIL;
 

@@ -295,6 +295,9 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
 
+static char	*config_file		= NULL;
+static int	config_allow_root	= 0;
+
 zbx_vector_ptr_t	zbx_addrs;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
@@ -842,7 +845,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"VMwareTimeout",		&CONFIG_VMWARE_TIMEOUT,			TYPE_INT,
 			PARM_OPT,	1,			300},
-		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
+		{"AllowRoot",			&config_allow_root,			TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"User",			&CONFIG_USER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -904,7 +907,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
 
-	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
+	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 
 	zbx_set_defaults();
 
@@ -1033,8 +1036,8 @@ int	main(int argc, char **argv)
 		{
 			case 'c':
 				opt_c++;
-				if (NULL == CONFIG_FILE)
-					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
+				if (NULL == config_file)
+					config_file = zbx_strdup(config_file, zbx_optarg);
 				break;
 			case 'R':
 				opt_r++;
@@ -1086,8 +1089,8 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == CONFIG_FILE)
-		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
+	if (NULL == config_file)
+		config_file = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 
 	/* required for simple checks */
 	zbx_init_metrics();
@@ -1115,7 +1118,7 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
-	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
+	return zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
 }
 
 static void	zbx_check_db(void)
@@ -1291,7 +1294,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
+	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (SUCCEED != zbx_coredump_disable())

@@ -18,13 +18,14 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "log.h"
 #include "zbxstr.h"
 
 ZBX_METRIC	parameter_hostname =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
-	{"system.hostname",     CF_HAVEPARAMS,  SYSTEM_HOSTNAME,        NULL};
+	{"system.hostname",     CF_HAVEPARAMS,  system_hostname,        NULL};
 
 static void	retrieve_hostname(char *buffer, int len, char **error)
 {
@@ -35,7 +36,7 @@ static void	retrieve_hostname(char *buffer, int len, char **error)
 	}
 }
 
-int	SYSTEM_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DWORD		dwSize = 256;
 	wchar_t		computerName[256];
