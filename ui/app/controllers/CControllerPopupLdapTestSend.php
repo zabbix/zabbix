@@ -41,7 +41,7 @@ class CControllerPopupLdapTestSend extends CController {
 			'group_name' =>				'db userdirectory_ldap.group_name',
 			'group_member' =>			'db userdirectory_ldap.group_member',
 			'group_filter' =>			'db userdirectory_ldap.group_filter',
-			'reference_attribute' =>	'db userdirectory_ldap.user_ref_attr',
+			'user_ref_attr' =>			'db userdirectory_ldap.user_ref_attr',
 			'group_membership' =>		'db userdirectory_ldap.group_membership',
 			'user_username' =>			'db userdirectory_ldap.user_username',
 			'user_lastname' =>			'db userdirectory_ldap.user_lastname',
@@ -81,7 +81,7 @@ class CControllerPopupLdapTestSend extends CController {
 		];
 		$this->getInputs($ldap_test_object, ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn', 'bind_password',
 			'search_attribute', 'start_tls', 'search_filter','test_username', 'test_password', 'provision_status',
-			'group_basedn', 'group_name', 'group_member', 'group_filter', 'reference_attribute','group_membership',
+			'group_basedn', 'group_name', 'group_member', 'group_filter', 'user_ref_attr','group_membership',
 			'user_username', 'user_lastname'
 		]);
 

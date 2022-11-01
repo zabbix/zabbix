@@ -36,7 +36,7 @@ class CControllerPopupLdapTestEdit extends CController {
 			'group_basedn' =>			'db userdirectory_ldap.group_basedn',
 			'group_name' =>				'db userdirectory_ldap.group_name',
 			'group_member' =>			'db userdirectory_ldap.group_member',
-			'reference_attribute' =>	'db userdirectory_ldap.user_ref_attr',
+			'user_ref_attr' =>			'db userdirectory_ldap.user_ref_attr',
 			'group_filter' =>			'db userdirectory_ldap.group_filter',
 			'group_membership' =>		'db userdirectory_ldap.group_membership',
 			'provision_media' =>		'array',
@@ -80,7 +80,7 @@ class CControllerPopupLdapTestEdit extends CController {
 
 		$this->getInputs($data['ldap_config'], ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn',
 			'bind_password', 'search_attribute', 'start_tls', 'search_filter','test_username', 'test_password',
-			'provision_status', 'group_basedn', 'group_name', 'group_member', 'reference_attribute','group_filter',
+			'provision_status', 'group_basedn', 'group_name', 'group_member', 'user_ref_attr','group_filter',
 			'group_membership', 'user_username', 'user_lastname', 'provision_media', 'provision_groups'
 		]);
 

@@ -123,8 +123,8 @@ $form = (new CForm('post', $form_action))
 			(new CFormField(
 				(new CRadioButtonList('group_configuration', $data['group_configuration']))
 					->setId('group-configuration')
-					->addValue(_('memberOf'), LDAP_MEMBER_OF)
-					->addValue(_('groupOfNames'), LDAP_GROUP_OF_NAMES)
+					->addValue(_('memberOf'), CControllerPopupLdapEdit::LDAP_MEMBER_OF)
+					->addValue(_('groupOfNames'), CControllerPopupLdapEdit::LDAP_GROUP_OF_NAMES)
 					->setModern(true)
 			))->addClass('allow-jit-provisioning')
 		])
@@ -170,11 +170,11 @@ $form = (new CForm('post', $form_action))
 		->addItem([
 			(new CLabel([_('Reference attribute'),
 				makeHelpIcon(_('Use %{ref} in group filter to reference value of this user attribute.'))
-			], 'reference_attribute'))
+			], 'user_ref_attr'))
 				->addClass('allow-jit-provisioning')
 				->addClass('group-of-names'),
 			(new CFormField(
-				(new CTextBox('reference_attribute', $data['reference_attribute'], false,
+				(new CTextBox('user_ref_attr', $data['user_ref_attr'], false,
 					DB::getFieldLength('userdirectory_ldap', 'user_ref_attr')
 				))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

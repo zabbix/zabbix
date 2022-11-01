@@ -104,9 +104,6 @@ define('IDP_TYPE_SAML',	2);
 define('JIT_PROVISIONING_DISABLED',	0);
 define('JIT_PROVISIONING_ENABLED',	1);
 
-define('LDAP_MEMBER_OF', 		0);
-define('LDAP_GROUP_OF_NAMES', 	1);
-
 define('ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT',	0);
 define('ZBX_SCRIPT_TYPE_IPMI',			1);
 define('ZBX_SCRIPT_TYPE_SSH',			2);

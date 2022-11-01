@@ -116,12 +116,14 @@ window.ldap_edit_popup = new class {
 
 			for (const element of membership_attribute) {
 				element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
-					group_configuration == <?= LDAP_GROUP_OF_NAMES ?>
+					group_configuration == <?= CControllerPopupLdapEdit::LDAP_GROUP_OF_NAMES ?>
 				)
 			}
 
 			for (const element of group_filter) {
-				element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', group_configuration == <?= LDAP_MEMBER_OF ?>)
+				element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+					group_configuration == <?= CControllerPopupLdapEdit::LDAP_MEMBER_OF ?>
+				)
 			}
 		}
 	}
