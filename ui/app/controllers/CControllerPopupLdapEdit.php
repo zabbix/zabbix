@@ -39,6 +39,7 @@ class CControllerPopupLdapEdit extends CController {
 			'group_basedn' =>					'db userdirectory_ldap.group_basedn',
 			'group_name' =>						'db userdirectory_ldap.group_name',
 			'group_member' =>					'db userdirectory_ldap.group_member',
+			'reference_attribute' =>			'db userdirectory_ldap.user_ref_attr',
 			'group_filter' =>					'db userdirectory_ldap.group_filter',
 			'group_membership' =>				'db userdirectory_ldap.group_membership',
 			'user_username' =>					'db userdirectory_ldap.user_username',
@@ -92,6 +93,7 @@ class CControllerPopupLdapEdit extends CController {
 			'group_basedn' => $this->getInput('group_basedn', ''),
 			'group_name' => $this->getInput('group_name', ''),
 			'group_member' => $this->getInput('group_member', ''),
+			'reference_attribute' => $this->getInput('reference_attribute', ''),
 			'group_filter' => $this->getInput('group_filter', ''),
 			'group_membership' => $this->getInput('group_membership', ''),
 			'user_username' => $this->getInput('user_username', ''),
@@ -113,6 +115,17 @@ class CControllerPopupLdapEdit extends CController {
 		$data['advanced_configuration'] = ($data['start_tls'] != ZBX_AUTH_START_TLS_OFF
 			|| $data['search_filter'] !== ''
 		);
+
+		if (!$data['group_membership'] && !$data['group_basedn'] && !$data['group_name'] && !$data['group_member']
+				&& !$data['reference_attribute'] && !$data['group_filter']) {
+			$data['group_configuration'] = LDAP_MEMBER_OF;
+		}
+		elseif (!$data['group_membership']) {
+			$data['group_configuration'] = LDAP_GROUP_OF_NAMES;
+		}
+		else {
+			$data['group_configuration'] = LDAP_MEMBER_OF;
+		}
 
 		self::extendProvisionGroups($data['provision_groups']);
 		self::extendProvisionMedia($data['provision_media']);

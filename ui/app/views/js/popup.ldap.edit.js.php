@@ -43,6 +43,7 @@ window.ldap_edit_popup = new class {
 
 		this.toggleAdvancedConfiguration(this.advanced_chbox.checked);
 		this.toggleAllowJitProvisioning(this.allow_jit_chbox.checked);
+		this.toggleGroupConfiguration();
 
 		this._addEventListeners();
 		this._renderProvisionGroups(provision_groups);
@@ -57,6 +58,10 @@ window.ldap_edit_popup = new class {
 		this.allow_jit_chbox.addEventListener('change', (e) => {
 			this.toggleAllowJitProvisioning(e.target.checked);
 		});
+
+		for (const element of document.querySelectorAll('#group-configuration input[type="radio"')) {
+			element.addEventListener('change', () => this.toggleGroupConfiguration());
+		}
 
 		this.provision_groups_table.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-add')) {
@@ -98,6 +103,26 @@ window.ldap_edit_popup = new class {
 	toggleAllowJitProvisioning(checked) {
 		for (const element of this.form.querySelectorAll('.allow-jit-provisioning')) {
 			element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
+		}
+
+		this.toggleGroupConfiguration();
+	}
+
+	toggleGroupConfiguration() {
+		if (this.allow_jit_chbox.checked) {
+			const group_configuration = document.querySelector('#group-configuration input:checked').value;
+			const membership_attribute = document.querySelectorAll('.member-of');
+			const group_filter = document.querySelectorAll('.group-of-names');
+
+			for (const element of membership_attribute) {
+				element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>',
+					group_configuration == <?= LDAP_GROUP_OF_NAMES ?>
+				)
+			}
+
+			for (const element of group_filter) {
+				element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', group_configuration == <?= LDAP_MEMBER_OF ?>)
+			}
 		}
 	}
 
