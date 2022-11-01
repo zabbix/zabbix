@@ -32,6 +32,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxexpr.h"
+#include "zbxdbwrap.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 

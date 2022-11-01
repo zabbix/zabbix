@@ -19,7 +19,7 @@
 
 #include "snmptrapper.h"
 #include "zbxserver.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 
 #include "zbxself.h"
 #include "zbxnix.h"

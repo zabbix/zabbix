@@ -10,6 +10,7 @@ libzbxdbcache_a_SOURCES = \
 	dbconfig_maintenance.c \
 	dbsync.c \
 	dbsync.h \
+	lld_macro.c \
 	valuecache.c \
 	valuecache.h \
 	user_macro.c \
