@@ -573,13 +573,13 @@ class CScript extends CApiService {
 
 		if ($method === 'create') {
 			$common_fields['scope']['default'] = ZBX_SCRIPT_SCOPE_ACTION;
-			$api_input_rules['uniq'] = [['name']];
+			$api_input_rules['uniq'] = [['name', 'menu_path']];
 			$common_fields['name']['flags'] |= API_REQUIRED;
 			$common_fields['type']['flags'] = API_REQUIRED;
 			$common_fields['command']['flags'] |= API_REQUIRED;
 		}
 		else {
-			$api_input_rules['uniq'] = [['scriptid'], ['name']];
+			$api_input_rules['uniq'] = [['scriptid'], ['name', 'menu_path']];
 			$common_fields += ['scriptid' => ['type' => API_ID, 'flags' => API_REQUIRED]];
 		}
 
@@ -1306,29 +1306,41 @@ class CScript extends CApiService {
 	 */
 	private static function checkDuplicates(array $scripts, array $db_scripts = null): void {
 		$names = [];
+		$menu_paths = [];
 
 		foreach ($scripts as $script) {
 			if (!array_key_exists('name', $script)) {
 				continue;
 			}
 
-			if ($db_scripts === null || $script['name'] !== $db_scripts[$script['scriptid']]['name']) {
+			$path_name = $script['menu_path'].'/'.$script['name'];
+
+			if ($db_scripts === null || $path_name !== $db_scripts[$script['scriptid']]['menu_path'].'/'.
+				isset([$script['scriptid']]['name'])) {
 				$names[] = $script['name'];
+				$menu_paths[] = $script['menu_path'];
 			}
 		}
 
-		if (!$names) {
+		if (!$names && !$menu_paths) {
 			return;
 		}
 
 		$duplicates = DB::select('scripts', [
-			'output' => ['name'],
-			'filter' => ['name' => $names],
+			'output' => ['name', 'menu_path'],
+			'filter' => ['name' => $names, 'menu_path' => $menu_paths],
 			'limit' => 1
 		]);
 
 		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $duplicates[0]['name']));
+			if ($duplicates[0]['menu_path'] == null) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.',
+					$duplicates[0]['name']));
+			}
+			else {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.',
+					$duplicates[0]['menu_path'].'/'.$duplicates[0]['name']));
+			}
 		}
 	}
 
