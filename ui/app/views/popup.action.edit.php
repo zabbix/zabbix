@@ -35,7 +35,7 @@ $form = (new CForm())
 $action_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['action']['name']?:''))
+		(new CTextBox('name', $data['action']['name'] ?: ''))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
@@ -76,14 +76,14 @@ $condition_hidden_data = (new CCol([
 $condition_suppressed_template = (new CScriptTemplate('condition-suppressed-row-tmpl'))->addItem(
 	(new CRow([
 		(new CCol('#{label}'))
-		->addClass('label')
-		->setAttribute('data-conditiontype', '#{conditiontype}')
-		->setAttribute('data-formulaid', '#{label}'),
+			->addClass('label')
+			->setAttribute('data-conditiontype', '#{conditiontype}')
+			->setAttribute('data-formulaid', '#{label}'),
 		(new CCol('#{condition_name}'))
 			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		$condition_hidden_data
-	]))->setAttribute('data-row_index','#{row_index}')
+	]))->setAttribute('data-row_index', '#{row_index}')
 );
 
 $condition_template_default = (new CScriptTemplate('condition-row-tmpl'))->addItem(
@@ -98,8 +98,7 @@ $condition_template_default = (new CScriptTemplate('condition-row-tmpl'))->addIt
 			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		$condition_hidden_data
-
-	]))->setAttribute('data-row_index','#{row_index}')
+	]))->setAttribute('data-row_index', '#{row_index}')
 );
 
 $condition_tag_value_template = (new CScriptTemplate('condition-tag-value-row-tmpl'))->addItem(
@@ -115,37 +114,35 @@ $condition_tag_value_template = (new CScriptTemplate('condition-tag-value-row-tm
 			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		$condition_hidden_data
-	]))->setAttribute('data-row_index','#{row_index}')
+	]))->setAttribute('data-row_index', '#{row_index}')
 );
 
-$action_tab
-	->addItem([
-		(new CLabel(_('Type of calculation'), 'label-evaltype'))->setId('label-evaltype'),
-		(new CFormField([
-			(new CSelect('evaltype'))
-				->setId('evaltype')
-				->setFocusableElementId('label-evaltype')
-				->setValue($data['action']['filter']['evaltype'])
-				->addOptions(CSelect::createOptionsFromArray([
-					CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-					CONDITION_EVAL_TYPE_AND => _('And'),
-					CONDITION_EVAL_TYPE_OR => _('Or'),
-					CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-				])),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CSpan(''))
-				->addStyle('white-space: normal;')
-				->setId('expression'),
-			(new CTextBox('formula', $data['formula'],
-				DB::getFieldLength('actions', 'formula')))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setId('formula')
-				->setAttribute('placeholder', 'A or (B and C) &hellip;'),
-			$condition_suppressed_template,
-			$condition_template_default,
-			$condition_tag_value_template
-		]))->setId('evaltype-formfield')
-	])->setId('actionCalculationRow');
+$action_tab->addItem([
+	(new CLabel(_('Type of calculation'), 'label-evaltype'))->setId('label-evaltype'),
+	(new CFormField([
+		(new CSelect('evaltype'))
+			->setId('evaltype')
+			->setFocusableElementId('label-evaltype')
+			->setValue($data['action']['filter']['evaltype'])
+			->addOptions(CSelect::createOptionsFromArray([
+				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+				CONDITION_EVAL_TYPE_AND => _('And'),
+				CONDITION_EVAL_TYPE_OR => _('Or'),
+				CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+			])),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CSpan(''))
+			->addStyle('white-space: normal;')
+			->setId('expression'),
+		(new CTextBox('formula', $data['formula'], DB::getFieldLength('actions', 'formula')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setId('formula')
+			->setAttribute('placeholder', 'A or (B and C) &hellip;'),
+		$condition_suppressed_template,
+		$condition_template_default,
+		$condition_tag_value_template
+	]))->setId('evaltype-formfield')
+])->setId('actionCalculationRow');
 
 $condition_table->addItem(
 	(new CTag('tfoot', true))
@@ -337,7 +334,7 @@ $operations_table->addItem(
 );
 
 // Operations templates.
-$operation_row_buttons = (new CCol([
+$operation_row_buttons = new CCol([
 	(new CList([
 		(new CButton(null, _('Edit')))
 			->addClass(ZBX_STYLE_BTN_LINK)
@@ -346,9 +343,8 @@ $operation_row_buttons = (new CCol([
 		(new CButton(null, _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('js-remove')
-	]))	->addClass(ZBX_STYLE_HOR_LIST)
-]))
-;
+	]))->addClass(ZBX_STYLE_HOR_LIST)
+]);
 
 $operation_basic_template = (new CScriptTemplate('operation-basic-row-tmpl'))->addItem(
 	(new CRow([
@@ -358,21 +354,21 @@ $operation_basic_template = (new CScriptTemplate('operation-basic-row-tmpl'))->a
 			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		$operation_row_buttons
-	]))->setAttribute('id','#{prefix}operations_#{row_index}')
+	]))->setAttribute('id', '#{prefix}operations_#{row_index}')
 );
 
 $operation_additional_template = (new CScriptTemplate('operation-additional-row-tmpl'))->addItem(
 	(new CRow([
 		(new CCol('#{steps}')),
 		(new CCol([
-			new CTag('b', true, '#{details}'), ' ', '#{data}',
+			new CTag('b', true, '#{details}'), ' ', '#{data}'
 		]))
 			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		(new CCol('#{start_in}')),
 		(new CCol('#{duration}')),
 		$operation_row_buttons
-	]))->setAttribute('id','#{prefix}operations_#{row_index}')
+	]))->setAttribute('id', '#{prefix}operations_#{row_index}')
 );
 
 $operation_usr_usrgrp_template = (new CScriptTemplate('operation-usr-usrgrp-row-tmpl'))->addItem(
@@ -386,7 +382,7 @@ $operation_usr_usrgrp_template = (new CScriptTemplate('operation-usr-usrgrp-row-
 			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		$operation_row_buttons
-	]))->setAttribute('id','#{prefix}operations_#{row_index}')
+	]))->setAttribute('id', '#{prefix}operations_#{row_index}')
 );
 
 $operation_usr_usrgrp_additional_template = (new CScriptTemplate('operation-usr-usrgrp-additional-row-tmpl'))->addItem(
@@ -403,7 +399,7 @@ $operation_usr_usrgrp_additional_template = (new CScriptTemplate('operation-usr-
 		new CCol('#{start_in}'),
 		new CCol('#{duration}'),
 		$operation_row_buttons
-	]))->setAttribute('id','#{prefix}operations_#{row_index}')
+	]))->setAttribute('id', '#{prefix}operations_#{row_index}')
 );
 
 $operation_script_additional_template = (new CScriptTemplate('operation-script-additional-row-tmpl'))->addItem(
@@ -421,7 +417,7 @@ $operation_script_additional_template = (new CScriptTemplate('operation-script-a
 		new CCol('#{start_in}'),
 		new CCol('#{duration}'),
 		$operation_row_buttons
-	]))->setAttribute('id','#{prefix}operations_#{row_index}')
+	]))->setAttribute('id', '#{prefix}operations_#{row_index}')
 );
 
 $operation_script_template = (new CScriptTemplate('operation-script-row-tmpl'))->addItem(
@@ -436,7 +432,7 @@ $operation_script_template = (new CScriptTemplate('operation-script-row-tmpl'))-
 			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
 		$operation_row_buttons
-	]))->setAttribute('id','#{prefix}operations_#{row_index}')
+	]))->setAttribute('id', '#{prefix}operations_#{row_index}')
 );
 
 $operations_tab->addItem([
@@ -647,14 +643,14 @@ $form
 	->addItem($tabs)
 	->addItem(
 		(new CScriptTag('
-			action_edit_popup.init('. json_encode([
+			action_edit_popup.init('.json_encode([
 				'condition_operators' => condition_operator2str(),
 				'condition_types' => condition_type2str(),
 				'conditions' => $data['action']['filter']['conditions'],
 				'actionid' => $data['actionid'] ?: 0,
 				'eventsource' => $data['eventsource'],
 				'allowed_operations' => $data['allowedOperations'],
-			], JSON_THROW_ON_ERROR) .');
+			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);
 
