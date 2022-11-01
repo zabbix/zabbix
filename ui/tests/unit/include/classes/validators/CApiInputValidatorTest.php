@@ -3682,6 +3682,12 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_REGEX],
+				'Server: nginx\/(.+(?<!\r))',
+				'/1/expression',
+				'Server: nginx\/(.+(?<!\r))'
+			],
+			[
+				['type' => API_REGEX],
 				'/',
 				'/1/expression',
 				'/'
