@@ -655,10 +655,10 @@ var hintBox = {
 };
 
 /**
- * Add object to the list of favourites.
+ * Add object to the list of favorites.
  */
 function add2favorites(object, objectid) {
-	sendAjaxData('zabbix.php?action=favourite.create', {
+	sendAjaxData('zabbix.php?action=favorite.create', {
 		data: {
 			object: object,
 			objectid: objectid
@@ -667,10 +667,10 @@ function add2favorites(object, objectid) {
 }
 
 /**
- * Remove object from the list of favourites. Remove all favourites if objectid==0.
+ * Remove object from the list of favorites. Remove all favorites if objectid==0.
  */
 function rm4favorites(object, objectid) {
-	sendAjaxData('zabbix.php?action=favourite.delete', {
+	sendAjaxData('zabbix.php?action=favorite.delete', {
 		data: {
 			object: object,
 			objectid: objectid

@@ -593,11 +593,11 @@ class testSID extends CWebTest {
 			// Export.
 			[['link' => 'zabbix.php?action=export.hosts&format=yaml&backurl=hosts.php&form_refresh=1&hosts%5B50011%5D=50011']],
 
-			// Favourite create.
-			[['link' => 'zabbix.php?action=favourite.create&object=screenid&objectid=200021']],
+			// Favorite create.
+			[['link' => 'zabbix.php?action=favorite.create&object=screenid&objectid=200021']],
 
-			// Favourite delete.
-			[['link' => 'zabbix.php?action=favourite.delete&object=screenid&objectid=200021']],
+			// Favorite delete.
+			[['link' => 'zabbix.php?action=favorite.delete&object=screenid&objectid=200021']],
 
 			// Host creation.
 			[[

@@ -140,7 +140,7 @@ function BR() {
 
 function get_icon($type, $params = []) {
 	switch ($type) {
-		case 'favourite':
+		case 'favorite':
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = (new CRedirectButton(SPACE, null))
 					->addClass(ZBX_STYLE_BTN_REMOVE_FAV)

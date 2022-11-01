@@ -34,8 +34,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$graphs = [];
 		$itemids = [];
 
-		foreach (CFavorite::get('web.favorite.graphids') as $favourite) {
-			$itemids[$favourite['value']] = true;
+		foreach (CFavorite::get('web.favorite.graphids') as $favorite) {
+			$itemids[$favorite['value']] = true;
 		}
 
 		if ($itemids) {

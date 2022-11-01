@@ -99,7 +99,7 @@ if ($data['action'] !== HISTORY_GRAPH && $data['action'] !== HISTORY_BATCH_GRAPH
 }
 
 if ($data['action'] == HISTORY_GRAPH && count($data['items']) == 1) {
-	$action_list->addItem(get_icon('favourite', [
+	$action_list->addItem(get_icon('favorite', [
 		'fav' => 'web.favorite.graphids',
 		'elid' => $item['itemid'],
 		'elname' => 'itemid'

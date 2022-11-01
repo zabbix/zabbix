@@ -62,7 +62,7 @@ $web_layout_mode = $this->getLayoutMode();
 				))->setEnabled($data['allowed_edit'])
 				: null
 			)
-			->addItem(get_icon('favourite', [
+			->addItem(get_icon('favorite', [
 				'fav' => 'web.favorite.sysmapids',
 				'elname' => 'sysmapid',
 				'elid' => $data['map']['sysmapid']

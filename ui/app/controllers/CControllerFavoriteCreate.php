@@ -19,12 +19,7 @@
 **/
 
 
-use Zabbix\Core\CWidget;
-
-class CControllerFavouriteDelete extends CController {
-
-	private const WIDGET_FAV_GRAPHS = 'favgraphs';
-	private const WIDGET_FAV_MAPS = 'favmaps';
+class CControllerFavoriteCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
@@ -51,19 +46,13 @@ class CControllerFavouriteDelete extends CController {
 			'sysmapid' => 'web.favorite.sysmapids'
 		];
 
-		$affected_widget_types = [
-			'graphid' => self::WIDGET_FAV_GRAPHS,
-			'itemid' => self::WIDGET_FAV_GRAPHS,
-			'sysmapid' => self::WIDGET_FAV_MAPS
-		];
-
 		$object = $this->getInput('object');
 		$objectid = $this->getInput('objectid');
 
 		$data = [];
 
 		DBstart();
-		$result = CFavorite::remove($profile[$object], $objectid, $object);
+		$result = CFavorite::add($profile[$object], $objectid, $object);
 		$result = DBend($result);
 
 		if ($result) {
@@ -71,18 +60,10 @@ class CControllerFavouriteDelete extends CController {
 				var addrm_fav = document.getElementById("addrm_fav");
 
 				if (addrm_fav !== null) {
-					addrm_fav.title = "'._('Add to favorites').'";
-					addrm_fav.onclick = () => add2favorites("'.$object.'", "'.$objectid.'");
-					addrm_fav.classList.add("btn-add-fav");
-					addrm_fav.classList.remove("btn-remove-fav");
-				}
-				else {
-					ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {
-						if (widget.getType() === "'.$affected_widget_types[$object].'"
-								&& widget.getState() === WIDGET_STATE_ACTIVE) {
-							widget._startUpdating();
-						}
-					});
+					addrm_fav.title = "'._('Remove from favorites').'";
+					addrm_fav.onclick = () => rm4favorites("'.$object.'", "'.$objectid.'");
+					addrm_fav.classList.add("btn-remove-fav");
+					addrm_fav.classList.remove("btn-add-fav");
 				}
 			';
 		}
