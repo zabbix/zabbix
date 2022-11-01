@@ -131,6 +131,7 @@ class CControllerPopupActionOperationEdit extends CController {
 				$result[] = $opcommand_host[0];
 			}
 		}
+		unset($opcommand_host);
 
 		if ($operation['opcommand_grp']) {
 			foreach($operation['opcommand_grp'] as &$host_group) {
@@ -138,9 +139,11 @@ class CControllerPopupActionOperationEdit extends CController {
 					'output' => ['groupid', 'name'],
 					'groupids' => $host_group['groupid']
 				]);
+				$result[] = $host_group;
 			}
-			$result[] = $host_group;
 		}
+		unset($host_group);
+
 
 		if ($operation['opgroup']) {
 			foreach($operation['opgroup'] as &$host_group) {
@@ -148,9 +151,10 @@ class CControllerPopupActionOperationEdit extends CController {
 					'output' => ['groupid', 'name'],
 					'groupids' => $host_group['groupid']
 				]);
+				$result[] = $host_group;
 			}
-			$result[] = $host_group;
 		}
+		unset($host_group);
 
 		if ($operation['optemplate']) {
 			foreach($operation['optemplate'] as &$template) {
@@ -158,8 +162,9 @@ class CControllerPopupActionOperationEdit extends CController {
 					'output' => ['name'],
 					'templateids' => $template['templateid']
 				]);
+				$result[] = $template;
 			}
-			$result[] = $template;
+			unset($template);
 		}
 
 		if ($operation['opmessage_grp']) {
