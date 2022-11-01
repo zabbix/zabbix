@@ -46,10 +46,23 @@ class CWidgetGeoMap extends CWidget {
 	}
 
 	_processUpdateResponse(response) {
-		super._processUpdateResponse(response);
+		if (this._initial_load) {
+			super._processUpdateResponse(response);
+		}
+		else {
+			let message_box = this._content_body.querySelector('output');
 
-		if ('geomap' in response) {
-			if ('config' in response.geomap) {
+			if (message_box !== null) {
+				message_box.remove();
+			}
+
+			if (response.messages !== undefined) {
+				this._content_body.prepend(makeMessageBox('bad', response.messages)[0]);
+			}
+		}
+
+		if (response.geomap !== undefined) {
+			if (response.geomap.config !== undefined) {
 				this._initMap(response.geomap.config);
 			}
 
@@ -63,26 +76,6 @@ class CWidgetGeoMap extends CWidget {
 		this._initial_load = true;
 
 		super.updateProperties({name, view_mode, fields});
-	}
-
-	_setContents({name, body, messages, info, debug}) {
-		this._setHeaderName(name);
-
-		if (this._initial_load) {
-			this._content_body.innerHTML = '';
-		}
-
-		if (messages !== undefined) {
-			this._content_body.insertAdjacentHTML('beforeend', messages);
-		}
-
-		if (this._initial_load) {
-			this._content_body.insertAdjacentHTML('beforeend', body);
-		}
-
-		if (debug !== undefined) {
-			this._content_body.insertAdjacentHTML('beforeend', debug);
-		}
 	}
 
 	_addMarkers(hosts) {
