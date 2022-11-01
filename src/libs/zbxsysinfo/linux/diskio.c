@@ -357,6 +357,8 @@ int	vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 						zbx_fclose(f);
 					}
+					else
+						continue;
 
 					if (0 == devtype_found)
 					{
