@@ -341,14 +341,22 @@ class CControllerAuthenticationEdit extends CController {
 			])
 			: [];
 
-		foreach ($provision_groups as &$provision_group) {
-			if (array_key_exists('roleid', $provision_group)) {
+		foreach ($provision_groups as $index => &$provision_group) {
+			if (array_key_exists('roleid', $provision_group) && array_key_exists($provision_group['roleid'], $roles)) {
 				$provision_group['role_name'] = $roles[$provision_group['roleid']]['name'];
+			}
+			else {
+				unset($provision_groups[$index]);
 			}
 
 			if (array_key_exists('user_groups', $provision_group)) {
-				foreach ($provision_group['user_groups'] as &$user_group) {
-					$user_group['name'] = $user_groups[$user_group['usrgrpid']]['name'];
+				foreach ($provision_group['user_groups'] as $index => &$user_group) {
+					if (array_key_exists($user_group['usrgrpid'], $user_groups)) {
+						$user_group['name'] = $user_groups[$user_group['usrgrpid']]['name'];
+					}
+					else {
+						unset($provision_group['user_groups'][$index]);
+					}
 				}
 				unset($user_group);
 			}

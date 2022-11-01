@@ -485,6 +485,7 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		self::checkProvisionGroups($userdirectories);
 		self::checkMediaTypes($userdirectories);
 		self::checkDuplicates($userdirectories);
 		self::checkSamlExists($userdirectories);
@@ -649,6 +650,7 @@ class CUserDirectory extends CApiService {
 
 		$userdirectories = array_column($userdirectories, null, 'userdirectoryid');
 
+		self::checkProvisionGroups($userdirectories);
 		self::checkMediaTypes($userdirectories);
 		self::checkDuplicates($userdirectories, $db_userdirectories);
 		self::addAffectedObjects($userdirectories, $db_userdirectories);
@@ -776,6 +778,32 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('User directory "%1$s" already exists.', $duplicates[0]['name'])
 			);
+		}
+	}
+
+	private static function checkProvisionGroups(array $userdirectories): void {
+		$roleids = [];
+		$usrgrpids = [];
+		foreach ($userdirectories as $userdirectory) {
+			if (!array_key_exists('provision_groups', $userdirectory)) {
+				continue;
+			}
+
+			foreach ($userdirectory['provision_groups'] as $provision_group) {
+				['roleid' => $roleid, 'user_groups' => $groups] = $provision_group;
+
+				$roleids[$roleid] = $roleid;
+				$usrgrpids = array_merge($usrgrpids, array_column($groups, 'usrgrpid'));
+			}
+		}
+
+		if (count($roleids) != API::Role()->get(['countOutput' => true, 'roleids' => $roleids])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$usrgrpids = array_keys(array_flip($usrgrpids));
+		if (count($usrgrpids) != API::UserGroup()->get(['countOutput' => true, 'usrgrpids' => $usrgrpids])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
