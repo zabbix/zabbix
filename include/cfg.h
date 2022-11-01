@@ -45,12 +45,10 @@
 #define ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX	SEC_PER_HOUR
 #define ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY	5
 
-extern char	*CONFIG_FILE;
 extern char	*CONFIG_LOG_TYPE_STR;
 extern int	CONFIG_LOG_TYPE;
 extern char	*CONFIG_LOG_FILE;
 extern int	CONFIG_LOG_FILE_SIZE;
-extern int	CONFIG_ALLOW_ROOT;
 extern int	CONFIG_TIMEOUT;
 
 struct cfg_line

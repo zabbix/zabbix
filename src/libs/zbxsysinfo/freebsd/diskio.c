@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "stats.h"
 #include "diskdevices.h"
@@ -211,12 +212,12 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return vfs_dev_rw(request, result, ZBX_DEV_READ);
 }
 
-int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return vfs_dev_rw(request, result, ZBX_DEV_WRITE);
 }

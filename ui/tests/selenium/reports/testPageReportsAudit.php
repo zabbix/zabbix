@@ -77,7 +77,7 @@ class testPageReportsAudit extends CWebTest {
 		}
 
 		// Check form labels.
-		$this->assertEquals(['Users', 'Resource', 'Resource ID', 'Recordset ID', 'Actions'], $form->getLabels()->asText());
+		$this->assertEquals(['Users', 'Actions', 'Resource', 'Resource ID', 'Recordset ID'], $form->getLabels()->asText());
 
 		// Check that resource values set as All by default.
 		$this->assertTrue($form->checkValue(['Resource' => 'All']));

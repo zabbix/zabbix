@@ -22,6 +22,7 @@
 
 #include "zbxalgo.h"
 #include "zbxipcservice.h"
+#include "zbxthreads.h"
 
 #define ZBX_IPC_SERVICE_RTC	"rtc"
 
@@ -65,7 +66,8 @@ void	zbx_rtc_shutdown_subs(zbx_rtc_t *rtc);
 void	zbx_rtc_notify_config_sync(zbx_ipc_async_socket_t *rtc);
 
 void	zbx_rtc_subscribe(zbx_ipc_async_socket_t *rtc, unsigned char proc_type, int proc_num);
-int	zbx_rtc_wait(zbx_ipc_async_socket_t *rtc, zbx_uint32_t *cmd, unsigned char **data, int timeout);
+int	zbx_rtc_wait(zbx_ipc_async_socket_t *rtc, const zbx_thread_info_t *info, zbx_uint32_t *cmd,
+		unsigned char **data, int timeout);
 int	zbx_rtc_reload_config_cache(char **error);
 
 int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char **error);

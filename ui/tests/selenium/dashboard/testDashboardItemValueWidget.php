@@ -241,9 +241,8 @@ class testDashboardItemValueWidget extends CWebTest {
 			'id:desc_h_pos',
 			'id:desc_v_pos',
 			'id:desc_size',
-			'id:desc_bold'
-			// TODO: uncomment after DEV-2154 is ready.
-//			'id:desc_color'
+			'id:desc_bold',
+			'xpath://input[@id="desc_color"]/..'
 		];
 
 		$values = [
@@ -252,43 +251,34 @@ class testDashboardItemValueWidget extends CWebTest {
 			'id:value_h_pos',
 			'id:value_size',
 			'id:value_v_pos',
-			'id:value_bold'
-			// TODO: uncomment after DEV-2154 is ready.
-//			'id:value_color'
+			'id:value_bold',
+			'xpath://input[@id="value_color"]/..'
 		];
 
 		$units = [
 			'id:units',
 			'id:units_pos',
 			'id:units_size',
-			'id:units_bold'
-			// TODO: uncomment after DEV-2154 is ready.
-//			'id:units_color'
+			'id:units_bold',
+			'xpath://input[@id="units_color"]/..'
 		];
 
 		$time = [
 			'id:time_h_pos',
 			'id:time_v_pos',
 			'id:time_size',
-			'id:time_bold'
-			// TODO: uncomment after DEV-2154 is ready.
-//			'id:time_color'
+			'id:time_bold',
+			'xpath://input[@id="time_color"]/..'
 		];
 
 		$indicator_colors = [
-			// TODO: uncomment after DEV-2154 is ready.
-//			'id:up_color',
-//			'id:down_color',
-//			'id:updown_color',
-		];
-
-		$background_color = [
-			// TODO: uncomment after DEV-2154 is ready.
-//			'lbl_bg_color'
+			'xpath://input[@id="up_color"]/..',
+			'xpath://input[@id="down_color"]/..',
+			'xpath://input[@id="updown_color"]/..'
 		];
 
 		// Merge all Advanced fields into one array.
-		$fields = array_merge($description, $values, $units, $time, $indicator_colors, $background_color);
+		$fields = array_merge($description, $values, $units, $time, $indicator_colors, ['Background color']);
 
 		foreach ([false, true] as $advanced_config) {
 			$form->fill(['Advanced configuration' => $advanced_config]);

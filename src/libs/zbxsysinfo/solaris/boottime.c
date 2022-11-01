@@ -19,10 +19,11 @@
 
 #include "zbxsysinfo.h"
 #include "zbx_sysinfo_kstat.h"
+#include "../sysinfo.h"
 
 #include "log.h"
 
-int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_boottime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
 

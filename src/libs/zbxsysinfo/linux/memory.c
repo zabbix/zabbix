@@ -18,12 +18,12 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "proc.h"
-
 #include "log.h"
 
-static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
+static int	vm_memory_total(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
@@ -38,7 +38,7 @@ static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_FREE(AGENT_RESULT *result)
+static int	vm_memory_free(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
@@ -53,7 +53,7 @@ static int	VM_MEMORY_FREE(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_BUFFERS(AGENT_RESULT *result)
+static int	vm_memory_buffers(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
@@ -68,7 +68,7 @@ static int	VM_MEMORY_BUFFERS(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_USED(AGENT_RESULT *result)
+static int	vm_memory_used(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
@@ -83,7 +83,7 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
+static int	vm_memory_pused(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 
@@ -104,7 +104,7 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
+static int	vm_memory_available(AGENT_RESULT *result)
 {
 	FILE		*f;
 	zbx_uint64_t	value;
@@ -155,7 +155,7 @@ close:
 	return ret;
 }
 
-static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
+static int	vm_memory_pavailable(AGENT_RESULT *result)
 {
 	struct sysinfo	info;
 	AGENT_RESULT	result_tmp;
@@ -170,7 +170,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 
 	zbx_init_agent_result(&result_tmp);
 
-	ret = VM_MEMORY_AVAILABLE(&result_tmp);
+	ret = vm_memory_available(&result_tmp);
 
 	if (SYSINFO_RET_FAIL == ret)
 	{
@@ -195,7 +195,7 @@ clean:
 	return ret;
 }
 
-static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
+static int	vm_memory_shared(AGENT_RESULT *result)
 {
 #ifdef KERNEL_2_4
 	struct sysinfo	info;
@@ -216,7 +216,7 @@ static int	VM_MEMORY_SHARED(AGENT_RESULT *result)
 #endif
 }
 
-static int	VM_MEMORY_PROC_MEMINFO(const char *meminfo_entry, AGENT_RESULT *result)
+static int	vm_memory_proc_meminfo(const char *meminfo_entry, AGENT_RESULT *result)
 {
 	FILE		*f;
 	zbx_uint64_t	value;
@@ -241,7 +241,7 @@ static int	VM_MEMORY_PROC_MEMINFO(const char *meminfo_entry, AGENT_RESULT *resul
 	return ret;
 }
 
-int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*mode;
 	int	ret;
@@ -255,31 +255,31 @@ int	VM_MEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	mode = get_rparam(request, 0);
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
-		ret = VM_MEMORY_TOTAL(result);
+		ret = vm_memory_total(result);
 	else if (0 == strcmp(mode, "free"))
-		ret = VM_MEMORY_FREE(result);
+		ret = vm_memory_free(result);
 	else if (0 == strcmp(mode, "buffers"))
-		ret = VM_MEMORY_BUFFERS(result);
+		ret = vm_memory_buffers(result);
 	else if (0 == strcmp(mode, "used"))
-		ret = VM_MEMORY_USED(result);
+		ret = vm_memory_used(result);
 	else if (0 == strcmp(mode, "pused"))
-		ret = VM_MEMORY_PUSED(result);
+		ret = vm_memory_pused(result);
 	else if (0 == strcmp(mode, "available"))
-		ret = VM_MEMORY_AVAILABLE(result);
+		ret = vm_memory_available(result);
 	else if (0 == strcmp(mode, "pavailable"))
-		ret = VM_MEMORY_PAVAILABLE(result);
+		ret = vm_memory_pavailable(result);
 	else if (0 == strcmp(mode, "shared"))
-		ret = VM_MEMORY_SHARED(result);
+		ret = vm_memory_shared(result);
 	else if (0 == strcmp(mode, "cached"))
-		ret = VM_MEMORY_PROC_MEMINFO("Cached:", result);
+		ret = vm_memory_proc_meminfo("Cached:", result);
 	else if (0 == strcmp(mode, "active"))
-		ret = VM_MEMORY_PROC_MEMINFO("Active:", result);
+		ret = vm_memory_proc_meminfo("Active:", result);
 	else if (0 == strcmp(mode, "anon"))
-		ret = VM_MEMORY_PROC_MEMINFO("AnonPages:", result);
+		ret = vm_memory_proc_meminfo("AnonPages:", result);
 	else if (0 == strcmp(mode, "inactive"))
-		ret = VM_MEMORY_PROC_MEMINFO("Inactive:", result);
+		ret = vm_memory_proc_meminfo("Inactive:", result);
 	else if (0 == strcmp(mode, "slab"))
-		ret = VM_MEMORY_PROC_MEMINFO("Slab:", result);
+		ret = vm_memory_proc_meminfo("Slab:", result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));

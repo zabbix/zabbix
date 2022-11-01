@@ -570,7 +570,20 @@ else {
 }
 
 $triggersFormList
-	->addRow(_('URL'), (new CTextBox('url', $data['url'], $discovered_trigger))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(
+		new CLabel([
+			_('Menu entry name'),
+			makeHelpIcon([_('Menu entry name is used as a label for the trigger URL in the event context menu.')])
+		]),
+		(new CTextBox('url_name', $data['url_name'], $discovered_trigger, DB::getFieldLength('triggers', 'url_name')))
+			->setAttribute('placeholder', _('Trigger URL'))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(
+		_('Menu entry URL'),
+		(new CTextBox('url', $data['url'], $discovered_trigger, DB::getFieldLength('triggers', 'url')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
 	->addRow(_('Description'),
 		(new CTextArea('comments', $data['comments']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

@@ -32,8 +32,6 @@ extern int				CONFIG_VMWARE_PERF_FREQUENCY;
 #define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
 
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern zbx_vmware_t			*vmware;
 
 /******************************************************************************
@@ -70,7 +68,7 @@ static const char	*vmware_job_type_string(zbx_vmware_job_t *job)
  * Return value: job for object or NULL                                       *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, int time_now)
+static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, time_t time_now)
 {
 	zbx_binary_heap_elem_t	*elem;
 	zbx_vmware_job_t	*job = NULL;
@@ -152,7 +150,7 @@ out:
  *             time_now - [IN] the current time                               *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, int time_now)
+static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t time_now)
 {
 	zbx_binary_heap_elem_t	elem_new = {0, job};
 
@@ -190,17 +188,17 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, int ti
 ZBX_THREAD_ENTRY(vmware_thread, args)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	int	services_updated = 0, services_removed = 0;
-	double	time_now, time_stat, time_idle = 0;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	int			services_updated = 0, services_removed = 0;
+	double			time_now, time_stat, time_idle = 0;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #define JOB_TIMEOUT	1
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -237,15 +235,15 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 			}
 
 			services_updated += vmware_job_exec(job);
-			vmware_job_schedule(vmware, job, (int)time_now);
+			vmware_job_schedule(vmware, job, (time_t)time_now);
 		}
 
 		if (zbx_time() - time_now <= JOB_TIMEOUT)
 		{
 			time_idle += JOB_TIMEOUT;
-			zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-			zbx_sleep_loop(JOB_TIMEOUT);
-			zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
+			zbx_sleep_loop(info, JOB_TIMEOUT);
+			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 		}
 	}
 
