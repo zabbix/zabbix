@@ -380,25 +380,44 @@ window.operation_popup = new class {
 	}
 
 	_addUserGroup(values) {
+		let usrgrp_table = document
+			.querySelector('#operation-message-user-groups-table tbody')
+			.getElementsByTagName('input');
+
+		let added_values = [];
+		for (let element of usrgrp_table) {
+			added_values.push(element.value);
+		}
+
 		let template = new Template(document.getElementById('operation-usergroup-row-tmpl').innerHTML);
 
 		values.forEach((value) => {
-			document
-				.querySelector('#operation-message-user-groups-table tbody')
-				.insertAdjacentHTML('beforeend', template.evaluate(value))
-		});
+			if (!added_values.includes(value.usrgrpid)) {
+				document
+					.querySelector('#operation-message-user-groups-table tbody')
+					.insertAdjacentHTML('beforeend', template.evaluate(value))
+			}
+		})
 	}
 
 	_addUser(values) {
+		let user_table = document.querySelector('#operation-message-user-table tbody').getElementsByTagName('input');
+		let added_values = [];
+		for (let element of user_table) {
+			added_values.push(element.value)
+		}
+
 		let template = new Template(document.getElementById('operation-user-row-tmpl').innerHTML);
 
 		values.forEach((value) => {
 			if (value.userid) {
 				value.id = value.userid;
 			}
-			document
-				.querySelector('#operation-message-user-table tbody')
-				.insertAdjacentHTML('beforeend', template.evaluate(value))
+			if (!added_values.includes(value.id)) {
+				document
+					.querySelector('#operation-message-user-table tbody')
+					.insertAdjacentHTML('beforeend', template.evaluate(value))
+			}
 		});
 	}
 
