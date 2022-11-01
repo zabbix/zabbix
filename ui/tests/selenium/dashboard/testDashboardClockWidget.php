@@ -19,6 +19,7 @@
 **/
 
 
+require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -60,15 +61,16 @@ class testDashboardClockWidget extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardClockWidget_Create($data) {
-		$dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
-			zbx_dbstr('DEV-2236 dashboard'));
-		//$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236 dashboard');
-		var_dump($dashboardid);
+		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236 dashboard');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$form->fill($data['MandatoryFields']);
-		$this->query('button', 'Add')->waitUntilClickable()->one()->click();
+		//$this->query('button', 'Add')->waitUntilClickable()->one()->click();
+
+
+		$this->query('xpath://button[contains(@class, "dialogue-widget-save")]')->waitUntilClickable()->one()->click();
+
 		$dashboard->save();
 	}
 
@@ -77,7 +79,7 @@ class testDashboardClockWidget extends CWebTest {
 	 */
 	public function testDashboardClockWidget_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash($this->sql);
-		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236');
+		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236 dashboard');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget('ClockWidgetCreatedByAutotest')->edit();
@@ -107,7 +109,7 @@ class testDashboardClockWidget extends CWebTest {
 	 * @dataProvider getUpdateData
 	 */
 	public function testDashboardClockWidget_Update($data) {
-		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236');
+		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236 dashboard');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->getWidget('ClockWidgetCreatedByAutotest')->edit();
@@ -131,12 +133,12 @@ class testDashboardClockWidget extends CWebTest {
 	 * Check clock widgets successful copy.
 	 */
 	public function testDashboardClockWidget_Copy() {
-		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236');
+		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236 dashboard');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 
 		// Get size of widget which will be copied;
-		$sql = "Select width, height from widget where name =".zbx_dbstr('Server')." and dashboardid =".$dashboardid." ORDER BY widgetid DESC";
+		$sql = "Select width, height from widget where name =".zbx_dbstr('Server')." ORDER BY widgetid DESC";
 		$original_size = CDBHelper::getRow($sql);
 
 		$dashboard->copyWidget('Server');
@@ -171,7 +173,7 @@ class testDashboardClockWidget extends CWebTest {
 	 * @dataProvider getDeleteData
 	 */
 	public function testDashboardClockWidget_Delete($data) {
-		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236');
+		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236 dashboard');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->edit()->getWidget($data['Fields']['Name']);
@@ -215,7 +217,7 @@ class testDashboardClockWidget extends CWebTest {
 	 */
 	public function testDashboardClockWidget_Cancel($data) {
 		$old_hash = CDBHelper::getHash($this->sql);
-		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236');
+		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236 dashboard');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 

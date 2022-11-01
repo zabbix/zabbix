@@ -154,10 +154,9 @@ class ClockWidgets {
 				]
 			]
 		]);
-		$dashboardids = CDataHelper::getIds('name');
-		var_dump($dashboardids);
+
 		return [
-			'dashboardids' => $dashboardids['DEV-2236 dashboard']
+			'dashboardids' => CDataHelper::getIds('name')
 		];
 	}
 }
