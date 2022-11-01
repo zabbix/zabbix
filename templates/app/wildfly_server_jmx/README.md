@@ -86,6 +86,7 @@ There are no template links in this template.
 |WildFly |WildFly {#JMX_DATA_SOURCE}: Cache delete, rate |<p>The number of statements discarded from the cache per second.</p> |JMX |jmx["{#JMXOBJ}",PreparedStatementCacheDeleteCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: Cache hit, rate |<p>The number of times that statements from the cache were used per second.</p> |JMX |jmx["{#JMXOBJ}",PreparedStatementCacheHitCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: Cache miss, rate |<p>The number of times that a statement request could not be satisfied with a statement from the cache per second.</p> |JMX |jmx["{#JMXOBJ}",PreparedStatementCacheMissCount]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
+|WildFly |WildFly {#JMX_DATA_SOURCE}: Statistics enabled |<p>Define whether runtime statistics are enabled or not.</p> |JMX |jmx["{#JMXOBJ}",statisticsEnabled, "JDBC"]<p>**Preprocessing**:</p><p>- BOOL_TO_DECIMAL</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: Connections: Active |<p>The number of open connections.</p> |JMX |jmx["{#JMXOBJ}",ActiveCount] |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: Connections: Available |<p>The available count.</p> |JMX |jmx["{#JMXOBJ}",AvailableCount] |
 |WildFly |WildFly {#JMX_DATA_SOURCE}: Blocking time, avg |<p>Average Blocking Time for pool.</p> |JMX |jmx["{#JMXOBJ}",AverageBlockingTime] |
@@ -131,6 +132,7 @@ There are no template links in this template.
 |WildFly: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m` |INFO |<p>Manual close: YES</p> |
 |WildFly: Failed to fetch info data |<p>Zabbix has not received data for items for the last 15 minutes</p> |`nodata(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"],15m)=1` |WARNING | |
 |WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed |<p>Deployment status has changed. Ack to close.</p> |`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#2) and length(last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status]))>0` |WARNING |<p>Manual close: YES</p> |
+|WildFly {#JMX_DATA_SOURCE}: JDBC monitoring statistic is not enabled |<p>-</p> |`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",statisticsEnabled, "JDBC"])=0` |INFO | |
 |WildFly {#JMX_DATA_SOURCE}: There are no active connections for 5m |<p>-</p> |`max(/WildFly Server by JMX/jmx["{#JMXOBJ}",ActiveCount],5m)=0` |WARNING | |
 |WildFly {#JMX_DATA_SOURCE}: Connection usage is too high |<p>-</p> |`min(/WildFly Server by JMX/jmx["{#JMXOBJ}",InUseCount],5m)/last(/WildFly Server by JMX/jmx["{#JMXOBJ}",AvailableCount])*100>{$WILDFLY.CONN.USAGE.WARN.MAX}` |HIGH | |
 |WildFly {#JMX_DATA_SOURCE}: Pools monitoring statistic is not enabled |<p>Zabbix has not received data for items for the last 15 minutes</p> |`last(/WildFly Server by JMX/jmx["{#JMXOBJ}",statisticsEnabled])=0` |INFO | |

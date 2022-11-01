@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-01T14:48:18Z'
+  date: '2022-11-01T16:07:09Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -768,6 +768,44 @@ zabbix_export:
                 -
                   tag: datasource
                   value: '{#JMX_DATA_SOURCE}'
+            -
+              uuid: 81dbce02ad4d492ebebd1a205bea1b43
+              name: 'WildFly {#JMX_DATA_SOURCE}: Statistics enabled'
+              type: JMX
+              key: 'jmx["{#JMXOBJ}",statisticsEnabled, "JDBC"]'
+              history: 7d
+              username: '{$WILDFLY.USER}'
+              password: '{$WILDFLY.PASSWORD}'
+              description: 'Define whether runtime statistics are enabled or not.'
+              valuemap:
+                name: 'WildFly flag'
+              preprocessing:
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              jmx_endpoint: 'service:jmx:{$WILDFLY.JMX.PROTOCOL}://{HOST.CONN}:{HOST.PORT}'
+              tags:
+                -
+                  tag: component
+                  value: datasources
+                -
+                  tag: datasource
+                  value: '{#JMX_DATA_SOURCE}'
+              trigger_prototypes:
+                -
+                  uuid: 2996a48892a640d69154de332c673755
+                  expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",statisticsEnabled, "JDBC"])=0'
+                  name: 'WildFly {#JMX_DATA_SOURCE}: JDBC monitoring statistic is not enabled'
+                  priority: INFO
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 322b26787ab444db90a1be3da2717dd2
