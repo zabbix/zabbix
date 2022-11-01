@@ -186,7 +186,7 @@ $form_grid->addItem([
 						->setName('operation[opmessage_usr][][userid]'),
 				]))
 			]))
-				->setAttribute('data-id','#{usrgrpid}')
+				->setAttribute('data-id','#{id}')
 		)
 	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
