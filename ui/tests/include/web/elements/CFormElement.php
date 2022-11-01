@@ -114,11 +114,12 @@ class CFormElement extends CElement {
 	/**
 	 * Get collection of form label elements.
 	 *
-	 * @param CElementFilter $filter    condition to be filtered by
+	 * @param CElementFilter $filter        condition to be filtered
+	 * @param array          $filter_params filter params
 	 *
 	 * @return CElementCollection
 	 */
-	public function getLabels($filter = null) {
+	public function getLabels($filter = null, $filter_params = []) {
 		$labels = $this->query('xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT.'/label')->all();
 
 		foreach ($labels as $key => $label) {
@@ -135,7 +136,7 @@ class CFormElement extends CElement {
 		}
 
 		if ($filter !== null) {
-			$labels = $labels->filter(new CElementFilter($filter));
+			$labels = $labels->filter($filter, $filter_params);
 		}
 
 		return $labels;

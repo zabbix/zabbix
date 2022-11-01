@@ -33,12 +33,14 @@ class CElementFilter {
 	const PRESENT = 'present';
 	const TEXT_PRESENT = 'text_present';
 	const ATTRIBUTES_PRESENT = 'attributes_present';
+	const CLASSES_PRESENT = 'classes_present';
 	const VISIBLE = 'visible';
 	const CLICKABLE = 'clickable';
 	const READY = 'ready';
 	const NOT_PRESENT = 'not present';
 	const TEXT_NOT_PRESENT = 'text not present';
 	const ATTRIBUTES_NOT_PRESENT = 'attributes_not_present';
+	const CLASSES_NOT_PRESENT = 'classes_not_present';
 	const NOT_VISIBLE = 'not visible';
 	const NOT_CLICKABLE = 'not clickable';
 	const SELECTED = 'selected';
@@ -111,6 +113,8 @@ class CElementFilter {
 			static::TEXT_NOT_PRESENT => 'getTextNotPresentCondition',
 			static::ATTRIBUTES_PRESENT => 'getAttributesPresentCondition',
 			static::ATTRIBUTES_NOT_PRESENT => 'getAttributesNotPresentCondition',
+			static::CLASSES_PRESENT => 'getClassesPresentCondition',
+			static::CLASSES_NOT_PRESENT => 'getClassesNotPresentCondition',
 			static::VISIBLE => 'getVisibleCondition',
 			static::NOT_VISIBLE => 'getNotVisibleCondition',
 			static::CLICKABLE => 'getClickableCondition',

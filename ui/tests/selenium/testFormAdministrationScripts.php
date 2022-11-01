@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @backup scripts
+ *
+ * @onBefore prepareScriptData
  */
 class testFormAdministrationScripts extends CWebTest {
 
@@ -38,7 +40,14 @@ class testFormAdministrationScripts extends CWebTest {
 	 *
 	 * @var integer
 	 */
-	protected static $scriptids;
+	protected static $clone_scriptids;
+
+	/**
+	 * Id of scripts.
+	 *
+	 * @var array
+	 */
+	protected static $ids;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -47,6 +56,68 @@ class testFormAdministrationScripts extends CWebTest {
 	 */
 	public function getBehaviors() {
 		return [CMessageBehavior::class];
+	}
+
+	/**
+	 * Function used to create scripts.
+	 */
+	public function prepareScriptData() {
+		$response = CDataHelper::call('script.create', [
+			[
+				'name' => 'SSH_api_clone_1',
+				'type' => 2,
+				'scope' => 1,
+				'username' => 'SSH_username',
+				'password' => 'SSH_password',
+				'command' => 'test',
+				'port' => '80'
+			],
+			[
+				'name' => 'SSH_api_clone_2',
+				'type' => 2,
+				'scope' => 1,
+				'authtype' => '1',
+				'username' => 'SSH_username',
+				'privatekey' => 'private_key',
+				'publickey' => 'public_key',
+				'command' => 'test'
+			],
+			[
+				'name' => 'TELNET_api_clone',
+				'type' => 3,
+				'scope' => 1,
+				'username' => 'TELNET_username',
+				'password' => 'TELNET_password',
+				'command' => 'test'
+			],
+			[
+				'name' => 'type URL, manual host event for clone',
+				'type' => 6,
+				'scope' => 2,
+				'new_window' => 0,
+				'menu_path' => 'menu/path',
+				'url' => 'sysmaps.php'
+			],
+			[
+				'name' => 'type URL, manual action event for clone',
+				'type' => 6,
+				'scope' => 4,
+				'url' => 'zabbix.com'
+			]
+		]);
+		$this->assertArrayHasKey('scriptids', $response);
+		self::$clone_scriptids = $response['scriptids'];
+
+		$scripts = CDataHelper::call('script.create', [
+			[
+				'name' => 'URI schemes',
+				'type' => 6,
+				'scope' => 2,
+				'url' => 'sysmaps.php'
+			]
+		]);
+		$this->assertArrayHasKey('scriptids', $scripts);
+		self::$ids = CDataHelper::getIds('name');
 	}
 
 	/**
@@ -1044,65 +1115,12 @@ class testFormAdministrationScripts extends CWebTest {
 	}
 
 	/**
-	 * Function used to create scripts.
-	 */
-	public function prepareScriptData() {
-		$response = CDataHelper::call('script.create', [
-			[
-				'name' => 'SSH_api_clone_1',
-				'type' => 2,
-				'scope' => 1,
-				'username' => 'SSH_username',
-				'password' => 'SSH_password',
-				'command' => 'test',
-				'port' => '80'
-			],
-			[
-				'name' => 'SSH_api_clone_2',
-				'type' => 2,
-				'scope' => 1,
-				'authtype' => '1',
-				'username' => 'SSH_username',
-				'privatekey' => 'private_key',
-				'publickey' => 'public_key',
-				'command' => 'test'
-			],
-			[
-				'name' => 'TELNET_api_clone',
-				'type' => 3,
-				'scope' => 1,
-				'username' => 'TELNET_username',
-				'password' => 'TELNET_password',
-				'command' => 'test'
-			],
-			[
-				'name' => 'type URL, manual host event for clone',
-				'type' => 6,
-				'scope' => 2,
-				'new_window' => 0,
-				'menu_path' => 'menu/path',
-				'url' => 'sysmaps.php'
-			],
-			[
-				'name' => 'type URL, manual action event for clone',
-				'type' => 6,
-				'scope' => 4,
-				'url' => 'zabbix.com'
-			]
-		]);
-		$this->assertArrayHasKey('scriptids', $response);
-		self::$scriptids = $response['scriptids'];
-	}
-
-	/**
 	 * Function for checking script cloning with only changed name.
-	 *
-	 * @onBefore prepareScriptData
 	 */
 	public function testFormAdministrationScripts_Clone() {
 		// Added existing webhook to the list.
-		array_push(self::$scriptids, '201');
-		foreach (self::$scriptids as $scriptid) {
+		array_push(self::$clone_scriptids, '201');
+		foreach (self::$clone_scriptids as $scriptid) {
 			$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.$scriptid);
 			$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
 			$values = $form->getFields()->asValues();
@@ -1146,6 +1164,7 @@ class testFormAdministrationScripts extends CWebTest {
 	 * Check the default values, visible and required fields in the script form based on the selected scope and type.
 	 */
 	public function testFormAdministrationScripts_Layout() {
+		$this->setNetworkThrottlingMode(self::NETWORK_THROTTLING_SLOW);
 		$common_all_scopes = [
 			'fields' => ['Name', 'Scope', 'Type', 'Description', 'Host group'],
 			'required' => ['Name'],
@@ -1223,23 +1242,23 @@ class testFormAdministrationScripts extends CWebTest {
 				// Check defaul values.
 				$form->checkValue(array_merge($scope_default, $type_fields['default']));
 
-				// TODO: Check required fields.
-				// $this->compareArrays(array_merge($common_all_scopes['required'], $type_fields['required']),
-				// 		$form->getLabels(CElementFilter::REQUIRED)->asText()
-				// );
+				// Check required fields.
+				$this->compareArrays(array_merge($common_all_scopes['required'], $type_fields['required']),
+						$form->getLabels(CElementFilter::CLASSES_PRESENT, ['form-label-asterisk'])
+						->filter(CElementFilter::VISIBLE)->asText()
+				);
 
 				if ($type === 'SSH') {
+					// Check fields with 'Public key' authentication method.
 					$form->fill(['Authentication method' => 'Public key']);
 
-					// Check visible fields for different authentication method.
 					$this->compareArrays(array_merge($scope_fields, $type_fields['fields_public_key']),
 							$form->getLabels(CElementFilter::VISIBLE)->asText()
 					);
-
-					// TODO: Check required fields for different authentication method.
-					// $this->compareArrays(array_merge($common_all_scopes['required'], $type_fields['required_public_key']),
-					// 		$form->getLabels(CElementFilter::REQUIRED)->asText()
-					// );
+					$this->compareArrays(array_merge($common_all_scopes['required'], $type_fields['required_public_key']),
+							$form->getLabels(CElementFilter::CLASSES_PRESENT, ['form-label-asterisk'])
+							->filter(CElementFilter::VISIBLE)->asText()
+					);
 
 					// Reset the value of the "Authentication method" field.
 					$form->fill(['Authentication method' => 'Password']);
@@ -1249,7 +1268,7 @@ class testFormAdministrationScripts extends CWebTest {
 	}
 
 	/**
-	 * Sort arrays to compare if they are equal.
+	 * Sort arrays and compare if they are equal.
 	 *
 	 * @param array $expected	expected fields from data provider
 	 * @param array $actual		actual fields on page
@@ -1258,5 +1277,201 @@ class testFormAdministrationScripts extends CWebTest {
 		sort($expected);
 		sort($actual);
 		$this->assertEquals(json_encode($expected), json_encode($actual));
+	}
+
+	/**
+	 * Modify the URI scheme validation rules and check the result for the URL type in script form.
+	 */
+	public function testFormAdministrationScripts_UriScheme() {
+		$invalid_schemes = ['dns://zabbix.com', 'message://zabbix.com'];
+		$default_valid_schemes = ['http://zabbix.com', 'https://zabbix.com', 'ftp://zabbix.com', 'file://zabbix.com',
+			'mailto://zabbix.com', 'tel://zabbix.com', 'ssh://zabbix.com'
+		];
+
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['URI schemes']);
+		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
+
+		// Check default URI scheme rules: http, https, ftp, file, mailto, tel, ssh.
+		$this->assertUriScheme($form, $default_valid_schemes);
+		$this->assertUriScheme($form, $invalid_schemes, TEST_BAD);
+
+		// Change valid URI schemes on "Other configuration parameters" page.
+		$this->page->open('zabbix.php?action=miscconfig.edit');
+		$config_form = $this->query('name:otherForm')->waitUntilReady()->asForm()->one();
+		$config_form->fill(['Valid URI schemes' => 'dns,message']);
+		$config_form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+
+		$this->page->open('zabbix.php?action=script.edit&scriptid='.self::$ids['URI schemes'])->waitUntilReady();
+		$this->assertUriScheme($form, $default_valid_schemes, TEST_BAD);
+		$this->assertUriScheme($form, $invalid_schemes);
+
+		// Disable URI scheme validation.
+		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
+		$config_form->fill(['Validate URI schemes' => false]);
+		$config_form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+
+		$this->page->open('zabbix.php?action=script.edit&scriptid='.self::$ids['URI schemes'])->waitUntilReady();
+		$this->assertUriScheme($form, array_merge($default_valid_schemes, $invalid_schemes));
+	}
+
+	/**
+	 * Fill in the URL field to check the uri scheme validation rules.
+	 *
+	 * @param CFormElement $form	form element of script
+	 * @param array $data			url field data
+	 * @param string $expected		expected result after script form submit, TEST_GOOD or TEST_BAD
+	 */
+	private function assertUriScheme($form, $data, $expected = TEST_GOOD) {
+		foreach ($data as $scheme) {
+			$form->fill(['URL' => $scheme]);
+			$form->submit();
+
+			if ($expected === TEST_GOOD) {
+				$this->assertMessage(TEST_GOOD, 'Script updated');
+				$this->page->open('zabbix.php?action=script.edit&scriptid='.self::$ids['URI schemes'])->waitUntilReady();
+			}
+			else {
+				$this->assertMessage(TEST_BAD, 'Cannot update script', 'Invalid parameter "/1/url": unacceptable URL.');
+				CMessageElement::find()->one()->close()->waitUntilNotVisible();
+			}
+		}
+	}
+
+	public function getContextMenuData() {
+		return [
+			// USER.* macros.
+			[
+				[
+					'fields' =>  [
+						'Name' => 'USER macros - manual host',
+						'Scope' => 'Manual host action',
+						'Type' => 'URL',
+						'URL' => '{USER.FULLNAME}, {USER.NAME}, {USER.SURNAME}, {USER.USERNAME}',
+						'Enable confirmation' => true,
+						'Confirmation text' => '{USER.FULLNAME}, {USER.NAME}, {USER.SURNAME}, {USER.USERNAME}'
+					],
+					'resolved_macros' => 'Zabbix Administrator (Admin), Zabbix, Administrator, Admin',
+					'host' => 'ЗАББИКС Сервер',
+					'trigger' => 'Test trigger with tag'
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'USER macros - manual event',
+						'Scope' => 'Manual event action',
+						'Type' => 'URL',
+						'URL' => '{USER.FULLNAME}, {USER.NAME}, {USER.SURNAME}, {USER.USERNAME}',
+						'Enable confirmation' => true,
+						'Confirmation text' => '{USER.FULLNAME}, {USER.NAME}, {USER.SURNAME}, {USER.USERNAME}'
+					],
+					'resolved_macros' => 'Zabbix Administrator (Admin), Zabbix, Administrator, Admin',
+					'host' => 'ЗАББИКС Сервер',
+					'trigger' => 'Test trigger with tag'
+				]
+			],
+			// EVENT.* macros.
+			[
+				[
+					'fields' =>  [
+						'Name' => 'EVENT macros - manual host',
+						'Scope' => 'Manual host action',
+						'Type' => 'URL',
+						'URL' => '{EVENT.ID},{EVENT.NAME},{EVENT.NSEVERITY},{EVENT.SEVERITY},{EVENT.STATUS},{EVENT.VALUE}',
+						'Enable confirmation' => true,
+						'Confirmation text' => '{EVENT.ID},{EVENT.NAME},{EVENT.NSEVERITY},{EVENT.SEVERITY},'.
+								'{EVENT.STATUS},{EVENT.VALUE}'
+					],
+					'resolved_macros' => '{EVENT.ID},{EVENT.NAME},{EVENT.NSEVERITY},{EVENT.SEVERITY},{EVENT.STATUS},{EVENT.VALUE}',
+					'host' => 'ЗАББИКС Сервер',
+					'trigger' => 'Test trigger with tag'
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'EVENT macros - manual event',
+						'Scope' => 'Manual event action',
+						'Type' => 'URL',
+						'URL' => '{EVENT.ID},{EVENT.NAME},{EVENT.NSEVERITY},{EVENT.SEVERITY},{EVENT.STATUS},{EVENT.VALUE}',
+						'Enable confirmation' => true,
+						'Confirmation text' => '{EVENT.ID},{EVENT.NAME},{EVENT.NSEVERITY},{EVENT.SEVERITY},'.
+								'{EVENT.STATUS},{EVENT.VALUE}'
+					],
+					'resolved_macros' => '93,Test trigger with tag,2,Warning,PROBLEM,1',
+					'host' => 'ЗАББИКС Сервер',
+					'trigger' => 'Test trigger with tag'
+				]
+			],
+			// HOST.* macros.
+			[
+				[
+					'fields' =>  [
+						'Name' => 'HOST macros - manual host',
+						'Scope' => 'Manual host action',
+						'Type' => 'URL',
+						'URL' => '{HOST.ID},{HOST.CONN},{HOST.DNS},{HOST.HOST},{HOST.IP},{HOST.NAME}',
+						'Enable confirmation' => true,
+						'Confirmation text' => '{HOST.ID},{HOST.CONN},{HOST.DNS},{HOST.HOST},{HOST.IP},{HOST.NAME}'
+					],
+					'resolved_macros' => '10084,127.0.0.1,,Test host,127.0.0.1,ЗАББИКС Сервер',
+					'host' => 'ЗАББИКС Сервер',
+					'trigger' => 'Test trigger with tag'
+				]
+			],
+			[
+				[
+					'fields' =>  [
+						'Name' => 'HOST macros - manual event',
+						'Scope' => 'Manual event action',
+						'Type' => 'URL',
+						'URL' => '{HOST.ID},{HOST.CONN},{HOST.DNS},{HOST.HOST},{HOST.IP},{HOST.NAME}',
+						'Enable confirmation' => true,
+						'Confirmation text' => '{HOST.ID},{HOST.CONN},{HOST.DNS},{HOST.HOST},{HOST.IP},{HOST.NAME}'
+					],
+					'resolved_macros' => '10084,127.0.0.1,,Test host,127.0.0.1,ЗАББИКС Сервер',
+					'host' => 'ЗАББИКС Сервер',
+					'trigger' => 'Test trigger with tag'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check resolved macros in Host and Event context menu on Problems page.
+	 *
+	 * @dataProvider getContextMenuData
+	 */
+	public function testFormAdministrationScripts_ContextMenu($data) {
+		$this->page->login()->open('zabbix.php?action=script.edit')->waitUntilReady();
+		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
+		$form->fill($data['fields']);
+		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Script added');
+
+		$this->page->open('zabbix.php?action=problem.view');
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		$with_script = ($data['fields']['Scope'] === 'Manual host action') ? $data['host'] : $data['trigger'];
+		$without_script = ($data['fields']['Scope'] === 'Manual host action') ? $data['trigger'] : $data['host'];
+
+		// Check resolved macros in context menu.
+		$table->query('link', $with_script)->one()->click();
+		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$this->assertEquals($data['resolved_macros'], $popup->getItem($data['fields']['Name'])->getAttribute('href'));
+
+		// Check resolved macros in confirmation alert.
+		$popup->fill($data['fields']['Name']);
+		$this->assertEquals($data['resolved_macros'], $this->page->getAlertText());
+		$this->page->dismissAlert();
+		$popup->close();
+
+		// Check that script link is not present in the context menu for other manual action.
+		$table->query('link', $without_script)->one()->click();
+		$this->assertEquals(0, CPopupMenuElement::find()->waitUntilVisible()->one()->getItems()
+				->filter(CElementFilter::TEXT_PRESENT, [$data['fields']['Name']])->count()
+		);
 	}
 }

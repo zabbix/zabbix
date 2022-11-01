@@ -100,7 +100,7 @@ interface IWaitable {
 	public function getAttributesPresentCondition($attributes);
 
 	/**
-	 * Condition describing state when text is not present within the object.
+	 * Condition describing state when attribute is not present within the object.
 	 *
 	 * @param array $attributes    attributes to not be present
 	 *
