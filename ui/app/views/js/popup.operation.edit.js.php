@@ -344,13 +344,24 @@ window.operation_popup = new class {
 	}
 
 	_openUserGroupPopup(target) {
+		let usrgrp_table = document
+			.querySelector('#operation-message-user-groups-table tbody')
+			.getElementsByTagName('input');
+
+		let disabled_values = [];
+		for (let element of usrgrp_table) {
+			disabled_values.push(element.value)
+		}
+
 		const parameters = {
 			'srctbl': 'usrgrp',
 			'srcfld1': 'usrgrpid',
 			'srcfld2': 'name',
 			'dstfrm': 'popup.operation',
 			'dstfld1': 'operation-message-user-groups-footer',
-			'multiselect': '1'
+			'multiselect': '1',
+			'editable': 1,
+			'disableids': disabled_values
 		}
 
 		const overlay = PopUp('popup.generic', parameters, {
@@ -401,20 +412,30 @@ window.operation_popup = new class {
 	}
 
 	_openUserPopup(trigger_element) {
-		const overlay = PopUp('popup.generic', {
+		let user_table = document.querySelector('#operation-message-user-table tbody').getElementsByTagName('input');
+		let disabled_values = [];
+		for (let element of user_table) {
+			disabled_values.push(element.value)
+		}
+
+		let parameters = {
 			'srctbl': 'users',
 			'srcfld1': 'userid',
 			'srcfld2': 'fullname',
 			'dstfrm': 'popup.operation',
 			'dstfld1': 'operation-message-users-footer',
-			'multiselect': '1'
-		}, {dialogue_class: 'modal-popup-generic', trigger_element});
+			'multiselect': '1',
+			'editable': 1,
+			'disableids': Object.values(disabled_values)
+		}
+
+		const overlay = PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic', trigger_element});
 
 		window.addPopupValues = ({object: objectid, parentId: sourceid, values}) => {
 			if (sourceid === 'operation-message-users-footer') {
 				overlay.$dialogue[0].dispatchEvent(new CustomEvent('submit-users-popup', {detail: values}));
 			}
-		}
+		};
 
 		overlay.$dialogue[0].addEventListener('submit-users-popup', (e) => {
 			this._addUser(e.detail);
@@ -429,7 +450,7 @@ window.operation_popup = new class {
 
 		while (document.querySelector(`#operation-condition-list [data-id="${row_index}"]`) !== null) {
 			row_index++;
-		}
+		};
 
 		parameters = {
 			type: <?= ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION ?>,
@@ -603,7 +624,7 @@ window.operation_popup = new class {
 		]
 
 		default_msg.onchange = function() {
-			if(document.querySelector('#operation_opmessage_default_msg').checked) {
+			if (document.querySelector('#operation_opmessage_default_msg').checked) {
 				message_fields.forEach((field) => {
 					document.getElementById(field).style.display='';
 					document.getElementById(field).removeAttribute('disabled');
