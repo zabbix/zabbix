@@ -1120,9 +1120,6 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/alarms'
-              status_codes: '200,503,404'
-              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
