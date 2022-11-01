@@ -2008,8 +2008,6 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              status_codes: '200,503,404'
-              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -2055,8 +2053,6 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              status_codes: '200,503,404'
-              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -2102,8 +2098,6 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              status_codes: '200,503,404'
-              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -2149,8 +2143,6 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              status_codes: '200,503,404'
-              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -2196,8 +2188,6 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              status_codes: '200,503,404'
-              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
