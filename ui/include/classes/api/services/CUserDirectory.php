@@ -46,7 +46,8 @@ class CUserDirectory extends CApiService {
 	 */
 	protected $ldap_output_fields = [
 		'host', 'port', 'base_dn', 'search_attribute', 'bind_dn', 'start_tls', 'search_filter', 'group_basedn',
-		'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username', 'user_lastname'
+		'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username', 'user_lastname',
+		'user_ref_attr'
 	];
 
 	/**
@@ -985,6 +986,12 @@ class CUserDirectory extends CApiService {
 			$user = array_merge($user, $provisioning->getUser($idp_user));
 
 			if (!array_key_exists('usrgrps', $user)) {
+				$user_ref_attr = $userdirectory['user_ref_attr'];
+
+				if ($user_ref_attr !== '' && array_key_exists($user_ref_attr, $idp_user)) {
+					$ldap->setQueryPlaceholders(['%{ref}' => $idp_user[$user_ref_attr]]);
+				}
+
 				$group_attributes = $provisioning->getGroupIdpAttributes();
 				$ldap_groups = $ldap->getGroupAttributes($group_attributes, $user['username'], $user['password']);
 				$ldap_groups = array_column($ldap_groups, $userdirectory['group_name']);
@@ -1041,7 +1048,7 @@ class CUserDirectory extends CApiService {
 			if ($userdirectory['provision_status'] == JIT_PROVISIONING_ENABLED) {
 				$userdirectory += $this->get([
 					'output' => ['group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership',
-						'user_username', 'user_lastname'
+						'user_ref_attr', 'user_username', 'user_lastname'
 					],
 					'userdirectoryids' => $userdirectory['userdirectoryid'],
 					'selectProvisionMedia' => ['name', 'mediatypeid', 'attribute'],
@@ -1064,6 +1071,7 @@ class CUserDirectory extends CApiService {
 			'group_basedn' =>		['type' => API_STRING_UTF8],
 			'group_name' =>			['type' => API_STRING_UTF8],
 			'group_member' =>		['type' => API_STRING_UTF8],
+			'user_ref_attr' =>		['type' => API_STRING_UTF8],
 			'group_filter' =>		['type' => API_STRING_UTF8],
 			'group_membership' =>	['type' => API_STRING_UTF8],
 			'user_username' =>		['type' => API_STRING_UTF8],
@@ -1292,6 +1300,10 @@ class CUserDirectory extends CApiService {
 			]],
 			'group_basedn' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'group_basedn')],
+										['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'user_ref_attr' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'idp_type', 'in' => implode(',', [IDP_TYPE_LDAP])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('userdirectory_ldap', 'user_ref_attr')],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
 			'group_name' =>		['type' => API_MULTIPLE, 'rules' => [

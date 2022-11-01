@@ -1873,6 +1873,12 @@ class CUser extends CApiService {
 					$user = array_merge($provision_user, $provisioning->getUser($idp_user));
 
 					if (!array_key_exists('usrgrps', $user)) {
+						$user_ref_attr = $config['user_ref_attr'];
+
+						if ($user_ref_attr !== '' && array_key_exists($user_ref_attr, $idp_user)) {
+							$ldap->setQueryPlaceholders(['%{ref}' => $idp_user[$user_ref_attr]]);
+						}
+
 						$group_attributes = $provisioning->getGroupIdpAttributes();
 						$ldap_groups = $ldap->getGroupAttributes($group_attributes, $user['username']);
 						$ldap_groups = array_column($ldap_groups, $config['group_name']);
@@ -2419,9 +2425,16 @@ class CUser extends CApiService {
 		}
 
 		$user_attributes = $provisioning->getUserIdpAttributes();
-		$user = $provisioning->getUser($ldap->getUserAttributes($user_attributes, $user_data['username']));
+		$idp_user = $ldap->getUserAttributes($user_attributes, $user_data['username']);
+		$user = $provisioning->getUser($idp_user);
 
 		if (!array_key_exists('usrgrps', $user)) {
+			$user_ref_attr = $config['user_ref_attr'];
+
+			if ($user_ref_attr !== '' && array_key_exists($user_ref_attr, $idp_user)) {
+				$ldap->setQueryPlaceholders(['%{ref}' => $idp_user[$user_ref_attr]]);
+			}
+
 			$group_attributes = $provisioning->getGroupIdpAttributes();
 			$ldap_groups = $ldap->getGroupAttributes($group_attributes, $user_data['username']);
 			$user += $provisioning->getUserGroupsAndRole(array_column($ldap_groups, $config['group_name']));

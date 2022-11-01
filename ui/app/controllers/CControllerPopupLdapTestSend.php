@@ -27,27 +27,28 @@ class CControllerPopupLdapTestSend extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'userdirectoryid' =>	'db userdirectory.userdirectoryid',
-			'host' =>				'required|db userdirectory_ldap.host|not_empty',
-			'port' =>				'required|db userdirectory_ldap.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
-			'base_dn' =>			'required|db userdirectory_ldap.base_dn|not_empty',
-			'bind_dn' =>			'db userdirectory_ldap.bind_dn',
-			'bind_password' =>		'db userdirectory_ldap.bind_password',
-			'search_attribute' =>	'required|db userdirectory_ldap.search_attribute|not_empty',
-			'start_tls' =>			'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
-			'search_filter' =>		'db userdirectory_ldap.search_filter',
-			'provision_status' =>	'db userdirectory.provision_status|in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
-			'group_basedn' =>		'db userdirectory_ldap.group_basedn',
-			'group_name' =>			'db userdirectory_ldap.group_name',
-			'group_member' =>		'db userdirectory_ldap.group_member',
-			'group_filter' =>		'db userdirectory_ldap.group_filter',
-			'group_membership' =>	'db userdirectory_ldap.group_membership',
-			'user_username' =>		'db userdirectory_ldap.user_username',
-			'user_lastname' =>		'db userdirectory_ldap.user_lastname',
-			'provision_media' =>	'array',
-			'provision_groups' =>	'array',
-			'test_username' =>		'required|string|not_empty',
-			'test_password' =>		'required|string|not_empty'
+			'userdirectoryid' =>		'db userdirectory.userdirectoryid',
+			'host' =>					'required|db userdirectory_ldap.host|not_empty',
+			'port' =>					'required|db userdirectory_ldap.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
+			'base_dn' =>				'required|db userdirectory_ldap.base_dn|not_empty',
+			'bind_dn' =>				'db userdirectory_ldap.bind_dn',
+			'bind_password' =>			'db userdirectory_ldap.bind_password',
+			'search_attribute' =>		'required|db userdirectory_ldap.search_attribute|not_empty',
+			'start_tls' =>				'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
+			'search_filter' =>			'db userdirectory_ldap.search_filter',
+			'provision_status' =>		'db userdirectory.provision_status|in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
+			'group_basedn' =>			'db userdirectory_ldap.group_basedn',
+			'group_name' =>				'db userdirectory_ldap.group_name',
+			'group_member' =>			'db userdirectory_ldap.group_member',
+			'group_filter' =>			'db userdirectory_ldap.group_filter',
+			'reference_attribute' =>	'db userdirectory_ldap.user_ref_attr',
+			'group_membership' =>		'db userdirectory_ldap.group_membership',
+			'user_username' =>			'db userdirectory_ldap.user_username',
+			'user_lastname' =>			'db userdirectory_ldap.user_lastname',
+			'provision_media' =>		'array',
+			'provision_groups' =>		'array',
+			'test_username' =>			'required|string|not_empty',
+			'test_password' =>			'required|string|not_empty'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -80,8 +81,8 @@ class CControllerPopupLdapTestSend extends CController {
 		];
 		$this->getInputs($ldap_test_object, ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn', 'bind_password',
 			'search_attribute', 'start_tls', 'search_filter','test_username', 'test_password', 'provision_status',
-			'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username',
-			'user_lastname'
+			'group_basedn', 'group_name', 'group_member', 'group_filter', 'reference_attribute','group_membership',
+			'user_username', 'user_lastname'
 		]);
 
 		foreach ($this->getInput('provision_groups', []) as $provision_group) {

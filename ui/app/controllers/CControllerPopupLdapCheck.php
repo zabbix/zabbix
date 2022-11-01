@@ -29,42 +29,34 @@ class CControllerPopupLdapCheck extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'userdirectoryid' =>	'db userdirectory.userdirectoryid',
-			'name' =>				'required|db userdirectory.name|not_empty',
-			'host' =>				'required|db userdirectory_ldap.host|not_empty',
-			'port' =>				'required|db userdirectory_ldap.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
-			'base_dn' =>			'required|db userdirectory_ldap.base_dn|not_empty',
-			'bind_dn' =>			'db userdirectory_ldap.bind_dn',
-			'bind_password' =>		'db userdirectory_ldap.bind_password',
-			'search_attribute' =>	'required|db userdirectory_ldap.search_attribute|not_empty',
-			'start_tls' =>			'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
-			'search_filter' =>		'db userdirectory_ldap.search_filter',
-			'description' =>		'db userdirectory.description',
-			'group_basedn' =>		'db userdirectory_ldap.group_basedn',
-			'group_name' =>			'db userdirectory_ldap.group_name',
-			'group_member' =>		'db userdirectory_ldap.group_member',
-			'group_filter' =>		'db userdirectory_ldap.group_filter',
-			'group_membership' =>	'db userdirectory_ldap.group_membership',
-			'user_username' =>		'db userdirectory_ldap.user_username',
-			'user_lastname' =>		'db userdirectory_ldap.user_lastname',
-			'add_ldap_server' =>	'in 0,1',
-			'provision_status' =>	'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
-			'provision_groups' =>	'array',
-			'provision_media' =>	'array'
+			'userdirectoryid' =>		'db userdirectory.userdirectoryid',
+			'name' =>					'required|db userdirectory.name|not_empty',
+			'host' =>					'required|db userdirectory_ldap.host|not_empty',
+			'port' =>					'required|db userdirectory_ldap.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
+			'base_dn' =>				'required|db userdirectory_ldap.base_dn|not_empty',
+			'bind_dn' =>				'db userdirectory_ldap.bind_dn',
+			'bind_password' =>			'db userdirectory_ldap.bind_password',
+			'search_attribute' =>		'required|db userdirectory_ldap.search_attribute|not_empty',
+			'start_tls' =>				'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
+			'search_filter' =>			'db userdirectory_ldap.search_filter',
+			'description' =>			'db userdirectory.description',
+			'group_basedn' =>			'db userdirectory_ldap.group_basedn',
+			'group_name' =>				'db userdirectory_ldap.group_name',
+			'group_member' =>			'db userdirectory_ldap.group_member',
+			'reference_attribute' =>	'db userdirectory_ldap.user_ref_attr',
+			'group_filter' =>			'db userdirectory_ldap.group_filter',
+			'group_membership' =>		'db userdirectory_ldap.group_membership',
+			'user_username' =>			'db userdirectory_ldap.user_username',
+			'user_lastname' =>			'db userdirectory_ldap.user_lastname',
+			'add_ldap_server' =>		'in 0,1',
+			'provision_status' =>		'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
+			'provision_groups' =>		'array',
+			'provision_media' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret && $this->getInput('provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
-			if (!$this->hasInput('group_basedn')) {
-				error(_s('Field "%1$s" is mandatory.', 'group_basedn'));
-				$ret = false;
-			}
-			elseif ($this->getInput('group_basedn') === '') {
-				error(_s('Incorrect value for field "%1$s": %2$s.', 'group_basedn', _('cannot be empty')));
-				$ret = false;
-			}
-
 			if ($ret && !$this->validateProvisionGroups()) {
 				error(_('Invalid user group mapping configuration.'));
 				$ret = false;
@@ -109,6 +101,7 @@ class CControllerPopupLdapCheck extends CController {
 				'group_basedn' => $this->getInput('group_basedn', ''),
 				'group_name' => $this->getInput('group_name', ''),
 				'group_member' => $this->getInput('group_member', ''),
+				'reference_attribute' => $this->getInput('reference_attribute', ''),
 				'group_filter' => $this->getInput('group_filter', ''),
 				'group_membership' => $this->getInput('group_membership', ''),
 				'user_username' => $this->getInput('user_username', ''),

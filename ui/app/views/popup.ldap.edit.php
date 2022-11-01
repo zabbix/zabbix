@@ -119,55 +119,95 @@ $form = (new CForm('post', $form_action))
 			)
 		])
 		->addItem([
+			(new CLabel(_('Group configuration'), 'group_configuration'))->addClass('allow-jit-provisioning'),
+			(new CFormField(
+				(new CRadioButtonList('group_configuration', $data['group_configuration']))
+					->setId('group-configuration')
+					->addValue(_('memberOf'), LDAP_MEMBER_OF)
+					->addValue(_('groupOfNames'), LDAP_GROUP_OF_NAMES)
+					->setModern(true)
+			))->addClass('allow-jit-provisioning')
+		])
+		->addItem([
 			(new CLabel(_('Group base DN'), 'group_basedn'))
-				->setAsteriskMark()
-				->addClass('allow-jit-provisioning'),
+				->addClass('allow-jit-provisioning')
+				->addClass('group-of-names'),
 			(new CFormField(
 				(new CTextBox('group_basedn', $data['group_basedn'], false,
 					DB::getFieldLength('userdirectory_ldap', 'group_basedn')
 				))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired()
-			))->addClass('allow-jit-provisioning')
+			))
+				->addClass('allow-jit-provisioning')
+				->addClass('group-of-names')
 		])
 		->addItem([
-			(new CLabel(_('Group name attribute'), 'group_name'))->addClass('allow-jit-provisioning'),
+			(new CLabel(_('Group name attribute'), 'group_name'))
+				->addClass('allow-jit-provisioning')
+				->addClass('group-of-names'),
 			(new CFormField(
 				(new CTextBox('group_name', $data['group_name'], false,
 					DB::getFieldLength('userdirectory_ldap', 'group_name')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			))->addClass('allow-jit-provisioning')
+			))
+				->addClass('allow-jit-provisioning')
+				->addClass('group-of-names')
 		])
 		->addItem([
 			(new CLabel(_('Group member attribute'), 'group_member'))
-				->addClass('allow-jit-provisioning'),
+				->addClass('allow-jit-provisioning')
+				->addClass('group-of-names'),
 			(new CFormField(
 				(new CTextBox('group_member', $data['group_member'], false,
 					DB::getFieldLength('userdirectory_ldap', 'group_member')
 				))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			))->addClass('allow-jit-provisioning')
+			))
+				->addClass('allow-jit-provisioning')
+				->addClass('group-of-names')
+		])
+		->addItem([
+			(new CLabel([_('Reference attribute'),
+				makeHelpIcon(_('Use %{ref} in group filter to reference value of this user attribute.'))
+			], 'reference_attribute'))
+				->addClass('allow-jit-provisioning')
+				->addClass('group-of-names'),
+			(new CFormField(
+				(new CTextBox('reference_attribute', $data['reference_attribute'], false,
+					DB::getFieldLength('userdirectory_ldap', 'user_ref_attr')
+				))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			))
+				->addClass('allow-jit-provisioning')
+				->addClass('group-of-names')
 		])
 		->addItem([
 			(new CLabel(_('Group filter'), 'group_filter'))
-				->addClass('allow-jit-provisioning'),
+				->addClass('allow-jit-provisioning')
+				->addClass('group-of-names'),
 			(new CFormField(
 				(new CTextBox('group_filter', $data['group_filter'], false,
 					DB::getFieldLength('userdirectory_ldap', 'group_filter')
 				))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAttribute('placeholder', CLdap::DEFAULT_FILTER_GROUP)
-			))->addClass('allow-jit-provisioning')
+			))
+				->addClass('allow-jit-provisioning')
+				->addClass('group-of-names')
 		])
 		->addItem([
 			(new CLabel(_('User group membership attribute'), 'group_membership'))
-				->addClass('allow-jit-provisioning'),
+				->addClass('allow-jit-provisioning')
+				->addClass('member-of'),
 			(new CFormField(
 				(new CTextBox('group_membership', $data['group_membership'], false,
 					DB::getFieldLength('userdirectory_ldap', 'group_membership')
 				))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			))->addClass('allow-jit-provisioning')
+			))
+				->addClass('allow-jit-provisioning')
+				->addClass('member-of')
 		])
 		->addItem([
 			(new CLabel(_('User name attribute'), 'user_username'))->addClass('allow-jit-provisioning'),
