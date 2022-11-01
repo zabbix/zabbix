@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testPageActions extends CLegacyWebTest {
@@ -154,7 +155,7 @@ class testPageActions extends CLegacyWebTest {
 	* @dataProvider allEventSources
 	*/
 	public function testPageActions_CheckLayout($eventsource) {
-		$this->zbxTestLogin('actionconf.php?eventsource='.$eventsource);
+		$this->zbxTestLogin('zabbix.php?action=action.list&eventsource='.$eventsource);
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->zbxTestCheckHeader($this->event_sources[$eventsource]);
@@ -184,11 +185,11 @@ class testPageActions extends CLegacyWebTest {
 	public function testPageActions_SimpleUpdate($action) {
 		$this->calculateHash($action['actionid']);
 
-		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
+		$this->zbxTestLogin('zabbix.php?action=action.list&eventsource='.$action['eventsource']);
 		$this->zbxTestClickLinkText($action['name']);
-		$this->zbxTestClickWait('update');
+		$this->zbxTestClickButtonText('Update');
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestTextPresent('Action updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action updated');
 		$this->zbxTestTextPresent($action['name']);
 
 		$this->verifyHash();
@@ -201,18 +202,20 @@ class testPageActions extends CLegacyWebTest {
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';
 		$this->oldHashAction = CDBHelper::getHash($this->sqlHashAction);
 
-		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
+		$this->zbxTestLogin('zabbix.php?action=action.list&eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
-				$this->zbxTestClickXpathWait("//a[contains(@onclick,'actionid[]=".$action['actionid']."')]");
-				$this->zbxTestTextPresent('Action disabled');
+				$this->zbxTestClickXpath('//a[contains(@actionid,"'.$action['actionid'].'") and (text()="Enabled")]');
+				$this->page->acceptAlert();
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action disabled');
 				$newStatus = ACTION_STATUS_DISABLED;
 				break;
 			case ACTION_STATUS_DISABLED:
-				$this->zbxTestClickXpath("//a[contains(@onclick,'actionid[]=".$action['actionid']."')]");
-				$this->zbxTestTextPresent('Action enabled');
+				$this->zbxTestClickXpath('//a[contains(@actionid,"'.$action['actionid'].'") and (text()="Disabled")]');
+				$this->page->acceptAlert();
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action enabled');
 				$newStatus = ACTION_STATUS_ENABLED;
 				break;
 			default:
@@ -238,18 +241,18 @@ class testPageActions extends CLegacyWebTest {
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';
 		$this->oldHashAction = CDBHelper::getHash($this->sqlHashAction);
 
-		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
+		$this->zbxTestLogin('zabbix.php?action=action.list&eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->zbxTestCheckHeader($this->event_sources[$action['eventsource']]);
 
 		$this->zbxTestCheckboxSelect('actionids_'.$action['actionid']);
-		$this->zbxTestClickButton('action.massdisable');
+		$this->zbxTestClickXpath('//button[contains(@class,"massdisable-action")]');
 
-		$this->zbxTestAcceptAlert();
+		$this->page->acceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestTextPresent('Action disabled');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action disabled');
 		$this->zbxTestTextPresent('Disabled');
 
 		$this->assertEquals(1, CDBHelper::getCount(
@@ -269,15 +272,15 @@ class testPageActions extends CLegacyWebTest {
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';
 		$this->oldHashAction = CDBHelper::getHash($this->sqlHashAction);
 
-		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
+		$this->zbxTestLogin('zabbix.php?action=action.list&eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->zbxTestCheckHeader($this->event_sources[$action['eventsource']]);
 
 		$this->zbxTestCheckboxSelect('actionids_'.$action['actionid']);
-		$this->zbxTestClickButton('action.massenable');
+		$this->zbxTestClickXpath('//button[contains(@class,"massenable-action")]');
 
-		$this->zbxTestAcceptAlert();
+		$this->page->acceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action enabled');
@@ -301,18 +304,18 @@ class testPageActions extends CLegacyWebTest {
 		$this->sqlHashAction = 'SELECT * FROM actions WHERE actionid<>'.$action['actionid'].' ORDER BY actionid';
 		$this->oldHashAction = CDBHelper::getHash($this->sqlHashAction);
 
-		$this->zbxTestLogin('actionconf.php?eventsource='.$action['eventsource']);
+		$this->zbxTestLogin('zabbix.php?action=action.list&eventsource='.$action['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->zbxTestCheckHeader($this->event_sources[$action['eventsource']]);
 
 		$this->zbxTestCheckboxSelect('actionids_'.$action['actionid']);
-		$this->zbxTestClickButton('action.massdelete');
+		$this->zbxTestClickXpath('//button[contains(@class,"massdelete-action")]');
 
-		$this->zbxTestAcceptAlert();
+		$this->page->acceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Selected actions deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action deleted');
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM actions WHERE actionid='.$action['actionid']));
 
