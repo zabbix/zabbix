@@ -302,6 +302,61 @@ static void	jsonpath_list_free(zbx_jsonpath_list_node_t *list)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: append array index to list                                        *
+ *                                                                            *
+ ******************************************************************************/
+zbx_jsonpath_list_node_t	*jsonpath_list_append_index(zbx_jsonpath_list_node_t *head, int index,
+		int check_duplicate)
+{
+	zbx_jsonpath_list_node_t	*node;
+
+	if (0 != check_duplicate)
+	{
+		for (node = head; NULL != node; node = node->next)
+		{
+			int	query_index;
+
+			memcpy(&query_index, node->data, sizeof(query_index));
+			if (query_index == index)
+				return head;
+		}
+	}
+
+	node = jsonpath_list_create_node(sizeof(int));
+	node->next = head;
+	memcpy(node->data, &index, sizeof(int));
+
+	return node;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: append name to list                                               *
+ *                                                                            *
+ ******************************************************************************/
+zbx_jsonpath_list_node_t	*jsonpath_list_append_name(zbx_jsonpath_list_node_t *head, const char *name, size_t len)
+{
+	zbx_jsonpath_list_node_t	*node, *new_node;
+
+	new_node = jsonpath_list_create_node(len + 1);
+	jsonpath_unquote(new_node->data, name, len + 1);
+
+	for (node = head; NULL != node; node = node->next)
+	{
+		if (0 == strcmp((char *)new_node->data, (char *)node->data))
+		{
+			zbx_free(new_node);
+			return head;
+		}
+	}
+
+	new_node->next = head;
+
+	return new_node;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: create jsonpath structure and compile json path                   *
  *                                                                            *
  ******************************************************************************/
@@ -1175,18 +1230,13 @@ static int	jsonpath_parse_names(const char *list, zbx_jsonpath_t *jsonpath, cons
 				}
 				else if (*start == *end)
 				{
-					zbx_jsonpath_list_node_t	*node;
-
 					if (start + 1 == end)
 					{
 						ret = zbx_jsonpath_error(start);
 						goto out;
 					}
 
-					node = jsonpath_list_create_node((size_t)(end - start + 1));
-					jsonpath_unquote(node->data, start, (size_t)(end - start + 1));
-					node->next = head;
-					head = node;
+					head = jsonpath_list_append_name(head, start, (size_t)(end - start));
 					parsed_name = 1;
 					start = NULL;
 				}
@@ -1293,19 +1343,13 @@ static int	jsonpath_parse_indexes(const char *list, zbx_jsonpath_t *jsonpath, co
 
 		if (NULL != start)
 		{
-			int	value;
-
 			if ('-' == *start && end == start + 1)
 			{
 				ret = zbx_jsonpath_error(start);
 				goto out;
 			}
 
-			node = jsonpath_list_create_node(sizeof(int));
-			node->next = head;
-			head = node;
-			value = atoi(start);
-			memcpy(node->data, &value, sizeof(int));
+			head = jsonpath_list_append_index(head, atoi(start), type == ZBX_JSONPATH_SEGMENT_MATCH_LIST);
 			start = NULL;
 			parsed_index = 1;
 		}

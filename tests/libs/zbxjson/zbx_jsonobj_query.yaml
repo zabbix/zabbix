@@ -768,6 +768,33 @@ in:
 out:
   return: SUCCEED
   value: '[8.95]'
+---
+test case: Query $.books[1,1].title
+include: &include zbx_jsonobj_query.inc.yaml
+in:
+  data: *include
+  path: $.books[1,1].title 
+out:
+  return: SUCCEED
+  value: Sword of Honour
+---
+test case: Query $.books[1:2].title
+include: &include zbx_jsonobj_query.inc.yaml
+in:
+  data: *include
+  path: $.books[1:2].title 
+out:
+  return: SUCCEED
+  value: '["Sword of Honour"]'
+---
+test case: Query $.books[1]["title","title"]
+include: &include zbx_jsonobj_query.inc.yaml
+in:
+  data: *include
+  path: $.books[1].["title","title"] 
+out:
+  return: SUCCEED
+  value: Sword of Honour
 ...
 
 
