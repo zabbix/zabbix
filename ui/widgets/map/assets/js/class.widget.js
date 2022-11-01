@@ -81,8 +81,7 @@ class CWidgetMap extends CWidget {
 
 		if (this._source_type == CWidgetMap.SOURCETYPE_FILTER) {
 			for (const widget of widgets) {
-				if (widget instanceof CWidgetNavTree
-						&& widget._fields.reference === this._fields.filter_widget_reference) {
+				if (widget._fields.reference === this._fields.filter_widget_reference) {
 					this._filter_widget = widget;
 
 					this._filter_widget.on(CWidgetMap.WIDGET_NAVTREE_EVENT_MARK, this._events.mark);

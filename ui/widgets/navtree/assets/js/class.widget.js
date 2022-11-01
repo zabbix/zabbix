@@ -68,7 +68,7 @@ class CWidgetNavTree extends CWidget {
 		this._maps = [];
 
 		for (const widget of widgets) {
-			if (widget instanceof CWidgetMap && this._fields.reference === widget._fields.filter_widget_reference) {
+			if (this._fields.reference === widget._fields.filter_widget_reference) {
 				this._maps.push(widget);
 			}
 		}
