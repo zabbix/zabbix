@@ -882,10 +882,10 @@ static void	jsonpath_expression_prepare_index(zbx_jsonpath_expression_t *exp)
 				{
 					left->type = ZBX_JSONPATH_PATH_OP;
 
-					if (ZBX_JSONPATH_CONST == left->type)
-						left->index_token = right->index_token;
-					else
+					if (ZBX_JSONPATH_CONST == right->type)
 						left->value_token = right->value_token;
+					else
+						left->index_token = right->index_token;
 				}
 				else
 					left->type = ZBX_JSONPATH_VALUE;
