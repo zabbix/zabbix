@@ -22,19 +22,19 @@
 class CControllerPopupActionOperationEdit extends CController {
 
 	protected function checkInput(): bool {
+		$eventsource = [
+			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+			EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+		];
+
 		$fields = [
-			'eventsource' =>	'required|in '.implode(',', [
-									EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
-									EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
-								]),
-			'recovery' =>		'required|in '.implode(',', [
-									ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION
-								]),
+			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', $eventsource),
+			'recovery' =>		'db operations.recovery',
 			'actionid' =>		'db actions.actionid',
 			'operation' =>		'array',
-			'operationid' =>	'string',
+			'operationid' =>	'db operations.operationid',
+			'operationtype' =>	'db operations.operationtype',
 			'data' =>			'array',
-			'operationtype' =>	'int32',
 			'row_index' =>		'int32'
 		];
 

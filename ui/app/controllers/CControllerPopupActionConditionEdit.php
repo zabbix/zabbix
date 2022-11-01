@@ -28,16 +28,16 @@ class CControllerPopupActionConditionEdit extends CController {
 		$condition_operators = array_keys(condition_operator2str());
 
 		$fields = [
-			'actionid' =>			'string',
+			'actionid' =>			'db actions.actionid',
 			'type' =>				'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION,
 			'source' =>				'required|in '.implode(',', [
 										EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
 										EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
 									]),
-			'condition_type' =>		'in '.implode(',', $condition_types),
-			'row_index' =>			'required|int32',
+			'condition_type' =>		'db conditions.conditiontype|in '.implode(',', $condition_types),
+			'operator' =>			'db conditions.operator|in '.implode(',', $condition_operators),
 			'trigger_context' =>	'in '.implode(',', ['host', 'template']),
-			'operator' =>			'in '.implode(',', $condition_operators)
+			'row_index' =>			'required|int32',
 		];
 
 		$ret = $this->validateInput($fields);

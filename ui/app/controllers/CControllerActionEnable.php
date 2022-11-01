@@ -26,11 +26,13 @@ class CControllerActionEnable extends CController {
 	}
 
 	protected function checkInput(): bool {
+		$eventsource = [
+			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+			EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+		];
+
 		$fields = [
-			'eventsource' =>	'in '.implode(',', [
-									EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
-									EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
-								]),
+			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', $eventsource),
 			'actionids' =>		'array_id|required|not_empty'
 		];
 

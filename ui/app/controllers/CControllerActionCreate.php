@@ -26,26 +26,28 @@ class CControllerActionCreate extends CController {
 	}
 
 	protected function checkInput(): bool {
+		$eventsource = [
+			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+			EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+		];
+
 		$fields = [
-			'eventsource' =>			'required|in '.implode(',', [
-											EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,EVENT_SOURCE_AUTOREGISTRATION,
-											EVENT_SOURCE_INTERNAL,EVENT_SOURCE_SERVICE
-										]),
-			'name' =>					'string|required|not_empty',
-			'status' =>					'in '.ACTION_STATUS_ENABLED,
+			'eventsource' =>			'required|db actions.eventsource|in '.implode(',', $eventsource),
+			'name' =>					'required|db actions.name|not_empty',
+			'status' =>					'db actions.status|in '.ACTION_STATUS_ENABLED,
 			'operations' =>				'array',
 			'recovery_operations' =>	'array',
 			'update_operations' =>		'array',
-			'esc_period' =>				'string|not_empty',
-			'filter' =>					'array',
+			'esc_period' =>				'db actions.esc_period|not_empty',
+			'filter' =>					'db actions.filter',
 			'conditions' =>				'array',
-			'evaltype' =>				'in '.implode(',', [
+			'evaltype' =>				'db actions.evaltype|in '.implode(',', [
 											CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
 											CONDITION_EVAL_TYPE_EXPRESSION
 										]),
-			'formula' =>				'string',
-			'notify_if_canceled' =>		ACTION_NOTIFY_IF_CANCELED_TRUE,
-			'pause_suppressed' =>		ACTION_PAUSE_SUPPRESSED_TRUE
+			'formula' =>				'db actions.formula',
+			'notify_if_canceled' =>		'db actions.notify_if_canceled|in '.ACTION_NOTIFY_IF_CANCELED_TRUE,
+			'pause_suppressed' =>		'db actions.pause_suppressed|in '.ACTION_PAUSE_SUPPRESSED_TRUE
 		];
 
 		$ret = $this->validateInput($fields);
