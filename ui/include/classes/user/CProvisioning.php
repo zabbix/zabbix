@@ -75,11 +75,11 @@ class CProvisioning {
 	public static function forUserDirectoryId($userdirectoryid): self {
 		[$userdirectory] = API::getApiService('userdirectory')->get([
 			'output' => ['userdirectoryid', 'idp_type', 'provision_status', 'user_username', 'user_lastname',
-				'host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls',
-				'search_filter', 'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership',
-				'idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages',
-				'sign_assertions', 'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
-				'encrypt_assertions'
+				'host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls', 'idp_entityid', 'sso_url',
+				'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages', 'sign_assertions',
+				'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
+				'encrypt_assertions', 'search_filter', 'group_basedn', 'group_name', 'group_member', 'user_ref_attr',
+				'group_filter', 'group_membership',
 			],
 			'userdirectoryids' => [$userdirectoryid],
 			'selectProvisionMedia' => ['name', 'mediatypeid', 'attribute'],
@@ -118,8 +118,8 @@ class CProvisioning {
 	public function getIdpConfig(): array {
 		$keys = [
 			IDP_TYPE_LDAP	=> ['host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls', 'search_filter',
-				'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership', 'user_username',
-				'user_lastname', 'bind_password'
+				'group_basedn', 'group_name', 'group_member', 'user_ref_attr', 'group_filter', 'group_membership',
+				'user_username', 'user_lastname', 'bind_password'
 			],
 			IDP_TYPE_SAML	=> ['idp_entityid', 'sso_url', 'slo_url', 'username_attribute', 'sp_entityid',
 				'nameid_format', 'sign_messages', 'sign_assertions', 'sign_authn_requests', 'sign_logout_requests',
@@ -160,7 +160,7 @@ class CProvisioning {
 
 		switch ($this->userdirectory['idp_type']) {
 			case IDP_TYPE_LDAP:
-				$fields = ['user_username', 'user_lastname', 'search_attribute', 'group_membership'];
+				$fields = ['user_username', 'user_lastname', 'search_attribute', 'group_membership', 'user_ref_attr'];
 
 				break;
 

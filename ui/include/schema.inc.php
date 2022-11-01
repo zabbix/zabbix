@@ -9028,6 +9028,12 @@ return [
 				'length' => 255,
 				'default' => ''
 			],
+			'user_ref_attr' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
 			'group_filter' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,

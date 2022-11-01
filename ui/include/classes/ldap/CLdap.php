@@ -91,6 +91,14 @@ class CLdap {
 	];
 
 	/**
+	 * Placeholders with value used for building bind or search filter query.
+	 * Key is placholder name, %{attr} and value is placeholder value to replace to.
+	 *
+	 * @var array
+	 */
+	protected $placeholders = [];
+
+	/**
 	 * Estabilished LDAP connection resource, for PHP8.1.0+ LDAP\Connection class instance.
 	 *
 	 * @var bool|resource|LDAP\Connection
@@ -382,6 +390,15 @@ class CLdap {
 	}
 
 	/**
+	 * Setter for additional placeholders supported in bind or search query.
+	 *
+	 * @param array $placeholders  Associative array where key is placeholder in form %{name}.
+	 */
+	public function setQueryPlaceholders(array $placeholders) {
+		$this->placeholders = $placeholders;
+	}
+
+	/**
 	 * Setup bind attributes according LDAP configuration.
 	 */
 	protected function initBindAttributes() {
@@ -441,7 +458,7 @@ class CLdap {
 	protected function search(string $dn, string $filter, array $placeholders, array $attributes): array {
 		$this->error = static::ERR_NONE;
 		$base = $this->makeFilter($dn, $placeholders, LDAP_ESCAPE_DN);
-		$filter = $this->makeFilter($filter, $placeholders, LDAP_ESCAPE_FILTER);
+		$filter = $this->makeFilter($filter, $placeholders + $this->placeholders, LDAP_ESCAPE_FILTER);
 		$resource = @ldap_search($this->ds, $base, $filter, $attributes);
 		$results = false;
 
