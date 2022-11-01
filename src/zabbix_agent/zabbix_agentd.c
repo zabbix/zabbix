@@ -282,6 +282,8 @@ int	CONFIG_TRIGGERHOUSEKEEPER_FORKS = 0;
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
 
+static zbx_config_log_t	log_file_cfg	= {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
+
 char	*opt = NULL;
 
 #ifdef _WINDOWS
@@ -598,8 +600,8 @@ static void	set_defaults(void)
 	if (NULL == CONFIG_PID_FILE)
 		CONFIG_PID_FILE = (char *)"/tmp/zabbix_agentd.pid";
 #endif
-	if (NULL == CONFIG_LOG_TYPE_STR)
-		CONFIG_LOG_TYPE_STR = zbx_strdup(CONFIG_LOG_TYPE_STR, ZBX_OPTION_LOGTYPE_FILE);
+	if (NULL == log_file_cfg.log_type_str)
+		log_file_cfg.log_type_str = zbx_strdup(log_file_cfg.log_type_str, ZBX_OPTION_LOGTYPE_FILE);
 }
 
 /******************************************************************************
@@ -675,7 +677,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (SUCCEED != zbx_validate_log_parameters(task))
+	if (SUCCEED != zbx_validate_log_parameters(task, &log_file_cfg))
 		err = 1;
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
@@ -848,11 +850,11 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 #endif
-		{"LogType",			&CONFIG_LOG_TYPE_STR,			TYPE_STRING,
+		{"LogType",			&log_file_cfg.log_type_str,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"LogFile",			&CONFIG_LOG_FILE,			TYPE_STRING,
+		{"LogFile",			&log_file_cfg.log_file_name,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"LogFileSize",			&CONFIG_LOG_FILE_SIZE,			TYPE_INT,
+		{"LogFileSize",			&log_file_cfg.log_file_size,		TYPE_INT,
 			PARM_OPT,	0,			1024},
 		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
 			PARM_OPT,	1,			30},
@@ -961,7 +963,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 
 	set_defaults();
 
-	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
+	log_file_cfg.log_type = zbx_get_log_type(log_file_cfg.log_type_str);
 
 	zbx_vector_str_create(&hostnames);
 	parse_hostnames(CONFIG_HOSTNAMES, &hostnames);
@@ -1097,7 +1099,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
+	if (SUCCEED != zabbix_open_log(log_file_cfg->config_log_type, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);

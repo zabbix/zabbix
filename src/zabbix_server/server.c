@@ -338,6 +338,8 @@ int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
 
+static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1}
+
 struct zbx_db_version_info_t	db_version_info;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
@@ -576,8 +578,8 @@ static void	zbx_set_defaults(void)
 	CONFIG_MAX_HOUSEKEEPER_DELETE = 0;
 #endif
 
-	if (NULL == CONFIG_LOG_TYPE_STR)
-		CONFIG_LOG_TYPE_STR = zbx_strdup(CONFIG_LOG_TYPE_STR, ZBX_OPTION_LOGTYPE_FILE);
+	if (NULL == log_file_cfg.log_type_str)
+		log_file_cfg.log_type_str = zbx_strdup(log_file_cfg.log_type_str, ZBX_OPTION_LOGTYPE_FILE);
 
 	if (NULL == CONFIG_SOCKET_PATH)
 		CONFIG_SOCKET_PATH = zbx_strdup(CONFIG_SOCKET_PATH, "/tmp");
@@ -686,7 +688,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	/* because they have non-zero default values */
 #endif
 
-	if (SUCCEED != zbx_validate_log_parameters(task))
+	if (SUCCEED != zbx_validate_log_parameters(task, &log_file_cfg))
 		err = 1;
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
