@@ -525,9 +525,7 @@ class CHttpTest extends CApiService {
 			}
 		}
 
-		$httptests = $this->extendObjectsByKey($httptests, $db_httptests, 'httptestid',
-			['hostid', 'name', 'templateid']
-		);
+		$httptests = $this->extendObjectsByKey($httptests, $db_httptests, 'httptestid', ['hostid', 'name']);
 
 		// uniqueness
 		foreach ($httptests as &$httptest) {
