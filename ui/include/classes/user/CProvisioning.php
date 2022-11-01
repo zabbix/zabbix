@@ -300,7 +300,7 @@ class CProvisioning {
 	public function getUserGroupsAndRole(array $group_names): array {
 		$user = ['usrgrps' => [], 'roleid' => 0];
 
-		if (!$group_names || !$this->userdirectory['provision_groups']) {
+		if (!$this->userdirectory['provision_groups']) {
 			return $user;
 		}
 
@@ -308,15 +308,19 @@ class CProvisioning {
 		$groups = [];
 
 		foreach ($this->userdirectory['provision_groups'] as $provision_group) {
+			$match = ($provision_group['name'] === '*');
+
 			if (strpos($provision_group['name'], '*') === false) {
 				$match = in_array($provision_group['name'], $group_names);
 			}
-			else {
+			else if (!$match) {
 				$regex = preg_quote($provision_group['name'], '/');
 				$regex = '/'.str_replace('\\*', '.*', $regex).'/';
-				$match = (bool) array_filter($group_names, function ($group_name) use ($regex) {
-					return preg_match($regex, $group_name);
-				});
+				$match = false;
+
+				foreach ($group_names as $group_name) {
+					$match = $match || preg_match($regex, $group_name);
+				}
 			}
 
 			if ($match) {
@@ -334,7 +338,14 @@ class CProvisioning {
 			['field' => 'type', 'order' => ZBX_SORT_DOWN],
 			['field' => 'name', 'order' => ZBX_SORT_UP]
 		]);
-		['roleid' => $user['roleid']] = reset($roles);
+
+		if ($roles) {
+			['roleid' => $user['roleid']] = reset($roles);
+		}
+		else {
+			$user['roleid'] = 0;
+		}
+
 		$user['usrgrps'] = $groups;
 
 		return $user;

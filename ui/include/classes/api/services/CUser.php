@@ -1868,23 +1868,7 @@ class CUser extends CApiService {
 				}
 
 				foreach ($provision_users as $provision_user) {
-					$user_attributes = $provisioning->getUserIdpAttributes();
-					$idp_user = $ldap->getUserAttributes($user_attributes, $provision_user['username']);
-					$user = array_merge($provision_user, $provisioning->getUser($idp_user));
-
-					if (!array_key_exists('usrgrps', $user)) {
-						$user_ref_attr = $config['user_ref_attr'];
-
-						if ($user_ref_attr !== '' && array_key_exists($user_ref_attr, $idp_user)) {
-							$ldap->setQueryPlaceholders(['%{ref}' => $idp_user[$user_ref_attr]]);
-						}
-
-						$group_attributes = $provisioning->getGroupIdpAttributes();
-						$ldap_groups = $ldap->getGroupAttributes($group_attributes, $user['username']);
-						$ldap_groups = array_column($ldap_groups, $config['group_name']);
-						$user = array_merge($user, $provisioning->getUserGroupsAndRole($ldap_groups));
-					}
-
+					$user = CUserDirectory::getProvisionedLdapUser($ldap, $provisioning, $provision_user);
 					$this->updateProvisionedUser($user);
 					$provisionedids[] = $provision_user['userid'];
 				}
@@ -2424,22 +2408,7 @@ class CUser extends CApiService {
 			return $user_data;
 		}
 
-		$user_attributes = $provisioning->getUserIdpAttributes();
-		$idp_user = $ldap->getUserAttributes($user_attributes, $user_data['username']);
-		$user = $provisioning->getUser($idp_user);
-
-		if (!array_key_exists('usrgrps', $user)) {
-			$user_ref_attr = $config['user_ref_attr'];
-
-			if ($user_ref_attr !== '' && array_key_exists($user_ref_attr, $idp_user)) {
-				$ldap->setQueryPlaceholders(['%{ref}' => $idp_user[$user_ref_attr]]);
-			}
-
-			$group_attributes = $provisioning->getGroupIdpAttributes();
-			$ldap_groups = $ldap->getGroupAttributes($group_attributes, $user_data['username']);
-			$user += $provisioning->getUserGroupsAndRole(array_column($ldap_groups, $config['group_name']));
-		}
-
+		$user = CUserDirectory::getProvisionedLdapUser($ldap, $provisioning, $user_data);
 		$user['username'] = $user_data['username'];
 		$user['userid'] = $user_data['userid'];
 
