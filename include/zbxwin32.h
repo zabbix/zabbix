@@ -29,8 +29,8 @@
 #	error "This module is only available for Windows OS"
 #endif
 
-#define	get_builtin_object_name(ctr)	zbx_get_counter_name(zbx_get_builtin_object_index(ctr))
-#define	get_builtin_counter_name(ctr)	zbx_get_counter_name(zbx_get_builtin_counter_index(ctr))
+#define	zbx_get_builtin_object_name(ctr)	zbx_get_counter_name(zbx_get_builtin_object_index(ctr))
+#define	zbx_get_builtin_counter_name(ctr)	zbx_get_counter_name(zbx_get_builtin_counter_index(ctr))
 
 /* this struct must be only modified along with mapping builtin_counter_ref[] in perfmon.c */
 typedef enum
