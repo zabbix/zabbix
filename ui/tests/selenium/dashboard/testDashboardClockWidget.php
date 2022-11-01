@@ -21,6 +21,7 @@
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup widget
@@ -29,6 +30,8 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 
 class testDashboardClockWidget extends CWebTest {
+
+	use TableTrait;
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -42,13 +45,56 @@ class testDashboardClockWidget extends CWebTest {
 	' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 	' wf.value_itemid, wf.value_graphid';
 
+	/**
+	 * Check clock widgets layout.
+	 */
+	public function testDashboardClockWidget_CheckLayout() {
+		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236 dashboard');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->getWidget('Server')->edit();
+
+		// Check edit forms header.
+		$this->assertEquals('Edit widget',
+			$form->query('xpath://h4[contains(@id, "dashboard-widget-head-title-widget_properties")]')->one()->getText());
+
+		// Check if widget type is selected as "Clock".
+		$this->assertEquals('Clock', $form->query('xpath:.//button[contains(@class, "focusable")]')->one()->getText());
+
+		// Check "Name" field max length.
+		$this->assertEquals('255', $form->query('id:name')->one()->getAttribute('maxlength'));
+
+		// Check fields "Refresh interval" values.
+		$refreshinterval_values = ['Default (15 minutes)', 'No refresh', '10 seconds', '30 seconds', '1 minute',
+			'2 minutes', '10 minutes', '15 minutes'];
+		$ri_dropdown = $form->query('name', 'rf_rate')->asDropdown()->one();
+		$this->assertEquals($refreshinterval_values, $ri_dropdown->getOptions()->asText());
+
+		// Check fields "Time type" values.
+		$timetype_values = ['Local time', 'Server time', 'Host time'];
+		$tt_dropdown = $form->query('name', 'time_type')->asDropdown()->one();
+		$this->assertEquals($timetype_values, $tt_dropdown->getOptions()->asText());
+
+		// Check that it's possible to select host items, when time type is "Host Time".
+		$form->fill(['Time type' => 'Host time']);
+		$this->assertTrue($this->query('button:Select')->waitUntilVisible()->one()->isClickable());
+
+		// Check that it's possible to change the status of "Show header" checkbox.
+		$this->assertTrue($form->query('xpath://input[contains(@id, "show_header")]')->one()->isSelected());
+
+		// Check if Apply and Cancel button are clickable.
+		foreach(['Apply', 'Cancel'] as $button) {
+			$this->assertTrue($this->query('button', $button)->one()->isClickable());
+		}
+	}
+
 	public static function getCreateData() {
 		return [
 			[
 				[
 					'MandatoryFields' => [
 						'Type' => 'Clock',
-						'Name' => 'ClockWidgetCreatedByAutotest'
+						'Name' => 'FrontendLocalClock'
 					]
 				]
 			]
@@ -66,11 +112,7 @@ class testDashboardClockWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$form->fill($data['MandatoryFields']);
-		//$this->query('button', 'Add')->waitUntilClickable()->one()->click();
-
-
 		$this->query('xpath://button[contains(@class, "dialogue-widget-save")]')->waitUntilClickable()->one()->click();
-
 		$dashboard->save();
 	}
 
