@@ -198,7 +198,7 @@ $form_grid->addItem([
 /** @var CSelectOption $option */
 foreach ($data['mediatype_options'] as $option) {
 	$mediatype = $option->toArray();
-	if(in_array($mediatype['value'], array_values($data['disabled_media']))) {
+	if (in_array($mediatype['value'], array_values($data['disabled_media']))) {
 		$option->addClass(ZBX_STYLE_RED);
 	}
 }
@@ -279,7 +279,7 @@ foreach($operation['opcommand_hst'] as $host) {
 	}
 }
 
-if($operation['opcommand_grp']) {
+if ($operation['opcommand_grp']) {
 	foreach ($operation['opcommand_grp'] as $group) {
 		$host_group['id'] = $group[0]['groupid'];
 		$host_group['name'] = $group[0]['name'];
@@ -287,7 +287,7 @@ if($operation['opcommand_grp']) {
 	}
 }
 
-if(array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand_grp', $operation)) {
+if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand_grp', $operation)) {
 	// Command execution targets row.
 	$form_grid->addItem([
 		(new CLabel(_('Target list')))

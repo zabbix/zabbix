@@ -35,7 +35,7 @@ window.action_edit_popup = new class {
 		this._initActionButtons();
 		this._processTypeOfCalculation();
 
-		if(typeof(conditions) === 'object') {
+		if (typeof(conditions) === 'object') {
 			conditions = Object.values(conditions)
 		}
 

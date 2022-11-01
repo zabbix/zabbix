@@ -178,7 +178,7 @@ class CControllerActionCreate extends CController {
 						break;
 
 					case 'update_operations':
-						if(array_key_exists('evaltype', $operation)) {
+						if (array_key_exists('evaltype', $operation)) {
 							unset($operation['evaltype']);
 						}
 						break;

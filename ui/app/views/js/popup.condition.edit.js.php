@@ -40,7 +40,7 @@ window.condition_popup = new class {
 	}
 
 	_loadViews() {
-		if(parseInt(document.querySelector('#condition-type').value) === <?= CONDITION_TYPE_SERVICE ?>) {
+		if (parseInt(document.querySelector('#condition-type').value) === <?= CONDITION_TYPE_SERVICE ?>) {
 			$('#service-new-condition')
 				.multiSelect('getSelectButton')
 				.addEventListener('click', () => {

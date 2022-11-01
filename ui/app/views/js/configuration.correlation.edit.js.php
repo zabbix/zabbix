@@ -97,11 +97,11 @@
 
 	function createRow(input) {
 		let row_count = document.querySelector('#condition_table').rows.length -2;
-		if(row_count !== 0) {
+		if (row_count !== 0) {
 			input.row_index = row_count;
 		}
 
-		if(input.groupids) {
+		if (input.groupids) {
 			for (const key in input.groupids) {
 				if (input.groupids.hasOwnProperty(key)) {
 					let element = {...input, name: input.groupids[key], value: key};
