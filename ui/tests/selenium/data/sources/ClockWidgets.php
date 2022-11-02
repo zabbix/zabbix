@@ -69,7 +69,7 @@ class ClockWidgets {
 
 		CDataHelper::call('dashboard.create', [
 			[
-				'name' => 'DEV-2236',
+				'name' => 'DEV-2236 dashboard',
 				'widgets' => [
 					[
 						'type' => 'clock',
@@ -130,10 +130,9 @@ class ClockWidgets {
 				]
 			]
 		]);
-		$dashboardids = CDataHelper::getIds('name');
 
 		return [
-			'dashboardids' => $dashboardids
+			'dashboardids' => CDataHelper::getIds('name')
 		];
 	}
 }
