@@ -1712,7 +1712,7 @@ function getEventUpdates(array $event) {
 /**
  * Make icons (suppressions, messages, severity changes, actions) for actions column.
  *
- * @param string $eventid                  Id for event, for which icons are created.
+ * @param string $eventid                  ID for event, for which icons are created.
  * @param array  $actions                  Array of actions data.
  * @param array  $actions['suppressions']  Suppression icon data.
  * @param array  $actions['messages']      Messages icon data.

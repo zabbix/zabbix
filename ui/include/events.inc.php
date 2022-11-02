@@ -156,6 +156,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param bool   $allowed['acknowledge']             Whether user is allowed to acknowledge problems.
  * @param bool   $allowed['close']                   Whether user is allowed to close problems.
  * @param bool   $allowed['suppress_problems']       Whether user is allowed to manually suppress/unsuppress problems.
+ * @param bool   $allowed['rank_change']             Whether user is allowed to change problem ranking.
  *
  * @return CTableInfo
  */
@@ -183,7 +184,7 @@ function make_event_details(array $event, array $allowed) {
 		->addRow([
 			_('Acknowledged'),
 			($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge'] || $can_be_closed
-					|| $allowed['suppress_problems'])
+					|| $allowed['suppress_problems'] || $allowed['rank_change'])
 				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 					->addClass(ZBX_STYLE_LINK_ALT)
@@ -257,16 +258,88 @@ function make_event_details(array $event, array $allowed) {
 }
 
 /**
+ * @param bool  $in_closing
+ * @param array $event
+ * @param array $tasks
  *
- * @param array  $startEvent                  An array of event data.
- * @param string $startEvent['eventid']       Event ID.
- * @param string $startEvent['objectid']      Object ID.
- * @param array  $allowed                     An array of user role rules.
- * @param bool   $allowed['add_comments']     Whether user is allowed to add problems comments.
- * @param bool   $allowed['change_severity']  Whether user is allowed to change problems severity.
- * @param bool   $allowed['acknowledge']      Whether user is allowed to acknowledge problems.
- * @param bool   $allowed['close']            Whether user is allowed to close problems.
- * @param bool   $allowed['suppress']         Whether user is allowed to suppress/unsuppress problems.
+ * @return string
+ */
+function getEventStatusString(bool $in_closing, array $event, array $tasks): string {
+	if ($event['r_eventid'] != 0) {
+		$value_str = _('RESOLVED');
+	}
+	else {
+		if ($in_closing) {
+			$value_str = _('CLOSING');
+		}
+		else {
+			$in_updating = false;
+
+			foreach ($event['acknowledges'] as $acknowledge) {
+				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) ==
+						ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
+						|| ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) ==
+						ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) {
+					$taskid = $acknowledge['taskid'];
+
+					// If currently is symptom.
+					if (array_key_exists($acknowledge['taskid'], $tasks)) {
+						$in_updating = true;
+						break;
+					}
+				}
+			}
+
+			$value_str = $in_updating ? _('UPDATING') : _('PROBLEM');
+		}
+	}
+
+	return $value_str;
+}
+
+function getActiveTasksByEventAcknowledges(array $events): array {
+	$tasks = [];
+	$taskids = [];
+
+	foreach ($events as $event) {
+		foreach ($event['acknowledges'] as $acknowledge) {
+			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) ==
+					ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
+					|| ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) ==
+					ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) {
+				$taskids[] = $acknowledge['taskid'];
+			}
+		}
+	}
+
+	if ($taskids) {
+		$tasks = API::Task()->get([
+			'output' => ['status'],
+			'taskids' => $taskids,
+			'preservekeys' => true
+		]);
+
+		if ($tasks) {
+			$tasks = array_filter($tasks, function($value) {
+				return ($value['status'] == ZBX_TM_STATUS_NEW || $value['status'] == ZBX_TM_STATUS_INPROGRESS);
+			});
+		}
+	}
+
+	return $tasks;
+}
+/**
+ *
+ * @param array  $startEvent                    An array of event data.
+ * @param string $startEvent['eventid']         Event ID.
+ * @param string $startEvent['objectid']        Object ID.
+ * @param array  $allowed                       An array of user role rules.
+ * @param bool   $allowed['add_comments']       Whether user is allowed to add problems comments.
+ * @param bool   $allowed['change_severity']    Whether user is allowed to change problems severity.
+ * @param bool   $allowed['acknowledge']        Whether user is allowed to acknowledge problems.
+ * @param bool   $allowed['close']              Whether user is allowed to close problems.
+ * @param bool   $allowed['suppress_problems']  Whether user is allowed to suppress/unsuppress problems.
+ * @param bool   $allowed['rank_change']        Whether user is allowed to change problem ranking.
  *
  * @return CTableInfo
  */
@@ -283,9 +356,11 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		]);
 
 	$events = API::Event()->get([
-		'output' => ['eventid', 'source', 'object', 'objectid', 'acknowledged', 'clock', 'ns', 'severity', 'r_eventid'],
+		'output' => ['eventid', 'source', 'object', 'objectid', 'acknowledged', 'clock', 'ns', 'severity', 'r_eventid',
+			'cause_eventid'
+		],
 		'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
-			'suppress_until'
+			'suppress_until', 'taskid'
 		],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
@@ -328,7 +403,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 	// Get trigger severities.
 	$triggers = $triggerids
 		? API::Trigger()->get([
-			'output' => ['priority'],
+			'output' => ['priority', 'manual_close'],
 			'triggerids' => $triggerids,
 			'preservekeys' => true
 		])
@@ -341,12 +416,15 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		'preservekeys' => true
 	]);
 
+	$tasks = getActiveTasksByEventAcknowledges($events);
+
 	foreach ($events as $event) {
 		$duration = ($event['r_eventid'] != 0)
 			? zbx_date2age($event['clock'], $event['r_clock'])
 			: zbx_date2age($event['clock']);
 
 		$can_be_closed = $allowed['close'];
+		$in_closing = false;
 
 		if ($event['r_eventid'] != 0) {
 			$value = TRIGGER_VALUE_FALSE;
@@ -355,18 +433,16 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 			$can_be_closed = false;
 		}
 		else {
-			$in_closing = false;
-
 			if (hasEventCloseAction($event['acknowledges'])) {
 				$in_closing = true;
 				$can_be_closed = false;
 			}
 
 			$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
-			$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 			$value_clock = $in_closing ? time() : $event['clock'];
 		}
 
+		$value_str = getEventStatusString($in_closing, $event, $tasks);
 		$is_acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
 		$cell_status = new CSpan($value_str);
 
@@ -378,7 +454,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 
 		// Create acknowledge link.
 		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
-				|| $can_be_closed || $allowed['suppress_problems'])
+				|| $can_be_closed || $allowed['suppress_problems'] || $allowed['rank_change'])
 			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)

@@ -100,10 +100,10 @@ $allowed = [
 
 foreach ($data['data']['problems'] as $eventid => $problem) {
 	$trigger = $data['data']['triggers'][$problem['objectid']];
+	$in_closing = false;
 
 	if ($problem['r_eventid'] != 0) {
 		$value = TRIGGER_VALUE_FALSE;
-		$value_str = _('RESOLVED');
 		$value_clock = $problem['r_clock'];
 		$can_be_closed = false;
 	}
@@ -113,9 +113,10 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			&& !$in_closing
 		);
 		$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
-		$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 		$value_clock = $in_closing ? time() : $problem['clock'];
 	}
+
+	$value_str = getEventStatusString($in_closing, $problem, $data['data']['tasks']);
 
 	$cell_clock = ($problem['clock'] >= $today)
 		? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])
@@ -307,7 +308,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
-		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY ) ? $opdata->addClass(ZBX_STYLE_WORDBREAK) : null,
+		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata->addClass(ZBX_STYLE_WORDBREAK) : null,
 		(new CCol(
 			(new CLinkAction(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
 				->setAjaxHint(CHintBoxHelper::getEventList($trigger['triggerid'], $eventid, $show_timeline,

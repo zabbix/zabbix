@@ -1058,6 +1058,8 @@ define('ZBX_PROBLEM_UPDATE_UNSUPPRESS',				0x40);
 define('ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE',	0x80);
 define('ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM',	0x100);
 
+define('ZBX_PROBLEM_SYMPTOM_LIMIT', 50);
+
 define('ZBX_EVENT_HISTORY_PROBLEM_EVENT',		0);
 define('ZBX_EVENT_HISTORY_RECOVERY_EVENT',		1);
 define('ZBX_EVENT_HISTORY_MANUAL_UPDATE',		2);
@@ -1997,6 +1999,8 @@ define('ZBX_STYLE_ACTION_ICON_ACK', 'icon-action-ack');
 define('ZBX_STYLE_ACTION_ICON_UNACK', 'icon-action-unack');
 define('ZBX_STYLE_ACTION_ICON_SUPPRESS', 'icon-action-suppress');
 define('ZBX_STYLE_ACTION_ICON_UNSUPPRESS', 'icon-action-unsuppress');
+define('ZBX_STYLE_ACTION_ICON_CAUSE', 'icon-action-cause');
+define('ZBX_STYLE_ACTION_ICON_SYMPTOM', 'icon-action-symptom');
 define('ZBX_STYLE_PROBLEM_GENERATED', 'icon-problem-generated');
 define('ZBX_STYLE_PROBLEM_RECOVERY', 'icon-problem-recovery');
 define('ZBX_STYLE_ACTIONS_NUM_GRAY', 'icon-actions-number-gray');

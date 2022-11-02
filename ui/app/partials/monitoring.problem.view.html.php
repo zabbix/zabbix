@@ -54,7 +54,8 @@ $options = [
 			'details' => $data['filter']['details'],
 			'highlight_row' => $data['filter']['highlight_row'],
 			'show_opdata' => $data['filter']['show_opdata']
-		]
+		],
+		'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 	]
 ];
 

@@ -47,9 +47,11 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 			'show_suppressed' => $fields['show_suppressed'],
 			'unacknowledged' => $fields['unacknowledged'],
 			'show_opdata' => $fields['show_opdata']
-		]);
+		], CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT));
 		list($sortfield, $sortorder) = self::getSorting($fields['sort_triggers']);
-		$data = CScreenProblem::sortData($data, $sortfield, $sortorder);
+		$data = CScreenProblem::sortData($data, CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT), $sortfield,
+			$sortorder
+		);
 
 		if (count($data['problems']) > $fields['show_lines']) {
 			$info = _n('%1$d of %3$d%2$s problem is shown', '%1$d of %3$d%2$s problems are shown',
@@ -77,6 +79,7 @@ class CControllerWidgetProblemsView extends CControllerWidget {
 
 		if ($data['problems']) {
 			$data['triggers_hosts'] = getTriggersHostsList($data['triggers']);
+			$data['tasks'] = getActiveTasksByEventAcknowledges($data['problems']);
 		}
 
 		$this->setResponse(new CControllerResponseData([

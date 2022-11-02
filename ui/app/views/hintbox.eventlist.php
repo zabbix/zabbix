@@ -94,28 +94,24 @@ if (array_key_exists('problems', $data)) {
 
 	foreach ($data['problems'] as $problem) {
 		$can_be_closed = $data['allowed_close'];
+		$in_closing = false;
 
 		if ($problem['r_eventid'] != 0) {
 			$value = TRIGGER_VALUE_FALSE;
-			$value_str = _('RESOLVED');
 			$value_clock = $problem['r_clock'];
 			$can_be_closed = false;
 		}
 		else {
-			$in_closing = false;
-
-			foreach ($problem['acknowledges'] as $acknowledge) {
-				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-					$in_closing = true;
-					$can_be_closed = false;
-					break;
-				}
+			if (hasEventCloseAction($event['acknowledges'])) {
+				$in_closing = true;
+				$can_be_closed = false;
 			}
 
 			$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
-			$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 			$value_clock = $in_closing ? time() : $problem['clock'];
 		}
+
+		$value_str = getEventStatusString($in_closing, $problem, $data['tasks']);
 
 		$cell_clock = ($problem['clock'] >= $today)
 			? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])

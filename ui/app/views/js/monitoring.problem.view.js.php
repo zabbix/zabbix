@@ -38,6 +38,7 @@
 		running: false,
 		timeout: null,
 		deferred: null,
+		opened_eventids: [],
 
 		init({filter_options, refresh_url, refresh_interval, filter_defaults}) {
 			this.refresh_url = new Curl(refresh_url, false);
@@ -50,6 +51,7 @@
 
 			this.initFilter(filter_options);
 			this.initAcknowledge();
+			this.initExpandables();
 
 			if (this.refresh_interval != 0) {
 				this.running = true;
@@ -164,6 +166,71 @@
 			});
 		},
 
+		initExpandables() {
+			const table = this.getCurrentResultsTable();
+			const expandable_buttons = table.querySelectorAll("button[data-action='show_symptoms']");
+
+			expandable_buttons.forEach(btn => {
+				['click','keydown'].forEach((e) => {
+					btn.addEventListener(e, (e) => {
+						if (e.type === 'click' || e.which === 13) {
+							this.showSymptoms(btn);
+						}
+					});
+
+					// Check if cause events were opened. If so, after (not full) refresh open them again.
+					if (this.opened_eventids.includes(btn.dataset.eventid)) {
+						const rows = table.querySelectorAll("tr[data-cause-eventid='" + btn.dataset.eventid + "']");
+
+						rows.forEach((row) => {
+							row.style.display = null;
+						});
+
+						btn.classList.remove('btn-widget-expand');
+						btn.classList.add('btn-widget-collapse');
+					}
+				});
+			});
+		},
+
+		showSymptoms(btn) {
+			// Prevent multiple clicking by first disabling button.
+			btn.disabled = true;
+
+			const table = this.getCurrentResultsTable();
+			const rows = table.querySelectorAll("tr[data-cause-eventid='" + btn.dataset.eventid + "']");
+			let state = false;
+
+			// Show symptom rows for current cause. Sliding animations are not supported on table rows.
+			rows.forEach((row) => {
+				if (row.getAttribute('style').indexOf('display:') != -1) {
+					row.style.display = null;
+					state = true;
+				}
+				else {
+					row.style.display = 'none';
+					state = false;
+				}
+			});
+
+			// Store or remove opened cause event IDs localy.
+			if (state) {
+				btn.classList.remove('btn-widget-expand');
+				btn.classList.add('btn-widget-collapse');
+
+				this.opened_eventids.push(btn.dataset.eventid);
+			}
+			else {
+				btn.classList.remove('btn-widget-collapse');
+				btn.classList.add('btn-widget-expand');
+
+				this.opened_eventids = this.opened_eventids.filter((id) => id !== btn.dataset.eventid);
+			}
+
+			// When complete enable button again.
+			btn.disabled = false;
+		},
+
 		getCurrentResultsTable() {
 			return document.getElementById('flickerfreescreen_problem');
 		},
@@ -185,6 +252,7 @@
 				new DOMParser().parseFromString(body, 'text/html').body.firstElementChild
 			);
 			chkbxRange.init();
+			this.initExpandables();
 		},
 
 		refreshDebug(debug) {
