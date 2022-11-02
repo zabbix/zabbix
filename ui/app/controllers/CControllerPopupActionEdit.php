@@ -101,6 +101,7 @@ class CControllerPopupActionEdit extends CController {
 				: '';
 
 			sortOperations($eventsource, $this->action['operations']);
+
 			$data = [
 				'eventsource' => $eventsource,
 				'actionid' => $this->action['actionid'],
@@ -120,11 +121,11 @@ class CControllerPopupActionEdit extends CController {
 				'allowedOperations' => getAllowedOperations($eventsource)
 			];
 			foreach ($data['action']['filter']['conditions'] as  $row_index => &$condition) {
-				$condition_name = $this->conditionValueToString($condition);
-				$data['condition_name'][] = $condition_name;
+				$condition_names = actionConditionValueToString([$data['action']]);
+				$data['condition_name'][] = $condition_names[0][$row_index];
 				$condition += [
 					'row_index' => $row_index,
-					'name' => $condition_name
+					'name' => $condition_names[0][$row_index]
 				];
 			}
 			unset ($condition);
@@ -159,232 +160,5 @@ class CControllerPopupActionEdit extends CController {
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);
-	}
-
-	protected function conditionValueToString($condition): array {
-		$groupIds = [];
-		$triggerIds = [];
-		$hostIds = [];
-		$templateIds = [];
-		$proxyIds = [];
-		$dRuleIds = [];
-		$dCheckIds = [];
-		$serviceids = [];
-
-		$result = _('Unknown');
-
-		switch ($condition['conditiontype']) {
-			case CONDITION_TYPE_HOST_GROUP:
-				$groupIds = $condition['value'];
-				break;
-
-			case CONDITION_TYPE_TRIGGER:
-				$triggerIds = $condition['value'];
-				break;
-
-			case CONDITION_TYPE_HOST:
-				$hostIds = $condition['value'];
-				break;
-
-			case CONDITION_TYPE_TEMPLATE:
-				$templateIds = $condition['value'];
-				break;
-
-			case CONDITION_TYPE_PROXY:
-				$proxyIds = $condition['value'];
-				break;
-
-			case CONDITION_TYPE_SERVICE:
-				$serviceids = $condition['value'];
-				break;
-
-			// return values as is for following condition types
-			case CONDITION_TYPE_TRIGGER_NAME:
-			case CONDITION_TYPE_HOST_METADATA:
-			case CONDITION_TYPE_HOST_NAME:
-			case CONDITION_TYPE_TIME_PERIOD:
-			case CONDITION_TYPE_DHOST_IP:
-			case CONDITION_TYPE_DSERVICE_PORT:
-			case CONDITION_TYPE_DUPTIME:
-			case CONDITION_TYPE_DVALUE:
-			case CONDITION_TYPE_EVENT_TAG:
-			case CONDITION_TYPE_EVENT_TAG_VALUE:
-			case CONDITION_TYPE_SERVICE_NAME:
-				$result = $condition['value'];
-				break;
-
-			case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
-				$result = $condition['value'] ? _('Ack') : _('Not Ack');
-				break;
-
-			case CONDITION_TYPE_TRIGGER_SEVERITY:
-				$result =CSeverityHelper::getName((int)$condition['value']);
-				break;
-
-			case CONDITION_TYPE_DRULE:
-				$dRuleIds[$condition['value']] = $condition['value'];
-				break;
-
-			case CONDITION_TYPE_DCHECK:
-				$dCheckIds[$condition['value']] = $condition['value'];
-				break;
-
-			case CONDITION_TYPE_DOBJECT:
-				$result = discovery_object2str($condition['value']);
-				break;
-
-			case CONDITION_TYPE_DSERVICE_TYPE:
-				$result = discovery_check_type2str($condition['value']);
-				break;
-
-			case CONDITION_TYPE_DSTATUS:
-				$result = discovery_object_status2str($condition['value']);
-				break;
-
-			case CONDITION_TYPE_EVENT_TYPE:
-				$result = eventType($condition['value']);
-				break;
-		}
-
-		$groups = [];
-		$triggers = [];
-		$hosts = [];
-		$templates = [];
-		$proxies = [];
-		$dRules = [];
-		$dChecks = [];
-		$services = [];
-
-		if ($groupIds) {
-			$groups = API::HostGroup()->get([
-				'output' => ['name'],
-				'groupids' => $groupIds,
-				'preservekeys' => true
-			]);
-		}
-
-		if ($triggerIds) {
-			$triggers = API::Trigger()->get([
-				'output' => ['description'],
-				'triggerids' => $triggerIds,
-				'expandDescription' => true,
-				'selectHosts' => ['name'],
-				'preservekeys' => true
-			]);
-		}
-
-		if ($hostIds) {
-			$hosts = API::Host()->get([
-				'output' => ['name'],
-				'hostids' => $hostIds,
-				'preservekeys' => true
-			]);
-		}
-
-		if ($templateIds) {
-			$templates = API::Template()->get([
-				'output' => ['name'],
-				'templateids' => $templateIds,
-				'preservekeys' => true
-			]);
-		}
-
-		if ($proxyIds) {
-			$proxies = API::Proxy()->get([
-				'output' => ['host'],
-				'proxyids' => $proxyIds,
-				'preservekeys' => true
-			]);
-		}
-
-		if ($dRuleIds) {
-			$dRules = API::DRule()->get([
-				'output' => ['name'],
-				'druleids' => $dRuleIds,
-				'preservekeys' => true
-			]);
-		}
-
-		if ($dCheckIds) {
-			$dChecks = API::DCheck()->get([
-				'output' => ['type', 'key_', 'ports'],
-				'dcheckids' => $dCheckIds,
-				'selectDRules' => ['name'],
-				'preservekeys' => true
-			]);
-		}
-
-		if ($serviceids) {
-			$services = API::Service()->get([
-				'output' => ['name'],
-				'serviceids' => $serviceids,
-				'preservekeys' => true
-			]);
-		}
-
-		if ($groups || $triggers || $hosts || $templates || $proxies || $dRules || $dChecks || $services) {
-			$id = $condition['value'];
-
-			switch ($condition['conditiontype']) {
-				case CONDITION_TYPE_HOST_GROUP:
-					if (array_key_exists($id, $groups)) {
-						$result = $groups[$id]['name'];
-					}
-					break;
-
-				case CONDITION_TYPE_TRIGGER:
-					if (array_key_exists($id, $triggers)) {
-						$host = reset($triggers[$id]['hosts']);
-						$result = $host['name'] . NAME_DELIMITER . $triggers[$id]['description'];
-					}
-					break;
-
-				case CONDITION_TYPE_HOST:
-					if (array_key_exists($id, $hosts)) {
-						$result = $hosts[$id]['name'];
-					}
-					break;
-
-				case CONDITION_TYPE_TEMPLATE:
-					if (array_key_exists($id, $templates)) {
-						$result = $templates[$id]['name'];
-					}
-					break;
-
-				case CONDITION_TYPE_PROXY:
-					if (array_key_exists($id, $proxies)) {
-						$result = $proxies[$id]['host'];
-					}
-					break;
-
-				case CONDITION_TYPE_DRULE:
-					if (array_key_exists($id, $dRules)) {
-						$result = $dRules[$id]['name'];
-					}
-					break;
-
-				case CONDITION_TYPE_DCHECK:
-					if (array_key_exists($id, $dChecks)) {
-						$drule = reset($dChecks[$id]['drules']);
-						$type = $dChecks[$id]['type'];
-						$key_ = $dChecks[$id]['key_'];
-						$ports = $dChecks[$id]['ports'];
-
-						$dCheck = discovery_check2str($type, $key_, $ports);
-
-						$result = $drule['name'] . NAME_DELIMITER . $dCheck;
-					}
-					break;
-
-				case CONDITION_TYPE_SERVICE:
-					if (array_key_exists($id, $services)) {
-						$result = $services[$id]['name'];
-					}
-					break;
-			}
-		}
-
-		$result_arr[] = $result;
-		return $result_arr;
 	}
 }
