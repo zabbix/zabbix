@@ -657,6 +657,7 @@ static int	check_service_starttype(SC_HANDLE h_srv, int start_type)
 						 */
 #define ZBX_SRV_STATE_ALL		0x007f  /* ZBX_SRV_STATE_STOPPED | ZBX_SRV_STATE_STARTED
 						 */
+
 static int	check_service_state_local(SC_HANDLE h_srv, int service_state)
 {
 	SERVICE_STATUS	status;

@@ -56,8 +56,7 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"system.uname",	0,		system_uname,		NULL},
 
-	{"service.discovery",	0,		check_service_discovery,
-									NULL},
+	{"service.discovery",	0,		check_service_discovery,	NULL},
 	{"service.info",	CF_HAVEPARAMS,	check_service_info,	ZABBIX_SERVICE_NAME},
 	{"service_state",	CF_HAVEPARAMS,	check_service_state,	ZABBIX_SERVICE_NAME},
 	{"services",		CF_HAVEPARAMS,	check_services,		NULL},
