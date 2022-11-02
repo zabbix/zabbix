@@ -481,6 +481,7 @@ static int	DBget_user_count(zbx_uint64_t *count_online, zbx_uint64_t *count_offl
 
 	while (NULL != (row = DBfetch(result)))
 	{
+#define ZBX_USER_ONLINE_TIME	600
 		if (atoi(row[0]) + ZBX_USER_ONLINE_TIME < now)
 			continue;
 

@@ -40,6 +40,16 @@
 #define	ZBX_POLLER_TYPE_ODBC		6
 #define	ZBX_POLLER_TYPE_COUNT		7	/* number of poller types */
 
+typedef union
+{
+	double		dbl;
+	zbx_uint64_t	ui64;
+	char		*str;
+	char		*err;
+	zbx_log_value_t	*log;
+}
+history_value_t;
+
 typedef enum
 {
 	ZBX_SESSION_TYPE_DATA = 0,
@@ -47,6 +57,16 @@ typedef enum
 	ZBX_SESSION_TYPE_COUNT,
 }
 zbx_session_type_t;
+
+typedef struct
+{
+	int	timestamp;
+	int	logeventid;
+	int	severity;
+	char	*source;
+	char	*value;
+}
+zbx_log_value_t;
 
 #define MAX_JAVA_ITEMS		32
 #define MAX_SNMP_ITEMS		128
@@ -915,6 +935,14 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules);
 void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zbx_vector_uint64_t *nested_groupids);
 void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hostids);
 
+/* item statuses */
+#define ITEM_STATUS_ACTIVE		0
+#define ITEM_STATUS_DISABLED		1
+
+/* item states */
+#define ITEM_STATE_NORMAL		0
+#define ITEM_STATE_NOTSUPPORTED		1
+
 #define ZBX_HC_ITEM_STATUS_NORMAL	0
 #define ZBX_HC_ITEM_STATUS_BUSY		1
 
@@ -1206,4 +1234,197 @@ void	zbx_dc_get_macro_updates(const zbx_vector_uint64_t *hostids, const zbx_vect
 		zbx_vector_uint64_t *del_macro_hostids);
 void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *templateids);
+
+
+/* maintenance */
+typedef enum
+{
+	TIMEPERIOD_TYPE_ONETIME = 0,
+/*	TIMEPERIOD_TYPE_HOURLY,*/
+	TIMEPERIOD_TYPE_DAILY = 2,
+	TIMEPERIOD_TYPE_WEEKLY,
+	TIMEPERIOD_TYPE_MONTHLY
+}
+zbx_timeperiod_type_t;
+
+typedef enum
+{
+	MAINTENANCE_TYPE_NORMAL = 0,
+	MAINTENANCE_TYPE_NODATA
+}
+zbx_maintenance_type_t;
+
+
+/* discovery rule */
+#define DRULE_STATUS_MONITORED		0
+#define DRULE_STATUS_NOT_MONITORED	1
+
+/* host statuses */
+#define HOST_STATUS_MONITORED		0
+#define HOST_STATUS_NOT_MONITORED	1
+/*#define HOST_STATUS_UNREACHABLE	2*/
+#define HOST_STATUS_TEMPLATE		3
+/*#define HOST_STATUS_DELETED		4*/
+#define HOST_STATUS_PROXY_ACTIVE	5
+#define HOST_STATUS_PROXY_PASSIVE	6
+
+
+/* host group types */
+#define HOSTGROUP_TYPE_HOST		0
+#define HOSTGROUP_TYPE_TEMPLATE		1
+
+/* host maintenance status */
+#define HOST_MAINTENANCE_STATUS_OFF	0
+#define HOST_MAINTENANCE_STATUS_ON	1
+
+/* host inventory mode */
+#define HOST_INVENTORY_DISABLED		-1	/* the host has no record in host_inventory */
+
+
+						/* only in server code, never in DB */
+#define HOST_INVENTORY_MANUAL		0
+#define HOST_INVENTORY_AUTOMATIC	1
+#define HOST_INVENTORY_COUNT		2
+
+#define HOST_INVENTORY_FIELD_COUNT	70
+
+/* interface availability */
+#define INTERFACE_AVAILABLE_UNKNOWN		0
+#define INTERFACE_AVAILABLE_TRUE		1
+#define INTERFACE_AVAILABLE_FALSE		2
+
+/* trigger statuses */
+#define TRIGGER_STATUS_ENABLED		0
+#define TRIGGER_STATUS_DISABLED		1
+
+/* trigger types */
+#define TRIGGER_TYPE_NORMAL		0
+#define TRIGGER_TYPE_MULTIPLE_TRUE	1
+
+/* trigger values */
+#define TRIGGER_VALUE_OK		0
+#define TRIGGER_VALUE_PROBLEM		1
+#define TRIGGER_VALUE_UNKNOWN		2	/* only in server code, never in DB */
+#define TRIGGER_VALUE_NONE		3	/* only in server code, never in DB */
+
+/* trigger states */
+#define TRIGGER_STATE_NORMAL		0
+#define TRIGGER_STATE_UNKNOWN		1
+
+/* trigger severity */
+#define TRIGGER_SEVERITY_NOT_CLASSIFIED	0
+#define TRIGGER_SEVERITY_INFORMATION	1
+#define TRIGGER_SEVERITY_WARNING	2
+#define TRIGGER_SEVERITY_AVERAGE	3
+#define TRIGGER_SEVERITY_HIGH		4
+#define TRIGGER_SEVERITY_DISASTER	5
+#define TRIGGER_SEVERITY_COUNT		6	/* number of trigger severities */
+
+/* trigger recovery mode */
+#define TRIGGER_RECOVERY_MODE_EXPRESSION		0
+#define TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION	1
+#define TRIGGER_RECOVERY_MODE_NONE			2
+
+/* business service values */
+#define SERVICE_VALUE_OK		0
+#define SERVICE_VALUE_PROBLEM		1
+
+#define ITEM_LOGTYPE_INFORMATION	1
+#define ITEM_LOGTYPE_WARNING		2
+#define ITEM_LOGTYPE_ERROR		4
+#define ITEM_LOGTYPE_FAILURE_AUDIT	7
+#define ITEM_LOGTYPE_SUCCESS_AUDIT	8
+#define ITEM_LOGTYPE_CRITICAL		9
+#define ITEM_LOGTYPE_VERBOSE		10
+
+/* media statuses */
+#define MEDIA_STATUS_ACTIVE	0
+#define MEDIA_STATUS_DISABLED	1
+
+/* action statuses */
+#define ACTION_STATUS_ACTIVE	0
+#define ACTION_STATUS_DISABLED	1
+
+/* action escalation processing mode */
+#define ACTION_PAUSE_SUPPRESSED_FALSE	0	/* process escalation for suppressed events */
+#define ACTION_PAUSE_SUPPRESSED_TRUE	1	/* pause escalation for suppressed events */
+
+/* action escalation canceled notification mode */
+#define ACTION_NOTIFY_IF_CANCELED_TRUE	1	/* notify about canceled escalations for action (default) */
+#define ACTION_NOTIFY_IF_CANCELED_FALSE	0	/* do not notify about canceled escalations for action */
+
+/* max number of retries for alerts */
+#define ALERT_MAX_RETRIES	3
+
+/* media type statuses */
+#define MEDIA_TYPE_STATUS_ACTIVE	0
+#define MEDIA_TYPE_STATUS_DISABLED	1
+
+/* SMTP security options */
+#define SMTP_SECURITY_NONE	0
+#define SMTP_SECURITY_STARTTLS	1
+#define SMTP_SECURITY_SSL	2
+
+/* SMTP authentication options */
+#define SMTP_AUTHENTICATION_NONE		0
+#define SMTP_AUTHENTICATION_NORMAL_PASSWORD	1
+
+/* operation types */
+#define OPERATION_TYPE_MESSAGE		0
+#define OPERATION_TYPE_COMMAND		1
+#define OPERATION_TYPE_HOST_ADD		2
+#define OPERATION_TYPE_HOST_REMOVE	3
+#define OPERATION_TYPE_GROUP_ADD	4
+#define OPERATION_TYPE_GROUP_REMOVE	5
+#define OPERATION_TYPE_TEMPLATE_ADD	6
+#define OPERATION_TYPE_TEMPLATE_REMOVE	7
+#define OPERATION_TYPE_HOST_ENABLE	8
+#define OPERATION_TYPE_HOST_DISABLE	9
+#define OPERATION_TYPE_HOST_INVENTORY	10
+#define OPERATION_TYPE_RECOVERY_MESSAGE	11
+#define OPERATION_TYPE_UPDATE_MESSAGE	12
+
+/* normal and recovery operations */
+#define ZBX_OPERATION_MODE_NORMAL	0
+#define ZBX_OPERATION_MODE_RECOVERY	1
+#define ZBX_OPERATION_MODE_UPDATE	2
+
+/* algorithms for service status calculation */
+#define ZBX_SERVICE_STATUS_CALC_SET_OK			0
+#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL	1
+#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE	2
+
+/* HTTP item types */
+#define ZBX_HTTPITEM_TYPE_RSPCODE	0
+#define ZBX_HTTPITEM_TYPE_TIME		1
+#define ZBX_HTTPITEM_TYPE_SPEED		2
+#define ZBX_HTTPITEM_TYPE_LASTSTEP	3
+#define ZBX_HTTPITEM_TYPE_LASTERROR	4
+
+/* proxy_history flags */
+#define PROXY_HISTORY_FLAG_META		0x01
+#define PROXY_HISTORY_FLAG_NOVALUE	0x02
+
+#define PROXY_HISTORY_MASK_NOVALUE	(PROXY_HISTORY_FLAG_META | PROXY_HISTORY_FLAG_NOVALUE)
+
+/* global correlation constants */
+#define ZBX_CORRELATION_ENABLED				0
+#define ZBX_CORRELATION_DISABLED			1
+
+#define ZBX_CORR_CONDITION_OLD_EVENT_TAG		0
+#define ZBX_CORR_CONDITION_NEW_EVENT_TAG		1
+#define ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP		2
+#define ZBX_CORR_CONDITION_EVENT_TAG_PAIR		3
+#define ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE		4
+#define ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE		5
+
+#define ZBX_CORR_OPERATION_CLOSE_OLD			0
+#define ZBX_CORR_OPERATION_CLOSE_NEW			1
+
+
+/* trigger correlation modes */
+#define ZBX_TRIGGER_CORRELATION_NONE	0
+#define ZBX_TRIGGER_CORRELATION_TAG	1
+
+
 #endif

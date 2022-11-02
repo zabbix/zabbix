@@ -2833,6 +2833,18 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, const char *tz, char **data,
 		int macro_type, char *error, int maxerrlen)
 {
+
+/* acknowledgment actions (flags) */
+#define ZBX_PROBLEM_UPDATE_CLOSE		0x0001
+#define ZBX_PROBLEM_UPDATE_ACKNOWLEDGE		0x0002
+#define ZBX_PROBLEM_UPDATE_MESSAGE		0x0004
+#define ZBX_PROBLEM_UPDATE_SEVERITY		0x0008
+#define ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE	0x0010
+#define ZBX_PROBLEM_UPDATE_SUPPRESS		0x0020
+#define ZBX_PROBLEM_UPDATE_UNSUPPRESS		0x0040
+
+#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	7
+
 	char				c, *replace_to = NULL, sql[64];
 	const char			*m;
 	int				N_functionid, indexed_macro, require_address, ret, res = SUCCEED,

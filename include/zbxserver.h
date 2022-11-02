@@ -56,6 +56,28 @@
 #define MACRO_EXPAND_NO			0
 #define MACRO_EXPAND_YES		1
 
+/* service supported by discoverer */
+typedef enum
+{
+	SVC_SSH = 0,
+	SVC_LDAP,
+	SVC_SMTP,
+	SVC_FTP,
+	SVC_HTTP,
+	SVC_POP,
+	SVC_NNTP,
+	SVC_IMAP,
+	SVC_TCP,
+	SVC_AGENT,
+	SVC_SNMPv1,
+	SVC_SNMPv2c,
+	SVC_ICMPPING,
+	SVC_SNMPv3,
+	SVC_HTTPS,
+	SVC_TELNET
+}
+zbx_dservice_type_t;
+
 int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
 		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,

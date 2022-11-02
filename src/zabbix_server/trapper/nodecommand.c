@@ -497,6 +497,14 @@ fail:
  ******************************************************************************/
 int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp)
 {
+
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
+
+#define ZBX_USER_ROLE_PERMISSION_UI_DEFAULT_ACCESS		"ui.default_access"
+#define ZBX_USER_ROLE_PERMISSION_UI_MONITORING_SERVICES		"ui.monitoring.services"
+
+
 	char			*result = NULL, *send = NULL, *debug = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
 				clientip[MAX_STRING_LEN];
 	int			ret = FAIL, got_hostid = 0, got_eventid = 0;
