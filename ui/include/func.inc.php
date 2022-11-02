@@ -1812,11 +1812,13 @@ function filter_messages(): array {
 		$messages = CMessageHelper::getMessages();
 		CMessageHelper::clear();
 
-		if ($type === CMessageHelper::MESSAGE_TYPE_SUCCESS) {
-			CMessageHelper::setSuccessTitle($title);
-		}
-		else {
-			CMessageHelper::setErrorTitle($title);
+		if ($title !== null) {
+			if ($type === CMessageHelper::MESSAGE_TYPE_SUCCESS) {
+				CMessageHelper::setSuccessTitle($title);
+			}
+			else {
+				CMessageHelper::setErrorTitle($title);
+			}
 		}
 
 		$generic_exists = false;
