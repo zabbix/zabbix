@@ -2421,7 +2421,7 @@ class CUser extends CApiService {
 	 * @param array $medias
 	 * @param array $medias[]['mediatypeid']
 	 */
-	protected function sanitizeUserMedia(array $medias) {
+	protected function sanitizeUserMedia(array $medias): array {
 		if (!$medias) {
 			return $medias;
 		}

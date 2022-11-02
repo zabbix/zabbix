@@ -20,7 +20,7 @@
 
 
 /**
- * Code responsible for user fields, media and groups provisioning.
+ * Class used for user fields, media and groups provisioning.
  */
 class CProvisioning {
 
@@ -68,23 +68,24 @@ class CProvisioning {
 	}
 
 	/**
-	 * Create instance for specific user directory by it id.
+	 * Create instance for specific user directory by id.
 	 *
 	 * @param int $userdirectoryid  User directory id to create CProvisioning instance for.
 	 */
 	public static function forUserDirectoryId($userdirectoryid): self {
-		[$userdirectory] = API::getApiService('userdirectory')->get([
+		$userdirectories = API::getApiService('userdirectory')->get([
 			'output' => ['userdirectoryid', 'idp_type', 'provision_status', 'user_username', 'user_lastname',
 				'host', 'port', 'base_dn', 'bind_dn', 'search_attribute', 'start_tls', 'idp_entityid', 'sso_url',
 				'slo_url', 'username_attribute', 'sp_entityid', 'nameid_format', 'sign_messages', 'sign_assertions',
 				'sign_authn_requests', 'sign_logout_requests', 'sign_logout_responses', 'encrypt_nameid',
 				'encrypt_assertions', 'search_filter', 'group_basedn', 'group_name', 'group_member', 'user_ref_attr',
-				'group_filter', 'group_membership',
+				'group_filter', 'group_membership'
 			],
 			'userdirectoryids' => [$userdirectoryid],
 			'selectProvisionMedia' => ['name', 'mediatypeid', 'attribute'],
 			'selectProvisionGroups' => ['name', 'roleid', 'user_groups']
 		]);
+		$userdirectory = reset($userdirectories);
 
 		if (!$userdirectory || $userdirectory['provision_status'] == JIT_PROVISIONING_DISABLED) {
 			return new self($userdirectory, []);
@@ -150,28 +151,19 @@ class CProvisioning {
 	public function getUserdirectoryId(): int {
 		return $this->userdirectory['userdirectoryid'];
 	}
+
 	/**
 	 * Get array of attributes to request from external source when requesting user data.
 	 *
 	 * @return array Array of attributes names to request from external source.
 	 */
 	public function getUserIdpAttributes(): array {
-		$attributes = [];
-
-		switch ($this->userdirectory['idp_type']) {
-			case IDP_TYPE_LDAP:
-				$fields = ['user_username', 'user_lastname', 'search_attribute', 'group_membership', 'user_ref_attr'];
-
-				break;
-
-			case IDP_TYPE_SAML:
-				$fields = ['user_username', 'user_lastname'];
-
-				break;
-		}
+		$fields = $this->userdirectory['idp_type'] == IDP_TYPE_LDAP
+			? ['user_username', 'user_lastname', 'search_attribute', 'group_membership', 'user_ref_attr']
+			: ['user_username', 'user_lastname'];
 
 		$attributes = array_intersect_key($this->userdirectory, array_flip($fields));
-		$attributes = array_merge(array_column($this->userdirectory['provision_media'], 'attribute'), $attributes);
+		$attributes = array_merge($this->getUserIdpMediaAttributes(), $attributes);
 
 		return array_keys(array_flip(array_filter($attributes, 'strlen')));
 	}
@@ -221,7 +213,7 @@ class CProvisioning {
 		}
 
 		if ($group_key !== '' && array_key_exists($group_key, $idp_user) && is_array($idp_user[$group_key])) {
-			/**
+			/*
 			 * Attribute to search for groups in user data defined, and if there will be no match, 'usrgrps' key
 			 * should exist to do not attempt to query LDAP for user groups once again.
 			 */
@@ -280,7 +272,7 @@ class CProvisioning {
 			$user_medias[] = [
 				'name' => $idp_attributes['name'],
 				'mediatypeid' => $mediatypeid,
-				'sendto' =>	[$idp_user[$idp_attribute]],
+				'sendto' =>	[$idp_user[$idp_attribute]]
 			];
 		}
 
@@ -305,7 +297,7 @@ class CProvisioning {
 		}
 
 		$roleids = [];
-		$groups = [];
+		$user_groups = [];
 
 		foreach ($this->userdirectory['provision_groups'] as $provision_group) {
 			$match = ($provision_group['name'] === '*');
@@ -313,7 +305,7 @@ class CProvisioning {
 			if (strpos($provision_group['name'], '*') === false) {
 				$match = in_array($provision_group['name'], $group_names);
 			}
-			else if (!$match) {
+			elseif (!$match) {
 				$regex = preg_quote($provision_group['name'], '/');
 				$regex = '/'.str_replace('\\*', '.*', $regex).'/';
 				$match = false;
@@ -324,29 +316,29 @@ class CProvisioning {
 			}
 
 			if ($match) {
-				$roleids[$provision_group['roleid']] = 1;
-				$groups = array_merge($groups, $provision_group['user_groups']);
+				$roleids[$provision_group['roleid']] = true;
+				$user_groups = array_merge($user_groups, $provision_group['user_groups']);
 			}
 		}
 
-		if (!$groups) {
+		if (!$user_groups) {
 			return $user;
 		}
 
 		$roles = array_intersect_key($this->mapping_roles, $roleids);
-		CArrayHelper::sort($roles, [
-			['field' => 'type', 'order' => ZBX_SORT_DOWN],
-			['field' => 'name', 'order' => ZBX_SORT_UP]
-		]);
-
 		if ($roles) {
+			CArrayHelper::sort($roles, [
+				['field' => 'type', 'order' => ZBX_SORT_DOWN],
+				['field' => 'name', 'order' => ZBX_SORT_UP]
+			]);
+
 			['roleid' => $user['roleid']] = reset($roles);
 		}
 		else {
 			$user['roleid'] = 0;
 		}
 
-		$user['usrgrps'] = $groups;
+		$user['usrgrps'] = $user_groups;
 
 		return $user;
 	}
