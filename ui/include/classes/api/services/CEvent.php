@@ -585,32 +585,6 @@ class CEvent extends CApiService {
 
 		// Get current data of the new cause event and get symptom events of the given cause events.
 		if ($has_change_rank_to_symptom_action) {
-			$dst_events = $this->get([
-				'output' => ['cause_eventid'],
-				'eventids' => $data['cause_eventid'],
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER,
-				'nopermissions' => true
-			]);
-
-			$cause_eventids = [];
-			foreach ($events as $eventid => $event) {
-				if ($event['cause_eventid'] == 0) {
-					$cause_eventids[] = $eventid;
-				}
-			}
-
-			if ($cause_eventids) {
-				$related_symptom_events = $this->get([
-					'output' => ['eventid', 'cause_eventid'],
-					'filter' => ['cause_eventid' => $cause_eventids],
-					'source' => EVENT_SOURCE_TRIGGERS,
-					'object' => EVENT_OBJECT_TRIGGER,
-					'preservekeys' => true,
-					'nopermissions' => true
-				]);
-			}
-
 			$update_symptom_eventids = validateEventRankChangeToSymptom($data['eventids'], $data['cause_eventid']);
 		}
 
@@ -620,6 +594,9 @@ class CEvent extends CApiService {
 		$acknowledges = [];
 		$suppress_eventids = [];
 		$unsuppress_eventids = [];
+		$tasks_update_event_rank_cause = [];
+		$tasks_update_event_rank_symptom = [];
+		$n = 0;
 
 		foreach ($events as $eventid => $event) {
 			$action = ZBX_PROBLEM_UPDATE_NONE;
@@ -679,17 +656,22 @@ class CEvent extends CApiService {
 			if (($data['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
 					&& $event['cause_eventid'] != 0) {
 				$action |= ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE;
+				$tasks_update_event_rank_cause[$n] = ['eventid' => $eventid];
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM action flag.
 			if ($has_change_rank_to_symptom_action && $update_symptom_eventids
 					&& in_array($eventid, $update_symptom_eventids)) {
 				$action |= ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM;
+				$tasks_update_event_rank_symptom[$n] = [
+					'eventid' => $eventid,
+					'cause_eventid' => $data['cause_eventid']
+				];
 			}
 
 			// For some of selected events action might not be performed, as event is already with given change.
 			if ($action != ZBX_PROBLEM_UPDATE_NONE) {
-				$acknowledges[] = [
+				$acknowledges[$n] = [
 					'userid' => self::$userData['userid'],
 					'eventid' => $eventid,
 					'clock' => $time,
@@ -697,11 +679,9 @@ class CEvent extends CApiService {
 					'action' => $action,
 					'old_severity' => $old_severity,
 					'new_severity' => $new_severity,
-					'suppress_until' => $suppress_until,
-					'cause_eventid' => $has_change_rank_to_symptom_action && $update_symptom_eventids
-						? $data['cause_eventid']
-						: null
+					'suppress_until' => $suppress_until
 				];
+				$n++;
 			}
 		}
 
@@ -872,7 +852,9 @@ class CEvent extends CApiService {
 						'taskid' => $id,
 						'type' => ZBX_TM_DATA_TYPE_RANK_EVENT,
 						'data' => json_encode([
-							'acknowledgeid' => $id
+							'acknowledgeid' => $id,
+							'eventid' => $tasks_update_event_rank_cause[$k]['eventid'],
+							'userid' => $acknowledgement[$k]['userid']
 						])
 					];
 				}
@@ -884,6 +866,17 @@ class CEvent extends CApiService {
 					zbx_toObject($taskids, 'taskid', true)
 				);
 				DB::insertBatch('task_data', $task_update_event_rank, false);
+
+				$upd_acknowledges = [];
+
+				foreach ($acknowledgeids as $k => $id) {
+					$upd_acknowledges[] = [
+						'values' => ['taskid' => $taskids[$k]],
+						'where' => ['acknowledgeid' => $id]
+					];
+				}
+
+				DB::update('acknowledges', $upd_acknowledges);
 			}
 
 			/*
@@ -909,7 +902,9 @@ class CEvent extends CApiService {
 						'type' => ZBX_TM_DATA_TYPE_RANK_EVENT,
 						'data' => json_encode([
 							'acknowledgeid' => $id,
-							'cause_eventid' => $data['cause_eventid']
+							'eventid' => $tasks_update_event_rank_symptom[$k]['eventid'],
+							'cause_eventid' => $tasks_update_event_rank_symptom[$k]['cause_eventid'],
+							'userid' => $acknowledgement[$k]['userid']
 						])
 					];
 				}
@@ -921,6 +916,17 @@ class CEvent extends CApiService {
 					zbx_toObject($taskids, 'taskid', true)
 				);
 				DB::insertBatch('task_data', $task_update_event_rank, false);
+
+				$upd_acknowledges = [];
+
+				foreach ($acknowledgeids as $k => $id) {
+					$upd_acknowledges[] = [
+						'values' => ['taskid' => $taskids[$k]],
+						'where' => ['acknowledgeid' => $id]
+					];
+				}
+
+				DB::update('acknowledges', $upd_acknowledges);
 			}
 		}
 
