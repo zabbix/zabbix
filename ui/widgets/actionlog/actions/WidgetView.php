@@ -23,40 +23,62 @@ namespace Widgets\ActionLog\Actions;
 
 use API,
 	CControllerDashboardWidgetView,
-	CControllerResponseData;
+	CControllerResponseData,
+	CRoleHelper;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
 	protected function doAction(): void {
 		[$sortfield, $sortorder] = self::getSorting($this->fields_values['sort_triggers']);
-		$alerts = $this->getAlerts($sortfield, $sortorder, $this->fields_values['show_lines']);
-		$db_users = $this->getDbUsers($alerts);
 
-		$actions = API::Action()->get([
-			'output' => ['actionid', 'name'],
-			'actionids' => array_unique(array_column($alerts, 'actionid')),
-			'preservekeys' => true
-		]);
-
-		$this->setResponse(new CControllerResponseData([
+		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'actions' => $actions,
-			'alerts'  => $alerts,
-			'db_users' => $db_users,
+			'has_access' => [
+				CRoleHelper::UI_REPORTS_ACTION_LOG => $this->checkAccess(CRoleHelper::UI_REPORTS_ACTION_LOG)
+			],
+			'statuses' => $this->fields_values['statuses'],
+			'message' => $this->fields_values['message'],
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
-		]));
+		];
+
+		$search_strings = [];
+
+		if ($data['message']) {
+			$search_strings = explode(' ', $data['message']);
+		}
+
+		$data['alerts'] = $this->getAlerts(
+			$data['statuses'], $search_strings, $sortfield, $sortorder, $this->fields_values['show_lines']
+		);
+
+		$data['db_users'] = $this->getDbUsers($data['alerts']);
+
+		$data['actions'] = API::Action()->get([
+			'output' => ['actionid', 'name'],
+			'actionids' => array_unique(array_column($data['alerts'], 'actionid')),
+			'preservekeys' => true
+		]);
+
+		$this->setResponse(new CControllerResponseData($data));
 	}
 
-	private function getAlerts(string $sortfield, string $sortorder, $show_lines): array {
+	private function getAlerts(array $filter_statuses, array $search_strings, string $sortfield, string $sortorder,
+			$show_lines): array {
 		$alerts = API::Alert()->get([
 			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
 				'mediatypeid', 'alerttype'
 			],
 			'selectMediatypes' => ['name', 'maxattempts'],
+			'filter' => ['status' => $filter_statuses],
+			'search' => [
+				'subject' => $search_strings,
+				'message' => $search_strings
+			],
+			'searchByAny' => true,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => $show_lines
@@ -104,10 +126,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			default:
 				return ['clock', ZBX_SORT_DOWN];
 
-			case SCREEN_SORT_TRIGGERS_TYPE_ASC:
+			case SCREEN_SORT_TRIGGERS_MEDIA_TYPE_ASC:
 				return ['mediatypeid', ZBX_SORT_UP];
 
-			case SCREEN_SORT_TRIGGERS_TYPE_DESC:
+			case SCREEN_SORT_TRIGGERS_MEDIA_TYPE_DESC:
 				return ['mediatypeid', ZBX_SORT_DOWN];
 
 			case SCREEN_SORT_TRIGGERS_STATUS_ASC:
@@ -123,4 +145,5 @@ class WidgetView extends CControllerDashboardWidgetView {
 				return ['sendto', ZBX_SORT_DOWN];
 		}
 	}
+
 }

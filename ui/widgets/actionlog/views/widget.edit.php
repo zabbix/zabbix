@@ -28,6 +28,14 @@
 
 (new CWidgetFormView($data))
 	->addField(
+		(new CWidgetFieldCheckBoxListView($data['fields']['statuses']))
+			->addClass(ZBX_STYLE_COLUMNS)
+			->addClass(ZBX_STYLE_COLUMNS_3)
+	)
+	->addField(
+		new CWidgetFieldTextBoxView($data['fields']['message'])
+	)
+	->addField(
 		new CWidgetFieldSelectView($data['fields']['sort_triggers'])
 	)
 	->addField(
