@@ -45,8 +45,10 @@ require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.p
 require_once dirname(__FILE__).'/dashboard/testDashboardItemValueWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardSlaReportWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardTopHostsWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardTriggerOverviewWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardViewMode.php';
 require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
 require_once dirname(__FILE__).'/dashboard/testPageDashboardList.php';
@@ -139,6 +141,11 @@ require_once dirname(__FILE__).'/roles/testUserRolesPermissions.php';
 require_once dirname(__FILE__).'/services/testFormServicesServices.php';
 require_once dirname(__FILE__).'/services/testPageServicesServices.php';
 require_once dirname(__FILE__).'/services/testPageServicesServicesMassUpdate.php';
+
+// SLA.
+require_once dirname(__FILE__).'/sla/testFormServicesSla.php';
+require_once dirname(__FILE__).'/sla/testPageServicesSla.php';
+require_once dirname(__FILE__).'/sla/testPageServicesSlaReport.php';
 
 // Tags.
 require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
@@ -287,8 +294,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardPages');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
+		$suite->addTestSuite('testDashboardSlaReportWidget');
 		$suite->addTestSuite('testDashboardSystemInformationWidget');
 		$suite->addTestSuite('testDashboardTopHostsWidget');
+		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardViewMode');
 		$suite->addTestSuite('testFormTemplateDashboards');
 		$suite->addTestSuite('testPageDashboardList');
@@ -381,6 +390,11 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormServicesServices');
 		$suite->addTestSuite('testPageServicesServices');
 		$suite->addTestSuite('testPageServicesServicesMassUpdate');
+
+		//SLA.
+		$suite->addTestSuite('testFormServicesSla');
+		$suite->addTestSuite('testPageServicesSla');
+		$suite->addTestSuite('testPageServicesSlaReport');
 
 		// Tags.
 		$suite->addTestSuite('testFormTagsHost');
@@ -492,9 +506,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testUrlUserPermissions');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
-		$suite->addTestSuite('testFormScheduledReport');
-		$suite->addTestSuite('testPageScheduledReport');
-		$suite->addTestSuite('testScheduledReportPermissions');
 		$suite->addTestSuite('testSID');
 
 		return $suite;

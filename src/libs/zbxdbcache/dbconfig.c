@@ -40,6 +40,7 @@
 #include "zbxtime.h"
 #include "zbxip.h"
 #include "zbxsysinfo.h"
+#include "events.h"
 
 int	sync_in_progress = 0;
 
@@ -15500,6 +15501,7 @@ static void	dc_reschedule_items(const zbx_hashset_t *activated_hosts)
 	zbx_vector_item_delay_destroy(&items);
 }
 
+
 /******************************************************************************
  *                                                                            *
  * Purpose: reschedule httptests on hosts that were re-enabled or unassigned  *
@@ -15555,7 +15557,6 @@ static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts)
 
 	zbx_vector_dc_httptest_ptr_destroy(&httptests);
 }
-
 
 /******************************************************************************
  *                                                                            *

@@ -18,7 +18,7 @@
 **/
 
 #include "lld.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 #include "zbxserver.h"
 
 #include "log.h"

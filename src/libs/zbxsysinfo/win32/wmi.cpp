@@ -479,7 +479,7 @@ out:
  *               SYSINFO_RET_FAIL - retrieving WMI value failed               *
  *                                                                            *
  ******************************************************************************/
-extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+extern "C" int	wmi_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char				*wmi_namespace, *wmi_query, *error = NULL;
 	VARIANT				*vtProp;
@@ -942,7 +942,7 @@ extern "C" int	convert_wmi_json(zbx_vector_wmi_instance_t *wmi_values, char **js
  *               SYSINFO_RET_FAIL - retrieving WMI value failed               *
  *                                                                            *
  ******************************************************************************/
-extern "C" int	WMI_GETALL(AGENT_REQUEST *request, AGENT_RESULT *result)
+extern "C" int	wmi_getall(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char				*wmi_namespace, *wmi_query, *jd = NULL, *error = NULL;
 	int				ret = SYSINFO_RET_FAIL;
