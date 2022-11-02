@@ -83,7 +83,7 @@
 				widget_last_type,
 				is_editable: dashboard.can_edit_dashboards && dashboard.editable
 					&& web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>,
-				is_edit_mode: dashboard.dashboardid === null || this.clone,
+				is_edit_mode: dashboard.dashboardid === null || clone,
 				can_edit_dashboards: dashboard.can_edit_dashboards,
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				time_period,
