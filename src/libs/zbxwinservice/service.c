@@ -116,6 +116,9 @@ static VOID WINAPI	ServiceEntry(DWORD argc, wchar_t **argv)
 {
 	wchar_t	*wservice_name;
 
+	ZBX_UNUSED(argc);
+	ZBX_UNUSED(argv);
+
 	wservice_name = zbx_utf8_to_unicode(ZABBIX_SERVICE_NAME);
 	serviceHandle = RegisterServiceCtrlHandler(wservice_name, ServiceCtrlHandler);
 	zbx_free(wservice_name);
