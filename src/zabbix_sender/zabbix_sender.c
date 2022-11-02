@@ -331,6 +331,8 @@ static char	*ZABBIX_HOSTNAME = NULL;
 static char	*ZABBIX_KEY = NULL;
 static char	*ZABBIX_KEY_VALUE = NULL;
 
+static char	*config_file = NULL;
+
 typedef struct
 {
 	zbx_vector_ptr_t	addrs;
@@ -881,7 +883,7 @@ static void	zbx_fill_from_config_file(char **dst, char *src)
 	}
 }
 
-static void	zbx_load_config(const char *config_file)
+static void	zbx_load_config(const char *config_file_in)
 {
 	char	*cfg_source_ip = NULL, *cfg_active_hosts = NULL, *cfg_hostname = NULL, *cfg_tls_connect = NULL,
 		*cfg_tls_ca_file = NULL, *cfg_tls_crl_file = NULL, *cfg_tls_server_cert_issuer = NULL,
@@ -932,7 +934,7 @@ static void	zbx_load_config(const char *config_file)
 	};
 
 	/* do not complain about unknown parameters in agent configuration file */
-	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_EXIT_FAILURE);
+	parse_cfg_file(config_file_in, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_EXIT_FAILURE);
 
 	/* get first hostname only */
 	if (NULL != cfg_hostname)
@@ -1011,8 +1013,8 @@ static void	parse_commandline(int argc, char **argv)
 		switch (ch)
 		{
 			case 'c':
-				if (NULL == CONFIG_FILE)
-					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
+				if (NULL == config_file)
+					config_file = zbx_strdup(config_file, zbx_optarg);
 				break;
 			case 'h':
 				zbx_help();
@@ -1502,8 +1504,8 @@ int	main(int argc, char **argv)
 
 	parse_commandline(argc, argv);
 
-	if (NULL != CONFIG_FILE)
-		zbx_load_config(CONFIG_FILE);
+	if (NULL != config_file)
+		zbx_load_config(config_file);
 #ifndef _WINDOWS
 	if (SUCCEED != zbx_locks_create(&error))
 	{

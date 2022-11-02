@@ -18,7 +18,7 @@
 **/
 
 #include "trigger_linking.h"
-#include "zbxdbhigh.h"
+#include "zbxdbwrap.h"
 #include "trigger_dep_linking.h"
 
 #include "zbxeval.h"

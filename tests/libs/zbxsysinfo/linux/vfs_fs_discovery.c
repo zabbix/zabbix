@@ -20,8 +20,8 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "zbxcommon.h"
 #include "zbxsysinfo.h"
+#include "../../../../src/libs/zbxsysinfo/sysinfo.h"
 
 #define GET_TEST_PARAM_FAIL(NAME, MOCK_ERR)	fail_msg("Cannot get \"%s\": %s", NAME, zbx_mock_error_string(MOCK_ERR))
 
@@ -71,9 +71,9 @@ void	zbx_mock_test_entry(void **state)
 	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&result);
 
-	if (expected_result != (actual_result = VFS_FS_DISCOVERY(&request, &result)))
+	if (expected_result != (actual_result = vfs_fs_discovery(&request, &result)))
 	{
-		fail_msg("Unexpected return code from VFS_FS_DISCOVERY(): expected %s, got %s",
+		fail_msg("Unexpected return code from vfs_fs_discovery(): expected %s, got %s",
 				zbx_sysinfo_ret_string(expected_result), zbx_sysinfo_ret_string(actual_result));
 	}
 

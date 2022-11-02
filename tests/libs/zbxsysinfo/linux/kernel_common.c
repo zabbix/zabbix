@@ -17,14 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "KERNEL_COMMON.h"
+#include "kernel_common.h"
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
 #include "zbxsysinfo.h"
+#include "../../../../src/libs/zbxsysinfo/sysinfo.h"
 #include "zbxnum.h"
 
-void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func)
+void	zbx_mock_test_entry_kernel_common(void **state, int kernel_func)
 {
 	AGENT_REQUEST		request;
 	AGENT_RESULT		param_result;
@@ -67,9 +68,9 @@ void	zbx_mock_test_entry_KERNEL_COMMON(void **state, int kernel_func)
 	zbx_init_agent_result(&param_result);
 
 	if (ZABBIX_MOCK_KERNEL_MAXPROC == kernel_func)
-		actual_result = KERNEL_MAXPROC(&request, &param_result);
+		actual_result = kernel_maxproc(&request, &param_result);
 	else if (ZABBIX_MOCK_KERNEL_MAXFILES == kernel_func)
-		actual_result = KERNEL_MAXFILES(&request, &param_result);
+		actual_result = kernel_maxfiles(&request, &param_result);
 	else
 		fail_msg("Invalid kernel_func");
 

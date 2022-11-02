@@ -206,7 +206,8 @@ static void	svc_get_fullpath(const char *path, wchar_t *fullpath, size_t max_ful
 	zbx_free(wpath);
 }
 
-static void	svc_get_command_line(const char *path, int multiple_agents, wchar_t *cmdLine, size_t max_cmdLine)
+static void	svc_get_command_line(const char *path, int multiple_agents, wchar_t *cmdLine, size_t max_cmdLine,
+		const char *config_file)
 {
 	wchar_t	path1[MAX_PATH], path2[MAX_PATH];
 
@@ -217,9 +218,9 @@ static void	svc_get_command_line(const char *path, int multiple_agents, wchar_t 
 	else
 		StringCchPrintf(path1, MAX_PATH, path2);
 
-	if (NULL != CONFIG_FILE)
+	if (NULL != config_file)
 	{
-		svc_get_fullpath(CONFIG_FILE, path2, MAX_PATH);
+		svc_get_fullpath(config_file, path2, MAX_PATH);
 		StringCchPrintf(cmdLine, max_cmdLine, TEXT("\"%s\" %s--config \"%s\""),
 				path1,
 				(0 == multiple_agents) ? TEXT("") : TEXT("--multiple-agents "),
@@ -259,7 +260,7 @@ static int	svc_install_event_source(const char *path)
 	return SUCCEED;
 }
 
-int	ZabbixCreateService(const char *path, int multiple_agents)
+int	ZabbixCreateService(const char *path, int multiple_agents, const char *config_file)
 {
 	SC_HANDLE		mgr, service;
 	SERVICE_DESCRIPTION	sd;
@@ -271,7 +272,7 @@ int	ZabbixCreateService(const char *path, int multiple_agents)
 	if (FAIL == svc_OpenSCManager(&mgr))
 		return ret;
 
-	svc_get_command_line(path, multiple_agents, cmdLine, MAX_PATH);
+	svc_get_command_line(path, multiple_agents, cmdLine, MAX_PATH, config_file);
 
 	wservice_name = zbx_utf8_to_unicode(ZABBIX_SERVICE_NAME);
 

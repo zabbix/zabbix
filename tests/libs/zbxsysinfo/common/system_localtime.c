@@ -21,6 +21,7 @@
 #include "zbxmockdata.h"
 
 #include "zbxsysinfo.h"
+#include "../../../../src/libs/zbxsysinfo/sysinfo.h"
 #include "zbxnum.h"
 #include "../../../../src/libs/zbxsysinfo/common/system.h"
 
@@ -149,7 +150,7 @@ void	zbx_mock_test_entry(void **state)
 	if (0 != strcmp(request.key, "system.localtime"))
 		fail_msg("Got unexpected item key parameter from test case data: %s", key_string);
 
-	if (expected_result != (actual_result = SYSTEM_LOCALTIME(&request, &param_result)))
+	if (expected_result != (actual_result = system_localtime(&request, &param_result)))
 	{
 		fail_msg("Got '%s' instead of '%s' as a result.", zbx_sysinfo_ret_string(actual_result),
 				zbx_sysinfo_ret_string(expected_result));
