@@ -22,6 +22,7 @@
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup widget
@@ -67,6 +68,7 @@ class testDashboardClockWidget extends CWebTest {
 		// Check fields "Refresh interval" values.
 		$refreshinterval_values = ['Default (15 minutes)', 'No refresh', '10 seconds', '30 seconds', '1 minute',
 			'2 minutes', '10 minutes', '15 minutes'];
+
 		$ri_dropdown = $form->query('name', 'rf_rate')->asDropdown()->one();
 		$this->assertEquals($refreshinterval_values, $ri_dropdown->getOptions()->asText());
 
@@ -92,9 +94,32 @@ class testDashboardClockWidget extends CWebTest {
 		return [
 			[
 				[
-					'MandatoryFields' => [
+					'Fields' => [
 						'Type' => 'Clock',
-						'Name' => 'FrontendLocalClock'
+						'Name' => 'FrontendServerClock',
+						'Refresh interval' => 'No refresh',
+						'Time type' => 'Server time'
+					]
+				]
+			],
+			[
+				[
+					'Fields' => [
+						'Type' => 'Clock',
+						'Name' => 'FrontendLocalClock',
+						'Refresh interval' => 'Default (15 minutes)',
+						'Time type' => 'Local time'
+					]
+				]
+			],
+			[
+				[
+					'Fields' => [
+						'Type' => 'Clock',
+						'Name' => 'FrontendHostClock',
+						'Refresh interval' => 'Default (15 minutes)',
+						'Time type' => 'Host time',
+						'Item' => 'DEV-2236 item'
 					]
 				]
 			]
@@ -111,8 +136,8 @@ class testDashboardClockWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
-		$form->fill($data['MandatoryFields']);
-		$this->query('xpath://button[contains(@class, "dialogue-widget-save")]')->waitUntilClickable()->one()->click();
+		$form->fill($data['Fields']);
+		$form->query('xpath://button[contains(@class, "dialogue-widget-save")]')->waitUntilClickable()->one()->click();
 		$dashboard->save();
 	}
 
@@ -124,10 +149,10 @@ class testDashboardClockWidget extends CWebTest {
 		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236 dashboard');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget('ClockWidgetCreatedByAutotest')->edit();
+		$form = $dashboard->getWidget('FrontendLocalClock')->edit();
 		$form->submit();
 		$this->page->waitUntilReady();
-		$dashboard->getWidget('ClockWidgetCreatedByAutotest');
+		$dashboard->getWidget('FrontendLocalClock');
 		$dashboard->save();
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
@@ -154,7 +179,7 @@ class testDashboardClockWidget extends CWebTest {
 		$dashboardid = CDataHelper::get('ClockWidgets.dashboardids.DEV-2236 dashboard');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->getWidget('ClockWidgetCreatedByAutotest')->edit();
+		$form = $dashboard->getWidget('FrontendLocalClock')->edit();
 		$form->fill($data['UpdateFields'])->waitUntilReady();
 		$form->submit();
 		$this->page->waitUntilReady();
