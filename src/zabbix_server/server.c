@@ -338,7 +338,7 @@ int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
 
-static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1}
+static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
 
@@ -1179,7 +1179,7 @@ int	main(int argc, char **argv)
 	}
 
 	return zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit,
-			log_file_cfg->log_type, log_file_cfg->log_file_name);
+			log_file_cfg.log_type, log_file_cfg.log_file_name);
 }
 
 static void	zbx_check_db(void)

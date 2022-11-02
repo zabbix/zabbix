@@ -123,6 +123,8 @@ int	main(int argc, char **argv)
 	char	*script_file = NULL, *input_file = NULL, *param = NULL, ch, *script = NULL, *error = NULL,
 		*result = NULL, script_error[MAX_STRING_LEN];
 
+	zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 0};
+
 	/* see description of 'optarg' in 'man 3 getopt' */
 	char		*zbx_optarg = NULL;
 

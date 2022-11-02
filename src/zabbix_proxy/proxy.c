@@ -1121,7 +1121,7 @@ int	main(int argc, char **argv)
 	}
 
 	return zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit,
-			log_file_cfg->log_type, log_file_cfg->log_file_name);
+			log_file_cfg.log_type, log_file_cfg.log_file_name);
 }
 
 static void	zbx_check_db(void)
