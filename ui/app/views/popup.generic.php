@@ -286,6 +286,14 @@ switch ($data['popup_type']) {
 				? new CCheckBox('item['.zbx_jsValue($trigger[$options['srcfld1']]).']', $trigger['triggerid'])
 				: null;
 
+			if (array_key_exists('_disabled', $trigger)) {
+				if ($data['multiselect']) {
+					$check_box->setChecked(1);
+					$check_box->setEnabled(false);
+				}
+				$description = new CLabel($trigger['description']);
+			}
+
 			if ($data['multiselect']) {
 				$description
 					->setAttribute('data-reference', $options['reference'])
