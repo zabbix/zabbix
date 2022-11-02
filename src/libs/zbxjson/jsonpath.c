@@ -305,7 +305,7 @@ static void	jsonpath_list_free(zbx_jsonpath_list_node_t *list)
  * Purpose: append array index to list                                        *
  *                                                                            *
  ******************************************************************************/
-zbx_jsonpath_list_node_t	*jsonpath_list_append_index(zbx_jsonpath_list_node_t *head, int index,
+static zbx_jsonpath_list_node_t	*jsonpath_list_append_index(zbx_jsonpath_list_node_t *head, int index,
 		int check_duplicate)
 {
 	zbx_jsonpath_list_node_t	*node;
@@ -334,7 +334,7 @@ zbx_jsonpath_list_node_t	*jsonpath_list_append_index(zbx_jsonpath_list_node_t *h
  * Purpose: append name to list                                               *
  *                                                                            *
  ******************************************************************************/
-zbx_jsonpath_list_node_t	*jsonpath_list_append_name(zbx_jsonpath_list_node_t *head, const char *name, size_t len)
+static zbx_jsonpath_list_node_t	*jsonpath_list_append_name(zbx_jsonpath_list_node_t *head, const char *name, size_t len)
 {
 	zbx_jsonpath_list_node_t	*node, *new_node;
 

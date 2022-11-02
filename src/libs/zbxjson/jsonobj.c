@@ -319,7 +319,7 @@ int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, zbx
 			zbx_chrcpy_alloc(str, str_alloc, str_offset, '}');
 			break;
 		default:
-			zbx_set_json_strerror("unknown json object with type: %d", obj->type);
+			zbx_set_json_strerror("unknown json object with type: %u", obj->type);
 			return FAIL;
 	}
 
