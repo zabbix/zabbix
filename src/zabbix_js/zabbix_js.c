@@ -175,7 +175,7 @@ int	main(int argc, char **argv)
 		goto clean;
 	}
 
-	if (SUCCEED != zabbix_open_log(LOG_TYPE_UNDEFINED, loglevel, NULL, &error))
+	if (SUCCEED != zabbix_open_log(&log_file_cfg, loglevel, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		goto clean;

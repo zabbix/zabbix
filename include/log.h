@@ -70,8 +70,7 @@ typedef struct
 #	define zabbix_log __zbx_zabbix_log
 #endif
 
-int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int type, int level, const char *filename,
-		char **error);
+int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error);
 void	__zbx_zabbix_log(int level, const char *fmt, ...) __zbx_attr_format_printf(2, 3);
 void	zabbix_close_log(void);
 
