@@ -40,16 +40,6 @@
 #define	ZBX_POLLER_TYPE_ODBC		6
 #define	ZBX_POLLER_TYPE_COUNT		7	/* number of poller types */
 
-typedef union
-{
-	double		dbl;
-	zbx_uint64_t	ui64;
-	char		*str;
-	char		*err;
-	zbx_log_value_t	*log;
-}
-history_value_t;
-
 typedef enum
 {
 	ZBX_SESSION_TYPE_DATA = 0,
@@ -58,25 +48,10 @@ typedef enum
 }
 zbx_session_type_t;
 
-typedef struct
-{
-	int	timestamp;
-	int	logeventid;
-	int	severity;
-	char	*source;
-	char	*value;
-}
-zbx_log_value_t;
-
 #define MAX_JAVA_ITEMS		32
 #define MAX_SNMP_ITEMS		128
 #define MAX_POLLER_ITEMS	128	/* MAX(MAX_JAVA_ITEMS, MAX_SNMP_ITEMS) */
 #define MAX_PINGER_ITEMS	128
-
-#define ZBX_TRIGGER_DEPENDENCY_LEVELS_MAX	32
-
-#define ZBX_TRIGGER_DEPENDENCY_FAIL		1
-#define ZBX_TRIGGER_DEPENDENCY_UNRESOLVED	2
 
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
@@ -262,10 +237,6 @@ typedef struct
 	zbx_tag_t	tag;
 }
 zbx_item_tag_t;
-
-#define ZBX_DC_TRIGGER_PROBLEM_EXPRESSION	0x1	/* this flag shows that trigger value recalculation is  */
-							/* initiated by a time-based function or a new value of */
-							/* an item in problem expression */
 
 typedef struct _DC_TRIGGER
 {
@@ -752,11 +723,6 @@ zbx_synced_new_config_t;
 					ZBX_ITEM_GET_HOUSEKEEPING)
 
 #define ZBX_ITEM_GET_PROCESS		(ZBX_ITEM_GET_MAINTENANCE|ZBX_ITEM_GET_MISC|ZBX_ITEM_GET_LOGTIMEFMT)
-
-#define ZBX_TRIGGER_GET_ITEMIDS		0x0001
-
-#define ZBX_TRIGGER_GET_DEFAULT		(~(unsigned int)ZBX_TRIGGER_GET_ITEMIDS)
-#define ZBX_TRIGGER_GET_ALL		(~(unsigned int)0)
 
 void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zbx_vector_uint64_t *deleted_itemids);
 void	DCsync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths);
@@ -1288,43 +1254,6 @@ zbx_maintenance_type_t;
 
 #define HOST_INVENTORY_FIELD_COUNT	70
 
-/* interface availability */
-#define INTERFACE_AVAILABLE_UNKNOWN		0
-#define INTERFACE_AVAILABLE_TRUE		1
-#define INTERFACE_AVAILABLE_FALSE		2
-
-/* trigger statuses */
-#define TRIGGER_STATUS_ENABLED		0
-#define TRIGGER_STATUS_DISABLED		1
-
-/* trigger types */
-#define TRIGGER_TYPE_NORMAL		0
-#define TRIGGER_TYPE_MULTIPLE_TRUE	1
-
-/* trigger values */
-#define TRIGGER_VALUE_OK		0
-#define TRIGGER_VALUE_PROBLEM		1
-#define TRIGGER_VALUE_UNKNOWN		2	/* only in server code, never in DB */
-#define TRIGGER_VALUE_NONE		3	/* only in server code, never in DB */
-
-/* trigger states */
-#define TRIGGER_STATE_NORMAL		0
-#define TRIGGER_STATE_UNKNOWN		1
-
-/* trigger severity */
-#define TRIGGER_SEVERITY_NOT_CLASSIFIED	0
-#define TRIGGER_SEVERITY_INFORMATION	1
-#define TRIGGER_SEVERITY_WARNING	2
-#define TRIGGER_SEVERITY_AVERAGE	3
-#define TRIGGER_SEVERITY_HIGH		4
-#define TRIGGER_SEVERITY_DISASTER	5
-#define TRIGGER_SEVERITY_COUNT		6	/* number of trigger severities */
-
-/* trigger recovery mode */
-#define TRIGGER_RECOVERY_MODE_EXPRESSION		0
-#define TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION	1
-#define TRIGGER_RECOVERY_MODE_NONE			2
-
 /* business service values */
 #define SERVICE_VALUE_OK		0
 #define SERVICE_VALUE_PROBLEM		1
@@ -1421,10 +1350,6 @@ zbx_maintenance_type_t;
 #define ZBX_CORR_OPERATION_CLOSE_OLD			0
 #define ZBX_CORR_OPERATION_CLOSE_NEW			1
 
-
-/* trigger correlation modes */
-#define ZBX_TRIGGER_CORRELATION_NONE	0
-#define ZBX_TRIGGER_CORRELATION_TAG	1
 
 
 #endif

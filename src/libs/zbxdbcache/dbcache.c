@@ -33,6 +33,7 @@
 #include "zbxtrends.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
+#include "zbx_trigger_constants.h"
 
 static zbx_shmem_info_t	*hc_index_mem = NULL;
 static zbx_shmem_info_t	*hc_mem = NULL;

@@ -24,6 +24,11 @@
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 
+/* interface availability */
+#define INTERFACE_AVAILABLE_UNKNOWN		0
+#define INTERFACE_AVAILABLE_TRUE		1
+#define INTERFACE_AVAILABLE_FALSE		2
+
 #define ZBX_IPC_SERVICE_AVAILABILITY		"availability"
 #define ZBX_IPC_AVAILABILITY_REQUEST		1
 #define ZBX_IPC_AVAILMAN_ACTIVE_HB		2
