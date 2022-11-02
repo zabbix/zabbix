@@ -150,7 +150,7 @@ class CTableRowElement extends CElement {
 	 *
 	 * @throws Exception
 	 */
-	public function assertValue($expected) {
+	public function assertValues($expected) {
 		if (!is_array($expected)) {
 			$expected = [$expected];
 		}

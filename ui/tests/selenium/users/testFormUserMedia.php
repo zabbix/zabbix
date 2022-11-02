@@ -554,7 +554,7 @@ class testFormUserMedia extends CWebTest {
 			$media_field = $user_form->getField('Media')->asTable();
 			$this->assertTrue($media_field->getRows()->count() === 1);
 			// Verify the values of "Type" and "Send to" for the created and updated media.
-			$media_field->getRow(0)->assertColumnValue([
+			$media_field->getRow(0)->assertValues([
 				'Type' => $data['media_fields']['Type'],
 				'Send to' => $data['media_fields']['Send to']
 			]);

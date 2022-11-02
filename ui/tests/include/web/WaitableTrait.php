@@ -251,7 +251,7 @@ trait WaitableTrait {
 	/**
 	 * @inheritdoc
 	 */
-	public function getClassessNotPresentCondition($classes) {
+	public function getClassesNotPresentCondition($classes) {
 		return $this->getReversedCondition($this->getClassesPresentCondition($classes));
 	}
 

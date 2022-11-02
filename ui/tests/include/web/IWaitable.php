@@ -109,6 +109,24 @@ interface IWaitable {
 	public function getAttributesNotPresentCondition($attributes);
 
 	/**
+	 * Condition describing state when classes is present within the object.
+	 *
+	 * @param array $classes    classes to be present
+	 *
+	 * @return callable
+	 */
+	public function getClassesPresentCondition($classes);
+
+	/**
+	 * Condition describing state when classes is not present within the object.
+	 *
+	 * @param array $classes    classes to not be present
+	 *
+	 * @return callable
+	 */
+	public function getClassesNotPresentCondition($classes);
+
+	/**
 	 * Condition describing state when object is selected.
 	 *
 	 * @return callable

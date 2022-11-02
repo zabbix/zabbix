@@ -471,7 +471,7 @@ class testPageHostInterfaces extends CWebTest {
 			// Check every interface row.
 			foreach ($interface_table->getRows() as $i => $row) {
 				$interface_details  = $data['interfaces'][$interface_name]['rows'][$i];
-				$row->assertColumnValue([
+				$row->assertValues([
 					'Interface' => $interface_details['Interface'],
 					'Status' => $interface_details['Status']['text'],
 					'Error' => $interface_details['Error']

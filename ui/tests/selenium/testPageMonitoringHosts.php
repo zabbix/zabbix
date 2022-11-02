@@ -938,9 +938,6 @@ class testPageMonitoringHosts extends CWebTest {
 						'Web',
 						'Detect operating system',
 						'Ping',
-						'Script for Clone',
-						'Script for Delete',
-						'Script for Update',
 						'Traceroute'
 					]
 				]
@@ -963,9 +960,6 @@ class testPageMonitoringHosts extends CWebTest {
 						'Web',
 						'Detect operating system',
 						'Ping',
-						'Script for Clone',
-						'Script for Delete',
-						'Script for Update',
 						'Traceroute'
 					]
 				]
@@ -988,9 +982,6 @@ class testPageMonitoringHosts extends CWebTest {
 						'Web',
 						'Detect operating system',
 						'Ping',
-						'Script for Clone',
-						'Script for Delete',
-						'Script for Update',
 						'Traceroute'
 					]
 				]
@@ -1013,9 +1004,6 @@ class testPageMonitoringHosts extends CWebTest {
 						'Web',
 						'Detect operating system',
 						'Ping',
-						'Script for Clone',
-						'Script for Delete',
-						'Script for Update',
 						'Traceroute'
 					]
 				]

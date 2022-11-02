@@ -30,11 +30,6 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testFormAdministrationScripts extends CWebTest {
 
-	private const ID_UPDATE = 200;	// Script for Update.
-
-	private const ID_DELETE = 202;
-	private const NAME_DELETE = 'Script for Delete';
-
 	/**
 	 * Id of scripts that created for future cloning.
 	 *
@@ -63,6 +58,23 @@ class testFormAdministrationScripts extends CWebTest {
 	 */
 	public function prepareScriptData() {
 		$response = CDataHelper::call('script.create', [
+			[
+				'name' => 'Script for Clone',
+				'type' => 5,
+				'scope' => 2,
+				'command' => 'test',
+				'parameters' => [
+					[
+						'name' => 'name1',
+						'value' => 'value1'
+					],
+					[
+						'name' => 'name2',
+						'value' => 'value2'
+					]
+				],
+				'description' => 'clone description'
+			],
 			[
 				'name' => 'SSH_api_clone_1',
 				'type' => 2,
@@ -110,6 +122,30 @@ class testFormAdministrationScripts extends CWebTest {
 
 		$scripts = CDataHelper::call('script.create', [
 			[
+				'name' => 'Script for Update',
+				'type' => 5,
+				'scope' => 2,
+				'command' => 'test',
+				'parameters' => [
+					[
+						'name' => 'update_name',
+						'value' => 'update_value'
+					],
+					[
+						'name' => 'update_name2',
+						'value' => 'update_value2'
+					]
+				],
+				'description' => 'update description'
+			],
+			[
+				'name' => 'Script for Delete',
+				'type' => 5,
+				'scope' => 2,
+				'command' => 'test',
+				'description' => 'delete description'
+			],
+			[
 				'name' => 'URI schemes',
 				'type' => 6,
 				'scope' => 2,
@@ -128,7 +164,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// Webhook.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Minimal script',
 						'Script' => 'java script'
 					]
@@ -138,7 +174,7 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				[
 					'trim' => true,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Test trailing spaces',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script'
@@ -161,7 +197,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max webhook',
 						'Scope' => 'Manual host action',
 						'Menu path' => 'path_1/path_2',
@@ -194,7 +230,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max webhook 2',
 						'Scope' => 'Action operation',
 						'Type' => 'Webhook',
@@ -222,7 +258,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max webhook 3',
 						'Scope' => 'Manual event action',
 						'Menu path' => 'path_1/path_2',
@@ -255,7 +291,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Test parameters',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script',
@@ -294,7 +330,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Webhook false confirmation',
 						'Script' => 'webhook',
 						'Script' => 'java script',
@@ -304,7 +340,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test 1',
 						'Script' => 'java script',
 						'Timeout' => '1'
@@ -313,7 +349,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test 60',
 						'Script' => 'java script',
 						'Timeout' => '60'
@@ -324,7 +360,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "timeout": value must be one of 1-60.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test 0',
 						'Script' => 'java script',
 						'Timeout' => '0'
@@ -333,7 +369,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test 1m',
 						'Script' => 'java script',
 						'Timeout' => '1m'
@@ -344,7 +380,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "timeout": value must be one of 1-60.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test 1h',
 						'Script' => 'java script',
 						'Timeout' => '1h'
@@ -355,7 +391,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "timeout": value must be one of 1-60.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test 70',
 						'Script' => 'java script',
 						'Timeout' => '70s'
@@ -366,7 +402,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "timeout": a time unit is expected.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test -1',
 						'Script' => 'java script',
 						'Timeout' => '-1'
@@ -377,7 +413,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "timeout": a time unit is expected.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Timeout test character',
 						'Script' => 'java script',
 						'Timeout' => 'char'
@@ -388,7 +424,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Test empty parameters',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script'
@@ -413,7 +449,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/parameters/2": value (name)=(Param1) already exists.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Test empty parameter names',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script'
@@ -438,7 +474,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/parameters/1/name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Test trailing spaces',
 						'Type' => 'Webhook',
 						'Script' => 'Webhook Script'
@@ -457,7 +493,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/command": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Webhook Empty script',
 						'Script' => ''
 					]
@@ -467,7 +503,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => '',
 						'Script' => 'Webhook: empty name'
 					]
@@ -476,7 +512,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// Script.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max script',
 						'Scope' => 'Manual host action',
 						'Menu path' => 'path_1/path_2',
@@ -494,7 +530,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max script 2',
 						'Scope' => 'Action operation',
 						'Type' => 'Script',
@@ -508,7 +544,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max script 3',
 						'Scope' => 'Manual event action',
 						'Menu path' => 'path_1/path_2',
@@ -528,7 +564,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => '',
 						'Type' => 'Script',
 						'Commands' => 'Script empty name'
@@ -539,7 +575,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/command": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Script empty command',
 						'Type' => 'Script',
 						'Commands' => ''
@@ -549,7 +585,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// IPMI.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max IPMI',
 						'Scope' => 'Manual host action',
 						'Menu path' => 'path_1/path_2',
@@ -567,7 +603,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max IPMI 2',
 						'Scope' => 'Action operation',
 						'Type' => 'IPMI',
@@ -580,7 +616,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max IPMI 3',
 						'Scope' => 'Manual event action',
 						'Menu path' => 'path_1/path_2',
@@ -600,7 +636,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => '',
 						'Type' => 'IPMI',
 						'Command' => 'IPMI empty name'
@@ -611,7 +647,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/command": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'IPMI empty command',
 						'Type' => 'IPMI',
 						'Command' => ''
@@ -621,7 +657,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// SSH.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max SSH',
 						'Scope' => 'Manual host action',
 						'Menu path' => 'path_1/path_2',
@@ -641,7 +677,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max SSH 2',
 						'Scope' => 'Action operation',
 						'Type' => 'SSH',
@@ -657,7 +693,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max SSH 3',
 						'Scope' => 'Manual event action',
 						'Menu path' => 'path_1/path_2',
@@ -677,7 +713,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max SSH 4',
 						'Scope' => 'Manual event action',
 						'Menu path' => 'path_1/path_2',
@@ -700,7 +736,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max SSH 5',
 						'Scope' => 'Action operation',
 						'Type' => 'SSH',
@@ -719,7 +755,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max SSH 6',
 						'Scope' => 'Manual host action',
 						'Menu path' => 'path_1/path_2',
@@ -744,7 +780,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => '',
 						'Type' => 'SSH',
 						'Commands' => 'SSH empty name'
@@ -755,7 +791,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/command": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'SSH empty command',
 						'Type' => 'SSH',
 						'Commands' => ''
@@ -766,7 +802,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/username": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'SSH empty username',
 						'Type' => 'SSH',
 						'Commands' => 'SSH empty username',
@@ -777,7 +813,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// Telnet
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max Telnet',
 						'Scope' => 'Manual host action',
 						'Menu path' => 'path_1/path_2',
@@ -797,7 +833,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max Telnet 2',
 						'Scope' => 'Action operation',
 						'Type' => 'Telnet',
@@ -813,7 +849,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Max Telnet 3',
 						'Scope' => 'Manual event action',
 						'Menu path' => 'path_1/path_2',
@@ -835,7 +871,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Incorrect value for field "name": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => '',
 						'Type' => 'Telnet',
 						'Commands' => 'Telnet empty name'
@@ -846,7 +882,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/command": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Telnet empty command',
 						'Type' => 'Telnet',
 						'Commands' => ''
@@ -857,7 +893,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/username": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Telnet empty username',
 						'Type' => 'Telnet',
 						'Commands' => 'Telnet empty username',
@@ -870,7 +906,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/url": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Url empty for host action',
 						'Scope' => 'Manual host action',
 						'Type' => 'URL',
@@ -882,7 +918,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/url": cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Url empty for event action',
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
@@ -894,7 +930,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/url": unacceptable URL.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'invalid uri schema',
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
@@ -906,7 +942,7 @@ class testFormAdministrationScripts extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'details' => 'Invalid parameter "/1/menu_path": directory cannot be empty.',
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'invalid menu path',
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
@@ -918,7 +954,7 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'type URL for manual host action',
 						'Scope' => 'Manual host action',
 						'Menu path' => 'top_menu/sub_menu/',
@@ -938,7 +974,7 @@ class testFormAdministrationScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'type URL for manual event action',
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
@@ -961,7 +997,7 @@ class testFormAdministrationScripts extends CWebTest {
 	 * @dataProvider getScriptsData
 	 */
 	public function testFormAdministrationScripts_Update($data) {
-		$this->checkScripts($data, true, 'zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
+		$this->checkScripts($data, true, 'zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
 	}
 
 	/**
@@ -1071,6 +1107,7 @@ class testFormAdministrationScripts extends CWebTest {
 					$dialog->query('xpath://span[@class="confirmation-msg"]')->waitUntilReady()->one()->getText());
 			$this->assertFalse($dialog->query('button:Execute')->one()->isEnabled());
 			$dialog->query('button:Cancel')->one()->click();
+			$dialog->ensureNotPresent();
 		}
 	}
 
@@ -1080,7 +1117,7 @@ class testFormAdministrationScripts extends CWebTest {
 	public function testFormAdministrationScripts_CancelUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
 		$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
 		$form->fill([
 			'Name' => 'Cancelled script',
@@ -1107,7 +1144,7 @@ class testFormAdministrationScripts extends CWebTest {
 	public function testFormAdministrationScripts_SimpleUpdate() {
 		$sql = 'SELECT * FROM scripts ORDER BY scriptid';
 		$old_hash = CDBHelper::getHash($sql);
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_UPDATE);
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Update']);
 		$this->query('id:script-form')->waitUntilReady()->asForm()->one()->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script updated');
@@ -1118,8 +1155,6 @@ class testFormAdministrationScripts extends CWebTest {
 	 * Function for checking script cloning with only changed name.
 	 */
 	public function testFormAdministrationScripts_Clone() {
-		// Added existing webhook to the list.
-		array_push(self::$clone_scriptids, '201');
 		foreach (self::$clone_scriptids as $scriptid) {
 			$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.$scriptid);
 			$form = $this->query('id:script-form')->waitUntilReady()->asForm()->one();
@@ -1152,19 +1187,20 @@ class testFormAdministrationScripts extends CWebTest {
 	 * Function for testing script delete from configuration form.
 	 */
 	public function testFormAdministrationScripts_Delete() {
-		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::ID_DELETE);
+		$this->page->login()->open('zabbix.php?action=script.edit&scriptid='.self::$ids['Script for Delete']);
 		$this->query('button:Delete')->waitUntilReady()->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Script deleted');
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE name='.zbx_dbstr(self::NAME_DELETE)));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM scripts WHERE scriptid='.
+				zbx_dbstr(self::$ids['Script for Delete']))
+		);
 	}
 
 	/**
 	 * Check the default values, visible and required fields in the script form based on the selected scope and type.
 	 */
 	public function testFormAdministrationScripts_Layout() {
-		$this->setNetworkThrottlingMode(self::NETWORK_THROTTLING_SLOW);
 		$common_all_scopes = [
 			'fields' => ['Name', 'Scope', 'Type', 'Description', 'Host group'],
 			'required' => ['Name'],
@@ -1344,7 +1380,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// USER.* macros.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'USER macros - manual host',
 						'Scope' => 'Manual host action',
 						'Type' => 'URL',
@@ -1359,7 +1395,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'USER macros - manual event',
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
@@ -1375,7 +1411,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// EVENT.* macros.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'EVENT macros - manual host',
 						'Scope' => 'Manual host action',
 						'Type' => 'URL',
@@ -1391,7 +1427,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'EVENT macros - manual event',
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
@@ -1408,7 +1444,7 @@ class testFormAdministrationScripts extends CWebTest {
 			// HOST.* macros.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'HOST macros - manual host',
 						'Scope' => 'Manual host action',
 						'Type' => 'URL',
@@ -1423,7 +1459,7 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'HOST macros - manual event',
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
