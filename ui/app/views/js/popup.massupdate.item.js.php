@@ -70,9 +70,8 @@
 
 	history_toggle.addEventListener('change', () => {
 		const history_input = document.getElementById('history');
-		const dont_keep = document.getElementById('history_mode_<?= ITEM_STORAGE_OFF ?>').checked;
 
-		if (dont_keep) {
+		if (document.getElementById('history_mode_<?= ITEM_STORAGE_OFF ?>').checked) {
 			history_input.style.display = 'none';
 			history_input.disabled = true;
 		}
@@ -82,7 +81,7 @@
 		}
 	});
 
-	history_toggle.dispatchEvent(new CustomEvent('change', {}));
+	history_toggle.dispatchEvent(new CustomEvent('change'));
 })();
 
 // Trends mode.
@@ -95,9 +94,8 @@
 
 	trends_toggle.addEventListener('change', () => {
 		const trends_input = document.getElementById('trends');
-		const dont_keep = document.getElementById('trends_mode_<?= ITEM_STORAGE_OFF ?>').checked;
 
-		if (dont_keep) {
+		if (document.getElementById('trends_mode_<?= ITEM_STORAGE_OFF ?>').checked) {
 			trends_input.disabled = true;
 			trends_input.style.display = 'none';
 		}
@@ -107,7 +105,7 @@
 		}
 	});
 
-	trends_toggle.dispatchEvent(new CustomEvent('change', {}));
+	trends_toggle.dispatchEvent(new CustomEvent('change'));
 })();
 
 // Custom intervals.
