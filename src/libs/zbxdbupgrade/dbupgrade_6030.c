@@ -476,6 +476,28 @@ static int DBpatch_6030061(void)
 	return DBmodify_field_type("triggers", &field, NULL);
 }
 
+static int	DBpatch_6030062(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.auditacts.filter.from", "web.actionlog.filter.from",
+			"web.auditacts.filter.to", "web.actionlog.filter.to",
+			"web.auditacts.filter.active", "web.actionlog.filter.active",
+			"web.auditacts.filter.userids", "web.actionlog.filter.userids"
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -544,5 +566,6 @@ DBPATCH_ADD(6030058, 0, 1)
 DBPATCH_ADD(6030059, 0, 1)
 DBPATCH_ADD(6030060, 0, 1)
 DBPATCH_ADD(6030061, 0, 1)
+DBPATCH_ADD(6030062, 0, 1)
 
 DBPATCH_END()
