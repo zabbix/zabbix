@@ -193,19 +193,26 @@ $form_grid->addItem([
 		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->setId('operation-message-users')
 ]);
+array_unshift($data['mediatype_options'], ['name' => '- '._('All').' -', 'mediatypeid' => 0, 'status' => 0]);
 
-// Make CSelectOption label red, if media type is disabled.
-/** @var CSelectOption $option */
-foreach ($data['mediatype_options'] as $option) {
-	$mediatype = $option->toArray();
-	if (in_array($mediatype['value'], array_values($data['disabled_media']))) {
-		$option->addClass(ZBX_STYLE_RED);
+foreach($data['mediatype_options'] as $mediatype_option) {
+	$media[$mediatype_option['mediatypeid']] = $mediatype_option['name'];
+	if ($mediatype_option['status'] == MEDIA_TYPE_STATUS_DISABLED) {
+		$disabled[] = $mediatype_option['mediatypeid'];
+	}
+}
+
+$mediatype_options = CSelect::createOptionsFromArray($media);
+foreach ($mediatype_options as $option_data) {
+	$option = $option_data->toArray();
+	if (in_array($option['value'], $disabled)) {
+		$option_data->addClass(ZBX_STYLE_RED);
 	}
 }
 
 // Operation message media type row.
 $select_opmessage_mediatype_default = (new CSelect('operation[opmessage][mediatypeid]'))
-	->addOptions($data['mediatype_options'])
+	->addOptions(CSelect::createOptionsFromArray($media))
 	->setFocusableElementId('operation-opmessage-mediatypeid')
 	->setValue($operation['opmessage']['mediatypeid'] ?? 0);
 
@@ -218,13 +225,14 @@ $form_grid->addItem([
 
 // Operation message media type row (explicit).
 $select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
-	->addOptions($data['mediatype_options'])
+	->addOptions($mediatype_options)
 	->setFocusableElementId('operation-opmessage-mediatypeid')
 	->setName('operation[opmessage][mediatypeid]')
 	->setValue($operation['opmessage']['mediatypeid'] ?? 0);
 
 $form_grid->addItem([
-	(new CLabel(_('Send only to'), $select_opmessage_mediatype->getFocusableElementId()))->setId('operation-message-mediatype-only-label'),
+	(new CLabel(_('Send only to'), $select_opmessage_mediatype->getFocusableElementId()))
+		->setId('operation-message-mediatype-only-label'),
 	(new CFormField($select_opmessage_mediatype))
 		->setId('operation-message-mediatype-only')
 		->setName('operation[opmessage][default_msg]')

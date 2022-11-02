@@ -93,16 +93,6 @@ class CControllerPopupActionOperationEdit extends CController {
 		}
 
 		$media_types = $this->popupConfigOperationMessage($operation)['mediatypes'];
-		$media_type[] = '- '._('All').' -';
-		$disabled_media = [];
-
-		foreach($media_types as $type) {
-			$media_type[$type['mediatypeid']] = $type['name'];
-			if ($type['status'] == MEDIA_TYPE_STATUS_DISABLED) {
-				$disabled_media[] = $type['mediatypeid'];
-			}
-		}
-
 		$this->getData($operation);
 		$operation['row_index'] = $this->hasInput('row_index') ? $this->getInput('row_index') : 0;
 
@@ -112,8 +102,7 @@ class CControllerPopupActionOperationEdit extends CController {
 			'recovery' => $recovery,
 			'operation' => $operation,
 			'operation_types' => $operation_type,
-			'mediatype_options' => CSelect::createOptionsFromArray($media_type),
-			'disabled_media' => $disabled_media
+			'mediatype_options' => $media_types,
 		];
 
 		$this->setResponse(new CControllerResponseData($data));
