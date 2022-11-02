@@ -1,1 +1,1 @@
-.........T [ZBX-21296] fixed readme setup GRANT commands in Oracle ODBC template (knaglis)
+...G.....T [ZBX-21296] updated ORACLE plugin and ORACLE ODBC template README grant select variables and added no grant (esneiders, knaglis)
