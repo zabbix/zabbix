@@ -243,10 +243,12 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
 static const char	*get_progname(void)
 {
 	return progname;
 }
+#endif
 
 static zbx_thread_activechk_args	*config_active_args = NULL;
 
@@ -1344,7 +1346,11 @@ int	main(int argc, char **argv)
 	char		*error = NULL;
 #ifdef _WINDOWS
 	int		ret;
-
+#endif
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	zbx_init_library_win32(&get_progname);
+#endif
+#ifdef _WINDOWS
 	/* Provide, so our process handles errors instead of the system itself. */
 	/* Attention!!! */
 	/* The system does not display the critical-error-handler message box. */
@@ -1361,9 +1367,6 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_import_symbols();
-	zbx_win_exception_init(&get_progname);
-#else
-	ZBX_UNUSED(get_progname);
 #endif
 #ifdef _WINDOWS
 	if (ZBX_TASK_SHOW_USAGE != t.task && ZBX_TASK_SHOW_VERSION != t.task && ZBX_TASK_SHOW_HELP != t.task &&

@@ -30,14 +30,17 @@
 typedef BOOL (WINAPI *SymGetLineFromAddrW64_func_t)(HANDLE, DWORD64, PDWORD, PIMAGEHLP_LINE64);
 typedef BOOL (WINAPI *SymFromAddr_func_t)(HANDLE a, DWORD64 b , PDWORD64 c, PSYMBOL_INFO d);
 
+#ifdef _M_X64
 static void	print_register(const char *name, unsigned __int64 value)
 {
-#ifdef _M_X64
 	zabbix_log(LOG_LEVEL_CRIT, "%-7s = %16I64x = %20I64u = %20I64d", name, value, value, value);
-#else
-	zabbix_log(LOG_LEVEL_CRIT, "%-7s = %16lx = %20lu = %20ld", name, value, value, value);
-#endif
 }
+#else
+static void	print_register(const char *name, unsigned __int32 value)
+{
+	zabbix_log(LOG_LEVEL_CRIT, "%-7s = %16lx = %20lu = %20ld", name, value, value, value);
+}
+#endif
 
 static void	print_fatal_info(CONTEXT *pctx)
 {
@@ -92,7 +95,7 @@ static void	print_fatal_info(CONTEXT *pctx)
 #undef ZBX_LSHIFT
 }
 
-static zbx_get_progname_f get_progname_cb = NULL;
+static zbx_get_progname_f	get_progname_cb = NULL;
 
 void	zbx_backtrace(void)
 {
@@ -228,7 +231,7 @@ static void	print_backtrace(CONTEXT *pctx)
 	zbx_free(pSym);
 }
 
-void	zbx_win_exception_init(zbx_get_progname_f get_progname)
+void	zbx_init_library_win32(zbx_get_progname_f get_progname)
 {
 	get_progname_cb = get_progname;
 }
