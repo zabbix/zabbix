@@ -122,9 +122,7 @@ class CControllerPopupLdapEdit extends CController {
 		$group_filter = $data['group_basedn'].$data['group_name'].$data['group_member'].$data['user_ref_attr']
 				.$data['group_filter'];
 
-		if ($group_filter !== '') {
-			$data['group_configuration'] = self::LDAP_GROUP_OF_NAMES;
-		}
+		$data['group_configuration'] = $group_filter === '' ? self::LDAP_MEMBER_OF : self::LDAP_GROUP_OF_NAMES;
 
 		self::extendProvisionGroups($data['provision_groups']);
 		self::extendProvisionMedia($data['provision_media']);

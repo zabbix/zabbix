@@ -161,8 +161,7 @@ $form = (new CForm('post', $form_action))
 			(new CFormField(
 				(new CTextBox('group_member', $data['group_member'], false,
 					DB::getFieldLength('userdirectory_ldap', 'group_member')
-				))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass('allow-jit-provisioning')
 				->addClass('group-of-names')
@@ -176,8 +175,7 @@ $form = (new CForm('post', $form_action))
 			(new CFormField(
 				(new CTextBox('user_ref_attr', $data['user_ref_attr'], false,
 					DB::getFieldLength('userdirectory_ldap', 'user_ref_attr')
-				))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass('allow-jit-provisioning')
 				->addClass('group-of-names')
@@ -203,8 +201,7 @@ $form = (new CForm('post', $form_action))
 			(new CFormField(
 				(new CTextBox('group_membership', $data['group_membership'], false,
 					DB::getFieldLength('userdirectory_ldap', 'group_membership')
-				))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass('allow-jit-provisioning')
 				->addClass('member-of')
