@@ -121,11 +121,8 @@ $actionTable = (new CTableInfo())
 	]);
 
 if ($this->data['actions']) {
-	$actionConditionStringValues = actionConditionValueToString($this->data['actions']);
-
-	$actionOperationDescriptions = getActionOperationDescriptions($data['eventsource'], $data['actions'],
-		ACTION_OPERATION
-	);
+	$actionConditionStringValues = $data['actionConditionStringValues'];
+	$actionOperationDescriptions = $data['actionOperationDescriptions'];
 
 	foreach ($this->data['actions'] as $aIdx => $action) {
 		$conditions = [];

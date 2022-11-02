@@ -107,7 +107,7 @@ class CControllerActionList extends CController {
 			'sortorder' => $sort_order,
 			'filter' => $filter,
 			'profileIdx' => 'web.action.list.filter',
-			'active_tab' => CProfile::get('web.action.list.filter.active', 1),
+			'active_tab' => CProfile::get('web.action.list.filter.active', 1)
 		];
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
@@ -126,6 +126,12 @@ class CControllerActionList extends CController {
 			'sortfield' => $sort_field,
 			'limit' => $limit
 		]);
+
+		$data['actionOperationDescriptions'] = getActionOperationDescriptions(
+			$data['eventsource'], $data['actions'], ACTION_OPERATION
+		);
+		$data['actionConditionStringValues'] = actionConditionValueToString($data['actions']);
+
 		order_result($data['actions'], $sort_field, $sort_order);
 
 		// pager
