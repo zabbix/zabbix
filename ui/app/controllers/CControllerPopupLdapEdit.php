@@ -96,7 +96,7 @@ class CControllerPopupLdapEdit extends CController {
 			'group_basedn' => $this->getInput('group_basedn', ''),
 			'group_name' => $this->getInput('group_name', ''),
 			'group_member' => $this->getInput('group_member', ''),
-			'user_ref_attr' => $this->getInput('reference_attribute', ''),
+			'user_ref_attr' => $this->getInput('user_ref_attr', ''),
 			'group_filter' => $this->getInput('group_filter', ''),
 			'group_membership' => $this->getInput('group_membership', ''),
 			'user_username' => $this->getInput('user_username', ''),
