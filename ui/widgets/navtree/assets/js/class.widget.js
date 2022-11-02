@@ -25,6 +25,10 @@ class CWidgetNavTree extends CWidget {
 
 	static WIDGET_MAP_EVENT_SUBMAP_SELECT = 'widget-map.submap-select';
 
+	static hasReferenceField() {
+		return true;
+	}
+
 	_init() {
 		super._init();
 

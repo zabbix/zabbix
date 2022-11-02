@@ -90,16 +90,10 @@ class CControllerTemplateDashboardEdit extends CController {
 			];
 		}
 
-		$widget_known_types = array_keys(APP::ModuleManager()->getWidgets(true));
-		$first_widget_type = $widget_known_types ? $widget_known_types[0] : null;
-		$widget_last_type = CProfile::get('web.dashboard.last_widget_type', $first_widget_type);
-
 		$data = [
 			'dashboard' => $dashboard,
 			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(true),
-			'widget_last_type' => in_array($widget_last_type, $widget_known_types, true)
-				? $widget_last_type
-				: $first_widget_type,
+			'widget_last_type' => CProfile::get('web.dashboard.last_widget_type'),
 			'time_period' => getTimeSelectorPeriod([]),
 			'page' => CPagerHelper::loadPage('template.dashboard.list', null)
 		];

@@ -26,8 +26,6 @@
 
 <script>
 	const view = {
-		dashboard: null,
-		page: null,
 		is_busy: false,
 		is_busy_saving: false,
 

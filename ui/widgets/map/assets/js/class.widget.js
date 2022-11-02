@@ -18,8 +18,6 @@
 **/
 
 
-
-
 class CWidgetMap extends CWidget {
 
 	static SOURCETYPE_MAP = 1;
@@ -29,6 +27,10 @@ class CWidgetMap extends CWidget {
 
 	static WIDGET_NAVTREE_EVENT_MARK = 'widget-navtree.mark';
 	static WIDGET_NAVTREE_EVENT_SELECT = 'widget-navtree.select';
+
+	static getForeignReferenceFields() {
+		return ['filter_widget_reference'];
+	}
 
 	_init() {
 		super._init();

@@ -48,7 +48,7 @@ class CDashboard extends CBaseComponent {
 		widget_min_rows,
 		widget_max_rows,
 		widget_defaults,
-		widget_last_type,
+		widget_last_type = null,
 		is_editable,
 		is_edit_mode,
 		can_edit_dashboards,
@@ -531,25 +531,31 @@ class CDashboard extends CBaseComponent {
 				const reference_substitution = new Map();
 
 				for (const widget of widgets) {
-					const reference_field = this._widget_defaults[widget.type].reference_field;
+					if (widget.type in this._widget_defaults) {
+						const widget_class = eval(this._widget_defaults[widget.type].js_class);
 
-					if (reference_field !== null) {
-						const old_reference = widget.fields[reference_field];
-						const new_reference = this._createReference({used_references});
+						if (widget_class.hasReferenceField()) {
+							const old_reference = widget.fields.reference;
+							const new_reference = this._createReference({used_references});
 
-						widget.fields[reference_field] = new_reference;
+							widget.fields.reference = new_reference;
 
-						used_references.add(new_reference);
-						reference_substitution.set(old_reference, new_reference);
+							used_references.add(new_reference);
+							reference_substitution.set(old_reference, new_reference);
+						}
 					}
 				}
 
 				for (const widget of widgets) {
-					for (const reference_field of this._widget_defaults[widget.type].foreign_reference_fields) {
-						const old_reference = widget.fields[reference_field];
+					if (widget.type in this._widget_defaults) {
+						const widget_class = eval(this._widget_defaults[widget.type].js_class);
 
-						if (reference_substitution.has(old_reference)) {
-							widget.fields[reference_field] = reference_substitution.get(old_reference);
+						for (const reference_field of widget_class.getForeignReferenceFields()) {
+							const old_reference = widget.fields[reference_field];
+
+							if (reference_substitution.has(old_reference)) {
+								widget.fields[reference_field] = reference_substitution.get(old_reference);
+							}
 						}
 					}
 				}
@@ -614,26 +620,30 @@ class CDashboard extends CBaseComponent {
 			dashboard_page.deleteWidget(widget, {is_batch_mode: true});
 		}
 
-		const reference_field = this._widget_defaults[new_widget_data.type].reference_field;
+		if (new_widget_data.type in this._widget_defaults) {
+			const new_widget_class = eval(this._widget_defaults[new_widget_data.type].js_class);
 
-		if (reference_field !== null) {
-			new_widget_data.fields[reference_field] = this._createReference();
+			if (new_widget_class.hasReferenceField()) {
+				new_widget_data.fields.reference = this._createReference();
+			}
 		}
 
 		let references = [];
 
 		for (const widget of dashboard_page.getWidgets()) {
-			const reference_field = this._widget_defaults[widget.getType()].reference_field;
-
-			if (reference_field !== null) {
-				references.push(widget.getFields()[reference_field]);
+			if (widget.constructor.hasReferenceField()) {
+				references.push(widget.getFields()['reference']);
 			}
 		}
 
-		for (const reference_field of this._widget_defaults[new_widget_data.type].foreign_reference_fields) {
-			if (reference_field in new_widget_data.fields
-					&& !references.includes(new_widget_data.fields[reference_field])) {
-				new_widget_data.fields[reference_field] = '';
+		if (new_widget_data.type in this._widget_defaults) {
+			const new_widget_class = eval(this._widget_defaults[new_widget_data.type].js_class);
+
+			for (const reference_field of new_widget_class.getForeignReferenceFields()) {
+				if (reference_field in new_widget_data.fields
+						&& !references.includes(new_widget_data.fields[reference_field])) {
+					new_widget_data.fields[reference_field] = '';
+				}
 			}
 		}
 
@@ -1130,7 +1140,9 @@ class CDashboard extends CBaseComponent {
 
 	editWidgetProperties(properties = {}, {new_widget_pos = null} = {}) {
 		if (properties.type === undefined) {
-			properties.type = this._widget_last_type;
+			properties.type = this._widget_last_type in this._widget_defaults
+				? this._widget_last_type
+				: Object.keys(this._widget_defaults)[0];
 		}
 
 		const overlay = PopUp(`widget.${properties.type}.edit`, {
@@ -1193,11 +1205,11 @@ class CDashboard extends CBaseComponent {
 			document.getElementById('type').addEventListener('change', () => this.reloadWidgetProperties());
 
 			form.addEventListener('change', (e) => {
-				const is_trimmable = e.target.matches(
+				const do_trim = e.target.matches(
 					'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])'
 				);
 
-				if (is_trimmable) {
+				if (do_trim) {
 					e.target.value = e.target.value.trim();
 				}
 			}, {capture: true});
@@ -1219,8 +1231,7 @@ class CDashboard extends CBaseComponent {
 	}
 
 	reloadWidgetProperties() {
-		const dialogueid = 'widget_properties';
-		const overlay = overlays_stack.getById(dialogueid);
+		const overlay = overlays_stack.getById('widget_properties');
 		const form = overlay.$dialogue.$body[0].querySelector('form');
 		const fields = getFormFields(form);
 
@@ -1229,11 +1240,6 @@ class CDashboard extends CBaseComponent {
 			unique_id: overlay.data.original_properties.unique_id ?? undefined,
 			dashboard_page_unique_id: overlay.data.original_properties.dashboard_page_unique_id ?? undefined
 		};
-
-		if (properties.type !== overlay.data.original_properties.type && properties.type !== this._widget_last_type) {
-			this._widget_last_type = properties.type;
-			updateUserProfile('web.dashboard.last_widget_type', properties.type, [], PROFILE_TYPE_STR);
-		}
 
 		if (properties.type === overlay.data.original_properties.type) {
 			properties.name = fields.name;
@@ -1248,7 +1254,7 @@ class CDashboard extends CBaseComponent {
 			properties.fields = fields;
 		}
 
-		overlay.$dialogue[0].dispatchEvent(new CustomEvent('overlay.reload', {detail: {dialogueid}}));
+		overlay.$dialogue[0].dispatchEvent(new CustomEvent('overlay.reload'));
 
 		this.editWidgetProperties(properties, {new_widget_pos: this._new_widget_pos});
 	}
@@ -1282,6 +1288,11 @@ class CDashboard extends CBaseComponent {
 		return Promise.resolve()
 			.then(() => this._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}))
 			.then(() => {
+				if (type !== this._widget_last_type) {
+					this._widget_last_type = type;
+					updateUserProfile('web.dashboard.last_widget_type', type, [], PROFILE_TYPE_STR);
+				}
+
 				overlayDialogueDestroy(overlay.dialogueid);
 
 				if (widget !== null && widget.getType() === type) {
@@ -1290,8 +1301,10 @@ class CDashboard extends CBaseComponent {
 					return;
 				}
 
-				if (this._widget_defaults[type].reference_field !== null) {
-					fields[this._widget_defaults[type].reference_field] = this._createReference();
+				const widget_class = eval(this._widget_defaults[type].js_class);
+
+				if (widget_class.hasReferenceField()) {
+					fields.reference = this._createReference();
 				}
 
 				const widget_data = {
@@ -1675,14 +1688,13 @@ class CDashboard extends CBaseComponent {
 
 		for (const dashboard_page of this._dashboard_pages.keys()) {
 			for (const widget of dashboard_page.getWidgets()) {
-				const type = widget.getType();
 				const fields = widget.getFields();
 
-				if (this._widget_defaults[type].reference_field !== null) {
-					used_references.add(fields[this._widget_defaults[type].reference_field]);
+				if (widget.constructor.hasReferenceField()) {
+					used_references.add(fields.reference);
 				}
 
-				for (const reference_field of this._widget_defaults[type].foreign_reference_fields) {
+				for (const reference_field of widget.constructor.getForeignReferenceFields()) {
 					used_references.add(fields[reference_field]);
 				}
 			}

@@ -26,10 +26,7 @@
  * @var array $data
  */
 
-use Zabbix\Widgets\Fields\CWidgetFieldReference;
-
 (new CWidgetFormView($data))
-	->addFieldVar($data['fields'][CWidgetFieldReference::FIELD_NAME])
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
 	)

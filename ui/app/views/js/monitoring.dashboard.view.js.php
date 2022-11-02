@@ -26,18 +26,24 @@
 
 <script>
 	const view = {
-		dashboard: null,
-		time_period: null,
-		dynamic: null,
-		has_time_selector: null,
 		is_busy: false,
 		is_busy_saving: false,
 
-		init({dashboard, time_period, dynamic, has_time_selector, widget_defaults, widget_last_type, web_layout_mode}) {
+		init({
+			dashboard,
+			widget_defaults,
+			widget_last_type,
+			has_time_selector,
+			time_period,
+			dynamic,
+			web_layout_mode,
+			clone
+		}) {
 			this.dashboard = dashboard;
+			this.has_time_selector = has_time_selector;
 			this.time_period = time_period;
 			this.dynamic = dynamic;
-			this.has_time_selector = has_time_selector;
+			this.clone = clone;
 
 			timeControl.refreshPage = false;
 
@@ -77,7 +83,7 @@
 				widget_last_type,
 				is_editable: dashboard.can_edit_dashboards && dashboard.editable
 					&& web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>,
-				is_edit_mode: dashboard.dashboardid === null,
+				is_edit_mode: dashboard.dashboardid === null || this.clone,
 				can_edit_dashboards: dashboard.can_edit_dashboards,
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				time_period,
@@ -102,7 +108,7 @@
 					jQuery('#dynamic_hostid').on('change', this.events.dynamicHostChange);
 				}
 
-				if (dashboard.dashboardid === null) {
+				if (dashboard.dashboardid === null || clone) {
 					this.edit();
 					ZABBIX.Dashboard.editProperties();
 				}
@@ -183,6 +189,10 @@
 
 			request_data.sharing = this.dashboard.sharing;
 
+			if (this.clone) {
+				request_data.clone = '1';
+			}
+
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.update');
@@ -224,7 +234,7 @@
 						messages = exception.error.messages;
 					}
 					else {
-						title = this.dashboard.dashboardid === null
+						title = this.dashboard.dashboardid === null && !this.clone
 							? <?= json_encode(_('Failed to create dashboard')) ?>
 							: <?= json_encode(_('Failed to update dashboard')) ?>;
 					}

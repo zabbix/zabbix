@@ -38,6 +38,14 @@ const WIDGET_EVENT_DELETE = 'widget-delete';
 
 class CWidget extends CBaseComponent {
 
+	static hasReferenceField() {
+		return false;
+	}
+
+	static getForeignReferenceFields() {
+		return [];
+	}
+
 	constructor({
 		type,
 		name,
@@ -842,7 +850,7 @@ class CWidget extends CBaseComponent {
 			this._button_edit = document.createElement('button');
 			this._button_edit.type = 'button';
 			this._button_edit.title = t('Edit')
-			this._button_edit.classList.add('btn-widget-edit');
+			this._button_edit.classList.add('btn-widget-edit', 'js-widget-edit');
 
 			const li = document.createElement('li');
 
@@ -855,7 +863,7 @@ class CWidget extends CBaseComponent {
 		this._button_actions.title = t('Actions');
 		this._button_actions.setAttribute('aria-expanded', 'false');
 		this._button_actions.setAttribute('aria-haspopup', 'true');
-		this._button_actions.classList.add('btn-widget-action');
+		this._button_actions.classList.add('btn-widget-action', 'js-widget-action');
 
 		const li = document.createElement('li');
 

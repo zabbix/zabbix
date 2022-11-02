@@ -35,10 +35,25 @@ class CControllerDashboardUpdate extends CController {
 			'display_period' =>	'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
 			'auto_start' =>		'required|db dashboard.auto_start|in 0,1',
 			'pages' =>			'array',
-			'sharing' =>		'array'
+			'sharing' =>		'array',
+			'clone' => 			'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret && $this->hasInput('clone')) {
+			$validator = new CNewValidator($this->getInputAll(), [
+				'dashboardid' => 'required'
+			]);
+
+			foreach ($validator->getAllErrors() as $error) {
+				info($error);
+			}
+
+			if ($validator->isErrorFatal() || $validator->isError()) {
+				$ret = false;
+			}
+		}
 
 		if ($ret) {
 			$sharing_errors = $this->validateSharing();
@@ -75,85 +90,123 @@ class CControllerDashboardUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$save_dashboard = [
-			'name' => $this->getInput('name'),
-			'userid' => $this->getInput('userid', 0),
-			'display_period' => $this->getInput('display_period'),
-			'auto_start' => $this->getInput('auto_start'),
-			'pages' => []
-		];
-
-		if ($this->hasInput('dashboardid')) {
-			$save_dashboard['dashboardid'] = $this->getInput('dashboardid');
-		}
-
-		foreach ($this->dashboard_pages as $dashboard_page) {
-			$save_dashboard_page = [
-				'name' => $dashboard_page['name'],
-				'display_period' => $dashboard_page['display_period'],
-				'widgets' => []
-			];
-
-			// Set dashboard_pageid if it exists and not cloning the dashboard.
-			if (array_key_exists('dashboardid', $save_dashboard)
-					&& array_key_exists('dashboard_pageid', $dashboard_page)) {
-				$save_dashboard_page['dashboard_pageid'] = $dashboard_page['dashboard_pageid'];
-			}
-
-			foreach ($dashboard_page['widgets'] as $widget) {
-				$save_widget = [
-					'x' => $widget['pos']['x'],
-					'y' => $widget['pos']['y'],
-					'width' => $widget['pos']['width'],
-					'height' => $widget['pos']['height'],
-					'type' => $widget['type'],
-					'name' => $widget['name'],
-					'view_mode' => $widget['view_mode'],
-					'fields' => $widget['form']->fieldsToApi()
-				];
-
-				// Set widgetid if it exists and not cloning the dashboard.
-				if (array_key_exists('dashboardid', $save_dashboard) && array_key_exists('widgetid', $widget)) {
-					$save_widget['widgetid'] = $widget['widgetid'];
-				}
-
-				$save_dashboard_page['widgets'][] = $save_widget;
-			}
-
-			$save_dashboard['pages'][] = $save_dashboard_page;
-		}
-
-		if ($this->hasInput('sharing')) {
-			$sharing = $this->getInput('sharing');
-
-			$save_dashboard['private'] = $sharing['private'];
-
-			if (array_key_exists('users', $sharing)) {
-				$save_dashboard['users'] = $sharing['users'];
-			}
-
-			if (array_key_exists('userGroups', $sharing)) {
-				$save_dashboard['userGroups'] = $sharing['userGroups'];
-			}
-		}
-
-		if (array_key_exists('dashboardid', $save_dashboard)) {
-			$result = API::Dashboard()->update($save_dashboard);
-
-			$success_title = _('Dashboard updated');
-			$error_title = _('Failed to update dashboard');
-		}
-		else {
-			$result = API::Dashboard()->create($save_dashboard);
-
-			$success_title = _('Dashboard created');
-			$error_title = _('Failed to create dashboard');
-		}
-
 		$output = [];
 
-		if ($result) {
-			$output['success']['title'] = $success_title;
+		try {
+			$db_widgets = [];
+
+			if ($this->hasInput('dashboardid')) {
+				$db_dashboards = API::Dashboard()->get([
+					'output' => [],
+					'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
+					'dashboardids' => $this->getInput('dashboardid')
+				]);
+
+				if (!$db_dashboards) {
+					error(_('No permissions to referred object or it does not exist!'));
+
+					throw new InvalidArgumentException();
+				}
+
+				foreach ($db_dashboards[0]['pages'] as $db_dashboard_page) {
+					foreach ($db_dashboard_page['widgets'] as $db_widget) {
+						$db_widgets[$db_widget['widgetid']] = $db_widget;
+					}
+				}
+			}
+
+			$save_dashboard = [
+				'name' => $this->getInput('name'),
+				'userid' => $this->getInput('userid', 0),
+				'display_period' => $this->getInput('display_period'),
+				'auto_start' => $this->getInput('auto_start'),
+				'pages' => []
+			];
+
+			if ($this->hasInput('dashboardid') && !$this->hasInput('clone')) {
+				$save_dashboard['dashboardid'] = $this->getInput('dashboardid');
+			}
+
+			foreach ($this->dashboard_pages as $dashboard_page) {
+				$save_dashboard_page = [
+					'name' => $dashboard_page['name'],
+					'display_period' => $dashboard_page['display_period'],
+					'widgets' => []
+				];
+
+				if (array_key_exists('dashboard_pageid', $dashboard_page) && !$this->hasInput('clone')) {
+					$save_dashboard_page['dashboard_pageid'] = $dashboard_page['dashboard_pageid'];
+				}
+
+				foreach ($dashboard_page['widgets'] as $widget) {
+					$save_widget = [
+						'x' => $widget['pos']['x'],
+						'y' => $widget['pos']['y'],
+						'width' => $widget['pos']['width'],
+						'height' => $widget['pos']['height']
+					];
+
+					if ($widget['type'] !== ZBX_WIDGET_INACCESSIBLE) {
+						$save_widget += [
+							'type' => $widget['type'],
+							'name' => $widget['name'],
+							'view_mode' => $widget['view_mode'],
+							'fields' => $widget['form']->fieldsToApi()
+						];
+					}
+					else {
+						if (!array_key_exists('widgetid', $widget)
+								|| !array_key_exists($widget['widgetid'], $db_widgets)) {
+							error(_('No permissions to referred object or it does not exist!'));
+
+							throw new InvalidArgumentException();
+						}
+
+						$db_widget = $db_widgets[$widget['widgetid']];
+
+						$save_widget += [
+							'type' => $db_widget['type'],
+							'name' => $db_widget['name'],
+							'view_mode' => $db_widget['view_mode'],
+							'fields' => $db_widget['fields']
+						];
+					}
+
+					if (array_key_exists('widgetid', $widget) && !$this->hasInput('clone')) {
+						$save_widget['widgetid'] = $widget['widgetid'];
+					}
+
+					$save_dashboard_page['widgets'][] = $save_widget;
+				}
+
+				$save_dashboard['pages'][] = $save_dashboard_page;
+			}
+
+			if ($this->hasInput('sharing')) {
+				$sharing = $this->getInput('sharing');
+
+				$save_dashboard['private'] = $sharing['private'];
+
+				if (array_key_exists('users', $sharing)) {
+					$save_dashboard['users'] = $sharing['users'];
+				}
+
+				if (array_key_exists('userGroups', $sharing)) {
+					$save_dashboard['userGroups'] = $sharing['userGroups'];
+				}
+			}
+
+			$result = $this->hasInput('dashboardid') && !$this->hasInput('clone')
+				? API::Dashboard()->update($save_dashboard)
+				: API::Dashboard()->create($save_dashboard);
+
+			if (!$result) {
+				throw new InvalidArgumentException();
+			}
+
+			$output['success']['title'] = $this->hasInput('dashboardid') && !$this->hasInput('clone')
+				? _('Dashboard updated')
+				: _('Dashboard created');
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -161,9 +214,11 @@ class CControllerDashboardUpdate extends CController {
 
 			$output['dashboardid'] = $result['dashboardids'][0];
 		}
-		else {
+		catch (InvalidArgumentException $e) {
 			$output['error'] = [
-				'title' => $error_title,
+				'title' => $this->hasInput('dashboardid') && !$this->hasInput('clone')
+					? _('Failed to update dashboard')
+					: _('Failed to create dashboard'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}

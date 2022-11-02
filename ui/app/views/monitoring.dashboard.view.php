@@ -39,6 +39,7 @@ $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
 $this->addJsFile('class.geomaps.js');
 $this->addJsFile('class.widget.js');
+$this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
 $this->addJsFile('class.calendar.js');
@@ -255,7 +256,8 @@ $html_page
 		'has_time_selector' => $data['has_time_selector'],
 		'time_period' => $data['time_period'],
 		'dynamic' => $data['dynamic'],
-		'web_layout_mode' => $web_layout_mode
+		'web_layout_mode' => $web_layout_mode,
+		'clone' => $data['clone']
 	]).');
 '))
 	->setOnDocumentReady()

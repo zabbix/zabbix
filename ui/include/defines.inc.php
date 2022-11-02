@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.4.0beta2');
 define('ZABBIX_API_VERSION',	'6.4.0');
 define('ZABBIX_EXPORT_VERSION',	'6.4');
 
-define('ZABBIX_DB_VERSION',		6030063);
+define('ZABBIX_DB_VERSION',		6030061);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1608,6 +1608,9 @@ define('WIDGET_GRAPH_PROTOTYPE',	'graphprototype');
 define('WIDGET_ITEM',				'item');
 define('WIDGET_PLAIN_TEXT',			'plaintext');
 define('WIDGET_URL',				'url');
+
+// Inaccessible widget type.
+define('ZBX_WIDGET_INACCESSIBLE',	'inaccessible');
 
 // event details sections
 define('SECTION_HAT_TRIGGERDETAILS',	'hat_triggerdetails');

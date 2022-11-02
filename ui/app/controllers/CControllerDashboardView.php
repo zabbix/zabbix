@@ -28,16 +28,30 @@ class CControllerDashboardView extends CController {
 	protected function checkInput() {
 		$fields = [
 			'dashboardid' =>		'db dashboard.dashboardid',
-			'source_dashboardid' =>	'db dashboard.dashboardid',
 			'hostid' =>				'db hosts.hostid',
 			'new' =>				'in 1',
 			'cancel' =>				'in 1',
+			'clone' =>				'in 1',
 			'from' =>				'range_time',
 			'to' =>					'range_time',
 			'slideshow' =>			'in 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
+
+		if ($ret && $this->hasInput('clone')) {
+			$validator = new CNewValidator($this->getInputAll(), [
+				'dashboardid' => 'required'
+			]);
+
+			foreach ($validator->getAllErrors() as $error) {
+				info($error);
+			}
+
+			if ($validator->isErrorFatal() || $validator->isError()) {
+				$ret = false;
+			}
+		}
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -51,7 +65,7 @@ class CControllerDashboardView extends CController {
 			return false;
 		}
 
-		if ($this->hasInput('new') || $this->hasInput('source_dashboardid')) {
+		if ($this->hasInput('new') || $this->hasInput('clone')) {
 			return $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 		}
 
@@ -106,25 +120,13 @@ class CControllerDashboardView extends CController {
 
 		updateTimeSelectorPeriod($time_selector_options);
 
-		$widget_known_types = array_keys(APP::ModuleManager()->getWidgets());
-
-		if ($widget_known_types) {
-			$widget_last_type = CProfile::get('web.dashboard.last_widget_type');
-
-			if (!in_array($widget_last_type, $widget_known_types, true)) {
-				$widget_last_type = $widget_known_types[0];
-			}
-		}
-		else {
-			$widget_last_type = null;
-		}
-
 		$data = [
 			'dashboard' => $dashboard,
 			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(),
-			'widget_last_type' => $widget_last_type,
+			'widget_last_type' => CProfile::get('web.dashboard.last_widget_type'),
 			'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
 			'time_period' => getTimeSelectorPeriod($time_selector_options),
+			'clone' => $this->hasInput('clone'),
 			'active_tab' => CProfile::get('web.dashboard.filter.active', 1)
 		];
 
@@ -184,19 +186,18 @@ class CControllerDashboardView extends CController {
 				'has_related_reports' => false
 			];
 		}
-		elseif ($this->hasInput('source_dashboardid')) {
-			// Clone dashboard and show as new.
+		elseif ($this->hasInput('clone')) {
 			$dashboards = API::Dashboard()->get([
-				'output' => ['name', 'private', 'display_period', 'auto_start'],
+				'output' => ['dashboardid', 'name', 'private', 'display_period', 'auto_start'],
 				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 				'selectUsers' => ['userid', 'permission'],
 				'selectUserGroups' => ['usrgrpid', 'permission'],
-				'dashboardids' => [$this->getInput('source_dashboardid')]
+				'dashboardids' => $this->getInput('dashboardid')
 			]);
 
 			if ($dashboards) {
 				$dashboard = [
-					'dashboardid' => null,
+					'dashboardid' => $dashboards[0]['dashboardid'],
 					'name' => $dashboards[0]['name'],
 					'display_period' => $dashboards[0]['display_period'],
 					'auto_start' => $dashboards[0]['auto_start'],
@@ -243,7 +244,7 @@ class CControllerDashboardView extends CController {
 				$dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid', 'name', 'userid', 'display_period', 'auto_start'],
 					'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
-					'dashboardids' => [$dashboardid],
+					'dashboardids' => $dashboardid,
 					'preservekeys' => true
 				]);
 

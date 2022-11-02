@@ -60,8 +60,9 @@ class CWidgetFieldWidgetSelectView extends CWidgetFieldView {
 
 			ZABBIX.Dashboard.getSelectedDashboardPage().getWidgets().forEach((widget) => {
 				if (widget.getType() === "'.$this->field->getSearchByValue().'") {
-					filter_select.addOption({label: widget.getHeaderName(), value: widget.getFields().reference});
-					if (widget.getFields().reference === "'.$this->field->getValue().'") {
+					const widget_reference = widget.getFields().reference;
+					filter_select.addOption({label: widget.getHeaderName(), value: widget_reference});
+					if (widget_reference === "'.$this->field->getValue().'") {
 						filter_select.value = "'.$this->field->getValue().'";
 					}
 				}

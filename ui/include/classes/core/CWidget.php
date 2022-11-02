@@ -92,9 +92,7 @@ class CWidget extends CModule {
 		return [
 			'name' => $this->getDefaultName(),
 			'size' => $this->getDefaultSize(),
-			'js_class' => $this->getJSClass(),
-			'reference_field' => null,
-			'foreign_reference_fields' => []
+			'js_class' => $this->getJSClass()
 		];
 	}
 

@@ -75,40 +75,8 @@ class CDashboardHelper {
 			CArrayHelper::sort($page['widgets'], ['y', 'x']);
 
 			foreach ($page['widgets'] as $widget_data) {
-				/** @var CWidget $widget */
-				$widget = APP::ModuleManager()->getModule($widget_data['type']);
-
-				if ($widget === null || $widget->getType() !== CModule::TYPE_WIDGET
-						|| ($templateid !== null && !$widget->hasTemplateSupport())) {
-					continue;
-				}
-
-				$widgetid = $widget_data['widgetid'];
-				$fields_orig = self::convertWidgetFields($widget_data['fields']);
-
-				// Transforms corrupted data to default values.
-				$widget_form = $widget->getForm($fields_orig, $templateid);
-				$widget_form->validate();
-				$values = $widget_form->getFieldsValues();
-
-				if ($with_rf_rate) {
-					$rf_rate = (int) CProfile::get('web.dashboard.widget.rf_rate', -1, $widgetid);
-
-					if ($rf_rate == -1) {
-						if ($templateid === null) {
-							$rf_rate = $values['rf_rate'] == -1 ? $widget->getDefaultRefreshRate() : $values['rf_rate'];
-						}
-						else {
-							$rf_rate = $widget->getDefaultRefreshRate();
-						}
-					}
-				}
-				else {
-					$rf_rate = 0;
-				}
-
-				$grid_page_widgets[] = [
-					'widgetid' => $widgetid,
+				$grid_page_widget = [
+					'widgetid' => $widget_data['widgetid'],
 					'type' => $widget_data['type'],
 					'name' => $widget_data['name'],
 					'view_mode' => $widget_data['view_mode'],
@@ -118,10 +86,41 @@ class CDashboardHelper {
 						'width' => (int) $widget_data['width'],
 						'height' => (int) $widget_data['height']
 					],
-					'rf_rate' => $rf_rate,
-					'form' => $widget_form,
-					'fields' => $fields_orig
+					'rf_rate' => 0,
+					'fields' => []
 				];
+
+				/** @var CWidget $widget */
+				$widget = APP::ModuleManager()->getModule($widget_data['type']);
+
+				if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET
+						&& ($templateid === null || $widget->hasTemplateSupport())) {
+					$grid_page_widget['fields'] = self::convertWidgetFields($widget_data['fields']);
+
+					if ($with_rf_rate) {
+						$rf_rate = (int) CProfile::get('web.dashboard.widget.rf_rate', -1, $widget_data['widgetid']);
+
+						if ($rf_rate == -1) {
+							if ($templateid === null) {
+								// Transforms corrupted data to default values.
+								$widget_form = $widget->getForm($grid_page_widget['fields'], $templateid);
+								$widget_form->validate();
+								$values = $widget_form->getFieldsValues();
+
+								$rf_rate = $values['rf_rate'] == -1
+									? $widget->getDefaultRefreshRate()
+									: $values['rf_rate'];
+							}
+							else {
+								$rf_rate = $widget->getDefaultRefreshRate();
+							}
+						}
+
+						$grid_page_widget['rf_rate'] = $rf_rate;
+					}
+				}
+
+				$grid_page_widgets[] = $grid_page_widget;
 			}
 
 			$grid_pages[] = [
@@ -400,13 +399,6 @@ class CDashboardHelper {
 			}
 
 			foreach ($dashboard_page['widgets'] as $widget_index => &$widget_data) {
-				$widget = APP::ModuleManager()->getModule($widget_data['type']);
-
-				if ($widget === null || $widget->getType() !== CModule::TYPE_WIDGET
-						|| ($templateid !== null && !$widget->hasTemplateSupport())) {
-					continue;
-				}
-
 				$widget_errors = [];
 
 				if (!array_key_exists('pos', $widget_data)) {
@@ -442,17 +434,38 @@ class CDashboardHelper {
 				}
 
 				$widget_fields = array_key_exists('fields', $widget_data) ? $widget_data['fields'] : [];
-				$widget_data['form'] = $widget->getForm($widget_fields, $templateid);
 				unset($widget_data['fields']);
 
-				if ($widget_errors = $widget_data['form']->validate()) {
-					if ($widget_data['name'] === '') {
-						$widget_name = $widget->getDefaultName();
-					}
-					else {
+				if ($widget_data['type'] === ZBX_WIDGET_INACCESSIBLE) {
+					continue;
+				}
+
+				$widget = APP::ModuleManager()->getModule($widget_data['type']);
+
+				if ($widget === null || $widget->getType() !== CModule::TYPE_WIDGET) {
+					if ($widget_data['name'] !== '') {
 						$widget_name = $widget_data['name'];
 					}
+					else {
+						$widget_name = 'pages['.$dashboard_page_index.'][widgets]['.$widget_index.']';
+					}
 
+					$errors[] = _s('Cannot save widget "%1$s".', $widget_name).' '._('Widget not supported.');
+
+					continue;
+				}
+
+				$widget_name = $widget_data['name'] !== '' ? $widget_data['name'] : $widget->getDefaultName();
+
+				if ($templateid !== null && !$widget->hasTemplateSupport()) {
+					$errors[] = _s('Cannot save widget "%1$s".', $widget_name).' '._('Widget not supported.');
+
+					continue;
+				}
+
+				$widget_data['form'] = $widget->getForm($widget_fields, $templateid);
+
+				if ($widget_errors = $widget_data['form']->validate()) {
 					foreach ($widget_errors as $error) {
 						$errors[] = _s('Cannot save widget "%1$s".', $widget_name).' '.$error;
 					}

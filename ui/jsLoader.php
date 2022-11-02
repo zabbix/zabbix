@@ -37,6 +37,7 @@ $available_js = [
 	'class.dashboard.page.js' => '',
 	'class.dashboard.widget.placeholder.js' => '',
 	'class.widget.js' => '',
+	'class.widget.inaccessible.js' => '',
 	'class.widget.iterator.js' => '',
 	'class.widget.paste-placeholder.js' => '',
 	'hostinterfacemanager.js' => '',
@@ -138,6 +139,9 @@ $translate_strings = [
 		'Start slideshow' => _('Start slideshow'),
 		'Stop slideshow' => _('Stop slideshow')
 	],
+	'class.dashboard.page.js' => [
+		'Inaccessible widget' => _('Inaccessible widget')
+	],
 	'class.dashboard.widget.placeholder.js' => [
 		'Add a new widget' => _('Add a new widget'),
 		'Click and drag to desired size.' => _('Click and drag to desired size.'),
@@ -159,6 +163,12 @@ $translate_strings = [
 		'Edit' => _s('Edit'),
 		'No refresh' => _('No refresh'),
 		'Paste' => _s('Paste'),
+		'Refresh interval' => _s('Refresh interval')
+	],
+	'class.widget.inaccessible.js' => [
+		'Inaccessible widget' => _('Inaccessible widget'),
+		'Actions' => _s('Actions'),
+		'Copy' => _s('Copy'),
 		'Refresh interval' => _s('Refresh interval')
 	],
 	'class.widget.iterator.js' => [

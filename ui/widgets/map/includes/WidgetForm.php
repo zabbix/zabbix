@@ -45,18 +45,14 @@ class WidgetForm extends CWidgetForm {
 	private const WIDGET_NAV_TREE = 'navtree';
 
 	public function addFields(): self {
-		$this
-			->addField(
-				new CWidgetFieldReference()
-			)
-			->addField(
-				(new CWidgetFieldRadioButtonList('source_type', _('Source type'), [
-					Widget::SOURCETYPE_MAP => _('Map'),
-					Widget::SOURCETYPE_FILTER => _('Map navigation tree')
-				]))
-					->setDefault(Widget::SOURCETYPE_MAP)
-					->setAction('ZABBIX.Dashboard.reloadWidgetProperties()')
-			);
+		$this->addField(
+			(new CWidgetFieldRadioButtonList('source_type', _('Source type'), [
+				Widget::SOURCETYPE_MAP => _('Map'),
+				Widget::SOURCETYPE_FILTER => _('Map navigation tree')
+			]))
+				->setDefault(Widget::SOURCETYPE_MAP)
+				->setAction('ZABBIX.Dashboard.reloadWidgetProperties()')
+		);
 
 		if (!array_key_exists('source_type', $this->values) || $this->values['source_type'] == Widget::SOURCETYPE_MAP) {
 			$this->addField(

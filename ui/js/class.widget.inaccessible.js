@@ -1,4 +1,3 @@
-<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,31 +18,41 @@
 **/
 
 
-namespace Widgets\NavTree;
+class CWidgetInaccessible extends CWidget {
 
-use Zabbix\Core\CWidget;
+	_doStart() {
+		super._doStart();
 
-class Widget extends CWidget {
+		this._content_header.querySelector('.js-widget-edit').disabled = true;
 
-	// Max depth of navigation tree.
-	public const MAX_DEPTH = 10;
-
-	public function getDefaultName(): string {
-		return _('Map navigation tree');
+		this._content_body.innerHTML = t('Inaccessible widget');
 	}
 
-	public function getTranslationStrings(): array {
-		return [
-			'class.widget.js' => [
-				'Add' => _s('Add'),
-				'Add child element' => _s('Add child elementsssss'),
-				'Add multiple maps' => _s('Add multiple maps'),
-				'Apply' => _s('Apply'),
-				'Cancel' => _s('Cancel'),
-				'Edit' => _s('Edit'),
-				'Edit tree element' => _s('Edit tree element'),
-				'Remove' => _s('Remove')
-			]
-		];
+	_promiseUpdate() {
+		return Promise.resolve();
+	}
+
+	getActionsContextMenu({can_paste_widget}) {
+		const menu = super.getActionsContextMenu({can_paste_widget});
+
+		for (const section of menu) {
+			switch (section.label) {
+				case t('Actions'):
+					for (const item of section.items) {
+						if (item.label === t('Copy')) {
+							item.disabled = true;
+						}
+					}
+					break;
+
+				case t('Refresh interval'):
+					for (const item of section.items) {
+						item.disabled = true;
+					}
+					break;
+			}
+		}
+
+		return menu;
 	}
 }
