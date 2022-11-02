@@ -234,7 +234,7 @@
 						messages = exception.error.messages;
 					}
 					else {
-						title = this.dashboard.dashboardid === null && !this.clone
+						title = this.dashboard.dashboardid === null || this.clone
 							? <?= json_encode(_('Failed to create dashboard')) ?>
 							: <?= json_encode(_('Failed to update dashboard')) ?>;
 					}
