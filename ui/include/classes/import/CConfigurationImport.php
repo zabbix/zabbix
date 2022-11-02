@@ -762,6 +762,15 @@ class CConfigurationImport {
 
 				$levels[$level] = true;
 
+				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+				];
+
+				if (!in_array($item['type'], $delay_types)) {
+					unset($item['delay']);
+				}
+
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
 					$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $item['interface_ref']);
 
@@ -1143,6 +1152,15 @@ class CConfigurationImport {
 
 					$levels[$level] = true;
 
+					$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+						ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+						ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+					];
+
+					if (!in_array($item_prototype['type'], $delay_types)) {
+						unset($item_prototype['delay']);
+					}
+
 					if (array_key_exists('interface_ref', $item_prototype) && $item_prototype['interface_ref']) {
 						$interfaceid = $this->referencer->findInterfaceidByRef($hostid,
 							$item_prototype['interface_ref']
@@ -1325,7 +1343,9 @@ class CConfigurationImport {
 				}
 			}
 		}
-
+// if ($discovery_rule['key_'] === 'jmx.get[beans,"jboss.as:subsystem=undertow,server=*,http-listener=*"]') {
+// 	file_put_contents('test.txt', print_r($item_prototypes_to_update, true) . "\n", FILE_APPEND);
+// }
 		ksort($levels);
 		foreach (array_keys($levels) as $level) {
 			if (array_key_exists($level, $item_prototypes_to_update) && $item_prototypes_to_update[$level]) {
