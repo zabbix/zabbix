@@ -638,8 +638,8 @@ class CUserDirectory extends CApiService {
 
 		foreach ($userdirectories as &$userdirectory) {
 			if ($userdirectory['provision_status'] == JIT_PROVISIONING_DISABLED) {
-				$empty_provision_fields = array_fill_keys(
-					['group_basedn', 'group_member', 'group_membership', 'user_username', 'user_lastname'], ''
+				$empty_provision_fields = array_fill_keys(['group_basedn', 'group_member', 'group_membership',
+					'user_username', 'user_lastname', 'user_ref_attr'], ''
 				);
 				$empty_provision_fields['provision_groups'] = [];
 				$empty_provision_fields['provision_media'] = [];
