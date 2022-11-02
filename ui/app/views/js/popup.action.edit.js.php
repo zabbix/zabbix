@@ -233,7 +233,14 @@ window.action_edit_popup = new class {
 					? table_row.getElementsByTagName('input')[3].value
 					: null;
 
-				result.push(input.conditiontype === conditiontype && input.value === value && input.value2 === value2);
+				if (conditiontype == <?= CONDITION_TYPE_SUPPRESSED ?>) {
+					result.push(input.conditiontype === conditiontype);
+				}
+				else {
+					result.push(
+						input.conditiontype === conditiontype && input.value === value && input.value2 === value2
+					);
+				}
 
 				if (input.row_index == it.getAttribute('data-row_index')) {
 					input.row_index ++;
