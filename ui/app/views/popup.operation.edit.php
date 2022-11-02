@@ -195,6 +195,8 @@ $form_grid->addItem([
 ]);
 array_unshift($data['mediatype_options'], ['name' => '- '._('All').' -', 'mediatypeid' => 0, 'status' => 0]);
 
+$disabled = [];
+
 foreach($data['mediatype_options'] as $mediatype_option) {
 	$media[$mediatype_option['mediatypeid']] = $mediatype_option['name'];
 	if ($mediatype_option['status'] == MEDIA_TYPE_STATUS_DISABLED) {

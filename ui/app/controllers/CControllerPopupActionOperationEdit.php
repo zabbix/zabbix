@@ -92,7 +92,10 @@ class CControllerPopupActionOperationEdit extends CController {
 			$operation_type[$type['value']] = $type['name'];
 		}
 
-		$media_types = $this->popupConfigOperationMessage($operation)['mediatypes'];
+		$media_types = API::MediaType()->get(['output' => ['mediatypeid', 'name', 'status']]);
+		CArrayHelper::sort($media_types, ['name']);
+		$media_types = array_values($media_types);
+
 		$this->getData($operation);
 		$operation['row_index'] = $this->hasInput('row_index') ? $this->getInput('row_index') : 0;
 
@@ -200,46 +203,6 @@ class CControllerPopupActionOperationEdit extends CController {
 		}
 
 		return $result;
-	}
-
-	private function popupConfigOperationMessage(array $operation): array {
-		$usergroups = [];
-		if ($operation['opmessage_grp']) {
-			$usergroups = API::UserGroup()->get([
-				'output' => ['usergroupid', 'name'],
-				'usrgrpids' => array_column($operation['opmessage_grp'], 'usrgrpid')
-			]);
-		}
-
-		$users = [];
-		if ($operation['opmessage_usr']) {
-			$db_users = API::User()->get([
-				'output' => ['userid', 'username', 'name', 'surname'],
-				'userids' => array_column($operation['opmessage_usr'], 'userid')
-			]);
-			CArrayHelper::sort($db_users, ['username']);
-
-			foreach ($db_users as $db_user) {
-				$users[] = [
-					'userid' => $db_user['userid'],
-					'name' => getUserFullname($db_user)
-				];
-			}
-		}
-
-		$mediatypes = API::MediaType()->get(['output' => ['mediatypeid', 'name', 'status']]);
-		CArrayHelper::sort($mediatypes, ['name']);
-		$mediatypes = array_values($mediatypes);
-
-		return [
-			'custom_message' => ($operation['opmessage']['default_msg'] === '1'),
-			'subject' => array_key_exists('subject', $operation['opmessage']) ? $operation['opmessage']['subject'] : '',
-			'body' =>array_key_exists('message', $operation['opmessage']) ? $operation['opmessage']['message'] : '',
-			'mediatypeid' => $operation['opmessage']['mediatypeid'],
-			'mediatypes' => $mediatypes,
-			'usergroups' => $usergroups,
-			'users' => $users
-		];
 	}
 
 	private function defaultOperationObject(): array {
