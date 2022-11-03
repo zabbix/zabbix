@@ -106,21 +106,22 @@ class testPageDashboardWidgets extends CWebTest {
 		$default_form->fill(['Type' => 'Clock']);
 		$default_form->waitUntilReloaded();
 		$overlay->close();
-		// Check that widget type is remembered as Clock.
-		$this->checkLastSelectedWidgetType('Clock', 'clock');
+		// Check that widget type is not remembered without submitting the form.
+		$this->checkLastSelectedWidgetType();
 
 		// Save edit widget form without changing widget type.
 		$sys_info_form = $dashboard->getWidget('System information')->edit();
 		$this->assertEquals('System information', $sys_info_form->getField('Type')->getValue());
 		$sys_info_form->submit();
 		$this->page->waitUntilReady();
-		// Check that widget type is still remembered as Clock.
-		$this->checkLastSelectedWidgetType('Clock', 'clock');
+		// Check that widget type is still unchanged.
+		$this->checkLastSelectedWidgetType();
 
 		// Opening edit widget form and change widget type.
 		$change_form = $dashboard->getWidget('System information')->edit();
 		$change_form->fill(['Type' => 'Data overview']);
-		$overlay->close();
+		$change_form->waitUntilReloaded();
+		$change_form->submit();
 		// Check that widget type inherited from previous widget.
 		$this->checkLastSelectedWidgetType('Data overview', 'dataover');
 
@@ -187,7 +188,7 @@ class testPageDashboardWidgets extends CWebTest {
 		// Change dashboard owner.
 		$owner = $configuration->getField('Owner');
 		$owner->clear();
-		$owner->select('test-user');
+		$owner->fill('test-user');
 		// Change dashboard name.
 		$configuration->getField('Name')->clear()->type('Dashboard create test');
 		$configuration->submit();
