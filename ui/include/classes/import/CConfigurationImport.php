@@ -1343,9 +1343,7 @@ class CConfigurationImport {
 				}
 			}
 		}
-// if ($discovery_rule['key_'] === 'jmx.get[beans,"jboss.as:subsystem=undertow,server=*,http-listener=*"]') {
-// 	file_put_contents('test.txt', print_r($item_prototypes_to_update, true) . "\n", FILE_APPEND);
-// }
+
 		ksort($levels);
 		foreach (array_keys($levels) as $level) {
 			if (array_key_exists($level, $item_prototypes_to_update) && $item_prototypes_to_update[$level]) {
