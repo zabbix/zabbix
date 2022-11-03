@@ -341,7 +341,7 @@ class CDashboardPage extends CBaseComponent {
 			});
 		}
 		else {
-			widget = this._createInaccessibleWidget({name, view_mode, widgetid, pos, unique_id});
+			widget = this._createInaccessibleWidget({name, widgetid, pos, unique_id});
 		}
 
 		this._doAddWidget(widget);
@@ -443,11 +443,11 @@ class CDashboardPage extends CBaseComponent {
 		});
 	}
 
-	_createInaccessibleWidget({name, view_mode, widgetid, pos, unique_id}) {
+	_createInaccessibleWidget({name, widgetid, pos, unique_id}) {
 		return this._createWidget(CWidgetInaccessible, {
 			type: 'inaccessible',
 			name,
-			view_mode,
+			view_mode: ZBX_WIDGET_VIEW_MODE_NORMAL,
 			fields: {},
 			defaults: {
 				name: t('Inaccessible widget')
