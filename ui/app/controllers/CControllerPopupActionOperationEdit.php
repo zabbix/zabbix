@@ -95,9 +95,40 @@ class CControllerPopupActionOperationEdit extends CController {
 		$media_types = API::MediaType()->get(['output' => ['mediatypeid', 'name', 'status']]);
 		CArrayHelper::sort($media_types, ['name']);
 		$media_types = array_values($media_types);
-
-		$this->getData($operation);
 		$operation['row_index'] = $this->hasInput('row_index') ? $this->getInput('row_index') : 0;
+
+		$operation_data = $this->getData($operation);
+
+		if (array_key_exists('user_group', $operation_data)) {
+			$operation['opmessage_grp'] = $operation_data['user_group'];
+		}
+
+		if (array_key_exists('users', $operation_data)) {
+			$operation['opmessage_usr'] = $operation_data['users'];
+		}
+
+		if (array_key_exists('opcommand_hst', $operation)) {
+			foreach($operation['opcommand_hst'] as &$opcommand_hst){
+				if ($opcommand_hst['hostid'] == 0){
+					$opcommand_hst = ['hostid' => 0];
+				}
+				else {
+					$opcommand_hst = $operation_data['opcommand_hst'][0];
+				}
+			}
+		}
+
+			if (array_key_exists('opcommand_grp', $operation_data)) {
+			$operation['opcommand_grp'] = $operation_data['opcommand_grp'][0];
+		}
+
+		if (array_key_exists('opgroup', $operation_data)) {
+			$operation['opgroup'] = $operation_data['opgroup'][0];
+		}
+
+		if (array_key_exists('optemplate', $operation_data)) {
+			$operation['optemplate'] = $operation_data['optemplate'][0];
+		}
 
 		$data = [
 			'eventsource' => $eventsource,
@@ -111,95 +142,102 @@ class CControllerPopupActionOperationEdit extends CController {
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
-	private function getData(&$operation) {
+	private function getData($operation) {
 		$result = [];
 
-		foreach ($operation['opcommand_hst'] as &$opcommand_host) {
-			if ($opcommand_host['hostid'] !== '0') {
-				$opcommand_host = API::Host()->get([
-						'output' => ['hostid', 'name'],
-						'hostids' => $opcommand_host['hostid']
-					]);
-				$result[] = $opcommand_host[0];
-			}
-		}
-		unset($opcommand_host);
-
-		if ($operation['opcommand_grp']) {
-			foreach($operation['opcommand_grp'] as &$host_group) {
-				$host_group = API::HostGroup()->get([
-					'output' => ['groupid', 'name'],
-					'groupids' => $host_group['groupid']
-				]);
-				$result[] = $host_group;
-			}
-		}
-		unset($host_group);
-
-
-		if ($operation['opgroup']) {
-			foreach($operation['opgroup'] as &$host_group) {
-				$host_group = API::HostGroup()->get([
-					'output' => ['groupid', 'name'],
-					'groupids' => $host_group['groupid']
-				]);
-				$result[] = $host_group;
-			}
-		}
-		unset($host_group);
-
-		if ($operation['optemplate']) {
-			foreach($operation['optemplate'] as &$template) {
-				$template = API::Template()->get([
-					'output' => ['name'],
-					'templateids' => $template['templateid']
-				]);
-				$result[] = $template;
-			}
-			unset($template);
-		}
-
 		if ($operation['opmessage_grp']) {
+			$groupids = [];
+
+			foreach ($operation['opmessage_grp'] as $group) {
+				$groupids[] = $group['usrgrpid'];
+			}
+
 			$i = 0;
 
-			foreach ($operation['opmessage_grp'] as $opmessage_grp) {
-				$usr_grpids = $opmessage_grp['usrgrpid'];
+			$user_groups = API::UserGroup()->get([
+				'output' => ['name'],
+				'usrgrpids' => array_values($groupids),
+				'preservekeys' => true
+			]);
 
-				$user_groups = API::UserGroup()->get([
-					'output' => ['name'],
-					'usrgrpids' => $usr_grpids,
-					'preservekeys' => true
-				]);
-
-				foreach ($user_groups as $user_group) {
-					$operation['opmessage_grp'][$i]['name'] = $user_group['name'];
-					$i++;
-				}
+			foreach ($user_groups as $user_group) {
+				$operation['opmessage_grp'][$i]['name'] = $user_group['name'];
+				$i++;
+				$result['user_group'][] = $user_group;
 			}
-			$result['user_group'] = $user_group;
 		}
 
 		if ($operation['opmessage_usr']) {
-			$i = 0;
 			foreach ($operation['opmessage_usr'] as $opmessage_usr) {
-				$userids = $opmessage_usr['userid'];
-
-				$fullnames = [];
-
-				$users = API::User()->get([
-					'output' => ['userid', 'username', 'name', 'surname'],
-					'userids' => $userids,
-					'preservekeys' => true
-				]);
-
-				foreach ($users as $user) {
-					$fullnames[$user['userid']] = getUserFullname($user);
-
-					$operation['opmessage_usr'][$i]['name'] = $fullnames[$opmessage_usr['userid']];
-					$i++;
-				}
+				$userids[] = $opmessage_usr['userid'];
 			}
-			$result['users'] = $users;
+
+			$users = API::User()->get([
+				'output' => ['userid', 'username', 'name', 'surname'],
+				'userids' => $userids,
+				'preservekeys' => true
+			]);
+
+			$fullnames = [];
+
+			foreach ($users as $user) {
+				$fullnames[$user['userid']] = getUserFullname($user);
+				$user['name'] = $fullnames[$user['userid']];
+
+				$result['users'][] = $user;
+			}
+		}
+
+		if ($operation['opcommand_hst']) {
+			foreach ($operation['opcommand_hst'] as $opcommand_host) {
+				$hostids[] = $opcommand_host['hostid'];
+			}
+
+			$host = API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => $hostids
+			]);
+
+			$result['opcommand_hst'][] = $host;
+		}
+
+		if ($operation['opcommand_grp']) {
+			foreach ($operation['opcommand_grp'] as $opcommand_group) {
+				$groupids[] = $opcommand_group['groupid'];
+			}
+
+			$group = API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $groupids
+			]);
+
+			$result['opcommand_grp'][] = $group;
+		}
+
+		if ($operation['opgroup']) {
+			foreach ($operation['opgroup'] as $opgroup) {
+				$groupids[] = $opgroup['groupid'];
+			}
+
+			$group = API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $groupids
+			]);
+
+			$result['opgroup'][] = $group;
+		}
+
+		if ($operation['optemplate']) {
+			foreach ($operation['optemplate'] as $optemplate) {
+				$templateids[] = $optemplate['templateid'];
+			}
+
+			$template = API::Template()->get([
+				'output' => ['templateid', 'name'],
+				'templateids' => $templateids
+			]);
+
+			$result['optemplate'][] = $template;
 		}
 
 		return $result;

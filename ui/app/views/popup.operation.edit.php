@@ -269,6 +269,7 @@ $form_grid->addItem([
 ]);
 
 $opcommand_hst_value = null;
+
 if (array_key_exists('0', $operation['opcommand_hst'])) {
 	if (array_key_exists('hostid', $operation['opcommand_hst'][0])) {
 		$opcommand_hst_value = $operation['opcommand_hst'][0]['hostid'];
@@ -279,20 +280,22 @@ $multiselect_values_host = [];
 $multiselect_values_host_grp = [];
 $hosts = [];
 
-foreach($operation['opcommand_hst'] as $host) {
-	if (array_key_exists(0, $host)) {
-		if (is_array($host[0])) {
-			$hosts['id'] = $host[0]['hostid'];
-			$hosts['name'] = $host[0]['name'];
-			$multiselect_values_host[] = $hosts;
+if ($operation['opcommand_hst']) {
+	foreach($operation['opcommand_hst'] as $host) {
+		if (array_key_exists('0', $host)) {
+			foreach ($host as $h) {
+				$hosts['id'] = $h['hostid'];
+				$hosts['name'] = $h['name'];
+				$multiselect_values_host[] = $hosts;
+			}
 		}
 	}
 }
 
 if ($operation['opcommand_grp']) {
 	foreach ($operation['opcommand_grp'] as $group) {
-		$host_group['id'] = $group[0]['groupid'];
-		$host_group['name'] = $group[0]['name'];
+		$host_group['id'] = $group['groupid'];
+		$host_group['name'] = $group['name'];
 		$multiselect_values_host_grp[] = $host_group;
 	}
 }
@@ -309,7 +312,7 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 				->addItem([
 					new CLabel(_('Current host')),
 					(new CFormField((new CCheckBox('operation[opcommand_hst][][hostid][current_host]', '0'))
-						->setChecked($opcommand_hst_value === '0')
+						->setChecked($opcommand_hst_value === 0)
 					))->setId('operation-command-checkbox')
 				])
 				->addItem([
@@ -361,8 +364,8 @@ $multiselect_values_ophost_grp = [];
 $multiselect_values_optemplate = [];
 
 foreach ($operation['opgroup'] as $group) {
-	$host_group['id'] = $group[0]['groupid'];
-	$host_group['name'] = $group[0]['name'];
+	$host_group['id'] = $group['groupid'];
+	$host_group['name'] = $group['name'];
 	$multiselect_values_ophost_grp[] = $host_group;
 }
 
@@ -395,8 +398,8 @@ $form_grid->addItem([
 ]);
 
 foreach ($operation['optemplate'] as $template) {
-	$templates['id'] = $template[0]['templateid'];
-	$templates['name'] = $template[0]['name'];
+	$templates['id'] = $template['templateid'];
+	$templates['name'] = $template['name'];
 	$multiselect_values_optemplate[] = $templates;
 }
 
