@@ -1149,8 +1149,16 @@ class CDashboard extends CBaseComponent {
 	}
 
 	editWidgetProperties(properties = {}, {new_widget_pos = null} = {}) {
+		this._clearWarnings();
+
 		if (properties.type === undefined) {
 			properties.type = this._widget_last_type;
+
+			if (properties.type === null) {
+				this._warn(t('Cannot add widget: no widgets available.'));
+
+				return;
+			}
 		}
 
 		const overlay = PopUp(`widget.${properties.type}.edit`, {
