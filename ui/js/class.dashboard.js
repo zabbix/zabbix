@@ -1319,17 +1319,17 @@ class CDashboard extends CBaseComponent {
 		return Promise.resolve()
 			.then(() => this._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}))
 			.then(() => {
-				if (type !== this._widget_last_type) {
-					this._widget_last_type = type;
-					updateUserProfile('web.dashboard.last_widget_type', type, [], PROFILE_TYPE_STR);
-				}
-
 				overlayDialogueDestroy(overlay.dialogueid);
 
 				if (widget !== null && widget.getType() === type) {
 					widget.updateProperties({name, view_mode, fields});
 
 					return;
+				}
+
+				if (type !== this._widget_last_type) {
+					this._widget_last_type = type;
+					updateUserProfile('web.dashboard.last_widget_type', type, [], PROFILE_TYPE_STR);
 				}
 
 				const widget_class = eval(this._widget_defaults[type].js_class);
