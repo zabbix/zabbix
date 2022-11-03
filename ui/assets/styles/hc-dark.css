@@ -1585,13 +1585,6 @@ div.dashboard-widget-clock .clock-digital {
     color: #cacaca;
     font-weight: bold; }
 
-div.dashboard-widget-inaccessible {
-  display: flex;
-  padding: 0 10px;
-  align-items: center;
-  justify-content: center;
-  color: #cacaca; }
-
 form.dashboard-widget-item .fields-group.fields-group-description, form.dashboard-widget-item .fields-group.fields-group-value, form.dashboard-widget-item .fields-group.fields-group-time, form.dashboard-widget-item .fields-group.fields-group-change-indicator {
   display: grid;
   grid-template-columns: minmax(100px, max-content) 3fr max-content auto;

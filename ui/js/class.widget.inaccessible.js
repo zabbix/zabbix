@@ -20,12 +20,35 @@
 
 class CWidgetInaccessible extends CWidget {
 
+	static ZBX_STYLE_LIST_TABLE = 'list-table';
+	static ZBX_STYLE_NOTHING_TO_SHOW = 'nothing-to-show';
+
 	_doStart() {
 		super._doStart();
 
-		this._content_header.querySelector('.js-widget-edit').disabled = true;
+		this._updateButtons();
 
-		this._content_body.innerHTML = t('Inaccessible widget');
+		this._content_body.innerHTML = `
+			<table class="${CWidgetInaccessible.ZBX_STYLE_LIST_TABLE}">
+				<tbody>
+					<tr class="${CWidgetInaccessible.ZBX_STYLE_NOTHING_TO_SHOW}">
+						<td>${t('No permissions to referred object or it does not exist!')}</td>
+					</tr>
+				</tbody>
+			</table>
+		`;
+	}
+
+	_updateButtons() {
+		for (const button of this._content_header.querySelectorAll('button')) {
+			button.hidden = !button.classList.contains('js-widget-action') || !this.isEditMode();
+		}
+	}
+
+	setEditMode() {
+		super.setEditMode();
+
+		this._updateButtons();
 	}
 
 	_promiseUpdate() {
