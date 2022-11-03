@@ -25,10 +25,9 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @dataSource EntitiesTags
+ * @dataSource Services
  *
  * @backup services
- *
- * @dataSource Services
  */
 class testPageServicesServices extends CWebTest {
 
@@ -317,6 +316,7 @@ class testPageServicesServices extends CWebTest {
 						]
 					],
 					'result' => [
+						'Service with tags for updating',
 						'Parent for 2 levels of child services 1',
 						'Service with multiple service tags',
 						'Simple actions service'
@@ -453,6 +453,7 @@ class testPageServicesServices extends CWebTest {
 						]
 					],
 					'result' => [
+						'Service with tags for updating',
 						'Parent for 2 levels of child services 1',
 						'Service with multiple service tags',
 						'Simple actions service'
@@ -475,7 +476,7 @@ class testPageServicesServices extends CWebTest {
 						]
 					],
 					'result' => [
-						'Name' => 'Simple actions service'
+						'Simple actions service'
 					]
 				]
 			],
@@ -523,6 +524,7 @@ class testPageServicesServices extends CWebTest {
 						]
 					],
 					'result' => [
+						'Service with tags for updating',
 						'Parent for 2 levels of child services 1',
 						'Service with multiple service tags'
 					]
