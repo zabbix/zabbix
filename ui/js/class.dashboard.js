@@ -1399,6 +1399,10 @@ class CDashboard extends CBaseComponent {
 			});
 	}
 
+	_isEditingWidgetProperties() {
+		return this._is_edit_widget_properties_cancel_subscribed;
+	}
+
 	_promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}) {
 		const curl = new Curl('zabbix.php');
 
@@ -1763,30 +1767,23 @@ class CDashboard extends CBaseComponent {
 			},
 
 			dashboardPageWidgetAdd: (e) => {
+				const dashboard_page = this._selected_dashboard_page;
+
 				const new_widget_data = this.getStoredWidgetDataCopy();
 				const new_widget_pos = e.detail.new_widget_pos;
 
 				if (new_widget_data !== null) {
-					const dashboard_page = this._selected_dashboard_page;
-
-					let do_reset_placeholder = true;
-
 					const menu = [
 						{
 							label: t('Actions'),
 							items: [
 								{
 									label: t('Add widget'),
-									clickCallback: () => {
-										this.editWidgetProperties({}, {new_widget_pos});
-										do_reset_placeholder = false;
-									}
+									clickCallback: () => this.editWidgetProperties({}, {new_widget_pos})
 								},
 								{
 									label: t('Paste widget'),
-									clickCallback: () => {
-										this.pasteWidget(new_widget_data, {new_widget_pos});
-									}
+									clickCallback: () => this.pasteWidget(new_widget_data, {new_widget_pos})
 								}
 							]
 						}
@@ -1799,7 +1796,7 @@ class CDashboard extends CBaseComponent {
 
 					jQuery(placeholder).menuPopup(menu, placeholder_event, {
 						closeCallback: () => {
-							if (do_reset_placeholder) {
+							if (!this._isEditingWidgetProperties()) {
 								dashboard_page.resetWidgetPlaceholder();
 							}
 						}
@@ -1807,6 +1804,10 @@ class CDashboard extends CBaseComponent {
 				}
 				else {
 					this.editWidgetProperties({}, {new_widget_pos});
+
+					if (!this._isEditingWidgetProperties()) {
+						dashboard_page.resetWidgetPlaceholder();
+					}
 				}
 			},
 
