@@ -901,16 +901,6 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules);
 void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zbx_vector_uint64_t *nested_groupids);
 void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hostids);
 
-/* item statuses */
-#define ITEM_STATUS_ACTIVE		0
-#define ITEM_STATUS_DISABLED		1
-
-/* item states */
-#define ITEM_STATE_NORMAL		0
-#define ITEM_STATE_NOTSUPPORTED		1
-
-#define ZBX_HC_ITEM_STATUS_NORMAL	0
-#define ZBX_HC_ITEM_STATUS_BUSY		1
 
 #define ZBX_DC_FLAG_META	0x01	/* contains meta information (lastlogsize and mtime) */
 #define ZBX_DC_FLAG_NOVALUE	0x02	/* entry contains no value */
@@ -1210,18 +1200,6 @@ typedef enum
 	MAINTENANCE_TYPE_NODATA
 }
 zbx_maintenance_type_t;
-
-/* discovery rule */
-#define DRULE_STATUS_MONITORED		0
-#define DRULE_STATUS_NOT_MONITORED	1
-
-#define ITEM_LOGTYPE_INFORMATION	1
-#define ITEM_LOGTYPE_WARNING		2
-#define ITEM_LOGTYPE_ERROR		4
-#define ITEM_LOGTYPE_FAILURE_AUDIT	7
-#define ITEM_LOGTYPE_SUCCESS_AUDIT	8
-#define ITEM_LOGTYPE_CRITICAL		9
-#define ITEM_LOGTYPE_VERBOSE		10
 
 /* action statuses */
 #define ACTION_STATUS_ACTIVE	0

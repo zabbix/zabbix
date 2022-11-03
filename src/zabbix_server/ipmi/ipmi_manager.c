@@ -35,6 +35,7 @@
 #include "zbxavailability.h"
 #include "zbxtime.h"
 #include "zbxsysinfo.h"
+#include "zbx_item_constants.h"
 
 #define ZBX_IPMI_MANAGER_DELAY	1
 

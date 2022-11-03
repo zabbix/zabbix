@@ -32,6 +32,7 @@
 #include "trigger_linking.h"
 #include "graph_linking.h"
 #include "zbxnum.h"
+#include "zbx_host_constants.h"
 
 typedef struct
 {

@@ -28,6 +28,8 @@
 #include "httpmacro.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
+#include "zbx_host_constants.h"
+#include "zbx_item_constants.h"
 
 /* HTTP item types */
 #define ZBX_HTTPITEM_TYPE_RSPCODE	0

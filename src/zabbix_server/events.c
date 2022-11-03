@@ -27,6 +27,8 @@
 #include "zbxservice.h"
 #include "zbxnum.h"
 #include "zbxexpr.h"
+#include "zbx_trigger_constants.h"
+#include "zbx_item_constants.h"
 
 /* event recovery data */
 typedef struct

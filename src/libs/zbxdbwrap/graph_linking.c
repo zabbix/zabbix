@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxdbwrap.h"
 #include "graph_linking.h"
 
 #include "zbxdbhigh.h"

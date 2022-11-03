@@ -18,6 +18,7 @@
 **/
 
 #include "service_manager.h"
+#include "../server.h"
 
 #include "log.h"
 #include "zbxself.h"
@@ -28,6 +29,8 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxexpr.h"
+#include "dbcache.h"
+#include "zbx_trigger_constants.h"
 
 extern unsigned char			program_type;
 extern int				CONFIG_SERVICEMAN_SYNC_FREQUENCY;

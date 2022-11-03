@@ -41,7 +41,9 @@
 #include "zbxip.h"
 #include "zbxsysinfo.h"
 #include "events.h"
+#include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
+#include "zbx_item_constants.h"
 
 int	sync_in_progress = 0;
 

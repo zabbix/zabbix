@@ -26,6 +26,7 @@
 #include "zbxip.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
+#include "zbx_rtc_constants.h"
 
 static char	*CONFIG_PID_FILE = NULL;
 

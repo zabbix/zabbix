@@ -24,6 +24,7 @@
 #include "zbxdb.h"
 #include "zbxnum.h"
 #include "zbx_trigger_constants.h"
+#include "zbx_host_constants.h"
 
 void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation)
 {

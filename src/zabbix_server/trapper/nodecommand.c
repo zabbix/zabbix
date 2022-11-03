@@ -28,6 +28,7 @@
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxdbwrap.h"
+#include "zbx_trigger_constants.h"
 
 /******************************************************************************
  *                                                                            *
