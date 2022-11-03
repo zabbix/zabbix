@@ -49,7 +49,7 @@ class CControllerDashboardWidgetCheck extends CController {
 				$this->widget = $widget;
 			}
 			else {
-				error(_('Widget not supported.'));
+				error(_('Inaccessible widget type.'));
 
 				$ret = false;
 			}

@@ -62,7 +62,7 @@ class CControllerDashboardWidgetEdit extends CController {
 				$this->widget = $widget;
 			}
 			else {
-				error(_('Widget not supported.'));
+				error(_('Inaccessible widget type.'));
 
 				$ret = false;
 			}
@@ -110,8 +110,8 @@ class CControllerDashboardWidgetEdit extends CController {
 			}
 		}
 
-		natsort($known_types);
-		natsort($deprecated_types);
+		natcasesort($known_types);
+		natcasesort($deprecated_types);
 
 		$form = $this->widget->getForm($this->getInput('fields', []),
 			$this->hasInput('templateid') ? $this->getInput('templateid') : null

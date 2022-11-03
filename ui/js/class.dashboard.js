@@ -504,6 +504,18 @@ class CDashboard extends CBaseComponent {
 	}
 
 	pasteDashboardPage(new_dashboard_page_data) {
+		this._clearWarnings();
+
+		const widgets = new_dashboard_page_data.widgets;
+
+		for (const widget of widgets) {
+			if (!(widget.type in this._widget_defaults)) {
+				this._warn(t('Cannot paste dashboard page: the page contains inaccessible widgets.'));
+
+				return;
+			}
+		}
+
 		if (this._dashboard_pages.size >= this._max_dashboard_pages) {
 			this._warnDashboardExhausted();
 
@@ -531,31 +543,27 @@ class CDashboard extends CBaseComponent {
 				const reference_substitution = new Map();
 
 				for (const widget of widgets) {
-					if (widget.type in this._widget_defaults) {
-						const widget_class = eval(this._widget_defaults[widget.type].js_class);
+					const widget_class = eval(this._widget_defaults[widget.type].js_class);
 
-						if (widget_class.hasReferenceField()) {
-							const old_reference = widget.fields.reference;
-							const new_reference = this._createReference({used_references});
+					if (widget_class.hasReferenceField()) {
+						const old_reference = widget.fields.reference;
+						const new_reference = this._createReference({used_references});
 
-							widget.fields.reference = new_reference;
+						widget.fields.reference = new_reference;
 
-							used_references.add(new_reference);
-							reference_substitution.set(old_reference, new_reference);
-						}
+						used_references.add(new_reference);
+						reference_substitution.set(old_reference, new_reference);
 					}
 				}
 
 				for (const widget of widgets) {
-					if (widget.type in this._widget_defaults) {
-						const widget_class = eval(this._widget_defaults[widget.type].js_class);
+					const widget_class = eval(this._widget_defaults[widget.type].js_class);
 
-						for (const reference_field of widget_class.getForeignReferenceFields()) {
-							const old_reference = widget.fields[reference_field];
+					for (const reference_field of widget_class.getForeignReferenceFields()) {
+						const old_reference = widget.fields[reference_field];
 
-							if (reference_substitution.has(old_reference)) {
-								widget.fields[reference_field] = reference_substitution.get(old_reference);
-							}
+						if (reference_substitution.has(old_reference)) {
+							widget.fields[reference_field] = reference_substitution.get(old_reference);
 						}
 					}
 				}
@@ -591,6 +599,14 @@ class CDashboard extends CBaseComponent {
 	}
 
 	pasteWidget(new_widget_data, {widget = null, new_widget_pos = null} = {}) {
+		this._clearWarnings();
+
+		if (!(new_widget_data.type in this._widget_defaults)) {
+			this._warn(t('Cannot paste widget: the widget is not accessible.'));
+
+			return;
+		}
+
 		const dashboard_page = this._selected_dashboard_page;
 
 		if (widget !== null) {
@@ -620,12 +636,10 @@ class CDashboard extends CBaseComponent {
 			dashboard_page.deleteWidget(widget, {is_batch_mode: true});
 		}
 
-		if (new_widget_data.type in this._widget_defaults) {
-			const new_widget_class = eval(this._widget_defaults[new_widget_data.type].js_class);
+		const new_widget_class = eval(this._widget_defaults[new_widget_data.type].js_class);
 
-			if (new_widget_class.hasReferenceField()) {
-				new_widget_data.fields.reference = this._createReference();
-			}
+		if (new_widget_class.hasReferenceField()) {
+			new_widget_data.fields.reference = this._createReference();
 		}
 
 		let references = [];
@@ -636,14 +650,10 @@ class CDashboard extends CBaseComponent {
 			}
 		}
 
-		if (new_widget_data.type in this._widget_defaults) {
-			const new_widget_class = eval(this._widget_defaults[new_widget_data.type].js_class);
-
-			for (const reference_field of new_widget_class.getForeignReferenceFields()) {
-				if (reference_field in new_widget_data.fields
-						&& !references.includes(new_widget_data.fields[reference_field])) {
-					new_widget_data.fields[reference_field] = '';
-				}
+		for (const reference_field of new_widget_class.getForeignReferenceFields()) {
+			if (reference_field in new_widget_data.fields
+					&& !references.includes(new_widget_data.fields[reference_field])) {
+				new_widget_data.fields[reference_field] = '';
 			}
 		}
 
@@ -1140,9 +1150,7 @@ class CDashboard extends CBaseComponent {
 
 	editWidgetProperties(properties = {}, {new_widget_pos = null} = {}) {
 		if (properties.type === undefined) {
-			properties.type = this._widget_last_type in this._widget_defaults
-				? this._widget_last_type
-				: Object.keys(this._widget_defaults)[0];
+			properties.type = this._widget_last_type;
 		}
 
 		const overlay = PopUp(`widget.${properties.type}.edit`, {
@@ -1397,7 +1405,21 @@ class CDashboard extends CBaseComponent {
 		if (this._can_edit_dashboards) {
 			menu_actions.push({
 				label: t('Copy'),
-				clickCallback: () => this._storeDashboardPageDataCopy(dashboard_page.getDataCopy())
+				clickCallback: () => {
+					this._clearWarnings();
+
+					const data_copy = dashboard_page.getDataCopy();
+
+					for (const widget of data_copy.widgets) {
+						if (!(widget.type in this._widget_defaults)) {
+							this._warn(t('Cannot copy dashboard page: the page contains inaccessible widgets.'));
+
+							return;
+						}
+					}
+
+					this._storeDashboardPageDataCopy(data_copy);
+				}
 			});
 		}
 
@@ -1442,25 +1464,23 @@ class CDashboard extends CBaseComponent {
 
 	// Dashboard view methods.
 
-	_warnDashboardExhausted() {
+	_warn(warning) {
 		this._clearWarnings();
 
-		this._warning_message_box = makeMessageBox('warning', [], sprintf(
-			t('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
-			this._max_dashboard_pages
-		));
+		this._warning_message_box = makeMessageBox('warning', [], warning);
 
 		addMessage(this._warning_message_box);
 	}
 
+	_warnDashboardExhausted() {
+		this._warn(sprintf(
+			t('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
+			this._max_dashboard_pages
+		));
+	}
+
 	_warnDashboardPageExhausted() {
-		this._clearWarnings();
-
-		this._warning_message_box = makeMessageBox('warning', [],
-			t('Cannot add widget: not enough free space on the dashboard.')
-		);
-
-		addMessage(this._warning_message_box);
+		this._warn(t('Cannot add widget: not enough free space on the dashboard.'));
 	}
 
 	_clearWarnings() {

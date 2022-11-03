@@ -126,6 +126,9 @@ $translate_strings = [
 		'Actions' => _('Actions'),
 		'Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.' => _('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
 		'Cannot add widget: not enough free space on the dashboard.' => _('Cannot add widget: not enough free space on the dashboard.'),
+		'Cannot copy dashboard page: the page contains inaccessible widgets.' => _('Cannot copy dashboard page: the page contains inaccessible widgets.'),
+		'Cannot paste dashboard page: the page contains inaccessible widgets.' => _('Cannot paste dashboard page: the page contains inaccessible widgets.'),
+		'Cannot paste widget: the widget is not accessible.' => _('Cannot paste widget: the widget is not accessible.'),
 		'Copy' => _('Copy'),
 		'Delete' => _('Delete'),
 		'Failed to paste dashboard page.' => _('Failed to paste dashboard page.'),
@@ -166,9 +169,9 @@ $translate_strings = [
 		'Refresh interval' => _s('Refresh interval')
 	],
 	'class.widget.inaccessible.js' => [
-		'Inaccessible widget' => _('Inaccessible widget'),
 		'Actions' => _s('Actions'),
 		'Copy' => _s('Copy'),
+		'Inaccessible widget' => _('Inaccessible widget'),
 		'Refresh interval' => _s('Refresh interval')
 	],
 	'class.widget.iterator.js' => [

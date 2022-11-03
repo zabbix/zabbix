@@ -450,7 +450,7 @@ class CDashboardHelper {
 						$widget_name = 'pages['.$dashboard_page_index.'][widgets]['.$widget_index.']';
 					}
 
-					$errors[] = _s('Cannot save widget "%1$s".', $widget_name).' '._('Widget not supported.');
+					$errors[] = _s('Cannot save widget "%1$s".', $widget_name).' '._('Inaccessible widget type.');
 
 					continue;
 				}
@@ -458,7 +458,7 @@ class CDashboardHelper {
 				$widget_name = $widget_data['name'] !== '' ? $widget_data['name'] : $widget->getDefaultName();
 
 				if ($templateid !== null && !$widget->hasTemplateSupport()) {
-					$errors[] = _s('Cannot save widget "%1$s".', $widget_name).' '._('Widget not supported.');
+					$errors[] = _s('Cannot save widget "%1$s".', $widget_name).' '._('Inaccessible widget type.');
 
 					continue;
 				}
@@ -571,5 +571,41 @@ class CDashboardHelper {
 		unset($dashboard);
 
 		return $dashboards;
+	}
+
+	public static function getWidgetLastType(bool $for_template_dashboard_only = false): ?string {
+		$known_widgets = APP::ModuleManager()->getWidgets($for_template_dashboard_only);
+
+		$widget_last_type = CProfile::get('web.dashboard.last_widget_type');
+
+		if (!array_key_exists($widget_last_type, $known_widgets)) {
+			$current_types = [];
+			$deprecated_types = [];
+
+			/** @var CWidget $widget */
+			foreach ($known_widgets as $widget) {
+				if (!$widget->isDeprecated()) {
+					$current_types[$widget->getId()] = $widget->getDefaultName();
+				}
+				else {
+					$deprecated_types[$widget->getId()] = $widget->getDefaultName();
+				}
+			}
+
+			natcasesort($current_types);
+			natcasesort($deprecated_types);
+
+			if ($current_types) {
+				$widget_last_type = array_key_first($current_types);
+			}
+			elseif ($deprecated_types) {
+				$widget_last_type = array_key_first($deprecated_types);
+			}
+			else {
+				$widget_last_type = null;
+			}
+		}
+
+		return $widget_last_type;
 	}
 }

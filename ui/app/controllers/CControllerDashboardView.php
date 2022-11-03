@@ -123,7 +123,7 @@ class CControllerDashboardView extends CController {
 		$data = [
 			'dashboard' => $dashboard,
 			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(),
-			'widget_last_type' => CProfile::get('web.dashboard.last_widget_type'),
+			'widget_last_type' => CDashboardHelper::getWidgetLastType(),
 			'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
 			'time_period' => getTimeSelectorPeriod($time_selector_options),
 			'clone' => $this->hasInput('clone'),

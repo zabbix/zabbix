@@ -62,7 +62,7 @@ class CControllerDashboardWidgetsSanitize extends CController {
 				$widget = APP::ModuleManager()->getModule($widget_input['type']);
 
 				if ($widget === null || $widget->getType() !== CModule::TYPE_WIDGET) {
-					error(_('Widget not supported.'));
+					error(_('Inaccessible widget type.'));
 
 					$ret = false;
 
