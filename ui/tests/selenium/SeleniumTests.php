@@ -391,7 +391,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageServicesServices');
 		$suite->addTestSuite('testPageServicesServicesMassUpdate');
 
-		//SLA.
+		// SLA.
 		$suite->addTestSuite('testFormServicesSla');
 		$suite->addTestSuite('testPageServicesSla');
 		$suite->addTestSuite('testPageServicesSlaReport');
