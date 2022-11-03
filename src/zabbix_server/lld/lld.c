@@ -210,6 +210,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, const 
  * Parameters: jp_row          - [IN] the lld data row                        *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             condition       - [IN] the lld filter condition                *
+ *             result          - [OUT] the result of evaluation               *
  *             info            - [OUT] the warning description                *
  *                                                                            *
  * Return value: SUCCEED - the lld data passed filter evaluation              *
