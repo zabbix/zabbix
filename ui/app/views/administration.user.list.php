@@ -208,7 +208,7 @@ foreach ($data['users'] as $user) {
 
 	$provisioned = $user['userdirectoryid'] ? new CDiv(date(ZBX_DATE_TIME, $user['ts_provisioned'])) : '';
 	$checkbox = new CCheckBox('userids['.$userid.']', $userid);
-	$info = $users_groups ? '' : makeWarningIcon(_('User does not have user groups!'));
+	$info = $users_groups ? '' : makeWarningIcon(_('User does not have user groups.'));
 	$username = new CLink($user['username'],
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'user.edit')
@@ -229,7 +229,7 @@ foreach ($data['users'] as $user) {
 	}
 
 	if (!$user['roleid']) {
-		$info = makeErrorIcon(_('User does not have user role!'));
+		$info = makeErrorIcon(_('User does not have user role.'));
 		$gui_access = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_GREY);
 		$api_access = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
 	}
