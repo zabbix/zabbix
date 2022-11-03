@@ -2010,6 +2010,9 @@ static char	*service_get_event_name(zbx_service_manager_t *manager, const char *
  ******************************************************************************/
 static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_vector_ptr_t *updates)
 {
+/* business service values */
+#define SERVICE_VALUE_OK		0
+#define SERVICE_VALUE_PROBLEM		1
 	const zbx_service_update_t	*update;
 	int				i, j, events_num = 0;
 	zbx_db_insert_t			db_insert_events, db_insert_problem, db_insert_event_tag, db_insert_problem_tag,

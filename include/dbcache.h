@@ -1254,10 +1254,6 @@ zbx_maintenance_type_t;
 
 #define HOST_INVENTORY_FIELD_COUNT	70
 
-/* business service values */
-#define SERVICE_VALUE_OK		0
-#define SERVICE_VALUE_PROBLEM		1
-
 #define ITEM_LOGTYPE_INFORMATION	1
 #define ITEM_LOGTYPE_WARNING		2
 #define ITEM_LOGTYPE_ERROR		4
@@ -1281,13 +1277,6 @@ zbx_maintenance_type_t;
 /* action escalation canceled notification mode */
 #define ACTION_NOTIFY_IF_CANCELED_TRUE	1	/* notify about canceled escalations for action (default) */
 #define ACTION_NOTIFY_IF_CANCELED_FALSE	0	/* do not notify about canceled escalations for action */
-
-/* max number of retries for alerts */
-#define ALERT_MAX_RETRIES	3
-
-/* media type statuses */
-#define MEDIA_TYPE_STATUS_ACTIVE	0
-#define MEDIA_TYPE_STATUS_DISABLED	1
 
 /* SMTP security options */
 #define SMTP_SECURITY_NONE	0

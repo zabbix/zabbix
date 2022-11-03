@@ -18,10 +18,11 @@
 **/
 
 #include "escalator.h"
+#include "zbxserver.h"
+#include "../server.h"
 
 #include "../db_lengths.h"
 #include "zbxnix.h"
-#include "zbxserver.h"
 #include "zbxself.h"
 #include "../actions.h"
 #include "../scripts/scripts.h"
@@ -1762,6 +1763,8 @@ err_alert:
 
 		if (NULL != r_event)
 		{
+/* max number of retries for alerts */
+#define ALERT_MAX_RETRIES	3
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, r_event->eventid, userid,
 					now, subject, message, (int)ALERT_STATUS_FAILED, (int)ALERT_MAX_RETRIES, error,
 					esc_step, (int)ALERT_TYPE_MESSAGE, ackid, event->eventid);

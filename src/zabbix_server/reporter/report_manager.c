@@ -19,6 +19,7 @@
 
 #include "report_manager.h"
 #include "zbxserver.h"
+#include "../server.h"
 
 #include "../db_lengths.h"
 #include "zbxself.h"
