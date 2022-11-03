@@ -63,10 +63,15 @@ class testFormGraphPrototype extends testFormGraphs {
 		$this->assertArrayHasKey('itemids', $item_prototypes);
 		$item_prototype_ids = CDataHelper::getIds('name');
 
-		self::$items['graph_prototype_trap_int']['itemid'] = $item_prototype_ids['graph_prototype_trap_int'];
-		self::$items['graph_prototype_trap_float']['itemid'] = $item_prototype_ids['graph_prototype_trap_float'];
-		self::$items['graph_prototype_trap_text']['itemid'] = $item_prototype_ids['graph_prototype_trap_text'];
-		self::$items['graph_prototype_trap_char']['itemid'] = $item_prototype_ids['graph_prototype_trap_char'];
+		foreach (['int', 'float', 'text', 'char'] as $suffix) {
+			$field = 'graph_prototype_trap_'.$suffix;
+			self::$items[$field]['itemid'] = $item_prototype_ids[$field];
+		}
+//
+//		self::$items['graph_prototype_trap_int']['itemid'] = $item_prototype_ids['graph_prototype_trap_int'];
+//		self::$items['graph_prototype_trap_float']['itemid'] = $item_prototype_ids['graph_prototype_trap_float'];
+//		self::$items['graph_prototype_trap_text']['itemid'] = $item_prototype_ids['graph_prototype_trap_text'];
+//		self::$items['graph_prototype_trap_char']['itemid'] = $item_prototype_ids['graph_prototype_trap_char'];
 
 		// Create graphs with previously created items.
 		$prepared_graph_prototypes = [
@@ -192,7 +197,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Exploded graph prototype duplicated Graph sum type',
-						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
+						'Graph type' => 'Exploded'
 					],
 					'items' => [
 						[
@@ -234,7 +239,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Exploded graph prototype duplicated Graph sum type mixed',
-						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
+						'Graph type' => 'Exploded'
 					],
 					'items' => [
 						[

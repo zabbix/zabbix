@@ -28,7 +28,7 @@ class testFormGraphs extends CWebTest {
 	const HOST = 'Simple form test host';					// Host id = 40001.
 	const HOSTID = 40001;									// Simple form test host.
 	const LLDID = 133800;									// testFormDiscoveryRule on Simple form test host.
-	CONST SQL = 'SELECT * FROM graphs ORDER BY graphid';
+	const SQL = 'SELECT * FROM graphs ORDER BY graphid';
 
 	/**
 	 * Flag for graph prototype.
@@ -92,7 +92,7 @@ class testFormGraphs extends CWebTest {
 				[
 					'check_defaults' => true,
 					'set_fields' => [
-						'Graph type' => CFormElement::RELOADABLE_FILL('Normal')
+						'Graph type' => 'Normal'
 					],
 					'check_fields' => [
 						'id:name' =>  ['value' => '', 'maxlength' => 255],
@@ -127,7 +127,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => CFormElement::RELOADABLE_FILL('Stacked')
+						'Graph type' => 'Stacked'
 					],
 					'check_fields' => [
 						'id:name' =>  ['value' => ''],
@@ -161,7 +161,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => CFormElement::RELOADABLE_FILL('Pie')
+						'Graph type' => 'Pie'
 					],
 					'check_fields' => [
 						'id:name' =>  ['value' => ''],
@@ -196,7 +196,7 @@ class testFormGraphs extends CWebTest {
 			[
 				[
 					'set_fields' => [
-						'Graph type' => CFormElement::RELOADABLE_FILL('Exploded')
+						'Graph type' => 'Exploded'
 					],
 					'check_fields' => [
 						'id:name' =>  ['value' => ''],
@@ -272,14 +272,14 @@ class testFormGraphs extends CWebTest {
 
 	public function checkGraphFormLayout($data) {
 		$this->page->login()->open($this->url)->waitUntilReady();
-		$this->query('button', 'Create graph'.$this->getGraphSuffix())->waitUntilClickable()
-				->one()->click();
-		$this->page->assertTitle('Configuration of graph'.$this->getGraphSuffix().'s');
+		$object = 'Graph'.$this->getGraphSuffix();
+		$this->query('button', 'Create '.lcfirst($object))->waitUntilClickable()->one()->click();
+		$this->page->assertTitle('Configuration of '.lcfirst($object).'s');
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
 
 		// Check default fields only for first case.
 		if (CTestArrayHelper::get($data, 'check_defaults', false)) {
-			$this->assertEquals(['Graph'.$this->getGraphSuffix(), 'Preview'], $form->getTabs());
+			$this->assertEquals([$object, 'Preview'], $form->getTabs());
 			$this->assertFalse($form->query('xpath:.//table[@id="itemsTable"]//div[@class="drag-icon"]')->exists());
 
 			$items_container = $form->getFieldContainer('Items');
@@ -300,7 +300,7 @@ class testFormGraphs extends CWebTest {
 			$this->page->waitUntilReady();
 			$this->assertTrue($this->query('xpath://div[@id="previewChart"]/img')->waitUntilPresent()->one()->isVisible());
 
-			$form->selectTab('Graph'.$this->getGraphSuffix());
+			$form->selectTab($object);
 			$this->page->waitUntilReady();
 		}
 
