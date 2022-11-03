@@ -78,7 +78,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @var int
 	 */
-	protected const INHERIT_CHUNK_SIZE = 100;
+	protected const INHERIT_CHUNK_SIZE = 1000;
 
 	/**
 	 * @abstract
