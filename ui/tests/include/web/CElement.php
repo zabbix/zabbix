@@ -717,7 +717,7 @@ class CElement extends CBaseElement implements IWaitable {
 				$expected = json_encode($expected);
 			}
 
-			throw new Exception('Element value '.$value.' doesn\'t match expected '.$expected.'.');
+			throw new Exception('Element value "'.$value.'" doesn\'t match expected "'.$expected.'".');
 		}
 
 		return ($expected == $value);

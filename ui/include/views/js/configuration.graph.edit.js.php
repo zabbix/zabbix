@@ -490,8 +490,6 @@
 			$('#itemButtonsRow').before($row);
 			$row.find('.<?= ZBX_STYLE_COLOR_PICKER ?> input').colorpicker();
 
-			colorPalette.incrementNextColor();
-
 			!this.graphs.readonly && this.rewriteNameLinks();
 		},
 
@@ -503,9 +501,18 @@
 				return false;
 			}
 
+			const form = document.getElementsByName(this.form_name)[0];
 			const itemTpl = new Template($('#tmpl-item-row-' + this.graphs.graphtype).html());
 
 			for (let i = 0; i < list.values.length; i++) {
+				const used_colors = [];
+
+				for (const color of form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+					if (color.value !== '') {
+						used_colors.push(color.value);
+					}
+				}
+
 				const number = $('#itemsTable tr.sortable').length;
 				const item = {
 					number: number,
@@ -517,7 +524,7 @@
 					yaxisside: 0,
 					sortorder: number,
 					flags: (typeof list.values[i].flags === 'undefined') ? 0 : list.values[i].flags,
-					color: colorPalette.getNextColor(),
+					color: colorPalette.getNextColor(used_colors),
 					name: list.values[i].name
 				};
 				const $row = $(itemTpl.evaluate(item));

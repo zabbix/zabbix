@@ -25,19 +25,6 @@
 #include "dbcache.h"
 #include "cfg.h"
 
-#if defined(HAVE_POSTGRESQL)
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
-#elif defined(HAVE_ORACLE)
-#	define ZBX_ORACLE_UTF8_CHARSET "AL32UTF8"
-#	define ZBX_ORACLE_CESU8_CHARSET "UTF8"
-#elif defined(HAVE_MYSQL)
-#	define ZBX_DB_STRLIST_DELIM		','
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8	"utf8,utf8mb3"
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4 	"utf8mb4"
-#	define ZBX_SUPPORTED_DB_CHARACTER_SET		ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8 "," ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4
-#	define ZBX_SUPPORTED_DB_COLLATION		"utf8_bin,utf8mb3_bin,utf8mb4_bin"
-#endif
-
 typedef struct
 {
 	zbx_uint64_t	autoreg_hostid;
@@ -64,6 +51,47 @@ void	DBclose(void)
 {
 	zbx_db_close();
 }
+
+#if defined(HAVE_POSTGRESQL)
+int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
+{
+	DB_RESULT	result;
+	int		ret;
+
+	if (1 == ZBX_DB_TSDB_V1) {
+		result = DBselect("select null from timescaledb_information.compressed_chunk_stats where hypertable_name in (%s) and "
+			"compression_status='Compressed'", table_names);
+	}
+	else
+	{
+		result = DBselect("select null from timescaledb_information.chunks where hypertable_name in (%s) and "
+			"is_compressed='t'", table_names);
+	}
+
+	if (NULL != DBfetch(result))
+		ret = SUCCEED;
+	else
+		ret = FAIL;
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+void	zbx_tsdb_update_dbversion_info(struct zbx_db_version_info_t *db_version_info)
+{
+	const char	*history_tables, *trends_tables;
+
+	history_tables = (1 == ZBX_DB_TSDB_V1 ? ZBX_TSDB1_HISTORY_TABLES : ZBX_TSDB2_HISTORY_TABLES);
+	trends_tables = (1 == ZBX_DB_TSDB_V1 ? ZBX_TSDB1_TRENDS_TABLES : ZBX_TSDB2_TRENDS_TABLES);
+
+	db_version_info->history_compressed_chunks = (SUCCEED ==
+			zbx_tsdb_table_has_compressed_chunks(history_tables)) ? 1 : 0;
+
+	db_version_info->trends_compressed_chunks = (SUCCEED ==
+			zbx_tsdb_table_has_compressed_chunks(trends_tables)) ? 1 : 0;
+}
+#endif
 
 int	zbx_db_validate_config_features(void)
 {
@@ -2510,19 +2538,8 @@ void	DBcheck_character_set(void)
 		char	*char_set = row[0];
 		char	*collation = row[1];
 
-		if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8, char_set, ZBX_DB_STRLIST_DELIM))
-		{
-			zbx_db_set_character_set("utf8mb3");
-		}
-		else if (SUCCEED == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4, char_set,
-				ZBX_DB_STRLIST_DELIM))
-		{
-			zbx_db_set_character_set("utf8mb4");
-		}
-		else
-		{
+		if (FAIL == str_in_list(ZBX_SUPPORTED_DB_CHARACTER_SET, char_set, ZBX_DB_STRLIST_DELIM))
 			zbx_warn_char_set(CONFIG_DBNAME, char_set);
-		}
 
 		if (SUCCEED != str_in_list(ZBX_SUPPORTED_DB_COLLATION, collation, ZBX_DB_STRLIST_DELIM))
 		{

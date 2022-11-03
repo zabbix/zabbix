@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-10T20:41:37Z'
+  date: '2022-08-15T17:34:06Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -218,6 +218,34 @@ zabbix_export:
               tag: component
               value: system
         -
+          uuid: f867fb976e0b49a895129865e95096c2
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'system.hw.uptime[hrSystemUptime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: e0d2149e1a114f3a971c324673beae2f
           name: 'System location'
           type: SNMP_AGENT
@@ -280,6 +308,28 @@ zabbix_export:
                   tag: scope
                   value: security
         -
+          uuid: d7f06d23f6b14677b5183f2cc94fc10d
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.net.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: f1535f45138b472c945e231a9beb9cc5
           name: 'System object ID'
           type: SNMP_AGENT
@@ -301,45 +351,6 @@ zabbix_export:
             -
               tag: component
               value: system
-        -
-          uuid: d7f06d23f6b14677b5183f2cc94fc10d
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'system.uptime[sysUpTime.0]'
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 667856dcaad04a108cb0a5150e825a50
-              expression: 'last(/Mellanox SNMP/system.uptime[sysUpTime.0])<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes.'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'No SNMP data collection'
-                  expression: 'max(/Mellanox SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
         -
           uuid: aba117057e824b6789fca847cae9e0fc
           name: 'SNMP agent availability'
@@ -1677,8 +1688,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Mellanox SNMP'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
         -
           uuid: e41382f2a3394e52b885bb6a70df35ff
           name: 'System performance'
@@ -1698,8 +1709,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CPU utilization'
                         host: 'Mellanox SNMP'
+                        name: 'CPU utilization'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -1722,8 +1733,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#MEMNAME}: Memory utilization'
                         host: 'Mellanox SNMP'
+                        name: '{#MEMNAME}: Memory utilization'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -1746,8 +1757,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#FSNAME}: Disk space usage'
                         host: 'Mellanox SNMP'
+                        name: '{#FSNAME}: Disk space usage'
       valuemaps:
         -
           uuid: d42214398aea4362b4fc61a090f188e1
@@ -2688,6 +2699,23 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: 667856dcaad04a108cb0a5150e825a50
+      expression: '(last(/Mellanox SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Mellanox SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Mellanox SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Mellanox SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        -
+          name: 'No SNMP data collection'
+          expression: 'max(/Mellanox SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        -
+          tag: scope
+          value: notice
   graphs:
     -
       uuid: 89bf34a1c3db423caa4fbeae774fa9cf

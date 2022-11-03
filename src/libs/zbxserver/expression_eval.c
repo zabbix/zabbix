@@ -1943,15 +1943,17 @@ static void	host_index_free(zbx_host_index_t *index)
 }
 
 /******************************************************************************
- *                                                                            *
- * Purpose: resolve expression macro empty and macro host references          *
- *          (// , {HOST.HOST}, {HOST.HOST<N>}) to  host names                 *
- *                                                                            *
- * Parameters: eval    - [IN] the evaluation data                             *
- *             trigger - [IN] the calculated item                             *
- *                                                                            *
- ******************************************************************************/
-void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, const DB_TRIGGER *trigger)
+*                                                                             *
+* Purpose: resolve expression with an empty host macro (default host)         *
+*          and macro host references, like:                                   *
+*          (two forward slashes, {HOST.HOST}, {HOST.HOST<N>},                 *
+*          {ITEM.KEY} and {ITEM.KEY<N>}) to host names and item keys          *
+*                                                                             *
+* Parameters: eval    - [IN/OUT] the evaluation expression                    *
+*             trigger - [IN] trigger which defines the evaluation expression  *
+*                                                                             *
+*******************************************************************************/
+void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval, const DB_TRIGGER *trigger)
 {
 	int			i, func_num, index;
 	zbx_vector_ptr_t	hosts;
@@ -1987,6 +1989,7 @@ void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, cons
 		if (NULL != hi->host)
 		{
 			query->ref.host = zbx_strdup(query->ref.host, hi->host);
+			DBget_trigger_value(trigger, &query->ref.key, func_num, ZBX_REQUEST_ITEM_KEY);
 		}
 		else
 		{

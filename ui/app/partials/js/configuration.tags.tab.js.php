@@ -30,39 +30,30 @@
 
 <script type="text/javascript">
 	jQuery(function() {
-		let tags_initialized = false;
+		const on_tab_create_activate = (event, ui) => {
+			const $panel = event.type === 'tabscreate' ? ui.panel : ui.newPanel;
 
-		$('#<?= $data['tabs_id'] ?>').on('tabscreate tabsactivate', function(event, ui) {
-			const $panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
+			if ($panel.attr('id') === '<?= $data['tags_tab_id'] ?>') {
+				$('#<?= $data['tabs_id'] ?>').off('tabscreate.tags-tab tabsactivate.tags-tab', on_tab_create_activate);
 
-			if ($panel.attr('id') === 'tags-tab') {
-				if (tags_initialized) {
-					return;
-				}
-
-				const $table = $('#tags-table');
+				const $table = $panel.find('.tags-table');
 
 				$table
 					.dynamicRows({template: '#tag-row-tmpl'})
-					.on('afteradd.dynamicRows', function() {
+					.on('afteradd.dynamicRows', () => {
 						$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $table).textareaFlexible();
 					})
 					.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
 					.textareaFlexible();
 
-				tags_initialized = true;
-			}
+				$table.on('click', '.element-table-disable', (e) => {
+					const type_input = e.target.closest('.form_row').querySelector('input[name$="[type]"]');
 
-			if (tags_initialized) {
-				$('#tags-table').on('click', 'button.element-table-disable', function() {
-					var num = $(this).attr('id').split('_')[1],
-						$type = $('#tags_' + num + '_type');
-
-					if ($type.val() & <?= ZBX_PROPERTY_OWN ?>) {
-						$type.val($type.val() & (~<?= ZBX_PROPERTY_OWN ?>));
-					}
+					type_input.value &= ~<?= ZBX_PROPERTY_OWN ?>;
 				});
 			}
-		});
+		};
+
+		$('#<?= $data['tabs_id'] ?>').on('tabscreate.tags-tab tabsactivate.tags-tab', on_tab_create_activate);
 	});
 </script>

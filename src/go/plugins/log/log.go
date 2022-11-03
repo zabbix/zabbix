@@ -44,6 +44,13 @@ type Plugin struct {
 	options Options
 }
 
+type metadata struct {
+	key       string
+	params    []string
+	blob      unsafe.Pointer
+	lastcheck time.Time
+}
+
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
@@ -54,13 +61,6 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 func (p *Plugin) Validate(options interface{}) error {
 	var o Options
 	return conf.Unmarshal(options, &o)
-}
-
-type metadata struct {
-	key       string
-	params    []string
-	blob      unsafe.Pointer
-	lastcheck time.Time
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -79,12 +79,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	} else {
 		data = meta.Data.(*metadata)
 		if !itemutil.CompareKeysParams(key, params, data.key, data.params) {
-			p.Debugf("item %d key has been changed, resetting log metadata", ctx.ItemID())
 			zbxlib.FreeActiveMetric(data.blob)
 			data.key = key
 			data.params = params
-			// reset lastlogsize/mtime if item key has been changed
-			if data.blob, err = zbxlib.NewActiveMetric(key, params, 0, 0); err != nil {
+			// recreate if item key has been changed
+			if data.blob, err = zbxlib.NewActiveMetric(key, params, meta.LastLogsize(), meta.Mtime()); err != nil {
 				return nil, err
 			}
 		}

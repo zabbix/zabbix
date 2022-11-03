@@ -772,7 +772,7 @@ static int	process_discovery(void)
 			now = (int)time(NULL);
 
 			DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64,
-					0 > now ? ZBX_JAN_2038 : now, druleid);
+					0 > now ? ZBX_JAN_2038 : now + SEC_PER_MIN, druleid);
 
 			continue;
 		}

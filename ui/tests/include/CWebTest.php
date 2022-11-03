@@ -49,7 +49,7 @@ class CWebTest extends CTest {
 	// Screenshot taken on test failure.
 	private $screenshot = null;
 	// Errors captured during the test.
-	private $errors = [];
+	protected $errors = [];
 	// Failed test URL.
 	private $current_url = null;
 	// Browser errors captured during test.

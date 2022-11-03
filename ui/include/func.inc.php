@@ -607,6 +607,72 @@ function convertUnitsS($value, $ignore_millisec = false) {
 }
 
 /**
+ * Convert time period to a human-readable format.
+ * The following units will be used: weeks, days, hours, minutes and seconds.
+ * Only the 3 most significant units will be displayed: #w #d #h, #d #h #m or #h #m #s, omitting empty ones.
+ *
+ * @param int $value  Time period in seconds.
+ *
+ * @return string
+ */
+function convertSecondsToTimeUnits(int $value): string {
+	$parts = [];
+	$start = null;
+
+	if (($v = floor($value / SEC_PER_WEEK)) > 0) {
+		$parts['weeks'] = $v;
+		$value -= $v * SEC_PER_WEEK;
+		$start = 0;
+	}
+
+	$level = 1;
+
+	foreach ([
+		'days' => SEC_PER_DAY,
+		'hours' => SEC_PER_HOUR,
+		'minutes' => SEC_PER_MIN
+	] as $part => $sec_per_part) {
+		$v = floor($value / $sec_per_part);
+
+		if ($v > 0) {
+			$parts[$part] = $v;
+			$value -= $v * $sec_per_part;
+			$start = $start === null ? $level : $start;
+		}
+
+		if ($start !== null && $level - $start >= 2) {
+			break;
+		}
+
+		$level++;
+	}
+
+	if ($start === null || $start >= 2) {
+		$v = $value + round(fmod($value, 1), ZBX_UNITS_ROUNDOFF_SUFFIXED);
+
+		if ($v > 0) {
+			$parts['seconds'] = $v;
+		}
+	}
+
+	$units = [
+		'weeks' => _x('w', 'week short'),
+		'days' => _x('d', 'day short'),
+		'hours' => _x('h', 'hour short'),
+		'minutes' => _x('m', 'minute short'),
+		'seconds' => _x('s', 'second short')
+	];
+
+	$result = [];
+
+	foreach ($parts as $part_unit => $part_value) {
+		$result[] = $part_value.$units[$part_unit];
+	}
+
+	return $result ? implode(' ', $result) : '0';
+}
+
+/**
  * Converts a raw value to a user-friendly representation based on unit and other parameters.
  * Example:
  * 	6442450944 B convert to 6 GB
@@ -1739,8 +1805,7 @@ function filter_messages(): array {
 
 		$generic_exists = false;
 		foreach ($messages as $message) {
-			if ($message['type'] === CMessageHelper::MESSAGE_TYPE_ERROR
-					&& ($message['source'] === 'sql' || $message['source'] === 'php')) {
+			if ($message['type'] === CMessageHelper::MESSAGE_TYPE_ERROR	&& $message['is_technical_error']) {
 				if (!$generic_exists) {
 					CMessageHelper::addError(_('System error occurred. Please contact Zabbix administrator.'));
 					$generic_exists = true;
@@ -2026,17 +2091,17 @@ function warning($messages): void {
 	}
 }
 
-/*
+/**
  * Add an error to global message array.
  *
- * @param string | array $msg	Error message text.
- * @param string		 $src	The source of error message.
+ * @param string|array $msgs                Error message text.
+ * @param bool         $is_technical_error
  */
-function error($msgs, string $src = ''): void {
+function error($msgs, bool $is_technical_error = false): void {
 	$msgs = zbx_toArray($msgs);
 
 	foreach ($msgs as $msg) {
-		CMessageHelper::addError($msg, $src);
+		CMessageHelper::addError($msg, $is_technical_error);
 	}
 }
 
@@ -2159,11 +2224,11 @@ function hasErrorMessages() {
 /**
  * Clears table rows selection's cookies.
  *
- * @param string $parentid  parent ID, is used as sessionStorage suffix
- * @param array  $keepids   checked rows ids
+ * @param string $name     entity name, used as sessionStorage suffix
+ * @param array  $keepids  checked rows ids
  */
-function uncheckTableRows($parentid = null, $keepids = []) {
-	$key = implode('_', array_filter(['cb', basename($_SERVER['SCRIPT_NAME'], '.php'), $parentid]));
+function uncheckTableRows($name = null, $keepids = []) {
+	$key = 'cb_'.basename($_SERVER['SCRIPT_NAME'], '.php').($name !== null ? '_'.$name : '');
 
 	if ($keepids) {
 		// If $keepids will not have same key as value, it will create mess, when new checkbox will be checked.
@@ -2290,7 +2355,7 @@ function zbx_err_handler($errno, $errstr, $errfile, $errline) {
 	}
 
 	// Don't show the call to this handler function.
-	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']', 'php');
+	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']', true);
 
 	return false;
 }

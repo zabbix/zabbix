@@ -201,11 +201,48 @@ static int	DBpatch_6000004(void)
 	return ret;
 }
 
+static int	DBpatch_6000005(void)
+{
+	const ZBX_FIELD	field = {"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("group_discovery", &field, NULL);
+}
+
+static int	DBpatch_6000006(void)
+{
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#	define ZBX_DB_CHAR_LENGTH(str)	"char_length(" #str ")"
+#else /* HAVE_ORACLE */
+#	define ZBX_DB_CHAR_LENGTH(str)	"length(" #str ")"
+#endif
+	if (ZBX_DB_OK > DBexecute(
+			"update group_discovery gd"
+			" set name=("
+				"select gp.name"
+				" from group_prototype gp"
+				" where gd.parent_group_prototypeid=gp.group_prototypeid"
+			")"
+			" where " ZBX_DB_CHAR_LENGTH(gd.name) "=64"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+#undef ZBX_DB_CHAR_LENGTH
+}
+
 #undef HTTPSTEP_ITEM_TYPE_RSPCODE
 #undef HTTPSTEP_ITEM_TYPE_TIME
 #undef HTTPSTEP_ITEM_TYPE_IN
 #undef HTTPSTEP_ITEM_TYPE_LASTSTEP
 #undef HTTPSTEP_ITEM_TYPE_LASTERROR
+
+static int	DBpatch_6000007(void)
+{
+	const ZBX_FIELD	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("users", &field, NULL);
+}
 
 #endif
 
@@ -218,5 +255,8 @@ DBPATCH_ADD(6000001, 0, 0)
 DBPATCH_ADD(6000002, 0, 0)
 DBPATCH_ADD(6000003, 0, 0)
 DBPATCH_ADD(6000004, 0, 0)
+DBPATCH_ADD(6000005, 0, 0)
+DBPATCH_ADD(6000006, 0, 0)
+DBPATCH_ADD(6000007, 0, 0)
 
 DBPATCH_END()

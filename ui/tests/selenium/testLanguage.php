@@ -89,7 +89,7 @@ class testLanguage extends CWebTest {
 		$this->page->open('zabbix.php?action=gui.edit');
 
 		// Change default language.
-		$form = $this->query('xpath://form[@aria-labeledby="page-title-general"]')->one()->asForm();
+		$form = $this->query('xpath://form[@aria-labelledby="page-title-general"]')->one()->asForm();
 		$form->fill($data['field']);
 		$form->submit();
 		$this->page->waitUntilReady();
