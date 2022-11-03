@@ -21,9 +21,9 @@
 
 class CControllerDashboardUpdate extends CController {
 
-	private ?array $db_dashboard;
+	private ?array $db_dashboard = null;
 
-	private ?array $dashboard_pages;
+	private ?array $dashboard_pages = null;
 
 	protected function init() {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
