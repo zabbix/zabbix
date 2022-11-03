@@ -132,7 +132,7 @@ trait WaitableTrait {
 	}
 
 	/**
-	 * Wait until object attribute is present.
+	 * Wait until object attribute is not present.
 	 *
 	 * @param string $attributes    attributes not be present
 	 *
@@ -144,6 +144,31 @@ trait WaitableTrait {
 		return $this;
 	}
 
+	/**
+	 * Wait until object class is present.
+	 *
+	 * @param string $classes    classes to be present
+	 *
+	 * @return $this
+	 */
+	public function waitUntilClassesPresent($classes) {
+		CElementQuery::waitUntil($this, CElementFilter::CLASSES_PRESENT, [$classes]);
+
+		return $this;
+	}
+
+	/**
+	 * Wait until object class is not present.
+	 *
+	 * @param string $classes    classes not be present
+	 *
+	 * @return $this
+	 */
+	public function waitUntilClassesNotPresent($classes) {
+		CElementQuery::waitUntil($this, CElementFilter::CLASSES_NOT_PRESENT, [$classes]);
+
+		return $this;
+	}
 
 	/**
 	 * Wait until object is clickable.
@@ -221,6 +246,13 @@ trait WaitableTrait {
 	 */
 	public function getAttributesNotPresentCondition($attributes) {
 		return $this->getReversedCondition($this->getAttributesPresentCondition($attributes));
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getClassesNotPresentCondition($classes) {
+		return $this->getReversedCondition($this->getClassesPresentCondition($classes));
 	}
 
 	/**

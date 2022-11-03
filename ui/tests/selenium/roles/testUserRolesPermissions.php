@@ -481,9 +481,6 @@ class testUserRolesPermissions extends CWebTest {
 			'Configuration',
 			'Detect operating system',
 			'Ping',
-			'Script for Clone',
-			'Script for Delete',
-			'Script for Update',
 			'Traceroute'
 		];
 		$context_after = [
