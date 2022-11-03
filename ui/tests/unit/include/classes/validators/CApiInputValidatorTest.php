@@ -6725,6 +6725,48 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/item_delay',
 				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
 			],
+			'Delay fits between blocking zero intervals' => [
+				['type' => API_ITEM_DELAY],
+				'10m;0/1-3,00:00-24:00;0/4,00:00-23:50;0/5-7,00:00-24:00',
+				'/1/item_delay',
+				'10m;0/1-3,00:00-24:00;0/4,00:00-23:50;0/5-7,00:00-24:00',
+			],
+			'Delay fits between blocking mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-3,00:00-24:00;0/4,00:00-23:45;10m/4,23:50-24:00;0/5-7,00:00-24:00',
+				'/1/item_delay',
+				'5m;0/1-3,00:00-24:00;0/4,00:00-23:45;10m/4,23:50-24:00;0/5-7,00:00-24:00'
+			],
+			'Delay does not fit between blocking mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'6m;0/1-3,00:00-24:00;0/4,00:00-23:45;5m/4,23:50-23:55;0/4,23:54-24:00;0/5-7,00:00-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Delay fits after blocking zero intervals' => [
+				['type' => API_ITEM_DELAY],
+				'10m;0/1-6,00:00-24:00;0/7,23:50-24:00',
+				'/1/item_delay',
+				'10m;0/1-6,00:00-24:00;0/7,23:50-24:00'
+			],
+			'Delay does not fit with after mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'10m;0/1-6,00:00-24:00;0/7,23:50-24:00;20m/7,00:00-23:55;0/7,00:00-23:49',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Delay fits at start of mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-7,00:10-24:00;10m/1-7,00:07-24:00',
+				'/1/item_delay',
+				'5m;0/1-7,00:10-24:00;10m/1-7,00:07-24:00'
+			],
+			'Delay does not fit at start of mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'8m;0/1-7,00:10-24:00;10m/1-7,00:07-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
 			[
 				['type' => API_XML],
 				null,
