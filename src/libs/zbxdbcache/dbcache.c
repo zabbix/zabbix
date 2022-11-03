@@ -2986,7 +2986,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 				items = (DC_ITEM *)zbx_calloc(NULL, 1, sizeof(DC_ITEM) * (size_t)ZBX_HC_SYNC_MAX);
 
 			if (NULL == errcodes)
-				errcodes = (int *)zbx_calloc(NULL, 1, sizeof(int) * (size_t)ZBX_HC_SYNC_MAX);
+				errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)ZBX_HC_SYNC_MAX);
 
 			zbx_vector_uint64_reserve(&itemids, history_num);
 

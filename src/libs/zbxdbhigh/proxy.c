@@ -3466,18 +3466,16 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 		zbx_proxy_suppress_t *nodata_win, char **info, unsigned int mode)
 {
 	const char		*pnext = NULL;
-	int			ret = SUCCEED, processed_num = 0, total_num = 0, values_num, read_num, i, *errcodes;
+	int			ret = SUCCEED, processed_num = 0, total_num = 0, values_num, read_num, i,
+				errcodes[ZBX_HISTORY_VALUES_MAX];
 	double			sec;
-	DC_ITEM			*items;
+	DC_ITEM			items[ZBX_HISTORY_VALUES_MAX] = {0};
 	char			*error = NULL;
 	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX], last_valueid = 0;
 	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
 	zbx_timespec_t		unique_shift = {0, 0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	items = (DC_ITEM *)zbx_calloc(NULL, 1, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
-	errcodes = (int *)zbx_calloc(NULL, 1, sizeof(int) * ZBX_HISTORY_VALUES_MAX);
 
 	sec = zbx_time();
 
