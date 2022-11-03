@@ -14651,15 +14651,15 @@ char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t 
 	for (ptr = params; ptr < params + params_len; ptr += sep_pos + 1)
 	{
 		size_t	param_pos, param_len;
-		int	quoted;
+		int	escaped;
 		char	*param;
 
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
-		param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
+		param = zbx_function_param_unescape_dyn(ptr + param_pos, param_len, &escaped);
 		(void)zbx_dc_expand_user_macros(um_handle, &param, &hostid, 1, NULL);
 
-		if (SUCCEED == zbx_function_param_quote(&param, quoted))
+		if (SUCCEED == zbx_function_param_escape(&param, escaped))
 			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
 		else
 			zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr + param_pos, param_len);

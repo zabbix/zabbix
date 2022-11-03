@@ -499,6 +499,105 @@ int	zbx_function_param_quote(char **param, int forced)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: unescapes function parameter                                      *
+ *                                                                            *
+ * Parameters: param   - [IN] the parameter to unescape                       *
+ *             len     - [IN] the parameter length                            *
+ *             escaped - [OUT] the flag that specifies whether parameter was  *
+ *                            escaped before extraction                       *
+ *                                                                            *
+ * Return value: The unescaped parameter. This value must be freed by the     *
+ *               caller.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_function_param_unescape_dyn(const char *param, size_t len, int *escaped)
+{
+	char	*out;
+
+	out = (char *)zbx_malloc(NULL, len + 1);
+
+	if (0 == (*escaped = (0 != len && '"' == *param)))
+	{
+		/* unescaped parameter - simply copy it */
+		memcpy(out, param, len);
+		out[len] = '\0';
+	}
+	else
+	{
+		const char	*pin;
+		char		*pout = out;
+
+		for (pin = param + 1; (size_t)(pin - param) < len - 1; pin++)
+		{
+			if ('\\' == pin[0] && ('"' == pin[1] || '\\' == pin[1]))
+				pin++;
+
+			*pout++ = *pin;
+		}
+
+		*pout = '\0';
+	}
+
+	return out;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: escapes function parameter                                        *
+ *                                                                            *
+ * Parameters: param   - [IN/OUT] function parameter                          *
+ *             forced  - [IN] 1 - enclose parameter in " even if it does not  *
+ *                                contain any special characters              *
+ *                            0 - do nothing if the parameter does not        *
+ *                                contain any special characters              *
+ *                                                                            *
+ * Return value: SUCCEED - if parameter was successfully escaped or escaping  *
+ *                         was not necessary                                  *
+ *               FAIL    - if parameter needs to but cannot be escaped due to *
+ *                         backslash in the end                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_function_param_escape(char **param, int forced)
+{
+	size_t	sz_src, sz_dst, not_bslash;
+
+	if (0 == forced && '"' != **param && ' ' != **param && NULL == strchr(*param, ',') &&
+			NULL == strchr(*param, ')') && NULL == strchr(*param, '(') && NULL == strchr(*param, '\\'))
+	{
+		return SUCCEED;
+	}
+
+	if (0 != (sz_src = strlen(*param)))
+	{
+		not_bslash = sz_src;
+		while(0 < not_bslash && (*param)[not_bslash - 1] == '\\')
+			not_bslash--;
+
+		/* if the backslash number is uneven at the end then we cannot escape the sting */
+		if (0 != (sz_src - not_bslash) % 2)
+			return FAIL;
+	}
+
+	sz_dst = zbx_get_escape_string_len(*param, "\"\\") + 3;
+
+	*param = (char *)zbx_realloc(*param, sz_dst);
+
+	(*param)[--sz_dst] = '\0';
+	(*param)[--sz_dst] = '"';
+
+	while (0 < sz_src)
+	{
+		(*param)[--sz_dst] = (*param)[--sz_src];
+		if ('"' == (*param)[sz_src] || '\\' == (*param)[sz_src])
+			(*param)[--sz_dst] = '\\';
+	}
+	(*param)[--sz_dst] = '"';
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: return parameter by index (Nparam) from parameter list (params)   *
  *                                                                            *
  * Parameters:                                                                *
@@ -527,7 +626,7 @@ char	*zbx_function_get_param_dyn(const char *params, int Nparam)
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
 		if (idx == Nparam)
-			out = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
+			out = zbx_function_param_unescape_dyn(ptr + param_pos, param_len, &quoted);
 	}
 
 	return out;
