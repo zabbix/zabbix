@@ -5957,7 +5957,7 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		}
 		else
 			dc_httptest_dequeue(httptest);
-#undef HTTPTEST_STATUS_MONITORED	0
+#undef HTTPTEST_STATUS_MONITORED
 		httptest->hostid = hostid;
 		httptest->delay = delay;
 		httptest->revision = revision;
