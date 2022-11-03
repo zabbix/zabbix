@@ -51,11 +51,14 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 	/* read event data */
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select eventid,source,object,objectid,clock,value,acknowledged,ns,name,severity"
-			" from events"
+			"select e.eventid,e.source,e.object,e.objectid,e.clock,e.value,e.acknowledged,e.ns,e.name,"
+				"e.severity,es.cause_eventid"
+			" from events e"
+			" left join event_symptom es"
+				" on es.eventid=e.eventid"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids->values, eventids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by eventid");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "e.eventid", eventids->values, eventids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by e.eventid");
 
 	result = DBselect("%s", sql);
 
@@ -74,6 +77,10 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 		event->ns = atoi(row[7]);
 		event->name = zbx_strdup(NULL, row[8]);
 		event->severity = atoi(row[9]);
+		if (SUCCEED == DBis_null(row[10]))
+			event->cause_eventid = 0;
+		else
+			ZBX_STR2UINT64(event->cause_eventid, row[10]);
 		event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
 
 		event->trigger.triggerid = 0;

@@ -2415,6 +2415,17 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		goto out;
 	}
 
+	if (EVENT_SOURCE_TRIGGERS == action->eventsource &&
+			ACTION_PAUSE_SYMPTOMS_TRUE == action->pause_symptoms &&
+			0 < event->cause_eventid &&
+			0 == escalation->acknowledgeid &&
+			0 == escalation->r_eventid)
+	{
+		/* suppress escalations for trigger-based symptom events */
+		ret = ZBX_ESCALATION_SUPPRESS;
+		goto out;
+	}
+
 	ret = ZBX_ESCALATION_PROCESS;
 out:
 

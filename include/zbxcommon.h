@@ -584,6 +584,8 @@ zbx_prototype_discover_t;
 /* action escalation processing mode */
 #define ACTION_PAUSE_SUPPRESSED_FALSE	0	/* process escalation for suppressed events */
 #define ACTION_PAUSE_SUPPRESSED_TRUE	1	/* pause escalation for suppressed events */
+#define ACTION_PAUSE_SYMPTOMS_FALSE	0	/* process escalation for symptom events */
+#define ACTION_PAUSE_SYMPTOMS_TRUE	1	/* pause escalation for symptom events */
 
 /* action escalation canceled notification mode */
 #define ACTION_NOTIFY_IF_CANCELED_TRUE	1	/* notify about canceled escalations for action (default) */

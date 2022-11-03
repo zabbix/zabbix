@@ -254,6 +254,7 @@ ZBX_DB_SERVICE;
 typedef struct
 {
 	zbx_uint64_t		eventid;
+	zbx_uint64_t		cause_eventid;
 	ZBX_DB_TRIGGER		trigger;
 	zbx_uint64_t		objectid;
 	char			*name;
@@ -390,6 +391,7 @@ typedef struct
 	int		esc_period;
 	unsigned char	eventsource;
 	unsigned char	pause_suppressed;
+	unsigned char	pause_symptoms;
 	unsigned char	recovery;
 	unsigned char	status;
 	unsigned char	notify_if_canceled;
