@@ -28,25 +28,26 @@ require_once dirname(__FILE__).'/../common/testFormHost.php';
  *
  * @onBefore prepareUpdateData
  */
-class testFormHostConfiguration extends testFormHost {
+class testFormHostFromMonitoring extends testFormHost {
 
-	public $link = 'zabbix.php?action=host.list';
+	public $monitoring = true;
+	public $link = 'zabbix.php?action=host.view';
 
-	public function testFormHostConfiguration_Layout() {
+	public function testFormHostFromMonitoring_Layout() {
 		$this->checkHostLayout();
 	}
 
 	/**
 	 * @dataProvider getCreateData
 	 */
-	public function testFormHostConfiguration_Create($data) {
+	public function testFormHostFromMonitoring_Create($data) {
 		$this->checkHostCreate($data);
 	}
 
 	/**
 	 * @dataProvider getValidationUpdateData
 	 */
-	public function testFormHostConfiguration_ValidationUpdate($data) {
+	public function testFormHostFromMonitoring_ValidationUpdate($data) {
 		$this->checkHostUpdate($data);
 	}
 
@@ -55,22 +56,22 @@ class testFormHostConfiguration extends testFormHost {
 	 *
 	 * @dataProvider getUpdateData
 	 */
-	public function testFormHostConfiguration_Update($data) {
+	public function testFormHostFromMonitoring_Update($data) {
 		$this->checkHostUpdate($data);
 	}
 
 	/**
 	 * Update the host without any changes and check host and interfaces hashes.
 	 */
-	public function testFormHostConfiguration_SimpleUpdate() {
+	public function testFormHostFromMonitoring_SimpleUpdate() {
 		$this->checkHostSimpleUpdate();
 	}
 
 	/**
 	 * @dataProvider getCloneData
 	 */
-	public function testFormHostConfiguration_Clone($data) {
-		$this->cloneHost($data);
+	public function testFormHostFromMonitoring_Clone($data) {
+		$this->cloneHost($data, 'Clone');
 
 		// Check that items aren't cloned from original host.
 		$this->assertItemsDBCount($data['fields']['Host name'], 0);
@@ -79,7 +80,7 @@ class testFormHostConfiguration extends testFormHost {
 	/**
 	 * @dataProvider getCloneData
 	 */
-	public function testFormHostConfiguration_FullClone($data) {
+	public function testFormHostFromMonitoring_FullClone($data) {
 		$this->cloneHost($data, 'Full clone');
 
 		// Check that items cloned from original host.
@@ -89,18 +90,19 @@ class testFormHostConfiguration extends testFormHost {
 	/**
 	 * @dataProvider getCancelData
 	 */
-	public function testFormHostConfiguration_Cancel($data) {
+	public function testFormHostFromMonitoring_Cancel($data) {
 		$this->checkCancel($data);
 	}
 
 	/**
 	 * @dataProvider getDeleteData
 	 */
-	public function testFormHostConfiguration_Delete($data) {
+	public function testFormHostFromMonitoring_Delete($data) {
 		$this->checkDelete($data);
 	}
 
-	public function testFormHostConfiguration_DiscoveredHostLayout() {
+	public function testFormHostFromMonitoring_DiscoveredHostLayout() {
 		$this->checkDiscoveredHostLayout();
 	}
 }
+

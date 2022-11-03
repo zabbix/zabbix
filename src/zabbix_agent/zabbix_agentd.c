@@ -86,6 +86,7 @@ int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 #include "stats.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
+#	include "zbxwin32.h"
 #else
 #	include "zbxnix.h"
 #endif
@@ -242,6 +243,13 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+static const char	*get_progname(void)
+{
+	return progname;
+}
+#endif
+
 static zbx_thread_activechk_args	*config_active_args = NULL;
 
 int	CONFIG_ALERTER_FORKS		= 0;
@@ -286,7 +294,6 @@ char	*opt = NULL;
 
 #ifdef _WINDOWS
 void	zbx_co_uninitialize();
-int	zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep);
 #endif
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
@@ -1248,7 +1255,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 #ifdef _WINDOWS
-	set_parent_signal_handler(zbx_on_exit);	/* must be called after all threads are created */
+	zbx_set_parent_signal_handler(zbx_on_exit);	/* must be called after all threads are created */
 
 	/* wait for an exiting thread */
 	res = WaitForMultipleObjectsEx(threads_num, threads, FALSE, INFINITE, FALSE);
@@ -1339,7 +1346,11 @@ int	main(int argc, char **argv)
 	char		*error = NULL;
 #ifdef _WINDOWS
 	int		ret;
-
+#endif
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	zbx_init_library_win32(&get_progname);
+#endif
+#ifdef _WINDOWS
 	/* Provide, so our process handles errors instead of the system itself. */
 	/* Attention!!! */
 	/* The system does not display the critical-error-handler message box. */
@@ -1491,7 +1502,7 @@ int	main(int argc, char **argv)
 	}
 
 #if defined(ZABBIX_SERVICE)
-	service_start(t.flags);
+	zbx_service_start(t.flags);
 #elif defined(ZABBIX_DAEMON)
 	zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
 #endif

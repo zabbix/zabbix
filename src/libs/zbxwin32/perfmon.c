@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "perfmon.h"
+#include "zbxwin32.h"
 
 #include "zbxstr.h"
+#include "zbxnum.h"
 #include "stats.h"
 #include "log.h"
 
@@ -230,7 +231,7 @@ PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpa
  *           sleep 1 second to get the second raw value.                      *
  *                                                                            *
  ******************************************************************************/
-PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath,
+PDH_STATUS	zbx_calculate_counter_value(const char *function, const char *counterpath,
 		zbx_perf_counter_lang_t lang, double *value)
 {
 	PDH_HQUERY		query;
@@ -300,7 +301,7 @@ close_query:
  *           installations for the same names                                 *
  *                                                                            *
  ******************************************************************************/
-DWORD	get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref)
+DWORD	zbx_get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref)
 {
 	return builtin_object_map[builtin_counter_map[counter_ref].object].pdhIndex;
 }
@@ -316,7 +317,7 @@ DWORD	get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref)
  *           installations for the same names                                 *
  *                                                                            *
  ******************************************************************************/
-DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
+DWORD	zbx_get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
 {
 	return builtin_counter_map[counter_ref].pdhIndex;
 }
@@ -340,7 +341,7 @@ DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
  *           by the caller.                                                   *
  *                                                                            *
  ******************************************************************************/
-wchar_t	*get_all_counter_names(HKEY reg_key, wchar_t *reg_value_name)
+wchar_t	*zbx_get_all_counter_names(HKEY reg_key, wchar_t *reg_value_name)
 {
 	wchar_t		*buffer = NULL;
 	DWORD		buffer_size = 0;
@@ -508,7 +509,7 @@ out:
  *           initialization from init_perf_collector().                       *
  *                                                                            *
  ******************************************************************************/
-int	init_builtin_counter_indexes(void)
+int	zbx_init_builtin_counter_indexes(void)
 {
 	int 				ret = SUCCEED, i;
 	wchar_t 			*counter_text, *eng_names, *counter_base;
@@ -526,7 +527,7 @@ int	init_builtin_counter_indexes(void)
 
 	/* Get buffer holding a list of performance counter indexes and English counter names. */
 	/* L"Counter" stores names, L"Help" stores descriptions ("Help" is not used).          */
-	if (NULL == (counter_base = eng_names = get_all_counter_names(HKEY_PERFORMANCE_TEXT, L"Counter")))
+	if (NULL == (counter_base = eng_names = zbx_get_all_counter_names(HKEY_PERFORMANCE_TEXT, L"Counter")))
 	{
 		ret = FAIL;
 		goto out;
@@ -568,7 +569,7 @@ int	init_builtin_counter_indexes(void)
 					builtin_counter_map[i].minSupported_dwMajorVersion && vi->dwMinorVersion >=
 					builtin_counter_map[i].minSupported_dwMinorVersion && 0 ==
 					wcscmp(builtin_counter_map[i].eng_name, counter_text) && SUCCEED ==
-					validate_object_counter(get_builtin_object_index(i), counter_index))
+					validate_object_counter(zbx_get_builtin_object_index(i), counter_index))
 			{
 				builtin_counter_map[i].pdhIndex = counter_index;
 				break;
@@ -617,7 +618,7 @@ out:
  *           installations for the same names                                 *
  *                                                                            *
  ******************************************************************************/
-wchar_t	*get_counter_name(DWORD pdhIndex)
+wchar_t	*zbx_get_counter_name(DWORD pdhIndex)
 {
 	zbx_perf_counter_id_t	*counterName;
 
@@ -656,7 +657,7 @@ wchar_t	*get_counter_name(DWORD pdhIndex)
 	return counterName->name;
 }
 
-int	check_counter_path(char *counterPath, int convert_from_numeric)
+int	zbx_check_counter_path(char *counterPath, int convert_from_numeric)
 {
 	PDH_COUNTER_PATH_ELEMENTS	*cpe = NULL;
 	PDH_STATUS			status;
@@ -687,15 +688,15 @@ int	check_counter_path(char *counterPath, int convert_from_numeric)
 
 	if (0 != convert_from_numeric)
 	{
-		int is_numeric = (SUCCEED == _wis_uint(cpe->szObjectName) ? 0x01 : 0);
-		is_numeric |= (SUCCEED == _wis_uint(cpe->szCounterName) ? 0x02 : 0);
+		int is_numeric = (SUCCEED == zbx_wis_uint(cpe->szObjectName) ? 0x01 : 0);
+		is_numeric |= (SUCCEED == zbx_wis_uint(cpe->szCounterName) ? 0x02 : 0);
 
 		if (0 != is_numeric)
 		{
 			if (0x01 & is_numeric)
-				cpe->szObjectName = get_counter_name(_wtoi(cpe->szObjectName));
+				cpe->szObjectName = zbx_get_counter_name(_wtoi(cpe->szObjectName));
 			if (0x02 & is_numeric)
-				cpe->szCounterName = get_counter_name(_wtoi(cpe->szCounterName));
+				cpe->szCounterName = zbx_get_counter_name(_wtoi(cpe->szCounterName));
 
 			if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__func__, cpe, counterPath))
 				goto clean;

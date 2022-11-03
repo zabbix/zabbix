@@ -110,7 +110,7 @@ OBJS = \
 	..\..\..\src\libs\zbxvariant\variant.o \
 	..\..\..\src\libs\zbxversion\version.o \
 	..\..\..\src\libs\zbxwin32\perfmon.o \
-	..\..\..\src\libs\zbxwin32\service.o \
+	..\..\..\src\libs\zbxwinservice\service.o \
 	..\..\..\src\zabbix_agent\active.o \
 	..\..\..\src\zabbix_agent\cpustat.o \
 	..\..\..\src\zabbix_agent\eventlog.o \
