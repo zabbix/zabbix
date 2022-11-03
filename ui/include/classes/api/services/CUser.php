@@ -363,6 +363,7 @@ class CUser extends CApiService {
 		$this->checkLanguages(array_column($users, 'lang'));
 
 		$roleids = array_flip(array_column($users, 'roleid'));
+		unset($roleids[0]);
 
 		if ($roleids) {
 			$this->checkRoles(array_keys($roleids));
@@ -557,6 +558,8 @@ class CUser extends CApiService {
 			$this->checkDuplicates($usernames);
 		}
 		$this->checkLanguages(zbx_objectValues($users, 'lang'));
+
+		unset($check_roleids[0]);
 		if ($check_roleids) {
 			$this->checkRoles($check_roleids);
 		}
