@@ -506,26 +506,24 @@ class CDashboard extends CBaseComponent {
 	pasteDashboardPage(new_dashboard_page_data) {
 		this._clearWarnings();
 
-		const widgets = new_dashboard_page_data.widgets;
-
-		for (const widget of widgets) {
-			if (!(widget.type in this._widget_defaults)) {
-				this._warn(t('Cannot paste dashboard page: the page contains inaccessible widgets.'));
-
-				return;
-			}
-		}
-
 		if (this._dashboard_pages.size >= this._max_dashboard_pages) {
 			this._warnDashboardExhausted();
 
 			return;
 		}
 
+		const widgets = [];
+
+		for (const widget of new_dashboard_page_data.widgets) {
+			if (widget.type in this._widget_defaults) {
+				widgets.push(widget);
+			}
+		}
+
 		const busy_condition = this._createBusyCondition();
 
 		return Promise.resolve()
-			.then(() => this._promiseDashboardWidgetsSanitize(new_dashboard_page_data.widgets))
+			.then(() => this._promiseDashboardWidgetsSanitize(widgets))
 			.then((response) => {
 				if (this._dashboard_pages.size >= this._max_dashboard_pages) {
 					this._warnDashboardExhausted();
@@ -533,16 +531,25 @@ class CDashboard extends CBaseComponent {
 					return;
 				}
 
-				const widgets = new_dashboard_page_data.widgets;
+				if (response.widgets.length < new_dashboard_page_data.widgets.length) {
+					this._warn(t('Inaccessible widgets were not pasted.'));
+				}
+
+				const sane_widgets = [];
 
 				for (let i = 0; i < response.widgets.length; i++) {
-					widgets[i].fields = response.widgets[i].fields;
+					if (response.widgets[i] !== null) {
+						sane_widgets.push({
+							...widgets[i],
+							fields: response.widgets[i].fields
+						});
+					}
 				}
 
 				const used_references = this._getUsedReferences();
 				const reference_substitution = new Map();
 
-				for (const widget of widgets) {
+				for (const widget of sane_widgets) {
 					const widget_class = eval(this._widget_defaults[widget.type].js_class);
 
 					if (widget_class.hasReferenceField()) {
@@ -556,7 +563,7 @@ class CDashboard extends CBaseComponent {
 					}
 				}
 
-				for (const widget of widgets) {
+				for (const widget of sane_widgets) {
 					const widget_class = eval(this._widget_defaults[widget.type].js_class);
 
 					for (const reference_field of widget_class.getForeignReferenceFields()) {
@@ -572,7 +579,7 @@ class CDashboard extends CBaseComponent {
 					dashboard_pageid: null,
 					name: new_dashboard_page_data.name,
 					display_period: new_dashboard_page_data.display_period,
-					widgets
+					widgets: sane_widgets
 				});
 
 				this._selectDashboardPage(dashboard_page, {is_async: true});
@@ -602,7 +609,7 @@ class CDashboard extends CBaseComponent {
 		this._clearWarnings();
 
 		if (!(new_widget_data.type in this._widget_defaults)) {
-			this._warn(t('Cannot paste widget: the widget is not accessible.'));
+			this._warn(t('Cannot paste inaccessible widget.'));
 
 			return;
 		}
@@ -673,6 +680,14 @@ class CDashboard extends CBaseComponent {
 			.then(() => this._promiseDashboardWidgetsSanitize([new_widget_data]))
 			.then((response) => {
 				if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_DESTROYED) {
+					return;
+				}
+
+				if (response.widgets[0] === null) {
+					dashboard_page.deleteWidget(paste_placeholder_widget);
+
+					this._warn(t('Cannot paste inaccessible widget.'));
+
 					return;
 				}
 
@@ -1417,16 +1432,21 @@ class CDashboard extends CBaseComponent {
 					this._clearWarnings();
 
 					const data_copy = dashboard_page.getDataCopy();
+					const data_copy_widgets = data_copy.widgets;
 
-					for (const widget of data_copy.widgets) {
-						if (!(widget.type in this._widget_defaults)) {
-							this._warn(t('Cannot copy dashboard page: the page contains inaccessible widgets.'));
+					data_copy.widgets = [];
 
-							return;
+					for (const widget of data_copy_widgets) {
+						if (widget.type in this._widget_defaults) {
+							data_copy.widgets.push(widget);
 						}
 					}
 
 					this._storeDashboardPageDataCopy(data_copy);
+
+					if (data_copy.widgets.length < data_copy_widgets.length) {
+						this._warn(t('Inaccessible widgets were not copied.'));
+					}
 				}
 			});
 		}
@@ -1749,7 +1769,7 @@ class CDashboard extends CBaseComponent {
 				if (new_widget_data !== null) {
 					const dashboard_page = this._selected_dashboard_page;
 
-					let menu_was_cancelled = true;
+					let do_reset_placeholder = true;
 
 					const menu = [
 						{
@@ -1759,14 +1779,13 @@ class CDashboard extends CBaseComponent {
 									label: t('Add widget'),
 									clickCallback: () => {
 										this.editWidgetProperties({}, {new_widget_pos});
-										menu_was_cancelled = false;
+										do_reset_placeholder = false;
 									}
 								},
 								{
 									label: t('Paste widget'),
 									clickCallback: () => {
 										this.pasteWidget(new_widget_data, {new_widget_pos});
-										menu_was_cancelled = false;
 									}
 								}
 							]
@@ -1780,7 +1799,7 @@ class CDashboard extends CBaseComponent {
 
 					jQuery(placeholder).menuPopup(menu, placeholder_event, {
 						closeCallback: () => {
-							if (menu_was_cancelled) {
+							if (do_reset_placeholder) {
 								dashboard_page.resetWidgetPlaceholder();
 							}
 						}

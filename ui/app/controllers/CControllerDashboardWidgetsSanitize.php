@@ -62,11 +62,9 @@ class CControllerDashboardWidgetsSanitize extends CController {
 				$widget = APP::ModuleManager()->getModule($widget_input['type']);
 
 				if ($widget === null || $widget->getType() !== CModule::TYPE_WIDGET) {
-					error(_('Inaccessible widget type.'));
+					$this->widgets_data[] = null;
 
-					$ret = false;
-
-					break;
+					continue;
 				}
 
 				if ($this->hasInput('templateid') && !$widget->hasTemplateSupport()) {
@@ -106,8 +104,10 @@ class CControllerDashboardWidgetsSanitize extends CController {
 	protected function doAction(): void {
 		$widgets = [];
 
-		foreach ($this->widgets_data as $widget_data) {
-			$widgets[] = ['fields' => $widget_data['form']->fieldsToApi()];
+		foreach ($this->widgets_data as $index => $widget_data) {
+			if ($widget_data !== null) {
+				$widgets[$index] = ['fields' => $widget_data['form']->fieldsToApi()];
+			}
 		}
 
 		if (!$this->hasInput('templateid')) {
@@ -119,11 +119,16 @@ class CControllerDashboardWidgetsSanitize extends CController {
 			'widgets' => []
 		];
 
-		foreach ($widgets as $widget_index => $widget) {
+		foreach ($this->widgets_data as $index => $widget_data) {
+			if ($widget_data === null) {
+				$output['widgets'][$index] = null;
+
+				continue;
+			}
+
 			$output_fields = [];
 
-			foreach ($widget['fields'] as $field) {
-
+			foreach ($widgets[$index]['fields'] as $field) {
 				if (array_key_exists($field['name'], $output_fields)) {
 					if (!is_array($output_fields[$field['name']])) {
 						$output_fields[$field['name']] = [$output_fields[$field['name']]];
@@ -136,7 +141,7 @@ class CControllerDashboardWidgetsSanitize extends CController {
 				}
 			}
 
-			$output['widgets'][$widget_index]['fields'] = $output_fields;
+			$output['widgets'][$index]['fields'] = $output_fields;
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output, JSON_THROW_ON_ERROR)]));
