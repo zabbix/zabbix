@@ -6717,7 +6717,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_ITEM_DELAY],
 				'5m;0/1-7,00:10-24:00;10m/1-7,05:00-24:00',
 				'/1/item_delay',
-				'5m;0/1-7,00:10-24:00;10m/1-7,05:00-24:00',
+				'5m;0/1-7,00:10-24:00;10m/1-7,05:00-24:00'
 			],
 			'Delay does not fit due to several flexible intervals' => [
 				['type' => API_ITEM_DELAY],
