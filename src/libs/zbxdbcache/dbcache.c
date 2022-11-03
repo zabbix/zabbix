@@ -2525,7 +2525,6 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 		ZBX_DC_HISTORY	*h = &history[i];
 		DC_ITEM		*item;
 		zbx_item_diff_t	*diff;
-		int		index;
 
 		/* discard history items that are older than compression age */
 		if (0 != compression_age && h->ts.sec < compression_age)
@@ -2541,20 +2540,13 @@ static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uin
 			continue;
 		}
 
-		if (FAIL == (index = zbx_vector_uint64_bsearch(itemids, h->itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			h->flags |= ZBX_DC_FLAG_UNDEF;
-			continue;
-		}
-
-		if (SUCCEED != errcodes[index])
+		if (SUCCEED != errcodes[i])
 		{
 			h->flags |= ZBX_DC_FLAG_UNDEF;
 			continue;
 		}
 
-		item = &items[index];
+		item = &items[i];
 
 		if (ITEM_STATUS_ACTIVE != item->status || HOST_STATUS_MONITORED != item->host.status)
 		{
@@ -2900,6 +2892,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values;
 	zbx_vector_uint64_pair_t	trends_diff, proxy_subscribtions;
 	ZBX_DC_HISTORY			history[ZBX_HC_SYNC_MAX];
+	DC_ITEM				*items = NULL;
+	int				*errcodes = NULL;
 
 	item_retrieve_mode = NULL == CONFIG_EXPORT_DIR ? ZBX_ITEM_GET_SYNC : ZBX_ITEM_GET_SYNC_EXPORT;
 
@@ -2954,8 +2948,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 	do
 	{
-		DC_ITEM			*items;
-		int			*errcodes, trends_num = 0, timers_num = 0, ret = SUCCEED;
+		int			trends_num = 0, timers_num = 0, ret = SUCCEED;
 		zbx_vector_uint64_t	itemids;
 		ZBX_DC_TREND		*trends = NULL;
 		zbx_timespec_t		ts;
@@ -2985,17 +2978,20 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 		if (0 != history_num)
 		{
+			zbx_vector_ptr_sort(&history_items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
 			hc_get_item_values(history, &history_items);	/* copy item data from history cache */
 
-			items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)history_num);
-			errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
+			if (NULL == items)
+				items = (DC_ITEM *)zbx_calloc(NULL, 1, sizeof(DC_ITEM) * (size_t)ZBX_HC_SYNC_MAX);
+
+			if (NULL == errcodes)
+				errcodes = (int *)zbx_calloc(NULL, 1, sizeof(int) * (size_t)ZBX_HC_SYNC_MAX);
 
 			zbx_vector_uint64_reserve(&itemids, history_num);
 
 			for (i = 0; i < history_num; i++)
 				zbx_vector_uint64_append(&itemids, history[i].itemid);
-
-			zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 			DCconfig_get_items_by_itemids_partial(items, itemids.values, errcodes, history_num,
 					item_retrieve_mode);
@@ -3159,8 +3155,6 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		{
 			zbx_free(trends);
 			DCconfig_clean_items(items, errcodes, history_num);
-			zbx_free(errcodes);
-			zbx_free(items);
 
 			zbx_vector_ptr_clear(&history_items);
 			hc_free_item_values(history, history_num);
@@ -3172,6 +3166,9 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 		/* This is done to allow syncer process to update its statistics. */
 	}
 	while (ZBX_SYNC_MORE == *more && ZBX_HC_SYNC_TIME_MAX >= time(NULL) - sync_start);
+
+	zbx_free(items);
+	zbx_free(errcodes);
 
 	zbx_vector_ptr_destroy(&history_items);
 	zbx_vector_ptr_destroy(&inventory_values);
