@@ -1528,20 +1528,20 @@ abstract class CItemGeneral extends CApiService {
 				case ZBX_FLAG_DISCOVERY_NORMAL:
 				case ZBX_FLAG_DISCOVERY_CREATED:
 					$error = $target_is_template
-						? _('Item with key "%1$s" already exists on template "%2$s".')
-						: _('Item with key "%1$s" already exists on host "%2$s".');
+						? _('An item with key "%1$s" already exists on the template "%2$s".')
+						: _('An item with key "%1$s" already exists on the host "%2$s".');
 					break;
 
 				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 					$error = $target_is_template
-						? _('Item prototype with key "%1$s" already exists on template "%2$s".')
-						: _('Item prototype with key "%1$s" already exists on host "%2$s".');
+						? _('An item prototype with key "%1$s" already exists on the template "%2$s".')
+						: _('An item prototype with key "%1$s" already exists on the host "%2$s".');
 					break;
 
 				case ZBX_FLAG_DISCOVERY_RULE:
 					$error = $target_is_template
-						? _('LLD rule with key "%1$s" already exists on template "%2$s".')
-						: _('LLD rule with key "%1$s" already exists on host "%2$s".');
+						? _('An LLD rule with key "%1$s" already exists on the template "%2$s".')
+						: _('An LLD rule with key "%1$s" already exists on the host "%2$s".');
 					break;
 			}
 
@@ -1868,24 +1868,24 @@ abstract class CItemGeneral extends CApiService {
 
 		foreach ($root_itemids as $root_itemid) {
 			if (self::maxDependencyLevelExceeded($master_item_links, $root_itemid, $links_path)) {
-				[$is_update, $flags, $key, $master_flags, $master_key, $is_template, $host] =
+				[$flags, $key, $master_flags, $master_key, $is_template, $host] =
 					self::getProblemCausedItemData($links_path, $items);
 
-				$error = self::getDependentItemError($is_update, $flags, $master_flags, $is_template);
+				$error = self::getDependentItemError($flags, $master_flags, $is_template);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $key, $master_key, $host,
-					_('allowed count of dependency levels will be exceeded')
+					_('allowed count of dependency levels would be exceeded')
 				));
 			}
 
 			if (self::maxDependentItemCountExceeded($master_item_links, $root_itemid, $links_path)) {
-				[$is_update, $flags, $key, $master_flags, $master_key, $is_template, $host] =
+				[$flags, $key, $master_flags, $master_key, $is_template, $host] =
 					self::getProblemCausedItemData($links_path, $items);
 
-				$error = self::getDependentItemError($is_update, $flags, $master_flags, $is_template);
+				$error = self::getDependentItemError($flags, $master_flags, $is_template);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $key, $master_key, $host,
-					_('allowed count of dependent items will be exceeded')
+					_('allowed count of dependent items would be exceeded')
 				));
 			}
 		}
@@ -2173,26 +2173,16 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Get the data of dependent item that caused the problem relying on the given path where the problem was detected.
+	 * Get data for a dependent item that causes a problem, based on the given path where the problem was detected.
 	 *
 	 * @param array $links_path
 	 * @param array $items
 	 *
 	 * @return array
-	 *
-	 * @return int   Cumulative count of items under the root item.
 	 */
 	private static function getProblemCausedItemData(array $links_path, array $items): array {
-		$items_by_masterid = [];
-
-		foreach ($items as $i => $item) {
-			unset($items[$i]);
-			$items_by_masterid[$item['master_itemid']][] = $item;
-		}
-
-		foreach ($links_path as $master_itemid) {
-			if (array_key_exists($master_itemid, $items_by_masterid)) {
-				$item = $items_by_masterid[$master_itemid][0];
+		foreach ($items as $item) {
+			if (in_array($item['master_itemid'], $links_path)) {
 				break;
 			}
 		}
@@ -2204,7 +2194,6 @@ abstract class CItemGeneral extends CApiService {
 				' AND '.dbConditionId('i.itemid', [$item['master_itemid']])
 		));
 
-		$is_update = array_key_exists('itemid', $item);
 		$flags = $item['flags'];
 		$key = $item['key_'];
 		$master_flags = $master_item_data['flags'];
@@ -2212,70 +2201,40 @@ abstract class CItemGeneral extends CApiService {
 		$is_template = $item['host_status'] == HOST_STATUS_TEMPLATE;
 		$host = $master_item_data['host'];
 
-		return [$is_update, $flags, $key, $master_flags, $master_key, $is_template, $host];
+		return [$flags, $key, $master_flags, $master_key, $is_template, $host];
 	}
 
 	/**
 	 * Get the error message about problem with dependent item according to given data.
 	 *
-	 * @param bool $is_update
 	 * @param int  $flags
 	 * @param int  $master_flags
 	 * @param bool $is_template
 	 *
 	 * @return string
 	 */
-	private static function getDependentItemError(bool $is_update, int $flags, int $master_flags,
-			bool $is_template): string {
+	private static function getDependentItemError(int $flags, int $master_flags, bool $is_template): string {
 		if ($flags == ZBX_FLAG_DISCOVERY_NORMAL) {
-			if ($is_update) {
-				return $is_template
-					? _('Cannot update the dependent item with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
-					: _('Cannot update the dependent item with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
-			}
-			else {
-				return $is_template
-					? _('Cannot create the dependent item with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
-					: _('Cannot create the dependent item with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
-			}
+			return $is_template
+				? _('Cannot set dependency for item with key "%1$s" on the master item with key "%2$s" on the template "%3$s": %4$s.')
+				: _('Cannot set dependency for item with key "%1$s" on the master item with key "%2$s" on the host "%3$s": %4$s.');
 		}
 		elseif ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			if ($is_update) {
-				if ($master_flags == ZBX_FLAG_DISCOVERY_NORMAL) {
-					return $is_template
-						? _('Cannot update the dependent item prototype with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
-						: _('Cannot update the dependent item prototype with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
-				}
-				else {
-					return $is_template
-						? _('Cannot update the dependent item prototype with key "%1$s" with reference to the master item prototype with key "%2$s" on the template "%3$s": %4$s.')
-						: _('Cannot update the dependent item prototype with key "%1$s" with reference to the master item prototype with key "%2$s" on the host "%3$s": %4$s.');
-				}
+			if ($master_flags == ZBX_FLAG_DISCOVERY_NORMAL) {
+				return $is_template
+					? _('Cannot set dependency for item prototype with key "%1$s" on the master item with key "%2$s" on the template "%3$s": %4$s.')
+					: _('Cannot set dependency for item prototype with key "%1$s" on the master item with key "%2$s" on the host "%3$s": %4$s.');
 			}
 			else {
-				if ($master_flags == ZBX_FLAG_DISCOVERY_NORMAL) {
-					return $is_template
-						? _('Cannot create the dependent item prototype with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
-						: _('Cannot create the dependent item prototype with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
-				}
-				else {
-					return $is_template
-						? _('Cannot create the dependent item prototype with key "%1$s" with reference to the master item prototype with key "%2$s" on the template "%3$s": %4$s.')
-						: _('Cannot create the dependent item prototype with key "%1$s" with reference to the master item prototype with key "%2$s" on the host "%3$s": %4$s.');
-				}
+				return $is_template
+					? _('Cannot set dependency for item prototype with key "%1$s" on the master item prototype with key "%2$s" on the template "%3$s": %4$s.')
+					: _('Cannot set dependency for item prototype with key "%1$s" on the master item prototype with key "%2$s" on the host "%3$s": %4$s.');
 			}
 		}
 		elseif ($flags == ZBX_FLAG_DISCOVERY_RULE) {
-			if ($is_update) {
-				return $is_template
-					? _('Cannot update the dependent LLD rule with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
-					: _('Cannot update the dependent LLD rule with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
-			}
-			else {
-				return $is_template
-					? _('Cannot create the dependent LLD rule with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
-					: _('Cannot create the dependent LLD rule with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
-			}
+			return $is_template
+				? _('Cannot set dependency for LLD rule with key "%1$s" on the master item with key "%2$s" on the template "%3$s": %4$s.')
+				: _('Cannot set dependency for LLD rule with key "%1$s" on the master item with key "%2$s" on the host "%3$s": %4$s.');
 		}
 	}
 

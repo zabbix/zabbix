@@ -397,14 +397,14 @@ class testDependentItems extends CAPITest {
 				]
 			],
 			'Check for maximum depth for the items tree (create). Add 4th level.' => [
-				'error' => 'Cannot create the dependent item with key "dependent.item.1.1.1.1.1" with reference to the master item with key "dependent.item.1.1.1.1" on the template "dependent.items.template.1": allowed count of dependency levels will be exceeded.',
+				'error' => 'Cannot set dependency for item with key "dependent.item.1.1.1.1.1" on the master item with key "dependent.item.1.1.1.1" on the template "dependent.items.template.1": allowed count of dependency levels would be exceeded.',
 				'method' => 'item.create',
 				// 1001: dependent.items.template.1
 				// 1008: dependent.items.template.1:dependent.item.1.1.1.1
 				'request_data' => self::getItems(1001, 1008, 'dependent.item.1.1.1.1', 1, 1)
 			],
 			'Check for maximum depth for the item prototypes tree (create). Add 4th level.' => [
-				'error' => 'Cannot create the dependent item prototype with key "dependent.item.1.1.1.1.1[{#LLD}]" with reference to the master item prototype with key "dependent.item.proto.1.1.1.1" on the template "dependent.items.template.1": allowed count of dependency levels will be exceeded.',
+				'error' => 'Cannot set dependency for item prototype with key "dependent.item.1.1.1.1.1[{#LLD}]" on the master item prototype with key "dependent.item.proto.1.1.1.1" on the template "dependent.items.template.1": allowed count of dependency levels would be exceeded.',
 				'method' => 'itemprototype.create',
 				// 1001: dependent.items.template.1
 				// 1017: dependent.items.template.1:discovery.rule.1
@@ -419,7 +419,7 @@ class testDependentItems extends CAPITest {
 				'request_data' => self::getDiscoveryRule(1001, 1008, 'dependent.discovery.rule.1.1.1.1', 1, 1)
 			],
 			'Check for maximum depth of the items tree (update). Add 4th level.' => [
-				'error' => 'Cannot update the dependent item with key "trap.1" with reference to the master item with key "dependent.item.1.1.1.1" on the template "dependent.items.template.1": allowed count of dependency levels will be exceeded.',
+				'error' => 'Cannot set dependency for item with key "trap.1" on the master item with key "dependent.item.1.1.1.1" on the template "dependent.items.template.1": allowed count of dependency levels would be exceeded.',
 				'method' => 'item.update',
 				'request_data' => [
 					'itemid' => 1016,		// dependent.items.template.1:trap.1
@@ -428,7 +428,7 @@ class testDependentItems extends CAPITest {
 				]
 			],
 			'Check for maximum depth of the item prototypes tree (update). Add 4th level.' => [
-				'error' => 'Cannot update the dependent item prototype with key "item.proto.1" with reference to the master item prototype with key "dependent.item.proto.1.1.1.1" on the template "dependent.items.template.1": allowed count of dependency levels will be exceeded.',
+				'error' => 'Cannot set dependency for item prototype with key "item.proto.1" on the master item prototype with key "dependent.item.proto.1.1.1.1" on the template "dependent.items.template.1": allowed count of dependency levels would be exceeded.',
 				'method' => 'itemprototype.update',
 				'request_data' => [
 					'itemid' => 1033,		// dependent.items.template.1:item.proto.1
@@ -446,7 +446,7 @@ class testDependentItems extends CAPITest {
 				]
 			],
 			'Check for maximum depth of the items tree (update). Add 4th level at the top.' => [
-				'error' => 'Cannot update the dependent item with key "item.2" with reference to the master item with key "item.1" on the host "dependent.items.host.4": allowed count of dependency levels will be exceeded.',
+				'error' => 'Cannot set dependency for item with key "item.2" on the master item with key "item.1" on the host "dependent.items.host.4": allowed count of dependency levels would be exceeded.',
 				'method' => 'item.update',
 				'request_data' => [
 					'itemid' => 1702,		// dependent.items.template.4:item.2
@@ -455,7 +455,7 @@ class testDependentItems extends CAPITest {
 				]
 			],
 			'Check for maximum depth of the mixed tree (update). Add 4th level at the top.' => [
-				'error' => 'Cannot update the dependent item with key "item.2" with reference to the master item with key "item.1" on the host "dependent.items.host.5": allowed count of dependency levels will be exceeded.',
+				'error' => 'Cannot set dependency for item with key "item.2" on the master item with key "item.1" on the host "dependent.items.host.5": allowed count of dependency levels would be exceeded.',
 				'method' => 'item.update',
 				'request_data' => [
 					'itemid' => 1902,		// dependent.items.template.5:item.2
@@ -464,7 +464,7 @@ class testDependentItems extends CAPITest {
 				]
 			],
 			'Check for maximum depth of the item prototypes tree (update). Add 4th level at the top.' => [
-				'error' => 'Cannot update the dependent item prototype with key "item.proto.2" with reference to the master item prototype with key "item.proto.1" on the host "dependent.items.host.6": allowed count of dependency levels will be exceeded.',
+				'error' => 'Cannot set dependency for item prototype with key "item.proto.2" on the master item prototype with key "item.proto.1" on the host "dependent.items.host.6": allowed count of dependency levels would be exceeded.',
 				'method' => 'itemprototype.update',
 				'request_data' => [
 					'itemid' => 2103,		// dependent.items.template.6:item.proto.2
@@ -473,7 +473,7 @@ class testDependentItems extends CAPITest {
 				]
 			],
 			'Check for maximum depth of the items tree (link a template).' => [
-				'error' => 'Cannot update the dependent item with key "dependent.item.1.1" with reference to the master item with key "master.item.1" on the host "dependent.items.host.2": allowed count of dependency levels will be exceeded.',
+				'error' => 'Cannot set dependency for item with key "dependent.item.1.1" on the master item with key "master.item.1" on the host "dependent.items.host.2": allowed count of dependency levels would be exceeded.',
 				'method' => 'host.update',
 				'request_data' => [
 					'hostid' => 1006,	// dependent.items.host.2
@@ -483,7 +483,7 @@ class testDependentItems extends CAPITest {
 				]
 			],
 			'Check for maximum depth of the mixed tree (link a template).' => [
-				'error' => 'Cannot update the dependent item with key "dependent.item.1.1" with reference to the master item with key "master.item.1" on the host "dependent.items.host.3": allowed count of dependency levels will be exceeded.',
+				'error' => 'Cannot set dependency for item with key "dependent.item.1.1" on the master item with key "master.item.1" on the host "dependent.items.host.3": allowed count of dependency levels would be exceeded.',
 				'method' => 'host.update',
 				'request_data' => [
 					'hostid' => 1007,	// dependent.items.host.3
@@ -493,14 +493,14 @@ class testDependentItems extends CAPITest {
 				]
 			],
 			'Check for maximum count of items in the tree on the template level.' => [
-				'error' => 'Cannot create the dependent item with key "dependent.item.1.3" with reference to the master item with key "master.item.1" on the template "dependent.items.template.1": allowed count of dependent items will be exceeded.',
+				'error' => 'Cannot set dependency for item with key "dependent.item.1.3" on the master item with key "master.item.1" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
 				'method' => 'item.create',
 				// 1001: dependent.items.template.1
 				// 1001: dependent.items.template.1:master.item.1
 				'request_data' => self::getItems(1001, 1001, 'dependent.item.1', 3, $dep_count_overflow - 3)
 			],
 			'Check for maximum count of items in the tree on the template level, combination.' => [
-				'error' => 'Cannot create the dependent item with key "dependent.item.1.2.3" with reference to the master item with key "dependent.item.1.2" on the template "dependent.items.template.1": allowed count of dependent items will be exceeded.',
+				'error' => 'Cannot set dependency for item with key "dependent.item.1.2.3" on the master item with key "dependent.item.1.2" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
 				'method' => 'item.create',
 				// 1001: dependent.items.template.1
 				// 1002: dependent.items.template.1:dependent.item.1.1
@@ -529,14 +529,14 @@ class testDependentItems extends CAPITest {
 				)
 			],
 			'Check for maximum count of items in the tree on the host level.' => [
-				'error' => 'Cannot create the dependent item with key "dependent.item.1.3" with reference to the master item with key "master.item.1" on the host "dependent.items.host.1": allowed count of dependent items will be exceeded.',
+				'error' => 'Cannot set dependency for item with key "dependent.item.1.3" on the master item with key "master.item.1" on the host "dependent.items.host.1": allowed count of dependent items would be exceeded.',
 				'method' => 'item.create',
 				// 1004: dependent.items.host.1
 				// 1301: dependent.items.host.1:master.item.1
 				'request_data' => self::getItems(1004, 1301, 'dependent.item.1', 3, $dep_count_overflow - 3 - 6)
 			],
 			'Check for maximum count of items in the tree on the host level, combination.' => [
-				'error' => 'Cannot create the dependent item with key "dependent.item.1.2.3" with reference to the master item with key "dependent.item.1.2" on the host "dependent.items.host.1": allowed count of dependent items will be exceeded.',
+				'error' => 'Cannot set dependency for item with key "dependent.item.1.2.3" on the master item with key "dependent.item.1.2" on the host "dependent.items.host.1": allowed count of dependent items would be exceeded.',
 				'method' => 'item.create',
 				// 1004: dependent.items.host.1
 				// 1302: dependent.items.host.1:dependent.item.1.1
@@ -576,7 +576,7 @@ class testDependentItems extends CAPITest {
 				)
 			],
 			'Check for maximum count of items in the tree on the template level, adding overflow via 2nd item.' => [
-				'error' => 'Cannot create the dependent item with key "dependent.item.1.2.30" with reference to the master item with key "dependent.item.1.2" on the template "dependent.items.template.1": allowed count of dependent items will be exceeded.',
+				'error' => 'Cannot set dependency for item with key "dependent.item.1.2.30" on the master item with key "dependent.item.1.2" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
 				'method' => 'item.create',
 				// 1001: dependent.items.template.1
 				// 1003: dependent.items.template.1:dependent.item.1.2
@@ -590,7 +590,7 @@ class testDependentItems extends CAPITest {
 				'request_data' => self::getDiscoveryRule(1001, 1001, 'dependent.discovery.rule.1', 2, $dep_count_overflow - 2 - 6)
 			],
 			'Check for maximum count of item prototypes in the tree on the template level.' => [
-				'error' => 'Cannot create the dependent item prototype with key "dependent.item.proto.1.3[{#LLD}]" with reference to the master item prototype with key "master.item.proto.1" on the template "dependent.items.template.1": allowed count of dependent items will be exceeded.',
+				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.3[{#LLD}]" on the master item prototype with key "master.item.proto.1" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
 				'method' => 'itemprototype.create',
 				// 1001: dependent.items.template.1
 				// 1017: dependent.items.template.1:discovery.rule.1
@@ -598,7 +598,7 @@ class testDependentItems extends CAPITest {
 				'request_data' => self::getItemPrototypes(1001, 1017, 1018, 'dependent.item.proto.1', 3, $dep_count_overflow - 3)
 			],
 			'Check for maximum count of item prototypes in the tree on the template level, combination, fail.' => [
-				'error' => 'Cannot create the dependent item prototype with key "dependent.item.proto.1.2.3[{#LLD}]" with reference to the master item prototype with key "dependent.item.proto.1.2" on the template "dependent.items.template.1": allowed count of dependent items will be exceeded.',
+				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.2.3[{#LLD}]" on the master item prototype with key "dependent.item.proto.1.2" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
 				'method' => 'itemprototype.create',
 				// 1001: dependent.items.template.1
 				// 1017: dependent.items.template.1:discovery.rule.1
@@ -610,7 +610,7 @@ class testDependentItems extends CAPITest {
 				)
 			],
 			'Check for maximum count of item prototypes in the tree on the host level.' => [
-				'error' => 'Cannot create the dependent item prototype with key "dependent.item.proto.1.3[{#LLD}]" with reference to the master item prototype with key "master.item.proto.1" on the host "dependent.items.host.1": allowed count of dependent items will be exceeded.',
+				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.3[{#LLD}]" on the master item prototype with key "master.item.proto.1" on the host "dependent.items.host.1": allowed count of dependent items would be exceeded.',
 				'method' => 'itemprototype.create',
 				// 1004: dependent.items.host.1
 				// 1317: dependent.items.template.1:discovery.rule.1
@@ -618,7 +618,7 @@ class testDependentItems extends CAPITest {
 				'request_data' => self::getItemPrototypes(1004, 1317, 1318, 'dependent.item.proto.1', 3, $dep_count_overflow - 3)
 			],
 			'Check for maximum count of item prototypes in the tree on the host level, combination.' => [
-				'error' => 'Cannot create the dependent item prototype with key "dependent.item.proto.1.2.3[{#LLD}]" with reference to the master item prototype with key "dependent.item.proto.1.2" on the host "dependent.items.host.1": allowed count of dependent items will be exceeded.',
+				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.2.3[{#LLD}]" on the master item prototype with key "dependent.item.proto.1.2" on the host "dependent.items.host.1": allowed count of dependent items would be exceeded.',
 				'method' => 'itemprototype.create',
 				// 1004: dependent.items.host.1
 				// 1317: dependent.items.template.1:discovery.rule.1
@@ -642,7 +642,7 @@ class testDependentItems extends CAPITest {
 				)
 			],
 			'Check for maximum count of item prototypes in the tree on the template.' => [
-				'error' => 'Cannot create the dependent item prototype with key "dependent.item.proto.1.2.11[{#LLD}]" with reference to the master item prototype with key "dependent.item.proto.1.2" on the template "dependent.items.template.1": allowed count of dependent items will be exceeded.',
+				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.2.11[{#LLD}]" on the master item prototype with key "dependent.item.proto.1.2" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
 				'method' => 'itemprototype.create',
 				// 1001: dependent.items.template.1
 				// 1017: dependent.items.template.1:discovery.rule.1
