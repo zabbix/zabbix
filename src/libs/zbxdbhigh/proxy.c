@@ -3534,9 +3534,6 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 			session->last_valueid = last_valueid;
 	}
 
-	zbx_free(errcodes);
-	zbx_free(items);
-
 	if (NULL == error)
 	{
 		ret = SUCCEED;
