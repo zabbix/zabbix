@@ -464,7 +464,7 @@ function isEventRecentlySuppressed(array $acknowledges, &$suppression_action = n
 			return false;
 		}
 		elseif (($ack['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
-			if ($ack['suppress_until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE || $ack['suppress_until'] > time()) {
+			if (array_key_exists('suppress_until', $ack) == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE || $ack['suppress_until'] > time()) {
 				$suppression_action = $ack;
 
 				return true;
