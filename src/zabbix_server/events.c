@@ -838,6 +838,11 @@ out:
 	return ret;
 }
 
+
+#define ZBX_CORR_OPERATION_CLOSE_OLD			0
+#define ZBX_CORR_OPERATION_CLOSE_NEW			1
+
+
 /******************************************************************************
  *                                                                            *
  * Purpose: checks if correlation has operations to change old events         *
@@ -1135,6 +1140,9 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, ZBX_D
 		}
 	}
 }
+
+#undef ZBX_CORR_OPERATION_CLOSE_OLD
+#undef ZBX_CORR_OPERATION_CLOSE_NEW
 
 /* specifies correlation execution scope */
 typedef enum

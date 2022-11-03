@@ -41,6 +41,15 @@
 
 extern char	*CONFIG_SSL_CA_LOCATION;
 
+/* SMTP security options */
+#define SMTP_SECURITY_NONE	0
+#define SMTP_SECURITY_STARTTLS	1
+#define SMTP_SECURITY_SSL	2
+
+/* SMTP authentication options */
+#define SMTP_AUTHENTICATION_NONE		0
+#define SMTP_AUTHENTICATION_NORMAL_PASSWORD	1
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Encode a string into a base64 string as required by rfc2047.      *

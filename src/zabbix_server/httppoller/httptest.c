@@ -29,6 +29,13 @@
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
 
+/* HTTP item types */
+#define ZBX_HTTPITEM_TYPE_RSPCODE	0
+#define ZBX_HTTPITEM_TYPE_TIME		1
+#define ZBX_HTTPITEM_TYPE_SPEED		2
+#define ZBX_HTTPITEM_TYPE_LASTSTEP	3
+#define ZBX_HTTPITEM_TYPE_LASTERROR	4
+
 typedef struct
 {
 	long	rspcode;

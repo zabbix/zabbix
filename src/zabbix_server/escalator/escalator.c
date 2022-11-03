@@ -2388,6 +2388,10 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 		}
 	}
 
+/* action escalation processing mode */
+#define ACTION_PAUSE_SUPPRESSED_FALSE	0	/* process escalation for suppressed events */
+#define ACTION_PAUSE_SUPPRESSED_TRUE	1	/* pause escalation for suppressed events */
+
 	if (EVENT_SOURCE_TRIGGERS == action->eventsource &&
 			ACTION_PAUSE_SUPPRESSED_TRUE == action->pause_suppressed &&
 			HOST_MAINTENANCE_STATUS_ON == maintenance &&
@@ -2457,6 +2461,11 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation_status_string(escalation->status));
+
+
+/* action escalation canceled notification mode */
+#define ACTION_NOTIFY_IF_CANCELED_TRUE	1	/* notify about canceled escalations for action (default) */
+#define ACTION_NOTIFY_IF_CANCELED_FALSE	0	/* do not notify about canceled escalations for action */
 
 	/* the cancellation notification can be sent if no objects are deleted and notification is not disabled */
 	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step &&

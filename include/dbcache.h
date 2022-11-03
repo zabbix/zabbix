@@ -1203,15 +1203,6 @@ void	zbx_dc_get_unused_macro_templates(zbx_hashset_t *templates, const zbx_vecto
 
 
 /* maintenance */
-typedef enum
-{
-	TIMEPERIOD_TYPE_ONETIME = 0,
-/*	TIMEPERIOD_TYPE_HOURLY,*/
-	TIMEPERIOD_TYPE_DAILY = 2,
-	TIMEPERIOD_TYPE_WEEKLY,
-	TIMEPERIOD_TYPE_MONTHLY
-}
-zbx_timeperiod_type_t;
 
 typedef enum
 {
@@ -1220,39 +1211,9 @@ typedef enum
 }
 zbx_maintenance_type_t;
 
-
 /* discovery rule */
 #define DRULE_STATUS_MONITORED		0
 #define DRULE_STATUS_NOT_MONITORED	1
-
-/* host statuses */
-#define HOST_STATUS_MONITORED		0
-#define HOST_STATUS_NOT_MONITORED	1
-/*#define HOST_STATUS_UNREACHABLE	2*/
-#define HOST_STATUS_TEMPLATE		3
-/*#define HOST_STATUS_DELETED		4*/
-#define HOST_STATUS_PROXY_ACTIVE	5
-#define HOST_STATUS_PROXY_PASSIVE	6
-
-
-/* host group types */
-#define HOSTGROUP_TYPE_HOST		0
-#define HOSTGROUP_TYPE_TEMPLATE		1
-
-/* host maintenance status */
-#define HOST_MAINTENANCE_STATUS_OFF	0
-#define HOST_MAINTENANCE_STATUS_ON	1
-
-/* host inventory mode */
-#define HOST_INVENTORY_DISABLED		-1	/* the host has no record in host_inventory */
-
-
-						/* only in server code, never in DB */
-#define HOST_INVENTORY_MANUAL		0
-#define HOST_INVENTORY_AUTOMATIC	1
-#define HOST_INVENTORY_COUNT		2
-
-#define HOST_INVENTORY_FIELD_COUNT	70
 
 #define ITEM_LOGTYPE_INFORMATION	1
 #define ITEM_LOGTYPE_WARNING		2
@@ -1262,30 +1223,9 @@ zbx_maintenance_type_t;
 #define ITEM_LOGTYPE_CRITICAL		9
 #define ITEM_LOGTYPE_VERBOSE		10
 
-/* media statuses */
-#define MEDIA_STATUS_ACTIVE	0
-#define MEDIA_STATUS_DISABLED	1
-
 /* action statuses */
 #define ACTION_STATUS_ACTIVE	0
 #define ACTION_STATUS_DISABLED	1
-
-/* action escalation processing mode */
-#define ACTION_PAUSE_SUPPRESSED_FALSE	0	/* process escalation for suppressed events */
-#define ACTION_PAUSE_SUPPRESSED_TRUE	1	/* pause escalation for suppressed events */
-
-/* action escalation canceled notification mode */
-#define ACTION_NOTIFY_IF_CANCELED_TRUE	1	/* notify about canceled escalations for action (default) */
-#define ACTION_NOTIFY_IF_CANCELED_FALSE	0	/* do not notify about canceled escalations for action */
-
-/* SMTP security options */
-#define SMTP_SECURITY_NONE	0
-#define SMTP_SECURITY_STARTTLS	1
-#define SMTP_SECURITY_SSL	2
-
-/* SMTP authentication options */
-#define SMTP_AUTHENTICATION_NONE		0
-#define SMTP_AUTHENTICATION_NORMAL_PASSWORD	1
 
 /* operation types */
 #define OPERATION_TYPE_MESSAGE		0
@@ -1302,32 +1242,10 @@ zbx_maintenance_type_t;
 #define OPERATION_TYPE_RECOVERY_MESSAGE	11
 #define OPERATION_TYPE_UPDATE_MESSAGE	12
 
-/* normal and recovery operations */
-#define ZBX_OPERATION_MODE_NORMAL	0
-#define ZBX_OPERATION_MODE_RECOVERY	1
-#define ZBX_OPERATION_MODE_UPDATE	2
-
-/* algorithms for service status calculation */
-#define ZBX_SERVICE_STATUS_CALC_SET_OK			0
-#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL	1
-#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE	2
-
-/* HTTP item types */
-#define ZBX_HTTPITEM_TYPE_RSPCODE	0
-#define ZBX_HTTPITEM_TYPE_TIME		1
-#define ZBX_HTTPITEM_TYPE_SPEED		2
-#define ZBX_HTTPITEM_TYPE_LASTSTEP	3
-#define ZBX_HTTPITEM_TYPE_LASTERROR	4
-
 /* proxy_history flags */
 #define PROXY_HISTORY_FLAG_META		0x01
 #define PROXY_HISTORY_FLAG_NOVALUE	0x02
-
 #define PROXY_HISTORY_MASK_NOVALUE	(PROXY_HISTORY_FLAG_META | PROXY_HISTORY_FLAG_NOVALUE)
-
-/* global correlation constants */
-#define ZBX_CORRELATION_ENABLED				0
-#define ZBX_CORRELATION_DISABLED			1
 
 #define ZBX_CORR_CONDITION_OLD_EVENT_TAG		0
 #define ZBX_CORR_CONDITION_NEW_EVENT_TAG		1
@@ -1335,9 +1253,6 @@ zbx_maintenance_type_t;
 #define ZBX_CORR_CONDITION_EVENT_TAG_PAIR		3
 #define ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE		4
 #define ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE		5
-
-#define ZBX_CORR_OPERATION_CLOSE_OLD			0
-#define ZBX_CORR_OPERATION_CLOSE_NEW			1
 
 
 

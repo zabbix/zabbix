@@ -23,4 +23,19 @@
 #define MEDIA_TYPE_STATUS_ACTIVE	0
 #define MEDIA_TYPE_STATUS_DISABLED	1
 
+/* media statuses */
+#define MEDIA_STATUS_ACTIVE	0
+#define MEDIA_STATUS_DISABLED	1
+
+/* normal and recovery operations */
+#define ZBX_OPERATION_MODE_NORMAL	0
+#define ZBX_OPERATION_MODE_RECOVERY	1
+#define ZBX_OPERATION_MODE_UPDATE	2
+
+
+/* algorithms for service status calculation */
+#define ZBX_SERVICE_STATUS_CALC_SET_OK			0
+#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL	1
+#define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE	2
+
 #endif /*ZABBIX_SERVER_H*/
