@@ -29,7 +29,6 @@
 #define HOST_STATUS_PROXY_ACTIVE	5
 #define HOST_STATUS_PROXY_PASSIVE	6
 
-
 /* host group types */
 #define HOSTGROUP_TYPE_HOST		0
 #define HOSTGROUP_TYPE_TEMPLATE		1
@@ -41,13 +40,11 @@
 /* host inventory mode */
 #define HOST_INVENTORY_DISABLED		-1	/* the host has no record in host_inventory */
 
-
 						/* only in server code, never in DB */
 #define HOST_INVENTORY_MANUAL		0
 #define HOST_INVENTORY_AUTOMATIC	1
 #define HOST_INVENTORY_COUNT		2
 
 #define HOST_INVENTORY_FIELD_COUNT	70
-
 
 #endif /*ZABBIX_ZBX_HOST_CONSTANTS_H*/

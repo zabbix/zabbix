@@ -2391,9 +2391,8 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 	}
 
 /* action escalation processing mode */
-#define ACTION_PAUSE_SUPPRESSED_FALSE	0	/* process escalation for suppressed events */
+/*#define ACTION_PAUSE_SUPPRESSED_FALSE	0	 process escalation for suppressed events */
 #define ACTION_PAUSE_SUPPRESSED_TRUE	1	/* pause escalation for suppressed events */
-
 	if (EVENT_SOURCE_TRIGGERS == action->eventsource &&
 			ACTION_PAUSE_SUPPRESSED_TRUE == action->pause_suppressed &&
 			HOST_MAINTENANCE_STATUS_ON == maintenance &&
@@ -2415,6 +2414,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *ac
 			goto out;
 		}
 	}
+#undef ACTION_PAUSE_SUPPRESSED_TRUE
 
 	if (0 != skip)
 	{

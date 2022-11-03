@@ -83,7 +83,6 @@ char	*zbx_date2str(time_t date, const char *tz);
 char	*zbx_time2str(time_t time, const char *tz);
 int	zbx_iso8601_utc(const char *str, time_t *time);
 
-
 typedef enum
 {
 	TIMEPERIOD_TYPE_ONETIME = 0,

@@ -1093,6 +1093,11 @@ out:
 	}
 
 	return ret;
+#undef EXPRESSION_TYPE_INCLUDED
+#undef EXPRESSION_TYPE_ANY_INCLUDED
+#undef EXPRESSION_TYPE_NOT_INCLUDED
+#undef EXPRESSION_TYPE_TRUE
+#undef EXPRESSION_TYPE_FALSE
 }
 
 int	regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive)

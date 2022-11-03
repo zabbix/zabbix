@@ -50,7 +50,6 @@ typedef enum
 }
 zbx_graph_yaxis_types_t;
 
-
 typedef enum
 {
 	ZBX_TEMPLATE_LINK_MANUAL = 0,

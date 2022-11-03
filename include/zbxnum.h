@@ -22,7 +22,6 @@
 
 #include "zbxcommon.h"
 
-
 /* database double precision upgrade states */
 #define ZBX_DB_DBL_PRECISION_DISABLED	0
 #define ZBX_DB_DBL_PRECISION_ENABLED	1

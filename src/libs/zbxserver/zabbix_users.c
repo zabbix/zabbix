@@ -79,7 +79,6 @@ char	*get_user_timezone(zbx_uint64_t userid)
 	return user_timezone;
 }
 
-
 /* user role permissions */
 typedef enum
 {
@@ -87,7 +86,6 @@ typedef enum
 	ROLE_PERM_ALLOW = 1,
 }
 zbx_user_role_permission_t;
-
 
 /******************************************************************************
  *                                                                            *

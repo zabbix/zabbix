@@ -311,7 +311,6 @@ typedef enum
 }
 zbx_alert_type_t;
 
-
 typedef enum
 {
 	ZBX_PROTOTYPE_STATUS_ENABLED,
@@ -327,7 +326,6 @@ typedef enum
 	ZBX_PROTOTYPE_DISCOVER_COUNT
 }
 zbx_prototype_discover_t;
-
 
 typedef struct ZBX_DB_MEDIATYPE
 {

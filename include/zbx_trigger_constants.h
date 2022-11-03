@@ -20,24 +20,19 @@
 #ifndef ZABBIX_ZBX_TRIGGER_CONSTANTS_H
 #define ZABBIX_ZBX_TRIGGER_CONSTANTS_H
 
-
 #define ZBX_DC_TRIGGER_PROBLEM_EXPRESSION	0x1	/* this flag shows that trigger value recalculation is  */
 							/* initiated by a time-based function or a new value of */
 							/* an item in problem expression */
-
 
 #define ZBX_TRIGGER_GET_ITEMIDS		0x0001
 
 #define ZBX_TRIGGER_GET_DEFAULT		(~(unsigned int)ZBX_TRIGGER_GET_ITEMIDS)
 #define ZBX_TRIGGER_GET_ALL		(~(unsigned int)0)
 
-
-
 #define ZBX_TRIGGER_DEPENDENCY_LEVELS_MAX	32
 
 #define ZBX_TRIGGER_DEPENDENCY_FAIL		1
 #define ZBX_TRIGGER_DEPENDENCY_UNRESOLVED	2
-
 
 /* trigger statuses */
 #define TRIGGER_STATUS_ENABLED		0
@@ -74,6 +69,5 @@
 /* trigger correlation modes */
 #define ZBX_TRIGGER_CORRELATION_NONE	0
 #define ZBX_TRIGGER_CORRELATION_TAG	1
-
 
 #endif /*ZABBIX_ZBX_TRIGGER_CONSTANTS_H*/

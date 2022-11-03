@@ -775,5 +775,4 @@ void	zbx_free_tag(zbx_tag_t *tag);
 
 /* time and memory size suffixes */
 zbx_uint64_t	suffix2factor(char c);
-
 #endif
