@@ -21,7 +21,9 @@
 
 class CControllerDashboardUpdate extends CController {
 
-	private $dashboard_pages;
+	private ?array $db_dashboard;
+
+	private ?array $dashboard_pages;
 
 	protected function init() {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -85,8 +87,27 @@ class CControllerDashboardUpdate extends CController {
 	}
 
 	protected function checkPermissions() {
-		return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
-			&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
+		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
+				|| !$this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS)) {
+			return false;
+		}
+
+		if ($this->hasInput('dashboardid')) {
+			$db_dashboards = API::Dashboard()->get([
+				'output' => ['dashboardid'],
+				'selectPages' => ['widgets'],
+				'dashboardids' => $this->getInput('dashboardid'),
+				'editable' => true
+			]);
+
+			if (!$db_dashboards) {
+				return false;
+			}
+
+			$this->db_dashboard = $db_dashboards[0];
+		}
+
+		return true;
 	}
 
 	protected function doAction() {
@@ -95,20 +116,8 @@ class CControllerDashboardUpdate extends CController {
 		try {
 			$db_widgets = [];
 
-			if ($this->hasInput('dashboardid')) {
-				$db_dashboards = API::Dashboard()->get([
-					'output' => [],
-					'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
-					'dashboardids' => $this->getInput('dashboardid')
-				]);
-
-				if (!$db_dashboards) {
-					error(_('No permissions to referred object or it does not exist!'));
-
-					throw new InvalidArgumentException();
-				}
-
-				foreach ($db_dashboards[0]['pages'] as $db_dashboard_page) {
+			if ($this->db_dashboard !== null) {
+				foreach ($this->db_dashboard['pages'] as $db_dashboard_page) {
 					foreach ($db_dashboard_page['widgets'] as $db_widget) {
 						$db_widgets[$db_widget['widgetid']] = $db_widget;
 					}
@@ -123,8 +132,8 @@ class CControllerDashboardUpdate extends CController {
 				'pages' => []
 			];
 
-			if ($this->hasInput('dashboardid') && !$this->hasInput('clone')) {
-				$save_dashboard['dashboardid'] = $this->getInput('dashboardid');
+			if ($this->db_dashboard !== null && !$this->hasInput('clone')) {
+				$save_dashboard['dashboardid'] = $this->db_dashboard['dashboardid'];
 			}
 
 			foreach ($this->dashboard_pages as $dashboard_page) {
@@ -196,7 +205,7 @@ class CControllerDashboardUpdate extends CController {
 				}
 			}
 
-			$result = $this->hasInput('dashboardid') && !$this->hasInput('clone')
+			$result = $this->db_dashboard !== null && !$this->hasInput('clone')
 				? API::Dashboard()->update($save_dashboard)
 				: API::Dashboard()->create($save_dashboard);
 
@@ -204,7 +213,7 @@ class CControllerDashboardUpdate extends CController {
 				throw new InvalidArgumentException();
 			}
 
-			$output['success']['title'] = $this->hasInput('dashboardid') && !$this->hasInput('clone')
+			$output['success']['title'] = $this->db_dashboard !== null && !$this->hasInput('clone')
 				? _('Dashboard updated')
 				: _('Dashboard created');
 
@@ -216,7 +225,7 @@ class CControllerDashboardUpdate extends CController {
 		}
 		catch (InvalidArgumentException $e) {
 			$output['error'] = [
-				'title' => $this->hasInput('dashboardid') && !$this->hasInput('clone')
+				'title' => $this->db_dashboard !== null && !$this->hasInput('clone')
 					? _('Failed to update dashboard')
 					: _('Failed to create dashboard'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
