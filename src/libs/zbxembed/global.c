@@ -23,7 +23,6 @@
 #include "embed.h"
 #include "duktape.h"
 #include "base64.h"
-#include "zbxhash.h"
 #include "zbxcrypto.h"
 
 /******************************************************************************

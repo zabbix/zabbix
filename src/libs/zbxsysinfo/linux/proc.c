@@ -18,12 +18,14 @@
 **/
 
 #include "proc.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
+
+#include "stats.h"
 
 #include "zbxstr.h"
 #include "zbxregexp.h"
 #include "log.h"
-#include "stats.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
@@ -500,7 +502,7 @@ static int	get_total_memory(zbx_uint64_t *total_memory)
 	return ret;
 }
 
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_SIZE	0
 #define ZBX_RSS		1
@@ -862,7 +864,6 @@ out:
 	}
 
 	return SYSINFO_RET_OK;
-
 #undef ZBX_SIZE
 #undef ZBX_RSS
 #undef ZBX_VSIZE
@@ -879,7 +880,7 @@ out:
 #undef ZBX_VMPTE
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		tmp[MAX_STRING_LEN], *procname, *proccomm, *param;
 	DIR		*dir;
@@ -1484,7 +1485,7 @@ out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
-int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*procname, *username, *cmdline, *tmp;
 	char		*errmsg = NULL;
@@ -1748,7 +1749,7 @@ static proc_data_t	*proc_read_data(char *path, int zbx_proc_mode)
 	return proc_data;
 }
 
-int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define SUM_PROC_VALUE(param)									\
 	do											\

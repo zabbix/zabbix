@@ -471,8 +471,9 @@ else {
 					'object_name' => 'hosts',
 					'data' => $data['filter']['hostids'],
 					'popup' => [
-						'filter_preselect_fields' => [
-							'hostgroups' => 'filter_groups_'
+						'filter_preselect' => [
+							'id' => 'filter_groups_',
+							'submit_as' => 'groupid'
 						],
 						'parameters' => [
 							'srctbl' => 'hosts',

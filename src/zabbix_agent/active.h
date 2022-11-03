@@ -39,7 +39,7 @@ extern int	CONFIG_LISTEN_PORT;
 
 extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
-#define HOST_METADATA_LEN	255	/* UTF-8 characters, not bytes */
+#define HOST_METADATA_LEN	65535	/* UTF-8 characters, not bytes */
 #define HOST_INTERFACE_LEN	255	/* UTF-8 characters, not bytes */
 
 typedef struct
@@ -48,6 +48,7 @@ typedef struct
 	char			*hostname;
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+	char			*config_file;
 }
 zbx_thread_activechk_args;
 

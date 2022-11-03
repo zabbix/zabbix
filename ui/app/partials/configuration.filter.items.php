@@ -79,9 +79,10 @@ $filter_column_1
 			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 			'data' => $data['filter_data']['hosts'],
 			'popup' => [
-				'filter_preselect_fields' => $data['context'] === 'host'
-					? ['hostgroups' => 'filter_groupids_']
-					: ['templategroups' => 'filter_groupids_'],
+				'filter_preselect' => [
+					'id' => 'filter_groupids_',
+					'submit_as' => 'groupid'
+				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',

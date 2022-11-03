@@ -42,7 +42,7 @@
 int	zbx_is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
 {
 	zbx_uint64_t		value_uint64 = 0, c;
-	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
+	const zbx_uint64_t	max_uint64 = ~__UINT64_C(0);
 
 	if ('\0' == *str || 0 == n || sizeof(zbx_uint64_t) < size || (0 == size && NULL != value))
 		return FAIL;
@@ -100,7 +100,7 @@ int	zbx_is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx
 int	zbx_is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
 {
 	zbx_uint64_t		value_uint64 = 0, c;
-	const zbx_uint64_t	max_uint64 = ~(zbx_uint64_t)__UINT64_C(0);
+	const zbx_uint64_t	max_uint64 = ~__UINT64_C(0);
 	int			len = 0;
 
 	if ('\0' == *str || 0 == n || sizeof(zbx_uint64_t) < size || (0 == size && NULL != value))
@@ -141,7 +141,13 @@ int	zbx_is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_
 	return SUCCEED;
 }
 
+static double	ZBX_FLOAT_EPSILON = 0.0001;
 static double	ZBX_DOUBLE_EPSILON = 2.22e-16;
+
+double	zbx_get_float_epsilon(void)
+{
+	return ZBX_FLOAT_EPSILON;
+}
 
 double	zbx_get_double_epsilon(void)
 {
@@ -566,6 +572,44 @@ int	zbx_is_hex_string(const char *str)
 
 		str += 3;
 	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate and optionally convert a string to a number of type      *
+ *         'int'                                                              *
+ *                                                                            *
+ * Parameters: str   - [IN] string to check                                   *
+ *             value - [OUT] output buffer where to write the converted value *
+ *                     (optional, can be NULL)                                *
+ *                                                                            *
+ * Return value:  SUCCEED - the string can be converted to 'int' and          *
+ *                          was converted if 'value' is not NULL              *
+ *                FAIL - the string does not represent a valid 'int' or       *
+ *                       its value is outside of valid range                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_is_int(const char *str, int *value)
+{
+	const char	*ptr;
+	zbx_uint32_t	value_ui32;
+	int		sign;
+
+	if ('-' == *(ptr = str))
+	{
+		ptr++;
+		sign = -1;
+	}
+	else
+		sign = 1;
+
+	if (SUCCEED != zbx_is_uint31(ptr, &value_ui32))
+		return FAIL;
+
+	if (NULL != value)
+		*value = ((int)value_ui32 * sign);
 
 	return SUCCEED;
 }

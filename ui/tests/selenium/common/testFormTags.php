@@ -513,8 +513,8 @@ class testFormTags extends CWebTest {
 		else {
 			$tags_table = 'id:problem_tags';
 		}
-		$this->query($tags_table)->asMultifieldTable()->waitUntilPresent()->one()->fill($data['tags']);
 
+		$this->query($tags_table)->asMultifieldTable()->waitUntilPresent()->one()->fill($data['tags']);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -627,16 +627,13 @@ class testFormTags extends CWebTest {
 				break;
 
 			case 'host':
-				$form = $this->query('name:host-form')->asForm()->waitUntilPresent()->one();
-				$form->fill(['Host name' => $new_name]);
-				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
-				$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
-				break;
-
 			case 'host prototype':
+			case 'discovered host':
 				$form_name = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:host-form';
 				$form = $this->query($form_name)->asForm()->waitUntilPresent()->one();
-				$form->fill(['Host name' => $new_name]);
+				if ($object !== 'discovered host') {
+					$form->fill(['Host name' => $new_name]);
+				}
 				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
 				break;
@@ -661,6 +658,7 @@ class testFormTags extends CWebTest {
 				$sql_old_name = 'SELECT NULL FROM services WHERE name='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM services WHERE name='.zbx_dbstr($new_name);
 				break;
+
 		}
 
 		if (!$this->problem_tags) {
@@ -677,16 +675,26 @@ class testFormTags extends CWebTest {
 		$this->query('button', $action)->one()->click();
 		$this->page->waitUntilReady();
 
+		if ($object === 'discovered host') {
+			$form->fill(['Host name' => $new_name]);
+		}
+
 		// Find form again for cloned host and click Add host.
 		$form->invalidate();
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, (
-				($object === 'service')
-					? ucfirst($object).' created'
-					: ucfirst($object).' added'
-			)
-		);
+
+		if ($object === 'discovered host') {
+			$this->assertMessage(TEST_GOOD, ('Host added'));
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, (
+					($object === 'service')
+						? ucfirst($object).' created'
+						: ucfirst($object).' added'
+				)
+			);
+		}
 
 		// Check the results in DB.
 		$this->assertEquals(1, CDBHelper::getCount($sql_old_name));
@@ -705,6 +713,7 @@ class testFormTags extends CWebTest {
 		switch ($object) {
 			case 'host':
 			case 'host prototype':
+			case 'discovered host':
 				$this->assertEquals($new_name, $form->getField('Host name')->getValue());
 				break;
 
@@ -725,7 +734,7 @@ class testFormTags extends CWebTest {
 		$form->selectTab('Tags');
 		$element->checkValue($tags);
 
-		if ($object === 'host') {
+		if ($object === 'host' || $object === 'discovered host') {
 			COverlayDialogElement::find()->one()->close();
 		}
 	}
@@ -755,6 +764,7 @@ class testFormTags extends CWebTest {
 
 			case 'host':
 			case 'host prototype':
+			case 'discovered host':
 			case 'template':
 				$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['name']));
 		}

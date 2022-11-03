@@ -25,8 +25,7 @@ package zbxlib
 #cgo CFLAGS: -I${SRCDIR}/../../../../include
 #cgo CFLAGS: -I${SRCDIR}/../../../../include/common
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "module.h"
 typedef int (*zbx_agent_check_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
 
@@ -37,16 +36,16 @@ static int execute_check(const char *key, zbx_agent_check_t check_func, char **v
 	AGENT_RESULT result;
 	AGENT_REQUEST request;
 
-	init_request(&request);
-	init_result(&result);
-	if (SUCCEED != parse_item_key(key, &request))
+	zbx_init_agent_request(&request);
+	zbx_init_agent_result(&result);
+	if (SUCCEED != zbx_parse_item_key(key, &request))
 	{
 		*value = zbx_strdup(NULL, "Invalid item key format.");
 		goto out;
 	}
 	if (SYSINFO_RET_OK != check_func(&request, &result))
 	{
-		if (0 != ISSET_MSG(&result))
+		if (0 != ZBX_ISSET_MSG(&result))
 		{
 			*error = zbx_strdup(NULL, result.msg);
 		}
@@ -55,13 +54,13 @@ static int execute_check(const char *key, zbx_agent_check_t check_func, char **v
 		goto out;
 	}
 
-	if (NULL != (pvalue = GET_TEXT_RESULT(&result)))
+	if (NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 		*value = zbx_strdup(NULL, *pvalue);
 
 	ret = SUCCEED;
 out:
-	free_result(&result);
-	free_request(&request);
+	zbx_free_agent_result(&result);
+	zbx_free_agent_request(&request);
 	return ret;
 }
 
@@ -73,6 +72,7 @@ import (
 	"unsafe"
 
 	"zabbix.com/pkg/itemutil"
+	"git.zabbix.com/ap/plugin-support/log"
 )
 
 func ExecuteCheck(key string, params []string) (result *string, err error) {
@@ -84,17 +84,21 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 
 	var cvalue, cerrmsg *C.char
 	ckey := C.CString(itemutil.MakeKey(key, params))
+	log.Tracef("Calling C function \"execute_check()\"")
 	if C.execute_check(ckey, C.zbx_agent_check_t(cfunc), &cvalue, &cerrmsg) == Succeed {
 		if cvalue != nil {
 			value := C.GoString(cvalue)
 			result = &value
 		}
+		log.Tracef("Calling C function \"free()\"")
 		C.free(unsafe.Pointer(cvalue))
 
 	} else {
 		err = errors.New(C.GoString(cerrmsg))
+		log.Tracef("Calling C function \"free()\"")
 		C.free(unsafe.Pointer(cerrmsg))
 	}
+	log.Tracef("Calling C function \"free()\"")
 	C.free(unsafe.Pointer(ckey))
 	return
 }

@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 
 #ifndef ZABBIX_SYSINFO_COMMON_HTTP_METRICS_H
 #define ZABBIX_SYSINFO_COMMON_HTTP_METRICS_H

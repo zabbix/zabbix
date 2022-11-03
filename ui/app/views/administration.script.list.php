@@ -170,6 +170,10 @@ foreach ($data['scripts'] as $script) {
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
 			$type = _('Webhook');
 			break;
+
+		case ZBX_SCRIPT_TYPE_URL:
+			$type = _('URL');
+			break;
 	}
 
 	if ($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) {

@@ -18,8 +18,9 @@
 **/
 
 #include "checks_telnet.h"
-
 #include "telnet_run.h"
+
+#include "zbxsysinfo.h"
 
 int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 {
@@ -27,9 +28,9 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 	int		ret = NOTSUPPORTED;
 	const char	*port, *encoding, *dns;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key, &request))
+	if (SUCCEED != zbx_parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
@@ -77,7 +78,7 @@ int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result)
 
 	ret = telnet_run(item, result, ZBX_NULL2EMPTY_STR(encoding));
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }

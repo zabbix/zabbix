@@ -22,7 +22,7 @@
 #include "stats.h"
 #include "log.h"
 #include "zbxmutexs.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxstr.h"
 
 #define OBJECT_CACHE_REFRESH_INTERVAL	60

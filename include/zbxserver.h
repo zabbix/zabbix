@@ -56,8 +56,6 @@
 #define MACRO_EXPAND_NO			0
 #define MACRO_EXPAND_YES		1
 
-typedef void (*zbx_get_zabbix_stats_ext_func_t)(struct zbx_json *json);
-
 int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
 		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
@@ -77,9 +75,6 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);
 
 void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const zbx_uint64_t *itemids, int item_num);
-
-void	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext_func_t cb);
-void	zbx_get_zabbix_stats(struct zbx_json *json);
 
 #define ZBX_EXPRESSION_NORMAL		0
 #define ZBX_EXPRESSION_AGGREGATE	1

@@ -642,7 +642,7 @@ size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, 
 	}
 	else if ('/' != *key)
 	{
-		while (SUCCEED == is_hostname_char(*key))
+		while (SUCCEED == zbx_is_hostname_char(*key))
 			key++;
 	}
 
@@ -675,7 +675,7 @@ size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, 
 				end += ZBX_CONST_STRLEN(MVAR_ITEM_KEY) + offset;
 		}
 	}
-	else if (SUCCEED != parse_key(&end))
+	else if (SUCCEED != zbx_parse_key(&end))
 		return 0;
 
 	if (*end == '?')

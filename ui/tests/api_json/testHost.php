@@ -4066,7 +4066,7 @@ class testHost extends CAPITest {
 						$key = strtolower($key);
 					}
 
-					// Add macros to references just like in data perparation.
+					// Add macros to references just like in data preparation.
 					self::$data['hostmacroids'][$key] = $db_hostmacro['hostmacroid'];
 				}
 

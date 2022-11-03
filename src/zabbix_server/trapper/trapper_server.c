@@ -28,6 +28,7 @@
 #include "zbxipcservice.h"
 #include "zbxcommshigh.h"
 #include "zbxnum.h"
+#include "proxyconfigread/proxyconfig_read.h"
 
 extern int	CONFIG_REPORTMANAGER_FORKS;
 
@@ -214,8 +215,12 @@ fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 
-int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp)
+int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
+		const zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f get_program_type_cb)
 {
+	ZBX_UNUSED(zbx_config_tls);
+	ZBX_UNUSED(get_program_type_cb);
+
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_REPORT_TEST))
 	{
 		trapper_process_report_test(sock, jp);
@@ -224,6 +229,11 @@ int	trapper_process_request(const char *request, zbx_socket_t *sock, const struc
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND))
 	{
 		trapper_process_alert_send(sock, jp);
+		return SUCCEED;
+	}
+	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
+	{
+		zbx_send_proxyconfig(sock, jp);
 		return SUCCEED;
 	}
 

@@ -22,7 +22,7 @@
 #include "log.h"
 
 #ifdef _WINDOWS
-#	include "sysinfo.h"
+#	include "zbxsysinfo.h"
 #else
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 typedef struct
@@ -412,7 +412,7 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
 
 #ifdef _WINDOWS
 #ifdef ZABBIX_AGENT
-	if (0 != (ZBX_MUTEX_THREAD_DENIED & get_thread_global_mutex_flag()))
+	if (0 != (ZBX_MUTEX_THREAD_DENIED & zbx_get_thread_global_mutex_flag()))
 	{
 		zbx_error("[file:'%s',line:%d] lock failed: ZBX_MUTEX_THREAD_DENIED is set for thread with id = %d",
 				filename, line, zbx_get_thread_id());

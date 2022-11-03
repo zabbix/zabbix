@@ -21,7 +21,7 @@ package zbxlib
 
 /*
 #include "zbxstr.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "perfmon.h"
 #include "../src/zabbix_agent/metrics.h"
@@ -37,6 +37,9 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/time.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/expr.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/function.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/host.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/macro.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/token.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/fatal.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/disk.o
@@ -112,7 +115,7 @@ char	*strerror_from_system(unsigned long error)
 	return utf8_string;
 }
 
-int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported."));
 	return SYSINFO_RET_FAIL;

@@ -36,7 +36,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'type' => 'Email',
 					'smtp_server' => 'mail.example.com',
 					'smtp_port' => 25,
-					'smtp_helo' => 'example.com',
+					'smtp_helo' => '',
 					'smtp_email' => 'zabbix@example.com'
 				]
 			],
@@ -45,7 +45,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'type' => 'Email',
 					'smtp_server' => 'mail.example.com',
 					'smtp_port' => 25,
-					'smtp_helo' => 'example.com',
+					'smtp_helo' => '',
 					'smtp_email' => 'zabbix@example.com',
 					'smtp_security' => 'STARTTLS',
 					'smtp_authentication' => 'Username and password'
@@ -56,7 +56,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'type' => 'Email',
 					'smtp_server' => 'mail.example.com',
 					'smtp_port' => 25,
-					'smtp_helo' => 'example.com',
+					'smtp_helo' => '',
 					'smtp_email' => 'zabbix@example.com',
 					'smtp_security' => 'SSL/TLS'
 				]
@@ -66,7 +66,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 					'type' => 'Email',
 					'smtp_server' => 'mail.example.com',
 					'smtp_port' => 25,
-					'smtp_helo' => 'example.com',
+					'smtp_helo' => '',
 					'smtp_email' => 'zabbix@example.com',
 					'message_format' => 'Plain text'
 				]
@@ -96,22 +96,22 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Create media type');
 
 		$this->zbxTestCheckHeader('Media types');
-		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'SMTP helo', 'SMTP email',
-			'Connection security', 'Authentication', 'Message format']);
+		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'Email' , 'SMTP helo',
+			'Connection security', 'Authentication', 'Message format', 'Description', 'Enabled']);
 
 		$this->zbxTestAssertElementPresentId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", 100);
 
 		$this->zbxTestAssertElementPresentId('type');
 		$this->zbxTestDropdownAssertSelected('type', 'Email');
-		$this->zbxTestDropdownHasOptions('type', ['Email', 'Script', 'SMS']);
+		$this->zbxTestDropdownHasOptions('type', ['Email', 'Script', 'SMS', 'Webhook']);
 
 		$this->zbxTestAssertNotVisibleId('exec_path');
 		$this->zbxTestAssertNotVisibleId('exec_params_table');
 		$this->zbxTestAssertNotVisibleId('gsm_modem');
 		$this->zbxTestAssertNotVisibleId('passwd');
 
-		if($data['type'] != 'Email') {
+		if ($data['type'] != 'Email') {
 			$this->zbxTestDropdownSelectWait('type', $data['type']);
 			$this->zbxTestAssertNotVisibleId('smtp_server');
 			$this->zbxTestAssertNotVisibleId('smtp_port');
@@ -293,6 +293,11 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 	* @dataProvider allMediaTypes
 	*/
 	public function testFormAdministrationMediaTypes_SimpleUpdate($mediatype) {
+		// Skip cases for Gmail and Office365 default media types as they require a password to be entered.
+		if (in_array($mediatype['name'], ['Gmail', 'Office365'])) {
+			return;
+		}
+
 		$name = $mediatype['name'];
 		$sqlMediaType = 'SELECT * FROM  media_type ORDER BY name';
 		$oldHashMediaType=CDBHelper::getHash($sqlMediaType);

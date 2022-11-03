@@ -17,10 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
-
-#include <tlhelp32.h>
-#include "sddl.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxsymbols.h"
 #include "log.h"
@@ -28,7 +26,9 @@
 #include "zbxalgo.h"
 #include "zbxstr.h"
 
-#define MAX_PROCESSES	4096
+#include <tlhelp32.h>
+#include "sddl.h"
+
 #define MAX_NAME	256
 
 typedef struct
@@ -119,7 +119,7 @@ lbl_err:
 	return res;
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	HANDLE			hProcessSnap, hProcess;
 	PROCESSENTRY32		pe32;
@@ -340,7 +340,7 @@ static int	GetProcessAttribute(HANDLE hProcess, int attr, int type, int count, d
  *         avg - average value for all processes named <process>
  *         sum - sum of values for all processes named <process>
  */
-int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_info(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	HANDLE			hProcessSnap, hProcess;
 	PROCESSENTRY32		pe32;
@@ -478,7 +478,7 @@ static void	proc_data_free(proc_data_t *proc_data)
 	zbx_free(proc_data);
 }
 
-int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define SUM_PROC_VALUE_DBL(param)					\
 	do								\

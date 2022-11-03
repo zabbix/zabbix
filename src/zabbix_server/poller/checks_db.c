@@ -22,6 +22,8 @@
 #ifdef HAVE_UNIXODBC
 
 #include "log.h"
+#include "zbxsysinfo.h"
+
 #include "../odbc/odbc.h"
 
 /******************************************************************************
@@ -47,9 +49,9 @@ int	get_value_db(const DC_ITEM *item, AGENT_RESULT *result)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' query:'%s'", __func__, item->key_orig, item->params);
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED != parse_item_key(item->key, &request))
+	if (SUCCEED != zbx_parse_item_key(item->key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
@@ -114,7 +116,7 @@ int	get_value_db(const DC_ITEM *item, AGENT_RESULT *result)
 	if (SUCCEED != ret)
 		SET_MSG_RESULT(result, error);
 out:
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

@@ -1,0 +1,72 @@
+---
+test case: successfully called system_localtime function
+in:
+  in_command: system.localtime[utc]
+  flags: 4
+---
+test case: successfully called vfs_file_size function
+in:
+  in_command: vfs.file.size[/etc/passwd]
+  flags: 4
+---
+test case: successfully called vfs_file_time function
+in:
+  in_command: vfs.file.time[/etc/passwd,modify]
+  flags: 4
+---
+test case: successfully called vfs_file_exists function
+in:
+  in_command: vfs.file.exists[/etc/passwd]
+  flags: 4
+---
+test case: successfully called vfs_file_contents function
+in:
+  in_command: vfs.file.contents[/etc/passwd]
+  flags: 4
+---
+# This case doesn't work
+#test case: successfully called vfs_file_regexp function
+#in:
+#  in_command: vfs.file.regexp[/etc/passwd,root]
+#  flags: 4
+#---
+test case: successfully called vfs_file_regmatch function
+in:
+  in_command: vfs.file.regmatch[/etc/passwd,root]
+  flags: 4
+---
+test case: successfully called vfs_file_md5sum function
+in:
+  in_command: vfs.file.md5sum[/etc/passwd]
+  flags: 4
+---
+test case: successfully called vfs_file_cksum function
+in:
+  in_command: vfs.file.cksum[/etc/passwd]
+  flags: 4
+---
+test case: successfully called vfs_dir_size function
+in:
+  in_command: vfs.dir.size[/var/log]
+  flags: 4
+---
+test case: successfully called net_dns function
+in:
+  in_command: net.dns[,zabbix.com]
+  flags: 4
+---
+test case: successfully called net_dns_record function
+in:
+  in_command: net.dns.record[,zabbix.com]
+  flags: 4
+---
+test case: successfully called net_tcp_port function
+in:
+  in_command: net.tcp.port[,80]
+  flags: 4
+---
+test case: successfully called system_users_num function
+in:
+  in_command: system.users.num
+  flags: 4
+...

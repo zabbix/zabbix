@@ -220,31 +220,31 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'system.cpu.util[,,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 0.5
+			'threshold' => 0.9
 		],
 		[
 			'key' => 'system.cpu.load[,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 0.5
+			'threshold' => 0.9
 		],
 		[
 			'key' => 'vfs.dev.read[,operations]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 10
+			'threshold' => 1000
 		],
 		[
 			'key' => 'vfs.dev.write[,operations]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 100
+			'threshold' => 10000
 		],
 		[
 			'key' => 'proc.cpu.util[,,,,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 10.0,
+			'threshold' => 90.0,
 			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
@@ -258,60 +258,60 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'system.swap.out[,pages]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 100,
+			'threshold' => 10000,
 			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'proc.mem[zabbix_server,zabbix,avg]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 100.0
+			'threshold' => 10000.0
 		],
 		[
 			'key' => 'web.page.perf[http://localhost]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 1.0,
+			'threshold' => 100.0,
 			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'net.tcp.service.perf[ssh]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 0.05
+			'threshold' => 5.00
 		],
 		[
 			'key' => 'net.udp.service.perf[ntp]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 0.05
+			'threshold' => 5.00
 		],
 		[
 			'key' => 'system.swap.size[,total]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 100,
+			'threshold' => 10000,
 			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'vfs.fs.inode[/,pfree]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 0.1,
+			'threshold' => 0.9,
 			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'vfs.fs.size[/tmp,free]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 10000000,
+			'threshold' => 100000000,
 			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'vm.memory.size[free]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 10000000,
+			'threshold' => 100000000,
 			'compareType' => self::COMPARE_AVERAGE
 		],
 		[// Should be treated as a special case, since this metric returns JSON object.
@@ -319,7 +319,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'zabbix.stats[127.0.0.1,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'threshold' => 50
+			'threshold' => 500
 		]
 	];
 

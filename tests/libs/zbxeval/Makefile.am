@@ -31,7 +31,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/proxypoller/libzbxproxypoller.a \
-	$(top_srcdir)/src/zabbix_server/selfmon/libzbxselfmon.a \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_srcdir)/src/zabbix_server/taskmanager/libzbxtaskmanager.a \
 	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
@@ -68,6 +67,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
 	$(top_builddir)/src/libs/zbxcyberark/libzbxcyberark.a \
 	$(top_builddir)/src/libs/zbxhashicorp/libzbxhashicorp.a \

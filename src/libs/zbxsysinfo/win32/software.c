@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
-int	SYSTEM_SW_ARCH(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
 

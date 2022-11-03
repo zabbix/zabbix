@@ -17,14 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <sys/procfs.h>
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxstr.h"
 
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+#include <sys/procfs.h>
+
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DIR		*dir;
 	int		proc;
@@ -150,7 +152,7 @@ out:
 	return SYSINFO_RET_OK;
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DIR		*dir;
 	int		proc;

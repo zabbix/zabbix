@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 require_once dirname(__FILE__).'/traits/TagTrait.php';
@@ -230,7 +231,8 @@ class testPageMonitoringHosts extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Status' => 'Disabled'
+						'Status' => 'Disabled',
+						'Host groups' => ['Zabbix server']
 					],
 					'expected' => [
 						'No data found.'
@@ -923,13 +925,17 @@ class testPageMonitoringHosts extends CWebTest {
 					'name' => 'ЗАББИКС Сервер',
 					'disabled' => ['Web'],
 					'titles' => [
-						'Inventory',
-						'Latest data',
-						'Problems',
-						'Graphs',
 						'Dashboards',
+						'Problems',
+						'Latest data',
+						'Graphs',
 						'Web',
-						'Configuration',
+						'Inventory',
+						'Host',
+						'Items',
+						'Triggers',
+						'Discovery',
+						'Web',
 						'Detect operating system',
 						'Ping',
 						'Script for Clone',
@@ -944,13 +950,17 @@ class testPageMonitoringHosts extends CWebTest {
 					'name' => 'Available host',
 					'disabled' => ['Web', 'Graphs', 'Dashboards'],
 					'titles' => [
-						'Inventory',
-						'Latest data',
-						'Problems',
-						'Graphs',
 						'Dashboards',
+						'Problems',
+						'Latest data',
+						'Graphs',
 						'Web',
-						'Configuration',
+						'Inventory',
+						'Host',
+						'Items',
+						'Triggers',
+						'Discovery',
+						'Web',
 						'Detect operating system',
 						'Ping',
 						'Script for Clone',
@@ -965,13 +975,17 @@ class testPageMonitoringHosts extends CWebTest {
 					'name' => 'Dynamic widgets H1',
 					'disabled' => ['Dashboards', 'Web'],
 					'titles' => [
-						'Inventory',
-						'Latest data',
-						'Problems',
-						'Graphs',
 						'Dashboards',
+						'Problems',
+						'Latest data',
+						'Graphs',
 						'Web',
-						'Configuration',
+						'Inventory',
+						'Host',
+						'Items',
+						'Triggers',
+						'Discovery',
+						'Web',
 						'Detect operating system',
 						'Ping',
 						'Script for Clone',
@@ -986,13 +1000,17 @@ class testPageMonitoringHosts extends CWebTest {
 					'name' => 'Host ZBX6663',
 					'disabled' => ['Dashboards'],
 					'titles' => [
-						'Inventory',
-						'Latest data',
-						'Problems',
-						'Graphs',
 						'Dashboards',
+						'Problems',
+						'Latest data',
+						'Graphs',
 						'Web',
-						'Configuration',
+						'Inventory',
+						'Host',
+						'Items',
+						'Triggers',
+						'Discovery',
+						'Web',
 						'Detect operating system',
 						'Ping',
 						'Script for Clone',
@@ -1016,11 +1034,13 @@ class testPageMonitoringHosts extends CWebTest {
 		$row->query('link', $data['name'])->one()->click();
 		$this->page->waitUntilReady();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-		$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
+		$this->assertEquals(['VIEW', 'CONFIGURATION', 'SCRIPTS'], $popup->getTitles()->asText());
 		$this->assertTrue($popup->hasItems($data['titles']));
+
 		foreach ($data['disabled'] as $disabled) {
-			$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '.
-					$disabled.'" and @class="menu-popup-item disabled"]')->one()->isPresent());
+			$this->assertTrue($popup->query('xpath://a[@aria-label="View, '.
+					$disabled.'" and @class="menu-popup-item disabled"]')->one()->isPresent()
+			);
 		}
 	}
 

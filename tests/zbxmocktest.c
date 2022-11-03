@@ -26,10 +26,6 @@
 
 unsigned char	program_type	= 0;
 
-ZBX_THREAD_LOCAL unsigned char	process_type		= 0;
-ZBX_THREAD_LOCAL int		process_num		= 0;
-ZBX_THREAD_LOCAL int		server_num		= 0;
-
 int	CONFIG_ALERTER_FORKS		= 3;
 int	CONFIG_DISCOVERER_FORKS		= 1;
 int	CONFIG_HOUSEKEEPER_FORKS	= 1;
@@ -45,7 +41,6 @@ int	CONFIG_JAVAPOLLER_FORKS		= 0;
 int	CONFIG_ESCALATOR_FORKS		= 1;
 int	CONFIG_SELFMON_FORKS		= 1;
 int	CONFIG_DATASENDER_FORKS		= 0;
-int	CONFIG_HEARTBEAT_FORKS		= 0;
 int	CONFIG_COLLECTOR_FORKS		= 0;
 int	CONFIG_PASSIVE_FORKS		= 0;
 int	CONFIG_ACTIVE_FORKS		= 0;

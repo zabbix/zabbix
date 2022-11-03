@@ -57,8 +57,9 @@ $left_column = (new CFormList())
 			'object_name' => 'hosts',
 			'data' => array_key_exists('hosts', $data) ? $data['hosts'] : [],
 			'popup' => [
-				'filter_preselect_fields' => [
-					'hostgroups' => 'groupids_'
+				'filter_preselect' => [
+					'id' => 'groupids_',
+					'submit_as' => 'groupid'
 				],
 				'parameters' => [
 					'srctbl' => 'hosts',
@@ -77,8 +78,9 @@ $left_column = (new CFormList())
 			'object_name' => 'triggers',
 			'data' => array_key_exists('triggers', $data) ? $data['triggers'] : [],
 			'popup' => [
-				'filter_preselect_fields' => [
-					'hosts' => 'hostids_'
+				'filter_preselect' => [
+					'id' => 'hostids_',
+					'submit_as' => 'hostid'
 				],
 				'parameters' => [
 					'srctbl' => 'triggers',
@@ -279,7 +281,7 @@ $right_column = (new CFormList())
 			->setUncheckedValue(0)
 			->setId('details_#{uniqid}'),
 		(new CDiv([
-			(new CLabel(_('Highlight whole row'), 'highlight_row'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
+			(new CLabel(_('Highlight whole row'), 'highlight_row_#{uniqid}'))->addClass(ZBX_STYLE_SECOND_COLUMN_LABEL),
 			(new CCheckBox('highlight_row'))
 				->setChecked($data['highlight_row'] == 1)
 				->setEnabled($data['compact_view'] == 1)
@@ -522,8 +524,9 @@ if (array_key_exists('render_html', $data)) {
 			name: 'hostids[]',
 			data: data.filter_view_data.hosts || [],
 			popup: {
-				filter_preselect_fields: {
-					hostgroups: 'groupids_' + data.uniqid
+				filter_preselect: {
+					id: 'groupids_' + data.uniqid,
+					submit_as: 'groupid'
 				},
 				parameters: {
 					multiselect: 1,
@@ -542,8 +545,9 @@ if (array_key_exists('render_html', $data)) {
 			name: 'triggerids[]',
 			data: data.filter_view_data.triggers || [],
 			popup: {
-				filter_preselect_fields: {
-					hosts: 'hostids_' + data.uniqid
+				filter_preselect: {
+					id: 'hostids_' + data.uniqid,
+					submit_as: 'hostid'
 				},
 				parameters: {
 					srctbl: 'triggers',

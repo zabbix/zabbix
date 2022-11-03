@@ -44,6 +44,8 @@ jQuery(document).ready(function($) {
 				$('#mediatype_email_send_to').hide();
 			}
 
+			$('.focusable', $(this)).toggleClass('red', $(`li[value="${mediatypeid}"]`, $(this)).hasClass('red'));
+
 		})
 		.trigger("change");
 

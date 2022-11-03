@@ -19,11 +19,11 @@
 
 #include "preprocessing.h"
 
-#include "zbxcommon.h"
 #include "log.h"
 #include "zbxserialize.h"
 #include "preproc_history.h"
 #include "item_preproc.h"
+#include "zbxsysinfo.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
@@ -683,7 +683,7 @@ void	zbx_preprocessor_free_dep_results(zbx_preproc_dep_result_t *results, int re
 
 	for (i = 0; i < results_num; i++)
 	{
-		free_result(&results[i].value);
+		zbx_free_agent_result(&results[i].value);
 		zbx_free(results[i].error);
 		zbx_vector_ptr_clear_ext(&results[i].history, (zbx_clean_func_t)zbx_preproc_op_history_free);
 		zbx_vector_ptr_destroy(&results[i].history);
@@ -1220,7 +1220,7 @@ static void	agent_result_set_value(zbx_variant_t *value, zbx_item_value_type_t v
 	unsigned char	type;
 	zbx_log_t	*log;
 
-	init_result(result);
+	zbx_init_agent_result(result);
 
 	if (NULL != *error)
 		return;
@@ -1536,16 +1536,16 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 
 	if (ITEM_STATE_NORMAL == state)
 	{
-		if (0 != ISSET_STR(result))
+		if (0 != ZBX_ISSET_STR(result))
 			value_len = strlen(result->str);
 
-		if (0 != ISSET_TEXT(result))
+		if (0 != ZBX_ISSET_TEXT(result))
 		{
 			if (value_len < (len = strlen(result->text)))
 				value_len = len;
 		}
 
-		if (0 != ISSET_LOG(result))
+		if (0 != ZBX_ISSET_LOG(result))
 		{
 			if (value_len < (len = strlen(result->log->value)))
 				value_len = len;

@@ -1,1 +1,0 @@
-..F....... [ZBX-21343] fixed trends, history and interval values being incorrectly converted to years in item list subfilter (agriscenko)

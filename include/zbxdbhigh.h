@@ -25,6 +25,7 @@
 #include "zbxdbschema.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxversion.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;
@@ -41,13 +42,6 @@ extern char	*CONFIG_DB_TLS_CIPHER_13;
 extern int	CONFIG_DBPORT;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
-
-typedef enum
-{
-	ZBX_TEMPLATE_LINK_MANUAL = 0,
-	ZBX_TEMPLATE_LINK_LLD = 1
-}
-zbx_host_template_link_type;
 
 #define ZBX_DB_CONNECT_NORMAL	0
 #define ZBX_DB_CONNECT_EXIT	1
@@ -156,6 +150,8 @@ zbx_host_template_link_type;
 #define ZBX_DSERVICE_VALUE_LEN		255
 #define ZBX_MAX_DISCOVERED_VALUE_SIZE	(ZBX_DSERVICE_VALUE_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1)
 
+typedef zbx_uint64_t	(*zbx_dc_get_nextid_func_t)(const char *table_name, int num);
+
 #ifdef HAVE_ORACLE
 #	define ZBX_PLSQL_BEGIN	"begin\n"
 #	define ZBX_PLSQL_END	"end;"
@@ -182,6 +178,12 @@ zbx_host_template_link_type;
 #	endif
 #	define	ZBX_SQL_STRVAL_EQ(str)	"=", str
 #	define	ZBX_SQL_STRVAL_NE(str)	"<>", str
+#endif
+
+#ifdef HAVE_MYSQL
+#	define ZBX_SQL_CONCAT()		"concat(%s,%s)"
+#else
+#	define ZBX_SQL_CONCAT()		"%s||%s"
 #endif
 
 #define ZBX_SQL_NULLCMP(f1, f2)	"((" f1 " is null and " f2 " is null) or " f1 "=" f2 ")"
@@ -218,6 +220,7 @@ typedef struct
 	char		*expression;
 	char		*recovery_expression;
 	char		*url;
+	char		*url_name;
 	char		*comments;
 	char		*correlation_tag;
 	char		*opdata;
@@ -233,6 +236,7 @@ typedef struct
 }
 ZBX_DB_TRIGGER;
 
+/* temporary cache of trigger related data */
 typedef struct
 {
 	zbx_uint64_t		serviceid;
@@ -410,7 +414,7 @@ typedef struct
 }
 zbx_service_alarm_t;
 
-int	DBinit(char **error);
+int	DBinit(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char **error);
 void	DBdeinit(void);
 
 void	DBinit_autoincrement_options(void);
@@ -497,7 +501,6 @@ typedef struct
 }
 zbx_trigger_diff_t;
 
-void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_diff);
 void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff);
 void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
 void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t triggerid, unsigned char priority,
@@ -507,27 +510,6 @@ char	*DBdyn_escape_field(const char *table_name, const char *field_name, const c
 char	*DBdyn_escape_string(const char *src);
 char	*DBdyn_escape_string_len(const char *src, size_t length);
 char	*DBdyn_escape_like_pattern(const char *src);
-
-int	DBadd_templates_to_host(int hostid, int host_templateid);
-
-int	DBadd_template_linkage(int hostid, int templateid, int items, int triggers, int graphs);
-
-int	DBadd_trigger_to_linked_hosts(int triggerid, int hostid);
-void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
-
-int	DBadd_graph_item_to_linked_hosts(int gitemid, int hostid);
-
-int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
-		zbx_host_template_link_type link_type, char **error);
-int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_vector_uint64_t *del_templateids,
-		char **error);
-
-void	DBdelete_items(zbx_vector_uint64_t *itemids);
-void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
-void	DBdelete_triggers(zbx_vector_uint64_t *triggerids);
-
-void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames);
-void	DBdelete_hosts_with_prototypes(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *hostnames);
 
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);
@@ -566,21 +548,7 @@ typedef enum
 }
 zbx_conn_flags_t;
 
-zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
-		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags);
-void	DBadd_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version,
-		const unsigned char bulk, const char *community, const char *securityname,
-		const unsigned char securitylevel, const char *authpassphrase, const char *privpassphrase,
-		const unsigned char authprotocol, const unsigned char privprotocol, const char *contextname,
-		const zbx_uint64_t hostid);
-
 const char	*DBget_inventory_field(unsigned char inventory_link);
-
-void	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode);
-void	DBadd_host_inventory(zbx_uint64_t hostid, int inventory_mode);
-
-int	DBtxn_status(void);
-int	DBtxn_ongoing(void);
 
 int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
@@ -604,8 +572,6 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
 #define DBlock_triggerids(ids)			DBlock_records("triggers", ids)
 #define DBlock_itemids(ids)			DBlock_records("items", ids)
 #define DBlock_group_prototypeids(ids)		DBlock_records("group_prototype", ids)
-
-void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 
 void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids);
 
@@ -674,25 +640,22 @@ typedef struct
 }
 zbx_item_diff_t;
 
-/* event support */
-void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events);
-void	zbx_db_free_event(ZBX_DB_EVENT *event);
-void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
-		zbx_vector_uint64_t *r_eventids);
 void	zbx_db_trigger_get_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
 void	zbx_db_trigger_get_recovery_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
 void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
 
 typedef struct
 {
-	zbx_uint64_t		hostid;
-	unsigned char		compress;
-	int			version;
-	int			lastaccess;
-	int			last_version_error_time;
-	int			proxy_delay;
-	int			more_data;
-	zbx_proxy_suppress_t	nodata_win;
+	zbx_uint64_t			hostid;
+	unsigned char			compress;
+	char				*version_str;
+	int				version_int;
+	zbx_proxy_compatibility_t	compatibility;
+	int				lastaccess;
+	int				last_version_error_time;
+	int				proxy_delay;
+	int				more_data;
+	zbx_proxy_suppress_t		nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)
@@ -701,13 +664,12 @@ typedef struct
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR			__UINT64_C(0x0008)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_PROXYDELAY			__UINT64_C(0x0010)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN		__UINT64_C(0x0020)
-#define ZBX_FLAGS_PROXY_DIFF_UPDATE_HEARTBEAT			__UINT64_C(0x0040)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG			__UINT64_C(0x0080)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
-	zbx_uint64_t	flags;
+	zbx_uint64_t			flags;
 }
 zbx_proxy_diff_t;
 
@@ -715,19 +677,6 @@ int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids);
 
 void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset, const zbx_vector_ptr_t *item_diff,
 		zbx_uint64_t mask);
-
-/* mock field to estimate how much data can be stored in characters, bytes or both, */
-/* depending on database backend                                                    */
-
-typedef struct
-{
-	int	bytes_num;
-	int	chars_num;
-}
-zbx_db_mock_field_t;
-
-void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field_len);
-int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text);
 
 int	zbx_db_check_instanceid(void);
 
@@ -833,8 +782,54 @@ int	zbx_db_trigger_get_constant(const ZBX_DB_TRIGGER *trigger, int index, char *
 int	zbx_db_trigger_get_itemid(const ZBX_DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
 void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
 
-int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
-
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
+void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
+
+#define ZBX_MAX_HRECORDS	1000
+#define ZBX_MAX_HRECORDS_TOTAL	10000
+
+#define ZBX_PROXY_DATA_DONE	0
+#define ZBX_PROXY_DATA_MORE	1
+
+void	calc_timestamp(const char *line, int *timestamp, const char *format);
+
+char	*zbx_get_proxy_protocol_version_str(const struct zbx_json_parse *jp);
+int	zbx_get_proxy_protocol_version_int(const char *version_str);
+
+/* condition evaluation types */
+#define ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR			0
+#define ZBX_ACTION_CONDITION_EVAL_TYPE_AND			1
+#define ZBX_ACTION_CONDITION_EVAL_TYPE_OR			2
+#define ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION		3
+
+/* condition types */
+#define ZBX_CONDITION_TYPE_HOST_GROUP			0
+#define ZBX_CONDITION_TYPE_HOST				1
+#define ZBX_CONDITION_TYPE_TRIGGER			2
+#define ZBX_CONDITION_TYPE_TRIGGER_NAME			3
+#define ZBX_CONDITION_TYPE_TRIGGER_SEVERITY		4
+/* #define ZBX_CONDITION_TYPE_TRIGGER_VALUE		5	deprecated */
+#define ZBX_CONDITION_TYPE_TIME_PERIOD			6
+#define ZBX_CONDITION_TYPE_DHOST_IP			7
+#define ZBX_CONDITION_TYPE_DSERVICE_TYPE		8
+#define ZBX_CONDITION_TYPE_DSERVICE_PORT		9
+#define ZBX_CONDITION_TYPE_DSTATUS			10
+#define ZBX_CONDITION_TYPE_DUPTIME			11
+#define ZBX_CONDITION_TYPE_DVALUE			12
+#define ZBX_CONDITION_TYPE_HOST_TEMPLATE		13
+#define ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED		14
+/* #define ZBX_CONDITION_TYPE_APPLICATION		15	deprecated */
+#define ZBX_CONDITION_TYPE_SUPPRESSED			16
+#define ZBX_CONDITION_TYPE_DRULE			18
+#define ZBX_CONDITION_TYPE_DCHECK			19
+#define ZBX_CONDITION_TYPE_PROXY			20
+#define ZBX_CONDITION_TYPE_DOBJECT			21
+#define ZBX_CONDITION_TYPE_HOST_NAME			22
+#define ZBX_CONDITION_TYPE_EVENT_TYPE			23
+#define ZBX_CONDITION_TYPE_HOST_METADATA		24
+#define ZBX_CONDITION_TYPE_EVENT_TAG			25
+#define ZBX_CONDITION_TYPE_EVENT_TAG_VALUE		26
+#define ZBX_CONDITION_TYPE_SERVICE			27
+#define ZBX_CONDITION_TYPE_SERVICE_NAME			28
 
 #endif /* ZABBIX_DBHIGH_H */

@@ -804,7 +804,7 @@ sub process_changelog($)
 
 	if ($delete_cascade)
 	{
-		die("foreign keys without RESTRICT flag are not compatible with table CHANGELOG token");
+		die("table '$table_name' foreign keys without RESTRICT flag are not compatible with table CHANGELOG token");
 	}
 
 	if (exists($table_types{$table_type}) && $table_types{$table_type} ne $table_name)

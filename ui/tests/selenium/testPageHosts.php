@@ -18,12 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
- * @dataSource TagFilter
+ * @dataSource TagFilter, Proxies
+ *
+ * @backup hosts
  */
 class testPageHosts extends CLegacyWebTest {
 	public $HostName = 'ЗАББИКС Сервер';
@@ -254,6 +257,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
+		$filter->getField('Host groups')->fill('Zabbix servers');
 
 		$this->zbxTestClickXpathWait('//label[text()="Proxy"]');
 		$this->zbxTestClickButtonText('Apply');

@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-#include "sysinfo.h"
+#include "zbxsysinfo.h"
+
 #include "modbtype.h"
 
 extern char			*CONFIG_HOSTNAMES;
@@ -26,25 +26,25 @@ extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 extern char			*CONFIG_HOST_METADATA;
 extern char			*CONFIG_HOST_METADATA_ITEM;
 
-static int	AGENT_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result);
-static int	AGENT_HOSTMETADATA(AGENT_REQUEST *request, AGENT_RESULT *result);
-static int	AGENT_PING(AGENT_REQUEST *request, AGENT_RESULT *result);
-static int	AGENT_VERSION(AGENT_REQUEST *request, AGENT_RESULT *result);
-static int	AGENT_VARIANT(AGENT_REQUEST *request, AGENT_RESULT *result);
+static int	agent_hostname(AGENT_REQUEST *request, AGENT_RESULT *result);
+static int	agent_hostmetadata(AGENT_REQUEST *request, AGENT_RESULT *result);
+static int	agent_ping(AGENT_REQUEST *request, AGENT_RESULT *result);
+static int	agent_version(AGENT_REQUEST *request, AGENT_RESULT *result);
+static int	agent_variant(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 ZBX_METRIC	parameters_agent[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
-	{"agent.hostname",	0,		AGENT_HOSTNAME,		NULL},
-	{"agent.hostmetadata",	0,		AGENT_HOSTMETADATA,	NULL},
-	{"agent.ping",		0,		AGENT_PING,		NULL},
-	{"agent.variant",	0,		AGENT_VARIANT,		NULL},
-	{"agent.version",	0,		AGENT_VERSION,		NULL},
-	{"modbus.get",		CF_HAVEPARAMS,	MODBUS_GET,		"tcp://127.0.0.1"},
+	{"agent.hostname",	0,		agent_hostname,		NULL},
+	{"agent.hostmetadata",	0,		agent_hostmetadata,	NULL},
+	{"agent.ping",		0,		agent_ping,		NULL},
+	{"agent.variant",	0,		agent_variant,		NULL},
+	{"agent.version",	0,		agent_version,		NULL},
+	{"modbus.get",		CF_HAVEPARAMS,	modbus_get,		"tcp://127.0.0.1"},
 	{NULL}
 };
 
-static int	AGENT_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	agent_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
 
@@ -62,7 +62,7 @@ static int	AGENT_HOSTNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	AGENT_HOSTMETADATA(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	agent_hostmetadata(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_OK;
 
@@ -74,8 +74,8 @@ static int	AGENT_HOSTMETADATA(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else if (NULL != CONFIG_HOST_METADATA_ITEM)
 	{
-		if (SUCCEED != process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, result) ||
-				NULL == GET_STR_RESULT(result))
+		if (SUCCEED != zbx_execute_agent_check(CONFIG_HOST_METADATA_ITEM, ZBX_PROCESS_LOCAL_COMMAND |
+				ZBX_PROCESS_WITH_ALIAS, result) || NULL == ZBX_GET_STR_RESULT(result))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot get host metadata using item \"%s\"",
 					CONFIG_HOST_METADATA_ITEM));
@@ -88,7 +88,7 @@ static int	AGENT_HOSTMETADATA(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-static int	AGENT_PING(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	agent_ping(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
 
@@ -97,7 +97,7 @@ static int	AGENT_PING(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	AGENT_VERSION(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	agent_version(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
 
@@ -106,7 +106,7 @@ static int	AGENT_VERSION(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	AGENT_VARIANT(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	agent_variant(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
 
