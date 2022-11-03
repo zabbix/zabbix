@@ -115,6 +115,88 @@ static void	worker_format_result(int step, const zbx_preproc_result_t *result, c
 	}
 }
 
+/* mock field to estimate how much data can be stored in characters, bytes or both, */
+/* depending on database backend                                                    */
+
+typedef struct
+{
+	int	bytes_num;
+	int	chars_num;
+}
+zbx_db_mock_field_t;
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initializes mock field                                            *
+ *                                                                            *
+ * Parameters: field      - [OUT] the field data                              *
+ *             field_type - [IN] the field type in database schema            *
+ *             field_len  - [IN] the field size in database schema            *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field_len)
+{
+	switch (field_type)
+	{
+		case ZBX_TYPE_CHAR:
+#if defined(HAVE_ORACLE)
+			field->chars_num = field_len;
+			field->bytes_num = 4000;
+#else
+			field->chars_num = field_len;
+			field->bytes_num = -1;
+#endif
+			return;
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+
+	field->chars_num = 0;
+	field->bytes_num = 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: 'appends' text to the field, if successful the character/byte     *
+ *           limits are updated                                               *
+ *                                                                            *
+ * Parameters: field - [IN/OUT] the mock field                                *
+ *             text  - [IN] the text to append                                *
+ *                                                                            *
+ * Return value: SUCCEED - the field had enough space to append the text      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text)
+{
+	int	bytes_num, chars_num;
+
+	if (-1 != field->bytes_num)
+	{
+		bytes_num = strlen(text);
+		if (bytes_num > field->bytes_num)
+			return FAIL;
+	}
+	else
+		bytes_num = 0;
+
+	if (-1 != field->chars_num)
+	{
+		chars_num = zbx_strlen_utf8(text);
+		if (chars_num > field->chars_num)
+			return FAIL;
+	}
+	else
+		chars_num = 0;
+
+	field->bytes_num -= bytes_num;
+	field->chars_num -= chars_num;
+
+	return SUCCEED;
+}
+
+
+
 /******************************************************************************
  *                                                                            *
  * Purpose: formats preprocessing error message                               *

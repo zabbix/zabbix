@@ -542,6 +542,17 @@ class CFormElement extends CElement {
 	}
 
 	/**
+	 * Check if field is marked as required in form.
+	 *
+	 * @param string $label    field label text
+	 *
+	 * @return boolean
+	 */
+	public function isRequired($label) {
+		return $this->getLabel($label)->hasClass('form-label-asterisk');
+	}
+
+	/**
 	 * Get form fields values.
 	 *
 	 * @param CElementFilter $filter    condition to be filtered by

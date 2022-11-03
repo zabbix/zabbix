@@ -34,7 +34,9 @@ class CGridFormElement extends CFormElement {
 	 * @inheritDoc
 	 */
 	public function getLabels($filter = null, $filter_params = []) {
-		$labels = $this->query('xpath:./div/div/'.self::TABLE_FORM.'/label|./'.self::TABLE_FORM.'/label')->all();
+		$labels = $this->query("xpath:.//div/div/".self::TABLE_FORM."/label|./".self::TABLE_FORM.
+				"/label|./div/div/div/div/".self::TABLE_FORM."/label"
+		)->all();
 
 		if ($this->filter !== null) {
 			$labels = $labels->filter($this->filter);

@@ -23,6 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxsysinfo.h"
+#include "../../../../src/libs/zbxsysinfo/sysinfo.h"
 #include "file.h"
 
 #define TEST_NAME "VFS_FILE_EXISTS"
@@ -45,7 +46,7 @@ void	zbx_mock_test_entry(void **state)
 	if (SUCCEED != zbx_parse_item_key(key, &request))
 		fail_msg("Cannot parse item key: %s", key);
 
-	ret = VFS_FILE_EXISTS(&request, &result);
+	ret = vfs_file_exists(&request, &result);
 	zbx_mock_assert_sysinfo_ret_eq("Invalid "TEST_NAME" return value", expected_ret, ret);
 
 	if (SYSINFO_RET_OK == ret)

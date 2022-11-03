@@ -18,50 +18,51 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 ZBX_METRIC	parameters_specific[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
-	{"kernel.maxfiles",	0,		KERNEL_MAXFILES,	NULL},
-	{"kernel.maxproc",	0,		KERNEL_MAXPROC,		NULL},
+	{"kernel.maxfiles",	0,		kernel_maxfiles,	NULL},
+	{"kernel.maxproc",	0,		kernel_maxproc,		NULL},
 
-	{"vfs.fs.size",		CF_HAVEPARAMS,	VFS_FS_SIZE,		"/,free"},
-	{"vfs.fs.inode",	CF_HAVEPARAMS,	VFS_FS_INODE,		"/,free"},
-	{"vfs.fs.discovery",	0,		VFS_FS_DISCOVERY,	NULL},
-	{"vfs.fs.get",		0,		VFS_FS_GET,		NULL},
+	{"vfs.fs.size",		CF_HAVEPARAMS,	vfs_fs_size,		"/,free"},
+	{"vfs.fs.inode",	CF_HAVEPARAMS,	vfs_fs_inode,		"/,free"},
+	{"vfs.fs.discovery",	0,		vfs_fs_discovery,	NULL},
+	{"vfs.fs.get",		0,		vfs_fs_get,		NULL},
 
-	{"vfs.dev.read",	CF_HAVEPARAMS,	VFS_DEV_READ,		"da0,operations"},
-	{"vfs.dev.write",	CF_HAVEPARAMS,	VFS_DEV_WRITE,		"da0,operations"},
+	{"vfs.dev.read",	CF_HAVEPARAMS,	vfs_dev_read,		"da0,operations"},
+	{"vfs.dev.write",	CF_HAVEPARAMS,	vfs_dev_write,		"da0,operations"},
 
-	{"net.tcp.listen",	CF_HAVEPARAMS,	NET_TCP_LISTEN,		"80"},
-	{"net.udp.listen",	CF_HAVEPARAMS,	NET_UDP_LISTEN,		"68"},
+	{"net.tcp.listen",	CF_HAVEPARAMS,	net_tcp_listen,		"80"},
+	{"net.udp.listen",	CF_HAVEPARAMS,	net_udp_listen,		"68"},
 
-	{"net.if.in",		CF_HAVEPARAMS,	NET_IF_IN,		"lo0,bytes"},
-	{"net.if.out",		CF_HAVEPARAMS,	NET_IF_OUT,		"lo0,bytes"},
-	{"net.if.total",	CF_HAVEPARAMS,	NET_IF_TOTAL,		"lo0,bytes"},
-	{"net.if.collisions",	CF_HAVEPARAMS,	NET_IF_COLLISIONS,	"lo0"},
-	{"net.if.discovery",	0,		NET_IF_DISCOVERY,	"lo0"},
+	{"net.if.in",		CF_HAVEPARAMS,	net_if_in,		"lo0,bytes"},
+	{"net.if.out",		CF_HAVEPARAMS,	net_if_out,		"lo0,bytes"},
+	{"net.if.total",	CF_HAVEPARAMS,	net_if_total,		"lo0,bytes"},
+	{"net.if.collisions",	CF_HAVEPARAMS,	net_if_collisions,	"lo0"},
+	{"net.if.discovery",	0,		net_if_discovery,	"lo0"},
 
-	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
+	{"vm.memory.size",	CF_HAVEPARAMS,	vm_memory_size,		"free"},
 
-	{"proc.get",		CF_HAVEPARAMS,	PROC_GET,		"inetd"},
-	{"proc.num",		CF_HAVEPARAMS,	PROC_NUM,		"inetd"},
-	{"proc.mem",		CF_HAVEPARAMS,	PROC_MEM,		"inetd"},
+	{"proc.get",		CF_HAVEPARAMS,	proc_get,		"inetd"},
+	{"proc.num",		CF_HAVEPARAMS,	proc_num,		"inetd"},
+	{"proc.mem",		CF_HAVEPARAMS,	proc_mem,		"inetd"},
 
-	{"system.cpu.switches",	0,		SYSTEM_CPU_SWITCHES,	NULL},
-	{"system.cpu.intr",	0,		SYSTEM_CPU_INTR,	NULL},
-	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,user,avg1"},
-	{"system.cpu.load",	CF_HAVEPARAMS,	SYSTEM_CPU_LOAD,	"all,avg1"},
-	{"system.cpu.num",	CF_HAVEPARAMS,	SYSTEM_CPU_NUM,		"online"},
-	{"system.cpu.discovery",0,		SYSTEM_CPU_DISCOVERY,	NULL},
+	{"system.cpu.switches",	0,		system_cpu_switches,	NULL},
+	{"system.cpu.intr",	0,		system_cpu_intr,	NULL},
+	{"system.cpu.util",	CF_HAVEPARAMS,	system_cpu_util,	"all,user,avg1"},
+	{"system.cpu.load",	CF_HAVEPARAMS,	system_cpu_load,	"all,avg1"},
+	{"system.cpu.num",	CF_HAVEPARAMS,	system_cpu_num,		"online"},
+	{"system.cpu.discovery",0,		system_cpu_discovery,	NULL},
 
-	{"system.uname",	0,		SYSTEM_UNAME,		NULL},
+	{"system.uname",	0,		system_uname,		NULL},
 
-	{"system.sw.arch",	0,		SYSTEM_SW_ARCH,		NULL},
-	{"system.swap.size",	CF_HAVEPARAMS,	SYSTEM_SWAP_SIZE,	"all,free"},
+	{"system.sw.arch",	0,		system_sw_arch,		NULL},
+	{"system.swap.size",	CF_HAVEPARAMS,	system_swap_size,	"all,free"},
 
-	{"system.uptime",	0,		SYSTEM_UPTIME,		NULL},
-	{"system.boottime",	0,		SYSTEM_BOOTTIME,	NULL},
+	{"system.uptime",	0,		system_uptime,		NULL},
+	{"system.boottime",	0,		system_boottime,	NULL},
 
 	{NULL}
 };
