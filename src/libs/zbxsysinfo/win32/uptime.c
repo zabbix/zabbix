@@ -20,7 +20,7 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "perfmon.h"
+#include "zbxwin32.h"
 
 int	system_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -29,8 +29,8 @@ int	system_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		ret;
 
 	zbx_snprintf(counter_path, sizeof(counter_path), "\\%u\\%u",
-			(unsigned int)get_builtin_object_index(PCI_SYSTEM_UP_TIME),
-			(unsigned int)get_builtin_counter_index(PCI_SYSTEM_UP_TIME));
+			(unsigned int)zbx_get_builtin_object_index(PCI_SYSTEM_UP_TIME),
+			(unsigned int)zbx_get_builtin_counter_index(PCI_SYSTEM_UP_TIME));
 
 	request_tmp.nparam = 1;
 	request_tmp.params = zbx_malloc(NULL, request_tmp.nparam * sizeof(char *));

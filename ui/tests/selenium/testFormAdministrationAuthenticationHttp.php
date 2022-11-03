@@ -680,7 +680,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	/**
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 */
-	public function removeGuestFromDisabledGroup() {
+	public  function removeGuestFromDisabledGroup() {
 		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
 	}
 

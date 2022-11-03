@@ -1692,7 +1692,7 @@ class testFormHost extends CWebTest {
 
 		// Get values from form.
 		$form->fill($data['fields']);
-		$original = $form->getFields()->asValues();
+		$original = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
 
 		// Clone host.
 		$this->query('button', $button)->waitUntilClickable()->one()->click();
@@ -2020,7 +2020,7 @@ class testFormHost extends CWebTest {
 						['name' => 'Host name', 'value' => self::DISCOVERED_HOST, 'maxlength' => 128, 'enabled' => false],
 						['name' => 'Visible name', 'value' => '', 'maxlength' => 128, 'enabled' => false],
 						['name' => 'id:add_templates_', 'value' => '', 'enabled' => true],
-						['name' => 'Host groups', 'value' => ['Zabbix servers'], 'enabled' => false],
+						['name' => 'Host groups', 'value' => ['Group for discovered host test'], 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_ip', 'value' =>  '127.0.0.1',
 								'maxlength' => 64, 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_dns', 'value' =>  '',

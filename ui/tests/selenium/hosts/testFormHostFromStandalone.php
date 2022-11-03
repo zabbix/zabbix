@@ -28,19 +28,19 @@ require_once dirname(__FILE__).'/../common/testFormHost.php';
  *
  * @onBefore prepareUpdateData
  */
-class testFormHostStandalone extends testFormHost {
+class testFormHostFromStandalone extends testFormHost {
 
 	public $standalone = true;
 	public $link = 'zabbix.php?action=host.edit&hostid=';
 
-	public function testFormHostStandalone_Layout() {
+	public function testFormHostFromStandalone_Layout() {
 		$this->checkHostLayout();
 	}
 
 	/**
 	 * @dataProvider getCreateData
 	 */
-	public function testFormHostStandalone_Create($data) {
+	public function testFormHostFromStandalone_Create($data) {
 		$this->link = 'zabbix.php?action=host.edit';
 		$this->checkHostCreate($data);
 	}
@@ -48,7 +48,7 @@ class testFormHostStandalone extends testFormHost {
 	/**
 	 * @dataProvider getValidationUpdateData
 	 */
-	public function testFormHostStandalone_ValidationUpdate($data) {
+	public function testFormHostFromStandalone_ValidationUpdate($data) {
 		$this->checkHostUpdate($data);
 	}
 
@@ -57,21 +57,21 @@ class testFormHostStandalone extends testFormHost {
 	 *
 	 * @dataProvider getUpdateData
 	 */
-	public function testFormHostStandalone_Update($data) {
+	public function testFormHostFromStandalone_Update($data) {
 		$this->checkHostUpdate($data);
 	}
 
 	/**
 	 * Update the host without any changes and check host and interfaces hashes.
 	 */
-	public function testFormHostStandalone_SimpleUpdate() {
+	public function testFormHostFromStandalone_SimpleUpdate() {
 		$this->checkHostSimpleUpdate();
 	}
 
 	/**
 	 * @dataProvider getCloneData
 	 */
-	public function testFormHostStandalone_Clone($data) {
+	public function testFormHostFromStandalone_Clone($data) {
 		$this->cloneHost($data, 'Clone');
 
 		// Check that items aren't cloned from original host.
@@ -81,7 +81,7 @@ class testFormHostStandalone extends testFormHost {
 	/**
 	 * @dataProvider getCloneData
 	 */
-	public function testFormHostStandalone_FullClone($data) {
+	public function testFormHostFromStandalone_FullClone($data) {
 		$this->cloneHost($data, 'Full clone');
 
 		// Check that items cloned from original host.
@@ -91,7 +91,7 @@ class testFormHostStandalone extends testFormHost {
 	/**
 	 * @dataProvider getCancelData
 	 */
-	public function testFormHostStandalone_Cancel($data) {
+	public function testFormHostFromStandalone_Cancel($data) {
 		$this->link = 'zabbix.php?action=host.edit';
 		$this->checkCancel($data);
 	}
@@ -99,11 +99,11 @@ class testFormHostStandalone extends testFormHost {
 	/**
 	 * @dataProvider getDeleteData
 	 */
-	public function testFormHostStandalone_Delete($data) {
+	public function testFormHostFromStandalone_Delete($data) {
 		$this->checkDelete($data);
 	}
 
-	public function testFormHostStandalone_DiscoveredHostLayout() {
+	public function testFormHostFromStandalone_DiscoveredHostLayout() {
 		$this->checkDiscoveredHostLayout();
 	}
 
@@ -111,7 +111,7 @@ class testFormHostStandalone extends testFormHost {
 	 * Test for checking templated objects that are linked to a discovered host and for checking their unlinkage.
 	 * This test is implemented only for Standalone scenario.
 	 */
-	public function testFormHostStandalone_DiscoveredHostLinkedTemplates() {
+	public function testFormHostFromStandalone_DiscoveredHostLinkedTemplates() {
 		$filtered_results = [
 			[
 				'type' => 'items',

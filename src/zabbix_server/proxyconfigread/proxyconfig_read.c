@@ -19,7 +19,7 @@
 
 #include "proxyconfig_read.h"
 
-#include "proxy.h"
+#include "zbxdbwrap.h"
 #include "zbxdbhigh.h"
 #include "libs/zbxkvs/kvs.h"
 #include "libs/zbxvault/vault.h"
