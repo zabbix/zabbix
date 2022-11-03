@@ -19,10 +19,10 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
-require_once dirname(__FILE__).'/traits/TagTrait.php';
-require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @backup profiles

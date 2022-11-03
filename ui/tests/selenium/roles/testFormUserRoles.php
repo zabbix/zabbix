@@ -24,12 +24,11 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
+ * @dataSource EntitiesTags, Services
+ *
  * @backup role, module, users
  *
- * @dataSource Services
- *
- * @onBefore prepareRoleData
- * @onBefore prepareUserData
+ * @onBefore prepareRoleData, prepareUserData
  */
 class testFormUserRoles extends CWebTest {
 
