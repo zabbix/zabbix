@@ -1006,7 +1006,6 @@ void		zbx_dc_cleanup_sessions(void);
 void		zbx_dc_cleanup_autoreg_host(void);
 
 /* maintenance support */
-
 typedef struct
 {
 	zbx_uint64_t	hostid;
