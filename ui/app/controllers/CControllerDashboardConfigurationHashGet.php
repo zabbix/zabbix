@@ -60,11 +60,20 @@ class CControllerDashboardConfigurationHashGet extends CController {
 		$configuration_hash = null;
 
 		if ($this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)) {
-			$db_dashboards = API::Dashboard()->get([
-				'output' => ['name', 'display_period', 'auto_start'],
-				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
-				'dashboardids' => $this->getInput('dashboardid')
-			]);
+			if ($this->hasInput('templateid')) {
+				$db_dashboards = API::TemplateDashboard()->get([
+					'output' => ['name', 'display_period', 'auto_start'],
+					'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
+					'dashboardids' => $this->getInput('dashboardid')
+				]);
+			}
+			else {
+				$db_dashboards = API::Dashboard()->get([
+					'output' => ['name', 'display_period', 'auto_start'],
+					'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
+					'dashboardids' => $this->getInput('dashboardid')
+				]);
+			}
 
 			if ($db_dashboards) {
 				$db_dashboard = $db_dashboards[0];

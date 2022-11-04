@@ -330,8 +330,6 @@ class CDashboard extends CBaseComponent {
 			clearTimeout(this._configuration_check_timeout_id);
 		}
 
-		console.log('start', this._configuration_check_period);
-
 		this._configuration_check_time = Date.now() + this._configuration_check_period;
 		this._configuration_check_timeout_id = setTimeout(() => this._checkConfiguration(),
 			this._configuration_check_period
