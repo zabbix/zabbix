@@ -1955,6 +1955,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxdb/Makefile
 	src/libs/zbxdbcache/Makefile
 	src/libs/zbxdbhigh/Makefile
+	src/libs/zbxdbwrap/Makefile
 	src/libs/zbxdbschema/Makefile
 	src/libs/zbxdbupgrade/Makefile
 	src/libs/zbxdiag/Makefile

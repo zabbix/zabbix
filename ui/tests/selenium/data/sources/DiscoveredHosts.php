@@ -42,10 +42,18 @@ class DiscoveredHosts {
 	 * @return array
 	 */
 	public static function load() {
+		// Create hostgroup for discovered host test.
+		$hostgroups = CDataHelper::call('hostgroup.create', [
+			[
+				'name' => 'Group for discovered host test'
+			]
+		]);
+		$hostgroupid = $hostgroups['groupids'][0];
+
 		$hosts = CDataHelper::call('host.create', [
 			'host' => 'Test of discovered host',
 			'groups' => [
-				['groupid' => 4]
+				['groupid' => $hostgroupid]
 			],
 			'interfaces' => [
 				'type'=> 1,
@@ -76,7 +84,7 @@ class DiscoveredHosts {
 		$host_prototypes = CDataHelper::call('hostprototype.create', [
 			'host' => 'Host created from host prototype {#KEY}',
 			'ruleid' => $lldid,
-			'groupLinks' => [['groupid' => 4]],
+			'groupLinks' => [['groupid' => $hostgroupid]],
 			'tags' => [
 				'tag' => 'prototype',
 				'value' => 'true'
@@ -102,7 +110,7 @@ class DiscoveredHosts {
 				zbx_dbstr(self::DISCOVERED_INTERFACEID).",".zbx_dbstr(self::DISCOVERED_HOSTID).", 1, 1, 1, '127.0.0.1', '', '10050')"
 		);
 		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUPID).
-				", ".zbx_dbstr(self::DISCOVERED_HOSTID).", 4)"
+				", ".zbx_dbstr(self::DISCOVERED_HOSTID).", ".$hostgroupid.")"
 		);
 		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUPID2).
 				", ".zbx_dbstr(self::DISCOVERED_HOSTID2).", 4)"

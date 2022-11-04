@@ -65,7 +65,7 @@ class testFormServicesSla extends CWebTest {
 			'Name' => '',
 			'SLO' => '',
 			'Reporting period' => 'Weekly',
-			'Time zone' => 'System default: (UTC+03:00) Europe/Riga',
+			'Time zone' => CDateTimeHelper::getTimeZoneFormat('System default'),
 			'Schedule' => '24x7',
 			'Effective date' => date('Y-m-d'),
 			'Description' => '',
@@ -736,7 +736,7 @@ class testFormServicesSla extends CWebTest {
 						'Name' => 'All Mandatory and optional fields',
 						'SLO' => '33.33',
 						'Reporting period' => 'Quarterly',
-						'Time zone' => '(UTC-02:00) America/Nuuk',
+						'Time zone' => 'America/Nuuk',
 						'Schedule' => 'Custom',
 						'id:service_tags_0_tag' => 'tag',
 						'name:service_tags[0][operator]' => 'Contains',
@@ -777,7 +777,7 @@ class testFormServicesSla extends CWebTest {
 						'Name' => '   Check trimming trailing and leading spaces   ',
 						'SLO' => '  7.77  ',
 						'Reporting period' => 'Quarterly',
-						'Time zone' => '(UTC-02:00) America/Nuuk',
+						'Time zone' => 'America/Nuuk',
 						'Schedule' => 'Custom',
 						'id:service_tags_0_tag' => '  trim tag  ',
 						'name:service_tags[0][operator]' => 'Contains',
@@ -916,7 +916,7 @@ class testFormServicesSla extends CWebTest {
 			'Name' => 'New name to Cancel',
 			'SLO' => '77.777',
 			'Reporting period' => 'Annually',
-			'Time zone' => '(UTC+01:00) Africa/Bangui',
+			'Time zone' => CDateTimeHelper::getTimeZoneFormat('Africa/Bangui'),
 			'Effective date' => '2022-09-10',
 			'id:service_tags_0_tag' => 'tag',
 			'id:service_tags_0_value' => 'value',
@@ -981,6 +981,10 @@ class testFormServicesSla extends CWebTest {
 	 */
 	private function checkAction($data, $update = false) {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+
+		if (array_key_exists('Time zone', $data['fields'])) {
+			$data['fields']['Time zone'] = CDateTimeHelper::getTimeZoneFormat($data['fields']['Time zone']);
+		}
 
 		// Excluded downtimes dialog validation is made without attempting to save the SLA, so no hash needed.
 		if ($expected === TEST_BAD && array_key_exists('error', $data)) {
