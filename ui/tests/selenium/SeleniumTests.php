@@ -64,6 +64,15 @@ require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
 require_once dirname(__FILE__).'/geomaps/testFormAdministrationGeneralGeomaps.php';
 require_once dirname(__FILE__).'/geomaps/testGeomapWidgetScreenshots.php';
 
+// Graphs.
+require_once dirname(__FILE__).'/graphs/testFormGraph.php';
+require_once dirname(__FILE__).'/graphs/testFormGraphPrototype.php';
+require_once dirname(__FILE__).'/graphs/testGraphAxis.php';
+require_once dirname(__FILE__).'/graphs/testInheritanceGraph.php';
+require_once dirname(__FILE__).'/graphs/testInheritanceGraphPrototype.php';
+require_once dirname(__FILE__).'/graphs/testPageGraphPrototypes.php';
+require_once dirname(__FILE__).'/graphs/testPageHostGraph.php';
+
 // Hosts.
 require_once dirname(__FILE__).'/hosts/testFormHostFromConfiguration.php';
 require_once dirname(__FILE__).'/hosts/testFormHostFromMonitoring.php';
@@ -171,7 +180,6 @@ require_once dirname(__FILE__).'/users/testFormUserProfile.php';
 require_once dirname(__FILE__).'/users/testPageUsers.php';
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
-require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
 
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
@@ -182,9 +190,7 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testPageAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testPageAdministrationScripts.php';
 require_once dirname(__FILE__).'/testPageEventCorrelation.php';
-require_once dirname(__FILE__).'/testPageGraphPrototypes.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
-require_once dirname(__FILE__).'/testPageHostGraph.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageTriggers.php';
 require_once dirname(__FILE__).'/testPageTriggerUrl.php';
@@ -225,8 +231,6 @@ require_once dirname(__FILE__).'/testFormEventCorrelation.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
-require_once dirname(__FILE__).'/testFormGraph.php';
-require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormMaintenance.php';
@@ -243,10 +247,8 @@ require_once dirname(__FILE__).'/testFormWeb.php';
 require_once dirname(__FILE__).'/testFormWebStep.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceTrigger.php';
-require_once dirname(__FILE__).'/testInheritanceGraph.php';
 require_once dirname(__FILE__).'/testInheritanceWeb.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
-require_once dirname(__FILE__).'/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
 require_once dirname(__FILE__).'/testLanguage.php';
 require_once dirname(__FILE__).'/testMultiselect.php';
@@ -312,6 +314,15 @@ class SeleniumTests {
 		// Geomaps.
 		$suite->addTestSuite('testFormAdministrationGeneralGeomaps');
 		$suite->addTestSuite('testGeomapWidgetScreenshots');
+
+		// Graphs.
+		$suite->addTestSuite('testFormGraph');
+		$suite->addTestSuite('testFormGraphPrototype');
+		$suite->addTestSuite('testGraphAxis');
+		$suite->addTestSuite('testInheritanceGraph');
+		$suite->addTestSuite('testInheritanceGraphPrototype');
+		$suite->addTestSuite('testPageGraphPrototypes');
+		$suite->addTestSuite('testPageHostGraph');
 
 		// Hosts.
 		$suite->addTestSuite('testFormHostFromConfiguration');
@@ -420,8 +431,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUsers');
 
 		$suite->addTestSuite('testExecuteNow');
-		$suite->addTestSuite('testGraphAxis');
-
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
 		$suite->addTestSuite('testPageAdministrationGeneralIconMapping');
 		$suite->addTestSuite('testPageAdministrationGeneralImages');
@@ -430,9 +439,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
 		$suite->addTestSuite('testPageAdministrationScripts');
 		$suite->addTestSuite('testPageEventCorrelation');
-		$suite->addTestSuite('testPageGraphPrototypes');
 		$suite->addTestSuite('testPageHistory');
-		$suite->addTestSuite('testPageHostGraph');
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageTriggers');
 		$suite->addTestSuite('testPageTriggerDescription');
@@ -471,8 +478,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationScripts');
 		$suite->addTestSuite('testFormAdministrationUserGroups');
 		$suite->addTestSuite('testFormEventCorrelation');
-		$suite->addTestSuite('testFormGraph');
-		$suite->addTestSuite('testFormGraphPrototype');
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormMaintenance');
@@ -489,8 +494,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormWebStep');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceTrigger');
-		$suite->addTestSuite('testInheritanceGraph');
-		$suite->addTestSuite('testInheritanceGraphPrototype');
 		$suite->addTestSuite('testInheritanceWeb');
 		$suite->addTestSuite('testInheritanceHostPrototype');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
