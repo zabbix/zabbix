@@ -131,7 +131,18 @@ class Group extends ScimApiService {
 	public function post(array $options): array {
 		$this->validatePost($options);
 
+		$db_scim_groups = DB::select('scim_groups', [
+			'output' => ['scim_groupid'],
+			'filter' => ['name' => $options['displayName']]
+		]);
+
+		if ($db_scim_groups) {
+			$options['id'] = $db_scim_groups[0]['scim_groupid'];
+			return $this->put($options);
+		}
+
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
+
 		[$scim_groupid] = DB::insert('scim_groups', [['name' => $options['displayName']]]);
 
 		if (!$scim_groupid) {
@@ -451,5 +462,52 @@ class Group extends ScimApiService {
 			'usrgrps' => array_key_exists('usrgrps', $group_rights) ? $group_rights['usrgrps'] : [],
 			'medias' => $user_media ? $user_media[0]['medias'] : []
 		]);
+	}
+
+	public static function createScimGroupsFromSamlAttributes(array $saml_group_names, string $userid): void {
+		if (!$saml_group_names) {
+			return;
+		}
+
+		// Check 'scim_groups' table.
+		$db_scim_groups = DB::select('scim_groups', [
+			'output' => ['scim_groupid', 'name'],
+			'filter' => ['name' => $saml_group_names],
+			'preservekeys' => true
+		]);
+
+		$groups_to_add = array_diff($saml_group_names, array_column($db_scim_groups, 'name'));
+		$scim_groupids = array_column($db_scim_groups, 'scim_groupid');
+
+		if ($groups_to_add) {
+			foreach ($groups_to_add as $group) {
+				[$scim_groupid] = DB::insert('scim_groups', [['name' => $group]]);
+				$scim_groupids[] = $scim_groupid;
+			}
+		}
+
+		// Check 'users_scim_groups' table.
+		$db_users_scim_groups = DB::select('users_scim_groups', [
+			'output' => ['scim_groupid'],
+			'filter' => ['userid' => $userid]
+		]);
+		$user_scim_groupids_to_add = array_diff($scim_groupids, array_column($db_users_scim_groups, 'scim_groupid'));
+		$user_scim_groupids_to_delete = array_diff(array_column($db_users_scim_groups, 'scim_groupid'), $scim_groupids);
+
+		if ($user_scim_groupids_to_add) {
+			foreach ($user_scim_groupids_to_add as $user_scim_groupid) {
+				DB::insert('users_scim_groups', [[
+					'userid' => $userid,
+					'scim_groupid' => $user_scim_groupid
+				]]);
+			}
+		}
+
+		if ($user_scim_groupids_to_delete) {
+			DB::delete('users_scim_groups', [
+				'userid' => $userid,
+				'scim_groupid' => $user_scim_groupids_to_delete
+			]);
+		}
 	}
 }
