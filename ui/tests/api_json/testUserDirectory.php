@@ -383,7 +383,7 @@ class testUserDirectory extends CAPITest {
 			],
 			'Test valid SAML SP name ID format' => [
 				'userdirectories' => [
-					['userdirectoryid' => 'API SAML', 'nameid_format' => 1]
+					['userdirectoryid' => 'API SAML', 'nameid_format' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient']
 				],
 				'expected_error' => null
 			],
@@ -490,7 +490,7 @@ class testUserDirectory extends CAPITest {
 					'userdirectoryid' => 'API SAML',
 					'encrypt_assertions' => 999
 				]],
-				'expected_error' => 'Invalid parameter "/encrypt_assertions": value must be one of '.
+				'expected_error' => 'Invalid parameter "/1/encrypt_assertions": value must be one of '.
 					implode(', ', [0, 1]).'.'
 			],
 			'Test invalid SAML Encrypt name ID' => [
@@ -498,7 +498,7 @@ class testUserDirectory extends CAPITest {
 					'userdirectoryid' => 'API SAML',
 					'encrypt_nameid' => 999
 				]],
-				'expected_error' => 'Invalid parameter "/encrypt_nameid": value must be one of '.
+				'expected_error' => 'Invalid parameter "/1/encrypt_nameid": value must be one of '.
 					implode(', ', [0, 1]).'.'
 			],
 			'Test invalid SAML Sign logout responses' => [
@@ -506,7 +506,7 @@ class testUserDirectory extends CAPITest {
 					'userdirectoryid' => 'API SAML',
 					'sign_logout_responses' => 999
 				]],
-				'expected_error' => 'Invalid parameter "/sign_logout_responses": value must be one of '.
+				'expected_error' => 'Invalid parameter "/1/sign_logout_responses": value must be one of '.
 					implode(', ', [0, 1]).'.'
 			],
 			'Test invalid SAML Sign authN requests' => [
@@ -514,7 +514,7 @@ class testUserDirectory extends CAPITest {
 					'userdirectoryid' => 'API SAML',
 					'sign_authn_requests' => 999
 				]],
-				'expected_error' => 'Invalid parameter "/sign_authn_requests": value must be one of '.
+				'expected_error' => 'Invalid parameter "/1/sign_authn_requests": value must be one of '.
 					implode(', ', [0, 1]).'.'
 			],
 			'Test invalid SAML Sign logout requests' => [
@@ -522,7 +522,7 @@ class testUserDirectory extends CAPITest {
 					'userdirectoryid' => 'API SAML',
 					'sign_logout_requests' => 999
 				]],
-				'expected_error' => 'Invalid parameter "/sign_logout_requests": value must be one of '.
+				'expected_error' => 'Invalid parameter "/1/sign_logout_requests": value must be one of '.
 					implode(', ', [0, 1]).'.'
 			],
 			'Test invalid SAML Sign assertions' => [
@@ -530,7 +530,7 @@ class testUserDirectory extends CAPITest {
 					'userdirectoryid' => 'API SAML',
 					'sign_assertions' => 999
 				]],
-				'expected_error' => 'Invalid parameter "/sign_assertions": value must be one of '.
+				'expected_error' => 'Invalid parameter "/1/sign_assertions": value must be one of '.
 					implode(', ', [0, 1]).'.'
 			],
 			'Test invalid SAML Sign messages' => [
@@ -538,8 +538,14 @@ class testUserDirectory extends CAPITest {
 					'userdirectoryid' => 'API SAML',
 					'sign_messages' => 999
 				]],
-				'expected_error' => 'Invalid parameter "/sign_messages": value must be one of '.
+				'expected_error' => 'Invalid parameter "/1/sign_messages": value must be one of '.
 					implode(', ', [0, 1]).'.'
+			],
+			'Test invalid SAML SP name ID format' => [
+				'userdirectories' => [
+					['userdirectoryid' => 'API SAML', 'nameid_format' => 1]
+				],
+				'expected_error' => 'Invalid parameter "/1/nameid_format": a character string is expected.'
 			]
 		];
 	}

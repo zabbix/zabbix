@@ -279,7 +279,7 @@ class testAuthentication extends CAPITest {
 			],
 			'Test valid default LDAP user directory' => [
 				'authentication' => [
-					'ldap_userdirectoryid' => self::$data['userdirectory_1']
+					'ldap_userdirectoryid' => 'userdirectory_1'
 				],
 				'expected_error' => null
 			],

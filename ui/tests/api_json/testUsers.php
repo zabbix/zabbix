@@ -2224,6 +2224,6 @@ class testUsers extends CAPITest {
 		]]);
 
 		$this->assertArrayHasKey('userdirectoryids', $response);
-		self::$data['userdirectoryid'] = $response['userdirectoryids'];
+		self::$data['userdirectoryid'] = reset($response['userdirectoryids']);
 	}
 }
