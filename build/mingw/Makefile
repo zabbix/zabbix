@@ -34,6 +34,7 @@ OBJS = \
 	$(OUTPUTDIR)\md5.o \
 	$(OUTPUTDIR)\sysinfo.o \
 	$(OUTPUTDIR)\vector.o \
+	$(OUTPUTDIR)\hashset.o \
 	$(OUTPUTDIR)\zbxregexp.o \
 	$(OUTPUTDIR)\persistent_state.o \
 	$(OUTPUTDIR)\logfiles.o \
@@ -211,6 +212,9 @@ $(OUTPUTDIR)\sysinfo_alias.o: $(TOPDIR)\src\libs\zbxsysinfo\alias\alias.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\vector.o: $(TOPDIR)\src\libs\zbxalgo\vector.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\hashset.o: $(TOPDIR)\src\libs\zbxalgo\hashset.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\version.o: $(TOPDIR)\src\libs\zbxversion\version.c

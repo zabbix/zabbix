@@ -69,6 +69,7 @@ OBJS = \
 	..\..\..\src\libs\zbxwin32\fatal.o \
 	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \
+	..\..\..\src\libs\zbxalgo\hashset.o \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o \
 	..\..\..\src\libs\zbxversion\version.o \
 	..\..\..\src\libs\zbxxml\xml.o \
