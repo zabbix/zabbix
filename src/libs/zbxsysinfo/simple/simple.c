@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "simple.h"
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
+#include "simple.h"
 
 #include "../common/net.h"
 #include "ntp.h"
@@ -42,10 +43,10 @@
 ZBX_METRIC	parameters_simple[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
-	{"net.tcp.service",	CF_HAVEPARAMS,	CHECK_SERVICE,		"ssh,127.0.0.1,22"},
-	{"net.tcp.service.perf",CF_HAVEPARAMS,	CHECK_SERVICE_PERF,	"ssh,127.0.0.1,22"},
-	{"net.udp.service",	CF_HAVEPARAMS,	CHECK_SERVICE,		"ntp,127.0.0.1,123"},
-	{"net.udp.service.perf",CF_HAVEPARAMS,	CHECK_SERVICE_PERF,	"ntp,127.0.0.1,123"},
+	{"net.tcp.service",	CF_HAVEPARAMS,	check_service,		"ssh,127.0.0.1,22"},
+	{"net.tcp.service.perf",CF_HAVEPARAMS,	check_service_perf,	"ssh,127.0.0.1,22"},
+	{"net.udp.service",	CF_HAVEPARAMS,	check_service,		"ntp,127.0.0.1,123"},
+	{"net.udp.service.perf",CF_HAVEPARAMS,	check_service_perf,	"ntp,127.0.0.1,123"},
 	{NULL}
 };
 
@@ -304,7 +305,7 @@ static int	validate_imap(const char *line)
 	return 0 == strncmp(line, "* OK", 4) ? ZBX_TCP_EXPECT_OK : ZBX_TCP_EXPECT_FAIL;
 }
 
-int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf)
+int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf)
 {
 	unsigned short	port = 0;
 	char		*service, *ip_str, ip[ZBX_MAX_DNSNAME_LEN + 1], *port_str;
@@ -492,12 +493,12 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
  * The old name for these checks is check_service[*].
  */
 
-int	CHECK_SERVICE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_service(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return check_service(request, "127.0.0.1", result, 0);
+	return zbx_check_service_default_addr(request, "127.0.0.1", result, 0);
 }
 
-int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return check_service(request, "127.0.0.1", result, 1);
+	return zbx_check_service_default_addr(request, "127.0.0.1", result, 1);
 }

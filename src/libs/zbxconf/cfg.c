@@ -25,13 +25,10 @@
 
 extern unsigned char	program_type;
 
-char	*CONFIG_FILE		= NULL;
-
 char	*CONFIG_LOG_TYPE_STR	= NULL;
 int	CONFIG_LOG_TYPE		= LOG_TYPE_UNDEFINED;
 char	*CONFIG_LOG_FILE	= NULL;
 int	CONFIG_LOG_FILE_SIZE	= 1;
-int	CONFIG_ALLOW_ROOT	= 0;
 int	CONFIG_TIMEOUT		= 3;
 
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,

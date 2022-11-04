@@ -23,7 +23,7 @@ package zbxlib
 #include "zbxstr.h"
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
-#include "perfmon.h"
+#include "zbxwin32.h"
 #include "../src/zabbix_agent/metrics.h"
 
 #cgo LDFLAGS: -Wl,--start-group
@@ -115,18 +115,18 @@ char	*strerror_from_system(unsigned long error)
 	return utf8_string;
 }
 
-int	PERF_COUNTER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported."));
 	return SYSINFO_RET_FAIL;
 }
 
-DWORD	get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
+DWORD	zbx_get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref)
 {
 	return 0;
 }
 
-DWORD	get_builtin_object_index(zbx_builtin_counter_ref_t object_ref)
+DWORD	zbx_get_builtin_object_index(zbx_builtin_counter_ref_t object_ref)
 {
 	return 0;
 }

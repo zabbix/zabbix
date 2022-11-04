@@ -15,7 +15,6 @@ SUBDIRS = \
 	trapper \
 	escalator \
 	proxypoller \
-	selfmon \
 	vmware \
 	taskmanager \
 	ipmi \
@@ -72,7 +71,6 @@ zabbix_server_LDADD = \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
 	proxyconfigread/libzbxproxyconfigread.a \
-	selfmon/libzbxselfmon.a \
 	vmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager.a \
 	odbc/libzbxodbc.a \
@@ -97,6 +95,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_builddir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_builddir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_builddir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	preprocessor/libpreprocessor.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
@@ -128,6 +127,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_builddir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_builddir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+	$(top_builddir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_builddir)/src/libs/zbxdbschema/libzbxdbschema.a \
 	$(top_builddir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_builddir)/src/libs/zbxmodules/libzbxmodules.a \

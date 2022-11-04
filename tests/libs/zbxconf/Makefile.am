@@ -19,7 +19,6 @@ parse_cfg_file_LDADD = \
 	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/proxypoller/libzbxproxypoller.a \
-	$(top_srcdir)/src/zabbix_server/selfmon/libzbxselfmon.a \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_srcdir)/src/zabbix_server/taskmanager/libzbxtaskmanager.a \
 	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
@@ -47,6 +46,7 @@ parse_cfg_file_LDADD = \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \

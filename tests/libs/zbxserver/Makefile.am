@@ -28,7 +28,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/proxypoller/libzbxproxypoller.a \
-	$(top_srcdir)/src/zabbix_server/selfmon/libzbxselfmon.a \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_srcdir)/src/zabbix_server/taskmanager/libzbxtaskmanager.a \
 	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
@@ -46,7 +45,18 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
 	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
+	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
+	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
+	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/zabbix_server/availability/libavailability.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
@@ -73,6 +83,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxservice/libzbxservice.a \
 	$(top_srcdir)/src/zabbix_server/service/libservice.a \
 	$(top_srcdir)/src/libs/zbxexport/libzbxexport.a \
+	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxdbschema/libzbxdbschema.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \

@@ -115,7 +115,7 @@ static char	*proc_argv(pid_t pid)
 	return argv;
 }
 
-int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *args;
 	int			do_task, pagesize, count, i, proccount = 0, invalid_user = 0, proc_ok, comm_ok, op, arg;
@@ -243,7 +243,7 @@ out:
 	return SYSINFO_RET_OK;
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *args;
 	int			proccount = 0, invalid_user = 0, zbx_proc_stat;
@@ -405,7 +405,7 @@ static char	*get_state(struct kinfo_proc2 *proc)
 	return state;
 }
 
-int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char				*procname, *proccomm, *param, *args;
 	int				invalid_user = 0, count, i, k, zbx_proc_mode, pagesize, op, arg;

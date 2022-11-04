@@ -185,7 +185,7 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 			zbx_unicode_to_utf8_static(wcounterPath, counterpath, PDH_MAX_COUNTER_PATH);
 			zbx_free(wcounterPath);
 
-			if (FAIL == check_counter_path(counterpath, lang == PERF_COUNTER_LANG_DEFAULT))
+			if (FAIL == zbx_check_counter_path(counterpath, lang == PERF_COUNTER_LANG_DEFAULT))
 			{
 				error = zbx_strdup(error, "Invalid counter path.");
 				goto pc_fail;
@@ -224,7 +224,7 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
  * Purpose: load user parameters from configuration file                      *
  *                                                                            *
  ******************************************************************************/
-static int	load_config_user_params(void)
+static int	load_config_user_params(const char *config_file)
 {
 	struct cfg_line	cfg[] =
 	{
@@ -235,25 +235,17 @@ static int	load_config_user_params(void)
 		{NULL}
 	};
 
-	return parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_NO_EXIT_FAILURE);
+	return parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_NO_EXIT_FAILURE);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: reload user parameters                                            *
- *                                                                            *
- * Parameters: process_type - process type                                    *
- *             process_num - process number                                   *
- *                                                                            *
- ******************************************************************************/
-void	reload_user_parameters(unsigned char process_type, int process_num)
+void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file)
 {
 	char		*error = NULL;
 	ZBX_METRIC	*metrics_fallback = NULL;
 
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
 
-	if (FAIL == load_config_user_params())
+	if (FAIL == load_config_user_params(config_file))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d]: error processing configuration file",
 				get_process_type_string(process_type), process_num);

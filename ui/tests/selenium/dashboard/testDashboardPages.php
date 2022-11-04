@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -686,25 +687,11 @@ class testDashboardPages extends CWebTest {
 
 		$value = $this->query('xpath:('.$selector.']/../../div)['.$index.']')->waitUntilVisible()->one()->getAttribute('class');
 		if ($value !== 'selected-tab') {
-			$this->selectPage($page_name, $index);
+			CDashboardElement::find()->one()->selectPage($page_name, $index);
 		}
 		$this->query('xpath:('.$selector.']/following-sibling::button)['.$index.']')->waitUntilClickable()->one()->click();
 
 		return CPopupMenuElement::find()->waitUntilVisible()->one();
-	}
-
-	/**
-	 * Select page by name.
-	 *
-	 * @param string $page_name		page name where to open menu
-	 * @param integer $index		number of page that has duplicated name
-	 */
-	private function selectPage($page_name, $index = 1) {
-		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($page_name);
-		$this->query('xpath:('.$selection.'])['.$index.']')
-				->one()->click()->waitUntilReady();
-		$this->query('xpath:'.$selection.']/../../div[@class="selected-tab"]')
-				->one()->waitUntilPresent();
 	}
 
 	/**

@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxstr.h"
 #include "log.h"
@@ -253,7 +254,7 @@ static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVIC
 	}
 }
 
-int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	service_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
 	SC_HANDLE			h_mgr;
@@ -390,7 +391,7 @@ next:
 	return SYSINFO_RET_OK;
 }
 
-int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	service_info(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_SRV_PARAM_STATE		0x01
 #define ZBX_SRV_PARAM_DISPLAYNAME	0x02
@@ -549,7 +550,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 #undef ZBX_NON_EXISTING_SRV
 }
 
-int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	service_state(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SC_HANDLE	mgr, service;
 	char		*name;
@@ -698,7 +699,7 @@ static int	check_service_state(SC_HANDLE h_srv, int service_state)
 	return FAIL;
 }
 
-int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	services(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int				start_type, service_state;
 	char				*type, *state, *exclude, *buf = NULL, *utf8;
@@ -810,17 +811,3 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	return SYSINFO_RET_OK;
 }
-#undef	ZBX_SRV_STARTTYPE_ALL
-#undef	ZBX_SRV_STARTTYPE_AUTOMATIC
-#undef	ZBX_SRV_STARTTYPE_MANUAL
-#undef	ZBX_SRV_STARTTYPE_DISABLED
-
-#undef ZBX_SRV_STATE_STOPPED		0x0001
-#undef ZBX_SRV_STATE_START_PENDING	0x0002
-#undef ZBX_SRV_STATE_STOP_PENDING	0x0004
-#undef ZBX_SRV_STATE_RUNNING		0x0008
-#undef ZBX_SRV_STATE_CONTINUE_PENDING	0x0010
-#undef ZBX_SRV_STATE_PAUSE_PENDING	0x0020
-#undef ZBX_SRV_STATE_PAUSED		0x0040
-#undef ZBX_SRV_STATE_STARTED		0x007e
-#undef ZBX_SRV_STATE_ALL		0x007f

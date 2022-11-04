@@ -789,7 +789,8 @@ function getItemFormData(array $item = [], array $options = []) {
 		'preprocessing_script_maxlength' => DB::getFieldLength('item_preproc', 'params'),
 		'context' => getRequest('context'),
 		'show_inherited_tags' => getRequest('show_inherited_tags', 0),
-		'tags' => getRequest('tags', [])
+		'tags' => getRequest('tags', []),
+		'backurl' => getRequest('backurl')
 	];
 
 	// Unset empty and inherited tags.

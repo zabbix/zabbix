@@ -44,6 +44,8 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 static int	connection_failure;
 extern unsigned char	program_type;
 
+static zbx_dc_get_nextid_func_t				zbx_cb_nextid;
+
 void	DBclose(void)
 {
 	zbx_db_close();
@@ -194,9 +196,14 @@ int	DBconnect(int flag)
 	return err;
 }
 
-int	DBinit(char **error)
+int	DBinit(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, char **error)
 {
-	return zbx_db_init(CONFIG_DBNAME, db_schema, error);
+	zbx_cb_nextid = cb_nextid;
+
+	if (ZBX_PROGRAM_TYPE_SERVER != program)
+		return zbx_db_init(CONFIG_DBNAME, db_schema, error);
+
+	return SUCCEED;
 }
 
 void	DBdeinit(void)
@@ -723,7 +730,7 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "autoreg_host") ||
 			0 == strcmp(tablename, "event_suppress") ||
 			0 == strcmp(tablename, "trigger_queue"))
-		return DCget_nextid(tablename, num);
+		return zbx_cb_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
 }
@@ -871,6 +878,14 @@ int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsu
 	}
 
 	return SUCCEED;
+}
+
+void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info)
+{
+	zbx_free(version_info->friendly_current_version);
+	zbx_free(version_info->extension);
+	zbx_free(version_info->ext_friendly_current_version);
+	zbx_free(version_info->ext_lic);
 }
 
 #ifdef HAVE_POSTGRESQL
@@ -2071,16 +2086,6 @@ const char	*DBget_inventory_field(unsigned char inventory_link)
 		return NULL;
 
 	return inventory_fields[inventory_link - 1];
-}
-
-int	DBtxn_status(void)
-{
-	return 0 == zbx_db_txn_error() ? SUCCEED : FAIL;
-}
-
-int	DBtxn_ongoing(void)
-{
-	return 0 == zbx_db_txn_level() ? FAIL : SUCCEED;
 }
 
 int	DBtable_exists(const char *table_name)
@@ -3515,76 +3520,6 @@ void	zbx_user_init(zbx_user_t *user)
 void	zbx_user_free(zbx_user_t *user)
 {
 	zbx_free(user->username);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: initializes mock field                                            *
- *                                                                            *
- * Parameters: field      - [OUT] the field data                              *
- *             field_type - [IN] the field type in database schema            *
- *             field_len  - [IN] the field size in database schema            *
- *                                                                            *
- ******************************************************************************/
-void	zbx_db_mock_field_init(zbx_db_mock_field_t *field, int field_type, int field_len)
-{
-	switch (field_type)
-	{
-		case ZBX_TYPE_CHAR:
-#if defined(HAVE_ORACLE)
-			field->chars_num = field_len;
-			field->bytes_num = 4000;
-#else
-			field->chars_num = field_len;
-			field->bytes_num = -1;
-#endif
-			return;
-	}
-
-	THIS_SHOULD_NEVER_HAPPEN;
-
-	field->chars_num = 0;
-	field->bytes_num = 0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: 'appends' text to the field, if successful the character/byte     *
- *           limits are updated                                               *
- *                                                                            *
- * Parameters: field - [IN/OUT] the mock field                                *
- *             text  - [IN] the text to append                                *
- *                                                                            *
- * Return value: SUCCEED - the field had enough space to append the text      *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text)
-{
-	int	bytes_num, chars_num;
-
-	if (-1 != field->bytes_num)
-	{
-		bytes_num = strlen(text);
-		if (bytes_num > field->bytes_num)
-			return FAIL;
-	}
-	else
-		bytes_num = 0;
-
-	if (-1 != field->chars_num)
-	{
-		chars_num = zbx_strlen_utf8(text);
-		if (chars_num > field->chars_num)
-			return FAIL;
-	}
-	else
-		chars_num = 0;
-
-	field->bytes_num -= bytes_num;
-	field->chars_num -= chars_num;
-
-	return SUCCEED;
 }
 
 /******************************************************************************

@@ -42,54 +42,54 @@
 
 extern int	CONFIG_TIMEOUT;
 
-static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result);
-static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result);
-static int	SYSTEM_RUN_LOCAL(AGENT_REQUEST *request, AGENT_RESULT *result);
+static int	only_active(AGENT_REQUEST *request, AGENT_RESULT *result);
+static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result);
+static int	system_run_no_remote(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 ZBX_METRIC	parameters_common_local[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
-	{"system.run",		CF_HAVEPARAMS,	SYSTEM_RUN_LOCAL, 	"echo test"},
+	{"system.run",		CF_HAVEPARAMS,	system_run_no_remote, 	"echo test"},
 	{NULL}
 };
 
 ZBX_METRIC	parameters_common[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
-	{"system.localtime",	CF_HAVEPARAMS,	SYSTEM_LOCALTIME,	"utc"},
-	{"system.run",		CF_HAVEPARAMS,	SYSTEM_RUN,		"echo test"},
+	{"system.localtime",	CF_HAVEPARAMS,	system_localtime,	"utc"},
+	{"system.run",		CF_HAVEPARAMS,	system_run,		"echo test"},
 
-	{"vfs.file.size",	CF_HAVEPARAMS,	VFS_FILE_SIZE,		VFS_TEST_FILE},
-	{"vfs.file.time",	CF_HAVEPARAMS,	VFS_FILE_TIME,		VFS_TEST_FILE ",modify"},
-	{"vfs.file.exists",	CF_HAVEPARAMS,	VFS_FILE_EXISTS,	VFS_TEST_FILE},
-	{"vfs.file.contents",	CF_HAVEPARAMS,	VFS_FILE_CONTENTS,	VFS_TEST_FILE},
-	{"vfs.file.regexp",	CF_HAVEPARAMS,	VFS_FILE_REGEXP,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
-	{"vfs.file.regmatch",	CF_HAVEPARAMS,	VFS_FILE_REGMATCH,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
-	{"vfs.file.md5sum",	CF_HAVEPARAMS,	VFS_FILE_MD5SUM,	VFS_TEST_FILE},
-	{"vfs.file.cksum",	CF_HAVEPARAMS,	VFS_FILE_CKSUM,		VFS_TEST_FILE},
-	{"vfs.file.owner",	CF_HAVEPARAMS,	VFS_FILE_OWNER,		VFS_TEST_FILE ",user,name"},
-	{"vfs.file.permissions",CF_HAVEPARAMS,	VFS_FILE_PERMISSIONS,	VFS_TEST_FILE},
-	{"vfs.file.get",	CF_HAVEPARAMS,	VFS_FILE_GET,		VFS_TEST_FILE},
+	{"vfs.file.size",	CF_HAVEPARAMS,	vfs_file_size,		VFS_TEST_FILE},
+	{"vfs.file.time",	CF_HAVEPARAMS,	vfs_file_time,		VFS_TEST_FILE ",modify"},
+	{"vfs.file.exists",	CF_HAVEPARAMS,	vfs_file_exists,	VFS_TEST_FILE},
+	{"vfs.file.contents",	CF_HAVEPARAMS,	vfs_file_contents,	VFS_TEST_FILE},
+	{"vfs.file.regexp",	CF_HAVEPARAMS,	vfs_file_regexp,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
+	{"vfs.file.regmatch",	CF_HAVEPARAMS,	vfs_file_regmatch,	VFS_TEST_FILE "," VFS_TEST_REGEXP},
+	{"vfs.file.md5sum",	CF_HAVEPARAMS,	vfs_file_md5sum,	VFS_TEST_FILE},
+	{"vfs.file.cksum",	CF_HAVEPARAMS,	vfs_file_cksum,		VFS_TEST_FILE},
+	{"vfs.file.owner",	CF_HAVEPARAMS,	vfs_file_owner,		VFS_TEST_FILE ",user,name"},
+	{"vfs.file.permissions",CF_HAVEPARAMS,	vfs_file_permissions,	VFS_TEST_FILE},
+	{"vfs.file.get",	CF_HAVEPARAMS,	vfs_file_get,		VFS_TEST_FILE},
 
-	{"vfs.dir.size",	CF_HAVEPARAMS,	VFS_DIR_SIZE,		VFS_TEST_DIR},
-	{"vfs.dir.count",	CF_HAVEPARAMS,	VFS_DIR_COUNT,		VFS_TEST_DIR},
-	{"vfs.dir.get",		CF_HAVEPARAMS,	VFS_DIR_GET,		VFS_TEST_DIR},
+	{"vfs.dir.size",	CF_HAVEPARAMS,	vfs_dir_size,		VFS_TEST_DIR},
+	{"vfs.dir.count",	CF_HAVEPARAMS,	vfs_dir_count,		VFS_TEST_DIR},
+	{"vfs.dir.get",		CF_HAVEPARAMS,	vfs_dir_get,		VFS_TEST_DIR},
 
-	{"net.dns",		CF_HAVEPARAMS,	NET_DNS,		",zabbix.com"},
-	{"net.dns.record",	CF_HAVEPARAMS,	NET_DNS_RECORD,		",zabbix.com"},
-	{"net.tcp.dns",		CF_HAVEPARAMS,	NET_DNS,		",zabbix.com"}, /* deprecated */
-	{"net.tcp.dns.query",	CF_HAVEPARAMS,	NET_DNS_RECORD,		",zabbix.com"}, /* deprecated */
-	{"net.tcp.port",	CF_HAVEPARAMS,	NET_TCP_PORT,		",80"},
+	{"net.dns",		CF_HAVEPARAMS,	net_dns,		",zabbix.com"},
+	{"net.dns.record",	CF_HAVEPARAMS,	net_dns_record,		",zabbix.com"},
+	{"net.tcp.dns",		CF_HAVEPARAMS,	net_dns,		",zabbix.com"}, /* deprecated */
+	{"net.tcp.dns.query",	CF_HAVEPARAMS,	net_dns_record,		",zabbix.com"}, /* deprecated */
+	{"net.tcp.port",	CF_HAVEPARAMS,	net_tcp_port,		",80"},
 
-	{"system.users.num",	0,		SYSTEM_USERS_NUM,	NULL},
+	{"system.users.num",	0,		system_users_num,	NULL},
 
-	{"log",			CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
-	{"log.count",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
-	{"logrt",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
-	{"logrt.count",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
-	{"eventlog",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"system"},
+	{"log",			CF_HAVEPARAMS,	only_active,		"logfile"},
+	{"log.count",		CF_HAVEPARAMS,	only_active,		"logfile"},
+	{"logrt",		CF_HAVEPARAMS,	only_active,		"logfile"},
+	{"logrt.count",		CF_HAVEPARAMS,	only_active,		"logfile"},
+	{"eventlog",		CF_HAVEPARAMS,	only_active,		"system"},
 
-	{"zabbix.stats",	CF_HAVEPARAMS,	ZABBIX_STATS,		"127.0.0.1,10051"},
+	{"zabbix.stats",	CF_HAVEPARAMS,	zabbix_stats,		"127.0.0.1,10051"},
 
 	{NULL}
 };
@@ -101,7 +101,7 @@ void	zbx_set_user_parameter_dir(const char *path)
 	user_parameter_dir = path;
 }
 
-static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	only_active(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
 
@@ -110,7 +110,7 @@ static int	ONLY_ACTIVE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_FAIL;
 }
 
-static int	execute_str(const char *command, AGENT_RESULT *result, const char* dir)
+static int	execute_str_local(const char *command, AGENT_RESULT *result, const char* dir)
 {
 	int		ret = SYSINFO_RET_FAIL;
 	char		*cmd_result = NULL, error[MAX_STRING_LEN];
@@ -136,7 +136,7 @@ out:
 	return ret;
 }
 
-int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	execute_user_parameter(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	if (1 != request->nparam)
 	{
@@ -144,17 +144,17 @@ int	EXECUTE_USER_PARAMETER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	return execute_str(get_rparam(request, 0), result, user_parameter_dir);
+	return execute_str_local(get_rparam(request, 0), result, user_parameter_dir);
 }
 
-int	EXECUTE_STR(const char *command, AGENT_RESULT *result)
+int	execute_str(const char *command, AGENT_RESULT *result)
 {
-	return execute_str(command, result, NULL);
+	return execute_str_local(command, result, NULL);
 }
 
-int	EXECUTE_DBL(const char *command, AGENT_RESULT *result)
+int	execute_dbl(const char *command, AGENT_RESULT *result)
 {
-	if (SYSINFO_RET_OK != EXECUTE_STR(command, result))
+	if (SYSINFO_RET_OK != execute_str(command, result))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == ZBX_GET_DBL_RESULT(result))
@@ -169,9 +169,9 @@ int	EXECUTE_DBL(const char *command, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	EXECUTE_INT(const char *command, AGENT_RESULT *result)
+int	execute_int(const char *command, AGENT_RESULT *result)
 {
-	if (SYSINFO_RET_OK != EXECUTE_STR(command, result))
+	if (SYSINFO_RET_OK != execute_str(command, result))
 		return SYSINFO_RET_FAIL;
 
 	if (NULL == ZBX_GET_UI64_RESULT(result))
@@ -186,7 +186,7 @@ int	EXECUTE_INT(const char *command, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result, int level)
+static int	system_run_local(AGENT_REQUEST *request, AGENT_RESULT *result, int level)
 {
 	char	*command, *flag;
 
@@ -209,7 +209,7 @@ static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result, int level)
 
 	if (NULL == flag || '\0' == *flag || 0 == strcmp(flag, "wait"))	/* default parameter */
 	{
-		return EXECUTE_STR(command, result);
+		return execute_str(command, result);
 	}
 	else if (0 == strcmp(flag, "nowait"))
 	{
@@ -230,7 +230,7 @@ static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result, int level)
 	return SYSINFO_RET_OK;
 }
 
-static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	level;
 
@@ -239,10 +239,10 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 != CONFIG_LOG_REMOTE_COMMANDS)
 		level = LOG_LEVEL_WARNING;
 
-	return system_run(request, result, level);
+	return system_run_local(request, result, level);
 }
 
-static int	SYSTEM_RUN_LOCAL(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	system_run_no_remote(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return system_run(request, result, LOG_LEVEL_DEBUG);
+	return system_run_local(request, result, LOG_LEVEL_DEBUG);
 }
