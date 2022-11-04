@@ -23,12 +23,12 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup userdirectory_ldap, userdirectory, config
- * @onBefore  prepareTestData
+ * @onBefore prepareRoleData
  */
 class testAuthentication extends CAPITest {
 
 	public static function authentication_get_data() {
-		error_log('calling authentication_get_data:::');
+		error_log(json_encode(['::: calling authentication_get_data :::', self::$data]));
 
 		return [
 			'Test getting authentication general data' => [
@@ -37,7 +37,7 @@ class testAuthentication extends CAPITest {
 						'http_case_sensitive', 'ldap_auth_enabled', 'ldap_case_sensitive', 'saml_auth_enabled',
 						'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules', 'jit_provision_interval',
 						'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid', 'ldap_userdirectoryid'
-					]
+					],
 				],
 				'get_result' => [
 					// General fields.
@@ -77,7 +77,7 @@ class testAuthentication extends CAPITest {
 	public function testAuthentication_Get($authentication, $get_result, $expected_error) {
 		$result = $this->call('authentication.get', $authentication);
 
-		error_log(json_encode(['calling testAuthentication_Get:::', self::$data['userdirectory_1']]));
+		error_log(json_encode(['test:::', $get_result['ldap_userdirectoryid'], $result['ldap_userdirectoryid']]));
 
 		if ($expected_error === null) {
 			$result = $result['result'];
@@ -100,7 +100,6 @@ class testAuthentication extends CAPITest {
 			$this->assertContains($result['ldap_case_sensitive'], $get_result['ldap_case_sensitive']);
 			$this->assertContains($result['ldap_jit_status'], $get_result['ldap_jit_status']);
 			$this->assertEquals($get_result['jit_provision_interval'], $result['jit_provision_interval']);
-			error_log(json_encode(['test:::', $get_result['ldap_userdirectoryid'], $result['ldap_userdirectoryid']]));
 			$this->assertEquals($get_result['ldap_userdirectoryid'], $result['ldap_userdirectoryid']);
 
 			// SAML fields.
@@ -111,209 +110,213 @@ class testAuthentication extends CAPITest {
 	}
 
 	public static function authentication_update_data_invalid() {
+		error_log(json_encode(['::: calling authentication_update_data_invalid :::', self::$data]));
+
 		return [
 			// Invalid general auth tests.
-			'Test invalid authentication type' => [
-				'authentication' => [
-					'authentication_type' => 999
-				],
-				'expected_error' => 'Invalid parameter "/authentication_type": value must be one of '.
-					implode(', ', [ZBX_AUTH_INTERNAL, ZBX_AUTH_LDAP]).'.'
-			],
-			'Test invalid password min length' => [
-				'authentication' => [
-					'passwd_min_length' => 999
-				],
-				'expected_error' => 'Invalid parameter "/passwd_min_length": value must be one of 1-70.'
-			],
-			'Test invalid password rules' => [
-				'authentication' => [
-					'passwd_check_rules' => 999
-				],
-				'expected_error' => 'Invalid parameter "/passwd_check_rules": value must be one of 0-'.
-					(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE).'.'
-			],
-			'Test authentication set to LDAP but having LDAP disabled at the same time' => [
-				'authentication' => [
-					'authentication_type' => ZBX_AUTH_LDAP,
-					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED
-				],
-				'expected_error' => 'Incorrect value for field "/authentication_type": LDAP must be enabled.'
-			],
+			// 'Test invalid authentication type' => [
+			// 	'authentication' => [
+			// 		'authentication_type' => 999
+			// 	],
+			// 	'expected_error' => 'Invalid parameter "/authentication_type": value must be one of '.
+			// 		implode(', ', [ZBX_AUTH_INTERNAL, ZBX_AUTH_LDAP]).'.'
+			// ],
+			// 'Test invalid password min length' => [
+			// 	'authentication' => [
+			// 		'passwd_min_length' => 999
+			// 	],
+			// 	'expected_error' => 'Invalid parameter "/passwd_min_length": value must be one of 1-70.'
+			// ],
+			// 'Test invalid password rules' => [
+			// 	'authentication' => [
+			// 		'passwd_check_rules' => 999
+			// 	],
+			// 	'expected_error' => 'Invalid parameter "/passwd_check_rules": value must be one of 0-'.
+			// 		(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE).'.'
+			// ],
+			// 'Test authentication set to LDAP but having LDAP disabled at the same time' => [
+			// 	'authentication' => [
+			// 		'authentication_type' => ZBX_AUTH_LDAP,
+			// 		'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED
+			// 	],
+			// 	'expected_error' => 'Incorrect value for field "/authentication_type": LDAP must be enabled.'
+			// ],
 
-			// Invalid HTTP auth tests.
-			'Test invalid HTTP auth' => [
-				'authentication' => [
-					'http_auth_enabled' => 999
-				],
-				'expected_error' => 'Invalid parameter "/http_auth_enabled": value must be one of '.
-					implode(', ', [ZBX_AUTH_HTTP_DISABLED, ZBX_AUTH_HTTP_ENABLED]).'.'
-			],
-			'Test invalid HTTP form' => [
-				'authentication' => [
-					'http_login_form' => 999
-				],
-				'expected_error' => 'Invalid parameter "/http_login_form": value must be one of '.
-					implode(', ', [ZBX_AUTH_FORM_ZABBIX, ZBX_AUTH_FORM_HTTP]).'.'
-			],
-			'Test invalid case sensitive for HTTP auth' => [
-				'authentication' => [
-					'http_case_sensitive' => 999
-				],
-				'expected_error' => 'Invalid parameter "/http_case_sensitive": value must be one of '.
-					implode(', ', [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE]).'.'
-			],
+			// // Invalid HTTP auth tests.
+			// 'Test invalid HTTP auth' => [
+			// 	'authentication' => [
+			// 		'http_auth_enabled' => 999
+			// 	],
+			// 	'expected_error' => 'Invalid parameter "/http_auth_enabled": value must be one of '.
+			// 		implode(', ', [ZBX_AUTH_HTTP_DISABLED, ZBX_AUTH_HTTP_ENABLED]).'.'
+			// ],
+			// 'Test invalid HTTP form' => [
+			// 	'authentication' => [
+			// 		'http_login_form' => 999
+			// 	],
+			// 	'expected_error' => 'Invalid parameter "/http_login_form": value must be one of '.
+			// 		implode(', ', [ZBX_AUTH_FORM_ZABBIX, ZBX_AUTH_FORM_HTTP]).'.'
+			// ],
+			// 'Test invalid case sensitive for HTTP auth' => [
+			// 	'authentication' => [
+			// 		'http_case_sensitive' => 999
+			// 	],
+			// 	'expected_error' => 'Invalid parameter "/http_case_sensitive": value must be one of '.
+			// 		implode(', ', [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE]).'.'
+			// ],
 
-			// Invalid LDAP auth tests.
-			'Test invalid LDAP auth' => [
-				'authentication' => [
-					'ldap_auth_enabled' => 999
-				],
-				'expected_error' => 'Invalid parameter "/ldap_auth_enabled": value must be one of '.
-					implode(', ', [ZBX_AUTH_LDAP_DISABLED, ZBX_AUTH_LDAP_ENABLED]).'.'
-			],
-			'Test invalid userdirectoryid' => [
-				'authentication' => [
-					'ldap_userdirectoryid' => 'userdirectory_invalidid_1'
-				],
-				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": referred object does not exist.'
-			],
-			'Cannot set default authentication ldap when ldap is disabled' => [
-				'authentication' => [
-					'authentication_type' => ZBX_AUTH_LDAP,
-					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED
-				],
-				'expected_error' => 'Incorrect value for field "/authentication_type": LDAP must be enabled.'
-			],
+			// // Invalid LDAP auth tests.
+			// 'Test invalid LDAP auth' => [
+			// 	'authentication' => [
+			// 		'ldap_auth_enabled' => 999
+			// 	],
+			// 	'expected_error' => 'Invalid parameter "/ldap_auth_enabled": value must be one of '.
+			// 		implode(', ', [ZBX_AUTH_LDAP_DISABLED, ZBX_AUTH_LDAP_ENABLED]).'.'
+			// ],
+			// 'Test invalid userdirectoryid' => [
+			// 	'authentication' => [
+			// 		'ldap_userdirectoryid' => 'userdirectory_invalidid_1'
+			// 	],
+			// 	'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": referred object does not exist.'
+			// ],
+			// 'Cannot set default authentication ldap when ldap is disabled' => [
+			// 	'authentication' => [
+			// 		'authentication_type' => ZBX_AUTH_LDAP,
+			// 		'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED
+			// 	],
+			// 	'expected_error' => 'Incorrect value for field "/authentication_type": LDAP must be enabled.'
+			// ],
 
-			// Invalid SAML auth tests.
-			'Test invalid SAML auth' => [
-				'authentication' => [
-					'saml_auth_enabled' => 999
-				],
-				'expected_error' => 'Invalid parameter "/saml_auth_enabled": value must be one of '.
-					implode(', ', [ZBX_AUTH_SAML_DISABLED, ZBX_AUTH_SAML_ENABLED]).'.'
-			],
-			'Test invalid case sensitive for SAML auth' => [
-				'authentication' => [
-					'saml_case_sensitive' => 999
-				],
-				'expected_error' => 'Invalid parameter "/saml_case_sensitive": value must be one of '.
-					implode(', ', [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE]).'.'
-			],
-			'Test setting up the SAML JIT status without specifying deprovisioned user group' => [
-				'authentication' => [
-					'saml_jit_status' => JIT_PROVISIONING_ENABLED,
-					'disabled_usrgrpid' => 0
-				],
-				'expected_error' => 'Deprovisioned users group cannot be empty.'
-			]
+			// // Invalid SAML auth tests.
+			// 'Test invalid SAML auth' => [
+			// 	'authentication' => [
+			// 		'saml_auth_enabled' => 999
+			// 	],
+			// 	'expected_error' => 'Invalid parameter "/saml_auth_enabled": value must be one of '.
+			// 		implode(', ', [ZBX_AUTH_SAML_DISABLED, ZBX_AUTH_SAML_ENABLED]).'.'
+			// ],
+			// 'Test invalid case sensitive for SAML auth' => [
+			// 	'authentication' => [
+			// 		'saml_case_sensitive' => 999
+			// 	],
+			// 	'expected_error' => 'Invalid parameter "/saml_case_sensitive": value must be one of '.
+			// 		implode(', ', [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE]).'.'
+			// ],
+			// 'Test setting up the SAML JIT status without specifying deprovisioned user group' => [
+			// 	'authentication' => [
+			// 		'saml_jit_status' => JIT_PROVISIONING_ENABLED,
+			// 		'disabled_usrgrpid' => 0
+			// 	],
+			// 	'expected_error' => 'Deprovisioned users group cannot be empty.'
+			// ]
 		];
 	}
 
 	public static function authentication_update_data_valid() {
+		error_log(json_encode(['::: calling authentication_update_data_valid :::', self::$data]));
+
 		return [
 			// Cannot test valid authentication change, because that will log out the current user.
 
 			// Valid general auth tests.
-			'Test valid password min length' => [
-				'authentication' => [
-					'passwd_min_length' => 32
-				],
-				'expected_error' => null
-			],
-			'Test valid password rules' => [
-				'authentication' => [
-					'passwd_check_rules' => (PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL)
-				],
-				'expected_error' => null
-			],
-			'Test valid deprovisioning group setup' => [
-				'authentication' => [
-					'disabled_usrgrpid' => self::$data['disabled_usrgrpid']
-				],
-				'expected_error' => null
-			],
+			// 'Test valid password min length' => [
+			// 	'authentication' => [
+			// 		'passwd_min_length' => 32
+			// 	],
+			// 	'expected_error' => null
+			// ],
+			// 'Test valid password rules' => [
+			// 	'authentication' => [
+			// 		'passwd_check_rules' => (PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL)
+			// 	],
+			// 	'expected_error' => null
+			// ],
+			// 'Test valid deprovisioning group setup' => [
+			// 	'authentication' => [
+			// 		'disabled_usrgrpid' => self::$data['disabled_usrgrpid']
+			// 	],
+			// 	'expected_error' => null
+			// ],
 
-			// Valid HTTP auth tests.
-			'Test valid HTTP auth' => [
-				'authentication' => [
-					'http_auth_enabled' => ZBX_AUTH_HTTP_ENABLED
-				],
-				'expected_error' => null
-			],
-			'Test valid HTTP form' => [
-				'authentication' => [
-					'http_login_form' => ZBX_AUTH_FORM_HTTP
-				],
-				'expected_error' => null
-			],
-			'Test update remove domains' => [
-				'authentication' => [
-					'http_strip_domains' => 'text.string'
-				],
-				'expected_error' => null
-			],
-			'Test valid case sensitive for HTTP auth' => [
-				'authentication' => [
-					'http_case_sensitive' => ZBX_AUTH_CASE_SENSITIVE
-				],
-				'expected_error' => null
-			],
+			// // Valid HTTP auth tests.
+			// 'Test valid HTTP auth' => [
+			// 	'authentication' => [
+			// 		'http_auth_enabled' => ZBX_AUTH_HTTP_ENABLED
+			// 	],
+			// 	'expected_error' => null
+			// ],
+			// 'Test valid HTTP form' => [
+			// 	'authentication' => [
+			// 		'http_login_form' => ZBX_AUTH_FORM_HTTP
+			// 	],
+			// 	'expected_error' => null
+			// ],
+			// 'Test update remove domains' => [
+			// 	'authentication' => [
+			// 		'http_strip_domains' => 'text.string'
+			// 	],
+			// 	'expected_error' => null
+			// ],
+			// 'Test valid case sensitive for HTTP auth' => [
+			// 	'authentication' => [
+			// 		'http_case_sensitive' => ZBX_AUTH_CASE_SENSITIVE
+			// 	],
+			// 	'expected_error' => null
+			// ],
 
-			// Valid LDAP auth tests.
-			'Test valid LDAP enabled' => [
-				'authentication' => [
-					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
-				],
-				'expected_error' => null
-			],
-			'Test valid LDAP JIT status' => [
-				'authentication' => [
-					'ldap_jit_status' => JIT_PROVISIONING_ENABLED,
-					'disabled_usrgrpid' => self::$data['disabled_usrgrpid']
-				],
-				'expected_error' => null
-			],
-			'Test valid LDAP JIT interval' => [
-				'authentication' => [
-					'jit_provision_interval' => '3h'
-				],
-				'expected_error' => null
-			],
-			'Test valid default LDAP user directory' => [
-				'authentication' => [
-					'ldap_userdirectoryid' => 'userdirectory_1'
-				],
-				'expected_error' => null
-			],
-			'Test valid case sensitive for LDAP auth' => [
-				'authentication' => [
-					'ldap_case_sensitive' => ZBX_AUTH_CASE_SENSITIVE
-				],
-				'expected_error' => null
-			],
+			// // Valid LDAP auth tests.
+			// 'Test valid LDAP enabled' => [
+			// 	'authentication' => [
+			// 		'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
+			// 	],
+			// 	'expected_error' => null
+			// ],
+			// 'Test valid LDAP JIT status' => [
+			// 	'authentication' => [
+			// 		'ldap_jit_status' => JIT_PROVISIONING_ENABLED,
+			// 		'disabled_usrgrpid' => self::$data['disabled_usrgrpid']
+			// 	],
+			// 	'expected_error' => null
+			// ],
+			// 'Test valid LDAP JIT interval' => [
+			// 	'authentication' => [
+			// 		'jit_provision_interval' => '3h'
+			// 	],
+			// 	'expected_error' => null
+			// ],
+			// 'Test valid default LDAP user directory' => [
+			// 	'authentication' => [
+			// 		'ldap_userdirectoryid' => 'userdirectory_1'
+			// 	],
+			// 	'expected_error' => null
+			// ],
+			// 'Test valid case sensitive for LDAP auth' => [
+			// 	'authentication' => [
+			// 		'ldap_case_sensitive' => ZBX_AUTH_CASE_SENSITIVE
+			// 	],
+			// 	'expected_error' => null
+			// ],
 
-			// Valid SAML auth tests.
-			'Test valid SAML auth' => [
-				'authentication' => [
-					'saml_auth_enabled' => ZBX_AUTH_SAML_ENABLED
-				],
-				'expected_error' => null
-			],
-			'Test valid case sensitive for SAML auth' => [
-				'authentication' => [
-					'saml_case_sensitive' => ZBX_AUTH_CASE_SENSITIVE
-				],
-				'expected_error' => null
-			],
-			'Test valid SAML JIT status' => [
-				'authentication' => [
-					'saml_jit_status' => JIT_PROVISIONING_ENABLED,
-					'disabled_usrgrpid' => self::$data['disabled_usrgrpid']
-				],
-				'expected_error' => null
-			]
+			// // Valid SAML auth tests.
+			// 'Test valid SAML auth' => [
+			// 	'authentication' => [
+			// 		'saml_auth_enabled' => ZBX_AUTH_SAML_ENABLED
+			// 	],
+			// 	'expected_error' => null
+			// ],
+			// 'Test valid case sensitive for SAML auth' => [
+			// 	'authentication' => [
+			// 		'saml_case_sensitive' => ZBX_AUTH_CASE_SENSITIVE
+			// 	],
+			// 	'expected_error' => null
+			// ],
+			// 'Test valid SAML JIT status' => [
+			// 	'authentication' => [
+			// 		'saml_jit_status' => JIT_PROVISIONING_ENABLED,
+			// 		'disabled_usrgrpid' => self::$data['disabled_usrgrpid']
+			// 	],
+			// 	'expected_error' => null
+			// ]
 		];
 	}
 
@@ -322,11 +325,10 @@ class testAuthentication extends CAPITest {
 	 * @dataProvider authentication_update_data_valid
 	 */
 	public function testAuthentication_Update($authentication, $expected_error) {
-
-		error_log(json_encode(['calling testAuthentication_Update:::', self::$data['userdirectory_1']]));
+		$test_data = self::getTestData();
 
 		if (array_key_exists('ldap_userdirectoryid', $authentication)) {
-			$authentication['ldap_userdirectoryid'] = static::$data[$authentication['ldap_userdirectoryid']];
+			$authentication['ldap_userdirectoryid'] = $test_data[$authentication['ldap_userdirectoryid']];
 		}
 
 		if ($expected_error === null) {
@@ -374,24 +376,16 @@ class testAuthentication extends CAPITest {
 	/**
 	 * Test data used by test.
 	 */
-	protected static $data = [
-		'userdirectory_1' => null,
-		'userdirectory_invalidid_1' => 999,
-		'disabled_usrgrpid' => 9 // User group 'Disabled'.
-	];
+	public static $data = null;
 
 	/**
-	 * Prepare data for tests. Create user, group, userdirectory.
+	 * Returns data for tests.
 	 */
-	public function prepareTestData() {
-		if (self::$data['userdirectory_1'] !== null) {
-			return;
-		}
-
-		error_log('calling prepareTestData:::');
+	public static function prepareRoleData() {
+		error_log(json_encode(['::: calling prepareRoleData :::', self::$data]));
 
 		// Create LDAP user directory.
-		$response = CDataHelper::call('userdirectory.create', [[
+		$userdirectory = CDataHelper::call('userdirectory.create', [[
 			'name' => 'Default LDAP',
 			'idp_type' => IDP_TYPE_LDAP,
 			'port' => 389,
@@ -400,7 +394,12 @@ class testAuthentication extends CAPITest {
 			'search_attribute' => 'uid'
 		]]);
 
-		$this->assertArrayHasKey('userdirectoryids', $response);
-		self::$data['userdirectory_1'] = reset($response['userdirectoryids']);
+		self::$data = [
+			'userdirectory_1' => reset($userdirectory['userdirectoryids']),
+			'userdirectory_invalidid_1' => 999,
+			'disabled_usrgrpid' => 9 // User group 'Disabled'.
+		];
+
+		error_log(json_encode(['::: calling prepareRoleData :::', self::$data]));
 	}
 }
