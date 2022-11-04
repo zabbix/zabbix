@@ -32,7 +32,6 @@
 #define ZBX_OPERATION_MODE_RECOVERY	1
 #define ZBX_OPERATION_MODE_UPDATE	2
 
-
 /* algorithms for service status calculation */
 #define ZBX_SERVICE_STATUS_CALC_SET_OK			0
 #define ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL	1

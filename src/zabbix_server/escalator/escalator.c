@@ -2459,15 +2459,13 @@ static void	escalation_log_cancel_warning(const DB_ESCALATION *escalation, const
 static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action, const ZBX_DB_EVENT *event,
 		const char *error, const char *default_timezone, const ZBX_DB_SERVICE *service, zbx_hashset_t *roles)
 {
+/* action escalation canceled notification mode */
+/* #define ACTION_NOTIFY_IF_CANCELED_TRUE	1 notify about canceled escalations for action (default) */
+#define ACTION_NOTIFY_IF_CANCELED_FALSE	0	/* do not notify about canceled escalations for action */
 	ZBX_USER_MSG	*user_msg = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation_status_string(escalation->status));
-
-
-/* action escalation canceled notification mode */
-#define ACTION_NOTIFY_IF_CANCELED_TRUE	1	/* notify about canceled escalations for action (default) */
-#define ACTION_NOTIFY_IF_CANCELED_FALSE	0	/* do not notify about canceled escalations for action */
 
 	/* the cancellation notification can be sent if no objects are deleted and notification is not disabled */
 	if (NULL != action && NULL != event && 0 != event->trigger.triggerid && 0 != escalation->esc_step &&
@@ -2482,6 +2480,7 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+#undef ACTION_NOTIFY_IF_CANCELED_FALSE
 }
 
 /******************************************************************************

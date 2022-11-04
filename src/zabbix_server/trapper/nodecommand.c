@@ -498,14 +498,6 @@ fail:
  ******************************************************************************/
 int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp)
 {
-
-#define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
-#define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
-
-#define ZBX_USER_ROLE_PERMISSION_UI_DEFAULT_ACCESS		"ui.default_access"
-#define ZBX_USER_ROLE_PERMISSION_UI_MONITORING_SERVICES		"ui.monitoring.services"
-
-
 	char			*result = NULL, *send = NULL, *debug = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
 				clientip[MAX_STRING_LEN];
 	int			ret = FAIL, got_hostid = 0, got_eventid = 0;
@@ -528,7 +520,8 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		result = zbx_strdup(result, "Permission denied. User is a member of group with disabled access.");
 		goto finish;
 	}
-
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
+#define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
 	if (SUCCEED != zbx_check_user_administration_actions_permissions(&user,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS))
@@ -536,7 +529,8 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		result = zbx_strdup(result, "Permission denied. No role access.");
 		goto finish;
 	}
-
+#undef ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS
+#undef ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS
 	/* extract and validate other JSON elements */
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SCRIPTID, tmp, sizeof(tmp), NULL) ||

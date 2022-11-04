@@ -487,7 +487,7 @@ static int	DBget_user_count(zbx_uint64_t *count_online, zbx_uint64_t *count_offl
 #define ZBX_USER_ONLINE_TIME	600
 		if (atoi(row[0]) + ZBX_USER_ONLINE_TIME < now)
 			continue;
-
+#undef ZBX_USER_ONLINE_TIME
 		users_online++;
 
 		if (0 == users_offline)	/* new user can be created and log in between two selects */

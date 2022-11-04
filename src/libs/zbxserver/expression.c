@@ -2847,7 +2847,6 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, const char *tz, char **data,
 		int macro_type, char *error, int maxerrlen)
 {
-
 	char				c, *replace_to = NULL, sql[64];
 	const char			*m;
 	int				N_functionid, indexed_macro, require_address, ret, res = SUCCEED,
