@@ -144,15 +144,13 @@ $form = (new CForm('post', $form_action))
 		])
 		->addItem([
 			(new CLabel(_('Group name attribute'), 'group_name'))
-				->addClass('allow-jit-provisioning')
-				->addClass('group-of-names'),
+				->addClass('allow-jit-provisioning'),
 			(new CFormField(
 				(new CTextBox('group_name', $data['group_name'], false,
 					DB::getFieldLength('userdirectory_ldap', 'group_name')
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			))
 				->addClass('allow-jit-provisioning')
-				->addClass('group-of-names')
 		])
 		->addItem([
 			(new CLabel(_('Group member attribute'), 'group_member'))
