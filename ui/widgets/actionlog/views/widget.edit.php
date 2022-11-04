@@ -46,7 +46,7 @@
 			->addClass(ZBX_STYLE_COLUMNS_3)
 	)
 	->addField(
-		new CWidgetFieldTextBoxView($data['fields']['message'])
+		(new CWidgetFieldTextBoxView($data['fields']['message']))->setPlaceholder(_('subject or body text'))
 	)
 	->addField(
 		new CWidgetFieldSelectView($data['fields']['sort_triggers'])
