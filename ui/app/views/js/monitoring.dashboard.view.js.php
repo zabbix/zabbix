@@ -33,6 +33,7 @@
 			dashboard,
 			widget_defaults,
 			widget_last_type,
+			configuration_hash,
 			has_time_selector,
 			time_period,
 			dynamic,
@@ -81,6 +82,7 @@
 				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
 				widget_defaults,
 				widget_last_type,
+				configuration_hash,
 				is_editable: dashboard.can_edit_dashboards && dashboard.editable
 					&& web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>,
 				is_edit_mode: dashboard.dashboardid === null || clone,
@@ -103,6 +105,7 @@
 			if (web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => this.edit());
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_APPLY_PROPERTIES, this.events.applyProperties);
+				ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, this.events.configurationOutdated);
 
 				if (dynamic.has_dynamic_widgets) {
 					jQuery('#dynamic_hostid').on('change', this.events.dynamicHostChange);
@@ -392,6 +395,10 @@
 
 				document.getElementById('<?= CHtmlPage::PAGE_TITLE_ID ?>').textContent = dashboard_data.name;
 				document.getElementById('dashboard-direct-link').textContent = dashboard_data.name;
+			},
+
+			configurationOutdated() {
+				location.href = location.href;
 			},
 
 			busy() {

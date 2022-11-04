@@ -83,6 +83,9 @@ class CControllerDashboardView extends CController {
 		return true;
 	}
 
+	/**
+	 * @throws JsonException
+	 */
 	protected function doAction() {
 		[$dashboard, $error] = $this->getDashboard();
 
@@ -120,10 +123,15 @@ class CControllerDashboardView extends CController {
 
 		updateTimeSelectorPeriod($time_selector_options);
 
+		$widget_defaults = APP::ModuleManager()->getWidgetsDefaults();
+
 		$data = [
 			'dashboard' => $dashboard,
-			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(),
+			'widget_defaults' => $widget_defaults,
 			'widget_last_type' => CDashboardHelper::getWidgetLastType(),
+			'configuration_hash' => $dashboard['dashboardid'] !== null
+				? CDashboardHelper::getConfigurationHash($dashboard, $widget_defaults)
+				: null,
 			'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
 			'time_period' => getTimeSelectorPeriod($time_selector_options),
 			'clone' => $this->hasInput('clone'),

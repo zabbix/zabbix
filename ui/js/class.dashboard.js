@@ -33,6 +33,7 @@ const DASHBOARD_EVENT_BUSY = 'dashboard-busy';
 const DASHBOARD_EVENT_IDLE = 'dashboard-idle';
 const DASHBOARD_EVENT_EDIT = 'dashboard-edit';
 const DASHBOARD_EVENT_APPLY_PROPERTIES = 'dashboard-apply-properties';
+const DASHBOARD_EVENT_CONFIGURATION_OUTDATED = 'dashboard-configuration-outdated';
 
 class CDashboard extends CBaseComponent {
 
@@ -49,6 +50,7 @@ class CDashboard extends CBaseComponent {
 		widget_max_rows,
 		widget_defaults,
 		widget_last_type = null,
+		configuration_hash = null,
 		is_editable,
 		is_edit_mode,
 		can_edit_dashboards,
@@ -88,6 +90,7 @@ class CDashboard extends CBaseComponent {
 		this._widget_max_rows = widget_max_rows;
 		this._widget_defaults = {...widget_defaults};
 		this._widget_last_type = widget_last_type;
+		this._configuration_hash = configuration_hash;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
 		this._can_edit_dashboards = can_edit_dashboards;
@@ -134,6 +137,11 @@ class CDashboard extends CBaseComponent {
 		this._slideshow_switch_time = null;
 		this._slideshow_timeout_id = null;
 
+		this._configuration_check_period = 60000;
+		this._configuration_check_steady_period = 2000;
+		this._configuration_check_time = null;
+		this._configuration_check_timeout_id = null;
+
 		this._is_unsaved = false;
 
 		if (!this._is_kiosk_mode) {
@@ -175,8 +183,12 @@ class CDashboard extends CBaseComponent {
 			this._target.classList.add(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
 		}
 
-		if (!this._is_edit_mode && this._data.auto_start == 1 && this._dashboard_pages.size > 1) {
-			this._startSlideshow();
+		if (!this._is_edit_mode) {
+			this._startConfigurationChecker();
+
+			if (this._data.auto_start == 1 && this._dashboard_pages.size > 1) {
+				this._startSlideshow();
+			}
 		}
 	}
 
@@ -199,6 +211,7 @@ class CDashboard extends CBaseComponent {
 			this._tabs.enableSorting();
 		}
 
+		this._stopConfigurationChecker();
 		this._stopSlideshow();
 
 		this._target.classList.add(ZBX_STYLE_DASHBOARD_IS_EDIT_MODE);
@@ -284,7 +297,7 @@ class CDashboard extends CBaseComponent {
 		}
 
 		this._slideshow_switch_time = Math.max(Date.now() + this._slideshow_steady_period,
-			timeout_ms + this._slideshow_switch_time
+			this._slideshow_switch_time + timeout_ms
 		);
 
 		this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(),
@@ -308,6 +321,100 @@ class CDashboard extends CBaseComponent {
 
 			this._slideshow_timeout_id = setTimeout(() => this._switchSlideshow(),
 				this._slideshow_switch_time - Date.now()
+			);
+		}
+	}
+
+	_startConfigurationChecker() {
+		if (this._configuration_check_timeout_id !== null) {
+			clearTimeout(this._configuration_check_timeout_id);
+		}
+
+		this._configuration_check_time = Date.now() + this._configuration_check_period;
+		this._configuration_check_timeout_id = setTimeout(() => this._checkConfiguration(),
+			this._configuration_check_period
+		);
+	}
+
+	_stopConfigurationChecker() {
+		if (this._configuration_check_timeout_id === null) {
+			return;
+		}
+
+		clearTimeout(this._configuration_check_timeout_id);
+
+		this._configuration_check_time = null;
+		this._configuration_check_timeout_id = null;
+	}
+
+	_checkConfiguration() {
+		this._configuration_check_timeout_id = null;
+
+		if (this._isUserInteracting()) {
+			this._configuration_check_time = Date.now() + this._configuration_check_steady_period;
+			this._configuration_check_timeout_id = setTimeout(() => this._checkConfiguration(),
+				this._configuration_check_steady_period
+			);
+
+			return;
+		}
+
+		const busy_condition = this._createBusyCondition();
+
+		Promise.resolve()
+			.then(() => this._promiseCheckConfiguration())
+			.catch((exception) => {
+				console.log('Could not check the dashboard configuration', exception);
+			})
+			.finally(() => {
+				this._configuration_check_time = Math.max(Date.now() + this._configuration_check_steady_period,
+					this._configuration_check_time + this._configuration_check_period
+				);
+
+				this._configuration_check_timeout_id = setTimeout(() => this._checkConfiguration(),
+					this._configuration_check_time - Date.now()
+				);
+
+				this._deleteBusyCondition(busy_condition);
+			});
+	}
+
+	_promiseCheckConfiguration() {
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'dashboard.configuration.hash.get');
+
+		return fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				dashboardid: this._data.dashboardid
+			})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				if (this._configuration_hash !== response.configuration_hash) {
+					this.fire(DASHBOARD_EVENT_CONFIGURATION_OUTDATED);
+				}
+			});
+	}
+
+	_keepSteadyConfigurationChecker() {
+		if (this._configuration_check_timeout_id === null) {
+			return;
+		}
+
+		if (this._configuration_check_timeout_id - Date.now() < this._configuration_check_steady_period) {
+			clearTimeout(this._configuration_check_timeout_id);
+
+			this._configuration_check_time = Date.now() + this._configuration_check_steady_period;
+
+			this._configuration_check_timeout_id = setTimeout(() => this._checkConfiguration(),
+				this._configuration_check_time - Date.now()
 			);
 		}
 	}
@@ -824,6 +931,8 @@ class CDashboard extends CBaseComponent {
 		if (!this._is_edit_mode) {
 			this._storeSelectedDashboardPage(dashboard_page);
 
+			this._keepSteadyConfigurationChecker();
+
 			if (this._isSlideshowRunning()) {
 				this._keepSteadySlideshow();
 			}
@@ -831,8 +940,12 @@ class CDashboard extends CBaseComponent {
 
 		this._promiseSelectDashboardPage(dashboard_page, {is_async})
 			.then(() => {
-				if (this._isSlideshowRunning()) {
-					this._startSlideshow();
+				if (!this._is_edit_mode) {
+					this._keepSteadyConfigurationChecker();
+
+					if (this._isSlideshowRunning()) {
+						this._startSlideshow();
+					}
 				}
 			});
 	}
@@ -1966,6 +2079,8 @@ class CDashboard extends CBaseComponent {
 					}
 
 					if (!this._is_edit_mode) {
+						this._keepSteadyConfigurationChecker();
+
 						if (this._isSlideshowRunning()) {
 							this._keepSteadySlideshow();
 						}

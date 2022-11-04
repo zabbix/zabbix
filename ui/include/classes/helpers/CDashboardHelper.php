@@ -608,4 +608,16 @@ class CDashboardHelper {
 
 		return $widget_last_type;
 	}
+
+	/**
+	 * @throws JsonException
+	 */
+	public static function getConfigurationHash(array $dashboard, array $widget_defaults): string {
+		ksort($widget_defaults);
+
+		return md5(json_encode([
+			array_intersect_key($dashboard, array_flip(['name', 'display_period', 'auto_start', 'pages'])),
+			$widget_defaults
+		], JSON_THROW_ON_ERROR));
+	}
 }

@@ -253,6 +253,7 @@ $html_page
 		'dashboard' => $data['dashboard'],
 		'widget_defaults' => $data['widget_defaults'],
 		'widget_last_type' => $data['widget_last_type'],
+		'configuration_hash' => $data['configuration_hash'],
 		'has_time_selector' => $data['has_time_selector'],
 		'time_period' => $data['time_period'],
 		'dynamic' => $data['dynamic'],
