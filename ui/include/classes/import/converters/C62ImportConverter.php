@@ -34,6 +34,86 @@ class C62ImportConverter extends CConverter {
 	public function convert(array $data): array {
 		$data['zabbix_export']['version'] = '6.4';
 
+		if (array_key_exists('hosts', $data['zabbix_export'])) {
+			$data['zabbix_export']['hosts'] = self::convertHosts($data['zabbix_export']['hosts']);
+		}
+
+		if (array_key_exists('templates', $data['zabbix_export'])) {
+			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
+		}
+
 		return $data;
+	}
+
+	/**
+	 * Convert hosts.
+	 *
+	 * @param array $hosts
+	 *
+	 * @return array
+	 */
+	private static function convertHosts(array $hosts): array {
+		foreach ($hosts as &$host) {
+			if (array_key_exists('discovery_rules', $host)) {
+				$host['discovery_rules'] = self::convertDiscoveryRules($host['discovery_rules']);
+			}
+		}
+		unset($host);
+
+		return $hosts;
+	}
+
+	/**
+	 * Convert templates.
+	 *
+	 * @param array $templates
+	 *
+	 * @return array
+	 */
+	private static function convertTemplates(array $templates): array {
+		foreach ($templates as &$template) {
+			if (array_key_exists('discovery_rules', $template)) {
+				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules']);
+			}
+		}
+		unset($template);
+
+		return $templates;
+	}
+
+	/**
+	 * Convert discovery rules.
+	 *
+	 * @param array $discovery_rules
+	 *
+	 * @return array
+	 */
+	private static function convertDiscoveryRules(array $discovery_rules): array {
+		foreach ($discovery_rules as &$discovery_rule) {
+			if (array_key_exists('item_prototypes', $discovery_rule)) {
+				$discovery_rule['item_prototypes'] = self::convertItemPrototypes($discovery_rule['item_prototypes']);
+			}
+		}
+		unset($discovery_rule);
+
+		return $discovery_rules;
+	}
+
+	/**
+	 * Convert item prototypes.
+	 *
+	 * @param array $item_prototypes
+	 *
+	 * @return array
+	 */
+	private static function convertItemPrototypes(array $item_prototypes): array {
+		foreach ($item_prototypes as &$item_prototype) {
+			if (array_key_exists('inventory_link', $item_prototype)) {
+				unset($item_prototype['inventory_link']);
+			}
+		}
+		unset($item_prototype);
+
+		return $item_prototypes;
 	}
 }

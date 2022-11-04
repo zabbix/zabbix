@@ -638,7 +638,6 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'publickey' =>				['type' => XML_STRING, 'default' => ''],
 									'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
-									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
 									'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 										'name' =>					['type' => XML_STRING | XML_REQUIRED]
 									]],
@@ -1324,7 +1323,6 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'publickey' =>				['type' => XML_STRING, 'default' => ''],
 									'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
-									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
 									'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 										'name' =>					['type' => XML_STRING | XML_REQUIRED]
 									]],

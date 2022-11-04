@@ -81,22 +81,22 @@
                     <item_prototypes>
                         <item_prototype>
                             <uuid>4d34d26d2480480c862261b1b9e9d99d</uuid>
-                            <name>DepItemProtoDependsOnNormalItem</name>
+                            <name>DepItemProtoDependsOnNormalItem1</name>
                             <type>DEPENDENT</type>
                             <key>depitemproto_deponnormal</key>
-                            <delay>10s</delay>
+                            <delay>0</delay>
                             <master_item>
                                 <key>tmpltrap</key>
                             </master_item>
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <uuid>c64594a285b64df79b137eeaec10e52b</uuid>
-                                    <expression>last(/SampleTemplate/depitemproto_deponnormal)=10</expression>
+                                    <expression>last(/SampleTemplate/depitemproto_deponnormal[WA])=10</expression>
                                     <name>proto_dep {#LLDMACRO}</name>
                                     <dependencies>
                                         <dependency>
                                             <name>proto {#LLDMACRO}</name>
-                                            <expression>last(/SampleTemplate/depitemproto_deponnormal)=110</expression>
+                                            <expression>last(/SampleTemplate/depitemproto_deponnormal[WA])=110</expression>
                                         </dependency>
                                     </dependencies>
                                     <tags>
@@ -108,7 +108,7 @@
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <uuid>1f2fbda374544b0cb77869c6f1d88314</uuid>
-                                    <expression>last(/SampleTemplate/depitemproto_deponnormal)=10</expression>
+                                    <expression>last(/SampleTemplate/depitemproto_deponnormal[WA])=10</expression>
                                     <name>proto {#LLDMACRO}</name>
                                     <tags>
                                         <tag>
@@ -179,7 +179,7 @@
             <items>
                 <item>
                     <uuid>9a1082526795476ab429acd9caafc920</uuid>
-                    <name>NormalItemPreproc1</name>
+                    <name>NormalItemPreproc11</name>
                     <key>agent.hostmetadata</key>
                     <delay>23s</delay>
                     <trends>0</trends>
@@ -196,7 +196,7 @@
                 </item>
                 <item>
                     <uuid>79a3b0eca3764c64abc7c53b83c0ce83</uuid>
-                    <name>Hostname1</name>
+                    <name>Hostname11</name>
                     <key>agent.hostname</key>
                     <delay>23s</delay>
                     <trends>0</trends>
@@ -285,13 +285,13 @@
                 </item>
                 <item>
                     <uuid>16e297773b8d48958ebd4da74918687c</uuid>
-                    <name>CalculatedItemPreprocStepTest1</name>
+                    <name>CalculatedItemPreprocStepTest11</name>
                     <type>CALCULATED</type>
                     <key>calculateditempreprocsteptest</key>
                     <delay>23s</delay>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
-                    <params>1+1</params>
+                    <params>1+1+1</params>
                     <preprocessing>
                         <step>
                             <type>REGEX</type>
@@ -349,7 +349,7 @@
                 </item>
                 <item>
                     <uuid>34693044a4b84f269f829c92b8e6888f</uuid>
-                    <name>CalculatedAsAggregated1</name>
+                    <name>CalculatedAsAggregated11</name>
                     <type>CALCULATED</type>
                     <key>calc_as_aggr</key>
                     <delay>23s</delay>
@@ -357,7 +357,7 @@
                 </item>
                 <item>
                     <uuid>489114fec8b44645b96b9c463ea54f22</uuid>
-                    <name>CalculatedPreproc1</name>
+                    <name>CalculatedPreproc11</name>
                     <type>CALCULATED</type>
                     <key>calc_preproc</key>
                     <delay>23s</delay>
@@ -366,15 +366,15 @@
                         <step>
                             <type>STR_REPLACE</type>
                             <parameters>
-                                <parameter>3</parameter>
-                                <parameter>4</parameter>
+                                <parameter>31</parameter>
+                                <parameter>41</parameter>
                             </parameters>
                         </step>
                     </preprocessing>
                 </item>
                 <item>
                     <uuid>de2c2812f00240ec84359fb3c0165ff6</uuid>
-                    <name>ODBC monitor1</name>
+                    <name>ODBC monitor11</name>
                     <type>ODBC</type>
                     <key>db.odbc.select[x,y,z]</key>
                     <delay>23s</delay>
@@ -382,10 +382,11 @@
                 </item>
                 <item>
                     <uuid>2012d2c4562340d990eebfac680cc1da</uuid>
-                    <name>Dependent item1</name>
+                    <name>Dependent item11</name>
                     <type>DEPENDENT</type>
                     <key>depitem</key>
                     <delay>0</delay>
+                    <units>MB</units>
                     <inventory_link>TYPE</inventory_link>
                     <master_item>
                         <key>calc</key>
@@ -393,7 +394,7 @@
                 </item>
                 <item>
                     <uuid>d8def5fedd5a42a7b9a910c805a56899</uuid>
-                    <name>DepItemOnCalcPreproc1</name>
+                    <name>DepItemOnCalcPreproc11</name>
                     <type>DEPENDENT</type>
                     <key>depitem_calc_preproc</key>
                     <delay>0</delay>
@@ -413,7 +414,7 @@
                 </item>
                 <item>
                     <uuid>10741348d10842d5a2888c7c3ebe4063</uuid>
-                    <name>DepItemOnDepCalcItem1</name>
+                    <name>DepItemOnDepCalcItem11</name>
                     <type>DEPENDENT</type>
                     <key>depitem_depitem</key>
                     <delay>0</delay>
@@ -433,7 +434,7 @@
                 </item>
                 <item>
                     <uuid>d3e8a08190584da2a79f0c2c665a62ee</uuid>
-                    <name>DepItemOnNormalDepItem1</name>
+                    <name>DepItemOnNormalDepItem11</name>
                     <type>DEPENDENT</type>
                     <key>depitem_depitem_normal</key>
                     <delay>0</delay>
@@ -453,7 +454,7 @@
                 </item>
                 <item>
                     <uuid>fd462776884943c08b6998bff03d5267</uuid>
-                    <name>DepItemOnInternalItem1</name>
+                    <name>DepItemOnInternalItem11</name>
                     <type>DEPENDENT</type>
                     <key>depitem_internal</key>
                     <delay>0</delay>
@@ -473,7 +474,7 @@
                 </item>
                 <item>
                     <uuid>a1baaaa5e7af48578a749c5380426ed6</uuid>
-                    <name>DepItemOnNormalItem1</name>
+                    <name>DepItemOnNormalItem11</name>
                     <type>DEPENDENT</type>
                     <key>depitem_normalitem</key>
                     <delay>0</delay>
@@ -493,7 +494,7 @@
                 </item>
                 <item>
                     <uuid>0a65fd6e155747ad9768e1c48c874264</uuid>
-                    <name>DepItemOnInternalItemPreproc1</name>
+                    <name>DepItemOnInternalItemPreproc11</name>
                     <type>DEPENDENT</type>
                     <key>depitem_normal_preproc</key>
                     <delay>0</delay>
@@ -513,14 +514,14 @@
                 </item>
                 <item>
                     <uuid>e2b844f2d30440ef88deff5f3a596e1b</uuid>
-                    <name>External check1</name>
+                    <name>External check11</name>
                     <type>EXTERNAL</type>
                     <key>extcheck</key>
                     <delay>23s</delay>
                 </item>
                 <item>
                     <uuid>2644c18c42864249a4be85871879af30</uuid>
-                    <name>HTTP agent1</name>
+                    <name>HTTP agent11</name>
                     <type>HTTP_AGENT</type>
                     <key>httpagent</key>
                     <delay>23s</delay>
@@ -547,14 +548,14 @@
                 </item>
                 <item>
                     <uuid>352e9f1baba8491f9fcf4e0e8d968f4d</uuid>
-                    <name>Simple check1</name>
+                    <name>Simple check11</name>
                     <type>SIMPLE</type>
                     <key>icmpping[127.0.0.1]</key>
                     <delay>23s</delay>
                 </item>
                 <item>
                     <uuid>f219f82b5f2f41d0a72f718684476638</uuid>
-                    <name>IPMI agent1</name>
+                    <name>IPMI agent11</name>
                     <type>IPMI</type>
                     <key>ipmi.get</key>
                     <delay>23s</delay>
@@ -564,7 +565,7 @@
                 </item>
                 <item>
                     <uuid>5184862f271d4f8ebec44ef6526c1da1</uuid>
-                    <name>item11</name>
+                    <name>item111</name>
                     <type>CALCULATED</type>
                     <key>itm</key>
                     <delay>23s</delay>
@@ -582,7 +583,7 @@
                 </item>
                 <item>
                     <uuid>3ce4f0ce210148cdb778a05e00bbdc81</uuid>
-                    <name>ItemPreproc1</name>
+                    <name>ItemPreproc11</name>
                     <type>CALCULATED</type>
                     <key>preproc</key>
                     <delay>23s</delay>
@@ -601,7 +602,7 @@
                 </item>
                 <item>
                     <uuid>74db5c8a26b447468c2f2590af135878</uuid>
-                    <name>Script1</name>
+                    <name>Script11</name>
                     <type>SCRIPT</type>
                     <key>script</key>
                     <delay>23s</delay>
@@ -616,14 +617,14 @@
                 </item>
                 <item>
                     <uuid>d94160c34be4455bba660b1b18c0fb0e</uuid>
-                    <name>ItemWithGlobalAndHostMacro1</name>
+                    <name>ItemWithGlobalAndHostMacro11</name>
                     <key>sensor[{$UU},{$HM1}]</key>
-                    <delay>{$GLOBDELAY}</delay>
+                    <delay>12s</delay>
                     <value_type>FLOAT</value_type>
                 </item>
                 <item>
                     <uuid>5861cb498c044908a7aa5b225500ba3d</uuid>
-                    <name>SNMP trap1</name>
+                    <name>SNMP trap11</name>
                     <type>SNMP_TRAP</type>
                     <key>snmptrap.fallback</key>
                     <delay>0</delay>
@@ -631,7 +632,7 @@
                 </item>
                 <item>
                     <uuid>0106d4d9fba64066a66fbfe2d2340602</uuid>
-                    <name>SNMP agent1</name>
+                    <name>SNMP agent11</name>
                     <type>SNMP_AGENT</type>
                     <snmp_oid>SNMPv2-MIB::sysContact.0</snmp_oid>
                     <key>snmp_test</key>
@@ -639,7 +640,7 @@
                 </item>
                 <item>
                     <uuid>49db5d3e8da84948a543801129a84b99</uuid>
-                    <name>SSH agent1</name>
+                    <name>SSH agent11</name>
                     <type>SSH</type>
                     <key>ssh.run[x,localhost]</key>
                     <delay>23s</delay>
@@ -649,7 +650,7 @@
                 </item>
                 <item>
                     <uuid>74939b6a93294881ac5ec83d885920c9</uuid>
-                    <name>Chassis1</name>
+                    <name>Chassis11</name>
                     <key>system.hw.chassis[model]</key>
                     <delay>23s</delay>
                     <trends>0</trends>
@@ -658,7 +659,7 @@
                 </item>
                 <item>
                     <uuid>8d311f6a4fb44a4ab325600539f8398e</uuid>
-                    <name>Uname1</name>
+                    <name>Uname11</name>
                     <key>system.uname</key>
                     <delay>23s</delay>
                     <trends>0</trends>
@@ -667,7 +668,7 @@
                 </item>
                 <item>
                     <uuid>dca59a5058074e9f96a3d81f973bba75</uuid>
-                    <name>Telnet agent1</name>
+                    <name>Telnet agent11</name>
                     <type>TELNET</type>
                     <key>telnet.run[a,localhost]</key>
                     <delay>23s</delay>
@@ -676,7 +677,7 @@
                 </item>
                 <item>
                     <uuid>aaaff64eee7e47589a6b6a329a1060a3</uuid>
-                    <name>Zabbix trapper1</name>
+                    <name>Zabbix trapper11</name>
                     <type>TRAP</type>
                     <key>trap</key>
                     <delay>0</delay>
@@ -684,14 +685,14 @@
                 </item>
                 <item>
                     <uuid>a1dfb8d4a8004159979dff4f884f5d89</uuid>
-                    <name>ItemWithMultilevelMacros1</name>
-                    <key>vfs.dir.count[/{$UU},{$CHLDTMPLMACRO},{$PRNTTMPLMACRO}]</key>
+                    <name>ItemWithMultilevelMacros11</name>
+                    <key>vfs.dir.count[/tmp/{$UU},{$CHLDTMPLMACRO},{$PRNTTMPLMACRO}]</key>
                     <delay>{$PRNTTMPLMACRO}</delay>
                     <units>MB</units>
                 </item>
                 <item>
                     <uuid>381db19a280a4c27a1ad86693ea535bc</uuid>
-                    <name>ItemWithMacro1</name>
+                    <name>ItemWithMacro11</name>
                     <key>vfs.file.get[/tmp/{$HM1}]</key>
                     <delay>23s</delay>
                     <trends>0</trends>
@@ -699,15 +700,15 @@
                 </item>
                 <item>
                     <uuid>ec8e28d9728f4418af7847db9ce17612</uuid>
-                    <name>delay_globmacro1</name>
-                    <key>vfs.file.get[/{$UU}]</key>
+                    <name>delay_globmacro11</name>
+                    <key>vfs.file.get[/tmp/{$UU}]</key>
                     <delay>{$GLOBDELAY}</delay>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                 </item>
                 <item>
                     <uuid>2a562bcf814343afb9c5cc4e9619e307</uuid>
-                    <name>Zabbix internal1</name>
+                    <name>Zabbix internal11</name>
                     <type>INTERNAL</type>
                     <key>zabbix[boottime]</key>
                     <delay>23s</delay>
