@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-08-19T20:06:41Z</date>
+    <date>2022-09-05T14:11:36Z</date>
     <media_types>
         <media_type>
             <name>Opsgenie</name>
@@ -30,6 +30,10 @@
                 <parameter>
                     <name>event_tags_json</name>
                     <value>{EVENT.TAGSJSON}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_action</name>
+                    <value>{EVENT.UPDATE.ACTION}</value>
                 </parameter>
                 <parameter>
                     <name>event_update_status</name>
@@ -88,6 +92,10 @@
                     <value>P4</value>
                 </parameter>
                 <parameter>
+                    <name>status_counter</name>
+                    <value>25</value>
+                </parameter>
+                <parameter>
                     <name>trigger_id</name>
                     <value>{TRIGGER.ID}</value>
                 </parameter>
@@ -100,7 +108,8 @@
                     <value>{USER.FULLNAME}</value>
                 </parameter>
             </parameters>
-            <script>var Media = {&#13;
+            <script>var method,&#13;
+    Media = {&#13;
     params: {},&#13;
     name: '',&#13;
     labels: [],&#13;
@@ -227,14 +236,26 @@
     },&#13;
 &#13;
     getAlertId: function (requestId) {&#13;
+        status_counter = params.status_counter || 25; &#13;
         do {&#13;
             resp = Media.request('get', 'requests/' + requestId, undefined, true);&#13;
+            status_counter -= 1;&#13;
         }&#13;
-        while (typeof resp.response !== 'object' || typeof resp.response.data === 'undefined'&#13;
-                || resp.response.data.success === false);&#13;
+        while ( status_counter &gt; 0 &amp;&amp; &#13;
+            ( &#13;
+            typeof resp.response !== 'object' || &#13;
+            typeof resp.response.data === 'undefined' ||&#13;
+            resp.response.data.success === false &amp;&amp;&#13;
+                !resp.response.data.status.includes(&quot;There is no open alert&quot;) &amp;&amp;&#13;
+                !resp.response.data.status.includes(&quot;Alert is already&quot;)&#13;
+            ) &#13;
+        );&#13;
 &#13;
         if (typeof resp.response !== 'object' || typeof resp.response.data === 'undefined') {&#13;
             throw 'Cannot get ' + Media.name + ' issue ID. Check debug log for more information.';&#13;
+        }&#13;
+        else if (resp.response.data.success === false ) {&#13;
+            throw Media.name + ': Operation status (' + resp.response.data.status + ')';&#13;
         }&#13;
 &#13;
         return resp;&#13;
@@ -381,12 +402,24 @@ try {&#13;
             throw Media.name + ' response code is unexpected. Check debug log for more information.';&#13;
         }&#13;
     }&#13;
-    // Update a created issue.&#13;
+    // Update or close the created issue.&#13;
     else {&#13;
         fields.user = (params.event_value != 0) ? params.zbxuser : '';&#13;
         fields.note = params.alert_message;&#13;
+        if ( [0, 3].indexOf(parseInt(params.event_source)) &gt; -1  &amp;&amp; params.event_value == 0 ) {&#13;
+            // skip sending of close request from update operation(mandatory when both update &amp; recovery operations are defined in action)  &#13;
+            method = params.event_update_status == 0 ? &quot;close&quot; : &quot;skip&quot;;&#13;
+        }&#13;
+        else if ( params.event_source == 0 &amp;&amp; params.event_value == 1 &amp;&amp; params.event_update_status == 1 &amp;&amp; params.event_update_action.includes('acknowledged')) {&#13;
+            method = params.event_update_action.includes('unacknowledged') ? &quot;unacknowledge&quot; : &quot;acknowledge&quot;;&#13;
+        }&#13;
+        else {&#13;
+            method = &quot;notes&quot;;&#13;
+        }&#13;
+
+        if (method !== &quot;skip&quot;) {&#13;
+        resp = Media.request('post', params.event_id + '/' + method +'?identifierType=alias', fields);&#13;
 &#13;
-        resp = Media.request('post', params.event_id + '/notes?identifierType=alias', fields);&#13;
         if (typeof resp.response !== 'object' || typeof resp.response.result === 'undefined') {&#13;
             throw 'Cannot update ' + Media.name + ' issue. Check debug log for more information.';&#13;
         }&#13;
@@ -398,7 +431,7 @@ try {&#13;
             throw Media.name + ' response code is unexpected. Check debug log for more information.';&#13;
         }&#13;
     }&#13;
-&#13;
+    }&#13;
     return JSON.stringify(result);&#13;
 }&#13;
 catch (error) {&#13;
@@ -461,7 +494,7 @@ Device service uptime: {DISCOVERY.SERVICE.UPTIME}</message>
 Host IP: {HOST.IP}&#13;
 Agent port: {HOST.PORT}</message>
                 </message_template>
-                <message_template>
+                                <message_template>
                     <event_source>TRIGGERS</event_source>
                     <operation_mode>RECOVERY</operation_mode>
                     <subject>Resolved in {EVENT.DURATION}: {EVENT.NAME}</subject>
@@ -473,6 +506,7 @@ Severity: {EVENT.SEVERITY}&#13;
 Original problem ID: {EVENT.ID}&#13;
 {TRIGGER.URL}</message>
                 </message_template>
+
             </message_templates>
         </media_type>
     </media_types>

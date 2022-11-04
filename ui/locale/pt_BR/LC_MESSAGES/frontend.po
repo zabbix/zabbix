@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2022-06-14 17:38+0000\n"
-"Last-Translator: Byron Lanverly <byron@lanverly.com.br>\n"
+"PO-Revision-Date: 2022-10-18 13:51+0000\n"
+"Last-Translator: Filipe <fpaternot@g.globo>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -2418,17 +2418,17 @@ msgstr "Não foi possível encontrar o mapeamento de ícones \"%1$s\" usado no m
 #: include/classes/import/CConfigurationImport.php:972
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Não foi possível localizar a interface \"%1$s\" utilizada para a regra de descoberta \"%2$s\" em \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:762
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar interface \"%1$s\" utilizada para o item \"%2$s\" em \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1139
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Não foi possível encontrar a interface \"%1$s\" usada para o protótipo de item \"%2$s\" da regra de descoberta \"%3$s\" em \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1636
 #, c-format
@@ -2928,7 +2928,7 @@ msgstr "Não foi possível atualizar o tipo de mídia"
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
 msgid "Cannot update module: %1$s."
-msgstr ""
+msgstr "Não é possível atualizar o módulo: %1$s."
 
 #: sysmaps.php:180
 msgid "Cannot update network map"
@@ -3191,11 +3191,11 @@ msgstr "Verifica se o serviço do DNS está em execução. Retorna 0 - DNS fora 
 #: include/classes/items/CHelpItems.php:317
 #: include/classes/items/CHelpItems.php:667
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
-msgstr ""
+msgstr "Verifica se o arquivo existe. Retorna `0` - não encontrado; `1` - existe um arquivo do tipo especificado"
 
 #: include/classes/items/CHelpItems.php:759
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
-msgstr ""
+msgstr "Verifica se o host está acessível por ping ICMP. `0` - O ping ICMP falha. `1` - Ping ICMP bem sucedido."
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:475
@@ -3412,7 +3412,7 @@ msgstr "Comandos"
 #: include/items.inc.php:1255
 msgctxt "SNMP Community"
 msgid "Community"
-msgstr ""
+msgstr "Comunidade"
 
 #: app/views/monitoring.problem.view.php:324
 msgid "Compact view"
@@ -3762,7 +3762,7 @@ msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:273
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
-msgstr ""
+msgstr "A conexão não será criptografada porque usa um arquivo socket (no Unix) ou memória compartilhada (Windows)."
 
 #: include/views/configuration.host.massupdate.php:311
 msgid "Connections"
@@ -3980,11 +3980,11 @@ msgstr "Quantidade de linhas compatíveis no arquivo de log monitorado. Retorna 
 
 #: include/classes/items/CHelpItems.php:1139
 msgid "Count of values enqueued in the low-level discovery processing queue."
-msgstr ""
+msgstr "Contagem de valores enfileirados na fila de processamento de descoberta de baixo nível."
 
 #: include/classes/items/CHelpItems.php:1143
 msgid "Count of values enqueued in the preprocessing queue."
-msgstr ""
+msgstr "Contagem de valores enfileirados na fila de pré-processamento."
 
 #: include/views/configuration.action.list.php:54
 msgid "Create action"
@@ -4392,34 +4392,34 @@ msgstr "Périodo de retenção de dados"
 #: include/classes/setup/CSetupWizard.php:389
 #: include/classes/setup/CSetupWizard.php:528
 msgid "Database TLS CA file"
-msgstr ""
+msgstr "Arquivo de CA TLS do banco de dados"
 
 #: include/classes/setup/CFrontendSetup.php:686
 #: include/classes/setup/CSetupWizard.php:300
 #: include/classes/setup/CSetupWizard.php:395
 #: include/classes/setup/CSetupWizard.php:536
 msgid "Database TLS certificate file"
-msgstr ""
+msgstr "Arquivo de certificado TLS do banco de dados"
 
 #: include/classes/setup/CFrontendSetup.php:690
 msgid "Database TLS certificate files must be read-only"
-msgstr ""
+msgstr "Os arquivos de certificado TLS do banco de dados devem ser somente leitura"
 
 #: include/classes/setup/CSetupWizard.php:312
 #: include/classes/setup/CSetupWizard.php:402
 msgid "Database TLS cipher list"
-msgstr ""
+msgstr "Lista de cifras TLS do banco de dados"
 
 #: include/classes/setup/CSetupWizard.php:270
 #: include/classes/setup/CSetupWizard.php:385
 msgid "Database TLS encryption"
-msgstr ""
+msgstr "Criptografia TLS do banco de dados"
 
 #: include/classes/setup/CSetupWizard.php:294
 #: include/classes/setup/CSetupWizard.php:392
 #: include/classes/setup/CSetupWizard.php:532
 msgid "Database TLS key file"
-msgstr ""
+msgstr "Arquivo de chave TLS do banco de dados"
 
 #: include/blocks.inc.php:696
 msgid "Database history tables upgraded"
@@ -4432,7 +4432,7 @@ msgstr "Host do banco de dados"
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/setup/CSetupWizard.php:398
 msgid "Database host verification"
-msgstr ""
+msgstr "Verificação do host do banco de dados"
 
 #: include/items.inc.php:95
 msgid "Database monitor"
@@ -5251,23 +5251,23 @@ msgstr "Objeto de descoberta"
 
 #: include/classes/items/CHelpItems.php:787
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Descoberta de clusters `VMware`, `<url>` - URL de serviço VMware. Retorna JSON"
 
 #: include/classes/items/CHelpItems.php:795
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Descoberta de datastores `VMware`, `<url>` - URL de serviço `VMware`. Retorna JSON"
 
 #: include/classes/items/CHelpItems.php:839
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "Descoberta de datastores do hypervisor `VMware`, `<url>` - URL do serviço `VMware`, `<uuid>` - nome do host do hypervisor `VMware`. Retorna JSON"
 
 #: include/classes/items/CHelpItems.php:859
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Descoberta de hipervisores `VMware`, `<url>` - URL de serviço `VMware`. Retorna JSON"
 
 #: include/classes/items/CHelpItems.php:1047
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "Descoberta de dispositivos de disco da máquina virtual `VMware`, `<url>` - URL do serviço `VMware`, `<uuid>` - nome do host da máquina virtual `VMware`. Retorna JSON"
 
 #: include/classes/items/CHelpItems.php:1059
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
@@ -8480,7 +8480,7 @@ msgstr "Campos inválidos para o mapa do sistema."
 #: include/classes/setup/CSetupWizard.php:536
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
-msgstr ""
+msgstr "Caminho de arquivo incorreto para \"%1$s\": %2$s."
 
 #: include/classes/helpers/CUploadFile.php:162
 msgid "Incorrect file upload."
@@ -8881,7 +8881,7 @@ msgstr "Grupo de usuários inválido."
 #: include/classes/api/services/CUser.php:1574
 #: include/classes/validators/CLdapAuthValidator.php:88 index_http.php:86
 msgid "Incorrect user name or password or account is temporarily blocked."
-msgstr ""
+msgstr "Nome de usuário ou senha incorretos, ou conta bloqueada temporariamente."
 
 #: app/controllers/CControllerPopupGeneric.php:454
 #: include/classes/api/services/CAction.php:811
@@ -9897,7 +9897,7 @@ msgstr "Item incluído"
 
 #: app/views/popup.itemtestedit.view.php:300
 msgid "Item contains user defined macros with type \"Secret text\". Values of these macros should be entered manually."
-msgstr ""
+msgstr "O item contém macros definidas pelo usuário com o tipo \"Texto secreto\". Os valores dessas macros devem ser inseridos manualmente."
 
 #: items.php:1275
 msgid "Item copied"
@@ -10000,7 +10000,7 @@ msgstr "Protótipos de itens atualizado"
 
 #: jsLoader.php:315
 msgid "Item type does not use interface"
-msgstr ""
+msgstr "O tipo de item não usa interface"
 
 #: items.php:852
 msgid "Item updated"
@@ -10146,7 +10146,7 @@ msgstr "É aguardado uma string JSON"
 #: include/classes/core/CJsonRpc.php:150
 #, c-format
 msgid "JSON-RPC error generation failed. No such error \"%1$s\"."
-msgstr ""
+msgstr "Falha na geração do erro JSON-RPC. Nenhum erro \"%1$s\"."
 
 #: include/items.inc.php:1792
 #: include/views/configuration.host.discovery.edit.php:669
@@ -10553,7 +10553,7 @@ msgstr "Associado aos templates"
 
 #: include/views/configuration.template.list.php:159
 msgid "Linked to templates"
-msgstr ""
+msgstr "Vínculo com templates"
 
 #: include/views/js/monitoring.sysmaps.js.php:718
 #: include/views/js/monitoring.sysmaps.js.php:729
@@ -10567,37 +10567,37 @@ msgstr "A lista está vazia"
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:639
 msgid "List of block devices and their type. Returns JSON"
-msgstr ""
+msgstr "Lista de dispositivos de bloco e seu tipo. Retorna JSON"
 
 #: include/classes/items/CHelpItems.php:197
 #: include/classes/items/CHelpItems.php:547
 msgid "List of detected CPUs/CPU cores. Returns JSON"
-msgstr ""
+msgstr "Lista de CPUs/núcleos de CPU detectados. Retorna JSON"
 
 #: include/classes/items/CHelpItems.php:341
 #: include/classes/items/CHelpItems.php:691
 msgid "List of mounted filesystems and their types. Returns JSON"
-msgstr ""
+msgstr "Lista de sistemas de arquivos montados e seus tipos. Retorna JSON"
 
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:695
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
-msgstr ""
+msgstr "Lista de sistemas de arquivos montados, seus tipos, espaço em disco e estatísticas de inode. Retorna JSON"
 
 #: include/classes/items/CHelpItems.php:101
 #: include/classes/items/CHelpItems.php:451
 msgid "List of network interfaces. Returns JSON"
-msgstr ""
+msgstr "Lista de interfaces de rede. Retorna JSON"
 
 #: include/classes/items/CHelpItems.php:153
 #: include/classes/items/CHelpItems.php:503
 msgid "List of object instances of Windows performance counters, discovered using object names in English. Returns JSON"
-msgstr ""
+msgstr "Lista de instâncias de objetos de contadores de desempenho do Windows, descobertas usando nomes de objetos em inglês. Retorna JSON"
 
 #: include/classes/items/CHelpItems.php:149
 #: include/classes/items/CHelpItems.php:499
 msgid "List of object instances of Windows performance counters. Returns JSON"
-msgstr ""
+msgstr "Lista de instâncias de objetos de contadores de desempenho do Windows. Retorna JSON"
 
 #: app/views/dashboard.sharing.edit.php:84
 #: include/views/monitoring.screen.edit.php:207
@@ -10740,7 +10740,7 @@ msgstr "S"
 #: include/func.inc.php:597 jsLoader.php:144
 msgctxt "month short"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:90
 msgid "MAC address A"
@@ -11432,7 +11432,7 @@ msgstr[1] "Módulos ativados: %1$s."
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
 msgid "Module updated: %1$s."
-msgstr ""
+msgstr "Módulo atualizado: %1$s."
 
 #: include/classes/core/CModuleManager.php:222
 #, c-format
@@ -11707,7 +11707,7 @@ msgstr "O nome do campo do formulário não pode exceder 255 caracteres."
 
 #: app/views/administration.module.edit.php:43
 msgid "Namespace"
-msgstr ""
+msgstr "Namespace"
 
 #: app/views/administration.housekeeping.edit.php:63
 msgid "Network discovery data storage period"
@@ -12531,7 +12531,7 @@ msgstr "Número de itens habilitados no host."
 
 #: include/blocks.inc.php:623
 msgid "Number of hosts (enabled/disabled)"
-msgstr ""
+msgstr "Quantidade de hosts (habilitados/desabilitados)"
 
 #: include/blocks.inc.php:636
 msgid "Number of items (enabled/disabled/not supported)"
@@ -12603,7 +12603,7 @@ msgstr "Número de passos"
 
 #: include/blocks.inc.php:632
 msgid "Number of templates"
-msgstr ""
+msgstr "Número de modelos"
 
 #: include/blocks.inc.php:647
 msgid "Number of triggers (enabled/disabled [problem/ok])"
@@ -12928,6 +12928,10 @@ msgstr "Apenas os últimos 20%% dos indicadores são exibidos."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Somente triggers de hosts ativados e dependentes de itens ativados são contadas"
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:430
 msgid "Opera"
 msgstr "Ópera"
@@ -13200,11 +13204,11 @@ msgstr "A extenção PHP LDAP está ausente."
 
 #: include/classes/setup/CFrontendSetup.php:565
 msgid "PHP OpenSSL"
-msgstr ""
+msgstr "PHP OpenSSL"
 
 #: include/classes/setup/CFrontendSetup.php:569
 msgid "PHP OpenSSL extension missing."
-msgstr ""
+msgstr "A extenção PHP OpenSSL está ausente."
 
 #: include/classes/setup/CFrontendSetup.php:308
 msgid "PHP bcmath"
@@ -14200,7 +14204,7 @@ msgstr "Recipiente (descendente)"
 
 #: include/views/administration.auditacts.list.php:30
 msgid "Recipients"
-msgstr ""
+msgstr "Destinatários"
 
 #: app/views/administration.user.edit.php:398
 #: include/classes/screens/CScreenProblem.php:1061
@@ -14656,7 +14660,7 @@ msgstr "Recurso"
 
 #: app/views/reports.auditlog.list.php:67
 msgid "Resource ID"
-msgstr ""
+msgstr "ID do recurso"
 
 #: app/views/popup.mediatypetest.edit.php:46
 msgid "Response"
@@ -15465,11 +15469,11 @@ msgstr "Enviar para trás"
 
 #: app/partials/popup.operations.php:80
 msgid "Send to user groups"
-msgstr ""
+msgstr "Enviar para grupos de usuários"
 
 #: app/partials/popup.operations.php:100
 msgid "Send to users"
-msgstr ""
+msgstr "Enviar para usuários"
 
 #: include/actions.inc.php:2154
 #: include/views/administration.auditacts.list.php:76
@@ -16172,7 +16176,7 @@ msgstr "Estático"
 
 #: include/classes/items/CHelpItems.php:1211
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
-msgstr ""
+msgstr "Estatísticas e disponibilidade do cache de gravação do Zabbix. Cache - um dos valores (modos: all, float, uint, str, log, text, não suportado), histórico (modos: pfree, free, total, used, pused), index (modos: pfree, free, total, used , pused), tendência (modos: pfree, free, total, used, pused)."
 
 #: app/controllers/CControllerPopupGeneric.php:210
 #: app/controllers/CControllerPopupGeneric.php:224
@@ -16818,7 +16822,7 @@ msgstr "A coordenada Y do elemento localizado entre X - %1$s e Y - %2$s na tela 
 #: include/classes/db/DbBackend.php:130
 #, c-format
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
-msgstr ""
+msgstr "A versão do banco de dados Zabbix não atende aos requisitos atuais. Versão do seu banco de dados: %1$s. Versão necessária: %2$s. Entre em contato com o administrador do sistema."
 
 #: include/html.inc.php:701
 #, c-format
@@ -16954,6 +16958,16 @@ msgstr "Esta coluna da tela não está vazia. Excluir ela?"
 #: include/classes/screens/CScreenBuilder.php:559
 msgid "This screen row is not empty. Delete it?"
 msgstr "Esta linha da tela não está vazia. Excluir ela?"
+
+#: app/views/administration.housekeeping.edit.php:134
+#: include/blocks.inc.php:714
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:164
+#: include/blocks.inc.php:730
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
 
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"
@@ -17651,7 +17665,7 @@ msgstr "Ucraniano (uk_UA)"
 
 #: include/classes/core/CConfigFile.php:200
 msgid "Unable to change configuration file permissions to 0600."
-msgstr ""
+msgstr "Não é possível alterar as permissões do arquivo de configuração para 0600."
 
 #: include/classes/core/CConfigFile.php:209
 msgid "Unable to create the configuration file."
@@ -17662,7 +17676,7 @@ msgstr "Não foi possível criar o arquivo de configuração."
 #: include/classes/db/PostgresqlDbBackend.php:61
 #, c-format
 msgid "Unable to determine current Zabbix database version: %1$s."
-msgstr ""
+msgstr "Não foi possível determinar a versão atual do banco de dados Zabbix: %1$s."
 
 #: include/classes/core/CConfigFile.php:205
 msgid "Unable to overwrite the existing configuration file."
@@ -17868,7 +17882,7 @@ msgstr "O formato de arquivo \"%1$s\" não é suportado."
 
 #: app/controllers/CControllerActionOperationGet.php:53
 msgid "Unsupported operation."
-msgstr ""
+msgstr "Operação não suportada."
 
 #: include/classes/api/services/CAction.php:2770
 #, c-format
@@ -19930,12 +19944,12 @@ msgstr "descoberta"
 #: include/classes/api/services/CTask.php:449
 #, c-format
 msgid "discovery rule \"%1$s\" on host \"%2$s\" is not monitored"
-msgstr ""
+msgstr "a regra de descoberta \"%1$s\" no host \"%2$s\" não é monitorada"
 
 #: app/partials/monitoring.latest.view.html.php:126
 #, c-format
 msgid "displaying %1$s to %2$s of %3$s Items"
-msgstr ""
+msgstr "exibindo %1$s a %2$s de %3$s itens"
 
 #: app/views/popup.lldoperation.php:67 include/actions.inc.php:27
 #: include/correlation.inc.php:34
@@ -20070,12 +20084,12 @@ msgstr "incluindo subgrupos"
 
 #: include/classes/parsers/CTriggerExpression.php:497
 msgid "incorrect calculated item formula"
-msgstr ""
+msgstr "fórmula de item calculado incorreta"
 
 #: include/classes/parsers/CTriggerExpression.php:511
 #, c-format
 msgid "incorrect calculated item formula starting from \"%1$s\""
-msgstr ""
+msgstr "fórmula de item calculado incorreta a partir de \"%1$s\""
 
 #: include/classes/validators/CEventCorrCondValidator.php:47
 msgid "incorrect condition type"
@@ -20092,12 +20106,12 @@ msgstr "sintaxe incorreta próximo de \"%1$s\""
 
 #: include/classes/parsers/CTriggerExpression.php:501
 msgid "incorrect trigger expression"
-msgstr ""
+msgstr "expressão de trigger incorreta"
 
 #: include/classes/parsers/CTriggerExpression.php:515
 #, c-format
 msgid "incorrect trigger expression starting from \"%1$s\""
-msgstr ""
+msgstr "verifique a expressão a partir de \"%1$s\""
 
 # Duplicate - Same of: include/views/administration.authentication.edit.php:35
 #: include/events.inc.php:37
@@ -20174,7 +20188,7 @@ msgstr "item"
 #: include/classes/api/services/CTask.php:450
 #, c-format
 msgid "item \"%1$s\" on host \"%2$s\" is not monitored"
-msgstr ""
+msgstr "item \"%1$s\" no host \"%2$s\" não é monitorado"
 
 #: include/classes/widgets/CWidgetHelper.php:650
 #: include/classes/widgets/CWidgetHelper.php:1007
@@ -20682,7 +20696,7 @@ msgstr "o parâmetro \"%1$s\" está ausente"
 #: include/classes/db/PostgresqlDbBackend.php:62
 #, c-format
 msgid "the table \"%1$s\" was not found"
-msgstr ""
+msgstr "a tabela \"%1$s\" não foi encontrada"
 
 #: include/classes/export/CConfigurationExportBuilder.php:77
 #: include/classes/import/validators/C44XmlValidator.php:2023
@@ -20725,7 +20739,7 @@ msgstr "a trigger não permite fechamento manual"
 
 #: include/classes/validators/CApiInputValidator.php:1855
 msgid "trigger expression must contain at least one host:key reference"
-msgstr ""
+msgstr "a expressão do gatilho deve conter pelo menos uma referência host:key"
 
 #: include/classes/api/services/CTriggerGeneral.php:1638
 msgid "trigger prototype cannot be moved to another template or host"

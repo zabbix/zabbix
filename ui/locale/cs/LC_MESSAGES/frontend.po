@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2022-08-22 07:28+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-10-25 08:52+0000\n"
+"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -2484,7 +2484,7 @@ msgstr "Nelze najít rozhraní \"%1$s\" použité pro položku \"%2$s\" na \"%3$
 #: include/classes/import/CConfigurationImport.php:1139
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Nelze najít rozhraní \"%1$s\" použité pro prototyp položky \"%2$s\" pravidla zjišťování \"%3$s\" na \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1636
 #, c-format
@@ -2539,7 +2539,7 @@ msgstr "Nelze nalézt šablonu \"%1$s\" pro prototyp hosta \"%2$s\" objevovacíh
 #: include/classes/import/CConfigurationImport.php:1025
 #, c-format
 msgid "Cannot find template \"%1$s\" for override \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Nelze najít šablonu „%1$s“ pro přepsání „%2$s“ pravidla zjišťování „%3$s“ na „%4$s“."
 
 #: include/classes/import/importers/CMapImporter.php:170
 #: include/classes/import/importers/CMapImporter.php:223
@@ -2595,9 +2595,9 @@ msgstr "Není možné nalinkovat šablonu."
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nelze načíst modul v: %1$s."
+msgstr[1] "Nelze načíst moduly v: %1$s."
+msgstr[2] "Nelze načíst moduly v: %1$s."
 
 #: include/classes/api/services/CUser.php:1132
 msgid "Cannot logout."
@@ -3255,7 +3255,7 @@ msgstr "Kontrola DNS. Vráti 0 - DNS je nedostupné (server neodpovídá nebo DN
 #: include/classes/items/CHelpItems.php:317
 #: include/classes/items/CHelpItems.php:667
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
-msgstr ""
+msgstr "Zkontroluje, zda soubor existuje. Vrací 0 - nenalezeno; 1 - soubor zadaného typu existuje"
 
 #: include/classes/items/CHelpItems.php:759
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -3324,7 +3324,7 @@ msgstr "Kruhové odkazování šablon není povolené."
 #: include/classes/core/ZBase.php:427
 #, c-format
 msgid "Class %1$s not found for action %2$s."
-msgstr ""
+msgstr "Třída %1$s nebyla nalezena pro akci %2$s."
 
 #: include/views/configuration.httpconf.list.php:192
 #: include/views/configuration.item.list.php:241
@@ -3536,7 +3536,7 @@ msgstr "Podmínka \"%2$s\" použitá ve formuli \"%3$s\" pro pravidlo nálezu  \
 #: include/classes/api/services/CDiscoveryRule.php:1559
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for override \"%1$s\"."
-msgstr ""
+msgstr "Podmínka \"%2$s\" není použita ve vzorci \"%3$s\" pro přepsání \"%1$s\"."
 
 #: include/classes/api/services/CAction.php:2724
 #, c-format
@@ -3556,7 +3556,7 @@ msgstr "Podmínka \"%2$s\" použitá ve formuli \"%3$s\" pro  pravidlo nálezu \
 #: include/classes/api/services/CDiscoveryRule.php:1558
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for override \"%1$s\" is not defined."
-msgstr ""
+msgstr "Podmínka \"%2$s\" použitá ve vzorci \"%3$s\" pro přepsání \"%1$s\" není definována."
 
 #: app/partials/popup.operations.php:393
 #: include/views/configuration.action.edit.php:138
@@ -4046,7 +4046,7 @@ msgstr "Počet spárovaných řádků v monitorovaném log souboru. Vrací celé
 
 #: include/classes/items/CHelpItems.php:1139
 msgid "Count of values enqueued in the low-level discovery processing queue."
-msgstr ""
+msgstr "Počet hodnot zařazených do fronty pro zpracování low-level discovery."
 
 #: include/classes/items/CHelpItems.php:1143
 msgid "Count of values enqueued in the preprocessing queue."
@@ -5318,19 +5318,19 @@ msgstr "Objekt objevování"
 
 #: include/classes/items/CHelpItems.php:787
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Objevování VMware clusterů, <url> – URL služby VMware. Vrátí JSON"
 
 #: include/classes/items/CHelpItems.php:795
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Zjištění datových úložišť VMware, <url> – URL služby VMware. Vrátí JSON"
 
 #: include/classes/items/CHelpItems.php:839
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "Zjišťování datových úložišť hypervizoru VMware, <url> - URL služby VMware, <uuid> - název hosta hypervizoru VMware. Vrátí JSON"
 
 #: include/classes/items/CHelpItems.php:859
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Zjištění hypervizorů VMware, <url> – URL služby VMware. Vrátí JSON"
 
 #: include/classes/items/CHelpItems.php:1047
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
@@ -5599,7 +5599,7 @@ msgstr ""
 #: include/profiles.inc.php:187
 #, c-format
 msgid "Duplicate severity name \"%1$s\"."
-msgstr ""
+msgstr "Duplicitní název závažnosti \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:735
 #: include/classes/api/services/CMap.php:1199
@@ -6115,7 +6115,7 @@ msgstr "Korelace událostí"
 
 #: correlation.php:26 include/views/configuration.correlation.edit.php:28
 msgid "Event correlation rules"
-msgstr "Pravidla korelace události"
+msgstr "Pravidla korelace událostí"
 
 #: tr_events.php:29 tr_events.php:173 tr_events.php:199
 msgid "Event details"
@@ -6648,17 +6648,17 @@ msgstr "Vzorec"
 #: include/classes/api/services/CAction.php:2722
 #, c-format
 msgid "Formula missing for action \"%1$s\"."
-msgstr ""
+msgstr "Pro akci „%1$s“ chybí vzorec."
 
 #: include/classes/api/services/CDiscoveryRule.php:1762
 #, c-format
 msgid "Formula missing for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "Chybí vzorec pro pravidlo zjišťování „%1$s“."
 
 #: include/classes/api/services/CDiscoveryRule.php:1555
 #, c-format
 msgid "Formula missing for override \"%1$s\"."
-msgstr ""
+msgstr "Chybí vzorec pro přepsání \"%1$s\"."
 
 #: include/locales.inc.php:55
 msgid "French (fr_FR)"
@@ -6738,7 +6738,7 @@ msgstr "Obecné"
 #: chart4.php:172 chart5.php:203
 #, c-format
 msgid "Generated in %1$s sec"
-msgstr ""
+msgstr "Vygenerováno za %1$s s"
 
 #: include/locales.inc.php:56
 msgid "Georgian (ka_GE)"
@@ -7885,7 +7885,7 @@ msgstr "IPMI senzor"
 
 #: include/classes/items/CHelpItems.php:1245
 msgid "IPMI sensor IDs and other sensor-related parameters. Returns JSON."
-msgstr ""
+msgstr "ID senzorů IPMI a další parametry související se senzory. Vrátí JSON."
 
 #: app/views/administration.iconmap.edit.php:58
 #: app/views/administration.image.edit.php:73
@@ -7921,7 +7921,7 @@ msgstr "Mapová ikona"
 #: include/classes/api/services/CIconMap.php:311
 #, c-format
 msgid "Icon map \"%1$s\" already exists."
-msgstr ""
+msgstr "Mapa ikon „%1$s“ již existuje."
 
 #: include/classes/api/services/CIconMap.php:533
 #, c-format
@@ -7957,22 +7957,22 @@ msgstr "Ikony"
 
 #: app/views/administration.authentication.edit.php:153
 msgid "IdP entity ID"
-msgstr ""
+msgstr "ID entity IdP"
 
 #: include/classes/core/CModuleManager.php:155
 #, c-format
 msgid "Identical ID (%1$s) is used by modules located at %2$s."
-msgstr ""
+msgstr "Identické ID (%1$s) používají moduly umístěné na %2$s."
 
 #: include/classes/core/CModuleManager.php:173
 #, c-format
 msgid "Identical actions are used by modules located at %1$s."
-msgstr ""
+msgstr "Identické akce používají moduly umístěné na %1$s."
 
 #: include/classes/core/CModuleManager.php:162
 #, c-format
 msgid "Identical namespace (%1$s) is used by modules located at %2$s."
-msgstr ""
+msgstr "Identický jmenný prostor (%1$s) používají moduly umístěné na %2$s."
 
 #: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:627
@@ -7981,7 +7981,7 @@ msgstr "Identifikace systému. Vrací řetězec"
 
 #: app/views/popup.lldoverride.php:54
 msgid "If filter matches"
-msgstr ""
+msgstr "Pokud filtr odpovídá"
 
 #: include/func.inc.php:1535 include/func.inc.php:1554
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
@@ -8025,7 +8025,7 @@ msgstr "Chyba načtení obrázku [%1$s] v [%2$s]."
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
 msgid "Image size must be less than %1$s."
-msgstr ""
+msgstr "Velikost obrázku musí být menší než %1$s."
 
 #: app/controllers/CControllerImageUpdate.php:137
 msgid "Image updated"
@@ -8071,7 +8071,7 @@ msgstr "Import úspěšný"
 #: hostinventories.php:190
 #, c-format
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
-msgstr ""
+msgstr "Nelze filtrovat podle pole inventáře \"%1$s\", které neexistuje."
 
 #: include/html.inc.php:299 include/maps.inc.php:404
 msgid "In maintenance"
@@ -8089,7 +8089,7 @@ msgstr "V rozsahu"
 #: include/views/configuration.host.edit.php:68
 #: include/views/configuration.host.list.php:228
 msgid "Inaccessible discovery rule"
-msgstr ""
+msgstr "Nepřístupné pravidlo pro objevování."
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:293
 msgid "Inaccessible graph"
@@ -8114,7 +8114,7 @@ msgstr "Nepřístupná položka"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:294
 msgid "Inaccessible item prototype"
-msgstr ""
+msgstr "Nepřístupný prototyp položky"
 
 #: app/partials/monitoring.host.view.html.php:92
 #: include/classes/screens/CScreenProblem.php:407
@@ -8154,7 +8154,7 @@ msgstr "Včetně"
 
 #: app/views/administration.mediatype.edit.php:240
 msgid "Include event menu entry"
-msgstr ""
+msgstr "Zahrnout položku nabídky události"
 
 #: app/views/administration.usergroup.edit.php:139
 #: app/views/administration.usergroup.edit.php:190
@@ -8339,7 +8339,7 @@ msgstr "Neplatná operace hosta. Host neexistuje nebo k němu nemáte přístup.
 #: include/classes/api/services/CAction.php:1873
 #, c-format
 msgid "Incorrect action operation port \"%1$s\"."
-msgstr ""
+msgstr "Neplatná akce operačního portu \"%1$s\"."
 
 #: include/classes/api/services/CAction.php:1978
 msgid "Incorrect action operation template. Template does not exist or you have no access to this template."
@@ -8464,7 +8464,7 @@ msgstr "Nesprávně vypočítaná hodnota SLA pro službu \"%1$s\"."
 #: include/classes/api/services/CHost.php:2278
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
-msgstr ""
+msgstr "V názvu hostitele \"%1$s\" byly použity nesprávné znaky."
 
 #: include/classes/api/services/CProxy.php:624
 #: include/classes/api/services/CProxy.php:740
@@ -8510,7 +8510,7 @@ msgstr "Nesprávně nastavený výraz \"%2$s\" pro pravidlo nálezu \"%1$s\": %3
 #: include/classes/api/services/CDiscoveryRule.php:1556
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for override \"%1$s\": %3$s."
-msgstr ""
+msgstr "Nesprávný vlastní výraz „%2$s“ pro pravidlo přepisu „%1$s“: %3$s."
 
 #: app/controllers/CControllerWidgetClockView.php:72
 msgid "Incorrect data."
@@ -8520,7 +8520,7 @@ msgstr "Nesprávné údaje."
 #: include/classes/db/PostgresqlDbBackend.php:95
 #, c-format
 msgid "Incorrect default charset for Zabbix database: %1$s."
-msgstr ""
+msgstr "Nesprávná výchozí znaková sada pro databázi Zabbix: %1$s."
 
 #: include/classes/api/services/CEvent.php:527
 #: include/classes/api/services/CProblem.php:394
@@ -8554,7 +8554,7 @@ msgstr "Neplatné pole pro sysmap."
 #: include/classes/setup/CSetupWizard.php:536
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
-msgstr ""
+msgstr "Nesprávná cesta k souboru pro „%1$s“: %2$s."
 
 #: include/classes/helpers/CUploadFile.php:162
 msgid "Incorrect file upload."
@@ -8583,7 +8583,7 @@ msgstr "Nesprávné nastavení filtru makra pravidlo nálezu \"%1$s\"."
 #: include/classes/api/services/CDiscoveryRule.php:1591
 #, c-format
 msgid "Incorrect filter condition macro for override \"%1$s\"."
-msgstr ""
+msgstr "Nesprávné makro podmínky filtru pro přepsání „%1$s“."
 
 #: include/classes/api/services/CAction.php:1624
 #: include/classes/api/services/CAction.php:2762
@@ -13015,6 +13015,10 @@ msgstr "Jen posledních 20%% indikátorů je zobrazených."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Počítány jsou pouze spouštěče přiřazené k povoleným hostitelům a závisející na povolených položkách"
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:430
 msgid "Opera"
 msgstr "Opera"
@@ -17046,6 +17050,16 @@ msgstr "Tento sloupec obrazovky není prázdny. Přesto smazat?"
 #: include/classes/screens/CScreenBuilder.php:559
 msgid "This screen row is not empty. Delete it?"
 msgstr "Tento řádek obrazovky není prázdny. Přesto smazat?"
+
+#: app/views/administration.housekeeping.edit.php:134
+#: include/blocks.inc.php:714
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:164
+#: include/blocks.inc.php:730
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
 
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"

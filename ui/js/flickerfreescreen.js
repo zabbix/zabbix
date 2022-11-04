@@ -61,6 +61,15 @@
 				this.screens[screen.id].data = new SVGMap(this.screens[screen.id].data);
 				$(screen.data.container).attr({'aria-label': screen.data.options.aria_label, 'tabindex': 0})
 					.find('svg').attr('aria-hidden', 'true');
+
+				$(screen.data.container).parents('.sysmap-scroll-container').eq(0)
+					.on('scroll', (e) => {
+						if (!e.target.dataset.last_scroll_at || Date.now() - e.target.dataset.last_scroll_at > 1000) {
+							$('.menu-popup-top').menuPopup('close', null, false);
+
+							e.target.dataset.last_scroll_at = Date.now();
+						}
+					});
 			}
 
 			// init refresh plan
@@ -106,14 +115,12 @@
 			 * 21   SCREEN_RESOURCE_HTTPTEST_DETAILS
 			 * 22   SCREEN_RESOURCE_DISCOVERY
 			 * 23   SCREEN_RESOURCE_HTTPTEST
-			 * 24   SCREEN_RESOURCE_PROBLEM
 			 */
 			var type_params = {
 					'17': ['mode', 'resourcetype', 'pageFile', 'page'],
 					'21': ['mode', 'resourcetype', 'profileIdx2'],
 					'22': ['mode', 'resourcetype', 'data'],
 					'23': ['mode', 'resourcetype', 'data', 'page'],
-					'24': ['mode', 'resourcetype', 'data', 'page'],
 					'default': ['mode', 'screenid', 'groupid', 'hostid', 'pageFile', 'profileIdx', 'profileIdx2',
 						'screenitemid'
 					]
@@ -242,8 +249,8 @@
 						to_ts: time_object.to_ts
 					});
 
-					// Reset pager on time range update (SCREEN_RESOURCE_HISTORY, SCREEN_RESOURCE_PROBLEM).
-					if ($.inArray(screen.resourcetype, [17, 24]) !== -1) {
+					// Reset pager on time range update (SCREEN_RESOURCE_HISTORY).
+					if (screen.resourcetype == 17) {
 						screen.page = 1;
 					}
 

@@ -12932,6 +12932,10 @@ msgstr "Nur die letzten 20%% des Indikators werden angezeigt."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Nur Auslöser, die mit aktiven Hosts und aktiven Datenpunkten verbunden sind, werden gezählt"
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr ""
+
 # Der Browser
 #: include/httptest.inc.php:430
 msgid "Opera"
@@ -16976,6 +16980,16 @@ msgstr "Diese Tafelspalte ist nicht leer. Löschen?"
 #: include/classes/screens/CScreenBuilder.php:559
 msgid "This screen row is not empty. Delete it?"
 msgstr "Diese Tafelzeile ist nicht leer. Löschen?"
+
+#: app/views/administration.housekeeping.edit.php:134
+#: include/blocks.inc.php:714
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:164
+#: include/blocks.inc.php:730
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
 
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"

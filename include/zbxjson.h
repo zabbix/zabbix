@@ -302,6 +302,8 @@ typedef struct
 
 	/* set to 1 when jsonpath points at single location */
 	unsigned char		definite;
+
+	unsigned char		first_match;
 }
 zbx_jsonpath_t;
 

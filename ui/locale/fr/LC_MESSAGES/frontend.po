@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2022-07-29 21:53+0000\n"
+"PO-Revision-Date: 2022-10-25 19:44+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -11700,7 +11700,7 @@ msgstr "Le champ de nom du formulaire ne doit pas dépasser 255 caractères."
 
 #: app/views/administration.module.edit.php:43
 msgid "Namespace"
-msgstr ""
+msgstr "Espace de noms"
 
 #: app/views/administration.housekeeping.edit.php:63
 msgid "Network discovery data storage period"
@@ -12917,6 +12917,10 @@ msgstr "Seules les 20 derniers %% des indicateurs sont affichés."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Seuls les déclencheurs assignés à des hôtes activés et dépendant d'éléments activés sont comptés"
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr "Ouvrir le journal"
+
 #: include/httptest.inc.php:430
 msgid "Opera"
 msgstr "Opera"
@@ -13405,7 +13409,7 @@ msgstr "La page a reçu des données incorrectes"
 #: include/classes/helpers/CPagerHelper.php:160
 msgctxt "page navigation"
 msgid "Pager"
-msgstr ""
+msgstr "Pager"
 
 #: app/views/administration.mediatype.edit.php:103 include/blocks.inc.php:612
 msgid "Parameter"
@@ -16943,6 +16947,16 @@ msgstr "Cette colonne de l'écran n'est pas vide. L'effacer ?"
 #: include/classes/screens/CScreenBuilder.php:559
 msgid "This screen row is not empty. Delete it?"
 msgstr "Cette ligne de l'écran n'est pas vide. L'effacer ?"
+
+#: app/views/administration.housekeeping.edit.php:134
+#: include/blocks.inc.php:714
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr "Ce paramètre doit être activé, car les tables d'historique contiennent des blocs compressés."
+
+#: app/views/administration.housekeeping.edit.php:164
+#: include/blocks.inc.php:730
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr "Ce paramètre doit être activé, car les tableaux de tendance contiennent des blocs compressés."
 
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"
