@@ -39,8 +39,9 @@ class CWidgetFormView {
 		$this->makeFormGrid();
 	}
 
-	// TODO AS: phpdoc
 	/**
+	 * Add configuration row with single label and multiple CWidgetFieldView-s as content.
+	 *
 	 * @param array|string|null $label
 	 * @param array             $items
 	 * @param string|null       $row_class
@@ -69,7 +70,15 @@ class CWidgetFormView {
 		return $this;
 	}
 
-	// TODO AS: phpdoc
+	/**
+	 * Add configuration row based on single CWidgetFieldView.
+	 *
+	 * @param CWidgetFieldView|null $field_view
+	 * @param string|null           $row_class
+	 * @param bool                  $show_label
+	 *
+	 * @return $this
+	 */
 	public function addField(?CWidgetFieldView $field_view, string $row_class = null, bool $show_label = true): self {
 		if ($field_view !== null) {
 			$this->registerFieldView($field_view);
@@ -80,7 +89,15 @@ class CWidgetFormView {
 		return $this;
 	}
 
-	// TODO AS: phpdoc
+	/**
+	 * Prepare CWidgetFieldView for addFieldGroup() items array in default view or by custom CHTML.
+	 *
+	 * @param CWidgetFieldView $field_view
+	 * @param array            $items
+	 * @param string|null      $row_class
+	 *
+	 * @return array  Label and field views taken from field object or $items array if not empty.
+	 */
 	public function makeCustomField(CWidgetFieldView $field_view, array $items = [], string $row_class = null): array {
 		$this->registerFieldView($field_view);
 
