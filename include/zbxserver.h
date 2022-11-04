@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXSERVER_H
 #define ZABBIX_ZBXSERVER_H
 
-#include "dbcache.h"
+#include "zbxcachehistory.h"
 #include "zbxvariant.h"
 
 #define MACRO_TYPE_MESSAGE_NORMAL	0x00000001

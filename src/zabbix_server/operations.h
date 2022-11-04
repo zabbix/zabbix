@@ -20,7 +20,7 @@
 #ifndef ZABBIX_OPERATIONS_H
 #define ZABBIX_OPERATIONS_H
 
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 extern int	CONFIG_TIMEOUT;
 

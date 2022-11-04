@@ -26,7 +26,7 @@
 #include "macrofunc.h"
 #include "log.h"
 #include "zbxexpr.h"
-#include "valuecache.h"
+#include "zbxcachevalue.h"
 #include "mocks/valuecache/valuecache_mock.h"
 
 int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,

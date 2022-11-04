@@ -20,10 +20,11 @@
 #ifndef ZABBIX_DBCONFIG_H
 #define ZABBIX_DBCONFIG_H
 
+#include "zbxcacheconfig.h"
+#include "user_macro.h"
+
 #include "zbxmutexs.h"
 #include "zbxalgo.h"
-#include "dbcache.h"
-#include "user_macro.h"
 #include "zbxversion.h"
 
 #define ZBX_MAINTENANCE_IDLE		0

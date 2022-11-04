@@ -25,7 +25,6 @@
 #include "zbxregexp.h"
 #include "cfg.h"
 #include "zbxcrypto.h"
-#include "../zbxkvs/kvs.h"
 #include "../zbxvault/vault.h"
 #include "base64.h"
 #include "zbxdbhigh.h"
@@ -40,7 +39,6 @@
 #include "zbxtime.h"
 #include "zbxip.h"
 #include "zbxsysinfo.h"
-#include "events.h"
 
 int	sync_in_progress = 0;
 
