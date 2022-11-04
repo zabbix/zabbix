@@ -315,51 +315,41 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Configuration of actions',
+				'title' => 'Fatal error, please report to the Zabbix team',
 				'check_server_name' => true,
-				'server_name_on_page' => true,
+				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'actionconf.php?form=update&actionid=3',
-						'text_present' => 'Actions'
-					],
-					[
-						'url' => 'actionconf.php?form=update&actionid=9999999',
-						'text_not_present' => 'Actions',
+						'url' => 'zabbix.php?action=action.list&eventsource=99999',
+						'text_not_present' => 'Trigger actions',
+						'fatal_error' => true,
 						'text_present' => [
-							'No permissions to referred object or it does not exist!'
+							'Incorrect value "99999" for "eventsource" field.',
+							'Controller: action.list',
+							'action: action.list',
+							'eventsource: 99999'
 						]
 					],
 					[
-						'url' => 'actionconf.php?form=update&actionid=abc',
-						'text_not_present' => 'Actions',
+						'url' => 'zabbix.php?action=action.list&eventsource=abc',
+						'text_not_present' => 'Trigger actions',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "actionid" is not integer.'
+							'Incorrect value "abc" for "eventsource" field.',
+							'Controller: action.list',
+							'action: action.list',
+							'eventsource: abc'
 						]
 					],
 					[
-						'url' => 'actionconf.php?form=update&actionid=',
-						'text_not_present' => 'Actions',
+						'url' => 'zabbix.php?action=action.list&eventsource=-1',
+						'text_not_present' => 'Trigger actions',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "actionid" is not integer.'
-						]
-					],
-					[
-						'url' => 'actionconf.php?form=update&actionid=-1',
-						'text_not_present' => 'Actions',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "actionid" field.'
-						]
-					],
-					[
-						'url' => 'actionconf.php?form=update',
-						'text_not_present' => 'Actions',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "actionid" is mandatory.'
+							'Incorrect value "-1" for "eventsource" field.',
+							'Controller: action.list',
+							'action: action.list',
+							'eventsource: -1'
 						]
 					]
 				]
