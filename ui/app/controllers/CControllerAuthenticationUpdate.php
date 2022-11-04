@@ -165,6 +165,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 				return false;
 			}
+
 			if (array_key_exists('provision_media', $ldap_server)
 					&& !$this->validateProvisionMedia($ldap_server['provision_media'])) {
 				error(_('Invalid LDAP JIT provisioning media type mapping configuration.'));
@@ -208,6 +209,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 				return false;
 			}
+
 			if (!$this->validateProvisionMedia($this->getInput('saml_provision_media', []))) {
 				error(_('Invalid SAML JIT provisioning media type mapping configuration.'));
 
@@ -539,10 +541,6 @@ class CControllerAuthenticationUpdate extends CController {
 		foreach ($provision_group as $group) {
 			if (!is_array($group)) {
 				return false;
-			}
-
-			if (array_key_exists('enabled', $group) && $group['enabled'] == 0) {
-				continue;
 			}
 
 			if (!array_key_exists('user_groups', $group) || !is_array($group['user_groups'])

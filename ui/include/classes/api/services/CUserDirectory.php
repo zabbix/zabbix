@@ -651,7 +651,7 @@ class CUserDirectory extends CApiService {
 
 		$userdirectories = array_column($userdirectories, null, 'userdirectoryid');
 
-		self::checkProvisionGroups($userdirectories);
+		self::checkProvisionGroups($userdirectories, $db_userdirectories);
 		self::checkMediaTypes($userdirectories);
 		self::checkDuplicates($userdirectories, $db_userdirectories);
 		self::addAffectedObjects($userdirectories, $db_userdirectories);
@@ -782,12 +782,20 @@ class CUserDirectory extends CApiService {
 		}
 	}
 
-	private static function checkProvisionGroups(array $userdirectories): void {
+	private static function checkProvisionGroups(array $userdirectories, array $db_userdirectories = null): void {
 		$roleids = [];
 		$usrgrpids = [];
-		foreach ($userdirectories as $userdirectory) {
-			if (!array_key_exists('provision_groups', $userdirectory)) {
+		foreach ($userdirectories as $i => $userdirectory) {
+			$db_userdir = $db_userdirectories ? $db_userdirectories[$userdirectory['userdirectoryid']] : null;
+
+			if ($userdirectory['provision_status'] == JIT_PROVISIONING_DISABLED) {
 				continue;
+			}
+			elseif ($db_userdir && $db_userdir['provision_status'] != $userdirectory['provision_status']
+					&& !array_key_exists('provision_groups', $userdirectory)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.$i,
+					_s('the parameter "%1$s" is missing', 'provision_groups')
+				));
 			}
 
 			foreach ($userdirectory['provision_groups'] as $provision_group) {
