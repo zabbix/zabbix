@@ -241,7 +241,7 @@ class testFormFilterProblems extends testFormFilter {
 			// Enable Set custom time period option.
 			$filter_container->editProperties();
 			$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
-			$dialog->fill(['Set custom time period' => true, 'From' => '2020-10-23 18:00']);
+			$dialog->fill(['Set custom time period' => true, 'From' => '2020-11-23 18:00']);
 			$dialog->submit();
 			COverlayDialogElement::ensureNotPresent();
 			$this->page->waitUntilReady();
@@ -251,7 +251,7 @@ class testFormFilterProblems extends testFormFilter {
 			// Changing time period from timeselector tab.
 			$form->fill(['Show' => 'History']);
 			$this->query('xpath://a[@class="tabfilter-item-link btn-time"]')->one()->click();
-			$this->query('xpath://input[@id="from"]')->one()->fill('2020-10-23 18:00');
+			$this->query('xpath://input[@id="from"]')->one()->fill('2020-11-23 18:00');
 			$this->query('id:apply')->one()->click();
 			$filter_container->selectTab($data['filter']['Name']);
 			$this->query('button:Update')->one()->click();
