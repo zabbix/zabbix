@@ -25,6 +25,11 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  *
  * @required-components server, proxy
  * @configurationDataProvider configurationProvider
+ * @backup config, functions, globalmacro
+ * @backup group_prototype, host_discovery, host_inventory, hostmacro, host_rtdata, hosts, hosts_groups, hosts_templates
+ * @backup hstgrp, interface, item_condition, item_discovery, item_parameter, item_preproc, item_rtdata, items
+ * @backup lld_macro_path, lld_override, lld_override_condition, lld_override_opdiscover, lld_override_operation
+ * @backup lld_override_opstatus
  */
 class testProxyConfSync extends CIntegrationTest
 {
@@ -1514,7 +1519,6 @@ class testProxyConfSync extends CIntegrationTest
 		$this->purgeExisting('item', 'itemids');
 		$this->purgeExisting('trigger', 'triggerids');
 		$this->purgeExisting('regexp', 'extend');
-		$this->purgeExisting('action', 'actionids');
 		$this->purgeHostGroups();
 		$this->purgeGlobalMacros();
 
@@ -1631,7 +1635,6 @@ class testProxyConfSync extends CIntegrationTest
 		$this->purgeExisting('template', 'templateids');
 		$this->purgeExisting('correlation', 'correlationids');
 		$this->purgeExisting('regexp', 'extend');
-		$this->purgeExisting('action', 'actionids');
 		$this->purgeExisting('item', 'itemids');
 		$this->purgeHostGroups();
 
