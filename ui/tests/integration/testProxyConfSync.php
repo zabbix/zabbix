@@ -26,7 +26,7 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  * @required-components server, proxy
  * @configurationDataProvider configurationProvider
  */
-class testInitialConfSync extends CIntegrationTest
+class testProxyConfSync extends CIntegrationTest
 {
 	private $expected_initial = [
 		[
@@ -1506,7 +1506,7 @@ class testInitialConfSync extends CIntegrationTest
 	/**
 	 * @required-components server, proxy
 	 */
-	public function testInitialConfSync_Insert()
+	public function testProxyConfSync_Insert()
 	{
 		$this->purgeExisting('host', 'hostids');
 		$this->purgeExisting('proxy', 'extend');
@@ -1539,7 +1539,7 @@ class testInitialConfSync extends CIntegrationTest
 		return true;
 	}
 
-	public function testInitialConfSync_Update()
+	public function testProxyConfSync_Update()
 	{
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "Proxy"', true, 90, 1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, "received configuration data from server", true, 90, 1);
@@ -1616,7 +1616,7 @@ class testInitialConfSync extends CIntegrationTest
 		return true;
 	}
 
-	public function testInitialConfSync_Delete()
+	public function testProxyConfSync_Delete()
 	{
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "Proxy"', true, 90, 1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_PROXY, "received configuration data from server", true, 90, 1);
