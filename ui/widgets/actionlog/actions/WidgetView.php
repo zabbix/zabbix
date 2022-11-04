@@ -34,9 +34,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'has_access' => [
-				CRoleHelper::UI_REPORTS_ACTION_LOG => $this->checkAccess(CRoleHelper::UI_REPORTS_ACTION_LOG)
-			],
 			'userids' => $this->fields_values['userids'],
 			'users' => [],
 			'actionids' => $this->fields_values['actionids'],
@@ -90,28 +87,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$mediatypeids = array_column($data['media_types'], 'mediatypeid');
 			$data['mediatypeids'] = $this->prepareDataForMultiselect($data['media_types'], 'media_types');
 		}
+
 		$search_strings = [];
 
 		if ($data['message']) {
 			$search_strings = explode(' ', $data['message']);
 		}
 
-		$data['alerts'] = $this->getAlerts($userids, $actionids, $mediatypeids, $data['statuses'], $search_strings,
-				$sortfield, $sortorder, $this->fields_values['show_lines']);
-
-		$data['db_users'] = $this->getDbUsers($data['alerts']);
-
-		$data['actions'] = API::Action()->get([
-			'output' => ['actionid', 'name'],
-			'actionids' => array_unique(array_column($data['alerts'], 'actionid')),
-			'preservekeys' => true
-		]);
-
-		$this->setResponse(new CControllerResponseData($data));
-	}
-
-	private function getAlerts(array $userids, array $actionids, array $mediatypeids, array $filter_statuses,
-			array $search_strings, string $sortfield, string $sortorder, $show_lines): array {
 		$alerts = API::Alert()->get([
 			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
 				'mediatypeid', 'alerttype'
@@ -120,7 +102,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'userids' => $userids ? $userids : null,
 			'actionids' => $actionids ? $actionids : null,
 			'mediatypeids' => $mediatypeids ? $mediatypeids : null,
-			'filter' => ['status' => $filter_statuses],
+			'filter' => ['status' => $data['statuses']],
 			'search' => [
 				'subject' => $search_strings,
 				'message' => $search_strings
@@ -128,7 +110,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'searchByAny' => true,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
-			'limit' => $show_lines
+			'limit' => $this->fields_values['show_lines']
 		]);
 
 		foreach ($alerts as &$alert) {
@@ -144,7 +126,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		unset($alert);
 
-		return $alerts;
+		$data['alerts'] = $alerts;
+
+		$data['db_users'] = $this->getDbUsers($data['alerts']);
+
+		$data['actions'] = API::Action()->get([
+			'output' => ['actionid', 'name'],
+			'actionids' => array_unique(array_column($data['alerts'], 'actionid')),
+			'preservekeys' => true
+		]);
+
+		$this->setResponse(new CControllerResponseData($data));
 	}
 
 	private function getDbUsers(array $alerts): array {
