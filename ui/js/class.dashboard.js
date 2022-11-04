@@ -86,7 +86,7 @@ class CDashboard extends CBaseComponent {
 		this._max_rows = max_rows;
 		this._widget_min_rows = widget_min_rows;
 		this._widget_max_rows = widget_max_rows;
-		this._widget_defaults = {...widget_defaults}; // force object
+		this._widget_defaults = {...widget_defaults};
 		this._widget_last_type = widget_last_type;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;

@@ -562,7 +562,7 @@ class ZBase {
 
 		try {
 			if ($action_class === null) {
-				throw new Exception(_('Class not found.'));
+				throw new CPageNotFoundException();
 			}
 
 			if (!class_exists($action_class)) {
@@ -626,30 +626,13 @@ class ZBase {
 		catch (CAccessDeniedException $e) {
 			$this->denyPageAccess($router);
 		}
+		catch (CPageNotFoundException $e) {
+			http_response_code(404);
+
+			self::terminateWithError($router, $e->getMessage());
+		}
 		catch (Exception $e) {
-			switch ($router->getLayout()) {
-				case 'layout.json':
-				case 'layout.widget':
-					echo (new CView('layout.json', [
-						'main_block' => json_encode([
-							'error' => [
-								'title' => $e->getMessage()
-							]
-						])
-					]))->getOutput();
-
-					break;
-
-				default:
-					echo (new CView('general.warning', [
-						'header' => $e->getMessage(),
-						'messages' => [],
-						'theme' => getUserTheme(CWebUser::$data)
-					]))->getOutput();
-			}
-
-			session_write_close();
-			exit();
+			self::terminateWithError($router, $e->getMessage());
 		}
 	}
 
@@ -804,6 +787,48 @@ class ZBase {
 
 			default:
 				echo (new CView('general.warning', $view))->getOutput();
+		}
+
+		session_write_close();
+		exit();
+	}
+
+	private static function terminateWithError(CRouter $router, string $error): void {
+		switch ($router->getLayout()) {
+			case 'layout.json':
+			case 'layout.widget':
+				$layout = 'layout.json';
+				break;
+
+			default:
+				if ((array_key_exists('CONTENT_TYPE', $_SERVER) && $_SERVER['CONTENT_TYPE'] === 'application/json')
+						|| (array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER)
+							&& strcasecmp($_SERVER['HTTP_X_REQUESTED_WITH'], 'XMLHttpRequest') == 0)) {
+					$layout = 'layout.json';
+				}
+				else {
+					$layout = 'general.warning';
+				}
+		}
+
+		switch ($layout) {
+			case 'layout.json':
+				echo (new CView('layout.json', [
+					'main_block' => json_encode([
+						'error' => [
+							'title' => $error
+						]
+					])
+				]))->getOutput();
+
+				break;
+
+			default:
+				echo (new CView('general.warning', [
+					'header' => $error,
+					'messages' => [],
+					'theme' => getUserTheme(CWebUser::$data)
+				]))->getOutput();
 		}
 
 		session_write_close();

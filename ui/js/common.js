@@ -410,6 +410,26 @@ function PopUp(action, parameters, {
 
 			overlay.recoverFocus();
 			overlay.containFocus();
+		})
+		.fail((resp) => {
+			const error = resp.responseJSON !== undefined && resp.responseJSON.error !== undefined
+				? resp.responseJSON.error
+				: {title: t('Unexpected server error.')};
+
+			overlay.setProperties({
+				content: makeMessageBox('bad', error.messages, error.title, false),
+				buttons: [
+					{
+						'title': t('Cancel'),
+						'class': 'btn-alt js-cancel',
+						'cancel': true,
+						'action': function() {}
+					}
+				]
+			});
+
+			overlay.recoverFocus();
+			overlay.containFocus();
 		});
 
 	addToOverlaysStack(overlay);
