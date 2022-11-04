@@ -210,7 +210,6 @@ class CPage {
 			self::$cookie = [
 				'name' => 'zbx_sessionid',
 				'value' => $sessionid,
-				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
 				'path' => rtrim(substr($path, 0, strrpos($path, '/')), '/')
 			];
 

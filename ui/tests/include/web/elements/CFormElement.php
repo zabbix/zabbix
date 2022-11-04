@@ -98,9 +98,12 @@ class CFormElement extends CElement {
 	/**
 	 * Get collection of form label elements.
 	 *
+	 * @param CElementFilter $filter        condition to be filtered
+	 * @param array          $filter_params filter params
+	 *
 	 * @return CElementCollection
 	 */
-	public function getLabels() {
+	public function getLabels($filter = null, $filter_params = []) {
 		$labels = $this->query('xpath:.//'.self::TABLE_FORM.'/li/'.self::TABLE_FORM_LEFT.'/label')->all();
 
 		foreach ($labels as $key => $label) {
@@ -113,7 +116,11 @@ class CFormElement extends CElement {
 		}
 
 		if ($this->filter !== null) {
-			return $labels->filter($this->filter);
+			$labels = $labels->filter($this->filter);
+		}
+
+		if ($filter !== null) {
+			$labels = $labels->filter($filter, $filter_params);
 		}
 
 		return $labels;
@@ -178,9 +185,11 @@ class CFormElement extends CElement {
 	/**
 	 * Get collection of element fields indexed by label name.
 	 *
+	 * @param CElementFilter $filter    condition to be filtered by
+	 *
 	 * @return CElementCollection
 	 */
-	public function getFields() {
+	public function getFields($filter = null) {
 		$fields = [];
 
 		foreach ($this->getLabels() as $label) {
@@ -195,6 +204,10 @@ class CFormElement extends CElement {
 		}
 
 		$this->fields = new CElementCollection($fields);
+
+		if ($filter !== null) {
+			$this->fields = $this->fields->filter(new CElementFilter($filter));
+		}
 
 		return $this->fields;
 	}
@@ -257,6 +270,15 @@ class CFormElement extends CElement {
 	 */
 	public function getFieldContainer($name) {
 		return $this->getLabel($name)->query('xpath:./../../'.self::TABLE_FORM_RIGHT)->one();
+	}
+
+	/**
+	 * Get tabs from form.
+	 *
+	 * @return CElementCollection
+	 */
+	public function getTabs() {
+		return $this->query("xpath:.//li[@role='tab']")->all()->asText();
 	}
 
 	/**
@@ -446,7 +468,13 @@ class CFormElement extends CElement {
 			return false;
 		}
 
-		return $element->checkValue($values, $raise_exception);
+		try {
+			return $element->checkValue($values, $raise_exception);
+		}
+		catch (\Exception $exception) {
+			CExceptionHelper::setMessage($exception, 'Failed to check value of field "'.$field.'":' . "\n" . $exception->getMessage());
+			throw $exception;
+		}
 	}
 
 	/**
@@ -474,5 +502,16 @@ class CFormElement extends CElement {
 	 */
 	public function isRequired($label) {
 		return $this->getLabel($label)->hasClass('form-label-asterisk');
+	}
+
+	/**
+	 * Get form fields values.
+	 *
+	 * @param CElementFilter $filter    condition to be filtered by
+	 *
+	 * @return array
+	 */
+	public function getValues($filter = null) {
+		return $this->getFields($filter)->asValues();
 	}
 }
