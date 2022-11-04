@@ -2876,6 +2876,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 	static ZBX_HISTORY_STRING	*history_string;
 	static ZBX_HISTORY_TEXT		*history_text;
 	static ZBX_HISTORY_LOG		*history_log;
+	static int			module_enabled = FAIL;
 	int				i, history_num, history_float_num, history_integer_num, history_string_num,
 					history_text_num, history_log_num, txn_error, compression_age;
 	unsigned int			item_retrieve_mode;
@@ -2894,30 +2895,35 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 	if (NULL == history_float && NULL != history_float_cbs)
 	{
+		module_enabled = SUCCEED;
 		history_float = (ZBX_HISTORY_FLOAT *)zbx_malloc(history_float,
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_FLOAT));
 	}
 
 	if (NULL == history_integer && NULL != history_integer_cbs)
 	{
+		module_enabled = SUCCEED;
 		history_integer = (ZBX_HISTORY_INTEGER *)zbx_malloc(history_integer,
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_INTEGER));
 	}
 
 	if (NULL == history_string && NULL != history_string_cbs)
 	{
+		module_enabled = SUCCEED;
 		history_string = (ZBX_HISTORY_STRING *)zbx_malloc(history_string,
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_STRING));
 	}
 
 	if (NULL == history_text && NULL != history_text_cbs)
 	{
+		module_enabled = SUCCEED;
 		history_text = (ZBX_HISTORY_TEXT *)zbx_malloc(history_text,
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_TEXT));
 	}
 
 	if (NULL == history_log && NULL != history_log_cbs)
 	{
+		module_enabled = SUCCEED;
 		history_log = (ZBX_HISTORY_LOG *)zbx_malloc(history_log,
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
 	}
@@ -3111,14 +3117,17 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 				const ZBX_DC_TREND	*ptrends = NULL;
 				int			history_num_loc = 0, trends_num_loc = 0;
 
-				DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
-						history_integer, &history_integer_num, history_string,
-						&history_string_num, history_text, &history_text_num, history_log,
-						&history_log_num);
+				if (SUCCEED == module_enabled)
+				{
+					DCmodule_prepare_history(history, history_num, history_float, &history_float_num,
+							history_integer, &history_integer_num, history_string,
+							&history_string_num, history_text, &history_text_num, history_log,
+							&history_log_num);
 
-				DCmodule_sync_history(history_float_num, history_integer_num, history_string_num,
-						history_text_num, history_log_num, history_float, history_integer,
-						history_string, history_text, history_log);
+					DCmodule_sync_history(history_float_num, history_integer_num, history_string_num,
+							history_text_num, history_log_num, history_float, history_integer,
+							history_string, history_text, history_log);
+				}
 
 				if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
 				{
