@@ -659,8 +659,7 @@ class testFormGraphs extends CWebTest {
 
 				// Add line color.
 				if (array_key_exists('color', $item)) {
-					$item_row->query('xpath:.//button[@id="lbl_items_'.$i.'_color"]')->waitUntilClickable()->one()->click();
-					$this->query('xpath://div[@class="color-picker"]')->asColorPicker()->one()->fill($item['color']);
+					$item_row->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->fill($item['color']);
 				}
 			}
 		}
@@ -733,9 +732,8 @@ class testFormGraphs extends CWebTest {
 
 				// Check lines color.
 				if (array_key_exists('color', $item)) {
-					$item_row->query('xpath:.//button[@id="lbl_items_'.$i.'_color"]')->waitUntilClickable()->one()->click();
 					$this->assertEquals($item['color'],
-							$this->query('xpath://div[@class="color-picker"]')->asColorPicker()->one()->getValue()
+							$item_row->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->getValue()
 					);
 				}
 			}
@@ -845,8 +843,7 @@ class testFormGraphs extends CWebTest {
 			}
 
 			// Add line color.
-			$item_row->query('xpath:.//button[@id="lbl_items_0_color"]')->waitUntilClickable()->one()->click();
-			$this->query('xpath://div[@class="color-picker"]')->asColorPicker()->one()->fill($data['items'][0]['color']);
+			$item_row->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->fill($data['items'][0]['color']);
 		}
 
 		$form->submit();
@@ -883,9 +880,8 @@ class testFormGraphs extends CWebTest {
 			}
 
 			// Check lines color.
-			$item_row->query('xpath:.//button[@id="lbl_items_0_color"]')->waitUntilClickable()->one()->click();
-			$this->assertEquals($data['items'][0]['color'],
-					$this->query('xpath://div[@class="color-picker"]')->asColorPicker()->one()->getValue()
+			$item_row->assertEquals($data['items'][0]['color'],
+					$this->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->getValue()
 			);
 		}
 	}
@@ -979,9 +975,7 @@ class testFormGraphs extends CWebTest {
 
 		// Change line color.
 		if (array_key_exists('color', $data['change'])) {
-			$item_row->query('xpath:.//button[@id="lbl_items_'.$item_number.'_color"]')->waitUntilClickable()->one()->click();
-			$this->query('xpath://div[@class="color-picker"]')->asColorPicker()->one()
-					->fill($data['change']['color']);
+			$item_row->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->fill($data['change']['color']);
 		}
 
 		$form->submit();
@@ -998,9 +992,8 @@ class testFormGraphs extends CWebTest {
 			);
 		}
 
-		$item_row->query('xpath:.//button[@id="lbl_items_'.$item_number.'_color"]')->waitUntilClickable()->one()->click();
 		$this->assertEquals($data['expected']['color'],
-				$this->query('xpath://div[@class="color-picker"]')->asColorPicker()->one()->getValue()
+				$item_row->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->getValue()
 		);
 	}
 

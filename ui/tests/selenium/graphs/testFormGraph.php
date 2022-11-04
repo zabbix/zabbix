@@ -51,10 +51,10 @@ class testFormGraph extends testFormGraphs {
 		$this->assertArrayHasKey('itemids', $items);
 		$itemids = CDataHelper::getIds('name');
 
-		self::$items['graph_trap_int']['itemid'] = $itemids['graph_trap_int'];
-		self::$items['graph_trap_float']['itemid'] = $itemids['graph_trap_float'];
-		self::$items['graph_trap_text']['itemid'] = $itemids['graph_trap_text'];
-		self::$items['graph_trap_log']['itemid'] = $itemids['graph_trap_log'];
+		foreach (['int', 'float', 'text', 'log'] as $suffix) {
+			$field = 'graph_trap_'.$suffix;
+			self::$items[$field]['itemid'] = $itemids[$field];
+		}
 
 		// Create graphs with previously created items.
 		$prepared_graphs = [
