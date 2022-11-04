@@ -966,9 +966,6 @@ void	zbx_dc_free_timers(zbx_vector_ptr_t *timers);
 
 void	zbx_get_host_interfaces_availability(zbx_uint64_t	hostid, zbx_agent_availability_t *agents);
 
-typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_ITEM *, const char *, const char *,
-		const zbx_timespec_t *, char **);
-
 /* external user macro cache API */
 
 typedef struct zbx_dc_um_handle_t zbx_dc_um_handle_t;
