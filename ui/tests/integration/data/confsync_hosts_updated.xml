@@ -15,10 +15,7 @@
     <hosts>
         <host>
             <host>Host1</host>
-            <name>Host1a</name>
-            <proxy>
-                <name>Proxy</name>
-            </proxy>
+            <name>Host1</name>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -33,10 +30,7 @@
         </host>
         <host>
             <host>Host2</host>
-            <name>Host2a</name>
-            <proxy>
-                <name>Proxy</name>
-            </proxy>
+            <name>Host2</name>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -56,10 +50,7 @@
         </host>
         <host>
             <host>Host3</host>
-            <name>Host3a</name>
-            <proxy>
-                <name>Proxy</name>
-            </proxy>
+            <name>Host3</name>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -75,10 +66,10 @@
             <inventory_mode>DISABLED</inventory_mode>
         </host>
         <host>
-            <host>Host4</host>
-            <name>Host4a</name>
+            <host>Host4_ActiveProxy</host>
+            <name>Host4_ActiveProxy</name>
             <proxy>
-                <name>Proxy</name>
+                <name>ProxyA</name>
             </proxy>
             <groups>
                 <group>
@@ -88,10 +79,10 @@
             <inventory_mode>DISABLED</inventory_mode>
         </host>
         <host>
-            <host>Host5</host>
-            <name>Host5a</name>
+            <host>Host5_PassiveProxy</host>
+            <name>Host5_PassiveProxy</name>
             <proxy>
-                <name>Proxy</name>
+                <name>ProxyP1</name>
             </proxy>
             <groups>
                 <group>
@@ -102,10 +93,7 @@
         </host>
         <host>
             <host>HostInventory</host>
-            <name>HostInventorya</name>
-            <proxy>
-                <name>Proxy</name>
-            </proxy>
+            <name>HostInventory</name>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -186,10 +174,7 @@
         </host>
         <host>
             <host>HostInventoryAutomatic</host>
-            <name>HostInventoryAutomatica</name>
-            <proxy>
-                <name>Proxy</name>
-            </proxy>
+            <name>HostInventoryAutomatic</name>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -230,14 +215,11 @@
                     <interface_ref>if1</interface_ref>
                 </item>
             </items>
-            <inventory_mode>DISABLED</inventory_mode>
+            <inventory_mode>AUTOMATIC</inventory_mode>
         </host>
         <host>
             <host>HostMultilevelTmpl</host>
-            <name>HostMultilevelTmpla</name>
-            <proxy>
-                <name>Proxy</name>
-            </proxy>
+            <name>HostMultilevelTmpl</name>
             <templates>
                 <template>
                     <name>bbbtmpl</name>
@@ -266,10 +248,7 @@
         </host>
         <host>
             <host>HostWithDiscovery</host>
-            <name>HostWithDiscoverya</name>
-            <proxy>
-                <name>Proxy</name>
-            </proxy>
+            <name>HostWithDiscovery</name>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -366,10 +345,7 @@
         </host>
         <host>
             <host>HostWithItems</host>
-            <name>HostWithItemsa</name>
-            <proxy>
-                <name>Proxy</name>
-            </proxy>
+            <name>HostWithItems</name>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -764,10 +740,7 @@
         </host>
         <host>
             <host>HostWithMacros</host>
-            <name>HostWithMacrosa</name>
-            <proxy>
-                <name>Proxy</name>
-            </proxy>
+            <name>HostWithMacros</name>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -820,10 +793,7 @@
         </host>
         <host>
             <host>HostWithTags</host>
-            <name>HostWithTagsa</name>
-            <proxy>
-                <name>Proxy</name>
-            </proxy>
+            <name>HostWithTags</name>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -853,10 +823,7 @@
         </host>
         <host>
             <host>HostWithTemplate</host>
-            <name>HostWithTemplatea</name>
-            <proxy>
-                <name>Proxy</name>
-            </proxy>
+            <name>HostWithTemplate</name>
             <templates>
                 <template>
                     <name>SampleTemplate</name>
@@ -871,10 +838,7 @@
         </host>
         <host>
             <host>HostWithWebScenario</host>
-            <name>HostWithWebScenarioa</name>
-            <proxy>
-                <name>Proxy</name>
-            </proxy>
+            <name>HostWithWebScenario</name>
             <groups>
                 <group>
                     <name>HG1</name>
@@ -938,57 +902,6 @@
                     </steps>
                 </httptest>
             </httptests>
-            <inventory_mode>DISABLED</inventory_mode>
-        </host>
-        <host>
-            <host>HostWithComprehensiveTemplate</host>
-            <name>HostWithComprehensiveTemplate1</name>
-            <proxy>
-                <name>Proxy</name>
-            </proxy>
-            <templates>
-                <template>
-                    <name>ComprehensiveTemplate</name>
-                </template>
-            </templates>
-            <groups>
-                <group>
-                    <name>HG1/Subgroup</name>
-                </group>
-            </groups>
-            <interfaces>
-                <interface>
-                    <ip>127.0.1.1</ip>
-                    <interface_ref>if1</interface_ref>
-                </interface>
-                <interface>
-                    <type>SNMP</type>
-                    <ip>127.0.1.3</ip>
-                    <port>161</port>
-                    <details>
-                        <community>{$SNMP_COMMUNITY}</community>
-                    </details>
-                    <interface_ref>if2</interface_ref>
-                </interface>
-                <interface>
-                    <type>IPMI</type>
-                    <ip>127.0.1.1</ip>
-                    <port>623</port>
-                    <interface_ref>if4</interface_ref>
-                </interface>
-                <interface>
-                    <type>JMX</type>
-                    <ip>127.0.1.1</ip>
-                    <port>12345</port>
-                    <interface_ref>if3</interface_ref>
-                </interface>
-            </interfaces>
-            <macros>
-                <macro>
-                    <macro>{$HM1}</macro>
-                    <value>hm1b</value>
-                </macro>
-            </macros>
             <inventory_mode>DISABLED</inventory_mode>
         </host>
     </hosts>
