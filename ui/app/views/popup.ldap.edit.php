@@ -201,7 +201,9 @@ $form = (new CForm('post', $form_action))
 			(new CFormField(
 				(new CTextBox('group_membership', $data['group_membership'], false,
 					DB::getFieldLength('userdirectory_ldap', 'group_membership')
-				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAttribute('placeholder', 'memberOf')
 			))
 				->addClass('allow-jit-provisioning')
 				->addClass('member-of')
