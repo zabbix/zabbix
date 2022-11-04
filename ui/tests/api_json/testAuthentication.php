@@ -22,17 +22,12 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * @onBefore  prepareTestData
- *
  * @backup userdirectory_ldap, userdirectory, config
  */
 class testAuthentication extends CAPITest {
 
 	public static function authentication_get_data() {
-		error_log(json_encode([
-			'inside authentication_get_data:::',
-			self::$data
-		]));
+		error_log('calling authentication_get_data:::');
 
 		return [
 			'Test getting authentication general data' => [
@@ -76,21 +71,17 @@ class testAuthentication extends CAPITest {
 	}
 
 	/**
+	 * @onBefore  prepareTestData
+	 *
 	 * @dataProvider authentication_get_data
 	 */
 	public function testAuthentication_Get($authentication, $get_result, $expected_error) {
 		$result = $this->call('authentication.get', $authentication);
 
-		error_log(json_encode([
-			'inside testAuthentication_Get:::',
-			$get_result
-		]));
+		error_log(json_encode(['calling testAuthentication_Get:::', self::$data['userdirectory_1']]));
+
 		if ($expected_error === null) {
 			$result = $result['result'];
-
-			error_log(json_encode([
-				'test:::', $get_result['ldap_userdirectoryid'], $result['ldap_userdirectoryid']
-			]));
 
 			// General fields.
 			$this->assertContains($result['authentication_type'], $get_result['authentication_type']);
@@ -327,10 +318,15 @@ class testAuthentication extends CAPITest {
 	}
 
 	/**
+	 * @onBefore  prepareTestData
+	 *
 	 * @dataProvider authentication_update_data_invalid
 	 * @dataProvider authentication_update_data_valid
 	 */
 	public function testAuthentication_Update($authentication, $expected_error) {
+
+		error_log(json_encode(['calling testAuthentication_Update:::', self::$data['userdirectory_1']]));
+
 		if (array_key_exists('ldap_userdirectoryid', $authentication)) {
 			$authentication['ldap_userdirectoryid'] = static::$data[$authentication['ldap_userdirectoryid']];
 		}
@@ -390,7 +386,7 @@ class testAuthentication extends CAPITest {
 	 * Prepare data for tests. Create user, group, userdirectory.
 	 */
 	public function prepareTestData() {
-		error_log('inside prepareTestData:::');
+		error_log('calling prepareTestData:::');
 
 		// Create LDAP user directory.
 		$response = CDataHelper::call('userdirectory.create', [[
@@ -403,12 +399,6 @@ class testAuthentication extends CAPITest {
 		]]);
 
 		$this->assertArrayHasKey('userdirectoryids', $response);
-		error_log(json_encode([
-			':::', $response
-		]));
 		self::$data['userdirectory_1'] = reset($response['userdirectoryids']);
-		error_log(json_encode([
-			'calling prepareTestData:::', self::$data
-		]));
 	}
 }
