@@ -2734,8 +2734,10 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.30rc1
 
 New features:
+.......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
 
 Bug fixes:
+.........T [ZBX-21844] fixed script in OPSgenie media (atocko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.29
