@@ -636,7 +636,6 @@ switch ($data['method']) {
 				}
 				break;
 
-
 			case 'actions':
 				$actions = API::Action()->get([
 					'output' => ['actionid', 'name'],

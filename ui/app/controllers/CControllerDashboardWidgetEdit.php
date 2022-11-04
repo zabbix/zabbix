@@ -35,6 +35,9 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldMultiSelectItemPrototype,
 	CWidgetFieldMultiSelectService,
 	CWidgetFieldMultiSelectSla,
+	CWidgetFieldMultiSelectUser,
+	CWidgetFieldMultiSelectAction,
+	CWidgetFieldMultiSelectMediaType,
 	CWidgetFieldSelectResource
 };
 
@@ -188,7 +191,10 @@ class CControllerDashboardWidgetEdit extends CController {
 			'prototype_item' => [],
 			'prototype_graph' => [],
 			'service' => [],
-			'sla' => []
+			'sla' => [],
+			'user' => [],
+			'action' => [],
+			'media_type' => []
 		];
 
 		foreach ($form->getFields() as $field) {
@@ -223,6 +229,18 @@ class CControllerDashboardWidgetEdit extends CController {
 			elseif ($field instanceof CWidgetFieldMultiSelectSla) {
 				$key = 'slas';
 				$var = 'sla';
+			}
+			elseif ($field instanceof CWidgetFieldMultiSelectUser) {
+				$key = 'users';
+				$var = 'user';
+			}
+			elseif ($field instanceof CWidgetFieldMultiSelectAction) {
+				$key = 'actions';
+				$var = 'action';
+			}
+			elseif ($field instanceof CWidgetFieldMultiSelectMediaType) {
+				$key = 'media_types';
+				$var = 'media_type';
 			}
 			else {
 				continue;
@@ -373,6 +391,54 @@ class CControllerDashboardWidgetEdit extends CController {
 			}
 		}
 
+		if ($ids['user']) {
+			$db_users = API::User()->get([
+				'output' => ['userid', 'username', 'name', 'surname'],
+				'userids' => array_keys($ids['user']),
+				'preservekeys' => true
+			]);
+
+			foreach ($db_users as $userid => $user) {
+				foreach ($ids['user'][$userid] as $field_name) {
+					$captions['ms']['users'][$field_name][$userid] += [
+						'name' => getUserFullname($user)
+					];
+				}
+			}
+		}
+
+		if ($ids['action']) {
+			$db_actions = API::Action()->get([
+				'output' => ['actionid', 'name'],
+				'actionids' => array_keys($ids['action']),
+				'preservekeys' => true
+			]);
+
+			foreach ($db_actions as $actionid => $action) {
+				foreach ($ids['action'][$actionid] as $field_name) {
+					$captions['ms']['actions'][$field_name][$actionid] += [
+						'name' => $action['name']
+					];
+				}
+			}
+		}
+
+		if ($ids['media_type']) {
+			$db_media_types = API::MediaType()->get([
+				'output' => ['mediatypeid', 'name'],
+				'mediatypeids' => array_keys($ids['media_type']),
+				'preservekeys' => true
+			]);
+
+			foreach ($db_media_types as $mediatypeid => $media_type) {
+				foreach ($ids['media_type'][$mediatypeid] as $field_name) {
+					$captions['ms']['media_types'][$field_name][$mediatypeid] += [
+						'name' => $media_type['name']
+					];
+				}
+			}
+		}
+
 		$inaccessible_resources = [
 			'groups' => _('Inaccessible group'),
 			'hosts' => _('Inaccessible host'),
@@ -381,7 +447,10 @@ class CControllerDashboardWidgetEdit extends CController {
 			'item_prototypes' => _('Inaccessible item prototype'),
 			'graph_prototypes' => _('Inaccessible graph prototype'),
 			'services' => _('Inaccessible service'),
-			'slas' => _('Inaccessible SLA')
+			'slas' => _('Inaccessible SLA'),
+			'users' => _('Inaccessible user'),
+			'actions' => _('Inaccessible action'),
+			'media_types' => _('Inaccessible media type')
 		];
 
 		foreach ($captions['ms'] as $resource_type => &$fields_captions) {

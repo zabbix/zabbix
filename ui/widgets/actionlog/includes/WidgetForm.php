@@ -26,7 +26,13 @@ use Zabbix\Widgets\{
 	CWidgetForm
 };
 
-use Zabbix\Widgets\Fields\{CWidgetFieldCheckBoxList, CWidgetFieldIntegerBox, CWidgetFieldSelect, CWidgetFieldTextBox};
+use Zabbix\Widgets\Fields\{CWidgetFieldCheckBoxList,
+	CWidgetFieldIntegerBox,
+	CWidgetFieldMultiSelectUser,
+	CWidgetFieldMultiSelectAction,
+	CWidgetFieldMultiSelectMediaType,
+	CWidgetFieldSelect,
+	CWidgetFieldTextBox};
 
 /**
  * Action log widget form.
@@ -35,6 +41,9 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
+			->addField(new CWidgetFieldMultiSelectUser('userids', _('Recipient')))
+			->addField(new CWidgetFieldMultiSelectAction('actionids', _('Actions')))
+			->addField(new CWidgetFieldMultiSelectMediaType('mediatypeids', _('Media types')))
 			->addField(
 				new CWidgetFieldCheckBoxList('statuses', _('Status'), [
 					ALERT_STATUS_NOT_SENT => _('In progress'),

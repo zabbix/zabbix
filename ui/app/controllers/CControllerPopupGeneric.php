@@ -1759,7 +1759,6 @@ class CControllerPopupGeneric extends CController {
 				$records = API::MediaType()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				break;
-
 		}
 
 		return $records;

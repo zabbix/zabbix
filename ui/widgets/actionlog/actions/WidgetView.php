@@ -24,7 +24,8 @@ namespace Widgets\ActionLog\Actions;
 use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
-	CRoleHelper;
+	CRoleHelper,
+	CArrayHelper;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -36,6 +37,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'has_access' => [
 				CRoleHelper::UI_REPORTS_ACTION_LOG => $this->checkAccess(CRoleHelper::UI_REPORTS_ACTION_LOG)
 			],
+			'userids' => $this->fields_values['userids'],
+			'users' => [],
+			'actionids' => $this->fields_values['actionids'],
+			'actions' => [],
+			'mediatypeids' => $this->fields_values['mediatypeids'],
+			'media_types' => [],
 			'statuses' => $this->fields_values['statuses'],
 			'message' => $this->fields_values['message'],
 			'sortfield' => $sortfield,
@@ -45,15 +52,52 @@ class WidgetView extends CControllerDashboardWidgetView {
 			]
 		];
 
+		$userids = [];
+
+		if ($data['userids']) {
+			$data['users'] = API::User()->get([
+				'output' => ['userid', 'username', 'name', 'surname'],
+				'userids' => $data['userids'],
+				'preservekeys' => true
+			]);
+
+			$userids = array_column($data['users'], 'userid');
+			$data['userids'] = $this->prepareDataForMultiselect($data['users'], 'users');
+		}
+
+		$actionids = [];
+
+		if ($data['actionids']) {
+			$data['actions'] = API::Action()->get([
+				'output' => ['actionid', 'name'],
+				'actionids' => $data['actionids'],
+				'preservekeys' => true
+			]);
+
+			$actionids = array_column($data['actions'], 'actionid');
+			$data['actionids'] = $this->prepareDataForMultiselect($data['actions'], 'actions');
+		}
+
+		$mediatypeids = [];
+
+		if ($data['mediatypeids']) {
+			$data['media_types'] = API::MediaType()->get([
+				'output' => ['mediatypeid', 'name', 'maxattempts'],
+				'mediatypeids' => $data['mediatypeids'],
+				'preservekeys' => true
+			]);
+
+			$mediatypeids = array_column($data['media_types'], 'mediatypeid');
+			$data['mediatypeids'] = $this->prepareDataForMultiselect($data['media_types'], 'media_types');
+		}
 		$search_strings = [];
 
 		if ($data['message']) {
 			$search_strings = explode(' ', $data['message']);
 		}
 
-		$data['alerts'] = $this->getAlerts(
-			$data['statuses'], $search_strings, $sortfield, $sortorder, $this->fields_values['show_lines']
-		);
+		$data['alerts'] = $this->getAlerts($userids, $actionids, $mediatypeids, $data['statuses'], $search_strings,
+				$sortfield, $sortorder, $this->fields_values['show_lines']);
 
 		$data['db_users'] = $this->getDbUsers($data['alerts']);
 
@@ -66,13 +110,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
-	private function getAlerts(array $filter_statuses, array $search_strings, string $sortfield, string $sortorder,
-			$show_lines): array {
+	private function getAlerts(array $userids, array $actionids, array $mediatypeids, array $filter_statuses,
+			array $search_strings, string $sortfield, string $sortorder, $show_lines): array {
 		$alerts = API::Alert()->get([
 			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
 				'mediatypeid', 'alerttype'
 			],
 			'selectMediatypes' => ['name', 'maxattempts'],
+			'userids' => $userids ? $userids : null,
+			'actionids' => $actionids ? $actionids : null,
+			'mediatypeids' => $mediatypeids ? $mediatypeids : null,
 			'filter' => ['status' => $filter_statuses],
 			'search' => [
 				'subject' => $search_strings,
@@ -146,4 +193,44 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 	}
 
+	/**
+	 * Prepare data for multiselect fields.
+	 *
+	 * @param array $data
+	 * @param string $type  Defines data type ('users', 'actions', 'media_types').
+	 *
+	 * @return array
+	 */
+
+	private function prepareDataForMultiselect(array $data, string $type): array {
+		$prepared_data = [];
+
+		foreach ($data as $value) {
+			switch ($type) {
+				case 'users':
+					$prepared_data[$value['userid']] = [
+						'id' => $value['userid'],
+						'name' => getUserFullname($value)
+					];
+					break;
+				case 'actions':
+					$prepared_data[$value['actionid']] = [
+						'id' => $value['actionid'],
+						'name' => $value['name']
+					];
+					break;
+				case 'media_types':
+					$prepared_data[$value['mediatypeid']] = [
+						'id' => $value['mediatypeid'],
+						'name' => $value['name'],
+						'maxattempts' => $value['maxattempts']
+					];
+					break;
+			}
+		}
+
+		CArrayHelper::sort($prepared_data, ['name']);
+
+		return $prepared_data;
+	}
 }
