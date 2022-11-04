@@ -800,7 +800,7 @@ class ZBase {
 				$layout = 'layout.json';
 				break;
 
-			default:
+			case null:
 				if ((array_key_exists('CONTENT_TYPE', $_SERVER) && $_SERVER['CONTENT_TYPE'] === 'application/json')
 						|| (array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER)
 							&& strcasecmp($_SERVER['HTTP_X_REQUESTED_WITH'], 'XMLHttpRequest') == 0)) {
@@ -809,7 +809,12 @@ class ZBase {
 				else {
 					$layout = 'general.warning';
 				}
+				break;
+
+			default:
+				$layout = 'general.warning';
 		}
+
 		switch ($layout) {
 			case 'layout.json':
 				echo (new CView('layout.json', [
