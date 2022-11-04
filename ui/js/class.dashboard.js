@@ -330,6 +330,8 @@ class CDashboard extends CBaseComponent {
 			clearTimeout(this._configuration_check_timeout_id);
 		}
 
+		console.log('start', this._configuration_check_period);
+
 		this._configuration_check_time = Date.now() + this._configuration_check_period;
 		this._configuration_check_timeout_id = setTimeout(() => this._checkConfiguration(),
 			this._configuration_check_period
@@ -398,7 +400,7 @@ class CDashboard extends CBaseComponent {
 					throw {error: response.error};
 				}
 
-				if (this._configuration_hash !== response.configuration_hash) {
+				if (response.configuration_hash !== null && this._configuration_hash !== response.configuration_hash) {
 					this.fire(DASHBOARD_EVENT_CONFIGURATION_OUTDATED);
 				}
 			});
@@ -409,7 +411,7 @@ class CDashboard extends CBaseComponent {
 			return;
 		}
 
-		if (this._configuration_check_timeout_id - Date.now() < this._configuration_check_steady_period) {
+		if (this._configuration_check_time - Date.now() < this._configuration_check_steady_period) {
 			clearTimeout(this._configuration_check_timeout_id);
 
 			this._configuration_check_time = Date.now() + this._configuration_check_steady_period;
