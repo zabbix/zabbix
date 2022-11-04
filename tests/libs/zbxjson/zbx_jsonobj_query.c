@@ -51,26 +51,13 @@ static void	check_indefinite_path_result(zbx_mock_handle_t handle, const char *r
 	zbx_mock_assert_json_eq("Indefinite query result", expected_output, returned_output);
 }
 
-void	zbx_mock_test_entry(void **state)
+static void	test_query(zbx_jsonobj_t *obj, const char *path, int expected_ret)
 {
-	const char		*data, *path;
-	struct zbx_json_parse	jp;
 	char			*output = NULL;
-	int			expected_ret, returned_ret;
+	int			returned_ret;
 	zbx_mock_handle_t	handle;
 
-	ZBX_UNUSED(state);
-
-	/* reset json error to check if compilation will set it */
-	zbx_set_json_strerror("%s", "");
-
-	data = zbx_mock_get_parameter_string("in.data");
-	if (FAIL == zbx_json_open(data, &jp))
-		fail_msg("Invalid json data: %s", zbx_json_strerror());
-
-	path = zbx_mock_get_parameter_string("in.path");
-	returned_ret = zbx_jsonpath_query(&jp, path, &output);
-	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
+	returned_ret = zbx_jsonobj_query(obj, path, &output);
 
 	if (FAIL == returned_ret)
 		printf("\tzbx_jsonpath_query() failed with: %s\n", zbx_json_strerror());
@@ -97,4 +84,31 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_assert_str_ne("tzbx_jsonpath_query() error", "", zbx_json_strerror());
 
 	zbx_free(output);
+
+}
+
+void	zbx_mock_test_entry(void **state)
+{
+	const char	*data, *path;
+	int		expected_ret;
+	zbx_jsonobj_t	obj;
+
+	ZBX_UNUSED(state);
+
+	/* reset json error to check if compilation will set it */
+	zbx_set_json_strerror("%s", "");
+
+	data = zbx_mock_get_parameter_string("in.data");
+	if (FAIL == zbx_jsonobj_open(data, &obj))
+		fail_msg("Invalid json data: %s", zbx_json_strerror());
+
+	path = zbx_mock_get_parameter_string("in.path");
+	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
+
+	test_query(&obj, path, expected_ret);
+
+	/* query second time to check index reuse */
+	test_query(&obj, path, expected_ret);
+
+	zbx_jsonobj_clear(&obj);
 }

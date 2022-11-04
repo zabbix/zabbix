@@ -456,6 +456,7 @@ class testDashboardPages extends CWebTest {
 		$dashboard->addPage();
 		$page_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$page_dialog->query('name:dashboard_page_properties_form')->asForm()->one()->fill($data['fields'])->submit();
+		$page_dialog->ensureNotPresent();
 		$dashboard->waitUntilReady();
 
 		$title = $data['fields']['Name'];

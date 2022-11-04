@@ -341,7 +341,6 @@ typedef struct
 }
 zbx_vmware_resourcepool_t;
 
-int	vmware_resourcepool_compare_id(const void *r1, const void *r2);
 ZBX_PTR_VECTOR_DECL(vmware_resourcepool, zbx_vmware_resourcepool_t *)
 
 /* the vmware eventlog state */
