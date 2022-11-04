@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-07-19 06:28+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-10-31 13:27+0000\n"
+"Last-Translator: Ioannis <johkarag@gmail.com>\n"
 "Language-Team: none\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
@@ -4256,12 +4256,30 @@ msgstr ""
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "Τέλος χρόνου σύνδεσης %1$s υπέρβαση δευτερολέπτων κατά τη σύνδεση με τον εξυπηρετητή Zabbix \"%2$s\"."
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
 "Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
 msgstr ""
 
 #: include/classes/server/CZabbixServer.php:597
@@ -4272,6 +4290,14 @@ msgid ""
 "2. Security environment (for example, SELinux) is blocking the connection;\n"
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
 msgstr ""
 
 #: include/classes/server/CZabbixServer.php:605
@@ -9908,6 +9934,10 @@ msgstr "Πληροφορία"
 msgctxt "compact table header"
 msgid "Info"
 msgstr "Πληροφορία"
+
+#: include/classes/data/CItemData.php:1428
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -16699,11 +16729,10 @@ msgid "Service data storage period"
 msgstr ""
 
 #: app/controllers/CControllerServiceDelete.php:63
-#, fuzzy
 msgid "Service deleted"
 msgid_plural "Services deleted"
-msgstr[0] "Υπηρεσία διεγράφη"
-msgstr[1] "Υπηρεσία διεγράφη"
+msgstr[0] "Η Υπηρεσία διεγράφη"
+msgstr[1] "Οι Υπηρεσίες διεγράφηκαν"
 
 #: app/views/administration.userrole.edit.php:146
 #: app/views/administration.userrole.edit.php:187
@@ -18344,6 +18373,16 @@ msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:172
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr ""
+
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:135
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:164
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr ""
 
 #: include/views/configuration.item.edit.php:125
@@ -20070,6 +20109,10 @@ msgstr ""
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1320
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr ""
@@ -21265,6 +21308,14 @@ msgstr ""
 #: app/views/administration.script.edit.php:127
 msgid "Zabbix server"
 msgstr "Εξυπηρετητής Zabbix"
+
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:601
 #, c-format

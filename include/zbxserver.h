@@ -22,6 +22,8 @@
 
 #include "dbcache.h"
 #include "zbxvariant.h"
+#include "zbxeval.h"
+#include "zbxdb.h"
 
 #define MACRO_TYPE_MESSAGE_NORMAL	0x00000001
 #define MACRO_TYPE_MESSAGE_RECOVERY	0x00000002

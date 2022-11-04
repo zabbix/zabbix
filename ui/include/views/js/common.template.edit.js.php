@@ -206,7 +206,7 @@
 				const form = e.target;
 				const form_fields = getFormFields(form);
 
-				let submitter = document.activeElement;
+				let submitter = e.submitter || document.activeElement;
 
 				if (submitter.tagName !== 'BUTTON') {
 					submitter = form.querySelector('button[type="submit"]');

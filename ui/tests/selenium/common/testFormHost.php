@@ -1691,7 +1691,7 @@ class testFormHost extends CWebTest {
 
 		// Get values from form.
 		$form->fill($data['fields']);
-		$original = $form->getFields()->asValues();
+		$original = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
 
 		// Clone host.
 		$this->query('button', $button)->waitUntilClickable()->one()->click();
