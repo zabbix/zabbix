@@ -2207,7 +2207,7 @@ class testUsers extends CAPITest {
 		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
 	}
 	public static $data = [
-		'userdirectoryid' => []
+		'userdirectoryid' => null
 	];
 
 	/**
