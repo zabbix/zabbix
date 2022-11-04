@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-10-19 00:43+0000\n"
+"PO-Revision-Date: 2022-10-28 08:43+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -4175,6 +4175,9 @@ msgid ""
 "1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
+"与 Zabbix 服务器“%1$s”的连接失败。可能的原因：\n"
+"1.“zabbix_server.conf”中的“NodeAddress”、“ListenPort”不正确或“zabbix.conf.php”中的服务器IP/DNS被覆盖；\n"
+"2. DNS 服务器配置不正确，地址解析不正确。\n"
 
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
@@ -4196,6 +4199,11 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
+"与 Zabbix 服务器“%1$s”的连接被拒绝。可能的原因：\n"
+"1.“zabbix_server.conf”中的“NodeAddress”、“ListenPort”不正确或“zabbix.conf.php”中的服务器IP/DNS被覆盖；\n"
+"2、安全环境（例如SELinux）阻断连接；\n"
+"3. Zabbix server 守护进程没有运行；\n"
+"4. 防火墙阻断 TCP 连接。\n"
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4219,6 +4227,9 @@ msgid ""
 "1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
+"与 Zabbix 服务器“%1$s”的连接超时。可能的原因：\n"
+"1.“zabbix_server.conf”中的“NodeAddress”、“ListenPort”不正确或“zabbix.conf.php”中的服务器IP/DNS被覆盖；\n"
+"2. 防火墙阻断 TCP 连接。\n"
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -9841,7 +9852,7 @@ msgstr "信息"
 
 #: include/classes/data/CItemData.php:1428
 msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "有关 vmware.datastore.perfcounter 所需的hypervisor内部磁盘的信息，<url> - VMware 服务 URL，<uuid> - VMware hypervisor主机名。返回 JSON"
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -18241,6 +18252,16 @@ msgstr "这个月到目前为止"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "此设置仅适用于数值数据。非数字数据将始终取自历史记录。"
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:135
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr "应启用此设置，因为历史表包含压缩块。"
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:164
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr "应启用此设置，因为趋势表包含压缩块。"
+
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
@@ -19956,7 +19977,7 @@ msgstr "VMware 数据存储管理程序列表，<url> - VMware 服务 URL，<dat
 
 #: include/classes/data/CItemData.php:1320
 msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
+msgstr "VMware 数据存储性能计数器，<url> - VMware 服务 URL，<id> - VMware 数据存储 uuid，<path> - 性能计数器路径，<instance> - 性能计数器实例"
 
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
@@ -21159,6 +21180,9 @@ msgid ""
 "1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
 "2. Incorrect network configuration.\n"
 msgstr ""
+"无法访问 Zabbix 服务器“%1$s”。可能的原因：\n"
+"1.“zabbix_server.conf”中的“NodeAddress”、“ListenPort”不正确或“zabbix.conf.php”中的服务器IP/DNS被覆盖；\n"
+"2.网络配置不正确。\n"
 
 #: include/classes/server/CZabbixServer.php:601
 #, c-format
