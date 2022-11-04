@@ -797,6 +797,9 @@ class CUserDirectory extends CApiService {
 					_s('the parameter "%1$s" is missing', 'provision_groups')
 				));
 			}
+			elseif (!array_key_exists('provision_groups', $userdirectory)) {
+				continue;
+			}
 
 			foreach ($userdirectory['provision_groups'] as $provision_group) {
 				['roleid' => $roleid, 'user_groups' => $groups] = $provision_group;
