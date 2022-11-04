@@ -73,7 +73,10 @@ static int	zbx_get_process_username(HANDLE hProcess, char *userName, char *sid)
 	int		iUse, res = FAIL;
 
 	/* clean result; */
-	*userName = *sid = '\0';
+	*userName = '\0';
+
+	if (NULL != sid)
+		*sid = '\0';
 
 	/* open the processes token */
 	if (0 == OpenProcessToken(hProcess, TOKEN_QUERY, &tok))
