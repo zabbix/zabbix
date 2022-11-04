@@ -28,7 +28,7 @@ class CWidgetFieldMultiSelectActionView extends CWidgetFieldMultiSelectView {
 	}
 
 	protected function getObjectName(): string {
-		return 'action';
+		return 'actions';
 	}
 
 	protected function getPopupParameters(): array {

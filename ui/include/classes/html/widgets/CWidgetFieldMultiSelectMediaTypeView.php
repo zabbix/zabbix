@@ -28,7 +28,7 @@ class CWidgetFieldMultiSelectMediaTypeView extends CWidgetFieldMultiSelectView {
 	}
 
 	protected function getObjectName(): string {
-		return 'media_type';
+		return 'media_types';
 	}
 
 	protected function getPopupParameters(): array {

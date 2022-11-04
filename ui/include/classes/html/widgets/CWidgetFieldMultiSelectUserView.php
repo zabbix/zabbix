@@ -28,7 +28,7 @@ class CWidgetFieldMultiSelectUserView extends CWidgetFieldMultiSelectView {
 	}
 
 	protected function getObjectName(): string {
-		return 'user';
+		return 'users';
 	}
 
 	protected function getPopupParameters(): array {
