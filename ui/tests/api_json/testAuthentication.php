@@ -390,6 +390,8 @@ class testAuthentication extends CAPITest {
 	 * Prepare data for tests. Create user, group, userdirectory.
 	 */
 	public function prepareTestData() {
+		error_log('inside prepareTestData:::');
+
 		// Create LDAP user directory.
 		$response = CDataHelper::call('userdirectory.create', [[
 			'name' => 'Default LDAP',
@@ -401,6 +403,12 @@ class testAuthentication extends CAPITest {
 		]]);
 
 		$this->assertArrayHasKey('userdirectoryids', $response);
+		error_log(json_encode([
+			':::', $response
+		]));
 		self::$data['userdirectory_1'] = reset($response['userdirectoryids']);
+		error_log(json_encode([
+			'calling prepareTestData:::', self::$data
+		]));
 	}
 }
