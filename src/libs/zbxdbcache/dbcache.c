@@ -1680,7 +1680,7 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, const DC_I
 			return;
 	}
 
-	zbx_format_value(value, sizeof(value), item->valuemapid, item->units, h->value_type);
+	zbx_format_value(value, sizeof(value), item->valuemapid, ZBX_NULL2EMPTY_STR(item->units), h->value_type);
 
 	inventory_value = (zbx_inventory_value_t *)zbx_malloc(NULL, sizeof(zbx_inventory_value_t));
 
@@ -1969,7 +1969,7 @@ static zbx_item_diff_t	*calculate_item_update(DC_ITEM *item, const ZBX_DC_HISTOR
 			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state, NULL,
 					NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, h->value.err);
 
-			if (0 != strcmp(item->error, h->value.err))
+			if (0 != strcmp(ZBX_NULL2EMPTY_STR(item->error), h->value.err))
 				item_error = h->value.err;
 		}
 		else
@@ -1985,7 +1985,7 @@ static zbx_item_diff_t	*calculate_item_update(DC_ITEM *item, const ZBX_DC_HISTOR
 			item_error = "";
 		}
 	}
-	else if (ITEM_STATE_NOTSUPPORTED == h->state && 0 != strcmp(item->error, h->value.err))
+	else if (ITEM_STATE_NOTSUPPORTED == h->state && 0 != strcmp(ZBX_NULL2EMPTY_STR(item->error), h->value.err))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "error reason for \"%s:%s\" changed: %s", item->host.host,
 				item->key_orig, h->value.err);
