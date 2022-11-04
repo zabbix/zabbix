@@ -1513,6 +1513,11 @@ class testProxyConfSync extends CIntegrationTest
 	 */
 	public function testProxyConfSync_Insert()
 	{
+		self::stopComponent(self::COMPONENT_SERVER);
+		self::clearLog(self::COMPONENT_SERVER);
+		self::stopComponent(self::COMPONENT_PROXY);
+		self::clearLog(self::COMPONENT_PROXY);
+
 		$this->purgeExisting('host', 'hostids');
 		$this->purgeExisting('proxy', 'extend');
 		$this->purgeExisting('template', 'templateids');
@@ -1521,11 +1526,6 @@ class testProxyConfSync extends CIntegrationTest
 		$this->purgeExisting('regexp', 'extend');
 		$this->purgeHostGroups();
 		$this->purgeGlobalMacros();
-
-		self::stopComponent(self::COMPONENT_SERVER);
-		self::clearLog(self::COMPONENT_SERVER);
-		self::stopComponent(self::COMPONENT_PROXY);
-		self::clearLog(self::COMPONENT_PROXY);
 
 		$this->loadInitialConfiguration();
 
