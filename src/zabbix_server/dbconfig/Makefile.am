@@ -10,4 +10,3 @@ libzbxdbconfig_a_CFLAGS = \
 	-I$(top_srcdir)/src/libs/zbxcacheconfig \
 	-I$(top_srcdir)/src/libs/zbxcachehistory \
 	-I$(top_srcdir)/src/libs/zbxcachevalue
-	
