@@ -20,23 +20,12 @@
 
 class CWidgetInaccessible extends CWidget {
 
-	static ZBX_STYLE_LIST_TABLE = 'list-table';
-	static ZBX_STYLE_NOTHING_TO_SHOW = 'nothing-to-show';
-
 	_doStart() {
 		super._doStart();
 
 		this._updateButtons();
 
-		this._content_body.innerHTML = `
-			<table class="${CWidgetInaccessible.ZBX_STYLE_LIST_TABLE}">
-				<tbody>
-					<tr class="${CWidgetInaccessible.ZBX_STYLE_NOTHING_TO_SHOW}">
-						<td>${t('No permissions to referred object or it does not exist!')}</td>
-					</tr>
-				</tbody>
-			</table>
-		`;
+		this._content_body.innerHTML = `<div>${t('No permissions to referred object or it does not exist!')}</div>`;
 	}
 
 	_updateButtons() {
@@ -77,5 +66,9 @@ class CWidgetInaccessible extends CWidget {
 		}
 
 		return menu;
+	}
+
+	_hasPadding() {
+		return true;
 	}
 }

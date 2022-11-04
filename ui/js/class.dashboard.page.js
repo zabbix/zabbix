@@ -447,7 +447,7 @@ class CDashboardPage extends CBaseComponent {
 		return this._createWidget(CWidgetInaccessible, {
 			type: 'inaccessible',
 			name,
-			view_mode: ZBX_WIDGET_VIEW_MODE_NORMAL,
+			view_mode: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER,
 			fields: {},
 			defaults: {
 				name: t('Inaccessible widget')
