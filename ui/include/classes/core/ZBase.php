@@ -562,7 +562,7 @@ class ZBase {
 
 		try {
 			if ($action_class === null) {
-				throw new CPageNotFoundException();
+				throw new Exception(_('Page not found'));
 			}
 
 			if (!class_exists($action_class)) {
@@ -625,11 +625,6 @@ class ZBase {
 		}
 		catch (CAccessDeniedException $e) {
 			$this->denyPageAccess($router);
-		}
-		catch (CPageNotFoundException $e) {
-			http_response_code(404);
-
-			self::terminateWithError($router, $e->getMessage());
 		}
 		catch (Exception $e) {
 			self::terminateWithError($router, $e->getMessage());
