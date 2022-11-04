@@ -1886,7 +1886,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if ('\0' != *cmdline)
 		{
-			char	*p, *pend, sep;
+			char	*p, *pend, sep = 0;
 			size_t	len;
 
 			if (NULL != (pend = strpbrk(cmdline, " :")))

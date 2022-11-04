@@ -499,9 +499,8 @@ int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (1 != sscanf(tmp, ZBX_FS_UI64, &curfreq))
 			{
 				zbx_fclose(f);
-				ret = SYSINFO_RET_FAIL;
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain CPU frequency."));
-				return ret;
+				return SYSINFO_RET_FAIL;
 			}
 		}
 	}
