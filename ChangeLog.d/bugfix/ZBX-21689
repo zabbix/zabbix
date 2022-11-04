@@ -1,0 +1,1 @@
+...G...... [ZBX-21689] fixed proc.num to not crash agent on Windows when 'user' parameter is set (asestakovs)
