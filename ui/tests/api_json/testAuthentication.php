@@ -29,6 +29,11 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 class testAuthentication extends CAPITest {
 
 	public static function authentication_get_data() {
+		error_log(json_encode([
+			'inside authentication_get_data:::',
+			self::$data
+		]));
+
 		return [
 			'Test getting authentication general data' => [
 				'authentication' => [
@@ -76,6 +81,10 @@ class testAuthentication extends CAPITest {
 	public function testAuthentication_Get($authentication, $get_result, $expected_error) {
 		$result = $this->call('authentication.get', $authentication);
 
+		error_log(json_encode([
+			'inside testAuthentication_Get:::',
+			$get_result
+		]));
 		if ($expected_error === null) {
 			$result = $result['result'];
 
