@@ -74,15 +74,14 @@ class testAuthentication extends CAPITest {
 	 * @dataProvider authentication_get_data
 	 */
 	public function testAuthentication_Get($authentication, $get_result, $expected_error) {
-
-		error_log(json_encode([
-			'test:::', self::$data
-		]));
-
 		$result = $this->call('authentication.get', $authentication);
 
 		if ($expected_error === null) {
 			$result = $result['result'];
+
+			error_log(json_encode([
+				'test:::', $get_result['ldap_userdirectoryid'], $result['ldap_userdirectoryid']
+			]));
 
 			// General fields.
 			$this->assertContains($result['authentication_type'], $get_result['authentication_type']);
