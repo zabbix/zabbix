@@ -599,7 +599,7 @@ class CUserDirectory extends CApiService {
 	 * @throws APIException
 	 */
 	private function validateUpdate(array &$userdirectories, ?array &$db_userdirectories): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['userdirectoryid']], 'fields' => [
 			'userdirectoryid' => ['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $userdirectories, '/', $error)) {
