@@ -692,7 +692,14 @@ class CItemPrototype extends CItemGeneral {
 					'where' => ['itemid' => $item['itemid']]
 				];
 
-				$item = array_intersect_key($item, $internal_fields + $upd_item + $nested_object_fields);
+				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+					$item = array_intersect_key($item,
+						array_flip(['authtype']) + $internal_fields + $upd_item + $nested_object_fields
+					);
+				}
+				else {
+					$item = array_intersect_key($item, $internal_fields + $upd_item + $nested_object_fields);
+				}
 
 				$upd_itemids[$i] = $item['itemid'];
 			}
