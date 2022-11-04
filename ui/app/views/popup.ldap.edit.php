@@ -119,7 +119,9 @@ $form = (new CForm('post', $form_action))
 			)
 		])
 		->addItem([
-			(new CLabel(_('Group configuration'), 'group_configuration'))->addClass('allow-jit-provisioning'),
+			(new CLabel([_('Group configuration'), makeHelpIcon(
+				_('memberOf is a preferable way to configure groups because it is faster. Use groupOfNames if your LDAP server does not support memberOf or group filtering is required.')
+			)], 'group_configuration'))->addClass('allow-jit-provisioning'),
 			(new CFormField(
 				(new CRadioButtonList('group_configuration', $data['group_configuration']))
 					->setId('group-configuration')
