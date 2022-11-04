@@ -267,7 +267,7 @@ class testUsers extends CAPITest {
 						'userdirectoryid' => 1234
 					]
 				],
-				'expected_error' => 'User directory with ID "%1$s" is not available.'
+				'expected_error' => 'User directory with ID "1234" is not available.'
 			]
 		];
 	}

@@ -486,58 +486,58 @@ class testUserDirectory extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/provision_media/2/mediatypeid": referred object does not exist.'
 			],
 			'Test invalid SAML Encrypt assertions' => [
-				'userdirectories' => [
+				'userdirectories' => [[
 					'userdirectoryid' => 'API SAML',
 					'encrypt_assertions' => 999
-				],
+				]],
 				'expected_error' => 'Invalid parameter "/encrypt_assertions": value must be one of '.
 					implode(', ', [0, 1]).'.'
 			],
 			'Test invalid SAML Encrypt name ID' => [
-				'userdirectories' => [
+				'userdirectories' => [[
 					'userdirectoryid' => 'API SAML',
 					'encrypt_nameid' => 999
-				],
+				]],
 				'expected_error' => 'Invalid parameter "/encrypt_nameid": value must be one of '.
 					implode(', ', [0, 1]).'.'
 			],
 			'Test invalid SAML Sign logout responses' => [
-				'userdirectories' => [
+				'userdirectories' => [[
 					'userdirectoryid' => 'API SAML',
 					'sign_logout_responses' => 999
-				],
+				]],
 				'expected_error' => 'Invalid parameter "/sign_logout_responses": value must be one of '.
 					implode(', ', [0, 1]).'.'
 			],
 			'Test invalid SAML Sign authN requests' => [
-				'userdirectories' => [
+				'userdirectories' => [[
 					'userdirectoryid' => 'API SAML',
 					'sign_authn_requests' => 999
-				],
+				]],
 				'expected_error' => 'Invalid parameter "/sign_authn_requests": value must be one of '.
 					implode(', ', [0, 1]).'.'
 			],
 			'Test invalid SAML Sign logout requests' => [
-				'userdirectories' => [
+				'userdirectories' => [[
 					'userdirectoryid' => 'API SAML',
 					'sign_logout_requests' => 999
-				],
+				]],
 				'expected_error' => 'Invalid parameter "/sign_logout_requests": value must be one of '.
 					implode(', ', [0, 1]).'.'
 			],
 			'Test invalid SAML Sign assertions' => [
-				'userdirectories' => [
+				'userdirectories' => [[
 					'userdirectoryid' => 'API SAML',
 					'sign_assertions' => 999
-				],
+				]],
 				'expected_error' => 'Invalid parameter "/sign_assertions": value must be one of '.
 					implode(', ', [0, 1]).'.'
 			],
 			'Test invalid SAML Sign messages' => [
-				'userdirectories' => [
+				'userdirectories' => [[
 					'userdirectoryid' => 'API SAML',
 					'sign_messages' => 999
-				],
+				]],
 				'expected_error' => 'Invalid parameter "/sign_messages": value must be one of '.
 					implode(', ', [0, 1]).'.'
 			]
