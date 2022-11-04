@@ -29,6 +29,8 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 class testUsers extends CAPITest {
 
 	public static function user_create() {
+		error_log(json_encode([':::', self::$data, ':::']));
+
 		return [
 			// Check user password.
 			[
