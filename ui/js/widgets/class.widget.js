@@ -122,6 +122,8 @@ class CWidget extends CBaseComponent {
 		this._update_retry_sec = 3;
 		this._show_preloader_asap = true;
 		this._resizable_handles = [];
+
+		this._hide_preloader_animation_frame = null;
 	}
 
 	// Logical state control methods.
@@ -816,15 +818,38 @@ class CWidget extends CBaseComponent {
 	}
 
 	_showPreloader() {
+		// Fixed Safari 16 bug: removing preloader classes on animation frame to ensure removal of icons.
+
+		if (this._hide_preloader_animation_frame !== null) {
+			cancelAnimationFrame(this._hide_preloader_animation_frame);
+			this._hide_preloader_animation_frame = null;
+		}
+
 		this._content_body.classList.add('is-loading');
 		this._content_body.classList.remove('is-loading-fadein', 'delayed-15s');
 	}
 
 	_hidePreloader() {
-		this._content_body.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
+		// Fixed Safari 16 bug: removing preloader classes on animation frame to ensure removal of icons.
+
+		if (this._hide_preloader_animation_frame !== null) {
+			return;
+		}
+
+		this._hide_preloader_animation_frame = requestAnimationFrame(() => {
+			this._content_body.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
+			this._hide_preloader_animation_frame = null;
+		});
 	}
 
 	_schedulePreloader() {
+		// Fixed Safari 16 bug: removing preloader classes on animation frame to ensure removal of icons.
+
+		if (this._hide_preloader_animation_frame !== null) {
+			cancelAnimationFrame(this._hide_preloader_animation_frame);
+			this._hide_preloader_animation_frame = null;
+		}
+
 		this._content_body.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
 	}
 
