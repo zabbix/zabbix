@@ -28,6 +28,8 @@
 #include "../../../src/libs/zbxjson/jsonpath.h"
 #include "../../../src/libs/zbxjson/json.h"
 
+static char	*segment_data_to_str(const zbx_jsonpath_segment_t *segment);
+
 static int	mock_str_to_segment_type(const char *segment_type)
 {
 	if (0 == strcmp("ZBX_JSONPATH_SEGMENT_MATCH_ALL", segment_type))
@@ -48,13 +50,15 @@ static int	mock_str_to_segment_type(const char *segment_type)
 static void	jsonpath_token_print(char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_jsonpath_token_t *token)
 {
+	int	i;
+
 	switch (token->type)
 	{
 		case ZBX_JSONPATH_TOKEN_PATH_ABSOLUTE:
 		case ZBX_JSONPATH_TOKEN_PATH_RELATIVE:
 		case ZBX_JSONPATH_TOKEN_CONST_STR:
 		case ZBX_JSONPATH_TOKEN_CONST_NUM:
-			zbx_strcpy_alloc(data, data_alloc, data_offset, token->data);
+			zbx_strcpy_alloc(data, data_alloc, data_offset, token->text);
 			break;
 		case ZBX_JSONPATH_TOKEN_PAREN_LEFT:
 			zbx_strcpy_alloc(data, data_alloc, data_offset, "(");
