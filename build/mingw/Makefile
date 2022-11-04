@@ -42,6 +42,7 @@ OBJS = \
 	$(OUTPUTDIR)\json.o \
 	$(OUTPUTDIR)\json_parser.o \
 	$(OUTPUTDIR)\jsonpath.o \
+	$(OUTPUTDIR)\jsonobj.o \
 	$(OUTPUTDIR)\sha256crypt.o \
 	$(OUTPUTDIR)\variant.o \
 	$(OUTPUTDIR)\sysinfo_system.o \
@@ -177,6 +178,9 @@ $(OUTPUTDIR)\json_parser.o: $(TOPDIR)\src\libs\zbxjson\json_parser.c
 	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
 
 $(OUTPUTDIR)\jsonpath.o: $(TOPDIR)\src\libs\zbxjson\jsonpath.c
+	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
+
+$(OUTPUTDIR)\jsonobj.o: $(TOPDIR)\src\libs\zbxjson\jsonobj.c
 	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
 
 $(OUTPUTDIR)\sha256crypt.o: $(TOPDIR)\src\libs\zbxhash\sha256crypt.c
