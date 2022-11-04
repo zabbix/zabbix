@@ -473,7 +473,7 @@ class testUserDirectory extends CAPITest {
 					'userdirectoryid' => 'LDAP #1',
 					'provision_status' => JIT_PROVISIONING_ENABLED
 				]],
-				'expected_error' => null
+				'expected_error' => 'Invalid parameter "/1": the parameter "provision_groups" is missing.'
 			],
 			'Set non-existing mediaid to provision media' => [
 				'userdirectories' => [[
