@@ -385,8 +385,12 @@ class testAuthentication extends CAPITest {
 	/**
 	 * Prepare data for tests. Create user, group, userdirectory.
 	 */
-	public function prepareTestData() {
+	public static function prepareTestData() {
 		error_log('calling prepareTestData:::');
+
+		if (self::$data['userdirectory_1'] !== null) {
+			return;
+		}
 
 		// Create LDAP user directory.
 		$response = CDataHelper::call('userdirectory.create', [[
