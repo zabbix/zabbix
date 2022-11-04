@@ -1164,6 +1164,7 @@ class testProxyConfSync extends CIntegrationTest
 		}
 
 		$response = $this->call($method . '.delete', $ids);
+		var_dump($response);
 	}
 
 	private function createGlobalMacros()
