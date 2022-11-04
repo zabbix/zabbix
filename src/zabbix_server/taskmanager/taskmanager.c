@@ -34,7 +34,6 @@
 #include "zbxrtc.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_proxy.h"
-#include "zbxcacheconfig.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxversion.h"
