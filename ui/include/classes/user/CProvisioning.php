@@ -53,15 +53,6 @@ class CProvisioning {
 	 */
 	protected $mapping_roles = [];
 
-	/**
-	 * Array of media types data used in media mappings.
-	 *
-	 * @var array $mapping_mediatypes[]
-	 * @var int   $mapping_mediatypes[mediatypeid]['mediatypeid']
-	 * @var int   $mapping_mediatypes[mediatypeid]['type']
-	 */
-	protected $mapping_mediatypes = [];
-
 	public function __construct(array $userdirectory, array $mapping_roles) {
 		$this->userdirectory = $userdirectory;
 		$this->mapping_roles = $mapping_roles;
@@ -144,15 +135,6 @@ class CProvisioning {
 	}
 
 	/**
-	 * Get provisioning user directory database id.
-	 *
-	 * @return int
-	 */
-	public function getUserdirectoryId(): int {
-		return $this->userdirectory['userdirectoryid'];
-	}
-
-	/**
 	 * Get array of attributes to request from external source when requesting user data.
 	 *
 	 * @return array Array of attributes names to request from external source.
@@ -191,58 +173,32 @@ class CProvisioning {
 	}
 
 	/**
-	 * Return array with user data created from external user data attributes.
-	 *
-	 * @param array $idp_user       User data from external source.
-	 *
-	 * @return array
-	 *         ['medias']                   Array of user media extracted from external user data.
-	 *                                      Empty array when no media found.
-	 *         ['medias'][]['mediatypeid']  User media type id.
-	 *         ['medias'][]['sendto']       Array with single entry of media notification recipient.
-	 *         ['usrgrps']                  Array of user groups extracted from external user data.
-	 *                                      Is set when user groups data were found in external data.
-	 *         ['usrgrps'][]['usrgrpid']    Matched user group id.
-	 */
-	public function getUser(array $idp_user): array {
-		$user = array_merge(['medias' => []], $this->getUserAttributes($idp_user, $this->userdirectory));
-		$group_key = $this->userdirectory['idp_type'] == IDP_TYPE_LDAP ? $this->userdirectory['group_membership'] : '';
-
-		if ($this->userdirectory['provision_media']) {
-			$user['medias'] = $this->getUserMedias($idp_user);
-		}
-
-		if ($group_key !== '' && array_key_exists($group_key, $idp_user) && is_array($idp_user[$group_key])) {
-			/*
-			 * Attribute to search for groups in user data defined, and if there will be no match, 'usrgrps' key
-			 * should exist to do not attempt to query LDAP for user groups once again.
-			 */
-			$user['usrgrps'] = [];
-			$user = array_merge($user, $this->getUserGroupsAndRole($idp_user[$group_key]));
-		}
-
-		return $user;
-	}
-
-	/**
 	 * Return array with user fields created from matched provision data on external user data attributes.
 	 *
-	 * @param array $idp_user    User data from external source, LDAP/SAML.
+	 * @param array $idp_user        User data from external source, LDAP/SAML.
+	 * @param bool  $case_sensitive  How IdP attributes should be matched.
 	 *
 	 * @return array
 	 */
-	public function getUserAttributes(array $idp_user): array {
-		$user = [];
+	public function getUserAttributes(array $idp_user, bool $case_sensitive = true): array {
 		$user_idp_fields = array_filter([
 			'name' => $this->userdirectory['user_username'],
 			'surname' => $this->userdirectory['user_lastname']
 		], 'strlen');
+		$user = array_fill_keys(array_keys($user_idp_fields), '');
+		$idp_user_lowercased = $case_sensitive ? [] : array_map('strtolower', $idp_user);
 
 		foreach ($user_idp_fields as $user_field => $idp_field) {
-			$value = array_intersect_key($idp_user, [$idp_field => '', strtolower($idp_field) => '']);
+			if (array_key_exists($idp_field, $idp_user)) {
+				$user[$user_field] = $idp_user[$idp_field];
 
-			if ($value) {
-				$user[$user_field] = reset($value);
+				continue;
+			}
+
+			$idp_field = strtolower($idp_field);
+
+			if (array_key_exists($idp_field, $idp_user_lowercased)) {
+				$user[$user_field] = $idp_user_lowercased[$idp_field];
 			}
 		}
 
@@ -252,28 +208,40 @@ class CProvisioning {
 	/**
 	 * Return array with user media created from matched provision_media on external user data attributes.
 	 *
-	 * @param array $idp_user    User data from external source, LDAP/SAML.
+	 * @param array $idp_user        User data from external source, LDAP/SAML.
+	 * @param bool  $case_sensitive  How IdP attributes should be matched.
 	 *
 	 * @return array
 	 *         []['mediatypeid']
 	 *         []['sendto']
 	 */
-	public function getUserMedias(array $idp_user): array {
+	public function getUserMedias(array $idp_user, bool $case_sensitive = true): array {
 		$user_medias = [];
 		$attributes = array_column($this->userdirectory['provision_media'], null, 'mediatypeid');
+		$idp_user_lowercased = $case_sensitive ? [] : array_map('strtolower', $idp_user);
 
 		foreach ($attributes as $mediatypeid => $idp_attributes) {
-			$idp_attribute = strtolower($idp_attributes['attribute']);
+			$idp_field = $idp_attributes['attribute'];
 
-			if (!array_key_exists($idp_attribute, $idp_user)) {
+			if (array_key_exists($idp_field, $idp_user)) {
+				$user_medias[] = [
+					'name' => $idp_attributes['name'],
+					'mediatypeid' => $mediatypeid,
+					'sendto' =>	[$idp_user[$idp_field]]
+				];
+
 				continue;
 			}
 
-			$user_medias[] = [
-				'name' => $idp_attributes['name'],
-				'mediatypeid' => $mediatypeid,
-				'sendto' =>	[$idp_user[$idp_attribute]]
-			];
+			$idp_field = strtolower($idp_field);
+
+			if (array_key_exists($idp_field, $idp_user_lowercased)) {
+				$user_medias[] = [
+					'name' => $idp_attributes['name'],
+					'mediatypeid' => $mediatypeid,
+					'sendto' =>	[$idp_user_lowercased[$idp_field]]
+				];
+			}
 		}
 
 		return $user_medias;
@@ -325,7 +293,9 @@ class CProvisioning {
 			return $user;
 		}
 
+		$user['usrgrps'] = $user_groups;
 		$roles = array_intersect_key($this->mapping_roles, $roleids);
+
 		if ($roles) {
 			CArrayHelper::sort($roles, [
 				['field' => 'type', 'order' => ZBX_SORT_DOWN],
@@ -334,11 +304,6 @@ class CProvisioning {
 
 			['roleid' => $user['roleid']] = reset($roles);
 		}
-		else {
-			$user['roleid'] = 0;
-		}
-
-		$user['usrgrps'] = $user_groups;
 
 		return $user;
 	}

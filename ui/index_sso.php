@@ -69,8 +69,8 @@ $certs += array_fill_keys(['SP_KEY', 'SP_CERT', 'IDP_CERT'], '');
 /** @var CUser $service */
 $service = API::getApiService('user');
 $userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
-$provision = CProvisioning::forUserDirectoryId($userdirectoryid);
-$provisioning_enabled = ($provision->isProvisioningEnabled()
+$provisioning = CProvisioning::forUserDirectoryId($userdirectoryid);
+$provisioning_enabled = ($provisioning->isProvisioningEnabled()
 	&& CAuthenticationHelper::get(CAuthenticationHelper::SAML_JIT_STATUS) ==  JIT_PROVISIONING_ENABLED
 );
 
@@ -85,7 +85,7 @@ if (array_key_exists('use_proxy_headers', $SSO['SETTINGS']) && (bool) $SSO['SETT
 
 $baseurl = Utils::getSelfURLNoQuery();
 $relay_state = null;
-$saml_settings = $provision->getIdpConfig();
+$saml_settings = $provisioning->getIdpConfig();
 $settings = [
 	'sp' => [
 		'entityId' => $saml_settings['sp_entityid'],
@@ -206,14 +206,15 @@ try {
 		];
 
 		if ($provisioning_enabled) {
-			$user = $provision->getUser($user_attributes);
+			$user = $provisioning->getUserAttributes($user_attributes);
+			$user['medias'] = $provisioning->getUserMedias($user_attributes);
 			$idp_groups = [];
 
 			if (array_key_exists($groups_key, $user_attributes) && is_array($user_attributes[$groups_key])) {
 				$idp_groups = $user_attributes[$groups_key];
 			}
 
-			$user += $provision->getUserGroupsAndRole($idp_groups);
+			$user += $provisioning->getUserGroupsAndRole($idp_groups);
 			$saml_data['provisioned_user'] = $user;
 		}
 
@@ -263,9 +264,13 @@ try {
 			throw new Exception(_('Session initialization error.'));
 		}
 
+		// Temporary disabling wrapper for API requests.
+		$wrapper = API::getWrapper();
+		API::setWrapper();
+
 		if ($saml_data['provisioned_user'] && $provisioning_enabled) {
 			$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryid();
-			$user_data = $service->findAccessibleUser($saml_data['username_attribute'],
+			$user_data = API::User()->findAccessibleUser($saml_data['username_attribute'],
 				(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
 				CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE), false
 			);
@@ -275,7 +280,7 @@ try {
 
 				if ($user_data['db_user']['userdirectoryid'] == $userdirectoryid) {
 					$saml_data['provisioned_user']['userid'] = $user_data['db_user']['userid'];
-					$deprovisioned = !$service->updateProvisionedUser($saml_data['provisioned_user']);
+					$deprovisioned = !API::User()->updateProvisionedUser($saml_data['provisioned_user']);
 				}
 
 				if ($deprovisioned) {
@@ -287,14 +292,15 @@ try {
 					'userdirectoryid'	=> $userdirectoryid,
 					'username'			=> $saml_data['username_attribute']
 				];
-				$service->createProvisionedUser($saml_data['provisioned_user']);
+				API::User()->createProvisionedUser($saml_data['provisioned_user']);
 			}
 		}
 
-		CWebUser::$data = $service->loginByUsername($saml_data['username_attribute'],
+		CWebUser::$data = API::User()->loginByUsername($saml_data['username_attribute'],
 			(CAuthenticationHelper::get(CAuthenticationHelper::SAML_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
 			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		);
+		API::setWrapper($wrapper);
 
 		if (CWebUser::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 			throw new Exception(_('GUI access disabled.'));

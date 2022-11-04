@@ -399,6 +399,52 @@ class CLdap {
 	}
 
 	/**
+	 * Return user data with medias, groups, roleid and user attributes matched from LDAP user data according
+	 * provisioning options.
+	 *
+	 * @param CProvisioning $provisioning      Provisioning class instance.
+	 * @param string        $username          Username of user to get provisioned data for.
+	 *
+	 * @return array
+	 */
+	public function getProvisionedData(CProvisioning $provisioning, string $username): array {
+		$ldap_groups = [];
+		$user = [
+			'medias' => [],
+			'usrgrps' => [],
+			'roleid' => 0
+		];
+		$config = $provisioning->getIdpConfig();
+		$user_attributes = $provisioning->getUserIdpAttributes();
+		$idp_user = $this->getUserAttributes($user_attributes, $username);
+		$user = $provisioning->getUserAttributes($idp_user);
+		$user['medias'] = $provisioning->getUserMedias($idp_user);
+
+		if ($config['group_membership'] !== '') {
+			$group_key = $config['group_membership'];
+
+			if (array_key_exists($group_key, $idp_user) && is_array($idp_user[$group_key])) {
+				$ldap_groups = $idp_user[$group_key];
+			}
+		}
+		else if ($config['group_filter'] !== '') {
+			$user_ref_attr = $config['user_ref_attr'];
+
+			if ($user_ref_attr !== '' && array_key_exists($user_ref_attr, $idp_user)) {
+				$this->setQueryPlaceholders(['%{ref}' => $idp_user[$user_ref_attr]]);
+			}
+
+			$group_attributes = $provisioning->getGroupIdpAttributes();
+			$ldap_groups = $this->getGroupAttributes($group_attributes, $username);
+			$ldap_groups = array_column($ldap_groups, $config['group_name']);
+		}
+
+		$user = array_merge($user, $provisioning->getUserGroupsAndRole($ldap_groups));
+
+		return $user;
+	}
+
+	/**
 	 * Setup bind attributes according LDAP configuration.
 	 */
 	protected function initBindAttributes() {
