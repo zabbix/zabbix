@@ -21,8 +21,6 @@
 
 class CControllerDashboardConfigurationHashGet extends CController {
 
-	private ?array $db_dashboard = null;
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -32,7 +30,8 @@ class CControllerDashboardConfigurationHashGet extends CController {
 	 */
 	protected function checkInput(): bool {
 		$fields = [
-			'dashboardid' => 'required|db dashboard.dashboardid|not_empty'
+			'dashboardid' =>	'required|db dashboard.dashboardid|not_empty',
+			'templateid' =>		'db dashboard.dashboardid|not_empty'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -51,32 +50,38 @@ class CControllerDashboardConfigurationHashGet extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)) {
-			return false;
-		}
-
-		$db_dashboards = API::Dashboard()->get([
-			'output' => ['name', 'display_period', 'auto_start'],
-			'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
-			'dashboardids' => $this->getInput('dashboardid')
-		]);
-
-		if (!$db_dashboards) {
-			return false;
-		}
-
-		$this->db_dashboard = $db_dashboards[0];
-
 		return true;
 	}
 
+	/**
+	 * @throws APIException|JsonException
+	 */
 	protected function doAction(): void {
-		$this->db_dashboard['pages'] = CDashboardHelper::preparePagesForGrid($this->db_dashboard['pages'], null, true);
+		$configuration_hash = null;
 
-		$widget_defaults = APP::ModuleManager()->getWidgetsDefaults();
+		if ($this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)) {
+			$db_dashboards = API::Dashboard()->get([
+				'output' => ['name', 'display_period', 'auto_start'],
+				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
+				'dashboardids' => $this->getInput('dashboardid')
+			]);
+
+			if ($db_dashboards) {
+				$db_dashboard = $db_dashboards[0];
+
+				$db_dashboard['pages'] = CDashboardHelper::preparePagesForGrid($db_dashboard['pages'],
+					$this->hasInput('templateid') ? $this->getInput('templateid') : null,
+					true
+				);
+
+				$widget_defaults = APP::ModuleManager()->getWidgetsDefaults($this->hasInput('templateid'));
+
+				$configuration_hash = CDashboardHelper::getConfigurationHash($db_dashboard, $widget_defaults);
+			}
+		}
 
 		$output = [
-			'configuration_hash' => CDashboardHelper::getConfigurationHash($this->db_dashboard, $widget_defaults)
+			'configuration_hash' => $configuration_hash
 		];
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output, JSON_THROW_ON_ERROR)]));

@@ -105,7 +105,6 @@
 			if (web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => this.edit());
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_APPLY_PROPERTIES, this.events.applyProperties);
-				ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, this.events.configurationOutdated);
 
 				if (dynamic.has_dynamic_widgets) {
 					jQuery('#dynamic_hostid').on('change', this.events.dynamicHostChange);
@@ -124,6 +123,8 @@
 						});
 				}
 			}
+
+			ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, this.events.configurationOutdated);
 
 			if (dynamic.has_dynamic_widgets) {
 				// Perform dynamic host switch when browser back/previous buttons are pressed.

@@ -388,6 +388,7 @@ class CDashboard extends CBaseComponent {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
+				templateid: this._data.templateid ?? undefined,
 				dashboardid: this._data.dashboardid
 			})
 		})

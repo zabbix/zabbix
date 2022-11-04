@@ -182,6 +182,7 @@ if (count($data['dashboard']['pages']) > 1
 			'host' => $data['host'],
 			'dashboard' => $data['dashboard'],
 			'widget_defaults' => $data['widget_defaults'],
+			'configuration_hash' => $data['configuration_hash'],
 			'time_period' => $data['time_period'],
 			'web_layout_mode' => $web_layout_mode
 		]).');
