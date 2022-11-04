@@ -385,6 +385,7 @@
 					group_basedn: row.querySelector(`[name="ldap_servers[${row_index}][group_basedn]"`).value,
 					group_name: row.querySelector(`[name="ldap_servers[${row_index}][group_name]"`).value,
 					group_member: row.querySelector(`[name="ldap_servers[${row_index}][group_member]"`).value,
+					user_ref_attr: row.querySelector(`[name="ldap_servers[${row_index}][user_ref_attr]"`).value,
 					group_filter: row.querySelector(`[name="ldap_servers[${row_index}][group_filter]"`).value,
 					group_membership: row.querySelector(`[name="ldap_servers[${row_index}][group_membership]"`).value,
 					user_username: row.querySelector(`[name="ldap_servers[${row_index}][user_username]"`).value,
@@ -564,6 +565,7 @@
 						<input type="hidden" name="ldap_servers[#{row_index}][group_basedn]" value="#{group_basedn}">
 						<input type="hidden" name="ldap_servers[#{row_index}][group_name]" value="#{group_name}">
 						<input type="hidden" name="ldap_servers[#{row_index}][group_member]" value="#{group_member}">
+						<input type="hidden" name="ldap_servers[#{row_index}][user_ref_attr]" value="#{user_ref_attr}">
 						<input type="hidden" name="ldap_servers[#{row_index}][group_filter]" value="#{group_filter}">
 						<input type="hidden" name="ldap_servers[#{row_index}][group_membership]" value="#{group_membership}">
 						<input type="hidden" name="ldap_servers[#{row_index}][user_username]" value="#{user_username}">
