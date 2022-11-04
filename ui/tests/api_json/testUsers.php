@@ -22,15 +22,11 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
- * @onBefore  prepareTestData
- *
  * @backup users
  */
 class testUsers extends CAPITest {
 
 	public static function user_create() {
-		error_log(json_encode([':::', self::$data, ':::']));
-
 		return [
 			// Check user password.
 			[
@@ -247,16 +243,6 @@ class testUsers extends CAPITest {
 								'sendto' => 'api@zabbix.com'
 							]
 						]
-					]
-				],
-				'expected_error' => null
-			],
-			[
-				'user' => [
-					[
-						'username' => 'API user with userdirectory',
-						'passwd' => 'Z@bb1x1234',
-						'userdirectoryid' => self::$data['userdirectoryid']
 					]
 				],
 				'expected_error' => null
@@ -2207,25 +2193,5 @@ class testUsers extends CAPITest {
 
 	public function addGuestToDisabledGroup() {
 		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
-	}
-	public static $data = [
-		'userdirectoryid' => null
-	];
-
-	/**
-	 * Create data to be used in tests.
-	 */
-	public function prepareTestData() {
-		$response = CDataHelper::call('userdirectory.create', [[
-			'name' => 'API LDAP #1',
-			'idp_type' => IDP_TYPE_LDAP,
-			'host' => 'ldap.forumsys.com',
-			'port' => 389,
-			'base_dn' => 'dc=example,dc=com',
-			'search_attribute' => 'uid'
-		]]);
-
-		$this->assertArrayHasKey('userdirectoryids', $response);
-		self::$data['userdirectoryid'] = reset($response['userdirectoryids']);
 	}
 }
