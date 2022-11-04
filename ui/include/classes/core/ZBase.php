@@ -141,7 +141,6 @@ class ZBase {
 		require_once 'include/func.inc.php';
 		require_once 'include/html.inc.php';
 		require_once 'include/perm.inc.php';
-		require_once 'include/audit.inc.php';
 		require_once 'include/js.inc.php';
 		require_once 'include/users.inc.php';
 		require_once 'include/validate.inc.php';
@@ -301,6 +300,7 @@ class ZBase {
 			$this->root_dir.'/include/classes/api',
 			$this->root_dir.'/include/classes/api/services',
 			$this->root_dir.'/include/classes/api/helpers',
+			$this->root_dir.'/include/classes/api/item_types',
 			$this->root_dir.'/include/classes/api/managers',
 			$this->root_dir.'/include/classes/api/clients',
 			$this->root_dir.'/include/classes/api/wrappers',
