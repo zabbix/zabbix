@@ -41,7 +41,7 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField(new CWidgetFieldMultiSelectUser('userids', _('Recipient')))
+			->addField(new CWidgetFieldMultiSelectUser('userids', _('Recipients')))
 			->addField(new CWidgetFieldMultiSelectAction('actionids', _('Actions')))
 			->addField(new CWidgetFieldMultiSelectMediaType('mediatypeids', _('Media types')))
 			->addField(
