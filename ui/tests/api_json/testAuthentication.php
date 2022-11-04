@@ -23,12 +23,10 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup userdirectory_ldap, userdirectory, config
+ * @onBefore  prepareTestData
  */
 class testAuthentication extends CAPITest {
 
-	/**
-	 * @onBefore  prepareTestData
-	 */
 	public static function authentication_get_data() {
 		error_log('calling authentication_get_data:::');
 
@@ -320,8 +318,6 @@ class testAuthentication extends CAPITest {
 	}
 
 	/**
-	 * @onBefore  prepareTestData
-	 *
 	 * @dataProvider authentication_update_data_invalid
 	 * @dataProvider authentication_update_data_valid
 	 */
