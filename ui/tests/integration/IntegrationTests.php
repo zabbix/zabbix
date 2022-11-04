@@ -52,6 +52,7 @@ class IntegrationTests {
 		if  (substr(getenv('DB'), 0, 4) === "tsdb" ) {
 			$suite->addTestSuite('testTimescaleDb');
 		}
+		$suite->addTestSuite('testProxyConfSync');
 		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
@@ -74,7 +75,6 @@ class IntegrationTests {
 		$suite->addTestSuite('testTriggerState');
 		$suite->addTestSuite('testActiveAvailability');
 		$suite->addTestSuite('testInitialConfSync');
-		$suite->addTestSuite('testProxyConfSync');
 
 		return $suite;
 	}
