@@ -1871,7 +1871,10 @@ class CUser extends CApiService {
 				}
 
 				foreach ($provision_users as $provision_user) {
-					$user = CUserDirectory::getProvisionedLdapUser($ldap, $provisioning, $provision_user);
+					$user = array_merge(
+						$provision_user,
+						$ldap->getProvisionedData($provisioning, $provision_user['username'])
+					);
 					$this->updateProvisionedUser($user);
 					$provisionedids[] = $provision_user['userid'];
 				}
@@ -2411,7 +2414,7 @@ class CUser extends CApiService {
 			return $user_data;
 		}
 
-		$user = CUserDirectory::getProvisionedLdapUser($ldap, $provisioning, $user_data);
+		$user = $ldap->getProvisionedData($provisioning, $user_data['username']);
 		$user['username'] = $user_data['username'];
 		$user['userid'] = $user_data['userid'];
 

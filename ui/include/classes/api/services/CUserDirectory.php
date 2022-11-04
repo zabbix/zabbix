@@ -992,7 +992,10 @@ class CUserDirectory extends CApiService {
 			}
 
 			$provisioning = new CProvisioning($userdirectory, $mapping_roles);
-			$user = self::getProvisionedLdapUser($ldap, $provisioning, $user);
+			$user = array_merge(
+				$user,
+				$ldap->getProvisionedData($provisioning, $user['username'])
+			);
 
 			if (array_key_exists('userdirectoryid', $userdirectory)) {
 				$user['userdirectoryid'] = $userdirectory['userdirectoryid'];
@@ -1000,45 +1003,6 @@ class CUserDirectory extends CApiService {
 		}
 
 		unset($user['password']);
-
-		return $user;
-	}
-
-	/**
-	 * Get user data array with updated provisioning attributes.
-	 *
-	 * @param CLdap         $ldap              Initialized CLdap class instance.
-	 * @param CProvisioning $provisioning      Initialized CProvisioning class instance.
-	 * @param array         $user              User data array.
-	 * @param string        $user['username']  Username of user to be updated.
-	 *
-	 * @return array
-	 */
-	public static function getProvisionedLdapUser(CLdap $ldap, CProvisioning $provisioning, array $user): array {
-		$config = $provisioning->getIdpConfig();
-		$user_attributes = $provisioning->getUserIdpAttributes();
-		$idp_user = $ldap->getUserAttributes($user_attributes, $user['username']);
-		$user = array_merge($user, $provisioning->getUser($idp_user));
-
-		if ($config['group_membership'] !== '') {
-			return $user + ['usrgrps' => []];
-		}
-
-		$ldap_groups = [];
-
-		if ($config['group_filter'] !== '') {
-			$user_ref_attr = $config['user_ref_attr'];
-
-			if ($user_ref_attr !== '' && array_key_exists($user_ref_attr, $idp_user)) {
-				$ldap->setQueryPlaceholders(['%{ref}' => $idp_user[$user_ref_attr]]);
-			}
-
-			$group_attributes = $provisioning->getGroupIdpAttributes();
-			$ldap_groups = $ldap->getGroupAttributes($group_attributes, $user['username']);
-			$ldap_groups = array_column($ldap_groups, $config['group_name']);
-		}
-
-		$user = array_merge($user, $provisioning->getUserGroupsAndRole($ldap_groups));
 
 		return $user;
 	}
