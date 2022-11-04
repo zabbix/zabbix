@@ -219,7 +219,6 @@ class CPage {
 			self::$cookie = [
 				'name' => 'zbx_session',
 				'value' => base64_encode(json_encode($data)),
-				'domain' => parse_url(PHPUNIT_URL, PHP_URL_HOST),
 				'path' => rtrim(substr($path, 0, strrpos($path, '/')), '/')
 			];
 
