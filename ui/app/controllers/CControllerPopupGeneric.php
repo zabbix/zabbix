@@ -489,8 +489,8 @@ class CControllerPopupGeneric extends CController {
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
 				'allowed_src_fields' => 'mediatypeid,name',
 				'form' => [
-					'name' => 'madia_typeform',
-					'id' => 'madia_types'
+					'name' => 'media_typeform',
+					'id' => 'media_types'
 				],
 				'table_columns' => [
 					_('Media type')

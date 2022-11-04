@@ -807,10 +807,10 @@ switch ($data['popup_type']) {
 			$name = (new CLink($media_type['name']))
 				->setId('spanid'.$media_type['mediatypeid'])
 				->setAttribute('data-reference', $options['reference'])
-				->setAttribute('data-madiatypeid', $media_type['mediatypeid'])
+				->setAttribute('data-mediatypeid', $media_type['mediatypeid'])
 				->setAttribute('data-parentid', $options['parentid'])
 				->onClick('
-					addValue(this.dataset.reference, this.dataset.madiatypeid, this.dataset.parentid ?? null);
+					addValue(this.dataset.reference, this.dataset.mediatypeid, this.dataset.parentid ?? null);
 					popup_generic.closePopup(event);
 				');
 
