@@ -572,7 +572,8 @@
 					<td class="wordbreak">#{host}</td>
 					<td class="js-ldap-usergroups">#{usrgrps}</td>
 					<td>
-						<input type="radio" name="ldap_default_row_index" value="#{row_index}" #{is_default}>
+						<input type="radio" name="ldap_default_row_index" value="#{row_index}" #{is_default} class="<?= ZBX_STYLE_CHECKBOX_RADIO ?>">
+						<label for="ldap_default_row_index" class="checkboxLikeLabel" style="height: 16px;width: 16px;"><span></span></label>
 					</td>
 					<td>
 						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
