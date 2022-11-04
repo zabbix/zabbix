@@ -254,7 +254,7 @@ static zbx_startup_type_t	get_service_startup_type(SC_HANDLE h_srv, QUERY_SERVIC
 	}
 }
 
-int	check_service_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	discover_services(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
 	SC_HANDLE			h_mgr;
@@ -391,7 +391,7 @@ next:
 	return SYSINFO_RET_OK;
 }
 
-int	check_service_info(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	get_service_info(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_SRV_PARAM_STATE		0x01
 #define ZBX_SRV_PARAM_DISPLAYNAME	0x02
@@ -550,7 +550,7 @@ int	check_service_info(AGENT_REQUEST *request, AGENT_RESULT *result)
 #undef ZBX_NON_EXISTING_SRV
 }
 
-int	check_service_state(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	get_service_state(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	SC_HANDLE	mgr, service;
 	char		*name;
@@ -658,7 +658,7 @@ static int	check_service_starttype(SC_HANDLE h_srv, int start_type)
 #define ZBX_SRV_STATE_ALL		0x007f  /* ZBX_SRV_STATE_STOPPED | ZBX_SRV_STATE_STARTED
 						 */
 
-static int	check_service_state_local(SC_HANDLE h_srv, int service_state)
+static int	get_service_state_local(SC_HANDLE h_srv, int service_state)
 {
 	SERVICE_STATUS	status;
 
@@ -700,7 +700,7 @@ static int	check_service_state_local(SC_HANDLE h_srv, int service_state)
 	return FAIL;
 }
 
-int	check_services(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	get_list_of_services(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int				start_type, service_state;
 	char				*type, *state, *exclude, *buf = NULL, *utf8;
@@ -777,7 +777,7 @@ int	check_services(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			if (SUCCEED == check_service_starttype(h_srv, start_type))
 			{
-				if (SUCCEED == check_service_state_local(h_srv, service_state))
+				if (SUCCEED == get_service_state_local(h_srv, service_state))
 				{
 					utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
 
