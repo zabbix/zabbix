@@ -23,7 +23,7 @@
 #include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxnix.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 #include "zbxself.h"
 #include "zbxtasks.h"
 #include "zbxcompress.h"

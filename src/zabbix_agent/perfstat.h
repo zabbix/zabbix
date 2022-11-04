@@ -24,7 +24,7 @@
 #	error "This module is only available for Windows OS"
 #endif
 
-#include "perfmon.h"
+#include "zbxwin32.h"
 
 zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterpath, int interval,
 		zbx_perf_counter_lang_t lang, char **error);
