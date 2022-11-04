@@ -810,7 +810,6 @@ class ZBase {
 					$layout = 'general.warning';
 				}
 		}
-
 		switch ($layout) {
 			case 'layout.json':
 				echo (new CView('layout.json', [

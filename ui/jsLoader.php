@@ -384,7 +384,8 @@ $translate_strings = [
 	],
 	'common.js' => [
 		'Cancel' => _('Cancel'),
-		'Ok' => _('Ok')
+		'Ok' => _('Ok'),
+		'Unexpected server error.' => _('Unexpected server error.')
 	],
 	'component.z-select.js' => [
 		'All' => _('All')
