@@ -25,39 +25,14 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * @backup userdirectory_ldap, userdirectory, config
  */
 class testAuthentication extends CAPITest {
-
-	/**
-	 * Test data used by test.
-	 */
-	public static $data = null;
-
 	public static function authentication_get_data() {
-
-		// Create LDAP user directory.
-		$userdirectory = CDataHelper::call('userdirectory.create', [[
-			'name' => 'Default LDAP',
-			'idp_type' => IDP_TYPE_LDAP,
-			'port' => 389,
-			'host' => 'ldap.forumsys.com',
-			'base_dn' => 'dc=example,dc=com',
-			'search_attribute' => 'uid'
-		]]);
-
-		self::$data = [
-			'userdirectory_1' => reset($userdirectory['userdirectoryids']),
-			'userdirectory_invalidid_1' => 999,
-			'disabled_usrgrpid' => 9 // User group 'Disabled'.
-		];
-
-		error_log(json_encode(['::: calling authentication_get_data :::', self::$data]));
-
 		return [
 			'Test getting authentication general data' => [
 				'authentication' => [
 					'output' => ['authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
 						'http_case_sensitive', 'ldap_auth_enabled', 'ldap_case_sensitive', 'saml_auth_enabled',
 						'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules', 'jit_provision_interval',
-						'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid', 'ldap_userdirectoryid'
+						'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid'
 					],
 				],
 				'get_result' => [
@@ -79,7 +54,6 @@ class testAuthentication extends CAPITest {
 					'ldap_auth_enabled' =>	[ZBX_AUTH_LDAP_DISABLED, ZBX_AUTH_LDAP_ENABLED],
 					'ldap_case_sensitive' => [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE],
 					'ldap_jit_status' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED],
-					'ldap_userdirectoryid' => self::$data['userdirectory_1'],
 					'jit_provision_interval' => '1h',
 
 					// SAML fields.
@@ -119,7 +93,6 @@ class testAuthentication extends CAPITest {
 			$this->assertContains($result['ldap_case_sensitive'], $get_result['ldap_case_sensitive']);
 			$this->assertContains($result['ldap_jit_status'], $get_result['ldap_jit_status']);
 			$this->assertEquals($get_result['jit_provision_interval'], $result['jit_provision_interval']);
-			$this->assertEquals($get_result['ldap_userdirectoryid'], $result['ldap_userdirectoryid']);
 
 			// SAML fields.
 			$this->assertContains($result['saml_auth_enabled'], $get_result['saml_auth_enabled']);
@@ -299,12 +272,6 @@ class testAuthentication extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test valid default LDAP user directory' => [
-				'authentication' => [
-					'ldap_userdirectoryid' => 'userdirectory_1'
-				],
-				'expected_error' => null
-			],
 			'Test valid case sensitive for LDAP auth' => [
 				'authentication' => [
 					'ldap_case_sensitive' => ZBX_AUTH_CASE_SENSITIVE
@@ -340,10 +307,6 @@ class testAuthentication extends CAPITest {
 	 * @dataProvider authentication_update_data_valid
 	 */
 	public function testAuthentication_Update($authentication, $expected_error) {
-		if (array_key_exists('ldap_userdirectoryid', $authentication)) {
-			$authentication['ldap_userdirectoryid'] = self::$data[$authentication['ldap_userdirectoryid']];
-		}
-
 		if ($expected_error === null) {
 			// Before updating, collect old authentication data.
 			$fields = '';
