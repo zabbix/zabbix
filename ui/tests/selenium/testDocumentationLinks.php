@@ -117,7 +117,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath:(//button[@class="btn-widget-edit"])[1]'
+							'element' => 'xpath:(//button[contains(@class, "btn-widget-edit")])[1]'
 						]
 					]
 				]
@@ -687,7 +687,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath:(//button[@class="btn-widget-edit"])[1]'
+							'element' => 'xpath:(//button[contains(@class, "btn-widget-edit")])[1]'
 						]
 					],
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets'

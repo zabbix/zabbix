@@ -25,7 +25,7 @@
 
 $this->includeJsFile('administration.iconmap.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Icon mapping'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_ICONMAP_EDIT));
@@ -46,7 +46,7 @@ $form = (new CForm())
 		->setArgument('action', ($data['iconmapid'] != 0) ? 'iconmap.update' : 'iconmap.create')
 		->getUrl()
 	)
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', 1);
 
 if ($data['iconmapid'] != 0) {
@@ -162,4 +162,4 @@ else {
 
 $form->addItem($tab);
 
-$widget->addItem($form)->show();
+$html_page->addItem($form)->show();

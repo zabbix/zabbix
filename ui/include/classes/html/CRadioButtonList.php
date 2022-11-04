@@ -100,7 +100,7 @@ class CRadioButtonList extends CList {
 		return $this;
 	}
 
-	public function setModern($modern) {
+	public function setModern($modern = true) {
 		$this->modern = $modern;
 
 		return $this;

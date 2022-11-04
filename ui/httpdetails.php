@@ -181,7 +181,7 @@ $graph_time->insertFlickerfreeJs();
 CScreenBuilder::insertScreenStandardJs($graph_in->timeline);
 
 // Create graphs widget.
-$widget = (new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Details of web scenario').': '.$http_test_name)
 	->setWebLayoutMode($page['web_layout_mode'])
 	->setControls((new CTag('nav', true,

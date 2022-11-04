@@ -25,7 +25,7 @@
 
 $this->includeJsFile('administration.gui.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('GUI'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_GUI_EDIT));
@@ -149,13 +149,13 @@ $gui_view = (new CTabView())
 	));
 
 $form = (new CForm())
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'gui.update')
 		->getUrl()
 	)
 	->addItem($gui_view);
 
-$widget
+$html_page
 	->addItem($form)
 	->show();

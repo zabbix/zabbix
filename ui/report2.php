@@ -156,7 +156,7 @@ $triggerData = isset($_REQUEST['triggerid'])
 	])
 	: null;
 
-$reportWidget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Availability report'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORT2));
 
@@ -167,7 +167,7 @@ if ($triggerData) {
 	$triggerData['hostid'] = $host['hostid'];
 	$triggerData['hostname'] = $host['name'];
 
-	$reportWidget->setControls((new CTag('nav', true,
+	$html_page->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CLink($triggerData['hostname'], (new CUrl('report2.php'))
 				->setArgument('page', CPagerHelper::loadPage('report2.php', null))
@@ -180,7 +180,7 @@ if ($triggerData) {
 	$table = (new CTableInfo())
 		->addRow(new CImg('chart4.php?triggerid='.$_REQUEST['triggerid']));
 
-	$reportWidget->addItem(BR())
+	$html_page->addItem(BR())
 		->addItem($table)
 		->show();
 }
@@ -195,7 +195,7 @@ else {
 		->addOption(new CSelectOption(AVAILABILITY_REPORT_BY_HOST, _('By host')))
 		->addOption(new CSelectOption(AVAILABILITY_REPORT_BY_TEMPLATE, _('By trigger template')));
 
-	$reportWidget->setControls((new CForm('get'))
+	$html_page->setControls((new CForm('get'))
 		->cleanItems()
 		->setAttribute('aria-label', _('Main filter'))
 		->addItem((new CList())
@@ -494,7 +494,7 @@ else {
 	}
 	unset($trigger);
 
-	$reportWidget->addItem(
+	$html_page->addItem(
 		(new CFilter())
 			->setResetUrl(new CUrl('report2.php'))
 			->setProfile($data['filter']['timeline']['profileIdx'])
@@ -563,7 +563,7 @@ else {
 	);
 	zbx_add_post_js('timeControl.processObjects();');
 
-	$reportWidget
+	$html_page
 		->addItem([$triggerTable, $paging])
 		->show();
 }

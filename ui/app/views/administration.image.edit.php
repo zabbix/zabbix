@@ -25,7 +25,7 @@
 
 $this->includeJsFile('administration.image.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Images'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_IMAGE_EDIT));
@@ -34,7 +34,7 @@ $form = (new CForm('post', (new CUrl('zabbix.php'))
 		->setArgument('action', ($data['imageid'] == 0) ? 'image.create' : 'image.update')
 		->getUrl(), 'multipart/form-data')
 	)
-		->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
+		->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 		->addVar('imagetype', $data['imagetype']);
 
 if ($data['imageid'] != 0) {
@@ -103,4 +103,4 @@ else {
 	));
 }
 
-$widget->addItem($form->addItem($tab_view))->show();
+$html_page->addItem($form->addItem($tab_view))->show();

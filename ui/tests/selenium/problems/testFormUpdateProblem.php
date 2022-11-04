@@ -936,12 +936,12 @@ class testFormUpdateProblem extends CWebTest {
 		// Check Event details page.
 		$row->getColumn('Time')->query('tag:a')->waitUntilClickable()->one()->click();
 		$this->page->assertHeader('Event details');
-		$this->checkHistoryTable($this->query("xpath://div[@id=\"hat_eventactions_widget\"]//table")->asTable()->one(),
+		$this->checkHistoryTable($this->query("xpath://section[@id=\"hat_eventactions\"]//table")->asTable()->one(),
 				'User/Recipient', 'Action'
 		);
 
 		// Check Actions hint in Event list.
-		$event_list_table = $this->query('xpath://div[@id="hat_eventlist_widget"]//table')->asTable()->one();
+		$event_list_table = $this->query('xpath://section[@id="hat_eventlist"]//table')->asTable()->one();
 		$event_list_table->getRow(0)->getColumn('Actions')->query($unsuppress_button)->waitUntilClickable()->one()->click();
 		$hint->invalidate();
 		$this->checkHistoryTable($hint->query('class:list-table')->asTable()->one(), 'User', 'Action');

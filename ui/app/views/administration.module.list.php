@@ -19,11 +19,16 @@
 **/
 
 
+/**
+ * @var CView $this
+ * @var array $data
+ */
+
 if ($data['uncheck']) {
 	uncheckTableRows('modules');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Modules'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MODULE_LIST))
@@ -127,6 +132,6 @@ $form->addItem([
 ]);
 
 // append form to widget
-$widget->addItem($form);
+$html_page->addItem($form);
 
-$widget->show();
+$html_page->show();

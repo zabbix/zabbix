@@ -132,7 +132,7 @@ class CModule extends CApiService {
 	 *
 	 * @param array $modules
 	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException|JsonException
 	 */
 	private static function validateCreate(array &$modules): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
@@ -147,7 +147,7 @@ class CModule extends CApiService {
 		}
 
 		foreach ($modules as &$module) {
-			$module['config'] = json_encode($module['config']);
+			$module['config'] = json_encode($module['config'], JSON_THROW_ON_ERROR);
 		}
 		unset($module);
 	}
@@ -196,7 +196,7 @@ class CModule extends CApiService {
 	 * @param array      $modules
 	 * @param array|null $db_modules
 	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException|JsonException
 	 */
 	private static function validateUpdate(array &$modules, array &$db_modules = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['moduleid']], 'fields' => [
@@ -221,7 +221,7 @@ class CModule extends CApiService {
 
 		foreach ($modules as &$module) {
 			if (array_key_exists('config', $module)) {
-				$module['config'] = json_encode($module['config']);
+				$module['config'] = json_encode($module['config'], JSON_THROW_ON_ERROR);
 			}
 		}
 		unset($module);

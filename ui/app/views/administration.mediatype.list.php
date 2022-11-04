@@ -27,7 +27,7 @@ if ($data['uncheck']) {
 	uncheckTableRows('mediatype');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Media types'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_LIST))
 	->setControls((new CTag('nav', true,
@@ -201,4 +201,6 @@ $mediaTypeForm->addItem([
 ]);
 
 // append form to widget
-$widget->addItem($mediaTypeForm)->show();
+$html_page
+	->addItem($mediaTypeForm)
+	->show();
