@@ -30,8 +30,8 @@ require_once dirname(__FILE__).'/../common/testFormGraphs.php';
  */
 class testFormGraphPrototype extends testFormGraphs {
 
-	public $prototype = true;
-	public $url = 'graphs.php?parent_discoveryid='.self::LLDID.'&context=host';
+	protected $prototype = true;
+	protected $url = 'graphs.php?parent_discoveryid='.self::LLDID.'&context=host';
 
 	public function prepareGraphPrototypesData() {
 		self::$update_graph = 'Graph for update';
@@ -67,11 +67,6 @@ class testFormGraphPrototype extends testFormGraphs {
 			$field = 'graph_prototype_trap_'.$suffix;
 			self::$items[$field]['itemid'] = $item_prototype_ids[$field];
 		}
-//
-//		self::$items['graph_prototype_trap_int']['itemid'] = $item_prototype_ids['graph_prototype_trap_int'];
-//		self::$items['graph_prototype_trap_float']['itemid'] = $item_prototype_ids['graph_prototype_trap_float'];
-//		self::$items['graph_prototype_trap_text']['itemid'] = $item_prototype_ids['graph_prototype_trap_text'];
-//		self::$items['graph_prototype_trap_char']['itemid'] = $item_prototype_ids['graph_prototype_trap_char'];
 
 		// Create graphs with previously created items.
 		$prepared_graph_prototypes = [

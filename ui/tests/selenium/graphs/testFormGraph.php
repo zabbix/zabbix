@@ -30,7 +30,7 @@ require_once dirname(__FILE__).'/../common/testFormGraphs.php';
  */
 class testFormGraph extends testFormGraphs {
 
-	public $url = 'graphs.php?filter_set=1&filter_hostids%5B0%5D='.self::HOSTID.'&context=host';
+	protected $url = 'graphs.php?filter_set=1&filter_hostids%5B0%5D='.self::HOSTID.'&context=host';
 
 	public function prepareGraphsData() {
 		self::$update_graph = 'Graph for update';
