@@ -26,6 +26,9 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  */
 class testAuthentication extends CAPITest {
 
+	/**
+	 * @onBefore  prepareTestData
+	 */
 	public static function authentication_get_data() {
 		error_log('calling authentication_get_data:::');
 
@@ -71,8 +74,6 @@ class testAuthentication extends CAPITest {
 	}
 
 	/**
-	 * @onBefore  prepareTestData
-	 *
 	 * @dataProvider authentication_get_data
 	 */
 	public function testAuthentication_Get($authentication, $get_result, $expected_error) {
@@ -101,6 +102,7 @@ class testAuthentication extends CAPITest {
 			$this->assertContains($result['ldap_case_sensitive'], $get_result['ldap_case_sensitive']);
 			$this->assertContains($result['ldap_jit_status'], $get_result['ldap_jit_status']);
 			$this->assertEquals($get_result['jit_provision_interval'], $result['jit_provision_interval']);
+			error_log(json_encode(['test:::', $get_result['ldap_userdirectoryid'], $result['ldap_userdirectoryid']]));
 			$this->assertEquals($get_result['ldap_userdirectoryid'], $result['ldap_userdirectoryid']);
 
 			// SAML fields.
@@ -385,19 +387,19 @@ class testAuthentication extends CAPITest {
 	/**
 	 * Prepare data for tests. Create user, group, userdirectory.
 	 */
-	public static function prepareTestData() {
-		error_log('calling prepareTestData:::');
-
+	public function prepareTestData() {
 		if (self::$data['userdirectory_1'] !== null) {
 			return;
 		}
+
+		error_log('calling prepareTestData:::');
 
 		// Create LDAP user directory.
 		$response = CDataHelper::call('userdirectory.create', [[
 			'name' => 'Default LDAP',
 			'idp_type' => IDP_TYPE_LDAP,
-			'host' => 'ldap.forumsys.com',
 			'port' => 389,
+			'host' => 'ldap.forumsys.com',
 			'base_dn' => 'dc=example,dc=com',
 			'search_attribute' => 'uid'
 		]]);
