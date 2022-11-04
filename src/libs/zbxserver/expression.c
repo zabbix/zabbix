@@ -4861,7 +4861,6 @@ void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const z
 
 	zbx_vector_uint64_create(&itemids_sorted);
 	zbx_vector_uint64_append_array(&itemids_sorted, itemids, item_num);
-	zbx_vector_uint64_sort(&itemids_sorted, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_ptr_create(&triggers_func_pos);
 	zbx_vector_ptr_reserve(&triggers_func_pos, trigger_order->values_num);
