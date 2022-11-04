@@ -880,8 +880,8 @@ class testFormGraphs extends CWebTest {
 			}
 
 			// Check lines color.
-			$item_row->assertEquals($data['items'][0]['color'],
-					$this->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->getValue()
+			$this->assertEquals($data['items'][0]['color'],
+					$item_row->query('xpath:.//div[@class="color-picker"]')->asColorPicker()->one()->getValue()
 			);
 		}
 	}
