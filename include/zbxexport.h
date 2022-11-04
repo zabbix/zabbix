@@ -21,14 +21,27 @@
 #define ZABBIX_EXPORT_H
 
 #include "zbxsysinc.h"
+#include "zbxtypes.h"
 
 #define ZBX_FLAG_EXPTYPE_EVENTS		1
 #define ZBX_FLAG_EXPTYPE_HISTORY	2
 #define ZBX_FLAG_EXPTYPE_TRENDS		4
 
+typedef struct
+{
+	char		*dir;
+	char		*type;
+	zbx_uint64_t	file_size;
+} zbx_config_export_t;
+
+zbx_config_export_t*	zbx_config_export_new(void);
+void			zbx_config_export_free(zbx_config_export_t *zbx_config_export);
+
+int	zbx_init_library_export(zbx_config_export_t *zbx_config_export, char **error);
+
 int	zbx_validate_export_type(char *export_type, uint32_t *export_mask);
 int	zbx_is_export_enabled(uint32_t flags);
-int	zbx_export_init(char **error);
+int	zbx_has_export_dir(void);
 
 void	zbx_problems_export_init(const char *process_name, int process_num);
 void	zbx_problems_export_write(const char *buf, size_t count);
