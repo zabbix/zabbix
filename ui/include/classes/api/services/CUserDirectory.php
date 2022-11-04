@@ -785,7 +785,7 @@ class CUserDirectory extends CApiService {
 	private static function checkProvisionGroups(array $userdirectories, array $db_userdirectories = null): void {
 		$roleids = [];
 		$usrgrpids = [];
-		foreach ($userdirectories as $i => $userdirectory) {
+		foreach (array_values($userdirectories) as $i => $userdirectory) {
 			$db_userdir = $db_userdirectories ? $db_userdirectories[$userdirectory['userdirectoryid']] : null;
 
 			if ($userdirectory['provision_status'] == JIT_PROVISIONING_DISABLED) {
@@ -793,7 +793,7 @@ class CUserDirectory extends CApiService {
 			}
 			elseif ($db_userdir && $db_userdir['provision_status'] != $userdirectory['provision_status']
 					&& !array_key_exists('provision_groups', $userdirectory)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.$i,
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
 					_s('the parameter "%1$s" is missing', 'provision_groups')
 				));
 			}
