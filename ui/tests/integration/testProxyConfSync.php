@@ -1530,6 +1530,19 @@ class testProxyConfSync extends CIntegrationTest
 
 		$this->loadInitialConfiguration();
 
+		$response = $this->call('host.get', [
+			'output' => 'extend'
+		]);
+		var_dump($response);
+		$response = $this->call('item.get', [
+			'output' => 'extend'
+		]);
+		var_dump($response);
+		$response = $this->call('trigger.get', [
+			'output' => 'extend'
+		]);
+		var_dump($response);
+
 		self::startComponent(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
 		self::startComponent(self::COMPONENT_PROXY);
