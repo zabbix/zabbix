@@ -1000,6 +1000,14 @@ class testProxyConfSync extends CIntegrationTest
 	 */
 	public function prepareData()
 	{
+		$this->purgeExisting('host', 'hostids');
+		$this->purgeExisting('proxy', 'extend');
+		$this->purgeExisting('template', 'templateids');
+		$this->purgeExisting('item', 'itemids');
+		$this->purgeExisting('trigger', 'triggerids');
+		$this->purgeExisting('regexp', 'extend');
+		$this->purgeHostGroups();
+		$this->purgeGlobalMacros();
 		return true;
 	}
 
@@ -1531,14 +1539,6 @@ class testProxyConfSync extends CIntegrationTest
 		$this->loadInitialConfiguration();
 
 		$response = $this->call('host.get', [
-			'output' => 'extend'
-		]);
-		var_dump($response);
-		$response = $this->call('item.get', [
-			'output' => 'extend'
-		]);
-		var_dump($response);
-		$response = $this->call('trigger.get', [
 			'output' => 'extend'
 		]);
 		var_dump($response);
