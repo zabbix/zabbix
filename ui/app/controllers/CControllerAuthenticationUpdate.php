@@ -26,8 +26,8 @@ class CControllerAuthenticationUpdate extends CController {
 	 */
 	private $response;
 
-	private const PROVISION_ENABLED_FIELDS = ['group_basedn', 'group_member', 'group_membership', 'user_username',
-		'user_lastname', 'provision_groups', 'provision_media'
+	private const PROVISION_ENABLED_FIELDS = ['group_basedn', 'group_member', 'group_membership',  'group_name',
+		'user_username', 'user_lastname', 'uer_ref_attr', 'provision_groups', 'provision_media'
 	];
 
 	protected function init() {
@@ -263,9 +263,7 @@ class CControllerAuthenticationUpdate extends CController {
 		try {
 			DBstart();
 
-			$result = $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED
-				? $this->processSamlConfiguration()
-				: $this->removeSamlUserDirectory();
+			$result = $this->processSamlConfiguration();
 
 			$ldap_userdirectoryid = 0;
 			if ($result) {
@@ -443,7 +441,7 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function processSamlConfiguration(): bool {
-		$saml_fields = [
+		$saml_data = [
 			'idp_entityid' => '',
 			'sso_url' => '',
 			'slo_url' => '',
@@ -457,39 +455,33 @@ class CControllerAuthenticationUpdate extends CController {
 			'sign_logout_responses' => 0,
 			'encrypt_nameid' => 0,
 			'encrypt_assertions' => 0,
-			'saml_provision_status' => JIT_PROVISIONING_DISABLED,
-			'saml_group_name' => '',
-			'saml_user_username' => '',
-			'saml_user_lastname' => '',
-			'saml_provision_groups' => [],
-			'saml_provision_media' => [],
+			'provision_status' => JIT_PROVISIONING_DISABLED,
 			'scim_status' => ZBX_AUTH_SCIM_PROVISIONING_DISABLED,
 		];
+		$this->getInputs($saml_data, array_keys($saml_data));
 
-		$this->getInputs($saml_fields, array_keys($saml_fields));
-
-		$saml_data = [
-			'idp_type' => IDP_TYPE_SAML,
-			'group_name' => $saml_fields['saml_group_name'],
-			'user_username' => $saml_fields['saml_user_username'],
-			'user_lastname' => $saml_fields['saml_user_lastname'],
-			'provision_status' => $saml_fields['saml_provision_status'],
-			'provision_groups' => $saml_fields['saml_provision_groups'],
-			'provision_media' => $saml_fields['saml_provision_media']
-		];
-
-		unset($saml_fields['saml_group_name'], $saml_fields['saml_user_username'], $saml_fields['saml_user_lastname'],
-			$saml_fields['saml_provision_groups'], $saml_fields['saml_provision_media'],
-			$saml_fields['saml_provision_status']
-		);
-
-		$saml_data += $saml_fields;
-
-		if (!array_key_exists('provision_status', $saml_data)
-				|| $saml_data['provision_status'] != JIT_PROVISIONING_ENABLED) {
-			$saml_data = array_diff_key($saml_data, array_flip(self::PROVISION_ENABLED_FIELDS));
+		if ($this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
+			$provisioning_fields = [
+				'saml_provision_status' => JIT_PROVISIONING_ENABLED,
+				'saml_group_name' => '',
+				'saml_user_username' => '',
+				'saml_user_lastname' => '',
+				'saml_provision_groups' => [],
+				'saml_provision_media' => [],
+			];
+			$this->getInputs($provisioning_fields, array_keys($provisioning_fields));
+			$provisioning_fields = CArrayHelper::renameKeys($provisioning_fields, [
+				'saml_group_name' => 'group_name',
+				'saml_user_username' => 'user_username',
+				'saml_user_lastname' => 'user_lastname',
+				'saml_provision_status' => 'provision_status',
+				'saml_provision_groups' => 'provision_groups',
+				'saml_provision_media' => 'provision_media'
+			]);
+			$saml_data = array_merge($saml_data, $provisioning_fields);
 		}
 
+		$saml_data['idp_type'] = IDP_TYPE_SAML;
 		$db_saml = API::UserDirectory()->get([
 			'output' => ['userdirectoryid'],
 			'filter' => ['idp_type' => IDP_TYPE_SAML]
@@ -569,16 +561,5 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		return true;
-	}
-
-	private function removeSamlUserDirectory(): bool {
-		$db_saml = API::UserDirectory()->get([
-			'output' => ['userdirectoryid'],
-			'filter' => ['idp_type' => IDP_TYPE_SAML]
-		]);
-
-		return $db_saml
-			? (bool) API::UserDirectory()->delete([$db_saml[0]['userdirectoryid']])
-			: true;
 	}
 }

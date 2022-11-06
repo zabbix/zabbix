@@ -639,7 +639,7 @@ class CUserDirectory extends CApiService {
 		foreach ($userdirectories as &$userdirectory) {
 			if ($userdirectory['provision_status'] == JIT_PROVISIONING_DISABLED) {
 				$empty_provision_fields = array_fill_keys(['group_basedn', 'group_member', 'group_membership',
-					'user_username', 'user_lastname', 'user_ref_attr'], ''
+					'group_name', 'user_username', 'user_lastname', 'user_ref_attr'], ''
 				);
 				$empty_provision_fields['provision_groups'] = [];
 				$empty_provision_fields['provision_media'] = [];
@@ -1391,7 +1391,7 @@ class CUserDirectory extends CApiService {
 											'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 											'attribute' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')]
 										]],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
 			'provision_groups' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
@@ -1401,7 +1401,7 @@ class CUserDirectory extends CApiService {
 												'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 											]]
 										]],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]]
 		]];
 

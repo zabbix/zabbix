@@ -22,8 +22,8 @@
 /**
  * @var CView $this
  */
-?>
 
+?>
 <script>
 	const view = new class {
 
@@ -34,7 +34,7 @@
 		}
 
 		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
-				saml_provision_media
+				saml_provision_media, templates
 		}) {
 			this.form = document.getElementById('authentication-form');
 			this.db_authentication_type = db_authentication_type;
@@ -42,55 +42,76 @@
 			this.saml_provision_groups_table = document.getElementById('saml-group-table');
 			this.saml_media_type_mapping_table = document.getElementById('saml-media-type-mapping-table');
 			this.ldap_jit_status = document.getElementById('ldap_jit_status');
+			this.ldap_servers_table = document.getElementById('ldap-servers');
+			this.templates = templates;
+			this.ldap_provisioning_fields = this.form.querySelectorAll(
+				'[name="ldap_jit_status"],[name="ldap_case_sensitive"],[name="jit_provision_interval"]'
+			);
+			const saml_readonly = !this.form.querySelector('[name="saml_auth_enabled"]').checked;
+			const ldap_readonly = !this.form.querySelector('[name="ldap_auth_enabled"]').checked;
 
 			this._addEventListeners();
 			this._addLdapServers(ldap_servers, ldap_default_row_index);
+			this._setTableVisiblityState(this.ldap_servers_table, ldap_readonly);
+			this._disableRemoveLdapServersWithUserGroups();
 			this._renderProvisionGroups(saml_provision_groups);
+			this._setTableVisiblityState(this.saml_provision_groups_table, saml_readonly);
 			this._renderProvisionMedia(saml_provision_media);
-
-			this.toggleSamlJitProvisioning(this.saml_provision_status.checked);
-
-			if (document.getElementById('saml_auth_enabled') !== null
-					&& !document.getElementById('saml_auth_enabled').checked) {
-				this.disableTable(this.saml_provision_groups_table);
-				this.disableTable(this.saml_media_type_mapping_table);
-			}
+			this._setTableVisiblityState(this.saml_media_type_mapping_table, saml_readonly);
 		}
 
 		_addEventListeners() {
-			document
-				.getElementById('ldap-servers')
-				.addEventListener('click', (e) => {
-					if (e.target.classList.contains('js-add')) {
-						this.editLdapServer();
-					}
-					else if (e.target.classList.contains('js-edit')) {
-						this.editLdapServer(e.target.closest('tr'));
-					}
-					else if (e.target.classList.contains('js-remove')) {
-						const table = e.target.closest('table');
-						const userdirectoryid_input = e.target.closest('tr')
-							.querySelector('input[name$="[userdirectoryid]"]');
+			this.ldap_servers_table.addEventListener('click', (e) => {
+				if (e.target.classList.contains('disabled')) {
+					return;
+				}
+				else if (e.target.classList.contains('js-add')) {
+					this.editLdapServer();
+				}
+				else if (e.target.classList.contains('js-edit')) {
+					this.editLdapServer(e.target.closest('tr'));
+				}
+				else if (e.target.classList.contains('js-remove')) {
+					const table = e.target.closest('table');
+					const userdirectoryid_input = e.target.closest('tr')
+						.querySelector('input[name$="[userdirectoryid]"]');
 
-						if (userdirectoryid_input !== null) {
-							const input = document.createElement('input');
-							input.type = 'hidden';
-							input.name = 'ldap_removed_userdirectoryids[]';
-							input.value = userdirectoryid_input.value;
-							this.form.appendChild(input);
+					if (userdirectoryid_input !== null) {
+						const input = document.createElement('input');
+						input.type = 'hidden';
+						input.name = 'ldap_removed_userdirectoryids[]';
+						input.value = userdirectoryid_input.value;
+						this.form.appendChild(input);
+					}
+
+					e.target.closest('tr').remove();
+
+					if (table.querySelector('input[name="ldap_default_row_index"]:checked') === null) {
+						const default_ldap = table.querySelector('input[name="ldap_default_row_index"]');
+
+						if (default_ldap !== null) {
+							default_ldap.checked = true;
 						}
-
-						e.target.closest('tr').remove();
-
-						if (table.querySelector('input[name="ldap_default_row_index"]:checked') === null) {
-							const default_ldap = table.querySelector('input[name="ldap_default_row_index"]');
-
-							if (default_ldap !== null) {
-								default_ldap.checked = true;
-							}
-						}
 					}
-				});
+				}
+			});
+
+			this.ldap_jit_status.addEventListener('change', (e) =>
+				this.form.querySelector('[name="jit_provision_interval"]')
+					.toggleAttribute('readonly', !e.target.checked)
+			);
+
+			this.form.querySelector('[type="checkbox"][name="ldap_auth_enabled"]').addEventListener('change', (e) => {
+				const is_readonly = !e.target.checked;
+
+				this.ldap_provisioning_fields.forEach(field => field.toggleAttribute('readonly', is_readonly));
+				this._setTableVisiblityState(this.ldap_servers_table, is_readonly);
+				this._disableRemoveLdapServersWithUserGroups();
+
+				if (!is_readonly && !this.ldap_jit_status.checked) {
+					this.form.querySelector('[name="jit_provision_interval"]').toggleAttribute('readonly', true);
+				}
+			});
 
 			document.getElementById('http_auth_enabled').addEventListener('change', (e) => {
 				this.form.querySelectorAll('[name^=http_]').forEach(field => {
@@ -100,31 +121,20 @@
 				});
 			});
 
-			if (document.getElementById('saml_auth_enabled') !== null) {
-				document.getElementById('saml_auth_enabled').addEventListener('change', (e) => {
-					this.form.querySelectorAll('.saml-enabled').forEach(field => {
-						field.disabled = !e.target.checked;
-					});
+			document.getElementById('saml_auth_enabled').addEventListener('change', (e) => {
+				const is_readonly = !e.target.checked;
 
-					if (e.target.checked) {
-						this.enableTable(this.saml_provision_groups_table);
-						this.enableTable(this.saml_media_type_mapping_table);
-					}
-					else {
-						this.disableTable(this.saml_provision_groups_table);
-						this.disableTable(this.saml_media_type_mapping_table);
-					}
-				});
-			}
-
-			this.saml_provision_status.addEventListener('change', (e) => {
-				this.toggleSamlJitProvisioning(e.target.checked);
+				this.form.querySelectorAll('.saml-enabled').forEach(field =>
+					field.toggleAttribute('readonly', is_readonly)
+				);
+				this._setTableVisiblityState(this.saml_provision_groups_table, is_readonly);
+				this._setTableVisiblityState(this.saml_media_type_mapping_table, is_readonly);
 			});
 
-			this.ldap_jit_status.addEventListener('change', (e) => {
-				this.form.querySelectorAll('.ldap-jit-status').forEach(field => {
-					field.disabled = !e.target.checked;
-				});
+			this.saml_provision_status.addEventListener('change', (e) => {
+				this.form.querySelectorAll('.saml-provision-status').forEach(field =>
+					field.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !e.target.checked)
+				);
 			});
 
 			this.saml_provision_groups_table.addEventListener('click', (e) => {
@@ -165,18 +175,6 @@
 			});
 		}
 
-		enableTable(table) {
-			table.querySelectorAll('button').forEach(button => {
-				button.disabled = false;
-			});
-		}
-
-		disableTable(table) {
-			table.querySelectorAll('button').forEach(button => {
-				button.disabled = true;
-			});
-		}
-
 		_authFormSubmit() {
 			const fields_to_trim = ['#http_strip_domains', '#saml_idp_entityid', '#saml_sso_url', '#saml_slo_url',
 				'#saml_username_attribute', '#saml_sp_entityid', '#saml_nameid_format'
@@ -198,10 +196,14 @@
 				ldap.row_index = row_index;
 				ldap.is_default = (ldap.row_index == ldap_default_row_index) ? 'checked' : '';
 
-				document
-					.querySelector('#ldap-servers tbody')
+				this.ldap_servers_table
+					.querySelector('tbody')
 					.appendChild(this._prepareServerRow(ldap));
 			}
+		}
+
+		_disableRemoveLdapServersWithUserGroups() {
+			this.form.querySelectorAll('[data-disable_remove] .js-remove').forEach(field => field.disabled = true);
 		}
 
 		_renderProvisionGroups(saml_provision_groups) {
@@ -222,6 +224,14 @@
 					.querySelector('tbody')
 					.appendChild(this._renderProvisionMediaRow(saml_media));
 			}
+		}
+
+		_setTableVisiblityState(table, readonly) {
+			table.classList.toggle('disabled', readonly);
+			table.querySelectorAll('a,input,button').forEach(node => {
+				node.toggleAttribute('disabled', readonly);
+				node.classList.toggle('disabled', readonly);
+			});
 		}
 
 		editSamlProvisionGroup(row = null) {
@@ -428,8 +438,8 @@
 						: '';
 					ldap.usrgrps = 0;
 
-					document
-						.querySelector('#ldap-servers tbody')
+					this.ldap_servers_table
+						.querySelector('tbody')
 						.appendChild(this._prepareServerRow(ldap));
 				}
 				else {
@@ -445,10 +455,12 @@
 		}
 
 		_prepareServerRow(ldap) {
-			const template_ldap_server_row = new Template(this._templateLdapServerRow());
+			const template_ldap_server_row = new Template(this.templates.ldap_servers_row);
 			const template = document.createElement('template');
 			template.innerHTML = template_ldap_server_row.evaluate(ldap).trim();
 			const row = template.content.firstChild;
+
+			row.querySelector('[name="ldap_default_row_index"]').toggleAttribute('checked', ldap.is_default);
 
 			if ('provision_groups' in ldap) {
 				for (const [group_index, provision_group] of Object.entries(ldap.provision_groups)) {
@@ -498,6 +510,7 @@
 
 			if (ldap.usrgrps > 0) {
 				row.querySelector('.js-remove').disabled = true;
+				row.dataset.disable_remove = true;
 			}
 
 			return row;
@@ -509,7 +522,7 @@
 				: '';
 
 			const template = document.createElement('template');
-			const template_saml_group_row = new Template(this._templateProvisionGroupRow());
+			const template_saml_group_row = new Template(this.templates.saml_provisioning_group_row);
 			template.innerHTML = template_saml_group_row.evaluate(saml_provision_group).trim();
 			const row = template.content.firstChild;
 
@@ -537,91 +550,12 @@
 		}
 
 		_renderProvisionMediaRow(saml_media) {
-			const template_saml_media_mapping_row = new Template(this._templateProvisionMediaRow());
+			const template_saml_media_mapping_row = new Template(this.templates.saml_provisioning_media_row);
 			const template = document.createElement('template');
 
 			template.innerHTML = template_saml_media_mapping_row.evaluate(saml_media).trim();
 
 			return template.content.firstChild;
-		}
-
-		_templateLdapServerRow() {
-			return `
-				<tr data-row_index="#{row_index}">
-					<td>
-						<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
-						<input type="hidden" name="ldap_servers[#{row_index}][userdirectoryid]" value="#{userdirectoryid}">
-						<input type="hidden" name="ldap_servers[#{row_index}][name]" value="#{name}">
-						<input type="hidden" name="ldap_servers[#{row_index}][host]" value="#{host}">
-						<input type="hidden" name="ldap_servers[#{row_index}][port]" value="#{port}">
-						<input type="hidden" name="ldap_servers[#{row_index}][base_dn]" value="#{base_dn}">
-						<input type="hidden" name="ldap_servers[#{row_index}][search_attribute]" value="#{search_attribute}">
-						<input type="hidden" name="ldap_servers[#{row_index}][search_filter]" value="#{search_filter}">
-						<input type="hidden" name="ldap_servers[#{row_index}][start_tls]" value="#{start_tls}">
-						<input type="hidden" name="ldap_servers[#{row_index}][bind_dn]" value="#{bind_dn}">
-						<input type="hidden" name="ldap_servers[#{row_index}][bind_password]" value="#{bind_password}">
-						<input type="hidden" name="ldap_servers[#{row_index}][description]" value="#{description}">
-						<input type="hidden" name="ldap_servers[#{row_index}][provision_status]" value="#{provision_status}">
-						<input type="hidden" name="ldap_servers[#{row_index}][group_basedn]" value="#{group_basedn}">
-						<input type="hidden" name="ldap_servers[#{row_index}][group_name]" value="#{group_name}">
-						<input type="hidden" name="ldap_servers[#{row_index}][group_member]" value="#{group_member}">
-						<input type="hidden" name="ldap_servers[#{row_index}][user_ref_attr]" value="#{user_ref_attr}">
-						<input type="hidden" name="ldap_servers[#{row_index}][group_filter]" value="#{group_filter}">
-						<input type="hidden" name="ldap_servers[#{row_index}][group_membership]" value="#{group_membership}">
-						<input type="hidden" name="ldap_servers[#{row_index}][user_username]" value="#{user_username}">
-						<input type="hidden" name="ldap_servers[#{row_index}][user_lastname]" value="#{user_lastname}">
-					</td>
-					<td class="wordbreak">#{host}</td>
-					<td class="js-ldap-usergroups">#{usrgrps}</td>
-					<td>
-						<input type="radio" name="ldap_default_row_index" value="#{row_index}" #{is_default} class="<?= ZBX_STYLE_CHECKBOX_RADIO ?>">
-						<label for="ldap_default_row_index" class="checkboxLikeLabel" style="height: 16px;width: 16px;"><span></span></label>
-					</td>
-					<td>
-						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-					</td>
-				</tr>
-			`;
-		}
-
-		_templateProvisionGroupRow() {
-			return `
-				<tr data-row_index="#{row_index}">
-					<td>
-						<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
-						<input type="hidden" name="saml_provision_groups[#{row_index}][name]" value="#{name}">
-					</td>
-					<td class="wordbreak">#{user_group_names}</td>
-					<td class="wordbreak">#{role_name}</td>
-					<td>
-						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-					</td>
-				</tr>
-			`;
-		}
-
-		_templateProvisionMediaRow() {
-			return `
-				<tr data-row_index="#{row_index}">
-					<td>
-						<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
-						<input type="hidden" name="saml_provision_media[#{row_index}][name]" value="#{name}">
-						<input type="hidden" name="saml_provision_media[#{row_index}][mediatypeid]" value="#{mediatypeid}">
-						<input type="hidden" name="saml_provision_media[#{row_index}][attribute]" value="#{attribute}">
-					</td>
-					<td class="wordbreak">#{mediatype_name}</td>
-					<td class="wordbreak">#{attribute}</td>
-					<td>
-						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-					</td>
-				</tr>
-			`;
-		}
-
-		toggleSamlJitProvisioning(checked) {
-			for (const element of this.form.querySelectorAll('.saml-provision-status')) {
-				element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
-			}
 		}
 	};
 </script>
