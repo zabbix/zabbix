@@ -1008,6 +1008,7 @@ class testProxyConfSync extends CIntegrationTest
 		$this->purgeExisting('regexp', 'extend');
 		$this->purgeHostGroups();
 		$this->purgeGlobalMacros();
+
 		return true;
 	}
 
@@ -1172,7 +1173,6 @@ class testProxyConfSync extends CIntegrationTest
 		}
 
 		$response = $this->call($method . '.delete', $ids);
-		var_dump($response);
 	}
 
 	private function createGlobalMacros()
@@ -1537,11 +1537,6 @@ class testProxyConfSync extends CIntegrationTest
 		$this->purgeGlobalMacros();
 
 		$this->loadInitialConfiguration();
-
-		$response = $this->call('host.get', [
-			'output' => 'extend'
-		]);
-		var_dump($response);
 
 		self::startComponent(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
