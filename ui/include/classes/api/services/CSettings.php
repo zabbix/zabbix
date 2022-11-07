@@ -169,7 +169,7 @@ class CSettings extends CApiService {
 	 * @return array
 	 */
 	protected function validateUpdate(array &$settings): array {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'default_theme' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => implode(',', array_keys(APP::getThemes()))],
 			'search_limit' =>					['type' => API_INT32, 'in' => '1:999999'],
 			'max_in_table' =>					['type' => API_INT32, 'in' => '1:99999'],
@@ -204,7 +204,7 @@ class CSettings extends CApiService {
 			'ok_ack_style' =>					['type' => API_INT32, 'in' => '0,1'],
 			'discovery_groupid' =>				['type' => API_ID],
 			'default_inventory_mode' =>			['type' => API_INT32, 'in' => HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC],
-			'alert_usrgrpid' =>					['type' => API_ID, 'flags' => API_ALLOW_NULL],
+			'alert_usrgrpid' =>					['type' => API_ID],
 			'snmptrap_logging' =>				['type' => API_INT32, 'in' => '0,1'],
 			'default_lang' =>					['type' => API_STRING_UTF8, 'in' => implode(',', array_keys(getLocales()))],
 			'default_timezone' =>				['type' => API_STRING_UTF8, 'in' => ZBX_DEFAULT_TIMEZONE.','.implode(',', array_keys(CTimezoneHelper::getList()))],
@@ -249,7 +249,7 @@ class CSettings extends CApiService {
 			}
 		}
 
-		if (array_key_exists('alert_usrgrpid', $settings) && $settings['alert_usrgrpid'] !== null) {
+		if (array_key_exists('alert_usrgrpid', $settings) && $settings['alert_usrgrpid'] != 0) {
 			$db_usrgrp_exists = API::UserGroup()->get([
 				'countOutput' => true,
 				'usrgrpids' => $settings['alert_usrgrpid']

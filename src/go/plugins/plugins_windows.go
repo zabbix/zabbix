@@ -31,7 +31,6 @@ import (
 	_ "zabbix.com/plugins/net/tcp"
 	_ "zabbix.com/plugins/net/udp"
 	_ "zabbix.com/plugins/oracle"
-	_ "zabbix.com/plugins/postgres"
 	_ "zabbix.com/plugins/proc"
 	_ "zabbix.com/plugins/redis"
 	_ "zabbix.com/plugins/smart"

@@ -761,15 +761,6 @@ function copyItems($srcHostId, $dstHostId, $assign_opt_interface = false) {
 	return true;
 }
 
-function get_item_by_itemid($itemid) {
-	$db_items = DBfetch(DBselect('SELECT i.* FROM items i WHERE i.itemid='.zbx_dbstr($itemid)));
-	if ($db_items) {
-		return $db_items;
-	}
-	error(_s('No item with item ID "%1$s".', $itemid));
-	return false;
-}
-
 /**
  * Description:
  * Replace items for specified host

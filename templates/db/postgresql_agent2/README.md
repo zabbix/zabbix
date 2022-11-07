@@ -95,7 +95,7 @@ There are no template links in this template.
 |PostgreSQL |Archive: Count of files in archive_status need to archive |<p>-</p> |DEPENDENT |pgsql.archive.count_files_to_archive<p>**Preprocessing**:</p><p>- JSONPATH: `$.count_files`</p> |
 |PostgreSQL |Archive: Count of files need to archive |<p>Size of files to archive</p> |DEPENDENT |pgsql.archive.size_files_to_archive<p>**Preprocessing**:</p><p>- JSONPATH: `$.size_files`</p> |
 |PostgreSQL |Dbstat: Blocks read time |<p>Time spent reading data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.sum.blk_read_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.blk_read_time`</p><p>- MULTIPLIER: `0.001`</p> |
-|PostgreSQL |Dbstat: Blocks write time |<p>Time spent writing data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.sum.blk_write_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.blk_read_time`</p><p>- MULTIPLIER: `0.001`</p> |
+|PostgreSQL |Dbstat: Blocks write time |<p>Time spent writing data file blocks by backends, in milliseconds</p> |DEPENDENT |pgsql.dbstat.sum.blk_write_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.blk_write_time`</p><p>- MULTIPLIER: `0.001`</p> |
 |PostgreSQL |Dbstat: Checksum failures |<p>Number of data page checksum failures detected (or on a shared object), or NULL if data checksums are not enabled. This metric included in PostgreSQL 12</p> |DEPENDENT |pgsql.dbstat.sum.checksum_failures.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.checksum_failures`</p><p>- MATCHES_REGEX: `^\d*$`</p><p>- CHANGE_PER_SECOND</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> -1`</p> |
 |PostgreSQL |Dbstat: Committed transactions |<p>Number of transactions that have been committed</p> |DEPENDENT |pgsql.dbstat.sum.xact_commit.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.xact_commit`</p><p>- CHANGE_PER_SECOND</p> |
 |PostgreSQL |Dbstat: Conflicts |<p>Number of queries canceled due to conflicts with recovery.  (Conflicts occur only on standby servers; see pg_stat_database_conflicts for details.)</p> |DEPENDENT |pgsql.dbstat.sum.conflicts.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.conflicts`</p><p>- CHANGE_PER_SECOND</p> |
@@ -186,12 +186,14 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
+|Dbstat: Checksum failures detected |<p>Data page checksum failures were detected on that DB instance.</p><p>https://www.postgresql.org/docs/current/checksums.html</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.sum.checksum_failures.rate)>0` |AVERAGE | |
 |Connections sum: Total number of connections is too high |<p>-</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.connections.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}` |AVERAGE | |
 |PostgreSQL: Oldest xid is too big |<p>-</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.oldest.xid["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]) > 18000000` |AVERAGE | |
 |PostgreSQL: Service has been restarted |<p>-</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]) < 600` |AVERAGE | |
 |PostgreSQL: Service is down |<p>-</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.ping["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"])=0` |HIGH | |
 |DB {#DBNAME}: Too many recovery conflicts |<p>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.</p><p>https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}` |AVERAGE | |
 |DB {#DBNAME}: Deadlock occurred |<p>-</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}` |HIGH | |
+|DB {#DBNAME}: Checksum failures detected |<p>Data page checksum failures were detected on that database.</p><p>https://www.postgresql.org/docs/current/checksums.html</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.checksum_failures.rate["{#DBNAME}"])>0` |AVERAGE | |
 |DB {#DBNAME}: Too many slow queries |<p>-</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}` |WARNING | |
 
 ## Feedback

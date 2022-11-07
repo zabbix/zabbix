@@ -525,6 +525,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					'description', 'status', 'discover', 'tags'
 				], true);
 
+				if ($db_item['type'] != ITEM_TYPE_HTTPAGENT) {
+					$allowed_fields += array_fill_keys([
+						'authtype', 'username', 'password', 'params', 'publickey', 'privatekey', 'interfaceid'
+					], true);
+				}
+
 				foreach ($item as $field => $value) {
 					if (!array_key_exists($field, $allowed_fields)) {
 						unset($item[$field]);

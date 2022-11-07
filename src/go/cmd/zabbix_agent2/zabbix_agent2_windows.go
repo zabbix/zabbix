@@ -26,11 +26,16 @@ import (
 	"strings"
 	"syscall"
 
+	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/pkg/pdh"
 )
 
 func loadOSDependentItems() error {
-	return pdh.LocateObjectsAndDefaultCounters(true)
+	if err := pdh.LocateObjectsAndDefaultCounters(true); err != nil {
+		log.Warningf("cannot load objects and default counters: %s", err.Error())
+	}
+
+	return nil
 }
 
 func init() {

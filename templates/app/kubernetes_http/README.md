@@ -11,12 +11,12 @@ Templates for Kubernetes monitoring
 
 | Name                                  | Readme                                                 | Template                                                                          |
 |---------------------------------------|--------------------------------------------------------|-----------------------------------------------------------------------------------|
-| Kubernetes nodes by HTTP              | [Readme](kubernetes_nodes_http/README.md)              | [Template](kubernetes_nodes_http/template_kube_nodes.yaml)                        |
-| Kubernetes cluster state by HTTP      | [Readme](kubernetes_state_http/README.md)              | [Template](kubernetes_state_http/template_kube_state.yaml)                        |
-| Kubernetes API server by HTTP         | [Readme](kubernetes_api_server_http/README.md)         | [Template](kubernetes_api_server_http/kubernetes_api_servers.yaml)                |
-| Kubernetes Controller manager by HTTP | [Readme](kubernetes_controller_manager_http/README.md) | [Template](kubernetes_controller_manager_http/kubernetes_controller_manager.yaml) |
-| Kubernetes Scheduler by HTTP          | [Readme](kubernetes_scheduler_http/README.md)          | [Template](kubernetes_scheduler_http/kubernetes_scheduler.yaml)                   |
-| Kubernetes kubelet by HTTP            | [Readme](kubernetes_kubelet_http/README.md)            | [Template](kubernetes_kubelet_http/template_kube_kubelet.yaml)                    |
+| Kubernetes nodes by HTTP              | [Readme](kubernetes_nodes_http/README.md)              | [Template](kubernetes_nodes_http/template_kubernetes_nodes.yaml)                        |
+| Kubernetes cluster state by HTTP      | [Readme](kubernetes_state_http/README.md)              | [Template](kubernetes_state_http/template_kubernetes_state.yaml)                        |
+| Kubernetes API server by HTTP         | [Readme](kubernetes_api_server_http/README.md)         | [Template](kubernetes_api_server_http/template_kubernetes_api_servers.yaml)                |
+| Kubernetes Controller manager by HTTP | [Readme](kubernetes_controller_manager_http/README.md) | [Template](kubernetes_controller_manager_http/template_kubernetes_controller_manager.yaml) |
+| Kubernetes Scheduler by HTTP          | [Readme](kubernetes_scheduler_http/README.md)          | [Template](kubernetes_scheduler_http/template_kubernetes_scheduler.yaml)                   |
+| Kubernetes kubelet by HTTP            | [Readme](kubernetes_kubelet_http/README.md)            | [Template](kubernetes_kubelet_http/template_kubernetes_kubelet.yaml)                    |
 
 Templates are of two types:
 

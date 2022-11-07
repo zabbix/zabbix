@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:27:50Z'
+  date: '2022-07-21T13:25:07Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -873,7 +873,7 @@ zabbix_export:
               value_type: FLOAT
               units: s
               params: 'bucket_percentile(//kubernetes.api.client_certificate_expiration_seconds_bucket[*],5m,1)'
-              description: '1 percentile of of the remaining lifetime on the certificate used to authenticate a request.'
+              description: '1 percentile of the remaining lifetime on the certificate used to authenticate a request.'
               tags:
                 -
                   tag: component

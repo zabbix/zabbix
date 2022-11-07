@@ -1005,16 +1005,7 @@ static int	vfs_dir_info(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE tim
 					break;
 				default:	/* not a directory => regular file */
 					if (0 != (types & ZBX_FT_FILE) && 0 != match)
-					{
-						wpath = zbx_utf8_to_unicode(path);
-						if (FAIL == link_processed(data.dwFileAttributes, wpath, &descriptors,
-								path))
-						{
-							EVALUATE_DIR_ENTITY()
-						}
-
-						zbx_free(wpath);
-					}
+						EVALUATE_DIR_ENTITY()
 free_path:
 					zbx_free(path);
 			}

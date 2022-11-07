@@ -255,7 +255,7 @@ zabbix_export:
         
             // Create an issue.
             // Numeric value of the event that triggered an action (1 for problem, 0 for recovering).
-            // Numeric value of of the problem update status. Possible values:
+            // Numeric value of the problem update status. Possible values:
             // 0 - Webhook was called because of problem/recovery event, 1 - Update operation.
             if ((params.event_source == 0 && params.event_value == 1 && params.event_update_status == 0)
                     || (params.event_source == 3 && params.event_value == 1)

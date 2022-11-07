@@ -578,7 +578,7 @@ class testToken extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/tokenid/1": a number is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -590,7 +590,7 @@ class testToken extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/tokenid": an array is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -602,7 +602,7 @@ class testToken extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/userid": an array is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -614,7 +614,7 @@ class testToken extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/userid/1": a number is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -626,7 +626,7 @@ class testToken extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/lastaccess/1": an integer is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -638,7 +638,7 @@ class testToken extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/lastaccess": an array is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -650,7 +650,7 @@ class testToken extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/status/1": value must be one of 0, 1.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -662,7 +662,7 @@ class testToken extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/status/1": value must be one of 0, 1.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -674,7 +674,7 @@ class testToken extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/expires_at/1": an integer is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -686,7 +686,7 @@ class testToken extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/expires_at": an array is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -698,7 +698,7 @@ class testToken extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/created_at/1": an integer is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -710,7 +710,7 @@ class testToken extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/created_at": an array is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -722,7 +722,7 @@ class testToken extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/creator_userid": an array is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],
@@ -734,7 +734,7 @@ class testToken extends CAPITest {
 					]
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/filter/creator_userid/1": a number is expected.',
+					'error' => null,
 					'result' => []
 				]
 			],

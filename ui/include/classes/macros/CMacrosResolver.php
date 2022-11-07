@@ -1821,11 +1821,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				: $usermacros_data['macros'];
 		}
 
-		$types = $this->transformToPositionTypes($types);
-
 		// Replace macros to value.
 		foreach ($macro_values as $key => $macros) {
-			$function = $this->resolveFunctionMacros($functions[$key]['function_string'], $macros, $types);
+			$function = $this->resolveFunctionMacros($functions[$key]['function_string'], $macros);
 			$function = substr_replace($function, TRIGGER_QUERY_PLACEHOLDER, $functions[$key]['function_query_pos'], 8);
 			$functions[$key]['parameter'] = substr($function, strlen($functions[$key]['function']) + 1, -1);
 		}

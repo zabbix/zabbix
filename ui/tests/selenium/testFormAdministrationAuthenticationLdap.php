@@ -44,7 +44,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 				[
 					'ldap_settings' => [
 						'Enable LDAP authentication' => true,
-						'LDAP host' => 'ldap.forumsys.com'
+						'LDAP host' => 'ipa.demo1.freeipa.org'
 					],
 					'error' => 'Incorrect value for field "ldap_base_dn": cannot be empty.'
 				]
@@ -53,8 +53,8 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 				[
 					'ldap_settings' => [
 						'Enable LDAP authentication' => true,
-						'LDAP host' => 'ldap.forumsys.com',
-						'Base DN' => 'dc=example,dc=com'
+						'LDAP host' => 'ipa.demo1.freeipa.org',
+						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org'
 					],
 					'error' => 'Incorrect value for field "ldap_search_attribute": cannot be empty.'
 				]
@@ -63,8 +63,8 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 				[
 					'ldap_settings' => [
 						'Enable LDAP authentication' => true,
-						'LDAP host' => 'ldap.forumsys.com',
-						'Base DN' => 'dc=example,dc=com',
+						'LDAP host' => 'ipa.demo1.freeipa.org',
+						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 						'Search attribute' => 'uid'
 					],
 					'error' => 'Login name or password is incorrect.'
@@ -74,10 +74,10 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 				[
 					'ldap_settings' => [
 						'Enable LDAP authentication' => true,
-						'LDAP host' => 'ldap.forumsys.com',
-						'Base DN' => 'dc=example,dc=com',
+						'LDAP host' => 'ipa.demo1.freeipa.org',
+						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 						'Search attribute' => 'uid',
-						'Login' => 'galieleo'
+						'Login' => 'admin'
 					],
 					'error' => 'Login name or password is incorrect.'
 				]
@@ -86,10 +86,10 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 				[
 					'ldap_settings' => [
 						'Enable LDAP authentication' => true,
-						'LDAP host' => 'ldap.forumsys.com',
-						'Base DN' => 'dc=example,dc=com',
+						'LDAP host' => 'ipa.demo1.freeipa.org',
+						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 						'Search attribute' => 'uid',
-						'Bind password' => 'password'
+						'Bind password' => 'Secret123'
 					],
 					'error' => 'Incorrect value for field "ldap_bind_dn": cannot be empty.'
 				]
@@ -100,23 +100,23 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 					'password' => 'zabbix',
 					'ldap_settings' => [
 						'Enable LDAP authentication' => true,
-						'LDAP host' => 'ldap.forumsys.com',
+						'LDAP host' => 'ipa.demo1.freeipa.org',
 						'Port' => '389',
-						'Base DN' => 'dc=example,dc=com',
+						'Base DN' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 						'Search attribute' => 'uid',
-						'Bind DN' => 'cn=read-only-admin,dc=example,dc=com',
+						'Bind DN' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
 						'Case-sensitive login' => true,
-						'Bind password' => 'password',
-						'Login' => 'galieleo',
-						'User password' => 'password'
+						'Bind password' => 'Secret123',
+						'Login' => 'admin',
+						'User password' => 'Secret123'
 					],
 					'db_check' => [
 						'authentication_type' => '1',
-						'ldap_host' => 'ldap.forumsys.com',
+						'ldap_host' => 'ipa.demo1.freeipa.org',
 						'ldap_port' => '389',
-						'ldap_base_dn' => 'dc=example,dc=com',
-						'ldap_bind_dn' => 'cn=read-only-admin,dc=example,dc=com',
-						'ldap_bind_password' => 'password',
+						'ldap_base_dn' => 'cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+						'ldap_bind_dn' => 'uid=admin,cn=users,cn=accounts,dc=demo1,dc=freeipa,dc=org',
+						'ldap_bind_password' => 'Secret123',
 						'ldap_search_attribute' => 'uid',
 						'http_auth_enabled' => '0',
 						'http_login_form' => '0',

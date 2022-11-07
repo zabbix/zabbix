@@ -309,7 +309,7 @@ if (hasRequest('add') || hasRequest('update')) {
 	$result = DBend($result);
 
 	if ($result) {
-		uncheckTableRows();
+		uncheckTableRows($eventsource);
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
@@ -318,7 +318,7 @@ elseif (hasRequest('delete') && hasRequest('actionid')) {
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['actionid']);
-		uncheckTableRows();
+		uncheckTableRows($eventsource);
 	}
 	show_messages($result, _('Action deleted'), _('Cannot delete action'));
 }
@@ -491,7 +491,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['action.mass
 			: _n('Action disabled', 'Actions disabled', $actions_count);
 
 		show_messages(true, $message);
-		uncheckTableRows();
+		uncheckTableRows($eventsource);
 	}
 	else {
 		$message = $status == ACTION_STATUS_ENABLED
@@ -505,7 +505,7 @@ elseif (hasRequest('action') && getRequest('action') == 'action.massdelete' && h
 	$result = API::Action()->delete(getRequest('g_actionid'));
 
 	if ($result) {
-		uncheckTableRows();
+		uncheckTableRows($eventsource);
 	}
 	show_messages($result, _('Selected actions deleted'), _('Cannot delete selected actions'));
 }

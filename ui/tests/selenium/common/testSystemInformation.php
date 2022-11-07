@@ -30,7 +30,6 @@ class testSystemInformation extends CWebTest {
 	public static $standby_lastaccess;
 	public static $stopped_lastaccess;
 	public static $unavailable_lastaccess;
-	public static $standalone_lastaccess;
 
 	public static $skip_fields;
 
@@ -43,7 +42,6 @@ class testSystemInformation extends CWebTest {
 		self::$standby_lastaccess = self::$active_lastaccess - 1;
 		self::$stopped_lastaccess = self::$active_lastaccess - 240;
 		self::$unavailable_lastaccess = self::$active_lastaccess - 180105;
-		self::$standalone_lastaccess = self::$active_lastaccess - 20;
 
 		$nodes = [
 			[
@@ -77,19 +75,10 @@ class testSystemInformation extends CWebTest {
 				'ha_nodeid' => 'ckvaw9wlf0001tn7psxgh3wfo',
 				'name' => 'Active node',
 				'address' => $DB['SERVER'],
-				'port' => $DB['PORT'],
+				'port' => 0,
 				'lastaccess' => self::$active_lastaccess,
 				'status' => 3,
 				'ha_sessionid' => 'ckvaw9wjo0000td7p8j66e74x'
-			],
-			[
-				'ha_nodeid' => 'ckvawe0t00001h57pcotna8nz',
-				'name' => '',
-				'address' => '192.168.133.100',
-				'port' => 10051,
-				'lastaccess' => self::$standalone_lastaccess,
-				'status' => 0,
-				'ha_sessionid' => 'ckvawe0rx0000gv7pi74mzlqp'
 			]
 		];
 
@@ -147,8 +136,7 @@ class testSystemInformation extends CWebTest {
 			'Active node' => self::$active_lastaccess,
 			'Unavailable node' => self::$unavailable_lastaccess,
 			'Stopped node' => self::$stopped_lastaccess,
-			'Standby node' => self::$standby_lastaccess,
-			'<standalone server>' => self::$standalone_lastaccess
+			'Standby node' => self::$standby_lastaccess
 		];
 
 		/**
@@ -174,7 +162,7 @@ class testSystemInformation extends CWebTest {
 			// Check Zabbix server address and port for each record in the HA cluster nodes table.
 			if ($name === 'Active node') {
 				self::$skip_fields[] = $row->getColumn('Address');
-				$this->assertEquals($DB['SERVER'].':'.$DB['PORT'], $row->getColumn('Address')->getText());
+				$this->assertEquals($DB['SERVER'].':0', $row->getColumn('Address')->getText());
 			}
 		}
 
@@ -182,7 +170,7 @@ class testSystemInformation extends CWebTest {
 		 * Check and hide the active Zabbix server address in widget that is working in System stats mode or in the part
 		 * of the report that displays the overall system statistics.
 		 */
-		$this->assertEquals($DB['SERVER'].':'.$DB['PORT'], $server_address->getText());
+		$this->assertEquals($DB['SERVER'].':0', $server_address->getText());
 		self::$skip_fields[] = $server_address;
 
 		// Hide the footer of the report as it contains Zabbix version.
@@ -215,13 +203,13 @@ class testSystemInformation extends CWebTest {
 		$table = $this->query('xpath://table[@class="list-table sticky-header"]')->asTable()->waitUntilVisible()->one();
 
 		// Check that before failover delay passes frontend thinks that Zabbix server is running.
-		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn(0)->getText());
+		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
 
 		// Wait for failover delay to pass.
 		sleep(self::$update_timestamp + self::FAILOVER_DELAY - time());
 
 		// Check that after failover delay passes frontend re-validates Zabbix server status.
 		$this->page->refresh();
-		$this->assertEquals('No', $table->findRow('Parameter', 'Zabbix server is running')->getColumn(0)->getText());
+		$this->assertEquals('No', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
 	}
 }

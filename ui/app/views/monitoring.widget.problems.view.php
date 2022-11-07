@@ -194,9 +194,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 			);
 
 			if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
-				$opdata = (new CCol($opdata))
-					->addClass('opdata')
-					->addClass(ZBX_STYLE_WORDWRAP);
+				$opdata = (new CCol($opdata))->addClass('opdata');
 			}
 		}
 	}
@@ -213,7 +211,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$problem_link = array_merge($problem_link, [' (', $opdata, ')']);
 	}
 
-	$description = (new CCol($problem_link));
+	$description = (new CCol($problem_link))->addClass(ZBX_STYLE_WORDBREAK);
 
 	$description_style = CSeverityHelper::getStyle((int) $problem['severity']);
 
@@ -275,7 +273,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		makeInformationList($info_icons),
 		$triggers_hosts[$trigger['triggerid']],
 		$description,
-		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY ) ? $opdata : null,
+		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY ) ? $opdata->addClass(ZBX_STYLE_WORDBREAK) : null,
 		(new CCol(
 			(new CLinkAction(zbx_date2age($problem['clock'], ($problem['r_eventid'] != 0) ? $problem['r_clock'] : 0)))
 				->setAjaxHint(CHintBoxHelper::getEventList($trigger['triggerid'], $eventid, $show_timeline,

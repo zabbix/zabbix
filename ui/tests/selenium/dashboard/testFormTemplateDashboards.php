@@ -139,7 +139,7 @@ class testFormTemplateDashboards extends CWebTest {
 			],
 			[
 				'templateid' => self::UPDATE_TEMPLATEID,
-				'name' => 'Dashboard without widgets',
+				'name' => 'Empty Dashboard without widgets',
 				'pages' => [[]]
 			],
 			[
@@ -445,8 +445,8 @@ class testFormTemplateDashboards extends CWebTest {
 					break;
 
 				case 'multiselect':
-					$default_value = [];
-					$this->assertEquals($default_value, array_values($field->getValue()));
+					$default_value = '';
+					$this->assertEquals($default_value, $field->getValue());
 					$this->assertEquals('type here to search', $field->query('xpath:.//input')->one()->getAttribute('placeholder'));
 					break;
 
@@ -498,9 +498,9 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'dashboard_properties' => [
-						'Name' => 'Dashboard without widgets'
+						'Name' => 'Empty Dashboard without widgets'
 					],
-					'error_message' => 'Dashboard "Dashboard without widgets" already exists.',
+					'error_message' => 'Dashboard "Empty Dashboard without widgets" already exists.',
 					'check_save' => true
 				]
 			],
@@ -1159,7 +1159,6 @@ class testFormTemplateDashboards extends CWebTest {
 	 * @param string	$check			Action that should be checked.
 	 */
 	private function checkSettings($data, $old_values, $status = 'created', $check = 'dashboard action') {
-//		$this->setNetworkThrottlingMode(self::NETWORK_THROTTLING_SLOW);
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if (CTestArrayHelper::get($data, 'check_save')) {
 				$this->query('button:Save changes')->one()->click();
@@ -1202,7 +1201,7 @@ class testFormTemplateDashboards extends CWebTest {
 
 			$dashboard_name = ($check === 'dashboard action')
 					? $created_values['Name']
-					: (($check === 'widget create') ? 'Dashboard without widgets' : 'Dashboard for widget update');
+					: (($check === 'widget create') ? 'Empty Dashboard without widgets' : 'Dashboard for widget update');
 			$this->query('link', $dashboard_name)->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
 

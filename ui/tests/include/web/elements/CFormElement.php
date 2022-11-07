@@ -107,6 +107,8 @@ class CFormElement extends CElement {
 		parent::invalidate();
 
 		$this->fields = new CElementCollection([]);
+
+		return $this;
 	}
 
 	/**
@@ -441,6 +443,12 @@ class CFormElement extends CElement {
 	public function checkValue($expected, $raise_exception = true) {
 		if ($expected && is_array($expected)) {
 			foreach ($expected as $field => $value) {
+				if ($value instanceof \Closure) {
+					$function = new ReflectionFunction($value);
+					$variables = $function->getStaticVariables();
+					$value = $variables['value'];
+				}
+
 				if ($this->checkFieldValue($field, $value, $raise_exception) === false) {
 					return false;
 				}
@@ -518,5 +526,16 @@ class CFormElement extends CElement {
 				$form->waitUntilReloaded();
 			}
 		};
+	}
+
+	/**
+	 * Check if field is marked as required in form.
+	 *
+	 * @param string $label    field label text
+	 *
+	 * @return boolean
+	 */
+	public function isRequired($label) {
+		return $this->getLabel($label)->hasClass('form-label-asterisk');
 	}
 }

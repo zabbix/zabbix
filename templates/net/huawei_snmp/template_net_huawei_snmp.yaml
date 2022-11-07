@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-14T11:00:43Z'
+  date: '2022-08-15T18:02:39Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -16,6 +16,7 @@ zabbix_export:
         MIBs used:
         EtherLike-MIB
         HUAWEI-ENTITY-EXTENT-MIB
+        HOST-RESOURCES-MIB
         SNMPv2-MIB
         ENTITY-MIB
         IF-MIB
@@ -182,6 +183,34 @@ zabbix_export:
               tag: component
               value: system
         -
+          uuid: 202c91a61d644285a0d74d88ae1b1a79
+          name: 'Uptime (hardware)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: 'system.hw.uptime[hrSystemUptime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: 78041d1a10ed4cb6b89a77bc1478b009
           name: 'System location'
           type: SNMP_AGENT
@@ -244,6 +273,28 @@ zabbix_export:
                   tag: scope
                   value: security
         -
+          uuid: e9dd0d849aaa499da9e2ef9e21ccd50e
+          name: 'Uptime (network)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: 'system.net.uptime[sysUpTime.0]'
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+        -
           uuid: a5e66466550f44a4b1d2137c751e9009
           name: 'System object ID'
           type: SNMP_AGENT
@@ -265,45 +316,6 @@ zabbix_export:
             -
               tag: component
               value: system
-        -
-          uuid: e9dd0d849aaa499da9e2ef9e21ccd50e
-          name: Uptime
-          type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.2.1.1.3.0
-          key: 'system.uptime[sysUpTime.0]'
-          delay: 30s
-          history: 2w
-          trends: 0d
-          units: uptime
-          description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
-          preprocessing:
-            -
-              type: MULTIPLIER
-              parameters:
-                - '0.01'
-          tags:
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: c8c41677f4ba463b90cea501e9112483
-              expression: 'last(/Huawei VRP SNMP/system.uptime[sysUpTime.0])<10m'
-              name: 'has been restarted'
-              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
-              priority: WARNING
-              description: 'Uptime is less than 10 minutes.'
-              manual_close: 'YES'
-              dependencies:
-                -
-                  name: 'No SNMP data collection'
-                  expression: 'max(/Huawei VRP SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
-              tags:
-                -
-                  tag: scope
-                  value: notice
         -
           uuid: 291fbe54d7c845bb9ec5b080be084612
           name: 'SNMP agent availability'
@@ -1372,8 +1384,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Huawei VRP SNMP'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
           uuid: 64bf3ebd444c4c4ca472b0846790b107
@@ -2305,3 +2317,20 @@ zabbix_export:
             -
               value: '2'
               newvalue: unknown
+  triggers:
+    -
+      uuid: c8c41677f4ba463b90cea501e9112483
+      expression: '(last(/Huawei VRP SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Huawei VRP SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Huawei VRP SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Huawei VRP SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      name: 'Host has been restarted'
+      event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
+      priority: WARNING
+      description: 'Uptime is less than 10 minutes.'
+      manual_close: 'YES'
+      dependencies:
+        -
+          name: 'No SNMP data collection'
+          expression: 'max(/Huawei VRP SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+      tags:
+        -
+          tag: scope
+          value: notice

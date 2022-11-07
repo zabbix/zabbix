@@ -40,7 +40,22 @@ class CPieGraphDraw extends CGraphDraw {
 	/* PRE CONFIG: ADD / SET / APPLY
 	/********************************************************************************************************/
 	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
-		$this->items[$this->num] = get_item_by_itemid($itemid);
+		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'units', 'value_type', 'valuemapid', 'history', 'trends'],
+			'itemids' => [$itemid],
+			'webitems' => true
+		]);
+
+		if (!$items) {
+			$items = API::ItemPrototype()->get([
+				'output' => ['itemid', 'hostid', 'name', 'key_', 'units', 'value_type', 'valuemapid', 'history',
+					'trends'
+				],
+				'itemids' => [$itemid]
+			]);
+		}
+
+		$this->items[$this->num] = reset($items);
 
 		$host = get_host_by_hostid($this->items[$this->num]['hostid']);
 
@@ -135,7 +150,8 @@ class CPieGraphDraw extends CGraphDraw {
 		$items = [];
 
 		for ($i = 0; $i < $this->num; $i++) {
-			$item = get_item_by_itemid($this->items[$i]['itemid']);
+			$item = $this->items[$i];
+
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
 
@@ -215,7 +231,7 @@ class CPieGraphDraw extends CGraphDraw {
 				$this->dataFrom = $item['source'];
 			}
 
-			switch ($this->items[$i]['calc_fnc']) {
+			switch ($item['calc_fnc']) {
 				case CALC_FNC_MIN:
 					$fncName = 'min';
 					break;
@@ -234,7 +250,7 @@ class CPieGraphDraw extends CGraphDraw {
 				? 0
 				: abs($this->data[$item['itemid']][$fncName]);
 
-			if ($this->items[$i]['calc_type'] == GRAPH_ITEM_SUM) {
+			if ($item['calc_type'] == GRAPH_ITEM_SUM) {
 				$this->background = $i;
 				$graph_sum = $item_value;
 			}

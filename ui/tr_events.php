@@ -128,9 +128,7 @@ if ($trigger['opdata'] !== '') {
 			'events' => true,
 			'html' => true
 		]
-	)))
-		->addClass('opdata')
-		->addClass(ZBX_STYLE_WORDWRAP);
+	)))->addClass('opdata');
 }
 else {
 	$db_items = API::Item()->get([

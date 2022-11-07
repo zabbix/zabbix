@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
@@ -117,9 +118,7 @@ class testFormFilter extends CWebTest {
 
 			$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertEquals('italic', $this->query('xpath://li[@data-target="tabfilter_1"]/a[@class="tabfilter-item-link"]')
-					->one()->getCSSValue('font-style')
-			);
+			$this->assertFalse($this->query('xpath://li[@data-target="tabfilter_1"]//span')->one()->hasClass('display-none'));
 
 			$filter_container->selectTab('update_tab');
 

@@ -37,7 +37,7 @@ $url = (new CUrl('host_discovery.php'))
 $form = (new CForm('post', $url))
 	->setId('host-discovery-form')
 	->setName('itemForm')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
 	->addVar('backurl', $data['backurl']);
@@ -1005,7 +1005,7 @@ if (!empty($data['itemid'])) {
 }
 else {
 	$cancel_button = $data['backurl'] !== null
-		? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+		? (new CRedirectButton(_('Cancel'), $data['backurl']))->setId('cancel')
 		: new CButtonCancel(url_param('context'));
 
 	$form_actions = new CFormActions(

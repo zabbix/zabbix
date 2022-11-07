@@ -92,7 +92,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 		$is_dynamic_item = ($is_template_dashboard || $fields['dynamic'] == WIDGET_DYNAMIC_ITEM);
 
 		// Replace graph item by particular host item if dynamic items are used.
-		if ($is_dynamic_item && $dynamic_hostid && $resourceid) {
+		if ($is_dynamic_item && $dynamic_hostid != 0 && $resourceid) {
 			// Find same simple-graph item in selected $dynamic_hostid host.
 			if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$src_items = API::Item()->get([
@@ -218,7 +218,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 				// get graph, used below
 				$graph = API::Graph()->get([
 					'output' => API_OUTPUT_EXTEND,
-					'selectHosts' => ['name'],
+					'selectHosts' => ['hostid', 'name'],
 					'graphids' => $resourceid,
 					'expandName' => true
 				]);
@@ -267,7 +267,7 @@ class CControllerWidgetGraphView extends CControllerWidget {
 					? $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name']
 					: $graph['name'];
 
-				if ($is_dynamic_item && $dynamic_hostid && $resourceid) {
+				if ($is_dynamic_item && $dynamic_hostid != 0 && $resourceid) {
 					if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
 						$graph_src = (new CUrl('chart7.php'))
 							->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
@@ -341,30 +341,31 @@ class CControllerWidgetGraphView extends CControllerWidget {
 			}
 			else {
 				if ($fields['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
-					if ($is_dynamic_item && $dynamic_hostid) {
-						$template_graphs = API::Graph()->get([
-							'output' => ['name'],
-							'graphids' => [$resourceid]
-						]);
+					$has_host_graph = $is_dynamic_item && $dynamic_hostid != 0
+						? (bool) API::Graph()->get([
+							'output' => [],
+							'hostids' => [$dynamic_hostid],
+							'filter' => [
+								'name' => $graph['name']
+							]
+						])
+						: true;
 
-						$resourceid = null;
-
-						if ($template_graphs) {
-							$host_graphs = API::Graph()->get([
-								'output' => ['graphid'],
-								'hostids' => [$dynamic_hostid],
-								'filter' => [
-									'name' => $template_graphs[0]['name']
-								]
-							]);
-
-							if ($host_graphs) {
-								$resourceid = $host_graphs[0]['graphid'];
-							}
-						}
+					if ($has_host_graph) {
+						$graph_url = $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS)
+							? (new CUrl('zabbix.php'))
+								->setArgument('action', 'charts.view')
+								->setArgument('filter_hostids', [$graph['hosts'][0]['hostid']])
+								->setArgument('filter_name', $graph['name'])
+								->setArgument('filter_show', GRAPH_FILTER_HOST)
+								->setArgument('filter_set', '1')
+								->setArgument('from', '')
+								->setArgument('to', '')
+							: null;
 					}
-
-					$graph_url = null;
+					else {
+						$graph_url = null;
+					}
 				}
 				else {
 					$graph_url = $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)

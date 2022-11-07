@@ -35,7 +35,7 @@ FIELD		|username	|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|name		|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|surname	|t_varchar(100)	|''	|NOT NULL	|0
 FIELD		|passwd		|t_varchar(60)	|''	|NOT NULL	|0
-FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|autologin	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|autologout	|t_varchar(32)	|'15m'	|NOT NULL	|0
 FIELD		|lang		|t_varchar(7)	|'default'|NOT NULL	|ZBX_NODATA
@@ -114,7 +114,7 @@ INDEX		|1		|hostid
 TABLE|group_discovery|groupid|ZBX_TEMPLATE
 FIELD		|groupid	|t_id		|	|NOT NULL	|0			|1|hstgrp
 FIELD		|parent_group_prototypeid|t_id	|	|NOT NULL	|0			|2|group_prototype|group_prototypeid|RESTRICT
-FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 
@@ -1936,4 +1936,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6000000	|6000004
+ROW		|1		|6000000	|6000007
