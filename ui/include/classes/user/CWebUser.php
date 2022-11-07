@@ -234,13 +234,11 @@ class CWebUser {
 	}
 
 	/**
-	 * Get user ip address.
+	 * Get user IP address.
 	 *
 	 * @return string
 	 */
 	public static function getIp(): string {
-		return (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) && $_SERVER['HTTP_X_FORWARDED_FOR'] !== '')
-			? $_SERVER['HTTP_X_FORWARDED_FOR']
-			: $_SERVER['REMOTE_ADDR'];
+		return $_SERVER['REMOTE_ADDR'];
 	}
 }
