@@ -34,9 +34,6 @@ typedef struct
 	zbx_uint64_t	file_size;
 } zbx_config_export_t;
 
-zbx_config_export_t*	zbx_config_export_new(void);
-void			zbx_config_export_free(zbx_config_export_t *zbx_config_export);
-
 int	zbx_init_library_export(zbx_config_export_t *zbx_config_export, char **error);
 
 int	zbx_validate_export_type(char *export_type, uint32_t *export_mask);

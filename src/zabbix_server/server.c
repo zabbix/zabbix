@@ -313,7 +313,7 @@ char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
 static zbx_config_tls_t		*zbx_config_tls = NULL;
-static zbx_config_export_t	*zbx_config_export = NULL;
+static zbx_config_export_t	zbx_config_export = {NULL, NULL, ZBX_GIBIBYTE};
 
 char	*CONFIG_HA_NODE_NAME		= NULL;
 char	*CONFIG_NODE_ADDRESS	= NULL;
@@ -644,9 +644,10 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (SUCCEED != zbx_validate_export_type(zbx_config_export->type, NULL))
+	if (SUCCEED != zbx_validate_export_type(zbx_config_export.type, NULL))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"ExportType\" configuration parameter: %s", zbx_config_export->type);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"ExportType\" configuration parameter: %s",
+				zbx_config_export.type);
 		err = 1;
 	}
 
@@ -929,11 +930,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"HistoryStorageDateIndex",	&CONFIG_HISTORY_STORAGE_PIPELINES,	TYPE_INT,
 			PARM_OPT,	0,			1},
-		{"ExportDir",			&(zbx_config_export->dir),		TYPE_STRING,
+		{"ExportDir",			&(zbx_config_export.dir),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"ExportType",			&(zbx_config_export->type),		TYPE_STRING_LIST,
+		{"ExportType",			&(zbx_config_export.type),		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"ExportFileSize",		&(zbx_config_export->file_size),	TYPE_UINT64,
+		{"ExportFileSize",		&(zbx_config_export.file_size),	TYPE_UINT64,
 			PARM_OPT,	ZBX_MEBIBYTE,	ZBX_GIBIBYTE},
 		{"StartLLDProcessors",		&CONFIG_LLDWORKER_FORKS,		TYPE_INT,
 			PARM_OPT,	1,			100},
@@ -1058,7 +1059,6 @@ static void	zbx_on_exit(int ret)
 #endif
 
 	zbx_config_tls_free(zbx_config_tls);
-	zbx_config_export_free(zbx_config_export);
 
 	exit(EXIT_SUCCESS);
 }
@@ -1081,7 +1081,6 @@ int	main(int argc, char **argv)
 	int		zbx_optind = 0;
 
 	zbx_config_tls = zbx_config_tls_new();
-	zbx_config_export = zbx_config_export_new();
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
@@ -1825,7 +1824,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_db_check_instanceid())
 		exit(EXIT_FAILURE);
 
-	if (FAIL == zbx_init_library_export(zbx_config_export, &error))
+	if (FAIL == zbx_init_library_export(&zbx_config_export, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize export: %s", error);
 		zbx_free(error);

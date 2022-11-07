@@ -41,27 +41,6 @@ static zbx_export_file_t	*trends_file;
 static zbx_export_file_t	*problems_file;
 static zbx_config_export_t	*config_export;
 
-zbx_config_export_t*	zbx_config_export_new(void)
-{
-	zbx_config_export_t	*zbx_config_export;
-
-	zbx_config_export = (zbx_config_export_t *)zbx_malloc(NULL, sizeof(zbx_config_export_t));
-
-	zbx_config_export->dir = NULL;
-	zbx_config_export->type = NULL;
-	zbx_config_export->file_size = ZBX_GIBIBYTE;
-
-	return zbx_config_export;
-}
-
-void	zbx_config_export_free(zbx_config_export_t *zbx_config_export)
-{
-	zbx_free(zbx_config_export->dir);
-	zbx_free(zbx_config_export->type);
-
-	zbx_free(zbx_config_export);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: validate export type                                              *
