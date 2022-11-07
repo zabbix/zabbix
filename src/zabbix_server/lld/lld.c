@@ -357,7 +357,7 @@ static int	filter_evaluate_and_or_andor(const lld_filter_t *filter, const struct
 		}
 	}
 
-	if (SUCCEED == zbx_evaluate(&result, expression, error, sizeof(error), &errmsgs))
+	if (SUCCEED == evaluate(&result, expression, error, sizeof(error), &errmsgs))
 	{
 		ret = (SUCCEED != zbx_double_compare(result, 0) ? SUCCEED : FAIL);
 	}
