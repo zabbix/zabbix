@@ -139,7 +139,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	protected function doAction(): void {
 		$db_defaults = DB::getDefaults('role');
 
-		if ($this->hasInput('form_refresh')) {
+		if ($this->hasInput('form_refresh') && $this->role === null) {
 			$data = $this->getFormData([
 				'roleid' => null,
 				'readonly' => (bool) $db_defaults['readonly'],
