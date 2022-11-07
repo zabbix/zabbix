@@ -1313,12 +1313,14 @@ class CScript extends CApiService {
 				continue;
 			}
 
-			$path_name = $script['menu_path'].'/'.$script['name'];
+			$menu_path = array_key_exists('menu_path', $script) ? $script['menu_path'] : '';
+			$script_id = array_key_exists('scriptid', $script) ? $script['scriptid'] : '';
+			$path_name = $menu_path.'/'.$script['name'];
 
-			if ($db_scripts === null || $path_name !== $db_scripts[$script['scriptid']]['menu_path'].'/'.
-				isset([$script['scriptid']]['name'])) {
+			if ($db_scripts === null || $path_name !== $db_scripts[$script_id]['menu_path'].'/'.
+				$db_scripts[$script['scriptid']]['name']) {
 				$names[] = $script['name'];
-				$menu_paths[] = $script['menu_path'];
+				$menu_paths[] = $menu_path;
 			}
 		}
 
