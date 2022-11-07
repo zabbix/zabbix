@@ -19,8 +19,6 @@
 
 #include "zbxmutexs.h"
 
-#include "log.h"
-
 #ifdef _WINDOWS
 #	include "zbxsysinfo.h"
 #else

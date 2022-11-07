@@ -71,7 +71,6 @@ int		zabbix_decrease_log_level(void);
 const char	*zabbix_get_log_level_string(void);
 #endif
 
-char		*zbx_strerror(int errnum);
 char		*strerror_from_system(unsigned long error);
 
 #ifdef _WINDOWS
