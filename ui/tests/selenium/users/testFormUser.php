@@ -75,14 +75,12 @@ class testFormUser extends CWebTest {
 			// Empty 'Group' field.
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Username' => 'Negative_Test1',
 						'Password' => 'test5678',
 						'Password (once again)' => 'test5678'
-					],
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Field "user_groups" is mandatory.'
+					]
 				]
 			],
 			// 'Password' fields not specified.
@@ -643,12 +641,10 @@ class testFormUser extends CWebTest {
 			// Empty 'Group' field.
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Groups' => ''
-					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Field "user_groups" is mandatory.'
+					]
 				]
 			],
 			// Empty 'Password (once again)' field.
