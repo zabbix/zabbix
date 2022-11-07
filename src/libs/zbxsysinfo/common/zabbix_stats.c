@@ -94,7 +94,7 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
 							"Cannot obtain internal statistics: received empty response."));
 				}
 				else if (SUCCEED == check_response(s.buffer, result))
-					set_result_type(result, ITEM_VALUE_TYPE_TEXT, s.buffer);
+					zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, s.buffer);
 			}
 			else
 			{

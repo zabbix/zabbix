@@ -43,9 +43,9 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 
 	*param = zbx_strdup(NULL, data);
 
-	unquote_key_param(*param);
+	zbx_unquote_key_param(*param);
 
-	if (FAIL == (ret = quote_key_param(param, quoted)))
+	if (FAIL == (ret = zbx_quote_key_param(param, quoted)))
 		zbx_free(*param);
 
 	return ret;

@@ -70,7 +70,7 @@ static int	parse_response(AGENT_RESULT *results, int *errcodes, int num, char *r
 				if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value,
 						&value_alloc, NULL))
 				{
-					set_result_type(&results[i], ITEM_VALUE_TYPE_TEXT, value);
+					zbx_set_agent_result_type(&results[i], ITEM_VALUE_TYPE_TEXT, value);
 					errcodes[i] = SUCCEED;
 				}
 				else if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_ERROR, &value,

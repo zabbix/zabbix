@@ -367,6 +367,7 @@ final class CItemData {
 			'zabbix[preprocessing_queue]',
 			'zabbix[process,<type>,<mode>,<state>]',
 			'zabbix[proxy,<name>,<param>]',
+			'zabbix[proxy,discovery]',
 			'zabbix[proxy_history]',
 			'zabbix[queue,<from>,<to>]',
 			'zabbix[rcache,<cache>,<mode>]',
@@ -1825,6 +1826,10 @@ final class CItemData {
 			'zabbix[proxy,<name>,<param>]' => [
 				'description' => _('Time of proxy last access. Name - proxy name. Valid params are: lastaccess - Unix timestamp, delay - seconds.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'zabbix[proxy,discovery]' => [
+				'description' => _('List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps) and compatibility (current/outdated/unsupported). Returns JSON.'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'zabbix[proxy_history]' => [
 				'description' => _('Number of items in proxy history that are not yet sent to the server'),

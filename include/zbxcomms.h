@@ -89,6 +89,15 @@ typedef struct
 zbx_config_tls_t	*zbx_config_tls_new(void);
 void	zbx_config_tls_free(zbx_config_tls_t *zbx_config_tls);
 
+
+typedef struct
+{
+	zbx_config_tls_t	*zbx_config_tls;
+	const char		*hostname;
+	const int		proxymode;
+}
+zbx_config_comms_args_t;
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
 #if defined(HAVE_GNUTLS)

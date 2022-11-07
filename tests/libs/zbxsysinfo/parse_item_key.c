@@ -79,9 +79,9 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Cannot get expected parameters from test case data: %s", zbx_mock_error_string(error));
 	}
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (expected_result != (actual_result = parse_item_key(item_key, &request)))
+	if (expected_result != (actual_result = zbx_parse_item_key(item_key, &request)))
 	{
 		fail_msg("Got %s instead of %s as a result.", zbx_result_string(actual_result),
 				zbx_result_string(expected_result));
@@ -129,5 +129,5 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("There are more actual parameters (%d) than expected (%d).", i, request.nparam);
 	}
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 }

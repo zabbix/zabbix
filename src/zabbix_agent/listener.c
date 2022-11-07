@@ -50,9 +50,9 @@ static void	process_listener(zbx_socket_t *s)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", s->buffer);
 
-		init_result(&result);
+		zbx_init_agent_result(&result);
 
-		if (SUCCEED == process(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result))
+		if (SUCCEED == zbx_execute_agent_check(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result))
 		{
 			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
 			{
@@ -90,7 +90,7 @@ static void	process_listener(zbx_socket_t *s)
 			}
 		}
 
-		free_result(&result);
+		zbx_free_agent_result(&result);
 	}
 
 	if (FAIL == ret)
@@ -126,7 +126,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			get_program_type_string(init_child_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 
-	memcpy(&s, (zbx_socket_t *)(init_child_args_in->listen_sock), sizeof(zbx_socket_t));
+	memcpy(&s, init_child_args_in->listen_sock, sizeof(zbx_socket_t));
 
 	zbx_free(args);
 

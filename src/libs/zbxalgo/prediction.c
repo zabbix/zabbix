@@ -1150,7 +1150,7 @@ out:
 double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, zbx_fit_t fit, unsigned k)
 {
 	zbx_matrix_t	*coefficients = NULL;
-	double		current, result;
+	double		current, result = -1.0;
 	int		res;
 
 	if (1 == n)

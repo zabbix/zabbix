@@ -27,7 +27,6 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "history_compress.h"
-#include "../../libs/zbxdbcache/valuecache.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -1130,7 +1129,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	if (0 == CONFIG_HOUSEKEEPING_FREQUENCY)
 	{
@@ -1248,7 +1247,6 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		DBclose();
 
 		zbx_dc_cleanup_sessions();
-		zbx_vc_housekeeping_value_cache();
 
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"
 				" %d audit items, %d records in " ZBX_FS_DBL " sec, %s]",

@@ -104,9 +104,9 @@ static void	get_maintenance(zbx_dc_maintenance_t *maintenance)
 	tags_evaltype = zbx_mock_get_parameter_string("in.maintenance.tags_evaltype");
 
 	if (0 == strcasecmp(tags_evaltype, "AND/OR"))
-		maintenance->tags_evaltype = MAINTENANCE_TAG_EVAL_TYPE_AND_OR;
+		maintenance->tags_evaltype = ZBX_MAINTENANCE_TAG_EVAL_TYPE_AND_OR;
 	else if (0 == strcasecmp(tags_evaltype, "OR"))
-		maintenance->tags_evaltype = MAINTENANCE_TAG_EVAL_TYPE_OR;
+		maintenance->tags_evaltype = ZBX_MAINTENANCE_TAG_EVAL_TYPE_OR;
 	else
 		fail_msg("unknown tags_evaltype value '%s'", tags_evaltype);
 

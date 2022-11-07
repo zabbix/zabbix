@@ -135,6 +135,11 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			$data = $this->setUserMedias($data);
 		}
 
+		$data['mediatypes'] = API::MediaType()->get([
+			'output' => ['status'],
+			'preservekeys' => true
+		]);
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('User profile'));
 		$this->setResponse($response);

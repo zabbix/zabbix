@@ -57,7 +57,7 @@ static int	DBpatch_2050001(void)
 		param = zbx_strdup(NULL, row[1]);
 		zbx_snprintf_alloc(&oid, &oid_alloc, &oid_offset, "discovery[{#SNMPVALUE},%s]", param);
 
-		if (FAIL == quote_key_param(&param, 0))
+		if (FAIL == zbx_quote_key_param(&param, 0))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert SNMP discovery OID \"%s\":"
 					" OID contains invalid character(s)", row[1]);
@@ -178,9 +178,9 @@ static int	DBpatch_2050012(void)
 
 	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
-		init_request(&request);
+		zbx_init_agent_request(&request);
 
-		if (SUCCEED != parse_item_key(row[2], &request))
+		if (SUCCEED != zbx_parse_item_key(row[2], &request))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse item key \"%s\"", row[2]);
 			continue;
@@ -191,7 +191,7 @@ static int	DBpatch_2050012(void)
 		/* NULL check to silence static analyzer warning */
 		if (NULL == param || (0 != strcmp("service.ntp", param) && 0 != strcmp("ntp", param)))
 		{
-			free_request(&request);
+			zbx_free_agent_request(&request);
 			continue;
 		}
 
@@ -212,7 +212,7 @@ static int	DBpatch_2050012(void)
 			while ('\0' != *(p++));
 		}
 
-		free_request(&request);
+		zbx_free_agent_request(&request);
 
 		/* replace "net.tcp.service" with "net.udp.service" */
 

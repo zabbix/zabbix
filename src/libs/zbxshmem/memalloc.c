@@ -548,8 +548,8 @@ int	zbx_shmem_create(zbx_shmem_info_t **info, zbx_uint64_t size, const char *des
 
 	if (!(SHMEM_MIN_SIZE <= size && size <= SHMEM_MAX_SIZE))
 	{
-		*error = zbx_dsprintf(*error, "requested size " ZBX_FS_SIZE_T " not within bounds [" ZBX_FS_UI64
-				" <= size <= " ZBX_FS_UI64 "]", (zbx_fs_size_t)size, SHMEM_MIN_SIZE, SHMEM_MAX_SIZE);
+		*error = zbx_dsprintf(*error, "requested size " ZBX_FS_UI64 " not within bounds [" ZBX_FS_UI64
+				" <= size <= " ZBX_FS_UI64 "]", size, SHMEM_MIN_SIZE, SHMEM_MAX_SIZE);
 		goto out;
 	}
 

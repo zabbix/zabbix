@@ -200,7 +200,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 #define JOB_TIMEOUT	1
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -243,9 +243,9 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 		if (zbx_time() - time_now <= JOB_TIMEOUT)
 		{
 			time_idle += JOB_TIMEOUT;
-			update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+			zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 			zbx_sleep_loop(JOB_TIMEOUT);
-			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+			zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		}
 	}
 

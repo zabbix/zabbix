@@ -338,7 +338,12 @@ class CMultiselectElement extends CElement {
 	 * @inheritdoc
 	 */
 	public function getValue() {
-		return $this->getSelected();
+		$selected = $this->getSelected();
+		if (is_array($selected) && count($selected) === 0) {
+			$selected = '';
+		}
+
+		return $selected;
 	}
 
 	/**

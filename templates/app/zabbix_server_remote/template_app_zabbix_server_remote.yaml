@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '6.2'
-  date: '2022-06-07T19:38:01Z'
+  version: '6.4'
+  date: '2022-08-25T04:16:45Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: 79b16cbbe593444eae3de66de0cb566b
       template: 'Remote Zabbix server health'
       name: 'Remote Zabbix server health'
-      description: 'Template tooling version used: 0.41'
+      description: 'Template tooling version used: 0.42'
       groups:
         -
           name: Templates/Applications
@@ -1816,6 +1816,27 @@ zabbix_export:
               tag: component
               value: system
         -
+          uuid: 1e6a7ebfc0de47fd823ff59458317172
+          name: 'Zabbix stats proxy'
+          type: DEPENDENT
+          key: zabbix.proxy.stats
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Zabbix proxy statistics master item.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.data.proxy
+          master_item:
+            key: 'zabbix[stats,{$ADDRESS},{$PORT}]'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
           uuid: 95c8bab7640a4227b8ce6cac06e1a08b
           name: 'Remote Zabbix server: Zabbix stats queue over 10m'
           type: INTERNAL
@@ -2023,6 +2044,385 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.data.ha
+        -
+          uuid: db52e7ced392405184955a884ad9dd00
+          name: 'Zabbix proxy discovery'
+          type: DEPENDENT
+          key: zabbix.proxy.discovery
+          delay: '0'
+          description: 'LLD rule with item and trigger prototypes for proxy discovery.'
+          item_prototypes:
+            -
+              uuid: b1fe4bb454a543a78cfa84810e320b46
+              name: 'Proxy [{#PROXY.NAME}]: Certificate'
+              type: DEPENDENT
+              key: 'zabbix.proxy.cert[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'Encryption status for connections from the proxy'
+              valuemap:
+                name: 'Service state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].cert.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: zabbix.proxy.stats
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: fb38b7fa4daa4ab28338f96d9f903ff8
+              name: 'Proxy [{#PROXY.NAME}]: Compatibility'
+              type: DEPENDENT
+              key: 'zabbix.proxy.compatibility[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'Zabbix proxy compatibility'
+              valuemap:
+                name: Compatibility
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].compatibility.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: zabbix.proxy.stats
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 53dbaf21b8934ea9bada97431d4b3e23
+                  expression: 'last(/Remote Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)<>1'
+                  name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy is incompatible'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Zabbix proxy not compatibility'
+                  dependencies:
+                    -
+                      name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy never seen'
+                      expression: 'last(/Remote Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 7c5a679fd7a34abca9d70e87150bb682
+              name: 'Proxy [{#PROXY.NAME}]: Compression'
+              type: DEPENDENT
+              key: 'zabbix.proxy.compression[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'Compression status'
+              valuemap:
+                name: 'Service state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].compression.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: zabbix.proxy.stats
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 5db51524aa24458eaa1fa318adc77430
+              name: 'Proxy [{#PROXY.NAME}]: Host count'
+              type: DEPENDENT
+              key: 'zabbix.proxy.hosts[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'The number of enabled hosts assigned to the proxy'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].hosts.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: zabbix.proxy.stats
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 84c3d0ad89574545b0756a6385c09961
+              name: 'Proxy [{#PROXY.NAME}]: Item count'
+              type: DEPENDENT
+              key: 'zabbix.proxy.items[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'The number of enabled items on enabled hosts assigned to the proxy'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].items.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: zabbix.proxy.stats
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 41f1158a246942379cd425bb9293636f
+              name: 'Proxy [{#PROXY.NAME}]: Last seen, in seconds'
+              type: DEPENDENT
+              key: 'zabbix.proxy.last_seen[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              value_type: FLOAT
+              description: 'The time when the proxy was last seen by the server'
+              valuemap:
+                name: 'Last seen'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].last_seen.first()'
+              master_item:
+                key: zabbix.proxy.stats
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 21bf9805e0de4e3ba674de388834958e
+                  expression: 'last(/Remote Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)>{$PROXY.LAST_SEEN.MAX}'
+                  name: 'Proxy [{#PROXY.NAME}]: Proxy last seen'
+                  event_name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy last seen more than {$PROXY.LAST_SEEN.MAX} seconds ago'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Zabbix proxy not updating configuration'
+                  dependencies:
+                    -
+                      name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy never seen'
+                      expression: 'last(/Remote Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                -
+                  uuid: d58a33ae396943009d359bb0cae9baba
+                  expression: 'last(/Remote Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1'
+                  name: 'Proxy [{#PROXY.NAME}]: Zabbix proxy never seen'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Zabbix proxy not updating configuration'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 56c5b47e6fa444a596db755d60b0cbaa
+              name: 'Proxy [{#PROXY.NAME}]: Mode'
+              type: DEPENDENT
+              key: 'zabbix.proxy.mode[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'Proxy mode'
+              valuemap:
+                name: 'Proxy mode'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].passive.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: zabbix.proxy.stats
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: a3b5f778c9b2450aad72ec97b6a52d50
+              name: 'Proxy [{#PROXY.NAME}]: PSK'
+              type: DEPENDENT
+              key: 'zabbix.proxy.psk[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'Encryption status for connections from the proxy'
+              valuemap:
+                name: 'Service state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].psk.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: zabbix.proxy.stats
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 8f93b4b7a5bc4c8a9a2a0fefdb0d8274
+              name: 'Proxy [{#PROXY.NAME}]: Required VPS'
+              type: DEPENDENT
+              key: 'zabbix.proxy.requiredperformance[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              value_type: FLOAT
+              units: '!vps'
+              description: 'Required proxy performance (the number of values that need to be collected per second)'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].requiredperformance.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: zabbix.proxy.stats
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: c3b50d734d944d0fbb59b29324e28554
+              name: 'Proxy [{#PROXY.NAME}]: Unencrypted'
+              type: DEPENDENT
+              key: 'zabbix.proxy.unencrypted[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              description: 'Encryption status for connections from the proxy'
+              valuemap:
+                name: 'Service state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].unencrypted.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return value === ''false'' ? 0 : 1'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: zabbix.proxy.stats
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+            -
+              uuid: 6486e23a16ba495d9fc40305425e8010
+              name: 'Proxy [{#PROXY.NAME}]: Version'
+              type: DEPENDENT
+              key: 'zabbix.proxy.version[{#PROXY.NAME}]'
+              delay: '0'
+              history: 1w
+              trends: '0'
+              value_type: CHAR
+              description: 'Zabbix proxy version'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name=="{#PROXY.NAME}")].version.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: zabbix.proxy.stats
+              tags:
+                -
+                  tag: component
+                  value: proxy
+                -
+                  tag: proxy-name
+                  value: '{#PROXY.NAME}'
+          master_item:
+            key: zabbix.proxy.stats
+          lld_macro_paths:
+            -
+              lld_macro: '{#PROXY.NAME}'
+              path: $.name
       tags:
         -
           tag: class
@@ -2038,6 +2438,10 @@ zabbix_export:
           macro: '{$ADDRESS}'
         -
           macro: '{$PORT}'
+        -
+          macro: '{$PROXY.LAST_SEEN.MAX}'
+          value: '600'
+          description: 'The maximum number of seconds that the Zabbix proxy is not seen'
       dashboards:
         -
           uuid: acf492c7fb70451ba2afc6938e745a3a
@@ -2229,6 +2633,49 @@ zabbix_export:
             -
               value: '3'
               newvalue: Active
+        -
+          uuid: 2498ad0b91d742888acccd435ba52962
+          name: Compatibility
+          mappings:
+            -
+              value: '0'
+              newvalue: Undefined
+            -
+              value: '1'
+              newvalue: Current
+            -
+              value: '2'
+              newvalue: Outdated
+            -
+              value: '3'
+              newvalue: Unsupported
+        -
+          uuid: 53d1560f612540d98a2983516b4b9f8c
+          name: 'Last seen'
+          mappings:
+            -
+              value: '-1'
+              newvalue: Never
+        -
+          uuid: cdbd6c1bc69b4dcf925a1048a970139b
+          name: 'Proxy mode'
+          mappings:
+            -
+              value: '0'
+              newvalue: Active
+            -
+              value: '1'
+              newvalue: Passive
+        -
+          uuid: 7a5e7def958c4f16b9380d4b81f609c9
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Off'
+            -
+              value: '1'
+              newvalue: 'On'
         -
           uuid: 5dff563dde3c45d8b6d92525111384c6
           name: 'Value cache operating mode'

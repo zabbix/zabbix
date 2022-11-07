@@ -289,99 +289,6 @@ typedef enum
 }
 zbx_dservice_type_t;
 
-/* item snmpv3 security levels */
-#define ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
-#define ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV	1
-#define ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV	2
-
-/* item snmpv3 authentication protocol */
-#define ITEM_SNMPV3_AUTHPROTOCOL_MD5		0
-#define ITEM_SNMPV3_AUTHPROTOCOL_SHA1		1
-#define ITEM_SNMPV3_AUTHPROTOCOL_SHA224		2
-#define ITEM_SNMPV3_AUTHPROTOCOL_SHA256		3
-#define ITEM_SNMPV3_AUTHPROTOCOL_SHA384		4
-#define ITEM_SNMPV3_AUTHPROTOCOL_SHA512		5
-
-/* item snmpv3 privacy protocol */
-#define ITEM_SNMPV3_PRIVPROTOCOL_DES		0
-#define ITEM_SNMPV3_PRIVPROTOCOL_AES128		1
-#define ITEM_SNMPV3_PRIVPROTOCOL_AES192		2
-#define ITEM_SNMPV3_PRIVPROTOCOL_AES256		3
-#define ITEM_SNMPV3_PRIVPROTOCOL_AES192C	4
-#define ITEM_SNMPV3_PRIVPROTOCOL_AES256C	5
-
-/* condition evaluation types */
-#define CONDITION_EVAL_TYPE_AND_OR		0
-#define CONDITION_EVAL_TYPE_AND			1
-#define CONDITION_EVAL_TYPE_OR			2
-#define CONDITION_EVAL_TYPE_EXPRESSION		3
-
-/* condition types */
-#define CONDITION_TYPE_HOST_GROUP		0
-#define CONDITION_TYPE_HOST			1
-#define CONDITION_TYPE_TRIGGER			2
-#define CONDITION_TYPE_TRIGGER_NAME		3
-#define CONDITION_TYPE_TRIGGER_SEVERITY		4
-/* #define CONDITION_TYPE_TRIGGER_VALUE		5	deprecated */
-#define CONDITION_TYPE_TIME_PERIOD		6
-#define CONDITION_TYPE_DHOST_IP			7
-#define CONDITION_TYPE_DSERVICE_TYPE		8
-#define CONDITION_TYPE_DSERVICE_PORT		9
-#define CONDITION_TYPE_DSTATUS			10
-#define CONDITION_TYPE_DUPTIME			11
-#define CONDITION_TYPE_DVALUE			12
-#define CONDITION_TYPE_HOST_TEMPLATE		13
-#define CONDITION_TYPE_EVENT_ACKNOWLEDGED	14
-/* #define CONDITION_TYPE_APPLICATION		15	deprecated */
-#define CONDITION_TYPE_SUPPRESSED		16
-#define CONDITION_TYPE_DRULE			18
-#define CONDITION_TYPE_DCHECK			19
-#define CONDITION_TYPE_PROXY			20
-#define CONDITION_TYPE_DOBJECT			21
-#define CONDITION_TYPE_HOST_NAME		22
-#define CONDITION_TYPE_EVENT_TYPE		23
-#define CONDITION_TYPE_HOST_METADATA		24
-#define CONDITION_TYPE_EVENT_TAG		25
-#define CONDITION_TYPE_EVENT_TAG_VALUE		26
-#define CONDITION_TYPE_SERVICE			27
-#define CONDITION_TYPE_SERVICE_NAME		28
-
-/* condition operators */
-#define CONDITION_OPERATOR_EQUAL		0
-#define CONDITION_OPERATOR_NOT_EQUAL		1
-#define CONDITION_OPERATOR_LIKE			2
-#define CONDITION_OPERATOR_NOT_LIKE		3
-#define CONDITION_OPERATOR_IN			4
-#define CONDITION_OPERATOR_MORE_EQUAL		5
-#define CONDITION_OPERATOR_LESS_EQUAL		6
-#define CONDITION_OPERATOR_NOT_IN		7
-#define CONDITION_OPERATOR_REGEXP		8
-#define CONDITION_OPERATOR_NOT_REGEXP		9
-#define CONDITION_OPERATOR_YES			10
-#define CONDITION_OPERATOR_NO			11
-#define CONDITION_OPERATOR_EXIST		12
-#define CONDITION_OPERATOR_NOT_EXIST		13
-
-/* maintenance tag operators */
-#define ZBX_MAINTENANCE_TAG_OPERATOR_EQUAL	0
-#define ZBX_MAINTENANCE_TAG_OPERATOR_LIKE	2
-
-/* service problem tag operators */
-#define ZBX_SERVICE_TAG_OPERATOR_EQUAL	0
-#define ZBX_SERVICE_TAG_OPERATOR_LIKE	2
-
-/* maintenance tag evaluation types */
-#define MAINTENANCE_TAG_EVAL_TYPE_AND_OR	0
-#define MAINTENANCE_TAG_EVAL_TYPE_OR	2
-
-/* event type action condition values */
-#define EVENT_TYPE_ITEM_NOTSUPPORTED		0
-/* #define EVENT_TYPE_ITEM_NORMAL		1	 deprecated */
-#define EVENT_TYPE_LLDRULE_NOTSUPPORTED		2
-/* #define EVENT_TYPE_LLDRULE_NORMAL		3	 deprecated */
-#define EVENT_TYPE_TRIGGER_UNKNOWN		4
-/* #define EVENT_TYPE_TRIGGER_NORMAL		5	 deprecated */
-
 typedef enum
 {
 	SYSMAP_ELEMENT_TYPE_HOST = 0,
@@ -399,13 +306,6 @@ typedef enum
 	GRAPH_YAXIS_TYPE_ITEM_VALUE
 }
 zbx_graph_yaxis_types_t;
-
-/* special item key used for ICMP pings */
-#define SERVER_ICMPPING_KEY	"icmpping"
-/* special item key used for ICMP ping latency */
-#define SERVER_ICMPPINGSEC_KEY	"icmppingsec"
-/* special item key used for ICMP ping loss packages */
-#define SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
 
 /* runtime control options */
 #define ZBX_CONFIG_CACHE_RELOAD		"config_cache_reload"
@@ -513,28 +413,27 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_HOUSEKEEPER		14
 #define ZBX_PROCESS_TYPE_DATASENDER		15
 #define ZBX_PROCESS_TYPE_CONFSYNCER		16
-#define ZBX_PROCESS_TYPE_HEARTBEAT		17
-#define ZBX_PROCESS_TYPE_SELFMON		18
-#define ZBX_PROCESS_TYPE_VMWARE			19
-#define ZBX_PROCESS_TYPE_COLLECTOR		20
-#define ZBX_PROCESS_TYPE_LISTENER		21
-#define ZBX_PROCESS_TYPE_ACTIVE_CHECKS		22
-#define ZBX_PROCESS_TYPE_TASKMANAGER		23
-#define ZBX_PROCESS_TYPE_IPMIMANAGER		24
-#define ZBX_PROCESS_TYPE_ALERTMANAGER		25
-#define ZBX_PROCESS_TYPE_PREPROCMAN		26
-#define ZBX_PROCESS_TYPE_PREPROCESSOR		27
-#define ZBX_PROCESS_TYPE_LLDMANAGER		28
-#define ZBX_PROCESS_TYPE_LLDWORKER		29
-#define ZBX_PROCESS_TYPE_ALERTSYNCER		30
-#define ZBX_PROCESS_TYPE_HISTORYPOLLER		31
-#define ZBX_PROCESS_TYPE_AVAILMAN		32
-#define ZBX_PROCESS_TYPE_REPORTMANAGER		33
-#define ZBX_PROCESS_TYPE_REPORTWRITER		34
-#define ZBX_PROCESS_TYPE_SERVICEMAN		35
-#define ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER	36
-#define ZBX_PROCESS_TYPE_ODBCPOLLER		37
-#define ZBX_PROCESS_TYPE_COUNT			38	/* number of process types */
+#define ZBX_PROCESS_TYPE_SELFMON		17
+#define ZBX_PROCESS_TYPE_VMWARE			18
+#define ZBX_PROCESS_TYPE_COLLECTOR		19
+#define ZBX_PROCESS_TYPE_LISTENER		20
+#define ZBX_PROCESS_TYPE_ACTIVE_CHECKS		21
+#define ZBX_PROCESS_TYPE_TASKMANAGER		22
+#define ZBX_PROCESS_TYPE_IPMIMANAGER		23
+#define ZBX_PROCESS_TYPE_ALERTMANAGER		24
+#define ZBX_PROCESS_TYPE_PREPROCMAN		25
+#define ZBX_PROCESS_TYPE_PREPROCESSOR		26
+#define ZBX_PROCESS_TYPE_LLDMANAGER		27
+#define ZBX_PROCESS_TYPE_LLDWORKER		28
+#define ZBX_PROCESS_TYPE_ALERTSYNCER		29
+#define ZBX_PROCESS_TYPE_HISTORYPOLLER		30
+#define ZBX_PROCESS_TYPE_AVAILMAN		31
+#define ZBX_PROCESS_TYPE_REPORTMANAGER		32
+#define ZBX_PROCESS_TYPE_REPORTWRITER		33
+#define ZBX_PROCESS_TYPE_SERVICEMAN		34
+#define ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER	35
+#define ZBX_PROCESS_TYPE_ODBCPOLLER		36
+#define ZBX_PROCESS_TYPE_COUNT			37	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -856,6 +755,8 @@ zbx_script_t;
 
 #define HOUSEKEEPER_STARTUP_DELAY	30	/* in minutes */
 
+#define ZBX_DEFAULT_INTERVAL	SEC_PER_MIN
+
 #define	GET_SENDER_TIMEOUT	60
 
 #ifndef MAX
@@ -1152,16 +1053,6 @@ zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
 
 zbx_uint32_t	zbx_letoh_uint32(zbx_uint32_t data);
 zbx_uint32_t	zbx_htole_uint32(zbx_uint32_t data);
-
-int	is_hostname_char(unsigned char c);
-int	is_key_char(unsigned char c);
-int	is_function_char(unsigned char c);
-int	is_macro_char(unsigned char c);
-int	is_discovery_macro(const char *name);
-int	parse_key(const char **exp);
-int	parse_host_key(char *exp, char **host, char **key);
-void	make_hostname(char *host);
-int	zbx_check_hostname(const char *hostname, char **error);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 

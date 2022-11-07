@@ -2,12 +2,12 @@
 
 SUBDIRS = \
 	diag \
-	heart \
 	housekeeper \
 	proxyconfig \
 	datasender \
 	stats \
-	taskmanager
+	taskmanager \
+	proxyconfigwrite
 
 sbin_PROGRAMS = zabbix_proxy
 
@@ -25,7 +25,6 @@ zabbix_proxy_SOURCES = proxy.c
 
 zabbix_proxy_LDADD = \
 	diag/libzbxdiag_proxy.a \
-	heart/libzbxheart.a \
 	$(top_builddir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	housekeeper/libzbxhousekeeper.a \
@@ -39,6 +38,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
 	$(top_builddir)/src/zabbix_server/odbc/libzbxodbc.a \
 	datasender/libzbxdatasender.a \
+	proxyconfigwrite/libzbxproxyconfigwrite.a \
 	$(top_builddir)/src/zabbix_server/preprocessor/libpreprocessor.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \

@@ -160,6 +160,19 @@ class testFormWebStep extends CLegacyWebTest {
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
+					'name' => 'Call to Prometheus API',
+					'step_name' => 'Step call to Prometheus API',
+					'url' => 'http://localhost:9090/api/v1/query?query=irate(node_network_transmit_bytes_total\{device!="lo",instance="192.168.150.101"}[1m])',
+					'parse' => true,
+					'parsed_query' => [
+						['name' => 'query', 'value' => 'irate(node_network_transmit_bytes_total\{device!="lo",instance="192.168.150.101"}[1m])']
+					],
+					'check_url' => 'http://localhost:9090/api/v1/query'
+				]
+			],
+			[
+				[
 					'expected' => TEST_ERROR,
 					'name' => 'URL parse validation',
 					'step_name' => 'Step URL parse validation',

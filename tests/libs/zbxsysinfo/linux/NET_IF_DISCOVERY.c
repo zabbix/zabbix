@@ -57,15 +57,15 @@ void	zbx_mock_test_entry(void **state)
 		expected_string = expected_json;
 	}
 
-	init_request(&request);
-	init_result(&result);
+	zbx_init_agent_request(&request);
+	zbx_init_agent_result(&result);
 
-	if (SUCCEED != parse_item_key("net.if.discovery", &request))
-		fail_msg("Unexpected return code from parse_item_key()");
+	if (SUCCEED != zbx_parse_item_key("net.if.discovery", &request))
+		fail_msg("Unexpected return code from zbx_parse_item_key()");
 
 	actual_ret = NET_IF_DISCOVERY(&request, &result);
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	if (actual_ret != expected_ret)
 	{
@@ -87,7 +87,7 @@ void	zbx_mock_test_entry(void **state)
 	if (0 != strcmp(expected_string, actual_string))
 		fail_msg("Unexpected result string: expected \"%s\", got \"%s\"", expected_string, actual_string);
 
-	free_result(&result);
+	zbx_free_agent_result(&result);
 }
 
 /* fails on error, sets *value to NULL if parameter not found */

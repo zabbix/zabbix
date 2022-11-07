@@ -24,7 +24,7 @@ class CControllerMediatypeUpdate extends CController {
 	protected function checkInput() {
 		$fields = [
 			'mediatypeid' =>			'fatal|required|db media_type.mediatypeid',
-			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(media_type2str())),
+			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
 			'name' =>					'db media_type.name|not_empty',
 			'smtp_server' =>			'db media_type.smtp_server',
 			'smtp_port' =>				'db media_type.smtp_port',
@@ -53,7 +53,8 @@ class CControllerMediatypeUpdate extends CController {
 			'description' =>			'db media_type.description',
 			'form_refresh' =>			'int32',
 			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
-			'message_templates' =>		'array'
+			'message_templates' =>		'array',
+			'provider' => 				'int32|in '.implode(',', array_keys(CMediatypeHelper::getEmailProviders()))
 		];
 
 		$ret = $this->validateInput($fields);
@@ -66,6 +67,16 @@ class CControllerMediatypeUpdate extends CController {
 					$ret = false;
 					break;
 				}
+			}
+		}
+
+		if ($ret && $this->getInput('type') == MEDIA_TYPE_EMAIL) {
+			$email_validator = new CEmailValidator();
+
+			if (!$email_validator->validate($this->getInput('smtp_email'))) {
+				error($email_validator->getError());
+				$error = self::VALIDATION_ERROR;
+				$ret = false;
 			}
 		}
 
@@ -111,11 +122,33 @@ class CControllerMediatypeUpdate extends CController {
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
 				$this->getInputs($mediatype, ['smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
-					'smtp_authentication', 'passwd', 'content_type'
+					'smtp_authentication', 'passwd', 'content_type', 'provider'
 				]);
 
-				if ($this->hasInput('smtp_username')) {
-					$mediatype['username'] = $this->getInput('smtp_username');
+				if ($mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
+					preg_match('/.*<(?<email>.*[^>])>$/i', $this->getInput('smtp_email'), $match);
+					$clean_email = $match ? $match['email'] : $this->getInput('smtp_email');
+
+					$domain = substr($clean_email, strrpos($clean_email, '@') + 1);
+
+					$mediatype['smtp_helo'] = $domain;
+
+					if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL) {
+						$mediatype['username'] = $clean_email;
+					}
+
+					if ($mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY) {
+
+						$formatted_domain = substr_replace($domain, '-', strrpos($domain, '.'), 1);
+						$static_part = CMediatypeHelper::getEmailProviders($mediatype['provider'])['smtp_server'];
+
+						$mediatype['smtp_server'] = $formatted_domain.$static_part;
+					}
+				}
+				else {
+					if ($this->hasInput('smtp_username')) {
+						$mediatype['username'] = $this->getInput('smtp_username');
+					}
 				}
 
 				$mediatype['smtp_verify_peer'] = $this->getInput('smtp_verify_peer', 0);

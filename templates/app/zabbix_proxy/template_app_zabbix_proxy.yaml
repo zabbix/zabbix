@@ -131,32 +131,6 @@ zabbix_export:
                   tag: scope
                   value: performance
         -
-          uuid: a1a7b0f3c34248a0993c305cd76fea5a
-          name: 'Zabbix proxy: Utilization of heartbeat sender internal processes, in %'
-          type: INTERNAL
-          key: 'zabbix[process,heartbeat sender,avg,busy]'
-          history: 1w
-          value_type: FLOAT
-          units: '%'
-          description: 'Average percentage of time heartbeat sender processes have been busy in the last minute.'
-          tags:
-            -
-              tag: component
-              value: internal-process
-          triggers:
-            -
-              uuid: 51e9b56f0d854808949c5c89a53edadf
-              expression: 'avg(/Zabbix proxy health/zabbix[process,heartbeat sender,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"heartbeat sender"}'
-              recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,heartbeat sender,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"heartbeat sender"}'
-              name: 'Zabbix proxy: Utilization of heartbeat sender processes is high'
-              event_name: 'Zabbix proxy: Utilization of heartbeat sender processes over {$ZABBIX.PROXY.UTIL.MAX:"heartbeat sender"}%'
-              priority: AVERAGE
-              tags:
-                -
-                  tag: scope
-                  value: performance
-        -
           uuid: d34bb8623fff4fb99f87167534299654
           name: 'Zabbix proxy: Utilization of history poller data collector processes, in %'
           type: INTERNAL
@@ -1209,42 +1183,36 @@ zabbix_export:
             key: 'zabbix[process,self-monitoring,avg,busy]'
         -
           sortorder: '4'
-          color: 0000EE
-          item:
-            host: 'Zabbix proxy health'
-            key: 'zabbix[process,heartbeat sender,avg,busy]'
-        -
-          sortorder: '5'
           color: 00EE00
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,data sender,avg,busy]'
         -
-          sortorder: '6'
+          sortorder: '5'
           color: '009999'
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,task manager,avg,busy]'
         -
-          sortorder: '7'
+          sortorder: '6'
           color: BBBB00
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,ipmi manager,avg,busy]'
         -
-          sortorder: '8'
+          sortorder: '7'
           color: '990000'
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,preprocessing manager,avg,busy]'
         -
-          sortorder: '9'
+          sortorder: '8'
           color: '008800'
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,preprocessing worker,avg,busy]'
         -
-          sortorder: '10'
+          sortorder: '9'
           color: 2B5429
           item:
             host: 'Zabbix proxy health'

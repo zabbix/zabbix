@@ -80,6 +80,49 @@ trait TableTrait {
 	}
 
 	/**
+	 * Check if values in table rows have data from data provider.
+	 *
+	 * @param array   $data        data array to be matched with result in table
+	 * @param string  $selector    table selector
+	 *
+	 * @throws Exception
+	 */
+	public function assertTableHasData($data = [], $selector = 'class:list-table') {
+		$table_rows = $this->query($selector)->asTable()->one()->index();
+
+		if (!$data) {
+			// Check that table contain one row with text "No data found."
+			$this->assertEquals(['No data found.'], $rows->asText());
+
+			return;
+		}
+
+		foreach ($data as $data_row) {
+			$found = false;
+
+			foreach ($table_rows as $table_row) {
+				$match = true;
+
+				foreach ($data_row as $key => $value) {
+					if (!isset($table_row[$key]) || $table_row[$key] != $data_row[$key]) {
+						$match = false;
+						break;
+					}
+				}
+
+				if ($match) {
+					$found = true;
+					break;
+				}
+			}
+
+			if (!$found) {
+				throw new \Exception('Row "'.implode(', ', $data_row).'" was not found in table.');
+			}
+		}
+	}
+
+	/**
 	 * Check if values in table column match data from data provider.
 	 *
 	 * @param array   $rows        data array to be match with result in table
@@ -92,6 +135,21 @@ trait TableTrait {
 		}
 
 		$this->assertTableData($data, $selector);
+	}
+
+	/**
+	 * Check if values in table column have data from data provider.
+	 *
+	 * @param array   $rows        data array to be matched with result in table
+	 * @param string  $field       table column name
+	 */
+	public function assertTableHasDataColumn($rows = [], $field = 'Name', $selector = 'class:list-table') {
+		$data = [];
+		foreach ($rows as $row) {
+			$data[] = [$field => $row];
+		}
+
+		$this->assertTableHasData($data, $selector);
 	}
 
 	/**

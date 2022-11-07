@@ -683,7 +683,7 @@ void	zbx_preprocessor_free_dep_results(zbx_preproc_dep_result_t *results, int re
 
 	for (i = 0; i < results_num; i++)
 	{
-		free_result(&results[i].value);
+		zbx_free_agent_result(&results[i].value);
 		zbx_free(results[i].error);
 		zbx_vector_ptr_clear_ext(&results[i].history, (zbx_clean_func_t)zbx_preproc_op_history_free);
 		zbx_vector_ptr_destroy(&results[i].history);
@@ -1220,7 +1220,7 @@ static void	agent_result_set_value(zbx_variant_t *value, zbx_item_value_type_t v
 	unsigned char	type;
 	zbx_log_t	*log;
 
-	init_result(result);
+	zbx_init_agent_result(result);
 
 	if (NULL != *error)
 		return;

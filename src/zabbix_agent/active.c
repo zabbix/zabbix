@@ -272,16 +272,16 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 	else						/* log.count[] */
 		max_num_parameters = 6;
 
-	init_request(&request);
+	zbx_init_agent_request(&request);
 
-	if (SUCCEED == parse_item_key(itemkey, &request) && 0 < get_rparams_num(&request) &&
+	if (SUCCEED == zbx_parse_item_key(itemkey, &request) && 0 < get_rparams_num(&request) &&
 			max_num_parameters >= get_rparams_num(&request) && NULL != (skip = get_rparam(&request, 4)) &&
 			0 == strcmp(skip, "skip"))
 	{
 		ret = SUCCEED;
 	}
 
-	free_request(&request);
+	zbx_free_agent_request(&request);
 
 	return ret;
 }
@@ -559,9 +559,9 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
 		config_type = "interface";
 	}
 
-	init_result(&result);
+	zbx_init_agent_result(&result);
 
-	if (SUCCEED == process(config, ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, &result) &&
+	if (SUCCEED == zbx_execute_agent_check(config, ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, &result) &&
 			NULL != (value = ZBX_GET_STR_RESULT(&result)) && NULL != *value)
 	{
 		if (SUCCEED != zbx_is_utf8(*value))
@@ -590,7 +590,7 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get host %s using \"%s\" item specified by"
 				" \"%s\" configuration parameter",config_type, config,config_name);
 
-	free_result(&result);
+	zbx_free_agent_result(&result);
 }
 
 /******************************************************************************
@@ -1159,9 +1159,9 @@ static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metr
 	AGENT_RESULT	result;
 	char		**pvalue;
 
-	init_result(&result);
+	zbx_init_agent_result(&result);
 
-	if (SUCCEED != (ret = process(metric->key, 0, &result)))
+	if (SUCCEED != (ret = zbx_execute_agent_check(metric->key, 0, &result)))
 	{
 		if (NULL != (pvalue = ZBX_GET_MSG_RESULT(&result)))
 			*error = zbx_strdup(*error, *pvalue);
@@ -1176,7 +1176,7 @@ static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metr
 				NULL, NULL, NULL, NULL, metric->flags, zbx_config_tls);
 	}
 out:
-	free_result(&result);
+	zbx_free_agent_result(&result);
 
 	return ret;
 }

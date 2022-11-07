@@ -438,7 +438,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 			get_program_type_string(poller_args_in->zbx_get_program_type_cb_arg()), server_num,
 			get_process_type_string(process_type), process_num);
 
-	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -462,7 +462,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 			finished_num = 0;
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != zbx_ipc_socket_read(&socket, &message))
 		{
@@ -470,7 +470,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 			exit(EXIT_FAILURE);
 		}
 
-		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		time_wake = zbx_time();
 		zbx_update_env(time_wake);

@@ -51,15 +51,8 @@ class CUserDirectory extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'userdirectoryids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'userdirectoryid' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'host' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-				'name' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			]],
-			'search' =>						['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_fill_keys(
-				['base_dn', 'bind_dn', 'description', 'host', 'name', 'search_attribute', 'search_filter'],
-				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE]
-			)],
+			'filter' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['userdirectoryid', 'host', 'name']],
+			'search' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['base_dn', 'bind_dn', 'description', 'host', 'name', 'search_attribute', 'search_filter']],
 			'searchByAny' =>				['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>				['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],

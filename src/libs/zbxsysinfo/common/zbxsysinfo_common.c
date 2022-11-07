@@ -96,7 +96,7 @@ ZBX_METRIC	parameters_common[] =
 
 static const char	*user_parameter_dir = NULL;
 
-void	set_user_parameter_dir(const char *path)
+void	zbx_set_user_parameter_dir(const char *path)
 {
 	user_parameter_dir = path;
 }

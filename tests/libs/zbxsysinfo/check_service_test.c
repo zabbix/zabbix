@@ -52,8 +52,8 @@ void	zbx_mock_test_entry(void **state)
 	default_addr = zbx_mock_get_parameter_string("in.interface");
 	ip = zbx_mock_get_parameter_string("in.ip");
 
-	init_result(&result);
-	init_request(&request);
+	zbx_init_agent_result(&result);
+	zbx_init_agent_request(&request);
 	*key = '\0';
 	strcat(key, "net.tcp.service[smtp");
 
@@ -64,7 +64,7 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	strcat(key, "]");
-	parse_item_key(key, &request);
+	zbx_parse_item_key(key, &request);
 
 	returned_code = check_service(&request, default_addr, &result, 0);
 	if (SUCCEED != returned_code && NULL != result.msg && '\0' != *(result.msg))
@@ -72,6 +72,6 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_result_eq("Return value", expected_code, returned_code);
 
-	free_result(&result);
-	free_request(&request);
+	zbx_free_agent_result(&result);
+	zbx_free_agent_request(&request);
 }

@@ -577,7 +577,6 @@ class testWebScenario extends CAPITest {
 				$dbRow = DBFetch($dbResult);
 				$this->assertEquals($dbRow['name'], $httptests[$key]['name']);
 				$this->assertEquals($dbRow['httptestid'], $httptests[$key]['httptestid']);
-				$this->assertEquals($dbRow['nextcheck'], 0);
 				$this->assertEquals($dbRow['delay'], 60);
 				$this->assertEquals($dbRow['status'], 0);
 				$this->assertEquals($dbRow['agent'], 'Zabbix');

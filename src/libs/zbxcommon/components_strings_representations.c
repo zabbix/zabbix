@@ -67,8 +67,6 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "data sender";
 		case ZBX_PROCESS_TYPE_CONFSYNCER:
 			return "configuration syncer";
-		case ZBX_PROCESS_TYPE_HEARTBEAT:
-			return "heartbeat sender";
 		case ZBX_PROCESS_TYPE_SELFMON:
 			return "self-monitoring";
 		case ZBX_PROCESS_TYPE_VMWARE:

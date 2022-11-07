@@ -154,4 +154,14 @@ int	zbx_dbsync_compare_maintenance_groups(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_maintenance_hosts(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync);
 
+int	zbx_dbsync_prepare_drules(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_dchecks(zbx_dbsync_t *sync);
+
+int	zbx_dbsync_prepare_httptests(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_httptest_fields(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_httpsteps(zbx_dbsync_t *sync);
+int	zbx_dbsync_prepare_httpstep_fields(zbx_dbsync_t *sync);
+void	zbx_dbsync_clear_user_macros(void);
+
+
 #endif /* BUILD_SRC_LIBS_ZBXDBCACHE_DBSYNC_H_ */

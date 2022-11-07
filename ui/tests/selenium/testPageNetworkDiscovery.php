@@ -60,7 +60,7 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider allRules
-	 * @backup drules
+	 * @backupOnce drules
 	 */
 	public function testPageNetworkDiscovery_MassDelete($drule) {
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
@@ -74,7 +74,6 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE druleid='.$drule['druleid']));
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dchecks WHERE druleid='.$drule['druleid']));
-		$this->page->logout();
 	}
 
 	public function testPageNetworkDiscovery_MassDisableAll() {

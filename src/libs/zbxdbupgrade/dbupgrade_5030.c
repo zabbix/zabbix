@@ -3858,18 +3858,18 @@ static int	DBpatch_5030123(void)
 
 static int	DBpatch_5030127(void)
 {
-#define CONDITION_TYPE_APPLICATION	15
+#define ZBX_CONDITION_TYPE_APPLICATION	15 /* deprecated */
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update conditions set conditiontype=%d,value2='Application' where conditiontype=%d",
-			CONDITION_TYPE_EVENT_TAG_VALUE, CONDITION_TYPE_APPLICATION))
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE, ZBX_CONDITION_TYPE_APPLICATION))
 	{
 		return FAIL;
 	}
 
 	return SUCCEED;
-#undef CONDITION_TYPE_APPLICATION
+#undef ZBX_CONDITION_TYPE_APPLICATION
 }
 
 static int	DBpatch_5030128(void)
@@ -5168,7 +5168,7 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 						ZBX_FS_UI64 "\" formula host:key parameter at %s", itemid, ptr);
 			}
 
-			ret = parse_host_key(arg0, &host, &key);
+			ret = zbx_parse_host_key(arg0, &host, &key);
 			zbx_free(arg0);
 
 			if (FAIL == ret)
@@ -5469,9 +5469,9 @@ static int	DBpatch_5030169(void)
 
 		params_offset = 0;
 
-		init_request(&request);
+		zbx_init_agent_request(&request);
 
-		if (SUCCEED != parse_item_key(row[1], &request))
+		if (SUCCEED != zbx_parse_item_key(row[1], &request))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot parse aggregate checks item key \"%s\"", row[1]);
 			continue;
@@ -5479,7 +5479,7 @@ static int	DBpatch_5030169(void)
 
 		ret_formula = dbpatch_aggregate2formula(row[0], &request, &params, &params_alloc, &params_offset,
 				&error);
-		free_request(&request);
+		zbx_free_agent_request(&request);
 
 		if (FAIL == ret_formula)
 		{

@@ -737,15 +737,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if ($db_item['logtimefmt'] !== getRequest('logtimefmt', '')) {
 						$item['logtimefmt'] = getRequest('logtimefmt', '');
 					}
-					if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
-						$item['interfaceid'] = getRequest('interfaceid', 0);
-					}
 					if ($db_item['params'] !== getRequest('params', '')) {
 						$item['params'] = getRequest('params', '');
 					}
 					if ($db_item['preprocessing'] !== $preprocessing) {
 						$item['preprocessing'] = $preprocessing;
 					}
+				}
+
+				if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
+					$item['interfaceid'] = getRequest('interfaceid', 0);
 				}
 
 				if ($db_item['delay'] != $delay) {

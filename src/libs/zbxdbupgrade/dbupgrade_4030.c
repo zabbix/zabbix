@@ -19,9 +19,7 @@
 
 #include "dbupgrade.h"
 
-#include "zbxexpr.h"
 #include "zbxdbhigh.h"
-#include "zbxnum.h"
 
 /*
  * 4.4 development database patches

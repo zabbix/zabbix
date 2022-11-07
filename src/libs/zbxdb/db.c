@@ -2744,7 +2744,7 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	ZBX_PG_SVERSION = (zbx_uint32_t)PQserverVersion(conn);
 
-	major = (zbx_uint32_t)RIGHT2(ZBX_PG_SVERSION/10000);
+	major = ZBX_PG_SVERSION/10000;
 
 	version_info->database = "PostgreSQL";
 
@@ -2755,12 +2755,12 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 
 	if (10 > major)
 	{
-		version_info->friendly_current_version = zbx_dsprintf(NULL, "%u.%d.%d", (unsigned int)major,
+		version_info->friendly_current_version = zbx_dsprintf(NULL, "%" PRIu32 ".%d.%d", major,
 				RIGHT2(ZBX_PG_SVERSION/100), RIGHT2(ZBX_PG_SVERSION));
 	}
 	else
 	{
-		version_info->friendly_current_version = zbx_dsprintf(NULL, "%u.%d", (unsigned int)major,
+		version_info->friendly_current_version = zbx_dsprintf(NULL, "%" PRIu32 ".%d", major,
 				RIGHT2(ZBX_PG_SVERSION));
 	}
 

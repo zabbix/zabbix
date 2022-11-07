@@ -36,7 +36,7 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 	AGENT_RESULT	result_tmp;
 	zbx_uint64_t	free, total;
 
-	init_result(&result_tmp);
+	zbx_init_agent_result(&result_tmp);
 
 	if (SYSINFO_RET_OK != VM_MEMORY_FREE(&result_tmp))
 	{
@@ -58,7 +58,7 @@ static int	VM_MEMORY_USED(AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 clean:
-	free_result(&result_tmp);
+	zbx_free_agent_result(&result_tmp);
 
 	return ret;
 }
@@ -69,7 +69,7 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 	AGENT_RESULT	result_tmp;
 	zbx_uint64_t	free, total;
 
-	init_result(&result_tmp);
+	zbx_init_agent_result(&result_tmp);
 
 	if (SYSINFO_RET_OK != VM_MEMORY_FREE(&result_tmp))
 	{
@@ -97,7 +97,7 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 clean:
-	free_result(&result_tmp);
+	zbx_free_agent_result(&result_tmp);
 
 	return ret;
 }
@@ -113,7 +113,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 	AGENT_RESULT	result_tmp;
 	zbx_uint64_t	free, total;
 
-	init_result(&result_tmp);
+	zbx_init_agent_result(&result_tmp);
 
 	if (SYSINFO_RET_OK != VM_MEMORY_FREE(&result_tmp))
 	{
@@ -141,7 +141,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 clean:
-	free_result(&result_tmp);
+	zbx_free_agent_result(&result_tmp);
 
 	return ret;
 }

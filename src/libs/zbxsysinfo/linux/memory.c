@@ -168,7 +168,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	init_result(&result_tmp);
+	zbx_init_agent_result(&result_tmp);
 
 	ret = VM_MEMORY_AVAILABLE(&result_tmp);
 
@@ -190,7 +190,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 
 	SET_DBL_RESULT(result, available / (double)total * 100);
 clean:
-	free_result(&result_tmp);
+	zbx_free_agent_result(&result_tmp);
 
 	return ret;
 }

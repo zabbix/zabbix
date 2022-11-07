@@ -79,6 +79,7 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const URL = 'url';
 	public const SCHEDULED_REPORT_TEST_TIMEOUT = 'report_test_timeout';
 	public const DBVERSION_STATUS = 'dbversion_status';
+	public const SERVER_STATUS = 'server_status';
 	public const AUDITLOG_ENABLED = 'auditlog_enabled';
 	public const GEOMAPS_TILE_PROVIDER = 'geomaps_tile_provider';
 	public const GEOMAPS_TILE_URL = 'geomaps_tile_url';

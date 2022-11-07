@@ -80,8 +80,8 @@ void	zbx_mock_test_entry(void **state)
 		}
 	}
 
-	init_request(&zbx_agent_request);
-	init_result(&zbx_agent_result);
+	zbx_init_agent_request(&zbx_agent_request);
+	zbx_init_agent_result(&zbx_agent_result);
 
 	/* call the function-under-test */
 	actual_ret = SYSTEM_CPU_SWITCHES(&zbx_agent_request, &zbx_agent_result);
@@ -121,6 +121,6 @@ void	zbx_mock_test_entry(void **state)
 		}
 	}
 
-	free_request(&zbx_agent_request);
-	free_result(&zbx_agent_result);
+	zbx_free_agent_request(&zbx_agent_request);
+	zbx_free_agent_result(&zbx_agent_result);
 }

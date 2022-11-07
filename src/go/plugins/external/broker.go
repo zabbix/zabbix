@@ -85,7 +85,19 @@ func (b *pluginBroker) handleConnection() {
 	for {
 		t, data, err := comms.Read(b.conn)
 		if err != nil {
-			return
+			if errors.Is(err, net.ErrClosed) {
+				log.Tracef("closed connection to loaded %s plugin", b.pluginName)
+
+				return
+			}
+
+			log.Errf(
+				"failed to read response for plugin %s, %s",
+				b.pluginName,
+				err.Error(),
+			)
+
+			continue
 		}
 
 		var id uint32
