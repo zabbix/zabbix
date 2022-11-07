@@ -25,7 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldWidgetSelect extends CWidgetField {
 
-	public const DEFAULT_VALUE = -1;
+	public const DEFAULT_VALUE = '';
 
 	private string $search_by_value;
 
@@ -64,7 +64,7 @@ class CWidgetFieldWidgetSelect extends CWidgetField {
 	}
 
 	public function setValue($value): self {
-		if ($value === '' || ctype_alnum($value)) {
+		if ($value === '' || ctype_alnum((string) $value)) {
 			$this->value = $value;
 		}
 
