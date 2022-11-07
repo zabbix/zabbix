@@ -47,7 +47,7 @@ $filter_actions = (new CCheckBoxList('filter_statuses'))
 	->setWidth(360)
 	->setOptions($filter_status_options);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Action log'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_ACTIONLOG_LIST))
 	->setControls(
@@ -204,7 +204,7 @@ $obj = [
 	'timeControl.processObjects();')
 )->show();
 
-$widget
+$html_page
 	->addItem(
 		(new CForm('get'))
 			->setName('auditForm')
