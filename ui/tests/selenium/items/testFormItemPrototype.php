@@ -1104,7 +1104,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'key' => 'vfs.file.cksum[/sbin/shutdown,{#KEY}]',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'An item prototype with key "vfs.file.cksum[/sbin/shutdown,{#KEY}]" already exists on host'
+						'An item prototype with key "vfs.file.cksum[/sbin/shutdown,{#KEY}]" already exists on the host'
 					]
 				]
 			],
