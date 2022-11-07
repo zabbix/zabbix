@@ -17,6 +17,7 @@
 	},
 	"actions": {
 		"widget.graphprototype.view": {
+			"class": "WidgetView",
 			"layout": "layout.json",
 			"view": null
 		}

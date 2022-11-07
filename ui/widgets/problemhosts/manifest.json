@@ -5,5 +5,10 @@
 	"name": "Problem hosts",
 	"namespace": "ProblemHosts",
 	"version": "1.0",
-	"author": "Zabbix SIA"
+	"author": "Zabbix SIA",
+	"actions": {
+		"widget.problemhosts.view": {
+			"class": "WidgetView"
+		}
+	}
 }

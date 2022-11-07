@@ -14,6 +14,11 @@
 		},
 		"js_class": "CWidgetItem"
 	},
+	"actions": {
+		"widget.item.view": {
+			"class": "WidgetView"
+		}
+	},
 	"assets": {
 		"js": ["class.widget.js"]
 	}

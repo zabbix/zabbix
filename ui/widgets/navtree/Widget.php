@@ -36,7 +36,7 @@ class Widget extends CWidget {
 		return [
 			'class.widget.js' => [
 				'Add' => _s('Add'),
-				'Add child element' => _s('Add child elementsssss'),
+				'Add child element' => _s('Add child elements'),
 				'Add multiple maps' => _s('Add multiple maps'),
 				'Apply' => _s('Apply'),
 				'Cancel' => _s('Cancel'),

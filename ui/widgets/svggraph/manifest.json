@@ -9,6 +9,11 @@
 	"widget": {
 		"js_class": "CWidgetSvgGraph"
 	},
+	"actions": {
+		"widget.svggraph.view": {
+			"class": "WidgetView"
+		}
+	},
 	"assets": {
 		"js": ["class.widget.js"]
 	}

@@ -11,5 +11,10 @@
 			"width": 6,
 			"height": 3
 		}
+	},
+	"actions": {
+		"widget.discovery.view": {
+			"class": "WidgetView"
+		}
 	}
 }
