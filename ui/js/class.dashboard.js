@@ -382,7 +382,7 @@ class CDashboard extends CBaseComponent {
 	_promiseCheckConfiguration() {
 		const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', 'dashboard.configuration.hash.get');
+		curl.setArgument('action', 'dashboard.config.hash');
 
 		return fetch(curl.getUrl(), {
 			method: 'POST',
