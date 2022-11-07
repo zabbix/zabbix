@@ -21,6 +21,7 @@
 
 
 window.action_edit_popup = new class {
+	// todo : CLEAN CODE, REMOVE UNNECESSARY FUNCTIONS
 
 	init({condition_operators, condition_types, conditions, actionid, eventsource}) {
 		this.overlay = overlays_stack.getById('action-edit');
@@ -42,6 +43,73 @@ window.action_edit_popup = new class {
 		for (const condition of conditions) {
 			this._createConditionsRow(condition);
 		}
+
+		// Reload operation table when esc period is changed
+		let esc_period = document.querySelector('#esc_period');
+		esc_period.addEventListener('change', (e) => {
+			this._loadOperationTable();
+		});
+
+		this.$operation_table = $('#operations-table-div');
+	}
+
+	_loadOperationTable(e = null) {
+		let new_operation = {};
+		if (e) {
+			new_operation = e.detail;
+		}
+
+		const fields = getFormFields(this.form);
+
+		// todo : add necessarry data for each table (to add data to correct table)
+
+		const curl = new Curl('zabbix.php', false);
+		curl.setArgument('action', 'popup.action.operation.get');
+		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
+		curl.setArgument('esc_period', document.querySelector('#esc_period').value);
+
+		// todo : add loader somewhere
+		fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				'operations': fields.operations,
+				'new_operation': new_operation
+			})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if (typeof response === 'object' && 'error' in response) {
+					const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
+
+					this.$operation_table.empty();
+					this.$operation_table.append(message_box);
+				}
+				else {
+					this.$operation_table.empty();
+					this.$operation_table.append(response.body)
+				}
+			})
+			.catch((exception) => {
+				// todo : add actions for situation when exception
+			})
+			.finally(
+				// todo : remove loader
+			);
+	}
+
+	loaderStart() {
+		// todo : add functionality to add loader
+		// this.operation_table.setAttribute('class', 'is-loading');
+	}
+
+	loaderStop() {
+		// todo : add functionality to remove loader
+		// this.operation_table.removeAttribute('class');
+		// this.$preloader.remove();
 	}
 
 	_initActionButtons() {
@@ -59,6 +127,7 @@ window.action_edit_popup = new class {
 				this._openOperationPopup(this.eventsource, <?= ACTION_UPDATE_OPERATION ?>, this.actionid);
 			}
 			else if (e.target.classList.contains('js-edit-operation')) {
+				// todo : fix this. Open the same popup,
 				this._openEditOperationPopup(e, JSON.parse(e.target.getAttribute('data_operation')), $(e.target).closest('tr').attr('id'));
 			}
 			else if (e.target.classList.contains('js-remove')) {
@@ -103,7 +172,8 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
-			this._createOperationsRow(e, row_id);
+			// todo : FIX! edit row, not add new one!
+			this._loadOperationTable(e);
 		});
 	}
 
@@ -121,7 +191,7 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
-			this._createOperationsRow(e);
+			this._loadOperationTable(e);
 		});
 	}
 
@@ -171,9 +241,9 @@ window.action_edit_popup = new class {
 					input.row_index ++;
 					template = new Template(document.getElementById('condition-row-tmpl').innerHTML)
 
-				document
-					.querySelector('#conditionTable tbody')
-					.insertAdjacentHTML('beforeend', template.evaluate(element))
+					document
+						.querySelector('#conditionTable tbody')
+						.insertAdjacentHTML('beforeend', template.evaluate(element))
 				}
 				this._processTypeOfCalculation();
 			})
@@ -191,8 +261,8 @@ window.action_edit_popup = new class {
 				switch(parseInt(input.conditiontype)) {
 					case <?= CONDITION_TYPE_SUPPRESSED ?>:
 						input.condition_name = input.operator == <?= CONDITION_OPERATOR_YES ?>
-						? <?= json_encode(_('Problem is suppressed')) ?>
-						: <?= json_encode(_('Problem is not suppressed')) ?>
+							? <?= json_encode(_('Problem is suppressed')) ?>
+							: <?= json_encode(_('Problem is not suppressed')) ?>
 
 						template = new Template(document.getElementById('condition-suppressed-row-tmpl').innerHTML);
 						break;
@@ -219,8 +289,8 @@ window.action_edit_popup = new class {
 	}
 
 	/**
-	* Check if row with the same conditiontype and value already exists.
-	*/
+	 * Check if row with the same conditiontype and value already exists.
+	 */
 	_checkConditionRow(input) {
 		let result = [];
 		[...document.getElementById('conditionTable').getElementsByTagName('tr')].map(it => {
@@ -273,8 +343,8 @@ window.action_edit_popup = new class {
 	}
 
 	/**
-	* Add hidden inputs to template for each possible eventsource/operation type/data combination.
-	*/
+	 * Add hidden inputs to template for each possible eventsource/operation type/data combination.
+	 */
 	_prepareOperationsRow(operation, op_template) {
 		const template = document.createElement('template');
 		let prefix = operation.prefix;
@@ -336,8 +406,8 @@ window.action_edit_popup = new class {
 	}
 
 	/**
-	* Add data to specific template based on operation recovery type, input data and eventsource.
-	*/
+	 * Add data to specific template based on operation recovery type, input data and eventsource.
+	 */
 	_createOperationsRow(input, row_id = null) {
 		let operation = input.detail.operation;
 

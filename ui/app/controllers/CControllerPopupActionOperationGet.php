@@ -19,165 +19,112 @@
 **/
 
 
-class CControllerPopupActionEdit extends CController {
+class CControllerPopupActionOperationGet extends CController {
 
-	protected function checkInput(): bool {
-		$eventsource = [
-			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
-			EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
-		];
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->disableSIDvalidation();
+	}
 
+	protected function checkInput() {
 		$fields = [
-			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', $eventsource),
-			'actionid' =>		'db actions.actionid'
+			'esc_period' =>		'db actions.esc_period|not_empty',
+			'operations'=>		'array',
+			'new_operation' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions(): bool {
-		switch ($this->getInput('eventsource')) {
-			case EVENT_SOURCE_TRIGGERS:
-				$has_permission = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
-				break;
-
-			case EVENT_SOURCE_DISCOVERY:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
-				break;
-
-			case EVENT_SOURCE_AUTOREGISTRATION:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
-				break;
-
-			case EVENT_SOURCE_INTERNAL:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
-				break;
-
-			case EVENT_SOURCE_SERVICE:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
-				break;
-		}
-
-		if (!$has_permission) {
-			return false;
-		}
-
-		if ($this->hasInput('actionid')) {
-			$this->action = API::Action()->get([
-				'output' => [
-					'actionid', 'name', 'esc_period', 'eventsource', 'status', 'pause_suppressed', 'notify_if_canceled'
-				],
-				'actionids' => $this->getInput('actionid'),
-				'selectOperations' => 'extend',
-				'selectRecoveryOperations' => 'extend',
-				'selectUpdateOperations' => 'extend',
-				'selectFilter' => 'extend'
-			]);
-
-			if (!$this->action) {
-				return false;
-			}
-			$this->action = $this->action[0];
-		}
-		else {
-			$this->action = null;
-		}
-
+	protected function checkPermissions() {
 		return true;
+		// todo : check if action can be edited??
 	}
 
-	protected function doAction(): void {
-		$eventsource = $this->getInput('eventsource', EVENT_SOURCE_TRIGGERS);
+	protected function doAction() {
+		$data['esc_period'] = $this->getInput('esc_period');
+		$data['operations'] = $this->getInput('operations');
 
-		if ($this->action !== null) {
-			$formula = array_key_exists('formula', $this->action['filter'])
-				? $this->action['filter']['formula']
-				: '';
+		if ($this->getInput('new_operation')) {
+			$data['operations'][] = $this->getInput('new_operation')['operation'];
+		}
 
-			sortOperations($eventsource, $this->action['operations']);
+		$operation = $this->getInput('operation');
 
-			$data = [
-				'eventsource' => $eventsource,
-				'actionid' => $this->action['actionid'],
-				'action' => [
-					'name' => $this->action['name'],
-					'esc_period' => $this->action['esc_period'],
-					'eventsource' => $eventsource,
-					'status' => $this->action['status'],
-					'operations' => $this->action['operations'],
-					'recovery_operations' => $this->action['recovery_operations'],
-					'update_operations' => $this->action['update_operations'],
-					'filter' => $this->action['filter'],
-					'pause_suppressed' => $this->action['pause_suppressed'],
-					'notify_if_canceled' =>  $this->action['notify_if_canceled']
-				],
-				'formula' => $formula,
-				'allowedOperations' => getAllowedOperations($eventsource)
-			];
-			foreach ($data['action']['filter']['conditions'] as  $row_index => &$condition) {
-				$condition_names = actionConditionValueToString([$data['action']]);
-				$data['condition_name'][] = $condition_names[0][$row_index];
-				$condition += [
-					'row_index' => $row_index,
-					'name' => $condition_names[0][$row_index]
-				];
-			}
-			unset ($condition);
+		if (preg_match('/\bscriptid\b/', $operation['operationtype'])){
+			$operation['opcommand']['scriptid'] = preg_replace('[\D]', '', $operation['operationtype']);
+			$operationtype = OPERATION_TYPE_COMMAND;
 
-			$data['action']['filter']['conditions'] = CConditionHelper::sortConditionsByFormulaId(
-				$data['action']['filter']['conditions']
-			);
-
-			// todo : add for other operation recovery types
-			foreach ($data['action']['operations'] as &$operation) {
-				$action = [
-					'esc_period' => $this->action['esc_period'],
-					'eventsource' => $eventsource,
-					'operations' => [$operation],
-					'recovery_operations' => [],
-					'update_operations' => [],
-				];
-
-				$operation['details'] = $this->getData($operation['operationtype'], [$action], ACTION_OPERATION);
+			if (array_key_exists('opcommand_hst', $operation)) {
+				foreach ($operation['opcommand_hst'] as $host) {
+					if (is_array($host['hostid']) && array_key_exists('current_host', $host['hostid'])) {
+						$operation['opcommand_hst'][0]['hostid'] = 0;
+					}
+				}
 			}
 		}
 		else {
-			$data = [
-				'eventsource' => $eventsource,
-				'actionid' => $this->getInput('actionid', ''),
-				'action' => [
-					'name' => '',
-					'esc_period' => DB::getDefault('actions', 'esc_period'),
-					'eventsource' => $eventsource,
-					'status' => '',
-					'operations' => [],
-					'recovery_operations' => [],
-					'update_operations' => [],
-					'filter' => [
-						'conditions' => [],
-						'evaltype' => ''
-					],
-					'pause_suppressed' => ACTION_PAUSE_SUPPRESSED_TRUE,
-					'notify_if_canceled' =>  ACTION_NOTIFY_IF_CANCELED_TRUE
-				],
-				'formula' => $this->getInput('formula', ''),
-				'allowedOperations' => getAllowedOperations($eventsource)
-			];
+			$operationtype = (int)preg_replace('[\D]', '', $operation['operationtype']);
 		}
 
-		$response = new CControllerResponseData($data);
-		$this->setResponse($response);
+		if (array_key_exists('opmessage', $operation)) {
+			if (!array_key_exists('default_msg', $operation['opmessage'])
+				&& ($operationtype === OPERATION_TYPE_MESSAGE
+					|| $operationtype === OPERATION_TYPE_RECOVERY_MESSAGE
+					|| $operationtype === OPERATION_TYPE_UPDATE_MESSAGE)) {
+				$operation['opmessage']['default_msg'] = '1';
+
+				unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
+			}
+		}
+		$operation['operationtype'] = $operationtype;
+
+		$data['operation'] = $operation;
+		$data['operation']['row_index'] = $this->getInput('row_index');
+
+		// todo : SORTING (by steps)
+
+		foreach ($data['operations'] as &$operation) {
+			$action = [
+				'name' => '',
+				'esc_period' => DB::getDefault('actions', 'esc_period'),
+				// todo : change eventsource
+				// todo : fix recovery, update operations
+				'eventsource' => EVENT_SOURCE_TRIGGERS,
+				'status' => 0,
+				'operations' => [$operation],
+				'recovery_operations' => [],
+				'update_operations' => [],
+				'filter' => [
+					'conditions' => [],
+					'evaltype' => ''
+				],
+				'pause_suppressed' => ACTION_PAUSE_SUPPRESSED_TRUE,
+				'notify_if_canceled' =>  ACTION_NOTIFY_IF_CANCELED_TRUE
+			];
+
+			$operation['details'] = $this->getData($operationtype, [$action], ACTION_OPERATION);
+		}
+
+		$this->setResponse(new CControllerResponseData($data));
 	}
 
 	protected function getData(int $operationtype, array $action, int $type): array {
-		$data = getActionOperationData($action, $type);
+		// todo : move this functionality to different function. because duplicates code from action edit controller
 
+		$data = getActionOperationData($action, $type);
 		$operation_values = getOperationDataValues($data);
 		$result = [];
 

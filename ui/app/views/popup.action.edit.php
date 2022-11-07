@@ -176,15 +176,6 @@ $action_tab
 // Operations tab.
 $operations_tab = (new CFormGrid());
 
-if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
-	$operations_tab->addItem([
-		(new CLabel(_('Default operation step duration'), 'esc_period'))->setAsteriskMark(),
-		(new CTextBox('esc_period', $data['action']['esc_period']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-	]);
-}
-
 // Operations table.
 $operations_table = (new CTable())
 	->setId('op-table')
@@ -456,7 +447,7 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 	$operations_table = (new CTable())
 		->setId('rec-table')
 		->setAttribute('style', 'width: 100%;');
-		$operations_table->setHeader([_('Details'), _('Action')]);
+	$operations_table->setHeader([_('Details'), _('Action')]);
 
 	if ($data['action']['recovery_operations']) {
 		$actionOperationDescriptions = getActionOperationDescriptions($data['eventsource'], [$data['action']],
@@ -634,10 +625,36 @@ $operations_tab->addItem(
 	new CFormField((new CLabel(_('At least one operation must exist.')))->setAsteriskMark())
 );
 
+
+// todo : fix tables, views for each eventsource
+// todo : remove unnecessary code
+
+$operations_tab_partial = new CFormGrid();
+$operations_tab_partial->addItem([
+	(new CLabel(_('Default operation step duration'), 'esc_period'))->setAsteriskMark(),
+	(new CTextBox('esc_period', $data['action']['esc_period']))
+		->setId('esc_period')
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->setAriaRequired()
+]);
+
+$data['esc_period'] = $data['action']['esc_period'];
+
+$operations_tab_partial->addItem([
+	new CLabel('Operations'),
+	(new CFormField(new CPartial('popup.operations.html', $data)))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setId('operations-table-div')
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+]);
+
+// todo : remove test tab;
+
 $tabs = (new CTabView())
 	->setSelected(0)
 	->addTab('action-tab', _('Action'), $action_tab)
-	->addTab('action-operations-tab', _('Operations'), $operations_tab, TAB_INDICATOR_OPERATIONS);
+	->addTab('action-operations-tab', _('Operations'), $operations_tab, TAB_INDICATOR_OPERATIONS)
+	->addTab('action-operations-partial-tab', _('Operations test'), $operations_tab_partial, TAB_INDICATOR_OPERATIONS);
 
 $form
 	->addItem($tabs)
