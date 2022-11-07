@@ -103,13 +103,22 @@
 
 			this.form.querySelector('[type="checkbox"][name="ldap_auth_enabled"]').addEventListener('change', (e) => {
 				const is_readonly = !e.target.checked;
+				const default_index = this.form.querySelector('input[name="ldap_default_row_index"]:checked');
+				const default_index_hidden = this.form.querySelector('[type="hidden"][name="ldap_default_row_index"]');
 
-				this.ldap_provisioning_fields.forEach(field => field.toggleAttribute('readonly', is_readonly));
+				this.ldap_provisioning_fields.forEach(field => {
+					field.toggleAttribute('readonly', is_readonly);
+					field.setAttribute('tabindex', is_readonly ? -1 : 0);
+				});
 				this._setTableVisiblityState(this.ldap_servers_table, is_readonly);
 				this._disableRemoveLdapServersWithUserGroups();
 
 				if (!is_readonly && !this.ldap_jit_status.checked) {
 					this.form.querySelector('[name="jit_provision_interval"]').toggleAttribute('readonly', true);
+				}
+
+				if (is_readonly && ldap_default_row_index) {
+					default_index_hidden.value = default_index.value;
 				}
 			});
 
@@ -124,9 +133,10 @@
 			document.getElementById('saml_auth_enabled').addEventListener('change', (e) => {
 				const is_readonly = !e.target.checked;
 
-				this.form.querySelectorAll('.saml-enabled').forEach(field =>
-					field.toggleAttribute('readonly', is_readonly)
-				);
+				this.form.querySelectorAll('.saml-enabled').forEach(field => {
+					field.toggleAttribute('readonly', is_readonly);
+					field.setAttribute('tabindex', is_readonly ? -1 : 0);
+				});
 				this._setTableVisiblityState(this.saml_provision_groups_table, is_readonly);
 				this._setTableVisiblityState(this.saml_media_type_mapping_table, is_readonly);
 			});
@@ -228,7 +238,7 @@
 
 		_setTableVisiblityState(table, readonly) {
 			table.classList.toggle('disabled', readonly);
-			table.querySelectorAll('a,input,button').forEach(node => {
+			table.querySelectorAll('a,input:not([type="hidden"]),button').forEach(node => {
 				node.toggleAttribute('disabled', readonly);
 				node.classList.toggle('disabled', readonly);
 			});
@@ -433,9 +443,7 @@
 
 				if (row === null) {
 					ldap.is_default = document.getElementById('ldap-servers')
-							.querySelector('input[name="ldap_default_row_index"]:checked') === null
-						? 'checked'
-						: '';
+							.querySelector('input[name="ldap_default_row_index"]:checked') === null;
 					ldap.usrgrps = 0;
 
 					this.ldap_servers_table
@@ -443,9 +451,7 @@
 						.appendChild(this._prepareServerRow(ldap));
 				}
 				else {
-					ldap.is_default = row.querySelector('input[name="ldap_default_row_index"]').checked === true
-						? 'checked'
-						: '';
+					ldap.is_default = row.querySelector('input[name="ldap_default_row_index"]').checked === true;
 					ldap.usrgrps = row.querySelector('.js-ldap-usergroups').textContent;
 
 					row.parentNode.insertBefore(this._prepareServerRow(ldap), row);

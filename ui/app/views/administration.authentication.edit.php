@@ -187,6 +187,7 @@ $http_tab = (new CFormGrid())
 
 // LDAP authentication fields.
 $ldap_auth_enabled = $data['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED;
+$form->addVar('ldap_default_row_index', $data['ldap_default_row_index']);
 $ldap_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable LDAP authentication'), 'ldap_auth_enabled'),
