@@ -31,7 +31,7 @@ $this->addJsFile('layout.mode.js');
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Dashboards'))
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DASHBOARDS_LIST))
@@ -52,7 +52,7 @@ $widget = (new CWidget())
 	);
 
 if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-	$widget
+	$html_page
 		->addItem((new CFilter())
 			->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'dashboard.list'))
 			->setProfile($data['profileIdx'])
@@ -128,5 +128,6 @@ $form->addItem([
 	], 'dashboard')
 ]);
 
-$widget->addItem($form);
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

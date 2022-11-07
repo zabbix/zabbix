@@ -655,10 +655,10 @@ var hintBox = {
 };
 
 /**
- * Add object to the list of favourites.
+ * Add object to the list of favorites.
  */
 function add2favorites(object, objectid) {
-	sendAjaxData('zabbix.php?action=favourite.create', {
+	sendAjaxData('zabbix.php?action=favorite.create', {
 		data: {
 			object: object,
 			objectid: objectid
@@ -667,10 +667,10 @@ function add2favorites(object, objectid) {
 }
 
 /**
- * Remove object from the list of favourites. Remove all favourites if objectid==0.
+ * Remove object from the list of favorites. Remove all favorites if objectid==0.
  */
 function rm4favorites(object, objectid) {
-	sendAjaxData('zabbix.php?action=favourite.delete', {
+	sendAjaxData('zabbix.php?action=favorite.delete', {
 		data: {
 			object: object,
 			objectid: objectid
@@ -684,7 +684,7 @@ function rm4favorites(object, objectid) {
  * @param {string} 	idx					User profile index
  * @param {string} 	value				Value
  * @param {object} 	idx2				An array of IDs
- * @param {integer} profile_type		Profile type
+ * @param {int} 	profile_type		Profile type
  */
 function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT) {
 	const value_fields = {
@@ -701,25 +701,23 @@ function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT) {
 	});
 }
 
-function changeWidgetState(obj, widgetId, idx) {
-	var widgetObj = jQuery('#' + widgetId + '_widget'),
-		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'),
-		state = 0;
+/**
+ * Section collapse toggle.
+ *
+ * @param {string}      id
+ * @param {string|null} profile_idx  If not null, stores state in profile.
+ */
+function toggleSection(id, profile_idx) {
+	const section = document.getElementById(id);
+	const toggle = section.querySelector('.section-toggle');
 
-	if (css === 'btn-widget-expand') {
-		jQuery('.body', widgetObj).slideUp(50);
-		jQuery('.dashboard-widget-foot', widgetObj).slideUp(50);
-	}
-	else {
-		jQuery('.body', widgetObj).slideDown(50);
-		jQuery('.dashboard-widget-foot', widgetObj).slideDown(50);
+	let is_collapsed = section.classList.contains('section-collapsed');
 
-		state = 1;
-	}
+	section.classList.toggle('section-collapsed', !is_collapsed);
+	toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
 
-	obj.title = (state == 1) ? t('S_COLLAPSE') : t('S_EXPAND');
-	if (idx !== '' && typeof idx !== 'undefined') {
-		updateUserProfile(idx, state, []);
+	if (profile_idx !== '') {
+		updateUserProfile(profile_idx, is_collapsed ? '1' : '0', []);
 	}
 }
 

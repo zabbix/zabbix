@@ -960,12 +960,6 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/int32_ranges": invalid range expression.'
 			],
 			[
-				['type' => API_INT32_RANGES],
-				'{$MACRO},30-40',
-				'/1/int32_ranges',
-				'Invalid parameter "/1/int32_ranges": invalid range expression.'
-			],
-			[
 				['type' => API_INT32_RANGES, 'in' => '0:50'],
 				'10-20,30-40',
 				'/1/int32_ranges',
@@ -976,6 +970,54 @@ class CApiInputValidatorTest extends TestCase {
 				'10-20,30-40',
 				'/1/int32_ranges',
 				'Invalid parameter "/1/int32_ranges": value must be one of 20-30.'
+			],
+			[
+				['type' => API_INT32_RANGES],
+				'{$MACRO}',
+				'/1/int32_ranges',
+				'Invalid parameter "/1/int32_ranges": invalid range expression.'
+			],
+			[
+				['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}',
+				'/1/int32_ranges',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO1}-{$MACRO2}',
+				'/1/int32_ranges',
+				'{$MACRO1}-{$MACRO2}'
+			],
+			[
+				['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO, 'in' => '20:30'],
+				'{$MACRO}-20,30-40',
+				'/1/int32_ranges',
+				'Invalid parameter "/1/int32_ranges": value must be one of 20-30.'
+			],
+			[
+				['type' => API_INT32_RANGES, 'flags' => API_ALLOW_USER_MACRO, 'in' => '20:40'],
+				'{$MACRO}-20,30-40',
+				'/1/int32_ranges',
+				'{$MACRO}-20,30-40'
+			],
+			[
+				['type' => API_INT32_RANGES],
+				'{#LLD}',
+				'/1/int32_ranges',
+				'Invalid parameter "/1/int32_ranges": invalid range expression.'
+			],
+			[
+				['type' => API_INT32_RANGES, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD}',
+				'/1/int32_ranges',
+				'{#LLD}'
+			],
+			[
+				['type' => API_INT32_RANGES, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD1}-{#LLD2}',
+				'/1/int32_ranges',
+				'{#LLD1}-{#LLD2}'
 			],
 			[
 				['type' => API_UINT64],
@@ -1278,6 +1320,228 @@ class CApiInputValidatorTest extends TestCase {
 				0.23E+11
 			],
 			[
+				['type' => API_FLOAT, 'in' => '0.5,1,1.5,2'],
+				'0.5',
+				'/1/float',
+				0.5
+			],
+			[
+				['type' => API_FLOAT, 'in' => '0.5,1,1.5,2'],
+				0.5,
+				'/1/float',
+				0.5
+			],
+			[
+				['type' => API_FLOAT, 'in' => '0.5,1,1.5,2'],
+				1,
+				'/1/float',
+				1.0
+			],
+			[
+				['type' => API_FLOAT, 'in' => '0.5:3.5'],
+				1,
+				'/1/float',
+				1.0
+			],
+			[
+				['type' => API_FLOAT, 'in' => '0.5:3.5'],
+				'1.3',
+				'/1/float',
+				1.3
+			],
+			[
+				['type' => API_FLOAT, 'in' => '0.5:3.5'],
+				'0.5',
+				'/1/float',
+				0.5
+			],
+			[
+				['type' => API_FLOAT, 'in' => '0.5:3.5'],
+				'3.5',
+				'/1/float',
+				3.5
+			],
+			[
+				['type' => API_FLOAT, 'in' => '0.5:3.5'],
+				'0',
+				'/1/float',
+				'Invalid parameter "/1/float": value must be within the range of 0.5-3.5.'
+			],
+			[
+				['type' => API_FLOAT, 'in' => '0.5:3.5'],
+				4.5,
+				'/1/float',
+				'Invalid parameter "/1/float": value must be within the range of 0.5-3.5.'
+			],
+			[
+				['type' => API_FLOAT, 'in' => '-123,1,1.5,2'],
+				'-123',
+				'/1/float',
+				-123.0
+			],
+			[
+				['type' => API_FLOAT],
+				'{$MACRO}',
+				'/1/float',
+				'Invalid parameter "/1/float": a floating point value is expected.'
+			],
+			[
+				['type' => API_FLOAT],
+				'{#LLD_MACRO}',
+				'/1/float',
+				'Invalid parameter "/1/float": a floating point value is expected.'
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_USER_MACRO],
+				108.108,
+				'/1/float',
+				108.108
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_USER_MACRO],
+				'108.108',
+				'/1/float',
+				108.108
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}',
+				'/1/float',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO: with context}',
+				'/1/float',
+				'{$MACRO: with context}'
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_USER_MACRO],
+				'Simple string',
+				'/1/float',
+				'Invalid parameter "/1/float": a floating point value is expected.'
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}{$MACRO2}',
+				'/1/float',
+				'Invalid parameter "/1/float": a floating point value is expected.'
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_USER_MACRO],
+				'{#LLD_MACRO}',
+				'/1/float',
+				'Invalid parameter "/1/float": a floating point value is expected.'
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_LLD_MACRO],
+				108.108,
+				'/1/float',
+				108.108
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_LLD_MACRO],
+				'108.108',
+				'/1/float',
+				108.108
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD_MACRO}',
+				'/1/float',
+				'{#LLD_MACRO}'
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_LLD_MACRO],
+				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}',
+				'/1/float',
+				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}'
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_LLD_MACRO],
+				'Simple string',
+				'/1/float',
+				'Invalid parameter "/1/float": a floating point value is expected.'
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD_MACRO}{#LLD_MACRO2}',
+				'/1/float',
+				'Invalid parameter "/1/float": a floating point value is expected.'
+			],
+			[
+				['type' => API_FLOAT, 'flags' => API_ALLOW_LLD_MACRO],
+				'{$MACRO}',
+				'/1/float',
+				'Invalid parameter "/1/float": a floating point value is expected.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'from' => ['type' => API_FLOAT],
+					'to' => ['type' => API_FLOAT, 'compare' => ['operator' => '>', 'field' => 'from']]
+				]],
+				[
+					'from' => '107',
+					'to' => '108'
+				],
+				'/',
+				[
+					'from' => 107.0,
+					'to' => 108.0
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'from' => ['type' => API_FLOAT],
+					'to' => ['type' => API_FLOAT, 'compare' => ['operator' => '>', 'field' => 'from']]
+				]],
+				[
+					'from' => '108',
+					'to' => '108.000108'
+				],
+				'/',
+				[
+					'from' => 108.0,
+					'to' => 108.000108
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'from' => ['type' => API_FLOAT],
+					'to' => ['type' => API_FLOAT, 'compare' => ['operator' => '>', 'field' => 'from']]
+				]],
+				[
+					'from' => '108',
+					'to' => '108'
+				],
+				'/',
+				'Invalid parameter "/to": cannot be less than or equal to the value of parameter "/from".'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'from' => ['type' => API_FLOAT],
+					'to' => ['type' => API_FLOAT, 'compare' => ['operator' => '>', 'field' => 'from']]
+				]],
+				[
+					'from' => 108.0,
+					'to' => 108.0
+				],
+				'/',
+				'Invalid parameter "/to": cannot be less than or equal to the value of parameter "/from".'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'from' => ['type' => API_FLOAT],
+					'to' => ['type' => API_FLOAT, 'compare' => ['operator' => '>', 'field' => 'from']]
+				]],
+				[
+					'from' => '108.001',
+					'to' => '108.0'
+				],
+				'/',
+				'Invalid parameter "/to": cannot be less than or equal to the value of parameter "/from".'
+			],
+			[
 				['type' => API_FLOATS],
 				[0, 1],
 				'/output',
@@ -1446,6 +1710,66 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/id": a number is expected.'
 			],
 			[
+				['type' => API_ID, 'in' => '0'],
+				0,
+				'/1/id',
+				'0'
+			],
+			[
+				['type' => API_ID, 'in' => '0'],
+				'0',
+				'/1/id',
+				'0'
+			],
+			[
+				['type' => API_ID, 'in' => '0'],
+				'000000',
+				'/1/id',
+				'0'
+			],
+			[
+				['type' => API_ID, 'in' => '0'],
+				true,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_ID, 'in' => '0'],
+				null,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_ID, 'in' => '0'],
+				[],
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_ID, 'in' => '0'],
+				0.0,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_ID, 'in' => '0'],
+				1.23E+11,
+				'/1/id',
+				'Invalid parameter "/1/id": a number is expected.'
+			],
+			[
+				['type' => API_ID, 'in' => '0'],
+				108,
+				'/1/id',
+				'Invalid parameter "/1/id": value must be 0.'
+			],
+			[
+				['type' => API_ID, 'in' => '0'],
+				'108',
+				'/1/id',
+				'Invalid parameter "/1/id": value must be 0.'
+			],
+			[
 				['type' => API_BOOLEAN],
 				true,
 				'/1/createMissing',
@@ -1585,6 +1909,34 @@ class CApiInputValidatorTest extends TestCase {
 				'/',
 				[
 					'host' => 'Zabbix server'
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'host' => ['type' => API_ANY],
+					'name' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'host' => 'Zabbix server'
+				],
+				'/',
+				[
+					'host' => 'Zabbix server'
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'host' => ['type' => API_ANY],
+					'name' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				],
+				'/',
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
 				]
 			],
 			[
@@ -3330,6 +3682,12 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_REGEX],
+				'Server: nginx\/(.+(?<!\r))',
+				'/1/expression',
+				'Server: nginx\/(.+(?<!\r))'
+			],
+			[
+				['type' => API_REGEX],
 				'/',
 				'/1/expression',
 				'/'
@@ -4320,6 +4678,42 @@ class CApiInputValidatorTest extends TestCase {
 				'192.168.3.5,192.168.6.1-240'
 			],
 			[
+				['type' => API_IP_RANGES],
+				'{$MACRO}',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": invalid address range "{$MACRO}".'
+			],
+			[
+				['type' => API_IP_RANGES, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}',
+				'/1/ip_range',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_IP_RANGES],
+				'{HOST.IP}',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": invalid address range "{HOST.IP}".'
+			],
+			[
+				['type' => API_IP_RANGES, 'macros' => true],
+				'{HOST.IP}',
+				'/1/ip_range',
+				'{HOST.IP}'
+			],
+			[
+				['type' => API_IP_RANGES, 'macros' => ['{HOST.IP}']],
+				'{HOST.DNS}',
+				'/1/ip_range',
+				'Invalid parameter "/1/ip_range": invalid address range "{HOST.DNS}".'
+			],
+			[
+				['type' => API_IP_RANGES, 'macros' => ['{HOST.IP}']],
+				'{HOST.IP}',
+				'/1/ip_range',
+				'{HOST.IP}'
+			],
+			[
 				['type' => API_DNS],
 				'',
 				'/1/dns',
@@ -4705,6 +5099,247 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/event_name',
 				''
 			],
+			[
+				['type' => API_JSON],
+				null,
+				'/1/json',
+				'Invalid parameter "/1/json": a character string is expected.'
+			],
+			[
+				['type' => API_JSON],
+				true,
+				'/1/json',
+				'Invalid parameter "/1/json": a character string is expected.'
+			],
+			[
+				['type' => API_JSON],
+				[],
+				'/1/json',
+				'Invalid parameter "/1/json": a character string is expected.'
+			],
+			[
+				['type' => API_JSON],
+				123,
+				'/1/json',
+				'Invalid parameter "/1/json": a character string is expected.'
+			],
+			[
+				['type' => API_JSON],
+				'123',
+				'/1/json',
+				'123'
+			],
+			[
+				['type' => API_JSON],
+				'',
+				'/1/json',
+				''
+			],
+			[
+				['type' => API_JSON, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/json',
+				'Invalid parameter "/1/json": cannot be empty.'
+			],
+			[
+				['type' => API_JSON],
+				'{}',
+				'/1/json',
+				'{}'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": "value"}',
+				'/1/json',
+				'{"key": "value"}'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": false}',
+				'/1/json',
+				'{"key": false}'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": null}',
+				'/1/json',
+				'{"key": null}'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": NaN}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON, 'length' => 15],
+				'{"key": "value"}',
+				'/1/json',
+				'Invalid parameter "/1/json": value is too long.'
+			],
+			[
+				['type' => API_JSON],
+				'abc',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": value}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": 123}',
+				'/1/json',
+				'{"key": 123}'
+			],
+			[
+				['type' => API_JSON],
+				'{$MACRO}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}',
+				'/1/json',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": {$MACRO}}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON, 'flags' => API_ALLOW_USER_MACRO],
+				'{"key": {$MACRO}}',
+				'/1/json',
+				'{"key": {$MACRO}}'
+			],
+			[
+				['type' => API_JSON],
+				'{#LLD}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD}',
+				'/1/json',
+				'{#LLD}'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": {#LLD}}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON, 'flags' => API_ALLOW_LLD_MACRO],
+				'{"key": {#LLD}}',
+				'/1/json',
+				'{"key": {#LLD}}'
+			],
+			[
+				['type' => API_JSON],
+				'{HOST.IP}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON, 'macros_n' => ['{HOST.IP}']],
+				'{HOST.IP}',
+				'/1/json',
+				'{HOST.IP}'
+			],
+			[
+				['type' => API_JSON, 'macros_n' => ['{HOST.IP}']],
+				'{HOST.IP2}',
+				'/1/json',
+				'{HOST.IP2}'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": {HOST.IP}}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON, 'macros_n' => ['{HOST.IP}']],
+				'{"key1": {HOST.IP1}, "key2": {HOST.IP2}}',
+				'/1/json',
+				'{"key1": {HOST.IP1}, "key2": {HOST.IP2}}'
+			],
+			[
+				['type' => API_JSON],
+				'[]',
+				'/1/json',
+				'[]'
+			],
+			[
+				['type' => API_JSON],
+				'[[]]',
+				'/1/json',
+				'[[]]'
+			],
+			[
+				['type' => API_JSON],
+				'[[], []]',
+				'/1/json',
+				'[[], []]'
+			],
+			[
+				['type' => API_JSON],
+				'[[1]]',
+				'/1/json',
+				'[[1]]'
+			],
+			[
+				['type' => API_JSON],
+				'[1, 2, 3]',
+				'/1/json',
+				'[1, 2, 3]'
+			],
+			[
+				['type' => API_JSON],
+				'[[true]]',
+				'/1/json',
+				'[[true]]'
+			],
+			[
+				['type' => API_JSON],
+				'[[null]]',
+				'/1/json',
+				'[[null]]'
+			],
+			[
+				['type' => API_JSON],
+				'{null: "value"}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
+				['type' => API_JSON],
+				'[{"key": "value"}]',
+				'/1/json',
+				'[{"key": "value"}]'
+			],
+			[
+				['type' => API_JSON],
+				'[{"key": "value"}, {"key": "value"}]',
+				'/1/json',
+				'[{"key": "value"}, {"key": "value"}]'
+			],
+			[
+				['type' => API_JSON],
+				'["key": "value"]',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+
 			[
 				['type' => API_JSONRPC_PARAMS],
 				[],
@@ -5543,6 +6178,1654 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => 3, 'name' => 2, 'value' => ['1', 2.5, '3', '4', '1']],
 				'/',
 				['type' => [3], 'name' => [2], 'value' => ['1', 2.5, '3', '4', '1']]
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'key',
+				'/1/item_key',
+				'key'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key',
+				'/1/item_key',
+				'super.key'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key[]',
+				'/1/item_key',
+				'super.key[]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key[0]',
+				'/1/item_key',
+				'super.key[0]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key[a, b, c]',
+				'/1/item_key',
+				'super.key[a, b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key[{HOST.HOST}]',
+				'/1/item_key',
+				'super.key[{HOST.HOST}]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key[abc{HOST.HOST}def]',
+				'/1/item_key',
+				'super.key[abc{HOST.HOST}def]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key[{#LLD_MACRO}, b, c]',
+				'/1/item_key',
+				'super.key[{#LLD_MACRO}, b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key[{#LLD_MACRO1}abc{#LLD_MACRO2}, b, c]',
+				'/1/item_key',
+				'super.key[{#LLD_MACRO1}abc{#LLD_MACRO2}, b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key["{#LLD_MACRO}", "b b", "c\""]',
+				'/1/item_key',
+				'super.key["{#LLD_MACRO}", "b b", "c\""]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key["{#LLD_MACRO1} {#LLD_MACRO2}", b, c]',
+				'/1/item_key',
+				'super.key["{#LLD_MACRO1} {#LLD_MACRO2}", b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[{#LLD_MACRO}, b, c]',
+				'/1/item_key',
+				'super.key[{#LLD_MACRO}, b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[a, b, c{#LLD_MACRO}d]',
+				'/1/item_key',
+				'super.key[a, b, c{#LLD_MACRO}d]'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[{{#LLD_MACRO}.fmtnum(2)}, b, c]',
+				'/1/item_key',
+				'super.key[{{#LLD_MACRO}.fmtnum(2)}, b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[a, b, c{{#LLD_MACRO}.fmtnum(2)}d]',
+				'/1/item_key',
+				'super.key[a, b, c{{#LLD_MACRO}.fmtnum(2)}d]'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key["{{#LLD_MACRO}.regsub(\"(.*)_([0-9]+)\", \1)}", b, c]',
+				'/1/item_key',
+				'super.key["{{#LLD_MACRO}.regsub(\"(.*)_([0-9]+)\", \1)}", b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[a, b, "{{#LLD_MACRO}.regsub(\"(.*)_([0-9]+)\", \1)}"]',
+				'/1/item_key',
+				'super.key[a, b, "{{#LLD_MACRO}.regsub(\"(.*)_([0-9]+)\", \1)}"]'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key["{{#LLD_MACRO}.regsub(\"(.*)_([0-9]+)\", \1)", b, c]',
+				'/1/item_key',
+				'super.key["{{#LLD_MACRO}.regsub(\"(.*)_([0-9]+)\", \1)", b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				null,
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": a character string is expected.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				123,
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": a character string is expected.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				true,
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": a character string is expected.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				[],
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": a character string is expected.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": cannot be empty.'
+			],
+			[
+				['type' => API_ITEM_KEY, 'length' => 2],
+				'key',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": value is too long.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'/key',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "/key".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'{#LLD_MACRO}',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "{#LLD_MACRO}".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'[{#LLD_MACRO}]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "[{#LLD_MACRO}]".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'[key',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "[key".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'key]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "]".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'[key]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "[key]".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'key[',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": unexpected end of key.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'key[a',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": unexpected end of key.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'key[a, "]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": unexpected end of key.'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[a, b, c]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": must contain at least one low-level discovery macro.'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[a, {$MACRO}, c]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": must contain at least one low-level discovery macro.'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[{#LLD_MACRO, b, c]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": must contain at least one low-level discovery macro.'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}, b, c]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "+)", \1)}, b, c]".'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				null,
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": a character string is expected.'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'abc',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": a time unit is expected.'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				123,
+				'/1/item_delay',
+				'123'
+			],
+			'Delay less than zero' => [
+				['type' => API_ITEM_DELAY],
+				-1,
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": a time unit is expected.'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'1m',
+				'/1/item_delay',
+				'1m'
+			],
+			[
+				['type' => API_ITEM_DELAY, 'length' => 2],
+				'10m',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": value is too long.'
+			],
+			'Zero delay without intervals' => [
+				['type' => API_ITEM_DELAY],
+				0,
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": cannot be equal to zero without custom intervals.'
+			],
+			'Nonsense in flexible interval' => [
+				['type' => API_ITEM_DELAY],
+				'0;1m/abc,10:00-18:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": incorrect syntax near ";1m/abc,10:00-18:00".'
+			],
+			'Nonsense in flexible period' => [
+				['type' => API_ITEM_DELAY],
+				'0;1m/1-7,abc',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": incorrect syntax near ";1m/1-7,abc".'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'0;1m/1-5,10:00-18:00',
+				'/1/item_delay',
+				'0;1m/1-5,10:00-18:00'
+			],
+			'Delay too big' => [
+				['type' => API_ITEM_DELAY],
+				SEC_PER_DAY + 1,
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": value must be one of 0-'.SEC_PER_DAY.'.'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'1m;30s/1-7,10:00-18:00',
+				'/1/item_delay',
+				'1m;30s/1-7,10:00-18:00'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'1m;h9m/30',
+				'/1/item_delay',
+				'1m;h9m/30'
+			],
+			'No user macro flag' => [
+				['type' => API_ITEM_DELAY],
+				'{$MACRO}',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": a time unit is expected.'
+			],
+			'User macro allowed' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}',
+				'/1/item_delay',
+				'{$MACRO}'
+			],
+			'User macro allowed, but LLD macro entered' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'{#LLD}',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": a time unit is expected.'
+			],
+			'No LLD macro flag' => [
+				['type' => API_ITEM_DELAY],
+				'{#LLD}',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": a time unit is expected.'
+			],
+			'LLD macro allowed, but user macro entered' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_LLD_MACRO],
+				'{$MACRO}',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": a time unit is expected.'
+			],
+			[
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD}',
+				'/1/item_delay',
+				'{#LLD}'
+			],
+			'User macros in a flexible interval' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'0;{$M}/{$M}',
+				'/1/item_delay',
+				'0;{$M}/{$M}'
+			],
+			'User macros in a scheduled interval' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'0;{$M}',
+				'/1/item_delay',
+				'0;{$M}'
+			],
+			'Zero delay and blocking zero-interval' => [
+				['type' => API_ITEM_DELAY],
+				'0;50s/1-6,09:00-18:00;0/1-6,00:00-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Zero delay and multiple combined blocking zero-intervals' => [
+				['type' => API_ITEM_DELAY],
+				'0;50s/1-6,09:00-18:00;0/1-3,00:00-24:00;0/4-7,00:00-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": non-active intervals cannot fill the entire time.'
+			],
+			'Non-convertible due to macro in period' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'0;50s/1-6,09:00-18:00;0/1-5,00:00-24:00;0/{$M}',
+				'/1/item_delay',
+				'0;50s/1-6,09:00-18:00;0/1-5,00:00-24:00;0/{$M}'
+			],
+			'Non-zero delay, but whole week consists of blocking interval' => [
+				['type' => API_ITEM_DELAY],
+				'1m;0/1-7,00:00-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": non-active intervals cannot fill the entire time.'
+			],
+			'Non-zero delay, but whole week combined of blocking intervals' => [
+				['type' => API_ITEM_DELAY],
+				'1m;0/1-4,00:00-24:00;0/3-7,00:00-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": non-active intervals cannot fill the entire time.'
+			],
+			'Macro used, but delay and intervals are all zero-blocking' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'0;0/1-6,09:00-12:00;0/{$M}',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have at least one interval greater than 0.'
+			],
+			'Macro in Period, but zero-week block' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'0;0/1-7,00:00-24:00;1/{$M}',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": non-active intervals cannot fill the entire time.'
+			],
+			'Macro in Interval, but zero-week block' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'0;0/1-7,00:00-24:00;{$M}/1-7,00:00-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": non-active intervals cannot fill the entire time.'
+			],
+			'Non-zero delay, macro in Interval' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'1m;{$M}/1-4,00:00-24:00;0/3-7,00:00-23:00',
+				'/1/item_delay',
+				'1m;{$M}/1-4,00:00-24:00;0/3-7,00:00-23:00'
+			],
+			'Polling overlapped by zero-interval as a whole' => [
+				['type' => API_ITEM_DELAY],
+				'5m;5m/2-4,00:00-24:00;0/1-7,00:00-23:57',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Polling chunk overlapped by zero-interval as a whole, but has another active interval' => [
+				['type' => API_ITEM_DELAY],
+				'1m;50s/2-4,00:00-24:00;0/1-5,00:00-24:00;50s/6,09:30-12:00',
+				'/1/item_delay',
+				'1m;50s/2-4,00:00-24:00;0/1-5,00:00-24:00;50s/6,09:30-12:00'
+			],
+			'Overlap by zero-interval, but polling window available before' => [
+				['type' => API_ITEM_DELAY],
+				'1m;50s/1-6,09:00-12:00;0/2-6,00:00-24:00',
+				'/1/item_delay',
+				'1m;50s/1-6,09:00-12:00;0/2-6,00:00-24:00'
+			],
+			'Zero-interval, but polling active outside' => [
+				['type' => API_ITEM_DELAY],
+				'1m;50s/1-6,09:00-12:00;0/2-3,00:00-24:00',
+				'/1/item_delay',
+				'1m;50s/1-6,09:00-12:00;0/2-3,00:00-24:00'
+			],
+			'Polling window available between side-overlapping zero chunks' => [
+				['type' => API_ITEM_DELAY],
+				'1m;50s/1-6,09:00-12:00;0/1-3,00:00-24:00;0/5-6,00:00-24:00',
+				'/1/item_delay',
+				'1m;50s/1-6,09:00-12:00;0/1-3,00:00-24:00;0/5-6,00:00-24:00'
+			],
+			'Polling window available too small for interval' => [
+				['type' => API_ITEM_DELAY],
+				'0;2h/1-6,09:00-12:00;0/1-6,09:00-10:30',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Polling window available equal to interval' => [
+				['type' => API_ITEM_DELAY],
+				'0;90m/1-6,09:00-12:00;0/1-6,09:00-10:30',
+				'/1/item_delay',
+				'0;90m/1-6,09:00-12:00;0/1-6,09:00-10:30'
+			],
+			'Polling window just less than available interval (90m-1s)' => [
+				['type' => API_ITEM_DELAY],
+				'0;5399/1-6,09:00-12:00;0/1-6,09:00-10:30',
+				'/1/item_delay',
+				'0;5399/1-6,09:00-12:00;0/1-6,09:00-10:30'
+			],
+			'Polling available via delay, before zero-blocks' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/2-7,00:00-24:00;0/1,00:05-24:00',
+				'/1/item_delay',
+				'5m;0/2-7,00:00-24:00;0/1,00:05-24:00'
+			],
+			'Polling available via delay, after zero-blocks' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-6,00:00-24:00;0/7,00:00-23:55',
+				'/1/item_delay',
+				'5m;0/1-6,00:00-24:00;0/7,00:00-23:55'
+			],
+			'Polling available via delay, between zero-blocks' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-3,00:00-24:00;0/4,00:05-24:00;0/5-7,00:00-24:00',
+				'/1/item_delay',
+				'5m;0/1-3,00:00-24:00;0/4,00:05-24:00;0/5-7,00:00-24:00'
+			],
+			'Polling possible via shorter of intervals' => [
+				['type' => API_ITEM_DELAY],
+				'0;0/1-6,00:00-24:00;20m/7,00:00-24:00;10m/7,00:00-24:00;0/7,00:00-01:35;0/7,01:45-24:00',
+				'/1/item_delay',
+				'0;0/1-6,00:00-24:00;20m/7,00:00-24:00;10m/7,00:00-24:00;0/7,00:00-01:35;0/7,01:45-24:00'
+			],
+			'Polling impossible via shorter of intervals' => [
+				['type' => API_ITEM_DELAY],
+				'0;0/1-6,00:00-24:00;20m/7,00:00-24:00;10m/7,00:00-24:00;0/7,00:00-01:35;0/7,01:44-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Polling possible via shorter of intervals, full window' => [
+				['type' => API_ITEM_DELAY],
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:00-11:00',
+				'/1/item_delay',
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:00-11:00'
+			],
+			'Polling possible via shorter of intervals, end of window' => [
+				['type' => API_ITEM_DELAY],
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:50-11:00',
+				'/1/item_delay',
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:50-11:00'
+			],
+			'Polling possible via shorter of intervals, start of window' => [
+				['type' => API_ITEM_DELAY],
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:00-10:10',
+				'/1/item_delay',
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:00-10:10'
+			],
+			'Polling possible via shorter of intervals, with overlap of cut-off longer one' => [
+				['type' => API_ITEM_DELAY],
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:40-10:50',
+				'/1/item_delay',
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:40-10:50'
+			],
+			'Interval shorter than period allowed' => [
+				['type' => API_ITEM_DELAY],
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:00-10:09',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": update interval "10m" is longer than period "1-7,10:00-10:09".'
+			],
+			'No window for delay' => [
+				['type' => API_ITEM_DELAY],
+				'10m;0/1-7,00:05-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Window for delay OK' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-7,00:05-24:00',
+				'/1/item_delay',
+				'5m;0/1-7,00:05-24:00'
+			],
+			'Window for smaller delay OK' => [
+				['type' => API_ITEM_DELAY],
+				'1m;0/1-7,00:05-24:00',
+				'/1/item_delay',
+				'1m;0/1-7,00:05-24:00'
+			],
+			'Polling via delay blocked by active flexible interval' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-7,00:05-24:00;10m/1-7,00:04-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Polling via delay not blocked by flexible intervals' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-7,00:10-24:00;10m/1-7,05:00-24:00',
+				'/1/item_delay',
+				'5m;0/1-7,00:10-24:00;10m/1-7,05:00-24:00'
+			],
+			'Delay does not fit due to several flexible intervals' => [
+				['type' => API_ITEM_DELAY],
+				'10m;0/1-7,00:00-00:01;0/1-7,00:10-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Delay fits between blocking zero intervals' => [
+				['type' => API_ITEM_DELAY],
+				'10m;0/1-3,00:00-24:00;0/4,00:00-23:50;0/5-7,00:00-24:00',
+				'/1/item_delay',
+				'10m;0/1-3,00:00-24:00;0/4,00:00-23:50;0/5-7,00:00-24:00'
+			],
+			'Delay fits between blocking mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-3,00:00-24:00;0/4,00:00-23:45;10m/4,23:50-24:00;0/5-7,00:00-24:00',
+				'/1/item_delay',
+				'5m;0/1-3,00:00-24:00;0/4,00:00-23:45;10m/4,23:50-24:00;0/5-7,00:00-24:00'
+			],
+			'Delay does not fit between blocking mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'6m;0/1-3,00:00-24:00;0/4,00:00-23:45;5m/4,23:50-23:55;0/4,23:54-24:00;0/5-7,00:00-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Delay fits after blocking zero intervals' => [
+				['type' => API_ITEM_DELAY],
+				'10m;0/1-6,00:00-24:00;0/7,23:50-24:00',
+				'/1/item_delay',
+				'10m;0/1-6,00:00-24:00;0/7,23:50-24:00'
+			],
+			'Delay does not fit with after mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'10m;0/1-6,00:00-24:00;0/7,23:50-24:00;20m/7,00:00-23:55;0/7,00:00-23:49',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Delay fits at start of mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-7,00:10-24:00;10m/1-7,00:07-24:00',
+				'/1/item_delay',
+				'5m;0/1-7,00:10-24:00;10m/1-7,00:07-24:00'
+			],
+			'Delay does not fit at start of mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'8m;0/1-7,00:10-24:00;10m/1-7,00:07-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			[
+				['type' => API_XML],
+				null,
+				'/1/xml',
+				'Invalid parameter "/1/xml": a character string is expected.'
+			],
+			[
+				['type' => API_XML],
+				123,
+				'/1/xml',
+				'Invalid parameter "/1/xml": a character string is expected.'
+			],
+			[
+				['type' => API_XML],
+				'',
+				'/1/xml',
+				''
+			],
+			[
+				['type' => API_XML, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/xml',
+				'Invalid parameter "/1/xml": cannot be empty.'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?>',
+				'/1/xml',
+				'Invalid parameter "/1/xml": (4) Start tag expected, \'<\' not found [Line: 1 | Column: 39].'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node>value</node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node>value</node>'
+			],
+			[
+				['type' => API_XML, 'length' => 10],
+				'<?xml version="1.0" encoding="UTF-8"?><node>value</node>',
+				'/1/xml',
+				'Invalid parameter "/1/xml": value is too long.'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="123">value</node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="123">value</node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="string">value</node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="string">value</node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node prop=string>value</node>',
+				'/1/xml',
+				'Invalid parameter "/1/xml": (39) AttValue: " or \' expected [Line: 1 | Column: 50].'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="string>value</node>',
+				'/1/xml',
+				'Invalid parameter "/1/xml": (38) Unescaped \'<\' not allowed in attributes values [Line: 1 | Column: 63].'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="<">value</node>',
+				'/1/xml',
+				'Invalid parameter "/1/xml": (38) Unescaped \'<\' not allowed in attributes values [Line: 1 | Column: 51].'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="&lt;">value</node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="&lt;">value</node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node><script></node>',
+				'/1/xml',
+				'Invalid parameter "/1/xml": (76) Opening and ending tag mismatch: script line 1 and node [Line: 1 | Column: 60].'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node><script/></node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node><script/></node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node><script /></node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node><script /></node>'
+			],
+			'Opening and ending tag mismatch' => [
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node></a></node>',
+				'/1/xml',
+				'Invalid parameter "/1/xml": (76) Opening and ending tag mismatch: node line 1 and a [Line: 1 | Column: 49].'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node>/></node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node>/></node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node>/&gt;</node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node>/&gt;</node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node>"</node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node>"</node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node>&quot;</node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node>&quot;</node>'
+			],
+
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_MULTIPLIER]],
+				'1',
+				'/1/params',
+				'1'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_MULTIPLIER]],
+				'1',
+				'/1/params',
+				'1'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_MULTIPLIER]],
+				'1.0',
+				'/1/params',
+				'1'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_MULTIPLIER]],
+				'1.08',
+				'/1/params',
+				'1.08'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_MULTIPLIER], 'length' => 2],
+				'1.08',
+				'/1/params',
+				'Invalid parameter "/1/params": value is too long.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_MULTIPLIER]],
+				'abc',
+				'/1/params',
+				'Invalid parameter "/1/params/1": a floating point value is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_MULTIPLIER]],
+				"1.08\n",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_MULTIPLIER]],
+				"1.08\n1.08",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_RTRIM]],
+				' ")',
+				'/1/params',
+				' ")'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_LTRIM]],
+				' "(',
+				'/1/params',
+				' "('
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_TRIM]],
+				' "()',
+				'/1/params',
+				' "()'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_RTRIM]],
+				" \"(\n \")",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_LTRIM]],
+				" \"(\n \")",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_TRIM]],
+				" \"(\n \")",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_REGSUB]],
+				"^[a-z]$\n\\1",
+				'/1/params',
+				"^[a-z]$\n\\1"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_REGSUB]],
+				"{\$MACRO}\n\\1",
+				'/1/params',
+				"{\$MACRO}\n\\1"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_REGSUB]],
+				"{\#LLD_MACRO}\n\\1",
+				'/1/params',
+				"{\#LLD_MACRO}\n\\1"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_REGSUB]],
+				"^[a-z$\n\\1",
+				'/1/params',
+				'Invalid parameter "/1/params/1": invalid regular expression.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_REGSUB]],
+				"^[a-z]$",
+				'/1/params',
+				'Invalid parameter "/1/params": the parameter "2" is missing.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_REGSUB]],
+				"^[a-z]$\n\\1\nabc",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "3".'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => ZBX_PREPROC_REGSUB],
+					'params' => ['type' => API_PREPROC_PARAMS, 'preproc_type' => ['field' => 'type']]
+				]],
+				[
+					'type' => ZBX_PREPROC_REGSUB,
+					'params' => "^[a-z]$\n\\1"
+				],
+				'/',
+				[
+					'type' => ZBX_PREPROC_REGSUB,
+					'params' => "^[a-z]$\n\\1"
+				]
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_XPATH]],
+				'number(/document/item/@attribute)',
+				'/1/params',
+				'number(/document/item/@attribute)'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_XPATH]],
+				'',
+				'/1/params',
+				'Invalid parameter "/1/params/1": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_XPATH]],
+				"number(/document/item/@attribute)\nabc",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_JSONPATH]],
+				'$.object.name',
+				'/1/params',
+				'$.object.name'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_JSONPATH]],
+				'',
+				'/1/params',
+				'Invalid parameter "/1/params/1": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_JSONPATH]],
+				"$.object.name\nabc",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"1\n",
+				'/1/params',
+				"1\n"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"\n10",
+				'/1/params',
+				"\n10"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"1\n10",
+				'/1/params',
+				"1\n10"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"\n",
+				'/1/params',
+				'Invalid parameter "/1/params": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"10.01\n10",
+				'/1/params',
+				'Invalid parameter "/1/params/2": cannot be less than or equal to the value of parameter "/1/params/1".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"10.01",
+				'/1/params',
+				'Invalid parameter "/1/params": the parameter "2" is missing.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_RANGE]],
+				"1\n10\nabc",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "3".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_REGEX]],
+				"^[a-z]$",
+				'/1/params',
+				"^[a-z]$"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_REGEX]],
+				"^[a-z$",
+				'/1/params',
+				'Invalid parameter "/1/params/1": invalid regular expression.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_REGEX]],
+				"@^[a-z$",
+				'/1/params',
+				'Invalid parameter "/1/params/1": invalid regular expression.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_REGEX]],
+				"^[a-z$\nabc",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_REGEX]],
+				"^[a-z]$",
+				'/1/params',
+				"^[a-z]$"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_REGEX]],
+				"^[a-z$",
+				'/1/params',
+				'Invalid parameter "/1/params/1": invalid regular expression.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_REGEX]],
+				"@^[a-z$",
+				'/1/params',
+				'Invalid parameter "/1/params/1": invalid regular expression.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_REGEX]],
+				"^[a-z$\nabc",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_ERROR_FIELD_JSON]],
+				'$.object.error',
+				'/1/params',
+				'$.object.error'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_ERROR_FIELD_JSON]],
+				'',
+				'/1/params',
+				'Invalid parameter "/1/params/1": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_ERROR_FIELD_JSON]],
+				"$.object.error\nabc",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_ERROR_FIELD_XML]],
+				'number(/document/item/@error)',
+				'/1/params',
+				'number(/document/item/@error)'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_ERROR_FIELD_XML]],
+				'',
+				'/1/params',
+				'Invalid parameter "/1/params/1": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_ERROR_FIELD_XML]],
+				"number(/document/item/@error)\nabc",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_ERROR_FIELD_REGEX]],
+				"^[a-z]$\n\\1",
+				'/1/params',
+				"^[a-z]$\n\\1"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_ERROR_FIELD_REGEX]],
+				"^[a-z$\n\\1",
+				'/1/params',
+				'Invalid parameter "/1/params/1": invalid regular expression.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_ERROR_FIELD_REGEX]],
+				"^[a-z]$",
+				'/1/params',
+				'Invalid parameter "/1/params": the parameter "2" is missing.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_ERROR_FIELD_REGEX]],
+				"^[a-z]$\n\\1\nabc",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "3".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'1',
+				'/1/params',
+				'1'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'30',
+				'/1/params',
+				'30'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'788400000', // 25 years
+				'/1/params',
+				'788400000'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'30s',
+				'/1/params',
+				'30s'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'10m',
+				'/1/params',
+				'10m'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'1h',
+				'/1/params',
+				'1h'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'1w',
+				'/1/params',
+				'1w'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'1.08',
+				'/1/params',
+				'Invalid parameter "/1/params/1": a time unit is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'1M',
+				'/1/params',
+				'Invalid parameter "/1/params/1": a time unit is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'1y',
+				'/1/params',
+				'Invalid parameter "/1/params/1": a time unit is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'-1',
+				'/1/params',
+				'Invalid parameter "/1/params/1": value must be one of 1-788400000.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'0',
+				'/1/params',
+				'Invalid parameter "/1/params/1": value must be one of 1-788400000.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'788400001',
+				'/1/params',
+				'Invalid parameter "/1/params/1": value must be one of 1-788400000.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'788400001',
+				'/1/params',
+				'Invalid parameter "/1/params/1": value must be one of 1-788400000.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'-1m',
+				'/1/params',
+				'Invalid parameter "/1/params/1": value must be one of 1-788400000.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				'9126d', // 25 years and 1 day
+				'/1/params',
+				'Invalid parameter "/1/params/1": value must be one of 1-788400000.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				"30\nabc",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SCRIPT]],
+				'return true;',
+				'/1/params',
+				'return true;'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SCRIPT]],
+				'',
+				'/1/params',
+				'Invalid parameter "/1/params/1": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SCRIPT]],
+				"let a = 'abc';\nreturn a;",
+				'/1/params',
+				"let a = 'abc';\nreturn a;"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nvalue",
+				'/1/params',
+				"metric{label1=\"value1\"}\nvalue\n"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nvalue\n",
+				'/1/params',
+				"metric{label1=\"value1\"}\nvalue\n"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"{\nvalue",
+				'/1/params',
+				'Invalid parameter "/1/params/1": invalid Prometheus pattern.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nvalue\n\n",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "4".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nlabel\nlabel1",
+				'/1/params',
+				"metric{label1=\"value1\"}\nlabel\nlabel1"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'flags' => API_ALLOW_USER_MACRO, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nlabel\n{\$MACRO}",
+				'/1/params',
+				"metric{label1=\"value1\"}\nlabel\n{\$MACRO}"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'flags' => API_ALLOW_LLD_MACRO, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nlabel\n{#LLD_MACRO}",
+				'/1/params',
+				"metric{label1=\"value1\"}\nlabel\n{#LLD_MACRO}"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nlabel\n",
+				'/1/params',
+				'Invalid parameter "/1/params/3": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nlabel\n-label1-",
+				'/1/params',
+				'Invalid parameter "/1/params/3": invalid Prometheus label.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nlabel\n",
+				'/1/params',
+				'Invalid parameter "/1/params/3": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nlabel",
+				'/1/params',
+				'Invalid parameter "/1/params": the parameter "3" is missing.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nlabel\nlabel1\nabc",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "4".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nfunction\nsum",
+				'/1/params',
+				"metric{label1=\"value1\"}\nfunction\nsum"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nfunction\nmin",
+				'/1/params',
+				"metric{label1=\"value1\"}\nfunction\nmin"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nfunction\nmax",
+				'/1/params',
+				"metric{label1=\"value1\"}\nfunction\nmax"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nfunction\navg",
+				'/1/params',
+				"metric{label1=\"value1\"}\nfunction\navg"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nfunction\ncount",
+				'/1/params',
+				"metric{label1=\"value1\"}\nfunction\ncount"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nfunction\ncook",
+				'/1/params',
+				'Invalid parameter "/1/params/3": value must be one of "sum", "min", "max", "avg", "count".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nfunction\n",
+				'/1/params',
+				'Invalid parameter "/1/params/3": value must be one of "sum", "min", "max", "avg", "count".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nfunction",
+				'/1/params',
+				'Invalid parameter "/1/params": the parameter "3" is missing.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"metric{label1=\"value1\"}\nmystery",
+				'/1/params',
+				'Invalid parameter "/1/params/2": value must be one of "value", "label", "function".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_PATTERN]],
+				"\nlabel\nlabel1",
+				'/1/params',
+				'Invalid parameter "/1/params/1": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_TO_JSON]],
+				'',
+				'/1/params',
+				''
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_TO_JSON]],
+				'metric{label1="value1"} == 123',
+				'/1/params',
+				'metric{label1="value1"} == 123'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_TO_JSON]],
+				'metric{%label1="value1"} == 123',
+				'/1/params',
+				'Invalid parameter "/1/params/1": invalid Prometheus pattern.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_PROMETHEUS_TO_JSON]],
+				"metric{label1=\"value1\"} == 123\nvalue",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
+				"\n\n0",
+				'/1/params',
+				"\n\n0"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
+				",\n\n0",
+				'/1/params',
+				",\n\n0"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
+				",\n\"\n0",
+				'/1/params',
+				",\n\"\n0"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
+				",\n\"\n1",
+				'/1/params',
+				",\n\"\n1"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
+				'',
+				'/1/params',
+				'Invalid parameter "/1/params": the parameter "2" is missing.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
+				"\n",
+				'/1/params',
+				'Invalid parameter "/1/params": the parameter "3" is missing.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
+				"\n\n",
+				'/1/params',
+				'Invalid parameter "/1/params/3": value must be one of "0", "1".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
+				"\n\n0\n",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "4".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
+				",\n\"\n2",
+				'/1/params',
+				'Invalid parameter "/1/params/3": value must be one of "0", "1".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
+				"abc\n",
+				'/1/params',
+				"abc\n"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
+				"abc",
+				'/1/params',
+				"abc\n"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
+				"abc\ndef",
+				'/1/params',
+				"abc\ndef"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
+				"",
+				'/1/params',
+				'Invalid parameter "/1/params/1": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
+				"\n",
+				'/1/params',
+				'Invalid parameter "/1/params/1": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
+				"\n\n",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "3".'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				'',
+				'/1/prometheus_pattern',
+				''
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				'cpu_usage_system{cpu="cpu-total"}',
+				'/1/prometheus_pattern',
+				'cpu_usage_system{cpu="cpu-total"}'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}{label1="value1"}==123',
+				'/1/prometheus_pattern',
+				'{$MACRO}{label1="value1"}==123'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN, 'flags' => API_ALLOW_USER_MACRO],
+				'metric{{$MACRO}="value1"}==123',
+				'/1/prometheus_pattern',
+				'metric{{$MACRO}="value1"}==123'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				'metric{label1="{$MACRO}"}==123',
+				'/1/prometheus_pattern',
+				'metric{label1="{$MACRO}"}==123'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN, 'flags' => API_ALLOW_USER_MACRO],
+				'metric{label="value1"}=={$MACRO}',
+				'/1/prometheus_pattern',
+				'metric{label="value1"}=={$MACRO}'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD_MACRO}{label1="value1"}==123',
+				'/1/prometheus_pattern',
+				'{#LLD_MACRO}{label1="value1"}==123'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN, 'flags' => API_ALLOW_LLD_MACRO],
+				'metric{{#LLD_MACRO}="value1"}==123',
+				'/1/prometheus_pattern',
+				'metric{{#LLD_MACRO}="value1"}==123'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				'metric{label1="{#LLD_MACRO}"}==123',
+				'/1/prometheus_pattern',
+				'metric{label1="{#LLD_MACRO}"}==123'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN, 'flags' => API_ALLOW_LLD_MACRO],
+				'metric{label="value1"}=={#LLD_MACRO}',
+				'/1/prometheus_pattern',
+				'metric{label="value1"}=={#LLD_MACRO}'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN, 'flags' => API_ALLOW_LLD_MACRO],
+				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}{label1="value1"}==123',
+				'/1/prometheus_pattern',
+				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}{label1="value1"}==123'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN, 'flags' => API_ALLOW_LLD_MACRO],
+				'metric{{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}="value1"}==123',
+				'/1/prometheus_pattern',
+				'metric{{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}="value1"}==123'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN, 'flags' => API_ALLOW_LLD_MACRO],
+				'metric{label="value1"}=={{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}',
+				'/1/prometheus_pattern',
+				'metric{label="value1"}=={{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				null,
+				'/1/prometheus_pattern',
+				'Invalid parameter "/1/prometheus_pattern": a character string is expected.'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				123,
+				'/1/prometheus_pattern',
+				'Invalid parameter "/1/prometheus_pattern": a character string is expected.'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/prometheus_pattern',
+				'Invalid parameter "/1/prometheus_pattern": cannot be empty.'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				'{',
+				'/1/prometheus_pattern',
+				'Invalid parameter "/1/prometheus_pattern": invalid Prometheus pattern.'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				'{$MACRO}',
+				'/1/prometheus_pattern',
+				'Invalid parameter "/1/prometheus_pattern": invalid Prometheus pattern.'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				'{#LLD_MACRO}',
+				'/1/prometheus_pattern',
+				'Invalid parameter "/1/prometheus_pattern": invalid Prometheus pattern.'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				'{$MACRO}{label1="value1"}==123',
+				'/1/prometheus_pattern',
+				'Invalid parameter "/1/prometheus_pattern": invalid Prometheus pattern.'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN],
+				'metric{label1="{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}"}==123',
+				'/1/prometheus_pattern',
+				'Invalid parameter "/1/prometheus_pattern": invalid Prometheus pattern.'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}{$MACRO2}{label1="value1"}==123',
+				'/1/prometheus_pattern',
+				'Invalid parameter "/1/prometheus_pattern": invalid Prometheus pattern.'
+			],
+			[
+				['type' => API_PROMETHEUS_PATTERN, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD_MACRO}{#LLD_MACRO2}{label1="value1"}==123',
+				'/1/prometheus_pattern',
+				'Invalid parameter "/1/prometheus_pattern": invalid Prometheus pattern.'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL],
+				'label1',
+				'/1/prometheus_label',
+				'label1'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL],
+				'superLabel_1',
+				'/1/prometheus_label',
+				'superLabel_1'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL],
+				'_superLabel_1',
+				'/1/prometheus_label',
+				'_superLabel_1'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL],
+				'SuperLabel_1',
+				'/1/prometheus_label',
+				'SuperLabel_1'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL],
+				null,
+				'/1/prometheus_label',
+				'Invalid parameter "/1/prometheus_label": a character string is expected.'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL],
+				123,
+				'/1/prometheus_label',
+				'Invalid parameter "/1/prometheus_label": a character string is expected.'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL],
+				'',
+				'/1/prometheus_label',
+				'Invalid parameter "/1/prometheus_label": cannot be empty.'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL],
+				'1_label',
+				'/1/prometheus_label',
+				'Invalid parameter "/1/prometheus_label": invalid Prometheus label.'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL],
+				'label}',
+				'/1/prometheus_label',
+				'Invalid parameter "/1/prometheus_label": invalid Prometheus label.'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL],
+				'{$MACRO}',
+				'/1/prometheus_label',
+				'Invalid parameter "/1/prometheus_label": invalid Prometheus label.'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}',
+				'/1/prometheus_label',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL],
+				'{#LLD_MACRO}',
+				'/1/prometheus_label',
+				'Invalid parameter "/1/prometheus_label": invalid Prometheus label.'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD_MACRO}',
+				'/1/prometheus_label',
+				'{#LLD_MACRO}'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL, 'flags' => API_ALLOW_LLD_MACRO],
+				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}',
+				'/1/prometheus_label',
+				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL],
+				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}',
+				'/1/prometheus_label',
+				'Invalid parameter "/1/prometheus_label": invalid Prometheus label.'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO}{$MACRO2}',
+				'/1/prometheus_label',
+				'Invalid parameter "/1/prometheus_label": invalid Prometheus label.'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD_MACRO}{#LLD_MACRO2}',
+				'/1/prometheus_label',
+				'Invalid parameter "/1/prometheus_label": invalid Prometheus label.'
+			],
+			[
+				['type' => API_PROMETHEUS_LABEL, 'flags' => API_ALLOW_LLD_MACRO],
+				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}{{#LLD_MACRO2}.regsub("(.*)_([0-9]+)", \1)}',
+				'/1/prometheus_label',
+				'Invalid parameter "/1/prometheus_label": invalid Prometheus label.'
 			]
 		];
 	}
@@ -6186,6 +8469,315 @@ class CApiInputValidatorTest extends TestCase {
 				'/',
 				false,
 				'Invalid parameter "/3/value/5": value (1) already exists.'
+			],
+			[
+				[
+					'type' => API_OBJECTS,
+					'uniq' => [['name']],
+					'uniq_by_values' => [['type' => ['1']]],
+					'fields' => [
+						'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3,4,5,6,7,8,9,10'],
+						'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+					]
+				],
+				[
+					['type' => '3', 'name' => 'Test1'],
+					['type' => '3', 'name' => 'Test2'],
+					['type' => '4', 'name' => 'Test3']
+				],
+				'/',
+				true,
+				''
+			],
+			[
+				[
+					'type' => API_OBJECTS,
+					'uniq' => [['name']],
+					'uniq_by_values' => [['type' => ['1']]],
+					'fields' => [
+						'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3,4,5,6,7,8,9,10'],
+						'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+					]
+				],
+				[
+					['type' => '3', 'name' => 'Test1'],
+					['type' => '3', 'name' => 'Test2'],
+					['type' => '4', 'name' => 'Test3'],
+					['type' => '1', 'name' => 'Test4']
+				],
+				'/',
+				true,
+				''
+			],
+			[
+				[
+					'type' => API_OBJECTS,
+					'uniq' => [['name']],
+					'uniq_by_values' => [['type' => ['1']]],
+					'fields' => [
+						'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3,4,5,6,7,8,9,10'],
+						'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+					]
+				],
+				[
+					['type' => '3', 'name' => 'Test1'],
+					['type' => '3', 'name' => 'Test2'],
+					['type' => '4', 'name' => 'Test3'],
+					['type' => '1', 'name' => 'Test4'],
+					['type' => '1', 'name' => 'Test5']
+				],
+				'/',
+				false,
+				'Invalid parameter "/5": only one object can exist within the combinations of (type)=((1)).'
+			],
+			[
+				[
+					'type' => API_OBJECTS,
+					'uniq' => [['name']],
+					'uniq_by_values' => [['type' => ['1', '2']]],
+					'fields' => [
+						'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3,4,5,6,7,8,9,10'],
+						'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+					]
+				],
+				[
+					['type' => '3', 'name' => 'Test1'],
+					['type' => '3', 'name' => 'Test2'],
+					['type' => '4', 'name' => 'Test3'],
+					['type' => '1', 'name' => 'Test4']
+				],
+				'/',
+				true,
+				''
+			],
+			[
+				[
+					'type' => API_OBJECTS,
+					'uniq' => [['name']],
+					'uniq_by_values' => [['type' => ['1', '2']]],
+					'fields' => [
+						'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3,4,5,6,7,8,9,10'],
+						'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+					]
+				],
+				[
+					['type' => '3', 'name' => 'Test1'],
+					['type' => '3', 'name' => 'Test2'],
+					['type' => '4', 'name' => 'Test3'],
+					['type' => '1', 'name' => 'Test4'],
+					['type' => '1', 'name' => 'Test5']
+				],
+				'/',
+				false,
+				'Invalid parameter "/5": only one object can exist within the combinations of (type)=((1, 2)).'
+			],
+			[
+				[
+					'type' => API_OBJECTS,
+					'uniq' => [['name']],
+					'uniq_by_values' => [['type' => ['1', '2']]],
+					'fields' => [
+						'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3,4,5,6,7,8,9,10'],
+						'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+					]
+				],
+				[
+					['type' => '3', 'name' => 'Test1'],
+					['type' => '3', 'name' => 'Test2'],
+					['type' => '4', 'name' => 'Test3'],
+					['type' => '1', 'name' => 'Test4'],
+					['type' => '2', 'name' => 'Test5']
+				],
+				'/',
+				false,
+				'Invalid parameter "/5": only one object can exist within the combinations of (type)=((1, 2)).'
+			],
+			[
+				[
+					'type' => API_OBJECTS,
+					'uniq' => [['name']],
+					'uniq_by_values' => [
+						['type' => ['1', '2']],
+						['type' => ['3']]
+					],
+					'fields' => [
+						'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3,4,5,6,7,8,9,10'],
+						'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+					]
+				],
+				[
+					['type' => '3', 'name' => 'Test1'],
+					['type' => '4', 'name' => 'Test3'],
+					['type' => '1', 'name' => 'Test4']
+				],
+				'/',
+				true,
+				''
+			],
+			[
+				[
+					'type' => API_OBJECTS,
+					'uniq' => [['name']],
+					'uniq_by_values' => [
+						['type' => ['1', '2']],
+						['type' => ['3']]
+					],
+					'fields' => [
+						'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3,4,5,6,7,8,9,10'],
+						'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+					]
+				],
+				[
+					['type' => '3', 'name' => 'Test1'],
+					['type' => '3', 'name' => 'Test2'],
+					['type' => '4', 'name' => 'Test3'],
+					['type' => '1', 'name' => 'Test4']
+				],
+				'/',
+				false,
+				'Invalid parameter "/2": only one object can exist within the combinations of (type)=((3)).'
+			],
+			[
+				[
+					'type' => API_OBJECTS,
+					'uniq' => [['name']],
+					'uniq_by_values' => [['type' => ['1', '2'], 'method' => ['a']]],
+					'fields' => [
+						'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3,4,5,6,7,8,9,10'],
+						'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+						'method' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => 'a,b,c,d']
+					]
+				],
+				[
+					['type' => '3', 'name' => 'Test1', 'method' => 'a'],
+					['type' => '3', 'name' => 'Test2', 'method' => 'a'],
+					['type' => '4', 'name' => 'Test3', 'method' => 'c'],
+					['type' => '1', 'name' => 'Test4', 'method' => 'a'],
+					['type' => '1', 'name' => 'Test5', 'method' => 'b'],
+					['type' => '2', 'name' => 'Test6', 'method' => 'b']
+				],
+				'/',
+				true,
+				''
+			],
+			[
+				[
+					'type' => API_OBJECTS,
+					'uniq' => [['name']],
+					'uniq_by_values' => [['type' => ['1', '2'], 'method' => ['a']]],
+					'fields' => [
+						'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3,4,5,6,7,8,9,10'],
+						'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+						'method' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => 'a,b,c,d']
+					]
+				],
+				[
+					['type' => '3', 'name' => 'Test1', 'method' => 'a'],
+					['type' => '3', 'name' => 'Test2', 'method' => 'a'],
+					['type' => '4', 'name' => 'Test3', 'method' => 'c'],
+					['type' => '1', 'name' => 'Test4', 'method' => 'a'],
+					['type' => '1', 'name' => 'Test5', 'method' => 'b'],
+					['type' => '2', 'name' => 'Test6', 'method' => 'b'],
+					['type' => '2', 'name' => 'Test7', 'method' => 'a']
+				],
+				'/',
+				false,
+				'Invalid parameter "/7": only one object can exist within the combinations of (type, method)=((1, 2), (a)).'
+			],
+			[
+				[
+					'type' => API_OBJECTS,
+					'uniq' => [['name']],
+					'uniq_by_values' => [['type' => ['1', '2'], 'method' => ['a']]],
+					'fields' => [
+						'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3,4,5,6,7,8,9,10'],
+						'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+						'method' =>	['type' => API_INT32, 'in' => 'a,b,c,d']
+					]
+				],
+				[
+					['type' => '3', 'name' => 'Test1', 'method' => 'a'],
+					['type' => '3', 'name' => 'Test2', 'method' => 'a'],
+					['type' => '4', 'name' => 'Test3', 'method' => 'c'],
+					['type' => '1', 'name' => 'Test4', 'method' => 'a'],
+					['type' => '1', 'name' => 'Test5', 'method' => 'b'],
+					['type' => '2', 'name' => 'Test6'],
+					['type' => '2', 'name' => 'Test7', 'method' => 'a']
+				],
+				'/',
+				false,
+				'Invalid parameter "/7": only one object can exist within the combinations of (type, method)=((1, 2), (a)).'
+			],
+			[
+				[
+					'type' => API_OBJECTS,
+					'uniq' => [['name']],
+					'uniq_by_values' => [['type' => ['1', '2'], 'method' => ['a', 'b']]],
+					'fields' => [
+						'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3,4,5,6,7,8,9,10'],
+						'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+						'method' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => 'a,b,c,d']
+					]
+				],
+				[
+					['type' => '3', 'name' => 'Test1', 'method' => 'a'],
+					['type' => '3', 'name' => 'Test2', 'method' => 'a'],
+					['type' => '4', 'name' => 'Test3', 'method' => 'c'],
+					['type' => '1', 'name' => 'Test4', 'method' => 'a'],
+					['type' => '1', 'name' => 'Test5', 'method' => 'c'],
+					['type' => '2', 'name' => 'Test6', 'method' => 'c'],
+					['type' => '2', 'name' => 'Test7', 'method' => 'd']
+				],
+				'/',
+				true,
+				''
+			],
+			[
+				[
+					'type' => API_OBJECTS,
+					'uniq' => [['name']],
+					'uniq_by_values' => [['type' => ['1', '2'], 'method' => ['a', 'b']]],
+					'fields' => [
+						'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3,4,5,6,7,8,9,10'],
+						'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+						'method' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => 'a,b,c,d']
+					]
+				],
+				[
+					['type' => '3', 'name' => 'Test1', 'method' => 'a'],
+					['type' => '3', 'name' => 'Test2', 'method' => 'a'],
+					['type' => '4', 'name' => 'Test3', 'method' => 'c'],
+					['type' => '1', 'name' => 'Test4', 'method' => 'a'],
+					['type' => '1', 'name' => 'Test5', 'method' => 'c'],
+					['type' => '1', 'name' => 'Test6', 'method' => 'b']
+				],
+				'/',
+				false,
+				'Invalid parameter "/6": only one object can exist within the combinations of (type, method)=((1, 2), (a, b)).'
+			],
+			[
+				[
+					'type' => API_OBJECTS,
+					'uniq' => [['name']],
+					'uniq_by_values' => [['type' => ['1', '2'], 'method' => ['a', 'b']]],
+					'fields' => [
+						'type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '1,2,3,4,5,6,7,8,9,10'],
+						'name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+						'method' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => 'a,b,c,d']
+					]
+				],
+				[
+					['type' => '3', 'name' => 'Test1', 'method' => 'a'],
+					['type' => '3', 'name' => 'Test2', 'method' => 'a'],
+					['type' => '4', 'name' => 'Test3', 'method' => 'c'],
+					['type' => '1', 'name' => 'Test4', 'method' => 'a'],
+					['type' => '1', 'name' => 'Test5', 'method' => 'c'],
+					['type' => '2', 'name' => 'Test6', 'method' => 'c'],
+					['type' => '2', 'name' => 'Test7', 'method' => 'b']
+				],
+				'/',
+				false,
+				'Invalid parameter "/7": only one object can exist within the combinations of (type, method)=((1, 2), (a, b)).'
 			]
 		];
 	}

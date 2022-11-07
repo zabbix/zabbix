@@ -31,7 +31,7 @@ if ($data['uncheck']) {
 	uncheckTableRows('hosts');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Hosts'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_LIST))
 	->setControls((new CTag('nav', true, (new CList())
@@ -166,7 +166,7 @@ $filter = (new CFilter())
 			])
 	]);
 
-$widget->addItem($filter);
+$html_page->addItem($filter);
 
 // table hosts
 $form = (new CForm())->setName('hosts');
@@ -545,7 +545,7 @@ $form->addItem([
 	], 'hosts')
 ]);
 
-$widget
+$html_page
 	->addItem($form)
 	->show();
 

@@ -154,7 +154,7 @@ class testActiveAvailability extends CIntegrationTest {
 			'hostid' => self::$hostid,
 			'name' => "act1",
 			'key_' => 'vfs.dir.size['.self::ACT_FILE_NAME.']',
-			'interfaceid' => self::$interfaceid,
+			'interfaceid' => 0,
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'value_type' => ITEM_VALUE_TYPE_TEXT,
 			'delay' => '1s'

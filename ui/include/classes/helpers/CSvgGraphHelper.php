@@ -19,6 +19,8 @@
 **/
 
 
+use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
+
 /**
  * Class calculates graph data and makes SVG graph.
  */
@@ -109,7 +111,7 @@ class CSvgGraphHelper {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
-			if ($data_set['dataset_type'] == CWidgetHelper::DATASET_TYPE_SINGLE_ITEM) {
+			if ($data_set['dataset_type'] == CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM) {
 				continue;
 			}
 
@@ -179,7 +181,7 @@ class CSvgGraphHelper {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
-			if ($data_set['dataset_type'] == CWidgetHelper::DATASET_TYPE_PATTERN_ITEM) {
+			if ($data_set['dataset_type'] == CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM) {
 				continue;
 			}
 
@@ -750,7 +752,7 @@ class CSvgGraphHelper {
 	 * Find problems at given time period that matches specified problem options.
 	 */
 	private static function getProblems(array $metrics, array $problem_options, array $time_period): array {
-		if ($problem_options['show_problems'] != SVG_GRAPH_PROBLEMS_SHOW) {
+		if ($problem_options['show_problems'] == SVG_GRAPH_PROBLEMS_OFF) {
 			return [];
 		}
 

@@ -1683,7 +1683,7 @@ FIELD		|tls_psk_identity|t_varchar(128)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|tls_psk	|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|tls_psk_identity
 
-TABLE|module|moduleid|
+TABLE|module|moduleid|ZBX_DATA
 FIELD		|moduleid	|t_id		|	|NOT NULL	|0
 FIELD		|id		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|relative_path	|t_varchar(255)	|''	|NOT NULL	|0
@@ -1987,4 +1987,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6030062	|6030062
+ROW		|1		|6030063	|6030063
