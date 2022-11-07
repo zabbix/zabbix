@@ -49,6 +49,7 @@ class CControllerPopupLdapCheck extends CController {
 			'user_username' =>			'db userdirectory_ldap.user_username',
 			'user_lastname' =>			'db userdirectory_ldap.user_lastname',
 			'add_ldap_server' =>		'in 0,1',
+			'group_configuration' =>	'in '.CControllerPopupLdapEdit::LDAP_MEMBER_OF.','.CControllerPopupLdapEdit::LDAP_GROUP_OF_NAMES,
 			'provision_status' =>		'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'provision_groups' =>		'array',
 			'provision_media' =>		'array'
@@ -89,29 +90,39 @@ class CControllerPopupLdapCheck extends CController {
 	protected function doAction(): void {
 		$data = [
 			'body' => [
-				'name' => $this->getInput('name'),
-				'host' => $this->getInput('host'),
-				'port' => $this->getInput('port'),
-				'base_dn' => $this->getInput('base_dn'),
-				'search_attribute' => $this->getInput('search_attribute'),
-				'start_tls' => $this->getInput('start_tls', ZBX_AUTH_START_TLS_OFF),
-				'bind_dn' => $this->getInput('bind_dn', ''),
-				'description' => $this->getInput('description', ''),
-				'search_filter' => $this->getInput('search_filter', ''),
-				'group_basedn' => $this->getInput('group_basedn', ''),
-				'group_name' => $this->getInput('group_name', ''),
-				'group_member' => $this->getInput('group_member', ''),
-				'user_ref_attr' => $this->getInput('user_ref_attr', ''),
-				'group_filter' => $this->getInput('group_filter', ''),
-				'group_membership' => $this->getInput('group_membership', ''),
-				'user_username' => $this->getInput('user_username', ''),
-				'user_lastname' => $this->getInput('user_lastname', ''),
-				'provision_status' => $this->getInput('provision_status', JIT_PROVISIONING_DISABLED),
-				'add_ldap_server' => $this->getInput('add_ldap_server', 1),
-				'provision_groups' => $this->getInput('provision_groups', []),
-				'provision_media' => $this->getInput('provision_media', [])
+				'name' => '',
+				'host' => '',
+				'port' => '',
+				'base_dn' => '',
+				'search_attribute' => '',
+				'start_tls' => ZBX_AUTH_START_TLS_OFF,
+				'bind_dn' => '',
+				'description' => '',
+				'search_filter' => '',
+				'group_basedn' => '',
+				'group_name' => '',
+				'group_member' => '',
+				'user_ref_attr' => '',
+				'group_filter' => '',
+				'group_membership' => '',
+				'user_username' => '',
+				'user_lastname' => '',
+				'provision_status' => JIT_PROVISIONING_DISABLED,
+				'add_ldap_server' => 1,
+				'provision_groups' => [],
+				'provision_media' => []
 			]
 		];
+		$fields = array_flip(array_keys($data['body']));
+
+		if ($this->getInput('group_configuration') == CControllerPopupLdapEdit::LDAP_MEMBER_OF) {
+			unset($fields['group_basedn'], $fields['group_member'], $fields['user_ref_attr'], $fields['group_filter']);
+		}
+		else {
+			unset($fields['group_membership']);
+		}
+
+		$this->getInputs($data['body'], array_keys($fields));
 
 		if ($this->hasInput('userdirectoryid')) {
 			$data['body']['userdirectoryid'] = $this->getInput('userdirectoryid');

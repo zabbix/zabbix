@@ -48,6 +48,7 @@ class CControllerPopupLdapEdit extends CController {
 			'user_username' =>					'db userdirectory_ldap.user_username',
 			'user_lastname' =>					'db userdirectory_ldap.user_lastname',
 			'add_ldap_server' =>				'in 0,1',
+			'group_configuration' =>			'in '.self::LDAP_MEMBER_OF.','.self::LDAP_GROUP_OF_NAMES,
 			'provision_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
 			'provision_groups' =>				'array',
 			'provision_media' =>				'array'
@@ -106,6 +107,7 @@ class CControllerPopupLdapEdit extends CController {
 			'userdirectoryid' => $this->hasInput('userdirectoryid') ? $this->getInput('userdirectoryid') : null,
 			'provision_groups' => $this->getInput('provision_groups', []),
 			'provision_media' => $this->getInput('provision_media', []),
+			'group_configuration' => $this->getInput('group_configuration', self::LDAP_MEMBER_OF),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -119,10 +121,10 @@ class CControllerPopupLdapEdit extends CController {
 			|| $data['search_filter'] !== ''
 		);
 
-		$group_filter = $data['group_basedn'].$data['group_name'].$data['group_member'].$data['user_ref_attr']
-				.$data['group_filter'];
-
-		$data['group_configuration'] = $group_filter === '' ? self::LDAP_MEMBER_OF : self::LDAP_GROUP_OF_NAMES;
+		if (!$this->hasInput('group_configuration')) {
+			$group_filter = $data['group_basedn'].$data['group_member'].$data['user_ref_attr'].$data['group_filter'];
+			$data['group_configuration'] = $group_filter === '' ? self::LDAP_MEMBER_OF : self::LDAP_GROUP_OF_NAMES;
+		}
 
 		self::extendProvisionGroups($data['provision_groups']);
 		self::extendProvisionMedia($data['provision_media']);
