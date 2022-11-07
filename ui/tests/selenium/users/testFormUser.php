@@ -641,10 +641,12 @@ class testFormUser extends CWebTest {
 			// Empty 'Group' field.
 			[
 				[
-					'expected' => TEST_GOOD,
+					'expected' => TEST_BAD,
 					'fields' => [
-						'Groups' => ''
-					]
+						'Username' => ''
+					],
+					'error_title' => 'Cannot update user',
+					'error_details' => 'Incorrect value for field "username": cannot be empty.'
 				]
 			],
 			// Empty 'Password (once again)' field.
@@ -904,9 +906,7 @@ class testFormUser extends CWebTest {
 						'Username' => 'Updated_user',
 						'Name' => 'Road',
 						'Last name' => 'Runner',
-						'Groups' => [
-							'Selenium user group in configuration'
-						],
+						'Groups' => [],
 						'Language' => 'English (en_US)',
 						'Theme' => 'High-contrast light',
 						'Auto-login' => true,

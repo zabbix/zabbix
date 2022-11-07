@@ -92,8 +92,7 @@ class testFormUserPermissions extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'user_name' => 'http-auth-admin',
-					'new_role' => '',
-					'user_type' => 'Admin'
+					'new_role' => ''
 				]
 			],
 			[
@@ -143,7 +142,11 @@ class testFormUserPermissions extends CWebTest {
 		$form = $this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm();
 		$form->selectTab('Permissions');
 		$form->getField('Role')->fill($data['new_role']);
-		$form->checkValue(['User type' => $data['user_type']]);
+
+		if (array_key_exists('User type', $data)) {
+			$form->checkValue(['User type' => $data['user_type']]);
+		}
+
 		$form->submit();
 
 		if ($data['expected'] === TEST_BAD) {
@@ -161,11 +164,13 @@ class testFormUserPermissions extends CWebTest {
 			$this->query('link', $data['user_name'])->one()->click();
 			$this->page->waitUntilReady();
 			$this->query('link:Permissions')->one()->click();
+			$form->invalidate();
 
-			$form->checkValue([
-					'Role' => $data['new_role'],
-					'User type' => $data['user_type']
-			]);
+			$values = array_key_exists('User type', $data)
+				? ['Role' => $data['new_role'], 'User type' => $data['user_type']]
+				: ['Role' => $data['new_role']];
+
+			$form->checkValue($values);
 		}
 	}
 

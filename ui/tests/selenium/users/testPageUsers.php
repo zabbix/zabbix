@@ -62,6 +62,9 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][contains(text(),'Displaying')]");
 		$this->zbxTestAssertElementText("//span[@id='selected_count']", '0 selected');
+
+		$form->query('button:Reset')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 	}
 
 	/**
@@ -84,7 +87,8 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of users');
 
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
-		$form->query('button:Reset')->waitUntilClickable()->one();
+		$form->query('button:Reset')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 
 		$this->zbxTestTextPresent($alias);
 		$this->zbxTestClickLinkText($alias);
@@ -101,7 +105,7 @@ class testPageUsers extends CLegacyWebTest {
 	public function testPageUsers_FilterByAlias() {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
-		$form->query('button:Reset')->waitUntilClickable()->one();
+		$form->query('button:Reset')->waitUntilClickable()->one()->click();
 		$form->fill(['Username' => $this->userAlias]);
 		$form->submit();
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", $this->userAlias);
@@ -111,7 +115,7 @@ class testPageUsers extends CLegacyWebTest {
 	public function testPageUsers_FilterNone() {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
-		$form->query('button:Reset')->waitUntilClickable()->one();
+		$form->query('button:Reset')->waitUntilClickable()->one()->click();
 		$form->fill(['Username' => '1928379128ksdhksdjfh']);
 		$form->submit();
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
@@ -123,7 +127,7 @@ class testPageUsers extends CLegacyWebTest {
 	public function testPageUsers_FilterByAllFields() {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
-		$form->query('button:Reset')->waitUntilClickable()->one();
+		$form->query('button:Reset')->waitUntilClickable()->one()->click();
 
 		$form->fill([
 			'User groups' => 'Zabbix administrators',
@@ -140,7 +144,7 @@ class testPageUsers extends CLegacyWebTest {
 	public function testPageUsers_FilterReset() {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
-		$form->query('button:Reset')->waitUntilClickable()->one();
+		$form->query('button:Reset')->waitUntilClickable()->one()->click();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
@@ -153,7 +157,7 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=user.list');
 		$this->zbxTestCheckTitle('Configuration of users');
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
-		$form->query('button:Reset')->waitUntilClickable()->one();
+		$form->query('button:Reset')->waitUntilClickable()->one()->click();
 
 		while ($user = DBfetch($result)) {
 			$id = $user['userid'];
