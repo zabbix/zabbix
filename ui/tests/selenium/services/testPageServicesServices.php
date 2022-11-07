@@ -24,9 +24,10 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup services
- *
+ * @dataSource EntitiesTags
  * @dataSource Services
+ *
+ * @backup services
  */
 class testPageServicesServices extends CWebTest {
 
@@ -34,7 +35,7 @@ class testPageServicesServices extends CWebTest {
 
 	const EDIT = true;
 
-	const SERVICE_COUNT = 16;
+	const SERVICE_COUNT = 19;
 
 	const LAYOUT_PARENT = 'Parent for 2 levels of child services';
 	const LAYOUT_CHILD = 'Child service with child service';
@@ -315,6 +316,7 @@ class testPageServicesServices extends CWebTest {
 						]
 					],
 					'result' => [
+						'Service with tags for updating',
 						'Parent for 2 levels of child services 1',
 						'Service with multiple service tags',
 						'Simple actions service'
@@ -451,6 +453,7 @@ class testPageServicesServices extends CWebTest {
 						]
 					],
 					'result' => [
+						'Service with tags for updating',
 						'Parent for 2 levels of child services 1',
 						'Service with multiple service tags',
 						'Simple actions service'
@@ -473,7 +476,7 @@ class testPageServicesServices extends CWebTest {
 						]
 					],
 					'result' => [
-						'Name' => 'Simple actions service'
+						'Simple actions service'
 					]
 				]
 			],
@@ -521,6 +524,7 @@ class testPageServicesServices extends CWebTest {
 						]
 					],
 					'result' => [
+						'Service with tags for updating',
 						'Parent for 2 levels of child services 1',
 						'Service with multiple service tags'
 					]
