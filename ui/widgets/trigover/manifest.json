@@ -9,6 +9,11 @@
 	"widget": {
 		"js_class": "CWidgetTrigerOver"
 	},
+	"actions": {
+		"widget.trigover.view": {
+			"class": "WidgetView"
+		}
+	},
 	"assets": {
 		"js": ["class.widget.js"]
 	}

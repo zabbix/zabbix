@@ -9,6 +9,11 @@
 	"widget": {
 		"js_class": "CWidgetProblems"
 	},
+	"actions": {
+		"widget.problems.view": {
+			"class": "WidgetView"
+		}
+	},
 	"assets": {
 		"js": ["class.widget.js"]
 	}

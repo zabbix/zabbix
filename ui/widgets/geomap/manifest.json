@@ -9,6 +9,11 @@
 	"widget": {
 		"js_class": "CWidgetGeoMap"
 	},
+	"actions": {
+		"widget.geomap.view": {
+			"class": "WidgetView"
+		}
+	},
 	"assets": {
 		"js": ["class.widget.js"]
 	}

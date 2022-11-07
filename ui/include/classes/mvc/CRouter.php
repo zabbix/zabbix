@@ -64,7 +64,7 @@ class CRouter {
 		'correlation.enable'						=> ['CControllerCorrelationEnable',						null,					null],
 		'correlation.list'							=> ['CControllerCorrelationList',						'layout.htmlpage',		'configuration.correlation.list'],
 		'correlation.update'						=> ['CControllerCorrelationUpdate',						null,					null],
-		'dashboard.configuration.hash.get'			=> ['CControllerDashboardConfigurationHashGet',			'layout.json',			null],
+		'dashboard.config.hash'						=> ['CControllerDashboardConfigHash',					'layout.json',			null],
 		'dashboard.delete'							=> ['CControllerDashboardDelete',						null,					null],
 		'dashboard.list'							=> ['CControllerDashboardList',							'layout.htmlpage',		'monitoring.dashboard.list'],
 		'dashboard.page.properties.check'			=> ['CControllerDashboardPagePropertiesCheck',			'layout.json',			null],

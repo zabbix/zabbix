@@ -382,7 +382,7 @@ class CDashboard extends CBaseComponent {
 	_promiseCheckConfiguration() {
 		const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', 'dashboard.configuration.hash.get');
+		curl.setArgument('action', 'dashboard.config.hash');
 
 		return fetch(curl.getUrl(), {
 			method: 'POST',
@@ -747,7 +747,11 @@ class CDashboard extends CBaseComponent {
 			return;
 		}
 
+		let old_widget_data = null;
+
 		if (widget !== null) {
+			old_widget_data = widget.getDataCopy({is_single_copy: false});
+
 			dashboard_page.deleteWidget(widget, {is_batch_mode: true});
 		}
 
@@ -792,7 +796,17 @@ class CDashboard extends CBaseComponent {
 				}
 
 				if (response.widgets[0] === null) {
-					dashboard_page.deleteWidget(paste_placeholder_widget);
+					if (widget !== null) {
+						dashboard_page.replaceWidget(paste_placeholder_widget, {
+							...old_widget_data,
+							widgetid: widget.getWidgetId(),
+							is_new: false,
+							unique_id: widget.getUniqueId()
+						});
+					}
+					else {
+						dashboard_page.deleteWidget(paste_placeholder_widget);
+					}
 
 					this._warn(t('Cannot paste inaccessible widget.'));
 

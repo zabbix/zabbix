@@ -50,7 +50,7 @@ class CWidgetFieldReference extends CWidgetField {
 	 * @param string $value  Reference value. Only numeric characters allowed.
 	 */
 	public function setValue($value): self {
-		if ($value === '' || ctype_alnum($value)) {
+		if ($value === '' || ctype_alnum((string) $value)) {
 			$this->value = $value;
 		}
 

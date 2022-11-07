@@ -12,5 +12,10 @@
 			"height": 3
 		},
 		"refresh_rate": 900
+	},
+	"actions": {
+		"widget.favgraphs.view": {
+			"class": "WidgetView"
+		}
 	}
 }

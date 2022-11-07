@@ -12,5 +12,10 @@
 			"width": 6,
 			"height": 3
 		}
+	},
+	"actions": {
+		"widget.plaintext.view": {
+			"class": "WidgetView"
+		}
 	}
 }

@@ -5,5 +5,10 @@
 	"name": "Action log",
 	"namespace": "ActionLog",
 	"version": "1.0",
-	"author": "Zabbix SIA"
+	"author": "Zabbix SIA",
+	"actions": {
+		"widget.actionlog.view": {
+			"class": "WidgetView"
+		}
+	}
 }

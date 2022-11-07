@@ -21,7 +21,8 @@
 
 namespace Zabbix\Core;
 
-use CControllerDashboardWidgetEdit;
+use CControllerDashboardWidgetEdit,
+	CControllerDashboardWidgetView;
 
 use Zabbix\Widgets\CWidgetForm;
 
@@ -74,7 +75,7 @@ class CWidget extends CModule {
 		];
 
 		$actions['widget.'.$this->getId().'.view'] += [
-			'class' => 'WidgetView',
+			'class' => CControllerDashboardWidgetView::class,
 			'view' => 'widget.view',
 			'layout' => 'layout.widget'
 		];

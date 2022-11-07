@@ -8,5 +8,10 @@
 	"author": "Zabbix SIA",
 	"widget": {
 		"refresh_rate": 900
+	},
+	"actions": {
+		"widget.systeminfo.view": {
+			"class": "WidgetView"
+		}
 	}
 }
