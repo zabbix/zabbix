@@ -5574,12 +5574,7 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
 	{
 		scriptitem = (ZBX_DC_SCRIPTITEM *)items.values[i];
 
-		if (0 == scriptitem->params.values_num)
-		{
-			zbx_vector_ptr_destroy(&scriptitem->params);
-			zbx_hashset_remove_direct(&config->scriptitems, scriptitem);
-		}
-		else
+		if (0 < scriptitem->params.values_num)
 			zbx_vector_ptr_sort(&scriptitem->params, dc_compare_itemscript_param);
 	}
 
