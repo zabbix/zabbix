@@ -584,6 +584,63 @@ static int	DBpatch_6030064(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6030065(void)
+{
+	const ZBX_FIELD	field = {"value_userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("widget_field", &field);
+}
+
+static int	DBpatch_6030066(void)
+{
+	return DBcreate_index("widget_field", "widget_field_9", "value_userid", 0);
+}
+
+static int	DBpatch_6030067(void)
+{
+	const ZBX_FIELD	field = {"value_userid", NULL, "users", "userid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 9, &field);
+}
+
+static int	DBpatch_6030068(void)
+{
+	const ZBX_FIELD	field = {"value_actionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("widget_field", &field);
+}
+
+static int	DBpatch_6030069(void)
+{
+	return DBcreate_index("widget_field", "widget_field_10", "value_actionid", 0);
+}
+
+static int	DBpatch_6030070(void)
+{
+	const ZBX_FIELD	field = {"value_actionid", NULL, "actions", "actionid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 10, &field);
+}
+
+static int	DBpatch_6030071(void)
+{
+	const ZBX_FIELD	field = {"value_mediatypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("widget_field", &field);
+}
+
+static int	DBpatch_6030072(void)
+{
+	return DBcreate_index("widget_field", "widget_field_11", "value_mediatypeid", 0);
+}
+
+static int	DBpatch_6030073(void)
+{
+	const ZBX_FIELD	field = {"value_mediatypeid", NULL, "media_type", "mediatypeid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("widget_field", 11, &field);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -655,5 +712,15 @@ DBPATCH_ADD(6030061, 0, 1)
 DBPATCH_ADD(6030062, 0, 1)
 DBPATCH_ADD(6030063, 0, 1)
 DBPATCH_ADD(6030064, 0, 1)
+DBPATCH_ADD(6030064, 0, 1)
+DBPATCH_ADD(6030065, 0, 1)
+DBPATCH_ADD(6030066, 0, 1)
+DBPATCH_ADD(6030067, 0, 1)
+DBPATCH_ADD(6030068, 0, 1)
+DBPATCH_ADD(6030069, 0, 1)
+DBPATCH_ADD(6030070, 0, 1)
+DBPATCH_ADD(6030071, 0, 1)
+DBPATCH_ADD(6030072, 0, 1)
+DBPATCH_ADD(6030073, 0, 1)
 
 DBPATCH_END()
