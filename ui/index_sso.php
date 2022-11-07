@@ -49,6 +49,7 @@ if (CAuthenticationHelper::get(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_
 
 use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Utils;
+use SCIM\services\Group as ScimGroup;
 
 global $SSO;
 
@@ -215,6 +216,7 @@ try {
 			}
 
 			$user += $provisioning->getUserGroupsAndRole($idp_groups);
+			$saml_data['idp_groups'] = $idp_groups;
 			$saml_data['provisioned_user'] = $user;
 		}
 
@@ -281,6 +283,9 @@ try {
 				if ($user_data['db_user']['userdirectoryid'] == $userdirectoryid) {
 					$saml_data['provisioned_user']['userid'] = $user_data['db_user']['userid'];
 					$deprovisioned = !API::User()->updateProvisionedUser($saml_data['provisioned_user']);
+					ScimGroup::createScimGroupsFromSamlAttributes($saml_data['idp_groups'],
+						$user_data['db_user']['userid']
+					);
 				}
 
 				if ($deprovisioned) {
@@ -292,8 +297,12 @@ try {
 					'userdirectoryid'	=> $userdirectoryid,
 					'username'			=> $saml_data['username_attribute']
 				];
-				API::User()->createProvisionedUser($saml_data['provisioned_user']);
+				$user = API::User()->createProvisionedUser($saml_data['provisioned_user']);
+				ScimGroup::createScimGroupsFromSamlAttributes($saml_data['idp_groups'], $user['userid']);
 			}
+
+			unset($saml_data['provisioned_user'], $saml_data['idp_groups']);
+			CSessionHelper::set('saml_data', $saml_data);
 		}
 
 		CWebUser::$data = API::User()->loginByUsername($saml_data['username_attribute'],
