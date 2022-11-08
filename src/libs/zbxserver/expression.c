@@ -1470,6 +1470,34 @@ static int	get_autoreg_value_by_event(const ZBX_DB_EVENT *event, char **replace_
 #define MVAR_EVENT_UPDATE_NSEVERITY	MVAR_EVENT_UPDATE "NSEVERITY}"
 #define MVAR_EVENT_UPDATE_SEVERITY	MVAR_EVENT_UPDATE "SEVERITY}"
 
+#define MVAR_EVENT_CAUSE			"{EVENT.CAUSE."	/* a prefix for all event cause macros */
+#define MVAR_EVENT_CAUSE_ACK_HISTORY		MVAR_EVENT_CAUSE "ACK.HISTORY}"	/* deprecated */
+#define MVAR_EVENT_CAUSE_ACK_STATUS		MVAR_EVENT_CAUSE "ACK.STATUS}"
+#define MVAR_EVENT_CAUSE_AGE			MVAR_EVENT_CAUSE "AGE}"
+#define MVAR_EVENT_CAUSE_DATE			MVAR_EVENT_CAUSE "DATE}"
+#define MVAR_EVENT_CAUSE_DURATION		MVAR_EVENT_CAUSE "DURATION}"
+#define MVAR_EVENT_CAUSE_ID			MVAR_EVENT_CAUSE "ID}"
+#define MVAR_EVENT_CAUSE_NAME			MVAR_EVENT_CAUSE "NAME}"
+#define MVAR_EVENT_CAUSE_STATUS			MVAR_EVENT_CAUSE "STATUS}"
+#define MVAR_EVENT_CAUSE_TAGS			MVAR_EVENT_CAUSE "TAGS}"
+#define MVAR_EVENT_CAUSE_TAGSJSON		MVAR_EVENT_CAUSE "TAGSJSON}"
+#define MVAR_EVENT_CAUSE_TIME			MVAR_EVENT_CAUSE "TIME}"
+#define MVAR_EVENT_CAUSE_VALUE			MVAR_EVENT_CAUSE "VALUE}"
+#define MVAR_EVENT_CAUSE_SEVERITY		MVAR_EVENT_CAUSE "SEVERITY}"
+#define MVAR_EVENT_CAUSE_NSEVERITY		MVAR_EVENT_CAUSE "NSEVERITY}"
+#define MVAR_EVENT_CAUSE_OBJECT			MVAR_EVENT_CAUSE "OBJECT}"
+#define MVAR_EVENT_CAUSE_SOURCE			MVAR_EVENT_CAUSE "SOURCE}"
+#define MVAR_EVENT_CAUSE_OPDATA			MVAR_EVENT_CAUSE "OPDATA}"
+#define MVAR_EVENT_CAUSE_UPDATE			MVAR_EVENT_CAUSE "UPDATE."
+#define MVAR_EVENT_CAUSE_UPDATE_ACTION		MVAR_EVENT_CAUSE_UPDATE "ACTION}"
+#define MVAR_EVENT_CAUSE_UPDATE_DATE		MVAR_EVENT_CAUSE_UPDATE "DATE}"
+#define MVAR_EVENT_CAUSE_UPDATE_HISTORY		MVAR_EVENT_CAUSE_UPDATE "HISTORY}"
+#define MVAR_EVENT_CAUSE_UPDATE_MESSAGE		MVAR_EVENT_CAUSE_UPDATE "MESSAGE}"
+#define MVAR_EVENT_CAUSE_UPDATE_TIME		MVAR_EVENT_CAUSE_UPDATE "TIME}"
+#define MVAR_EVENT_CAUSE_UPDATE_STATUS		MVAR_EVENT_CAUSE_UPDATE "STATUS}"
+#define MVAR_EVENT_CAUSE_UPDATE_NSEVERITY	MVAR_EVENT_CAUSE_UPDATE "NSEVERITY}"
+#define MVAR_EVENT_CAUSE_UPDATE_SEVERITY	MVAR_EVENT_CAUSE_UPDATE "SEVERITY}"
+
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_PROXY_NAME			"{PROXY.NAME}"
 #define MVAR_PROXY_DESCRIPTION		"{PROXY.DESCRIPTION}"
@@ -2823,6 +2851,179 @@ static const char	*trigger_value_string(unsigned char value)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: request cause event value by macro                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_event_cause_value(const char *macro, char **replace_to, const ZBX_DB_EVENT *event,
+		const zbx_uint64_t *recipient_userid, const zbx_service_alarm_t *service_alarm,
+		const DB_ACKNOWLEDGE *ack, const char *tz, int macro_type, char *error, int maxerrlen)
+{
+	zbx_uint64_t			r_eventid;
+	const ZBX_DB_EVENT		*cause_event, *r_event, *c_event;
+	zbx_vector_uint64_t		eventids, r_eventids;
+	zbx_vector_ptr_t		events, r_events;
+	zbx_vector_uint64_pair_t	dummy_event_pairs;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid = " ZBX_FS_UI64 ", event name = '%s'", __func__, event->eventid,
+			event->name);
+
+	if (0 == event->cause_eventid)
+		goto out;
+
+	zbx_vector_uint64_create(&eventids);
+	zbx_vector_ptr_create(&events);
+
+	zbx_vector_uint64_create(&r_eventids);
+	zbx_vector_ptr_create(&r_events);
+	zbx_vector_uint64_pair_create(&dummy_event_pairs);
+
+	zbx_vector_uint64_append(&eventids, event->cause_eventid);
+	zbx_db_get_events_by_eventids(&eventids, &events);
+	cause_event = events.values[0];
+
+	zbx_db_get_eventid_r_eventid_pairs(&eventids, &dummy_event_pairs, &r_eventids);
+
+	if (r_eventids.values_num == 0)
+	{
+		r_eventid = 0;
+		c_event = cause_event;
+	}
+	else
+	{
+		zbx_db_get_events_by_eventids(&r_eventids, &r_events);
+		r_event = r_events.values[0];
+		r_eventid = r_event->eventid;
+		c_event = r_event;
+	}
+
+	if (EVENT_SOURCE_TRIGGERS != c_event->source)
+		goto clean;
+
+	if (0 == strcmp(macro, MVAR_EVENT_CAUSE_ACK_HISTORY) || 0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_HISTORY))
+	{
+		get_event_update_history(cause_event, replace_to, recipient_userid, tz);
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_ACK_STATUS))
+	{
+		*replace_to = zbx_strdup(*replace_to, cause_event->acknowledged ? "Yes" : "No");
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_AGE))
+	{
+		*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - cause_event->clock));
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_DATE))
+	{
+		*replace_to = zbx_strdup(*replace_to, zbx_date2str(cause_event->clock, tz));
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_DURATION))
+	{
+		if (NULL == r_event)
+			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - cause_event->clock));
+		else
+			*replace_to = zbx_strdup(*replace_to, zbx_age2str(r_event->clock - cause_event->clock));
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_ID))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, ZBX_FS_UI64, cause_event->eventid);
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_NAME))
+	{
+		*replace_to = zbx_strdup(*replace_to, cause_event->name);
+	}
+	if (0 == strcmp(macro, MVAR_EVENT_CAUSE_STATUS))
+	{
+		*replace_to = zbx_strdup(*replace_to, event_value_string(c_event->source, c_event->object,
+				c_event->value));
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_VALUE))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%d", c_event->value);
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_TAGS))
+	{
+		get_event_tags(cause_event, replace_to);
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_TAGSJSON))
+	{
+		get_event_tags_json(cause_event, replace_to);
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_TIME))
+	{
+		*replace_to = zbx_strdup(*replace_to, zbx_time2str(cause_event->clock, tz));
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_SEVERITY))
+	{
+		if (FAIL == get_trigger_severity_name(cause_event->severity, replace_to))
+			*replace_to = zbx_strdup(*replace_to, "unknown");
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_NSEVERITY))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%d", (int)cause_event->severity);
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_OBJECT))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%d", cause_event->object);
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_SOURCE))
+	{
+		*replace_to = zbx_dsprintf(*replace_to, "%d", cause_event->source);
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_OPDATA))
+	{
+		resolve_opdata(c_event, replace_to, tz, error, maxerrlen);
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_ACTION))
+	{
+		if (0 != (macro_type & MACRO_TYPE_MESSAGE_UPDATE) && NULL != ack)
+		{
+			get_problem_update_actions(ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
+					ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
+					ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_MESSAGE |
+					ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_SUPPRESS
+					| ZBX_PROBLEM_UPDATE_UNSUPPRESS, tz, replace_to);
+		}
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_DATE))
+	{
+		if (0 != (macro_type & MACRO_TYPE_MESSAGE_UPDATE) && NULL != ack)
+			*replace_to = zbx_strdup(*replace_to, zbx_date2str(ack->clock, tz));
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_MESSAGE))
+	{
+		if (0 != (macro_type & MACRO_TYPE_MESSAGE_UPDATE) && NULL != ack)
+			*replace_to = zbx_strdup(*replace_to, ack->message);
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_TIME))
+	{
+		if (NULL != service_alarm)
+			*replace_to = zbx_strdup(*replace_to, zbx_time2str(service_alarm->clock, tz));
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_NSEVERITY))
+	{
+		if (NULL != service_alarm)
+			*replace_to = zbx_dsprintf(*replace_to, "%d", (int)service_alarm->value);
+	}
+	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_SEVERITY))
+	{
+		if (NULL != service_alarm && FAIL == get_trigger_severity_name(service_alarm->value, replace_to))
+			*replace_to = zbx_strdup(*replace_to, "unknown");
+	}
+
+clean:
+	zbx_vector_ptr_clear_ext(&events, (zbx_clean_func_t)zbx_db_free_event);
+	zbx_vector_ptr_destroy(&events);
+	zbx_vector_uint64_destroy(&eventids);
+
+	zbx_vector_ptr_clear_ext(&r_events, (zbx_clean_func_t)zbx_db_free_event);
+	zbx_vector_ptr_destroy(&r_events);
+	zbx_vector_uint64_destroy(&r_eventids);
+	zbx_vector_uint64_pair_destroy(&dummy_event_pairs);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
  *                                                                            *
  ******************************************************************************/
@@ -2947,7 +3148,12 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 
 			c_event = ((NULL != r_event) ? r_event : event);
 
-			if (EVENT_SOURCE_TRIGGERS == c_event->source)
+			if (0 == strncmp(m, MVAR_EVENT_CAUSE, ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE)))
+			{
+				get_event_cause_value(m, &replace_to, event, userid, service_alarm, ack, tz, macro_type,
+						error, maxerrlen);
+			}
+			else if (EVENT_SOURCE_TRIGGERS == c_event->source)
 			{
 				if (ZBX_TOKEN_USER_MACRO == token.type)
 				{
