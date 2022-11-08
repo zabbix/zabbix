@@ -54,7 +54,12 @@ class CSystemInfoHelper {
 			}
 		}
 
-		$data += CHousekeepingHelper::getWarnings($dbversion_status);
+		$data += CHousekeepingHelper::getWarnings($dbversion_status) + [
+			CHousekeepingHelper::HK_HISTORY_MODE => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE),
+			CHousekeepingHelper::HK_TRENDS_MODE => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_MODE),
+			CHousekeepingHelper::HK_HISTORY_GLOBAL => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL),
+			CHousekeepingHelper::HK_TRENDS_GLOBAL => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)
+		];
 
 		$ha_cluster_enabled = false;
 
