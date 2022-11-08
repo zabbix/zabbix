@@ -78,4 +78,23 @@ class CDateTimeHelper {
 	public static function countDays($date = 'now', $period = 'P1Y') {
 		return (new DateTime($date))->diff((new DateTime($date))->sub(new DateInterval($period)))->days;
 	}
+
+	/**
+	 * Get the time difference in months between two moments in time.
+	 *
+	 * @param string|int	$from		timestamp or string that represents the oldest moments in time
+	 * @param string|int	$to			timestamp or string that represents the newest moments in time
+	 *
+	 * @return int
+	 */
+	public static function countMonthsBetweenDates($from, $to = 'now') {
+		foreach ([&$from, &$to] as &$moment) {
+			if (is_string($moment)) {
+				$moment = strtotime($moment);
+			}
+		}
+		unset($moment);
+
+		return ((date('Y', $to) - date('Y', $from)) * 12) + ((date('m', $to) - date('m', $from)));
+	}
 }
