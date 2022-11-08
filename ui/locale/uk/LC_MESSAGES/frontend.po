@@ -17039,6 +17039,16 @@ msgstr "Стовпчик комплексного екрану не порожн
 msgid "This screen row is not empty. Delete it?"
 msgstr "Рядок комплексного екрану не порожній. Видалити його?"
 
+#: app/views/administration.housekeeping.edit.php:134
+#: include/blocks.inc.php:714
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:164
+#: include/blocks.inc.php:730
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
+
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"
 msgstr "Цей тиждень"

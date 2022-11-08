@@ -62,6 +62,8 @@ class CControllerHousekeepingEdit extends CController {
 	}
 
 	protected function doAction() {
+		global $DB;
+
 		$config = select_config();
 
 		$data = [
@@ -87,6 +89,18 @@ class CControllerHousekeepingEdit extends CController {
 			'db_extension'				=> $config['db_extension'],
 			'compression_availability'	=> $config['compression_availability']
 		];
+
+		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && $config['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB
+				&& $config['compression_availability'] == 1) {
+			$hk_warnings = [
+				'hk_needs_override_history' => PostgresqlDbBackend::isCompressed([
+					'history', 'history_log', 'history_str', 'history_text', 'history_uint'
+				]),
+				'hk_needs_override_trends' => PostgresqlDbBackend::isCompressed(['trends', 'trends_uint'])
+			];
+
+			$data += array_filter($hk_warnings);
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of housekeeping'));

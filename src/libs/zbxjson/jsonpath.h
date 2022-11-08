@@ -153,9 +153,9 @@ zbx_jsonpath_token_type_t;
 typedef struct
 {
 	unsigned char	type;
-	char		*data;
+	char		*text;
+	zbx_jsonpath_t	*path;
 }
 zbx_jsonpath_token_t;
-
 
 #endif

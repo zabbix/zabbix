@@ -61,6 +61,15 @@
 				this.screens[screen.id].data = new SVGMap(this.screens[screen.id].data);
 				$(screen.data.container).attr({'aria-label': screen.data.options.aria_label, 'tabindex': 0})
 					.find('svg').attr('aria-hidden', 'true');
+
+				$(screen.data.container).parents('.sysmap-scroll-container').eq(0)
+					.on('scroll', (e) => {
+						if (!e.target.dataset.last_scroll_at || Date.now() - e.target.dataset.last_scroll_at > 1000) {
+							$('.menu-popup-top').menuPopup('close', null, false);
+
+							e.target.dataset.last_scroll_at = Date.now();
+						}
+					});
 			}
 
 			// init refresh plan
