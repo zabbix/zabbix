@@ -102,13 +102,11 @@ func (p *Plugin) Collect() (err error) {
 		return
 	}
 
-	if p.collectError = win32.PdhCollectQueryData(p.query); p.collectError != nil {
-		return p.collectError
-	}
+	p.collectError = win32.PdhCollectQueryData(p.query)
 
 	expireTime := time.Now().Add(-maxInactivityPeriod)
 	for index, c := range p.counters {
-		if c.lastAccess.Before(expireTime) {
+		if c.lastAccess.Before(expireTime) || nil != p.collectError {
 			if cerr := win32.PdhRemoveCounter(c.handle); cerr != nil {
 				p.Debugf("error while removing counter '%s': %s", index.path, cerr)
 			}
