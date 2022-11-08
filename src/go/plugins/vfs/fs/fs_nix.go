@@ -55,9 +55,7 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 			continue
 		}
 
-		if bytes.Total > 0 {
-			fsmap[*info.FsName] = &FsInfoNew{info.FsName, info.FsType, nil, bytes, inodes}
-		}
+		fsmap[*info.FsName] = &FsInfoNew{info.FsName, info.FsType, nil, bytes, inodes}
 	}
 
 	allData, err = p.getFsInfo()
@@ -109,6 +107,8 @@ func (p *Plugin) getFsInfo() (data []*FsInfo, err error) {
 }
 
 func getFsStats(path string) (stats *FsStats, err error) {
+	var pused float64
+
 	fs := unix.Statfs_t{}
 	err = unix.Statfs(path, &fs)
 	if err != nil {
@@ -123,13 +123,22 @@ func getFsStats(path string) (stats *FsStats, err error) {
 	total := fs.Blocks * uint64(fs.Bsize)
 	free := available * uint64(fs.Bsize)
 	used := (fs.Blocks - fs.Bfree) * uint64(fs.Bsize)
-	pfree := 100.00 * float64(available) / float64(fs.Blocks-fs.Bfree+fs.Bavail)
+	pfree := float64(fs.Blocks-fs.Bfree+fs.Bavail)
+
+	if pfree > 0 {
+		pfree = 100.00 * float64(available) / pfree
+		pused = 100 - pfree
+	} else {
+		pfree = 0
+		pused = 0
+	}
+
 	stats = &FsStats{
 		Total: total,
 		Free:  free,
 		Used:  used,
 		PFree: pfree,
-		PUsed: 100 - pfree,
+		PUsed: pused,
 	}
 
 	return
