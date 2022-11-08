@@ -1,4 +1,4 @@
-Changes for 6.4.0beta3.
+Changes for 6.4.0beta3
 
 New features:
 ..F....... [ZBXNEXT-7469] simplified creation of dashboard widgets; moved widgets to modules; updated modules framework (ashubin, averza)
