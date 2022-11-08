@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-10-26T11:27:07Z'
+  date: '2022-11-08T08:52:11Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -20,13 +20,14 @@ zabbix_export:
       description: |
         This template is designed to monitor Microsoft Azure by HTTP.
         It works without any external scripts and uses the script item.
+        Currently the template supports discovery of virtual machines (VMs), MySQL and PosgtreSQL servers.
         
         Setup:
           1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID} and {$AZURE.SUBSCRIPTION_ID}.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, and {$AZURE.SUBSCRIPTION_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -206,7 +207,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The result of API requests is in the JSON.'
+          description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             -
@@ -260,12 +261,12 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
-                formulaid: A
+                formulaid: B
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
+                formulaid: A
           description: 'The list of the MySQL servers is provided by the subscription.'
           host_prototypes:
             -
@@ -393,12 +394,12 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
-                formulaid: A
+                formulaid: B
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
+                formulaid: A
           description: 'The list of the PostgreSQL servers is provided by the subscription.'
           host_prototypes:
             -
@@ -526,12 +527,12 @@ zabbix_export:
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.MATCHES}'
-                formulaid: A
+                formulaid: B
               -
                 macro: '{#GROUP}'
                 value: '{$AZURE.RESOURCE_GROUP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: B
+                formulaid: A
           description: 'The list of the virtual machines is provided by the subscription.'
           host_prototypes:
             -
@@ -689,7 +690,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -953,7 +954,7 @@ zabbix_export:
               name: 'Azure MySQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'CPU utilization is too high. The system might be slow to respond.'
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope
@@ -1149,7 +1150,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The result of API requests is in the JSON.'
+          description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             -
@@ -1292,7 +1293,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Replication lag in seconds.'
+          description: 'The replication lag expressed in seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -1314,7 +1315,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The backup storage used in bytes.'
+          description: 'Used backup storage expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -1335,7 +1336,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit in bytes.'
+          description: 'The storage limit expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -1356,7 +1357,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Storage utilization in %.'
+          description: 'The storage utilization expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -1400,7 +1401,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used storage space in bytes.'
+          description: 'Used storage space expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -1434,15 +1435,15 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization in %.'
+          description: 'The critical threshold of the CPU utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of the storage utilization in %.'
+          description: 'The critical threshold of the storage utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of the storage utilization in %.'
+          description: 'The warning threshold of the storage utilization expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -1486,7 +1487,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -1689,7 +1690,7 @@ zabbix_export:
               name: 'Azure MySQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'CPU utilization is too high. The system might be slow to respond.'
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope
@@ -1884,7 +1885,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The result of API requests is in the JSON.'
+          description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             -
@@ -2021,7 +2022,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Replication lag in seconds.'
+          description: 'The replication lag expressed in seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -2043,7 +2044,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The backup storage used in bytes.'
+          description: 'Used backup storage expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -2064,7 +2065,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit in bytes.'
+          description: 'The storage limit expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -2085,7 +2086,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Storage utilization in %.'
+          description: 'The storage utilization expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -2129,7 +2130,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit of server log in bytes.'
+          description: 'The storage limit of a server log expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -2150,7 +2151,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The storage utilization by a server log in %.'
+          description: 'The storage utilization by a server log expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -2171,7 +2172,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage space used by a server log in bytes.'
+          description: 'The storage space used by a server log expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -2192,7 +2193,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used storage space in bytes.'
+          description: 'Used storage space expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -2222,7 +2223,7 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization in %.'
+          description: 'The critical threshold of the CPU utilization expressed in %.'
         -
           macro: '{$AZURE.DB.FAILED_CONN.MAX.WARN}'
           value: '25'
@@ -2230,15 +2231,15 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the memory utilization in %.'
+          description: 'The critical threshold of the memory utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of the storage utilization in %.'
+          description: 'The critical threshold of the storage utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of the storage utilization in %.'
+          description: 'The warning threshold of the storage utilization expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -2282,7 +2283,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -2535,7 +2536,7 @@ zabbix_export:
               name: 'Azure PostgreSQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'CPU utilization is too high. The system might be slow to respond.'
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope
@@ -2744,7 +2745,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The result of API requests is in the JSON.'
+          description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             -
@@ -2840,7 +2841,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!ops'
-          description: 'IO Operations per second.'
+          description: 'I/O Operations per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -2861,7 +2862,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!ops'
-          description: 'The number of data disk I/O read operations per second.'
+          description: 'The number of the data disk I/O read operations per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -2883,7 +2884,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '!ops'
-          description: 'The number of data disk I/O write operations per second.'
+          description: 'The number of the data disk I/O write operations per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -2988,7 +2989,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The backup storage used in bytes.'
+          description: 'Used backup storage expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3010,7 +3011,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Free storage space in bytes.'
+          description: 'Free storage space expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3031,7 +3032,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Storage utilization in %.'
+          description: 'The storage utilization expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -3075,7 +3076,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage space used by a transaction log in bytes.'
+          description: 'The storage space used by a transaction log expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3096,7 +3097,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used storage space in bytes.'
+          description: 'Used storage space expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3116,7 +3117,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Maximum used transaction IDs.'
+          description: 'The maximum number of used transaction IDs.'
           preprocessing:
             -
               type: JSONPATH
@@ -3146,19 +3147,19 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization in %.'
+          description: 'The critical threshold of the CPU utilization expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the memory utilization in %.'
+          description: 'The critical threshold of the memory utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of the storage utilization in %.'
+          description: 'The critical threshold of the storage utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of the storage utilization in %.'
+          description: 'The warning threshold of the storage utilization expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -3202,7 +3203,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -3393,7 +3394,7 @@ zabbix_export:
               name: 'Azure PostgreSQL: High CPU utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'CPU utilization is too high. The system might be slow to respond.'
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope
@@ -3589,7 +3590,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The result of API requests is in the JSON.'
+          description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             -
@@ -3726,7 +3727,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Replication lag in seconds.'
+          description: 'The replication lag expressed in seconds.'
           preprocessing:
             -
               type: JSONPATH
@@ -3748,7 +3749,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Lag in bytes of the most lagging replica.'
+          description: 'Lag expressed in bytes for the most lagging replica.'
           preprocessing:
             -
               type: JSONPATH
@@ -3770,7 +3771,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The backup storage used in bytes.'
+          description: 'Used backup storage expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3791,7 +3792,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit in bytes.'
+          description: 'The storage limit expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3812,7 +3813,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Storage utilization in %.'
+          description: 'The storage utilization expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -3856,7 +3857,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage limit of a server log in bytes.'
+          description: 'The storage limit of a server log expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3877,7 +3878,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The storage utilization by a server log in %.'
+          description: 'The storage utilization by a server log expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -3898,7 +3899,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'The storage space used by a server log in bytes.'
+          description: 'The storage space used by a server log expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3919,7 +3920,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: 'Used storage space in bytes.'
+          description: 'Used storage space expressed in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -3949,19 +3950,19 @@ zabbix_export:
         -
           macro: '{$AZURE.DB.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization in %.'
+          description: 'The critical threshold of the CPU utilization expressed in %.'
         -
           macro: '{$AZURE.DB.MEMORY.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the memory utilization in %.'
+          description: 'The critical threshold of the memory utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.CRIT}'
           value: '90'
-          description: 'The critical threshold of the storage utilization in %.'
+          description: 'The critical threshold of the storage utilization expressed in %.'
         -
           macro: '{$AZURE.DB.STORAGE.PUSED.WARN}'
           value: '80'
-          description: 'The warning threshold of the storage utilization in %.'
+          description: 'The warning threshold of the storage utilization expressed in %.'
         -
           macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
@@ -4005,7 +4006,7 @@ zabbix_export:
             `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
             See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
           2. Link the template to a host.
-          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+          3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -4237,7 +4238,7 @@ zabbix_export:
               name: 'Azure: High CPU utilization'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'CPU utilization is too high. The system might be slow to respond.'
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
               tags:
                 -
                   tag: scope
@@ -4752,7 +4753,7 @@ zabbix_export:
             }
             
             return JSON.stringify(data);
-          description: 'The result of API requests is in the JSON.'
+          description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
             -
@@ -5462,7 +5463,7 @@ zabbix_export:
         -
           macro: '{$AZURE.VM.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization in %.'
+          description: 'The critical threshold of the CPU utilization expressed in %.'
       valuemaps:
         -
           uuid: 38c8ce1516704ec2a6f1ea9686db56b9
@@ -5725,21 +5726,6 @@ zabbix_export:
             host: 'Azure MySQL single server by HTTP'
             key: azure.db.mysql.storage.server.log.limit
     -
-      uuid: 4210e6b4ed8744589dce88217e961a56
-      name: 'Azure MySQL: Storage utilization'
-      graph_items:
-        -
-          color: 1A7C11
-          item:
-            host: 'Azure MySQL flexible server by HTTP'
-            key: azure.db.mysql.storage.used
-        -
-          sortorder: '1'
-          color: 2774A4
-          item:
-            host: 'Azure MySQL flexible server by HTTP'
-            key: azure.db.mysql.storage.limit
-    -
       uuid: bdc178e6faaa4850badc0c60c7c80d40
       name: 'Azure MySQL: Storage utilization'
       graph_items:
@@ -5753,6 +5739,21 @@ zabbix_export:
           color: 2774A4
           item:
             host: 'Azure MySQL single server by HTTP'
+            key: azure.db.mysql.storage.limit
+    -
+      uuid: 4210e6b4ed8744589dce88217e961a56
+      name: 'Azure MySQL: Storage utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Azure MySQL flexible server by HTTP'
+            key: azure.db.mysql.storage.used
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Azure MySQL flexible server by HTTP'
             key: azure.db.mysql.storage.limit
     -
       uuid: 2b60e8b1fd7c43f4ac61812e43c0e1ca

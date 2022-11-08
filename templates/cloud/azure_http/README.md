@@ -6,6 +6,7 @@
 For Zabbix version: 6.2 and higher.
 This template is designed to monitor Microsoft Azure by HTTP.
 It works without any external scripts and uses the script item.
+Currently the template supports discovery of virtual machines (VMs), MySQL and PosgtreSQL servers.
 
 ## Setup
 
@@ -18,7 +19,7 @@ It works without any external scripts and uses the script item.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID} and {$AZURE.SUBSCRIPTION_ID}.
+3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, and {$AZURE.SUBSCRIPTION_ID}.
 
 ## Zabbix configuration
 
@@ -64,7 +65,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Azure |Azure: Get resources |<p>The result of API requests is in the JSON.</p> |SCRIPT |azure.get.resources<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure: Get resources |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.get.resources<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Azure |Azure: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.get.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 
 ## Triggers
@@ -98,7 +99,7 @@ It works without any external scripts and uses the script item.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
 
 ## Zabbix configuration
 
@@ -114,7 +115,7 @@ No specific Zabbix configuration is required.
 |{$AZURE.RESOURCE_ID} |<p>Microsoft Azure virtual machine ID.</p> |`` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
 |{$AZURE.TENANT_ID} |<p>Microsoft Azure tenant ID.</p> |`` |
-|{$AZURE.VM.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
+|{$AZURE.VM.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization expressed in %.</p> |`90` |
 
 ## Template links
 
@@ -127,7 +128,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Azure |Azure: Get data |<p>The result of API requests is in the JSON.</p> |SCRIPT |azure.vm.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure: Get data |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.vm.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Azure |Azure: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.vm.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure: Availability state |<p>The availability status of the resource.</p> |DEPENDENT |azure.vm.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure: Availability status detailed |<p>The summary description of the availability status.</p> |DEPENDENT |azure.vm.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
@@ -188,7 +189,7 @@ There are no template links in this template.
 |Azure: Virtual machine is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure virtual machine by HTTP/azure.vm.availability.state)=2` |HIGH | |
 |Azure: Virtual machine is degraded |<p>The resource is in degraded state.</p> |`last(/Azure virtual machine by HTTP/azure.vm.availability.state)=1` |AVERAGE | |
 |Azure: Virtual machine is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure virtual machine by HTTP/azure.vm.availability.state)=3` |WARNING | |
-|Azure: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure virtual machine by HTTP/azure.vm.cpu.percentage,5m)>{$AZURE.VM.CPU.UTIL.CRIT}` |HIGH | |
+|Azure: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure virtual machine by HTTP/azure.vm.cpu.percentage,5m)>{$AZURE.VM.CPU.UTIL.CRIT}` |HIGH | |
 
 ## Feedback
 
@@ -215,7 +216,7 @@ It works without any external scripts and uses the script item.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
 
 ## Zabbix configuration
 
@@ -228,9 +229,9 @@ No specific Zabbix configuration is required.
 |{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`60s` |
 |{$AZURE.DB.ABORTED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p> |`25` |
-|{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
-|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization in %.</p> |`90` |
-|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization in %.</p> |`80` |
+|{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization expressed in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization expressed in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization expressed in %.</p> |`80` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
 |{$AZURE.RESOURCE_ID} |<p>Microsoft Azure virtual machine ID.</p> |`` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
@@ -247,7 +248,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Azure |Azure MySQL: Get data |<p>The result of API requests is in the JSON.</p> |SCRIPT |azure.db.mysql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure MySQL: Get data |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.db.mysql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Azure |Azure MySQL: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.db.mysql.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure MySQL: Availability state |<p>The availability status of the resource.</p> |DEPENDENT |azure.db.mysql.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure MySQL: Availability status detailed |<p>The summary description of the availability status.</p> |DEPENDENT |azure.db.mysql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
@@ -260,11 +261,11 @@ There are no template links in this template.
 |Azure |Azure MySQL: Connections aborted |<p>The count of aborted connections.</p> |DEPENDENT |azure.db.mysql.connections.aborted<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.aborted_connections.total`</p> |
 |Azure |Azure MySQL: Queries |<p>The count of queries.</p> |DEPENDENT |azure.db.mysql.queries<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.Queries.total`</p> |
 |Azure |Azure MySQL: IO consumption percent |<p>The IO percent.</p> |DEPENDENT |azure.db.mysql.io.consumption.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.io_consumption_percent.maximum`</p> |
-|Azure |Azure MySQL: Storage percent |<p>Storage utilization in %.</p> |DEPENDENT |azure.db.mysql.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.maximum`</p> |
-|Azure |Azure MySQL: Storage used |<p>Used storage space in bytes.</p> |DEPENDENT |azure.db.mysql.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.maximum`</p> |
-|Azure |Azure MySQL: Storage limit |<p>The storage limit in bytes.</p> |DEPENDENT |azure.db.mysql.storage.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_limit.maximum`</p> |
-|Azure |Azure MySQL: Backup storage used |<p>The backup storage used in bytes.</p> |DEPENDENT |azure.db.mysql.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.maximum`</p> |
-|Azure |Azure MySQL: Replication lag |<p>Replication lag in seconds.</p> |DEPENDENT |azure.db.mysql.replication.lag<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.replication_lag.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure MySQL: Storage percent |<p>The storage utilization expressed in %.</p> |DEPENDENT |azure.db.mysql.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.maximum`</p> |
+|Azure |Azure MySQL: Storage used |<p>Used storage space expressed in bytes.</p> |DEPENDENT |azure.db.mysql.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.maximum`</p> |
+|Azure |Azure MySQL: Storage limit |<p>The storage limit expressed in bytes.</p> |DEPENDENT |azure.db.mysql.storage.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_limit.maximum`</p> |
+|Azure |Azure MySQL: Backup storage used |<p>Used backup storage expressed in bytes.</p> |DEPENDENT |azure.db.mysql.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.maximum`</p> |
+|Azure |Azure MySQL: Replication lag |<p>The replication lag expressed in seconds.</p> |DEPENDENT |azure.db.mysql.replication.lag<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.replication_lag.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure MySQL: CPU credits remaining |<p>Remaining CPU credits.</p> |DEPENDENT |azure.db.mysql.cpu.credits.remaining<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_credits_remaining.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure MySQL: CPU credits consumed |<p>Consumed CPU credits.</p> |DEPENDENT |azure.db.mysql.cpu.credits.consumed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_credits_consumed.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 
@@ -276,7 +277,7 @@ There are no template links in this template.
 |Azure MySQL: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=2` |HIGH | |
 |Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
 |Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
-|Azure MySQL: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure MySQL flexible server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure MySQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure MySQL flexible server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
 |Azure MySQL: Server has aborted connections |<p>The number of failed attempts to connect to the MySQL server is more than {$AZURE.DB.ABORTED_CONN.MAX.WARN}.</p> |`min(/Azure MySQL flexible server by HTTP/azure.db.mysql.connections.aborted,5m)>{$AZURE.DB.ABORTED_CONN.MAX.WARN}` |AVERAGE | |
 |Azure MySQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
 |Azure MySQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure MySQL flexible server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
@@ -306,7 +307,7 @@ It works without any external scripts and uses the script item.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
 
 ## Zabbix configuration
 
@@ -318,11 +319,11 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`60s` |
-|{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
+|{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization expressed in %.</p> |`90` |
 |{$AZURE.DB.FAILED_CONN.MAX.WARN} |<p>The number of failed attempts to connect to the MySQL server for trigger expression.</p> |`25` |
-|{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization in %.</p> |`90` |
-|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization in %.</p> |`90` |
-|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization in %.</p> |`80` |
+|{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization expressed in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization expressed in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization expressed in %.</p> |`80` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
 |{$AZURE.RESOURCE_ID} |<p>Microsoft Azure virtual machine ID.</p> |`` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
@@ -339,7 +340,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Azure |Azure MySQL: Get data |<p>The result of API requests is in the JSON.</p> |SCRIPT |azure.db.mysql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure MySQL: Get data |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.db.mysql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Azure |Azure MySQL: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.db.mysql.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure MySQL: Availability state |<p>The availability status of the resource.</p> |DEPENDENT |azure.db.mysql.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure MySQL: Availability status detailed |<p>The summary description of the availability status.</p> |DEPENDENT |azure.db.mysql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
@@ -350,14 +351,14 @@ There are no template links in this template.
 |Azure |Azure MySQL: Connections active |<p>The count of active connections.</p> |DEPENDENT |azure.db.mysql.connections.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.active_connections.average`</p> |
 |Azure |Azure MySQL: Connections failed |<p>The count of failed connections.</p> |DEPENDENT |azure.db.mysql.connections.failed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connections_failed.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure MySQL: IO consumption percent |<p>The IO percent.</p> |DEPENDENT |azure.db.mysql.io.consumption.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.io_consumption_percent.average`</p> |
-|Azure |Azure MySQL: Storage percent |<p>Storage utilization in %.</p> |DEPENDENT |azure.db.mysql.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.average`</p> |
-|Azure |Azure MySQL: Storage used |<p>Used storage space in bytes.</p> |DEPENDENT |azure.db.mysql.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.average`</p> |
-|Azure |Azure MySQL: Storage limit |<p>The storage limit in bytes.</p> |DEPENDENT |azure.db.mysql.storage.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_limit.maximum`</p> |
-|Azure |Azure MySQL: Backup storage used |<p>The backup storage used in bytes.</p> |DEPENDENT |azure.db.mysql.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.average`</p> |
-|Azure |Azure MySQL: Replication lag |<p>Replication lag in seconds.</p> |DEPENDENT |azure.db.mysql.replication.lag<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.seconds_behind_master.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure MySQL: Server log storage percent |<p>The storage utilization by a server log in %.</p> |DEPENDENT |azure.db.mysql.storage.server.log.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_percent.average`</p> |
-|Azure |Azure MySQL: Server log storage used |<p>The storage space used by a server log in bytes.</p> |DEPENDENT |azure.db.mysql.storage.server.log.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_usage.average`</p> |
-|Azure |Azure MySQL: Server log storage limit |<p>The storage limit of server log in bytes.</p> |DEPENDENT |azure.db.mysql.storage.server.log.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_limit.maximum`</p> |
+|Azure |Azure MySQL: Storage percent |<p>The storage utilization expressed in %.</p> |DEPENDENT |azure.db.mysql.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.average`</p> |
+|Azure |Azure MySQL: Storage used |<p>Used storage space expressed in bytes.</p> |DEPENDENT |azure.db.mysql.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.average`</p> |
+|Azure |Azure MySQL: Storage limit |<p>The storage limit expressed in bytes.</p> |DEPENDENT |azure.db.mysql.storage.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_limit.maximum`</p> |
+|Azure |Azure MySQL: Backup storage used |<p>Used backup storage expressed in bytes.</p> |DEPENDENT |azure.db.mysql.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.average`</p> |
+|Azure |Azure MySQL: Replication lag |<p>The replication lag expressed in seconds.</p> |DEPENDENT |azure.db.mysql.replication.lag<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.seconds_behind_master.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure MySQL: Server log storage percent |<p>The storage utilization by a server log expressed in %.</p> |DEPENDENT |azure.db.mysql.storage.server.log.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_percent.average`</p> |
+|Azure |Azure MySQL: Server log storage used |<p>The storage space used by a server log expressed in bytes.</p> |DEPENDENT |azure.db.mysql.storage.server.log.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_usage.average`</p> |
+|Azure |Azure MySQL: Server log storage limit |<p>The storage limit of a server log expressed in bytes.</p> |DEPENDENT |azure.db.mysql.storage.server.log.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_limit.maximum`</p> |
 
 ## Triggers
 
@@ -367,7 +368,7 @@ There are no template links in this template.
 |Azure MySQL: MySQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=2` |HIGH | |
 |Azure MySQL: MySQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=1` |AVERAGE | |
 |Azure MySQL: MySQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.availability.state)=3` |WARNING | |
-|Azure MySQL: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure MySQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
 |Azure MySQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
 |Azure MySQL: Server has failed connections |<p>The number of failed attempts to connect to the MySQL server is more than {$AZURE.DB.FAILED_CONN.MAX.WARN}.</p> |`min(/Azure MySQL single server by HTTP/azure.db.mysql.connections.failed,5m)>{$AZURE.DB.FAILED_CONN.MAX.WARN}` |AVERAGE | |
 |Azure MySQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure MySQL single server by HTTP/azure.db.mysql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
@@ -398,7 +399,7 @@ It works without any external scripts and uses the script item.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
 
 ## Zabbix configuration
 
@@ -410,10 +411,10 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`60s` |
-|{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
-|{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization in %.</p> |`90` |
-|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization in %.</p> |`90` |
-|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization in %.</p> |`80` |
+|{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization expressed in %.</p> |`90` |
+|{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization expressed in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization expressed in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization expressed in %.</p> |`80` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
 |{$AZURE.RESOURCE_ID} |<p>Microsoft Azure virtual machine ID.</p> |`` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
@@ -430,7 +431,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Azure |Azure PostgreSQL: Get data |<p>The result of API requests is in the JSON.</p> |SCRIPT |azure.db.pgsql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure PostgreSQL: Get data |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.db.pgsql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Azure |Azure PostgreSQL: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.db.pgsql.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure PostgreSQL: Availability state |<p>The availability status of the resource.</p> |DEPENDENT |azure.db.pgsql.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure PostgreSQL: Availability status detailed |<p>The summary description of the availability status.</p> |DEPENDENT |azure.db.pgsql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
@@ -441,20 +442,20 @@ There are no template links in this template.
 |Azure |Azure PostgreSQL: Connections active |<p>The count of active connections.</p> |DEPENDENT |azure.db.pgsql.connections.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.active_connections.average`</p> |
 |Azure |Azure PostgreSQL: Connections succeeded |<p>The count of succeeded connections.</p> |DEPENDENT |azure.db.pgsql.connections.succeeded<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connections_succeeded.total`</p> |
 |Azure |Azure PostgreSQL: Connections failed |<p>The count of failed connections.</p> |DEPENDENT |azure.db.pgsql.connections.failed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connections_failed.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure PostgreSQL: Storage percent |<p>Storage utilization in %.</p> |DEPENDENT |azure.db.pgsql.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.average`</p> |
-|Azure |Azure PostgreSQL: Storage used |<p>Used storage space in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.average`</p> |
-|Azure |Azure PostgreSQL: Storage free |<p>Free storage space in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.free<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_free.average`</p> |
-|Azure |Azure PostgreSQL: Backup storage used |<p>The backup storage used in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure PostgreSQL: Storage percent |<p>The storage utilization expressed in %.</p> |DEPENDENT |azure.db.pgsql.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.average`</p> |
+|Azure |Azure PostgreSQL: Storage used |<p>Used storage space expressed in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.average`</p> |
+|Azure |Azure PostgreSQL: Storage free |<p>Free storage space expressed in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.free<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_free.average`</p> |
+|Azure |Azure PostgreSQL: Backup storage used |<p>Used backup storage expressed in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure PostgreSQL: CPU credits remaining |<p>The total number of credits available to burst.</p> |DEPENDENT |azure.db.pgsql.cpu.credits.remaining<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_credits_remaining.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure PostgreSQL: CPU credits consumed |<p>The total number of credits consumed by the database server.</p> |DEPENDENT |azure.db.pgsql.cpu.credits.consumed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.cpu_credits_consumed.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure PostgreSQL: Data disk queue depth |<p>The number of outstanding I/O operations to the data disk.</p> |DEPENDENT |azure.db.pgsql.disk.queue.depth<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.disk_queue_depth.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure PostgreSQL: Data disk IOPS |<p>IO Operations per second.</p> |DEPENDENT |azure.db.pgsql.iops<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.iops.average`</p> |
-|Azure |Azure PostgreSQL: Data disk read IOPS |<p>The number of data disk I/O read operations per second.</p> |DEPENDENT |azure.db.pgsql.iops.read<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.read_iops.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure PostgreSQL: Data disk write IOPS |<p>The number of data disk I/O write operations per second.</p> |DEPENDENT |azure.db.pgsql.iops.write<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.write_iops.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure PostgreSQL: Data disk IOPS |<p>I/O Operations per second.</p> |DEPENDENT |azure.db.pgsql.iops<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.iops.average`</p> |
+|Azure |Azure PostgreSQL: Data disk read IOPS |<p>The number of the data disk I/O read operations per second.</p> |DEPENDENT |azure.db.pgsql.iops.read<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.read_iops.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure PostgreSQL: Data disk write IOPS |<p>The number of the data disk I/O write operations per second.</p> |DEPENDENT |azure.db.pgsql.iops.write<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.write_iops.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure PostgreSQL: Data disk read Bps |<p>Bytes read per second from the data disk during the monitoring period.</p> |DEPENDENT |azure.db.pgsql.disk.bps.read<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.read_throughput.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure PostgreSQL: Data disk write Bps |<p>Bytes written per second to the data disk during the monitoring period.</p> |DEPENDENT |azure.db.pgsql.disk.bps.write<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.write_throughput.average`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure PostgreSQL: Transaction log storage used |<p>The storage space used by a transaction log in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.txlogs.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.txlogs_storage_used.average`</p> |
-|Azure |Azure PostgreSQL: Maximum used transaction IDs |<p>Maximum used transaction IDs.</p> |DEPENDENT |azure.db.pgsql.txid.used.max<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.maximum_used_transactionIDs.average`</p> |
+|Azure |Azure PostgreSQL: Transaction log storage used |<p>The storage space used by a transaction log expressed in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.txlogs.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.txlogs_storage_used.average`</p> |
+|Azure |Azure PostgreSQL: Maximum used transaction IDs |<p>The maximum number of used transaction IDs.</p> |DEPENDENT |azure.db.pgsql.txid.used.max<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.maximum_used_transactionIDs.average`</p> |
 
 ## Triggers
 
@@ -464,7 +465,7 @@ There are no template links in this template.
 |Azure PostgreSQL: PostgreSQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.availability.state)=2` |HIGH | |
 |Azure PostgreSQL: PostgreSQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.availability.state)=1` |AVERAGE | |
 |Azure PostgreSQL: PostgreSQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.availability.state)=3` |WARNING | |
-|Azure PostgreSQL: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure PostgreSQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
 |Azure PostgreSQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
 |Azure PostgreSQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
 |Azure PostgreSQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure PostgreSQL flexible server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
@@ -494,7 +495,7 @@ It works without any external scripts and uses the script item.
       See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
 
 2. Link the template to a host.
-3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID} and {$AZURE.RESOURCE_ID}.
+3. Configure macros {$AZURE.APP_ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT_ID}, {$AZURE.SUBSCRIPTION_ID}, and {$AZURE.RESOURCE_ID}.
 
 ## Zabbix configuration
 
@@ -506,10 +507,10 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$AZURE.APP_ID} |<p>Microsoft Azure app ID.</p> |`` |
 |{$AZURE.DATA.TIMEOUT} |<p>A response timeout for API.</p> |`60s` |
-|{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
-|{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization in %.</p> |`90` |
-|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization in %.</p> |`90` |
-|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization in %.</p> |`80` |
+|{$AZURE.DB.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization expressed in %.</p> |`90` |
+|{$AZURE.DB.MEMORY.UTIL.CRIT} |<p>The critical threshold of the memory utilization expressed in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.CRIT} |<p>The critical threshold of the storage utilization expressed in %.</p> |`90` |
+|{$AZURE.DB.STORAGE.PUSED.WARN} |<p>The warning threshold of the storage utilization expressed in %.</p> |`80` |
 |{$AZURE.PASSWORD} |<p>Microsoft Azure password.</p> |`` |
 |{$AZURE.RESOURCE_ID} |<p>Microsoft Azure virtual machine ID.</p> |`` |
 |{$AZURE.SUBSCRIPTION_ID} |<p>Microsoft Azure subscription ID.</p> |`` |
@@ -526,7 +527,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Azure |Azure PostgreSQL: Get data |<p>The result of API requests is in the JSON.</p> |SCRIPT |azure.db.pgsql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Azure |Azure PostgreSQL: Get data |<p>The result of API requests is expressed in the JSON.</p> |SCRIPT |azure.db.pgsql.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
 |Azure |Azure PostgreSQL: Get errors |<p>A list of errors from API requests.</p> |DEPENDENT |azure.db.pgsql.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure PostgreSQL: Availability state |<p>The availability status of the resource.</p> |DEPENDENT |azure.db.pgsql.availability.state<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.availabilityState`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- STR_REPLACE: `Available 0`</p><p>- STR_REPLACE: `Degraded 1`</p><p>- STR_REPLACE: `Unavailable 2`</p><p>- STR_REPLACE: `Unknown 3`</p><p>- IN_RANGE: `0 3 `</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 3`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Azure |Azure PostgreSQL: Availability status detailed |<p>The summary description of the availability status.</p> |DEPENDENT |azure.db.pgsql.availability.details<p>**Preprocessing**:</p><p>- JSONPATH: `$.health.summary`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
@@ -537,15 +538,15 @@ There are no template links in this template.
 |Azure |Azure PostgreSQL: Connections active |<p>The count of active connections.</p> |DEPENDENT |azure.db.pgsql.connections.active<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.active_connections.average`</p> |
 |Azure |Azure PostgreSQL: Connections failed |<p>The count of failed connections.</p> |DEPENDENT |azure.db.pgsql.connections.failed<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.connections_failed.total`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Azure |Azure PostgreSQL: IO consumption percent |<p>The IO Percent.</p> |DEPENDENT |azure.db.pgsql.io.consumption.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.io_consumption_percent.average`</p> |
-|Azure |Azure PostgreSQL: Storage percent |<p>Storage utilization in %.</p> |DEPENDENT |azure.db.pgsql.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.average`</p> |
-|Azure |Azure PostgreSQL: Storage used |<p>Used storage space in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.average`</p> |
-|Azure |Azure PostgreSQL: Storage limit |<p>The storage limit in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_limit.maximum`</p> |
-|Azure |Azure PostgreSQL: Backup storage used |<p>The backup storage used in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.average`</p> |
-|Azure |Azure PostgreSQL: Replication lag |<p>Replication lag in seconds.</p> |DEPENDENT |azure.db.pgsql.replica.log.delay<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.pg_replica_log_delay_in_seconds.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure PostgreSQL: Max lag across replicas in bytes |<p>Lag in bytes of the most lagging replica.</p> |DEPENDENT |azure.db.pgsql.replica.log.delay.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.pg_replica_log_delay_in_bytes.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Azure |Azure PostgreSQL: Server log storage percent |<p>The storage utilization by a server log in %.</p> |DEPENDENT |azure.db.pgsql.storage.server.log.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_percent.average`</p> |
-|Azure |Azure PostgreSQL: Server log storage used |<p>The storage space used by a server log in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.server.log.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_usage.average`</p> |
-|Azure |Azure PostgreSQL: Server log storage limit |<p>The storage limit of a server log in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.server.log.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_limit.maximum`</p> |
+|Azure |Azure PostgreSQL: Storage percent |<p>The storage utilization expressed in %.</p> |DEPENDENT |azure.db.pgsql.storage.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_percent.average`</p> |
+|Azure |Azure PostgreSQL: Storage used |<p>Used storage space expressed in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_used.average`</p> |
+|Azure |Azure PostgreSQL: Storage limit |<p>The storage limit expressed in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.storage_limit.maximum`</p> |
+|Azure |Azure PostgreSQL: Backup storage used |<p>Used backup storage expressed in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.backup.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.backup_storage_used.average`</p> |
+|Azure |Azure PostgreSQL: Replication lag |<p>The replication lag expressed in seconds.</p> |DEPENDENT |azure.db.pgsql.replica.log.delay<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.pg_replica_log_delay_in_seconds.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure PostgreSQL: Max lag across replicas in bytes |<p>Lag expressed in bytes for the most lagging replica.</p> |DEPENDENT |azure.db.pgsql.replica.log.delay.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.pg_replica_log_delay_in_bytes.maximum`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Azure |Azure PostgreSQL: Server log storage percent |<p>The storage utilization by a server log expressed in %.</p> |DEPENDENT |azure.db.pgsql.storage.server.log.percent<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_percent.average`</p> |
+|Azure |Azure PostgreSQL: Server log storage used |<p>The storage space used by a server log expressed in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.server.log.used<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_usage.average`</p> |
+|Azure |Azure PostgreSQL: Server log storage limit |<p>The storage limit of a server log expressed in bytes.</p> |DEPENDENT |azure.db.pgsql.storage.server.log.limit<p>**Preprocessing**:</p><p>- JSONPATH: `$.metrics.serverlog_storage_limit.maximum`</p> |
 
 ## Triggers
 
@@ -555,7 +556,7 @@ There are no template links in this template.
 |Azure PostgreSQL: PostgreSQL server is unavailable |<p>The resource state is unavailable.</p> |`last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.availability.state)=2` |HIGH | |
 |Azure PostgreSQL: PostgreSQL server is degraded |<p>The resource is in degraded state.</p> |`last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.availability.state)=1` |AVERAGE | |
 |Azure PostgreSQL: PostgreSQL server is in unknown state |<p>The resource state is unknown.</p> |`last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.availability.state)=3` |WARNING | |
-|Azure PostgreSQL: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
+|Azure PostgreSQL: High CPU utilization |<p>The CPU utilization is too high. The system might be slow to respond.</p> |`min(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.cpu.percentage,5m)>{$AZURE.DB.CPU.UTIL.CRIT}` |HIGH | |
 |Azure PsotgreSQL: High memory utilization |<p>The system is running out of free memory.</p> |`min(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.memory.percentage,5m)>{$AZURE.DB.MEMORY.UTIL.CRIT}` |AVERAGE | |
 |Azure PostgreSQL: Storage space is critically low |<p>Critical utilization of the storage space.</p> |`last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.CRIT}` |AVERAGE | |
 |Azure PostgreSQL: Storage space is low |<p>High utilization of the storage space.</p> |`last(/Azure PostgreSQL single server by HTTP/azure.db.pgsql.storage.percent)>{$AZURE.DB.STORAGE.PUSED.WARN}` |WARNING | |
