@@ -18,7 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -78,7 +79,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 
 		// Check table headers.
 		$this->assertEquals(['Name', 'Width', 'Height', 'Graph type', 'Discover'],
-				$this->getTextOfElements('//form[@name="graphForm"]//thead/tr/th[not(@class)]')
+				$this->getTextOfElements("//form[@name=\"graphForm\"]//thead/tr/th[not(@class)]")
 		);
 
 		// Check graph prototype number in breadcrumb.
