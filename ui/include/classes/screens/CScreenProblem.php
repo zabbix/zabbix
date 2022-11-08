@@ -149,7 +149,7 @@ class CScreenProblem extends CScreenBase {
 	 *
 	 * @return mixed
 	 */
-	public static function getData(array $filter, int $limit, bool $resolve_comments = false, $count_output = false) {
+	public static function getData(array $filter, int $limit, bool $resolve_comments = false) {
 		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids']
 			? getSubGroups($filter['groupids'])
 			: null;
@@ -336,10 +336,6 @@ class CScreenProblem extends CScreenBase {
 
 		$data['problems'] = array_slice($data['problems'], 0, $limit + 1, true);
 
-		if ($count_output) {
-			return count($data['problems']);
-		}
-
 		if ($show_opdata && $data['triggers']) {
 			$items = API::Item()->get([
 				'output' => ['itemid', 'name', 'value_type', 'units'],
@@ -420,17 +416,18 @@ class CScreenProblem extends CScreenBase {
 	}
 
 	/**
-	 * @param array  $data
-	 * @param array  $data['problems']
-	 * @param array  $data['triggers']
-	 * @param string $sort
-	 * @param string $sortorder
+	 * Sort the problem list.
 	 *
-	 * @static
+	 * @param array  $data              Problems and triggers data.
+	 * @param array  $data['problems']  List of problems.
+	 * @param array  $data['triggers']  List of triggers.
+	 * @param int    $limit             Global search limit.
+	 * @param string $sort              Sort field.
+	 * @param string $sortorder         Sort order.
 	 *
 	 * @return array
 	 */
-	public static function sortData(array $data, int $limit, $sort, $sortorder) {
+	public static function sortData(array $data, int $limit, $sort, $sortorder): array {
 		if (!$data['problems']) {
 			return $data;
 		}
@@ -823,10 +820,15 @@ class CScreenProblem extends CScreenBase {
 				$problem['symptoms'] = [];
 
 				if ($problem['cause_eventid'] == 0) {
-					$problem['symptom_count'] = self::getData(
-						['show_symptoms' => true, 'cause_eventid' => $problem['eventid']] + $this->data['filter'],
-						$this->data['limit'], false, true
-					);
+					$options = [
+						'filter' => ['cause_eventid' => $problem['eventid']],
+						'limit' => $this->data['limit'],
+						'countOutput' => true
+					];
+
+					$problem['symptom_count'] = ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL)
+						? API::Event()->get($options)
+						: API::Problem()->get($options);
 
 					if ($problem['symptom_count'] > 0) {
 						$has_symptoms_on_page = true;
@@ -844,15 +846,24 @@ class CScreenProblem extends CScreenBase {
 
 		if ($cause_eventids_with_symptoms) {
 			// Get all symptoms for given cause event IDs.
-			$symptom_data = self::getData(['show_symptoms' => true,
-				'cause_eventid' => $cause_eventids_with_symptoms
-			] + $this->data['filter'], ZBX_PROBLEM_SYMPTOM_LIMIT, true);
+			$symptom_data = self::getData([
+				'show_symptoms' => true,
+				'cause_eventid' => $cause_eventids_with_symptoms,
+				'show' => $this->data['filter']['show'],
+				'details' => $this->data['filter']['details'],
+				'show_opdata' => $this->data['filter']['show_opdata']
+			], ZBX_PROBLEM_SYMPTOM_LIMIT, true);
+
 			$symptom_data = self::sortData($symptom_data, ZBX_PROBLEM_SYMPTOM_LIMIT, $this->data['sort'],
 				$this->data['sortorder']
 			);
 
 			// Filter does not matter.
-			$symptom_data = self::makeData($symptom_data, $this->data['filter'], true);
+			$symptom_data = self::makeData($symptom_data, [
+				'show' => $this->data['filter']['show'],
+				'details' => $this->data['filter']['details'],
+				'show_opdata' => $this->data['filter']['show_opdata']
+			], true);
 
 			$data['users'] += $symptom_data['users'];
 			$data['correlations'] += $symptom_data['correlations'];
@@ -1032,26 +1043,22 @@ class CScreenProblem extends CScreenBase {
 					]));
 			}
 
-			if ($this->data['filter']['show_tags']) {
-				$tags = makeTags($data['problems'] + $symptom_data['problems'], true, 'eventid',
+			$tags = $this->data['filter']['show_tags']
+				? makeTags($data['problems'] + $symptom_data['problems'], true, 'eventid',
 					$this->data['filter']['show_tags'], array_key_exists('tags', $this->data['filter'])
 						? $this->data['filter']['tags']
 						: [],
 					null, $this->data['filter']['tag_name_format'], $this->data['filter']['tag_priority']
-				);
-			}
+				)
+				: [];
 
-			if ($data['problems']) {
-				$triggers_hosts = makeTriggersHostsList($triggers_hosts);
-			}
+			$triggers_hosts = $data['problems'] ? makeTriggersHostsList($triggers_hosts) : [];
 
 			$last_clock = 0;
 			$today = strtotime('today');
 
 			// Make trigger dependencies.
-			if ($data['triggers']) {
-				$dependencies = getTriggerDependencies($data['triggers']);
-			}
+			$dependencies = $data['triggers'] ? getTriggerDependencies($data['triggers']) : [];
 
 			$allowed = [
 				'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
@@ -1206,13 +1213,44 @@ class CScreenProblem extends CScreenBase {
 	}
 
 	/**
-	 * @param CTableInfo $table
-	 * @param array      $problems
-	 * @param array      $data
-	 * @param bool       $show_as_block
+	 * Add problems and symtoms to table.
+	 *
+	 * @param CTableInfo $table                                 Table object to which problems are added to.
+	 * @param array      $problems                              List of problems.
+	 * @param array      $data                                   Additional data to build the table.
+	 * @param array      $data['triggers']                      List of triggers.
+	 * @param int        $data['today']                         Today's date in integer format.
+	 * @param array      $data['tasks']                         List of tasks. Used to determine current problem status.
+	 * @param array      $data['users']                         List of users.
+	 * @param array      $data['correlations']                  List of correlations.
+	 * @param array      $data['dependencies']                  List of trigger dependencies
+	 * @param array      $data['filter']                        Problem filter.
+	 * @param int        $data['filter']['show_suppressed']     "Show suppressed problems" filter option.
+	 * @param int        $data['filter']['highlight_row']       "Highlight whole row" filter option
+	 * @param int        $data['filter']['show_tags']           "Show tags" filter option
+	 * @param int        $data['filter']['compact_view']        "Compact view" filter option.
+	 * @param int        $data['filter']['details']             "Show details" filter option.
+	 * @param int        $data['show_opdata']                   "Show operational data" filter option.
+	 * @param int        $data['show_timeline']                 "Show timeline" filter option.
+	 * @param int        $data['has_symptoms_on_page']          True if there is not only cause problems.
+	 * @param int        $data['last_clock']                    Problem time. Used to show timeline breaks.
+	 * @param int        $data['sortorder']                     Sort problems in ascending or descending order.
+	 * @param array      $data['allowed']                       An array of user role rules.
+	 * @param bool       $data['allowed']['close']              Whether user is allowed to close problems.
+	 * @param bool       $data['allowed']['add_comments']       Whether user is allowed to add problems comments.
+	 * @param bool       $data['allowed']['change_severity']    Whether user is allowed to change problems severity.
+	 * @param bool       $data['allowed']['acknowledge']        Whether user is allowed to acknowledge problems.
+	 * @param bool       $data['allowed']['suppress_problems']  Whether user is allowed to manually suppress/unsuppress
+	 *                                                          problems.
+	 * @param bool       $data['allowed']['rank_change']        Whether user is allowed to change problem ranking.
+	 * @param bool       $data['show_recovery_data']            True if filter "Show" option is "Recent problems"
+	 *                                                          or History.
+	 * @param array      $data['triggers_hosts']                List of trigger hosts.
+	 * @param array      $data['actions']                       List of actions.
+	 * @param array      $data['tags']                          List of tags.
+	 * @param bool       $nested                                If true, show the symptom rows with indentation.
 	 */
-	private static function addProblemsToTable(CTableInfo $table, array $problems, array $data,
-			$show_as_block = false): void {
+	private static function addProblemsToTable(CTableInfo $table, array $problems, array $data, $nested = false): void {
 		foreach ($problems as $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -1404,7 +1442,7 @@ class CScreenProblem extends CScreenBase {
 				}
 			}
 			else {
-				if ($show_as_block) {
+				if ($nested) {
 					// First column empty and second column checkbox for symptom event.
 					$row = (new CRow([
 						'',
@@ -1425,7 +1463,7 @@ class CScreenProblem extends CScreenBase {
 				));
 
 				// If there are causes as well, show additional empty column.
-				if (!$show_as_block && $data['has_symptoms_on_page']) {
+				if (!$nested && $data['has_symptoms_on_page']) {
 					$row->addItem(new CCol(''));
 				}
 			}
@@ -1453,7 +1491,8 @@ class CScreenProblem extends CScreenBase {
 
 			// Create acknowledge link.
 			$problem_update_link = ($data['allowed']['add_comments'] || $data['allowed']['change_severity']
-					|| $data['allowed']['acknowledge'] || $can_be_closed || $data['allowed']['suppress_problems'])
+					|| $data['allowed']['acknowledge'] || $can_be_closed || $data['allowed']['suppress_problems']
+					|| $data['allowed']['rank_change'])
 				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 					->addClass(ZBX_STYLE_LINK_ALT)

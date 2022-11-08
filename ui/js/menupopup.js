@@ -647,7 +647,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		curl.setArgument('action', 'popup.acknowledge.create');
 
 		/*
-		 * Some widets cannot show symptoms. So it is not possible to convert to symptoms cause if only cause evets are
+		 * Some widgets cannot show symptoms. So it is not possible to convert to symptoms cause if only cause evets are
 		 * displayed.
 		 */
 		if (typeof options.show_rank_change_cause !== 'undefined' && options.show_rank_change_cause) {
