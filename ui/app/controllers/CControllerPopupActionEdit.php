@@ -145,6 +145,35 @@ class CControllerPopupActionEdit extends CController {
 				];
 
 				$operation['details'] = $this->getData($operation['operationtype'], [$action], ACTION_OPERATION);
+				$operation['recovery'] = ACTION_OPERATION;
+			}
+
+			unset($operation);
+			foreach ($data['action']['recovery_operations'] as &$operation) {
+				$action = [
+					'esc_period' => $this->action['esc_period'],
+					'eventsource' => $eventsource,
+					'operations' => [],
+					'recovery_operations' => [$operation],
+					'update_operations' => [],
+				];
+
+				$operation['details'] = $this->getData($operation['operationtype'], [$action], ACTION_RECOVERY_OPERATION);
+				$operation['recovery'] = ACTION_RECOVERY_OPERATION;
+			}
+
+			unset($operation);
+			foreach ($data['action']['update_operations'] as &$operation) {
+				$action = [
+					'esc_period' => $this->action['esc_period'],
+					'eventsource' => $eventsource,
+					'operations' => [],
+					'recovery_operations' => [],
+					'update_operations' => [$operation],
+				];
+
+				$operation['details'] = $this->getData($operation['operationtype'], [$action], ACTION_UPDATE_OPERATION);
+				$operation['recovery'] = ACTION_UPDATE_OPERATION;
 			}
 		}
 		else {

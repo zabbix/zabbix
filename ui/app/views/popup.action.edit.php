@@ -175,434 +175,63 @@ $action_tab
 
 // Operations tab.
 $operations_tab = (new CFormGrid());
+if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
+	$operations_tab->addItem([
+		(new CLabel(_('Default operation step duration'), 'esc_period'))->setAsteriskMark(),
+		(new CTextBox('esc_period', $data['action']['esc_period']))
+			->setId('esc_period')
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired()
+	]);
+}
 
 // Operations table.
-$operations_table = (new CTable())
-	->setId('op-table')
-	->setAttribute('style', 'width: 100%;');
+// todo : remove unnecessary code
+$data['esc_period'] = $data['action']['esc_period'];
+// todo : pass missing data
 
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
-	$operations_table->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration'), _('Action')]);
-	$delays = count_operations_delay($data['action']['operations'], $data['action']['esc_period']);
+	$data['table'] = 'operation';
 }
 else {
-	$operations_table->setHeader([_('Details'), _('Action')]);
+	$data['table'] = 'operation';
 }
 
-if ($data['action']['operations']) {
-	$actionOperationDescriptions = getActionOperationDescriptions($data['eventsource'], [$data['action']], ACTION_OPERATION);
-
-	$simple_interval_parser = new CSimpleIntervalParser();
-
-	foreach ($data['action']['operations'] as $operationid => $operation) {
-
-		if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_OPERATION])) {
-			continue;
-		}
-
-		if (array_key_exists('opcommand', $operation)) {
-			$operation['opcommand'] += [
-				'scriptid' => '0'
-			];
-		}
-
-		if (!isset($operation['opconditions'])) {
-			$operation['opconditions'] = [];
-		}
-
-		$details = new CSpan($actionOperationDescriptions[0][$operationid]);
-
-		$operation_for_popup = array_merge($operation, ['id' => $operationid]);
-		foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
-			if (array_key_exists($var, $operation_for_popup)) {
-				$operation_for_popup[$var] = zbx_objectValues($operation_for_popup[$var], $field);
-			}
-		}
-
-		if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
-			$esc_steps_txt = null;
-			$esc_period_txt = null;
-			$esc_delay_txt = null;
-
-			if ($operation['esc_step_from'] < 1) {
-				$operation['esc_step_from'] = 1;
-			}
-
-			// display N-N as N
-			$esc_steps_txt = ($operation['esc_step_from'] == $operation['esc_step_to'] || $operation['esc_step_to'] == 0)
-				? $operation['esc_step_from']
-				: $operation['esc_step_from'].' - '.$operation['esc_step_to'];
-
-			$esc_period_txt = ($simple_interval_parser->parse($operation['esc_period']) == CParser::PARSE_SUCCESS
-				&& timeUnitToSeconds($operation['esc_period']) == 0)
-				? _('Default')
-				: $operation['esc_period'];
-
-			$esc_delay_txt = ($delays[$operation['esc_step_from']] === null)
-				? _('Unknown')
-				: ($delays[$operation['esc_step_from']] != 0
-					? convertUnits(['value' => $delays[$operation['esc_step_from']], 'units' => 'uptime'])
-					: _('Immediately')
-				);
-
-			$operation_row = [
-				$esc_steps_txt,
-				$details,
-				$esc_delay_txt,
-				$esc_period_txt,
-				(new CCol(
-					new CHorList([
-						(new CSimpleButton(_('Edit')))
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('js-edit-operation')
-							->setAttribute('data_operation', json_encode([
-								'operationid' => $operationid,
-								'actionid' => $data['actionid'],
-								'eventsource' => $data['eventsource'],
-								'operationtype' => ACTION_OPERATION,
-								'data' => $operation
-							])),
-						[
-							(new CButton('remove', _('Remove')))
-								->addClass('js-remove')
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->removeId(),
-							new CVar('operations['.$operationid.']', $operation),
-							new CVar('operations_for_popup['.ACTION_OPERATION.']['.$operationid.']',
-								json_encode($operation_for_popup)
-							)
-						]
-					])
-				))->addClass(ZBX_STYLE_NOWRAP)
-			];
-		}
-		else {
-			$operation_row = [
-				$details,
-				(new CCol(
-					new CHorList([
-						(new CSimpleButton(_('Edit')))
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('js-edit-operation')
-							->setAttribute('data_operation', json_encode([
-								'operationid' => $operationid,
-								'actionid' => $data['actionid'],
-								'eventsource' => $data['eventsource'],
-								'operationtype' => ACTION_OPERATION,
-								'data' => $operation
-							])),
-						[
-							(new CButton('remove', _('Remove')))
-								->addClass('js-remove')
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->removeId(),
-							new CVar('operations['.$operationid.']', $operation),
-							new CVar('operations_for_popup['.ACTION_OPERATION.']['.$operationid.']',
-								json_encode($operation_for_popup)
-							)
-						]
-					])
-				))->addClass(ZBX_STYLE_NOWRAP)
-			];
-		}
-
-		$operations_table->addRow($operation_row, null, 'operations_'.$operationid);
-	}
-}
-
-$operations_table->addItem(
-	(new CTag('tfoot', true))
-		->addItem(
-			(new CCol(
-				(new CSimpleButton(_('Add')))
-					->setAttribute('data-actionid', $data['actionid'])
-					->setAttribute('data-eventsource', $data['eventsource'])
-					->setAttribute('operationtype', ACTION_OPERATION)
-					->addClass('js-operation-details')
-					->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColSpan(4)
-		)
-);
-
-// Operations templates.
-$operation_row_buttons = new CCol([
-	(new CList([
-		(new CButton(null, _('Edit')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('js-edit-operation')
-			->setAttribute('data_operation', '#{data_operation}'),
-		(new CButton(null, _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('js-remove')
-	]))->addClass(ZBX_STYLE_HOR_LIST)
-]);
-
-$operation_basic_template = (new CScriptTemplate('operation-basic-row-tmpl'))->addItem(
-	(new CRow([
-		(new CCol([
-			new CTag('b', true, '#{details}'), ' ', '#{data}'
-		]))
-			->addClass(ZBX_STYLE_WORDWRAP)
-			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
-		$operation_row_buttons
-	]))->setAttribute('id', '#{prefix}operations_#{row_index}')
-);
-
-$operation_additional_template = (new CScriptTemplate('operation-additional-row-tmpl'))->addItem(
-	(new CRow([
-		(new CCol('#{steps}')),
-		(new CCol([
-			new CTag('b', true, '#{details}'), ' ', '#{data}'
-		]))
-			->addClass(ZBX_STYLE_WORDWRAP)
-			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
-		(new CCol('#{start_in}')),
-		(new CCol('#{duration}')),
-		$operation_row_buttons
-	]))->setAttribute('id', '#{prefix}operations_#{row_index}')
-);
-
-$operation_usr_usrgrp_template = (new CScriptTemplate('operation-usr-usrgrp-row-tmpl'))->addItem(
-	(new CRow([
-		(new CCol([
-			(new CFormField([
-				new CTag('b', true, '#{usr_details}'), ' ', '#{usr_data}'
-			]))->addItem(new CTag('br')),
-			new CTag('b', true, '#{usrgrp_details}'), ' ', '#{usrgrp_data}'
-		]))
-			->addClass(ZBX_STYLE_WORDWRAP)
-			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
-		$operation_row_buttons
-	]))->setAttribute('id', '#{prefix}operations_#{row_index}')
-);
-
-$operation_usr_usrgrp_additional_template = (new CScriptTemplate('operation-usr-usrgrp-additional-row-tmpl'))->addItem(
-	(new CRow([
-		new CCol('#{steps}'),
-		(new CCol([
-			(new CFormField([
-				new CTag('b', true, '#{usr_details}'), ' ', '#{usr_data}'
-			]))->addItem(new CTag('br')),
-			new CTag('b', true, '#{usrgrp_details}'), ' ', '#{usrgrp_data}'
-		]))
-			->addClass(ZBX_STYLE_WORDWRAP)
-			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
-		new CCol('#{start_in}'),
-		new CCol('#{duration}'),
-		$operation_row_buttons
-	]))->setAttribute('id', '#{prefix}operations_#{row_index}')
-);
-
-$operation_script_additional_template = (new CScriptTemplate('operation-script-additional-row-tmpl'))->addItem(
-	(new CRow([
-		new CCol('#{steps}'),
-		(new CCol([
-			(new CFormField(new CTag('b', true, '#{current}')))->addItem(new CTag('br')),
-			(new CFormField([
-				new CTag('b', true, '#{host_details}'), ' ', '#{host_data}'
-			]))->addItem(new CTag('br')),
-			new CTag('b', true, '#{hostgr_details}'), ' ', '#{hostgr_data}'
-		]))
-			->addClass(ZBX_STYLE_WORDWRAP)
-			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
-		new CCol('#{start_in}'),
-		new CCol('#{duration}'),
-		$operation_row_buttons
-	]))->setAttribute('id', '#{prefix}operations_#{row_index}')
-);
-
-$operation_script_template = (new CScriptTemplate('operation-script-row-tmpl'))->addItem(
-	(new CRow([
-		(new CCol([
-			(new CFormField(new CTag('b', true, '#{current}')))->addItem(new CTag('br')),
-			(new CFormField([
-				new CTag('b', true, '#{host_details}'), ' ', '#{host_data}'
-			]))->addItem(new CTag('br')),
-			new CTag('b', true, '#{hostgr_details}'), ' ', '#{hostgr_data}'
-		]))
-			->addClass(ZBX_STYLE_WORDWRAP)
-			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
-		$operation_row_buttons
-	]))->setAttribute('id', '#{prefix}operations_#{row_index}')
-);
-
-$operations_tab->addItem([
-	new CLabel(_('Operations')),
-	(new CFormField([
-		$operations_table,
-		$operation_basic_template,
-		$operation_additional_template,
-		$operation_usr_usrgrp_template,
-		$operation_usr_usrgrp_additional_template,
-		$operation_script_template,
-		$operation_script_additional_template
-	]))
+	$operations_tab->addItem([
+	new CLabel('Operations'),
+	(new CFormField(new CPartial('popup.operations.html', $data)))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setId('operations-table-div')
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 ]);
+unset ($data['table']);
 
 // Recovery operations table.
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
-	// Create operation table.
-	$operations_table = (new CTable())
-		->setId('rec-table')
-		->setAttribute('style', 'width: 100%;');
-	$operations_table->setHeader([_('Details'), _('Action')]);
-
-	if ($data['action']['recovery_operations']) {
-		$actionOperationDescriptions = getActionOperationDescriptions($data['eventsource'], [$data['action']],
-			ACTION_RECOVERY_OPERATION
-		);
-		foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
-			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_RECOVERY_OPERATION])) {
-				continue;
-			}
-			if (!isset($operation['opconditions'])) {
-				$operation['opconditions'] = [];
-			}
-			if (!array_key_exists('opmessage', $operation)) {
-				$operation['opmessage'] = [];
-			}
-			$operation['opmessage'] += [
-				'mediatypeid' => '0',
-				'message' => '',
-				'subject' => '',
-				'default_msg' => '1'
-			];
-			$details = new CSpan($actionOperationDescriptions[0][$operationid]);
-			$operation_for_popup = array_merge($operation, ['id' => $operationid]);
-			foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
-				if (array_key_exists($var, $operation_for_popup)) {
-					$operation_for_popup[$var] = zbx_objectValues($operation_for_popup[$var], $field);
-				}
-			}
-			$operations_table->addRow([
-				$details,
-				(new CCol(
-					new CHorList([
-						(new CSimpleButton(_('Edit')))
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('js-edit-operation')
-							->setAttribute('data_operation', json_encode([
-								'operationid' => $operationid,
-								'actionid' => $data['actionid'],
-								'eventsource' => $data['eventsource'],
-								'operationtype' => ACTION_RECOVERY_OPERATION,
-								'data' => $operation
-							])),
-						[
-							(new CButton('remove', _('Remove')))
-								->setAttribute('data_operationid', $operationid)
-								->addClass('js-remove')
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->removeId(),
-							new CVar('recovery_operations['.$operationid.']', $operation),
-							new CVar('operations_for_popup['.ACTION_RECOVERY_OPERATION.']['.$operationid.']',
-								json_encode($operation_for_popup)
-							)
-						]
-					])
-				))->addClass(ZBX_STYLE_NOWRAP)
-			], null, 'recovery_operations_'.$operationid);
-		}
-	}
-
-	$operations_table->addItem(
-		(new CTag('tfoot', true))
-			->addItem(
-				(new CCol(
-					(new CSimpleButton(_('Add')))
-						->setAttribute('data-actionid', $data['actionid'])
-						->setAttribute('data-eventsource', $data['eventsource'])
-						->addClass('js-recovery-operations-create')
-						->addClass(ZBX_STYLE_BTN_LINK)
-				))->setColSpan(4)
-			)
-	);
+	$data['table'] = 'recovery';
 
 	$operations_tab->addItem([
-		new CLabel(_('Recovery operations')),
-		(new CFormField($operations_table))
+		new CLabel('Recovery operations'),
+		(new CFormField(new CPartial('popup.operations.html', $data)))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setId('rec-operations-table-div')
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
+	unset ($data['table']);
 }
 
-// Update operations.
+// Update operations table.
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_SERVICE) {
-	$operations_table = (new CTable())
-		->setId('upd-table')
-		->setAttribute('style', 'width: 100%;')
-		->setHeader([_('Details'), _('Action')]);
-
-	if ($data['action']['update_operations']) {
-		$operation_descriptions = getActionOperationDescriptions($data['eventsource'], [$data['action']],
-			ACTION_UPDATE_OPERATION
-		);
-		foreach ($data['action']['update_operations'] as $operationid => $operation) {
-			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_UPDATE_OPERATION])) {
-				continue;
-			}
-			$operation += [
-				'opconditions' => []
-			];
-			$details = new CSpan($operation_descriptions[0][$operationid]);
-			$operation_for_popup = array_merge($operation, ['id' => $operationid]);
-			foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
-				if (array_key_exists($var, $operation_for_popup)) {
-					$operation_for_popup[$var] = zbx_objectValues($operation_for_popup[$var], $field);
-				}
-			}
-			$operations_table->addRow([
-				$details,
-				(new CCol(
-					new CHorList([
-						(new CSimpleButton(_('Edit')))
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('js-edit-operation')
-							->setAttribute('data_operation', json_encode([
-								'operationid' => $operationid,
-								'actionid' => $data['actionid'],
-								'eventsource' => $data['eventsource'],
-								'operationtype' => ACTION_UPDATE_OPERATION,
-								'data' => $operation
-							])),
-						[
-							(new CButton('remove', _('Remove')))
-								->setAttribute('data_operationid', $operationid)
-								->addClass('js-remove')
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->removeId(),
-							new CVar('update_operations['.$operationid.']', $operation),
-							new CVar('operations_for_popup['.ACTION_UPDATE_OPERATION.']['.$operationid.']',
-								json_encode($operation_for_popup)
-							)
-						]
-					])
-				))->addClass(ZBX_STYLE_NOWRAP)
-			], null, 'update_operations_'.$operationid);
-		}
-	}
-
-	$operations_table->addItem(
-		(new CTag('tfoot', true))
-			->addItem(
-				(new CCol(
-					(new CSimpleButton(_('Add')))
-						->setAttribute('data-actionid', $data['actionid'])
-						->setAttribute('data-eventsource', $data['eventsource'])
-						->addClass('js-update-operations-create')
-						->addClass(ZBX_STYLE_BTN_LINK)
-				))->setColSpan(4)
-			)
-	);
+	$data['table'] = 'update';
 
 	$operations_tab->addItem([
-		new CLabel(_('Update operations')),
-		(new CFormField($operations_table))
+		new CLabel('Update operations'),
+		(new CFormField(new CPartial('popup.operations.html', $data)))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->setId('upd-operations-table-div')
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
+	unset ($data['table']);
 }
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
@@ -625,36 +254,10 @@ $operations_tab->addItem(
 	new CFormField((new CLabel(_('At least one operation must exist.')))->setAsteriskMark())
 );
 
-
-// todo : fix tables, views for each eventsource
-// todo : remove unnecessary code
-
-$operations_tab_partial = new CFormGrid();
-$operations_tab_partial->addItem([
-	(new CLabel(_('Default operation step duration'), 'esc_period'))->setAsteriskMark(),
-	(new CTextBox('esc_period', $data['action']['esc_period']))
-		->setId('esc_period')
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAriaRequired()
-]);
-
-$data['esc_period'] = $data['action']['esc_period'];
-
-$operations_tab_partial->addItem([
-	new CLabel('Operations'),
-	(new CFormField(new CPartial('popup.operations.html', $data)))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setId('operations-table-div')
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-]);
-
-// todo : remove test tab;
-
 $tabs = (new CTabView())
 	->setSelected(0)
 	->addTab('action-tab', _('Action'), $action_tab)
-	->addTab('action-operations-tab', _('Operations'), $operations_tab, TAB_INDICATOR_OPERATIONS)
-	->addTab('action-operations-partial-tab', _('Operations test'), $operations_tab_partial, TAB_INDICATOR_OPERATIONS);
+	->addTab('action-operations-tab', _('Operations'), $operations_tab, TAB_INDICATOR_OPERATIONS);
 
 $form
 	->addItem($tabs)

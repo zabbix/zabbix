@@ -44,24 +44,30 @@ window.action_edit_popup = new class {
 			this._createConditionsRow(condition);
 		}
 
-		// Reload operation table when esc period is changed
+		// Reload operation table when esc_period is changed.
 		let esc_period = document.querySelector('#esc_period');
-		esc_period.addEventListener('change', (e) => {
+		esc_period.addEventListener('change', () => {
 			this._loadOperationTable();
 		});
-
-		this.$operation_table = $('#operations-table-div');
 	}
 
 	_loadOperationTable(e = null) {
+		if (this.recovery == <?= ACTION_RECOVERY_OPERATION ?>){
+			this.$operation_table = $('#rec-operations-table-div');
+		}
+		else if (this.recovery == <?= ACTION_UPDATE_OPERATION ?>){
+			this.$operation_table = $('#upd-operations-table-div');
+		}
+		else {
+			this.$operation_table = $('#operations-table-div');
+		}
+
 		let new_operation = {};
 		if (e) {
 			new_operation = e.detail;
 		}
 
 		const fields = getFormFields(this.form);
-
-		// todo : add necessarry data for each table (to add data to correct table)
 
 		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', 'popup.action.operation.get');
@@ -77,6 +83,8 @@ window.action_edit_popup = new class {
 			},
 			body: JSON.stringify({
 				'operations': fields.operations,
+				'recovery_operations': fields.recovery_operations,
+				'update_operations': fields.update_operations,
 				'new_operation': new_operation
 			})
 		})

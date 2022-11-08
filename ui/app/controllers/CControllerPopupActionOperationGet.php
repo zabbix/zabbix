@@ -28,9 +28,11 @@ class CControllerPopupActionOperationGet extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'esc_period' =>		'db actions.esc_period|not_empty',
-			'operations'=>		'array',
-			'new_operation' =>	'array'
+			'esc_period' =>			'db actions.esc_period|not_empty',
+			'operations'=>			'array',
+			'recovery_operations'=>	'array',
+			'update_operations'=>	'array',
+			'new_operation' =>		'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -50,72 +52,156 @@ class CControllerPopupActionOperationGet extends CController {
 
 	protected function checkPermissions() {
 		return true;
+		// todo : add permission check
 		// todo : check if action can be edited??
 	}
 
 	protected function doAction() {
 		$data['esc_period'] = $this->getInput('esc_period');
-		$data['operations'] = $this->getInput('operations');
+		$new_operation = array_key_exists('operation', $this->getInput('new_operation'))
+			? $this->getInput('new_operation')['operation']
+			: null;
 
-		if ($this->getInput('new_operation')) {
-			$data['operations'][] = $this->getInput('new_operation')['operation'];
-		}
-
-		$operation = $this->getInput('operation');
-
-		if (preg_match('/\bscriptid\b/', $operation['operationtype'])){
-			$operation['opcommand']['scriptid'] = preg_replace('[\D]', '', $operation['operationtype']);
-			$operationtype = OPERATION_TYPE_COMMAND;
-
-			if (array_key_exists('opcommand_hst', $operation)) {
-				foreach ($operation['opcommand_hst'] as $host) {
-					if (is_array($host['hostid']) && array_key_exists('current_host', $host['hostid'])) {
-						$operation['opcommand_hst'][0]['hostid'] = 0;
-					}
-				}
+		if ($new_operation) {
+			if ($new_operation['recovery'] == ACTION_OPERATION) {
+				$data['table'] = 'operation';
+				$data['operations'] = $this->getInput('operations');
+				$data['operations'][] = $new_operation;
+			}
+			elseif ($new_operation['recovery'] == ACTION_RECOVERY_OPERATION) {
+				$data['table'] = 'recovery';
+				$data['operations'] = $this->getInput('recovery_operations');
+				$data['operations'][] = $new_operation;
+			}
+			elseif ($new_operation['recovery'] == ACTION_UPDATE_OPERATION) {
+				$data['table'] = 'update';
+				$data['operations'] = $this->getInput('update_operations');
+				$data['operations'][] = $new_operation;
 			}
 		}
 		else {
-			$operationtype = (int)preg_replace('[\D]', '', $operation['operationtype']);
+			$data['table'] = 'operation';
+			$data['operations'] = $this->getInput('operations');
 		}
 
-		if (array_key_exists('opmessage', $operation)) {
-			if (!array_key_exists('default_msg', $operation['opmessage'])
-				&& ($operationtype === OPERATION_TYPE_MESSAGE
-					|| $operationtype === OPERATION_TYPE_RECOVERY_MESSAGE
-					|| $operationtype === OPERATION_TYPE_UPDATE_MESSAGE)) {
-				$operation['opmessage']['default_msg'] = '1';
+		$operations = [];
+		$recovery_operations = [];
+		$update_operations = [];
 
-				unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
+		foreach ($data['operations'] as $operation) {
+			if ($operation['recovery'] == ACTION_OPERATION) {
+				$operations[] = $operation;
+			}
+			elseif ($operation['recovery'] == ACTION_RECOVERY_OPERATION) {
+				$recovery_operations[] = $operation;
+			}
+			elseif ($operation['recovery'] == ACTION_UPDATE_OPERATION) {
+				$udpate_operations[] = $operation;
 			}
 		}
-		$operation['operationtype'] = $operationtype;
 
-		$data['operation'] = $operation;
-		$data['operation']['row_index'] = $this->getInput('row_index');
-
-		// todo : SORTING (by steps)
+		// todo : add operation SORTING (by steps) + sorting by operationtype ???
 
 		foreach ($data['operations'] as &$operation) {
-			$action = [
-				'name' => '',
-				'esc_period' => DB::getDefault('actions', 'esc_period'),
-				// todo : change eventsource
-				// todo : fix recovery, update operations
-				'eventsource' => EVENT_SOURCE_TRIGGERS,
-				'status' => 0,
-				'operations' => [$operation],
-				'recovery_operations' => [],
-				'update_operations' => [],
-				'filter' => [
-					'conditions' => [],
-					'evaltype' => ''
-				],
-				'pause_suppressed' => ACTION_PAUSE_SUPPRESSED_TRUE,
-				'notify_if_canceled' =>  ACTION_NOTIFY_IF_CANCELED_TRUE
-			];
+			if (preg_match('/\bscriptid\b/', $operation['operationtype'])) {
+				$operation['opcommand']['scriptid'] = preg_replace('[\D]', '', $operation['operationtype']);
+				$operationtype = OPERATION_TYPE_COMMAND;
 
-			$operation['details'] = $this->getData($operationtype, [$action], ACTION_OPERATION);
+				if (array_key_exists('opcommand_hst', $operation)) {
+					foreach ($operation['opcommand_hst'] as $host) {
+						if (is_array($host['hostid']) && array_key_exists('current_host', $host['hostid'])) {
+							$operation['opcommand_hst'][0]['hostid'] = 0;
+						}
+					}
+				}
+			}
+			else {
+				$operationtype = (int)preg_replace('[\D]', '', $operation['operationtype']);
+			}
+
+			if (array_key_exists('opmessage', $operation)) {
+				if (!array_key_exists('default_msg', $operation['opmessage'])
+					&& ($operationtype === OPERATION_TYPE_MESSAGE
+						|| $operationtype === OPERATION_TYPE_RECOVERY_MESSAGE
+						|| $operationtype === OPERATION_TYPE_UPDATE_MESSAGE)) {
+					$operation['opmessage']['default_msg'] = '1';
+
+					unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
+				}
+			}
+
+			$operation['operationtype'] = $operationtype;
+		}
+		unset($operation);
+
+		if ($new_operation) {
+			if ($new_operation['recovery'] == ACTION_OPERATION) {
+				foreach ($operations as $operation) {
+					$action = [
+						'name' => '',
+						'esc_period' => DB::getDefault('actions', 'esc_period'),
+						'eventsource' => $operation['eventsource'],
+						'status' => 0,
+						'operations' => $operation['recovery'] == ACTION_OPERATION ? [$operation] : [],
+						'recovery_operations' => $operation['recovery'] == ACTION_RECOVERY_OPERATION ? [$operation] : [],
+						'update_operations' => $operation['recovery'] == ACTION_UPDATE_OPERATION ? [$operation] : [],
+						'filter' => [
+							'conditions' => [],
+							'evaltype' => ''
+						],
+						'pause_suppressed' => ACTION_PAUSE_SUPPRESSED_TRUE,
+						'notify_if_canceled' =>  ACTION_NOTIFY_IF_CANCELED_TRUE
+					];
+
+					$operation['details'] = $this->getData($operationtype, [$action], $operation['recovery']);
+				}
+			}
+
+			elseif ($new_operation['recovery'] == ACTION_RECOVERY_OPERATION) {
+				unset($operation);
+				foreach ($recovery_operations as $operation) {
+					$action = [
+						'name' => '',
+						'esc_period' => DB::getDefault('actions', 'esc_period'),
+						'eventsource' => $operation['eventsource'],
+						'status' => 0,
+						'operations' => $operation['recovery'] == ACTION_OPERATION ? [$operation] : [],
+						'recovery_operations' => $operation['recovery'] == ACTION_RECOVERY_OPERATION ? [$operation] : [],
+						'update_operations' => $operation['recovery'] == ACTION_UPDATE_OPERATION ? [$operation] : [],
+						'filter' => [
+							'conditions' => [],
+							'evaltype' => ''
+						],
+						'pause_suppressed' => ACTION_PAUSE_SUPPRESSED_TRUE,
+						'notify_if_canceled' =>  ACTION_NOTIFY_IF_CANCELED_TRUE
+					];
+
+					$operation['details'] = $this->getData($operationtype, [$action], $operation['recovery']);
+				}
+			}
+
+			elseif ($new_operation['recovery'] == ACTION_UPDATE_OPERATION) {
+				unset($operation);
+				foreach ($update_operations as $operation) {
+					$action = [
+						'name' => '',
+						'esc_period' => DB::getDefault('actions', 'esc_period'),
+						'eventsource' => $operation['eventsource'],
+						'status' => 0,
+						'operations' => $operation['recovery'] == ACTION_OPERATION ? [$operation] : [],
+						'recovery_operations' => $operation['recovery'] == ACTION_RECOVERY_OPERATION ? [$operation] : [],
+						'update_operations' => $operation['recovery'] == ACTION_UPDATE_OPERATION ? [$operation] : [],
+						'filter' => [
+							'conditions' => [],
+							'evaltype' => ''
+						],
+						'pause_suppressed' => ACTION_PAUSE_SUPPRESSED_TRUE,
+						'notify_if_canceled' =>  ACTION_NOTIFY_IF_CANCELED_TRUE
+					];
+
+					$operation['details'] = $this->getData($operationtype, [$action], $operation['recovery']);
+				}
+			}
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
