@@ -4,11 +4,7 @@
 ## Overview
 
 For Zabbix version: 6.0 and higher.  
-![Product picture](images/pic.png?raw=true)
-> Courtesy of Cisco Systems, Inc. Unauthorized use not permitted.
-
 Cloud-scale ASIC facilitates ACI leaf-spine architecture and NX-OS VxLAN Fabrics with diverse modular and fixed portfolio.
-
 https://www.cisco.com/c/en/us/support/switches/nexus-9000-series-switches/series.html
 
 This template was tested on:
