@@ -238,14 +238,10 @@ class CControllerAuthenticationEdit extends CController {
 
 			$data += $saml_configuration;
 
-			$data['ldap_default_row_index'] = 0;
-
-			if ($data['ldap_servers']) {
-				$data['ldap_default_row_index'] = array_search($data[CAuthenticationHelper::LDAP_USERDIRECTORYID],
-					array_column($data['ldap_servers'], 'userdirectoryid')
-				);
-			}
-
+			// Cast false to 0 when no ldap server is found as default.
+			$data['ldap_default_row_index'] = (int) array_search($data[CAuthenticationHelper::LDAP_USERDIRECTORYID],
+				array_column($data['ldap_servers'], 'userdirectoryid')
+			);
 			$data['ldap_removed_userdirectoryids'] = [];
 		}
 
