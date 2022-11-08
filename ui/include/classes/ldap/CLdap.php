@@ -311,9 +311,11 @@ class CLdap {
 			return $groups;
 		}
 
+		$attributes = array_flip(array_map('strtolower', $attributes));
+
 		for ($j = 0; $j < $results['count']; $j++) {
 			$result = $results[$j];
-			$result_attributes = array_intersect_key($result, array_flip($attributes));
+			$result_attributes = array_intersect_key($result, $attributes);
 
 			if (!$result_attributes) {
 				continue;
@@ -400,7 +402,7 @@ class CLdap {
 
 	/**
 	 * Return user data with medias, groups, roleid and user attributes matched from LDAP user data according
-	 * provisioning options.
+	 * provisioning options. All attributes are matched in case insensitive way.
 	 *
 	 * @param CProvisioning $provisioning      Provisioning class instance.
 	 * @param string        $username          Username of user to get provisioned data for.
@@ -417,18 +419,18 @@ class CLdap {
 		$config = $provisioning->getIdpConfig();
 		$user_attributes = $provisioning->getUserIdpAttributes();
 		$idp_user = $this->getUserAttributes($user_attributes, $username);
-		$user = $provisioning->getUserAttributes($idp_user);
-		$user['medias'] = $provisioning->getUserMedias($idp_user);
+		$user = $provisioning->getUserAttributes($idp_user, false);
+		$user['medias'] = $provisioning->getUserMedias($idp_user, false);
 
 		if ($config['group_membership'] !== '') {
-			$group_key = $config['group_membership'];
+			$group_key = strtolower($config['group_membership']);
 
 			if (array_key_exists($group_key, $idp_user) && is_array($idp_user[$group_key])) {
 				$ldap_groups = $idp_user[$group_key];
 			}
 		}
 		else if ($config['group_filter'] !== '') {
-			$user_ref_attr = $config['user_ref_attr'];
+			$user_ref_attr = strtolower($config['user_ref_attr']);
 
 			if ($user_ref_attr !== '' && array_key_exists($user_ref_attr, $idp_user)) {
 				$this->setQueryPlaceholders(['%{ref}' => $idp_user[$user_ref_attr]]);
@@ -436,7 +438,7 @@ class CLdap {
 
 			$group_attributes = $provisioning->getGroupIdpAttributes();
 			$ldap_groups = $this->getGroupAttributes($group_attributes, $username);
-			$ldap_groups = array_column($ldap_groups, $config['group_name']);
+			$ldap_groups = array_column($ldap_groups, strtolower($config['group_name']));
 		}
 
 		$user = array_merge($user, $provisioning->getUserGroupsAndRole($ldap_groups));
@@ -509,6 +511,7 @@ class CLdap {
 		$results = false;
 
 		if ($resource !== false) {
+			// All attributes keys, in result array, will be in lowercase.
 			$results = @ldap_get_entries($this->ds, $resource);
 			ldap_free_result($resource);
 		}

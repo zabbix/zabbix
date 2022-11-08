@@ -186,7 +186,13 @@ class CProvisioning {
 			'surname' => $this->userdirectory['user_lastname']
 		], 'strlen');
 		$user = array_fill_keys(array_keys($user_idp_fields), '');
-		$idp_user_lowercased = $case_sensitive ? [] : array_map('strtolower', $idp_user);
+		$idp_user_lowercased = [];
+
+		if (!$case_sensitive) {
+			foreach ($idp_user as $idp_attr => $idp_value) {
+				$idp_user_lowercased[strtolower($idp_attr)] = $idp_value;
+			}
+		}
 
 		foreach ($user_idp_fields as $user_field => $idp_field) {
 			if (array_key_exists($idp_field, $idp_user)) {
@@ -218,7 +224,13 @@ class CProvisioning {
 	public function getUserMedias(array $idp_user, bool $case_sensitive = true): array {
 		$user_medias = [];
 		$attributes = array_column($this->userdirectory['provision_media'], null, 'mediatypeid');
-		$idp_user_lowercased = $case_sensitive ? [] : array_map('strtolower', $idp_user);
+		$idp_user_lowercased = [];
+
+		if (!$case_sensitive) {
+			foreach ($idp_user as $idp_attr => $idp_value) {
+				$idp_user_lowercased[strtolower($idp_attr)] = $idp_value;
+			}
+		}
 
 		foreach ($attributes as $mediatypeid => $idp_attributes) {
 			$idp_field = $idp_attributes['attribute'];
