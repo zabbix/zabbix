@@ -215,8 +215,6 @@ func (c *ConnManager) create(uri uri.URI, privilege string) (*OraConn, error) {
 		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
-	fmt.Println("conp", connParams)
-
 	connector := godror.NewConnector(godror.ConnectionParams{
 		StandaloneConnection: true,
 		CommonParams: godror.CommonParams{
