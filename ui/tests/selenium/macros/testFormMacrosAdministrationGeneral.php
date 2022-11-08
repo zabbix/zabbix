@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -38,8 +39,6 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 	public function getBehaviors() {
 		return [CMessageBehavior::class];
 	}
-
-	use MacrosTrait;
 
 	private $macroMaxLength = 255;
 	private $macroPlaceholder = '{$MACRO}';
@@ -884,7 +883,8 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 	/**
 	 * @onBeforeOnce prepareUpdateData
 	 *
-	 * @dataProvider getUpdateVaultMacrosData
+	 * @dataProvider getUpdateVaultMacrosNormalData
+	 * @dataProvider getUpdateVaultMacrosCommonData
 	 */
 	public function testFormMacrosAdministrationGeneral_UpdateVaultMacros($data) {
 		$this->selectVault($data['vault']);

@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "../sysinfo.h"
 #include "net.h"
 
 #include "zbxcomms.h"
@@ -76,7 +77,7 @@ out:
 	return SYSINFO_RET_OK;
 }
 
-int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_tcp_port(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	unsigned short	port;
 	int		value_int, ret;

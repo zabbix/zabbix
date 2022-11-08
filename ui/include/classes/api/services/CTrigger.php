@@ -518,7 +518,7 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Add triggers.
 	 *
-	 * Trigger params: expression, description, type, priority, status, comments, url, templateid
+	 * Trigger params: expression, description, type, priority, status, comments, url_name, url, templateid
 	 *
 	 * @param array $triggers
 	 *

@@ -161,10 +161,9 @@ class CMessageHelper {
 	/**
 	 * Clear messages.
 	 */
-	public static function clear(bool $clear_title = true): void {
-		if ($clear_title) {
-			self::$title = null;
-		}
+	public static function clear(): void {
+		self::$type = null;
+		self::$title = null;
 		self::$messages = [];
 	}
 

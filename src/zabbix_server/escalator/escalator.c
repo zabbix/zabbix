@@ -32,6 +32,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxexpr.h"
+#include "zbxdbwrap.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 
@@ -113,9 +114,6 @@ static void	zbx_tag_filter_free(zbx_tag_filter_t *tag_filter)
 	zbx_free(tag_filter->value);
 	zbx_free(tag_filter);
 }
-
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static void	add_message_alert(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event, zbx_uint64_t actionid,
 		int esc_step, zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message,
@@ -3267,6 +3265,7 @@ out:
  * Parameters: now               - [IN] the current time                      *
  *             nextcheck         - [IN/OUT] time of the next invocation       *
  *             escalation_source - [IN] type of escalations to be handled     *
+ *             process_num       - [IN] process number                        *
  *                                                                            *
  * Return value: the count of deleted escalations                             *
  *                                                                            *
@@ -3278,7 +3277,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	process_escalations(int now, int *nextcheck, unsigned int escalation_source,
-		const char *default_timezone)
+		const char *default_timezone, int process_num)
 {
 	int			ret = 0;
 	DB_RESULT		result;
@@ -3438,16 +3437,16 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	double				sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t				last_stat_time;
 	zbx_config_t			cfg;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(escalator_args_in->zbx_get_program_type_cb_arg()), server_num,
 			get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -3476,13 +3475,13 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 		nextcheck = time(NULL) + CONFIG_ESCALATOR_FREQUENCY;
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_TRIGGER,
-				cfg.default_timezone);
+				cfg.default_timezone, process_num);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_ITEM,
-				cfg.default_timezone);
+				cfg.default_timezone, process_num);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_SERVICE,
-				cfg.default_timezone);
+				cfg.default_timezone, process_num);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_DEFAULT,
-				cfg.default_timezone);
+				cfg.default_timezone, process_num);
 
 		zbx_config_clean(&cfg);
 		total_sec += zbx_time() - sec;
@@ -3513,7 +3512,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 			last_stat_time = now;
 		}
 
-		zbx_sleep_loop(sleeptime);
+		zbx_sleep_loop(info, sleeptime);
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

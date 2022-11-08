@@ -23,16 +23,16 @@
  * @var CView $this
  */
 
-$widget = new CWidget();
+$html_page = new CHtmlPage();
 
 if ($data['parent_discoveryid'] === null) {
-	$widget
+	$html_page
 		->setTitle(_('Graphs'))
 		->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_GRAPH_EDIT))
 		->setNavigation(getHostNavigation('graphs', $data['hostid']));
 }
 else {
-	$widget
+	$html_page
 		->setTitle(_('Graph prototypes'))
 		->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_PROTOTYPE_GRAPH_EDIT))
 		->setNavigation(getHostNavigation('graphs', $data['hostid'], $data['parent_discoveryid']));
@@ -46,7 +46,7 @@ $url = (new CUrl('graphs.php'))
 // Create form.
 $graphForm = (new CForm('post', $url))
 	->setName('graphForm')
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid']);
 
@@ -533,10 +533,9 @@ require_once dirname(__FILE__).'/js/configuration.graph.edit.js.php';
 
 $graphForm->addItem($graphTab);
 
-// Append form to widget.
-$widget->addItem($graphForm);
-
-$widget->show();
+$html_page
+	->addItem($graphForm)
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

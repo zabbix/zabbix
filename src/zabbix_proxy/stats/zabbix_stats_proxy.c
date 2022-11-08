@@ -18,7 +18,7 @@
 **/
 
 #include "zabbix_stats.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 #include "zbxcomms.h"
 #include "zbxjson.h"
 #include "zbxstr.h"

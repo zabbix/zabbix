@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-10-06 10:56+0000\n"
+"PO-Revision-Date: 2022-10-28 08:40+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -4182,6 +4182,17 @@ msgstr "连接超时"
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
 msgstr "连接到 Zabbix 服务器“%2$s”时超时,已超 %1$s 秒。"
 
+#: include/classes/server/CZabbixServer.php:610
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" failed. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect DNS server configuration.\n"
+msgstr ""
+"与 Zabbix 服务器“%1$s”的连接失败。可能的原因：\n"
+"1.“zabbix_server.conf”中的“NodeAddress”、“ListenPort”不正确或“zabbix.conf.php”中的服务器IP/DNS被覆盖；\n"
+"2. DNS 服务器配置不正确，地址解析不正确。\n"
+
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
 msgid ""
@@ -4192,6 +4203,21 @@ msgstr ""
 "连接到Zabbix服务器 \"%1$s\" 失败. 可能的原因是:\n"
 "1.\"zabbix.conf.php\"中的服务器IP/DNS配置不正确；\n"
 "2.DNS服务器配置不正确。\n"
+
+#: include/classes/server/CZabbixServer.php:598
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" refused. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Security environment (for example, SELinux) is blocking the connection;\n"
+"3. Zabbix server daemon not running;\n"
+"4. Firewall is blocking TCP connection.\n"
+msgstr ""
+"与 Zabbix 服务器“%1$s”的连接被拒绝。可能的原因：\n"
+"1.“zabbix_server.conf”中的“NodeAddress”、“ListenPort”不正确或“zabbix.conf.php”中的服务器IP/DNS被覆盖；\n"
+"2、安全环境（例如SELinux）阻断连接；\n"
+"3. Zabbix server 守护进程没有运行；\n"
+"4. 防火墙阻断 TCP 连接。\n"
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4207,6 +4233,17 @@ msgstr ""
 "2. 安全环境（例如SELinux）阻塞连接；\n"
 "3. Zabbix server 守护进程没有运行；\n"
 "4. 开启了防火墙阻止 TCP 连接。\n"
+
+#: include/classes/server/CZabbixServer.php:606
+#, c-format
+msgid ""
+"Connection to Zabbix server \"%1$s\" timed out. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Firewall is blocking TCP connection.\n"
+msgstr ""
+"与 Zabbix 服务器“%1$s”的连接超时。可能的原因：\n"
+"1.“zabbix_server.conf”中的“NodeAddress”、“ListenPort”不正确或“zabbix.conf.php”中的服务器IP/DNS被覆盖；\n"
+"2. 防火墙阻断 TCP 连接。\n"
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -9857,6 +9894,10 @@ msgctxt "compact table header"
 msgid "Info"
 msgstr "信息"
 
+#: include/classes/data/CItemData.php:1429
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr "有关 vmware.datastore.perfcounter 所需的hypervisor内部磁盘的信息，<url> - VMware 服务 URL，<uuid> - VMware 管理程序主机名。返回 JSON"
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -11926,6 +11967,11 @@ msgstr "菜单条目 URL"
 msgid "Menu entry name"
 msgstr "菜单条目名"
 
+#: include/views/configuration.trigger.prototype.edit.php:554
+#: include/views/configuration.triggers.edit.php:576
+msgid "Menu entry name is used as a label for the trigger URL in the event context menu."
+msgstr "菜单条目名称在事件内容菜单中用作触发器 URL 的标签。"
+
 #: app/views/administration.script.edit.php:108
 msgid "Menu path"
 msgstr "菜单路径"
@@ -13679,7 +13725,7 @@ msgstr "在新窗口中打开"
 
 #: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
 msgid "Open log"
-msgstr ""
+msgstr "打开日志"
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -18297,6 +18343,16 @@ msgstr "此设置仅适用于数值类型。"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "此设置仅适用于数值数据。非数字数据将始终取自历史记录。"
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr "应启用此设置，因为历史表包含压缩块。"
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr "应启用此设置，因为趋势表包含压缩块。"
+
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
@@ -20014,6 +20070,10 @@ msgstr "VMware数据存储容量统计信息，以字节为单位，以百分比
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "VMware 数据存储管理程序列表，<url> - VMware 服务 URL，<datastore> - 数据存储名称"
 
+#: include/classes/data/CItemData.php:1321
+msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
+msgstr "VMware 数据存储性能计数器，<url> - VMware 服务 URL，<id> - VMware 数据存储 uuid，<path> - 性能计数器路径，<instance> - 性能计数器实例"
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr "VMware 数据存储属性，<url> - VMware 服务 URL，<uuid> - 数据存储名称，<prop> - 属性路径"
@@ -21207,6 +21267,17 @@ msgstr "Zabbix 登录表单"
 #: app/views/administration.script.edit.php:127
 msgid "Zabbix server"
 msgstr "zabbix服务器"
+
+#: include/classes/server/CZabbixServer.php:602
+#, c-format
+msgid ""
+"Zabbix server \"%1$s\" cannot be reached. Possible reasons:\n"
+"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
+"2. Incorrect network configuration.\n"
+msgstr ""
+"无法访问 Zabbix 服务器“%1$s”。可能的原因：\n"
+"1.“zabbix_server.conf”中的“NodeAddress”、“ListenPort”不正确或“zabbix.conf.php”中的服务器IP/DNS被覆盖；\n"
+"2.网络配置不正确。\n"
 
 #: include/classes/server/CZabbixServer.php:601
 #, c-format

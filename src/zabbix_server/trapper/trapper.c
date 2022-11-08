@@ -19,7 +19,7 @@
 
 #include "trapper.h"
 #include "zbxserver.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 
 #include "log.h"
 #include "zbxself.h"
@@ -39,6 +39,7 @@
 #include "base64.h"
 #include "zbxtime.h"
 #include "zbxstats.h"
+#include "zbx_rtc_constants.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
@@ -49,8 +50,6 @@
 
 static zbx_get_program_type_f          zbx_get_program_type_cb = NULL;
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern size_t				(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
 
 extern int	CONFIG_CONFSYNCER_FORKS;
@@ -1259,21 +1258,22 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	double			sec = 0.0;
 	zbx_socket_t		s;
 	int			ret;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 #ifdef HAVE_NETSNMP
 	zbx_ipc_async_socket_t	rtc;
 #endif
 
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
 	zbx_get_program_type_cb = trapper_args_in->zbx_get_program_type_cb_arg;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(trapper_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	memcpy(&s, trapper_args_in->listen_sock, sizeof(zbx_socket_t));
 
@@ -1300,7 +1300,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
 				get_process_type_string(process_type), process_num, sec);
 
-		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 		/* Trapper has to accept all types of connections it can accept with the specified configuration. */
 		/* Only after receiving data it is known who has sent them and one can decide to accept or discard */
@@ -1315,13 +1315,13 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			/* get connection timestamp */
 			zbx_timespec(&ts);
 
-			zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 			zbx_setproctitle("%s #%d [processing data]", get_process_type_string(process_type),
 					process_num);
 
 #ifdef HAVE_NETSNMP
-			while (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
+			while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
 			{
 				if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd && 0 == snmp_reload)
 				{

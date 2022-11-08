@@ -18,12 +18,13 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "stats.h"
 #include "log.h"
 #include "zbxnum.h"
 
-int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*type;
 	struct pst_dynamic	dyn;
@@ -54,7 +55,7 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*tmp;
 	int	cpu_num, state, mode;
@@ -108,7 +109,7 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return get_cpustat(result, cpu_num, state, mode);
 }
 
-int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*tmp;
 	struct pst_dynamic	dyn;

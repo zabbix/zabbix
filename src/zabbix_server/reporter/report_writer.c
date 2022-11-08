@@ -27,9 +27,7 @@
 #include "report_protocol.h"
 #include "zbxtime.h"
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 extern char	*CONFIG_WEBSERVICE_URL;
 
@@ -415,10 +413,10 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 	zbx_alerter_dispatch_t		dispatch = {0};
 	int				report_status = FAIL, started_num = 0, sent_num = 0, finished_num = 0;
 	double				time_now, time_stat, time_wake, time_idle = 0;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
@@ -438,7 +436,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 			get_program_type_string(poller_args_in->zbx_get_program_type_cb_arg()), server_num,
 			get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -462,7 +460,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 			finished_num = 0;
 		}
 
-		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 		if (SUCCEED != zbx_ipc_socket_read(&socket, &message))
 		{
@@ -470,7 +468,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 			exit(EXIT_FAILURE);
 		}
 
-		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		time_wake = zbx_time();
 		zbx_update_env(time_wake);

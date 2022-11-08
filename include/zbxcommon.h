@@ -834,6 +834,7 @@ void	zbx_version(void);
 
 const char	*get_program_name(const char *path);
 typedef unsigned char	(*zbx_get_program_type_f)(void);
+typedef const char	*(*zbx_get_progname_f)(void);
 
 typedef enum
 {
@@ -853,34 +854,6 @@ typedef enum
 #endif
 }
 zbx_task_t;
-
-/* runtime control commands */
-#define ZBX_RTC_UNKNOWN				0
-#define ZBX_RTC_LOG_LEVEL_INCREASE		1
-#define ZBX_RTC_LOG_LEVEL_DECREASE		2
-#define ZBX_RTC_HOUSEKEEPER_EXECUTE		3
-#define ZBX_RTC_CONFIG_CACHE_RELOAD		8
-#define ZBX_RTC_SNMP_CACHE_RELOAD		9
-#define ZBX_RTC_DIAGINFO			10
-#define ZBX_RTC_SECRETS_RELOAD			11
-#define ZBX_RTC_SERVICE_CACHE_RELOAD		12
-#define ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE	13
-#define ZBX_RTC_HA_STATUS			14
-#define ZBX_RTC_HA_REMOVE_NODE			15
-#define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
-#define ZBX_RTC_USER_PARAMETERS_RELOAD		17
-#define ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD	18
-#define ZBX_RTC_PROXYPOLLER_PROCESS		19
-
-/* internal rtc messages */
-#define ZBX_RTC_SUBSCRIBE			100
-#define ZBX_RTC_SHUTDOWN			101
-#define ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT	102
-
-/* runtime control notifications, must be less than 10000 */
-#define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
-
-#define ZBX_IPC_RTC_MAX				9999
 
 typedef enum
 {

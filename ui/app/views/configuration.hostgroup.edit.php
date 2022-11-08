@@ -48,7 +48,7 @@ $data += [
 		]
 ];
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(($data['groupid'] == 0) ? _('New host group') : _('Host group'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOSTGROUPS_EDIT))
 	->addItem(new CPartial('configuration.hostgroup.edit.html', $data))

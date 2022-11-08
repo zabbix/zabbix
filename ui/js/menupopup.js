@@ -107,154 +107,206 @@ function getMenuPopupHistory(options) {
  * @return array
  */
 function getMenuPopupHost(options, trigger_element) {
-	var sections = [];
+	const sections = [];
+	const items = [];
+	const configuration = [];
+	let url;
 
 	// go to section
 	if (options.hasGoTo) {
-		var	host_inventory = {
-				label: t('Inventory')
-			},
-			latest_data = {
-				label: t('Latest data')
-			},
-			problems = {
-				label: t('Problems')
-			},
-			graphs = {
-				label: t('Graphs')
-			},
-			dashboards = {
-				label: t('Dashboards')
-			},
-			web = {
-				label: t('Web')
-			};
+		// dashboard
+		if (options.allowed_ui_hosts) {
+			url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'host.dashboard.view')
+			url.setArgument('hostid', options.hostid)
 
-		// inventory link
-		var url = new Curl('hostinventories.php', false);
-		url.setArgument('hostid', options.hostid);
-		host_inventory.url = url.getUrl();
-
-		// latest data link
-		var url = new Curl('zabbix.php', false);
-		url.setArgument('action', 'latest.view');
-		if (typeof options.tags !== 'undefined') {
-			url.setArgument('tags', options.tags);
-			url.setArgument('evaltype', options.evaltype);
+			items.push({
+				label: t('Dashboards'),
+				disabled: !options.showDashboards,
+				url: url.getUrl()
+			});
 		}
-		url.setArgument('filter_name', '');
-		url.setArgument('hostids[]', options.hostid);
-		latest_data.url = url.getUrl();
 
-		if (!options.showTriggers) {
-			problems.disabled = true;
-		}
-		else {
-			var url = new Curl('zabbix.php', false);
+		// problems
+		if (options.allowed_ui_problems) {
+			url = new Curl('zabbix.php', false);
 			url.setArgument('action', 'problem.view');
 			url.setArgument('filter_name', '');
 			url.setArgument('hostids[]', options.hostid);
-			if (typeof options.severities !== 'undefined') {
+
+			if ('severities' in options) {
 				url.setArgument('severities[]', options.severities);
 			}
-			if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
+
+			if ('show_suppressed' in options) {
 				url.setArgument('show_suppressed', '1');
 			}
-			if (typeof options.tags !== 'undefined') {
+
+			if ('tags' in options) {
 				url.setArgument('tags', options.tags);
 				url.setArgument('evaltype', options.evaltype);
 			}
 
-			problems.url = url.getUrl();
+			items.push({
+				label: t('Problems'),
+				disabled: !options.showTriggers,
+				url: url.getUrl()
+			});
 		}
 
-		if (!options.showGraphs) {
-			graphs.disabled = true;
-		}
-		else {
-			var graphs_url = new Curl('zabbix.php', false);
-
-			graphs_url.setArgument('action', 'charts.view')
-			graphs_url.setArgument('filter_hostids[]', options.hostid);
-			graphs_url.setArgument('filter_set', '1');
-			graphs.url = graphs_url.getUrl();
-		}
-
-		if (!options.showDashboards) {
-			dashboards.disabled = true;
-		}
-		else {
-			var dashboards_url = new Curl('zabbix.php', false);
-
-			dashboards_url.setArgument('action', 'host.dashboard.view')
-			dashboards_url.setArgument('hostid', options.hostid)
-			dashboards.url = dashboards_url.getUrl();
-		}
-
-		if (!options.showWeb) {
-			web.disabled = true;
-		}
-		else {
-			var web_url = new Curl('zabbix.php', false);
-			web_url.setArgument('action', 'web.view');
-			web_url.setArgument('filter_hostids[]', options.hostid);
-			web_url.setArgument('filter_set', '1');
-			web.url = web_url.getUrl();
-		}
-
-		var items = [];
-
-		if (options.allowed_ui_inventory) {
-			items.push(host_inventory);
-		}
-
+		// latest data
 		if (options.allowed_ui_latest_data) {
-			items.push(latest_data);
-		}
+			url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'latest.view');
 
-		if (options.allowed_ui_problems) {
-			items.push(problems);
-		}
-
-		if (options.allowed_ui_hosts) {
-			items.push(graphs);
-			items.push(dashboards);
-			items.push(web);
-		}
-
-		if (options.allowed_ui_conf_hosts) {
-			var config = {
-				label: t('Configuration'),
-				disabled: !options.isWriteable
-			};
-
-			if (options.isWriteable) {
-				const config_url = new Curl('zabbix.php', false);
-				config_url.setArgument('action', 'host.edit');
-				config_url.setArgument('hostid', options.hostid);
-				config.url = config_url.getUrl();
-
-				config.clickCallback = function (e) {
-					e.preventDefault();
-					jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-					view.editHost(options.hostid);
-				};
+			if ('tags' in options) {
+				url.setArgument('tags', options.tags);
+				url.setArgument('evaltype', options.evaltype);
 			}
 
-			items.push(config);
+			url.setArgument('filter_name', '');
+			url.setArgument('hostids[]', options.hostid);
+
+			items.push({
+				label: t('Latest data'),
+				url: url.getUrl()
+			});
+		}
+
+		// graphs
+		if (options.allowed_ui_hosts) {
+			url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'charts.view')
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('filter_set', '1');
+
+			items.push({
+				label: t('Graphs'),
+				disabled: !options.showGraphs,
+				url: url.getUrl()
+			});
+		}
+
+		// web
+		if (options.allowed_ui_hosts) {
+			url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'web.view');
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('filter_set', '1');
+
+			items.push({
+				label: t('Web'),
+				disabled: !options.showWeb,
+				url: url.getUrl()
+			});
+		}
+
+		// inventory link
+		if (options.allowed_ui_inventory) {
+			url = new Curl('hostinventories.php', false);
+			url.setArgument('hostid', options.hostid);
+
+			items.push({
+				label: t('Inventory'),
+				url: url.getUrl()
+			});
 		}
 
 		if (items.length) {
 			sections.push({
-				label: t('Host'),
+				label: t('View'),
 				items: items
+			});
+		}
+
+		// Configuration
+		if (options.allowed_ui_conf_hosts) {
+			// host
+			url = new Curl('zabbix.php', false);
+			url.setArgument('action', 'host.edit');
+			url.setArgument('hostid', options.hostid);
+
+			configuration.push({
+				label: t('Host'),
+				disabled: !options.isWriteable,
+				url: url.getUrl(),
+				clickCallback: function(e) {
+					e.preventDefault();
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+					view.editHost(options.hostid);
+				}
+			});
+
+			// items
+			url = new Curl('items.php', false);
+			url.setArgument('filter_set', '1');
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('context', 'host');
+
+			configuration.push({
+				label: t('Items'),
+				disabled: !options.isWriteable,
+				url: url.getUrl()
+			});
+
+			// triggers
+			url = new Curl('triggers.php', false);
+			url.setArgument('filter_set', '1');
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('context', 'host');
+
+			configuration.push({
+				label: t('Triggers'),
+				disabled: !options.isWriteable,
+				url: url.getUrl()
+			});
+
+			// graphs
+			url = new Curl('graphs.php', false);
+			url.setArgument('filter_set', '1');
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('context', 'host');
+
+			configuration.push({
+				label: t('Graphs'),
+				disabled: !options.isWriteable,
+				url: url.getUrl()
+			});
+
+			// discovery
+			url = new Curl('host_discovery.php', false);
+			url.setArgument('filter_set', '1');
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('context', 'host');
+
+			configuration.push({
+				label: t('Discovery'),
+				disabled: !options.isWriteable,
+				url: url.getUrl()
+			});
+
+			// web scenario
+			url = new Curl('httpconf.php', false);
+			url.setArgument('filter_set', '1');
+			url.setArgument('filter_hostids[]', options.hostid);
+			url.setArgument('context', 'host');
+
+			configuration.push({
+				label: t('Web'),
+				disabled: !options.isWriteable,
+				url: url.getUrl()
+			});
+
+			sections.push({
+				label: t('Configuration'),
+				items: configuration
 			});
 		}
 	}
 
 	// urls
-	if (typeof options.urls !== 'undefined') {
+	if ('urls' in options) {
 		sections.push({
 			label: t('Links'),
 			items: getMenuPopupURLData(options.urls, trigger_element)
@@ -262,7 +314,7 @@ function getMenuPopupHost(options, trigger_element) {
 	}
 
 	// scripts
-	if (typeof options.scripts !== 'undefined') {
+	if ('scripts' in options) {
 		sections.push({
 			label: t('Scripts'),
 			items: getMenuPopupScriptData(options.scripts, trigger_element, options.hostid)
@@ -400,33 +452,110 @@ function getMenuPopupMapElementGroup(options) {
  * @return array
  */
 function getMenuPopupMapElementTrigger(options) {
-	if (!options.allowed_ui_problems) {
-		return [];
-	}
+	const sections = [];
+	const items = [];
+	let url;
 
-	var sections = [],
-		problems_url = new Curl('zabbix.php', false);
+	if (options.allowed_ui_problems) {
+		url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'problem.view');
+		url.setArgument('filter_name', '');
+		url.setArgument('triggerids', options.triggers.map((value) => value.triggerid));
 
-	problems_url.setArgument('action', 'problem.view');
-	problems_url.setArgument('filter_name', '');
-	problems_url.setArgument('triggerids[]', options.triggerids);
-	if (typeof options.severities !== 'undefined') {
-		problems_url.setArgument('severities[]', options.severities);
-	}
-	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
-		problems_url.setArgument('show_suppressed', '1');
-	}
+		if ('severities' in options) {
+			url.setArgument('severities[]', options.severities);
+		}
 
-	sections.push({
-		label: t('Go to'),
-		items: [{
+		if ('show_suppressed' in options) {
+			url.setArgument('show_suppressed', '1');
+		}
+
+		items.push({
 			label: t('Problems'),
-			url: problems_url.getUrl()
-		}]
-	});
+			disabled: !options.showEvents,
+			url: url.getUrl()
+		});
+	}
+
+	// items problems
+	if (options.allowed_ui_latest_data && options.items.length) {
+		const history = [];
+
+		for (const item of options.items) {
+			url = new Curl('history.php', false);
+			url.setArgument('action', item.params.action);
+			url.setArgument('itemids[]', item.params.itemid);
+
+			history.push({
+				label: item.name,
+				url: url.getUrl()
+			});
+		};
+
+		items.push({
+			label: t('History'),
+			items: history
+		});
+	}
+
+	if (items.length) {
+		sections.push({
+			label: t('View'),
+			items: items
+		});
+	}
+
+	// configuration
+	if (options.allowed_ui_conf_hosts) {
+		const config_urls = [];
+		const trigger_urls = [];
+		const item_urls = [];
+
+		for (const value of options.triggers) {
+			url = new Curl('triggers.php', false);
+			url.setArgument('form', 'update');
+			url.setArgument('triggerid', value.triggerid);
+			url.setArgument('context', 'host');
+
+			trigger_urls.push({
+				label: value.description,
+				url: url.getUrl()
+			});
+		}
+
+		config_urls.push({
+			label: t('Triggers'),
+			items: trigger_urls
+		});
+
+		if (options.items.length) {
+			for (const item of options.items) {
+				url = new Curl('items.php', false);
+				url.setArgument('form', 'update');
+				url.setArgument('itemid', item.params.itemid);
+				url.setArgument('context', 'host');
+
+				item_urls.push({
+					label: item.name,
+					disabled: item.params.is_webitem,
+					url: url.getUrl()
+				});
+			};
+
+			config_urls.push({
+				label: t('Items'),
+				items: item_urls
+			});
+		}
+
+		sections.push({
+			label: t('Configuration'),
+			items: config_urls
+		});
+	}
 
 	// urls
-	if (typeof options.urls !== 'undefined') {
+	if ('urls' in options) {
 		sections.push({
 			label: t('Links'),
 			items: options.urls
@@ -482,7 +611,8 @@ function getMenuPopupDashboard(options, trigger_element) {
 
 		const url_clone = new Curl('zabbix.php', false);
 		url_clone.setArgument('action', 'dashboard.view');
-		url_clone.setArgument('source_dashboardid', options.dashboardid);
+		url_clone.setArgument('dashboardid', options.dashboardid);
+		url_clone.setArgument('clone', '1');
 
 		const url_delete = new Curl('zabbix.php', false);
 		url_delete.setArgument('action', 'dashboard.delete');
@@ -580,94 +710,115 @@ function getMenuPopupDashboard(options, trigger_element) {
  * @return array
  */
 function getMenuPopupTrigger(options, trigger_element) {
-	var sections = [],
-		items = [];
+	const sections = [];
+	const items = [];
+	let url;
 
 	if (options.allowed_ui_problems) {
 		// events
-		var events = {
-			label: t('Problems')
-		};
-
-	if (typeof options.showEvents !== 'undefined' && options.showEvents) {
-		var url = new Curl('zabbix.php', false);
+		url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'problem.view');
 		url.setArgument('filter_name', '');
 		url.setArgument('triggerids[]', options.triggerid);
 
-			events.url = url.getUrl();
-		}
-		else {
-			events.disabled = true;
-		}
-
-		items[items.length] = events;
+		items.push({
+			label: t('Problems'),
+			disabled: !options.showEvents,
+			url: url.getUrl()
+		});
 	}
 
 	// acknowledge
-	if (typeof options.acknowledge !== 'undefined' && options.acknowledge) {
-		items[items.length] = {
+	if ('acknowledge' in options) {
+		items.push({
 			label: t('Acknowledge'),
 			clickCallback: function() {
 				jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
 
 				acknowledgePopUp({eventids: [options.eventid]}, trigger_element);
 			}
+		});
+	}
+
+	// items problems
+	if (options.allowed_ui_latest_data && options.items.length) {
+		const history = [];
+
+		for (const item of options.items) {
+			url = new Curl('history.php', false);
+			url.setArgument('action', item.params.action);
+			url.setArgument('itemids[]', item.params.itemid);
+
+			history.push({
+				label: item.name,
+				url: url.getUrl()
+			});
 		};
+
+		items.push({
+			label: t('History'),
+			items: history
+		});
+	}
+
+	if (items.length) {
+		sections.push({
+			label: t('View'),
+			items: items
+		});
 	}
 
 	// configuration
 	if (options.allowed_ui_conf_hosts) {
-		var url = new Curl('triggers.php', false);
+		const config_urls = [];
+		const item_urls = [];
 
+		url = new Curl('triggers.php', false);
 		url.setArgument('form', 'update');
 		url.setArgument('triggerid', options.triggerid);
 		url.setArgument('context', 'host');
 
-		items[items.length] = {
-			label: t('Configuration'),
+		config_urls.push({
+			label: t('Trigger'),
 			url: url.getUrl()
-		};
-	}
+		});
 
-	if (items.length) {
-		sections[sections.length] = {
-			label: t('S_TRIGGER'),
-			items: items
-		};
+		if (options.items.length) {
+			for (const item of options.items) {
+				url = new Curl('items.php', false);
+				url.setArgument('form', 'update');
+				url.setArgument('itemid', item.params.itemid);
+				url.setArgument('context', 'host');
+
+				item_urls.push({
+					label: item.name,
+					disabled: item.params.is_webitem,
+					url: url.getUrl()
+				});
+			}
+
+			config_urls.push({
+				label: t('Items'),
+				items: item_urls
+			});
+		}
+
+		sections.push({
+			label: t('Configuration'),
+			items: config_urls
+		});
 	}
 
 	// urls
 	if ('urls' in options) {
-		sections[sections.length] = {
+		sections.push({
 			label: t('Links'),
 			items: getMenuPopupURLData(options.urls, trigger_element)
-		};
-	}
-
-	// items
-	if (options.allowed_ui_latest_data && typeof options.items !== 'undefined' && objectSize(options.items) > 0) {
-		var items = [];
-
-		jQuery.each(options.items, function(i, item) {
-			var url = new Curl('history.php', false);
-			url.setArgument('action', item.params.action);
-			url.setArgument('itemids[]', item.params.itemid);
-
-			items[items.length] = {
-				label: item.name,
-				url: url.getUrl()
-			};
 		});
-
-		sections[sections.length] = {
-			label: t('History'),
-			items: items
-		};
 	}
 
 	// scripts
-	if (typeof options.scripts !== 'undefined') {
+	if ('scripts' in options) {
 		sections.push({
 			label: t('Scripts'),
 			items: getMenuPopupScriptData(options.scripts, trigger_element, null, options.eventid)
@@ -691,8 +842,24 @@ function getMenuPopupTrigger(options, trigger_element) {
  * @return array
  */
 function getMenuPopupItem(options) {
+	const sections = [];
+	const actions = [];
 	const items = [];
 	let url;
+
+	// latest data link
+	if (options.allowed_ui_latest_data) {
+		url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'latest.view');
+		url.setArgument('hostids[]', options.hostid);
+		url.setArgument('name', options.name);
+		url.setArgument('filter_name', '');
+
+		items.push({
+			label: t('Latest data'),
+			url: url.getUrl()
+		});
+	}
 
 	url = new Curl('history.php', false);
 	url.setArgument('action', 'showgraph');
@@ -708,32 +875,32 @@ function getMenuPopupItem(options) {
 	url.setArgument('action', 'showvalues');
 	url.setArgument('itemids[]', options.itemid);
 
-	const values = {
+	items.push({
 		label: t('Values'),
-		url: url.getUrl()
-	}
+		url: url.getUrl(),
+		disabled: !options.history && !options.trends
+	});
 
 	url = new Curl('history.php', false);
 	url.setArgument('action', 'showlatest');
 	url.setArgument('itemids[]', options.itemid);
 
-	const latest = {
+	items.push({
 		label: t('500 latest values'),
-		url: url.getUrl()
-	}
+		url: url.getUrl(),
+		disabled: !options.history && !options.trends
+	});
 
-	if (!options.history && !options.trends) {
-		values.disabled = true;
-		latest.disabled = true;
-	}
-
-	items.push(values);
-	items.push(latest);
+	sections.push({
+		label: t('View'),
+		items: items
+	});
 
 	if (options.allowed_ui_conf_hosts) {
-		const config = {
-			label: t('Configuration'),
-			disabled: !options.isWriteable
+		const config_urls = [];
+		const config_triggers = {
+			label: t('Triggers'),
+			disabled: options.triggers.length === 0
 		};
 
 		if (options.isWriteable) {
@@ -741,12 +908,81 @@ function getMenuPopupItem(options) {
 			url.setArgument('form', 'update');
 			url.setArgument('hostid', options.hostid);
 			url.setArgument('itemid', options.itemid);
-			url.setArgument('context', 'host');
+			url.setArgument('backurl', options.backurl);
+			url.setArgument('context', options.context);
 
-			config.url = url.getUrl();
+			config_urls.push({
+				label: t('Item'),
+				url: url.getUrl()
+			});
 		}
 
-		items.push(config);
+		if (options.triggers.length) {
+			const trigger_items = [];
+
+			for (const value of options.triggers) {
+				url = new Curl('triggers.php', false);
+				url.setArgument('form', 'update');
+				url.setArgument('triggerid', value.triggerid);
+				url.setArgument('backurl', options.backurl);
+				url.setArgument('context', options.context);
+
+				trigger_items.push({
+					label: value.description,
+					url: url.getUrl()
+				});
+			}
+
+			config_triggers.items = trigger_items;
+		}
+
+		config_urls.push(config_triggers);
+
+		url = new Curl('triggers.php', false);
+		url.setArgument('form', 'create');
+		url.setArgument('hostid', options.hostid);
+		url.setArgument('description', options.name);
+		url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
+		url.setArgument('backurl', options.backurl);
+		url.setArgument('context', options.context);
+
+		config_urls.push({
+			label: t('Create trigger'),
+			url: url.getUrl()
+		});
+
+		url = new Curl('items.php', false);
+		url.setArgument('form', 'create');
+		url.setArgument('hostid', options.hostid);
+		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
+		url.setArgument('master_itemid', options.itemid);
+		url.setArgument('backurl', options.backurl);
+		url.setArgument('context', options.context);
+
+		config_urls.push({
+			label: t('Create dependent item'),
+			url: url.getUrl(),
+			disabled: options.isDiscovery
+		});
+
+		url = new Curl('host_discovery.php', false);
+		url.setArgument('form', 'create');
+		url.setArgument('hostid', options.hostid);
+		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
+		url.setArgument('master_itemid', options.itemid);
+		url.setArgument('backurl', options.backurl);
+		url.setArgument('context', options.context);
+
+		config_urls.push({
+			label: t('Create dependent discovery rule'),
+			url: url.getUrl(),
+			disabled: options.isDiscovery
+		});
+
+		sections.push({
+			label: t('Configuration'),
+			items: config_urls
+		});
 	}
 
 	const execute = {
@@ -762,118 +998,18 @@ function getMenuPopupItem(options) {
 		};
 	}
 
-	items.push(execute);
+	actions.push(execute);
 
-	return [{
-		label: t('Item'),
-		items: items
-	}];
+	sections.push({
+		label: t('Actions'),
+		items: actions
+	});
+
+	return sections;
 }
 
 /**
- * Get menu popup item log section data.
- *
- * @param string options['backurl']                   Url from where the popup menu was called.
- * @param string options['itemid']
- * @param string options['hostid']
- * @param string options['host']                      Host name.
- * @param string options['name']
- * @param string options['key']                       Item key.
- * @param array  options['triggers']                  (optional)
- * @param string options['triggers'][n]['triggerid']
- * @param string options['triggers'][n]['name']
- * @param bool   options['allowed_ui_latest_data']    Whether user has access to latest data page.
- * @param string options['context']                   Additional parameter in URL to identify main section.
- *
- * @return array
- */
-function getMenuPopupItemConfiguration(options) {
-	const items = [];
-	let url;
-
-	if (options.context === 'host' && options.allowed_ui_latest_data) {
-		url = new Curl('zabbix.php', false);
-		url.setArgument('action', 'latest.view');
-		url.setArgument('hostids[]', options.hostid);
-		url.setArgument('name', options.name);
-		url.setArgument('filter_name', '');
-
-		items.push({
-			label: t('Latest data'),
-			url: url.getUrl()
-		});
-	}
-
-	url = new Curl('triggers.php', false);
-	url.setArgument('form', 'create');
-	url.setArgument('hostid', options.hostid);
-	url.setArgument('description', options.name);
-	url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
-	url.setArgument('context', options.context);
-	url.setArgument('backurl', options.backurl);
-
-	items.push({
-		label: t('Create trigger'),
-		url: url.getUrl()
-	});
-
-	if (options.triggers.length > 0) {
-		const triggers = [];
-
-		jQuery.each(options.triggers, function (i, trigger) {
-			url = new Curl('triggers.php', false);
-			url.setArgument('form', 'update');
-			url.setArgument('triggerid', trigger.triggerid);
-			url.setArgument('context', options.context);
-			url.setArgument('backurl', options.backurl);
-
-			triggers.push({
-				label: trigger.name,
-				url: url.getUrl()
-			});
-		});
-
-		items.push({
-			label: t('Triggers'),
-			items: triggers
-		})
-	}
-
-	url = new Curl('items.php', false);
-	url.setArgument('form', 'create');
-	url.setArgument('hostid', options.hostid);
-	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
-	url.setArgument('master_itemid', options.itemid);
-	url.setArgument('context', options.context);
-
-	items.push({
-		label: t('Create dependent item'),
-		url: url.getUrl(),
-		disabled: !options.create_dependent_item
-	});
-
-	url = new Curl('host_discovery.php', false);
-	url.setArgument('form', 'create');
-	url.setArgument('hostid', options.hostid);
-	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
-	url.setArgument('master_itemid', options.itemid);
-	url.setArgument('context', options.context);
-	url.setArgument('backurl', options.backurl);
-
-	items.push({
-		label: t('Create dependent discovery rule'),
-		url: url.getUrl(),
-		disabled: !options.create_dependent_discovery
-	});
-
-	return [{
-		label: options.name,
-		items: items
-	}];
-}
-
-/**
- * Get menu structure for item prototypess.
+ * Get menu structure for item prototypes.
  *
  * @param array  options['name']
  * @param string options['backurl']                             Url from where the popup menu was called.
@@ -888,9 +1024,50 @@ function getMenuPopupItemConfiguration(options) {
  *
  * @return array
  */
-function getMenuPopupItemPrototypeConfiguration(options) {
-	const items = [];
+function getMenuPopupItemPrototype(options) {
+	const sections = [];
+	const config_urls = [];
+	let config_triggers = {
+		label: t('Trigger prototypes'),
+		disabled: true
+	};
+
 	let url;
+
+	url = new Curl('disc_prototypes.php', false);
+	url.setArgument('form', 'update');
+	url.setArgument('parent_discoveryid', options.parent_discoveryid);
+	url.setArgument('itemid', options.itemid);
+	url.setArgument('context', options.context);
+
+	config_urls.push({
+		label: t('Item prototype'),
+		url: url.getUrl()
+	});
+
+	if (options.trigger_prototypes.length) {
+		const trigger_prototypes = [];
+
+		for (const value of options.trigger_prototypes) {
+			url = new Curl('trigger_prototypes.php', false);
+			url.setArgument('form', 'update');
+			url.setArgument('parent_discoveryid', options.parent_discoveryid);
+			url.setArgument('triggerid', value.triggerid)
+			url.setArgument('context', options.context);
+			url.setArgument('backurl', options.backurl);
+
+			trigger_prototypes.push({
+				label: value.description,
+				url: url.getUrl()
+			});
+		}
+
+		if (trigger_prototypes.length) {
+			config_triggers = {...config_triggers, ...{items: trigger_prototypes, disabled: false}};
+		}
+	}
+
+	config_urls.push(config_triggers);
 
 	url = new Curl('trigger_prototypes.php', false);
 	url.setArgument('parent_discoveryid', options.parent_discoveryid);
@@ -900,33 +1077,10 @@ function getMenuPopupItemPrototypeConfiguration(options) {
 	url.setArgument('context', options.context);
 	url.setArgument('backurl', options.backurl);
 
-	items.push({
+	config_urls.push({
 		label: t('Create trigger prototype'),
 		url: url.getUrl()
 	});
-
-	if (options.trigger_prototypes.length > 0) {
-		const trigger_prototypes = [];
-
-		jQuery.each(options.trigger_prototypes, function (i, trigger) {
-			url = new Curl('trigger_prototypes.php', false);
-			url.setArgument('form', 'update');
-			url.setArgument('parent_discoveryid', options.parent_discoveryid);
-			url.setArgument('triggerid', trigger.triggerid)
-			url.setArgument('context', options.context);
-			url.setArgument('backurl', options.backurl);
-
-			trigger_prototypes.push({
-				label: trigger.name,
-				url: url.getUrl()
-			});
-		});
-
-		items.push({
-			label: t('Trigger prototypes'),
-			items: trigger_prototypes
-		});
-	}
 
 	url = new Curl('disc_prototypes.php', false);
 	url.setArgument('form', 'create');
@@ -935,15 +1089,17 @@ function getMenuPopupItemPrototypeConfiguration(options) {
 	url.setArgument('master_itemid', options.itemid);
 	url.setArgument('context', options.context);
 
-	items.push({
+	config_urls.push({
 		label: t('Create dependent item'),
 		url: url.getUrl()
 	});
 
-	return [{
-		label: options.name,
-		items: items
-	}];
+	sections.push({
+		label: t('Configuration'),
+		items: config_urls
+	});
+
+	return sections;
 }
 
 /**
@@ -1322,7 +1478,8 @@ jQuery(function($) {
 	}
 
 	var defaultOptions = {
-		closeCallback: function(){}
+		closeCallback: function(){},
+		background_layer: true
 	};
 
 	var methods = {
@@ -1383,7 +1540,10 @@ jQuery(function($) {
 
 			$menu_popup.data('menu_popup', options);
 
-			$('.wrapper').append($('<div>', {class: 'menu-popup-overlay'}));
+			if (options.background_layer) {
+				$('.wrapper').append($('<div>', {class: 'menu-popup-overlay'}));
+			}
+
 			$('.wrapper').append($menu_popup);
 
 			// Position the menu (before hiding).
@@ -1400,7 +1560,9 @@ jQuery(function($) {
 			// Need to be postponed.
 			setTimeout(function() {
 				$(document)
-					.on('click', {menu: $menu_popup, opener: $opener}, menuPopupDocumentCloseHandler)
+					.on('click dragstart contextmenu', {menu: $menu_popup, opener: $opener},
+						menuPopupDocumentCloseHandler
+					)
 					.on('keydown', {menu: $menu_popup}, menuPopupKeyDownHandler);
 			});
 
@@ -1419,7 +1581,7 @@ jQuery(function($) {
 				$('[aria-expanded="true"]', menu_popup).attr({'aria-expanded': 'false'});
 
 				$(document)
-					.off('click', menuPopupDocumentCloseHandler)
+					.off('click dragstart contextmenu', menuPopupDocumentCloseHandler)
 					.off('keydown', menuPopupKeyDownHandler);
 
 				var overlay = removeFromOverlaysStack('menu-popup', return_focus);
@@ -1429,7 +1591,10 @@ jQuery(function($) {
 					$(overlay['element']).attr({'aria-expanded': 'false'});
 				}
 
-				menu_popup.prev().remove();
+				if (options.background_layer) {
+					menu_popup.prev().remove();
+				}
+
 				menu_popup.remove();
 
 				// Call menu close callback function.
@@ -1467,14 +1632,26 @@ jQuery(function($) {
 				$('>a', li[0]).addClass('highlighted');
 
 				if (!$('ul', item[0]).is(':visible')) {
-					$('ul:first', item[0]).prev('[role="menuitem"]').attr({'aria-expanded': 'true'});
+					const $submenu = $('ul:first', item[0]);
 
-					$('ul:first', item[0])
-						.css({
+					if ($submenu.length) {
+						const position = {
 							'top': pos.top - 6,
 							'left': pos.left + li.outerWidth() + 14,
-							'display': 'block'
-						});
+						};
+
+						$submenu
+							.css('display' ,'block')
+							.prev('[role="menuitem"]').attr({'aria-expanded': 'true'});
+
+						let max_relative_left = $(window).outerWidth(true) - $submenu.outerWidth(true)
+							- menu[0].getBoundingClientRect().left - 14 * 2;
+
+						position.top = Math.max(0, position.top);
+						position.left = Math.max(0, Math.min(max_relative_left, position.left));
+
+						$submenu.css(position);
+					}
 				}
 			}
 			else {

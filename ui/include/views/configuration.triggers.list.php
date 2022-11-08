@@ -146,7 +146,7 @@ $filter = (new CFilter())
 	->addvar('context', $data['context'], 'filter_context')
 	->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Triggers'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
 		? CDocHelper::DATA_COLLECTION_HOST_TRIGGERS_LIST
@@ -173,10 +173,10 @@ $widget = (new CWidget())
 	);
 
 if ($data['single_selected_hostid'] != 0) {
-	$widget->setNavigation(getHostNavigation('triggers', $data['single_selected_hostid']));
+	$html_page->setNavigation(getHostNavigation('triggers', $data['single_selected_hostid']));
 }
 
-$widget->addItem($filter);
+$html_page->addItem($filter);
 
 $url = (new CUrl('triggers.php'))
 	->setArgument('context', $data['context'])
@@ -370,10 +370,9 @@ $triggers_form->addItem([
 	)
 ]);
 
-// append form to widget
-$widget->addItem($triggers_form);
-
-$widget->show();
+$html_page
+	->addItem($triggers_form)
+	->show();
 
 (new CScriptTag('view.init();'))
 	->setOnDocumentReady()

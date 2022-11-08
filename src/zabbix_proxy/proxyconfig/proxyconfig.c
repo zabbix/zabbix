@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "zbxnix.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 #include "zbxself.h"
 #include "zbxtime.h"
 
@@ -29,19 +29,18 @@
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
 #include "proxyconfigwrite/proxyconfig_write.h"
+#include "zbx_rtc_constants.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 extern zbx_vector_ptr_t	zbx_addrs;
 extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
-		const zbx_config_tls_t *zbx_config_tls)
+		const zbx_config_tls_t *zbx_config_tls, const zbx_thread_info_t *thread_info)
 {
 	zbx_socket_t		sock;
 	struct	zbx_json_parse	jp, jp_kvs_paths = {0};
@@ -71,16 +70,16 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	reserved = j.buffer_size;
 	zbx_json_free(&j);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_IDLE);
 
 	if (FAIL == zbx_connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
 			CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING, zbx_config_tls))	/* retry till have a connection */
 	{
-		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
 		goto out;
 	}
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
 
 	if (SUCCEED != zbx_get_data_from_server(&sock, &buffer, buffer_size, reserved, &error))
 	{
@@ -244,15 +243,15 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_ipc_async_socket_t		rtc;
 	int				sleeptime;
 	zbx_synced_new_config_t		synced = ZBX_SYNCED_NEW_CONFIG_NO;
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
+	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(proxyconfig_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(proxyconfig_args_in->zbx_config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg);
 #endif
@@ -276,7 +275,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 		unsigned char	*rtc_data;
 		int		config_cache_reload = 0;
 
-		while (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
 				config_cache_reload = 1;
@@ -319,7 +318,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-		process_configuration_sync(&data_size, &synced, proxyconfig_args_in->zbx_config_tls);
+		process_configuration_sync(&data_size, &synced, proxyconfig_args_in->zbx_config_tls, info);
 		interval = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL " sec, idle %d sec]",

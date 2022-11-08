@@ -1,0 +1,14 @@
+{
+	"manifest_version": 2.0,
+	"id": "problemhosts",
+	"type": "widget",
+	"name": "Problem hosts",
+	"namespace": "ProblemHosts",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"actions": {
+		"widget.problemhosts.view": {
+			"class": "WidgetView"
+		}
+	}
+}

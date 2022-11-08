@@ -77,7 +77,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		'Trigger disabled with tags' => 'icon-depend-up'
 	];
 
-	/*
+	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
 	 * because it can change.
 	 */
@@ -391,21 +391,6 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 						'Host for suppression' => [
 							'Trigger_for_suppression'
 						],
-						'Host for triggers filtering' => [
-							'Inheritance trigger with tags'
-						]
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Filter triggers by tag with default operator'
-					],
-					'tags' => [
-						['name' => 'server', 'operator' => 'Contains', 'value' => 'sel']
-					],
-					'expected' => [
 						'Host for triggers filtering' => [
 							'Inheritance trigger with tags'
 						]

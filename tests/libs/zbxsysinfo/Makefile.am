@@ -48,7 +48,6 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/proxypoller/libzbxproxypoller.a \
-	$(top_srcdir)/src/zabbix_server/selfmon/libzbxselfmon.a \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_srcdir)/src/zabbix_server/taskmanager/libzbxtaskmanager.a \
 	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
@@ -79,6 +78,7 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
@@ -119,11 +119,11 @@ check_service_test_LDADD = \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
@@ -191,19 +191,19 @@ zbx_execute_agent_check_LDADD = $(COMMON_LIB_FILES) \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a
 
 zbx_execute_agent_check_WRAP_FUNCS = \
-	-Wl,--wrap=SYSTEM_LOCALTIME \
-	-Wl,--wrap=VFS_FILE_SIZE \
-	-Wl,--wrap=VFS_FILE_TIME \
-	-Wl,--wrap=VFS_FILE_EXISTS \
-	-Wl,--wrap=VFS_FILE_CONTENTS \
-	-Wl,--wrap=VFS_FILE_REGMATCH \
-	-Wl,--wrap=VFS_FILE_MD5SUM \
-	-Wl,--wrap=VFS_FILE_CKSUM \
-	-Wl,--wrap=VFS_DIR_SIZE \
-	-Wl,--wrap=NET_DNS \
-	-Wl,--wrap=NET_DNS_RECORD \
-	-Wl,--wrap=NET_TCP_PORT \
-	-Wl,--wrap=SYSTEM_USERS_NUM
+	-Wl,--wrap=system_localtime \
+	-Wl,--wrap=vfs_file_size \
+	-Wl,--wrap=vfs_file_time \
+	-Wl,--wrap=vfs_file_exists \
+	-Wl,--wrap=vfs_file_contents \
+	-Wl,--wrap=vfs_file_regmatch \
+	-Wl,--wrap=vfs_file_md5sum \
+	-Wl,--wrap=vfs_file_cksum \
+	-Wl,--wrap=vfs_dir_size \
+	-Wl,--wrap=net_dns \
+	-Wl,--wrap=net_dns_record \
+	-Wl,--wrap=net_tcp_port \
+	-Wl,--wrap=system_users_num
 
 zbx_execute_agent_check_LDADD += @AGENT_LIBS@
 
@@ -220,9 +220,9 @@ zbx_execute_agent_check_http_SOURCES = \
 zbx_execute_agent_check_http_LDADD = $(COMMON_LIB_FILES)
 
 zbx_execute_agent_check_http_WRAP_FUNCS = \
-	-Wl,--wrap=WEB_PAGE_GET \
-	-Wl,--wrap=WEB_PAGE_PERF \
-	-Wl,--wrap=WEB_PAGE_REGEXP
+	-Wl,--wrap=web_page_get \
+	-Wl,--wrap=web_page_perf \
+	-Wl,--wrap=web_page_regexp
 
 zbx_execute_agent_check_http_LDADD += @AGENT_LIBS@
 
@@ -238,6 +238,7 @@ check_key_access_rules_SOURCES = \
 
 check_key_access_rules_LDADD = $(COMMON_LIB_FILES) \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a
 

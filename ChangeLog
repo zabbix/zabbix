@@ -1,21 +1,61 @@
+Changes for 6.4.0beta3
+
+New features:
+..F....... [ZBXNEXT-7469] simplified creation of dashboard widgets; moved widgets to modules; updated modules framework (ashubin, averza)
+A.F......T [ZBXNEXT-6470,ZBXNEXT-6980] implemented audit logging of item and item prototype API objects (abiba, agriscenko, dgoloscapov, jfreibergs, vmaksimovs)
+.......PS. [ZBXNEXT-8040] added object based json parsing and jsonpath optimizations (wiper)
+.........T [ZBXNEXT-7940] added template OS processes by Zabbix agent (egordymov)
+
+Bug fixes:
+.......PS. [ZBX-21655] fixed VMware datastore discovery to not return same datastore multiple times (asestakovs)
+..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
+..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
+...G...... [ZBX-21689] fixed proc.num to not crash agent on Windows when 'user' parameter is set (asestakovs)
+........S. [ZBX-21463] fixed Zabbix server to not attach interface to script items during linking (arimdjonoks)
+
+--------------------------------------------------------------------------------
 Changes for 6.4.0beta2
 
 New features:
+.......PS. [ZBXNEXT-7953] added VMware tags support for vSphere versions older than 7U2 (asestakovs)
+..F.....S. [ZBXNEXT-7122] added detection of compressed chunks in history or trend tables, and warnings that suggest enabling housekeeping overrides accordingly (dgoloscapov, jfreibergs)
+.........T [ZBXNEXT-8018] added token authentication in Template GitLab by HTTP (atocko)
+..F....... [ZBXNEXT-7512] implemented new context menu for host, item and trigger in the Monitoring section (rlataria)
+..F.....S. [ZBXNEXT-7972] implemented name for trigger URL (dpetra, kprutkovs)
+.......PS. [ZBXNEXT-6401] added new vmware keys vmware.datastore.perfcounter and vmware.hv.diskinfo.get (MVekslers)
+..F....... [ZBXNEXT-8038] improved layout for audit log report utilising two-column layout (kkuzmina)
+.......PS. [ZBXNEXT-7816] added support of PostgreSQL 15 (vso)
+.......PS. [ZBXNEXT-7970] added support of TimescaleDB 2.8 (vso)
+.........T [ZBXNEXT-7902] added templates for Azure MySQL servers (vkhaliev)
 ........S. [ZBXNEXT-7920] improved value cache not to drop items from cache when no new value has arrived in 24 hours (vso)
+.........T [ZBXNEXT-8035] added override for file system discovery trigger in f5 template (knaglis)
 
 Bug fixes:
+..F....... [ZBX-17300] fixed handling of context menu in the Map builder (jfreibergs)
+..F....... [ZBX-21656] fixed clone buttons on template editing form that were not working in Safari 16 (averza)
+..F....... [ZBX-20505] fixed subfilter counters displaying incorrect values in Monitoring => Graph view (rdetlavs)
+........S. [ZBX-21733] improved performance of system information and queue calculation to reduce history syncer locking (vso)
+...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
+.........T [ZBX-21673] fixed read operations per second during preprocessing in Ceph by Zabbix agent 2 template (drasihov)
+.......PS. [ZBX-21724] fixed updating of lastaccess for proxies in availman if active proxy is used (dgoloscapov)
+.........T [ZBX-21582] optimized HPE Synergy template to spread load across preprocessing workers (vkhaliev)
+..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
+..F....... [ZBX-21606] fixed "Allowed hosts" field in HTTP agent item (kkuzmina)
+A......... [ZBX-19224] added ability to unset headers in web scenario (rlataria)
 ........S. [ZBX-21709] fixed database upgrade patch to skip unexpected invalid service downtime instead of failing (vso)
-..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
+..F....... [ZBX-21562] fixed maps not working with elements that contain disabled triggers (rdetlavs)
 ...G...... [ZBX-21637] fixed Zabbix server to rerun auto registration attempt in 120 seconds if host is deleted (vso)
-........S. [ZBX-21537] fixed history syncers being stuck waiting on system information being collected (vso)
+........S. [ZBX-21537] fixed history syncers being stuck while waiting on system information being collected (vso)
 ........S. [ZBX-21025] fixed the allowed argument range limits for char() trigger function (kprutkovs)
-.........T [ZBX-21484] updated documentation for templates SMART by Zabbix agent 2 (atocko)
+.........T [ZBX-21484] updated documentation for SMART templates by Zabbix agent 2 (atocko)
 .......PS. [ZBX-21725] fixed configuration cache shared memory leak when removing vault macros (wiper)
 ........S. [ZBX-21510] made NodeAddress use ListenIP and ListenPort if not explicitly specified (kprutkovs)
 ........S. [ZBX-21706] fixed double precision update patch for TimescaleDb (akozlovs)
 ..F....... [ZBX-19512] fixed debug info block content refresh after changing table content in Monitoring -> Problems page (miks)
 ..F....... [ZBX-21682] removed unnecessary horizontal separator from Host interface (kkuzmina)
 ...G...... [ZBX-21610] fixed problem with sysctl() kern.proc.args API bug on FreeBSD <= 8.2 (ssimonenko)
+.........T [ZBX-21672] fixed event source in mediatypes (egordymov)
+.........T [ZBX-21693] fixed repeated lines in templates (egordymov)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.0beta1
@@ -59,13 +99,49 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
 
 --------------------------------------------------------------------------------
+Changes for 6.2.5rc1
+
+New features:
+.......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
+.........T [ZBXNEXT-7940] added template OS processes by Zabbix agent (egordymov)
+
+Bug fixes:
+.......PS. [ZBX-21655] fixed VMware datastore discovery to not return same datastore multiple times (asestakovs)
+.......P.. [ZBX-21468] fixed synchronization of the "hstgrp" configuration table (jxl)
+..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
+..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
+...G...... [ZBX-21689] fixed proc.num to not crash agent on Windows when 'user' parameter is set (asestakovs)
+
+--------------------------------------------------------------------------------
+Changes for 6.2.4
+
+6.2.4rc1 was released as 6.2.4 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.2.4rc1
 
 New features:
+.......PS. [ZBXNEXT-7953] added VMware tags support for vSphere versions older than 7U2 (asestakovs)
+..F.....S. [ZBXNEXT-7122] added detection of compressed chunks in history or trend tables, and warnings that suggest enabling housekeeping overrides accordingly (dgoloscapov, jfreibergs)
+.........T [ZBXNEXT-8018] added token authentication in Template GitLab by HTTP (atocko)
+.......PS. [ZBXNEXT-6401] added new vmware keys vmware.datastore.perfcounter and vmware.hv.diskinfo.get (MVekslers)
+.......PS. [ZBXNEXT-7816] added support of PostgreSQL 15 (vso)
+.......PS. [ZBXNEXT-7970] added support of TimescaleDB 2.8 (vso)
+.........T [ZBXNEXT-7902] added templates for Azure MySQL servers (vkhaliev)
 A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
-A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
+.........T [ZBXNEXT-8035] added override for file system discovery trigger in f5 template (knaglis)
 
 Bug fixes:
+..F....... [ZBX-17300] fixed handling of context menu in Map builder (jfreibergs)
+..F....... [ZBX-21656] fixed clone buttons not working in Safari 16 on template editing form (averza)
+..F....... [ZBX-20505] fixed subfilter counters displaying incorrect values in Monitoring => Graph view (rdetlavs)
+...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
+.........T [ZBX-21673] fixed read operations per second preprocessing in Ceph by Zabbix agent 2 template (drasihov)
+.......PS. [ZBX-21724] fixed updating of lastaccess for proxies in availman if active proxy is used (dgoloscapov)
+.........T [ZBX-21582] optimized HPE Synergy template to spread load across preprocessing workers (vkhaliev)
+..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
+..F....... [ZBX-21606] fixed "Allowed hosts" field in HTTP agent item (kkuzmina)
+A......... [ZBX-19224] added ability to unset headers in web scenario (rlataria)
 ........S. [ZBX-21709] fixed database upgrade patch to skip unexpected invalid service downtime instead of failing (vso)
 ..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
 ........S. [ZBX-21537] fixed history syncers being stuck waiting on system information being collected (vso)
@@ -94,13 +170,8 @@ A.F....... [ZBX-21097] fixed filtering by "Resource ID" and "Recordset ID" field
 ..F....... [ZBX-21544] fixed value of query field being truncated to the first "=" sign when pressing parse button (agriscenko)
 .........T [ZBX-21581] optimized HPE Primera template to spread the load across preprocessing workers (vkhaliev)
 ........S. [ZBX-21009] fixed double escaping in trigger function upon host autoregistration (kprutkovs)
-.........T [ZBX-21580] optimized HPE MSA 2060 Storage by HTTP template to spread the load across preprocessing workers (drasihov)
-.........T [ZBX-21579] optimized HPE MSA 2040 Storage by HTTP template to spread the load across preprocessing workers (drasihov)
-.........T [ZBX-21421] fixed variable spelling in Kubernetes cluster state by HTTP template (atocko)
-...G...... [ZBX-21466] fixed race condition in Zabbix agent 2 leading to permanently stuck mount reads (arimdjonoks)
-..F....... [ZBX-21544] fixed value of query field being truncated to the first "=" sign when pressing parse button (agriscenko)
-.........T [ZBX-21581] optimized HPE Primera template to spread the load across preprocessing workers (vkhaliev)
-........S. [ZBX-21009] fixed double escaping in trigger function upon host autoregistration (kprutkovs)
+.........T [ZBX-21672] fixed event source in mediatypes (egordymov)
+.........T [ZBX-21693] fixed repeated lines in templates (egordymov)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.3
@@ -478,13 +549,50 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.11rc1
+
+New features:
+.......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
+
+Bug fixes:
+........S. [ZBX-21655] fixed VMware datastore discovery to not return same datastore multiple times (asestakovs)
+..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
+..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.10
+
+6.0.10rc2 was released as 6.0.10 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.10rc2
+
+6.0.10rc2 was released as 6.0.10rc1 including missing templates
+
+--------------------------------------------------------------------------------
 Changes for 6.0.10rc1
 
 New features:
+.........T [ZBXNEXT-8018] added token authentication in Template GitLab by HTTP (atocko)
+..F.....S. [ZBXNEXT-7122] added detection of compressed chunks in history or trend tables, and warnings that suggest enabling housekeeping overrides accordingly (dgoloscapov, jfreibergs)
+.......PS. [ZBXNEXT-7816] added support of PostgreSQL 15 (vso)
+.......PS. [ZBXNEXT-7970] added support of TimescaleDB 2.8 (vso)
+.........T [ZBX-21672] fixed event source in mediatypes (egordymov)
 ..F....... [ZBXNEXT-7567] implemented saving the state of the default filters in monitoring sections (acikuns)
 A.F.I..... [ZBXNEXT-7971] increased max length of the "URL (after login)" field (Sasha)
 
 Bug fixes:
+..F....... [ZBX-17300] fixed handling of context menu in Map builder (jfreibergs)
+.........T [ZBXNEXT-8035] added override for file system discovery trigger in f5 template (knaglis)
+..F....... [ZBX-21656] fixed clone buttons not working in Safari 16 on template editing form (averza)
+..F....... [ZBX-20505] fixed subfilter counters displaying incorrect values in Monitoring => Graph view (rdetlavs)
+...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
+.........T [ZBX-21673] fixed read operations per second preprocessing in Ceph by Zabbix agent 2 template (drasihov)
+..F....... [ZBX-18478] fixed LDAP test button visibility in user authentication form (gcalenko)
+.........T [ZBX-21582] optimized HPE Synergy template to spread load across preprocessing workers (vkhaliev)
+..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
+..F....... [ZBX-21606] fixed "Allowed hosts" field in HTTP agent item (kkuzmina)
+A......... [ZBX-19224] added ability to unset headers in web scenario (rlataria)
 ........S. [ZBX-21709] fixed database upgrade patch to skip unexpected invalid service downtime instead of failing (vso)
 ..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
 ........S. [ZBX-21537] fixed history syncers being stuck waiting on system information being collected (vso)
@@ -2642,11 +2750,38 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.30rc1
+
+New features:
+.......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
+
+Bug fixes:
+.........T [ZBX-21844] fixed script in OPSgenie media (atocko)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.29
+
+5.0.29rc2 was released as 5.0.29 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.29rc2
+
+5.0.29rc2 was released as 5.0.29rc1 including missing templates
+
+--------------------------------------------------------------------------------
 Changes for 5.0.29rc1
 
 New features:
+..F.....S. [ZBXNEXT-7122] added detection of compressed chunks in history or trend tables, and warnings that suggest enabling housekeeping overrides accordingly (dgoloscapov, jfreibergs)
 
 Bug fixes:
+..F....... [ZBX-17300] fixed handling of context menu in Map builder (jfreibergs)
+.........T [ZBXNEXT-8035] added override for file system discovery trigger in f5 template (knaglis)
+...G...... [ZBX-21452] fixed wmi.get* crash of zabbix_agentd for windows (MVekslers)
+.........T [ZBX-21673] fixed read operations per second preprocessing in Ceph by Zabbix agent 2 template (drasihov)
+..F....... [ZBX-18478] fixed LDAP test button visibility in user authentication form (gcalenko)
+..F....... [ZBX-21708] fixed PHP TypeError when opening non-existing dashboard (dpetra)
+A......... [ZBX-19224] added ability to unset headers in web scenario (rlataria)
 ..F....... [ZBX-21562] fixed maps not working with elements having disabled triggers (rdetlavs)
 .........T [ZBX-21484] updated documentation for templates SMART by Zabbix agent 2 (atocko)
 ........S. [ZBX-21537] fixed history syncers being stuck waiting on system information being collected (vso)

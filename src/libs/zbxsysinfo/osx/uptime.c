@@ -18,10 +18,11 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "log.h"
 
-int	SYSTEM_UPTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_uptime(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		mib[] = {CTL_KERN, KERN_BOOTTIME};
 	struct timeval	boottime;

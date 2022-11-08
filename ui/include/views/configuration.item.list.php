@@ -25,7 +25,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Items'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
 		? CDocHelper::DATA_COLLECTION_HOST_ITEM_LIST
@@ -52,10 +52,10 @@ $widget = (new CWidget())
 	);
 
 if ($data['hostid'] != 0) {
-	$widget->setNavigation(getHostNavigation('items', $data['hostid']));
+	$html_page->setNavigation(getHostNavigation('items', $data['hostid']));
 }
 
-$widget->addItem(new CPartial('configuration.filter.items', [
+$html_page->addItem(new CPartial('configuration.filter.items', [
 	'filter_data' => $data['filter_data'],
 	'subfilter' => $data['subfilter'],
 	'context' => $data['context']
@@ -237,7 +237,7 @@ foreach ($data['items'] as $item) {
 
 	$wizard = (new CButton(null))
 		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
-		->setMenuPopup(CMenuPopupHelper::getItemConfiguration([
+		->setMenuPopup(CMenuPopupHelper::getItem([
 			'itemid' => $item['itemid'],
 			'context' => $data['context'],
 			'backurl' => $backurl
@@ -343,10 +343,9 @@ $itemForm->addItem([$itemTable, $data['paging'], new CActionButtonList('action',
 	$data['checkbox_hash']
 )]);
 
-// Append form to widget.
-$widget->addItem($itemForm);
-
-$widget->show();
+$html_page
+	->addItem($itemForm)
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
