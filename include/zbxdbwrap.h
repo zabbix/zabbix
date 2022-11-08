@@ -21,7 +21,7 @@
 #define ZABBIX_DBWRAP_H
 
 #include "zbxdbhigh.h"
-#include "zbxcachehistory.h"
+#include "zbxcacheconfig.h"
 
 #define ZBX_PROXYMODE_ACTIVE	0
 #define ZBX_PROXYMODE_PASSIVE	1
