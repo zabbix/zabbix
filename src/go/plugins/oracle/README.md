@@ -88,7 +88,9 @@ Examples of valid URIs:
 #### Using keys' parameters
 The common parameters for all keys are: [ConnString][,User][,Password][,Service] 
 Where ConnString can be either a URI or a session name.   
-ConnString will be treated as a URI if no session with the given name is found.  
+ConnString will be treated as a URI if no session with the given name is found.
+User can contain sysdba, sysoper, sysasm privileges. It must be used with `as` as a separator
+e.g `user as sysdba`, privilege can be upper or lowercase, and must be at the end of username string.
 If you use ConnString as a session name, just skip the rest of the connection parameters.  
  
 #### Using named sessions

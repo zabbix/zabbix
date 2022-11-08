@@ -185,7 +185,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(uri uri.URI) (*OraConn, error) {
+func (c *ConnManager) create(uri uri.URI, privilege string) (*OraConn, error) {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -210,6 +210,13 @@ func (c *ConnManager) create(uri uri.URI) (*OraConn, error) {
 		`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
 		uri.Host(), uri.Port(), service, c.connectTimeout/time.Second)
 
+	connParams, err := getConnParams(privilege)
+	if err != nil {
+		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
+	}
+
+	fmt.Println("conp", connParams)
+
 	connector := godror.NewConnector(godror.ConnectionParams{
 		StandaloneConnection: true,
 		CommonParams: godror.CommonParams{
@@ -217,6 +224,7 @@ func (c *ConnManager) create(uri uri.URI) (*OraConn, error) {
 			ConnectString: connectString,
 			Password:      godror.NewPassword(uri.Password()),
 		},
+		ConnParams: connParams,
 	})
 
 	client := sql.OpenDB(connector)
@@ -255,14 +263,14 @@ func (c *ConnManager) get(uri uri.URI) *OraConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI) (conn *OraConn, err error) {
+func (c *ConnManager) GetConnection(uri uri.URI, privilege string) (conn *OraConn, err error) {
 	c.Lock()
 	defer c.Unlock()
 
 	conn = c.get(uri)
 
 	if conn == nil {
-		conn, err = c.create(uri)
+		conn, err = c.create(uri, privilege)
 	}
 
 	if err != nil {
@@ -271,6 +279,23 @@ func (c *ConnManager) GetConnection(uri uri.URI) (conn *OraConn, err error) {
 		} else {
 			err = zbxerr.ErrorConnectionFailed.Wrap(err)
 		}
+	}
+
+	return
+}
+
+func getConnParams(privilege string) (out godror.ConnParams, err error) {
+	switch privilege {
+	case "sysdba":
+		out.IsSysDBA = true
+	case "sysoper":
+		out.IsSysOper = true
+	case "sysasm":
+		out.IsSysASM = true
+	case "":
+	default:
+		err = fmt.Errorf("incorrect privilege, %s", privilege)
+		return
 	}
 
 	return
