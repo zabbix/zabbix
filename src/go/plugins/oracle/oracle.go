@@ -21,8 +21,10 @@ package oracle
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"zabbix.com/pkg/uri"
@@ -51,7 +53,6 @@ var impl Plugin
 
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (result interface{}, err error) {
-
 	params, extraParams, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
 		return nil, err
@@ -59,7 +60,12 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 	service := url.QueryEscape(params["Service"])
 
-	uri, err := uri.NewWithCreds(params["URI"]+"?service="+service, params["User"], params["Password"], uriDefaults)
+	user, privilege, err := splitUserPrivilege(params)
+	if err != nil {
+		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
+	}
+
+	uri, err := uri.NewWithCreds(params["URI"]+"?service="+service, user, params["Password"], uriDefaults)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +75,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(*uri)
+	conn, err := p.connMgr.GetConnection(*uri, privilege)
 	if err != nil {
 		// Special logic of processing connection errors should be used if oracle.ping is requested
 		// because it must return pingFailed if any error occurred.
@@ -116,4 +122,28 @@ func (p *Plugin) Start() {
 func (p *Plugin) Stop() {
 	p.connMgr.Destroy()
 	p.connMgr = nil
+}
+
+func splitUserPrivilege(params map[string]string) (user, privilege string, err error) {
+	var ok bool
+	user, ok = params["User"]
+	if !ok {
+		return "", "", errors.New("missing parameter 'User'")
+	}
+
+	var trim int
+
+	switch true {
+	case strings.HasSuffix(strings.ToLower(user), " as sysdba"):
+		privilege = "sysdba"
+		trim = 10
+	case strings.HasSuffix(strings.ToLower(user), " as sysoper"):
+		privilege = "sysoper"
+		trim = 11
+	case strings.HasSuffix(strings.ToLower(user), " as sysasm"):
+		privilege = "sysasm"
+		trim = 10
+	}
+
+	return user[:len(user)-trim], privilege, nil
 }
