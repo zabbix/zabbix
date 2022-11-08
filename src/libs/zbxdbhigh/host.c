@@ -3672,9 +3672,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 				zbx_audit_host_prototype_update_json_add_interfaces(host_prototype->hostid,
 						interface->interfaceid, interface->main, interface->type,
 						interface->useip, interface->ip, interface->dns, atoi(interface->port));
-			}
-			else
-			{
+
 				if (INTERFACE_TYPE_SNMP == interface->type)
 				{
 					zbx_db_insert_add_values(&db_insert_snmp, interface->interfaceid,
