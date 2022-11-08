@@ -29,7 +29,7 @@ require_once __DIR__.'/js/common.template.edit.js.php';
 $host_prototype = $data['host_prototype'];
 $parent_host = $data['parent_host'];
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Host prototypes'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_PROTOTYPE_EDIT))
 	->setNavigation(getHostNavigation('hosts', $data['discovery_rule']['hostid'], $data['discovery_rule']['itemid']));
@@ -48,7 +48,7 @@ $url = (new CUrl('host_prototypes.php'))
 $form = (new CForm('post', $url))
 	->setId('host-prototype-form')
 	->setName('hostPrototypeForm')
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', getRequest('form', 1))
 	->addVar('parent_discoveryid', $data['discovery_rule']['itemid'])
 	->addVar('tls_accept', $parent_host['tls_accept'])
@@ -449,6 +449,7 @@ else {
 }
 
 $form->addItem($tabs);
-$widget->addItem($form);
 
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

@@ -37,19 +37,9 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'triggerid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']],
-	'eventid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']],
-	// Ajax
-	'widget' =>		[T_ZBX_STR, O_OPT, P_ACT,	IN('"'.WIDGET_HAT_EVENTACTIONS.'","'.WIDGET_HAT_EVENTLIST.'"'), null],
-	'state' =>		[T_ZBX_INT, O_OPT, P_ACT,	IN('0,1'), null]
+	'eventid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']]
 ];
 check_fields($fields);
-
-/*
- * Ajax
- */
-if (hasRequest('widget') && hasRequest('state')) {
-	CProfile::update('web.tr_events.hats.'.getRequest('widget').'.state', getRequest('state'), PROFILE_TYPE_INT);
-}
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
@@ -171,35 +161,36 @@ require_once dirname(__FILE__).'/include/views/js/tr_events.js.php';
 
 $event_tab = (new CDiv([
 	new CDiv([
-		(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger, $event['eventid'])))
-			->setHeader(_('Trigger details')),
-		(new CUiWidget(WIDGET_HAT_EVENTDETAILS, make_event_details($event, $allowed)))
-			->setHeader(_('Event details'))
+		(new CSection(make_trigger_details($trigger, $event['eventid'])))
+			->setId(SECTION_HAT_TRIGGERDETAILS)
+			->setHeader(new CTag('h4', true, _('Trigger details'))),
+		(new CSection(make_event_details($event, $allowed)))
+			->setId(SECTION_HAT_EVENTDETAILS)
+			->setHeader(new CTag('h4', true, _('Event details')))
 	]),
 	new CDiv([
-		(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONS,
-			makeEventDetailsActionsTable($actions, $users, $mediatypes)
-		))
-			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state', true))
-			->setHeader(_('Actions'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONS.'.state')
-			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FLUID),
-		(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST, make_small_eventlist($event, $allowed)))
-			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state', true))
-			->setHeader(_('Event list [previous 20]'), [], 'web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state')
-			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FLUID)
+		(new CSectionCollapsible(makeEventDetailsActionsTable($actions, $users, $mediatypes)))
+			->setId(SECTION_HAT_EVENTACTIONS)
+			->setHeader(new CTag('h4', true, _('Actions')))
+			->setProfileIdx('web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state')
+			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state', true)),
+		(new CSectionCollapsible(make_small_eventlist($event, $allowed)))
+			->setId(SECTION_HAT_EVENTLIST)
+			->setHeader(new CTag('h4', true, _('Event list [previous 20]')))
+			->setProfileIdx('web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state')
+			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state', true))
 	])
 ]))
 	->addClass(ZBX_STYLE_COLUMNS)
 	->addClass(ZBX_STYLE_COLUMNS_2);
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Event details'))
 	->setWebLayoutMode($page['web_layout_mode'])
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::TR_EVENTS))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())
-				->addItem(get_icon('kioskmode', ['mode' => $page['web_layout_mode']]))
+			(new CList())->addItem(get_icon('kioskmode', ['mode' => $page['web_layout_mode']]))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($event_tab)

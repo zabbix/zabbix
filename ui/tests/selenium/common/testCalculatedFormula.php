@@ -3453,7 +3453,7 @@ class testCalculatedFormula extends CWebTest {
 
 		$this->page->login()->open($this->url)->waitUntilReady();
 		$form = $this->query('name:itemForm')->asForm()->waitUntilVisible()->one();
-		$key = 'calc'.microtime(true);
+		$key = 'calc'.microtime(true).'[{#KEY}]';
 
 		$form->fill([
 			'Name' => 'Calc',

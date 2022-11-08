@@ -1,8 +1,16 @@
 Changes for 6.4.0beta3
 
 New features:
+..F....... [ZBXNEXT-7469] simplified creation of dashboard widgets; moved widgets to modules; updated modules framework (ashubin, averza)
+A.F......T [ZBXNEXT-6470,ZBXNEXT-6980] implemented audit logging of item and item prototype API objects (abiba, agriscenko, dgoloscapov, jfreibergs, vmaksimovs)
+.......PS. [ZBXNEXT-8040] added object based json parsing and jsonpath optimizations (wiper)
+.........T [ZBXNEXT-7940] added template OS processes by Zabbix agent (egordymov)
 
 Bug fixes:
+.......PS. [ZBX-21655] fixed VMware datastore discovery to not return same datastore multiple times (asestakovs)
+..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
+..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
+...G...... [ZBX-21689] fixed proc.num to not crash agent on Windows when 'user' parameter is set (asestakovs)
 ........S. [ZBX-21463] fixed Zabbix server to not attach interface to script items during linking (arimdjonoks)
 
 --------------------------------------------------------------------------------
@@ -89,6 +97,25 @@ A.F.....S. [ZBXNEXT-3496] added ability to add own links to Host and Event conte
 ..F....... [ZBXNEXT-7832] renamed setting "Dynamic item" to "Enable host selection" for URL, Plain text, Graph prototype, Item value, Graph classic widgets (agavriluks)
 .D.G...PS. [ZBXNEXT-7852] added incremental active check refresh for active agents (vso)
 ..F....PS. [ZBXNEXT-6406] removed requirement of host interface for server-originated checks (agavriluks, gcalenko, kprutkovs)
+
+--------------------------------------------------------------------------------
+Changes for 6.2.5rc1
+
+New features:
+.......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
+.........T [ZBXNEXT-7940] added template OS processes by Zabbix agent (egordymov)
+
+Bug fixes:
+.......PS. [ZBX-21655] fixed VMware datastore discovery to not return same datastore multiple times (asestakovs)
+.......P.. [ZBX-21468] fixed synchronization of the "hstgrp" configuration table (jxl)
+..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
+..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
+...G...... [ZBX-21689] fixed proc.num to not crash agent on Windows when 'user' parameter is set (asestakovs)
+
+--------------------------------------------------------------------------------
+Changes for 6.2.4
+
+6.2.4rc1 was released as 6.2.4 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.2.4rc1
@@ -520,6 +547,22 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.11rc1
+
+New features:
+.......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
+
+Bug fixes:
+........S. [ZBX-21655] fixed VMware datastore discovery to not return same datastore multiple times (asestakovs)
+..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
+..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.10
+
+6.0.10rc2 was released as 6.0.10 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.10rc2
@@ -2705,6 +2748,20 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.30rc1
+
+New features:
+.......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
+
+Bug fixes:
+.........T [ZBX-21844] fixed script in OPSgenie media (atocko)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.29
+
+5.0.29rc2 was released as 5.0.29 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.29rc2

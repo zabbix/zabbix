@@ -30,8 +30,10 @@ $browser-sprite-path: '../img/browser-sprite.png?20220722';
 
 @import "components/buttons";
 @import "components/color-picker";
+@import "components/columns-wrapper";
 @import "components/dashboard/dashboard";
 @import "components/dashboard/widget-clock";
+@import "components/dashboard/widget-inaccessible";
 @import "components/dashboard/widget-item";
 @import "components/dashboard/widget-slareport";
 @import "components/dashboard/widget-svggraph";
@@ -45,6 +47,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20220722';
 @import "components/message-box";
 @import "components/radio-list-control";
 @import "components/range-control";
+@import "components/section";
 @import "components/service/info";
 @import "components/subfilter";
 @import "components/svg-graph";
@@ -2616,10 +2619,10 @@ $var-icons: (
 }
 
 $trigger-expression-tree-icons: (
-	top-bottom: url($sprite-path) no-repeat -84px -300px,
-	top-bottom-right: url($sprite-path) no-repeat -84px -334px,
-	top-right: url($sprite-path) no-repeat -84px -372px,
-	empty: url($sprite-path) no-repeat -84px -350px
+	top-bottom: -84px -300px,
+	top-bottom-right: -84px -334px,
+	top-right: -84px -372px,
+	empty: -84px -350px
 );
 
 %trigger-expression-tree-icons-common {
@@ -3082,7 +3085,7 @@ $form-icon-btn: (
 		margin: 0 10px;
 
 		.dashboard-widget-head {
-			margin-bottom: 14px;
+			margin-bottom: 12px;
 
 			.icon-doc-link {
 				margin-right: -26px;
@@ -3101,10 +3104,14 @@ $form-icon-btn: (
 			width: 100%;
 			max-height: calc(100vh - 220px);
 			max-width: inherit;
-			margin: 0 -10px 10px;
+			margin: 0 -10px 8px;
 			padding: 0 10px;
 			position: relative;
 			@extend %webkit-scrollbar;
+
+			> form {
+				padding: 2px 0;
+			}
 
 			.table-forms {
 				.table-forms-td-right {
@@ -3738,23 +3745,6 @@ $form-icon-btn: (
 	stroke-opacity: .35;
 	stroke: $red;
 	stroke-width: 2px;
-}
-
-.svg-graph-preview {
-	margin-top: 10px;
-	min-width: 1120px;
-	height: 300px;
-	position: relative;
-
-	> div {
-		background: $ui-bg-color;
-		height: 300px;
-		position: absolute;
-		left: 0;
-		right: 0;
-		top: 0;
-		z-index: 3; // More than z-index of form controls, less than z-index of .msg-*.
-	}
 }
 
 .svg-graph-hintbox {
@@ -4727,73 +4717,6 @@ svg {
 	word-break: break-word;
 }
 
-.overrides-list {
-	display: table;
-	width: 90%;
-	max-width: 738px;
-	padding-left: 15px;
-
-	.overrides-list-item {
-		display: table-row;
-
-		.btn-remove {
-			position: relative;
-			right: -73px;
-			top: 3px;
-		}
-	}
-}
-
-.overrides-options-list {
-	white-space: normal;
-	padding: 5px 0 8px;
-	margin-bottom: 10px;
-	border-bottom: 1px solid $table-border-color;
-
-	> li {
-		display: inline-block;
-		margin: 2px 7px 2px 0;
-		white-space: nowrap;
-		vertical-align: middle;
-
-		> div {
-			position: relative;
-			padding: 1px 18px 1px 1px;
-			background-color: $ui-bg-selected-color;
-			border-radius: 2px;
-
-			> span {
-				color: lighten($ui-bg-selected-color, 100%);
-				padding-left: 8px;
-				line-height: 22px;
-			}
-
-			> input[type=text] {
-				border-style: none;
-				line-height: 22px;
-				min-height: 22px;
-				width: 85px;
-			}
-
-			> .subfilter-disable-btn {
-				position: absolute;
-				right: 0;
-				top: 0;
-				min-height: 24px;
-			}
-		}
-	}
-
-	.color-picker {
-		.color-picker-preview {
-			margin: 1px;
-			width: 20px;
-			min-height: 20px;
-			background-position: -323px -411px;
-		}
-	}
-}
-
 .list-accordion-foot {
 	> div {
 		display: table-cell;
@@ -4868,75 +4791,6 @@ svg {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		line-height: 24px;
-	}
-}
-
-.columns-wrapper {
-	$column-count: (2, 3);
-	$column-size: (
-		5: 5%,
-		10: 10%,
-		15: 15%,
-		20: 20%,
-		33: 33.33333%,
-		35: 35%,
-		40: 40%,
-		50: 50%,
-		75: 75%,
-		90: 90%,
-		95: 95%
-	);
-
-	display: flex;
-	flex-wrap: wrap;
-	align-items: start;
-
-	&.columns-nowrap {
-		flex-wrap: nowrap;
-	}
-
-	// Dynamically generated classes for the columns count:
-	//  .columns-2
-	//  .columns-3
-	@each $count in $column-count {
-		&.columns-#{$count} > {
-			div,
-			li {
-				display: block;
-				flex: 0 0 (100% / $count);
-				max-width: (100% / $count);
-			}
-		}
-	}
-
-	// Dynamically generated classes for the column width:
-	//  .column-5
-	//  .column-10
-	//  .column-15
-	//  .column-20
-	//  .column-33
-	//  .column-35
-	//  .column-40
-	//  .column-50
-	//  .column-75
-	//  .column-90
-	//  .column-95
-	@each $class, $width in $column-size {
-		.column-#{$class} {
-			flex: 0 0 $width;
-			max-width: $width;
-		}
-	}
-
-	.column-center {
-		display: flex;
-		justify-content: center;
-		text-align: center;
-	}
-
-	.column-middle {
-		display: flex;
-		align-items: center;
 	}
 }
 

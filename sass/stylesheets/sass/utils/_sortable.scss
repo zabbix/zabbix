@@ -9,8 +9,14 @@
 
 		@if $ui-transitions {
 			transition: left .2s, top .2s;
+		}
+	}
 
-			.sortable-item:not(.sortable-dragging) {
+	.sortable-item {
+		box-sizing: border-box;
+
+		@if $ui-transitions {
+			&:not(.sortable-dragging) {
 				transition: left .2s, top .2s;
 			}
 		}

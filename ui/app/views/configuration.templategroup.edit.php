@@ -48,7 +48,7 @@ $data += [
 		]
 ];
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(($data['groupid'] == 0) ? _('New template group') : _('Template group'))
 	->addItem(new CPartial('configuration.templategroup.edit.html', $data))
 	->show();
