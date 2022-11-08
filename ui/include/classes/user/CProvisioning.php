@@ -223,7 +223,6 @@ class CProvisioning {
 	 */
 	public function getUserMedias(array $idp_user, bool $case_sensitive = true): array {
 		$user_medias = [];
-		$attributes = array_column($this->userdirectory['provision_media'], null, 'mediatypeid');
 		$idp_user_lowercased = [];
 
 		if (!$case_sensitive) {
@@ -232,13 +231,13 @@ class CProvisioning {
 			}
 		}
 
-		foreach ($attributes as $mediatypeid => $idp_attributes) {
+		foreach ($this->userdirectory['provision_media'] as $idp_attributes) {
 			$idp_field = $idp_attributes['attribute'];
 
 			if (array_key_exists($idp_field, $idp_user)) {
 				$user_medias[] = [
 					'name' => $idp_attributes['name'],
-					'mediatypeid' => $mediatypeid,
+					'mediatypeid' => $idp_attributes['mediatypeid'],
 					'sendto' =>	[$idp_user[$idp_field]]
 				];
 
@@ -250,7 +249,7 @@ class CProvisioning {
 			if (array_key_exists($idp_field, $idp_user_lowercased)) {
 				$user_medias[] = [
 					'name' => $idp_attributes['name'],
-					'mediatypeid' => $mediatypeid,
+					'mediatypeid' => $idp_attributes['mediatypeid'],
 					'sendto' =>	[$idp_user_lowercased[$idp_field]]
 				];
 			}
