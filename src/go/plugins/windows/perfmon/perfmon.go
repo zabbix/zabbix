@@ -102,13 +102,11 @@ func (p *Plugin) Collect() (err error) {
 		return
 	}
 
-	if p.collectError = win32.PdhCollectQueryData(p.query); p.collectError != nil {
-		return p.collectError
-	}
+	err = win32.PdhCollectQueryData(p.query)
 
 	expireTime := time.Now().Add(-maxInactivityPeriod)
 	for index, c := range p.counters {
-		if c.lastAccess.Before(expireTime) {
+		if c.lastAccess.Before(expireTime) || nil != err {
 			if cerr := win32.PdhRemoveCounter(c.handle); cerr != nil {
 				p.Debugf("error while removing counter '%s': %s", index.path, cerr)
 			}
@@ -262,10 +260,6 @@ func (p *Plugin) Start() {
 }
 
 func (p *Plugin) Stop() {
-	p.counters = make(map[perfCounterIndex]*perfCounter)
-
-	_ = win32.PdhCloseQuery(p.query)
-	p.query = 0
 }
 
 func init() {
