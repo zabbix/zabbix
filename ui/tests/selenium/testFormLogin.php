@@ -22,14 +22,25 @@
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
+/**
+ * @dataSource LoginUsers
+ */
 class testFormLogin extends CWebTest {
 
 	public static function getLoginLogoutData() {
 		return [
 			[
 				[
+					'login' => 'LDAP user',
+					'password' => 'zabbix12345',
+					'expected' => TEST_BAD,
+					'error_message' => 'Cannot bind anonymously to LDAP server.'
+				]
+			],
+			[
+				[
 					'login' => 'disabled-user',
-					'password' => 'zabbix',
+					'password' => 'zabbix12345',
 					'expected' => TEST_BAD,
 					'error_message' => 'No permissions for system access.'
 				]
@@ -37,7 +48,7 @@ class testFormLogin extends CWebTest {
 			[
 				[
 					'login' => 'no-access-to-the-frontend',
-					'password' => 'zabbix',
+					'password' => 'zabbix12345',
 					'expected' => TEST_BAD,
 					'error_message' => 'GUI access disabled.'
 				]
@@ -147,7 +158,7 @@ class testFormLogin extends CWebTest {
 
 		// Account is blocked, waiting 30 sec and trying to login.
 		sleep(30);
-		$this->page->userLogin($user, 'zabbix');
+		$this->page->userLogin($user, 'zabbix12345');
 		$this->page->assertHeader('Global view');
 		$this->assertStringContainsString('5 failed login attempts logged.', $this->query('class:msg-bad')
 				->waitUntilVisible()->one()->getText());

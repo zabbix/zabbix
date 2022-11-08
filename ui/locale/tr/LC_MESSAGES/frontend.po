@@ -12906,6 +12906,10 @@ msgstr "Göstergenin yalnızca son %%20'si görüntüleniyor."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Yalnızca etkin ana makinelere atanmış ve etkin öğelere bağımlılığı olan tetikler sayıldı"
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:430
 msgid "Opera"
 msgstr "Opera"
@@ -16933,6 +16937,16 @@ msgstr "Bu ekran sütunu boş değil. Silinsin mi?"
 #: include/classes/screens/CScreenBuilder.php:559
 msgid "This screen row is not empty. Delete it?"
 msgstr "Bu ekran satırı boş değil. Silinsin mi?"
+
+#: app/views/administration.housekeeping.edit.php:134
+#: include/blocks.inc.php:714
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:164
+#: include/blocks.inc.php:730
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr ""
 
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"

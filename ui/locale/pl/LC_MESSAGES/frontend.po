@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2022-09-02 08:02+0000\n"
-"Last-Translator: Paweł Seledec <pawel.seledec@zetosoftware.pl>\n"
+"PO-Revision-Date: 2022-10-27 16:28+0000\n"
+"Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -13015,6 +13015,10 @@ msgstr "Wyświetlane jest tylko ostatnie 20%% wskaźników."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Liczone są tylko wyzwalacze przypisane do włączonych hostów w zależności od włączonych pozycji"
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr "Otwórz dziennik"
+
 #: include/httptest.inc.php:430
 msgid "Opera"
 msgstr "Opera"
@@ -17046,6 +17050,16 @@ msgstr "Ta kolumna ekranu nie jest pusta. Usunąć ją?"
 #: include/classes/screens/CScreenBuilder.php:559
 msgid "This screen row is not empty. Delete it?"
 msgstr "Ten wiersz ekranu nie jest pusty. Usunąć go?"
+
+#: app/views/administration.housekeeping.edit.php:134
+#: include/blocks.inc.php:714
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr "To ustawienie powinno być włączone, ponieważ tabele historii zawierają skompresowane dane."
+
+#: app/views/administration.housekeeping.edit.php:164
+#: include/blocks.inc.php:730
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr "To ustawienie powinno być włączone, ponieważ tabele trendu zawierają skompresowane dane."
 
 #: include/func.inc.php:2592 srv_status.php:39
 msgid "This week"

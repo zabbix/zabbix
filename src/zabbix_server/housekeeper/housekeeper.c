@@ -34,6 +34,10 @@
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
+#if defined(HAVE_POSTGRESQL)
+extern int	ZBX_TSDB_VERSION;
+#endif
+
 static int	hk_period;
 
 #define HK_INITIAL_DELETE_QUEUE_SIZE	4096
@@ -606,6 +610,43 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 #endif
 }
 
+#if defined(HAVE_POSTGRESQL)
+static int hk_history_has_compressed_chunks(void)
+{
+	const char	*table_list;
+
+	table_list = (1 == ZBX_DB_TSDB_V1 ? ZBX_TSDB1_HISTORY_TABLES : ZBX_TSDB2_HISTORY_TABLES);
+
+	return zbx_tsdb_table_has_compressed_chunks(table_list);
+}
+
+static int hk_trends_has_compressed_chunks(void)
+{
+	const char	*table_list;
+
+	table_list = (1 == ZBX_DB_TSDB_V1 ? ZBX_TSDB1_TRENDS_TABLES : ZBX_TSDB2_TRENDS_TABLES);
+
+	return zbx_tsdb_table_has_compressed_chunks(table_list);
+}
+
+static void	hk_tsdb_check_config()
+{
+	if (cfg.hk.history_global == ZBX_HK_OPTION_DISABLED && cfg.hk.history_mode == ZBX_HK_OPTION_ENABLED &&
+		SUCCEED == hk_history_has_compressed_chunks())
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Incorrect configuration. Override item history period is disabled, but "
+				"historical data is compressed. Housekeeper may skip deleting this data.");
+	}
+
+	if (cfg.hk.trends_global == ZBX_HK_OPTION_DISABLED && cfg.hk.trends_mode == ZBX_HK_OPTION_ENABLED &&
+			SUCCEED == hk_trends_has_compressed_chunks())
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Incorrect configuration. Override item trends period is disabled, but "
+				"trends data is compressed. Housekeeper may skip deleting this data.");
+	}
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: housekeeping_history_and_trends                                  *
@@ -621,11 +662,15 @@ static int	housekeeping_history_and_trends(int now)
 {
 	int			deleted = 0, i, rc;
 	zbx_hk_history_rule_t	*rule;
+#if defined(HAVE_POSTGRESQL)
+	int			ignore_history = 0, ignore_trends = 0;
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
 	/* prepare delete queues for all history housekeeping rules */
 	hk_history_delete_queue_prepare_all(hk_history_rules, now);
+
 
 	/* Loop through the history rules. Each rule is a history table (such as history_log, trends_uint, etc) */
 	/* we need to clear records from */
@@ -644,6 +689,47 @@ static int	housekeeping_history_and_trends(int now)
 			continue;
 		}
 
+#if defined(HAVE_POSTGRESQL)
+		if (ZBX_TSDB_VERSION > 0)
+		{
+			if (0 == strcmp(rule->history, "history"))
+			{
+				if (1 == ignore_history)
+				{
+					hk_history_release(rule);
+					continue;
+				}
+
+				if (SUCCEED == hk_history_has_compressed_chunks())
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Unable to perform housekeeping for history "
+							"tables due to having compressed chunks and disabled item history period override.");
+
+					ignore_history = 1;
+					hk_history_release(rule);
+					continue;
+				}
+			}
+			else if (0 == strcmp(rule->history, "trends"))
+			{
+				if (1 == ignore_trends)
+				{
+					hk_history_release(rule);
+					continue;
+				}
+
+				if (SUCCEED == hk_trends_has_compressed_chunks())
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Unable to perform housekeeping for trends "
+							"tables due to having compressed chunks and disabled item trends period override.");
+
+					ignore_trends = 1;
+					hk_history_release(rule);
+					continue;
+				}
+			}
+		}
+#endif
 		/* process delete queue for the housekeeping rule */
 
 		zbx_vector_ptr_sort(&rule->delete_queue, hk_item_update_cache_compare);
@@ -1154,6 +1240,16 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	hk_history_compression_init();
 
 	zbx_set_sigusr_handler(zbx_housekeeper_sigusr_handler);
+
+#if defined(HAVE_POSTGRESQL)
+	if (ZBX_TSDB_VERSION > 0)
+	{
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
+		hk_tsdb_check_config();
+		DBclose();
+	}
+#endif
 
 	while (ZBX_IS_RUNNING())
 	{
