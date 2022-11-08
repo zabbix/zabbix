@@ -78,7 +78,6 @@
 											(fields[i]).disabled = false;
 										}
 									}
-									console.log(document.getElementById('tab_http'));
 									document.getElementById('http_auth_enabled').checked = true;
 								}
 							}
