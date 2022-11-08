@@ -1142,6 +1142,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM actions',
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=action.list&eventsource=0',
 					'case' => 'action create'
 				]
@@ -1151,6 +1152,7 @@ class testSID extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM actions',
+					'access_denied' => true,
 					'link' => 'zabbix.php?action=action.list&eventsource=0',
 					'case' => 'action update'
 				]
