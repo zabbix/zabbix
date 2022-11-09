@@ -273,19 +273,19 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: check if the lld data passes filter evaluation by and rule        *
- *                                                                            *
- * Parameters: filter          - [IN] the lld filter                          *
- *             jp_row          - [IN] the lld data row                        *
- *             lld_macro_paths - [IN] use json path to extract from jp_row    *
- *             info            - [OUT] the warning description                *
- *                                                                            *
- * Return value: SUCCEED - the lld data passed filter evaluation              *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
+/****************************************************************************************
+ *                                                                                      *
+ * Purpose: check if the lld data passes filter evaluation by and/or/andor rules        *
+ *                                                                                      *
+ * Parameters: filter          - [IN] the lld filter                                    *
+ *             jp_row          - [IN] the lld data row                                  *
+ *             lld_macro_paths - [IN] use json path to extract from jp_row              *
+ *             info            - [OUT] the warning description                          *
+ *                                                                                      *
+ * Return value: SUCCEED - the lld data passed filter evaluation                        *
+ *               FAIL    - otherwise                                                    *
+ *                                                                                      *
+ ****************************************************************************************/
 static int	filter_evaluate_and_or_andor(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **info)
 {
