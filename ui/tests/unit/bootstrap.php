@@ -73,5 +73,6 @@ $autoloader->addNamespace('', [
 	__DIR__.'/include/classes/import/converters',
 	__DIR__.'/include/classes/include/classes/vaults'
 ]);
-$autoloader->addNamespace('Core', [__DIR__.'/../../include/classes/core']);
+$autoloader->addNamespace('Zabbix\\Core', [__DIR__.'/../../include/classes/core']);
+$autoloader->addNamespace('Zabbix\\Widgets', [__DIR__.'/../../include/classes/widgets']);
 $autoloader->register();

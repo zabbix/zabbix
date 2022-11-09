@@ -18,12 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../include/CWebTest.php';
 require_once dirname(__FILE__).'/common/testFormPreprocessing.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
- * @backup services
+ * @dataSource Services
+ * @dataSource EntitiesTags
+ *
  * @backup profiles
  */
 class testFormTabIndicators extends CWebTest {
@@ -804,27 +807,6 @@ class testFormTabIndicators extends CWebTest {
 		$this->assertTabIndicator($tab_selector, false);
 	}
 
-	/**
-	 * Function used to create services for dependencies indicator test.
-	 */
-	public function prepareServiceData() {
-		CDataHelper::call('service.create', [
-			[
-				'name' => 'Service 1',
-				'algorithm' => 0,
-				'sortorder' => 0
-			],
-			[
-				'name' => 'Service 2',
-				'algorithm' => 0,
-				'sortorder' => 0
-			]
-		]);
-	}
-
-	/**
-	 * @onBeforeOnce prepareServiceData
-	 */
 	public function testFormTabIndicators_CheckServiceIndicators() {
 		$this->page->login()->open('zabbix.php?action=service.list.edit')->waitUntilReady();
 
@@ -843,7 +825,7 @@ class testFormTabIndicators extends CWebTest {
 		$overlay->query('id:serviceid_all')->asCheckbox()->one()->check();
 		$overlay->query('button:Select')->one()->click();
 		$overlay->waitUntilNotVisible();
-		$this->assertTabIndicator($tab_selector, 2);
+		$this->assertTabIndicator($tab_selector, CDBHelper::getCount('SELECT null FROM services'));
 
 		// Remove all child services and check count indicator.
 		$child_services_tab->query('button:Remove')->all()->click();

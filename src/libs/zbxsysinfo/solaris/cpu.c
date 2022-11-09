@@ -19,12 +19,13 @@
 
 #include "zbxsysinfo.h"
 #include "zbx_sysinfo_kstat.h"
+#include "../sysinfo.h"
 
 #include "stats.h"
 #include "log.h"
 #include "zbxnum.h"
 
-int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*tmp;
 	int	name;
@@ -59,7 +60,7 @@ int	SYSTEM_CPU_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*tmp;
 	int	cpu_num, state, mode;
@@ -156,7 +157,7 @@ close:
 }
 #endif
 
-int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*tmp;
 	double	value;
@@ -247,7 +248,7 @@ int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	kstat_ctl_t	*kc;
 	kstat_t		*k;
@@ -289,7 +290,7 @@ int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_cpu_intr(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	kstat_ctl_t	*kc;
 	kstat_t		*k;

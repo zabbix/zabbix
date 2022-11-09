@@ -72,7 +72,7 @@ class testPageTriggerUrl extends CWebTest {
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
 						'Trigger' => 'triggers.php?form=update&triggerid=100032&context=host',
 						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
-						'Trigger URL' => 'tr_events.php?triggerid=100032&eventid=9000',
+						'URL name for menu' => 'tr_events.php?triggerid=100032&eventid=9000',
 						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101'
 					],
 					'background' => 'na-bg'

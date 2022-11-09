@@ -341,7 +341,6 @@ typedef struct
 }
 zbx_vmware_resourcepool_t;
 
-int	vmware_resourcepool_compare_id(const void *r1, const void *r2);
 ZBX_PTR_VECTOR_DECL(vmware_resourcepool, zbx_vmware_resourcepool_t *)
 
 /* the vmware eventlog state */
@@ -498,7 +497,7 @@ typedef struct
 	/* the vmware service instance version numeric */
 	unsigned short			major_version;
 	unsigned short			minor_version;
-	unsigned short			patch_version;
+	unsigned short			update_version;
 
 	/* the vmware service instance fullname */
 	char				*fullname;

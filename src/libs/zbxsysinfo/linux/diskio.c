@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "zbxjson.h"
 #include "zbxstr.h"
@@ -285,12 +286,12 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_DEV_READ(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return vfs_dev_rw(request, result, ZBX_DEV_READ);
 }
 
-int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return vfs_dev_rw(request, result, ZBX_DEV_WRITE);
 }
@@ -298,7 +299,7 @@ int	VFS_DEV_WRITE(AGENT_REQUEST *request, AGENT_RESULT *result)
 /* SCSI device type CD/DVD-ROM. http://en.wikipedia.org/wiki/SCSI_Peripheral_Device_Type */
 #define SCSI_TYPE_ROM			0x05
 
-int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define DEVTYPE_STR	"DEVTYPE="
 #define DEVTYPE_STR_LEN	ZBX_CONST_STRLEN(DEVTYPE_STR)
@@ -356,6 +357,8 @@ int	VFS_DEV_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 						zbx_fclose(f);
 					}
+					else
+						continue;
 
 					if (0 == devtype_found)
 					{

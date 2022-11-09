@@ -25,7 +25,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.trigger.prototype.list.js.php';
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Trigger prototypes'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
 		? CDocHelper::DATA_COLLECTION_HOST_TRIGGER_PROTOTYPE_LIST
@@ -226,7 +226,6 @@ $triggersForm->addItem([
 	)
 ]);
 
-// append form to widget
-$widget->addItem($triggersForm);
-
-$widget->show();
+$html_page
+	->addItem($triggersForm)
+	->show();

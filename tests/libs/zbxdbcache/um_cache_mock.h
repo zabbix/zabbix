@@ -20,8 +20,8 @@
 #ifndef ZABBIX_UM_CACHE_MOCK_H
 #define ZABBIX_UM_CACHE_MOCK_H
 
-#include "zbxdbcache/dbconfig.h"
-#include "zbxdbcache/dbsync.h"
+#include "zbxcacheconfig/dbconfig.h"
+#include "zbxcacheconfig/dbsync.h"
 
 typedef struct
 {

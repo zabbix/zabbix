@@ -39,7 +39,7 @@ if ($data['action'] === 'problem.view') {
 		uncheckTableRows('problem');
 	}
 
-	$widget = (new CWidget())
+	$html_page = (new CHtmlPage())
 		->setTitle(_('Problems'))
 		->setWebLayoutMode($web_layout_mode)
 		->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_PROBLEMS_VIEW))
@@ -66,14 +66,14 @@ if ($data['action'] === 'problem.view') {
 
 		// Set javascript options for tab filter initialization in monitoring.problem.view.js.php file.
 		$data['filter_options'] = $filter->options;
-		$widget->addItem($filter);
+		$html_page->addItem($filter);
 	}
 	else {
 		$data['filter_options'] = null;
 	}
 
 	$this->includeJsFile('monitoring.problem.view.js.php', $data);
-	$widget
+	$html_page
 		->addItem(new CPartial('monitoring.problem.view.html', array_intersect_key($data,
 			array_flip(['page', 'action', 'sort', 'sortorder', 'filter', 'tabfilter_idx'])
 		)))

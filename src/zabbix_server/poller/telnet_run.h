@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TELNET_RUN_H
 #define ZABBIX_TELNET_RUN_H
 
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 int	telnet_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding);
 

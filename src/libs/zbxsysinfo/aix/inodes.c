@@ -65,8 +65,8 @@ int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree,
 	}
 	else if (NULL != mode && (0 == strcmp(mode, "pfree") || 0 == strcmp(mode, "pused")))
 	{
-		*error = zbx_strdup(NULL, "Cannot calculate percentage because total is zero.");
-		return SYSINFO_RET_FAIL;
+		*pfree = 100.0;
+		*pused = 0.0;
 	}
 
 	return SYSINFO_RET_OK;
@@ -74,7 +74,7 @@ int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree,
 #undef ZBX_FFREE
 }
 
-static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_fs_inode_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*fsname, *mode, *error;
 	zbx_uint64_t		total, free, used;
@@ -130,7 +130,7 @@ static int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_execute_threaded_metric(vfs_fs_inode, request, result);
+	return zbx_execute_threaded_metric(vfs_fs_inode_local, request, result);
 }

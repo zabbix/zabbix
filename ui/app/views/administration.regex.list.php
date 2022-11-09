@@ -27,7 +27,7 @@ if ($data['uncheck']) {
 	uncheckTableRows('regex');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Regular expressions'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_REGEX_LIST))
@@ -82,4 +82,4 @@ $form->addItem([
 	], 'regex')
 ]);
 
-$widget->addItem($form)->show();
+$html_page->addItem($form)->show();

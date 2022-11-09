@@ -47,7 +47,7 @@ extern char	*CONFIG_USER;
 void	load_aliases(char **lines);
 int	load_user_parameters(char **lines, char **err);
 int	load_key_access_rule(const char *value, const struct cfg_line *cfg);
-void	reload_user_parameters(unsigned char process_type, int process_num);
+void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file);
 #ifdef _WINDOWS
 void	load_perf_counters(const char **def_lines, const char **eng_lines);
 #endif

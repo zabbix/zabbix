@@ -78,7 +78,7 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'description' => 'testInheritanceTriggerPrototype5',
-					'expression' => 'last(/Inheritance test template/item-discovery-prototype)<0'
+					'expression' => 'last(/Inheritance test template/item-discovery-prototype[{#KEY}])<0'
 				]
 			],
 			[

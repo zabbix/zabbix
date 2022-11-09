@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "hardware.h"
 #include "zbxsysinfo.h"
+#include "hardware.h"
 #include "../common/zbxsysinfo_common.h"
+#include "../sysinfo.h"
 
 #include "zbxalgo.h"
 #include "zbxregexp.h"
@@ -290,7 +291,7 @@ close:
 	return ret;
 }
 
-int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_hw_chassis(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*mode, buf[MAX_STRING_LEN];
 	int	ret = SYSINFO_RET_FAIL;
@@ -391,7 +392,7 @@ static size_t	print_freq(char *buffer, size_t size, int filter, int cpu, zbx_uin
 	return offset;
 }
 
-int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret = SYSINFO_RET_FAIL, filter, cpu, cur_cpu = -1, offset = 0;
 	zbx_uint64_t	maxfreq = ZBX_MAX_UINT64, curfreq = ZBX_MAX_UINT64;
@@ -495,7 +496,12 @@ int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 				filter))
 		{
 			ret = SYSINFO_RET_OK;
-			sscanf(tmp, ZBX_FS_UI64, &curfreq);
+			if (1 != sscanf(tmp, ZBX_FS_UI64, &curfreq))
+			{
+				zbx_fclose(f);
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain CPU frequency."));
+				return SYSINFO_RET_FAIL;
+			}
 		}
 	}
 
@@ -515,7 +521,7 @@ int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_hw_devices(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*type;
 
@@ -528,9 +534,9 @@ int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	type = get_rparam(request, 0);
 
 	if (NULL == type || '\0' == *type || 0 == strcmp(type, "pci"))
-		return EXECUTE_STR("lspci", result);	/* list PCI devices by default */
+		return execute_str("lspci", result);	/* list PCI devices by default */
 	else if (0 == strcmp(type, "usb"))
-		return EXECUTE_STR("lsusb", result);
+		return execute_str("lsusb", result);
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
@@ -538,7 +544,7 @@ int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 }
 
-int	SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_hw_macaddr(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	size_t			offset;
 	int			s, i, show_names;
