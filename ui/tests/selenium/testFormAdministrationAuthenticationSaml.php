@@ -54,7 +54,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 						'Username attribute' => 'UA',
 						'SP entity ID' => 'SP'
 					],
-					'error' => 'Incorrect value for field "saml_idp_entityid": cannot be empty.'
+					'error' => 'Incorrect value for field "idp_entityid": cannot be empty.'
 				]
 			],
 			// Missing SSO service URL
@@ -66,7 +66,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 						'Username attribute' => 'UA',
 						'SP entity ID' => 'SP'
 					],
-					'error' => 'Incorrect value for field "saml_sso_url": cannot be empty.'
+					'error' => 'Incorrect value for field "sso_url": cannot be empty.'
 				]
 			],
 			// Missing Username attribute
@@ -78,7 +78,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 						'IdP entity ID' => 'IdP',
 						'SP entity ID' => 'SP'
 					],
-					'error' => 'Incorrect value for field "saml_username_attribute": cannot be empty.'
+					'error' => 'Incorrect value for field "username_attribute": cannot be empty.'
 				]
 			],
 			// Missing SP entity ID
@@ -90,7 +90,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 						'IdP entity ID' => 'IdP',
 						'Username attribute' => 'UA'
 					],
-					'error' => 'Incorrect value for field "saml_sp_entityid": cannot be empty.'
+					'error' => 'Incorrect value for field "sp_entityid": cannot be empty.'
 				]
 			],
 			// Configure SAML with only
@@ -147,11 +147,11 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 					],
 					'db_check' => [
 						'saml_auth_enabled' => '1',
-						'saml_idp_entityid' => 'IdP_saml_zabbix.com',
-						'saml_sso_url' => 'SSO_saml_zabbix.com',
+						'idp_entityid' => 'IdP_saml_zabbix.com',
+						'sso_url' => 'SSO_saml_zabbix.com',
 						'saml_slo_url' => 'SLO_saml_zabbix.com',
-						'saml_username_attribute' => 'Username attribute',
-						'saml_sp_entityid' => 'SP entity ID',
+						'username_attribute' => 'Username attribute',
+						'sp_entityid' => 'SP entity ID',
 						'saml_nameid_format' => 'SP name ID format',
 						'saml_sign_messages' => '1',
 						'saml_sign_assertions' => '1',
@@ -194,8 +194,8 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 			}
 			$form->checkValue($data['fields']);
 			if (array_key_exists('db_check', $data)) {
-				$sql = 'SELECT saml_auth_enabled, saml_idp_entityid, saml_sso_url, saml_slo_url, saml_username_attribute,'.
-						' saml_sp_entityid, saml_nameid_format, saml_sign_messages, saml_sign_assertions,'.
+				$sql = 'SELECT saml_auth_enabled, idp_entityid, sso_url, saml_slo_url, username_attribute,'.
+						' sp_entityid, saml_nameid_format, saml_sign_messages, saml_sign_assertions,'.
 						' saml_sign_authn_requests, saml_sign_logout_requests, saml_sign_logout_responses,'.
 						' saml_encrypt_nameid, saml_encrypt_assertions, saml_case_sensitive'.
 						' FROM config';
