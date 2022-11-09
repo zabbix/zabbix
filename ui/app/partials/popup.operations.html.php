@@ -84,13 +84,21 @@ if ($data['table'] === 'operation') {
 				);
 		}
 
-		// todo: add all data to rows
-		// todo : fix if two or three types of data
-
-		$details_column = new CCol([
-			new CTag('b', true, $operation['details']['type'][0]),
-			implode(' ', $operation['details']['data'][0])
-		]);
+		if (count($operation['details']['type']) > 1) {
+			foreach ($operation['details']['type'] as $id => $type) {
+				$details[] = [
+					new CTag('b', true, $type), implode(' ', $operation['details']['data'][$id]), BR()
+				];
+				$details_column = $details;
+			}
+			unset($details);
+		}
+		else {
+			$details_column = new CCol([
+				new CTag('b', true, $operation['details']['type'][0]),
+				implode(' ', $operation['details']['data'][0])
+			]);
+		}
 
 		$hidden_data = array_filter($operation, function ($key) {
 			return !in_array($key, [
@@ -179,6 +187,7 @@ elseif ($data['table'] === 'recovery') {
 		if ($operations) {
 			foreach ($operations as $operationid => $operation) {
 				// todo : add check for allowed operations
+
 				if (!isset($operation['opconditions'])) {
 					$operation['opconditions'] = [];
 				}
@@ -200,11 +209,22 @@ elseif ($data['table'] === 'recovery') {
 					}
 				}
 
-				$details_column = new CCol([
-					// todo : fix if two or three types of data
-					new CTag('b', true, $operation['details']['type'][0]),
-					implode(' ', $operation['details']['data'][0])
-				]);
+				if (count($operation['details']['type']) > 1) {
+					foreach ($operation['details']['type'] as $id => $type) {
+						$details[] = [
+							new CTag('b', true, $type), implode(' ', $operation['details']['data'][$id]), BR()
+						];
+						$details_column = $details;
+					}
+					unset($details);
+				}
+				else {
+					$details_column = new CCol([
+						new CTag('b', true, $operation['details']['type'][0]),
+						implode(' ', $operation['details']['data'][0])
+					]);
+				}
+
 
 				$hidden_data = array_filter($operation, function ($key) {
 					return !in_array($key, [
@@ -287,7 +307,7 @@ elseif ($data['table'] === 'update') {
 				$operation += [
 					'opconditions' => []
 				];
-				// $details = new CSpan($operation_descriptions[0][$operationid]);
+
 				$operation_for_popup = array_merge($operation, ['id' => $operationid]);
 				foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
 					if (array_key_exists($var, $operation_for_popup)) {
@@ -295,12 +315,21 @@ elseif ($data['table'] === 'update') {
 					}
 				}
 
-				$details_column = new CCol([
-					// todo : fix if two or three types of data
-					new CTag('b', true, $operation['details']['type'][0]),
-					implode(' ', $operation['details']['data'][0])
-
-				]);
+				if (count($operation['details']['type']) > 1) {
+					foreach ($operation['details']['type'] as $id => $type) {
+						$details[] = [
+							new CTag('b', true, $type), implode(' ', $operation['details']['data'][$id]), BR()
+						];
+						$details_column = $details;
+					}
+					unset($details);
+				}
+				else {
+					$details_column = new CCol([
+						new CTag('b', true, $operation['details']['type'][0]),
+						implode(' ', $operation['details']['data'][0])
+					]);
+				}
 
 				$hidden_data = array_filter($operation, function ($key) {
 					return !in_array($key, [
