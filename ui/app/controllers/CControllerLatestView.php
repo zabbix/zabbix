@@ -200,6 +200,7 @@ class CControllerLatestView extends CControllerLatest {
 			'sort_order' => $sort_order,
 			'view_curl' => $view_url,
 			'paging' => $paging,
+			'uncheck' => $this->hasInput('filter_reset'),
 			'config' => [
 				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
 				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),

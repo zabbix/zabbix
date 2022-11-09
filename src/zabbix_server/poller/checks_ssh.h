@@ -24,7 +24,7 @@
 #include "config.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result);
 #endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH)*/

@@ -25,7 +25,10 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
+ * @dataSource ScheduledReports, ExecuteNowAction
+ *
  * @backup role
+ *
  * @onBefore prepareRoleData
  * @dataSource LoginUsers, ExecuteNowAction
  */
@@ -144,8 +147,8 @@ class testPageUserRoles extends CWebTest {
 			],
 			[
 				'Name' => 'Admin role',
-				'#' => 'Users 2',
-				'Users' => 'admin-zabbix, http-auth-admin'
+				'#' => 'Users 4',
+				'Users' => 'admin-zabbix, admin user for testFormScheduledReport, http-auth-admin, user-recipient of the report'
 			],
 			[
 				'Name' => 'Guest role',

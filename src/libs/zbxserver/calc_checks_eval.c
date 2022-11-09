@@ -20,7 +20,7 @@
 #include "zbxserver.h"
 
 #include "log.h"
-#include "valuecache.h"
+#include "zbxcachevalue.h"
 #include "evalfunc.h"
 #include "zbxeval.h"
 #include "expression.h"

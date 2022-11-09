@@ -18,9 +18,9 @@
 **/
 
 #include "proxydata.h"
-#include "proxy.h"
 
-#include "zbxdbhigh.h"
+#include "zbxdbwrap.h"
+#include "zbxcachehistory.h"
 #include "log.h"
 #include "zbxtasks.h"
 #include "zbxmutexs.h"

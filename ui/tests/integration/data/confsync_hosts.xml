@@ -191,6 +191,7 @@
                     <name>Hostname</name>
                     <key>agent.hostname</key>
                     <trends>0</trends>
+		    <delay>15s</delay>
                     <value_type>CHAR</value_type>
                     <inventory_link>NAME</inventory_link>
                     <interface_ref>if1</interface_ref>
@@ -271,11 +272,11 @@
                         <item_prototype>
                             <name>ItemProto</name>
                             <type>CALCULATED</type>
-                            <key>proto</key>
+                            <key>proto[{#X}]</key>
                             <params>1</params>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>last(/HostWithDiscovery/proto)=1</expression>
+                                    <expression>last(/HostWithDiscovery/proto[{#X}])=1</expression>
                                     <name>TriggerPrototype</name>
                                     <priority>DISASTER</priority>
                                     <manual_close>YES</manual_close>

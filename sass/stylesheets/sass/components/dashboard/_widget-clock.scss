@@ -1,39 +1,40 @@
 // Widget configuration.
 
 form.dashboard-widget-clock {
-	.fields-group-date,
-	.fields-group-time,
-	.fields-group-tzone {
-		display: grid;
-		grid-template-columns: 60px 120px repeat(2, minmax(60px, max-content) auto);
-		align-items: center;
-		column-gap: 10px;
-		row-gap: 5px;
+	.fields-group {
+		&.fields-group-date,
+		&.fields-group-time,
+		&.fields-group-tzone {
+			display: grid;
+			grid-template-columns: 60px 120px repeat(2, minmax(60px, max-content) auto);
+			align-items: center;
+			column-gap: 10px;
+			row-gap: 5px;
 
-		label {
-			text-align: right;
-		}
+			label {
+				text-align: right;
+			}
 
-		.field-size {
-			input {
-				margin-right: 5px;
+			.field-size {
+				input {
+					margin-right: 5px;
+				}
 			}
 		}
-	}
 
-	.fields-group-time {
-		.field-format {
-			grid-column: 4 / -1;
-		}
-	}
-
-	.fields-group-tzone {
-		.field-format {
-			grid-column: 2 / -1;
+		&.fields-group-time {
+			.field-format {
+				grid-column: 4 / -1;
+			}
 		}
 
-		.field-timezone {
-			grid-column: 2 / -1;
+		&.fields-group-tzone {
+			.form-field {
+				&.field-tzone-timezone,
+				&.field-tzone-format {
+					grid-column: 2 / -1;
+				}
+			}
 		}
 	}
 }
@@ -41,7 +42,7 @@ form.dashboard-widget-clock {
 // Widget view.
 
 div.dashboard-widget-clock {
-	&.clock-digital {
+	.clock-digital {
 		$line-height: 1.14;
 
 		box-sizing: border-box;

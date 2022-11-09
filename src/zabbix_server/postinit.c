@@ -24,7 +24,8 @@
 #include "zbxtasks.h"
 #include "log.h"
 #include "zbxnum.h"
-#include "valuecache.h"
+#include "zbxcachevalue.h"
+#include "zbxdbwrap.h"
 
 #define ZBX_HIST_MACRO_NONE		(-1)
 #define ZBX_HIST_MACRO_ITEM_VALUE	0

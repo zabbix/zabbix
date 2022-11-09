@@ -415,7 +415,8 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array|null $hostids
 	 * @param bool       $clear
 	 */
-	protected static function unlinkTemplatesObjects(array $templateids, array $hostids = null, bool $clear = false): void {
+	protected static function unlinkTemplatesObjects(array $templateids, array $hostids = null,
+			bool $clear = false): void {
 		$flags = ($clear)
 			? [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE]
 			: [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_PROTOTYPE];
@@ -584,220 +585,15 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// items, discovery rules
-		$upd_items = [
-			ZBX_FLAG_DISCOVERY_NORMAL => [],
-			ZBX_FLAG_DISCOVERY_RULE => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
-		];
-		$parent_itemids = [];
-		$item_prototypeids = [];
-
-		$sqlFrom = ' items i1,items i2,hosts h';
-		$sqlWhere = ' i2.itemid=i1.templateid'.
-			' AND '.dbConditionInt('i2.hostid', $templateids).
-			' AND '.dbConditionInt('i1.flags', $flags).
-			' AND h.hostid=i1.hostid';
-
-		if (!is_null($hostids)) {
-			$sqlWhere .= ' AND '.dbConditionInt('i1.hostid', $hostids);
+		if ($clear) {
+			CDiscoveryRule::clearTemplateObjects($templateids, $hostids);
+			CItem::clearTemplateObjects($templateids, $hostids);
+			CHttpTest::clearTemplateObjects($templateids, $hostids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,h.status as host_status,i1.type,i1.valuemapid'.
-			' FROM '.$sqlFrom.
-			' WHERE '.$sqlWhere;
-
-		$dbItems = DBSelect($sql);
-
-		while ($item = DBfetch($dbItems)) {
-			if ($clear) {
-				$upd_items[$item['flags']][$item['itemid']] = true;
-			}
-			else {
-				$upd_item = ['templateid' => 0];
-				if ($item['host_status'] == HOST_STATUS_TEMPLATE && $item['type'] != ITEM_TYPE_HTTPTEST) {
-					$upd_item['uuid'] = generateUuidV4();
-				}
-
-				if ($item['valuemapid'] !== '0') {
-					$upd_item['valuemapid'] = '0';
-
-					if ($item['host_status'] == HOST_STATUS_TEMPLATE) {
-						$parent_itemids[] = $item['itemid'];
-					}
-					elseif ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$item_prototypeids[] = $item['itemid'];
-					}
-				}
-
-				$upd_items[$item['flags']][$item['itemid']] = [
-					'values' => $upd_item,
-					'where' => ['itemid' => $item['itemid']]
-				];
-			}
-		}
-
-		if ($upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
-			if ($clear) {
-				CDiscoveryRuleManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]));
-			}
-			else {
-				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_RULE]);
-			}
-		}
-
-		if ($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]) {
-			if ($clear) {
-				CItemManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]));
-			}
-			else {
-				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
-			}
-		}
-
-		if ($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
-			if ($clear) {
-				CItemPrototypeManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
-			}
-			else {
-				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
-			}
-		}
-
-		if ($parent_itemids) {
-			$child_upd_items = [];
-
-			while ($parent_itemids) {
-				$result = DBselect(
-					'SELECT i.itemid,i.flags,h.status AS host_status'.
-					' FROM items i,hosts h'.
-					' WHERE i.hostid=h.hostid'.
-						' AND '.dbConditionId('i.templateid', $parent_itemids)
-				);
-
-				$parent_itemids = [];
-
-				while ($row = DBfetch($result)) {
-					$parent_itemids[] = $row['itemid'];
-
-					$child_upd_items[] = [
-						'values' => ['valuemapid' => '0'],
-						'where' => ['itemid' => $row['itemid']]
-					];
-
-					if (in_array($row['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
-							&& $row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$item_prototypeids[] = $row['itemid'];
-					}
-				}
-			}
-
-			if ($child_upd_items) {
-				DB::update('items', $child_upd_items);
-			}
-		}
-
-		if ($item_prototypeids) {
-			$options = [
-				'output' => ['itemid'],
-				'filter' => ['parent_itemid' => $item_prototypeids],
-				'sortfield' => ['itemid'],
-				'sortorder' => [ZBX_SORT_DOWN]
-			];
-			$result = DBselect(DB::makeSql('item_discovery', $options));
-
-			$upd_discovered_items = [];
-
-			while ($row = DBfetch($result)) {
-				$upd_discovered_items[] = [
-					'values' => ['valuemapid' => '0'],
-					'where' => ['itemid' => $row['itemid']]
-				];
-			}
-
-			if ($upd_discovered_items) {
-				DB::update('items', $upd_discovered_items);
-			}
-		}
-
-		// host prototypes
-		if (!$clear && $upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
-			$host_prototypes = DBSelect(
-				'SELECT DISTINCT h.hostid,h3.status as host_status'.
-				' FROM hosts h'.
-					' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
-					' INNER JOIN hosts h2 ON h.templateid=h2.hostid'.
-					' INNER JOIN host_discovery hd2 ON h.hostid=hd.hostid'.
-					' INNER JOIN items i ON hd.parent_itemid=i.itemid'.
-					' INNER JOIN hosts h3 ON i.hostid=h3.hostid'.
-				' WHERE '.dbConditionInt('hd.parent_itemid', array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]))
-			);
-
-			$upd_host_prototypes = [];
-
-			while ($host_prototype = DBfetch($host_prototypes)) {
-				$upd_host_prototype = ['templateid' => 0];
-				if ($host_prototype['host_status'] == HOST_STATUS_TEMPLATE) {
-					$upd_host_prototype['uuid'] = generateUuidV4();
-				}
-
-				$upd_host_prototypes[$host_prototype['hostid']] = [
-					'values' => $upd_host_prototype,
-					'where' => ['hostid' => $host_prototype['hostid']]
-				];
-			}
-
-			if ($upd_host_prototypes) {
-				DB::update('hosts', $upd_host_prototypes);
-				DB::update('group_prototype', [
-					'values' => ['templateid' => 0],
-					'where' => ['hostid' => array_keys($upd_host_prototypes)]
-				]);
-			}
-		}
-
-		// http tests
-		$upd_httptests = [];
-
-		$sqlWhere = '';
-		if ($hostids !== null) {
-			$sqlWhere = ' AND '.dbConditionInt('ht1.hostid', $hostids);
-		}
-		$sql = 'SELECT DISTINCT ht1.httptestid,h.status as host_status'.
-				' FROM httptest ht1,httptest ht2,hosts h'.
-				' WHERE ht1.templateid=ht2.httptestid'.
-					' AND ht1.hostid=h.hostid'.
-					' AND '.dbConditionInt('ht2.hostid', $templateids).
-				$sqlWhere;
-
-		$httptests = DBSelect($sql);
-
-		while ($httptest = DBfetch($httptests)) {
-			if ($clear) {
-				$upd_httptests[$httptest['httptestid']] = true;
-			}
-			else {
-				$upd_httptest = ['templateid' => 0];
-				if ($httptest['host_status'] == HOST_STATUS_TEMPLATE) {
-					$upd_httptest['uuid'] = generateUuidV4();
-				}
-
-				$upd_httptests[$httptest['httptestid']] = [
-					'values' => $upd_httptest,
-					'where' => ['httptestid' => $httptest['httptestid']]
-				];
-			}
-		}
-
-		if ($upd_httptests) {
-			if ($clear) {
-				$result = API::HttpTest()->delete(array_keys($upd_httptests), true);
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear Web scenarios.'));
-				}
-			}
-			else {
-				DB::update('httptest', $upd_httptests);
-			}
+		else {
+			CDiscoveryRule::unlinkTemplateObjects($templateids, $hostids);
+			CItem::unlinkTemplateObjects($templateids, $hostids);
+			CHttpTest::unlinkTemplateObjects($templateids, $hostids);
 		}
 	}
 
@@ -819,11 +615,11 @@ abstract class CHostGeneral extends CHostBase {
 			Manager::HttpTest()->link($templateid, $hostids);
 		}
 
-		API::Item()->syncTemplates($link_request);
+		CItem::linkTemplateObjects($templateids, $hostids);
 		$ruleids = API::DiscoveryRule()->syncTemplates($templateids, $hostids);
 
 		if ($ruleids) {
-			API::ItemPrototype()->syncTemplates($link_request);
+			CItemPrototype::linkTemplateObjects($templateids, $hostids);
 			API::HostPrototype()->syncTemplates($ruleids, $hostids);
 		}
 
@@ -1052,11 +848,11 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		foreach ($link_requests as $link_request) {
-			API::Item()->syncTemplates($link_request);
+			CItem::linkTemplateObjects($link_request['templateids'], $link_request['hostids']);
 			$ruleids = API::DiscoveryRule()->syncTemplates($link_request['templateids'], $link_request['hostids']);
 
 			if ($ruleids) {
-				API::ItemPrototype()->syncTemplates($link_request);
+				CItemPrototype::linkTemplateObjects($link_request['templateids'], $link_request['hostids']);
 				API::HostPrototype()->syncTemplates($ruleids, $link_request['hostids']);
 			}
 		}
@@ -1280,186 +1076,15 @@ abstract class CHostGeneral extends CHostBase {
 		}
 		/* }}} GRAPHS */
 
-		/* ITEMS, DISCOVERY RULES {{{ */
-		$upd_items = [
-			ZBX_FLAG_DISCOVERY_NORMAL => [],
-			ZBX_FLAG_DISCOVERY_RULE => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
-		];
-		$item_prototypeids = [];
-
-		$sqlFrom = ' items i1,items i2,hosts h';
-		$sqlWhere = ' i2.itemid=i1.templateid'.
-			' AND '.dbConditionInt('i2.hostid', $templateids).
-			' AND '.dbConditionInt('i1.flags', $flags).
-			' AND h.hostid=i1.hostid';
-
-		if (!is_null($targetids)) {
-			$sqlWhere .= ' AND '.dbConditionInt('i1.hostid', $targetids);
+		if ($clear) {
+			CDiscoveryRule::clearTemplateObjects($templateids, $targetids);
+			CItem::clearTemplateObjects($templateids, $targetids);
+			CHttpTest::clearTemplateObjects($templateids, $targetids);
 		}
-		$sql = 'SELECT DISTINCT i1.itemid,i1.flags,h.status as host_status,i1.type,i1.valuemapid'.
-			' FROM '.$sqlFrom.
-			' WHERE '.$sqlWhere;
-
-		$dbItems = DBSelect($sql);
-
-		while ($item = DBfetch($dbItems)) {
-			if ($clear) {
-				$upd_items[$item['flags']][$item['itemid']] = true;
-			}
-			else {
-				$upd_item = ['templateid' => 0];
-				if ($item['host_status'] == HOST_STATUS_TEMPLATE && $item['type'] != ITEM_TYPE_HTTPTEST) {
-					$upd_item['uuid'] = generateUuidV4();
-				}
-
-				if ($item['valuemapid'] !== '0') {
-					$upd_item['valuemapid'] = '0';
-
-					if (in_array($item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
-							&& $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$item_prototypeids[] = $item['itemid'];
-					}
-				}
-
-				$upd_items[$item['flags']][$item['itemid']] = [
-					'values' => $upd_item,
-					'where' => ['itemid' => $item['itemid']]
-				];
-			}
-		}
-
-		if ($upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
-			if ($clear) {
-				CDiscoveryRuleManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]));
-			}
-			else {
-				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_RULE]);
-			}
-		}
-
-		if ($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]) {
-			if ($clear) {
-				CItemManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_NORMAL]));
-			}
-			else {
-				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_NORMAL]);
-			}
-		}
-
-		if ($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]) {
-			if ($clear) {
-				CItemPrototypeManager::delete(array_keys($upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]));
-			}
-			else {
-				DB::update('items', $upd_items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
-
-				if ($item_prototypeids) {
-					$options = [
-						'output' => ['itemid'],
-						'filter' => ['parent_itemid' => $item_prototypeids],
-						'sortfield' => ['itemid'],
-						'sortorder' => [ZBX_SORT_DOWN]
-					];
-					$result = DBselect(DB::makeSql('item_discovery', $options));
-
-					$upd_discovered_items = [];
-
-					while ($row = DBfetch($result)) {
-						$upd_discovered_items[] = [
-							'values' => ['valuemapid' => '0'],
-							'where' => ['itemid' => $row['itemid']]
-						];
-					}
-
-					if ($upd_discovered_items) {
-						DB::update('items', $upd_discovered_items);
-					}
-				}
-			}
-		}
-		/* }}} ITEMS, DISCOVERY RULES */
-
-		// host prototypes
-		// we need only to unlink host prototypes. in case of unlink and clear they will be deleted together with LLD rules.
-		if (!$clear && $upd_items[ZBX_FLAG_DISCOVERY_RULE]) {
-			$host_prototypes = DBSelect(
-				'SELECT DISTINCT h.hostid,h3.status as host_status'.
-				' FROM hosts h'.
-					' INNER JOIN host_discovery hd ON h.hostid=hd.hostid'.
-					' INNER JOIN hosts h2 ON h.templateid=h2.hostid'.
-					' INNER JOIN host_discovery hd2 ON h.hostid=hd.hostid'.
-					' INNER JOIN items i ON hd.parent_itemid=i.itemid'.
-					' INNER JOIN hosts h3 ON i.hostid=h3.hostid'.
-				' WHERE '.dbConditionInt('hd.parent_itemid', array_keys($upd_items[ZBX_FLAG_DISCOVERY_RULE]))
-			);
-
-			$upd_host_prototypes = [];
-
-			while ($host_prototype = DBfetch($host_prototypes)) {
-				$upd_host_prototype = ['templateid' => 0];
-				if ($host_prototype['host_status'] == HOST_STATUS_TEMPLATE) {
-					$upd_host_prototype['uuid'] = generateUuidV4();
-				}
-
-				$upd_host_prototypes[$host_prototype['hostid']] = [
-					'values' => $upd_host_prototype,
-					'where' => ['hostid' => $host_prototype['hostid']]
-				];
-			}
-
-			if ($upd_host_prototypes) {
-				DB::update('hosts', $upd_host_prototypes);
-				DB::update('group_prototype', [
-					'values' => ['templateid' => 0],
-					'where' => ['hostid' => array_keys($upd_host_prototypes)]
-				]);
-			}
-		}
-
-		// http tests
-		$upd_httptests = [];
-
-		$sqlWhere = '';
-		if (!is_null($targetids)) {
-			$sqlWhere = ' AND '.dbConditionInt('ht1.hostid', $targetids);
-		}
-		$sql = 'SELECT DISTINCT ht1.httptestid,h.status as host_status'.
-				' FROM httptest ht1,httptest ht2,hosts h'.
-				' WHERE ht1.templateid=ht2.httptestid'.
-					' AND ht1.hostid=h.hostid'.
-					' AND '.dbConditionInt('ht2.hostid', $templateids).
-				$sqlWhere;
-
-		$httptests = DBSelect($sql);
-
-		while ($httptest = DBfetch($httptests)) {
-			if ($clear) {
-				$upd_httptests[$httptest['httptestid']] = true;
-			}
-			else {
-				$upd_httptest = ['templateid' => 0];
-				if ($httptest['host_status'] == HOST_STATUS_TEMPLATE) {
-					$upd_httptest['uuid'] = generateUuidV4();
-				}
-
-				$upd_httptests[$httptest['httptestid']] = [
-					'values' => $upd_httptest,
-					'where' => ['httptestid' => $httptest['httptestid']]
-				];
-			}
-		}
-
-		if ($upd_httptests) {
-			if ($clear) {
-				$result = API::HttpTest()->delete(array_keys($upd_httptests), true);
-				if (!$result) {
-					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear Web scenarios.'));
-				}
-			}
-			else {
-				DB::update('httptest', $upd_httptests);
-			}
+		else {
+			CDiscoveryRule::unlinkTemplateObjects($templateids, $targetids);
+			CItem::unlinkTemplateObjects($templateids, $targetids);
+			CHttpTest::unlinkTemplateObjects($templateids, $targetids);
 		}
 
 		parent::unlink($templateids, $targetids);

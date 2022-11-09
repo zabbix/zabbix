@@ -611,7 +611,8 @@ function getMenuPopupDashboard(options, trigger_element) {
 
 		const url_clone = new Curl('zabbix.php', false);
 		url_clone.setArgument('action', 'dashboard.view');
-		url_clone.setArgument('source_dashboardid', options.dashboardid);
+		url_clone.setArgument('dashboardid', options.dashboardid);
+		url_clone.setArgument('clone', '1');
 
 		const url_delete = new Curl('zabbix.php', false);
 		url_delete.setArgument('action', 'dashboard.delete');

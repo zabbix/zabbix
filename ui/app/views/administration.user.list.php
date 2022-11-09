@@ -29,7 +29,7 @@ if ($data['uncheck']) {
 	uncheckTableRows('user');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Users'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USER_LIST))
 	->setControls((new CList([
@@ -253,6 +253,6 @@ $form->addItem([
 ]);
 
 // Append form to widget.
-$widget
+$html_page
 	->addItem($form)
 	->show();

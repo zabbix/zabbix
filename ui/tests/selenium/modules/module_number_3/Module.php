@@ -2,7 +2,7 @@
 
 namespace Modules\Example_C;
 
-use Core\CModule,
+use Zabbix\Core\CModule,
 	APP,
 	CMenu;
 

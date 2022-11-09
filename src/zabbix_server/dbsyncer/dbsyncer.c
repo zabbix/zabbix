@@ -23,7 +23,7 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxtime.h"
-#include "dbcache.h"
+#include "zbxcachehistory.h"
 #include "zbxexport.h"
 
 extern int				CONFIG_HISTSYNCER_FREQUENCY;

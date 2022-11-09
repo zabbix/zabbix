@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXTRENDS_H
 #define ZABBIX_ZBXTRENDS_H
 
-#include "dbcache.h"
+#include "zbxcachehistory.h"
 #include "zbxtime.h"
 
 int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error);

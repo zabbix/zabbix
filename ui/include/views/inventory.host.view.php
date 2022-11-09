@@ -260,12 +260,13 @@ $hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel()]));
 
 $web_layout_mode = CViewHelper::loadLayoutMode();
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Host inventory'))
 	->setWebLayoutMode($web_layout_mode)
 	->setControls((new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode])))
-	->addItem((new CForm())
-		->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
-		->addItem($hostInventoriesTab)
+	->addItem(
+		(new CForm())
+			->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
+			->addItem($hostInventoriesTab)
 	)
 	->show();
