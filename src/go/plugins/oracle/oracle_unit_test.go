@@ -48,6 +48,7 @@ func Test_getConnParams(t *testing.T) {
 			gotOut, err := getConnParams(tt.args.privilege)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getConnParams() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 			if !reflect.DeepEqual(gotOut, tt.wantOut) {
@@ -87,6 +88,7 @@ func Test_splitUserPrivilege(t *testing.T) {
 			gotUser, gotPrivilege, err := splitUserPrivilege(tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("splitUserPrivilege() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 			if gotUser != tt.wantUser {

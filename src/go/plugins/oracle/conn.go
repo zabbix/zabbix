@@ -293,6 +293,7 @@ func getConnParams(privilege string) (out godror.ConnParams, err error) {
 	case "":
 	default:
 		err = fmt.Errorf("incorrect privilege, %s", privilege)
+
 		return
 	}
 
