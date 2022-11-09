@@ -22,7 +22,7 @@
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxshmem.h"
-#include "dbcache.h"
+#include "zbxcachehistory.h"
 #include "preproc.h"
 #include "log.h"
 #include "zbxmutexs.h"

@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxserver.h"
-#include "valuecache.h"
+#include "zbxcachevalue.h"
 #include "mocks/valuecache/valuecache_mock.h"
 #include "../../../src/libs/zbxserver/anomalystl.h"
 

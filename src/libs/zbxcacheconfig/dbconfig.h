@@ -20,10 +20,11 @@
 #ifndef ZABBIX_DBCONFIG_H
 #define ZABBIX_DBCONFIG_H
 
+#include "zbxcacheconfig.h"
+#include "user_macro.h"
+
 #include "zbxmutexs.h"
 #include "zbxalgo.h"
-#include "dbcache.h"
-#include "user_macro.h"
 #include "zbxversion.h"
 
 #define ZBX_MAINTENANCE_IDLE		0
@@ -891,7 +892,7 @@ typedef struct
 	zbx_hashset_t		autoreg_hosts;
 	zbx_hashset_t		host_inventories;
 	zbx_hashset_t		host_inventories_auto;	/* For caching of automatically populated host inventories. */
-	 	 	 	 	 	 	/* Configuration syncer will read host_inventories without  */
+							/* Configuration syncer will read host_inventories without  */
 							/* locking cache and therefore it cannot be updated by      */
 							/* by history syncers when new data is received.	    */
 	zbx_hashset_t		ipmihosts;

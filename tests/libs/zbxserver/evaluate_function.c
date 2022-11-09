@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "valuecache.h"
+#include "zbxcachevalue.h"
 #include "zbxserver.h"
 #include "../../src/libs/zbxserver/evalfunc.h"
 
