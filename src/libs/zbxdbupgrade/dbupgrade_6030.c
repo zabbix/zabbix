@@ -606,18 +606,29 @@ static int	DBpatch_6030066(void)
 
 static int	DBpatch_6030067(void)
 {
-	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_insert"))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
-				" skipping patch of adding it (and also insert trigger) to \"hosts\" table");
+		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_insert trigger for table \"hosts\" already exists,"
+				" skipping patch of adding it to \"hosts\" table");
 		return SUCCEED;
 	}
 
-	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("hosts", "name", "name_upper", "upper",
-			"hostid");
+	return zbx_dbupgrade_attach_trigger_with_function_on_insert("hosts", "name", "name_upper", "upper", "hostid");
 }
 
 static int	DBpatch_6030068(void)
+{
+	if (SUCCEED == DBtrigger_exists("hosts", "hosts_name_upper_update"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "hosts_name_upper_update trigger for table \"hosts\" already exists,"
+				" skipping patch of adding it to \"hosts\" table");
+		return SUCCEED;
+	}
+
+	return zbx_dbupgrade_attach_trigger_with_function_on_update("hosts", "name", "name_upper", "upper", "hostid");
+}
+
+static int	DBpatch_6030069(void)
 {
 	const ZBX_FIELD field = {"name_upper", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -631,7 +642,7 @@ static int	DBpatch_6030068(void)
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_6030069(void)
+static int	DBpatch_6030070(void)
 {
 	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
 	{
@@ -644,7 +655,7 @@ static int	DBpatch_6030069(void)
 	return DBcreate_index("items", "items_9", "hostid,name_upper", 0);
 }
 
-static int	DBpatch_6030070(void)
+static int	DBpatch_6030071(void)
 {
 	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
 	{
@@ -659,17 +670,28 @@ static int	DBpatch_6030070(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6030071(void)
+static int	DBpatch_6030072(void)
+{
+	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_insert"))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_insert trigger for table \"items\" already exists,"
+				" skipping patch of adding it to \"items\" table");
+		return SUCCEED;
+	}
+
+	return zbx_dbupgrade_attach_trigger_with_function_on_insert("items", "name", "name_upper", "upper", "itemid");
+}
+
+static int	DBpatch_6030073(void)
 {
 	if (SUCCEED == DBtrigger_exists("items", "items_name_upper_update"))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "items_name_upper_update trigger for table \"items\" already exists,"
-				" skipping patch of adding it (and also insert trigger) to \"items\" table");
+				" skipping patch of adding it to \"items\" table");
 		return SUCCEED;
 	}
 
-	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("items", "name", "name_upper", "upper",
-			"itemid");
+	return zbx_dbupgrade_attach_trigger_with_function_on_update("items", "name", "name_upper", "upper", "itemid");
 }
 #endif
 
@@ -749,4 +771,6 @@ DBPATCH_ADD(6030068, 0, 1)
 DBPATCH_ADD(6030069, 0, 1)
 DBPATCH_ADD(6030070, 0, 1)
 DBPATCH_ADD(6030071, 0, 1)
+DBPATCH_ADD(6030072, 0, 1)
+DBPATCH_ADD(6030073, 0, 1)
 DBPATCH_END()
