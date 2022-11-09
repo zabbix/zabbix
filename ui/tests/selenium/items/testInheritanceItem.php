@@ -135,7 +135,7 @@ class testInheritanceItem extends CLegacyWebTest {
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestCheckHeader('Items');
 				$this->zbxTestTextNotPresent('Item added');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item'); //todo zi
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item'); // todo zi
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}

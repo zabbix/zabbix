@@ -1147,7 +1147,7 @@
 		this.$form.trimValues(['#step_name', '#url', '#timeout', '#required', '#status_codes']);
 
 		url.setArgument('validate', 1);
-		this.$form.parent().find('.msg-bad, .msg-good').remove(); //todo zi
+		this.$form.parent().find('.msg-bad, .msg-good').remove(); // todo zi
 
 		var curr_pairs = this.stepPairsData();
 

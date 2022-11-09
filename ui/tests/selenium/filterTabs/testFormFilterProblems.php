@@ -354,7 +354,7 @@ class testFormFilterProblems extends testFormFilter {
 		else {
 			// Changing time period from timeselector tab.
 			$form->fill(['Show' => 'History']);
-			$this->query('xpath://a[@class="tabfilter-item-link btn-time"]')->one()->click(); //todo zi
+			$this->query('xpath://a[@class="tabfilter-item-link btn-time"]')->one()->click(); // todo zi
 			$this->query('xpath://input[@id="from"]')->one()->fill('now-2y');
 			$this->query('id:apply')->one()->click();
 			$filter_container->selectTab($data['filter']['Name']);
