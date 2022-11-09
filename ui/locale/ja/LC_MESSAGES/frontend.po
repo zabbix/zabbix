@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-10-15 04:11+0000\n"
+"PO-Revision-Date: 2022-11-08 14:32+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -4482,6 +4482,9 @@ msgid ""
 "1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
+"Zabbixサーバー\"%1$s\"への接続に失敗しました。以下の原因が考えられます：\n"
+"1. \"zabbix_server.conf\"内の\"NodeAddress\"か\"ListenPort\"が正しくないか、\"zabbix.conf.php\"内のIP/DNSで上書きされている。\n"
+"2. DNSサーバーの設定が正しくない。\n"
 
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
@@ -4503,6 +4506,11 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Zabbixサーバー\"%1$s\"への接続が拒否されました。以下の原因が考えられます：\n"
+"1. \"zabbix_server.conf\"内の\"NodeAddress\"か\"ListenPort\"が正しくないか、\"zabbix.conf.php\"内のIP/DNSで上書きされている。\n"
+"2. セキュリティ設定（例えばSELinux）によって接続がブロックされている。\n"
+"3. Zabbixサーバーデーモンが起動していない。\n"
+"4. FirewallによってTCPでの接続がブロックされている。\n"
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4526,6 +4534,9 @@ msgid ""
 "1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Zabbixサーバー\"%1$s\"への接続がタイムアウトしました。以下の原因が考えられます：\n"
+"1. \"zabbix_server.conf\"内の\"NodeAddress\"か\"ListenPort\"が正しくないか、\"zabbix.conf.php\"内のIP/DNSで上書きされている。\n"
+"2. FirewallによってTCPでの接続がブロックされている。\n"
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -10196,7 +10207,7 @@ msgstr "情報"
 
 #: include/classes/data/CItemData.php:1429
 msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "vmware.datastore.perfcounterに必要なハイパーバイザーの内部ディスクに関する情報、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。JSONで返す"
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -18650,12 +18661,12 @@ msgstr "この設定は数値データにだけ適用されます。非数値デ
 #: app/partials/administration.system.info.php:199
 #: app/views/administration.housekeeping.edit.php:134
 msgid "This setting should be enabled, because history tables contain compressed chunks."
-msgstr ""
+msgstr "ヒストリテーブルには圧縮されたチャンクが含まれているため、この設定を有効にする必要があります。"
 
 #: app/partials/administration.system.info.php:213
 #: app/views/administration.housekeeping.edit.php:163
 msgid "This setting should be enabled, because trend tables contain compressed chunks."
-msgstr ""
+msgstr "トレンド テーブルには圧縮されたチャンクが含まれているため、この設定を有効にする必要があります。"
 
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
@@ -20327,7 +20338,7 @@ msgstr "VMwareのキャッシュ統計。利用可能なモード：total, free,
 
 #: include/classes/data/CItemData.php:1252
 msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "VMwareクラスターのアラームデータ、JSONで返す、<url> - VMwareサービスURL、<id> - VMwareクラスターid"
 
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"

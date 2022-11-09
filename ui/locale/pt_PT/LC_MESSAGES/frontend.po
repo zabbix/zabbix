@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-10-28 11:33+0000\n"
+"PO-Revision-Date: 2022-11-08 22:54+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -3314,7 +3314,7 @@ msgstr "Não é possível passar o ID do modelo duplicado para a ligação: %1$s
 
 #: jsLoader.php:130
 msgid "Cannot paste inaccessible widget."
-msgstr ""
+msgstr "Não é possível colar o widget inacessível."
 
 #: include/classes/db/DB.php:958
 #, c-format
@@ -9238,11 +9238,11 @@ msgstr "Se acha que esta mensagem está errada, por favor consulte os administra
 
 #: app/views/administration.miscconfig.edit.php:125
 msgid "Iframe sandboxing exceptions"
-msgstr ""
+msgstr "Exceções de sandboxing de iframe"
 
 #: include/classes/helpers/CServiceHelper.php:151
 msgid "Ignore this service"
-msgstr ""
+msgstr "Ignorar este serviço"
 
 #: app/controllers/CControllerAuditLogList.php:224
 #: app/views/administration.image.edit.php:61
@@ -9273,7 +9273,7 @@ msgstr "Tipo de etiqueta da imagem"
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
 msgid "Image size must be less than %1$s."
-msgstr ""
+msgstr "O tamanho da imagem deve ser menor que %1$s."
 
 #: app/controllers/CControllerImageUpdate.php:147
 msgid "Image updated"
@@ -9305,7 +9305,7 @@ msgstr "Importar"
 #: app/controllers/CControllerPopupImportCompare.php:141
 #: app/controllers/CControllerPopupImport.php:154
 msgid "Import failed"
-msgstr ""
+msgstr "Falha na importação"
 
 #: app/views/popup.import.php:152
 msgid "Import file"
@@ -9318,7 +9318,7 @@ msgstr "Importado com sucesso"
 #: hostinventories.php:192
 #, c-format
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
-msgstr ""
+msgstr "Impossível filtrar por campo de inventário \"%1$s\", que não existe."
 
 #: include/html.inc.php:277 include/maps.inc.php:409
 msgid "In maintenance"
@@ -9331,21 +9331,21 @@ msgstr "Em progresso"
 
 #: include/items.inc.php:1864
 msgid "In range"
-msgstr ""
+msgstr "No intervalo"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:363
 msgid "Inaccessible SLA"
-msgstr ""
+msgstr "SLA inacessível"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:121
 #: app/controllers/CControllerScheduledReportEdit.php:303
 msgid "Inaccessible dashboard"
-msgstr ""
+msgstr "Painel inacessível"
 
 #: app/partials/configuration.host.edit.html.php:60
 #: app/views/configuration.host.list.php:237
 msgid "Inaccessible discovery rule"
-msgstr ""
+msgstr "Regra de descoberta inacessível"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:359
 msgid "Inaccessible graph"
@@ -9353,7 +9353,7 @@ msgstr "Gráfico inacessível"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:361
 msgid "Inaccessible graph prototype"
-msgstr ""
+msgstr "Protótipo gráfico inacessível"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:356
 #: host_prototypes.php:475
@@ -9370,7 +9370,7 @@ msgstr "Item inacessível"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:360
 msgid "Inaccessible item prototype"
-msgstr ""
+msgstr "Protótipo de item inacessível"
 
 #: app/partials/monitoring.host.view.html.php:105
 #: app/partials/monitoring.latest.view.html.php:210
@@ -9379,7 +9379,7 @@ msgstr ""
 #: include/hostgroups.inc.php:293 include/triggers.inc.php:2023
 #: include/views/inventory.host.view.php:42
 msgid "Inaccessible maintenance"
-msgstr ""
+msgstr "Manutenção inacessível"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:135
 #: app/controllers/CControllerWidgetNavTreeItemEdit.php:63
@@ -9388,17 +9388,17 @@ msgstr "Mapa inacessível"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:362
 msgid "Inaccessible service"
-msgstr ""
+msgstr "Serviço inacessível"
 
 #: httpconf.php:661 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
 #: include/triggers.inc.php:2162
 msgid "Inaccessible template"
-msgstr ""
+msgstr "Modelo inacessível"
 
 #: include/triggers.inc.php:2368 include/triggers.inc.php:2376
 msgid "Inaccessible trigger"
-msgstr ""
+msgstr "Gatilho inacessível"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:105
 #: app/controllers/CControllerPopupScheduledReportList.php:77
@@ -9416,22 +9416,22 @@ msgstr "Utilizador inacessível"
 
 #: app/controllers/CControllerScheduledReportEdit.php:231
 msgid "Inaccessible user group"
-msgstr ""
+msgstr "Grupo de utilizadores inacessível"
 
 #: jsLoader.php:147 jsLoader.php:175
 msgid "Inaccessible widget"
-msgstr ""
+msgstr "Widget inacessível"
 
 #: app/controllers/CControllerDashboardWidgetCheck.php:52
 #: app/controllers/CControllerDashboardWidgetEdit.php:65
 #: include/classes/helpers/CDashboardHelper.php:453
 #: include/classes/helpers/CDashboardHelper.php:461
 msgid "Inaccessible widget type."
-msgstr ""
+msgstr "Tipo de widget inacessível."
 
 #: jsLoader.php:138
 msgid "Inaccessible widgets were not copied."
-msgstr ""
+msgstr "Não foram copiados widgets inacessíveis."
 
 #: jsLoader.php:139
 msgid "Inaccessible widgets were not pasted."
