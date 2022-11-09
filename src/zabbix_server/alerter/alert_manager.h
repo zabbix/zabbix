@@ -20,7 +20,14 @@
 #ifndef ZABBIX_ALERT_MANAGER_H
 #define ZABBIX_ALERT_MANAGER_H
 
+#include "zbxcommon.h"
 #include "zbxthreads.h"
+
+typedef struct
+{
+	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+}
+zbx_thread_alert_manager_args;
 
 ZBX_THREAD_ENTRY(alert_manager_thread, args);
 

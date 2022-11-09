@@ -33,8 +33,6 @@
 
 #define	ALARM_ACTION_TIMEOUT	40
 
-extern unsigned char			program_type;
-
 static zbx_es_t	es_engine;
 
 /******************************************************************************
@@ -284,6 +282,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
+	zbx_thread_alert_args	*alert_args_in = (zbx_thread_alert_args *)(((zbx_thread_args_t *)args)->args);
 	char			*error = NULL;
 	int			success_num = 0, fail_num = 0;
 	zbx_ipc_socket_t	alerter_socket;
@@ -294,8 +293,9 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(alert_args_in->zbx_get_program_type_cb_arg()), server_num,
+			get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 

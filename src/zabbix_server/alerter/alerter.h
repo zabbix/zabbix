@@ -22,6 +22,12 @@
 
 #include "zbxthreads.h"
 
+typedef struct
+{
+	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+}
+zbx_thread_alert_args;
+
 extern char	*CONFIG_ALERT_SCRIPTS_PATH;
 
 ZBX_THREAD_ENTRY(alerter_thread, args);

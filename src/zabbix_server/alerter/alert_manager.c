@@ -57,8 +57,6 @@
 
 #define ZBX_MEDIA_CONTENT_TYPE_DEFAULT	255
 
-extern unsigned char			program_type;
-
 extern int	CONFIG_ALERTER_FORKS;
 extern char	*CONFIG_ALERT_SCRIPTS_PATH;
 
@@ -2229,25 +2227,27 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 {
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
-
-	zbx_am_t		manager;
-	char			*error = NULL;
-	zbx_ipc_client_t	*client;
-	zbx_ipc_message_t	*message;
-	zbx_am_alerter_t	*alerter;
-	int			ret, sent_num = 0, failed_num = 0, now, time_watchdog = 0, time_ping = 0,
-				time_mediatype = 0;
-	double			time_stat, time_idle = 0, time_now, sec;
-	zbx_timespec_t		timeout = {1, 0};
-	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_thread_alert_manager_args	*alert_manager_args_in = (zbx_thread_alert_manager_args *)
+							(((zbx_thread_args_t *)args)->args);
+	zbx_am_t			manager;
+	char				*error = NULL;
+	zbx_ipc_client_t		*client;
+	zbx_ipc_message_t		*message;
+	zbx_am_alerter_t		*alerter;
+	int				ret, sent_num = 0, failed_num = 0, now, time_watchdog = 0, time_ping = 0,
+					time_mediatype = 0;
+	double				time_stat, time_idle = 0, time_now, sec;
+	zbx_timespec_t			timeout = {1, 0};
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(alert_manager_args_in->zbx_get_program_type_cb_arg()), server_num,
+			get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 

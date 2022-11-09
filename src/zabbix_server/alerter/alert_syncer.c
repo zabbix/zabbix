@@ -35,8 +35,6 @@
 #define ZBX_ALERT_BATCH_SIZE		1000
 #define ZBX_MEDIATYPE_CACHE_TTL		SEC_PER_DAY
 
-extern unsigned char			program_type;
-
 extern int	CONFIG_CONFSYNCER_FREQUENCY;
 
 typedef struct
@@ -911,17 +909,20 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 
 ZBX_THREAD_ENTRY(alert_syncer_thread, args)
 {
-	double			sec1, sec2, time_cleanup = 0, time_watchdog = 0;
-	int			alerts_num, sleeptime, nextcheck, freq_watchdog, results_num;
-	zbx_am_db_t		amdb;
-	char			*error = NULL;
-	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_thread_alert_syncer_args	*alert_syncer_args_in = (zbx_thread_alert_syncer_args *)
+							(((zbx_thread_args_t *)args)->args);
+	double				sec1, sec2, time_cleanup = 0, time_watchdog = 0;
+	int				alerts_num, sleeptime, nextcheck, freq_watchdog, results_num;
+	zbx_am_db_t			amdb;
+	char				*error = NULL;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(alert_syncer_args_in->zbx_get_program_type_cb_arg()), server_num,
+			get_process_type_string(process_type), process_num);
 
 	if (SUCCEED != am_db_init(&amdb, &error))
 	{

@@ -20,7 +20,14 @@
 #ifndef ZABBIX_ALERT_SYNCER_H
 #define ZABBIX_ALERT_SYNCER_H
 
+#include "zbxcommon.h"
 #include "zbxthreads.h"
+
+typedef struct
+{
+	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+}
+zbx_thread_alert_syncer_args;
 
 ZBX_THREAD_ENTRY(alert_syncer_thread, args);
 

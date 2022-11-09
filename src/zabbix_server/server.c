@@ -1290,6 +1290,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
 	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, &db_version_info};
+	zbx_thread_alert_syncer_args	alert_syncer_args = {get_program_type};
+	zbx_thread_alert_manager_args	alert_manager_args = {get_program_type};
+	zbx_thread_alert_args		alert_args = {get_program_type};
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1432,6 +1435,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(pinger_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ALERTER:
+				thread_args.args = &alert_args;
 				zbx_thread_start(alerter_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HOUSEKEEPER:
@@ -1492,6 +1496,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 #endif
 			case ZBX_PROCESS_TYPE_ALERTMANAGER:
+				thread_args.args = &alert_manager_args;
 				zbx_thread_start(alert_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LLDMANAGER:
@@ -1501,6 +1506,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(lld_worker_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ALERTSYNCER:
+				thread_args.args = &alert_syncer_args;
 				zbx_thread_start(alert_syncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTORYPOLLER:
