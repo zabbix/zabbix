@@ -154,19 +154,25 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
-#define DEFINE_CHR_CONFIG(name, value) \
-	char *config_##name = value; \
-	static const char *get_config_##name(void); \
-	static const char *get_config_##name(void) \
-	{\
-		return config_##name; \
-	}
+char	*config_tmpdir = NULL;
+static const char	*get_config_tmpdir(void)
+{
+	return config_tmpdir;
+}
 
-DEFINE_CHR_CONFIG(tmpdir, NULL)
-DEFINE_CHR_CONFIG(fping_location, NULL)
-DEFINE_CHR_CONFIG(fping6_location, NULL)
+char	*config_fping_location= NULL;
+static const char	*get_config_fping_location(void)
+{
+	return config_fping_location;
+}
 
-#undef DEFINE_CHR_CONFIG
+char	*config_fping6_location = NULL;
+#ifdef HAVE_IPV6
+static const char	*get_config_fping6_location(void)
+{
+	return config_fping6_location;
+}
+#endif
 
 char	*CONFIG_SOURCE_IP		= NULL;
 static const char	*get_config_source_ip(void) {
