@@ -186,7 +186,6 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 }
 
 // Operations table.
-// todo : remove unnecessary code
 $data['esc_period'] = $data['action']['esc_period'];
 
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {

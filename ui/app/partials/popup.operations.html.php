@@ -125,10 +125,7 @@ if ($data['table'] === 'operation') {
 						->addClass('js-remove')
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->removeId(),
-					new CVar('operations['.$operationid.']', $hidden_data),
-//					new CVar('operations_for_popup['.ACTION_UPDATE_OPERATION.']['.$operationid.']',
-//						json_encode($operation_for_popup)
-//					)
+					new CVar('operations['.$operationid.']', $hidden_data)
 				]
 			]))
 				->setName('button-list')
@@ -141,7 +138,7 @@ if ($data['table'] === 'operation') {
 				$esc_delay_txt,
 				$esc_period_txt,
 				$buttons
-			]);
+			])->addClass(ZBX_STYLE_WORDWRAP);
 		}
 		else {
 			$operations_table->addRow([
@@ -257,11 +254,7 @@ elseif ($data['table'] === 'recovery') {
 									->addClass('js-remove')
 									->addClass(ZBX_STYLE_BTN_LINK)
 									->removeId(),
-								new CVar('recovery_operations[' . $operationid . ']', $hidden_data),
-							// todo : check if this is necessary
-//							new CVar('operations_for_popup['.ACTION_RECOVERY_OPERATION.']['.$operationid.']',
-//								json_encode($operation_for_popup)
-//							)
+								new CVar('recovery_operations[' . $operationid . ']', $hidden_data)
 							]
 						])
 					))->addClass(ZBX_STYLE_NOWRAP)
@@ -362,10 +355,7 @@ elseif ($data['table'] === 'update') {
 									->addClass('js-remove')
 									->addClass(ZBX_STYLE_BTN_LINK)
 									->removeId(),
-								new CVar('update_operations['.$operationid.']', $hidden_data),
-//								new CVar('operations_for_popup['.ACTION_UPDATE_OPERATION.']['.$operationid.']',
-//									json_encode($operation_for_popup)
-//								)
+								new CVar('update_operations['.$operationid.']', $hidden_data)
 							]
 						])
 					))->addClass(ZBX_STYLE_NOWRAP)

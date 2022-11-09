@@ -521,7 +521,7 @@ $form->addItem($form_grid);
 
 $buttons = [
 	[
-		'title' => array_key_exists('operationid',$data['operation']) ? _('Update') : _('Add'),
+		'title' => array_key_exists('details',$data['operation']) ? _('Update') : _('Add'),
 		'class' => 'js-add',
 		'keepOpen' => true,
 		'isSubmit' => true,
