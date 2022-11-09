@@ -50,10 +50,9 @@ if ($data['table'] === 'operation') {
 	}
 
 	foreach ($operations as $operationid => $operation) {
+
 		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 			$simple_interval_parser = new CSimpleIntervalParser();
-
-			// todo : fix delays when opening action edit popup and editing step duration
 
 			$delays = array_key_exists('action', $data)
 				? count_operations_delay($data['action']['operations'], $data['action']['esc_period'])
@@ -85,7 +84,19 @@ if ($data['table'] === 'operation') {
 				);
 		}
 
-		// todo : remove details and other unnecessarry data from hidden inputs
+		// todo: add all data to rows
+		// todo : fix if two or three types of data
+
+		$details_column = new CCol([
+			new CTag('b', true, $operation['details']['type'][0]),
+			implode(' ', $operation['details']['data'][0])
+		]);
+
+		$hidden_data = array_filter($operation, function ($key) {
+			return !in_array($key, [
+				'row_index', 'duration', 'steps', 'details'
+			]);
+		}, ARRAY_FILTER_USE_KEY );
 
 		$buttons =
 			(new CHorList([
@@ -105,31 +116,21 @@ if ($data['table'] === 'operation') {
 						->addClass('js-remove')
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->removeId(),
-					new CVar('operations['.$operationid.']', $operation),
-					//	new CVar('operations_for_popup['.ACTION_UPDATE_OPERATION.']['.$operationid.']',
-					//		json_encode($operation_for_popup)
-					//	)
+					new CVar('operations['.$operationid.']', $hidden_data),
+//					new CVar('operations_for_popup['.ACTION_UPDATE_OPERATION.']['.$operationid.']',
+//						json_encode($operation_for_popup)
+//					)
 				]
 			]))
 				->setName('button-list')
 				->addClass(ZBX_STYLE_NOWRAP);
-
-
-		// todo: add all data to rows
-		// todo : fix if two or three types of data
-
-		$details_column = new CCol([
-			new CTag('b', true, $operation['details']['type'][0]),
-			implode(' ', $operation['details']['data'][0])
-
-		]);
 
 		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 			$operations_table->addRow([
 				$esc_steps_txt,
 				$details_column,
 				$esc_delay_txt,
-				$operation['esc_period'] == 0 ? 'Default' : $operation['esc_period'],
+				$esc_period_txt,
 				$buttons
 			]);
 		}
@@ -203,8 +204,13 @@ elseif ($data['table'] === 'recovery') {
 					// todo : fix if two or three types of data
 					new CTag('b', true, $operation['details']['type'][0]),
 					implode(' ', $operation['details']['data'][0])
-
 				]);
+
+				$hidden_data = array_filter($operation, function ($key) {
+					return !in_array($key, [
+						'row_index', 'duration', 'steps', 'details'
+					]);
+				}, ARRAY_FILTER_USE_KEY );
 
 				$operations_table->addRow([
 					$details_column,
@@ -228,7 +234,7 @@ elseif ($data['table'] === 'recovery') {
 									->addClass('js-remove')
 									->addClass(ZBX_STYLE_BTN_LINK)
 									->removeId(),
-								new CVar('recovery_operations[' . $operationid . ']', $operation),
+								new CVar('recovery_operations[' . $operationid . ']', $hidden_data),
 							// todo : check if this is necessary
 //							new CVar('operations_for_popup['.ACTION_RECOVERY_OPERATION.']['.$operationid.']',
 //								json_encode($operation_for_popup)
@@ -258,6 +264,7 @@ elseif ($data['table'] === 'recovery') {
 		);
 		$operations_table->show();
 }
+
 elseif ($data['table'] === 'update') {
 	if (!array_key_exists('action', $data)) {
 		$operations = $data['operations'];
@@ -295,6 +302,12 @@ elseif ($data['table'] === 'update') {
 
 				]);
 
+				$hidden_data = array_filter($operation, function ($key) {
+					return !in_array($key, [
+						'row_index', 'duration', 'steps', 'details'
+					]);
+				}, ARRAY_FILTER_USE_KEY );
+
 				$operations_table->addRow([
 					$details_column,
 					(new CCol(
@@ -317,10 +330,10 @@ elseif ($data['table'] === 'update') {
 									->addClass('js-remove')
 									->addClass(ZBX_STYLE_BTN_LINK)
 									->removeId(),
-								new CVar('update_operations['.$operationid.']', $operation),
-								new CVar('operations_for_popup['.ACTION_UPDATE_OPERATION.']['.$operationid.']',
-									json_encode($operation_for_popup)
-								)
+								new CVar('update_operations['.$operationid.']', $hidden_data),
+//								new CVar('operations_for_popup['.ACTION_UPDATE_OPERATION.']['.$operationid.']',
+//									json_encode($operation_for_popup)
+//								)
 							]
 						])
 					))->addClass(ZBX_STYLE_NOWRAP)

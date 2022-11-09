@@ -135,7 +135,6 @@ window.action_edit_popup = new class {
 				this._openOperationPopup(this.eventsource, <?= ACTION_UPDATE_OPERATION ?>, this.actionid);
 			}
 			else if (e.target.classList.contains('js-edit-operation')) {
-				// todo : fix this. Open the same popup,
 				this._openEditOperationPopup(e, JSON.parse(e.target.getAttribute('data_operation')), $(e.target).closest('tr').attr('id'));
 			}
 			else if (e.target.classList.contains('js-remove')) {
@@ -148,29 +147,14 @@ window.action_edit_popup = new class {
 		});
 	}
 
-	_openEditOperationPopup(e, operation_data, row_id) {
-		const row_index = e.target.closest('tr').rowIndex -1;
-		const data = JSON.parse(e.target.getAttribute('data_operation'));
+	_openEditOperationPopup(e, operation_data) {
+		let row = e.target.closest('tr');
 
-		if (data.operationid || data.operationid === 0) {
-			this.parameters = {
-				eventsource: this.eventsource,
-				recovery: operation_data.operationtype,
-				actionid: this.actionid,
-				data: operation_data.data,
-				row_index: row_index
-			}
-			this.recovery = operation_data.operationtype;
-		}
-		else  {
-			this.parameters = {
-				eventsource: this.eventsource,
-				recovery: operation_data.recovery,
-				actionid: this.actionid,
-				data: data,
-				row_index: row_index
-			}
-			this.recovery = operation_data.recovery;
+		this.parameters = {
+			eventsource: this.eventsource,
+			recovery: operation_data.operationtype,
+			actionid: this.actionid,
+			data: operation_data.data
 		}
 
 		const overlay = PopUp('popup.action.operation.edit', this.parameters, {
@@ -180,7 +164,7 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
-			// todo : FIX! edit row, not add new one!
+			row.remove();
 			this._loadOperationTable(e);
 		});
 	}

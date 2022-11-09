@@ -58,6 +58,7 @@ class CControllerPopupActionOperationGet extends CController {
 
 	protected function doAction() {
 		$data['esc_period'] = $this->getInput('esc_period');
+
 		$new_operation = array_key_exists('operation', $this->getInput('new_operation'))
 			? $this->getInput('new_operation')['operation']
 			: null;
@@ -134,82 +135,43 @@ class CControllerPopupActionOperationGet extends CController {
 		}
 		unset($operation);
 
-		if ($new_operation) {
-			if ($new_operation['recovery'] == ACTION_OPERATION) {
-				foreach ($operations as $operation) {
-					$action = [
-						'name' => '',
-						'esc_period' => DB::getDefault('actions', 'esc_period'),
-						'eventsource' => $operation['eventsource'],
-						'status' => 0,
-						'operations' => $operation['recovery'] == ACTION_OPERATION ? [$operation] : [],
-						'recovery_operations' => $operation['recovery'] == ACTION_RECOVERY_OPERATION ? [$operation] : [],
-						'update_operations' => $operation['recovery'] == ACTION_UPDATE_OPERATION ? [$operation] : [],
-						'filter' => [
-							'conditions' => [],
-							'evaltype' => ''
-						],
-						'pause_suppressed' => ACTION_PAUSE_SUPPRESSED_TRUE,
-						'notify_if_canceled' =>  ACTION_NOTIFY_IF_CANCELED_TRUE
-					];
 
-					$operation['details'] = $this->getData($operationtype, [$action], $operation['recovery']);
-				}
+		$action = [
+			'name' => '',
+			'esc_period' => DB::getDefault('actions', 'esc_period'),
+			// todo : pass eventsource
+			'eventsource' => EVENT_SOURCE_TRIGGERS,
+			'operations' => $operations,
+			'recovery_operations' => [],
+			'update_operations' => [],
+		];
+
+
+		foreach ($data['operations'] as &$operation) {
+			if (!$new_operation) {
+				$action['operations'] = [$operation];
+				$operation['details'] = $this->getData($operationtype, [$action], $operation['recovery']);
 			}
-
-			elseif ($new_operation['recovery'] == ACTION_RECOVERY_OPERATION) {
-				unset($operation);
-				foreach ($recovery_operations as $operation) {
-					$action = [
-						'name' => '',
-						'esc_period' => DB::getDefault('actions', 'esc_period'),
-						'eventsource' => $operation['eventsource'],
-						'status' => 0,
-						'operations' => $operation['recovery'] == ACTION_OPERATION ? [$operation] : [],
-						'recovery_operations' => $operation['recovery'] == ACTION_RECOVERY_OPERATION ? [$operation] : [],
-						'update_operations' => $operation['recovery'] == ACTION_UPDATE_OPERATION ? [$operation] : [],
-						'filter' => [
-							'conditions' => [],
-							'evaltype' => ''
-						],
-						'pause_suppressed' => ACTION_PAUSE_SUPPRESSED_TRUE,
-						'notify_if_canceled' =>  ACTION_NOTIFY_IF_CANCELED_TRUE
-					];
-
-					$operation['details'] = $this->getData($operationtype, [$action], $operation['recovery']);
-				}
+			elseif ($new_operation && $new_operation['recovery'] == ACTION_OPERATION) {
+				$action['operations'] = [$operation];
+				$operation['details'] = $this->getData($operation['operationtype'], [$action], $operation['recovery']);
 			}
-
-			elseif ($new_operation['recovery'] == ACTION_UPDATE_OPERATION) {
-				unset($operation);
-				foreach ($update_operations as $operation) {
-					$action = [
-						'name' => '',
-						'esc_period' => DB::getDefault('actions', 'esc_period'),
-						'eventsource' => $operation['eventsource'],
-						'status' => 0,
-						'operations' => $operation['recovery'] == ACTION_OPERATION ? [$operation] : [],
-						'recovery_operations' => $operation['recovery'] == ACTION_RECOVERY_OPERATION ? [$operation] : [],
-						'update_operations' => $operation['recovery'] == ACTION_UPDATE_OPERATION ? [$operation] : [],
-						'filter' => [
-							'conditions' => [],
-							'evaltype' => ''
-						],
-						'pause_suppressed' => ACTION_PAUSE_SUPPRESSED_TRUE,
-						'notify_if_canceled' =>  ACTION_NOTIFY_IF_CANCELED_TRUE
-					];
-
-					$operation['details'] = $this->getData($operationtype, [$action], $operation['recovery']);
-				}
+			elseif ($new_operation && $new_operation['recovery'] == ACTION_RECOVERY_OPERATION) {
+				$action['recovery_operations'] = [$operation];
+				$operation['details'] = $this->getData($operation['operationtype'], [$action], $operation['recovery']);
+			}
+			elseif ($new_operation && $new_operation['recovery'] == ACTION_UPDATE_OPERATION) {
+				$action['update_operations'] = [$operation];
+				$operation['details'] = $this->getData($operation['operationtype'], [$action], $operation['recovery']);
 			}
 		}
+		unset($operation);
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
 	protected function getData(int $operationtype, array $action, int $type): array {
 		// todo : move this functionality to different function. because duplicates code from action edit controller
-
 		$data = getActionOperationData($action, $type);
 		$operation_values = getOperationDataValues($data);
 		$result = [];
