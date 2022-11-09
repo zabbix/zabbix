@@ -120,7 +120,7 @@ class testPageMaps extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Network maps');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of network maps');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Network map updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Network map updated'); //todo zi
 		$this->zbxTestTextPresent($name);
 		$this->zbxTestTextPresent('Configuration of network maps');
 
@@ -144,7 +144,7 @@ class testPageMaps extends CLegacyWebTest {
 
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of network maps');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Network map deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Network map deleted'); //todo zi
 
 		$sql = "select * from sysmaps where sysmapid=$sysmapid";
 		$this->assertEquals(0, CDBHelper::getCount($sql));

@@ -114,12 +114,12 @@ window.widget_svggraph_form = new class {
 				);
 			})
 			.on('click', function(e) {
-				if (!e.target.classList.contains('color-picker-preview')) {
+				if (!e.target.classList.contains('color-picker-preview')) { //todo zi
 					jQuery.colorpicker('hide');
 				}
 
 				if (e.target.classList.contains('js-click-expend')
-						|| e.target.classList.contains('color-picker-preview')
+						|| e.target.classList.contains('color-picker-preview') //todo zi
 						|| e.target.classList.contains('<?= ZBX_STYLE_BTN_GREY ?>')) {
 					jQuery('#data_sets').zbx_vertical_accordion('expandNth',
 						jQuery(e.target).closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').index()
@@ -809,7 +809,7 @@ window.widget_svggraph_form = new class {
 				}
 				$preview_container.removeClass('is-loading');
 
-				$form.prev('.msg-bad').remove();
+				$form.prev('.msg-bad').remove(); //todo zi
 
 				if ('error' in r) {
 					const message_box = makeMessageBox('bad', r.error.messages, r.error.title);

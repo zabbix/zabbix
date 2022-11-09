@@ -79,7 +79,7 @@ class CControllerFavouriteDelete extends CController {
 					});
 				}
 			';
-		}
+		}//todo zi
 		else {
 			$data['main_block'] = '';
 		}

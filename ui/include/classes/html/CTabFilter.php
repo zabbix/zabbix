@@ -29,7 +29,7 @@ class CTabFilter extends CDiv {
 	const CSS_TAB_EXPANDED = 'expanded';
 	const CSS_TAB_SORTABLE_CONTAINER = 'ui-sortable-container';
 	const CSS_ID_PREFIX = 'tabfilter_';
-	const CSS_TABFILTER_ICON_FILTER = 'icon-filter';
+	const CSS_TABFILTER_ICON_FILTER = 'icon-filter'; //todo zi
 	const CSS_TABFILTER_ITEM = 'tabfilter-item-label';
 
 	/**
@@ -329,13 +329,13 @@ class CTabFilter extends CDiv {
 				->addClass($enabled ? null : ZBX_STYLE_DISABLED),
 			(new CSimpleButton())
 				->setEnabled($enabled)
-				->addClass(ZBX_STYLE_BTN_TIME_LEFT),
+				->addClass(ZBX_STYLE_BTN_TIME_LEFT), //todo zi
 			(new CSimpleButton(_('Zoom out')))
 				->setEnabled($enabled)
-				->addClass(ZBX_STYLE_BTN_TIME_OUT),
+				->addClass(ZBX_STYLE_BTN_TIME_OUT), //todo zi
 			(new CSimpleButton())
 				->setEnabled($enabled)
-				->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
+				->addClass(ZBX_STYLE_BTN_TIME_RIGHT) //todo zi
 		];
 	}
 
@@ -367,7 +367,7 @@ class CTabFilter extends CDiv {
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectNextTab')
 				->addClass('btn-iterator-page-next')
-		]);
+		]);// todo zi
 
 		if (array_key_exists('timeselector', $this->options)) {
 			array_map([$nav_list, 'addItem'], $this->getTimeselectorNavigation());
@@ -376,7 +376,7 @@ class CTabFilter extends CDiv {
 		return new CTag('nav', true , new CList([
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectPrevTab')
-				->addClass('btn-iterator-page-previous'),
+				->addClass('btn-iterator-page-previous'), // todo zi
 			$sortable ? (new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER) : null,
 			$static ? $static : null,
 			$nav_list

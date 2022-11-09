@@ -39,7 +39,7 @@ if (typeof addPopupValues === 'undefined') {
 			toleranceElement: '> div',
 			forceHelperSize: true,
 			tolerance: 'intersect',
-			handle: '.drag-icon',
+			handle: '.drag-icon', //todo zi
 			items: '.tree-item',
 			helper:	'clone',
 			revert:	10,

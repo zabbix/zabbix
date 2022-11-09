@@ -204,7 +204,7 @@ class CLegacyWebTest extends CWebTest {
 	public function zbxTestDoubleClickBeforeMessage($click_id, $id) {
 		$this->zbxTestClickWait($click_id);
 
-		if (!$this->zbxTestElementPresentId($id) && $this->query('class:msg-bad')->count() === 0){
+		if (!$this->zbxTestElementPresentId($id) && $this->query('class:msg-bad')->count() === 0){ //todo zi
 			$this->zbxTestClickWait($click_id);
 		}
 	}
@@ -315,14 +315,14 @@ class CLegacyWebTest extends CWebTest {
 		if ($string === 'Filter') {
 			$element = $this->query('xpath', "//div[contains(@class,'table filter-forms')]")->one()->isDisplayed();
 			if (!$element) {
-				$this->zbxTestClickXpathWait("//a[contains(@class,'filter-trigger')]");
+				$this->zbxTestClickXpathWait("//a[contains(@class,'filter-trigger')]"); //todo zi
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[contains(@class,'table filter-forms')]"));
 			}
 		}
 		else {
 			$element = $this->query('xpath', "//div[@class='time-input']")->one()->isDisplayed();
 			if (!$element) {
-				$this->zbxTestClickXpathWait("//a[contains(@class,'btn-time')]");
+				$this->zbxTestClickXpathWait("//a[contains(@class,'btn-time')]"); //todo
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[@class='time-input']"));
 			}
 		}

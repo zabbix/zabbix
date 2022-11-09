@@ -47,7 +47,7 @@ class testFormHostGroup extends CLegacyWebTest {
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('button:Add')->waitUntilClickable()->one()->click();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add host group');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add host group'); //todo zi
 		$this->zbxTestTextPresent('Invalid parameter "/1/name": cannot be empty.');
 		$dialog->close();
 	}
@@ -56,7 +56,7 @@ class testFormHostGroup extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=hostgroup.edit');
 		$this->zbxTestInputTypeWait('name', $this->hostGroup);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host group added');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host group added');//todo zi
 
 		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup'";
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -67,7 +67,7 @@ class testFormHostGroup extends CLegacyWebTest {
 
 		$this->zbxTestInputTypeWait('name', $this->hostGroup);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add host group');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add host group'); //todo zi
 		$this->zbxTestTextPresent('Host group "'.$this->hostGroup.'" already exists.');
 	}
 
@@ -79,7 +79,7 @@ class testFormHostGroup extends CLegacyWebTest {
 		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 		$form->getField('Group name')->clear();
 		$this->query('button:Update')->one()->click();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update host group');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update host group'); //todo zi
 		$this->zbxTestTextPresent('Invalid parameter "/1/name": cannot be empty.');
 		COverlayDialogElement::find()->one()->close();
 	}
@@ -98,7 +98,7 @@ class testFormHostGroup extends CLegacyWebTest {
 		$form = $this->query('id:hostgroupForm')->asForm()->one();
 		$form->query('id:name')->one()->overwrite($hostGroup['name']);
 		$form->submit();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update host group');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot update host group'); //todo zi
 		$this->zbxTestTextPresent('Host group "'.$hostGroup['name'].'" already exists.');
 		$dialog->close();
 	}
@@ -112,7 +112,7 @@ class testFormHostGroup extends CLegacyWebTest {
 		$form = $this->query('id:hostgroupForm')->asForm()->one();
 		$form->query('id:name')->one()->overwrite($this->hostGroup.' 2');
 		$form->submit();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host group updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host group updated');//todo zi
 
 		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup ". 2 ."'";
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -129,7 +129,7 @@ class testFormHostGroup extends CLegacyWebTest {
 
 		$dialog->query('button:Delete')->one()->click();
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host group deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host group deleted'); //todo zi
 
 		$sql = "SELECT * FROM hstgrp WHERE name='$this->hostGroup ". 2 ."'";
 		$this->assertEquals(0, CDBHelper::getCount($sql));

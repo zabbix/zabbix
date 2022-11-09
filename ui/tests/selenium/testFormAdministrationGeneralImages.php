@@ -89,7 +89,7 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/ui/tests/images/image.png');
 		$this->zbxTestClickButtonText('Update');
 		$this->zbxTestCheckTitle('Configuration of images');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated'); //todo zi
 
 		$sql = 'SELECT * FROM images WHERE imagetype=1 AND name=\''.$this->icon_image_name2.'\'';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Image with such name does not exist in the DB');
@@ -102,7 +102,7 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of images');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image deleted');//todo zi
 		$this->zbxTestTextPresent(['Images', 'Image deleted']);
 
 		$sql = 'SELECT * FROM images WHERE imagetype=1 AND name=\''.$this->icon_image_name2.'\'';
@@ -135,7 +135,7 @@ class testFormAdministrationGeneralImages extends CLegacyWebTest {
 		$this->zbxTestInputTypeWait('image', PHPUNIT_BASEDIR.'/ui/tests/images/image.png');
 		$this->zbxTestClickButtonText('Update');
 		$this->zbxTestCheckTitle('Configuration of images');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');//todo zi
 
 		$sql = 'SELECT * FROM images WHERE imagetype=2 AND name=\''.$this->bg_image_name2.'\'';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Image with such name does not exist in the DB');

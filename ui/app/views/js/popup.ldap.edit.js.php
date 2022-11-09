@@ -135,7 +135,7 @@ window.ldap_edit_popup = new class {
 
 	removePopupMessages() {
 		for (const el of this.form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) { //todo zi
 				el.parentNode.removeChild(el);
 			}
 		}

@@ -54,7 +54,7 @@ $widget = (new CWidget())
 			->setId('dashboard-control')
 			->addItem(
 				(new CTag('nav', true, new CList([
-					(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
+					(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF), //todo zi
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
 						->addItem((new CButton('dashboard-add-widget',
@@ -63,7 +63,7 @@ $widget = (new CWidget())
 						->addItem(
 							(new CButton('dashboard-add', '&#8203;'))
 								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
+								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON) //todo zi
 						),
 					(new CButton('dashboard-save', _('Save changes'))),
 					(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
@@ -93,11 +93,11 @@ $dashboard->addItem(
 				->addItem([
 					(new CSimpleButton())
 						->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
-						->addClass('btn-iterator-page-previous')
+						->addClass('btn-iterator-page-previous') //todo zi
 						->setEnabled(false),
 					(new CSimpleButton())
 						->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
-						->addClass('btn-iterator-page-next')
+						->addClass('btn-iterator-page-next') //todo zi
 						->setEnabled(false)
 				])
 		)

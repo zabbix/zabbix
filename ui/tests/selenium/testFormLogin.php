@@ -162,7 +162,7 @@ class testFormLogin extends CWebTest {
 		sleep(30);
 		$this->page->userLogin($user, 'zabbix12345');
 		$this->page->assertHeader('Global view');
-		$this->assertStringContainsString('5 failed login attempts logged.', $this->query('class:msg-bad')
+		$this->assertStringContainsString('5 failed login attempts logged.', $this->query('class:msg-bad') //todo zi
 				->waitUntilVisible()->one()->getText()
 		);
 	}

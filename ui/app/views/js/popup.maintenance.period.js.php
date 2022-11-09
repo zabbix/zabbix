@@ -75,7 +75,7 @@ function submitMaintenancePeriod(overlay) {
 			if ('error' in response) {
 				overlay.unsetLoading();
 
-				overlay.$dialogue.find('.msg-bad').remove();
+				overlay.$dialogue.find('.msg-bad').remove(); //todo zi
 
 				const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
 

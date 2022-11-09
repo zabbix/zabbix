@@ -1834,40 +1834,40 @@ define('ZBX_STYLE_ARROW_LEFT', 'arrow-left');
 define('ZBX_STYLE_ARROW_RIGHT', 'arrow-right');
 define('ZBX_STYLE_ARROW_UP', 'arrow-up');
 define('ZBX_STYLE_BLUE', 'blue');
-define('ZBX_STYLE_BTN_ADD', 'btn-add');
-define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav');
+define('ZBX_STYLE_BTN_ADD', 'btn-add'); //todo zi
+define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav'); //todo zi
 define('ZBX_STYLE_BTN_ALT', 'btn-alt');
-define('ZBX_STYLE_BTN_TOGGLE_CHEVRON', 'btn-toggle-chevron');
+define('ZBX_STYLE_BTN_TOGGLE_CHEVRON', 'btn-toggle-chevron'); //todo zi
 define('ZBX_STYLE_BTN_SPLIT', 'btn-split');
-define('ZBX_STYLE_BTN_TOGGLE', 'btn-dropdown-toggle');
+define('ZBX_STYLE_BTN_TOGGLE', 'btn-dropdown-toggle'); //todo zi
 define('ZBX_STYLE_BTN_BACK_MAP', 'btn-back-map');
 define('ZBX_STYLE_BTN_BACK_MAP_CONTAINER', 'btn-back-map-container');
 define('ZBX_STYLE_BTN_BACK_MAP_CONTENT', 'btn-back-map-content');
-define('ZBX_STYLE_BTN_BACK_MAP_ICON', 'btn-back-map-icon');
-define('ZBX_STYLE_BTN_ACTION', 'btn-action');
-define('ZBX_STYLE_BTN_DASHBOARD_CONF', 'btn-dashboard-conf');
+define('ZBX_STYLE_BTN_BACK_MAP_ICON', 'btn-back-map-icon'); //todo zi
+define('ZBX_STYLE_BTN_ACTION', 'btn-action'); //todo zi
+define('ZBX_STYLE_BTN_DASHBOARD_CONF', 'btn-dashboard-conf'); //todo zi
 define('ZBX_STYLE_BTN_DASHBOARD_NORMAL', 'btn-dashboard-normal');
-define('ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW', 'btn-dashboard-kioskmode-toggle-slideshow');
-define('ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE', 'btn-dashboard-kioskmode-previous-page');
-define('ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE', 'btn-dashboard-kioskmode-next-page');
-define('ZBX_STYLE_BTN_DEBUG', 'btn-debug');
-define('ZBX_STYLE_BTN_EDIT', 'btn-edit');
+define('ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW', 'btn-dashboard-kioskmode-toggle-slideshow'); //todo zi
+define('ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE', 'btn-dashboard-kioskmode-previous-page'); //todo zi
+define('ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE', 'btn-dashboard-kioskmode-next-page'); //todo zi
+define('ZBX_STYLE_BTN_DEBUG', 'btn-debug'); //todo zi
+define('ZBX_STYLE_BTN_EDIT', 'btn-edit'); //todo zi
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
-define('ZBX_STYLE_BTN_IMPORT', 'btn-import');
-define('ZBX_STYLE_BTN_INFO', 'btn-info');
+define('ZBX_STYLE_BTN_IMPORT', 'btn-import'); //todo zi
+define('ZBX_STYLE_BTN_INFO', 'btn-info'); //todo zi
 define('ZBX_STYLE_BTN_LINK', 'btn-link');
-define('ZBX_STYLE_BTN_KIOSK', 'btn-kiosk');
-define('ZBX_STYLE_BTN_MIN', 'btn-min');
+define('ZBX_STYLE_BTN_KIOSK', 'btn-kiosk'); //todo zi
+define('ZBX_STYLE_BTN_MIN', 'btn-min'); //todo zi
 define('ZBX_STYLE_BTN_REMOVE', 'btn-remove');
-define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
+define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav'); //todo zi
 define('ZBX_STYLE_BTN_TAG', 'btn-tag');
-define('ZBX_STYLE_BTN_TIME', 'btn-time');
-define('ZBX_STYLE_BTN_TIME_LEFT', 'btn-time-left');
-define('ZBX_STYLE_BTN_TIME_OUT', 'btn-time-out');
-define('ZBX_STYLE_BTN_TIME_RIGHT', 'btn-time-right');
-define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action');
-define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
-define('ZBX_STYLE_BTN_WIDGET_EDIT', 'btn-widget-edit');
+define('ZBX_STYLE_BTN_TIME', 'btn-time'); //todo zi
+define('ZBX_STYLE_BTN_TIME_LEFT', 'btn-time-left'); //todo zi
+define('ZBX_STYLE_BTN_TIME_OUT', 'btn-time-out'); //todo zi
+define('ZBX_STYLE_BTN_TIME_RIGHT', 'btn-time-right'); //todo zi
+define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action'); //todo zi
+define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse'); //todo zi
+define('ZBX_STYLE_BTN_WIDGET_EDIT', 'btn-widget-edit');//todo zi
 define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
 define('ZBX_STYLE_BOTTOM', 'bottom');
 define('ZBX_STYLE_BROWSER_LOGO_CHROME', 'browser-logo-chrome');
@@ -1923,7 +1923,7 @@ define('ZBX_STYLE_DIFF_REMOVED', 'diff-removed');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
-define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
+define('ZBX_STYLE_DRAG_ICON', 'drag-icon'); //todo zi
 define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
 define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');
 define('ZBX_STYLE_OK_UNACK_FG', 'ok-unack-fg');
@@ -1945,7 +1945,7 @@ define('ZBX_STYLE_FILTER_CONTAINER', 'filter-container');
 define('ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB', 'filter-highlight-row-cb');
 define('ZBX_STYLE_FILTER_FORMS', 'filter-forms');
 define('ZBX_STYLE_FILTER_SPACE', 'filter-space');
-define('ZBX_STYLE_FILTER_TRIGGER', 'filter-trigger');
+define('ZBX_STYLE_FILTER_TRIGGER', 'filter-trigger'); //todo zi
 define('ZBX_STYLE_FLH_AVERAGE_BG', 'flh-average-bg');
 define('ZBX_STYLE_FLH_DISASTER_BG', 'flh-disaster-bg');
 define('ZBX_STYLE_FLH_HIGH_BG', 'flh-high-bg');
@@ -1968,18 +1968,18 @@ define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
 define('ZBX_STYLE_HINTBOX_WRAP', 'hintbox-wrap');
-define('ZBX_STYLE_ICON_ACKN', 'icon-ackn');
-define('ZBX_STYLE_ICON_CAL', 'icon-cal');
+define('ZBX_STYLE_ICON_ACKN', 'icon-ackn'); //todo zi
+define('ZBX_STYLE_ICON_CAL', 'icon-cal');//todo zi
 define('ZBX_STYLE_ICON_COUNT', 'icon-count');
-define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');
-define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
+define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down'); //todo zi
+define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up'); //todo zi
 define('ZBX_STYLE_ICON_DESCRIPTION', 'icon-description');
-define('ZBX_STYLE_ICON_INFO', 'icon-info');
-define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible');
+define('ZBX_STYLE_ICON_INFO', 'icon-info'); //todo zi
+define('ZBX_STYLE_ICON_INVISIBLE', 'icon-invisible'); //todo zi
 define('ZBX_STYLE_ICON_USER', 'icon-user');
-define('ZBX_STYLE_ICON_USER_GROUP', 'icon-user-group');
-define('ZBX_STYLE_ICON_MAINTENANCE', 'icon-maintenance');
-define('ZBX_STYLE_ICON_WIZARD_ACTION', 'icon-wizard-action');
+define('ZBX_STYLE_ICON_USER_GROUP', 'icon-user-group'); //todo zi
+define('ZBX_STYLE_ICON_MAINTENANCE', 'icon-maintenance'); //todo zi
+define('ZBX_STYLE_ICON_WIZARD_ACTION', 'icon-wizard-action'); //TODO zi define
 define('ZBX_STYLE_ACTION_COMMAND', 'icon-action-command');
 define('ZBX_STYLE_ACTION_ICON_CLOSE', 'icon-action-close');
 define('ZBX_STYLE_ACTION_ICON_MSG', 'icon-action-msg');
@@ -2126,7 +2126,7 @@ define('ZBX_STYLE_TEXTAREA_FLEXIBLE', 'textarea-flexible');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER', 'textarea-flexible-container');
 define('ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT', 'textarea-flexible-parent');
 define('ZBX_STYLE_TFOOT_BUTTONS', 'tfoot-buttons');
-define('ZBX_STYLE_TD_DRAG_ICON', 'td-drag-icon');
+define('ZBX_STYLE_TD_DRAG_ICON', 'td-drag-icon'); //todo zi
 define('ZBX_STYLE_TIME_ZONE', 'time-zone');
 define('ZBX_STYLE_TIMELINE_AXIS', 'timeline-axis');
 define('ZBX_STYLE_TIMELINE_DATE', 'timeline-date');
@@ -2201,8 +2201,8 @@ define('ZBX_STYLE_BY_SEVERITY_WIDGET', 'by-severity-widget');
 define('ZBX_STYLE_CHECKBOX_BLOCK', 'checkbox-block');
 
 // Icons.
-define('ZBX_STYLE_ICON_TEXT', 'icon-text');
-define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret');
+define('ZBX_STYLE_ICON_TEXT', 'icon-text'); //todo zi
+define('ZBX_STYLE_ICON_SECRET_TEXT', 'icon-secret'); //todo zi
 define('ZBX_STYLE_ICON_HELP_HINT', 'icon-help-hint');
 define('ZBX_STYLE_ICON_DOC_LINK', 'icon-doc-link');
 

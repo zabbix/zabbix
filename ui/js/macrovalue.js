@@ -35,7 +35,7 @@
 	function btnUndoFocusEventHandle() {
 		$(this)
 			.closest('.macro-input-group')
-			.find('.btn-undo')
+			.find('.btn-undo') //todo zi
 			.toggleClass('is-focused');
 	}
 
@@ -75,8 +75,8 @@
 			.trigger('change');
 
 		$('.btn-dropdown-container button', $container)
-			.removeClass('icon-text icon-secret')
-			.addClass('btn-alt btn-dropdown-toggle icon-invisible');
+			.removeClass('icon-text icon-secret') //todo zi
+			.addClass('btn-alt btn-dropdown-toggle icon-invisible'); //todo zi
 
 		$this.hide();
 	}
@@ -145,7 +145,7 @@
 			);
 
 			if (!$curr_control.data('is-activated')) {
-				$('.btn-undo', $container).show();
+				$('.btn-undo', $container).show(); //todo zi
 				$curr_control.data('is-activated', true);
 			}
 
@@ -171,7 +171,7 @@
 				$('.input-secret input, .macro-input-group .textarea-flexible', $(this))
 					.off('focus blur', btnUndoFocusEventHandle)
 					.on('focus blur', btnUndoFocusEventHandle);
-				$('.btn-undo', $(this))
+				$('.btn-undo', $(this)) //todo zi
 					.off('click', btnUndoClickEventHandle)
 					.on('click', btnUndoClickEventHandle);
 				$('.dropdown-value', $(this))

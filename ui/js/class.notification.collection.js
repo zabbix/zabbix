@@ -140,11 +140,11 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
 	header.appendChild(this.btn_close);
 
 	this.btn_mute = this.makeToggleBtn(
-		{class: 'btn-sound-on', title: locale['S_MUTE']},
-		{class: 'btn-sound-off', title: locale['S_UNMUTE']}
+		{class: 'btn-sound-on', title: locale['S_MUTE']}, //todo zi
+		{class: 'btn-sound-off', title: locale['S_UNMUTE']} //todo zi
 	);
 
-	this.btn_snooze = this.makeToggleBtn({class: 'btn-alarm-on'}, {class: 'btn-alarm-off'});
+	this.btn_snooze = this.makeToggleBtn({class: 'btn-alarm-on'}, {class: 'btn-alarm-off'}); //todo zi
 	this.btn_snooze.setAttribute('title', locale['S_SNOOZE']);
 
 	const li_btn_snooze = document.createElement('li');

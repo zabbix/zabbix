@@ -703,7 +703,7 @@ function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT) {
 
 function changeWidgetState(obj, widgetId, idx) {
 	var widgetObj = jQuery('#' + widgetId + '_widget'),
-		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'),
+		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'), // TODO ZI:
 		state = 0;
 
 	if (css === 'btn-widget-expand') {

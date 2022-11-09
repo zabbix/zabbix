@@ -1464,13 +1464,13 @@ class testFormWeb extends CLegacyWebTest {
 		$expected = $data['expected'];
 		switch ($expected) {
 			case TEST_GOOD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario added'); //todo zi
 				$this->zbxTestCheckTitle('Configuration of web monitoring');
 				$this->zbxTestTextPresent(['Number of steps', 'Interval', 'Status']);
 				break;
 
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']); //todo zi
 				$this->zbxTestCheckTitle('Configuration of web monitoring');
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
@@ -1527,7 +1527,7 @@ class testFormWeb extends CLegacyWebTest {
 				$this->zbxTestInputTypeWait('expression', $expressionTrigger);
 				$this->zbxTestClickWait('add');
 
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger added');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger added'); //todo zi
 				$this->zbxTestCheckTitle('Configuration of triggers');
 				$this->zbxTestCheckHeader('Triggers');
 			}
@@ -1539,7 +1539,7 @@ class testFormWeb extends CLegacyWebTest {
 
 			$this->zbxTestAcceptAlert();
 
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario deleted');
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Web scenario deleted'); //todo zi
 			$this->assertEquals(0, CDBHelper::getCount("SELECT * FROM httptest test LEFT JOIN httpstep step ON ".
 				"step.httptestid = test.httptestid ".
 				"WHERE test.name = '".$name."' AND step.name = '".$step."'"));

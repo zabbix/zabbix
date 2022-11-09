@@ -3179,7 +3179,7 @@ ZABBIX.apps.map = (function($) {
 					axis: 'y',
 					containment: 'parent',
 					cursor: 'grabbing',
-					handle: 'div.drag-icon',
+					handle: 'div.drag-icon', //todo zi
 					tolerance: 'pointer',
 					opacity: 0.6,
 					update: this.recalculateSortOrder,

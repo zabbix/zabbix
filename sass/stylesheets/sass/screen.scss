@@ -39,6 +39,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20220722';
 @import "components/diff";
 @import "components/expandable-subfilter";
 @import "components/form-search";
+@import "components/icons";
 @import "components/inline-filter";
 @import "components/menu-main";
 @import "components/menu-user";
@@ -2064,7 +2065,7 @@ $icon-widget-btn: (
 //  .btn-iterator-page-next
 //  .btn-widget-action
 //  .btn-widget-collapse
-//  .btn-widget-expand
+//  .btn-widget-expand // TODO ZI
 //  .btn-widget-edit
 //  .btn-alarm-on
 //  .btn-alarm-off
@@ -3295,7 +3296,7 @@ $form-icon-btn: (
 		border-bottom-left-radius: 0;
 
 		&::after {
-			background: url($sprite-path) no-repeat -47px -478px;
+			background: url($sprite-path) no-repeat -47px -478px; //todo zi elaborate
 			content: '';
 			position: absolute;
 			left: 3px;
@@ -5913,7 +5914,7 @@ button {
 	}
 }
 
-.icon-invisible.menu-popup-item,
+.icon-invisible.menu-popup-item, // elaborate todo zi
 .icon-invisible.btn-dropdown-toggle {
 	width: 100%;
 

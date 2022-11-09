@@ -189,7 +189,7 @@ function itemGetValueTest(overlay) {
 			overlay.unsetLoading();
 		},
 		success: function(ret) {
-			overlay.$dialogue.find('.msg-bad, .msg-good, .msg-warning').remove();
+			overlay.$dialogue.find('.msg-bad, .msg-good, .msg-warning').remove(); //todo zi
 
 			if ('error' in ret) {
 				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
@@ -280,7 +280,7 @@ function itemCompleteTest(overlay) {
 			overlay.unsetLoading();
 		},
 		success: function(ret) {
-			overlay.$dialogue.find('.msg-bad, .msg-good, .msg-warning').remove();
+			overlay.$dialogue.find('.msg-bad, .msg-good, .msg-warning').remove(); //todo zi
 
 			if ('error' in ret) {
 				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);

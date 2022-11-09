@@ -539,7 +539,7 @@ class CWidgetNavTree extends CWidget {
 
 			button_add_child.type = 'button';
 			button_add_child.title = t('Add child element');
-			button_add_child.classList.add('btn-add', 'js-button-add-child');
+			button_add_child.classList.add('btn-add', 'js-button-add-child'); //todo zi
 			button_add_child.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_child);
 
@@ -547,7 +547,7 @@ class CWidgetNavTree extends CWidget {
 
 			button_add_maps.type = 'button';
 			button_add_maps.title = t('Add multiple maps');
-			button_add_maps.classList.add('btn-import', 'js-button-add-maps');
+			button_add_maps.classList.add('btn-import', 'js-button-add-maps'); //todo zi
 			button_add_maps.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_maps);
 
@@ -556,7 +556,7 @@ class CWidgetNavTree extends CWidget {
 
 				button_edit.type = 'button';
 				button_edit.title = t('Edit');
-				button_edit.classList.add('btn-edit', 'js-button-edit');
+				button_edit.classList.add('btn-edit', 'js-button-edit'); //todo zi
 				button_edit.setAttribute('data-id', item.id);
 				tools.appendChild(button_edit);
 
@@ -573,7 +573,7 @@ class CWidgetNavTree extends CWidget {
 		if (this._is_edit_mode && editable) {
 			const drag = document.createElement('div');
 
-			drag.classList.add('drag-icon');
+			drag.classList.add('drag-icon'); //todo zi
 			content.appendChild(drag);
 		}
 
@@ -885,7 +885,7 @@ class CWidgetNavTree extends CWidget {
 										overlay.unsetLoading();
 									},
 									success: (resp) => {
-										form.querySelectorAll('.msg-bad').forEach((msg) => {
+										form.querySelectorAll('.msg-bad').forEach((msg) => { //todo zi
 											msg.remove();
 										})
 

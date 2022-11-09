@@ -123,7 +123,7 @@ window.update_problem_popup = new class {
 			}
 		})
 		.done(function(response) {
-			overlay.$dialogue.find('.msg-bad').remove();
+			overlay.$dialogue.find('.msg-bad').remove(); //todo zi
 
 			if ('error' in response) {
 				const message_box = makeMessageBox('bad', response.error.messages,

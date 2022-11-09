@@ -222,7 +222,7 @@ function objectSize(obj) {
 /**
  * Add standard message to the top of the site.
  *
- * @param {jQuery}  jQuery object representing HTML message box with class name .msg-good, .msg-bad or .msg-warning.
+ * @param {jQuery}  jQuery object representing HTML message box with class name .msg-good, .msg-bad or .msg-warning. //todo zi
  */
 function addMessage($msg_box) {
 	var $wrapper = $('.wrapper'),
@@ -244,7 +244,7 @@ function addMessage($msg_box) {
  * Clear standard messages.
  */
 function clearMessages() {
-	$('.wrapper').find('> .msg-good, > .msg-bad, > .msg-warning').not('.msg-global-footer').remove();
+	$('.wrapper').find('> .msg-good, > .msg-bad, > .msg-warning').not('.msg-global-footer').remove(); //todo zi
 }
 
 /**
@@ -717,7 +717,7 @@ function parseUrlString(url_string) {
  * @return {jQuery}
  */
 function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = null) {
-	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'},
+	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'}, //todo zi
 		msg_class = classes[type];
 
 	if (show_details === null) {

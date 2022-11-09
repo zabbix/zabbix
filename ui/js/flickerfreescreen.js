@@ -261,9 +261,9 @@
 							screen.timestamp = request_start;
 							screen.isRefreshing = false;
 
-							$('.wrapper > .msg-bad').remove();
+							$('.wrapper > .msg-bad').remove(); //todo zi
 							$('#flickerfreescreen_' + id).replaceWith(html);
-							html.filter('.msg-bad').insertBefore('.wrapper main');
+							html.filter('.msg-bad').insertBefore('.wrapper main'); //todo zi
 
 							window.flickerfreeScreen.setElementProgressState(id, false);
 						}

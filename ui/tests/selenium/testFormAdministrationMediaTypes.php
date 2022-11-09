@@ -305,7 +305,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=mediatype.list');
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type updated'); //todo zi
 		$this->zbxTestTextPresent($name);
 
 		$newHashMediaType = CDBHelper::getHash($sqlMediaType);
@@ -336,7 +336,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 			$this->zbxTestTextPresent('Media types used by action');
 		}
 		else {
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type deleted');
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type deleted'); //todo zi
 			$sql = 'SELECT * FROM media_type WHERE mediatypeid='.zbx_dbstr($id);
 			$this->assertEquals(0, CDBHelper::getCount($sql));
 		}
@@ -626,7 +626,7 @@ class testFormAdministrationMediaTypes extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type added');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Media type added'); //todo zi
 				$this->zbxTestCheckTitle('Configuration of media types');
 				$this->zbxTestTextPresent($data['name']);
 				break;

@@ -135,7 +135,7 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 				break;
 
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item'); //todo zi
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}

@@ -54,7 +54,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			CProfiler::getInstance()->show();
 
 			(new CButton(null))
-				->addClass(ZBX_STYLE_BTN_DEBUG)
+				->addClass(ZBX_STYLE_BTN_DEBUG) //todo zi
 				->show();
 		}
 	}

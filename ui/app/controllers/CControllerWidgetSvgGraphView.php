@@ -173,9 +173,9 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 
 		if (CWidgetFormSvgGraph::hasOverrideTime($fields)) {
 			$info[] = [
-				'icon' => 'btn-info-clock',
+				'icon' => 'btn-info-clock', //todo zi
 				'hint' => relativeDateToText($fields['time_from'], $fields['time_to'])
-			];
+			]; //todo zi
 		}
 
 		return $info;

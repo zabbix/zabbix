@@ -247,9 +247,9 @@ class CFilter extends CDiv {
 
 		if ($visible) {
 			$this->addTab(new CDiv([
-				(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_LEFT),
-				(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_OUT),
-				(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
+				(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_LEFT), //todo zi
+				(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_OUT), //todo zi
+				(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_RIGHT)//todo zi
 			]), null);
 
 			$predefined_ranges = [];

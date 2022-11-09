@@ -52,7 +52,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Linux by Zabbix agent active');
 		$dialog->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated'); //todo zi
 		$this->zbxTestTextPresent($this->host_for_template);
 	}
 
@@ -87,7 +87,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 		$dialog->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');//todo zi
 
 		// this should be a separate test
 		// should check that items, triggers and graphs are not linked to the template anymore
@@ -112,7 +112,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Linux by Zabbix agent active');
 		$form->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated'); //todo zi
 		$this->zbxTestTextPresent($this->host_for_template);
 	}
 
@@ -147,7 +147,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 		$dialog->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated'); //todo zi
 
 		$this->zbxTestClickXpathWait("//a[contains(@href,'items.php?filter_set=1&filter_hostids%5B0%5D=".$hostid."')]");
 		$this->page->waitUntilReady();

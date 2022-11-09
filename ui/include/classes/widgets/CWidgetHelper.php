@@ -1109,7 +1109,7 @@ class CWidgetHelper {
 				}
 			});
 		';
-	}
+	} //todo zi
 
 	/**
 	 * Function returns array containing HTML objects filled with given values. Used to generate HTML row in widget
@@ -1279,7 +1279,7 @@ class CWidgetHelper {
 			(new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
 				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
-				->addClass('js-main-drag-icon'),
+				->addClass('js-main-drag-icon'), //todo zi
 			(new CDiv())
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
 				->addClass('dataset-head')
@@ -1532,7 +1532,7 @@ class CWidgetHelper {
 				(new CButton(null, '&#8203;'))
 					->setId('dataset-menu')
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
+					->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON) //todo zi
 			]);
 	}
 

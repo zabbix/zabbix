@@ -588,7 +588,7 @@ class testFormGraph extends CLegacyWebTest {
 		$this->zbxTestLogin('graphs.php?form=update&graphid='.$data['graphid'].'&hostid=40001&context=host');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of graphs');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph updated'); //todo zi
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Hosts')->clear()->fill('Simple form test host');
 		$filter->submit();
@@ -952,7 +952,7 @@ class testFormGraph extends CLegacyWebTest {
 		switch ($expected) {
 			case TEST_GOOD:
 				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add graph']);
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph added');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph added'); //todo zi
 				$this->zbxTestCheckTitle('Configuration of graphs');
 				$this->zbxTestCheckHeader('Graphs');
 				break;

@@ -29,7 +29,7 @@
 			$input = $btn_change.siblings('input[type=password]'),
 			$btn_undo = $btn_change
 				.closest('.macro-input-group')
-				.find('.btn-undo');
+				.find('.btn-undo'); //todo zi
 
 		$input
 			.prop('disabled', false)

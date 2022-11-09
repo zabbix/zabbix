@@ -93,12 +93,12 @@ $widget = (new CWidget())
 				->addClass(ZBX_STYLE_DASHBOARD_KIOSKMODE_CONTROLS)
 				->addItem(
 					(new CSimpleButton(null))
-						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE)
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE) //todo zi
 						->setTitle(_('Previous page'))
 				)
 				->addItem(
 					(new CSimpleButton(null))
-						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW)
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW) //todo zi
 						->setTitle(($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
 							? _s('Stop slideshow')
 							: _s('Start slideshow')
@@ -111,7 +111,7 @@ $widget = (new CWidget())
 				)
 				->addItem(
 					(new CSimpleButton(null))
-						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE)
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE) //todo zi
 						->setTitle(_('Next page'))
 				)
 			: null
@@ -158,11 +158,11 @@ if (count($data['dashboard']['pages']) > 1
 						->addItem([
 							(new CSimpleButton())
 								->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
-								->addClass('btn-iterator-page-previous')
+								->addClass('btn-iterator-page-previous') //todo zi
 								->setEnabled(false),
 							(new CSimpleButton())
 								->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
-								->addClass('btn-iterator-page-next')
+								->addClass('btn-iterator-page-next') //todo zi
 								->setEnabled(false),
 							(new CSimpleButton([
 								(new CSpan(_s('Start slideshow')))->addClass('slideshow-state-stopped'),

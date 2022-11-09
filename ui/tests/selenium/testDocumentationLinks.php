@@ -121,7 +121,7 @@ class testDocumentationLinks extends CWebTest {
 						]
 					]
 				]
-			],
+			], //todo
 			// #5 Add dashboard page configuration popup.
 			[
 				[
@@ -431,6 +431,7 @@ class testDocumentationLinks extends CWebTest {
 					]
 				]
 			],
+			//todo zi
 			// #40 Availability report view.
 			[
 				[
@@ -692,7 +693,7 @@ class testDocumentationLinks extends CWebTest {
 					],
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets'
 				]
-			],
+			], //todo zi
 			// #69 Template dashboard widget edit popup.
 			[
 				[

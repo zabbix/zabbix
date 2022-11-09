@@ -55,35 +55,33 @@ $form-search-focused-icon-hover-opacity: $form-search-icon-focused-opacity !defa
 		}
 	}
 
-	.search-icon {
-		position: absolute;
-		top: 0;
-		right: 0;
-		width: 24px;
-		height: 24px;
+	.zi-search {
+		float: right;
 		padding: 0;
 
 		// Reset global button style.
 		background-color: transparent !important;
-
-		background: url($sprite-path) no-repeat $form-search-icon-bg-position;
-		image-rendering: pixelated;
 		border: 0;
 		opacity: $form-search-icon-opacity;
 		transform: scale(.8);
 
 		&:focus {
+			opacity: 1;
 			box-shadow: 0 0 0 2px $form-search-focused-border-color;
 		}
 
-		&:focus,
 		&:hover:not(:disabled) {
-			background-position: $form-search-icon-focused-bg-position;
-			opacity: $form-search-icon-focused-opacity;
+			&::before {
+				color: $menu-icon-color-hover-focus;
+			}
 		}
 
-		@if $ui-transitions {
-			transition: opacity $ui-transition-duration ease-out;
+		&::before {
+			font-size: 24px;
+
+			@if $ui-transitions {
+				transition: opacity $ui-transition-duration ease-out;
+			}
 		}
 	}
 }

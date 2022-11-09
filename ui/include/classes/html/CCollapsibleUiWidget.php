@@ -56,7 +56,7 @@ class CCollapsibleUiWidget extends CUiWidget {
 		}
 		else {
 			$icon
-				->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
+				->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND) // TODO ZI:
 				->setTitle(_('Expand'));
 		}
 

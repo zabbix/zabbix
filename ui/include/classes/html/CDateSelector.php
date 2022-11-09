@@ -190,7 +190,7 @@ class CDateSelector extends CTag {
 					->setReadonly($this->readonly)
 			)
 			->addItem((new CButton($this->name.'_calendar'))
-				->addClass(ZBX_STYLE_ICON_CAL)
+				->addClass(ZBX_STYLE_ICON_CAL) //todo zi
 				->setEnabled($this->enabled && !$this->readonly)
 				->onClick('toggleCalendar(this, "'.$this->name.'", "'.$this->date_format.'");'));
 

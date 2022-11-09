@@ -33,7 +33,7 @@ class CWidgetElement extends CElement {
 	 * @return integer
 	 */
 	public function getRefreshInterval() {
-		$this->query('xpath:.//button[@class="btn-widget-action"]')->waitUntilPresent()->one()->click(true);
+		$this->query('xpath:.//button[@class="btn-widget-action"]')->waitUntilPresent()->one()->click(true); //todo zi
 		$selected = $this->query('xpath://ul[@role="menu"]//a[contains(@aria-label, "selected")]')->one();
 		$aria_label = explode(', ', $selected->getAttribute('aria-label'), 3);
 
@@ -66,7 +66,7 @@ class CWidgetElement extends CElement {
 	 * @return boolean
 	 */
 	public function isEditable() {
-		return $this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->isPresent();
+		return $this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->isPresent(); //todo zi
 	}
 
 	/**
@@ -77,7 +77,7 @@ class CWidgetElement extends CElement {
 	public function edit() {
 		// Edit can sometimes fail so we have to retry this operation.
 		for ($i = 0; $i < 2; $i++) {
-			$this->query('xpath:.//button[@class="btn-widget-edit"]')->waitUntilPresent()->one()->click(true);
+			$this->query('xpath:.//button[@class="btn-widget-edit"]')->waitUntilPresent()->one()->click(true); //todo zi
 
 			try {
 				return $this->query('xpath://div[@data-dialogueid="widget_properties"]//form')->waitUntilVisible()->asForm()->one();

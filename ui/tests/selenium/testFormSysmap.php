@@ -292,13 +292,13 @@ class testFormSysmap extends CLegacyWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestTextNotPresent('Page received incorrect data', 'Cannot add network map');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map added');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map added'); //todo zi
 				$this->assertEquals(1, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$data['name']."'"));
 				break;
 
 		case TEST_BAD:
 				$this->zbxTestTextNotPresent('Network map added');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']); //todo zi
 				foreach ($data['errors'] as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}
@@ -342,7 +342,7 @@ class testFormSysmap extends CLegacyWebTest {
 		$this->zbxTestInputTypeOverwrite('name', $new_map_name);
 		$this->zbxTestClickWait('update');
 
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map updated'); //todo zi
 		$this->zbxTestTextPresent($new_map_name);
 		$this->assertEquals(1, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$new_map_name."'"));
 		$this->assertEquals(0, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='$this->edit_map_name'"));
@@ -357,7 +357,7 @@ class testFormSysmap extends CLegacyWebTest {
 		$this->zbxTestInputTypeOverwrite('name', $mapName);
 		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of network maps');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map added');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map added'); //todo zi
 		$this->assertEquals(1, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
 		$this->zbxTestTextPresent($mapName);
 		return $mapName;
@@ -373,7 +373,7 @@ class testFormSysmap extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait("//a[text()='".$mapName."']/../..//a[text()='Properties']");
 		$this->zbxTestClickWait('delete');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Network map deleted'); //todo zi
 		$this->assertEquals(0, CDBHelper::getCount("SELECT sysmapid FROM sysmaps WHERE name='".$mapName."'"));
 	}
 }

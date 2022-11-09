@@ -519,7 +519,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$this->zbxTestClick('add');
 
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype added');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype added'); //todo zi
 
 		if (array_key_exists('visible_name', $data)) {
 			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$data['visible_name'].'"]');
@@ -557,7 +557,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestClickWait('update');
 
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated');
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated'); //todo zi
 			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$host['name'].'"]');
 		}
 
@@ -633,7 +633,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$this->zbxTestClick('update');
 
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype updated'); //todo zi
 		if (array_key_exists('visible_name', $data)) {
 			$this->zbxTestTextPresent($data['visible_name']);
 		}
@@ -912,7 +912,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$this->zbxTestClick('add');
 
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype added');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype added'); //todo zi
 
 		if (array_key_exists('visible_name', $data)) {
 			$this->zbxTestAssertElementPresentXpath('//a[contains(@href, "form") and text()="'.$data['visible_name'].'"]');
@@ -974,7 +974,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		$this->zbxTestClickAndAcceptAlert('delete');
 
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host prototype deleted'); //todo zi
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM hosts WHERE host='.zbx_dbstr($prototype_name)));
 	}

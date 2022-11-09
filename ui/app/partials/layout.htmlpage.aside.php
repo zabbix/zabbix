@@ -37,16 +37,16 @@ $header = (new CDiv())
 	->addItem(
 		(new CDiv([
 			(new CButton(null, _('Collapse sidebar')))
-				->addClass('button-compact js-sidebar-mode')
+				->addClass('button-compact js-sidebar-mode') //todo zi
 				->setAttribute('title', _('Collapse sidebar')),
 			(new CButton(null, _('Expand sidebar')))
-				->addClass('button-expand js-sidebar-mode')
+				->addClass('button-expand js-sidebar-mode') //todo zi
 				->setAttribute('title', _('Expand sidebar')),
 			(new CButton(null, _('Hide sidebar')))
-				->addClass('button-hide js-sidebar-mode')
+				->addClass('button-hide js-sidebar-mode') //todo zi
 				->setAttribute('title', _('Hide sidebar')),
 			(new CButton(null, _('Show sidebar')))
-				->addClass('button-show js-sidebar-mode')
+				->addClass('button-show js-sidebar-mode') //todo zi
 				->setAttribute('title', _('Show sidebar'))
 		]))->addClass('sidebar-header-buttons')
 	);
@@ -56,7 +56,7 @@ $server_name = ($data['server_name'] !== '')
 	: null;
 
 $search_icon = (new CSubmitButton(null))
-	->addClass('search-icon')
+	->addClass('zi-search js-search')
 	->setTitle(_('Search'));
 
 if (getRequest('search', '') === '') {

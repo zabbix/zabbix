@@ -220,7 +220,7 @@ class testPageServicesServices extends CWebTest {
 			);
 		}
 
-		$edit_button = $info_card->query('xpath://button['.CXPathHelper::fromClass('btn-edit').']');
+		$edit_button = $info_card->query('xpath://button['.CXPathHelper::fromClass('btn-edit').']'); //todo zi
 		$this->assertEquals($edit, $edit_button->one(false)->isClickable());
 		$table->invalidate();
 		$this->assertTableStats(1);

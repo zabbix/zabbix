@@ -34,7 +34,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Dashboards')))
 					->setId('dashboard')
-					->setIcon('icon-dashboards')
+					->setIcon('zi-dashboard')
 					->setAction('dashboard.view')
 					->setAliases(['dashboard.list'])
 			);
@@ -74,7 +74,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Monitoring')))
 					->setId('view')
-					->setIcon('icon-monitoring')
+					->setIcon('zi-eye-alt')
 					->setSubMenu(new CMenu($submenu_monitoring))
 			);
 		}
@@ -101,7 +101,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Services')))
 					->setId('services')
-					->setIcon('icon-services')
+					->setIcon('zi-hierarchy')
 					->setSubMenu(new CMenu($submenu_services))
 			);
 		}
@@ -121,7 +121,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Inventory')))
 					->setId('cm')
-					->setIcon('icon-inventory')
+					->setIcon('zi-list')
 					->setSubMenu(new CMenu($submenu_inventory))
 			);
 		}
@@ -159,7 +159,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Reports')))
 					->setId('reports')
-					->setIcon('icon-reports')
+					->setIcon('zi-report')
 					->setSubMenu(new CMenu($submenu_reports))
 			);
 		}
@@ -214,7 +214,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Data collection')))
 					->setId('config')
-					->setIcon('icon-data-collection')
+					->setIcon('zi-download')
 					->setSubMenu(new CMenu($submenu_data_collection))
 			);
 		}
@@ -282,7 +282,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Alerts')))
 					->setId('alerts')
-					->setIcon('icon-alerts')
+					->setIcon('zi-envelope')
 					->setSubMenu(new CMenu($submenu_alerts))
 			);
 		}
@@ -319,7 +319,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Users')))
 					->setId('users-menu')
-					->setIcon('icon-users')
+					->setIcon('zi-users')
 					->setSubMenu(new CMenu($submenu_users))
 			);
 		}
@@ -387,7 +387,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Administration')))
 					->setId('admin')
-					->setIcon('icon-administration')
+					->setIcon('zi-cog')
 					->setSubMenu(new CMenu($submenu_administration))
 			);
 		}
@@ -408,14 +408,14 @@ class CMenuHelper {
 			$menu
 				->add(
 					(new CMenuItem(_('Support')))
-						->setIcon('icon-support')
+						->setIcon('zi-support')
 						->setUrl(new CUrl(getSupportUrl($lang)))
 						->setTitle(_('Zabbix Technical Support'))
 						->setTarget('_blank')
 				)
 				->add(
 					(new CMenuItem(_('Integrations')))
-						->setIcon('icon-integrations')
+						->setIcon('zi-z')
 						->setUrl(new CUrl(getIntegrationsUrl($lang)))
 						->setTitle(_('Zabbix Integrations'))
 						->setTarget('_blank')
@@ -424,7 +424,7 @@ class CMenuHelper {
 
 		$menu->add(
 			(new CMenuItem(_('Help')))
-				->setIcon('icon-help')
+				->setIcon('zi-help')
 				->setUrl(new CUrl(CBrandHelper::getHelpUrl()))
 				->setTitle(_('Help'))
 				->setTarget('_blank')
@@ -438,14 +438,14 @@ class CMenuHelper {
 		if (CWebUser::isGuest()) {
 			$menu->add(
 				(new CMenuItem(_('Guest user')))
-					->setIcon('icon-guest')
+					->setIcon('zi-user')
 					->setTitle(getUserFullname($user))
 			);
 		}
 		elseif (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
 			$menu->add(
 				(new CMenuItem(_('User settings')))
-					->setIcon('icon-profile')
+					->setIcon('zi-user-filled')
 					->setTitle(getUserFullname($user))
 					->setSubMenu(new CMenu([
 						(new CMenuItem(_('Profile')))
@@ -458,7 +458,7 @@ class CMenuHelper {
 		else {
 			$menu->add(
 				(new CMenuItem(_('User settings')))
-					->setIcon('icon-profile')
+					->setIcon('zi-user-filled')
 					->setAction('userprofile.edit')
 					->setTitle(getUserFullname($user))
 			);
@@ -466,7 +466,7 @@ class CMenuHelper {
 
 		$menu->add(
 			(new CMenuItem(_('Sign out')))
-				->setIcon('icon-signout')
+				->setIcon('zi-signout')
 				->setUrl(new CUrl('#signout'))
 				->setTitle(_('Sign out'))
 				->onClick('ZABBIX.logout()')

@@ -156,7 +156,7 @@ class testFormTemplate extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Template added');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Template added'); //todo zi
 				$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$data['name']."'"));
 				break;
 
@@ -224,7 +224,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->filterAndOpenTemplate($this->template_edit_name);
 		$this->zbxTestInputTypeOverwrite('template_name', $new_template_name);
 		$this->zbxTestClickWait('update');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template updated'); //todo zi
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$new_template_name."'"));
 		$this->assertEquals(0, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_edit_name'"));
 	}
@@ -237,7 +237,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->zbxTestClickWait('clone');
 		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added'); //todo zi
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
 
@@ -254,7 +254,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->zbxTestClickWait('full_clone');
 		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
 		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added'); //todo zi
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
 
@@ -270,7 +270,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->filterAndOpenTemplate($this->template);
 		$this->zbxTestClickWait('delete');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template deleted'); //todo zi
 
 		$this->assertEquals(0, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template'"));
 		$this->assertEquals(0, CDBHelper::getCount("select * from hostmacro where hostid='".$template['hostid']."'"));
@@ -282,7 +282,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->filterAndOpenTemplate($this->template_full_delete);
 		$this->zbxTestClickWait('delete_and_clear');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template deleted'); //todo zi
 		$this->assertEquals(0, CDBHelper::getCount("SELECT hostid FROM hosts WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(0, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(0, CDBHelper::getCount("SELECT graphid FROM graphs WHERE templateid='".$template['hostid']."'"));
