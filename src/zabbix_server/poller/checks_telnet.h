@@ -21,7 +21,7 @@
 #define ZABBIX_CHECKS_TELNET_H
 
 #include "module.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 int	get_value_telnet(DC_ITEM *item, AGENT_RESULT *result);
 

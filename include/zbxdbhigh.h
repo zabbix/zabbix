@@ -641,10 +641,6 @@ typedef struct
 }
 zbx_item_diff_t;
 
-void	zbx_db_trigger_get_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
-void	zbx_db_trigger_get_recovery_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
-void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
-
 typedef struct
 {
 	zbx_uint64_t			hostid;
@@ -776,13 +772,6 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 
-void	zbx_db_trigger_get_all_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
-void	zbx_db_trigger_get_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
-int	zbx_db_trigger_get_all_hostids(const ZBX_DB_TRIGGER *trigger, const zbx_vector_uint64_t **hostids);
-int	zbx_db_trigger_get_constant(const ZBX_DB_TRIGGER *trigger, int index, char **out);
-int	zbx_db_trigger_get_itemid(const ZBX_DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
-void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
-
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
 void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
 
@@ -798,10 +787,10 @@ char	*zbx_get_proxy_protocol_version_str(const struct zbx_json_parse *jp);
 int	zbx_get_proxy_protocol_version_int(const char *version_str);
 
 /* condition evaluation types */
-#define ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR			0
-#define ZBX_ACTION_CONDITION_EVAL_TYPE_AND			1
-#define ZBX_ACTION_CONDITION_EVAL_TYPE_OR			2
-#define ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION		3
+#define ZBX_CONDITION_EVAL_TYPE_AND_OR			0
+#define ZBX_CONDITION_EVAL_TYPE_AND			1
+#define ZBX_CONDITION_EVAL_TYPE_OR			2
+#define ZBX_CONDITION_EVAL_TYPE_EXPRESSION		3
 
 /* condition types */
 #define ZBX_CONDITION_TYPE_HOST_GROUP			0
@@ -832,5 +821,20 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str);
 #define ZBX_CONDITION_TYPE_EVENT_TAG_VALUE		26
 #define ZBX_CONDITION_TYPE_SERVICE			27
 #define ZBX_CONDITION_TYPE_SERVICE_NAME			28
+
+typedef struct
+{
+	zbx_uint64_t	autoreg_hostid;
+	zbx_uint64_t	hostid;
+	char		*host;
+	char		*ip;
+	char		*dns;
+	char		*host_metadata;
+	int		now;
+	unsigned short	port;
+	unsigned short	flag;
+	unsigned int	connection_type;
+}
+zbx_autoreg_host_t;
 
 #endif /* ZABBIX_DBHIGH_H */

@@ -21,7 +21,7 @@
 #include "zbxhttp.h"
 #include "zbxjson.h"
 #include "log.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 #ifdef HAVE_LIBCURL
 

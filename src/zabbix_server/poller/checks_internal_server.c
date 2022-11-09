@@ -18,9 +18,9 @@
 **/
 
 #include "zbxcommon.h"
-#include "valuecache.h"
+#include "zbxcachevalue.h"
 #include "zbxlld.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxha.h"
 #include "zbxjson.h"
 #include "zbxtime.h"

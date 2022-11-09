@@ -1953,7 +1953,9 @@ AC_CONFIG_FILES([
 	src/libs/zbxcrypto/Makefile
 	src/libs/zbxcyberark/Makefile
 	src/libs/zbxdb/Makefile
-	src/libs/zbxdbcache/Makefile
+	src/libs/zbxcacheconfig/Makefile
+	src/libs/zbxcachehistory/Makefile
+	src/libs/zbxcachevalue/Makefile
 	src/libs/zbxdbhigh/Makefile
 	src/libs/zbxdbwrap/Makefile
 	src/libs/zbxdbschema/Makefile

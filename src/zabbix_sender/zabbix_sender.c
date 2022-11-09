@@ -1497,6 +1497,7 @@ int	main(int argc, char **argv)
 	char			*error = NULL;
 	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp, ns;
 	zbx_thread_sendval_args	*sendval_args = NULL;
+	zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 0};
 
 	zbx_config_tls = zbx_config_tls_new();
 
@@ -1514,7 +1515,7 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zabbix_open_log(LOG_TYPE_UNDEFINED, CONFIG_LOG_LEVEL, NULL, &error))
+	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
