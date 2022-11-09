@@ -258,6 +258,8 @@ static int	ha_db_begin(zbx_ha_info_t *info)
 
 	if (ZBX_DB_FAIL == info->db_status)
 		ha_set_error(info, "database error");
+	else if (ZBX_DB_DOWN == info->db_status)
+		DBclose();
 
 	return info->db_status;
 }
@@ -279,6 +281,8 @@ static int	ha_db_rollback(zbx_ha_info_t *info)
 
 	if (ZBX_DB_FAIL == info->db_status)
 		ha_set_error(info, "database error");
+	else if (ZBX_DB_DOWN == info->db_status)
+		DBclose();
 
 	return info->db_status;
 }
