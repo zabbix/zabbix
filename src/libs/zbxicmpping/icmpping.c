@@ -49,7 +49,6 @@ static int		packet_interval6;
 static int		fping_ipv6_supported;
 #endif
 
-#define FPING_CHECK_EXPIRED	3600	/* seconds, expire detected fping options every hour */
 static time_t	fping_check_reset_at;	/* time of the last fping options expiration */
 
 static void	get_source_ip_option(const char *fping, const char **option, unsigned char *checked)
@@ -292,6 +291,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 
 	assert(hosts);
 
+#define FPING_CHECK_EXPIRED	3600	/* seconds, expire detected fping options every hour */
+
 	/* expire detected options once in a while */
 	if ((time(NULL) - fping_check_reset_at) > FPING_CHECK_EXPIRED)
 	{
@@ -305,6 +306,8 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 		fping_ipv6_supported = FPING_UNINITIALIZED_VALUE;
 #endif
 	}
+
+#undef FPING_CHECK_EXPIRED
 
 	tmp_size = (size_t)(MAX_STRING_LEN + count * response_time_chars_max);
 	tmp = zbx_malloc(tmp, tmp_size);
@@ -711,6 +714,13 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize library                                                *
+ *                                                                            *
+ * Parameters: config - [IN]  pointer to library configuration structure      *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config)
 {
 	config_icmpping = config;
@@ -720,6 +730,7 @@ void	zbx_init_library_icmpping(const zbx_config_icmpping_t *config)
  *                                                                            *
  * Purpose: ping hosts listed in the host files                               *
  *                                                                            *
+ * Parameters: hosts         - [IN]  list of target hosts                     *
  *             hosts_count   - [IN]  number of target hosts                   *
  *             count         - [IN]  number of pings to send to each target   *
  *                                   (fping option -C)                        *
