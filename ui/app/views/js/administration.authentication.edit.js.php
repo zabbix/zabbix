@@ -117,7 +117,7 @@
 					this.form.querySelector('[name="jit_provision_interval"]').toggleAttribute('readonly', true);
 				}
 
-				if (is_readonly && ldap_default_row_index) {
+				if (is_readonly && default_index && ldap_default_row_index) {
 					default_index_hidden.value = default_index.value;
 				}
 			});
