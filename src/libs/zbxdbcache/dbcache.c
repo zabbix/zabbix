@@ -2492,9 +2492,9 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
  *             proxy_subscribtions - [IN] history compression age             *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, const zbx_vector_uint64_t *itemids,
-		DC_ITEM *items, const int *errcodes, int history_num, zbx_vector_ptr_t *item_diff,
-		zbx_vector_ptr_t *inventory_values, int compression_age, zbx_vector_uint64_pair_t *proxy_subscribtions)
+static void	DCmass_prepare_history(ZBX_DC_HISTORY *history, DC_ITEM *items, const int *errcodes, int history_num,
+		zbx_vector_ptr_t *item_diff, zbx_vector_ptr_t *inventory_values, int compression_age,
+		zbx_vector_uint64_pair_t *proxy_subscribtions)
 {
 	static time_t	last_history_discard = 0;
 	time_t		now;
