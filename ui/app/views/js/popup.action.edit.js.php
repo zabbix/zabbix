@@ -47,17 +47,20 @@ window.action_edit_popup = new class {
 		// Reload operation table when esc_period is changed.
 		let esc_period = document.querySelector('#esc_period');
 		if (esc_period) {
-			esc_period.addEventListener('change', () => {
-				this._loadOperationTable();
+			esc_period.addEventListener('change', (e) => {
+				this._loadOperationTable(e);
 			});
 		}
 	}
 
 	_loadOperationTable(e = null) {
-		if (!this.recovery && e) {
+
+		if (e.type == 'change'){
+			this.recovery = <?= ACTION_OPERATION ?>
+		}
+		else if (e && e.type != 'change') {
 			this.recovery = e.detail.operation.recovery;
 		}
-
 
 		if (this.recovery == <?= ACTION_RECOVERY_OPERATION ?>){
 			this.$operation_table = $('#rec-operations-table-div');
