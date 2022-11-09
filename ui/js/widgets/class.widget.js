@@ -847,7 +847,7 @@ class CWidget extends CBaseComponent {
 			this._button_edit = document.createElement('button');
 			this._button_edit.type = 'button';
 			this._button_edit.title = t('Edit')
-			this._button_edit.classList.add('btn-widget-edit'); //todo zi
+			this._button_edit.classList.add('btn-widget-edit'); // todo zi
 
 			const li = document.createElement('li');
 
@@ -860,7 +860,7 @@ class CWidget extends CBaseComponent {
 		this._button_actions.title = t('Actions');
 		this._button_actions.setAttribute('aria-expanded', 'false');
 		this._button_actions.setAttribute('aria-haspopup', 'true');
-		this._button_actions.classList.add('btn-widget-action'); //todo zi
+		this._button_actions.classList.add('btn-widget-action'); // todo zi
 
 		const li = document.createElement('li');
 

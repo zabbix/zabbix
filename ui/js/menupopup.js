@@ -1693,7 +1693,7 @@ jQuery(function($) {
 	}
 
 	function menuPopupKeyDownHandler(event) {
-		var link_selector = '.menu-popup-item', //todo zi
+		var link_selector = '.menu-popup-item', // todo zi
 			menu_popup = $(event.data.menu[0]),
 			level = menu_popup,
 			selected,
@@ -1706,14 +1706,14 @@ jQuery(function($) {
 
 		// Find active menu items.
 		items = $('>li', level).filter(function() {
-			return $(this).has('.menu-popup-item').length; //todo zi
+			return $(this).has('.menu-popup-item').length; // todo zi
 		});
 
 		// Find an element that was selected when key was pressed.
-		if ($('.menu-popup-item.highlighted', level).length) { //todo zi
+		if ($('.menu-popup-item.highlighted', level).length) { // todo zi
 			selected = $(link_selector + '.highlighted', level).closest('li');
 		}
-		else if ($('.menu-popup-item', level).filter(function() { //todo zi
+		else if ($('.menu-popup-item', level).filter(function() { // todo zi
 			return this == document.activeElement;
 		}).length) {
 			selected = $(document.activeElement).closest('li');
@@ -1837,7 +1837,7 @@ jQuery(function($) {
 			});
 		}
 
-		link.addClass('menu-popup-item'); //todo zi
+		link.addClass('menu-popup-item'); // todo zi
 
 		if (options.disabled) {
 			link.addClass('disabled');

@@ -175,7 +175,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 					});
 
 				$overlay_colorbox = $('<div>', {
-					class: 'color-picker-preview', //todo zi
+					class: 'color-picker-preview', // todo zi
 					'data-use-default': t('D')
 				});
 
@@ -189,7 +189,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 					.on('click', () => setColorHandler(''));
 
 				overlay = $('<div>', {
-					class: 'overlay-dialogue color-picker-dialogue', //todo zi
+					class: 'overlay-dialogue color-picker-dialogue', // todo zi
 					id: 'color_picker'
 				})
 					.append($close)
@@ -370,7 +370,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			$('<button>', {
 				id: 'lbl_' + id,
 				type: 'button',
-				class: 'color-picker-preview', //todo zi
+				class: 'color-picker-preview', // todo zi
 				title: element.value ? '#' + element.value : '',
 				'data-use-default': t('D')
 			})

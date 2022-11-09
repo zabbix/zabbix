@@ -695,7 +695,7 @@ function validate_trigger_expression(overlay) {
 			overlay.unsetLoading();
 		},
 		success: function(ret) {
-			overlay.$dialogue.find('.msg-bad, .msg-good').remove(); //todo zi
+			overlay.$dialogue.find('.msg-bad, .msg-good').remove(); // todo zi
 
 			if ('error' in ret) {
 				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);

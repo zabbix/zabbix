@@ -29,11 +29,11 @@ jQuery(function($) {
 			from_clndr: $container.find('[name=from_calendar]'),
 			to_clndr: $container.find('[name=to_calendar]'),
 			apply: $container.find('[name=apply]'),
-			increment: $container.find('.btn-time-right'), //todo zi
-			decrement: $container.find('.btn-time-left'), //todo zi
-			zoomout: $container.find('.btn-time-out'), //todo zi
+			increment: $container.find('.btn-time-right'), // todo zi
+			decrement: $container.find('.btn-time-left'), // todo zi
+			zoomout: $container.find('.btn-time-out'), // todo zi
 			quickranges: $container.find('.time-quick a'),
-			label: $container.find('.btn-time') //todo zi
+			label: $container.find('.btn-time') // todo zi
 		},
 		request_data = {
 			idx: $container.data('profileIdx'),

@@ -978,7 +978,7 @@ class CDashboard extends CBaseComponent {
 			})
 			.catch((exception) => {
 				for (const element of form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {//todo zi
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {// todo zi
 						element.parentNode.removeChild(element);
 					}
 				}
@@ -1054,7 +1054,7 @@ class CDashboard extends CBaseComponent {
 			})
 			.catch((exception) => {
 				for (const element of form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) { //todo zi
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) { // todo zi
 						element.parentNode.removeChild(element);
 					}
 				}
@@ -1307,7 +1307,7 @@ class CDashboard extends CBaseComponent {
 			})
 			.catch((exception) => {
 				for (const element of form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) { //todo zi
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) { // todo zi
 						element.parentNode.removeChild(element);
 					}
 				}
@@ -1466,7 +1466,7 @@ class CDashboard extends CBaseComponent {
 		if (!this._is_kiosk_mode) {
 			const has_aria_expanded = this._tabs
 				.getList()
-				.querySelector('.btn-dashboard-page-properties[aria-expanded="true"]') !== null; //todo zi
+				.querySelector('.btn-dashboard-page-properties[aria-expanded="true"]') !== null; // todo zi
 
 			if (has_aria_expanded) {
 				return true;
@@ -1518,7 +1518,7 @@ class CDashboard extends CBaseComponent {
 			properties_button.title = t('Actions');
 			properties_button.setAttribute('aria-expanded', 'false');
 			properties_button.setAttribute('aria-haspopup', 'true');
-			properties_button.classList.add('btn-dashboard-page-properties'); //todo zi
+			properties_button.classList.add('btn-dashboard-page-properties'); // todo zi
 
 			tab_contents.append(properties_button);
 		}
@@ -1842,7 +1842,7 @@ class CDashboard extends CBaseComponent {
 					if (dashboard_page !== this._selected_dashboard_page) {
 						this._selectDashboardPage(dashboard_page, {is_async: true});
 					}
-					else if (e.target.classList.contains('btn-dashboard-page-properties')) { //todo zi
+					else if (e.target.classList.contains('btn-dashboard-page-properties')) { // todo zi
 						jQuery(e.target).menuPopup(this._getDashboardPageActionsContextMenu(dashboard_page),
 							new jQuery.Event(e)
 						);
@@ -1860,7 +1860,7 @@ class CDashboard extends CBaseComponent {
 						if (dashboard_page !== this._selected_dashboard_page) {
 							this._selectDashboardPage(dashboard_page, {is_async: true});
 						}
-						else if (e.target.classList.contains('btn-dashboard-page-properties')) { //todo zi
+						else if (e.target.classList.contains('btn-dashboard-page-properties')) { // todo zi
 							jQuery(e.target).menuPopup(this._getDashboardPageActionsContextMenu(dashboard_page),
 								new jQuery.Event(e)
 							);
