@@ -43,7 +43,7 @@
 						'focused': true,
 						'action': function() {
 							$('main')
-								.prev('.msg-bad') //todo zi
+								.prev('.msg-bad') // todo zi
 								.remove();
 
 							$('#default_lang').val("<?= DB::getDefault('config', 'default_lang') ?>");

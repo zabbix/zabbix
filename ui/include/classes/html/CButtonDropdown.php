@@ -66,7 +66,7 @@ class CButtonDropdown extends CButton {
 		$this->dropdown_items = $items;
 
 		$this->addClass(ZBX_STYLE_BTN_ALT);
-		$this->addClass(ZBX_STYLE_BTN_TOGGLE); //todo zi
+		$this->addClass(ZBX_STYLE_BTN_TOGGLE); // todo zi
 	}
 
 	public function toString($destroy = true) {
@@ -74,7 +74,7 @@ class CButtonDropdown extends CButton {
 			'type' => 'dropdown',
 			'data' => [
 				'items' => $this->dropdown_items,
-				'toggle_class' => ZBX_STYLE_BTN_TOGGLE //todo zi
+				'toggle_class' => ZBX_STYLE_BTN_TOGGLE // todo zi
 			]
 		]);
 

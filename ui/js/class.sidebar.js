@@ -40,7 +40,7 @@ class CSidebar extends CBaseComponent {
 	}
 
 	init() {
-		this._sidebar_toggle = document.getElementById('sidebar-button-toggle'); //todo zi
+		this._sidebar_toggle = document.getElementById('sidebar-button-toggle'); // todo zi
 		this._sidebar_scrollable = this._target.querySelector('.scrollable');
 
 		this._is_focused = false;

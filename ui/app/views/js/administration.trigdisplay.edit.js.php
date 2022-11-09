@@ -59,7 +59,7 @@
 						'focused': true,
 						'action': function() {
 							$('main')
-								.prev('.msg-bad') //todo zi
+								.prev('.msg-bad') // todo zi
 								.remove();
 
 							var custom_color_enabled = <?=

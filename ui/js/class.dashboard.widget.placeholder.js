@@ -20,7 +20,7 @@
 
 const ZBX_STYLE_WIDGET_PLACEHOLDER = 'dashboard-widget-placeholder';
 const ZBX_STYLE_WIDGET_PLACEHOLDER_BOX = 'dashboard-widget-placeholder-box';
-const ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL = 'dashboard-widget-placeholder-label'; //todo zi
+const ZBX_STYLE_WIDGET_PLACEHOLDER_LABEL = 'dashboard-widget-placeholder-label'; // todo zi
 const ZBX_STYLE_WIDGET_PLACEHOLDER_RESIZING = 'dashboard-widget-placeholder-resizing';
 const ZBX_STYLE_WIDGET_PLACEHOLDER_HIDDEN = 'hidden';
 

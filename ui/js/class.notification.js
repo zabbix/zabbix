@@ -88,7 +88,7 @@ ZBX_Notification.prototype.render = function(severity_styles) {
 	var title_prefix = this._raw.resolved ? locale.S_RESOLVED : locale.S_PROBLEM_ON;
 
 	this.node.title_node.innerHTML = title_prefix + ' ' + BBCode.Parse(this._raw.title);
-	this.node.indicator.className = 'notif-indic ' + severity_styles[this._raw.resolved ? -1 : this._raw.severity]; //todo zi
+	this.node.indicator.className = 'notif-indic ' + severity_styles[this._raw.resolved ? -1 : this._raw.severity]; // todo zi
 	this.node.snooze_icon.style.opacity = this._raw.snoozed ? 1 : 0;
 };
 
@@ -125,7 +125,7 @@ ZBX_Notification.prototype.makeNode = function() {
 	node.indicator = indicator;
 	node.title_node = title_node;
 	node.snooze_icon = document.createElement('div');
-	node.snooze_icon.className = 'notif-indic-snooze'; //todo zi
+	node.snooze_icon.className = 'notif-indic-snooze'; // todo zi
 	node.snooze_icon.style.opacity = 0;
 
 	node.indicator.appendChild(node.snooze_icon);

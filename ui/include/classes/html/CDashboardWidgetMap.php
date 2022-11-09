@@ -157,7 +157,7 @@ class CDashboardWidgetMap extends CDiv {
 						(new CLink(
 							(new CSpan())
 								->addClass(ZBX_STYLE_BTN_BACK_MAP)
-								->addItem((new CDiv())->addClass(ZBX_STYLE_BTN_BACK_MAP_ICON)) //todo zi
+								->addItem((new CDiv())->addClass(ZBX_STYLE_BTN_BACK_MAP_ICON)) // todo zi
 								->addItem((new CDiv())
 									->addClass(ZBX_STYLE_BTN_BACK_MAP_CONTENT)
 									->addItem(_s('Go back to %1$s', $this->previous_map['name']))

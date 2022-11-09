@@ -144,7 +144,7 @@ window.host_edit_popup = {
 
 	removePopupMessages() {
 		for (const el of this.form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad, .msg-warning')) { //todo zi
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) { // todo zi
 				el.parentNode.removeChild(el);
 			}
 		}
