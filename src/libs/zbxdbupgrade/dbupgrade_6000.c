@@ -269,23 +269,27 @@ static int	DBpatch_6000010(void)
 
 static int	DBpatch_6000011(void)
 {
-	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("hosts", "name", "name_upper", "upper",
-			"hostid");
+	return zbx_dbupgrade_attach_trigger_with_function_on_insert("hosts", "name", "name_upper", "upper", "hostid");
 }
 
 static int	DBpatch_6000012(void)
+{
+	return zbx_dbupgrade_attach_trigger_with_function_on_update("hosts", "name", "name_upper", "upper", "hostid");
+}
+
+static int	DBpatch_6000013(void)
 {
 	const ZBX_FIELD field = {"name_upper", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("items", &field);
 }
 
-static int	DBpatch_6000013(void)
+static int	DBpatch_6000014(void)
 {
 	return DBcreate_index("items", "items_9", "hostid,name_upper", 0);
 }
 
-static int	DBpatch_6000014(void)
+static int	DBpatch_6000015(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -296,10 +300,14 @@ static int	DBpatch_6000014(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6000015(void)
+static int	DBpatch_6000016(void)
 {
-	return zbx_dbupgrade_attach_trigger_with_function_on_insert_or_update("items", "name", "name_upper", "upper",
-			"itemid");
+	return zbx_dbupgrade_attach_trigger_with_function_on_insert("items", "name", "name_upper", "upper", "itemid");
+}
+
+static int	DBpatch_6000017(void)
+{
+	return zbx_dbupgrade_attach_trigger_with_function_on_update("items", "name", "name_upper", "upper", "itemid");
 }
 #endif
 
@@ -323,5 +331,7 @@ DBPATCH_ADD(6000012, 0, 0)
 DBPATCH_ADD(6000013, 0, 0)
 DBPATCH_ADD(6000014, 0, 0)
 DBPATCH_ADD(6000015, 0, 0)
+DBPATCH_ADD(6000016, 0, 0)
+DBPATCH_ADD(6000017, 0, 0)
 
 DBPATCH_END()
