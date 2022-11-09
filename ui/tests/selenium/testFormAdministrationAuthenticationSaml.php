@@ -180,7 +180,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 
 		// Check SAML settings update messages and, in case of successful update, check that field values were saved.
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, $data['error']);
+			$this->assertMessage(TEST_BAD, 'Cannot update authentication',  $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
 		}
 		else {
