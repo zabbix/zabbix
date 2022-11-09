@@ -46,9 +46,11 @@ window.action_edit_popup = new class {
 
 		// Reload operation table when esc_period is changed.
 		let esc_period = document.querySelector('#esc_period');
-		esc_period.addEventListener('change', () => {
-			this._loadOperationTable();
-		});
+		if (esc_period) {
+			esc_period.addEventListener('change', () => {
+				this._loadOperationTable();
+			});
+		}
 	}
 
 	_loadOperationTable(e = null) {
@@ -72,7 +74,9 @@ window.action_edit_popup = new class {
 		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', 'popup.action.operation.get');
 		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
-		curl.setArgument('esc_period', document.querySelector('#esc_period').value);
+		if (document.querySelector('#esc_period')) {
+			curl.setArgument('esc_period', document.querySelector('#esc_period').value);
+		}
 
 		// todo : add loader somewhere
 		fetch(curl.getUrl(), {
