@@ -134,7 +134,6 @@ class CControllerPopupActionEdit extends CController {
 				$data['action']['filter']['conditions']
 			);
 
-			// todo : add for other operation recovery types
 			foreach ($data['action']['operations'] as &$operation) {
 				$action = [
 					'esc_period' => $this->action['esc_period'],

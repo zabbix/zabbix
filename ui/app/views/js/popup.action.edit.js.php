@@ -58,14 +58,15 @@ window.action_edit_popup = new class {
 			this.recovery = e.detail.operation.recovery;
 		}
 
-		if (this.recovery == <?= ACTION_OPERATION ?>){
-			this.$operation_table = $('#operations-table-div');
-		}
-		else if (this.recovery == <?= ACTION_RECOVERY_OPERATION ?>){
+
+		if (this.recovery == <?= ACTION_RECOVERY_OPERATION ?>){
 			this.$operation_table = $('#rec-operations-table-div');
 		}
 		else if (this.recovery == <?= ACTION_UPDATE_OPERATION ?>){
 			this.$operation_table = $('#upd-operations-table-div');
+		}
+		else {
+			this.$operation_table = $('#operations-table-div');
 		}
 
 		let new_operation = {};

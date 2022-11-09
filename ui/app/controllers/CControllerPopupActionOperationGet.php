@@ -86,22 +86,12 @@ class CControllerPopupActionOperationGet extends CController {
 		}
 
 		$operations = [];
-		$recovery_operations = [];
-		$update_operations = [];
 
 		foreach ($data['operations'] as $operation) {
 			if ($operation['recovery'] == ACTION_OPERATION) {
 				$operations[] = $operation;
 			}
-			elseif ($operation['recovery'] == ACTION_RECOVERY_OPERATION) {
-				$recovery_operations[] = $operation;
-			}
-			elseif ($operation['recovery'] == ACTION_UPDATE_OPERATION) {
-				$udpate_operations[] = $operation;
-			}
 		}
-
-		// todo : add operation SORTING (by steps) + sorting by operationtype ???
 
 		foreach ($data['operations'] as &$operation) {
 			if (preg_match('/\bscriptid\b/', $operation['operationtype'])) {
@@ -146,7 +136,6 @@ class CControllerPopupActionOperationGet extends CController {
 			'update_operations' => [],
 		];
 
-
 		foreach ($data['operations'] as &$operation) {
 			if (!$new_operation) {
 				$action['operations'] = [$operation];
@@ -166,6 +155,22 @@ class CControllerPopupActionOperationGet extends CController {
 			}
 		}
 		unset($operation);
+
+
+		foreach ($data['operations'] as $operation) {
+			if ($operation['recovery'] == ACTION_OPERATION) {
+				$data['action']['operations'][] = $operation;
+				sortOperations($operation['eventsource'], $data['action']['operations']);
+			}
+			if ($operation['recovery'] == ACTION_RECOVERY_OPERATION) {
+				$data['action']['recovery_operations'][] = $operation;
+				sortOperations($operation['eventsource'], $data['action']['recovery_operations']);
+			}
+			if ($operation['recovery'] == ACTION_UPDATE_OPERATION) {
+				$data['action']['update_operations'][] = $operation;
+				sortOperations($operation['eventsource'], $data['action']['udpate_operations']);
+			}
+		}
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
