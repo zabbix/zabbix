@@ -193,6 +193,7 @@ static unsigned char	get_program_type(void)
 
 #define DEFINE_CHR_CONFIG(name, value) \
 	char *config_##name = value; \
+	static const char *get_config_##name(void); \
 	static const char *get_config_##name(void) \
 	{\
 		return config_##name; \
