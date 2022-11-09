@@ -258,6 +258,8 @@ class CSortable extends CBaseComponent {
 
 			item.style.left = `${item_rect.x - list_rect.x}px`;
 			item.style.top = `${item_rect.y - list_rect.y}px`;
+			item.style.width = `${item_rect.width}px`;
+			item.style.height = `${item_rect.height}px`;
 		}
 
 		this._target.classList.add(ZBX_STYLE_SORTABLE_DRAGGING);
@@ -268,6 +270,9 @@ class CSortable extends CBaseComponent {
 		this._drag_item = drag_item;
 		this._drag_item.style.left = `${drag_item_rect.x - target_rect.x}px`;
 		this._drag_item.style.top = `${drag_item_rect.y - target_rect.y}px`;
+		this._drag_item.style.width = `${drag_item_rect.width}px`;
+		this._drag_item.style.height = `${drag_item_rect.height}px`;
+
 		this._target.appendChild(this._drag_item);
 
 		// Hide the actual dragging item.
@@ -355,6 +360,8 @@ class CSortable extends CBaseComponent {
 		drag_item.classList.remove(ZBX_STYLE_SORTABLE_DRAGGING);
 		drag_item.style.left = '';
 		drag_item.style.top = '';
+		drag_item.style.width = '';
+		drag_item.style.height = '';
 
 		this._target.classList.remove(ZBX_STYLE_SORTABLE_DRAGGING);
 		this._list.style.width = '';
@@ -363,6 +370,8 @@ class CSortable extends CBaseComponent {
 		for (const item of items) {
 			item.style.left = '';
 			item.style.top = '';
+			item.style.width = '';
+			item.style.height = '';
 		}
 
 		// Re-focus the dragged item.

@@ -189,4 +189,5 @@ SUBDIRS = \
 
 EXTRA_DIST = \
 	zbxsymbols \
-	zbxwin32
+	zbxwin32 \
+	zbxwinservice

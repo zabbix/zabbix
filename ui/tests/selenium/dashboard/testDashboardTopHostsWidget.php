@@ -25,7 +25,9 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * @dataSource TopHostsWidget
  *
- * @backup widget, profiles, dashboard, items
+ * @backup widget, profiles
+ *
+ * @onAfter clearData
  */
 class testDashboardTopHostsWidget extends CWebTest {
 
@@ -1789,7 +1791,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text'
+							'Item' => 'top_hosts_trap_text'
 						]
 					],
 					'text' => 'Text for text item'
@@ -1804,7 +1806,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item' => 'top_hosts_trap_text',
 							'History data' => 'Trends'
 						]
 					],
@@ -1820,7 +1822,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item' => 'top_hosts_trap_text',
 							'Display' => 'Bar'
 						]
 					]
@@ -1835,7 +1837,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item' => 'top_hosts_trap_text',
 							'Display' => 'Indicators'
 						]
 					]
@@ -1850,7 +1852,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item' => 'top_hosts_trap_text',
 							'Aggregation function' => 'max'
 						]
 					]
@@ -1865,7 +1867,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_text',
+							'Item' => 'top_hosts_trap_text',
 							'Thresholds' => [
 								[
 									'threshold' => '10'
@@ -1884,7 +1886,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log'
+							'Item' => 'top_hosts_trap_log'
 						]
 					],
 					'text' => 'Logs for text item'
@@ -1899,7 +1901,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item' => 'top_hosts_trap_log',
 							'History data' => 'Trends'
 						]
 					],
@@ -1915,7 +1917,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item' => 'top_hosts_trap_log',
 							'Display' => 'Bar'
 						]
 					]
@@ -1930,7 +1932,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item' => 'top_hosts_trap_log',
 							'Display' => 'Indicators'
 						]
 					]
@@ -1945,7 +1947,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item' => 'top_hosts_trap_log',
 							'Aggregation function' => 'max'
 						]
 					]
@@ -1960,7 +1962,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_log',
+							'Item' => 'top_hosts_trap_log',
 							'Thresholds' => [
 								[
 									'threshold' => '10'
@@ -1979,7 +1981,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char'
+							'Item' => 'top_hosts_trap_char'
 						]
 					],
 					'text' => 'characters_here'
@@ -1994,7 +1996,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item' => 'top_hosts_trap_char',
 							'History data' => 'Trends'
 						]
 					],
@@ -2010,7 +2012,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item' => 'top_hosts_trap_char',
 							'Display' => 'Bar'
 						]
 					]
@@ -2025,7 +2027,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item' => 'top_hosts_trap_char',
 							'Display' => 'Indicators'
 						]
 					]
@@ -2040,7 +2042,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item' => 'top_hosts_trap_char',
 							'Aggregation function' => 'max'
 						]
 					]
@@ -2055,7 +2057,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
-							'Item' => 'trap_char',
+							'Item' => 'top_hosts_trap_char',
 							'Thresholds' => [
 								[
 									'threshold' => '10'
@@ -2103,5 +2105,16 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$dashboard->getWidget($data['main_fields']['Name'])->waitUntilReady();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+	}
+
+	/**
+	 * Delete all created data after test.
+	 */
+	public static function clearData() {
+		$dashboardids = CDBHelper::getColumn("SELECT * from dashboard where name LIKE 'top_host_%'", 'dashboardid');
+		CDataHelper::call('dashboard.delete', $dashboardids);
+
+		$itemids = CDBHelper::getColumn("SELECT * FROM items WHERE name LIKE 'top_hosts_trap%'", 'itemid');
+		CDataHelper::call('item.delete', $itemids);
 	}
 }

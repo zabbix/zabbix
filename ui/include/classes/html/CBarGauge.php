@@ -20,7 +20,8 @@
 
 
 class CBarGauge extends CTag {
-	private $thresholds = [];
+
+	private array $thresholds = [];
 
 	public function __construct() {
 		parent::__construct('z-bar-gauge', true);

@@ -26,14 +26,14 @@
 
 $this->includeJsFile('administration.userrole.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('User roles'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERROLE_EDIT));
 
 $form = (new CForm())
 	->setId('userrole-form')
 	->setName('user_role_form')
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['roleid'] !== null) {
 	$form->addVar('roleid', $data['roleid']);
@@ -244,28 +244,31 @@ $form_grid->addItem(
 );
 
 $modules = [];
-foreach ($data['labels']['modules'] as $moduleid => $label) {
-	$modules[] = new CDiv(
+
+foreach ($data['labels']['modules'] as $moduleid => $module_name) {
+	$module = new CDiv(
 		(new CCheckBox('modules['.$moduleid.']', 1))
 			->setChecked(
-				array_key_exists($moduleid, $data['rules']['modules']) ? $data['rules']['modules'][$moduleid] : true
+				array_key_exists($moduleid, $data['rules']['modules'])
+					? $data['rules']['modules'][$moduleid]
+					: !array_key_exists($moduleid, $data['disabled_moduleids'])
 			)
 			->setReadonly($data['readonly'])
-			->setLabel($label)
+			->setLabel($module_name)
 			->setUncheckedValue(0)
 	);
+
+	if (array_key_exists($moduleid, $data['disabled_moduleids'])) {
+		$module->addItem((new CSpan([' (', _('Disabled'), ')']))->addClass(ZBX_STYLE_RED));
+	}
+
+	$modules[] = $module;
 }
 
 if ($modules) {
-	$form_grid->addItem([
-		new CFormField(
-			(new CDiv(
-				(new CDiv($modules))
-					->addClass(ZBX_STYLE_COLUMNS)
-					->addClass(ZBX_STYLE_COLUMNS_3)
-			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		)
-	]);
+	$form_grid->addItem(
+		new CFormField($modules)
+	);
 }
 else {
 	$form_grid->addItem(
@@ -405,8 +408,10 @@ $form_grid->addItem(
 $tabs = (new CTabView())->addTab('user_role_tab', _('User role'), $form_grid);
 
 $form->addItem((new CTabView())->addTab('user_role_tab', _('User role'), $form_grid));
-$widget->addItem($form);
-$widget->show();
+
+$html_page
+	->addItem($form)
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
