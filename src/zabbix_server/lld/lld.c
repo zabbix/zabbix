@@ -486,9 +486,7 @@ static int	filter_evaluate(const lld_filter_t *filter, const struct zbx_json_par
 	switch (filter->evaltype)
 	{
 		case ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR:
-			ZBX_FALLTHROUGH;
 		case ZBX_ACTION_CONDITION_EVAL_TYPE_AND:
-			ZBX_FALLTHROUGH;
 		case ZBX_ACTION_CONDITION_EVAL_TYPE_OR:
 			return filter_evaluate_and_or_andor(filter, jp_row, lld_macro_paths, info);
 		case ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION:
