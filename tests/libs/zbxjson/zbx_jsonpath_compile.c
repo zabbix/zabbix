@@ -50,8 +50,6 @@ static int	mock_str_to_segment_type(const char *segment_type)
 static void	jsonpath_token_print(char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_jsonpath_token_t *token)
 {
-	int	i;
-
 	switch (token->type)
 	{
 		case ZBX_JSONPATH_TOKEN_PATH_ABSOLUTE:

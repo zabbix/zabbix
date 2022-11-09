@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:36:45Z'
+  date: '2022-10-27T12:22:05Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -8,14 +8,14 @@ zabbix_export:
   templates:
     -
       uuid: 8e5236f799b347a8ae90a979198be85e
-      template: 'Squid SNMP'
-      name: 'Squid SNMP'
+      template: 'Squid by SNMP'
+      name: 'Squid by SNMP'
       description: |
         Template for monitoring Squid caching proxy via SNMP
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/409339-discussion-thread-for-official-zabbix-template-squid
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -43,7 +43,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7e0f0a9e8a9d4f6193946e4f8cd4a2e3
-              expression: 'last(/Squid SNMP/net.tcp.service[tcp,,{$SQUID.HTTP.PORT}])=0'
+              expression: 'last(/Squid by SNMP/net.tcp.service[tcp,,{$SQUID.HTTP.PORT}])=0'
               name: 'Squid: Port {$SQUID.HTTP.PORT} is down'
               priority: AVERAGE
               manual_close: 'YES'
@@ -169,7 +169,7 @@ zabbix_export:
           triggers:
             -
               uuid: 40c41c87e46443f886506da5e580657e
-              expression: 'last(/Squid SNMP/squid[cacheCurrentUnusedFDescrCnt])<{$SQUID.FILE.DESC.WARN.MIN}'
+              expression: 'last(/Squid by SNMP/squid[cacheCurrentUnusedFDescrCnt])<{$SQUID.FILE.DESC.WARN.MIN}'
               name: 'Squid: Squid is running out of file descriptors'
               event_name: 'Squid: Squid is running out of file descriptors (<{$SQUID.FILE.DESC.WARN.MIN})'
               priority: WARNING
@@ -1053,7 +1053,7 @@ zabbix_export:
           triggers:
             -
               uuid: 89efc9400197427fa718395286dd3583
-              expression: 'last(/Squid SNMP/squid[cacheUptime])<10m'
+              expression: 'last(/Squid by SNMP/squid[cacheUptime])<10m'
               name: 'Squid: Squid has been restarted'
               event_name: 'Squid: Squid has been restarted (uptime < 10m)'
               priority: INFO
@@ -1085,7 +1085,7 @@ zabbix_export:
           triggers:
             -
               uuid: c5991152d2da4df7ae0d978233c5a859
-              expression: 'last(/Squid SNMP/squid[cacheVersionId],#1)<>last(/Squid SNMP/squid[cacheVersionId],#2) and length(last(/Squid SNMP/squid[cacheVersionId]))>0'
+              expression: 'last(/Squid by SNMP/squid[cacheVersionId],#1)<>last(/Squid by SNMP/squid[cacheVersionId],#2) and length(last(/Squid by SNMP/squid[cacheVersionId]))>0'
               name: 'Squid: Squid version has been changed'
               event_name: 'Squid: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
@@ -1137,7 +1137,7 @@ zabbix_export:
   triggers:
     -
       uuid: 89a1cfe0f02f4da880f197c2e5605db8
-      expression: 'avg(/Squid SNMP/squid[cacheSysPageFaults],5m)>avg(/Squid SNMP/squid[cacheProtoClientHttpRequests],5m)/100*{$SQUID.PAGE.FAULT.WARN}'
+      expression: 'avg(/Squid by SNMP/squid[cacheSysPageFaults],5m)>avg(/Squid by SNMP/squid[cacheProtoClientHttpRequests],5m)/100*{$SQUID.PAGE.FAULT.WARN}'
       name: 'Squid: High sys page faults rate'
       event_name: 'Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests)'
       priority: WARNING
@@ -1147,7 +1147,7 @@ zabbix_export:
           value: performance
     -
       uuid: 5676f1e02dc7413fb1a34543ccaf1384
-      expression: 'last(/Squid SNMP/squid[cacheCurrentSwapSize])>last(/Squid SNMP/squid[cacheSwapHighWM])*last(/Squid SNMP/squid[cacheSwapMaxSize])/100'
+      expression: 'last(/Squid by SNMP/squid[cacheCurrentSwapSize])>last(/Squid by SNMP/squid[cacheSwapHighWM])*last(/Squid by SNMP/squid[cacheSwapMaxSize])/100'
       name: 'Squid: Swap usage is more than high watermark'
       event_name: 'Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%)'
       opdata: 'Used: {ITEM.LASTVALUE1}'
@@ -1161,7 +1161,7 @@ zabbix_export:
           value: performance
     -
       uuid: 2cf87472ebf74239bb782580448f696c
-      expression: 'last(/Squid SNMP/squid[cacheCurrentSwapSize])>last(/Squid SNMP/squid[cacheSwapLowWM])*last(/Squid SNMP/squid[cacheSwapMaxSize])/100'
+      expression: 'last(/Squid by SNMP/squid[cacheCurrentSwapSize])>last(/Squid by SNMP/squid[cacheSwapLowWM])*last(/Squid by SNMP/squid[cacheSwapMaxSize])/100'
       name: 'Squid: Swap usage is more than low watermark'
       event_name: 'Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%)'
       opdata: 'Used: {ITEM.LASTVALUE1}'
@@ -1181,13 +1181,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheDnsRequests]'
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheDnsReplies]'
     -
       uuid: e301cc76e0ff4e22bc66a46b19230c33
@@ -1196,19 +1196,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheFqdnRequests]'
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheFqdnHits]'
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheFqdnMisses]'
     -
       uuid: 22556883f0a04b6999013d1a5ce58382
@@ -1217,19 +1217,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheCurrentFileDescrCnt]'
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheCurrentUnusedFDescrCnt]'
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheCurrentResFileDescrCnt]'
     -
       uuid: 647af850b9914d7b803c7f509f4c4f71
@@ -1238,13 +1238,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheHttpInKb]'
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheHttpOutKb]'
     -
       uuid: c3d9ac16b3e24067b1041b93ee8aaebe
@@ -1253,19 +1253,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheIpRequests]'
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheIpHits]'
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheIpMisses]'
     -
       uuid: 7b9f0d0f6558432b83375e2fcd082812
@@ -1274,19 +1274,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheMaxResSize]'
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheMemMaxSize]'
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheMemUsage]'
     -
       uuid: d4b916fb3ea14e55b3e9799b85d8e40b
@@ -1295,13 +1295,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheNumObjCount]'
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheCurrentUnlinkRequests]'
     -
       uuid: af823298924d47b09e17eeff093da448
@@ -1310,71 +1310,71 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheHttpAllSvcTime.5]'
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheHttpAllSvcTime.60]'
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheHttpMissSvcTime.5]'
         -
           sortorder: '3'
           color: A54F10
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheHttpMissSvcTime.60]'
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheHttpHitSvcTime.5]'
         -
           sortorder: '5'
           color: 6C59DC
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheHttpHitSvcTime.60]'
         -
           sortorder: '6'
           color: AC8C14
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheIcpQuerySvcTime.5]'
         -
           sortorder: '7'
           color: 611F27
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheIcpQuerySvcTime.60]'
         -
           sortorder: '8'
           color: F230E0
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheIcpReplySvcTime.5]'
         -
           sortorder: '9'
           color: FFAD40
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheIcpReplySvcTime.60]'
         -
           sortorder: '10'
           color: 40CDFF
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheDnsSvcTime.5]'
         -
           sortorder: '11'
           color: 40FFA0
           item:
-            host: 'Squid SNMP'
+            host: 'Squid by SNMP'
             key: 'squid[cacheDnsSvcTime.60]'

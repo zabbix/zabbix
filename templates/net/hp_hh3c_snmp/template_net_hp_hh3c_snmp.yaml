@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T11:09:20Z'
+  date: '2022-10-27T11:31:50Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 57aeccd43b744942b9555269b79a96ad
-      template: 'HP Comware HH3C SNMP'
-      name: 'HP Comware HH3C SNMP'
+      template: 'HP Comware HH3C by SNMP'
+      name: 'HP Comware HH3C by SNMP'
       description: |
         Template Net HP Comware (HH3C)
         
@@ -50,7 +50,7 @@ zabbix_export:
           triggers:
             -
               uuid: 1bd6a4748e29498e99ccd3b23d83cdf7
-              expression: 'max(/HP Comware HH3C SNMP/icmpping,#3)=0'
+              expression: 'max(/HP Comware HH3C by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -76,14 +76,14 @@ zabbix_export:
           triggers:
             -
               uuid: d41edaea369d40d2944af72a3ee76850
-              expression: 'min(/HP Comware HH3C SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Comware HH3C SNMP/icmppingloss,5m)<100'
+              expression: 'min(/HP Comware HH3C by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Comware HH3C by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/HP Comware HH3C SNMP/icmpping,#3)=0'
+                  expression: 'max(/HP Comware HH3C by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -109,17 +109,17 @@ zabbix_export:
           triggers:
             -
               uuid: 2698115b6f014e8cbdb11c2d5eeb8f08
-              expression: 'avg(/HP Comware HH3C SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/HP Comware HH3C by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/HP Comware HH3C SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Comware HH3C SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/HP Comware HH3C by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Comware HH3C by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/HP Comware HH3C SNMP/icmpping,#3)=0'
+                  expression: 'max(/HP Comware HH3C by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -265,7 +265,7 @@ zabbix_export:
           triggers:
             -
               uuid: cf1d0aa58a194904902899dbba814514
-              expression: 'last(/HP Comware HH3C SNMP/system.name,#1)<>last(/HP Comware HH3C SNMP/system.name,#2) and length(last(/HP Comware HH3C SNMP/system.name))>0'
+              expression: 'last(/HP Comware HH3C by SNMP/system.name,#1)<>last(/HP Comware HH3C by SNMP/system.name,#2) and length(last(/HP Comware HH3C by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -346,7 +346,7 @@ zabbix_export:
           triggers:
             -
               uuid: bc6e9c399c3d4d43aaeb5a1b03deb7d4
-              expression: 'max(/HP Comware HH3C SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/HP Comware HH3C by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -354,7 +354,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/HP Comware HH3C SNMP/icmpping,#3)=0'
+                  expression: 'max(/HP Comware HH3C by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -397,7 +397,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 17e0f72418f4432d852b5c39ddf675bd
-                  expression: 'last(/HP Comware HH3C SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}]))>0'
+                  expression: 'last(/HP Comware HH3C by SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C by SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Firmware has changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -450,7 +450,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d3633f4584344570a1c0570f0b082590
-                  expression: 'last(/HP Comware HH3C SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
+                  expression: 'last(/HP Comware HH3C by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced'
                   event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
@@ -503,7 +503,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9e6cccf7daec4405ac3bb1a27670fcee
-                  expression: 'last(/HP Comware HH3C SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}]))>0'
+                  expression: 'last(/HP Comware HH3C by SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C by SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Operating system description has changed'
                   priority: INFO
                   description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -511,7 +511,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'System name has changed'
-                      expression: 'last(/HP Comware HH3C SNMP/system.name,#1)<>last(/HP Comware HH3C SNMP/system.name,#2) and length(last(/HP Comware HH3C SNMP/system.name))>0'
+                      expression: 'last(/HP Comware HH3C by SNMP/system.name,#1)<>last(/HP Comware HH3C by SNMP/system.name,#2) and length(last(/HP Comware HH3C by SNMP/system.name))>0'
                   tags:
                     -
                       tag: scope
@@ -553,7 +553,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: b0821c8e75e14e53906c3a3f209a2785
-                  expression: 'count(/HP Comware HH3C SNMP/sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"fanError\"}")=1 or count(/HP Comware HH3C SNMP/sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"hardwareFaulty\"}")=1'
+                  expression: 'count(/HP Comware HH3C by SNMP/sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"fanError\"}")=1 or count(/HP Comware HH3C by SNMP/sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"hardwareFaulty\"}")=1'
                   name: '{#ENT_NAME}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -606,7 +606,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 37a4a248c89240fe82c5fd6622123aa0
-                  expression: 'min(/HP Comware HH3C SNMP/system.cpu.util[hh3cEntityExtCpuUsage.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/HP Comware HH3C by SNMP/system.cpu.util[hh3cEntityExtCpuUsage.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '{#MODULE_NAME}: High CPU utilization'
                   event_name: '{#MODULE_NAME}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -636,7 +636,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e8d3cb45afea4cbd935c9ea668746260
-                  expression: 'min(/HP Comware HH3C SNMP/vm.memory.util[hh3cEntityExtMemUsage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/HP Comware HH3C by SNMP/vm.memory.util[hh3cEntityExtMemUsage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#MODULE_NAME}: High memory utilization'
                   event_name: '{#MODULE_NAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -659,7 +659,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'HP Comware HH3C SNMP'
+                    host: 'HP Comware HH3C by SNMP'
                     key: 'system.cpu.util[hh3cEntityExtCpuUsage.{#SNMPINDEX}]'
             -
               uuid: ff71369f73174bc0baf98f6da6f82d97
@@ -671,7 +671,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'HP Comware HH3C SNMP'
+                    host: 'HP Comware HH3C by SNMP'
                     key: 'vm.memory.util[hh3cEntityExtMemUsage.{#SNMPINDEX}]'
         -
           uuid: ef05164a28be4a37950e7edc17dd389b
@@ -977,9 +977,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d0a5ea31836946f28abe357440ebdbea
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1030,21 +1030,21 @@ zabbix_export:
             -
               uuid: b672a06043664dafa8f69d7d530a8723
               expression: |
-                change(/HP Comware HH3C SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/HP Comware HH3C SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/HP Comware HH3C SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/HP Comware HH3C SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/HP Comware HH3C SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/HP Comware HH3C SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/HP Comware HH3C SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/HP Comware HH3C SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/HP Comware HH3C SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/HP Comware HH3C SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1053,8 +1053,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1062,13 +1062,13 @@ zabbix_export:
             -
               uuid: 98c74ed2d41941218802f4c472331f46
               expression: |
-                (avg(/HP Comware HH3C SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Comware HH3C SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/HP Comware HH3C SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Comware HH3C SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/HP Comware HH3C SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/HP Comware HH3C by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/HP Comware HH3C by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/HP Comware HH3C SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/HP Comware HH3C SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/HP Comware HH3C SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/HP Comware HH3C SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/HP Comware HH3C by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/HP Comware HH3C by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -1078,8 +1078,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1087,12 +1087,12 @@ zabbix_export:
             -
               uuid: d7d8ad2b63ac41e6b84852c312c2a8d9
               expression: |
-                min(/HP Comware HH3C SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/HP Comware HH3C SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/HP Comware HH3C by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/HP Comware HH3C by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/HP Comware HH3C SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/HP Comware HH3C SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/HP Comware HH3C by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/HP Comware HH3C by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1102,8 +1102,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/HP Comware HH3C SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1120,42 +1120,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'HP Comware HH3C SNMP'
+                    host: 'HP Comware HH3C by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'HP Comware HH3C SNMP'
+                    host: 'HP Comware HH3C by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'HP Comware HH3C SNMP'
+                    host: 'HP Comware HH3C by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'HP Comware HH3C SNMP'
+                    host: 'HP Comware HH3C by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'HP Comware HH3C SNMP'
+                    host: 'HP Comware HH3C by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'HP Comware HH3C SNMP'
+                    host: 'HP Comware HH3C by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: 21d413e388294d288edc95d98eb27980
@@ -1225,7 +1225,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 0ff624a6250b431498e4747678149e4b
-                  expression: 'last(/HP Comware HH3C SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
+                  expression: 'last(/HP Comware HH3C by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
@@ -1290,7 +1290,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 0c3cb88352e2417fb2b80bb78448fb35
-                  expression: 'count(/HP Comware HH3C SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"psuError\"}")=1 or count(/HP Comware HH3C SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"rpsError\"}")=1 or count(/HP Comware HH3C SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"hardwareFaulty\"}")=1'
+                  expression: 'count(/HP Comware HH3C by SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"psuError\"}")=1 or count(/HP Comware HH3C by SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"rpsError\"}")=1 or count(/HP Comware HH3C by SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"hardwareFaulty\"}")=1'
                   name: '{#ENT_NAME}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1345,9 +1345,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: bbad03018e8e408c952cca2615b4eab3
-                  expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                  expression: 'avg(/HP Comware HH3C by SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                  recovery_expression: 'max(/HP Comware HH3C by SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   name: '{#SNMPVALUE}: Temperature is above critical threshold'
                   event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1362,9 +1362,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: cda6a4e305fe41239462d2f85acc5590
-                  expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
+                  expression: 'avg(/HP Comware HH3C by SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
+                  recovery_expression: 'max(/HP Comware HH3C by SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
                   name: '{#SNMPVALUE}: Temperature is above warning threshold'
                   event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1373,8 +1373,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Temperature is above critical threshold'
-                      expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
-                      recovery_expression: 'max(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+                      expression: 'avg(/HP Comware HH3C by SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}'
+                      recovery_expression: 'max(/HP Comware HH3C by SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
                   tags:
                     -
                       tag: scope
@@ -1384,9 +1384,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 340a9c397bff4ac5a37a2ada9d0c1e69
-                  expression: 'avg(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
+                  expression: 'avg(/HP Comware HH3C by SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/HP Comware HH3C SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
+                  recovery_expression: 'min(/HP Comware HH3C by SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
                   name: '{#SNMPVALUE}: Temperature is too low'
                   event_name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1525,7 +1525,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'HP Comware HH3C SNMP'
+                        host: 'HP Comware HH3C by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
@@ -2506,7 +2506,7 @@ zabbix_export:
   triggers:
     -
       uuid: c1372deba2b148f4ac8be6493f0b9868
-      expression: '(last(/HP Comware HH3C SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP Comware HH3C SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP Comware HH3C SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP Comware HH3C SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP Comware HH3C by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2515,7 +2515,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/HP Comware HH3C SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/HP Comware HH3C by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope

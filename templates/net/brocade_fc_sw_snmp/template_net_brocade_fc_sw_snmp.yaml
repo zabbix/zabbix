@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T11:01:17Z'
+  date: '2022-10-27T11:34:49Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: de96d02bd5f242bfa31308ae2131d03f
-      template: 'Brocade FC SNMP'
-      name: 'Brocade FC SNMP'
+      template: 'Brocade FC by SNMP'
+      name: 'Brocade FC by SNMP'
       description: |
         Template Net Brocade FC
         
@@ -48,7 +48,7 @@ zabbix_export:
           triggers:
             -
               uuid: 0c73f37e7ffc4acf83a7edeb84398aba
-              expression: 'max(/Brocade FC SNMP/icmpping,#3)=0'
+              expression: 'max(/Brocade FC by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -74,14 +74,14 @@ zabbix_export:
           triggers:
             -
               uuid: eea2256c85764c12b1da83dd8d1a9fe3
-              expression: 'min(/Brocade FC SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Brocade FC SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Brocade FC by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Brocade FC by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Brocade FC SNMP/icmpping,#3)=0'
+                  expression: 'max(/Brocade FC by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -107,17 +107,17 @@ zabbix_export:
           triggers:
             -
               uuid: 17df26093a5f42fdb19715371c85f733
-              expression: 'avg(/Brocade FC SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Brocade FC by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Brocade FC SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Brocade FC SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Brocade FC by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Brocade FC by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Brocade FC SNMP/icmpping,#3)=0'
+                  expression: 'max(/Brocade FC by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -181,7 +181,7 @@ zabbix_export:
           triggers:
             -
               uuid: 68a50684095941cb90f22fbc8d632e7a
-              expression: 'min(/Brocade FC SNMP/system.cpu.util[swCpuUsage.0],5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Brocade FC by SNMP/system.cpu.util[swCpuUsage.0],5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization'
               event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -238,7 +238,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9c5ae10dbafb45658f25f0279a8a1934
-              expression: 'last(/Brocade FC SNMP/system.hw.firmware,#1)<>last(/Brocade FC SNMP/system.hw.firmware,#2) and length(last(/Brocade FC SNMP/system.hw.firmware))>0'
+              expression: 'last(/Brocade FC by SNMP/system.hw.firmware,#1)<>last(/Brocade FC by SNMP/system.hw.firmware,#2) and length(last(/Brocade FC by SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -272,7 +272,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9939f98da99c435a9b5505e55e8abb5f
-              expression: 'last(/Brocade FC SNMP/system.hw.serialnumber,#1)<>last(/Brocade FC SNMP/system.hw.serialnumber,#2) and length(last(/Brocade FC SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/Brocade FC by SNMP/system.hw.serialnumber,#1)<>last(/Brocade FC by SNMP/system.hw.serialnumber,#2) and length(last(/Brocade FC by SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -359,7 +359,7 @@ zabbix_export:
           triggers:
             -
               uuid: 0e624c73fdca490e809ffe9235cda610
-              expression: 'last(/Brocade FC SNMP/system.name,#1)<>last(/Brocade FC SNMP/system.name,#2) and length(last(/Brocade FC SNMP/system.name))>0'
+              expression: 'last(/Brocade FC by SNMP/system.name,#1)<>last(/Brocade FC by SNMP/system.name,#2) and length(last(/Brocade FC by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -441,7 +441,7 @@ zabbix_export:
           triggers:
             -
               uuid: b91af8b94e2047538376be9911beadee
-              expression: 'count(/Brocade FC SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
+              expression: 'count(/Brocade FC by SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               name: 'System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -455,7 +455,7 @@ zabbix_export:
                   value: performance
             -
               uuid: b17d4a2bae804c968984b763fa4562fc
-              expression: 'count(/Brocade FC SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_WARN_STATUS:\"offline\"}")=1 or count(/Brocade FC SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_WARN_STATUS:\"testing\"}")=1'
+              expression: 'count(/Brocade FC by SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_WARN_STATUS:\"offline\"}")=1 or count(/Brocade FC by SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_WARN_STATUS:\"testing\"}")=1'
               name: 'System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -463,7 +463,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System status is in critical state'
-                  expression: 'count(/Brocade FC SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
+                  expression: 'count(/Brocade FC by SNMP/system.status[swOperStatus.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1'
               tags:
                 -
                   tag: scope
@@ -490,7 +490,7 @@ zabbix_export:
           triggers:
             -
               uuid: 1991ae08b008488380db02160b15160e
-              expression: 'min(/Brocade FC SNMP/vm.memory.util[swMemUsage.0],5m)>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/Brocade FC by SNMP/vm.memory.util[swMemUsage.0],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization'
               event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
@@ -526,7 +526,7 @@ zabbix_export:
           triggers:
             -
               uuid: 1c67a764531b48f1a931a9a928a8708d
-              expression: 'max(/Brocade FC SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Brocade FC by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -534,7 +534,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Brocade FC SNMP/icmpping,#3)=0'
+                  expression: 'max(/Brocade FC by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -589,7 +589,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 75003433a8304644a20d11b82dcbae14
-                  expression: 'count(/Brocade FC SNMP/sensor.fan.status[swSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                  expression: 'count(/Brocade FC by SNMP/sensor.fan.status[swSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '{#SENSOR_INFO}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -603,7 +603,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 83e8182fd7034edca8317fa91776b6d2
-                  expression: 'count(/Brocade FC SNMP/sensor.fan.status[swSensorStatus.{#SNMPINDEX}],#1,"ne","{$FAN_OK_STATUS}")=1'
+                  expression: 'count(/Brocade FC by SNMP/sensor.fan.status[swSensorStatus.{#SNMPINDEX}],#1,"ne","{$FAN_OK_STATUS}")=1'
                   name: '{#SENSOR_INFO}: Fan is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -611,7 +611,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
-                      expression: 'count(/Brocade FC SNMP/sensor.fan.status[swSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                      expression: 'count(/Brocade FC by SNMP/sensor.fan.status[swSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   tags:
                     -
                       tag: scope
@@ -920,9 +920,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: e5391912a6b84c1bb41832e88df4fb96
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -973,21 +973,21 @@ zabbix_export:
             -
               uuid: 5a98171af6b342ab97e0c6c9de0bd589
               expression: |
-                change(/Brocade FC SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Brocade FC SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/Brocade FC by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Brocade FC by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/Brocade FC SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/Brocade FC SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/Brocade FC SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/Brocade FC SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/Brocade FC SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/Brocade FC SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/Brocade FC by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Brocade FC by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Brocade FC by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Brocade FC by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Brocade FC by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Brocade FC by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Brocade FC SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Brocade FC SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/Brocade FC by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Brocade FC by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -996,8 +996,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1005,13 +1005,13 @@ zabbix_export:
             -
               uuid: a16b52f43a224a11861813be5a11697c
               expression: |
-                (avg(/Brocade FC SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Brocade FC SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/Brocade FC SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Brocade FC SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/Brocade FC SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/Brocade FC by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Brocade FC by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/Brocade FC by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Brocade FC by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/Brocade FC by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Brocade FC SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Brocade FC SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/Brocade FC SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Brocade FC SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/Brocade FC by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Brocade FC by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/Brocade FC by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Brocade FC by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -1021,8 +1021,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1030,12 +1030,12 @@ zabbix_export:
             -
               uuid: 9f42c5a5ed1341c1a26263642e4dabe4
               expression: |
-                min(/Brocade FC SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Brocade FC SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Brocade FC by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Brocade FC by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Brocade FC SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Brocade FC SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Brocade FC by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Brocade FC by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1045,8 +1045,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Brocade FC SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Brocade FC by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1063,42 +1063,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Brocade FC SNMP'
+                    host: 'Brocade FC by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Brocade FC SNMP'
+                    host: 'Brocade FC by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Brocade FC SNMP'
+                    host: 'Brocade FC by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Brocade FC SNMP'
+                    host: 'Brocade FC by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Brocade FC SNMP'
+                    host: 'Brocade FC by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Brocade FC SNMP'
+                    host: 'Brocade FC by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: 32c9720e348e4d4ebb9e70c2b247de29
@@ -1133,7 +1133,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 649e7344411242738d9824f861b3c49a
-                  expression: 'count(/Brocade FC SNMP/sensor.psu.status[swSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
+                  expression: 'count(/Brocade FC by SNMP/sensor.psu.status[swSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: '{#SENSOR_INFO}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1147,7 +1147,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: bfe2f4085f6840da9e8d30f37bb29fdb
-                  expression: 'count(/Brocade FC SNMP/sensor.psu.status[swSensorStatus.{#SNMPINDEX}],#1,"ne","{$PSU_OK_STATUS}")=1'
+                  expression: 'count(/Brocade FC by SNMP/sensor.psu.status[swSensorStatus.{#SNMPINDEX}],#1,"ne","{$PSU_OK_STATUS}")=1'
                   name: '{#SENSOR_INFO}: Power supply is not in normal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -1155,7 +1155,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Power supply is in critical state'
-                      expression: 'count(/Brocade FC SNMP/sensor.psu.status[swSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
+                      expression: 'count(/Brocade FC by SNMP/sensor.psu.status[swSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   tags:
                     -
                       tag: scope
@@ -1211,9 +1211,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 5ee4c1931e244d638b58f945f8a7565c
-                  expression: 'avg(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}'
+                  expression: 'avg(/Brocade FC by SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_INFO}"}-3'
+                  recovery_expression: 'max(/Brocade FC by SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_INFO}"}-3'
                   name: '{#SENSOR_INFO}: Temperature is above critical threshold'
                   event_name: '{#SENSOR_INFO}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SENSOR_INFO}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1228,9 +1228,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: fc68b3a0ea6643f988c26e3e735d7491
-                  expression: 'avg(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}'
+                  expression: 'avg(/Brocade FC by SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}+3'
+                  recovery_expression: 'min(/Brocade FC by SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}+3'
                   name: '{#SENSOR_INFO}: Temperature is too low'
                   event_name: '{#SENSOR_INFO}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1246,11 +1246,11 @@ zabbix_export:
             -
               uuid: 726afdedb08848bd86ab4161cef29f42
               expression: |
-                avg(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_INFO}"}
+                avg(/Brocade FC by SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_INFO}"}
                 or
-                last(/Brocade FC SNMP/sensor.temp.status[swSensorStatus.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
+                last(/Brocade FC by SNMP/sensor.temp.status[swSensorStatus.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'max(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SENSOR_INFO}"}-3'
+              recovery_expression: 'max(/Brocade FC by SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SENSOR_INFO}"}-3'
               name: '{#SENSOR_INFO}: Temperature is above warning threshold'
               event_name: '{#SENSOR_INFO}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SENSOR_INFO}"}'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1259,8 +1259,8 @@ zabbix_export:
               dependencies:
                 -
                   name: '{#SENSOR_INFO}: Temperature is above critical threshold'
-                  expression: 'avg(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}'
-                  recovery_expression: 'max(/Brocade FC SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_INFO}"}-3'
+                  expression: 'avg(/Brocade FC by SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}'
+                  recovery_expression: 'max(/Brocade FC by SNMP/sensor.temp.value[swSensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SENSOR_INFO}"}-3'
               tags:
                 -
                   tag: scope
@@ -1404,7 +1404,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Brocade FC SNMP'
+                        host: 'Brocade FC by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
@@ -2355,7 +2355,7 @@ zabbix_export:
   triggers:
     -
       uuid: 42bb10d788484b92ac7290e171ee28a2
-      expression: '(last(/Brocade FC SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Brocade FC SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Brocade FC SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Brocade FC SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/Brocade FC by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Brocade FC by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Brocade FC by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Brocade FC by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2364,7 +2364,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/Brocade FC SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/Brocade FC by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
@@ -2380,7 +2380,7 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Brocade FC SNMP'
+            host: 'Brocade FC by SNMP'
             key: 'system.cpu.util[swCpuUsage.0]'
     -
       uuid: d1e06bb17c2f458699664bfa61c12496
@@ -2392,5 +2392,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Brocade FC SNMP'
+            host: 'Brocade FC by SNMP'
             key: 'vm.memory.util[swMemUsage.0]'

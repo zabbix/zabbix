@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T10:57:03Z'
+  date: '2022-10-27T11:34:32Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: b8a6f34fd5c447b1b9310746a96f4e80
-      template: 'ZYXEL ES3500-8PD SNMP'
-      name: 'ZYXEL ES3500-8PD SNMP'
+      template: 'ZYXEL ES3500-8PD by SNMP'
+      name: 'ZYXEL ES3500-8PD by SNMP'
       description: |
         ZYXEL ES3500-8PD
         
@@ -53,7 +53,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3bbbd93c114f4bf5b8f4788ca6825afd
-              expression: 'max(/ZYXEL ES3500-8PD SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/ZYXEL ES3500-8PD by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'ZYXEL ES3500-8PD: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -107,7 +107,7 @@ zabbix_export:
           triggers:
             -
               uuid: 3cf67f911a854d2ebeb9e006f3f97738
-              expression: 'min(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.cpuusage,5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.cpuusage,5m)>{$CPU.UTIL.CRIT}'
               name: 'ZYXEL ES3500-8PD: High CPU utilization'
               event_name: 'ZYXEL ES3500-8PD: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -154,7 +154,7 @@ zabbix_export:
           triggers:
             -
               uuid: bd6d0fe201094c00b6c93d7c04c27729
-              expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.fwversion,#1)<>last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.fwversion,#2) and length(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.fwversion))>0'
+              expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.fwversion,#1)<>last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.fwversion,#2) and length(last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.fwversion))>0'
               name: 'ZYXEL ES3500-8PD: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -277,7 +277,7 @@ zabbix_export:
           triggers:
             -
               uuid: e03ca45643354a18a9d6ffbb38a07654
-              expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.model)<>"ES3500-8PD"'
+              expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.model)<>"ES3500-8PD"'
               name: 'ZYXEL ES3500-8PD: Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel ES3500-8PD, but connected to {ITEM.VALUE}'
@@ -360,7 +360,7 @@ zabbix_export:
           triggers:
             -
               uuid: 83548aba74c148e28e6611d5abfb9694
-              expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.serialnumber,#1)<>last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.serialnumber,#2) and length(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.serialnumber))>0'
+              expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.serialnumber,#1)<>last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.serialnumber,#2) and length(last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.serialnumber))>0'
               name: 'ZYXEL ES3500-8PD: Device has been replaced'
               event_name: 'ZYXEL ES3500-8PD: Device has been replaced (new serial number received)'
               priority: INFO
@@ -402,7 +402,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c59c3730eea44cf7a842fe46aa12fa3d
-                  expression: 'min(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: 'ZYXEL ES3500-8PD: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool'
                   event_name: 'ZYXEL ES3500-8PD: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -759,9 +759,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 27ba4832c79d447186ae6de254aad9d7
-                  expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}],#2)'
+                  expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}])<>2'
+                  recovery_expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.net.if.operstatus[{#SNMPINDEX}])<>2'
                   name: 'ZYXEL ES3500-8PD: Port {#SNMPINDEX}: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -962,37 +962,37 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL ES3500-8PD SNMP'
+                    host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.in.ucastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL ES3500-8PD SNMP'
+                    host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.out.ucastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'ZYXEL ES3500-8PD SNMP'
+                    host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.in.multicastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'ZYXEL ES3500-8PD SNMP'
+                    host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.out.multicastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   item:
-                    host: 'ZYXEL ES3500-8PD SNMP'
+                    host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.in.broadcastpkts[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   item:
-                    host: 'ZYXEL ES3500-8PD SNMP'
+                    host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.out.broadcastpkts[{#SNMPINDEX}]'
             -
               uuid: 4e20dd0297a94188a6e4032df91432dc
@@ -1001,13 +1001,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL ES3500-8PD SNMP'
+                    host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.in.traffic[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL ES3500-8PD SNMP'
+                    host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.out.traffic[{#SNMPINDEX}]'
             -
               uuid: c57f41ad6c084a358668e4d7a57b902e
@@ -1018,13 +1018,13 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL ES3500-8PD SNMP'
+                    host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.out.util[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'ZYXEL ES3500-8PD SNMP'
+                    host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.net.if.in.util[{#SNMPINDEX}]'
           overrides:
             -
@@ -1042,7 +1042,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: '.*'
-                  status: ENABLED
                   discover: NO_DISCOVER
         -
           uuid: 21d6664eb56c41b388b4f4709a81d33d
@@ -1100,7 +1099,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 8ce109a9f09b41458a4e9d8698238ad0
-                  expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
+                  expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
                   name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
                   event_name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
@@ -1111,7 +1110,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 6ecef48a1fdd4e16afe9472f59e0ad1a
-                  expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
+                  expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
                   name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
                   event_name: 'ZYXEL ES3500-8PD: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
@@ -1128,7 +1127,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL ES3500-8PD SNMP'
+                    host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.sfp.ddm[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1288,7 +1287,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 46739144d51b441886d544829749cf21
-                  expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}]))>0'
+                  expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.sfp.serialnumber[{#SNMPINDEX}]))>0'
                   name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX} has been replaced'
                   event_name: 'ZYXEL ES3500-8PD: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
@@ -1419,7 +1418,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 51fad2cd7daf49ad9027f44fd9ea81af
-                  expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
+                  expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}'
                   name: 'ZYXEL ES3500-8PD: Temperature {#ZYXEL.TEMP.ID} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1436,7 +1435,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL ES3500-8PD SNMP'
+                    host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.temp[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1491,7 +1490,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 2cce1a60cfea4bb89e1b9582f6045d3c
-                  expression: 'last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
+                  expression: 'last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}'
                   name: 'ZYXEL ES3500-8PD: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1508,7 +1507,7 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'ZYXEL ES3500-8PD SNMP'
+                    host: 'ZYXEL ES3500-8PD by SNMP'
                     key: 'zyxel.3500_8pd.volt[{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1698,7 +1697,7 @@ zabbix_export:
   triggers:
     -
       uuid: eb7a268bfa324366953221e3c1788127
-      expression: '(last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.hw.uptime)>0 and last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.hw.uptime)<10m) or (last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.hw.uptime)=0 and last(/ZYXEL ES3500-8PD SNMP/zyxel.3500_8pd.net.uptime)<10m)'
+      expression: '(last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.hw.uptime)>0 and last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.hw.uptime)<10m) or (last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.hw.uptime)=0 and last(/ZYXEL ES3500-8PD by SNMP/zyxel.3500_8pd.net.uptime)<10m)'
       name: 'ZYXEL ES3500-8PD: Host has been restarted'
       event_name: 'ZYXEL ES3500-8PD: {HOST.NAME} has been restarted (uptime < 10m)'
       priority: INFO
@@ -1719,5 +1718,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'ZYXEL ES3500-8PD SNMP'
+            host: 'ZYXEL ES3500-8PD by SNMP'
             key: zyxel.3500_8pd.cpuusage
