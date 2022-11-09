@@ -7230,8 +7230,7 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host = NULL;
 
-	memset(items, 0, sizeof(DC_ITEM) * (size_t)num);
-	memset(errcodes, 0, sizeof(int) * (size_t)num);
+	memset(errcodes, 0, sizeof(int) * num);
 
 	RDLOCK_CACHE;
 
@@ -7265,15 +7264,6 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 			continue;
 
 		items[i].itemid = itemids[i];
-
-		if (NULL == items[i].error)
-			items[i].error = zbx_strdup(NULL, "");
-
-		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
-		{
-			if (NULL == items[i].units)
-				items[i].units = zbx_strdup(NULL, "");
-		}
 	}
 }
 
