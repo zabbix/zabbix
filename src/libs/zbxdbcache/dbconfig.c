@@ -7792,8 +7792,7 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 	zbx_config_hk_t		config_hk;
 	zbx_dc_um_handle_t	*um_handle;
 
-	memset(items, 0, sizeof(DC_ITEM) * (size_t)num);
-	memset(errcodes, 0, sizeof(int) * (size_t)num);
+	memset(errcodes, 0, sizeof(int) * num);
 
 	RDLOCK_CACHE;
 
@@ -7832,15 +7831,6 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 			continue;
 
 		items[i].itemid = itemids[i];
-
-		if (NULL == items[i].error)
-			items[i].error = zbx_strdup(NULL, "");
-
-		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
-		{
-			if (NULL == items[i].units)
-				items[i].units = zbx_strdup(NULL, "");
-		}
 
 		if (0 != (mode & ZBX_ITEM_GET_HOUSEKEEPING))
 			dc_items_convert_hk_periods(&config_hk, &items[i]);
