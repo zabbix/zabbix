@@ -1328,7 +1328,7 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"create trigger %s_%s_insert\n"
 			"before insert on %s for each row\n"
-				"set new.%s=%s(new.%s)",
+				"set new.%s=%s(new.%s);",
 			table_name, indexed_column_name, table_name, indexed_column_name, func_name,
 			original_column_name);
 #elif defined(HAVE_POSTGRESQL)
