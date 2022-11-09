@@ -117,7 +117,7 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 			new CLabel($section_label, $section_key),
 			new CFormField(
 				(new CCheckBoxList())
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					->setOptions($ui)
 					->setVertical()
 					->setColumns(3)
