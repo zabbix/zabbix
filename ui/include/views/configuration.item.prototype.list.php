@@ -161,7 +161,7 @@ foreach ($data['items'] as $item) {
 	]);
 
 	$wizard = (new CButton(null))
-		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION) //todo zi
+		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION) // todo zi
 		->setMenuPopup($item_menu);
 
 	$nodiscover = ($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);

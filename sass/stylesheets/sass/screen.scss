@@ -3296,7 +3296,7 @@ $form-icon-btn: (
 		border-bottom-left-radius: 0;
 
 		&::after {
-			background: url($sprite-path) no-repeat -47px -478px; //todo zi elaborate
+			background: url($sprite-path) no-repeat -47px -478px; // todo zi elaborate
 			content: '';
 			position: absolute;
 			left: 3px;

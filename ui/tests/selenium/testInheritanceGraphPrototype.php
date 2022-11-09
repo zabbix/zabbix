@@ -129,7 +129,7 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of graph prototypes');
 				$this->zbxTestCheckHeader('Graph prototypes');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add graph prototype'); //todo zi
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add graph prototype'); // todo zi
 				$this->zbxTestTextPresent($data['errors']);
 				$this->zbxTestTextNotPresent('Graph prototype added');
 				break;

@@ -184,7 +184,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 
 		$this->zbxTestClickWait('delete');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Regular expression deleted'); //todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Regular expression deleted'); // todo zi
 		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions']);
 
 		$sql = 'SELECT * FROM regexps r WHERE r.name='.zbx_dbstr($this->regexp2);

@@ -369,7 +369,7 @@ class testSidebarMenu extends CWebTest {
 			else {
 				$hide = 'Hide sidebar';
 				$unhide = 'Show sidebar';
-				$id = 'sidebar-button-toggle'; //todo zi
+				$id = 'sidebar-button-toggle'; // todo zi
 			}
 
 			// Clicking hide/collapse button.

@@ -37,7 +37,7 @@ class CMessageElement extends CElement {
 	 * @return boolean
 	 */
 	public function isGood() {
-		return in_array('msg-good', explode(' ', $this->getAttribute('class')));//todo zi
+		return in_array('msg-good', explode(' ', $this->getAttribute('class')));// todo zi
 	}
 
 	/**
@@ -46,7 +46,7 @@ class CMessageElement extends CElement {
 	 * @return boolean
 	 */
 	public function isBad() {
-		return in_array('msg-bad', explode(' ', $this->getAttribute('class'))); //todo zi
+		return in_array('msg-bad', explode(' ', $this->getAttribute('class'))); // todo zi
 	}
 
 	/**
@@ -55,7 +55,7 @@ class CMessageElement extends CElement {
 	 * @return boolean
 	 */
 	public function isWarning() {
-		return in_array('msg-warning', explode(' ', $this->getAttribute('class'))); //todo zi
+		return in_array('msg-warning', explode(' ', $this->getAttribute('class'))); // todo zi
 	}
 
 
@@ -65,7 +65,7 @@ class CMessageElement extends CElement {
 	 * @return string
 	 */
 	public function getTitle() {
-		if ($this->getAttribute('class') === 'msg-bad msg-global'){ //todo zi
+		if ($this->getAttribute('class') === 'msg-bad msg-global'){ // todo zi
 			return strtok($this->getText(), "\n");
 		}
 		else {

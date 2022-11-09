@@ -143,13 +143,13 @@ function get_icon($type, $params = []) {
 		case 'favourite':
 			if (CFavorite::exists($params['fav'], $params['elid'], $params['elname'])) {
 				$icon = (new CRedirectButton(SPACE, null))
-					->addClass(ZBX_STYLE_BTN_REMOVE_FAV) //todo zi
+					->addClass(ZBX_STYLE_BTN_REMOVE_FAV) // todo zi
 					->setTitle(_('Remove from favorites'))
 					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
 			else {
 				$icon = (new CRedirectButton(SPACE, null))
-					->addClass(ZBX_STYLE_BTN_ADD_FAV) //todo zi
+					->addClass(ZBX_STYLE_BTN_ADD_FAV) // todo zi
 					->setTitle(_('Add to favorites'))
 					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
 			}
@@ -164,7 +164,7 @@ function get_icon($type, $params = []) {
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_NORMAL)
 					->addClass(ZBX_LAYOUT_MODE)
 					->addClass(ZBX_STYLE_BTN_DASHBOARD_NORMAL)
-					->addClass(ZBX_STYLE_BTN_MIN); //todo zi
+					->addClass(ZBX_STYLE_BTN_MIN); // todo zi
 			}
 			else {
 				$icon = (new CButton(null, '&nbsp;'))
@@ -910,7 +910,7 @@ function makeInformationList($info_icons) {
  */
 function makeInformationIcon($message) {
 	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_INFO) //todo zi
+		->addClass(ZBX_STYLE_ICON_INFO) // todo zi
 		->addClass(ZBX_STYLE_STATUS_GREEN)
 		->setHint($message, ZBX_STYLE_HINTBOX_WRAP);
 }
@@ -934,7 +934,7 @@ function makeMaintenanceIcon($type, $name, $description) {
 	}
 
 	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_MAINTENANCE) //todo zi
+		->addClass(ZBX_STYLE_ICON_MAINTENANCE) // todo zi
 		->setHint($hint);
 }
 
@@ -1056,7 +1056,7 @@ function makeDescriptionIcon($description) {
  */
 function makeErrorIcon($error) {
 	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_INFO) //todo zi
+		->addClass(ZBX_STYLE_ICON_INFO) // todo zi
 		->addClass(ZBX_STYLE_STATUS_RED)
 		->setHint($error, ZBX_STYLE_HINTBOX_WRAP." ".ZBX_STYLE_RED);
 }

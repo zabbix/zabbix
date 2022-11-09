@@ -3726,7 +3726,7 @@ $.widget( "ui.resizable", $.ui.mouse, {
 				position: "absolute",
 				left: this.elementOffset.left + "px",
 				top: this.elementOffset.top + "px",
-				zIndex: ++o.zIndex //TODO: Don't modify option
+				zIndex: ++o.zIndex // TODO: Don't modify option
 			} );
 
 			this.helper

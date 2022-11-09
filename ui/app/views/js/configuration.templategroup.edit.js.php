@@ -130,7 +130,7 @@
 				.then(success_callback)
 				.catch((exception) => {
 					for (const element of this.form.parentNode.children) {
-						if (element.matches('.msg-good, .msg-bad, .msg-warning')) { //todo zi
+						if (element.matches('.msg-good, .msg-bad, .msg-warning')) { // todo zi
 							element.parentNode.removeChild(element);
 						}
 					}

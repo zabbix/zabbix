@@ -79,6 +79,6 @@ class CFilterTabElement extends CElement {
 			$this->selectTab($name, $count);
 		}
 
-		$this->query('xpath:.//a[@class="icon-edit"]')->one()->waitUntilReady()->click(true); //todo zi
+		$this->query('xpath:.//a[@class="icon-edit"]')->one()->waitUntilReady()->click(true); // todo zi
 	}
 }

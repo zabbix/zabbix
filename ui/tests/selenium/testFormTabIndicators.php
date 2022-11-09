@@ -669,7 +669,7 @@ class testFormTabIndicators extends CWebTest {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
 			$form->getField('Type')->fill('Graph');
 			$form->invalidate();
-		} //todo zi
+		} // todo zi
 		elseif (CTestArrayHelper::get($data, 'create_button')) {
 			$this->query('button', $data['create_button'])->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();

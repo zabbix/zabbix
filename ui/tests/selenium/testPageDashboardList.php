@@ -46,7 +46,7 @@ class testPageDashboardList extends CWebTest {
 
 		// Check filter collapse/expand.
 		foreach (['true', 'false'] as $status) {
-			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one(); //todo zi
+			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one(); // todo zi
 			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
 		}
 

@@ -37,16 +37,16 @@ $header = (new CDiv())
 	->addItem(
 		(new CDiv([
 			(new CButton(null, _('Collapse sidebar')))
-				->addClass('button-compact js-sidebar-mode') //todo zi
+				->addClass('button-compact js-sidebar-mode') // todo zi
 				->setAttribute('title', _('Collapse sidebar')),
 			(new CButton(null, _('Expand sidebar')))
-				->addClass('button-expand js-sidebar-mode') //todo zi
+				->addClass('button-expand js-sidebar-mode') // todo zi
 				->setAttribute('title', _('Expand sidebar')),
 			(new CButton(null, _('Hide sidebar')))
-				->addClass('button-hide js-sidebar-mode') //todo zi
+				->addClass('button-hide js-sidebar-mode') // todo zi
 				->setAttribute('title', _('Hide sidebar')),
 			(new CButton(null, _('Show sidebar')))
-				->addClass('button-show js-sidebar-mode') //todo zi
+				->addClass('button-show js-sidebar-mode') // todo zi
 				->setAttribute('title', _('Show sidebar'))
 		]))->addClass('sidebar-header-buttons')
 	);

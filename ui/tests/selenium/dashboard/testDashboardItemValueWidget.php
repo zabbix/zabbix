@@ -1278,7 +1278,7 @@ class testDashboardItemValueWidget extends CWebTest {
 	 */
 	public function testDashboardItemValueWidget_ThresholdWarningMessage($data) {
 		$warning = 'id:item-value-thresholds-warning';
-		$info = 'class:icon-info'; //todo zi
+		$info = 'class:icon-info'; // todo zi
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();

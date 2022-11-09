@@ -1383,7 +1383,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 				$this->assertFalse($change_button->isEnabled());
 				$this->assertFalse($revert_button->isClickable());
 			}
-			$this->assertFalse($value_field->query('xpath:.//button[contains(@class, "btn-dropdown-toggle")]')->one()->isEnabled()); //todo zi
+			$this->assertFalse($value_field->query('xpath:.//button[contains(@class, "btn-dropdown-toggle")]')->one()->isEnabled()); // todo zi
 		}
 		else {
 			$value_field = $this->getValueField($data['macro']);

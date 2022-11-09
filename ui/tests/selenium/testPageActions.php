@@ -280,7 +280,7 @@ class testPageActions extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action enabled'); //todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action enabled'); // todo zi
 		$this->zbxTestTextPresent('Enabled');
 
 		$this->assertEquals(1, CDBHelper::getCount(
@@ -312,7 +312,7 @@ class testPageActions extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Selected actions deleted'); //todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Selected actions deleted'); // todo zi
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM actions WHERE actionid='.$action['actionid']));
 

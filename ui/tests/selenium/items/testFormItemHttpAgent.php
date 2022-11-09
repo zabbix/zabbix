@@ -367,7 +367,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		}
 
 		// Check error message on posting the form.
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']); //todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error']); // todo zi
 		$this->zbxTestTextPresentInMessageDetails($data['error_details']);
 	}
 
@@ -1008,7 +1008,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		}
 
 		$this->zbxTestClickWait('add');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');//todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item added');// todo zi
 		$this->zbxTestTextPresent($data['fields']['Name']);
 
 		// Check the results in DB.

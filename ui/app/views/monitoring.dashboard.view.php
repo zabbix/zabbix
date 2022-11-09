@@ -117,7 +117,7 @@ $widget = (new CWidget())
 					)
 					->addItem(
 						(new CButton('', '&nbsp;'))
-							->addClass(ZBX_STYLE_BTN_ACTION) //todo zi
+							->addClass(ZBX_STYLE_BTN_ACTION) // todo zi
 							->setId('dashboard-actions')
 							->setTitle(_('Actions'))
 							->setEnabled($data['dashboard']['can_edit_dashboards']
@@ -134,7 +134,7 @@ $widget = (new CWidget())
 			))->setAttribute('aria-label', _('Content controls')))
 			->addItem((new CListItem(
 				(new CTag('nav', true, new CList([
-					(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF), //todo zi
+					(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF), // todo zi
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
 						->addItem((new CButton('dashboard-add-widget',
@@ -143,7 +143,7 @@ $widget = (new CWidget())
 						->addItem(
 							(new CButton('dashboard-add', '&#8203;'))
 								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON) //todo zi
+								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON) // todo zi
 						),
 					(new CButton('dashboard-save', _('Save changes'))),
 					(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
@@ -159,12 +159,12 @@ $widget = (new CWidget())
 				->addClass(ZBX_STYLE_DASHBOARD_KIOSKMODE_CONTROLS)
 				->addItem(
 					(new CSimpleButton(null))
-						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE) //todo zi
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE) // todo zi
 						->setTitle(_('Previous page'))
 				)
 				->addItem(
 					(new CSimpleButton(null))
-						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW) //todo zi
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW) // todo zi
 						->setTitle(($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
 							? _s('Stop slideshow')
 							: _s('Start slideshow')
@@ -177,7 +177,7 @@ $widget = (new CWidget())
 				)
 				->addItem(
 					(new CSimpleButton(null))
-						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE) //todo zi
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE) // todo zi
 						->setTitle(_('Next page'))
 				)
 			: null
@@ -228,11 +228,11 @@ if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 					->addItem([
 						(new CSimpleButton())
 							->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
-							->addClass('btn-iterator-page-previous') //todo zi
+							->addClass('btn-iterator-page-previous') // todo zi
 							->setEnabled(false),
 						(new CSimpleButton())
 							->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
-							->addClass('btn-iterator-page-next') //todo zi
+							->addClass('btn-iterator-page-next') // todo zi
 							->setEnabled(false),
 						(new CSimpleButton([
 							(new CSpan(_s('Start slideshow')))->addClass('slideshow-state-stopped'),
