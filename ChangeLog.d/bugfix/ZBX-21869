@@ -1,0 +1,1 @@
+.......... [ZBX-21869] fixed database upgrade from 5.0 on setups requiring primary keys for tables (wiper)

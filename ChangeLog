@@ -1,9 +1,12 @@
 Changes for 6.0.11rc1
 
 New features:
+.........T [ZBXNEXT-6844] added Cisco Meraki template (abiba, vkhaliev)
 .......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
 
 Bug fixes:
+........S. [ZBX-21765] removed HTTP header "Accept-Encoding" from defaults in a web scenario step request (dimir)
+.......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)
 ........S. [ZBX-21655] fixed VMware datastore discovery to not return same datastore multiple times (asestakovs)
 ..F....... [ZBX-21677] fixed checkbox resetting in Monitoring->Latest data and Monitoring->Problems (rdetlavs)
 ..F....... [ZBX-21687] fixed persistent preloader icons over dashboard widgets on Safari 16 (averza)
@@ -2205,6 +2208,7 @@ New features:
 .......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
 
 Bug fixes:
+.......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)
 .........T [ZBX-21844] fixed script in OPSgenie media (atocko)
 
 --------------------------------------------------------------------------------
