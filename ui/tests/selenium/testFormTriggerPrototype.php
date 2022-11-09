@@ -900,7 +900,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					}
 				}
 				else {
-					$this->zbxTestAssertElementNotPresentXpath('//a[@class="icon-info status-red"]'); //todo zi
+					$this->zbxTestAssertElementNotPresentXpath('//a[@class="icon-info status-red"]'); // todo zi
 				}
 			}
 		}

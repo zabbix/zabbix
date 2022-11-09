@@ -1238,10 +1238,10 @@ function expressionLevelDraw(array $next, $level) {
 	$expr = [];
 	for ($i = 1; $i <= $level; $i++) {
 		if ($i == $level) {
-			$class_name = $next[$i] ? 'icon-tree-top-bottom-right' : 'icon-tree-top-right'; //todo zi
+			$class_name = $next[$i] ? 'icon-tree-top-bottom-right' : 'icon-tree-top-right'; // todo zi
 		}
 		else {
-			$class_name = $next[$i] ? 'icon-tree-top-bottom' : 'icon-tree-empty'; //todo zi
+			$class_name = $next[$i] ? 'icon-tree-top-bottom' : 'icon-tree-empty'; // todo zi
 		}
 
 		$expr[] = (new CSpan(''))->addClass($class_name);
@@ -2417,7 +2417,7 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
 	foreach (['down', 'up'] as $type) {
 		if (array_key_exists($type, $dependencies)) {
 			$header = ($type === 'down') ? _('Depends on') : _('Dependent');
-			$class = ($type === 'down') ? ZBX_STYLE_ICON_DEPEND_DOWN : ZBX_STYLE_ICON_DEPEND_UP; //todo zi
+			$class = ($type === 'down') ? ZBX_STYLE_ICON_DEPEND_DOWN : ZBX_STYLE_ICON_DEPEND_UP; // todo zi
 
 			$table = (new CTableInfo())
 				->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')

@@ -514,7 +514,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule updated'); //todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule updated'); // todo zi
 		$this->zbxTestTextPresent("$name");
 
 		$this->assertEquals($oldHashDiscovery, CDBHelper::getHash($sqlDiscovery));
@@ -1582,13 +1582,13 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			switch ($expected) {
 				case TEST_GOOD:
 					$this->zbxTestCheckTitle('Configuration of discovery rules');
-					$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule created'); //todo zi
+					$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule created'); // todo zi
 					$this->zbxTestTextPresent(['Item prototypes',  'Trigger prototypes', 'Graph prototypes']);
 					break;
 
 				case TEST_BAD:
 					$this->zbxTestCheckTitle('Configuration of discovery rules');
-					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']); //todo zi
+					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']); // todo zi
 					foreach ($data['errors'] as $msg) {
 						$this->zbxTestTextPresent($msg);
 					}
@@ -1654,7 +1654,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'Database monitor', 'IPMI agent', 'SSH agent', 'TELNET agent',
 					'JMX agent', 'Dependent item'])) {
 				$this->zbxTestClickButtonText('Execute now');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully'); //todo zi
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully'); // todo zi
 			}
 			else {
 				$this->zbxTestAssertElementPresentXpath("//button[text()='Execute now'][@disabled]");
@@ -1688,7 +1688,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestClickButton('discoveryrule.massdelete');
 
 			$this->zbxTestAcceptAlert();
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rules deleted'); //todo zi
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rules deleted'); // todo zi
 
 			$sql = "SELECT itemid FROM items WHERE name = '".$name."' and hostid = ".$this->hostid;
 			$this->assertEquals(0, CDBHelper::getCount($sql), 'Discovery rule has not been deleted from DB.');
@@ -1799,7 +1799,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestClickWait('add');
 
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule created'); //todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule created'); // todo zi
 		$this->zbxTestTextPresent($data['name']);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
@@ -1941,7 +1941,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestClickWait('add');
 
-		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add discovery rule'); //todo zi
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add discovery rule'); // todo zi
 		$this->zbxTestTextPresentInMessageDetails($data['error_message']);
 
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM items WHERE name ='.zbx_dbstr($data['name']).' AND hostid = '.$this->hostid));
