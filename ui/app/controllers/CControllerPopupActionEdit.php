@@ -120,6 +120,7 @@ class CControllerPopupActionEdit extends CController {
 				'formula' => $formula,
 				'allowedOperations' => getAllowedOperations($eventsource)
 			];
+
 			foreach ($data['action']['filter']['conditions'] as  $row_index => &$condition) {
 				$condition_names = actionConditionValueToString([$data['action']]);
 				$data['condition_name'][] = $condition_names[0][$row_index];

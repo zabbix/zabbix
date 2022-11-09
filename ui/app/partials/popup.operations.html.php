@@ -33,14 +33,12 @@ if ($data['table'] === 'operation') {
 
 	if (!array_key_exists('action', $data)) {
 		$operations = $data['operations'];
-		$eventsource = array_key_exists('eventsource', $operations[0])
-			? $operations[0]['eventsource']
-			: $data['eventsource'];
 	}
 	else {
 		$operations = $data['action']['operations'];
-		$eventsource = $data['eventsource'];
 	}
+
+	$eventsource = $data['eventsource'];
 
 	if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 		$operations_table->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration'), _('Action')]);
@@ -50,6 +48,10 @@ if ($data['table'] === 'operation') {
 	}
 
 	foreach ($operations as $operationid => $operation) {
+		if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_OPERATION])) {
+			continue;
+		}
+
 		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 			$simple_interval_parser = new CSimpleIntervalParser();
 
@@ -185,7 +187,9 @@ elseif ($data['table'] === 'recovery') {
 
 		if ($operations) {
 			foreach ($operations as $operationid => $operation) {
-				// todo : add check for allowed operations
+				if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_RECOVERY_OPERATION])) {
+					continue;
+				}
 
 				if (!isset($operation['opconditions'])) {
 					$operation['opconditions'] = [];
@@ -299,10 +303,10 @@ elseif ($data['table'] === 'update') {
 
 		if ($operations) {
 			foreach ($operations as $operationid => $operation) {
-				// todo : pass allowed operations
-//				if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_UPDATE_OPERATION])) {
-//					continue;
-//				}
+				if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_UPDATE_OPERATION])) {
+					continue;
+				}
+
 				$operation += [
 					'opconditions' => []
 				];

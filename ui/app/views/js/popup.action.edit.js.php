@@ -161,13 +161,12 @@ window.action_edit_popup = new class {
 
 		this.parameters = {
 			eventsource: this.eventsource,
-			recovery: operation_data.operationtype,
+			recovery: operation_data.data.recovery,
 			actionid: this.actionid,
 			data: operation_data.data
 		}
 
 		const overlay = PopUp('popup.action.operation.edit', this.parameters, {
-			recovery: this.recovery,
 			dialogueid: 'operations',
 			dialogue_class: 'modal-popup-medium'
 		});

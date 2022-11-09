@@ -53,7 +53,6 @@ class CControllerPopupActionOperationGet extends CController {
 	protected function checkPermissions() {
 		return true;
 		// todo : add permission check
-		// todo : check if action can be edited??
 	}
 
 	protected function doAction() {
@@ -125,11 +124,9 @@ class CControllerPopupActionOperationGet extends CController {
 		}
 		unset($operation);
 
-
 		$action = [
 			'name' => '',
 			'esc_period' => DB::getDefault('actions', 'esc_period'),
-			// todo : pass eventsource
 			'eventsource' => EVENT_SOURCE_TRIGGERS,
 			'operations' => $operations,
 			'recovery_operations' => [],
@@ -137,6 +134,9 @@ class CControllerPopupActionOperationGet extends CController {
 		];
 
 		foreach ($data['operations'] as &$operation) {
+			$eventsource = $operation['eventsource'];
+			$action['eventsource'] = $eventsource;
+
 			if (!$new_operation) {
 				$action['operations'] = [$operation];
 				$operation['details'] = $this->getData($operationtype, [$action], $operation['recovery']);
@@ -172,6 +172,8 @@ class CControllerPopupActionOperationGet extends CController {
 			}
 		}
 
+		$data['allowedOperations'] = getAllowedOperations($eventsource);
+		$data['eventsource'] = $eventsource;
 		$data['action']['esc_period'] = $this->getInput('esc_period');
 		$this->setResponse(new CControllerResponseData($data));
 	}
