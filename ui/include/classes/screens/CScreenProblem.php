@@ -806,7 +806,7 @@ class CScreenProblem extends CScreenBase {
 			unset($trigger);
 		}
 
-		$symptom_eventids = [];
+		$symptom_cause_eventids = [];
 		$cause_eventids_with_symptoms = [];
 		$has_symptoms_on_page = false;
 		$symptom_data['problems'] = [];
@@ -838,7 +838,7 @@ class CScreenProblem extends CScreenBase {
 
 				if ($problem['cause_eventid'] != 0) {
 					// For CSV get cause names for these symptom events.
-					$symptom_eventids[] = $problem['eventid'];
+					$symptom_cause_eventids[] = $problem['cause_eventid'];
 				}
 			}
 			unset($problem);
@@ -953,7 +953,7 @@ class CScreenProblem extends CScreenBase {
 				}
 			}
 			// There might be cause events without symptoms or only symptoms.
-			elseif ($symptom_eventids) {
+			elseif ($symptom_cause_eventids) {
 				if ($this->data['filter']['compact_view']) {
 					$header[] = (new CColHeader())->addStyle('width: 20px;');
 				}
@@ -1076,7 +1076,6 @@ class CScreenProblem extends CScreenBase {
 				'dependencies' => $dependencies,
 				'show_opdata' =>  $show_opdata,
 				'has_symptoms_on_page' => $has_symptoms_on_page,
-				'symptom_eventids' => $symptom_eventids,
 				'show_timeline' => $show_timeline,
 				'last_clock' => $last_clock,
 				'show_recovery_data' => $show_recovery_data,
@@ -1103,7 +1102,7 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		/*
-		 * Search limit performs +1 selection to know if limit was exceeded, this will assure that csv has
+		 * Search limit performs +1 selection to know if limit was exceeded, this will assure that CSV has
 		 * "search_limit" records at most.
 		 */
 		array_splice($data['problems'], $this->data['limit']);
@@ -1117,6 +1116,7 @@ class CScreenProblem extends CScreenBase {
 			_('Status'),
 			_('Host'),
 			_('Problem'),
+			$symptom_cause_eventids ? _('Cause') : null,
 			($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? _('Operational data') : null,
 			_('Duration'),
 			_('Ack'),
@@ -1126,6 +1126,19 @@ class CScreenProblem extends CScreenBase {
 
 		// Make tags from all events.
 		$tags = makeTags($data['problems'] + $symptom_data['problems'], false);
+
+		// Get cause event names for symtoms.
+		if ($symptom_cause_eventids) {
+			$options = [
+				'output' => ['cause_eventid', 'name'],
+				'eventids' => $symptom_cause_eventids,
+				'preservekeys' => true
+			];
+
+			$causes = ($this->data['filter']['show'] == TRIGGERS_OPTION_ALL)
+				? API::Event()->get($options)
+				: API::Problem()->get($options);
+		}
 
 		foreach ($data['problems'] as $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
@@ -1194,6 +1207,10 @@ class CScreenProblem extends CScreenBase {
 			$row[] = ($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $trigger['opdata'] !== '')
 				? $problem['name'].' ('.$opdata.')'
 				: $problem['name'];
+
+			if ($symptom_cause_eventids) {
+				$row[] = $problem['cause_eventid'] != 0 ? $causes[$problem['cause_eventid']]['name'] : '';
+			}
 
 			if ($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) {
 				$row[] = $opdata;
