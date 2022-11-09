@@ -50,7 +50,6 @@ if ($data['table'] === 'operation') {
 	}
 
 	foreach ($operations as $operationid => $operation) {
-
 		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 			$simple_interval_parser = new CSimpleIntervalParser();
 
@@ -335,7 +334,7 @@ elseif ($data['table'] === 'update') {
 					return !in_array($key, [
 						'row_index', 'duration', 'steps', 'details'
 					]);
-				}, ARRAY_FILTER_USE_KEY );
+				}, ARRAY_FILTER_USE_KEY);
 
 				$operations_table->addRow([
 					$details_column,

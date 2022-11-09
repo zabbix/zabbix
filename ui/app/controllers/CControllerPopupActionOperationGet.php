@@ -172,6 +172,7 @@ class CControllerPopupActionOperationGet extends CController {
 			}
 		}
 
+		$data['action']['esc_period'] = $this->getInput('esc_period');
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
