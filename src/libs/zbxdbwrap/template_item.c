@@ -20,7 +20,7 @@
 #include "zbxdbhigh.h"
 
 #include "log.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
 #include "zbxnum.h"

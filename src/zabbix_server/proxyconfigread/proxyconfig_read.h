@@ -20,7 +20,7 @@
 #ifndef ZABBIX_PROXYCONFIG_READ_H
 #define ZABBIX_PROXYCONFIG_READ_H
 
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 typedef enum {
 	ZBX_PROXYCONFIG_STATUS_EMPTY,

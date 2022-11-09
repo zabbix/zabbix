@@ -46,10 +46,15 @@ libzbxpoller_proxy_a_SOURCES = \
 
 libzbxpoller_a_CFLAGS = \
 	-I$(top_srcdir)/src/libs/zbxsysinfo/simple \
-	-I$(top_srcdir)/src/libs/zbxdbcache \
+	-I$(top_srcdir)/src/libs/zbxcacheconfig \
+	-I$(top_srcdir)/src/libs/zbxcachehistory \
+	-I$(top_srcdir)/src/libs/zbxcachevalue \
 	$(SNMP_CFLAGS) \
 	$(SSH2_CFLAGS) \
 	$(SSH_CFLAGS) \
 	$(LIBXML2_CFLAGS)
 
-libzbxpoller_server_a_CFLAGS = -I$(top_srcdir)/src/libs/zbxdbcache
+libzbxpoller_server_a_CFLAGS = \
+	-I$(top_srcdir)/src/libs/zbxcacheconfig \
+	-I$(top_srcdir)/src/libs/zbxcachehistory \
+	-I$(top_srcdir)/src/libs/zbxcachevalue

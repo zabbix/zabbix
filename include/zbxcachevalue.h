@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_VALUECACHE_H
-#define ZABBIX_VALUECACHE_H
+#ifndef ZABBIX_CACHEVALUE_H
+#define ZABBIX_CACHEVALUE_H
 
 #include "zbxtypes.h"
 #include "zbxalgo.h"
@@ -119,4 +119,4 @@ void	zbx_vc_get_mem_stats(zbx_shmem_stats_t *mem);
 void	zbx_vc_get_item_stats(zbx_vector_ptr_t *stats);
 void	zbx_vc_flush_stats(void);
 
-#endif	/* ZABBIX_VALUECACHE_H */
+#endif

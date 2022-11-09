@@ -17,11 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxcacheconfig.h"
 #include "dbsync.h"
 
 #include "log.h"
-#include "dbcache.h"
-#include "zbxserialize.h"
 #include "base64.h"
 #include "zbxeval.h"
 #include "zbxnum.h"

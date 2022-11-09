@@ -35,7 +35,9 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
 	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
-	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
+	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
+	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -47,7 +49,9 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
-	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
+	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
+	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
+	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -144,7 +148,9 @@ macro_fmttime_LDADD += @SERVER_LIBS@
 macro_fmttime_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS)
 
 macro_fmttime_CFLAGS = $(COMMON_COMPILER_FLAGS) \
-	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxserver
 
 evaluate_function_SOURCES = \
@@ -217,22 +223,30 @@ VALUECACHE_WRAP_FUNCS = \
 
 evaluate_function_CFLAGS = $(COMMON_COMPILER_FLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
-	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory
 
 evaluate_stl_CFLAGS = $(COMMON_COMPILER_FLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
-	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory
 
 evaluate_percentage_deviations_in_remainder_CFLAGS = $(COMMON_COMPILER_FLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
-	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory
 
 valuemaps_CFLAGS = $(COMMON_COMPILER_FLAGS) \
 	-I@top_srcdir@/src/libs/zbxalgo \
-	-I@top_srcdir@/src/libs/zbxdbcache \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory
 endif
 
