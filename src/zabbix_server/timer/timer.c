@@ -20,7 +20,7 @@
 #include "timer.h"
 
 #include "log.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxnum.h"

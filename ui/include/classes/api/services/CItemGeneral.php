@@ -38,12 +38,47 @@ abstract class CItemGeneral extends CApiService {
 		INTERFACE_TYPE_IPMI
 	];
 
-	const ERROR_EXISTS_TEMPLATE = 'existsTemplate';
-	const ERROR_EXISTS = 'exists';
-	const ERROR_NO_INTERFACE = 'noInterface';
-	const ERROR_INVALID_KEY = 'invalidKey';
+	/**
+	 * A list of supported preprocessing types.
+	 *
+	 * @var array
+	 */
+	public const SUPPORTED_PREPROCESSING_TYPES = [];
 
-	protected $fieldRules;
+	/**
+	 * A list of preprocessing types that supports the "params" field.
+	 *
+	 * @var array
+	 */
+	protected const PREPROC_TYPES_WITH_PARAMS = [];
+
+	/**
+	 * A list of preprocessing types that supports the error handling.
+	 *
+	 * @var array
+	 */
+	protected const PREPROC_TYPES_WITH_ERR_HANDLING = [];
+
+	/**
+	 * A list of supported item types.
+	 *
+	 * @var array
+	 */
+	protected const SUPPORTED_ITEM_TYPES = [];
+
+	/**
+	 * A list of field names for each of value types.
+	 *
+	 * @var array
+	 */
+	protected const VALUE_TYPE_FIELD_NAMES = [];
+
+	/**
+	 * Maximum number of inheritable items per iteration.
+	 *
+	 * @var int
+	 */
+	protected const INHERIT_CHUNK_SIZE = 1000;
 
 	/**
 	 * @abstract
@@ -54,2006 +89,1211 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	abstract public function get($options = []);
 
-	public function __construct() {
-		parent::__construct();
-
-		// template - if templated item, value is taken from template item, cannot be changed on host
-		// system - values should not be updated
-		// host - value should be null for template items
-		$this->fieldRules = [
-			'type'					=> ['template' => 1],
-			'snmp_oid'				=> ['template' => 1],
-			'hostid'				=> [],
-			'name'					=> ['template' => 1],
-			'description'			=> [],
-			'key_'					=> ['template' => 1],
-			'master_itemid'			=> ['template' => 1],
-			'delay'					=> [],
-			'history'				=> [],
-			'trends'				=> [],
-			'status'				=> [],
-			'discover'				=> [],
-			'value_type'			=> ['template' => 1],
-			'trapper_hosts'			=> [],
-			'units'					=> ['template' => 1],
-			'formula'				=> ['template' => 1],
-			'error'					=> ['system' => 1],
-			'lastlogsize'			=> ['system' => 1],
-			'logtimefmt'			=> [],
-			'templateid'			=> ['system' => 1],
-			'valuemapid'			=> ['template' => 1],
-			'params'				=> [],
-			'ipmi_sensor'			=> ['template' => 1],
-			'authtype'				=> [],
-			'username'				=> [],
-			'password'				=> [],
-			'publickey'				=> [],
-			'privatekey'			=> [],
-			'mtime'					=> ['system' => 1],
-			'flags'					=> [],
-			'filter'				=> [],
-			'interfaceid'			=> ['host' => 1],
-			'inventory_link'		=> [],
-			'lifetime'				=> [],
-			'preprocessing'			=> ['template' => 1],
-			'overrides'				=> ['template' => 1],
-			'jmx_endpoint'			=> [],
-			'url'					=> ['template' => 1],
-			'timeout'				=> ['template' => 1],
-			'query_fields'			=> ['template' => 1],
-			'parameters'			=> ['template' => 1],
-			'posts'					=> ['template' => 1],
-			'status_codes'			=> ['template' => 1],
-			'follow_redirects'		=> ['template' => 1],
-			'post_type'				=> ['template' => 1],
-			'http_proxy'			=> ['template' => 1],
-			'headers'				=> ['template' => 1],
-			'retrieve_mode'			=> ['template' => 1],
-			'request_method'		=> ['template' => 1],
-			'output_format'			=> ['template' => 1],
-			'allow_traps'			=> [],
-			'ssl_cert_file'			=> ['template' => 1],
-			'ssl_key_file'			=> ['template' => 1],
-			'ssl_key_password'		=> ['template' => 1],
-			'verify_peer'			=> ['template' => 1],
-			'verify_host'			=> ['template' => 1]
-		];
-
-		$this->errorMessages = array_merge($this->errorMessages, [
-			self::ERROR_NO_INTERFACE => _('Cannot find host interface on "%1$s" for item key "%2$s".')
-		]);
-	}
-
 	/**
-	 * Check items data.
-	 *
-	 * Any system field passed to the function will be unset.
-	 *
-	 * @throw APIException
-	 *
-	 * @param array $items passed by reference
-	 * @param bool  $update
-	 */
-	protected function checkInput(array &$items, $update = false) {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)]
-		]];
-		if ($update) {
-			unset($api_input_rules['fields']['type']['flags']);
-		}
-
-		foreach ($items as $num => $item) {
-			$data = array_intersect_key($item, $api_input_rules['fields']);
-			if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($num + 1), $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-		}
-
-		if ($update) {
-			$itemDbFields = ['itemid' => null];
-
-			$dbItemsFields = ['itemid', 'templateid'];
-			foreach ($this->fieldRules as $field => $rule) {
-				if (!isset($rule['system'])) {
-					$dbItemsFields[] = $field;
-				}
-			}
-
-			$dbItems = $this->get([
-				'output' => $dbItemsFields,
-				'itemids' => zbx_objectValues($items, 'itemid'),
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			$dbHosts = API::Host()->get([
-				'output' => ['hostid', 'status', 'name'],
-				'hostids' => zbx_objectValues($dbItems, 'hostid'),
-				'templated_hosts' => true,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-		}
-		else {
-			$itemDbFields = [
-				'name' => null,
-				'key_' => null,
-				'hostid' => null,
-				'type' => null,
-				'value_type' => null,
-				'delay' => null
-			];
-
-			$dbHosts = API::Host()->get([
-				'output' => ['hostid', 'status', 'name'],
-				'hostids' => zbx_objectValues($items, 'hostid'),
-				'templated_hosts' => true,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			$discovery_rules = [];
-
-			if ($this instanceof CItemPrototype) {
-				$itemDbFields['ruleid'] = null;
-				$druleids = zbx_objectValues($items, 'ruleid');
-
-				if ($druleids) {
-					$discovery_rules = API::DiscoveryRule()->get([
-						'output' => ['hostid'],
-						'itemids' => $druleids,
-						'preservekeys' => true
-					]);
-				}
-			}
-		}
-
-		// interfaces
-		$interfaces = API::HostInterface()->get([
-			'output' => ['interfaceid', 'hostid', 'type'],
-			'hostids' => zbx_objectValues($dbHosts, 'hostid'),
-			'nopermissions' => true,
-			'preservekeys' => true
-		]);
-
-		if ($update) {
-			$updateDiscoveredValidator = new CUpdateDiscoveredValidator([
-				'allowed' => ['itemid', 'status'],
-				'messageAllowedField' => _('Cannot update "%2$s" for a discovered item "%1$s".')
-			]);
-			foreach ($items as &$item) {
-				// check permissions
-				if (!array_key_exists($item['itemid'], $dbItems)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
-
-				$dbItem = $dbItems[$item['itemid']];
-
-				if (array_key_exists('hostid', $item) && bccomp($dbItem['hostid'], $item['hostid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'hostid', _('cannot be changed'))
-					);
-				}
-
-				$itemName = array_key_exists('name', $item) ? $item['name'] : $dbItem['name'];
-
-				// discovered fields, except status, cannot be updated
-				$updateDiscoveredValidator->setObjectName($itemName);
-				$this->checkPartialValidator($item, $updateDiscoveredValidator, $dbItem);
-
-				$item += [
-					'hostid' => $dbItem['hostid'],
-					'type' => $dbItem['type'],
-					'name' => $dbItem['name'],
-					'key_' => $dbItem['key_'],
-					'flags' => $dbItem['flags']
-				];
-			}
-			unset($item);
-		}
-
-		$item_key_parser = new CItemKey();
-		$ip_range_parser = new CIPRangeParser([
-			'v6' => ZBX_HAVE_IPV6,
-			'ranges' => false,
-			'usermacros' => true,
-			'macros' => [
-				'{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'
-			]
-		]);
-		$update_interval_parser = new CUpdateIntervalParser([
-			'usermacros' => true,
-			'lldmacros' => (get_class($this) === 'CItemPrototype')
-		]);
-
-		$index = 0;
-		foreach ($items as $inum => &$item) {
-			$item = $this->clearValues($item);
-			$index++;
-
-			$fullItem = $items[$inum];
-
-			if (!check_db_fields($itemDbFields, $item)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
-			if ($update) {
-				$type = array_key_exists('type', $item) ? $item['type'] : $dbItems[$item['itemid']]['type'];
-
-				if ($type == ITEM_TYPE_HTTPAGENT) {
-					$this->validateHTTPCheck($fullItem, $dbItems[$item['itemid']]);
-				}
-
-				check_db_fields($dbItems[$item['itemid']], $fullItem);
-
-				$this->checkNoParameters(
-					$item,
-					['templateid', 'state', 'lastlogsize', 'mtime', 'error'],
-					_('Cannot update "%1$s" for item "%2$s".'),
-					$item['name']
-				);
-
-				// apply rules
-				foreach ($this->fieldRules as $field => $rules) {
-					if ($fullItem['type'] == ITEM_TYPE_SCRIPT) {
-						$rules['template'] = 1;
-					}
-
-					if ((0 != $fullItem['templateid'] && isset($rules['template'])) || isset($rules['system'])) {
-						unset($item[$field]);
-
-						// For templated item and fields that should not be modified, use the value from DB.
-						if (array_key_exists($field, $dbItems[$item['itemid']])
-								&& array_key_exists($field, $fullItem)) {
-							$fullItem[$field] = $dbItems[$item['itemid']][$field];
-						}
-					}
-				}
-
-				if (!isset($item['key_'])) {
-					$item['key_'] = $fullItem['key_'];
-				}
-				if (!isset($item['hostid'])) {
-					$item['hostid'] = $fullItem['hostid'];
-				}
-
-				// If a templated item is being assigned to an interface with a different type, ignore it.
-				$itemInterfaceType = itemTypeInterface($dbItems[$item['itemid']]['type']);
-
-				if ($itemInterfaceType !== INTERFACE_TYPE_ANY && $itemInterfaceType !== INTERFACE_TYPE_OPT
-						&& $fullItem['templateid']
-						&& array_key_exists('interfaceid', $item) && array_key_exists($item['interfaceid'], $interfaces)
-						&& $interfaces[$item['interfaceid']]['type'] != $itemInterfaceType) {
-
-					unset($item['interfaceid']);
-				}
-			}
-			else {
-				if ($fullItem['type'] == ITEM_TYPE_HTTPAGENT) {
-					$this->validateHTTPCheck($fullItem, []);
-				}
-
-				if (!isset($dbHosts[$item['hostid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
-
-				check_db_fields($itemDbFields, $fullItem);
-
-				$this->checkNoParameters(
-					$item,
-					['templateid', 'state'],
-					_('Cannot set "%1$s" for item "%2$s".'),
-					$item['name']
-				);
-
-				if ($this instanceof CItemPrototype && (!array_key_exists($fullItem['ruleid'], $discovery_rules)
-						|| $discovery_rules[$fullItem['ruleid']]['hostid'] != $fullItem['hostid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('No permissions to referred object or it does not exist!')
-					);
-				}
-			}
-
-			if ($fullItem['type'] == ITEM_TYPE_CALCULATED) {
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'params' =>		['type' => API_CALC_FORMULA, 'flags' => $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'params')],
-					'value_type' =>	['type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])]
-				]];
-
-				$data = array_intersect_key($item, $api_input_rules['fields']);
-
-				if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($inum + 1), $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
-			}
-
-			if ($fullItem['type'] == ITEM_TYPE_SCRIPT) {
-				if ($update) {
-					if ($dbItems[$item['itemid']]['type'] == $fullItem['type']) {
-						$flags = API_NOT_EMPTY;
-					}
-					else {
-						$flags = API_REQUIRED | API_NOT_EMPTY;
-					}
-				}
-				else {
-					$flags = API_REQUIRED | API_NOT_EMPTY;
-				}
-
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'params' => ['type' => API_STRING_UTF8, 'flags' => $flags, 'length' => DB::getFieldLength('items', 'params')],
-					'timeout' => [
-						'type' => API_TIME_UNIT, 'flags' => ($this instanceof CItemPrototype)
-							? $flags | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
-							: $flags | API_ALLOW_USER_MACRO,
-						'in' => '1:'.SEC_PER_MIN
-					],
-					'parameters' => ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-						'name' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_parameter', 'name')],
-						'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('item_parameter', 'value')]
-					]]
-				]];
-
-				$data = array_intersect_key($item, $api_input_rules['fields']);
-
-				if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($inum + 1), $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
-			}
-
-			$host = $dbHosts[$fullItem['hostid']];
-
-			// Validate update interval.
-			if (!in_array($fullItem['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-					&& ($fullItem['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($fullItem['key_'], 'mqtt.get', 8) !== 0)
-					&& !validateDelay($update_interval_parser, 'delay', $fullItem['delay'], $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-
-			// For non-numeric types, whichever value was entered in trends field, is overwritten to zero.
-			if ($fullItem['value_type'] == ITEM_VALUE_TYPE_STR || $fullItem['value_type'] == ITEM_VALUE_TYPE_LOG
-					|| $fullItem['value_type'] == ITEM_VALUE_TYPE_TEXT) {
-				$item['trends'] = '0';
-			}
-
-			// Check if the item requires an interface.
-			if ($host['status'] == HOST_STATUS_TEMPLATE) {
-				unset($item['interfaceid']);
-			}
-			else {
-				$item_interface_type = itemTypeInterface($fullItem['type']);
-
-				if ($item_interface_type !== false) {
-					if (!array_key_exists('interfaceid', $fullItem) || !$fullItem['interfaceid']) {
-						if ($item_interface_type != INTERFACE_TYPE_OPT) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
-						}
-					}
-					elseif (!array_key_exists($fullItem['interfaceid'], $interfaces)
-							|| bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
-					}
-					elseif ($item_interface_type !== INTERFACE_TYPE_ANY && $item_interface_type !== INTERFACE_TYPE_OPT
-							&& $interfaces[$fullItem['interfaceid']]['type'] != $item_interface_type) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
-					}
-				}
-				// No interface required, just set it to zero.
-				else {
-					$item['interfaceid'] = 0;
-				}
-			}
-
-			// item key
-			if ($fullItem['type'] == ITEM_TYPE_DB_MONITOR) {
-				if (!isset($fullItem['flags']) || $fullItem['flags'] != ZBX_FLAG_DISCOVERY_RULE) {
-					if (strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_DB_MONITOR) == 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Check the key, please. Default example was passed.')
-						);
-					}
-				}
-				elseif ($fullItem['flags'] == ZBX_FLAG_DISCOVERY_RULE) {
-					if (strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY) == 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Check the key, please. Default example was passed.')
-						);
-					}
-				}
-			}
-			elseif (($fullItem['type'] == ITEM_TYPE_SSH && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_SSH) == 0)
-					|| ($fullItem['type'] == ITEM_TYPE_TELNET && strcmp($fullItem['key_'], ZBX_DEFAULT_KEY_TELNET) == 0)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Check the key, please. Default example was passed.'));
-			}
-
-			// key
-			if ($item_key_parser->parse($fullItem['key_']) != CParser::PARSE_SUCCESS) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_params($this->getErrorMsg(self::ERROR_INVALID_KEY), [
-						$fullItem['key_'], $fullItem['name'], $host['name'], $item_key_parser->getError()
-					])
-				);
-			}
-
-			if (($fullItem['type'] == ITEM_TYPE_TRAPPER || $fullItem['type'] == ITEM_TYPE_HTTPAGENT)
-					&& array_key_exists('trapper_hosts', $fullItem) && $fullItem['trapper_hosts'] !== ''
-					&& !$ip_range_parser->parse($fullItem['trapper_hosts'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'trapper_hosts', $ip_range_parser->getError())
-				);
-			}
-
-			// jmx
-			if ($fullItem['type'] == ITEM_TYPE_JMX) {
-				if (!array_key_exists('jmx_endpoint', $fullItem) && !$update) {
-					$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
-				}
-				if (array_key_exists('jmx_endpoint', $fullItem) && $fullItem['jmx_endpoint'] === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'jmx_endpoint', _('cannot be empty'))
-					);
-				}
-
-				if (($fullItem['username'] === '') !== ($fullItem['password'] === '')) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'username',
-								_('both username and password should be either present or empty'))
-					);
-				}
-			}
-			else {
-				if (array_key_exists('jmx_endpoint', $item) && $item['jmx_endpoint'] !== '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'jmx_endpoint', _('should be empty'))
-					);
-				}
-				elseif (array_key_exists('jmx_endpoint', $fullItem) && $fullItem['jmx_endpoint'] !== '') {
-					$item['jmx_endpoint'] = '';
-				}
-			}
-
-			// Dependent item.
-			if ($fullItem['type'] == ITEM_TYPE_DEPENDENT) {
-				if ($update) {
-					if (array_key_exists('master_itemid', $item) && !$item['master_itemid']) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('cannot be empty')
-						));
-					}
-					if ($dbItems[$fullItem['itemid']]['type'] != ITEM_TYPE_DEPENDENT
-							&& !array_key_exists('master_itemid', $item)) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('cannot be empty')
-						));
-					}
-				}
-				elseif (!array_key_exists('master_itemid', $item) || !$item['master_itemid']) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _('cannot be empty')
-					));
-				}
-				if (array_key_exists('master_itemid', $item) && !is_int($item['master_itemid'])
-						&& !(is_string($item['master_itemid']) && ctype_digit($item['master_itemid']))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
-						$item['master_itemid'], 'master_itemid'
-					));
-				}
-			}
-			else {
-				if (array_key_exists('master_itemid', $item) && $item['master_itemid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-						'master_itemid', _('should be empty')
-					));
-				}
-				$item['master_itemid'] = 0;
-			}
-
-			// ssh, telnet
-			if ($fullItem['type'] == ITEM_TYPE_SSH || $fullItem['type'] == ITEM_TYPE_TELNET) {
-				if ($fullItem['username'] === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No authentication user name specified.'));
-				}
-
-				if ($fullItem['type'] == ITEM_TYPE_SSH && $fullItem['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
-					if ($fullItem['publickey'] === '') {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No public key file specified.'));
-					}
-					if ($fullItem['privatekey'] === '') {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No private key file specified.'));
-					}
-				}
-			}
-
-			// Prevent IPMI sensor field being empty if item key is not "ipmi.get".
-			if ($fullItem['type'] == ITEM_TYPE_IPMI && $fullItem['key_'] !== 'ipmi.get'
-					&& (!array_key_exists('ipmi_sensor', $fullItem) || $fullItem['ipmi_sensor'] === '')) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'ipmi_sensor', _('cannot be empty')
-				));
-			}
-
-			// snmp trap
-			if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP
-					&& $fullItem['key_'] !== 'snmptrap.fallback' && $item_key_parser->getKey() !== 'snmptrap') {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid.'));
-			}
-
-			// snmp oid
-			if ($fullItem['type'] == ITEM_TYPE_SNMP
-					&& (!array_key_exists('snmp_oid', $fullItem) || $fullItem['snmp_oid'] === '')) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No SNMP OID specified.'));
-			}
-
-			$this->checkSpecificFields($fullItem, $update ? 'update' : 'create');
-
-			$this->validateItemPreprocessing($fullItem);
-			$this->validateTags($item, '/'.$index);
-		}
-		unset($item);
-
-		$this->validateValueMaps($items);
-
-		$this->checkAndAddUuid($items, $dbHosts, $update);
-		$this->checkExistingItems($items);
-	}
-
-	/**
-	 * Check that only items on templates have UUID. Add UUID to all host prototypes on templates,
-	 *   if it doesn't exist.
-	 *
-	 * @param array $items_to_create
-	 * @param array $db_hosts
-	 * @param bool $is_update
+	 * @param array      $field_names
+	 * @param array      $items
+	 * @param array|null $db_items
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$items_to_create, array $db_hosts, bool $is_update): void {
-		if ($is_update) {
-			foreach ($items_to_create as $index => &$item) {
-				if (array_key_exists('uuid', $item)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1),
-							_s('unexpected parameter "%1$s"', 'uuid')
-						)
-					);
+	protected static function validateByType(array $field_names, array &$items, array $db_items = null): void {
+		$checked_fields = array_fill_keys($field_names, ['type' => API_ANY]);
+
+		foreach ($items as $i => &$item) {
+			$api_input_rules = ['type' => API_OBJECT, 'fields' => $checked_fields];
+			$db_item = ($db_items === null) ? null : $db_items[$item['itemid']];
+			$item_type = CItemTypeFactory::getObject($item['type']);
+
+			if ($db_item === null) {
+				$api_input_rules['fields'] += $item_type::getCreateValidationRules($item);
+			}
+			elseif ($db_item['templateid'] != 0) {
+				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+					$item += array_intersect_key($db_item, array_flip(['allow_traps']));
+				}
+				elseif ($item['type'] == ITEM_TYPE_SSH) {
+					$item += array_intersect_key($db_item, array_flip(['authtype']));
+				}
+
+				if ($item['type'] === ITEM_TYPE_SSH && $item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY
+						&& $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY) {
+					$item += array_intersect_key($db_item, array_flip(['publickey', 'privatekey']));
+				}
+
+				$api_input_rules['fields'] += $item_type::getUpdateValidationRulesInherited($db_item);
+			}
+			elseif ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				$api_input_rules['fields'] += $item_type::getUpdateValidationRulesDiscovered();
+			}
+			else {
+				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+					$item += array_intersect_key($db_item, array_flip(
+						['request_method', 'post_type', 'authtype', 'allow_traps']
+					));
+				}
+				elseif ($item['type'] == ITEM_TYPE_SSH) {
+					$item += array_intersect_key($db_item, array_flip(['authtype']));
+				}
+
+				$interfaceid_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI,
+					ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_HTTPAGENT,
+					ITEM_TYPE_SNMP
+				];
+
+				if (in_array($item['type'], $interfaceid_types)) {
+					$opt_interface_types = [ITEM_TYPE_SIMPLE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+						ITEM_TYPE_HTTPAGENT
+					];
+
+					if (in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+							&& (!in_array($db_item['type'], $interfaceid_types)
+								|| (in_array($item['type'], array_diff($interfaceid_types, $opt_interface_types))
+									&& in_array($db_item['type'], $opt_interface_types)
+									&& $db_item['interfaceid'] == 0))) {
+						$item += array_intersect_key($db_item, array_flip(['interfaceid']));
+					}
+				}
+
+				$username_types = [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+					ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT
+				];
+
+				if (in_array($item['type'], [ITEM_TYPE_SSH, ITEM_TYPE_TELNET])) {
+					$opt_username_types = array_diff($username_types, [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]);
+
+					if (!in_array($db_item['type'], $username_types)
+							|| (in_array($db_item['type'], $opt_username_types) && $db_item['username'] === '')) {
+						$item += array_intersect_key($db_item, array_flip(['username']));
+					}
+				}
+
+				$params_types = [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED,
+					ITEM_TYPE_SCRIPT
+				];
+
+				if (in_array($item['type'], $params_types) && !in_array($db_item['type'], $params_types)) {
+					$item += array_intersect_key($db_item, array_flip(['params']));
+				}
+
+				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
+					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
+				];
+
+				if (in_array($item['type'], $delay_types)) {
+					if (!in_array($db_item['type'], $delay_types)
+							|| ($db_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+								&& strncmp($db_item['key_'], 'mqtt.get', 8) === 0)) {
+						$item += array_intersect_key($db_item, array_flip(['delay']));
+					}
+				}
+
+				if ($item['type'] == ITEM_TYPE_DEPENDENT && $db_item['type'] != ITEM_TYPE_DEPENDENT) {
+					$item += array_intersect_key($db_item, array_flip(['master_itemid']));
+				}
+
+				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+					$post_types = [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML];
+
+					if (in_array($item['post_type'], $post_types) && !in_array($db_item['post_type'], $post_types)) {
+						$item += array_intersect_key($db_item, array_flip(['posts']));
+					}
+				}
+
+				if ($item['type'] == ITEM_TYPE_IPMI
+						&& ($db_item['type'] != ITEM_TYPE_IPMI
+							|| ($item['key_'] !== $db_item['key_'] && $db_item['key_'] === 'ipmi.get'))) {
+					$item += array_intersect_key($db_item, array_flip(['ipmi_sensor']));
+				}
+
+				if ($item['type'] == ITEM_TYPE_JMX && $db_item['type'] != ITEM_TYPE_JMX) {
+					$item += array_intersect_key($db_item, array_flip(['jmx_endpoint']));
+				}
+
+				if ($item['type'] == ITEM_TYPE_SNMP && $db_item['type'] != ITEM_TYPE_SNMP) {
+					$item += array_intersect_key($db_item, array_flip(['snmp_oid']));
+				}
+
+				if ($item['type'] === ITEM_TYPE_SSH && $item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY
+						&& $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY) {
+					$item += array_intersect_key($db_item, array_flip(['publickey', 'privatekey']));
+				}
+
+				$api_input_rules['fields'] += $item_type::getUpdateValidationRules($db_item);
+			}
+
+			$api_input_rules['fields'] += CItemType::getDefaultValidationRules();
+
+			if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+
+			if ($item['type'] == ITEM_TYPE_JMX) {
+				if (array_key_exists('username', $item) || array_key_exists('password', $item)
+						|| ($db_item !== null && $db_item['type'] != ITEM_TYPE_JMX)) {
+					$_item = array_intersect_key($item, array_flip(['username', 'password']));
+
+					if ($db_item === null) {
+						$_item += array_fill_keys(['username', 'password'], '');
+					}
+					else {
+						$_item += array_intersect_key($db_item, array_flip(['username', 'password']));
+					}
+
+					if (($_item['username'] === '') !== ($_item['password'] === '')) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+							_('both username and password should be either present or empty')
+						));
+					}
 				}
 			}
 
-			return;
-		}
+			if (array_key_exists('query_fields', $item)) {
+				foreach ($item['query_fields'] as $query_field) {
+					if (count($query_field) != 1 || key($query_field) === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							'/'.($i + 1).'/query_fields', _('nonempty key and value pair expected'))
+						);
+					}
+				}
 
-		foreach ($items_to_create as $index => &$item) {
-			if ($db_hosts[$item['hostid']]['status'] != HOST_STATUS_TEMPLATE && array_key_exists('uuid', $item)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/' . ($index + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-				);
+				$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
+
+				if (strlen($item['query_fields']) > DB::getFieldLength('items', 'query_fields')) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/query_fields', _('value is too long')
+					));
+				}
 			}
 
-			if ($db_hosts[$item['hostid']]['status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
-				$item['uuid'] = generateUuidV4();
+			if (array_key_exists('headers', $item)) {
+				foreach ($item['headers'] as $name => $value) {
+					if (trim($name) === '' || !is_string($value) || $value === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							'/'.($i + 1).'/headers', _('nonempty key and value pair expected')
+						));
+					}
+				}
+
+				$item['headers'] = self::headersArrayToString($item['headers']);
+
+				if (strlen($item['headers']) > DB::getFieldLength('items', 'headers')) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/headers', _('value is too long')
+					));
+				}
 			}
 		}
 		unset($item);
-
-		$db_uuid = DB::select('items', [
-			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($items_to_create, 'uuid')],
-			'limit' => 1
-		]);
-
-		if ($db_uuid) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_uuid[0]['uuid'])
-			);
-		}
 	}
 
 	/**
-	 * Validates tags.
-	 *
-	 * @param array  $item
-	 * @param array  $item['tags']
-	 * @param string $item['tags'][]['tag']
-	 * @param string $item['tags'][]['value']
-	 *
-	 * @throws APIException if the input is invalid.
+	 * @param array $items
 	 */
-	protected function validateTags(array $item, string $path = '/') {
-		if (!array_key_exists('tags', $item)) {
-			return;
-		}
-
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'tags'		=> ['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
-				'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_tag', 'tag')],
-				'value'		=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('item_tag', 'value')]
-			]]
+	protected static function validateUniqueness(array &$items): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['hostid', 'key_']], 'fields' => [
+			'hostid' =>	['type' => API_ANY],
+			'key_' =>	['type' => API_ANY]
 		]];
 
-		$item_tags = ['tags' => $item['tags']];
-		if (!CApiInputValidator::validate($api_input_rules, $item_tags, $path, $error)) {
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $items, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
 	/**
-	 * Check item specific fields. Each API like Item, Itemprototype and Discovery rule may inherit different fields
-	 * to validate.
-	 *
-	 * @param array  $item    An array of single item data.
-	 * @param string $method  A string of "create" or "update" method.
-	 *
-	 * @return bool
+	 * @return array
 	 */
-	abstract protected function checkSpecificFields(array $item, $method);
+	protected static function getTagsValidationRules(): array {
+		return ['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+			'tag' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_tag', 'tag')],
+			'value' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('item_tag', 'value')]
+		]];
+	}
 
-	protected function clearValues(array $item) {
-		if (isset($item['port']) && $item['port'] != '') {
-			$item['port'] = ltrim($item['port'], '0');
-			if ($item['port'] == '') {
-				$item['port'] = 0;
+	/**
+	 * @param int $flags
+	 *
+	 * @return array
+	 */
+	public static function getPreprocessingValidationRules(int $flags = 0x00): array {
+		return [
+			'type' => API_OBJECTS,
+			'uniq_by_values' => [
+				['type' => [ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED]],
+				['type' => [ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				['type' => [ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON]],
+				['type' => [ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]]
+			],
+			'fields' => [
+				'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_PREPROCESSING_TYPES)],
+				'params' =>					['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'type', 'in' => implode(',', static::PREPROC_TYPES_WITH_PARAMS)], 'type' => API_PREPROC_PARAMS, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($flags & API_ALLOW_LLD_MACRO), 'preproc_type' => ['field' => 'type'], 'length' => DB::getFieldLength('item_preproc', 'params')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('item_preproc', 'params')]
+				]],
+				'error_handler' =>			['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'type', 'in' => implode(',', array_diff(static::PREPROC_TYPES_WITH_ERR_HANDLING, [ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]))], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR])],
+												['if' => ['field' => 'type', 'in' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR])],
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('item_preproc', 'error_handler')]
+				]],
+				'error_handler_params' =>	['type' => API_MULTIPLE, 'rules' => [
+												['if' => static function (array $data): bool {
+													return array_key_exists('error_handler', $data) && $data['error_handler'] == ZBX_PREPROC_FAIL_SET_VALUE;
+												},  'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('item_preproc', 'error_handler_params')],
+												['if' => static function (array $data): bool {
+													return array_key_exists('error_handler', $data) && $data['error_handler'] == ZBX_PREPROC_FAIL_SET_ERROR;
+												},  'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'error_handler_params')],
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('item_preproc', 'error_handler_params')]
+				]]
+			]
+		];
+	}
+
+	/**
+	 * Check that host IDs of given items are valid.
+	 * If host IDs are valid, $db_hosts and $db_templates parameters will be filled with found hosts and templates.
+	 *
+	 * @param array      $items
+	 * @param array|null $db_hosts
+	 * @param array|null $db_templates
+	 *
+	 * @throws APIException
+	 */
+	protected static function checkHostsAndTemplates(array $items, array &$db_hosts = null,
+			array &$db_templates = null): void {
+		$hostids = array_unique(array_column($items, 'hostid'));
+
+		$db_templates = API::Template()->get([
+			'output' => [],
+			'templateids' => $hostids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		$_hostids = array_diff($hostids, array_keys($db_templates));
+
+		$db_hosts = $_hostids
+			? API::Host()->get([
+				'output' => ['status'],
+				'hostids' => $_hostids,
+				'editable' => true,
+				'preservekeys' => true
+			])
+			: [];
+
+		if (count($db_templates) + count($db_hosts) != count($hostids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Add host_status property to given items in accordance of given hosts and templates statuses.
+	 *
+	 * @param array $items
+	 * @param array $db_hosts
+	 * @param array $db_templates
+	 */
+	protected static function addHostStatus(array &$items, array $db_hosts, array $db_templates): void {
+		foreach ($items as &$item) {
+			if (array_key_exists($item['hostid'], $db_templates)) {
+				$item['host_status'] = HOST_STATUS_TEMPLATE;
+			}
+			else {
+				$item['host_status'] = $db_hosts[$item['hostid']]['status'];
+			}
+		}
+		unset($item);
+	}
+
+	/**
+	 * Add flags property to given items with the given flags value.
+	 *
+	 * @param array $items
+	 * @param int   $flags
+	 */
+	protected static function addFlags(array &$items, int $flags): void {
+		foreach ($items as &$item) {
+			$item['flags'] = $flags;
+		}
+		unset($item);
+	}
+
+	/**
+	 * Check and add UUID to all item prototypes on templates, if it doesn't exist.
+	 *
+	 * @param array $items
+	 *
+	 * @throws APIException
+	 */
+	protected static function checkAndAddUuid(array &$items): void {
+		foreach ($items as &$item) {
+			if ($item['host_status'] == HOST_STATUS_TEMPLATE && !array_key_exists('uuid', $item)) {
+				$item['uuid'] = generateUuidV4();
+			}
+		}
+		unset($item);
+
+		$uuids = array_column($items, 'uuid');
+
+		if (!$uuids) {
+			return;
+		}
+
+		$duplicates = DB::select('items', [
+			'output' => ['uuid'],
+			'filter' => ['uuid' => $uuids],
+			'limit' => 1
+		]);
+
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Entry with UUID "%1$s" already exists.', $duplicates[0]['uuid'])
+			);
+		}
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array|null $hostids
+	 *
+	 * @return array
+	 */
+	protected static function getTemplateLinks(array $items, ?array $hostids): array {
+		if ($hostids !== null) {
+			$db_hosts = DB::select('hosts', [
+				'output' => ['hostid', 'status'],
+				'hostids' => $hostids,
+				'preservekeys' => true
+			]);
+
+			$tpl_links = [];
+
+			foreach ($items as $item) {
+				$tpl_links[$item['hostid']] = $db_hosts;
+			}
+		}
+		else {
+			$templateids = [];
+
+			foreach ($items as $item) {
+				if ($item['host_status'] == HOST_STATUS_TEMPLATE) {
+					$templateids[$item['hostid']] = true;
+				}
+			}
+
+			if (!$templateids) {
+				return [];
+			}
+
+			$result = DBselect(
+				'SELECT ht.templateid,ht.hostid,h.status'.
+				' FROM hosts_templates ht,hosts h'.
+				' WHERE ht.hostid=h.hostid'.
+					' AND '.dbConditionId('ht.templateid', array_keys($templateids))
+			);
+
+			$tpl_links = [];
+
+			while ($row = DBfetch($result)) {
+				$tpl_links[$row['templateid']][$row['hostid']] = [
+					'hostid' => $row['hostid'],
+					'status' => $row['status']
+				];
 			}
 		}
 
-		if (array_key_exists('type', $item) &&
-				($item['type'] == ITEM_TYPE_DEPENDENT || $item['type'] == ITEM_TYPE_TRAPPER
-					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && array_key_exists('key_', $item)
-						&& strncmp($item['key_'], 'mqtt.get', 8) === 0))) {
-			$item['delay'] = 0;
+		return $tpl_links;
+	}
+
+	/**
+	 * Filter out inheritable items from the given items.
+	 *
+	 * @param array $items
+	 * @param array $db_items
+	 * @param array $tpl_links
+	 */
+	protected static function filterObjectsToInherit(array &$items, array &$db_items, array $tpl_links): void {
+		foreach ($items as $i => $item) {
+			if (!array_key_exists($item['hostid'], $tpl_links)) {
+				unset($items[$i]);
+
+				if (array_key_exists($item['itemid'], $db_items)) {
+					unset($db_items[$item['itemid']]);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check that no items with repeating keys would be inherited to a single host or template.
+	 *
+	 * @param array $items
+	 * @param array $db_items
+	 * @param array $tpl_links
+	 *
+	 * @throws APIException
+	 */
+	protected static function checkDoubleInheritedNames(array $items, array $db_items, array $tpl_links): void {
+		$item_indexes = [];
+
+		foreach ($items as $i => $item) {
+			if (array_key_exists($item['itemid'], $db_items) && $item['key_'] === $db_items[$item['itemid']]['key_']) {
+				continue;
+			}
+
+			$item_indexes[$item['key_']][] = $i;
+		}
+
+		foreach ($item_indexes as $key => $indexes) {
+			if (count($indexes) == 1) {
+				continue;
+			}
+
+			$tpl_items = array_column(array_intersect_key($items, array_flip($indexes)), null, 'hostid');
+			$templateids = array_keys($tpl_items);
+			$template_count = count($templateids) - 1;
+
+			for ($i = 0; $i < $template_count - 1; $i++) {
+				for ($j = $i + 1; $j < $template_count; $j++) {
+					$same_hosts = array_intersect_key($tpl_links[$templateids[$i]], $tpl_links[$templateids[$j]]);
+
+					if ($same_hosts) {
+						$same_host = reset($same_hosts);
+
+						$hosts = DB::select('hosts', [
+							'output' => ['hostid', 'host'],
+							'hostids' => [$templateids[$i], $templateids[$j], $same_host['hostid']],
+							'preservekeys' => true
+						]);
+
+						$target_is_host = in_array($same_host['status'],
+							[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]
+						);
+
+						switch ($tpl_items[$templateids[$i]]['flags']) {
+							case ZBX_FLAG_DISCOVERY_NORMAL:
+									$error = $target_is_host
+									? _('Cannot inherit items with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
+									: _('Cannot inherit items with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
+								break;
+
+							case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+								$error = $target_is_host
+									? _('Cannot inherit item prototypes with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
+									: _('Cannot inherit item prototypes with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
+								break;
+
+							case ZBX_FLAG_DISCOVERY_RULE:
+								$error = $target_is_host
+									? _('Cannot inherit LDD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
+									: _('Cannot inherit LDD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
+								break;
+						}
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $key,
+							$hosts[$templateids[$i]]['host'], $hosts[$templateids[$j]]['host'],
+							$hosts[$same_host['hostid']]['host']
+						));
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get item chunks to inherit.
+	 *
+	 * @param array $items
+	 * @param array $tpl_links
+	 *
+	 * @return array
+	 */
+	protected static function getInheritChunks(array $items, array $tpl_links): array {
+		$chunks = [
+			[
+				'item_indexes' => [],
+				'hosts' => [],
+				'size' => 0
+			]
+		];
+		$last = 0;
+
+		foreach ($items as $i => $item) {
+			$hosts_chunks = array_chunk($tpl_links[$item['hostid']], self::INHERIT_CHUNK_SIZE, true);
+
+			foreach ($hosts_chunks as $hosts) {
+				if ($chunks[$last]['size'] < self::INHERIT_CHUNK_SIZE) {
+					$_hosts = array_slice($hosts, 0, self::INHERIT_CHUNK_SIZE - $chunks[$last]['size'], true);
+
+					$can_add_hosts = true;
+
+					foreach ($chunks[$last]['item_indexes'] as $_i) {
+						$new_hosts = array_diff_key($_hosts, $chunks[$last]['hosts']);
+
+						if (array_intersect_key($tpl_links[$items[$_i]['hostid']], $new_hosts)) {
+							$can_add_hosts = false;
+							break;
+						}
+					}
+
+					if ($can_add_hosts) {
+						$chunks[$last]['item_indexes'][] = $i;
+						$chunks[$last]['hosts'] += $_hosts;
+						$chunks[$last]['size'] += count($_hosts);
+
+						$hosts = array_diff_key($hosts, $_hosts);
+					}
+				}
+
+				if ($hosts) {
+					$chunks[++$last] = [
+						'item_indexes' => [$i],
+						'hosts' => $hosts,
+						'size' => count($hosts)
+					];
+				}
+			}
+		}
+
+		return $chunks;
+	}
+
+	/**
+	 * @param array $item
+	 * @param array $upd_db_item
+	 *
+	 * @throws APIException
+	 */
+	protected static function showObjectMismatchError(array $item, array $upd_db_item): void {
+		$target_is_host = in_array($upd_db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
+
+		$hosts = DB::select('hosts', [
+			'output' => ['host'],
+			'hostids' => [$item['hostid'], $upd_db_item['hostid']],
+			'preservekeys' => true
+		]);
+
+		$error = '';
+
+		switch ($item['flags']) {
+			case ZBX_FLAG_DISCOVERY_NORMAL:
+				switch ($upd_db_item['flags']) {
+					case ZBX_FLAG_DISCOVERY_RULE:
+						$error = $target_is_host
+							? _('Cannot inherit item with key "%1$s" of template "%2$s" to host "%3$s", because an LLD rule with the same key already exists.')
+							: _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because an LLD rule with the same key already exists.');
+						break 2;
+
+					case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+						$error = $target_is_host
+							? _('Cannot inherit item with key "%1$s" of template "%2$s" to host "%3$s", because an item prototype with the same key already exists.')
+							: _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because an item prototype with the same key already exists.');
+						break 2;
+
+					case ZBX_FLAG_DISCOVERY_CREATED:
+						$error = $target_is_host
+							? _('Cannot inherit item with key "%1$s" of template "%2$s" to host "%3$s", because a discovered item with the same key already exists.')
+							: _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
+						break 2;
+				}
+
+			case ZBX_FLAG_DISCOVERY_RULE:
+				switch ($upd_db_item['flags']) {
+					case ZBX_FLAG_DISCOVERY_NORMAL:
+						$error = $target_is_host
+							? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because a discovered item with the same key already exists.')
+							: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
+						break 2;
+
+					case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+						$error = $target_is_host
+							? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because an item prototype with the same key already exists.')
+							: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because an item prototype with the same key already exists.');
+						break 2;
+
+					case ZBX_FLAG_DISCOVERY_CREATED:
+						$error = $target_is_host
+							? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because a discovered item with the same key already exists.')
+							: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
+						break 2;
+				}
+
+			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+				switch ($upd_db_item['flags']) {
+					case ZBX_FLAG_DISCOVERY_NORMAL:
+						$error = $target_is_host
+							? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because a discovered item with the same key already exists.')
+							: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
+						break 2;
+
+					case ZBX_FLAG_DISCOVERY_RULE:
+						$error = $target_is_host
+							? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because an LLD rule with the same key already exists.')
+							: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because an LLD rule with the same key already exists.');
+						break 2;
+
+					case ZBX_FLAG_DISCOVERY_CREATED:
+						$error = $target_is_host
+							? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because a discovered item with the same key already exists.')
+							: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
+						break 2;
+				}
+		}
+
+		if ($error) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $upd_db_item['key_'],
+				$hosts[$item['hostid']]['host'], $hosts[$upd_db_item['hostid']]['host']
+			));
+		}
+
+		if ($upd_db_item['templateid'] == 0) {
+			return;
+		}
+
+		$template = DBfetch(DBselect(
+			'SELECT h.host'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionId('i.itemid', [$upd_db_item['templateid']])
+		));
+
+		switch ($item['flags']) {
+			case ZBX_FLAG_DISCOVERY_NORMAL:
+				$error = $target_is_host
+					? _('Cannot inherit item with key "%1$s" of template "%2$s" to host "%3$s", because an item with the same key is already inherited from template "%4$s".')
+					: _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because an item with the same key is already inherited from template "%4$s".');
+				break;
+
+			case ZBX_FLAG_DISCOVERY_RULE:
+				$error = $target_is_host
+					? _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because an item with the same key is already inherited from template "%4$s".')
+					: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because an item with the same key is already inherited from template "%4$s".');
+				break;
+
+			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+				$error = $target_is_host
+					? _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because an item with the same key is already inherited from template "%4$s".')
+					: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because an item with the same key is already inherited from template "%4$s".');
+				break;
+		}
+
+		self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $upd_db_item['key_'], $hosts[$item['hostid']]['host'],
+			$hosts[$upd_db_item['hostid']]['host'], $template['host']
+		));
+	}
+
+	/**
+	 * @param array $item
+	 *
+	 * @return array
+	 */
+	protected static function unsetNestedObjectIds(array $item): array {
+		if (array_key_exists('tags', $item)) {
+			foreach ($item['tags'] as &$tag) {
+				unset($tag['itemtagid']);
+			}
+			unset($tag);
+		}
+
+		if (array_key_exists('preprocessing', $item)) {
+			foreach ($item['preprocessing'] as &$preprocessing) {
+				unset($preprocessing['item_preprocid']);
+			}
+			unset($preprocessing);
+		}
+
+		if (array_key_exists('parameters', $item)) {
+			foreach ($item['parameters'] as &$parameter) {
+				unset($parameter['item_parameterid']);
+			}
+			unset($parameter);
 		}
 
 		return $item;
 	}
 
-	protected function errorInheritFlags($flag, $key, $host) {
-		switch ($flag) {
-			case ZBX_FLAG_DISCOVERY_NORMAL:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as an item.', $key, $host));
-				break;
-			case ZBX_FLAG_DISCOVERY_RULE:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as a discovery rule.', $key, $host));
-				break;
-			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as an item prototype.', $key, $host));
-				break;
-			case ZBX_FLAG_DISCOVERY_CREATED:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as an item created from item prototype.', $key, $host));
-				break;
-			default:
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Item with key "%1$s" already exists on "%2$s" as unknown item element.', $key, $host));
-		}
-	}
-
 	/**
-	 * Return first main interface matched from list of preferred types, or NULL.
+	 * Update relation to master item for inherited dependent items.
 	 *
-	 * @param array $interfaces  An array of interfaces to choose from.
-	 *
-	 * @return ?array
+	 * @param array $upd_items
+	 * @param array $ins_items
+	 * @param array $hostids
 	 */
-	public static function findInterfaceByPriority(array $interfaces): ?array {
-		$interface_by_type = [];
+	protected static function setChildMasterItemIds(array &$upd_items, array &$ins_items, array $hostids): void {
+		$upd_item_indexes = [];
+		$ins_item_indexes = [];
 
-		foreach ($interfaces as $interface) {
-			if ($interface['main'] == INTERFACE_PRIMARY) {
-				$interface_by_type[$interface['type']] = $interface;
+		foreach ($upd_items as $i => $upd_item) {
+			if ($upd_item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists('master_itemid', $upd_item)) {
+				$upd_item_indexes[$upd_item['master_itemid']][$upd_item['hostid']][] = $i;
 			}
 		}
 
-		foreach (self::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
-			if (array_key_exists($interface_type, $interface_by_type)) {
-				return $interface_by_type[$interface_type];
+		foreach ($ins_items as $i => $ins_item) {
+			if ($ins_item['type'] == ITEM_TYPE_DEPENDENT) {
+				$ins_item_indexes[$ins_item['master_itemid']][$ins_item['hostid']][] = $i;
 			}
 		}
 
-		return null;
-	}
-
-	/**
-	 * Returns the interface that best matches the given item.
-	 *
-	 * @param array $item_type  An item type
-	 * @param array $interfaces An array of interfaces to choose from
-	 *
-	 * @return array|boolean    The best matching interface;
-	 *							an empty array of no matching interface was found;
-	 *							false, if the item does not need an interface
-	 */
-	public static function findInterfaceForItem($item_type, array $interfaces) {
-		$type = itemTypeInterface($item_type);
-
-		if ($type == INTERFACE_TYPE_OPT) {
-			return false;
-		}
-		elseif ($type == INTERFACE_TYPE_ANY) {
-			return self::findInterfaceByPriority($interfaces);
-		}
-		// the item uses a specific type of interface
-		elseif ($type !== false) {
-			$interface_by_type = [];
-
-			foreach ($interfaces as $interface) {
-				if ($interface['main'] == INTERFACE_PRIMARY) {
-					$interface_by_type[$interface['type']] = $interface;
-				}
-			}
-
-			return array_key_exists($type, $interface_by_type) ? $interface_by_type[$type] : [];
-		}
-		// the item does not need an interface
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * Updates the children of the item on the given hosts and propagates the inheritance to the child hosts.
-	 *
-	 * @param array      $tpl_items  An array of items to inherit.
-	 * @param array|null $hostids    An array of hosts to inherit to; if set to null, the items will be inherited to all
-	 *                               linked hosts or templates.
-	 */
-	protected function inherit(array $tpl_items, array $hostids = null) {
-		$tpl_items = zbx_toHash($tpl_items, 'itemid');
-
-		// Inherit starting from common items and finishing up dependent.
-		while ($tpl_items) {
-			$_tpl_items = [];
-
-			foreach ($tpl_items as $tpl_item) {
-				if ($tpl_item['type'] != ITEM_TYPE_DEPENDENT
-						|| !array_key_exists($tpl_item['master_itemid'], $tpl_items)) {
-					$_tpl_items[$tpl_item['itemid']] = $tpl_item;
-				}
-			}
-
-			foreach ($_tpl_items as $itemid => $_tpl_item) {
-				unset($tpl_items[$itemid]);
-			}
-
-			$this->_inherit($_tpl_items, $hostids);
-		}
-	}
-
-	/**
-	 * Auxiliary method for item inheritance. See full description in inherit() method.
-	 */
-	private function _inherit(array $tpl_items, array $hostids = null) {
-		// Prepare the child items.
-		$new_items = $this->prepareInheritedItems($tpl_items, $hostids);
-		if (!$new_items) {
+		if (!$upd_item_indexes && !$ins_item_indexes) {
 			return;
 		}
-
-		$ins_items = [];
-		$upd_items = [];
-
-		foreach ($new_items as $new_item) {
-			if (array_key_exists('itemid', $new_item)) {
-				if ($this instanceof CItemPrototype) {
-					unset($new_item['ruleid']);
-				}
-				$upd_items[$new_item['itemid']] = $new_item;
-			}
-			else {
-				$ins_items[] = $new_item;
-			}
-		}
-
-		$this->validateDependentItems($new_items);
-
-		// Save the new items.
-		if ($ins_items) {
-			if ($this instanceof CItem) {
-				static::validateInventoryLinks($ins_items, false);
-			}
-
-			$this->createReal($ins_items);
-		}
-
-		if ($upd_items) {
-			if ($this instanceof CItem) {
-				static::validateInventoryLinks($upd_items, true);
-			}
-
-			$this->updateReal($upd_items);
-		}
-
-		$new_items = array_merge($upd_items, $ins_items);
-
-		// Inheriting items from the templates.
-		$db_items = DBselect(
-			'SELECT i.itemid'.
-			' FROM items i,hosts h'.
-			' WHERE i.hostid=h.hostid'.
-				' AND '.dbConditionInt('i.itemid', zbx_objectValues($new_items, 'itemid')).
-				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE])
-		);
-
-		$tpl_itemids = [];
-		while ($db_item = DBfetch($db_items)) {
-			$tpl_itemids[$db_item['itemid']] = true;
-		}
-
-		foreach ($new_items as $index => $new_item) {
-			if (!array_key_exists($new_item['itemid'], $tpl_itemids)) {
-				unset($new_items[$index]);
-			}
-		}
-
-		$this->inherit($new_items);
-	}
-
-	/**
-	 * Prepares and returns an array of child items, inherited from items $tpl_items on the given hosts.
-	 *
-	 * @param array      $tpl_items
-	 * @param string     $tpl_items[<itemid>]['itemid']
-	 * @param string     $tpl_items[<itemid>]['hostid']
-	 * @param string     $tpl_items[<itemid>]['key_']
-	 * @param int        $tpl_items[<itemid>]['type']
-	 * @param array      $tpl_items[<itemid>]['preprocessing']                    (optional)
-	 * @param int        $tpl_items[<itemid>]['preprocessing'][]['type']
-	 * @param string     $tpl_items[<itemid>]['preprocessing'][]['params']
-	 * @param int        $tpl_items[<itemid>]['flags']
-	 * @param string     $tpl_items[<itemid>]['master_itemid']                    (optional)
-	 * @param mixed      $tpl_items[<itemid>][<field_name>]                       (optional)
-	 * @param array|null $hostids
-	 *
-	 * @return array an array of unsaved child items
-	 */
-	private function prepareInheritedItems(array $tpl_items, array $hostids = null) {
-		$itemids_by_templateid = [];
-		foreach ($tpl_items as $tpl_item) {
-			$itemids_by_templateid[$tpl_item['hostid']][] = $tpl_item['itemid'];
-		}
-
-		// Fetch all child hosts.
-		$chd_hosts = API::Host()->get([
-			'output' => ['hostid', 'host', 'status'],
-			'selectParentTemplates' => ['templateid'],
-			'selectInterfaces' => ['interfaceid', 'main', 'type'],
-			'templateids' => array_keys($itemids_by_templateid),
-			'hostids' => $hostids,
-			'preservekeys' => true,
-			'nopermissions' => true,
-			'templated_hosts' => true
-		]);
-		if (!$chd_hosts) {
-			return [];
-		}
-
-		$chd_items_tpl = [];
-		$chd_items_key = [];
-
-		// Preparing list of items by item templateid.
-		$sql = 'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid'.
-			' FROM items i'.
-			' WHERE '.dbConditionInt('i.templateid', zbx_objectValues($tpl_items, 'itemid'));
-		if ($hostids !== null) {
-			$sql .= ' AND '.dbConditionInt('i.hostid', $hostids);
-		}
-		$db_items = DBselect($sql);
-
-		while ($db_item = DBfetch($db_items)) {
-			$hostid = $db_item['hostid'];
-			unset($db_item['hostid']);
-
-			$chd_items_tpl[$hostid][$db_item['templateid']] = $db_item;
-		}
-
-		$hostids_by_key = [];
-
-		// Preparing list of items by item key.
-		foreach ($chd_hosts as $chd_host) {
-			$tpl_itemids = [];
-
-			foreach ($chd_host['parentTemplates'] as $parent_template) {
-				if (array_key_exists($parent_template['templateid'], $itemids_by_templateid)) {
-					$tpl_itemids = array_merge($tpl_itemids, $itemids_by_templateid[$parent_template['templateid']]);
-				}
-			}
-
-			foreach ($tpl_itemids as $tpl_itemid) {
-				if (!array_key_exists($chd_host['hostid'], $chd_items_tpl)
-						|| !array_key_exists($tpl_itemid, $chd_items_tpl[$chd_host['hostid']])) {
-					$hostids_by_key[$tpl_items[$tpl_itemid]['key_']][] = $chd_host['hostid'];
-				}
-			}
-		}
-
-		foreach ($hostids_by_key as $key_ => $key_hostids) {
-			$sql_select = ($this instanceof CItemPrototype) ? ',id.parent_itemid AS ruleid' : '';
-			// "LEFT JOIN" is needed to check flags on inherited and existing item, item prototype or lld rule.
-			// For example, when linking an item prototype with same key as in an item on target host or template.
-			$sql_join = ($this instanceof CItemPrototype) ? ' LEFT JOIN item_discovery id ON i.itemid=id.itemid' : '';
-			$db_items = DBselect(
-				'SELECT i.itemid,i.hostid,i.type,i.key_,i.flags,i.templateid'.$sql_select.
-					' FROM items i'.$sql_join.
-					' WHERE '.dbConditionInt('i.hostid', $key_hostids).
-						' AND '.dbConditionString('i.key_', [$key_])
-			);
-
-			while ($db_item = DBfetch($db_items)) {
-				$hostid = $db_item['hostid'];
-				unset($db_item['hostid']);
-
-				$chd_items_key[$hostid][$db_item['key_']] = $db_item;
-			}
-		}
-
-		// List of the discovery rules.
-		if ($this instanceof CItemPrototype) {
-			// List of itemids without 'ruleid' property.
-			$tpl_itemids = [];
-			$tpl_ruleids = [];
-			foreach ($tpl_items as $tpl_item) {
-				if (!array_key_exists('ruleid', $tpl_item)) {
-					$tpl_itemids[] = $tpl_item['itemid'];
-				}
-				else {
-					$tpl_ruleids[$tpl_item['ruleid']] = true;
-				}
-			}
-
-			if ($tpl_itemids) {
-				$db_rules = DBselect(
-					'SELECT id.parent_itemid,id.itemid'.
-						' FROM item_discovery id'.
-						' WHERE '.dbConditionInt('id.itemid', $tpl_itemids)
-				);
-
-				while ($db_rule = DBfetch($db_rules)) {
-					$tpl_items[$db_rule['itemid']]['ruleid'] = $db_rule['parent_itemid'];
-					$tpl_ruleids[$db_rule['parent_itemid']] = true;
-				}
-			}
-
-			$sql = 'SELECT i.hostid,i.templateid,i.itemid'.
-					' FROM items i'.
-					' WHERE '.dbConditionInt('i.templateid', array_keys($tpl_ruleids));
-			if ($hostids !== null) {
-				$sql .= ' AND '.dbConditionInt('i.hostid', $hostids);
-			}
-			$db_rules = DBselect($sql);
-
-			// List of child lld ruleids by child hostid and parent lld ruleid.
-			$chd_ruleids = [];
-			while ($db_rule = DBfetch($db_rules)) {
-				$chd_ruleids[$db_rule['hostid']][$db_rule['templateid']] = $db_rule['itemid'];
-			}
-		}
-
-		$new_items = [];
-		// List of the updated item keys by hostid.
-		$upd_hostids_by_key = [];
-
-		foreach ($chd_hosts as $chd_host) {
-			$tpl_itemids = [];
-
-			foreach ($chd_host['parentTemplates'] as $parent_template) {
-				if (array_key_exists($parent_template['templateid'], $itemids_by_templateid)) {
-					$tpl_itemids = array_merge($tpl_itemids, $itemids_by_templateid[$parent_template['templateid']]);
-				}
-			}
-
-			foreach ($tpl_itemids as $tpl_itemid) {
-				$tpl_item = $tpl_items[$tpl_itemid];
-
-				$chd_item = null;
-
-				// Update by templateid.
-				if (array_key_exists($chd_host['hostid'], $chd_items_tpl)
-						&& array_key_exists($tpl_item['itemid'], $chd_items_tpl[$chd_host['hostid']])) {
-					$chd_item = $chd_items_tpl[$chd_host['hostid']][$tpl_item['itemid']];
-
-					if ($tpl_item['key_'] !== $chd_item['key_']) {
-						$upd_hostids_by_key[$tpl_item['key_']][] = $chd_host['hostid'];
-					}
-				}
-				// Update by key.
-				elseif (array_key_exists($chd_host['hostid'], $chd_items_key)
-						&& array_key_exists($tpl_item['key_'], $chd_items_key[$chd_host['hostid']])) {
-					$chd_item = $chd_items_key[$chd_host['hostid']][$tpl_item['key_']];
-
-					// Check if an item of a different type with the same key exists.
-					if ($tpl_item['flags'] != $chd_item['flags']) {
-						$this->errorInheritFlags($chd_item['flags'], $chd_item['key_'], $chd_host['host']);
-					}
-
-					// Check if item already linked to another template.
-					if ($chd_item['templateid'] != 0 && bccomp($chd_item['templateid'], $tpl_item['itemid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _params(
-							$this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), [$tpl_item['key_'], $chd_host['host']]
-						));
-					}
-
-					if ($this instanceof CItemPrototype) {
-						$chd_ruleid = $chd_ruleids[$chd_host['hostid']][$tpl_item['ruleid']];
-						if (bccomp($chd_item['ruleid'], $chd_ruleid) != 0) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Item prototype "%1$s" already exists on "%2$s", linked to another rule.',
-									$chd_item['key_'], $chd_host['host']
-								)
-							);
-						}
-					}
-				}
-
-				// copying item
-				$new_item = $tpl_item;
-				$new_item['uuid'] = '';
-
-				if ($chd_item !== null) {
-					$new_item['itemid'] = $chd_item['itemid'];
-
-					if ($new_item['type'] == ITEM_TYPE_HTTPAGENT) {
-						$new_item['interfaceid'] = null;
-					}
-				}
-				else {
-					unset($new_item['itemid']);
-					if ($this instanceof CItemPrototype) {
-						$new_item['ruleid'] = $chd_ruleids[$chd_host['hostid']][$tpl_item['ruleid']];
-					}
-				}
-				$new_item['hostid'] = $chd_host['hostid'];
-				$new_item['templateid'] = $tpl_item['itemid'];
-
-				if ($chd_host['status'] != HOST_STATUS_TEMPLATE) {
-					if ($chd_item === null || $new_item['type'] != $chd_item['type']) {
-						$interface = self::findInterfaceForItem($new_item['type'], $chd_host['interfaces']);
-
-						if ($interface) {
-							$new_item['interfaceid'] = $interface['interfaceid'];
-						}
-						elseif ($interface !== false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _params(
-								$this->getErrorMsg(self::ERROR_NO_INTERFACE), [$chd_host['host'], $new_item['key_']]
-							));
-						}
-					}
-
-					if ($this instanceof CItem || $this instanceof CDiscoveryRule) {
-						if (!array_key_exists('itemid', $new_item)) {
-							$new_item['rtdata'] = true;
-						}
-					}
-				}
-
-				if (array_key_exists('preprocessing', $new_item)) {
-					foreach ($new_item['preprocessing'] as $preprocessing) {
-						if ($chd_item) {
-							$preprocessing['itemid'] = $chd_item['itemid'];
-						}
-						else {
-							unset($preprocessing['itemid']);
-						}
-					}
-				}
-
-				$new_items[] = $new_item;
-			}
-		}
-
-		// Check if item with a new key already exists on the child host.
-		if ($upd_hostids_by_key) {
-			$sql_where = [];
-			foreach ($upd_hostids_by_key as $key => $hostids) {
-				$sql_where[] = dbConditionInt('i.hostid', $hostids).' AND i.key_='.zbx_dbstr($key);
-			}
-
-			$sql = 'SELECT i.hostid,i.key_'.
-				' FROM items i'.
-				' WHERE ('.implode(') OR (', $sql_where).')';
-			$db_items = DBselect($sql, 1);
-
-			if ($db_item = DBfetch($db_items)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _params($this->getErrorMsg(self::ERROR_EXISTS),
-					[$db_item['key_'], $chd_hosts[$db_item['hostid']]['host']]
-				));
-			}
-		}
-
-		return $this->prepareDependentItems($tpl_items, $new_items, $hostids);
-	}
-
-	/**
-	 * Update relations for inherited dependent items to master items.
-	 *
-	 * @param array      $tpl_items
-	 * @param int        $tpl_items[<itemid>]['type']
-	 * @param string     $tpl_items[<itemid>]['master_itemid']
-	 * @param array      $new_items
-	 * @param string     $new_items[<itemid>]['hostid']
-	 * @param int        $new_items[<itemid>]['type']
-	 * @param string     $new_items[<itemid>]['templateid']
-	 * @param array|null $hostids
-	 *
-	 * @return array an array of synchronized inherited items.
-	 */
-	private function prepareDependentItems(array $tpl_items, array $new_items, array $hostids = null) {
-		$tpl_master_itemids = [];
-
-		foreach ($tpl_items as $tpl_item) {
-			if ($tpl_item['type'] == ITEM_TYPE_DEPENDENT) {
-				$tpl_master_itemids[$tpl_item['master_itemid']] = true;
-			}
-		}
-
-		if ($tpl_master_itemids) {
-			$sql = 'SELECT i.itemid,i.hostid,i.templateid'.
-				' FROM items i'.
-				' WHERE '.dbConditionId('i.templateid', array_keys($tpl_master_itemids));
-			if ($hostids !== null) {
-				$sql .= ' AND '.dbConditionId('i.hostid', $hostids);
-			}
-			$db_items = DBselect($sql);
-
-			$master_links = [];
-
-			while ($db_item = DBfetch($db_items)) {
-				$master_links[$db_item['templateid']][$db_item['hostid']] = $db_item['itemid'];
-			}
-
-			foreach ($new_items as &$new_item) {
-				if ($new_item['type'] == ITEM_TYPE_DEPENDENT) {
-					$tpl_item = $tpl_items[$new_item['templateid']];
-
-					if (array_key_exists('master_itemid', $tpl_item)) {
-						$new_item['master_itemid'] = $master_links[$tpl_item['master_itemid']][$new_item['hostid']];
-					}
-				}
-			}
-			unset($new_item);
-		}
-
-		return $new_items;
-	}
-
-	/**
-	 * Validate item pre-processing.
-	 *
-	 * @param array  $item                                             An array of single item data.
-	 * @param array  $item['preprocessing']                            An array of item pre-processing data.
-	 * @param string $item['preprocessing'][]['type']                  The preprocessing option type. Possible values:
-	 *                                                                  1 - ZBX_PREPROC_MULTIPLIER;
-	 *                                                                  2 - ZBX_PREPROC_RTRIM;
-	 *                                                                  3 - ZBX_PREPROC_LTRIM;
-	 *                                                                  4 - ZBX_PREPROC_TRIM;
-	 *                                                                  5 - ZBX_PREPROC_REGSUB;
-	 *                                                                  6 - ZBX_PREPROC_BOOL2DEC;
-	 *                                                                  7 - ZBX_PREPROC_OCT2DEC;
-	 *                                                                  8 - ZBX_PREPROC_HEX2DEC;
-	 *                                                                  9 - ZBX_PREPROC_DELTA_VALUE;
-	 *                                                                  10 - ZBX_PREPROC_DELTA_SPEED;
-	 *                                                                  11 - ZBX_PREPROC_XPATH;
-	 *                                                                  12 - ZBX_PREPROC_JSONPATH;
-	 *                                                                  13 - ZBX_PREPROC_VALIDATE_RANGE;
-	 *                                                                  14 - ZBX_PREPROC_VALIDATE_REGEX;
-	 *                                                                  15 - ZBX_PREPROC_VALIDATE_NOT_REGEX;
-	 *                                                                  16 - ZBX_PREPROC_ERROR_FIELD_JSON;
-	 *                                                                  17 - ZBX_PREPROC_ERROR_FIELD_XML;
-	 *                                                                  18 - ZBX_PREPROC_ERROR_FIELD_REGEX;
-	 *                                                                  19 - ZBX_PREPROC_THROTTLE_VALUE;
-	 *                                                                  20 - ZBX_PREPROC_THROTTLE_TIMED_VALUE;
-	 *                                                                  21 - ZBX_PREPROC_SCRIPT;
-	 *                                                                  22 - ZBX_PREPROC_PROMETHEUS_PATTERN;
-	 *                                                                  23 - ZBX_PREPROC_PROMETHEUS_TO_JSON;
-	 *                                                                  24 - ZBX_PREPROC_CSV_TO_JSON;
-	 *                                                                  25 - ZBX_PREPROC_STR_REPLACE;
-	 *                                                                  26 - ZBX_PREPROC_VALIDATE_NOT_SUPPORTED;
-	 * @param string $item['preprocessing'][]['params']                Additional parameters used by preprocessing
-	 *                                                                 option. Multiple parameters are separated by LF
-	 *                                                                 (\n) character.
-	 * @param string $item['preprocessing'][]['error_handler']         Action type used in case of preprocessing step
-	 *                                                                 failure. Possible values:
-	 *                                                                  0 - ZBX_PREPROC_FAIL_DEFAULT;
-	 *                                                                  1 - ZBX_PREPROC_FAIL_DISCARD_VALUE;
-	 *                                                                  2 - ZBX_PREPROC_FAIL_SET_VALUE;
-	 *                                                                  3 - ZBX_PREPROC_FAIL_SET_ERROR.
-	 * @param string $item['preprocessing'][]['error_handler_params']  Error handler parameters.
-	 */
-	protected function validateItemPreprocessing(array $item) {
-		if (array_key_exists('preprocessing', $item)) {
-			if (!is_array($item['preprocessing'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
-			$type_validator = new CLimitedSetValidator(['values' => static::SUPPORTED_PREPROCESSING_TYPES]);
-
-			$error_handler_validator = new CLimitedSetValidator([
-				'values' => [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE,
-					ZBX_PREPROC_FAIL_SET_ERROR
-				]
-			]);
-
-			$unsupported_error_handler_validator = new CLimitedSetValidator([
-				'values' => [ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR]
-			]);
-
-			$prometheus_pattern_parser = new CPrometheusPatternParser(['usermacros' => true,
-				'lldmacros' => ($this instanceof CItemPrototype)
-			]);
-			$prometheus_output_parser = new CPrometheusOutputParser(['usermacros' => true,
-				'lldmacros' => ($this instanceof CItemPrototype)
-			]);
-
-			$required_fields = ['type', 'params', 'error_handler', 'error_handler_params'];
-			$delta = false;
-			$throttling = false;
-			$prometheus = false;
-
-			foreach ($item['preprocessing'] as $preprocessing) {
-				$missing_keys = array_diff($required_fields, array_keys($preprocessing));
-
-				if ($missing_keys) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Item pre-processing is missing parameters: %1$s', implode(', ', $missing_keys))
-					);
-				}
-
-				if (is_array($preprocessing['type'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-				}
-				elseif ($preprocessing['type'] === '' || $preprocessing['type'] === null
-						|| $preprocessing['type'] === false) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'type', _('cannot be empty'))
-					);
-				}
-
-				if (!$type_validator->validate($preprocessing['type'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'type',
-							_s('unexpected value "%1$s"', $preprocessing['type'])
-						)
-					);
-				}
-
-				$preprocessing['params'] = str_replace("\r\n", "\n", $preprocessing['params']);
-
-				switch ($preprocessing['type']) {
-					case ZBX_PREPROC_MULTIPLIER:
-						// Check if custom multiplier is a valid number.
-						$params = $preprocessing['params'];
-
-						if (is_array($params)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif ($params === '' || $params === null || $params === false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
-							);
-						}
-
-						if (is_numeric($params)) {
-							break;
-						}
-
-						$types = ['usermacros' => true];
-
-						if ($this instanceof CItemPrototype) {
-							$types['lldmacros'] = true;
-						}
-
-						if (!(new CMacrosResolverGeneral)->getMacroPositions($params, $types)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('a numeric value is expected')
-							));
-						}
-						break;
-
-					case ZBX_PREPROC_RTRIM:
-					case ZBX_PREPROC_LTRIM:
-					case ZBX_PREPROC_TRIM:
-					case ZBX_PREPROC_XPATH:
-					case ZBX_PREPROC_JSONPATH:
-					case ZBX_PREPROC_VALIDATE_REGEX:
-					case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-					case ZBX_PREPROC_ERROR_FIELD_JSON:
-					case ZBX_PREPROC_ERROR_FIELD_XML:
-					case ZBX_PREPROC_SCRIPT:
-						// Check 'params' if not empty.
-						if (is_array($preprocessing['params'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif ($preprocessing['params'] === '' || $preprocessing['params'] === null
-								|| $preprocessing['params'] === false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
-							);
-						}
-						break;
-
-					case ZBX_PREPROC_REGSUB:
-					case ZBX_PREPROC_ERROR_FIELD_REGEX:
-					case ZBX_PREPROC_STR_REPLACE:
-						// Check if 'params' are not empty and if second parameter contains (after \n) is not empty.
-						if (is_array($preprocessing['params'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif ($preprocessing['params'] === '' || $preprocessing['params'] === null
-								|| $preprocessing['params'] === false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
-							);
-						}
-
-						$params = explode("\n", $preprocessing['params']);
-
-						if ($params[0] === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('first parameter is expected')
-							));
-						}
-
-						if (($preprocessing['type'] == ZBX_PREPROC_REGSUB
-								|| $preprocessing['type'] == ZBX_PREPROC_ERROR_FIELD_REGEX)
-								&& (!array_key_exists(1, $params) || $params[1] === '')) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('second parameter is expected')
-							));
-						}
-						break;
-
-					case ZBX_PREPROC_VALIDATE_RANGE:
-						if (is_array($preprocessing['params'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif (trim($preprocessing['params']) === '' || $preprocessing['params'] === null
-								|| $preprocessing['params'] === false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
-							);
-						}
-
-						$params = explode("\n", $preprocessing['params']);
-
-						if ($params[0] !== '' && !is_numeric($params[0])
-								&& (new CUserMacroParser())->parse($params[0]) != CParser::PARSE_SUCCESS
-								&& (!($this instanceof CItemPrototype)
-									|| ((new CLLDMacroFunctionParser())->parse($params[0]) != CParser::PARSE_SUCCESS
-										&& (new CLLDMacroParser())->parse($params[0]) != CParser::PARSE_SUCCESS))) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('a numeric value is expected')
-							));
-						}
-
-						if ($params[1] !== '' && !is_numeric($params[1])
-								&& (new CUserMacroParser())->parse($params[1]) != CParser::PARSE_SUCCESS
-								&& (!($this instanceof CItemPrototype)
-									|| ((new CLLDMacroFunctionParser())->parse($params[1]) != CParser::PARSE_SUCCESS
-										&& (new CLLDMacroParser())->parse($params[1]) != CParser::PARSE_SUCCESS))) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('a numeric value is expected')
-							));
-						}
-
-						if (is_numeric($params[0]) && is_numeric($params[1]) && $params[0] > $params[1]) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Incorrect value for field "%1$s": %2$s.',
-								'params',
-								_s('"%1$s" value must be less than or equal to "%2$s" value', _('min'), _('max'))
-							));
-						}
-						break;
-
-					case ZBX_PREPROC_BOOL2DEC:
-					case ZBX_PREPROC_OCT2DEC:
-					case ZBX_PREPROC_HEX2DEC:
-					case ZBX_PREPROC_THROTTLE_VALUE:
-						// Check if 'params' is empty, because it must be empty.
-						if (is_array($preprocessing['params'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif ($preprocessing['params'] !== '' && $preprocessing['params'] !== null
-								&& $preprocessing['params'] !== false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('should be empty'))
-							);
-						}
-
-						if ($preprocessing['type'] == ZBX_PREPROC_THROTTLE_VALUE) {
-							if ($throttling) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one throttling step is allowed.'));
-							}
-							else {
-								$throttling = true;
-							}
-						}
-						break;
-
-					case ZBX_PREPROC_DELTA_VALUE:
-					case ZBX_PREPROC_DELTA_SPEED:
-					case ZBX_PREPROC_XML_TO_JSON:
-						// Check if 'params' is empty, because it must be empty.
-						if (is_array($preprocessing['params'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif ($preprocessing['params'] !== '' && $preprocessing['params'] !== null
-								&& $preprocessing['params'] !== false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('should be empty'))
-							);
-						}
-
-						if ($preprocessing['type'] == ZBX_PREPROC_DELTA_VALUE
-								|| $preprocessing['type'] == ZBX_PREPROC_DELTA_SPEED) {
-							// Check if one of the deltas (Delta per second or Delta value) already exists.
-							if ($delta) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one change step is allowed.'));
-							}
-							else {
-								$delta = true;
-							}
-						}
-						break;
-
-					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-						$api_input_rules = [
-							'type' => API_TIME_UNIT,
-							'flags' => ($this instanceof CItem)
-								? API_NOT_EMPTY | API_ALLOW_USER_MACRO
-								: API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO,
-							'in' => '1:'.ZBX_MAX_TIMESHIFT
-						];
-
-						if (!CApiInputValidator::validate($api_input_rules, $preprocessing['params'], 'params',
-								$error)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-						}
-
-						if ($throttling) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one throttling step is allowed.'));
-						}
-						else {
-							$throttling = true;
-						}
-						break;
-
-					case ZBX_PREPROC_PROMETHEUS_PATTERN:
-					case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-						if ($prometheus) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one Prometheus step is allowed.'));
-						}
-
-						$prometheus = true;
-
-						if (is_array($preprocessing['params'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-
-						if ($preprocessing['type'] == ZBX_PREPROC_PROMETHEUS_PATTERN) {
-							if ($preprocessing['params'] === '' || $preprocessing['params'] === null
-									|| $preprocessing['params'] === false) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
-								);
-							}
-
-							$params = explode("\n", $preprocessing['params']);
-
-							if ($params[0] === '') {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('first parameter is expected')
-								));
-							}
-							elseif (!array_key_exists(1, $params)) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('second parameter is expected')
-								));
-							}
-							elseif (!array_key_exists(2, $params)
-									&& ($params[1] === ZBX_PREPROC_PROMETHEUS_LABEL
-										|| $params[1] === ZBX_PREPROC_PROMETHEUS_FUNCTION)) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('third parameter is expected')
-								));
-							}
-
-							if ($prometheus_pattern_parser->parse($params[0]) != CParser::PARSE_SUCCESS) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('invalid Prometheus pattern')
-								));
-							}
-
-							if (!in_array($params[1], [ZBX_PREPROC_PROMETHEUS_VALUE, ZBX_PREPROC_PROMETHEUS_LABEL,
-									ZBX_PREPROC_PROMETHEUS_FUNCTION])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('invalid aggregation method')
-								));
-							}
-
-							switch ($params[1]) {
-								case ZBX_PREPROC_PROMETHEUS_VALUE:
-									if (array_key_exists(2, $params) && $params[2] !== '') {
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Incorrect value for field "%1$s": %2$s.', 'params',
-												_('invalid Prometheus output')
-											)
-										);
-									}
-									break;
-
-								case ZBX_PREPROC_PROMETHEUS_LABEL:
-									if ($prometheus_output_parser->parse($params[2]) != CParser::PARSE_SUCCESS) {
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Incorrect value for field "%1$s": %2$s.', 'params',
-												_('invalid Prometheus output')
-											)
-										);
-									}
-									break;
-
-								case ZBX_PREPROC_PROMETHEUS_FUNCTION:
-									if (!in_array($params[2], [ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN,
-											ZBX_PREPROC_PROMETHEUS_MAX, ZBX_PREPROC_PROMETHEUS_AVG,
-											ZBX_PREPROC_PROMETHEUS_COUNT])) {
-										self::exception(ZBX_API_ERROR_PARAMETERS,
-											_s('Incorrect value for field "%1$s": %2$s.', 'params',
-												_('unsupported Prometheus function')
-											)
-										);
-									}
-									break;
-							}
-						}
-						// Prometheus to JSON can be empty and has only one parameter.
-						elseif ($preprocessing['params'] !== '') {
-							if ($prometheus_pattern_parser->parse($preprocessing['params']) != CParser::PARSE_SUCCESS) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('invalid Prometheus pattern')
-								));
-							}
-						}
-						break;
-
-					case ZBX_PREPROC_CSV_TO_JSON:
-						if (is_array($preprocessing['params'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif ($preprocessing['params'] === '' || $preprocessing['params'] === null
-								|| $preprocessing['params'] === false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('cannot be empty'))
-							);
-						}
-
-						$params = explode("\n", $preprocessing['params']);
-
-						$params_cnt = count($params);
-						if ($params_cnt > 3) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif ($params_cnt == 1) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('second parameter is expected')
-							));
-						}
-						elseif ($params_cnt == 2) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-								'params', _('third parameter is expected')
-							));
-						}
-						else {
-							// Correct amount of parameters, but check if they are valid.
-
-							if (mb_strlen($params[0]) > 1) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('value of first parameter is too long')
-								));
-							}
-
-							if (mb_strlen($params[1]) > 1) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('value of second parameter is too long')
-								));
-							}
-
-							$with_header_row_validator = new CLimitedSetValidator([
-								'values' => [ZBX_PREPROC_CSV_NO_HEADER, ZBX_PREPROC_CSV_HEADER]
-							]);
-
-							if (!$with_header_row_validator->validate($params[2])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect value for field "%1$s": %2$s.', 'params',
-										_s('value of third parameter must be one of %1$s',
-											implode(', ', [ZBX_PREPROC_CSV_NO_HEADER, ZBX_PREPROC_CSV_HEADER])
-										)
-									)
-								);
-							}
-						}
-						break;
-
-					case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
-						// Check if 'params' is empty, because it must be empty.
-						if (is_array($preprocessing['params'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif ($preprocessing['params'] !== '' && $preprocessing['params'] !== null
-								&& $preprocessing['params'] !== false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'params', _('should be empty'))
-							);
-						}
-
-						$preprocessing_types = array_column($item['preprocessing'], 'type');
-
-						if (count(array_keys($preprocessing_types, ZBX_PREPROC_VALIDATE_NOT_SUPPORTED)) > 1) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_('Only one not supported value check is allowed.')
-							);
-						}
-						break;
-				}
-
-				switch ($preprocessing['type']) {
-					case ZBX_PREPROC_RTRIM:
-					case ZBX_PREPROC_LTRIM:
-					case ZBX_PREPROC_TRIM:
-					case ZBX_PREPROC_THROTTLE_VALUE:
-					case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-					case ZBX_PREPROC_SCRIPT:
-					case ZBX_PREPROC_STR_REPLACE:
-						if (is_array($preprocessing['error_handler'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif ($preprocessing['error_handler'] != ZBX_PREPROC_FAIL_DEFAULT) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler',
-									_s('unexpected value "%1$s"', $preprocessing['error_handler'])
-								)
-							);
-						}
-
-						if (is_array($preprocessing['error_handler_params'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif ($preprocessing['error_handler_params'] !== ''
-								&& $preprocessing['error_handler_params'] !== null
-								&& $preprocessing['error_handler_params'] !== false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
-									_('should be empty')
-								)
-							);
-						}
-						break;
-
-					case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
-						if (is_array($preprocessing['error_handler'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif (!$unsupported_error_handler_validator->validate($preprocessing['error_handler'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler',
-									_s('unexpected value "%1$s"', $preprocessing['error_handler'])
-								)
-							);
-						}
-
-						if (is_array($preprocessing['error_handler_params'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif ($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_DISCARD_VALUE
-								&& $preprocessing['error_handler_params'] !== ''
-								&& $preprocessing['error_handler_params'] !== null
-								&& $preprocessing['error_handler_params'] !== false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
-									_('should be empty')
-								)
-							);
-						}
-						elseif ($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_SET_ERROR
-								&& ($preprocessing['error_handler_params'] === ''
-									|| $preprocessing['error_handler_params'] === null
-									|| $preprocessing['error_handler_params'] === false)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
-									_('cannot be empty')
-								)
-							);
-						}
-						break;
-
-					default:
-						if (is_array($preprocessing['error_handler'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif (!$error_handler_validator->validate($preprocessing['error_handler'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler',
-									_s('unexpected value "%1$s"', $preprocessing['error_handler'])
-								)
-							);
-						}
-
-						if (is_array($preprocessing['error_handler_params'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-						}
-						elseif (($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT
-									|| $preprocessing['error_handler'] == ZBX_PREPROC_FAIL_DISCARD_VALUE)
-								&& $preprocessing['error_handler_params'] !== ''
-								&& $preprocessing['error_handler_params'] !== null
-								&& $preprocessing['error_handler_params'] !== false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
-									_('should be empty')
-								)
-							);
-						}
-						elseif ($preprocessing['error_handler'] == ZBX_PREPROC_FAIL_SET_ERROR
-								&& ($preprocessing['error_handler_params'] === ''
-									|| $preprocessing['error_handler_params'] === null
-									|| $preprocessing['error_handler_params'] === false)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect value for field "%1$s": %2$s.', 'error_handler_params',
-									_('cannot be empty')
-								)
-							);
-						}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Method validates preprocessing steps independently from other item properties.
-	 *
-	 * @param array  $preprocessing_steps    An array of item pre-processing step details.
-	 *                                       See self::validateItemPreprocessing for details.
-	 *
-	 * @return bool|string
-	 */
-	public function validateItemPreprocessingSteps(array $preprocessing_steps) {
-		try {
-			$this->validateItemPreprocessing(['preprocessing' => $preprocessing_steps]);
-
-			return true;
-		}
-		catch (APIException $error) {
-			return $error->getMessage();
-		}
-	}
-
-	/**
-	 * Insert item pre-processing data into DB.
-	 *
-	 * @param array  $items                     An array of items.
-	 * @param string $items[]['itemid']
-	 * @param array  $items[]['preprocessing']  An array of item pre-processing data.
-	 */
-	protected function createItemPreprocessing(array $items) {
-		$item_preproc = [];
-
-		foreach ($items as $item) {
-			if (array_key_exists('preprocessing', $item)) {
-				$step = 1;
-
-				foreach ($item['preprocessing'] as $preprocessing) {
-					$item_preproc[] = [
-						'itemid' => $item['itemid'],
-						'step' => ($preprocessing['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 0 : $step++,
-						'type' => $preprocessing['type'],
-						'params' => $preprocessing['params'],
-						'error_handler' => $preprocessing['error_handler'],
-						'error_handler_params' => $preprocessing['error_handler_params']
-					];
-				}
-			}
-		}
-
-		if ($item_preproc) {
-			DB::insertBatch('item_preproc', $item_preproc);
-		}
-	}
-
-	/**
-	 * Update item pre-processing data in DB. Delete old records and create new ones.
-	 *
-	 * @param array  $items
-	 * @param string $items[]['itemid']
-	 * @param array  $items[]['preprocessing']
-	 * @param int    $items[]['preprocessing'][]['type']
-	 * @param string $items[]['preprocessing'][]['params']
-	 * @param int    $items[]['preprocessing'][]['error_handler']
-	 * @param string $items[]['preprocessing'][]['error_handler_params']
-	 */
-	protected function updateItemPreprocessing(array $items) {
-		$item_preprocs = [];
-
-		foreach ($items as $item) {
-			if (array_key_exists('preprocessing', $item)) {
-				$item_preprocs[$item['itemid']] = [];
-				$step = 1;
-
-				foreach ($item['preprocessing'] as $item_preproc) {
-					$curr_step = ($item_preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 0 : $step++;
-					$item_preprocs[$item['itemid']][$curr_step] = [
-						'type' => $item_preproc['type'],
-						'params' => $item_preproc['params'],
-						'error_handler' => $item_preproc['error_handler'],
-						'error_handler_params' => $item_preproc['error_handler_params']
-					];
-				}
-			}
-		}
-
-		if (!$item_preprocs) {
-			return;
-		}
-
-		$ins_item_preprocs = [];
-		$upd_item_preprocs = [];
-		$del_item_preprocids = [];
 
 		$options = [
-			'output' => ['item_preprocid', 'itemid', 'step', 'type', 'params', 'error_handler', 'error_handler_params'],
-			'filter' => ['itemid' => array_keys($item_preprocs)]
+			'output' => ['itemid', 'hostid', 'templateid'],
+			'filter' => [
+				'templateid' => array_keys($ins_item_indexes + $upd_item_indexes),
+				'hostid' => $hostids
+			]
 		];
-		$db_item_preprocs = DBselect(DB::makeSql('item_preproc', $options));
+		$result = DBselect(DB::makeSql('items', $options));
 
-		while ($db_item_preproc = DBfetch($db_item_preprocs)) {
-			if (array_key_exists($db_item_preproc['step'], $item_preprocs[$db_item_preproc['itemid']])) {
-				$item_preproc = $item_preprocs[$db_item_preproc['itemid']][$db_item_preproc['step']];
-				$upd_item_preproc = [];
-
-				if ($item_preproc['type'] != $db_item_preproc['type']) {
-					$upd_item_preproc['type'] = $item_preproc['type'];
+		while ($row = DBfetch($result)) {
+			if (array_key_exists($row['templateid'], $upd_item_indexes)
+					&& array_key_exists($row['hostid'], $upd_item_indexes[$row['templateid']])) {
+				foreach ($upd_item_indexes[$row['templateid']][$row['hostid']] as $i) {
+					$upd_items[$i]['master_itemid'] = $row['itemid'];
 				}
-				if ($item_preproc['params'] !== $db_item_preproc['params']) {
-					$upd_item_preproc['params'] = $item_preproc['params'];
-				}
-				if ($item_preproc['error_handler'] != $db_item_preproc['error_handler']) {
-					$upd_item_preproc['error_handler'] = $item_preproc['error_handler'];
-				}
-				if ($item_preproc['error_handler_params'] !== $db_item_preproc['error_handler_params']) {
-					$upd_item_preproc['error_handler_params'] = $item_preproc['error_handler_params'];
-				}
-
-				if ($upd_item_preproc) {
-					$upd_item_preprocs[] = [
-						'values' => $upd_item_preproc,
-						'where' => ['item_preprocid' => $db_item_preproc['item_preprocid']]
-					];
-				}
-				unset($item_preprocs[$db_item_preproc['itemid']][$db_item_preproc['step']]);
 			}
-			else {
-				$del_item_preprocids[] = $db_item_preproc['item_preprocid'];
+
+			if (array_key_exists($row['templateid'], $ins_item_indexes)
+					&& array_key_exists($row['hostid'], $ins_item_indexes[$row['templateid']])) {
+				foreach ($ins_item_indexes[$row['templateid']][$row['hostid']] as $i) {
+					$ins_items[$i]['master_itemid'] = $row['itemid'];
+				}
 			}
-		}
-
-		foreach ($item_preprocs as $itemid => $preprocs) {
-			foreach ($preprocs as $step => $preproc) {
-				$ins_item_preprocs[] = [
-					'itemid' => $itemid,
-					'step' => $step
-				] + $preproc;
-			}
-		}
-
-		if ($del_item_preprocids) {
-			DB::delete('item_preproc', ['item_preprocid' => $del_item_preprocids]);
-		}
-
-		if ($upd_item_preprocs) {
-			DB::update('item_preproc', $upd_item_preprocs);
-		}
-
-		if ($ins_item_preprocs) {
-			DB::insertBatch('item_preproc', $ins_item_preprocs);
 		}
 	}
 
 	/**
-	 * Create item parameters.
+	 * @param array $upd_items
+	 * @param array $upd_db_items
+	 * @param array $ins_items
 	 *
-	 * @param array $items                             Array of items.
-	 * @param array $items[]['parameters']             Item parameters.
-	 * @param array $items[]['parameters'][]['name']   Parameter name.
-	 * @param array $items[]['parameters'][]['value']  Parameter value.
-	 * @param array $itemids                           Array of item IDs that were created before.
+	 * @throws APIException
 	 */
-	protected function createItemParameters(array $items, array $itemids): void {
-		$item_parameters = [];
+	protected static function addInterfaceIds(array &$upd_items, array $upd_db_items, array &$ins_items): void {
+		$upd_item_indexes = [];
+		$ins_item_indexes = [];
+		$interface_types = [];
 
-		foreach ($items as $key => $item) {
-			$items[$key]['itemid'] = $itemids[$key];
+		$required_interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI,
+			INTERFACE_TYPE_JMX
+		];
 
-			if (!array_key_exists('parameters', $item) || !$item['parameters']) {
+		$upd_item_indexes_by_interfaceid = [];
+
+		foreach ($upd_items as $i => $upd_item) {
+			if (!in_array($upd_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])) {
 				continue;
 			}
 
-			foreach ($item['parameters'] as $parameter) {
-				$item_parameters[] = [
-					'itemid' => $items[$key]['itemid'],
-					'name' => $parameter['name'],
-					'value' => $parameter['value']
-				];
+			$interface_type = itemTypeInterface($upd_item['type']);
+
+			if (!in_array($interface_type, $required_interface_types)) {
+				continue;
+			}
+
+			if ($upd_db_items[$upd_item['itemid']]['interfaceid'] != 0) {
+				$upd_item_indexes_by_interfaceid[$upd_db_items[$upd_item['itemid']]['interfaceid']][] = $i;
+			}
+			else {
+				$upd_item_indexes[$upd_item['hostid']][$interface_type][] = $i;
+				$interface_types[$interface_type] = true;
 			}
 		}
 
-		if ($item_parameters) {
-			DB::insertBatch('item_parameter', $item_parameters);
-		}
-	}
+		if ($upd_item_indexes_by_interfaceid) {
+			$options = [
+				'output' => ['interfaceid', 'type'],
+				'interfaceids' => array_keys($upd_item_indexes_by_interfaceid)
+			];
+			$result = DBselect(DB::makeSql('interface', $options));
 
-	/**
-	 * Update item parameters.
-	 *
-	 * @param array      $items                             Array of items.
-	 * @param int|string $items[]['itemid']                 Item ID.
-	 * @param int|string $items[]['type']                   Item type.
-	 * @param array      $items[]['parameters']             Item parameters.
-	 * @param array      $items[]['parameters'][]['name']   Parameter name.
-	 * @param array      $items[]['parameters'][]['value']  Parameter value.
-	 */
-	protected function updateItemParameters(array $items): void {
-		$db_item_parameters_by_itemid = [];
+			while ($row = DBfetch($result)) {
+				foreach ($upd_item_indexes_by_interfaceid[$row['interfaceid']] as $i) {
+					$upd_item = $upd_items[$i];
+					$interface_type = itemTypeInterface($upd_item['type']);
 
-		foreach ($items as $item) {
-			if ($item['type'] != ITEM_TYPE_SCRIPT || array_key_exists('parameters', $item)) {
-				$db_item_parameters_by_itemid[$item['itemid']] = [];
+					if ($interface_type != $row['type']) {
+						$upd_item_indexes[$upd_item['hostid']][$interface_type][] = $i;
+						$interface_types[$interface_type] = true;
+					}
+				}
 			}
 		}
 
-		if (!$db_item_parameters_by_itemid) {
+		foreach ($ins_items as $i => $ins_item) {
+			if (!in_array($ins_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])) {
+				continue;
+			}
+
+			$interface_type = itemTypeInterface($ins_item['type']);
+
+			if (!in_array($interface_type, $required_interface_types)) {
+				continue;
+			}
+
+			$ins_item_indexes[$ins_item['hostid']][$interface_type][] = $i;
+			$interface_types[$interface_type] = true;
+		}
+
+		if (!$upd_item_indexes && !$ins_item_indexes) {
 			return;
 		}
 
 		$options = [
-			'output' => ['item_parameterid', 'itemid', 'name', 'value'],
-			'filter' => ['itemid' => array_keys($db_item_parameters_by_itemid)]
+			'output' => ['interfaceid', 'hostid', 'type'],
+			'filter' => [
+				'hostid' => array_keys($upd_item_indexes + $ins_item_indexes),
+				'type' => array_keys($interface_types),
+				'main' => INTERFACE_PRIMARY
+			]
 		];
-		$result = DBselect(DB::makeSql('item_parameter', $options));
+		$result = DBselect(DB::makeSql('interface', $options));
 
 		while ($row = DBfetch($result)) {
-			$db_item_parameters_by_itemid[$row['itemid']][$row['name']] = [
-				'item_parameterid' => $row['item_parameterid'],
-				'value' => $row['value']
-			];
+			if (array_key_exists($row['hostid'], $upd_item_indexes)
+					&& array_key_exists($row['type'], $upd_item_indexes[$row['hostid']])) {
+				foreach ($upd_item_indexes[$row['hostid']][$row['type']] as $_i => $i) {
+					$upd_items[$i]['interfaceid'] = $row['interfaceid'];
+
+					unset($upd_item_indexes[$row['hostid']][$row['type']][$_i]);
+				}
+
+				if (!$upd_item_indexes[$row['hostid']][$row['type']]) {
+					unset($upd_item_indexes[$row['hostid']][$row['type']]);
+				}
+
+				if (!$upd_item_indexes[$row['hostid']]) {
+					unset($upd_item_indexes[$row['hostid']]);
+				}
+			}
+
+			if (array_key_exists($row['hostid'], $ins_item_indexes)
+					&& array_key_exists($row['type'], $ins_item_indexes[$row['hostid']])) {
+				foreach ($ins_item_indexes[$row['hostid']][$row['type']] as $_i => $i) {
+					$ins_items[$i]['interfaceid'] = $row['interfaceid'];
+
+					unset($ins_item_indexes[$row['hostid']][$row['type']][$_i]);
+				}
+
+				if (!$ins_item_indexes[$row['hostid']][$row['type']]) {
+					unset($ins_item_indexes[$row['hostid']][$row['type']]);
+				}
+
+				if (!$ins_item_indexes[$row['hostid']]) {
+					unset($ins_item_indexes[$row['hostid']]);
+				}
+			}
 		}
 
+		$item = null;
+
+		if ($upd_item_indexes) {
+			$hostid = key($upd_item_indexes);
+			$interface_type = key($upd_item_indexes[$hostid]);
+			$i = reset($upd_item_indexes[$hostid][$interface_type]);
+
+			$item = $upd_items[$i];
+		}
+		elseif ($ins_item_indexes) {
+			$hostid = key($ins_item_indexes);
+			$interface_type = key($ins_item_indexes[$hostid]);
+			$i = reset($ins_item_indexes[$hostid][$interface_type]);
+
+			$item = $ins_items[$i];
+		}
+
+		if ($item === null) {
+			return;
+		}
+
+		$templates = DBfetchArray(DBselect(
+			'SELECT h.host'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionId('i.itemid', [$item['templateid']])
+		));
+
+		$hosts = DB::select('hosts', [
+			'output' => ['host'],
+			'hostids' => $item['hostid']
+		]);
+
+		switch ($item['flags']) {
+			case ZBX_FLAG_DISCOVERY_NORMAL:
+				$error = _('Cannot inherit item with key "%1$s" of template "%2$s" to host "%3$s", because a host interface of type "%4$s" is required.');
+				break;
+
+			case ZBX_FLAG_DISCOVERY_CREATED:
+				$error = _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to host "%3$s", because a host interface of type "%4$s" is required.');
+				break;
+
+			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+				$error = _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to host "%3$s", because a host interface of type "%4$s" is required.');
+				break;
+		}
+
+		self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $item['key_'], $templates[0]['host'],
+			$hosts[0]['host'], interfaceType2str($interface_type)
+		));
+	}
+
+	/**
+	 * Inherit dependent items in nesting order.
+	 *
+	 * @param array $dep_items_to_link[<master item index>][<dependent item index>]
+	 * @param array $items_to_link
+	 * @param array $hostids
+	 */
+	protected static function inheritDependentItems(array $dep_items_to_link, array $items_to_link,
+			array $hostids): void {
+		while ($dep_items_to_link) {
+			$items = [];
+
+			foreach ($dep_items_to_link as $i => $_items) {
+				if (array_key_exists($i, $items_to_link)) {
+					$items += $_items;
+					unset($dep_items_to_link[$i]);
+				}
+			}
+
+			static::inherit(array_values($items), [], $hostids, true);
+
+			$items_to_link = $items;
+		}
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array      $db_items
+	 * @param array|null $hostids
+	 * @param bool       $is_dep_items  Inherit called for dependent items.
+	 */
+	abstract protected static function inherit(array $items, array $db_items = [], array $hostids = null,
+			bool $is_dep_items = false): void;
+
+	/**
+	 * Add default values for fields that became unnecessary as the result of the change of the type fields.
+	 *
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	protected static function addFieldDefaultsByType(array &$items, array $db_items): void {
+		$type_field_defaults = [
+			// The fields used for multiple item types.
+			'interfaceid' => 0,
+			'authtype' => DB::getDefault('items', 'authtype'),
+			'username' => DB::getDefault('items', 'username'),
+			'password' => DB::getDefault('items', 'password'),
+			'params' => DB::getDefault('items', 'params'),
+			'timeout' => DB::getDefault('items', 'timeout'),
+			'delay' => DB::getDefault('items', 'delay'),
+			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
+
+			// Dependent item type specific fields.
+			'master_itemid' => 0,
+
+			// HTTP Agent item type specific fields.
+			'url' => DB::getDefault('items', 'url'),
+			'query_fields' => DB::getDefault('items', 'query_fields'),
+			'request_method' => DB::getDefault('items', 'request_method'),
+			'post_type' => DB::getDefault('items', 'post_type'),
+			'posts' => DB::getDefault('items', 'posts'),
+			'headers' => DB::getDefault('items', 'headers'),
+			'status_codes' => DB::getDefault('items', 'status_codes'),
+			'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
+			'retrieve_mode' => DB::getDefault('items', 'retrieve_mode'),
+			'output_format' => DB::getDefault('items', 'output_format'),
+			'http_proxy' => DB::getDefault('items', 'http_proxy'),
+			'verify_peer' => DB::getDefault('items', 'verify_peer'),
+			'verify_host' => DB::getDefault('items', 'verify_host'),
+			'ssl_cert_file' => DB::getDefault('items', 'ssl_cert_file'),
+			'ssl_key_file' => DB::getDefault('items', 'ssl_key_file'),
+			'ssl_key_password' => DB::getDefault('items', 'ssl_key_password'),
+			'allow_traps' => DB::getDefault('items', 'allow_traps'),
+
+			// IPMI item type specific fields.
+			'ipmi_sensor' => DB::getDefault('items', 'ipmi_sensor'),
+
+			// JMX item type specific fields.
+			'jmx_endpoint' => DB::getDefault('items', 'jmx_endpoint'),
+
+			// Script item type specific fields.
+			'parameters' => [],
+
+			// SNMP item type specific fields.
+			'snmp_oid' => DB::getDefault('items', 'snmp_oid'),
+
+			// SSH item type specific fields.
+			'publickey' => DB::getDefault('items', 'publickey'),
+			'privatekey' => DB::getDefault('items', 'privatekey')
+		];
+
+		$value_type_field_defaults = [
+			'units' => DB::getDefault('items', 'units'),
+			'trends' => DB::getDefault('items', 'trends'),
+			'valuemapid' => 0,
+			'logtimefmt' => DB::getDefault('items', 'logtimefmt'),
+			'inventory_link' => DB::getDefault('items', 'inventory_link')
+		];
+
+		foreach ($items as &$item) {
+			if (!array_key_exists('type', $db_items[$item['itemid']])) {
+				continue;
+			}
+
+			$db_item = $db_items[$item['itemid']];
+
+			if ($item['type'] != $db_item['type']) {
+				$type_field_names = CItemTypeFactory::getObject($item['type'])::FIELD_NAMES;
+				$db_type_field_names = CItemTypeFactory::getObject($db_item['type'])::FIELD_NAMES;
+
+				$field_names = array_flip(array_diff($db_type_field_names, $type_field_names));
+
+				if ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) == 0) {
+					$field_names += array_flip(['delay']);
+				}
+
+				if (array_intersect([$item['type'], $db_item['type']], [ITEM_TYPE_SSH, ITEM_TYPE_HTTPAGENT])) {
+					$field_names += array_flip(['authtype']);
+				}
+
+				if ($item['host_status'] == HOST_STATUS_TEMPLATE && array_key_exists('interfaceid', $field_names)) {
+					unset($field_names['interfaceid']);
+				}
+
+				$item += array_intersect_key($type_field_defaults, $field_names);
+			}
+			elseif ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
+				if (array_key_exists('key_', $item) && $item['key_'] !== $db_item['key_']
+						&& strncmp($item['key_'], 'mqtt.get', 8) == 0) {
+					$item += array_intersect_key($type_field_defaults, array_flip(['delay']));
+				}
+			}
+			elseif ($item['type'] == ITEM_TYPE_SSH) {
+				if (array_key_exists('authtype', $item) && $item['authtype'] !== $db_item['authtype']
+						&& $item['authtype'] == ITEM_AUTHTYPE_PASSWORD) {
+					$item += array_intersect_key($type_field_defaults, array_flip(['publickey', 'privatekey']));
+				}
+			}
+			elseif ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				if (array_key_exists('request_method', $item) && $item['request_method'] != $db_item['request_method']
+						&& $item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+					$item += ['retrieve_mode' => HTTPTEST_STEP_RETRIEVE_MODE_HEADERS];
+				}
+
+				if (array_key_exists('authtype', $item) && $item['authtype'] != $db_item['authtype']
+						&& $item['authtype'] == HTTPTEST_AUTH_NONE) {
+					$item += array_intersect_key($type_field_defaults, array_flip(['username', 'password']));
+				}
+
+				if (array_key_exists('allow_traps', $item) && $item['allow_traps'] != $db_item['allow_traps']
+						&& $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF) {
+					$item += array_intersect_key($type_field_defaults, array_flip(['trapper_hosts']));
+				}
+			}
+
+			if (array_key_exists('value_type', $item) && $item['value_type'] != $db_item['value_type']) {
+				$type_field_names = static::VALUE_TYPE_FIELD_NAMES[$item['value_type']];
+				$db_type_field_names = static::VALUE_TYPE_FIELD_NAMES[$db_item['value_type']];
+
+				$field_names = array_flip(array_diff($db_type_field_names, $type_field_names));
+
+				if (array_key_exists('trends', $field_names)) {
+					$item += ['trends' => 0];
+				}
+
+				$item += array_intersect_key($value_type_field_defaults, $field_names);
+			}
+		}
+		unset($item);
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array|null $db_items
+	 * @param array|null $upd_itemids
+	 */
+	protected static function updateParameters(array &$items, array $db_items = null,
+			array &$upd_itemids = null): void {
 		$ins_item_parameters = [];
 		$upd_item_parameters = [];
 		$del_item_parameterids = [];
 
-		foreach ($db_item_parameters_by_itemid as $itemid => $db_item_parameters) {
-			$item = $items[$itemid];
+		foreach ($items as $i => &$item) {
+			$update = false;
 
-			if ($item['type'] == ITEM_TYPE_SCRIPT && array_key_exists('parameters', $item)) {
-				foreach ($item['parameters'] as $parameter) {
-					if (array_key_exists($parameter['name'], $db_item_parameters)) {
-						if ($db_item_parameters[$parameter['name']]['value'] !== $parameter['value']) {
-							$upd_item_parameters[] = [
-								'values' => ['value' => $parameter['value']],
-								'where' => [
-									'item_parameterid' => $db_item_parameters[$parameter['name']]['item_parameterid']
-								]
-							];
-						}
-						unset($db_item_parameters[$parameter['name']]);
+			if ($db_items === null) {
+				if ($item['type'] == ITEM_TYPE_SCRIPT && array_key_exists('parameters', $item) && $item['parameters']) {
+					$update = true;
+				}
+			}
+			else {
+				if (!array_key_exists('type', $db_items[$item['itemid']])) {
+					continue;
+				}
+
+				if ($item['type'] == ITEM_TYPE_SCRIPT) {
+					if (array_key_exists('parameters', $item)) {
+						$update = true;
 					}
-					else {
-						$ins_item_parameters[] = [
-							'itemid' => $itemid,
-							'name' => $parameter['name'],
-							'value' => $parameter['value']
-						];
-					}
+				}
+				elseif ($db_items[$item['itemid']]['type'] == ITEM_TYPE_SCRIPT
+						&& $db_items[$item['itemid']]['parameters']) {
+					$update = true;
 				}
 			}
 
-			$del_item_parameterids = array_merge($del_item_parameterids,
-				array_column($db_item_parameters, 'item_parameterid')
-			);
+			if (!$update) {
+				continue;
+			}
+
+			$changed = false;
+			$db_item_parameters = ($db_items !== null)
+				? array_column($db_items[$item['itemid']]['parameters'], null, 'name')
+				: [];
+
+			foreach ($item['parameters'] as &$item_parameter) {
+				if (array_key_exists($item_parameter['name'], $db_item_parameters)) {
+					$db_item_parameter = $db_item_parameters[$item_parameter['name']];
+					$item_parameter['item_parameterid'] = $db_item_parameter['item_parameterid'];
+					unset($db_item_parameters[$db_item_parameter['name']]);
+
+					$upd_item_parameter = DB::getUpdatedValues('item_parameter', $item_parameter, $db_item_parameter);
+
+					if ($upd_item_parameter) {
+						$upd_item_parameters[] = [
+							'values' => $upd_item_parameter,
+							'where' => ['item_parameterid' => $db_item_parameter['item_parameterid']]
+						];
+						$changed = true;
+					}
+				}
+				else {
+					$ins_item_parameters[] = ['itemid' => $item['itemid']] + $item_parameter;
+					$changed = true;
+				}
+			}
+			unset($item_parameter);
+
+			if ($db_item_parameters) {
+				$del_item_parameterids =
+					array_merge($del_item_parameterids, array_column($db_item_parameters, 'item_parameterid'));
+				$changed = true;
+			}
+
+			if ($db_items !== null) {
+				if ($changed) {
+					$upd_itemids[$i] = $item['itemid'];
+				}
+				else {
+					unset($item['parameters']);
+				}
+			}
 		}
+		unset($item);
 
 		if ($del_item_parameterids) {
 			DB::delete('item_parameter', ['item_parameterid' => $del_item_parameterids]);
@@ -2064,50 +1304,369 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		if ($ins_item_parameters) {
-			DB::insertBatch('item_parameter', $ins_item_parameters);
+			$item_parameterids = DB::insert('item_parameter', $ins_item_parameters);
+		}
+
+		foreach ($items as &$item) {
+			if (!array_key_exists('parameters', $item)) {
+				continue;
+			}
+
+			foreach ($item['parameters'] as &$item_parameter) {
+				if (!array_key_exists('item_parameterid', $item_parameter)) {
+					$item_parameter['item_parameterid'] = array_shift($item_parameterids);
+				}
+			}
+			unset($item_parameter);
+		}
+		unset($item);
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array|null $db_items
+	 * @param array|null $upd_itemids
+	 */
+	protected static function updatePreprocessing(array &$items, array $db_items = null,
+			array &$upd_itemids = null): void {
+		$ins_item_preprocs = [];
+		$upd_item_preprocs = [];
+		$del_item_preprocids = [];
+
+		foreach ($items as $i => &$item) {
+			if (!array_key_exists('preprocessing', $item)) {
+				continue;
+			}
+
+			$changed = false;
+			$db_item_preprocs = ($db_items !== null)
+				? array_column($db_items[$item['itemid']]['preprocessing'], null, 'step')
+				: [];
+
+			$step = 1;
+
+			foreach ($item['preprocessing'] as &$item_preproc) {
+				$item_preproc['step'] = ($item_preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 0 : $step++;
+
+				if (array_key_exists($item_preproc['step'], $db_item_preprocs)) {
+					$db_item_preproc = $db_item_preprocs[$item_preproc['step']];
+					$item_preproc['item_preprocid'] = $db_item_preproc['item_preprocid'];
+					unset($db_item_preprocs[$db_item_preproc['step']]);
+
+					$upd_item_preproc = DB::getUpdatedValues('item_preproc', $item_preproc, $db_item_preproc);
+
+					if ($upd_item_preproc) {
+						$upd_item_preprocs[] = [
+							'values' => $upd_item_preproc,
+							'where' => ['item_preprocid' => $db_item_preproc['item_preprocid']]
+						];
+						$changed = true;
+					}
+				}
+				else {
+					$ins_item_preprocs[] = ['itemid' => $item['itemid']] + $item_preproc;
+					$changed = true;
+				}
+			}
+			unset($item_preproc);
+
+			if ($db_item_preprocs) {
+				$del_item_preprocids =
+					array_merge($del_item_preprocids, array_column($db_item_preprocs, 'item_preprocid'));
+				$changed = true;
+			}
+
+			if ($db_items !== null) {
+				if ($changed) {
+					$upd_itemids[$i] = $item['itemid'];
+				}
+				else {
+					unset($item['preprocessing']);
+				}
+			}
+		}
+		unset($item);
+
+		if ($del_item_preprocids) {
+			DB::delete('item_preproc', ['item_preprocid' => $del_item_preprocids]);
+		}
+
+		if ($upd_item_preprocs) {
+			DB::update('item_preproc', $upd_item_preprocs);
+		}
+
+		if ($ins_item_preprocs) {
+			$item_preprocids = DB::insert('item_preproc', $ins_item_preprocs);
+		}
+
+		foreach ($items as &$item) {
+			if (!array_key_exists('preprocessing', $item)) {
+				continue;
+			}
+
+			foreach ($item['preprocessing'] as &$item_preproc) {
+				if (!array_key_exists('item_preprocid', $item_preproc)) {
+					$item_preproc['item_preprocid'] = array_shift($item_preprocids);
+				}
+			}
+			unset($item_preproc);
+		}
+		unset($item);
+	}
+
+	/**
+	 * @param array      $items
+	 * @param array|null $db_items
+	 * @param array|null $upd_itemids
+	 */
+	protected static function updateTags(array &$items, array $db_items = null, array &$upd_itemids = null): void {
+		$ins_tags = [];
+		$del_itemtagids = [];
+
+		foreach ($items as $i => &$item) {
+			if (!array_key_exists('tags', $item)) {
+				continue;
+			}
+
+			$changed = false;
+			$db_tags = ($db_items !== null) ? $db_items[$item['itemid']]['tags'] : [];
+
+			foreach ($item['tags'] as &$tag) {
+				$db_itemtagid = key(array_filter($db_tags, static function (array $db_tag) use ($tag): bool {
+					return $tag['tag'] === $db_tag['tag']
+						&& (!array_key_exists('value', $tag) || $tag['value'] === $db_tag['value']);
+				}));
+
+				if ($db_itemtagid !== null) {
+					$tag['itemtagid'] = $db_itemtagid;
+					unset($db_tags[$db_itemtagid]);
+				}
+				else {
+					$ins_tags[] = ['itemid' => $item['itemid']] + $tag;
+					$changed = true;
+				}
+			}
+			unset($tag);
+
+			if ($db_tags) {
+				$del_itemtagids = array_merge($del_itemtagids, array_keys($db_tags));
+				$changed = true;
+			}
+
+			if ($db_items !== null) {
+				if ($changed) {
+					$upd_itemids[$i] = $item['itemid'];
+				}
+				else {
+					unset($item['tags']);
+				}
+			}
+		}
+		unset($item);
+
+		if ($del_itemtagids) {
+			DB::delete('item_tag', ['itemtagid' => $del_itemtagids]);
+		}
+
+		if ($ins_tags) {
+			$itemtagids = DB::insert('item_tag', $ins_tags);
+		}
+
+		foreach ($items as &$item) {
+			if (!array_key_exists('tags', $item)) {
+				continue;
+			}
+
+			foreach ($item['tags'] as &$tag) {
+				if (!array_key_exists('itemtagid', $tag)) {
+					$tag['itemtagid'] = array_shift($itemtagids);
+				}
+			}
+			unset($tag);
+		}
+		unset($item);
+	}
+
+	/**
+	 * Check for unique item keys.
+	 *
+	 * @param array      $items
+	 * @param array|null $db_items
+	 *
+	 * @throws APIException if item keys are not unique.
+	 */
+	protected static function checkDuplicates(array $items, array $db_items = null): void {
+		$host_keys = [];
+
+		foreach ($items as $item) {
+			if ($db_items === null || $item['key_'] !== $db_items[$item['itemid']]['key_']) {
+				$host_keys[$item['hostid']][] = $item['key_'];
+			}
+		}
+
+		if (!$host_keys) {
+			return;
+		}
+
+		$where = [];
+		foreach ($host_keys as $hostid => $keys) {
+			$where[] = '('.dbConditionId('i.hostid', [$hostid]).' AND '.dbConditionString('i.key_', $keys).')';
+		}
+
+		$duplicates = DBfetchArray(DBselect(
+			'SELECT i.key_,i.flags,h.host,h.status'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND ('.implode(' OR ', $where).')',
+			1
+		));
+
+		if ($duplicates) {
+			$target_is_template = ($duplicates[0]['status'] == HOST_STATUS_TEMPLATE);
+
+			switch ($duplicates[0]['flags']) {
+				case ZBX_FLAG_DISCOVERY_NORMAL:
+				case ZBX_FLAG_DISCOVERY_CREATED:
+					$error = $target_is_template
+						? _('An item with key "%1$s" already exists on the template "%2$s".')
+						: _('An item with key "%1$s" already exists on the host "%2$s".');
+					break;
+
+				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+					$error = $target_is_template
+						? _('An item prototype with key "%1$s" already exists on the template "%2$s".')
+						: _('An item prototype with key "%1$s" already exists on the host "%2$s".');
+					break;
+
+				case ZBX_FLAG_DISCOVERY_RULE:
+					$error = $target_is_template
+						? _('An LLD rule with key "%1$s" already exists on the template "%2$s".')
+						: _('An LLD rule with key "%1$s" already exists on the host "%2$s".');
+					break;
+			}
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $duplicates[0]['key_'], $duplicates[0]['host']));
 		}
 	}
 
 	/**
-	 * Check if any item from list already exists.
-	 * If items have item ids it will check for existing item with different itemid.
+	 * @param array      $items
+	 * @param array|null $db_items
 	 *
-	 * @throw APIException
-	 *
-	 * @param array $items
+	 * @throws APIException
 	 */
-	protected function checkExistingItems(array $items) {
-		$itemKeysByHostId = [];
-		$itemIds = [];
-		foreach ($items as $item) {
-			if (!isset($itemKeysByHostId[$item['hostid']])) {
-				$itemKeysByHostId[$item['hostid']] = [];
-			}
-			$itemKeysByHostId[$item['hostid']][] = $item['key_'];
+	protected static function checkHostInterfaces(array $items, array $db_items = null): void {
+		foreach ($items as $i => &$item) {
+			$interface_type = itemTypeInterface($item['type']);
 
-			if (isset($item['itemid'])) {
-				$itemIds[] = $item['itemid'];
+			if (!in_array($item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+					|| $interface_type === false) {
+				unset($items[$i]);
+				continue;
+			}
+
+			$check = false;
+
+			if ($db_items === null) {
+				if (array_key_exists('interfaceid', $item)) {
+					if ($item['interfaceid'] != 0) {
+						$check = true;
+					}
+					elseif ($interface_type != INTERFACE_TYPE_OPT) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							'/'.($i + 1).'/interfaceid', _('the host interface ID is expected')
+						));
+					}
+				}
+			}
+			else {
+				$db_item = $db_items[$item['itemid']];
+
+				if ($item['type'] == $db_item['type']) {
+					if (array_key_exists('interfaceid', $item)) {
+						if ($item['interfaceid'] != 0) {
+							if (bccomp($item['interfaceid'], $db_item['interfaceid']) != 0) {
+								$check = true;
+							}
+						}
+						elseif ($interface_type != INTERFACE_TYPE_OPT) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i + 1).'/interfaceid', _('the host interface ID is expected')
+							));
+						}
+					}
+				}
+				else {
+					$db_interface_type = itemTypeInterface($db_item['type']);
+
+					if (array_key_exists('interfaceid', $item)) {
+						if ($item['interfaceid'] != 0) {
+							if (bccomp($item['interfaceid'], $db_item['interfaceid']) != 0
+									|| ($interface_type != INTERFACE_TYPE_OPT
+										&& $interface_type != $db_interface_type)) {
+								$check = true;
+							}
+						}
+						elseif ($interface_type != INTERFACE_TYPE_OPT) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i + 1).'/interfaceid', _('the host interface ID is expected')
+							));
+						}
+					}
+					else {
+						if ($db_item['interfaceid'] != 0) {
+							if ($interface_type != INTERFACE_TYPE_OPT && $interface_type != $db_interface_type) {
+								$item += ['interfaceid' => $db_item['interfaceid']];
+
+								$check = true;
+							}
+						}
+						elseif ($interface_type != INTERFACE_TYPE_OPT) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i + 1), _s('the parameter "%1$s" is missing', 'interfaceid')
+							));
+						}
+					}
+				}
+			}
+
+			if (!$check) {
+				unset($items[$i]);
 			}
 		}
+		unset($item);
 
-		$sqlWhere = [];
-		foreach ($itemKeysByHostId as $hostId => $keys) {
-			$sqlWhere[] = '(i.hostid='.zbx_dbstr($hostId).' AND '.dbConditionString('i.key_', $keys).')';
+		if (!$items) {
+			return;
 		}
 
-		if ($sqlWhere) {
-			$sql = 'SELECT i.key_,h.host'.
-					' FROM items i,hosts h'.
-					' WHERE i.hostid=h.hostid AND ('.implode(' OR ', $sqlWhere).')';
+		$db_interfaces = DB::select('interface', [
+			'output' => ['interfaceid', 'hostid', 'type'],
+			'interfaceids' => array_unique(array_column($items, 'interfaceid')),
+			'preservekeys' => true
+		]);
 
-			// if we update existing items we need to exclude them from result.
-			if ($itemIds) {
-				$sql .= ' AND '.dbConditionInt('i.itemid', $itemIds, true);
+		foreach ($items as $i => $item) {
+			if (!array_key_exists($item['interfaceid'], $db_interfaces)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i + 1).'/interfaceid', _('the host interface ID is expected')
+				));
 			}
-			$dbItems = DBselect($sql, 1);
-			while ($dbItem = DBfetch($dbItems)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Item with key "%1$s" already exists on "%2$s".', $dbItem['key_'], $dbItem['host']));
+
+			if (bccomp($db_interfaces[$item['interfaceid']]['hostid'], $item['hostid']) != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i + 1).'/interfaceid', _('cannot be the host interface ID from another host')
+				));
+			}
+
+			$interface_type = itemTypeInterface($item['type']);
+
+			if ($interface_type != INTERFACE_TYPE_OPT
+					&& $db_interfaces[$item['interfaceid']]['type'] != $interface_type) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i + 1).'/interfaceid',
+					_s('the host interface ID of type "%1$s" is expected', interfaceType2str($interface_type))
+				));
 			}
 		}
 	}
@@ -2222,237 +1781,461 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Validate items with type ITEM_TYPE_DEPENDENT for create or update operation.
+	 * Check that dependent items of given items are valid.
 	 *
-	 * @param array  $items
-	 * @param string $items[]['itemid']         (mandatory for updated items and item prototypes)
-	 * @param string $items[]['hostid']
-	 * @param int    $items[]['type']
-	 * @param string $items[]['master_itemid']  (mandatory for ITEM_TYPE_DEPENDENT)
-	 * @param int    $items[]['flags']          (mandatory for items)
+	 * @param array $items
+	 * @param array $db_items
+	 * @param bool  $inherited
 	 *
-	 * @throws APIException for invalid data.
+	 * @throws APIException
 	 */
-	protected function validateDependentItems(array $items) {
-		$dep_items = [];
-		$upd_itemids = [];
+	protected static function checkDependentItems(array $items, array $db_items = [], bool $inherited = false): void {
+		$del_links = [];
 
-		foreach ($items as $item) {
+		foreach ($items as $i => $item) {
+			$check = false;
+
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-				if ($this instanceof CDiscoveryRule || $this instanceof CItemPrototype
-						|| $item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-					$dep_items[] = $item;
-				}
+				if (!array_key_exists('itemid', $item)) {
+					if ($item['master_itemid'] != 0) {
+						$check = true;
+					}
+					else {
+						$error = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+							? _('an item/item prototype ID is expected')
+							: _('an item ID is expected');
 
-				if (array_key_exists('itemid', $item)) {
-					$upd_itemids[] = $item['itemid'];
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							'/'.($i + 1).'/master_itemid', $error
+						));
+					}
 				}
+				else {
+					if (array_key_exists('master_itemid', $item)) {
+						if ($item['master_itemid'] != 0) {
+							if (bccomp($item['master_itemid'], $db_items[$item['itemid']]['master_itemid']) != 0) {
+								$check = true;
+
+								if ($db_items[$item['itemid']]['master_itemid'] != 0) {
+									$del_links[$item['itemid']] = $db_items[$item['itemid']]['master_itemid'];
+								}
+							}
+						}
+						else {
+							$error = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+								? _('an item/item prototype ID is expected')
+								: _('an item ID is expected');
+
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								'/'.($i + 1).'/master_itemid', $error
+							));
+						}
+					}
+				}
+			}
+			elseif (array_key_exists('itemid', $item) && $db_items[$item['itemid']]['type'] == ITEM_TYPE_DEPENDENT) {
+				$del_links[$item['itemid']] = $db_items[$item['itemid']]['master_itemid'];
+			}
+
+			if (!$check) {
+				unset($items[$i]);
 			}
 		}
 
-		if (!$dep_items) {
+		if (!$items) {
 			return;
 		}
 
-		if ($this instanceof CItemPrototype && $upd_itemids) {
-			$db_links = DBselect(
-				'SELECT id.itemid,id.parent_itemid AS ruleid'.
-				' FROM item_discovery id'.
-				' WHERE '.dbConditionId('id.itemid', $upd_itemids)
-			);
-
-			$links = [];
-
-			while ($db_link = DBfetch($db_links)) {
-				$links[$db_link['itemid']] = $db_link['ruleid'];
-			}
-
-			foreach ($dep_items as &$dep_item) {
-				if (array_key_exists('itemid', $dep_item)) {
-					$dep_item['ruleid'] = $links[$dep_item['itemid']];
-				}
-			}
-			unset($dep_item);
+		if (!$inherited) {
+			self::checkMasterItems($items, $db_items);
 		}
 
-		$master_itemids = [];
+		$dep_item_links = self::getDependentItemLinks($items, $del_links);
 
-		foreach ($dep_items as $dep_item) {
-			$master_itemids[$dep_item['master_itemid']] = true;
+		if (!$inherited && $db_items) {
+			self::checkCircularDependencies($items, $dep_item_links);
 		}
 
-		$master_items = [];
-
-		// Fill relations array by master items (item prototypes). Discovery rule should not be master item.
-		do {
-			if ($this instanceof CItemPrototype) {
-				$db_master_items = DBselect(
-					'SELECT i.itemid,i.hostid,i.master_itemid,i.flags,id.parent_itemid AS ruleid'.
-					' FROM items i'.
-						' LEFT JOIN item_discovery id'.
-							' ON i.itemid=id.itemid'.
-					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
-						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE])
-				);
-			}
-			// CDiscoveryRule, CItem
-			else {
-				$db_master_items = DBselect(
-					'SELECT i.itemid,i.hostid,i.master_itemid'.
-					' FROM items i'.
-					' WHERE '.dbConditionId('i.itemid', array_keys($master_itemids)).
-						' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL])
-				);
-			}
-
-			while ($db_master_item = DBfetch($db_master_items)) {
-				$master_items[$db_master_item['itemid']] = $db_master_item;
-
-				unset($master_itemids[$db_master_item['itemid']]);
-			}
-
-			if ($master_itemids) {
-				reset($master_itemids);
-
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-						_s('Item "%1$s" does not exist or you have no access to this item', key($master_itemids))
-					)
-				);
-			}
-
-			$master_itemids = [];
-
-			foreach ($master_items as $master_item) {
-				if ($master_item['master_itemid'] != 0
-						&& !array_key_exists($master_item['master_itemid'], $master_items)) {
-					$master_itemids[$master_item['master_itemid']] = true;
-				}
-			}
-		} while ($master_itemids);
-
-		foreach ($dep_items as $dep_item) {
-			$master_item = $master_items[$dep_item['master_itemid']];
-
-			if ($dep_item['hostid'] != $master_item['hostid']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'master_itemid', _('"hostid" of dependent item and master item should match')
-				));
-			}
-
-			if ($this instanceof CItemPrototype && $master_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
-					&& $dep_item['ruleid'] != $master_item['ruleid']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'master_itemid', _('"ruleid" of dependent item and master item should match')
-				));
-			}
-
-			if (array_key_exists('itemid', $dep_item)) {
-				$master_itemid = $dep_item['master_itemid'];
-
-				while ($master_itemid != 0) {
-					if ($master_itemid == $dep_item['itemid']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-							'master_itemid', _('circular item dependency is not allowed')
-						));
-					}
-
-					$master_itemid = $master_items[$master_itemid]['master_itemid'];
-				}
-			}
-		}
-
-		// Fill relations array by dependent items (item prototypes).
 		$root_itemids = [];
 
-		foreach ($master_items as $master_item) {
-			if ($master_item['master_itemid'] == 0) {
-				$root_itemids[] = $master_item['itemid'];
+		foreach ($dep_item_links as $itemid => $master_itemid) {
+			if ($master_itemid == 0) {
+				$root_itemids[] = $itemid;
 			}
 		}
 
-		$dependent_items = [];
-
-		foreach ($dep_items as $dep_item) {
-			if (array_key_exists('itemid', $dep_item)) {
-				$dependent_items[$dep_item['master_itemid']][] = $dep_item['itemid'];
-			}
-		}
-
-		$master_itemids = $root_itemids;
-
-		do {
-			$sql = 'SELECT i.master_itemid,i.itemid'.
-				' FROM items i'.
-				' WHERE '.dbConditionId('i.master_itemid', $master_itemids);
-			if ($upd_itemids) {
-				$sql .= ' AND '.dbConditionId('i.itemid', $upd_itemids, true); // Exclude updated items.
-			}
-
-			$db_items = DBselect($sql);
-
-			while ($db_item = DBfetch($db_items)) {
-				$dependent_items[$db_item['master_itemid']][] = $db_item['itemid'];
-			}
-
-			$_master_itemids = $master_itemids;
-			$master_itemids = [];
-
-			foreach ($_master_itemids as $master_itemid) {
-				if (array_key_exists($master_itemid, $dependent_items)) {
-					$master_itemids = array_merge($master_itemids, $dependent_items[$master_itemid]);
-				}
-			}
-		} while ($master_itemids);
-
-		foreach ($dep_items as $dep_item) {
-			if (!array_key_exists('itemid', $dep_item)) {
-				$dependent_items[$dep_item['master_itemid']][] = false;
-			}
-		}
+		$master_item_links = self::getMasterItemLinks($items, $root_itemids, $del_links);
 
 		foreach ($root_itemids as $root_itemid) {
-			self::checkDependencyDepth($dependent_items, $root_itemid);
+			if (self::maxDependencyLevelExceeded($master_item_links, $root_itemid, $links_path)) {
+				[$flags, $key, $master_flags, $master_key, $is_template, $host] =
+					self::getProblemCausedItemData($links_path, $items);
+
+				$error = self::getDependentItemError($flags, $master_flags, $is_template);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $key, $master_key, $host,
+					_('allowed count of dependency levels would be exceeded')
+				));
+			}
+
+			if (self::maxDependentItemCountExceeded($master_item_links, $root_itemid, $links_path)) {
+				[$flags, $key, $master_flags, $master_key, $is_template, $host] =
+					self::getProblemCausedItemData($links_path, $items);
+
+				$error = self::getDependentItemError($flags, $master_flags, $is_template);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $key, $master_key, $host,
+					_('allowed count of dependent items would be exceeded')
+				));
+			}
 		}
 	}
 
 	/**
-	 * Validate depth and amount of elements in the tree of the dependent items.
+	 * Check that master item IDs of given dependent items are valid.
 	 *
-	 * @param array  $dependent_items
-	 * @param string $dependent_items[<master_itemid>][]  List if the dependent item IDs ("false" for new items)
-	 *                                                    by master_itemid.
-	 * @param string $root_itemid                         ID of the item being checked.
-	 * @param int    $level                               Current dependency level.
+	 * @param array $items
+	 * @param array $db_items
 	 *
-	 * @throws APIException for invalid data.
+	 * @throws APIException
 	 */
-	private static function checkDependencyDepth(array $dependent_items, $root_itemid, $level = 0) {
-		$count = 0;
+	private static function checkMasterItems(array $items, array $db_items): void {
+		$master_itemids = array_unique(array_column($items, 'master_itemid'));
+		$flags = $items[key($items)]['flags'];
 
-		if (array_key_exists($root_itemid, $dependent_items)) {
-			if (++$level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'master_itemid', _('maximum number of dependency levels reached')
+		if ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			$db_master_items = DBfetchArrayAssoc(DBselect(
+				'SELECT i.itemid,i.hostid,i.master_itemid,i.flags,id.parent_itemid AS ruleid'.
+				' FROM items i'.
+				' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
+				' WHERE '.dbConditionId('i.itemid', $master_itemids).
+					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE])
+			), 'itemid');
+		}
+		else {
+			$db_master_items = DB::select('items', [
+				'output' => ['itemid', 'hostid', 'master_itemid'],
+				'itemids' => $master_itemids,
+				'filter' => [
+					'flags' => ZBX_FLAG_DISCOVERY_NORMAL
+				],
+				'preservekeys' => true
+			]);
+		}
+
+		foreach ($items as $i => $item) {
+			if (!array_key_exists($item['master_itemid'], $db_master_items)) {
+				$error = $flags == ZBX_FLAG_DISCOVERY_PROTOTYPE
+					? _('an item/item prototype ID is expected')
+					: _('an item ID is expected');
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i + 1).'/master_itemid', $error
 				));
 			}
 
-			foreach ($dependent_items[$root_itemid] as $master_itemid) {
-				$count++;
+			$db_master_item = $db_master_items[$item['master_itemid']];
 
-				if ($master_itemid !== false) {
-					$count += self::checkDependencyDepth($dependent_items, $master_itemid, $level);
+			if (bccomp($db_master_item['hostid'], $item['hostid']) != 0) {
+				$error = $flags == ZBX_FLAG_DISCOVERY_PROTOTYPE
+					? _('cannot be an item/item prototype ID from another host or template')
+					: _('cannot be an item ID from another host or template');
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					'/'.($i + 1).'/master_itemid', $error
+				));
+			}
+
+			if ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE && $db_master_item['ruleid'] != 0) {
+				$item_ruleid = array_key_exists('itemid', $item)
+					? $db_items[$item['itemid']]['ruleid']
+					: $item['ruleid'];
+
+				if (bccomp($db_master_item['ruleid'], $item_ruleid) != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/master_itemid', _('cannot be an item prototype ID from another LLD rule')
+					));
 				}
 			}
+		}
+	}
 
-			if ($count > ZBX_DEPENDENT_ITEM_MAX_COUNT) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-					'master_itemid', _('maximum dependent items count reached')
-				));
+	/**
+	 * Get dependent item links starting from the given dependent items and till the highest dependency level.
+	 *
+	 * @param  array $items
+	 * @param  array $del_links
+	 *
+	 * @return array  Array of the links where each key contain the ID of dependent item and value contain the
+	 *                appropriate ID of the master item.
+	 */
+	private static function getDependentItemLinks(array $items, array $del_links): array {
+		$links = array_column($items, 'master_itemid', 'itemid');
+		$master_itemids = array_flip(array_column($items, 'master_itemid'));
+
+		while ($master_itemids) {
+			$options = [
+				'output' => ['itemid', 'hostid', 'master_itemid'],
+				'itemids' => array_keys($master_itemids)
+			];
+			$db_master_items = DBselect(DB::makeSql('items', $options));
+
+			$master_itemids = [];
+
+			while ($db_master_item = DBfetch($db_master_items)) {
+				if (array_key_exists($db_master_item['itemid'], $del_links)
+						&& bccomp($db_master_item['master_itemid'], $del_links[$db_master_item['itemid']]) == 0) {
+					$links[$db_master_item['itemid']] = 0;
+					continue;
+				}
+
+				$links[$db_master_item['itemid']] = $db_master_item['master_itemid'];
+
+				if ($db_master_item['master_itemid'] != 0) {
+					$master_itemids[$db_master_item['master_itemid']] = true;
+				}
 			}
 		}
 
-		return $count;
+		return $links;
+	}
+
+	/**
+	 * Check that the changed master item IDs of dependent items do not create a circular dependencies.
+	 *
+	 * @param array $items
+	 * @param array $dep_item_links
+	 *
+	 * @throws APIException
+	 */
+	private static function checkCircularDependencies(array $items, array $dep_item_links): void {
+		foreach ($items as $i => $item) {
+			$master_itemid = $item['master_itemid'];
+
+			while ($master_itemid != 0) {
+				if (bccomp($master_itemid, $item['itemid']) == 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/master_itemid', _('circular item dependency is not allowed')
+					));
+				}
+
+				$master_itemid = $dep_item_links[$master_itemid];
+			}
+		}
+	}
+
+	/**
+	 * Get master item links starting from the given master items and till the lowest level master items.
+	 *
+	 * @param  array $items
+	 * @param  array $master_itemids
+	 * @param  array $del_links
+	 *
+	 * @return array  Array of the links where each key contain the ID of master item and value contain the array of
+	 *                appropriate dependent item IDs.
+	 */
+	private static function getMasterItemLinks(array $items, array $master_itemids, array $del_links): array {
+		$ins_links = [];
+		$upd_item_links = [];
+
+		foreach ($items as $item) {
+			if (array_key_exists('itemid', $item)) {
+				$upd_item_links[$item['master_itemid']][] = $item['itemid'];
+			}
+			else {
+				$ins_links[$item['master_itemid']][] = 0;
+			}
+		}
+
+		$links = [];
+
+		do {
+			$options = [
+				'output' => ['master_itemid', 'itemid'],
+				'filter' => [
+					'master_itemid' => $master_itemids
+				]
+			];
+			$db_items = DBselect(DB::makeSql('items', $options));
+
+			$_master_itemids = [];
+
+			while ($db_item = DBfetch($db_items)) {
+				if (array_key_exists($db_item['itemid'], $del_links)
+						&& bccomp($db_item['master_itemid'], $del_links[$db_item['itemid']]) == 0) {
+					continue;
+				}
+
+				$links[$db_item['master_itemid']][] = $db_item['itemid'];
+				$_master_itemids[] = $db_item['itemid'];
+			}
+
+			foreach ($master_itemids as $master_itemid) {
+				if (array_key_exists($master_itemid, $upd_item_links)) {
+					foreach ($upd_item_links[$master_itemid] as $itemid) {
+						$_master_itemids[] = $itemid;
+						$links[$master_itemid][] = $itemid;
+					}
+				}
+			}
+
+			$master_itemids = $_master_itemids;
+		} while ($master_itemids);
+
+		foreach ($ins_links as $master_itemid => $ins_items) {
+			$links[$master_itemid] = array_key_exists($master_itemid, $links)
+				? array_merge($links[$master_itemid], $ins_items)
+				: $ins_items;
+		}
+
+		return $links;
+	}
+
+	/**
+	 * Check whether maximum number of dependency levels is exceeded.
+	 *
+	 * @param array      $master_item_links
+	 * @param string     $master_itemid
+	 * @param array|null $links_path
+	 * @param int        $level
+	 *
+	 * @return bool
+	 */
+	private static function maxDependencyLevelExceeded(array $master_item_links, string $master_itemid,
+			array &$links_path = null, int $level = 0): bool {
+		if (!array_key_exists($master_itemid, $master_item_links)) {
+			return false;
+		}
+
+		if ($links_path === null) {
+			$links_path = [];
+		}
+
+		$links_path[] = $master_itemid;
+		$level++;
+
+		if ($level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
+			return true;
+		}
+
+		foreach ($master_item_links[$master_itemid] as $itemid) {
+			$_links_path = $links_path;
+
+			if (self::maxDependencyLevelExceeded($master_item_links, $itemid, $_links_path, $level)) {
+				$links_path = $_links_path;
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Check whether maximum count of dependent items is exceeded.
+	 *
+	 * @param array      $master_item_links
+	 * @param string     $master_itemid
+	 * @param array|null $links_path
+	 * @param int        $count
+	 *
+	 * @return bool
+	 */
+	private static function maxDependentItemCountExceeded(array $master_item_links, string $master_itemid,
+			array &$links_path = null, int &$count = 0): bool {
+		if (!array_key_exists($master_itemid, $master_item_links)) {
+			return false;
+		}
+
+		if ($links_path === null) {
+			$links_path = [];
+		}
+
+		$links_path[] = $master_itemid;
+		$count += count($master_item_links[$master_itemid]);
+
+		if ($count > ZBX_DEPENDENT_ITEM_MAX_COUNT) {
+			return true;
+		}
+
+		foreach ($master_item_links[$master_itemid] as $itemid) {
+			$_links_path = $links_path;
+
+			if (self::maxDependentItemCountExceeded($master_item_links, $itemid, $_links_path, $count)) {
+				$links_path = $_links_path;
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get data for a dependent item that causes a problem, based on the given path where the problem was detected.
+	 *
+	 * @param array $links_path
+	 * @param array $items
+	 *
+	 * @return array
+	 */
+	private static function getProblemCausedItemData(array $links_path, array $items): array {
+		foreach ($items as $item) {
+			if (in_array($item['master_itemid'], $links_path)) {
+				break;
+			}
+		}
+
+		$master_item_data = DBfetch(DBselect(
+			'SELECT i.flags,i.key_,h.host'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionId('i.itemid', [$item['master_itemid']])
+		));
+
+		$flags = $item['flags'];
+		$key = $item['key_'];
+		$master_flags = $master_item_data['flags'];
+		$master_key = $master_item_data['key_'];
+		$is_template = $item['host_status'] == HOST_STATUS_TEMPLATE;
+		$host = $master_item_data['host'];
+
+		return [$flags, $key, $master_flags, $master_key, $is_template, $host];
+	}
+
+	/**
+	 * Get the error message about problem with dependent item according to given data.
+	 *
+	 * @param int  $flags
+	 * @param int  $master_flags
+	 * @param bool $is_template
+	 *
+	 * @return string
+	 */
+	private static function getDependentItemError(int $flags, int $master_flags, bool $is_template): string {
+		if ($flags == ZBX_FLAG_DISCOVERY_NORMAL) {
+			return $is_template
+				? _('Cannot set dependency for item with key "%1$s" on the master item with key "%2$s" on the template "%3$s": %4$s.')
+				: _('Cannot set dependency for item with key "%1$s" on the master item with key "%2$s" on the host "%3$s": %4$s.');
+		}
+		elseif ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+			if ($master_flags == ZBX_FLAG_DISCOVERY_NORMAL) {
+				return $is_template
+					? _('Cannot set dependency for item prototype with key "%1$s" on the master item with key "%2$s" on the template "%3$s": %4$s.')
+					: _('Cannot set dependency for item prototype with key "%1$s" on the master item with key "%2$s" on the host "%3$s": %4$s.');
+			}
+			else {
+				return $is_template
+					? _('Cannot set dependency for item prototype with key "%1$s" on the master item prototype with key "%2$s" on the template "%3$s": %4$s.')
+					: _('Cannot set dependency for item prototype with key "%1$s" on the master item prototype with key "%2$s" on the host "%3$s": %4$s.');
+			}
+		}
+		elseif ($flags == ZBX_FLAG_DISCOVERY_RULE) {
+			return $is_template
+				? _('Cannot set dependency for LLD rule with key "%1$s" on the master item with key "%2$s" on the template "%3$s": %4$s.')
+				: _('Cannot set dependency for LLD rule with key "%1$s" on the master item with key "%2$s" on the host "%3$s": %4$s.');
+		}
 	}
 
 	/**
@@ -2462,7 +2245,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @return array
 	 */
-	protected function headersStringToArray($headers) {
+	protected static function headersStringToArray(string $headers): array {
 		$result = [];
 
 		foreach (explode("\r\n", $headers) as $header) {
@@ -2483,7 +2266,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @return string
 	 */
-	protected function headersArrayToString(array $headers) {
+	protected static function headersArrayToString(array $headers): string {
 		$result = [];
 
 		foreach ($headers as $k => $v) {
@@ -2491,253 +2274,6 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		return implode("\r\n", $result);
-	}
-
-	/**
-	 * Validate item with type ITEM_TYPE_HTTPAGENT.
-	 *
-	 * @param array $item     Array of item fields.
-	 * @param array $db_item  Array of item database fields for update action or empty array for create action.
-	 *
-	 * @throws APIException for invalid data.
-	 */
-	protected function validateHTTPCheck(array $item, array $db_item) {
-		$rules = [
-			'timeout' => [
-				'type' => API_TIME_UNIT, 'flags' => ($this instanceof CItemPrototype)
-					? API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO
-					: API_NOT_EMPTY | API_ALLOW_USER_MACRO,
-				'in' => '1:'.SEC_PER_MIN
-			],
-			'url' => [
-				'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY,
-				'length' => DB::getFieldLength('items', 'url')
-			],
-			'status_codes' => [
-				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'status_codes')
-			],
-			'follow_redirects' => [
-				'type' => API_INT32,
-				'in' => implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON])
-			],
-			'post_type' => [
-				'type' => API_INT32,
-				'in' => implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML])
-			],
-			'http_proxy' => [
-				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'http_proxy')
-			],
-			'headers' => [
-				'type' => API_STRINGS_UTF8
-			],
-			'retrieve_mode' => [
-				'type' => API_INT32,
-				'in' => implode(',', [
-					HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
-					HTTPTEST_STEP_RETRIEVE_MODE_BOTH
-				])
-			],
-			'request_method' => [
-				'type' => API_INT32,
-				'in' => implode(',', [
-					HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD
-				])
-			],
-			'output_format' => [
-				'type' => API_INT32,
-				'in' => implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON])
-			],
-			'allow_traps' => [
-				'type' => API_INT32,
-				'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])
-			],
-			'ssl_cert_file' => [
-				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_cert_file')
-			],
-			'ssl_key_file' => [
-				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_file')
-			],
-			'ssl_key_password' => [
-				'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')
-			],
-			'verify_peer' => [
-				'type' => API_INT32,
-				'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])
-			],
-			'verify_host' => [
-				'type' => API_INT32,
-				'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])
-			],
-			'authtype' => [
-				'type' => API_INT32,
-				'in' => implode(',', [
-					HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS,
-					HTTPTEST_AUTH_DIGEST
-				])
-			]
-		];
-
-		$data = $item + $db_item;
-
-		if (array_key_exists('authtype', $data)
-				&& ($data['authtype'] == HTTPTEST_AUTH_BASIC || $data['authtype'] == HTTPTEST_AUTH_NTLM
-					|| $data['authtype'] == HTTPTEST_AUTH_KERBEROS || $data['authtype'] == HTTPTEST_AUTH_DIGEST)) {
-			$rules += [
-				'username' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-				'password' => [ 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')]
-			];
-		}
-
-		// Strict validation for 'retrieve_mode' only for create action.
-		if (array_key_exists('request_method', $data) && $data['request_method'] == HTTPCHECK_REQUEST_HEAD
-				&& array_key_exists('retrieve_mode', $item)) {
-			$rules['retrieve_mode']['in'] = (string) HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
-		}
-
-		if (array_key_exists('post_type', $data)
-				&& ($data['post_type'] == ZBX_POSTTYPE_JSON || $data['post_type'] == ZBX_POSTTYPE_XML)) {
-			$rules['posts'] = [
-				'type' => API_STRING_UTF8,
-				'length' => DB::getFieldLength('items', 'posts')
-			];
-		}
-
-		if (array_key_exists('templateid', $data) && $data['templateid']) {
-			$rules['interfaceid'] = [
-				'type' => API_ID, 'flags' => API_REQUIRED
-			];
-
-			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				unset($rules['interfaceid']['flags']);
-			}
-		}
-
-		if (array_key_exists('trapper_hosts', $item) && $item['trapper_hosts'] !== ''
-				&& (!array_key_exists('allow_traps', $data) || $data['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect value for field "%1$s": %2$s.', 'trapper_hosts', _('should be empty'))
-			);
-		}
-
-		// Keep values only for fields with defined validation rules.
-		$data = array_intersect_key($data, $rules);
-
-		if (!CApiInputValidator::validate(['type' => API_OBJECT, 'fields' => $rules], $data, '', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		if (array_key_exists('query_fields', $item)) {
-			if (!is_array($item['query_fields'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', 'query_fields', _('an array is expected'))
-				);
-			}
-
-			foreach ($item['query_fields'] as $v) {
-				if (!is_array($v) || count($v) > 1 || key($v) === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', 'query_fields', _('nonempty key and value pair expected'))
-					);
-				}
-			}
-
-			if (strlen(json_encode($item['query_fields'])) > DB::getFieldLength('items', 'query_fields')) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'query_fields',
-					_('cannot convert to JSON, result value too long')
-				));
-			}
-		}
-
-		if (array_key_exists('headers', $item)) {
-			if (!is_array($item['headers'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', 'headers', _('an array is expected'))
-				);
-			}
-
-			foreach ($item['headers'] as $k => $v) {
-				if (trim($k) === '' || !is_string($v) || $v === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', 'headers', _('nonempty key and value pair expected'))
-					);
-				}
-			}
-		}
-
-		if (array_key_exists('status_codes', $item) && $item['status_codes']) {
-			$ranges_parser = new CRangesParser([
-				'usermacros' => true,
-				'lldmacros' => ($this instanceof CItemPrototype)
-			]);
-
-			if ($ranges_parser->parse($item['status_codes']) != CParser::PARSE_SUCCESS) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value "%1$s" for "%2$s" field.', $item['status_codes'], 'status_codes')
-				);
-			}
-		}
-
-		if ((array_key_exists('post_type', $item) || array_key_exists('posts', $item))
-				&& ($data['post_type'] == ZBX_POSTTYPE_JSON || $data['post_type'] == ZBX_POSTTYPE_XML)) {
-			$posts = array_key_exists('posts', $data) ? $data['posts'] : '';
-			libxml_use_internal_errors(true);
-
-			if ($data['post_type'] == ZBX_POSTTYPE_XML
-					&& simplexml_load_string($posts, null, LIBXML_IMPORT_FLAGS) === false) {
-				$errors = libxml_get_errors();
-				libxml_clear_errors();
-
-				if (!$errors) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', 'posts', _('XML is expected'))
-					);
-				}
-				else {
-					$error = reset($errors);
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', 'posts',
-						_s('%1$s [Line: %2$s | Column: %3$s]', '('.$error->code.') '.trim($error->message),
-						$error->line, $error->column
-					)));
-				}
-			}
-
-			if ($data['post_type'] == ZBX_POSTTYPE_JSON) {
-				if (trim($posts, " \r\n") === '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', 'posts', _('JSON is expected'))
-					);
-				}
-
-				$types = [
-					'usermacros' => true,
-					'macros_n' => [
-						'{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.HOST}', '{HOST.NAME}', '{ITEM.ID}',
-						'{ITEM.KEY}'
-					]
-				];
-
-				if ($this instanceof CItemPrototype) {
-					$types['lldmacros'] = true;
-				}
-
-				$matches = (new CMacrosResolverGeneral)->getMacroPositions($posts, $types);
-
-				$shift = 0;
-
-				foreach ($matches as $pos => $substr) {
-					$posts = substr_replace($posts, '1', $pos + $shift, strlen($substr));
-					$shift = $shift + 1 - strlen($substr);
-				}
-
-				json_decode($posts);
-
-				if (json_last_error()) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', 'posts', _('JSON is expected'))
-					);
-				}
-			}
-		}
 	}
 
 	/**
@@ -2812,162 +2348,254 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Update item tags.
-	 *
-	 * @param array  $items
-	 * @param string $items[]['itemid']
-	 * @param array  $items[]['tags']
-	 * @param string $items[]['tags'][]['tag']
-	 * @param string $items[]['tags'][]['value']
-	 */
-	protected function updateItemTags(array $items): void {
-		$items = array_filter($items, function ($item) {
-			return array_key_exists('tags', $item);
-		});
-
-		// Select tags from database.
-		$db_tags = DBselect(
-			'SELECT itemtagid, itemid, tag, value'.
-			' FROM item_tag'.
-			' WHERE '.dbConditionInt('itemid', array_keys($items))
-		);
-
-		array_walk($items, function (&$item) {
-			$item['db_tags'] = [];
-		});
-
-		while ($db_tag = DBfetch($db_tags)) {
-			$items[$db_tag['itemid']]['db_tags'][] = $db_tag;
-		}
-
-		// Find which tags must be added/deleted.
-		$new_tags = [];
-		$del_tagids = [];
-		foreach ($items as $item) {
-			CArrayHelper::sort($item['tags'], ['tag', 'value']);
-
-			foreach ($item['db_tags'] as $del_tag_key => $tag_delete) {
-				foreach ($item['tags'] as $new_tag_key => $tag_add) {
-					if ($tag_delete['tag'] === $tag_add['tag'] && $tag_delete['value'] === $tag_add['value']) {
-						unset($item['db_tags'][$del_tag_key], $item['tags'][$new_tag_key]);
-						continue 2;
-					}
-				}
-			}
-
-			$del_tagids = array_merge($del_tagids, array_column($item['db_tags'], 'itemtagid'));
-
-			foreach ($item['tags'] as $tag_add) {
-				$tag_add['itemid'] = $item['itemid'];
-				$new_tags[] = $tag_add;
-			}
-		}
-
-		if ($del_tagids) {
-			DB::delete('item_tag', ['itemtagid' => $del_tagids]);
-		}
-		if ($new_tags) {
-			DB::insert('item_tag', $new_tags);
-		}
-	}
-
-	/**
-	 * Record item tags into database.
-	 *
-	 * @param array  $items
-	 * @param array  $items[]['tags']
-	 * @param string $items[]['tags'][]['tag']
-	 * @param string $items[]['tags'][]['value']
-	 * @param int    $items[]['itemid']
-	 */
-	protected function createItemTags(array $items): void {
-		$new_tags = [];
-		foreach ($items as $key => $item) {
-			if (array_key_exists('tags', $item)) {
-				foreach ($item['tags'] as $tag) {
-					$tag['itemid'] = $item['itemid'];
-					$new_tags[] = $tag;
-				}
-			}
-		}
-
-		if ($new_tags) {
-			DB::insert('item_tag', $new_tags);
-		}
-	}
-
-	/**
 	 * Check that valuemap belong to same host as item.
 	 *
-	 * @param array $items
+	 * @param array      $items
+	 * @param array|null $db_items
+	 *
+	 * @throws APIException
 	 */
-	protected function validateValueMaps(array $items): void {
-		$valuemapids_by_hostid = [];
+	protected static function checkValueMaps(array $items, array $db_items = null): void {
+		$item_indexes = [];
 
-		foreach ($items as $item) {
-			if (array_key_exists('valuemapid', $item) && $item['valuemapid'] != 0) {
-				$valuemapids_by_hostid[$item['hostid']][$item['valuemapid']] = true;
+		foreach ($items as $i => $item) {
+			if (array_key_exists('valuemapid', $item) && $item['valuemapid'] != 0
+					&& ($db_items === null
+						|| bccomp($item['valuemapid'], $db_items[$item['itemid']]['valuemapid']) != 0)) {
+				$item_indexes[$item['valuemapid']][] = $i;
 			}
 		}
 
-		$sql_where = [];
-		foreach ($valuemapids_by_hostid as $hostid => $valuemapids) {
-			$sql_where[] = '(vm.hostid='.zbx_dbstr($hostid).' AND '.
-				dbConditionId('vm.valuemapid', array_keys($valuemapids)).')';
+		if (!$item_indexes) {
+			return;
 		}
 
-		if ($sql_where) {
-			$result = DBselect(
-				'SELECT vm.valuemapid,vm.hostid'.
-				' FROM valuemap vm'.
-				' WHERE '.implode(' OR ', $sql_where)
-			);
-			while ($row = DBfetch($result)) {
-				unset($valuemapids_by_hostid[$row['hostid']][$row['valuemapid']]);
+		$options = [
+			'output' => ['valuemapid', 'hostid'],
+			'valuemapids' => array_keys($item_indexes)
+		];
+		$db_valuemaps = DBselect(DB::makeSql('valuemap', $options));
 
-				if (!$valuemapids_by_hostid[$row['hostid']]) {
-					unset($valuemapids_by_hostid[$row['hostid']]);
+		while ($db_valuemap = DBfetch($db_valuemaps)) {
+			foreach ($item_indexes[$db_valuemap['valuemapid']] as $i) {
+				if (bccomp($db_valuemap['hostid'], $items[$i]['hostid']) != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/valuemapid', _('cannot be a value map ID from another host or template')
+					));
 				}
-			}
-
-			if ($valuemapids_by_hostid) {
-				$hostid = key($valuemapids_by_hostid);
-				$valuemapid = key($valuemapids_by_hostid[$hostid]);
-
-				$host_row = DBfetch(DBselect('SELECT h.host FROM hosts h WHERE h.hostid='.zbx_dbstr($hostid)));
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Valuemap with ID "%1$s" is not available on "%2$s".',
-					$valuemapid, $host_row['host']
-				));
 			}
 		}
 	}
 
 	/**
-	 * Normalize preprocessing step parameters.
+	 * Add the internally used fields to the given $db_items.
 	 *
-	 * @param array  $preprocessing                   Preprocessing steps.
-	 * @param string $preprocessing[<num>]['params']  Preprocessing step parameters.
-	 * @param int    $preprocessing[<num>]['type']    Preprocessing step type.
-	 *
-	 * @return array
+	 * @param array $db_items
 	 */
-	protected function normalizeItemPreprocessingSteps(array $preprocessing): array {
-		foreach ($preprocessing as &$step) {
-			$step['params'] = str_replace("\r\n", "\n", $step['params']);
-			$params = explode("\n", $step['params']);
+	protected static function addInternalFields(array &$db_items): void {
+		$result = DBselect(
+			'SELECT i.itemid,i.hostid,i.templateid,i.flags,h.status AS host_status'.
+			' FROM items i,hosts h'.
+			' WHERE i.hostid=h.hostid'.
+				' AND '.dbConditionId('i.itemid', array_keys($db_items))
+		);
 
-			switch ($step['type']) {
-				case ZBX_PREPROC_PROMETHEUS_PATTERN:
-					if (!array_key_exists(2, $params)) {
-						$params[2] = '';
-					}
-					break;
-			}
-
-			$step['params'] = implode("\n", $params);
+		while ($row = DBfetch($result)) {
+			$db_items[$row['itemid']] += $row;
 		}
-		unset($step);
+	}
 
-		return $preprocessing;
+	/**
+	 * Note: instances may override this to add e.g. tags.
+	 *
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	protected static function addAffectedObjects(array $items, array &$db_items): void {
+		self::addAffectedTags($items, $db_items);
+		self::addAffectedPreprocessing($items, $db_items);
+		self::addAffectedParameters($items, $db_items);
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	protected static function addAffectedTags(array $items, array &$db_items): void {
+		$itemids = [];
+
+		foreach ($items as $item) {
+			if (array_key_exists('tags', $item)) {
+				$itemids[] = $item['itemid'];
+				$db_items[$item['itemid']]['tags'] = [];
+			}
+		}
+
+		if (!$itemids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['itemtagid', 'itemid', 'tag', 'value'],
+			'filter' => ['itemid' => $itemids]
+		];
+		$db_item_tags = DBselect(DB::makeSql('item_tag', $options));
+
+		while ($db_item_tag = DBfetch($db_item_tags)) {
+			$db_items[$db_item_tag['itemid']]['tags'][$db_item_tag['itemtagid']] =
+				array_diff_key($db_item_tag, array_flip(['itemid']));
+		}
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	protected static function addAffectedPreprocessing(array $items, array &$db_items): void {
+		$itemids = [];
+
+		foreach ($items as $item) {
+			if (array_key_exists('preprocessing', $item)) {
+				$itemids[] = $item['itemid'];
+				$db_items[$item['itemid']]['preprocessing'] = [];
+			}
+		}
+
+		if (!$itemids) {
+			return;
+		}
+
+		$options = [
+			'output' => [
+				'item_preprocid', 'itemid', 'step', 'type', 'params', 'error_handler', 'error_handler_params'
+			],
+			'filter' => ['itemid' => $itemids]
+		];
+		$db_item_preprocs = DBselect(DB::makeSql('item_preproc', $options));
+
+		while ($db_item_preproc = DBfetch($db_item_preprocs)) {
+			$db_items[$db_item_preproc['itemid']]['preprocessing'][$db_item_preproc['item_preprocid']] =
+				array_diff_key($db_item_preproc, array_flip(['itemid']));
+		}
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 */
+	protected static function addAffectedParameters(array $items, array &$db_items): void {
+		$itemids = [];
+
+		foreach ($items as $item) {
+			$db_type = $db_items[$item['itemid']]['type'];
+
+			if ((array_key_exists('parameters', $item) && $item['type'] == ITEM_TYPE_SCRIPT)
+					|| ($item['type'] != $db_type && $db_type == ITEM_TYPE_SCRIPT)) {
+				$itemids[] = $item['itemid'];
+				$db_items[$item['itemid']]['parameters'] = [];
+			}
+			elseif (array_key_exists('parameters', $item)) {
+				$db_items[$item['itemid']]['parameters'] = [];
+			}
+		}
+
+		if (!$itemids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['item_parameterid', 'itemid', 'name', 'value'],
+			'filter' => ['itemid' => $itemids]
+		];
+		$db_item_parameters = DBselect(DB::makeSql('item_parameter', $options));
+
+		while ($db_item_parameter = DBfetch($db_item_parameters)) {
+			$db_items[$db_item_parameter['itemid']]['parameters'][$db_item_parameter['item_parameterid']] =
+				array_diff_key($db_item_parameter, array_flip(['itemid']));
+		}
+	}
+
+	/**
+	 * Add the inherited items of the given items to the given item array.
+	 *
+	 * @param array $db_items
+	 */
+	public static function addInheritedItems(array &$db_items): void {
+		$templateids = array_keys($db_items);
+
+		do {
+			$options = [
+				'output' => ['itemid', 'name'],
+				'filter' => ['templateid' => $templateids]
+			];
+			$result = DBselect(DB::makeSql('items', $options));
+
+			$templateids = [];
+
+			while ($row = DBfetch($result)) {
+				if (!array_key_exists($row['itemid'], $db_items)) {
+					$templateids[] = $row['itemid'];
+
+					$db_items[$row['itemid']] = $row;
+				}
+			}
+		} while ($templateids);
+	}
+
+	/**
+	 * Reset the MIN and MAX values of Y axis in the graphs, if such are calculated using the given items.
+	 *
+	 * @param array $del_itemids
+	 */
+	protected static function resetGraphsYAxis(array $del_itemids): void {
+		DB::update('graphs', [
+			'values' => [
+				'ymin_type' => GRAPH_YAXIS_TYPE_CALCULATED,
+				'ymin_itemid' => null
+			],
+			'where' => ['ymin_itemid' => $del_itemids]
+		]);
+
+		DB::update('graphs', [
+			'values' => [
+				'ymax_type' => GRAPH_YAXIS_TYPE_CALCULATED,
+				'ymax_itemid' => null
+			],
+			'where' => ['ymax_itemid' => $del_itemids]
+		]);
+	}
+
+	/**
+	 * Delete triggers and trigger prototypes, which contain the given items in the expression.
+	 *
+	 * @param array $del_itemids
+	 */
+	protected static function deleteAffectedTriggers(array $del_itemids): void {
+		$result = DBselect(
+			'SELECT DISTINCT f.triggerid,t.flags'.
+			' FROM functions f,triggers t'.
+			' WHERE f.triggerid=t.triggerid'.
+				' AND '.dbConditionInt('f.itemid', $del_itemids)
+		);
+
+		$del_trigger_prototypeids = [];
+		$del_triggerids = [];
+
+		while ($row = DBfetch($result)) {
+			if ($row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$del_trigger_prototypeids[] = $row['triggerid'];
+			}
+			else {
+				$del_triggerids[] = $row['triggerid'];
+			}
+		}
+
+		if ($del_triggerids) {
+			CTriggerManager::delete($del_triggerids);
+		}
+
+		if ($del_trigger_prototypeids) {
+			CTriggerPrototypeManager::delete($del_trigger_prototypeids);
+		}
 	}
 }

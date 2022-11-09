@@ -27,7 +27,7 @@ if ($data['uncheck']) {
 	uncheckTableRows('userrole');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('User roles'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERROLE_LIST))
 	->setControls(
@@ -130,5 +130,6 @@ $form->addItem([
 	], 'userrole')
 ]);
 
-$widget->addItem($form);
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

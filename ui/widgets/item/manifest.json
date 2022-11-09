@@ -1,0 +1,25 @@
+{
+	"manifest_version": 2.0,
+	"id": "item",
+	"type": "widget",
+	"name": "Item value",
+	"namespace": "Item",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"template_support": true,
+		"size": {
+			"width": 4,
+			"height": 3
+		},
+		"js_class": "CWidgetItem"
+	},
+	"actions": {
+		"widget.item.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

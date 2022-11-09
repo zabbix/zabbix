@@ -25,7 +25,7 @@
 
 $this->includeJsFile('administration.regex.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Regular expressions'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_REGEX_EDIT));
@@ -39,7 +39,7 @@ if ($data['regexid'] != 0) {
 $form = (new CForm())
 	->setId('regex')
 	->setAction($action->getUrl())
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 $table = (new CTable())
 	->setId('tbl_expr')
@@ -172,6 +172,6 @@ else {
 
 $form->addItem($reg_exp_view);
 
-$widget
+$html_page
 	->addItem($form)
 	->show();

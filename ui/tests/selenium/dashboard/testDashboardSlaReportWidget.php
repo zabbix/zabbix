@@ -1951,16 +1951,17 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					]
 				]
 			],
+			// Months are excluded as strtotime() calculates month substraction incorrectly on he last days on the month.
 			[
 				[
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'From' => 'now-1d-1w-1M-1y',
+						'From' => 'now-1d-1w-1y',
 						'Show periods' => 3
 					],
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
-						'From' => 'today - 1 day - 1 week - 1 month - 1 year'
+						'From' => 'today - 1 day - 1 week - 1 year'
 					]
 				]
 			],
@@ -2030,16 +2031,17 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					]
 				]
 			],
+			// Months are excluded as strtotime() calculates month substraction incorrectly on he last days on the month.
 			[
 				[
 					'fields' => [
 						'SLA' => 'SLA Daily',
-						'To' => 'now-1d-1w-1M-1y',
+						'To' => 'now-1d-1w-1y',
 						'Show periods' => 3
 					],
 					'reporting_period' => 'Daily',
 					'equivalent_timestamps' => [
-						'To' => 'today - 1 day - 1 week - 1 month - 1 year'
+						'To' => 'now - 1 day - 1 week - 1 year'
 					]
 				]
 			],
@@ -2283,8 +2285,6 @@ class testDashboardSlaReportWidget extends testSlaReport {
 	private function getWidgetDateTimeData($data) {
 		// By default the last 20 periods are displayed.
 		$show_periods = (array_key_exists('Show periods', $data['fields'])) ? $data['fields']['Show periods'] : 20;
-
-
 
 		if (array_key_exists('To', $data['fields'])) {
 			$to_date = $data['fields']['To'];

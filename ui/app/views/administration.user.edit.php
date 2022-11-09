@@ -29,7 +29,7 @@ $this->includeJsFile(($data['action'] === 'user.edit')
 	: 'administration.userprofile.edit.js.php'
 );
 
-$widget = new CWidget();
+$html_page = new CHtmlPage();
 
 if ($data['action'] === 'user.edit') {
 	$widget_name = _('Users');
@@ -40,13 +40,14 @@ else {
 	$widget_name .= ($data['name'] !== '' || $data['surname'] !== '')
 		? $data['name'].' '.$data['surname']
 		: $data['username'];
-	$widget->setTitleSubmenu(getUserSettingsSubmenu());
+	$html_page->setTitleSubmenu(getUserSettingsSubmenu());
 	$doc_url = CDocHelper::USERS_USERPROFILE_EDIT;
 }
 
-$widget
+$html_page
 	->setTitle($widget_name)
 	->setDocUrl(CDocHelper::getUrl($doc_url));
+
 $tabs = new CTabView();
 
 if ($data['form_refresh'] == 0) {
@@ -57,7 +58,7 @@ if ($data['form_refresh'] == 0) {
 $user_form = (new CForm())
 	->setId('user-form')
 	->setName('user_form')
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['action'])
 	->addVar('userid', $data['userid']);
 
@@ -615,11 +616,12 @@ if ($data['action'] === 'user.edit') {
 		else {
 			$elements = [];
 
-			foreach ($data['modules'] as $moduleid => $module) {
-				$elements[] = (new CSpan($module['id']))->addClass(
-					CRoleHelper::checkAccess('modules.module.'.$moduleid, $data['roleid'])
-						? ZBX_STYLE_STATUS_GREEN
-						: ZBX_STYLE_STATUS_GREY
+			foreach ($data['modules'] as $moduleid => $module_name) {
+				$elements[] = (new CSpan($module_name))->addClass(
+					array_key_exists($moduleid, $data['disabled_moduleids'])
+							|| $data['modules_rules'][$moduleid] == MODULE_STATUS_DISABLED
+						? ZBX_STYLE_STATUS_GREY
+						: ZBX_STYLE_STATUS_GREEN
 				);
 			}
 
@@ -824,6 +826,6 @@ else {
 
 // Append tab to form.
 $user_form->addItem($tabs);
-$widget
+$html_page
 	->addItem($user_form)
 	->show();

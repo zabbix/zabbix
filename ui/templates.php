@@ -333,7 +333,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				throw new Exception();
 			}
 
-			if (!copyItems($cloneTemplateId, $input_templateid, true)) {
+			if (!copyItemsToHosts('templateids', [$cloneTemplateId], true, [$input_templateid])) {
 				throw new Exception();
 			}
 

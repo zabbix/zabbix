@@ -249,8 +249,8 @@ static int	set_object_names(void)
 	if (TRUE == refresh)
 		ppsd.lastrefresh_objects = time(NULL);
 
-	if (NULL == (p_eng = names_eng = get_all_counter_names(HKEY_PERFORMANCE_TEXT, L"Counter")) ||
-			NULL == (p_loc = names_loc = get_all_counter_names(HKEY_PERFORMANCE_NLSTEXT, L"Counter")))
+	if (NULL == (p_eng = names_eng = zbx_get_all_counter_names(HKEY_PERFORMANCE_TEXT, L"Counter")) ||
+			NULL == (p_loc = names_loc = zbx_get_all_counter_names(HKEY_PERFORMANCE_NLSTEXT, L"Counter")))
 	{
 		goto out;
 	}
@@ -448,7 +448,7 @@ int	init_perf_collector(zbx_threadedness_t threadedness, char **error)
 	ppsd.lastrefresh_objects = 0;
 	ppsd.lastupdate_names = 0;
 
-	if (SUCCEED != init_builtin_counter_indexes())
+	if (SUCCEED != zbx_init_builtin_counter_indexes())
 	{
 		*error = zbx_strdup(*error, "cannot initialize built-in counter indexes");
 		goto out;
@@ -680,7 +680,7 @@ out:
 	if (NULL != counterpath)
 	{
 		/* request counter value directly from Windows performance counters */
-		PDH_STATUS pdh_status = calculate_counter_value(__func__, counterpath, perfs->lang, value);
+		PDH_STATUS pdh_status = zbx_calculate_counter_value(__func__, counterpath, perfs->lang, value);
 
 		if (PDH_NOT_IMPLEMENTED == pdh_status)
 			*error = zbx_strdup(*error, "Counter is not supported for this Microsoft Windows version");
@@ -756,7 +756,7 @@ out:
 	if (SUCCEED != ret && NULL != perfs)
 	{
 		/* request counter value directly from Windows performance counters */
-		if (ERROR_SUCCESS == calculate_counter_value(__func__, counterpath, lang, value))
+		if (ERROR_SUCCESS == zbx_calculate_counter_value(__func__, counterpath, lang, value))
 			ret = SUCCEED;
 	}
 
