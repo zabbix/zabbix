@@ -28,7 +28,7 @@
 if ($data['table'] === 'operation') {
 	// Create operations table.
 	$operations_table = (new CTable())
-		->setId('operation-table')
+		->setId('op-table')
 		->setAttribute('style', 'width: 100%;');
 
 	if (!array_key_exists('action', $data)) {
@@ -169,7 +169,7 @@ if ($data['table'] === 'operation') {
 // Create operations recovery table.
 elseif ($data['table'] === 'recovery') {
 	$operations_table = (new CTable())
-		->setId('recovery-table')
+		->setId('rec-table')
 		->setAttribute('style', 'width: 100%;');
 
 // todo : pass data in 'action' array, so that the code can be cleaned a bit
@@ -290,7 +290,7 @@ elseif ($data['table'] === 'update') {
 	}
 
 	$operations_table = (new CTable())
-			->setId('update-table')
+			->setId('upd-table')
 			->setAttribute('style', 'width: 100%;')
 			->setHeader([_('Details'), _('Action')]);
 
