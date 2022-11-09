@@ -20,6 +20,7 @@
 #ifndef ZABBIX_ALERT_H
 #define ZABBIX_ALERT_H
 
+#include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 
@@ -40,11 +41,13 @@ typedef struct
 }
 zbx_alerter_dispatch_result_t;
 
+ZBX_PTR_VECTOR_DECL(alerter_dispatch_result, zbx_alerter_dispatch_result_t *)
+
 typedef struct
 {
-	zbx_ipc_async_socket_t	alerter;
-	int			total_num;
-	zbx_vector_ptr_t	results;
+	zbx_ipc_async_socket_t			alerter;
+	int					total_num;
+	zbx_vector_alerter_dispatch_result_t	results;
 }
 zbx_alerter_dispatch_t;
 

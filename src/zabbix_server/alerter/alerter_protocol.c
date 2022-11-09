@@ -19,6 +19,7 @@
 
 #include "alerter_protocol.h"
 
+#include "alert.h"
 #include "log.h"
 #include "zbxserialize.h"
 
@@ -1167,7 +1168,7 @@ int	zbx_alerter_begin_dispatch(zbx_alerter_dispatch_t *dispatch, const char *sub
 		goto out;
 	}
 
-	zbx_vector_ptr_create(&dispatch->results);
+	zbx_vector_alerter_dispatch_result_create(&dispatch->results);
 	dispatch->total_num = 0;
 	ret = SUCCEED;
 
@@ -1306,7 +1307,7 @@ int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, char **error)
 					value = NULL;
 				}
 
-				zbx_vector_ptr_append(&dispatch->results, result);
+				zbx_vector_alerter_dispatch_result_append(&dispatch->results, result);
 
 				zbx_free(value);
 				zbx_free(errmsg);
@@ -1330,18 +1331,11 @@ out:
 	return ret;
 }
 
-void	zbx_alerter_dispatch_result_free(zbx_alerter_dispatch_result_t *result)
-{
-	zbx_free(result->recipient);
-	zbx_free(result->info);
-	zbx_free(result);
-}
-
 void	zbx_alerter_clear_dispatch(zbx_alerter_dispatch_t *dispatch)
 {
 	if (SUCCEED == zbx_ipc_async_socket_connected(&dispatch->alerter))
 		zbx_ipc_async_socket_close(&dispatch->alerter);
 
-	zbx_vector_ptr_clear_ext(&dispatch->results, (zbx_clean_func_t)zbx_alerter_dispatch_result_free);
-	zbx_vector_ptr_destroy(&dispatch->results);
+	zbx_vector_alerter_dispatch_result_clear_ext(&dispatch->results, zbx_alerter_dispatch_result_free);
+	zbx_vector_alerter_dispatch_result_destroy(&dispatch->results);
 }
