@@ -27,12 +27,18 @@ class CControllerPopupActionOperationGet extends CController {
 	}
 
 	protected function checkInput() {
+		$eventsource = [
+			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+			EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+		];
+
 		$fields = [
 			'esc_period' =>			'db actions.esc_period|not_empty',
 			'operations'=>			'array',
 			'recovery_operations'=>	'array',
 			'update_operations'=>	'array',
-			'new_operation' =>		'array'
+			'new_operation' =>		'array',
+			'eventsource' =>		'required|db actions.eventsource|in '.implode(',', $eventsource)
 		];
 
 		$ret = $this->validateInput($fields);
@@ -57,6 +63,7 @@ class CControllerPopupActionOperationGet extends CController {
 
 	protected function doAction() {
 		$data['esc_period'] = $this->getInput('esc_period');
+		$eventsource = $this->getInput('eventsource');
 
 		$new_operation = array_key_exists('operation', $this->getInput('new_operation'))
 			? $this->getInput('new_operation')['operation']
@@ -92,50 +99,17 @@ class CControllerPopupActionOperationGet extends CController {
 			}
 		}
 
-		foreach ($data['operations'] as &$operation) {
-			if (preg_match('/\bscriptid\b/', $operation['operationtype'])) {
-				$operation['opcommand']['scriptid'] = preg_replace('[\D]', '', $operation['operationtype']);
-				$operationtype = OPERATION_TYPE_COMMAND;
-
-				if (array_key_exists('opcommand_hst', $operation)) {
-					foreach ($operation['opcommand_hst'] as $host) {
-						if (is_array($host['hostid']) && array_key_exists('current_host', $host['hostid'])) {
-							$operation['opcommand_hst'][0]['hostid'] = 0;
-						}
-					}
-				}
-			}
-			else {
-				$operationtype = (int)preg_replace('[\D]', '', $operation['operationtype']);
-			}
-
-			if (array_key_exists('opmessage', $operation)) {
-				if (!array_key_exists('default_msg', $operation['opmessage'])
-					&& ($operationtype === OPERATION_TYPE_MESSAGE
-						|| $operationtype === OPERATION_TYPE_RECOVERY_MESSAGE
-						|| $operationtype === OPERATION_TYPE_UPDATE_MESSAGE)) {
-					$operation['opmessage']['default_msg'] = '1';
-
-					unset($operation['opmessage']['subject'], $operation['opmessage']['message']);
-				}
-			}
-
-			$operation['operationtype'] = $operationtype;
-		}
-		unset($operation);
-
 		$action = [
 			'name' => '',
 			'esc_period' => DB::getDefault('actions', 'esc_period'),
-			'eventsource' => EVENT_SOURCE_TRIGGERS,
+			'eventsource' => $eventsource,
 			'operations' => $operations,
 			'recovery_operations' => [],
 			'update_operations' => [],
 		];
 
 		foreach ($data['operations'] as &$operation) {
-			$eventsource = $operation['eventsource'];
-			$action['eventsource'] = $eventsource;
+			$operationtype = $operation['operationtype'];
 
 			if (!$new_operation) {
 				$action['operations'] = [$operation];
@@ -160,15 +134,15 @@ class CControllerPopupActionOperationGet extends CController {
 		foreach ($data['operations'] as $operation) {
 			if ($operation['recovery'] == ACTION_OPERATION) {
 				$data['action']['operations'][] = $operation;
-				sortOperations($operation['eventsource'], $data['action']['operations']);
+				sortOperations($eventsource, $data['action']['operations']);
 			}
 			if ($operation['recovery'] == ACTION_RECOVERY_OPERATION) {
 				$data['action']['recovery_operations'][] = $operation;
-				sortOperations($operation['eventsource'], $data['action']['recovery_operations']);
+				sortOperations($eventsource, $data['action']['recovery_operations']);
 			}
 			if ($operation['recovery'] == ACTION_UPDATE_OPERATION) {
 				$data['action']['update_operations'][] = $operation;
-				sortOperations($operation['eventsource'], $data['action']['udpate_operations']);
+				sortOperations($eventsource, $data['action']['udpate_operations']);
 			}
 		}
 
@@ -179,7 +153,6 @@ class CControllerPopupActionOperationGet extends CController {
 	}
 
 	protected function getData(int $operationtype, array $action, int $type): array {
-		// todo : move this functionality to different function. because duplicates code from action edit controller
 		$data = getActionOperationData($action, $type);
 		$operation_values = getOperationDataValues($data);
 		$result = [];
@@ -205,6 +178,7 @@ class CControllerPopupActionOperationGet extends CController {
 				$operation =  $action[0]['update_operations'][0];
 				break;
 		}
+		$eventsource = $this->getInput('eventsource');
 
 		// Format the output.
 		if ($type == ACTION_OPERATION) {
@@ -249,7 +223,7 @@ class CControllerPopupActionOperationGet extends CController {
 					break;
 
 				case OPERATION_TYPE_COMMAND:
-					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
+					if ($eventsource == EVENT_SOURCE_SERVICE) {
 						$result['type'][] = _s('Run script "%1$s" on Zabbix server', $scripts[$operation['opcommand']['scriptid']]['name']);
 						break;
 					}
@@ -400,7 +374,7 @@ class CControllerPopupActionOperationGet extends CController {
 					break;
 
 				case OPERATION_TYPE_COMMAND:
-					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
+					if ($eventsource == EVENT_SOURCE_SERVICE) {
 						$result['type'][] = _s('Run script "%1$s" on Zabbix server', $scripts[$operation['opcommand']['scriptid']]['name']);
 						break;
 					}

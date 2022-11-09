@@ -97,7 +97,8 @@ window.action_edit_popup = new class {
 				'operations': fields.operations,
 				'recovery_operations': fields.recovery_operations,
 				'update_operations': fields.update_operations,
-				'new_operation': new_operation
+				'new_operation': new_operation,
+				'eventsource': this.eventsource
 			})
 		})
 			.then((response) => response.json())

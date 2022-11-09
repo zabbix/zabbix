@@ -175,6 +175,8 @@ class CControllerPopupActionEdit extends CController {
 				$operation['details'] = $this->getData($operation['operationtype'], [$action], ACTION_UPDATE_OPERATION);
 				$operation['recovery'] = ACTION_UPDATE_OPERATION;
 			}
+			unset($operation);
+
 		}
 		else {
 			$data = [
@@ -206,6 +208,7 @@ class CControllerPopupActionEdit extends CController {
 
 	protected function getData(int $operationtype, array $action, int $type): array {
 		$data = getActionOperationData($action, $type);
+		$eventsource = $action[0]['eventsource'];
 
 		$operation_values = getOperationDataValues($data);
 		$result = [];
@@ -275,7 +278,7 @@ class CControllerPopupActionEdit extends CController {
 					break;
 
 				case OPERATION_TYPE_COMMAND:
-					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
+					if ($eventsource == EVENT_SOURCE_SERVICE) {
 						$result['type'][] = _s('Run script "%1$s" on Zabbix server', $scripts[$operation['opcommand']['scriptid']]['name']);
 						break;
 					}
@@ -426,7 +429,7 @@ class CControllerPopupActionEdit extends CController {
 					break;
 
 				case OPERATION_TYPE_COMMAND:
-					if ($operation['eventsource'] == EVENT_SOURCE_SERVICE) {
+					if ($eventsource == EVENT_SOURCE_SERVICE) {
 						$result['type'][] = _s('Run script "%1$s" on Zabbix server', $scripts[$operation['opcommand']['scriptid']]['name']);
 						break;
 					}
