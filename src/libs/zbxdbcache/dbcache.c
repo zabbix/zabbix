@@ -2992,7 +2992,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 			DCconfig_get_items_by_itemids_partial(items, itemids.values, errcodes, history_num,
 					item_retrieve_mode);
 
-			DCmass_prepare_history(history, &itemids, items, errcodes, history_num, &item_diff,
+			DCmass_prepare_history(history, items, errcodes, history_num, &item_diff,
 					&inventory_values, compression_age, &proxy_subscribtions);
 
 			if (FAIL != (ret = DBmass_add_history(history, history_num)))
