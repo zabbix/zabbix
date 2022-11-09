@@ -465,7 +465,7 @@ static int	DBpatch_3010024_validate_action(zbx_uint64_t actionid, int eventsourc
 	DB_RESULT	result;
 	int		conditiontype, ret = ZBX_3010024_ACTION_DISABLE, value;
 
-	/* evaltype: 0 - ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR, 1 - ZBX_ACTION_CONDITION_EVAL_TYPE_AND */
+	/* evaltype: 0 - ZBX_CONDITION_EVAL_TYPE_AND_OR, 1 - ZBX_CONDITION_EVAL_TYPE_AND */
 	if (evaltype != 0 && evaltype != 1)
 		return ret;
 
@@ -1045,7 +1045,7 @@ static int	DBpatch_3010026(void)
 		index = conditionids.values_num;
 		DBpatch_3010026_get_conditionids(actionid, row[4], eventsource, &conditionids);
 
-		/* evaltype: 3 - ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION */
+		/* evaltype: 3 - ZBX_CONDITION_EVAL_TYPE_EXPRESSION */
 		if (3 != evaltype)
 			continue;
 

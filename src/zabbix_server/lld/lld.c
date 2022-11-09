@@ -116,7 +116,7 @@ static void	lld_filter_init(lld_filter_t *filter)
 {
 	zbx_vector_ptr_create(&filter->conditions);
 	filter->expression = NULL;
-	filter->evaltype = ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR;
+	filter->evaltype = ZBX_CONDITION_EVAL_TYPE_AND_OR;
 }
 
 /******************************************************************************
@@ -195,7 +195,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, const 
 		;
 	DBfree_result(result);
 
-	if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
+	if (ZBX_CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
 		zbx_vector_ptr_sort(&filter->conditions, lld_condition_compare_by_macro);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -307,7 +307,7 @@ static int	filter_evaluate_and_or_andor(const lld_filter_t *filter, const struct
 
 		switch (filter->evaltype)
 		{
-			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR:
+			case ZBX_CONDITION_EVAL_TYPE_AND_OR:
 				if (NULL == lastmacro)
 				{
 					zbx_chrcpy_alloc(&expression, &expression_alloc, &expression_offset, '(');
@@ -321,8 +321,8 @@ static int	filter_evaluate_and_or_andor(const lld_filter_t *filter, const struct
 
 				lastmacro = condition->macro;
 				break;
-			case ZBX_ACTION_CONDITION_EVAL_TYPE_AND:
-			case ZBX_ACTION_CONDITION_EVAL_TYPE_OR:
+			case ZBX_CONDITION_EVAL_TYPE_AND:
+			case ZBX_CONDITION_EVAL_TYPE_OR:
 				if (0 != i)
 				{
 					zbx_chrcpy_alloc(&expression, &expression_alloc, &expression_offset, ' ');
@@ -351,7 +351,7 @@ static int	filter_evaluate_and_or_andor(const lld_filter_t *filter, const struct
 
 		if (filter->conditions.values_num == i + 1)
 		{
-			if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
+			if (ZBX_CONDITION_EVAL_TYPE_AND_OR == filter->evaltype)
 				zbx_chrcpy_alloc(&expression, &expression_alloc, &expression_offset, ')');
 
 			expression_offset++;
@@ -485,11 +485,11 @@ static int	filter_evaluate(const lld_filter_t *filter, const struct zbx_json_par
 
 	switch (filter->evaltype)
 	{
-		case ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR:
-		case ZBX_ACTION_CONDITION_EVAL_TYPE_AND:
-		case ZBX_ACTION_CONDITION_EVAL_TYPE_OR:
+		case ZBX_CONDITION_EVAL_TYPE_AND_OR:
+		case ZBX_CONDITION_EVAL_TYPE_AND:
+		case ZBX_CONDITION_EVAL_TYPE_OR:
 			return filter_evaluate_and_or_andor(filter, jp_row, lld_macro_paths, info);
-		case ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION:
+		case ZBX_CONDITION_EVAL_TYPE_EXPRESSION:
 			return filter_evaluate_expression(filter, jp_row, lld_macro_paths, info);
 	}
 
@@ -540,7 +540,7 @@ static int	lld_override_conditions_load(zbx_vector_ptr_t *overrides, const zbx_v
 	{
 		override = (lld_override_t *)overrides->values[i];
 
-		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == override->filter.evaltype)
+		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == override->filter.evaltype)
 			zbx_vector_ptr_sort(&override->filter.conditions, lld_condition_compare_by_macro);
 	}
 
