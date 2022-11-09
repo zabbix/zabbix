@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T11:13:42Z'
+  date: '2022-10-27T11:49:17Z'
   template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: fac50638cb77468598c29a6a47520c24
-      template: 'MikroTik RB1100AHx4 Dude Edition SNMP'
-      name: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+      template: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
+      name: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
       description: |
         The template for monitoring Ethernet router MikroTik RB1100AHx4 Dude Edition.
         Powerful 1U rackmount router with 13x Gigabit Ethernet ports, 60GB M.2 drive for Dude database
@@ -43,7 +43,7 @@ zabbix_export:
           triggers:
             -
               uuid: c093758529824015be966f41e9e27757
-              expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/icmpping,#3)=0'
+              expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -69,14 +69,14 @@ zabbix_export:
           triggers:
             -
               uuid: 05873e7bbc8347f48daf707af0a3a1df
-              expression: 'min(/MikroTik RB1100AHx4 Dude Edition SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik RB1100AHx4 Dude Edition SNMP/icmppingloss,5m)<100'
+              expression: 'min(/MikroTik RB1100AHx4 Dude Edition by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik RB1100AHx4 Dude Edition by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/icmpping,#3)=0'
+                  expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -102,17 +102,17 @@ zabbix_export:
           triggers:
             -
               uuid: f0a1435b054f46a3a496ab8c92591d96
-              expression: 'avg(/MikroTik RB1100AHx4 Dude Edition SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/MikroTik RB1100AHx4 Dude Edition by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/MikroTik RB1100AHx4 Dude Edition SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik RB1100AHx4 Dude Edition SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/MikroTik RB1100AHx4 Dude Edition by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/MikroTik RB1100AHx4 Dude Edition by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/icmpping,#3)=0'
+                  expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -206,7 +206,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9f571e3e7d7b4025a62cb4d61684a63f
-              expression: 'last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.hw.firmware,#1)<>last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.hw.firmware,#2) and length(last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.hw.firmware))>0'
+              expression: 'last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.hw.firmware,#1)<>last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.hw.firmware,#2) and length(last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.hw.firmware))>0'
               name: 'Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -262,7 +262,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6c56d13df5a84f8c81e3b11b5979fe2f
-              expression: 'last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.hw.serialnumber,#1)<>last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.hw.serialnumber,#2) and length(last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.hw.serialnumber))>0'
+              expression: 'last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.hw.serialnumber,#1)<>last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.hw.serialnumber,#2) and length(last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.hw.serialnumber))>0'
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
@@ -349,7 +349,7 @@ zabbix_export:
           triggers:
             -
               uuid: 64b6467c681f43f4954a24d7bc326588
-              expression: 'last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.name,#1)<>last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.name,#2) and length(last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.name))>0'
+              expression: 'last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.name,#1)<>last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.name,#2) and length(last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -432,7 +432,7 @@ zabbix_export:
           triggers:
             -
               uuid: cbc5e573f7ff4d4186782e18abb18323
-              expression: 'last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.sw.os[mtxrLicVersion.0],#2) and length(last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.sw.os[mtxrLicVersion.0]))>0'
+              expression: 'last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.sw.os[mtxrLicVersion.0],#1)<>last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.sw.os[mtxrLicVersion.0],#2) and length(last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.sw.os[mtxrLicVersion.0]))>0'
               name: 'Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
@@ -440,7 +440,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'System name has changed'
-                  expression: 'last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.name,#1)<>last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.name,#2) and length(last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.name))>0'
+                  expression: 'last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.name,#1)<>last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.name,#2) and length(last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.name))>0'
               tags:
                 -
                   tag: scope
@@ -510,7 +510,7 @@ zabbix_export:
           triggers:
             -
               uuid: 41dc7494d2d04e2e8fd9f31d744cdf94
-              expression: 'min(/MikroTik RB1100AHx4 Dude Edition SNMP/vm.memory.util[memoryUsedPercentage.Memory],5m)>{$MEMORY.UTIL.MAX}'
+              expression: 'min(/MikroTik RB1100AHx4 Dude Edition by SNMP/vm.memory.util[memoryUsedPercentage.Memory],5m)>{$MEMORY.UTIL.MAX}'
               name: 'High memory utilization'
               event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
@@ -546,7 +546,7 @@ zabbix_export:
           triggers:
             -
               uuid: 289a3d4d39e14627bb26817d21221c05
-              expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -554,7 +554,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/icmpping,#3)=0'
+                  expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -588,7 +588,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 40af64475bf54290b74ac2ed6f3183f2
-                  expression: 'min(/MikroTik RB1100AHx4 Dude Edition SNMP/system.cpu.util[hrProcessorLoad.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  expression: 'min(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.cpu.util[hrProcessorLoad.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
                   name: '#{#SNMPINDEX}: High CPU utilization'
                   event_name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -609,7 +609,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+                    host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
                     key: 'system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]'
         -
           uuid: 3bcc104afb9a4ca29c0fe55a88484b08
@@ -647,9 +647,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a1116b45b6e341dabc44b226c4741f97
-                  expression: 'avg(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
+                  expression: 'avg(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                  recovery_expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
                   name: 'CPU: Temperature is above critical threshold'
                   event_name: 'CPU: Temperature is above critical threshold: >{$TEMP_CRIT:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -664,9 +664,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 7b61f191e2634044a81981627fb52483
-                  expression: 'avg(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}'
+                  expression: 'avg(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
+                  recovery_expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"CPU"}-3'
                   name: 'CPU: Temperature is above warning threshold'
                   event_name: 'CPU: Temperature is above warning threshold: >{$TEMP_WARN:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -675,8 +675,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'CPU: Temperature is above critical threshold'
-                      expression: 'avg(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
-                      recovery_expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
+                      expression: 'avg(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}'
+                      recovery_expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"CPU"}-3'
                   tags:
                     -
                       tag: scope
@@ -686,9 +686,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: c62859952edc45fd8c09a267e6badab9
-                  expression: 'avg(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
+                  expression: 'avg(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
+                  recovery_expression: 'min(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"CPU"}+3'
                   name: 'CPU: Temperature is too low'
                   event_name: 'CPU: Temperature is too low: <{$TEMP_CRIT_LOW:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -738,9 +738,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9980a1f6561c4b16935e204dfdf67c65
-                  expression: 'avg(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
+                  expression: 'avg(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
+                  recovery_expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
                   name: 'Device: Temperature is above critical threshold'
                   event_name: 'Device: Temperature is above critical threshold: >{$TEMP_CRIT:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -755,9 +755,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: c0be5c2bae7f45e780addd984a3f77c4
-                  expression: 'avg(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Device"}'
+                  expression: 'avg(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Device"}-3'
+                  recovery_expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_WARN:"Device"}-3'
                   name: 'Device: Temperature is above warning threshold'
                   event_name: 'Device: Temperature is above warning threshold: >{$TEMP_WARN:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -766,8 +766,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'Device: Temperature is above critical threshold'
-                      expression: 'avg(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
-                      recovery_expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
+                      expression: 'avg(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Device"}'
+                      recovery_expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"Device"}-3'
                   tags:
                     -
                       tag: scope
@@ -777,9 +777,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: ee368004b1f24293b8162d78b456a6d0
-                  expression: 'avg(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Device"}'
+                  expression: 'avg(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Device"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/MikroTik RB1100AHx4 Dude Edition SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Device"}+3'
+                  recovery_expression: 'min(/MikroTik RB1100AHx4 Dude Edition by SNMP/sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"Device"}+3'
                   name: 'Device: Temperature is too low'
                   event_name: 'Device: Temperature is too low: <{$TEMP_CRIT_LOW:"Device"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -836,7 +836,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 6b1a507739c940ffb528a41d5af76069
-                  expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRP.MIN.WARN}'
+                  expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRP.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP is low (below {$LTEMODEM.RSRP.MIN.WARN}dbm for 5m)'
                   priority: WARNING
@@ -872,7 +872,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 0b2b0b8cdf964cc48d7ece2be62d115e
-                  expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRQ.MIN.WARN}'
+                  expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}],5m) < {$LTEMODEM.RSRQ.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ is low (below {$LTEMODEM.RSRQ.MIN.WARN}db for 5m)'
                   priority: WARNING
@@ -908,7 +908,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 4d271b81500f4513a1408dfa8f0e1e29
-                  expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}],5m) < {$LTEMODEM.RSSI.MIN.WARN}'
+                  expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}],5m) < {$LTEMODEM.RSSI.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI is low (below {$LTEMODEM.RSSI.MIN.WARN}dbm for 5m)'
                   priority: WARNING
@@ -944,7 +944,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 8875480665294938bee208b23d416d34
-                  expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}],5m) < {$LTEMODEM.SINR.MIN.WARN}'
+                  expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}],5m) < {$LTEMODEM.SINR.MIN.WARN}'
                   name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR is low'
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR is low (below {$LTEMODEM.SINR.MIN.WARN}db for 5m)'
                   priority: WARNING
@@ -963,25 +963,25 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+                    host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
                     key: 'lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+                    host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
                     key: 'lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+                    host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
                     key: 'lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+                    host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
                     key: 'lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}]'
         -
           uuid: 9dab50003a824e0faddea18cf89e88b2
@@ -1240,7 +1240,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c529624e4a254ecba9659fc9d43f9df4
-                  expression: 'last(/MikroTik RB1100AHx4 Dude Edition SNMP/ssid.state[mtxrWlCMState.{#SNMPINDEX}])<>"running-ap"'
+                  expression: 'last(/MikroTik RB1100AHx4 Dude Edition by SNMP/ssid.state[mtxrWlCMState.{#SNMPINDEX}])<>"running-ap"'
                   name: 'Interface {#IFNAME}({#IFALIAS}): AP interface {#IFNAME}({#IFALIAS}) is not running'
                   priority: WARNING
                   description: 'Access point interface can be not running by different reasons - disabled interface, power off, network link down.'
@@ -1555,9 +1555,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 789cf81a742c41dfa356b253b01faeca
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1608,21 +1608,21 @@ zabbix_export:
             -
               uuid: bf2dcee19ae44de98fed1b9f41d80ea9
               expression: |
-                change(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1631,8 +1631,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1640,13 +1640,13 @@ zabbix_export:
             -
               uuid: 92470dac23d7480f817f1d903e6ba869
               expression: |
-                (avg(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -1656,8 +1656,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1665,12 +1665,12 @@ zabbix_export:
             -
               uuid: 7ab169c391b142afa4fd1441d1cb7595
               expression: |
-                min(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1680,8 +1680,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/MikroTik RB1100AHx4 Dude Edition SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/MikroTik RB1100AHx4 Dude Edition by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1698,42 +1698,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+                    host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+                    host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+                    host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+                    host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+                    host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+                    host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: 8a9272779331436896db3a69fac40bb7
@@ -1830,8 +1830,8 @@ zabbix_export:
             -
               uuid: 47a1f1bee8f64507900f48de26bba052
               expression: |
-                last(/MikroTik RB1100AHx4 Dude Edition SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
-                ((last(/MikroTik RB1100AHx4 Dude Edition SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik RB1100AHx4 Dude Edition SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik RB1100AHx4 Dude Edition SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                last(/MikroTik RB1100AHx4 Dude Edition by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
+                ((last(/MikroTik RB1100AHx4 Dude Edition by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik RB1100AHx4 Dude Edition by SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik RB1100AHx4 Dude Edition by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               name: 'Disk-{#SNMPINDEX}: Disk space is critically low'
               event_name: 'Disk-{#SNMPINDEX}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1852,8 +1852,8 @@ zabbix_export:
             -
               uuid: 419bd5a8f90d4e879be3707a3ad3f551
               expression: |
-                last(/MikroTik RB1100AHx4 Dude Edition SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and
-                ((last(/MikroTik RB1100AHx4 Dude Edition SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik RB1100AHx4 Dude Edition SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik RB1100AHx4 Dude Edition SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                last(/MikroTik RB1100AHx4 Dude Edition by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"} and
+                ((last(/MikroTik RB1100AHx4 Dude Edition by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik RB1100AHx4 Dude Edition by SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik RB1100AHx4 Dude Edition by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               name: 'Disk-{#SNMPINDEX}: Disk space is low'
               event_name: 'Disk-{#SNMPINDEX}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"Disk-{#SNMPINDEX}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1868,8 +1868,8 @@ zabbix_export:
                 -
                   name: 'Disk-{#SNMPINDEX}: Disk space is critically low'
                   expression: |
-                    last(/MikroTik RB1100AHx4 Dude Edition SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
-                    ((last(/MikroTik RB1100AHx4 Dude Edition SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik RB1100AHx4 Dude Edition SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik RB1100AHx4 Dude Edition SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
+                    last(/MikroTik RB1100AHx4 Dude Edition by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"Disk-{#SNMPINDEX}"} and
+                    ((last(/MikroTik RB1100AHx4 Dude Edition by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/MikroTik RB1100AHx4 Dude Edition by SNMP/vfs.fs.used[hrStorageSize.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"Disk-{#SNMPINDEX}"} or timeleft(/MikroTik RB1100AHx4 Dude Edition by SNMP/vfs.fs.pused[hrStorageSize.{#SNMPINDEX}],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -1891,14 +1891,14 @@ zabbix_export:
                   calc_fnc: LAST
                   type: GRAPH_SUM
                   item:
-                    host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+                    host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
                     key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: C80000
                   calc_fnc: LAST
                   item:
-                    host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+                    host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
                     key: 'vfs.fs.used[hrStorageSize.{#SNMPINDEX}]'
       tags:
         -
@@ -2048,7 +2048,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+                        host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
@@ -2961,7 +2961,7 @@ zabbix_export:
   triggers:
     -
       uuid: 81a1b9e9630c4b28b035da3b9fa7e6d7
-      expression: '(last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/MikroTik RB1100AHx4 Dude Edition SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/MikroTik RB1100AHx4 Dude Edition by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2970,7 +2970,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/MikroTik RB1100AHx4 Dude Edition SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/MikroTik RB1100AHx4 Dude Edition by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
@@ -2986,5 +2986,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'MikroTik RB1100AHx4 Dude Edition SNMP'
+            host: 'MikroTik RB1100AHx4 Dude Edition by SNMP'
             key: 'vm.memory.util[memoryUsedPercentage.Memory]'

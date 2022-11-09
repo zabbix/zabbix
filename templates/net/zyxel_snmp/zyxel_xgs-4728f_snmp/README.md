@@ -1,9 +1,9 @@
 
-# ZYXEL XGS-4728F SNMP
+# ZYXEL XGS-4728F by SNMP
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.2 and higher.
 https://www.zyxel.com/products_services/xgs_4728f.shtml
 
 This template was tested on:
@@ -47,7 +47,7 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Fan discovery |<p>An entry in fanRpmTable.</p> |SNMP |zyxel.4728f.fan.discovery |
-|Interface discovery |<p>-</p> |SNMP |zyxel.4728f.net.if.discovery<p>**Filter**:</p>AND <p>- {#ZYXEL.IF.NAME} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}`</p><p>- {#ZYXEL.IF.NAME} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}`</p><p>- {#ZYXEL.IF.LINKUPTYPE} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}`</p><p>- {#ZYXEL.IF.LINKUPTYPE} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Don't create triggers for matching interface<br> - {#ZYXEL.IF.NAME} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}`<br>  - TRIGGER_PROTOTYPE REGEXP `.*` - NO_DISCOVER</p> |
+|Interface discovery |<p>-</p> |SNMP |zyxel.4728f.net.if.discovery<p>**Filter**:</p>AND <p>- {#ZYXEL.IF.NAME} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}`</p><p>- {#ZYXEL.IF.NAME} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}`</p><p>- {#ZYXEL.IF.LINKUPTYPE} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}`</p><p>- {#ZYXEL.IF.LINKUPTYPE} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}`</p><p>**Overrides:**</p><p>Don't create triggers for matching interface<br> - {#ZYXEL.IF.NAME} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}`<br>  - TRIGGER_PROTOTYPE REGEXP `.*`<br>  - NO_DISCOVER</p> |
 |Memory pool discovery |<p>-</p> |SNMP |zyxel.4728f.memory.discovery |
 |SFP with DDM discovery |<p>SFP DDM module discovery.</p> |SNMP |zyxel.4728f.sfp.ddm.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>**Filter**:</p>AND <p>- {#ZYXEL.SFP.DESCRIPTION} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.SFPDDM.DESC.MATCHES}`</p><p>- {#ZYXEL.SFP.DESCRIPTION} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.SFPDDM.DESC.NOT_MATCHES}`</p> |
 |SFP without DDM discovery |<p>SFP module discovery.</p> |SNMP |zyxel.4728f.sfp.discovery<p>**Filter**:</p>AND <p>- {#ZYXEL.SFP.STATUS} MATCHES_REGEX `{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}`</p><p>- {#ZYXEL.SFP.STATUS} NOT_MATCHES_REGEX `{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}`</p> |
@@ -103,26 +103,26 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|ZYXEL XGS-4728F: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/ZYXEL XGS-4728F SNMP/zyxel.4728f.cpuusage,5m)>{$CPU.UTIL.CRIT}` |WARNING | |
-|ZYXEL XGS-4728F: FAN{#SNMPINDEX} is in critical state |<p>Please check the fan unit</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}` |AVERAGE | |
-|ZYXEL XGS-4728F: Template does not match hardware |<p>This template is for Zyxel XGS-4728F, but connected to {ITEM.VALUE}</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.model)<>"XGS-4728F"` |INFO | |
-|ZYXEL XGS-4728F: Firmware has changed |<p>Firmware version has changed. Ack to close</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion,#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion,#2) and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.fwversion))>0` |INFO |<p>Manual close: YES</p> |
-|ZYXEL XGS-4728F: Device has been replaced |<p>Device serial number has changed. Ack to close</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber,#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber,#2) and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.serialnumber))>0` |INFO |<p>Manual close: YES</p> |
-|ZYXEL XGS-4728F: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool |<p>The system is running out of free memory.</p> |`min(/ZYXEL XGS-4728F SNMP/zyxel.4728f.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}` |AVERAGE | |
-|ZYXEL XGS-4728F: Port {#SNMPINDEX}: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)</p><p>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#2)`<p>Recovery expression:</p>`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])<>2` |AVERAGE |<p>Manual close: YES</p> |
-|ZYXEL XGS-4728F: SFP {#SNMPINDEX} has been replaced |<p>SFP {#SNMPINDEX} serial number has changed. Ack to close</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}]))>0` |INFO |<p>Manual close: YES</p> |
-|ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} |<p>The upper threshold value of the parameter is exceeded</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}` |WARNING | |
-|ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} |<p>The parameter values are less than the lower threshold</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}` |WARNING | |
-|ZYXEL XGS-4728F: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state |<p>Please check the power supply</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}` |AVERAGE | |
-|ZYXEL XGS-4728F: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/ZYXEL XGS-4728F SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
-|ZYXEL XGS-4728F: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`(last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.hw.uptime)>0 and last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.hw.uptime)<10m) or (last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.hw.uptime)=0 and last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.net.uptime)<10m)` |INFO |<p>Manual close: YES</p> |
-|ZYXEL XGS-4728F: Temperature {#ZYXEL.TEMP.ID} is in critical state |<p>Please check the temperature</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}` |AVERAGE | |
+|ZYXEL XGS-4728F: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.cpuusage,5m)>{$CPU.UTIL.CRIT}` |WARNING | |
+|ZYXEL XGS-4728F: FAN{#SNMPINDEX} is in critical state |<p>Please check the fan unit</p> |`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}` |AVERAGE | |
+|ZYXEL XGS-4728F: Template does not match hardware |<p>This template is for Zyxel XGS-4728F, but connected to {ITEM.VALUE}</p> |`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.model)<>"XGS-4728F"` |INFO | |
+|ZYXEL XGS-4728F: Firmware has changed |<p>Firmware version has changed. Ack to close</p> |`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion,#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion,#2) and length(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion))>0` |INFO |<p>Manual close: YES</p> |
+|ZYXEL XGS-4728F: Device has been replaced |<p>Device serial number has changed. Ack to close</p> |`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber,#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber,#2) and length(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber))>0` |INFO |<p>Manual close: YES</p> |
+|ZYXEL XGS-4728F: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool |<p>The system is running out of free memory.</p> |`min(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}` |AVERAGE | |
+|ZYXEL XGS-4728F: Port {#SNMPINDEX}: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)</p><p>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p> |`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#2)`<p>Recovery expression:</p>`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])<>2` |AVERAGE |<p>Manual close: YES</p> |
+|ZYXEL XGS-4728F: SFP {#SNMPINDEX} has been replaced |<p>SFP {#SNMPINDEX} serial number has changed. Ack to close</p> |`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}]))>0` |INFO |<p>Manual close: YES</p> |
+|ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} |<p>The upper threshold value of the parameter is exceeded</p> |`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}` |WARNING | |
+|ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} |<p>The parameter values are less than the lower threshold</p> |`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}` |WARNING | |
+|ZYXEL XGS-4728F: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state |<p>Please check the power supply</p> |`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}` |AVERAGE | |
+|ZYXEL XGS-4728F: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/ZYXEL XGS-4728F by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
+|ZYXEL XGS-4728F: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)>0 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)<10m) or (last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)=0 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.uptime)<10m)` |INFO |<p>Manual close: YES</p> |
+|ZYXEL XGS-4728F: Temperature {#ZYXEL.TEMP.ID} is in critical state |<p>Please check the temperature</p> |`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}` |AVERAGE | |
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com
+Please report any issues with the template at https://support.zabbix.com.
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel).
+You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel).
 
 ## Known Issues
 

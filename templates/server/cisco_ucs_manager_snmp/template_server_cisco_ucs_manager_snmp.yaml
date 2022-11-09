@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-16T10:54:52Z'
+  date: '2022-10-27T12:00:52Z'
   template_groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: d5eb4ce08a334098a85e6e02c534be90
-      template: 'Cisco UCS Manager SNMP'
-      name: 'Cisco UCS Manager SNMP'
+      template: 'Cisco UCS Manager by SNMP'
+      name: 'Cisco UCS Manager by SNMP'
       description: |
         This is a template for Cisco UCS Manager monitoring via Zabbix SNMP Agent that works without any external scripts.
         
@@ -162,7 +162,7 @@ zabbix_export:
           triggers:
             -
               uuid: 622ac72c0e534bba94bb93636e4dc103
-              expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.name[sysName.0],#1)<>last(/Cisco UCS Manager SNMP/cisco.ucs.name[sysName.0],#2) and length(last(/Cisco UCS Manager SNMP/cisco.ucs.name[sysName.0]))>0'
+              expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.name[sysName.0],#1)<>last(/Cisco UCS Manager by SNMP/cisco.ucs.name[sysName.0],#2) and length(last(/Cisco UCS Manager by SNMP/cisco.ucs.name[sysName.0]))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -265,7 +265,7 @@ zabbix_export:
           triggers:
             -
               uuid: 010a749e3a3242cd8e3ea30459fae5a4
-              expression: 'max(/Cisco UCS Manager SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Cisco UCS Manager by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -313,7 +313,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 0300b4bf4e0b42adb1b9e4985e80e356
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
                   name: '{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is in critical state!'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -327,7 +327,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 158561ecab8b4bbd9c0a616f419bda10
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
                   name: '{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is not in optimal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -335,7 +335,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is in critical state!'
-                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                      expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
                   tags:
                     -
                       tag: scope
@@ -408,7 +408,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 28c32222815f47e193d09afe5aafae79
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT:"inoperable"}'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT:"inoperable"}'
                   name: '{#DISKARRAY_LOCATION}: Disk array controller is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -422,7 +422,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 4e758fac4df54388b5f4555bb170bdd3
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN:"degraded"}'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN:"degraded"}'
                   name: '{#DISKARRAY_LOCATION}: Disk array controller is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -430,7 +430,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DISKARRAY_LOCATION}: Disk array controller is in critical state'
-                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT:"inoperable"}'
+                      expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT:"inoperable"}'
                   tags:
                     -
                       tag: scope
@@ -440,7 +440,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 264e15d04626432987c2193bf190c56c
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])>{$DISK.ARRAY.STATUS.OK:"operable"}'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])>{$DISK.ARRAY.STATUS.OK:"operable"}'
                   name: '{#DISKARRAY_LOCATION}: Disk array controller is not in optimal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -448,10 +448,10 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DISKARRAY_LOCATION}: Disk array controller is in critical state'
-                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT:"inoperable"}'
+                      expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT:"inoperable"}'
                     -
                       name: '{#DISKARRAY_LOCATION}: Disk array controller is in warning state'
-                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN:"degraded"}'
+                      expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN:"degraded"}'
                   tags:
                     -
                       tag: scope
@@ -493,7 +493,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 7417bd7646c248eb9664875d7d19e9ea
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"inoperable"}'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"inoperable"}'
                   name: '{#FAN_LOCATION}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -507,7 +507,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: b3d6cb64470e4e4c9bf1d619c0015823
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}])={$FAN.STATUS.WARN:"degraded"}'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}])={$FAN.STATUS.WARN:"degraded"}'
                   name: '{#FAN_LOCATION}: Fan is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -515,7 +515,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#FAN_LOCATION}: Fan is in critical state'
-                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"inoperable"}'
+                      expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}])={$FAN.STATUS.CRIT:"inoperable"}'
                   tags:
                     -
                       tag: scope
@@ -999,9 +999,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: edfbf339b2664fae88e2a9003383e37f
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco UCS Manager by SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Cisco UCS Manager by SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager by SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1052,8 +1052,8 @@ zabbix_export:
             -
               uuid: caaa61b8d89540c496678d739610ae38
               expression: |
-                min(/Cisco UCS Manager SNMP/cisco.ucs.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Cisco UCS Manager SNMP/cisco.ucs.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Cisco UCS Manager by SNMP/cisco.ucs.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Cisco UCS Manager by SNMP/cisco.ucs.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate on {#IFNAME}'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate on {#IFNAME} ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1063,8 +1063,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco UCS Manager by SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Cisco UCS Manager by SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager by SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1078,42 +1078,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Cisco UCS Manager SNMP'
+                    host: 'Cisco UCS Manager by SNMP'
                     key: 'cisco.ucs.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Cisco UCS Manager SNMP'
+                    host: 'Cisco UCS Manager by SNMP'
                     key: 'cisco.ucs.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Cisco UCS Manager SNMP'
+                    host: 'Cisco UCS Manager by SNMP'
                     key: 'cisco.ucs.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Cisco UCS Manager SNMP'
+                    host: 'Cisco UCS Manager by SNMP'
                     key: 'cisco.ucs.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Cisco UCS Manager SNMP'
+                    host: 'Cisco UCS Manager by SNMP'
                     key: 'cisco.ucs.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Cisco UCS Manager SNMP'
+                    host: 'Cisco UCS Manager by SNMP'
                     key: 'cisco.ucs.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
           preprocessing:
             -
@@ -1221,7 +1221,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 693cdcf58cb34def90ade23e2f2485cb
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.physicaldisk.serialnumber[cucsStorageLocalDiskSerial.{#SNMPINDEX}]))>0'
                   name: '{#DISK_LOCATION}: Disk has been replaced'
                   event_name: '{#DISK_LOCATION}: Disk has been replaced (new serial number received)'
                   priority: INFO
@@ -1288,7 +1288,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ba92b99606fa4bf0bc4f1b6a362c2cdb
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}])={$DISK.STATUS.CRIT:"bad"} or last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}])={$DISK.STATUS.CRIT:"predictiveFailure"}'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}])={$DISK.STATUS.CRIT:"bad"} or last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}])={$DISK.STATUS.CRIT:"predictiveFailure"}'
                   name: '{#DISK_LOCATION}: Physical disk error'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1296,7 +1296,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#DISK_LOCATION}: Physical disk failed'
-                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"failed"}'
+                      expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"failed"}'
                   tags:
                     -
                       tag: scope
@@ -1306,7 +1306,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: eabf5aa62f004a2c996cc11bb5a6716a
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"failed"}'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}])={$DISK.STATUS.FAIL:"failed"}'
                   name: '{#DISK_LOCATION}: Physical disk failed'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -1352,7 +1352,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 0d2713cf2b72472c8d8896880476c20e
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"inoperable"}'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"inoperable"}'
                   name: '{#PSU_LOCATION}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1366,7 +1366,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 468f08407a7448a384e5dcde589cb9d0
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}])={$PSU.STATUS.WARN:"degraded"}'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}])={$PSU.STATUS.WARN:"degraded"}'
                   name: '{#PSU_LOCATION}: Power supply is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1374,7 +1374,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#PSU_LOCATION}: Power supply is in critical state'
-                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"inoperable"}'
+                      expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}])={$PSU.STATUS.CRIT:"inoperable"}'
                   tags:
                     -
                       tag: scope
@@ -1414,9 +1414,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c3b3933ceb504207a87054a1f9773a76
-                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"CPU"}'
+                  expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"CPU"}-3'
+                  recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"CPU"}-3'
                   name: '{#SENSOR_LOCATION}: Temperature is above critical threshold'
                   event_name: '{#SENSOR_LOCATION}: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1431,9 +1431,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 13b393265f59431687b776297cb0b104
-                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"CPU"}'
+                  expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"CPU"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"CPU"}-3'
+                  recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"CPU"}-3'
                   name: '{#SENSOR_LOCATION}: Temperature is above warning threshold'
                   event_name: '{#SENSOR_LOCATION}: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"CPU"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1442,8 +1442,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_LOCATION}: Temperature is above critical threshold'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"CPU"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"CPU"}-3'
+                      expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"CPU"}'
+                      recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"CPU"}-3'
                   tags:
                     -
                       tag: scope
@@ -1483,9 +1483,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: aa4bf1c8b942462dbd21ccf8bd8c4a6b
-                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                  expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                  recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold'
                   event_name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1500,9 +1500,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 7751dd6bf1394daa9d918005d2d99d10
-                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
+                  expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
+                  recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.IOH: Temperature is above warning threshold'
                   event_name: '{#SENSOR_LOCATION}.IOH: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1511,8 +1511,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                      expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
                   tags:
                     -
                       tag: scope
@@ -1544,9 +1544,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 230958b560374a118857b77418c6ba11
-                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                  expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                  recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold'
                   event_name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1561,9 +1561,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 4cdcddd04b0e4625893a1e20ce22a10f
-                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
+                  expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
+                  recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Ambient: Temperature is above warning threshold'
                   event_name: '{#SENSOR_LOCATION}.Ambient: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1572,8 +1572,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                      expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
                   tags:
                     -
                       tag: scope
@@ -1605,9 +1605,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 8ee1dfc360aa4aca84a03b452ead92ce
-                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                  expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                  recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold'
                   event_name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1622,9 +1622,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 196c9fe3facf4e3db348337714c77e17
-                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
+                  expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
+                  recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Front: Temperature is above warning threshold'
                   event_name: '{#SENSOR_LOCATION}.Front: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1633,8 +1633,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_LOCATION}.Front: Temperature is above critical threshold'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                      expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
                   tags:
                     -
                       tag: scope
@@ -1666,9 +1666,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: a8714fcba51c46f9aa84fa02fba37743
-                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                  expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                  recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold'
                   event_name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold: >{$TEMP.MAX.CRIT:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1683,9 +1683,9 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 87068c693e574cd3952ca90e95a7a681
-                  expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
+                  expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.WARN:"Ambient"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
+                  recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.WARN:"Ambient"}-3'
                   name: '{#SENSOR_LOCATION}.Rear: Temperature is above warning threshold'
                   event_name: '{#SENSOR_LOCATION}.Rear: Temperature is above warning threshold: >{$TEMP.MAX.WARN:"Ambient"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1694,8 +1694,8 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold'
-                      expression: 'avg(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
-                      recovery_expression: 'max(/Cisco UCS Manager SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
+                      expression: 'avg(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP.MAX.CRIT:"Ambient"}'
+                      recovery_expression: 'max(/Cisco UCS Manager by SNMP/cisco.ucs.sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP.MAX.CRIT:"Ambient"}-3'
                   tags:
                     -
                       tag: scope
@@ -1758,7 +1758,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 27253665837647bb9c3be58f7d0881ae
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager SNMP/cisco.ucs.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS Manager SNMP/cisco.ucs.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]))>0'
                   name: '{#UNIT_LOCATION}: Device has been replaced'
                   event_name: '{#UNIT_LOCATION}: Device has been replaced (new serial number received)'
                   priority: INFO
@@ -1794,7 +1794,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 7f7c337f4f9f44a3a176acce5bf27f29
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"computeFailed"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"configFailure"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"unconfigFailure"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"inoperable"}'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"computeFailed"} or last(/Cisco UCS Manager by SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"configFailure"} or last(/Cisco UCS Manager by SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"unconfigFailure"} or last(/Cisco UCS Manager by SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"inoperable"}'
                   name: '{#UNIT_LOCATION}: System status is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
@@ -1808,7 +1808,7 @@ zabbix_export:
                       value: performance
                 -
                   uuid: 15ee6a98f2af4da4bcaa95821ffff524
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"testFailed"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"thermalProblem"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"powerProblem"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"voltageProblem"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"diagnosticsFailed"}'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"testFailed"} or last(/Cisco UCS Manager by SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"thermalProblem"} or last(/Cisco UCS Manager by SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"powerProblem"} or last(/Cisco UCS Manager by SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"voltageProblem"} or last(/Cisco UCS Manager by SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.WARN:"diagnosticsFailed"}'
                   name: '{#UNIT_LOCATION}: System status is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1816,7 +1816,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#UNIT_LOCATION}: System status is in critical state'
-                      expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"computeFailed"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"configFailure"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"unconfigFailure"} or last(/Cisco UCS Manager SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"inoperable"}'
+                      expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"computeFailed"} or last(/Cisco UCS Manager by SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"configFailure"} or last(/Cisco UCS Manager by SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"unconfigFailure"} or last(/Cisco UCS Manager by SNMP/cisco.ucs.status[cucsComputeRackUnitOperState.{#SNMPINDEX}])={$HEALTH.STATUS.CRIT:"inoperable"}'
                   tags:
                     -
                       tag: scope
@@ -1917,7 +1917,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 63232b4e1f6b411a93ff8abad1ff3200
-                  expression: 'last(/Cisco UCS Manager SNMP/cisco.ucs.hw.virtualdisk.status[cucsStorageLocalLunPresence.{#SNMPINDEX}])<>{$VDISK.STATUS.OK:"equipped"}'
+                  expression: 'last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.virtualdisk.status[cucsStorageLocalLunPresence.{#SNMPINDEX}])<>{$VDISK.STATUS.OK:"equipped"}'
                   name: '{#VDISK_LOCATION}: Virtual disk is not in OK state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -2122,7 +2122,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Cisco UCS Manager SNMP'
+                        host: 'Cisco UCS Manager by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
@@ -3403,7 +3403,7 @@ zabbix_export:
   triggers:
     -
       uuid: 9026e680b409424e8fa29934878cb771
-      expression: '(last(/Cisco UCS Manager SNMP/cisco.ucs.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco UCS Manager SNMP/cisco.ucs.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco UCS Manager SNMP/cisco.ucs.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco UCS Manager SNMP/cisco.ucs.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco UCS Manager by SNMP/cisco.ucs.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco UCS Manager by SNMP/cisco.ucs.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -3412,7 +3412,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/Cisco UCS Manager SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/Cisco UCS Manager by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope

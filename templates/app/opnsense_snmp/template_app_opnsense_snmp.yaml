@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-08-17T11:03:51Z'
+  date: '2022-10-27T12:16:12Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 0c94915edb4c41bf8c627dddb4f68f5a
-      template: 'OPNsense SNMP'
-      name: 'OPNsense SNMP'
+      template: 'OPNsense by SNMP'
+      name: 'OPNsense by SNMP'
       description: |
         Template for monitoring OPNsense by SNMP
         Setup:
@@ -59,7 +59,7 @@ zabbix_export:
           triggers:
             -
               uuid: fba46d0094bc4f0e98537ceca27dd6bc
-              expression: 'last(/OPNsense SNMP/opnsense.dhcpd.status)=0'
+              expression: 'last(/OPNsense by SNMP/opnsense.dhcpd.status)=0'
               name: 'OPNsense: DHCP server is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -94,7 +94,7 @@ zabbix_export:
           triggers:
             -
               uuid: 0e2cbbbd999d476a84cb93a9b7ef42d6
-              expression: 'last(/OPNsense SNMP/opnsense.dns.status)=0'
+              expression: 'last(/OPNsense by SNMP/opnsense.dns.status)=0'
               name: 'OPNsense: DNS server is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -129,7 +129,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7864dec91012436f89b728019bf99fda
-              expression: 'last(/OPNsense SNMP/opnsense.lighttpd.status)=0'
+              expression: 'last(/OPNsense by SNMP/opnsense.lighttpd.status)=0'
               name: 'OPNsense: Web server is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -286,7 +286,7 @@ zabbix_export:
           triggers:
             -
               uuid: 42d9a74d984d4ac2bf778be74cd8588f
-              expression: 'last(/OPNsense SNMP/opnsense.pf.status)<>1'
+              expression: 'last(/OPNsense by SNMP/opnsense.pf.status)<>1'
               name: 'OPNsense: Packet filter is not running'
               opdata: 'Current running state: {ITEM.LASTVALUE1}'
               priority: HIGH
@@ -354,7 +354,7 @@ zabbix_export:
           triggers:
             -
               uuid: d1f03d136f30401b8f70cbc3196446ee
-              expression: 'min(/OPNsense SNMP/opnsense.source.tracking.table.pused,#3)>{$SOURCE.TRACKING.TABLE.UTIL.MAX}'
+              expression: 'min(/OPNsense by SNMP/opnsense.source.tracking.table.pused,#3)>{$SOURCE.TRACKING.TABLE.UTIL.MAX}'
               name: 'OPNsense: Source tracking table usage is high'
               event_name: 'OPNsense: Source tracking table usage more than {$SOURCE.TRACKING.TABLE.UTIL.MAX}.'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -409,7 +409,7 @@ zabbix_export:
           triggers:
             -
               uuid: f31e301def314e9b81ee0f8a26dc1e37
-              expression: 'min(/OPNsense SNMP/opnsense.state.table.pused,#3)>{$STATE.TABLE.UTIL.MAX}'
+              expression: 'min(/OPNsense by SNMP/opnsense.state.table.pused,#3)>{$STATE.TABLE.UTIL.MAX}'
               name: 'OPNsense: State table usage is high'
               event_name: 'OPNsense: State table usage more than {$STATE.TABLE.UTIL.MAX}.'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -443,7 +443,7 @@ zabbix_export:
           triggers:
             -
               uuid: f2cb074945624a8184ceb1ab3d3b2f52
-              expression: 'max(/OPNsense SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/OPNsense by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'OPNsense: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -700,9 +700,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 5a58e9ffee1f45c4a4f859c1f0b7c2dc
-                  expression: 'min(/OPNsense SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
+                  expression: 'min(/OPNsense by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/OPNsense SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
+                  recovery_expression: 'max(/OPNsense by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
                   name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate'
                   event_name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors in: {ITEM.LASTVALUE1}'
@@ -711,7 +711,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
-                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   tags:
                     -
                       tag: scope
@@ -1051,9 +1051,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 9d6dafdae44343f1a4e0934ec44da7b3
-                  expression: 'min(/OPNsense SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
+                  expression: 'min(/OPNsense by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/OPNsense SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
+                  recovery_expression: 'max(/OPNsense by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
                   name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate'
                   event_name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors out: {ITEM.LASTVALUE2}'
@@ -1062,7 +1062,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
-                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   tags:
                     -
                       tag: scope
@@ -1310,7 +1310,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 4a189b213b8e40589be007367361d70e
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
                   name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1355,21 +1355,21 @@ zabbix_export:
             -
               uuid: e351276dfe6a43db88bdb437d2ef4a8e
               expression: |
-                change(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])>0
+                change(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])>0
                 and (
-                last(/OPNsense SNMP/net.if.type[{#SNMPINDEX}])=6 or
-                last(/OPNsense SNMP/net.if.type[{#SNMPINDEX}])=7 or
-                last(/OPNsense SNMP/net.if.type[{#SNMPINDEX}])=11 or
-                last(/OPNsense SNMP/net.if.type[{#SNMPINDEX}])=62 or
-                last(/OPNsense SNMP/net.if.type[{#SNMPINDEX}])=69 or
-                last(/OPNsense SNMP/net.if.type[{#SNMPINDEX}])=117
+                last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=6 or
+                last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=7 or
+                last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=11 or
+                last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=62 or
+                last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=69 or
+                last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=117
                 )
                 and
-                (last(/OPNsense SNMP/net.if.status[{#SNMPINDEX}])<>2)
+                (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or
-                (last(/OPNsense SNMP/net.if.status[{#SNMPINDEX}])=2)
+                (change(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or
+                (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)
               name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1377,7 +1377,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
                   tag: scope
@@ -1385,10 +1385,10 @@ zabbix_export:
             -
               uuid: d9a23c4dee9c4fd0862748923d656023
               expression: |
-                (avg(/OPNsense SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])) and
-                last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])>0
+                (avg(/OPNsense by SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])) and
+                last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/OPNsense SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])'
+              recovery_expression: 'avg(/OPNsense by SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])'
               name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage'
               event_name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
@@ -1397,7 +1397,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
                   tag: scope
@@ -1405,10 +1405,10 @@ zabbix_export:
             -
               uuid: 4c120cefd9dd4f8aa257023610b3ed19
               expression: |
-                (avg(/OPNsense SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])) and
-                last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])>0
+                (avg(/OPNsense by SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])) and
+                last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/OPNsense SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/OPNsense SNMP/net.if.speed[{#SNMPINDEX}])'
+              recovery_expression: 'avg(/OPNsense by SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])'
               name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage'
               event_name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'Out: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
@@ -1417,7 +1417,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)'
               tags:
                 -
                   tag: scope
@@ -1430,53 +1430,53 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.in.pass.v4.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: F63100
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.in.block.v4.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: 2774A4
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.in.pass.v6.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.in.block.v6.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.in.pass.v4.pps[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.in.block.v4.pps[{#SNMPINDEX}]'
                 -
                   sortorder: '6'
                   color: AC8C14
                   yaxisside: RIGHT
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.in.pass.v6.pps[{#SNMPINDEX}]'
                 -
                   sortorder: '7'
                   color: 611F27
                   yaxisside: RIGHT
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.in.block.v6.pps[{#SNMPINDEX}]'
             -
               uuid: ab44b919a9d94955b27bf9a4499e4bf5
@@ -1486,42 +1486,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.in[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.out[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.out.errors[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.in.errors[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.out.discards[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.in.discards[{#SNMPINDEX}]'
             -
               uuid: 21b603de7402416fb2f472e56010f5f6
@@ -1530,53 +1530,53 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.out.pass.v4.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: F63100
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.out.block.v4.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: 2774A4
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.out.pass.v6.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.out.block.v6.bps[{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.out.pass.v4.pps[{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.out.block.v4.pps[{#SNMPINDEX}]'
                 -
                   sortorder: '6'
                   color: AC8C14
                   yaxisside: RIGHT
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.out.pass.v6.pps[{#SNMPINDEX}]'
                 -
                   sortorder: '7'
                   color: 611F27
                   yaxisside: RIGHT
                   item:
-                    host: 'OPNsense SNMP'
+                    host: 'OPNsense by SNMP'
                     key: 'net.if.out.block.v6.pps[{#SNMPINDEX}]'
       tags:
         -
@@ -2589,35 +2589,35 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'OPNsense SNMP'
+            host: 'OPNsense by SNMP'
             key: opnsense.packets.match
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'OPNsense SNMP'
+            host: 'OPNsense by SNMP'
             key: opnsense.packets.bad.offset
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'OPNsense SNMP'
+            host: 'OPNsense by SNMP'
             key: opnsense.packets.fragment
         -
           sortorder: '3'
           color: A54F10
           item:
-            host: 'OPNsense SNMP'
+            host: 'OPNsense by SNMP'
             key: opnsense.packets.short
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: 'OPNsense SNMP'
+            host: 'OPNsense by SNMP'
             key: opnsense.packets.normalize
         -
           sortorder: '5'
           color: 6C59DC
           item:
-            host: 'OPNsense SNMP'
+            host: 'OPNsense by SNMP'
             key: opnsense.packets.mem.drop
