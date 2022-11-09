@@ -239,7 +239,7 @@
         status_counter = params.status_counter || 25; &#13;
         do {&#13;
             resp = Media.request('get', 'requests/' + requestId, undefined, true);&#13;
-        status_counter -= 1;&#13;            
+            status_counter -= 1;&#13;
         }&#13;
         while ( status_counter &gt; 0 &amp;&amp; &#13;
             ( &#13;
@@ -416,7 +416,7 @@ try {&#13;
         else {&#13;
             method = &quot;notes&quot;;&#13;
         }&#13;
-
+&#13;
         if (method !== &quot;skip&quot;) {&#13;
         resp = Media.request('post', params.event_id + '/' + method +'?identifierType=alias', fields);&#13;
 &#13;
