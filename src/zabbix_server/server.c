@@ -1290,8 +1290,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
 	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, &db_version_info};
-	zbx_thread_alert_syncer_args	alert_syncer_args = {get_program_type};
-	zbx_thread_alert_manager_args	alert_manager_args = {get_program_type};
+	zbx_thread_alert_syncer_args	alert_syncer_args = {get_program_type, CONFIG_CONFSYNCER_FREQUENCY};
+	zbx_thread_alert_manager_args	alert_manager_args = {get_program_type, CONFIG_ALERT_SCRIPTS_PATH};
 	zbx_thread_alert_args		alert_args = {get_program_type};
 
 	if (SUCCEED != init_database_cache(&error))

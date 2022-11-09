@@ -26,6 +26,7 @@
 typedef struct
 {
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+	int			confsyncer_frequency;
 }
 zbx_thread_alert_syncer_args;
 

@@ -58,7 +58,6 @@
 #define ZBX_MEDIA_CONTENT_TYPE_DEFAULT	255
 
 extern int	CONFIG_ALERTER_FORKS;
-extern char	*CONFIG_ALERT_SCRIPTS_PATH;
 
 /*
  * The alert queue is implemented as a nested queue.
@@ -1352,17 +1351,18 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
  *                                                                            *
  * Purpose: gets script media type parameters with expanded macros            *
  *                                                                            *
- * Parameters: mediatype - [IN]                                               *
- *             alert     - [IN]                                               *
- *             cmd       - [OUT] the command to execute                       *
- *             error     - [OUT] the error message                            *
+ * Parameters: mediatype    - [IN]                                            *
+ *             alert        - [IN]                                            *
+ *             scripts_path - [IN] scripts path                               *
+ *             cmd          - [OUT] the command to execute                    *
+ *             error        - [OUT] the error message                         *
  *                                                                            *
  * Return value: SUCCEED - the command was prepared successfully              *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_am_alert_t *alert, char **cmd,
-		char **error)
+static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_am_alert_t *alert,
+		const char *scripts_path, char **cmd, char **error)
 {
 	DB_ALERT	db_alert;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
@@ -1370,7 +1370,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 
 	*cmd = (char *)zbx_malloc(NULL, cmd_alloc);
 
-	zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, "%s/%s", CONFIG_ALERT_SCRIPTS_PATH, mediatype->exec_path);
+	zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, "%s/%s", scripts_path, mediatype->exec_path);
 
 	if (0 == access(*cmd, X_OK))
 	{
@@ -1427,12 +1427,14 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
  * Parameters: manager         - [IN] the alert manager                       *
  *             alerter         - [IN] the target alerter                      *
  *             alert           - [IN] the alert to send                       *
+ *             scripts_path    - [IN] scripts path                            *
  *                                                                            *
  * Return value: SUCCEED - the alert was successfully sent to alerter         *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am_alert_t *alert)
+static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am_alert_t *alert,
+		const char *scripts_path)
 {
 	zbx_am_mediatype_t	*mediatype;
 	unsigned char		*data = NULL, debug;
@@ -1485,7 +1487,7 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 			break;
 		case MEDIA_TYPE_EXEC:
 			command = ZBX_IPC_ALERTER_EXEC;
-			if (FAIL == am_prepare_mediatype_exec_command(mediatype, alert, &cmd, &error))
+			if (FAIL == am_prepare_mediatype_exec_command(mediatype, alert, scripts_path, &cmd, &error))
 			{
 				if (ALERT_SOURCE_EXTERNAL == ZBX_ALERTPOOL_SOURCE(alert->alertpoolid))
 					am_external_alert_send_response(&manager->ipc, alert, NULL, FAIL, error, NULL);
@@ -2242,6 +2244,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	const char			*scripts_path = alert_manager_args_in->scripts_path;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
@@ -2312,7 +2315,7 @@ ZBX_THREAD_ENTRY(alert_manager_thread, args)
 			if (NULL == (alerter = (zbx_am_alerter_t *)zbx_queue_ptr_pop(&manager.free_alerters)))
 				break;
 
-			if (FAIL == am_process_alert(&manager, alerter, am_pop_alert(&manager)))
+			if (FAIL == am_process_alert(&manager, alerter, am_pop_alert(&manager), scripts_path))
 				zbx_queue_ptr_push(&manager.free_alerters, alerter);
 		}
 

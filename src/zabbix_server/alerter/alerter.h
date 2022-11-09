@@ -28,8 +28,6 @@ typedef struct
 }
 zbx_thread_alert_args;
 
-extern char	*CONFIG_ALERT_SCRIPTS_PATH;
-
 ZBX_THREAD_ENTRY(alerter_thread, args);
 
 #endif

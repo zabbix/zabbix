@@ -35,8 +35,6 @@
 #define ZBX_ALERT_BATCH_SIZE		1000
 #define ZBX_MEDIATYPE_CACHE_TTL		SEC_PER_DAY
 
-extern int	CONFIG_CONFSYNCER_FREQUENCY;
-
 typedef struct
 {
 	zbx_hashset_t		mediatypes;
@@ -936,7 +934,7 @@ ZBX_THREAD_ENTRY(alert_syncer_thread, args)
 
 	sleeptime = ZBX_POLL_INTERVAL;
 
-	if (ZBX_WATCHDOG_ALERT_FREQUENCY < (freq_watchdog = CONFIG_CONFSYNCER_FREQUENCY))
+	if (ZBX_WATCHDOG_ALERT_FREQUENCY < (freq_watchdog = alert_syncer_args_in->confsyncer_frequency))
 		freq_watchdog = ZBX_WATCHDOG_ALERT_FREQUENCY;
 
 	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
