@@ -4448,7 +4448,7 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 			zbx_vector_ptr_append(&action->conditions, condition);
 		}
 
-		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 			zbx_vector_ptr_append(&actions, action);
 	}
 
@@ -4468,7 +4468,7 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 			{
 				zbx_vector_ptr_remove_noorder(&action->conditions, index);
 
-				if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+				if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 					zbx_vector_ptr_append(&actions, action);
 			}
 		}
@@ -4488,7 +4488,7 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 	{
 		action = (zbx_dc_action_t *)actions.values[i];
 
-		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 			zbx_vector_ptr_sort(&action->conditions, dc_compare_action_conditions_by_type);
 	}
 
@@ -4755,7 +4755,7 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 			zbx_vector_ptr_append(&correlation->conditions, condition);
 
 		/* sort the conditions later */
-		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
+		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
 			zbx_vector_ptr_append(&correlations, correlation);
 	}
 
@@ -4777,7 +4777,7 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
 				/* sort the conditions later */
-				if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
+				if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
 					zbx_vector_ptr_append(&correlations, correlation);
 
 				zbx_vector_ptr_remove_noorder(&correlation->conditions, index);
@@ -13349,7 +13349,7 @@ static char	*dc_correlation_formula_dup(const zbx_dc_correlation_t *dc_correlati
 	const zbx_dc_corr_condition_t	*dc_condition;
 	zbx_uint64_t			last_id;
 
-	if (ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION == dc_correlation->evaltype || 0 ==
+	if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == dc_correlation->evaltype || 0 ==
 			dc_correlation->conditions.values_num)
 	{
 		return zbx_strdup(NULL, dc_correlation->formula);
@@ -13359,10 +13359,10 @@ static char	*dc_correlation_formula_dup(const zbx_dc_correlation_t *dc_correlati
 
 	switch (dc_correlation->evaltype)
 	{
-		case ZBX_ACTION_CONDITION_EVAL_TYPE_OR:
+		case ZBX_CONDITION_EVAL_TYPE_OR:
 			op = " or";
 			break;
-		case ZBX_ACTION_CONDITION_EVAL_TYPE_AND:
+		case ZBX_CONDITION_EVAL_TYPE_AND:
 			op = " and";
 			break;
 	}
