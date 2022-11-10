@@ -80,7 +80,13 @@ window.action_edit_popup = new class {
 		curl.setArgument('action', 'popup.action.operation.get');
 		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 		if (document.querySelector('#esc_period')) {
-			curl.setArgument('esc_period', document.querySelector('#esc_period').value);
+			let esc_period = (document.querySelector('#esc_period').value).trim();
+
+			if (esc_period === '') {
+				esc_period = 0;
+			}
+
+			curl.setArgument('esc_period', esc_period);
 		}
 
 		// todo : add loader somewhere
