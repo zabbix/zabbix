@@ -119,4 +119,77 @@ zbx_mntopt_t;
 char		*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags);
 #endif
 
+/* external system functions */
+int	get_sensor(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	kernel_maxfiles(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	kernel_maxproc(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	kernel_openfiles(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+#ifdef ZBX_PROCSTAT_COLLECTOR
+int	proc_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result);
+#endif
+
+int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_in(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_tcp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_udp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_switches(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_intr(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_load(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_cpu_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_chassis(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_cpu(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_devices(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_hw_macaddr(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_swap_in(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_swap_out(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_swap_size(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_uptime(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_uname(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	system_boottime(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_fs_get(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
+int	user_perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	perf_counter_en(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	perf_instance_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	perf_instance_discovery_en(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	discover_services(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	get_service_info(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	get_service_state(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	get_list_of_services(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	proc_info(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_list(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	wmi_get(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	wmi_getall(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vm_vmemory_size(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	registry_data(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	registry_get(AGENT_REQUEST *request, AGENT_RESULT *result);
+#endif
+
+#ifdef _AIX
+int	system_stat(AGENT_REQUEST *request, AGENT_RESULT *result);
+#endif
 #endif /* ZABBIX_SYSINFO_H */

@@ -1588,12 +1588,6 @@ class testWebScenario extends CAPITest {
 				]
 			]
 		], null);
-
-		$itemids = array_keys(array_fill(150151, 9, 0));
-
-		DBexecute('UPDATE items SET name=REPLACE(name, '.zbx_dbstr('"Webtest key_name"').', '.zbx_dbstr('"$1"').') WHERE '.dbConditionInt('itemid', $itemids));
-		DBexecute('UPDATE items SET name=REPLACE(name, '.zbx_dbstr('"Webstep name 1"').', '.zbx_dbstr('"$2"').') WHERE '.dbConditionInt('itemid', $itemids));
-		DBexecute('UPDATE items SET name=REPLACE(name, '.zbx_dbstr('"Webstep name 2"').', '.zbx_dbstr('"$2"').') WHERE '.dbConditionInt('itemid', $itemids));
 	}
 
 	/**

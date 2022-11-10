@@ -50,7 +50,6 @@
 #include "snmptrapper/snmptrapper.h"
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
-#include "selfmon/selfmon.h"
 #include "vmware/vmware.h"
 #include "taskmanager/taskmanager.h"
 #include "preprocessor/preproc_manager.h"
@@ -63,15 +62,15 @@
 #include "reporter/report_manager.h"
 #include "reporter/report_writer.h"
 #include "events.h"
-#include "../libs/zbxdbcache/valuecache.h"
+#include "zbxcachevalue.h"
 #include "setproctitle.h"
-#include "zbxcrypto.h"
 #include "zbxhistory.h"
 #include "postinit.h"
 #include "../libs/zbxvault/vault.h"
 #include "zbxtrends.h"
 #include "ha/ha.h"
 #include "zbxrtc.h"
+#include "rtc/rtc_server.h"
 #include "zbxha.h"
 #include "zbxstats.h"
 #include "stats/zabbix_stats.h"
@@ -79,6 +78,8 @@
 #include "diag/diag_server.h"
 #include "zbxip.h"
 #include "zbxsysinfo.h"
+#include "zbx_rtc_constants.h"
+#include "zbxthreads.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -188,10 +189,6 @@ static unsigned char	get_program_type(void)
 {
 	return program_type;
 }
-
-ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
-ZBX_THREAD_LOCAL int		process_num	= 0;
-ZBX_THREAD_LOCAL int		server_num	= 0;
 
 int	CONFIG_ALERTER_FORKS		= 3;
 int	CONFIG_DISCOVERER_FORKS		= 1;
@@ -337,6 +334,13 @@ int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
 char	*CONFIG_WEBSERVICE_URL	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
+
+static char	*config_file		= NULL;
+static int	config_allow_root	= 0;
+
+static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
+
+struct zbx_db_version_info_t	db_version_info;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -574,8 +578,8 @@ static void	zbx_set_defaults(void)
 	CONFIG_MAX_HOUSEKEEPER_DELETE = 0;
 #endif
 
-	if (NULL == CONFIG_LOG_TYPE_STR)
-		CONFIG_LOG_TYPE_STR = zbx_strdup(CONFIG_LOG_TYPE_STR, ZBX_OPTION_LOGTYPE_FILE);
+	if (NULL == log_file_cfg.log_type_str)
+		log_file_cfg.log_type_str = zbx_strdup(log_file_cfg.log_type_str, ZBX_OPTION_LOGTYPE_FILE);
 
 	if (NULL == CONFIG_SOCKET_PATH)
 		CONFIG_SOCKET_PATH = zbx_strdup(CONFIG_SOCKET_PATH, "/tmp");
@@ -684,7 +688,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	/* because they have non-zero default values */
 #endif
 
-	if (SUCCEED != zbx_validate_log_parameters(task))
+	if (SUCCEED != zbx_validate_log_parameters(task, &log_file_cfg))
 		err = 1;
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
@@ -813,11 +817,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			5},
 		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"LogType",			&CONFIG_LOG_TYPE_STR,			TYPE_STRING,
+		{"LogType",			&log_file_cfg.log_type_str,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"LogFile",			&CONFIG_LOG_FILE,			TYPE_STRING,
+		{"LogFile",			&log_file_cfg.log_file_name,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"LogFileSize",			&CONFIG_LOG_FILE_SIZE,			TYPE_INT,
+		{"LogFileSize",			&log_file_cfg.log_file_size,		TYPE_INT,
 			PARM_OPT,	0,			1024},
 		{"AlertScriptsPath",		&CONFIG_ALERT_SCRIPTS_PATH,		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -887,7 +891,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"VMwareTimeout",		&CONFIG_VMWARE_TIMEOUT,			TYPE_INT,
 			PARM_OPT,	1,			300},
-		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
+		{"AllowRoot",			&config_allow_root,			TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"User",			&CONFIG_USER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -962,10 +966,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
-	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
+	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 	zbx_set_defaults();
 
-	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
+	log_file_cfg.log_type = zbx_get_log_type(log_file_cfg.log_type_str);
 
 	zbx_validate_config(task);
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -1093,8 +1097,8 @@ int	main(int argc, char **argv)
 		{
 			case 'c':
 				opt_c++;
-				if (NULL == CONFIG_FILE)
-					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
+				if (NULL == config_file)
+					config_file = zbx_strdup(config_file, zbx_optarg);
 				break;
 			case 'R':
 				opt_r++;
@@ -1146,8 +1150,8 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == CONFIG_FILE)
-		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
+	if (NULL == config_file)
+		config_file = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 
 	/* required for simple checks */
 	zbx_init_metrics();
@@ -1165,7 +1169,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != (ret = zbx_rtc_process(t.opts, &error)))
+		if (SUCCEED != (ret = rtc_process(t.opts, &error)))
 		{
 			zbx_error("Cannot perform runtime control command: %s", error);
 			zbx_free(error);
@@ -1174,14 +1178,14 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
-	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
+	return zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit,
+			log_file_cfg.log_type, log_file_cfg.log_file_name);
 }
 
 static void	zbx_check_db(void)
 {
-	struct zbx_db_version_info_t	db_version_info;
-	struct zbx_json			db_version_json;
-	int				result = SUCCEED;
+	struct zbx_json	db_version_json;
+	int		result = SUCCEED;
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
 	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
@@ -1216,6 +1220,12 @@ static void	zbx_check_db(void)
 			zabbix_log(LOG_LEVEL_WARNING, "database could be upgraded to use primary keys in history tables");
 		}
 
+#if defined(HAVE_POSTGRESQL)
+		if (0 == zbx_strcmp_null(db_version_info.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
+		{
+			zbx_tsdb_extract_compressed_chunk_flags(&db_version_info);
+		}
+#endif
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == result)
@@ -1226,13 +1236,10 @@ static void	zbx_check_db(void)
 	}
 
 	DBclose();
-	zbx_free(db_version_info.friendly_current_version);
-	zbx_free(db_version_info.extension);
-	zbx_free(db_version_info.ext_friendly_current_version);
-	zbx_free(db_version_info.ext_lic);
 
-	if(SUCCEED != result)
+	if (SUCCEED != result)
 	{
+		zbx_db_version_info_clear(&db_version_info);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -1282,6 +1289,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, CONFIG_SOURCE_IP, get_program_type};
+	zbx_thread_housekeeper_args	housekeeper_args = {get_program_type, &db_version_info};
 
 	if (SUCCEED != init_database_cache(&error))
 	{
@@ -1355,16 +1363,17 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	for (i = 0; i < threads_num; i++)
 	{
-		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.process_type, &thread_args.process_num))
+		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.info.process_type,
+				&thread_args.info.process_num))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
 		}
 
-		thread_args.server_num = i + 1;
+		thread_args.info.server_num = i + 1;
 		thread_args.args = NULL;
 
-		switch (thread_args.process_type)
+		switch (thread_args.info.process_type)
 		{
 			case ZBX_PROCESS_TYPE_SERVICEMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
@@ -1373,7 +1382,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_vc_enable();
 				zbx_thread_start(dbconfig_thread, &thread_args, &threads[i]);
-				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc)))
+				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc, rtc_process_request_ex)))
 					goto out;
 
 				if (SUCCEED != (ret = zbx_ha_get_status(CONFIG_HA_NODE_NAME, ha_stat, ha_failover,
@@ -1426,6 +1435,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(alerter_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HOUSEKEEPER:
+				thread_args.args = &housekeeper_args;
 				zbx_thread_start(housekeeper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TIMER:
@@ -1459,7 +1469,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(proxypoller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SELFMON:
-				zbx_thread_start(selfmon_thread, &thread_args, &threads[i]);
+				zbx_thread_start(zbx_selfmon_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_VMWARE:
 				zbx_thread_start(vmware_thread, &thread_args, &threads[i]);
@@ -1540,7 +1550,7 @@ static int	server_restart_logger(char **error)
 	if (SUCCEED != zbx_locks_create(error))
 		return FAIL;
 
-	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, error))
+	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, error))
 		return FAIL;
 
 	return SUCCEED;
@@ -1561,7 +1571,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 
 	zbx_unset_child_signal_handler();
 
-	zbx_rtc_reset(rtc);
+	rtc_reset(rtc);
 
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	/* Disable locks so main process doesn't hang on logging if a process was              */
@@ -1660,7 +1670,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
+	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1730,7 +1740,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:               " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
+	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (SUCCEED != zbx_coredump_disable())
@@ -1773,6 +1783,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_vault_db_credentials_get(&CONFIG_DBUSER, &CONFIG_DBPASSWORD, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != DBinit(DCget_nextid, program_type, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -1912,7 +1929,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||
 					ZBX_RTC_LOG_LEVEL_INCREASE == message->code)
 			{
-				zbx_rtc_dispatch(&rtc, client, message);
+				zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_ex);
 			}
 			else
 			{
@@ -1999,6 +2016,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zabbix_log(LOG_LEVEL_CRIT, "cannot pause HA manager: %s", error);
 		zbx_free(error);
 	}
+
+	zbx_db_version_info_clear(&db_version_info);
 
 	zbx_on_exit(ZBX_EXIT_STATUS());
 

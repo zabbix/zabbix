@@ -25,7 +25,8 @@
 #include "zbxregexp.h"
 #include "zbxvariant.h"
 #include "zbxeval.h"
-#include "valuecache.h"
+#include "zbxdbwrap.h"
+#include "zbxcachevalue.h"
 #include "macrofunc.h"
 #include "zbxxml.h"
 #include "zbxstr.h"
@@ -1571,6 +1572,7 @@ static int	get_autoreg_value_by_event(const ZBX_DB_EVENT *event, char **replace_
 #define MVAR_STATUS				"{STATUS}"			/* deprecated */
 #define MVAR_TRIGGER_VALUE			"{TRIGGER.VALUE}"
 #define MVAR_TRIGGER_URL			"{TRIGGER.URL}"
+#define MVAR_TRIGGER_URL_NAME			"{TRIGGER.URL.NAME}"
 
 #define MVAR_TRIGGER_EVENTS_ACK			"{TRIGGER.EVENTS.ACK}"
 #define MVAR_TRIGGER_EVENTS_UNACK		"{TRIGGER.EVENTS.UNACK}"
@@ -3564,6 +3566,13 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 							NULL, NULL, NULL, tz, &replace_to, MACRO_TYPE_TRIGGER_URL,
 							error, maxerrlen);
 				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_URL_NAME))
+				{
+					replace_to = zbx_strdup(replace_to, event->trigger.url_name);
+					substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, NULL, NULL, tz, &replace_to, MACRO_TYPE_TRIGGER_URL,
+							error, maxerrlen);
+				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
 				{
 					replace_to = zbx_dsprintf(replace_to, "%d", c_event->trigger.value);
@@ -3838,6 +3847,13 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				else if (0 == strcmp(m, MVAR_TRIGGER_URL))
 				{
 					replace_to = zbx_strdup(replace_to, event->trigger.url);
+					substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, NULL, NULL, tz, &replace_to, MACRO_TYPE_TRIGGER_URL,
+							error, maxerrlen);
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_URL_NAME))
+				{
+					replace_to = zbx_strdup(replace_to, event->trigger.url_name);
 					substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, NULL, NULL, tz, &replace_to, MACRO_TYPE_TRIGGER_URL,
 							error, maxerrlen);
@@ -5370,7 +5386,6 @@ void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const z
 
 	zbx_vector_uint64_create(&itemids_sorted);
 	zbx_vector_uint64_append_array(&itemids_sorted, itemids, item_num);
-	zbx_vector_uint64_sort(&itemids_sorted, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_ptr_create(&triggers_func_pos);
 	zbx_vector_ptr_reserve(&triggers_func_pos, trigger_order->values_num);
@@ -5583,7 +5598,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 		zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		*items_num = itemids.values_num;
-		*items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)itemids.values_num);
+		*items = (DC_ITEM *)zbx_calloc(NULL, 1, sizeof(DC_ITEM) * (size_t)itemids.values_num);
 		*items_err = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)itemids.values_num);
 
 		DCconfig_get_items_by_itemids_partial(*items, itemids.values, *items_err, itemids.values_num,

@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.4.0beta2])
+AC_INIT([Zabbix],[6.4.0beta4])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -1953,8 +1953,11 @@ AC_CONFIG_FILES([
 	src/libs/zbxcrypto/Makefile
 	src/libs/zbxcyberark/Makefile
 	src/libs/zbxdb/Makefile
-	src/libs/zbxdbcache/Makefile
+	src/libs/zbxcacheconfig/Makefile
+	src/libs/zbxcachehistory/Makefile
+	src/libs/zbxcachevalue/Makefile
 	src/libs/zbxdbhigh/Makefile
+	src/libs/zbxdbwrap/Makefile
 	src/libs/zbxdbschema/Makefile
 	src/libs/zbxdbupgrade/Makefile
 	src/libs/zbxdiag/Makefile
@@ -2024,6 +2027,7 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/diag/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
+	src/zabbix_proxy/rtc/Makefile
 	src/zabbix_proxy/proxyconfigwrite/Makefile
 	src/zabbix_proxy/stats/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
@@ -2048,8 +2052,8 @@ AC_CONFIG_FILES([
 	src/zabbix_server/proxyconfigread/Makefile
 	src/zabbix_server/proxypoller/Makefile
 	src/zabbix_server/reporter/Makefile
+	src/zabbix_server/rtc/Makefile
 	src/zabbix_server/scripts/Makefile
-	src/zabbix_server/selfmon/Makefile
 	src/zabbix_server/service/Makefile
 	src/zabbix_server/snmptrapper/Makefile
 	src/zabbix_server/stats/Makefile

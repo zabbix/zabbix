@@ -179,8 +179,8 @@ class testSystemInformation extends CWebTest {
 		}
 
 		// Check and hide the text of messages, because they contain ip addresses of the current host.
-		$error_text = "Connection to Zabbix server \"".$DB['SERVER']."\" failed. Possible reasons:\n".
-				"1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n".
+		$error_text = "Connection to Zabbix server \"".$DB['SERVER'].":0\" failed. Possible reasons:\n".
+				"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".
 				"2. Incorrect DNS server configuration.\n".
 				"Failed to parse address \"".$DB['SERVER']."\"";
 		$messages = CMessageElement::find()->all();
@@ -201,13 +201,13 @@ class testSystemInformation extends CWebTest {
 		$table = $this->query('xpath://table[@class="list-table sticky-header"]')->asTable()->waitUntilVisible()->one();
 
 		// Check that before failover delay passes frontend thinks that Zabbix server is running.
-		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn(0)->getText());
+		$this->assertEquals('Yes', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
 
 		// Wait for failover delay to pass.
 		sleep(self::$update_timestamp + self::FAILOVER_DELAY - time());
 
 		// Check that after failover delay passes frontend re-validates Zabbix server status.
 		$this->page->refresh();
-		$this->assertEquals('No', $table->findRow('Parameter', 'Zabbix server is running')->getColumn(0)->getText());
+		$this->assertEquals('No', $table->findRow('Parameter', 'Zabbix server is running')->getColumn('Value')->getText());
 	}
 }

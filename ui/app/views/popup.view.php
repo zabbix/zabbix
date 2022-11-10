@@ -25,7 +25,7 @@
 
 $this->addJsFile('class.calendar.js');
 
-(new CWidget())->show();
+(new CHtmlPage())->show();
 
 (new CScriptTag(
 	'PopUp("'.$data['popup']['action'].'", '.json_encode($data['popup']['options']).');'.

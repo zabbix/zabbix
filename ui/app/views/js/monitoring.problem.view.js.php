@@ -99,11 +99,11 @@
 
 				this.refreshResults();
 				this.refreshCounters();
+				chkbxRange.clearSelectedOnFilterChange();
 
 				if (this.active_filter !== this.filter._active_item) {
 					this.active_filter = this.filter._active_item;
 					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
-					chkbxRange.clearSelectedOnFilterChange();
 				}
 			});
 

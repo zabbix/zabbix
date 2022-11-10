@@ -57,6 +57,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"datastore.discovery", VMCHECK_FUNC(check_vcenter_datastore_discovery)},
 	{"datastore.tags.get", VMCHECK_FUNC(check_vcenter_datastore_tags_get)},
 	{"datastore.read", VMCHECK_FUNC(check_vcenter_datastore_read)},
+	{"datastore.perfcounter", VMCHECK_FUNC(check_vcenter_datastore_perfcounter)},
 	{"datastore.property", VMCHECK_FUNC(check_vcenter_datastore_property)},
 	{"datastore.size", VMCHECK_FUNC(check_vcenter_datastore_size)},
 	{"datastore.write", VMCHECK_FUNC(check_vcenter_datastore_write)},
@@ -77,6 +78,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.datastore.list", VMCHECK_FUNC(check_vcenter_hv_datastore_list)},
 	{"hv.datastore.multipath", VMCHECK_FUNC(check_vcenter_hv_datastore_multipath)},
 	{"hv.discovery", VMCHECK_FUNC(check_vcenter_hv_discovery)},
+	{"hv.diskinfo.get", VMCHECK_FUNC(check_vcenter_hv_diskinfo_get)},
 	{"hv.fullname", VMCHECK_FUNC(check_vcenter_hv_fullname)},
 	{"hv.hw.cpu.num", VMCHECK_FUNC(check_vcenter_hv_hw_cpu_num)},
 	{"hv.hw.cpu.freq", VMCHECK_FUNC(check_vcenter_hv_hw_cpu_freq)},
@@ -217,12 +219,12 @@ int	get_value_simple(const DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t
 
 	if (0 == strcmp(request.key, "net.tcp.service") || 0 == strcmp(request.key, "net.udp.service"))
 	{
-		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, result, 0))
+		if (SYSINFO_RET_OK == zbx_check_service_default_addr(&request, item->interface.addr, result, 0))
 			ret = SUCCEED;
 	}
 	else if (0 == strcmp(request.key, "net.tcp.service.perf") || 0 == strcmp(request.key, "net.udp.service.perf"))
 	{
-		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, result, 1))
+		if (SYSINFO_RET_OK == zbx_check_service_default_addr(&request, item->interface.addr, result, 1))
 			ret = SUCCEED;
 	}
 	else if (SUCCEED == get_vmware_function(request.key, &vmfunc))

@@ -77,7 +77,7 @@ class testPageReportsAudit extends CWebTest {
 		}
 
 		// Check form labels.
-		$this->assertEquals(['Users', 'Resource', 'Resource ID', 'Recordset ID', 'Actions'], $form->getLabels()->asText());
+		$this->assertEquals(['Users', 'Actions', 'Resource', 'Resource ID', 'Recordset ID'], $form->getLabels()->asText());
 
 		// Check that resource values set as All by default.
 		$this->assertTrue($form->checkValue(['Resource' => 'All']));
@@ -96,7 +96,7 @@ class testPageReportsAudit extends CWebTest {
 			'API token' => ['Add', 'Delete', 'Update'],
 			'Action' => ['Add', 'Delete', 'Update'],
 			'Authentication' => ['Update'],
-			'Autoregistration' => ['Add', 'Delete', 'Update'],
+			'Autoregistration' => ['Update'],
 			'Dashboard' => ['Add', 'Delete', 'Update'],
 			'Discovery rule' => ['Add', 'Delete', 'Update'],
 			'Event correlation' => ['Add', 'Delete', 'Update'],
@@ -128,6 +128,7 @@ class testPageReportsAudit extends CWebTest {
 			'Trigger' => ['Add', 'Delete', 'Update'],
 			'Trigger prototype' => ['Add', 'Delete', 'Update'],
 			'User' => ['Add', 'Delete', 'Failed login', 'Login', 'Logout', 'Update'],
+			'User directory' => ['Add', 'Delete', 'Update'],
 			'User group' => ['Add', 'Delete', 'Update'],
 			'User role' => ['Add', 'Delete', 'Update'],
 			'Value map' => ['Add', 'Delete', 'Update'],

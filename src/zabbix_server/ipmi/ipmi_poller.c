@@ -33,9 +33,7 @@
 
 #define ZBX_IPMI_MANAGER_CLEANUP_DELAY		SEC_PER_DAY
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 /******************************************************************************
  *                                                                            *
@@ -173,21 +171,20 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 	zbx_ipc_async_socket_t	ipmi_socket;
 	int			polled_num = 0;
 	double			time_stat, time_idle = 0, time_now, time_read;
+	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
-
-	process_type = ((zbx_thread_args_t *)args)->process_type;
-
-	server_num = ((zbx_thread_args_t *)args)->server_num;
-	process_num = ((zbx_thread_args_t *)args)->process_num;
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	if (FAIL == zbx_ipc_async_socket_open(&ipmi_socket, ZBX_IPC_SERVICE_IPMI, SEC_PER_MIN, &error))
 	{
@@ -221,7 +218,7 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 			polled_num = 0;
 		}
 
-		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
 		while (ZBX_IS_RUNNING())
 		{
@@ -240,7 +237,7 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 			zbx_perform_all_openipmi_ops(ipmi_timeout);
 		}
 
-		zbx_update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 		if (NULL == message)
 			break;

@@ -21,7 +21,7 @@
 #define ZABBIX_POLLER_H
 
 #include "zbxthreads.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxcomms.h"
 
 typedef struct

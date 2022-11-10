@@ -41,6 +41,12 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		];
 	}
 
+	private static $widget_names = ['Action log', 'Clock', 'Data overview', 'Discovery status', 'Favorite graphs',
+		'Favorite maps','Geomap', 'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value',
+		'Map', 'Map navigation tree', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
+		'System information', 'Top hosts', 'Trigger overview', 'URL', 'Web monitoring'
+	];
+
 	public function testPageAdministrationGeneralModules_Layout() {
 		$modules = [
 			[
@@ -79,6 +85,18 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'Status' => 'Disabled'
 			]
 		];
+
+		// Create an array with widgt modules that should be present by default.
+		$widget_modules = [];
+
+		foreach (self::$widget_names as $i => $name) {
+			$widget_modules[$i]['Name'] = $name;
+			$widget_modules[$i]['Version'] = '1.0';
+			$widget_modules[$i]['Author'] = 'Zabbix SIA';
+			$widget_modules[$i]['Description'] = '';
+			$widget_modules[$i]['Status'] = 'Enabled';
+		}
+
 		// Open modules page and check header.
 		$this->page->login()->open('zabbix.php?action=module.list');
 		$this->assertEquals('Modules', $this->query('tag:h1')->one()->getText());
@@ -87,12 +105,17 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		foreach (['Scan directory' => true, 'Enable' => false, 'Disable' => false] as $button => $enabled) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled($enabled));
 		}
-		// Check that modules are not being loaded until the 'Scan directory' button is pressed.
-		$this->assertEquals($this->query('class:nothing-to-show')->one()->getText(), 'No data found.');
-		$this->assertEquals('Displaying 0 of 0 found', $this->query('class:table-stats')->one()->getText());
+
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		// Check that only widget modules are present until the 'Scan directory' button is pressed.
+		$this->assertTableData($widget_modules);
+
+		$count = $table->getRows()->count();
+		$this->assertTableStats($count);
+
 		$this->assertEquals('0 selected', $this->query('id:selected_count')->one()->getText());
 		// Check modules table headers.
-		$table = $this->query('class:list-table')->asTable()->one();
 		$headers = $table->getHeadersText();
 		// Remove empty element from headers array.
 		array_shift($headers);
@@ -101,8 +124,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		// Load modules.
 		$this->loadModules();
 
+		$all_modules = array_merge($widget_modules, $modules);
+		// Sort column contents ascending.
+		usort($all_modules, function($a, $b) {
+			return strcmp($a['Name'], $b['Name']);
+		});
+
 		// Check parameters of modules in the modules table.
-		$this->assertTableData($modules);
+		$this->assertTableData($all_modules);
 
 		$count = CDBHelper::getCount('SELECT moduleid FROM module');
 		$this->assertEquals('Displaying '.$count.' of '.$count.' found', $this->query('class:table-stats')->one()->getText());
@@ -121,8 +150,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Version' => '1',
 					'Author' => '1st Module author',
 					'Description' => '1st Module description',
-					'Directory' => 'module_number_1',
-					'Namespace' => 'Example_A',
+					'Directory' => 'modules/module_number_1',
+					'Namespace' => 'Modules\Example_A',
 					'Homepage' => '1st module URL',
 					'Enabled' => false
 				]
@@ -134,8 +163,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Version' => 'two !@#$%^&*()_+',
 					'Author' => '2nd Module author !@#$%^&*()_+',
 					'Description' => 'Module description !@#$%^&*()_+',
-					'Directory' => 'module_number_2',
-					'Namespace' => 'Example_B',
+					'Directory' => 'modules/module_number_2',
+					'Namespace' => 'Modules\Example_B',
 					'Homepage' => '!@#$%^&*()_+',
 					'Enabled' => false
 				]
@@ -147,8 +176,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Version' => '',
 					'Author' => '-',
 					'Description' => '-',
-					'Directory' => 'module_number_4',
-					'Namespace' => 'Example_A',
+					'Directory' => 'modules/module_number_4',
+					'Namespace' => 'Modules\Example_A',
 					'Homepage' => '-',
 					'Enabled' => false
 				]
@@ -160,8 +189,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Version' => '',
 					'Author' => '-',
 					'Description' => 'Adding top-level and sub-level menu',
-					'Directory' => 'module_number_5',
-					'Namespace' => 'Example_E',
+					'Directory' => 'modules/module_number_5',
+					'Namespace' => 'Modules\Example_E',
 					'Homepage' => '-',
 					'Enabled' => false
 				]
@@ -173,8 +202,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'Version' => 'бета 2',
 					'Author' => 'Работник Заббикса',
 					'Description' => 'Удалить "Reports" из меню верхнего уровня, а так же удалить "Maps" из секции "Monitoring".',
-					'Directory' => 'module_number_6',
-					'Namespace' => 'Example_F',
+					'Directory' => 'modules/module_number_6',
+					'Namespace' => 'Modules\Example_F',
 					'Homepage' => '-',
 					'Enabled' => false
 				]
@@ -277,9 +306,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'action' => 'forth.module'
 							]
 						],
-//						'error_title' => 'Cannot update module: 4th Module.',
-						'error_details' => 'Identical namespace (Example_A) is used by modules located at '.
-								'module_number_1, module_number_4.'
+						'error_details' => 'Identical namespace (Modules\Example_A) is used by modules located at '.
+								'modules/module_number_1, modules/module_number_4.'
 					]
 				]
 			],
@@ -409,9 +437,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'filter' => [
 						'Status' => 'Enabled'
 					],
-					'expected' => [
-						'2nd Module name !@#$%^&*()_+'
-					]
+					'expected' => array_merge(['2nd Module name !@#$%^&*()_+'], self::$widget_names)
 				]
 			],
 			// Retrieve only Disabled modules.
@@ -582,7 +608,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			if (CTestArrayHelper::get($entry, 'check_disabled', true)) {
 				$this->page->open('zabbix.php?action='.$entry['action'])->waitUntilReady();
 				$message = CMessageElement::find()->one();
-				$this->assertStringContainsString('Class not found', $message->getText());
+				$this->assertStringContainsString('Page not found', $message->getText());
 				$this->page->open('zabbix.php?action=module.list');
 			}
 		}
