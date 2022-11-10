@@ -35,4 +35,6 @@ void	zbx_set_json_strerror(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 int	json_open_path(const struct zbx_json_parse *jp, const zbx_jsonpath_t *jsonpath, struct zbx_json_parse *out);
 
+const char	*json_copy_string(const char *p, char *out, size_t size);
+
 #endif
