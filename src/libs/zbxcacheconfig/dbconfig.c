@@ -8531,7 +8531,10 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 	dst_item->lastlogsize = src_item->lastlogsize;
 	dst_item->mtime = src_item->mtime;
 
-	dst_item->error = zbx_strdup(NULL, src_item->error);
+	if ('\0' != *src_item->error)
+		dst_item->error = zbx_strdup(NULL, src_item->error);
+	else
+		dst_item->error = NULL;
 
 	if (ZBX_ITEM_GET_MISC & mode)
 	{
