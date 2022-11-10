@@ -103,7 +103,7 @@ jQuery(function($) {
 
 	$('input[unchecked-value]').each(function() {
 		const $this = $(this);
-
+		uncheckedHandler($this);
 		$this.on('change', function () {
 			uncheckedHandler($this)
 		})
