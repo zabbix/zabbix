@@ -27,6 +27,7 @@
 #include "zbxservice.h"
 #include "zbxnum.h"
 #include "zbxexpr.h"
+#include "zbxdbwrap.h"
 
 /* event recovery data */
 typedef struct

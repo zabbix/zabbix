@@ -2098,7 +2098,7 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			case ZBX_PREPROC_ERROR_FIELD_XML:
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			case ZBX_PREPROC_SCRIPT:
-				$step['params'] = CRLFtoLF($step['params'][0]);
+				$step['params'] = $step['params'][0];
 				break;
 
 			case ZBX_PREPROC_VALIDATE_RANGE:
@@ -2147,17 +2147,12 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 		}
 
 		$step += [
-			'error_handler' => (string) ZBX_PREPROC_FAIL_DEFAULT,
+			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
 			'error_handler_params' => ''
 		];
 
-		// Ensure exact ordering of fields (and exclude helper fields) for exact matching to DB countepart on update.
-		$step = [
-			'type' => $step['type'],
-			'params' => $step['params'],
-			'error_handler' => $step['error_handler'],
-			'error_handler_params' => $step['error_handler_params']
-		];
+		// Remove fictional fields that don't belong to DB and API.
+		unset($step['sortorder'], $step['on_fail']);
 	}
 	unset($step);
 
@@ -2373,11 +2368,11 @@ function prepareItemParameters(array $parameters): array {
  * Get sanitized item fields of given input.
  *
  * @param array  $input
+ * @param string $input['templateid']
+ * @param int    $input['flags']
  * @param int    $input['type']
  * @param string $input['key_']
  * @param int    $input['value_type']
- * @param string $input['templateid']
- * @param int    $input['flags']
  * @param int    $input['authtype']
  * @param int    $input['allow_traps']
  * @param int    $input['hosts'][0]['status']
@@ -2435,8 +2430,8 @@ function getMainItemFieldNames(array $input): array {
  * Get item field names of the given type and template ID.
  *
  * @param array  $input
- * @param int    $input['type']
  * @param string $input['templateid']
+ * @param int    $input['type']
  */
 function getTypeItemFieldNames(array $input): array {
 	switch ($input['type']) {

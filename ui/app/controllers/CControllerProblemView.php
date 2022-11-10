@@ -45,7 +45,7 @@ class CControllerProblemView extends CControllerProblem {
 			'show_suppressed' =>		'in 0,1',
 			'unacknowledged' =>			'in 0,1',
 			'compact_view' =>			'in 0,1',
-			'show_timeline' =>			'in 0,1',
+			'show_timeline' =>			'in '.ZBX_TIMELINE_OFF.','.ZBX_TIMELINE_ON,
 			'details' =>				'in 0,1',
 			'highlight_row' =>			'in 0,1',
 			'show_opdata' =>			'in '.OPERATIONAL_DATA_SHOW_NONE.','.OPERATIONAL_DATA_SHOW_SEPARATELY.','.OPERATIONAL_DATA_SHOW_WITH_PROBLEM,

@@ -83,7 +83,7 @@
                             <uuid>f988e57fcdc541668c3c32919d3cfa60</uuid>
                             <name>DepItemProtoDependsOnNormalItem</name>
                             <type>DEPENDENT</type>
-                            <key>depitemproto_deponnormal</key>
+                            <key>depitemproto_deponnormal[{#LLDMACRO}]</key>
                             <delay>0</delay>
                             <master_item>
                                 <key>tmpltrap</key>
@@ -91,12 +91,12 @@
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <uuid>ebc83aff113846518d3e1c88532274e1</uuid>
-                                    <expression>last(/SampleTemplate/depitemproto_deponnormal)=0</expression>
+                                    <expression>last(/SampleTemplate/depitemproto_deponnormal[{#LLDMACRO}])=0</expression>
                                     <name>proto_dep {#LLDMACRO}</name>
                                     <dependencies>
                                         <dependency>
                                             <name>proto {#LLDMACRO}</name>
-                                            <expression>last(/SampleTemplate/depitemproto_deponnormal)=1</expression>
+                                            <expression>last(/SampleTemplate/depitemproto_deponnormal[{#LLDMACRO}])=1</expression>
                                         </dependency>
                                     </dependencies>
                                     <tags>
@@ -108,7 +108,7 @@
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <uuid>6032b6444698467c8f41587858f089e5</uuid>
-                                    <expression>last(/SampleTemplate/depitemproto_deponnormal)=1</expression>
+                                    <expression>last(/SampleTemplate/depitemproto_deponnormal[{#LLDMACRO}])=1</expression>
                                     <name>proto {#LLDMACRO}</name>
                                     <tags>
                                         <tag>
@@ -592,7 +592,7 @@
                     <uuid>d94160c34be4455bba660b1b18c0fb0e</uuid>
                     <name>ItemWithGlobalAndHostMacro1</name>
                     <key>sensor[{$UU},{$HM1}]</key>
-                    <delay>{$GLOBDELAY}</delay>
+                    <delay>11s</delay>
                     <value_type>FLOAT</value_type>
                 </item>
                 <item>
@@ -600,7 +600,7 @@
                     <name>SNMP trap1</name>
                     <type>SNMP_TRAP</type>
                     <key>snmptrap.fallback</key>
-                    <delay>10s</delay>
+                    <delay>0</delay>
                 </item>
                 <item>
                     <uuid>0106d4d9fba64066a66fbfe2d2340602</uuid>
@@ -659,6 +659,7 @@
                     <uuid>381db19a280a4c27a1ad86693ea535bc</uuid>
                     <name>ItemWithMacro1</name>
                     <key>vfs.file.get[/tmp/{$HM1}]</key>
+                    <delay>2s</delay>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                 </item>

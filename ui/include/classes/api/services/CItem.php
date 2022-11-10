@@ -576,7 +576,6 @@ class CItem extends CItemGeneral {
 
 		$ins_items_rtdata = [];
 		$host_statuses = [];
-		$flags = [];
 
 		foreach ($items as &$item) {
 			$item['itemid'] = array_shift($itemids);
@@ -586,8 +585,7 @@ class CItem extends CItemGeneral {
 			}
 
 			$host_statuses[] = $item['host_status'];
-			$flags[] = $item['flags'];
-			unset($item['host_status'], $item['flags']);
+			unset($item['host_status']);
 		}
 		unset($item);
 
@@ -603,7 +601,6 @@ class CItem extends CItemGeneral {
 
 		foreach ($items as &$item) {
 			$item['host_status'] = array_shift($host_statuses);
-			$item['flags'] = array_shift($flags);
 		}
 		unset($item);
 	}
@@ -616,10 +613,12 @@ class CItem extends CItemGeneral {
 	public function update(array $items): array {
 		$this->validateUpdate($items, $db_items);
 
+		$itemids = array_column($items, 'itemid');
+
 		self::updateForce($items, $db_items);
 		self::inherit($items, $db_items);
 
-		return ['itemids' => array_column($items, 'itemid')];
+		return ['itemids' => $itemids];
 	}
 
 	/**
@@ -803,15 +802,19 @@ class CItem extends CItemGeneral {
 	 * @param array $items
 	 * @param array $db_items
 	 */
-	public static function updateForce(array &$items, array $db_items): void {
+	public static function updateForce(array &$items, array &$db_items): void {
 		// Helps to avoid deadlocks.
 		CArrayHelper::sort($items, ['itemid'], ZBX_SORT_DOWN);
 
 		self::addFieldDefaultsByType($items, $db_items);
 
 		$upd_items = [];
+		$upd_itemids = [];
 
-		foreach ($items as $item) {
+		$internal_fields = array_flip(['itemid', 'type', 'key_', 'value_type', 'hostid', 'flags', 'host_status']);
+		$nested_object_fields = array_flip(['tags', 'preprocessing', 'parameters']);
+
+		foreach ($items as $i => &$item) {
 			$upd_item = DB::getUpdatedValues('items', $item, $db_items[$item['itemid']]);
 
 			if ($upd_item) {
@@ -819,16 +822,34 @@ class CItem extends CItemGeneral {
 					'values' => $upd_item,
 					'where' => ['itemid' => $item['itemid']]
 				];
+
+				if (array_key_exists('type', $item) && $item['type'] == ITEM_TYPE_HTTPAGENT) {
+					$item = array_intersect_key($item,
+						array_flip(['authtype']) + $internal_fields + $upd_item + $nested_object_fields
+					);
+				}
+				else {
+					$item = array_intersect_key($item, $internal_fields + $upd_item + $nested_object_fields);
+				}
+
+				$upd_itemids[$i] = $item['itemid'];
+			}
+			else {
+				$item = array_intersect_key($item, $internal_fields + $nested_object_fields);
 			}
 		}
+		unset($item);
 
 		if ($upd_items) {
 			DB::update('items', $upd_items);
 		}
 
-		self::updateTags($items, $db_items);
-		self::updatePreprocessing($items, $db_items);
-		self::updateParameters($items, $db_items);
+		self::updateTags($items, $db_items, $upd_itemids);
+		self::updatePreprocessing($items, $db_items, $upd_itemids);
+		self::updateParameters($items, $db_items, $upd_itemids);
+
+		$items = array_intersect_key($items, $upd_itemids);
+		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ITEM, $items, $db_items);
 	}
@@ -889,7 +910,7 @@ class CItem extends CItemGeneral {
 		$db_items = DB::select('items', [
 			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
-			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+			], array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])),
 			'filter' => [
 				'hostid' => $templateids,
 				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
@@ -1377,14 +1398,9 @@ class CItem extends CItemGeneral {
 		$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT];
 
 		foreach ($items as $i => $item) {
-			if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				unset($items[$i]);
-				continue;
-			}
-
 			$check = false;
 
-			if (in_array($item['value_type'], $value_types)) {
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL && in_array($item['value_type'], $value_types)) {
 				if (array_key_exists('inventory_link', $item)) {
 					if (!array_key_exists('itemid', $item)) {
 						if ($item['inventory_link'] != 0) {

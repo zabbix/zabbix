@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -202,10 +203,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		}
 
 		if ($new_page) {
-			$this->query('xpath://div[@class="dashboard-navigation-tabs"]//span[text()="'.$new_page_name.'"]')
-					->waitUntilClickable()->one()->click();
-			$this->query('xpath://div[@class="selected-tab"]//span[text()="'.$new_page_name.'"]')
-					->waitUntilVisible()->one();
+			$dashboard->selectPage($new_page_name);
 		}
 
 		$dashboard->edit();

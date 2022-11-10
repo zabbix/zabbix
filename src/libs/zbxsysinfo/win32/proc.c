@@ -73,7 +73,10 @@ static int	zbx_get_process_username(HANDLE hProcess, char *userName, char *sid)
 	int		iUse, res = FAIL;
 
 	/* clean result; */
-	*userName = *sid = '\0';
+	*userName = '\0';
+
+	if (NULL != sid)
+		*sid = '\0';
 
 	/* open the processes token */
 	if (0 == OpenProcessToken(hProcess, TOKEN_QUERY, &tok))
@@ -119,7 +122,7 @@ lbl_err:
 	return res;
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	HANDLE			hProcessSnap, hProcess;
 	PROCESSENTRY32		pe32;
@@ -340,7 +343,7 @@ static int	GetProcessAttribute(HANDLE hProcess, int attr, int type, int count, d
  *         avg - average value for all processes named <process>
  *         sum - sum of values for all processes named <process>
  */
-int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_info(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	HANDLE			hProcessSnap, hProcess;
 	PROCESSENTRY32		pe32;
@@ -478,7 +481,7 @@ static void	proc_data_free(proc_data_t *proc_data)
 	zbx_free(proc_data);
 }
 
-int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define SUM_PROC_VALUE_DBL(param)					\
 	do								\

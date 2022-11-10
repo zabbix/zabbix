@@ -70,7 +70,7 @@ $form->addItem([
 	], $checkbox_hash)
 ]);
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Dashboards'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DASHBOARDS_LIST))
 	->setControls(

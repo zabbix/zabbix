@@ -287,7 +287,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 					],
 					'details' => 'Invalid parameter "/1/master_itemid": an item/item prototype ID is expected.'
 				]
-			],
+			]
 		];
 	}
 

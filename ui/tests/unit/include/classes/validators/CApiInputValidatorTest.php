@@ -3682,6 +3682,12 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_REGEX],
+				'Server: nginx\/(.+(?<!\r))',
+				'/1/expression',
+				'Server: nginx\/(.+(?<!\r))'
+			],
+			[
+				['type' => API_REGEX],
 				'/',
 				'/1/expression',
 				'/'
@@ -6437,6 +6443,18 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/item_delay',
 				'Invalid parameter "/1/item_delay": cannot be equal to zero without custom intervals.'
 			],
+			'Nonsense in flexible interval' => [
+				['type' => API_ITEM_DELAY],
+				'0;1m/abc,10:00-18:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": incorrect syntax near ";1m/abc,10:00-18:00".'
+			],
+			'Nonsense in flexible period' => [
+				['type' => API_ITEM_DELAY],
+				'0;1m/1-7,abc',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": incorrect syntax near ";1m/1-7,abc".'
+			],
 			[
 				['type' => API_ITEM_DELAY],
 				'0;1m/1-5,10:00-18:00',
@@ -6521,7 +6539,7 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/item_delay',
 				'Invalid parameter "/1/item_delay": non-active intervals cannot fill the entire time.'
 			],
-			'Non-convertable due to macro in Period' => [
+			'Non-convertible due to macro in period' => [
 				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
 				'0;50s/1-6,09:00-18:00;0/1-5,00:00-24:00;0/{$M}',
 				'/1/item_delay',
@@ -6593,12 +6611,6 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/item_delay',
 				'1m;50s/1-6,09:00-12:00;0/1-3,00:00-24:00;0/5-6,00:00-24:00'
 			],
-			'Polling window available between side-overlapping zero chunks' => [
-				['type' => API_ITEM_DELAY],
-				'1m;50s/1-6,09:00-12:00;0/1-3,00:00-24:00;0/5-6,00:00-24:00',
-				'/1/item_delay',
-				'1m;50s/1-6,09:00-12:00;0/1-3,00:00-24:00;0/5-6,00:00-24:00'
-			],
 			'Polling window available too small for interval' => [
 				['type' => API_ITEM_DELAY],
 				'0;2h/1-6,09:00-12:00;0/1-6,09:00-10:30',
@@ -6617,7 +6629,144 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/item_delay',
 				'0;5399/1-6,09:00-12:00;0/1-6,09:00-10:30'
 			],
-
+			'Polling available via delay, before zero-blocks' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/2-7,00:00-24:00;0/1,00:05-24:00',
+				'/1/item_delay',
+				'5m;0/2-7,00:00-24:00;0/1,00:05-24:00'
+			],
+			'Polling available via delay, after zero-blocks' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-6,00:00-24:00;0/7,00:00-23:55',
+				'/1/item_delay',
+				'5m;0/1-6,00:00-24:00;0/7,00:00-23:55'
+			],
+			'Polling available via delay, between zero-blocks' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-3,00:00-24:00;0/4,00:05-24:00;0/5-7,00:00-24:00',
+				'/1/item_delay',
+				'5m;0/1-3,00:00-24:00;0/4,00:05-24:00;0/5-7,00:00-24:00'
+			],
+			'Polling possible via shorter of intervals' => [
+				['type' => API_ITEM_DELAY],
+				'0;0/1-6,00:00-24:00;20m/7,00:00-24:00;10m/7,00:00-24:00;0/7,00:00-01:35;0/7,01:45-24:00',
+				'/1/item_delay',
+				'0;0/1-6,00:00-24:00;20m/7,00:00-24:00;10m/7,00:00-24:00;0/7,00:00-01:35;0/7,01:45-24:00'
+			],
+			'Polling impossible via shorter of intervals' => [
+				['type' => API_ITEM_DELAY],
+				'0;0/1-6,00:00-24:00;20m/7,00:00-24:00;10m/7,00:00-24:00;0/7,00:00-01:35;0/7,01:44-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Polling possible via shorter of intervals, full window' => [
+				['type' => API_ITEM_DELAY],
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:00-11:00',
+				'/1/item_delay',
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:00-11:00'
+			],
+			'Polling possible via shorter of intervals, end of window' => [
+				['type' => API_ITEM_DELAY],
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:50-11:00',
+				'/1/item_delay',
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:50-11:00'
+			],
+			'Polling possible via shorter of intervals, start of window' => [
+				['type' => API_ITEM_DELAY],
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:00-10:10',
+				'/1/item_delay',
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:00-10:10'
+			],
+			'Polling possible via shorter of intervals, with overlap of cut-off longer one' => [
+				['type' => API_ITEM_DELAY],
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:40-10:50',
+				'/1/item_delay',
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:40-10:50'
+			],
+			'Interval shorter than period allowed' => [
+				['type' => API_ITEM_DELAY],
+				'0;0/1-7,00:00-10:00;0/1-7,11:00-24:00;20m/1-7,10:45-24:00;10m/1-7,10:00-10:09',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": update interval "10m" is longer than period "1-7,10:00-10:09".'
+			],
+			'No window for delay' => [
+				['type' => API_ITEM_DELAY],
+				'10m;0/1-7,00:05-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Window for delay OK' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-7,00:05-24:00',
+				'/1/item_delay',
+				'5m;0/1-7,00:05-24:00'
+			],
+			'Window for smaller delay OK' => [
+				['type' => API_ITEM_DELAY],
+				'1m;0/1-7,00:05-24:00',
+				'/1/item_delay',
+				'1m;0/1-7,00:05-24:00'
+			],
+			'Polling via delay blocked by active flexible interval' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-7,00:05-24:00;10m/1-7,00:04-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Polling via delay not blocked by flexible intervals' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-7,00:10-24:00;10m/1-7,05:00-24:00',
+				'/1/item_delay',
+				'5m;0/1-7,00:10-24:00;10m/1-7,05:00-24:00'
+			],
+			'Delay does not fit due to several flexible intervals' => [
+				['type' => API_ITEM_DELAY],
+				'10m;0/1-7,00:00-00:01;0/1-7,00:10-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Delay fits between blocking zero intervals' => [
+				['type' => API_ITEM_DELAY],
+				'10m;0/1-3,00:00-24:00;0/4,00:00-23:50;0/5-7,00:00-24:00',
+				'/1/item_delay',
+				'10m;0/1-3,00:00-24:00;0/4,00:00-23:50;0/5-7,00:00-24:00'
+			],
+			'Delay fits between blocking mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-3,00:00-24:00;0/4,00:00-23:45;10m/4,23:50-24:00;0/5-7,00:00-24:00',
+				'/1/item_delay',
+				'5m;0/1-3,00:00-24:00;0/4,00:00-23:45;10m/4,23:50-24:00;0/5-7,00:00-24:00'
+			],
+			'Delay does not fit between blocking mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'6m;0/1-3,00:00-24:00;0/4,00:00-23:45;5m/4,23:50-23:55;0/4,23:54-24:00;0/5-7,00:00-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Delay fits after blocking zero intervals' => [
+				['type' => API_ITEM_DELAY],
+				'10m;0/1-6,00:00-24:00;0/7,23:50-24:00',
+				'/1/item_delay',
+				'10m;0/1-6,00:00-24:00;0/7,23:50-24:00'
+			],
+			'Delay does not fit with after mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'10m;0/1-6,00:00-24:00;0/7,23:50-24:00;20m/7,00:00-23:55;0/7,00:00-23:49',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
+			'Delay fits at start of mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'5m;0/1-7,00:10-24:00;10m/1-7,00:07-24:00',
+				'/1/item_delay',
+				'5m;0/1-7,00:10-24:00;10m/1-7,00:07-24:00'
+			],
+			'Delay does not fit at start of mixed intervals' => [
+				['type' => API_ITEM_DELAY],
+				'8m;0/1-7,00:10-24:00;10m/1-7,00:07-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have a polling interval not blocked by non-active interval periods.'
+			],
 			[
 				['type' => API_XML],
 				null,

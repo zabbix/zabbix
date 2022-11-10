@@ -979,7 +979,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'vfs.file.cksum[/sbin/shutdown]',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'Item with key "vfs.file.cksum[/sbin/shutdown]" already exists on'
+						'An item with key "vfs.file.cksum[/sbin/shutdown]" already exists on'
 					]
 				]
 			],

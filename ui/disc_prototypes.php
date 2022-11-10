@@ -415,62 +415,20 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if (hasRequest('update')) {
-			$condition_fields = array_flip(['templateid']);
-
 			$db_items = API::ItemPrototype()->get([
-				'output' => array_diff(array_keys($input + $condition_fields), ['tags', 'preprocessing']),
-				'selectTags' => ['tag', 'value'],
-				'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
+				'output' => ['templateid', 'type', 'key_', 'value_type', 'authtype', 'allow_traps'],
 				'itemids' => $itemid
 			]);
 
-			$db_item = $db_items[0];
-
-			$item = getSanitizedItemFields($input + $db_item + [
+			$item = getSanitizedItemFields($input + $db_items[0] + [
 				'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE,
 				'hosts' => $lld_rules[0]['hosts']
 			]);
 
-			$upd_item = DB::getUpdatedValues('items', array_diff_key($item, array_flip(['query_fields', 'headers'])),
-				$db_item
-			);
+			$response = API::ItemPrototype()->update(['itemid' => $itemid] + $item);
 
-			if (array_key_exists('tags', $item)) {
-				CArrayHelper::sort($item['tags'], ['tag', 'value']);
-				CArrayHelper::sort($db_item['tags'], ['tag', 'value']);
-
-				if ($item['tags'] !== $db_item['tags']) {
-					$upd_item['tags'] = $item['tags'];
-				}
-			}
-
-			if (array_key_exists('preprocessing', $item) && $item['preprocessing'] !== $db_item['preprocessing']) {
-				$upd_item['preprocessing'] = $item['preprocessing'];
-			}
-
-			if (array_key_exists('parameters', $item)) {
-				$parameters = array_column($item['parameters'], 'value', 'name');
-				$db_parameters = array_column($db_item['parameters'], 'value', 'name');
-
-				if ($parameters != $db_parameters) {
-					$upd_item['parameters'] = $item['parameters'];
-				}
-			}
-
-			if (array_key_exists('query_fields', $item) && $item['query_fields'] !== $db_item['query_fields']) {
-				$upd_item['query_fields'] = $item['query_fields'];
-			}
-
-			if (array_key_exists('headers', $item) && $item['headers'] !== $db_item['headers']) {
-				$upd_item['headers'] = $item['headers'];
-			}
-
-			if ($upd_item) {
-				$response = API::ItemPrototype()->update(['itemid' => $itemid] + $upd_item);
-
-				if ($response === false) {
-					throw new Exception();
-				}
+			if ($response === false) {
+				throw new Exception();
 			}
 		}
 	}

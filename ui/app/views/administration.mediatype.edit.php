@@ -28,7 +28,7 @@ $this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('administration.mediatype.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Media types'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_EDIT));
 
@@ -45,7 +45,7 @@ $mediaTypeForm = (new CForm())
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem((new CVar('status', MEDIA_TYPE_STATUS_DISABLED))->removeId())
 	->disablePasswordAutofill()
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 // Create form list.
 $mediatype_formlist = (new CFormList())
@@ -201,7 +201,7 @@ $row_template = (new CTag('script', true))
 		]))->addClass('form_row')
 	);
 
-$widget->addItem($row_template);
+$html_page->addItem($row_template);
 
 $parameters_table->addRow([(new CButton('parameter_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
@@ -389,4 +389,4 @@ else {
 $mediaTypeForm->addItem($tabs);
 
 // append form to widget
-$widget->addItem($mediaTypeForm)->show();
+$html_page->addItem($mediaTypeForm)->show();

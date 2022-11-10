@@ -22,14 +22,15 @@
 
 #include "zbxdbhigh.h"
 #include "zbxsysinfo.h"
+#include "../../../src/libs/zbxsysinfo/sysinfo.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 
 static char	*called_key = NULL;
 
-int	__wrap_WEB_PAGE_GET(const char *command, AGENT_RESULT *result);
-int	__wrap_WEB_PAGE_PERF(const char *command, AGENT_RESULT *result);
-int	__wrap_WEB_PAGE_REGEXP(const char *command, AGENT_RESULT *result);
+int	__wrap_web_page_get(const char *command, AGENT_RESULT *result);
+int	__wrap_web_page_perf(const char *command, AGENT_RESULT *result);
+int	__wrap_web_page_regexp(const char *command, AGENT_RESULT *result);
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -70,7 +71,7 @@ void	zbx_mock_test_entry(void **state)
 	}
 }
 
-int	__wrap_WEB_PAGE_GET(const char *command, AGENT_RESULT *result)
+int	__wrap_web_page_get(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -80,7 +81,7 @@ int	__wrap_WEB_PAGE_GET(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_WEB_PAGE_PERF(const char *command, AGENT_RESULT *result)
+int	__wrap_web_page_perf(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);
@@ -90,7 +91,7 @@ int	__wrap_WEB_PAGE_PERF(const char *command, AGENT_RESULT *result)
 	return SUCCEED;
 }
 
-int	__wrap_WEB_PAGE_REGEXP(const char *command, AGENT_RESULT *result)
+int	__wrap_web_page_regexp(const char *command, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(command);
 	ZBX_UNUSED(result);

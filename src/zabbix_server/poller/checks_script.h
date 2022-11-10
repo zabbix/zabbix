@@ -21,7 +21,7 @@
 #define ZABBIX_CHECKS_SCRIPT_H
 
 #include "module.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 void	scriptitem_es_engine_init(void);
 void	scriptitem_es_engine_destroy(void);

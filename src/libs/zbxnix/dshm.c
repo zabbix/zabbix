@@ -22,8 +22,6 @@
 #include "zbxcommon.h"
 #include "log.h"
 
-extern char	*CONFIG_FILE;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: creates dynamic shared memory segment                             *

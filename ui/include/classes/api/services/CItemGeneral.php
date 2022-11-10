@@ -78,7 +78,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @var int
 	 */
-	protected const INHERIT_CHUNK_SIZE = 100;
+	protected const INHERIT_CHUNK_SIZE = 1000;
 
 	/**
 	 * @abstract
@@ -919,9 +919,6 @@ abstract class CItemGeneral extends CApiService {
 						$upd_item_indexes[$upd_item['hostid']][$interface_type][] = $i;
 						$interface_types[$interface_type] = true;
 					}
-					else {
-						$upd_items[$i]['interfaceid'] = $row['interfaceid'];
-					}
 				}
 			}
 		}
@@ -1217,13 +1214,15 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * @param array      $items
 	 * @param array|null $db_items
+	 * @param array|null $upd_itemids
 	 */
-	protected static function updateParameters(array &$items, array $db_items = null): void {
+	protected static function updateParameters(array &$items, array $db_items = null,
+			array &$upd_itemids = null): void {
 		$ins_item_parameters = [];
 		$upd_item_parameters = [];
 		$del_item_parameterids = [];
 
-		foreach ($items as &$item) {
+		foreach ($items as $i => &$item) {
 			$update = false;
 
 			if ($db_items === null) {
@@ -1251,6 +1250,7 @@ abstract class CItemGeneral extends CApiService {
 				continue;
 			}
 
+			$changed = false;
 			$db_item_parameters = ($db_items !== null)
 				? array_column($db_items[$item['itemid']]['parameters'], null, 'name')
 				: [];
@@ -1268,17 +1268,30 @@ abstract class CItemGeneral extends CApiService {
 							'values' => $upd_item_parameter,
 							'where' => ['item_parameterid' => $db_item_parameter['item_parameterid']]
 						];
+						$changed = true;
 					}
 				}
 				else {
 					$ins_item_parameters[] = ['itemid' => $item['itemid']] + $item_parameter;
+					$changed = true;
 				}
 			}
 			unset($item_parameter);
 
-			$del_item_parameterids = array_merge($del_item_parameterids,
-				array_column($db_item_parameters, 'item_parameterid')
-			);
+			if ($db_item_parameters) {
+				$del_item_parameterids =
+					array_merge($del_item_parameterids, array_column($db_item_parameters, 'item_parameterid'));
+				$changed = true;
+			}
+
+			if ($db_items !== null) {
+				if ($changed) {
+					$upd_itemids[$i] = $item['itemid'];
+				}
+				else {
+					unset($item['parameters']);
+				}
+			}
 		}
 		unset($item);
 
@@ -1312,17 +1325,20 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * @param array      $items
 	 * @param array|null $db_items
+	 * @param array|null $upd_itemids
 	 */
-	protected static function updatePreprocessing(array &$items, array $db_items = null): void {
+	protected static function updatePreprocessing(array &$items, array $db_items = null,
+			array &$upd_itemids = null): void {
 		$ins_item_preprocs = [];
 		$upd_item_preprocs = [];
 		$del_item_preprocids = [];
 
-		foreach ($items as &$item) {
+		foreach ($items as $i => &$item) {
 			if (!array_key_exists('preprocessing', $item)) {
 				continue;
 			}
 
+			$changed = false;
 			$db_item_preprocs = ($db_items !== null)
 				? array_column($db_items[$item['itemid']]['preprocessing'], null, 'step')
 				: [];
@@ -1344,15 +1360,30 @@ abstract class CItemGeneral extends CApiService {
 							'values' => $upd_item_preproc,
 							'where' => ['item_preprocid' => $db_item_preproc['item_preprocid']]
 						];
+						$changed = true;
 					}
 				}
 				else {
 					$ins_item_preprocs[] = ['itemid' => $item['itemid']] + $item_preproc;
+					$changed = true;
 				}
 			}
 			unset($item_preproc);
 
-			$del_item_preprocids = array_merge($del_item_preprocids, array_column($db_item_preprocs, 'item_preprocid'));
+			if ($db_item_preprocs) {
+				$del_item_preprocids =
+					array_merge($del_item_preprocids, array_column($db_item_preprocs, 'item_preprocid'));
+				$changed = true;
+			}
+
+			if ($db_items !== null) {
+				if ($changed) {
+					$upd_itemids[$i] = $item['itemid'];
+				}
+				else {
+					unset($item['preprocessing']);
+				}
+			}
 		}
 		unset($item);
 
@@ -1386,16 +1417,18 @@ abstract class CItemGeneral extends CApiService {
 	/**
 	 * @param array      $items
 	 * @param array|null $db_items
+	 * @param array|null $upd_itemids
 	 */
-	protected static function updateTags(array &$items, array $db_items = null): void {
+	protected static function updateTags(array &$items, array $db_items = null, array &$upd_itemids = null): void {
 		$ins_tags = [];
 		$del_itemtagids = [];
 
-		foreach ($items as &$item) {
+		foreach ($items as $i => &$item) {
 			if (!array_key_exists('tags', $item)) {
 				continue;
 			}
 
+			$changed = false;
 			$db_tags = ($db_items !== null) ? $db_items[$item['itemid']]['tags'] : [];
 
 			foreach ($item['tags'] as &$tag) {
@@ -1410,11 +1443,24 @@ abstract class CItemGeneral extends CApiService {
 				}
 				else {
 					$ins_tags[] = ['itemid' => $item['itemid']] + $tag;
+					$changed = true;
 				}
 			}
 			unset($tag);
 
-			$del_itemtagids = array_merge($del_itemtagids, array_keys($db_tags));
+			if ($db_tags) {
+				$del_itemtagids = array_merge($del_itemtagids, array_keys($db_tags));
+				$changed = true;
+			}
+
+			if ($db_items !== null) {
+				if ($changed) {
+					$upd_itemids[$i] = $item['itemid'];
+				}
+				else {
+					unset($item['tags']);
+				}
+			}
 		}
 		unset($item);
 
@@ -1482,20 +1528,20 @@ abstract class CItemGeneral extends CApiService {
 				case ZBX_FLAG_DISCOVERY_NORMAL:
 				case ZBX_FLAG_DISCOVERY_CREATED:
 					$error = $target_is_template
-						? _('Item with key "%1$s" already exists on template "%2$s".')
-						: _('Item with key "%1$s" already exists on host "%2$s".');
+						? _('An item with key "%1$s" already exists on the template "%2$s".')
+						: _('An item with key "%1$s" already exists on the host "%2$s".');
 					break;
 
 				case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 					$error = $target_is_template
-						? _('Item prototype with key "%1$s" already exists on template "%2$s".')
-						: _('Item prototype with key "%1$s" already exists on host "%2$s".');
+						? _('An item prototype with key "%1$s" already exists on the template "%2$s".')
+						: _('An item prototype with key "%1$s" already exists on the host "%2$s".');
 					break;
 
 				case ZBX_FLAG_DISCOVERY_RULE:
 					$error = $target_is_template
-						? _('LLD rule with key "%1$s" already exists on template "%2$s".')
-						: _('LLD rule with key "%1$s" already exists on host "%2$s".');
+						? _('An LLD rule with key "%1$s" already exists on the template "%2$s".')
+						: _('An LLD rule with key "%1$s" already exists on the host "%2$s".');
 					break;
 			}
 
@@ -1822,24 +1868,24 @@ abstract class CItemGeneral extends CApiService {
 
 		foreach ($root_itemids as $root_itemid) {
 			if (self::maxDependencyLevelExceeded($master_item_links, $root_itemid, $links_path)) {
-				[$is_update, $flags, $key, $master_flags, $master_key, $is_template, $host] =
+				[$flags, $key, $master_flags, $master_key, $is_template, $host] =
 					self::getProblemCausedItemData($links_path, $items);
 
-				$error = self::getDependentItemError($is_update, $flags, $master_flags, $is_template);
+				$error = self::getDependentItemError($flags, $master_flags, $is_template);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $key, $master_key, $host,
-					_('allowed count of dependency levels will be exceeded')
+					_('allowed count of dependency levels would be exceeded')
 				));
 			}
 
 			if (self::maxDependentItemCountExceeded($master_item_links, $root_itemid, $links_path)) {
-				[$is_update, $flags, $key, $master_flags, $master_key, $is_template, $host] =
+				[$flags, $key, $master_flags, $master_key, $is_template, $host] =
 					self::getProblemCausedItemData($links_path, $items);
 
-				$error = self::getDependentItemError($is_update, $flags, $master_flags, $is_template);
+				$error = self::getDependentItemError($flags, $master_flags, $is_template);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $key, $master_key, $host,
-					_('allowed count of dependent items will be exceeded')
+					_('allowed count of dependent items would be exceeded')
 				));
 			}
 		}
@@ -2127,26 +2173,16 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Get the data of dependent item that caused the problem relying on the given path where the problem was detected.
+	 * Get data for a dependent item that causes a problem, based on the given path where the problem was detected.
 	 *
 	 * @param array $links_path
 	 * @param array $items
 	 *
 	 * @return array
-	 *
-	 * @return int   Cumulative count of items under the root item.
 	 */
 	private static function getProblemCausedItemData(array $links_path, array $items): array {
-		$items_by_masterid = [];
-
-		foreach ($items as $i => $item) {
-			unset($items[$i]);
-			$items_by_masterid[$item['master_itemid']][] = $item;
-		}
-
-		foreach ($links_path as $master_itemid) {
-			if (array_key_exists($master_itemid, $items_by_masterid)) {
-				$item = $items_by_masterid[$master_itemid][0];
+		foreach ($items as $item) {
+			if (in_array($item['master_itemid'], $links_path)) {
 				break;
 			}
 		}
@@ -2158,7 +2194,6 @@ abstract class CItemGeneral extends CApiService {
 				' AND '.dbConditionId('i.itemid', [$item['master_itemid']])
 		));
 
-		$is_update = array_key_exists('itemid', $item);
 		$flags = $item['flags'];
 		$key = $item['key_'];
 		$master_flags = $master_item_data['flags'];
@@ -2166,70 +2201,40 @@ abstract class CItemGeneral extends CApiService {
 		$is_template = $item['host_status'] == HOST_STATUS_TEMPLATE;
 		$host = $master_item_data['host'];
 
-		return [$is_update, $flags, $key, $master_flags, $master_key, $is_template, $host];
+		return [$flags, $key, $master_flags, $master_key, $is_template, $host];
 	}
 
 	/**
 	 * Get the error message about problem with dependent item according to given data.
 	 *
-	 * @param bool $is_update
 	 * @param int  $flags
 	 * @param int  $master_flags
 	 * @param bool $is_template
 	 *
 	 * @return string
 	 */
-	private static function getDependentItemError(bool $is_update, int $flags, int $master_flags,
-			bool $is_template): string {
+	private static function getDependentItemError(int $flags, int $master_flags, bool $is_template): string {
 		if ($flags == ZBX_FLAG_DISCOVERY_NORMAL) {
-			if ($is_update) {
-				return $is_template
-					? _('Cannot update the dependent item with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
-					: _('Cannot update the dependent item with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
-			}
-			else {
-				return $is_template
-					? _('Cannot create the dependent item with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
-					: _('Cannot create the dependent item with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
-			}
+			return $is_template
+				? _('Cannot set dependency for item with key "%1$s" on the master item with key "%2$s" on the template "%3$s": %4$s.')
+				: _('Cannot set dependency for item with key "%1$s" on the master item with key "%2$s" on the host "%3$s": %4$s.');
 		}
 		elseif ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			if ($is_update) {
-				if ($master_flags == ZBX_FLAG_DISCOVERY_NORMAL) {
-					return $is_template
-						? _('Cannot update the dependent item prototype with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
-						: _('Cannot update the dependent item prototype with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
-				}
-				else {
-					return $is_template
-						? _('Cannot update the dependent item prototype with key "%1$s" with reference to the master item prototype with key "%2$s" on the template "%3$s": %4$s.')
-						: _('Cannot update the dependent item prototype with key "%1$s" with reference to the master item prototype with key "%2$s" on the host "%3$s": %4$s.');
-				}
+			if ($master_flags == ZBX_FLAG_DISCOVERY_NORMAL) {
+				return $is_template
+					? _('Cannot set dependency for item prototype with key "%1$s" on the master item with key "%2$s" on the template "%3$s": %4$s.')
+					: _('Cannot set dependency for item prototype with key "%1$s" on the master item with key "%2$s" on the host "%3$s": %4$s.');
 			}
 			else {
-				if ($master_flags == ZBX_FLAG_DISCOVERY_NORMAL) {
-					return $is_template
-						? _('Cannot create the dependent item prototype with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
-						: _('Cannot create the dependent item prototype with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
-				}
-				else {
-					return $is_template
-						? _('Cannot create the dependent item prototype with key "%1$s" with reference to the master item prototype with key "%2$s" on the template "%3$s": %4$s.')
-						: _('Cannot create the dependent item prototype with key "%1$s" with reference to the master item prototype with key "%2$s" on the host "%3$s": %4$s.');
-				}
+				return $is_template
+					? _('Cannot set dependency for item prototype with key "%1$s" on the master item prototype with key "%2$s" on the template "%3$s": %4$s.')
+					: _('Cannot set dependency for item prototype with key "%1$s" on the master item prototype with key "%2$s" on the host "%3$s": %4$s.');
 			}
 		}
 		elseif ($flags == ZBX_FLAG_DISCOVERY_RULE) {
-			if ($is_update) {
-				return $is_template
-					? _('Cannot update the dependent LLD rule with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
-					: _('Cannot update the dependent LLD rule with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
-			}
-			else {
-				return $is_template
-					? _('Cannot create the dependent LLD rule with key "%1$s" with reference to the master item with key "%2$s" on the template "%3$s": %4$s.')
-					: _('Cannot create the dependent LLD rule with key "%1$s" with reference to the master item with key "%2$s" on the host "%3$s": %4$s.');
-			}
+			return $is_template
+				? _('Cannot set dependency for LLD rule with key "%1$s" on the master item with key "%2$s" on the template "%3$s": %4$s.')
+				: _('Cannot set dependency for LLD rule with key "%1$s" on the master item with key "%2$s" on the host "%3$s": %4$s.');
 		}
 	}
 

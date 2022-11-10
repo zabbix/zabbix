@@ -59,7 +59,7 @@ foreach ($submenu_source as $value => $label) {
 
 $current_url = (new CUrl('actionconf.php'))->setArgument('eventsource', $data['eventsource']);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle($title)
 	->setTitleSubmenu(['main_section' => ['items' => $submenu]])
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_ACTION_LIST))
@@ -180,7 +180,6 @@ $actionForm->addItem([
 	], $data['eventsource'])
 ]);
 
-// append form to widget
-$widget->addItem($actionForm);
-
-$widget->show();
+$html_page
+	->addItem($actionForm)
+	->show();

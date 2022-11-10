@@ -525,9 +525,7 @@ class CHttpTest extends CApiService {
 			}
 		}
 
-		$httptests = $this->extendObjectsByKey($httptests, $db_httptests, 'httptestid',
-			['hostid', 'name', 'templateid']
-		);
+		$httptests = $this->extendObjectsByKey($httptests, $db_httptests, 'httptestid', ['hostid', 'name']);
 
 		// uniqueness
 		foreach ($httptests as &$httptest) {
@@ -634,6 +632,10 @@ class CHttpTest extends CApiService {
 
 		DB::delete('httptest_field', ['httptestid' => $del_httptestids]);
 		DB::delete('httptest_tag', ['httptestid' => $del_httptestids]);
+		DB::update('httptest', [
+			'values' => ['templateid' => 0],
+			'where' => ['httptestid' => $del_httptestids]
+		]);
 		DB::delete('httptest', ['httptestid' => $del_httptestids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_SCENARIO, $db_httptests);

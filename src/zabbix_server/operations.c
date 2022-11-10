@@ -24,6 +24,7 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
 #include "zbxnum.h"
+#include "zbxdbwrap.h"
 
 typedef enum
 {

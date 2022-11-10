@@ -1,0 +1,72 @@
+section {
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
+
+	.section-head {
+		display: flex;
+		height: 32px;
+		line-height: 32px;
+
+		h4 {
+			padding: 0 10px;
+			margin-right: auto;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			font-weight: bold;
+			line-height: inherit;
+			color: lighten($font-color, 15%);
+		}
+	}
+
+	.section-toggle {
+		@extend %btn-widget-defaults;
+
+		width: 24px;
+		height: 24px;
+		margin: 2px 2px 0 auto;
+		background: url($sprite-path) no-repeat -6px -654px;
+	}
+
+	.section-foot {
+		padding: 0 10px;
+		text-align: right;
+		line-height: 32px;
+		color: $font-alt-color;
+	}
+
+	&.section-collapsed {
+		.section-body,
+		.section-foot {
+			display: none;
+		}
+
+		.section-toggle {
+			background-position: -6px -689px;
+		}
+	}
+
+	&:not(:last-child) {
+		margin-bottom: 10px;
+	}
+
+	.list-table {
+		border: 0;
+
+		tbody tr:last-child {
+			td {
+				border-bottom: 1px solid $table-border-color;
+			}
+		}
+
+		td,
+		th {
+			&:first-child {
+				padding-left: 10px;
+			}
+
+			&:last-child {
+				padding-right: 10px;
+			}
+		}
+	}
+}

@@ -18,12 +18,13 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 
 #include "log.h"
 #include "cfg.h"
 #include "zbxtime.h"
 
-#include "perfmon.h"
+#include "zbxwin32.h"
 
 #pragma comment(lib, "user32.lib")
 
@@ -169,7 +170,7 @@ static void	get_wmi_check_timeout(const char *wmi_namespace, const char *query, 
 	*time_previous_query_finished = zbx_time();
 }
 
-int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	system_uname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*os = NULL;
 	size_t	os_alloc = 0, os_offset = 0;

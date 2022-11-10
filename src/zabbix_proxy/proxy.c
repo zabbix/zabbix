@@ -17,10 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "proxy.h"
+#include "zbxdbwrap.h"
 
 #include "cfg.h"
 #include "zbxdbhigh.h"
+#include "zbxcacheconfig.h"
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
@@ -294,6 +295,11 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
 
+static char	*config_file		= NULL;
+static int	config_allow_root	= 0;
+
+static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
+
 zbx_vector_ptr_t	zbx_addrs;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
@@ -499,8 +505,8 @@ static void	zbx_set_defaults(void)
 		program_type = ZBX_PROGRAM_TYPE_PROXY_PASSIVE;
 	}
 
-	if (NULL == CONFIG_LOG_TYPE_STR)
-		CONFIG_LOG_TYPE_STR = zbx_strdup(CONFIG_LOG_TYPE_STR, ZBX_OPTION_LOGTYPE_FILE);
+	if (NULL == log_file_cfg.log_type_str)
+		log_file_cfg.log_type_str = zbx_strdup(log_file_cfg.log_type_str, ZBX_OPTION_LOGTYPE_FILE);
 
 	if (NULL == CONFIG_SOCKET_PATH)
 		CONFIG_SOCKET_PATH = zbx_strdup(CONFIG_SOCKET_PATH, "/tmp");
@@ -606,7 +612,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	/* because they have non-zero default values */
 #endif
 
-	if (SUCCEED != zbx_validate_log_parameters(task))
+	if (SUCCEED != zbx_validate_log_parameters(task, &log_file_cfg))
 		err = 1;
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
@@ -775,11 +781,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			5},
 		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"LogType",			&CONFIG_LOG_TYPE_STR,			TYPE_STRING,
+		{"LogType",			&log_file_cfg.log_type_str,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"LogFile",			&CONFIG_LOG_FILE,			TYPE_STRING,
+		{"LogFile",			&log_file_cfg.log_file_name,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"LogFileSize",			&CONFIG_LOG_FILE_SIZE,			TYPE_INT,
+		{"LogFileSize",			&log_file_cfg.log_file_size,		TYPE_INT,
 			PARM_OPT,	0,			1024},
 		{"ExternalScripts",		&CONFIG_EXTERNALSCRIPTS,		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -841,7 +847,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"VMwareTimeout",		&CONFIG_VMWARE_TIMEOUT,			TYPE_INT,
 			PARM_OPT,	1,			300},
-		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
+		{"AllowRoot",			&config_allow_root,			TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"User",			&CONFIG_USER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -903,11 +909,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
 
-	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
+	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 
 	zbx_set_defaults();
 
-	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
+	log_file_cfg.log_type = zbx_get_log_type(log_file_cfg.log_type_str);
 
 	zbx_validate_config(task);
 
@@ -1032,8 +1038,8 @@ int	main(int argc, char **argv)
 		{
 			case 'c':
 				opt_c++;
-				if (NULL == CONFIG_FILE)
-					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
+				if (NULL == config_file)
+					config_file = zbx_strdup(config_file, zbx_optarg);
 				break;
 			case 'R':
 				opt_r++;
@@ -1085,8 +1091,8 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == CONFIG_FILE)
-		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
+	if (NULL == config_file)
+		config_file = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 
 	/* required for simple checks */
 	zbx_init_metrics();
@@ -1114,7 +1120,8 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
-	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
+	return zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit,
+			log_file_cfg.log_type, log_file_cfg.log_file_name);
 }
 
 static void	zbx_check_db(void)
@@ -1138,7 +1145,7 @@ static void	proxy_db_init(void)
 	zbx_stat_t	db_stat;
 #endif
 
-	if (SUCCEED != DBinit(&error))
+	if (SUCCEED != DBinit(DCget_nextid, program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
@@ -1227,7 +1234,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE, &error))
+	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
 	{
 		zbx_error("cannot open log:%s", error);
 		zbx_free(error);
@@ -1290,7 +1297,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
+	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (SUCCEED != zbx_coredump_disable())

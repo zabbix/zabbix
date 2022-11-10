@@ -19,7 +19,7 @@
 
 #include "trapper.h"
 #include "zbxserver.h"
-#include "proxy.h"
+#include "zbxdbwrap.h"
 
 #include "log.h"
 #include "zbxself.h"
@@ -74,6 +74,13 @@ typedef struct
 	zbx_uint64_t	value;
 }
 zbx_entry_attribute_t;
+
+typedef enum
+{
+	ZBX_COUNTER_TYPE_UI64,
+	ZBX_COUNTER_TYPE_DBL
+}
+zbx_counter_type_t;
 
 typedef struct
 {

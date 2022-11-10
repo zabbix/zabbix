@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-10-15 04:11+0000\n"
+"PO-Revision-Date: 2022-11-08 14:32+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -255,6 +255,11 @@ msgstr "%1$s件選択済"
 #: app/controllers/CControllerMediatypeEnable.php:93
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
+msgstr ""
+
+#: include/classes/core/CModuleManager.php:153
+#, c-format
+msgid "%1$s.php class must extend %2$s for module located at %3$s."
 msgstr ""
 
 #: app/controllers/CControllerMediatypeEnable.php:108
@@ -876,6 +881,10 @@ msgstr "新しいウィジェットを追加"
 msgid "Add child element"
 msgstr "子の要素を追加"
 
+#: widgets/navtree/Widget.php:39
+msgid "Add child elements"
+msgstr ""
+
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
 msgstr "子サービスの追加"
@@ -1202,6 +1211,36 @@ msgstr "スワップ領域にスワップアウトされるゲストの物理メ
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "ゲストの物理メモリページをバックアップするために消費されたホストの物理メモリ量、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
+
+#: include/classes/api/services/CItemGeneral.php:1544
+#, c-format
+msgid "An LLD rule with key \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1543
+#, c-format
+msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1538
+#, c-format
+msgid "An item prototype with key \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1537
+#, c-format
+msgid "An item prototype with key \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1532
+#, c-format
+msgid "An item with key \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1531
+#, c-format
+msgid "An item with key \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
@@ -2102,9 +2141,23 @@ msgstr "ユーザーグループを追加できません"
 msgid "Cannot add web scenario"
 msgstr "Webシナリオを追加できません"
 
+#: jsLoader.php:129
+msgid "Cannot add widget: no widgets available."
+msgstr ""
+
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
 msgstr "ウィジェットが追加できません: ダッシュボードの空き領域が足りません。"
+
+#: include/classes/api/services/CItem.php:1532
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of host \"%3$s\", because it is already populated by the item with key \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1531
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\""
+msgstr ""
 
 #: jsLoader.php:343
 msgctxt "screen reader"
@@ -2174,6 +2227,16 @@ msgstr[0] "グラフをコピーできません"
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
 msgstr[0] "アイテムをコピーできません"
+
+#: include/classes/api/services/CDiscoveryRule.php:2475
+#, c-format
+msgid "Cannot copy item prototype with key \"%1$s\" without its master item with key \"%2$s\"."
+msgstr ""
+
+#: include/items.inc.php:590
+#, c-format
+msgid "Cannot copy item with key \"%1$s\" without its master item with key \"%2$s\"."
+msgstr ""
 
 #: triggers.php:538
 msgid "Cannot copy trigger"
@@ -2736,6 +2799,16 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロ�
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "アイテムのキー\"%2$s\"のインターフェースは\"%1$s\"に存在しません。"
 
+#: include/classes/api/services/CDiscoveryRule.php:2517
+#, c-format
+msgid "Cannot find host interface on \"%1$s\" for item prototype with key \"%2$s\"."
+msgstr ""
+
+#: include/items.inc.php:640
+#, c-format
+msgid "Cannot find host interface on \"%1$s\" for item with key \"%2$s\"."
+msgstr ""
+
 #: include/classes/import/importers/CMapImporter.php:207
 #, c-format
 msgid "Cannot find icon \"%1$s\" used in map \"%2$s\"."
@@ -2851,6 +2924,185 @@ msgstr "ユーサーの役割\"%1$s\"のルール\"%2$s\"内に空のタグが�
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] "テンプレート\"%1$s\"をインポートできません。リンクされているテンプレート\"%2$s\"が存在しません。"
+
+#: include/classes/api/services/CItemGeneral.php:588
+#, c-format
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:589
+#, c-format
+msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:704
+#: include/classes/api/services/CItemGeneral.php:716
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1030
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:710
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:769
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:705
+#: include/classes/api/services/CItemGeneral.php:717
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:711
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:770
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemPrototype.php:1230
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemPrototype.php:1231
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:725
+#: include/classes/api/services/CItemGeneral.php:737
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1034
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:731
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:775
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:726
+#: include/classes/api/services/CItemGeneral.php:738
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:732
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:776
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:582
+#, c-format
+msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:583
+#, c-format
+msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1455
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to host \"%5$s\", because they would populate the same inventory field \"%6$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1454
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to template \"%5$s\", because they would populate the same inventory field \"%6$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:695
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1026
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:683
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:689
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:763
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1509
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:696
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:690
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:764
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItem.php:1508
+#, c-format
+msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:576
+#, c-format
+msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:577
+#, c-format
+msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1581
 msgid "Cannot insert trigger expression"
@@ -2987,6 +3239,10 @@ msgstr "ホストの表示名を一括更新できません。"
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
 msgstr "テンプレートIDの重複のためリンク%1$sを作成できません。"
 
+#: jsLoader.php:130
+msgid "Cannot paste inaccessible widget."
+msgstr ""
+
 #: include/classes/db/DB.php:958
 #, c-format
 msgid "Cannot perform delete statement on table \"%1$s\" without where condition."
@@ -3072,6 +3328,46 @@ msgstr "グラフのプロトタイプ\"%2$s\"に\"%1$s\"を設定できませ�
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "アイテム\"%2$s\"に\"%1$s\"を設定できません。"
+
+#: include/classes/api/services/CItemGeneral.php:2237
+#, c-format
+msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2236
+#, c-format
+msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2231
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2230
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2226
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2225
+#, c-format
+msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2220
+#, c-format
+msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:2219
+#, c-format
+msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
+msgstr ""
 
 #: include/classes/api/services/CHost.php:1037
 #: include/classes/api/services/CHost.php:2015
@@ -4186,6 +4482,9 @@ msgid ""
 "1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
+"Zabbixサーバー\"%1$s\"への接続に失敗しました。以下の原因が考えられます：\n"
+"1. \"zabbix_server.conf\"内の\"NodeAddress\"か\"ListenPort\"が正しくないか、\"zabbix.conf.php\"内のIP/DNSで上書きされている。\n"
+"2. DNSサーバーの設定が正しくない。\n"
 
 #: include/classes/server/CZabbixServer.php:609
 #, c-format
@@ -4207,6 +4506,11 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Zabbixサーバー\"%1$s\"への接続が拒否されました。以下の原因が考えられます：\n"
+"1. \"zabbix_server.conf\"内の\"NodeAddress\"か\"ListenPort\"が正しくないか、\"zabbix.conf.php\"内のIP/DNSで上書きされている。\n"
+"2. セキュリティ設定（例えばSELinux）によって接続がブロックされている。\n"
+"3. Zabbixサーバーデーモンが起動していない。\n"
+"4. FirewallによってTCPでの接続がブロックされている。\n"
 
 #: include/classes/server/CZabbixServer.php:597
 #, c-format
@@ -4230,6 +4534,9 @@ msgid ""
 "1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Zabbixサーバー\"%1$s\"への接続がタイムアウトしました。以下の原因が考えられます：\n"
+"1. \"zabbix_server.conf\"内の\"NodeAddress\"か\"ListenPort\"が正しくないか、\"zabbix.conf.php\"内のIP/DNSで上書きされている。\n"
+"2. FirewallによってTCPでの接続がブロックされている。\n"
 
 #: include/classes/server/CZabbixServer.php:605
 #, c-format
@@ -9025,6 +9332,25 @@ msgstr "アクセスできないユーザー"
 msgid "Inaccessible user group"
 msgstr "アクセスできないユーザーグループ"
 
+#: jsLoader.php:147 jsLoader.php:175
+msgid "Inaccessible widget"
+msgstr ""
+
+#: app/controllers/CControllerDashboardWidgetCheck.php:52
+#: app/controllers/CControllerDashboardWidgetEdit.php:65
+#: include/classes/helpers/CDashboardHelper.php:453
+#: include/classes/helpers/CDashboardHelper.php:461
+msgid "Inaccessible widget type."
+msgstr ""
+
+#: jsLoader.php:138
+msgid "Inaccessible widgets were not copied."
+msgstr ""
+
+#: jsLoader.php:139
+msgid "Inaccessible widgets were not pasted."
+msgstr ""
+
 #: app/partials/js/scheduledreport.subscription.js.php:165
 #: app/partials/js/scheduledreport.subscription.js.php:181
 #: app/views/popup.scheduledreport.subscription.php:117
@@ -9881,7 +10207,7 @@ msgstr "情報"
 
 #: include/classes/data/CItemData.php:1429
 msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "vmware.datastore.perfcounterに必要なハイパーバイザーの内部ディスクに関する情報、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。JSONで返す"
 
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
@@ -14208,6 +14534,10 @@ msgstr "ページ %1$d"
 msgid "Page display period"
 msgstr "ページ表示間隔"
 
+#: include/classes/core/ZBase.php:565
+msgid "Page not found"
+msgstr ""
+
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:46
 #: include/validate.inc.php:435
 msgid "Page received incorrect data"
@@ -18328,6 +18658,16 @@ msgstr "この設定は数値データにだけ適用されます。"
 msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
 msgstr "この設定は数値データにだけ適用されます。非数値データは常にヒストリから取得されます。"
 
+#: app/partials/administration.system.info.php:199
+#: app/views/administration.housekeeping.edit.php:134
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr "ヒストリテーブルには圧縮されたチャンクが含まれているため、この設定を有効にする必要があります。"
+
+#: app/partials/administration.system.info.php:213
+#: app/views/administration.housekeeping.edit.php:163
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
+msgstr "トレンド テーブルには圧縮されたチャンクが含まれているため、この設定を有効にする必要があります。"
+
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
 msgid "This type of information may not match the key."
@@ -19998,7 +20338,7 @@ msgstr "VMwareのキャッシュ統計。利用可能なモード：total, free,
 
 #: include/classes/data/CItemData.php:1252
 msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
-msgstr ""
+msgstr "VMwareクラスターのアラームデータ、JSONで返す、<url> - VMwareサービスURL、<id> - VMwareクラスターid"
 
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
@@ -20919,6 +21259,11 @@ msgstr "ワーキングタイム"
 msgid "Write"
 msgstr "表示/設定"
 
+#: include/classes/core/CModuleManager.php:136
+#, c-format
+msgid "Wrong %1$s.php class name for module located at %2$s."
+msgstr ""
+
 #: include/classes/core/CModuleManager.php:203
 #, c-format
 msgid "Wrong Module.php class name for module located at %1$s."
@@ -21463,6 +21808,14 @@ msgstr "すべて"
 msgid "all media"
 msgstr "すべてのメディア"
 
+#: include/classes/api/services/CItemGeneral.php:1877
+msgid "allowed count of dependency levels would be exceeded"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1888
+msgid "allowed count of dependent items would be exceeded"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
 msgstr "IPアドレスを指定してください"
@@ -21531,6 +21884,18 @@ msgstr "識別子は式で定義されていません"
 #: include/classes/validators/CApiInputValidator.php:677
 msgid "an integer is expected"
 msgstr "整数で指定してください"
+
+#: include/classes/api/services/CItemGeneral.php:1806
+#: include/classes/api/services/CItemGeneral.php:1827
+#: include/classes/api/services/CItemGeneral.php:1930
+msgid "an item ID is expected"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1805
+#: include/classes/api/services/CItemGeneral.php:1826
+#: include/classes/api/services/CItemGeneral.php:1929
+msgid "an item/item prototype ID is expected"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:716
 #: include/classes/validators/CApiInputValidator.php:2882
@@ -21685,6 +22050,22 @@ msgstr "計算"
 msgid "can be used to add \"@2x\" to the URL to load retina tiles."
 msgstr "高精細タイルを読み込むためにURLに\"@2x\"を追加できる。"
 
+#: include/classes/api/services/CItemGeneral.php:2383
+msgid "cannot be a value map ID from another host or template"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1942
+msgid "cannot be an item ID from another host or template"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1956
+msgid "cannot be an item prototype ID from another LLD rule"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1941
+msgid "cannot be an item/item prototype ID from another host or template"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:229
 msgid "cannot be changed"
 msgstr "変更できません"
@@ -21785,6 +22166,10 @@ msgstr "変更できません"
 msgid "cannot be empty"
 msgstr "空白は指定できません"
 
+#: include/classes/validators/CApiInputValidator.php:3560
+msgid "cannot be equal to zero without custom intervals"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2982
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
@@ -21796,6 +22181,10 @@ msgstr "パラメーター\"%1$s\"の値以下にすることはできません"
 msgid "cannot be specified the value of parameter \"%1$s\""
 msgstr "パラメーター\"%1$s\"の値を指定できません"
 
+#: include/classes/api/services/CItemGeneral.php:1658
+msgid "cannot be the host interface ID from another host"
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
 msgstr "リンクを削除できません"
@@ -21803,6 +22192,14 @@ msgstr "リンクを削除できません"
 #: include/classes/api/services/CItemGeneral.php:2602
 msgid "cannot convert to JSON, result value too long"
 msgstr "JSONに変換できません、結果の値が長すぎます"
+
+#: include/classes/api/services/CItem.php:899
+msgid "cannot delete inherited item"
+msgstr ""
+
+#: include/classes/api/services/CItemPrototype.php:810
+msgid "cannot delete inherited item prototype"
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:2167
 msgid "cannot delete templated host prototype"
@@ -22231,6 +22628,10 @@ msgctxt "event source"
 msgid "internal"
 msgstr "内部イベント"
 
+#: include/classes/validators/CApiInputValidator.php:4155
+msgid "invalid Prometheus label"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:1535
 #: include/classes/api/services/CItemGeneral.php:1545
 msgid "invalid Prometheus output"
@@ -22616,6 +23017,14 @@ msgstr "少なくとも英字の小文字1文字と大文字1文字を含める�
 msgid "must contain at least one special character"
 msgstr "少なくとも特殊記号を1文字含めるようにしてください"
 
+#: include/classes/validators/CApiInputValidator.php:3818
+msgid "must have a polling interval not blocked by non-active interval periods"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:3653
+msgid "must have at least one interval greater than 0"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:98
 #: app/views/administration.user.edit.php:150
 #: include/classes/validators/CPasswordComplexityValidator.php:108
@@ -22705,6 +23114,10 @@ msgstr "障害抑制解除の権限がありません"
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
 msgstr "nodata() - 期間Tの間取得データなし (1 - 取得データなし、0 - それ以外)、Mode (strict - 送られてきたデータ内のプロキシでの遅延を無視)"
 
+#: include/classes/validators/CApiInputValidator.php:3681
+msgid "non-active intervals cannot fill the entire time"
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:113
 #: app/views/popup.tophosts.column.edit.php:125
 #: include/classes/widgets/CWidgetHelper.php:1285 include/graphs.inc.php:74
@@ -22779,6 +23192,11 @@ msgstr "off"
 #: include/classes/setup/CFrontendSetup.php:626
 msgid "on"
 msgstr "on"
+
+#: include/classes/validators/CApiInputValidator.php:2388
+#, c-format
+msgid "only one object can exist within the combinations of %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTestSend.php:182
 msgid "only one time unit is allowed"
@@ -23093,6 +23511,18 @@ msgstr "tan() - 値のタンジェント"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "テンプレートID\"%1$s\"が%2$s回使用されています"
 
+#: include/classes/api/services/CItemGeneral.php:1577
+#: include/classes/api/services/CItemGeneral.php:1594
+#: include/classes/api/services/CItemGeneral.php:1612
+#: include/classes/api/services/CItemGeneral.php:1652
+msgid "the host interface ID is expected"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:1668
+#, c-format
+msgid "the host interface ID of type \"%1$s\" is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2813
 msgid "the last new line feed is missing"
 msgstr "最後の改行がありません"
@@ -23336,6 +23766,11 @@ msgstr "サポートされていない時間の単位です"
 #: include/classes/import/validators/CXmlValidator.php:64
 msgid "unsupported version number"
 msgstr "サポートされていないバージョン番号です"
+
+#: include/classes/validators/CApiInputValidator.php:3626
+#, c-format
+msgid "update interval \"%1$s\" is longer than period \"%2$s\""
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:509
 msgid "uppercase identifier expected"
