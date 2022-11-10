@@ -1055,13 +1055,17 @@ class DB {
 	/**
 	 * Convert field to uppercase or substitute it with its pre-upcased variant.
 	 *
-	 * @param string $field_name
-	 * @param string $table_name
-	 * @param string $table_alias
+	 * @param string      $field_name
+	 * @param string      $table_name
+	 * @param string|null $table_alias
 	 *
 	 * @return string
 	 */
-	public static function uppercaseField(string $field_name, string $table_name, string $table_alias): string {
+	public static function uppercaseField(string $field_name, string $table_name, string $table_alias = null): string {
+		if ($table_alias === null) {
+			$table_alias = $table_name;
+		}
+
 		if ($field_name === 'name' && self::hasField($table_name, 'name_upper')) {
 			return $table_alias.'.name_upper';
 		}
