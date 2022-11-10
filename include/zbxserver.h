@@ -68,7 +68,7 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const ZB
 		int macro_type, char *error, int maxerrlen);
 
 void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
-		const DC_ITEM *history_items, const int *history_errcodes);
+		const DC_HISTORY_ITEM *history_items, const int *history_errcodes);
 void	zbx_prepare_triggers(DC_TRIGGER **triggers, int triggers_num);
 
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,

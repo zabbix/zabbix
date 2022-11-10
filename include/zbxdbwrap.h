@@ -112,7 +112,7 @@ void	zbx_db_trigger_get_expression(const ZBX_DB_TRIGGER *trigger, char **express
 void	zbx_db_trigger_get_recovery_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
 void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
 
-typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_ITEM *, const char *, const char *,
+typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_EVALUATE_ITEM *, const char *, const char *,
 		const zbx_timespec_t *, char **);
 
 void	zbx_db_trigger_explain_expression(const ZBX_DB_TRIGGER *trigger, char **expression,

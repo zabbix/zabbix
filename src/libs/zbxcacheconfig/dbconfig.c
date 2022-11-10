@@ -8066,19 +8066,6 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned 
 			*dst_host->ipmi_password = '\0';
 		}
 	}
-
-	if (ZBX_ITEM_GET_INVENTORY & mode)
-	{
-		if (NULL != (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories,
-				&src_host->hostid)))
-		{
-			dst_host->inventory_mode = (signed char)host_inventory->inventory_mode;
-		}
-		else
-		{
-			dst_host->inventory_mode = HOST_INVENTORY_DISABLED;
-		}
-	}
 }
 
 /******************************************************************************
@@ -8537,30 +8524,14 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
-
-	if (ZBX_ITEM_GET_DYNAMIC & mode)
-	{
-		dst_item->state = src_item->state;
-		dst_item->lastlogsize = src_item->lastlogsize;
-		dst_item->mtime = src_item->mtime;
-
-		if ('\0' != *src_item->error)
-			dst_item->error = zbx_strdup(NULL, src_item->error);
-	}
-	else
-		dst_item->error = NULL;
-
-	dst_item->inventory_link = src_item->inventory_link;
-	dst_item->valuemapid = src_item->valuemapid;
 	dst_item->status = src_item->status;
 
-	if (0 != (mode & ZBX_ITEM_GET_HOUSEKEEPING))
-		dst_item->history_period = zbx_strdup(NULL, src_item->history_period);
-	else
-		dst_item->history_period = NULL;
-	dst_item->trends_period = NULL;
-
 	zbx_strscpy(dst_item->key_orig, src_item->key);
+
+	dst_item->lastlogsize = src_item->lastlogsize;
+	dst_item->mtime = src_item->mtime;
+
+	dst_item->error = zbx_strdup(NULL, src_item->error);
 
 	if (ZBX_ITEM_GET_MISC & mode)
 	{
@@ -8574,20 +8545,6 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 
 	switch (src_item->value_type)
 	{
-		case ITEM_VALUE_TYPE_FLOAT:
-		case ITEM_VALUE_TYPE_UINT64:
-			if (0 != (ZBX_ITEM_GET_NUM & mode))
-			{
-				numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &src_item->itemid);
-
-				if (0 != (mode & ZBX_ITEM_GET_HOUSEKEEPING))
-					dst_item->trends_period = zbx_strdup(NULL, numitem->trends_period);
-
-				/* allocate after lock */
-				if (0 != (ZBX_ITEM_GET_EMPTY_UNITS & mode) || '\0' != *numitem->units)
-					dst_item->units = zbx_strdup(NULL, numitem->units);
-			}
-			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (ZBX_ITEM_GET_LOGTIMEFMT & mode)
 			{
@@ -8891,11 +8848,6 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 		if (NULL != errcodes && SUCCEED != errcodes[i])
 			continue;
 
-		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
-		{
-			zbx_free(items[i].units);
-		}
-
 		switch (items[i].type)
 		{
 			case ITEM_TYPE_HTTPAGENT:
@@ -8916,10 +8868,8 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 				break;
 		}
 
-		zbx_free(items[i].delay);
 		zbx_free(items[i].error);
-		zbx_free(items[i].history_period);
-		zbx_free(items[i].trends_period);
+		zbx_free(items[i].delay);
 	}
 }
 
@@ -9254,7 +9204,7 @@ void	DCconfig_get_active_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, in
  *          expanding user macros and applying global housekeeping settings   *
  *                                                                            *
  ******************************************************************************/
-static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, DC_ITEM *item)
+static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, DC_HISTORY_ITEM *item)
 {
 	if (NULL != item->trends_period)
 	{
@@ -9322,7 +9272,67 @@ void	DCconfig_history_data_get_items_by_itemids(DC_ITEM *items, const zbx_uint64
 	get_items_maintenances(items, errcodes, num);
 }
 
-void	DCconfig_history_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
+static void	DCget_history_host(DC_HISTORY_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned int mode)
+{
+	const ZBX_DC_HOST_INVENTORY	*host_inventory;
+
+	dst_host->hostid = src_host->hostid;
+	dst_host->proxy_hostid = src_host->proxy_hostid;
+	dst_host->status = src_host->status;
+
+	zbx_strscpy(dst_host->host, src_host->host);
+
+	if (ZBX_ITEM_GET_HOSTNAME & mode)
+		zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
+
+	if (NULL != (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories,
+			&src_host->hostid)))
+	{
+		dst_host->inventory_mode = (signed char)host_inventory->inventory_mode;
+	}
+	else
+		dst_host->inventory_mode = HOST_INVENTORY_DISABLED;
+}
+
+static void	DCget_history_item(DC_HISTORY_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned int mode)
+{
+	const ZBX_DC_NUMITEM		*numitem;
+
+	dst_item->type = src_item->type;
+	dst_item->value_type = src_item->value_type;
+
+	dst_item->state = src_item->state;
+	dst_item->lastlogsize = src_item->lastlogsize;
+	dst_item->mtime = src_item->mtime;
+
+	if ('\0' != *src_item->error)
+		dst_item->error = zbx_strdup(NULL, src_item->error);
+
+	dst_item->inventory_link = src_item->inventory_link;
+	dst_item->valuemapid = src_item->valuemapid;
+	dst_item->status = src_item->status;
+
+	dst_item->history_period = zbx_strdup(NULL, src_item->history_period);
+	dst_item->trends_period = NULL;
+	dst_item->flags = src_item->flags;
+
+	zbx_strscpy(dst_item->key_orig, src_item->key);
+
+	switch (src_item->value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+		case ITEM_VALUE_TYPE_UINT64:
+			numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &src_item->itemid);
+
+			dst_item->trends_period = zbx_strdup(NULL, numitem->trends_period);
+
+			if ('\0' != *numitem->units)
+				dst_item->units = zbx_strdup(NULL, numitem->units);
+			break;
+	}
+}
+
+void	DCconfig_history_get_items_by_itemids(DC_HISTORY_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
 		unsigned int mode)
 {
 	int			i;
@@ -9352,11 +9362,10 @@ void	DCconfig_history_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *i
 			}
 		}
 
-		DCget_host(&items[i].host, dc_host, mode);
-		DCget_item(&items[i], dc_item, mode);
+		DCget_history_host(&items[i].host, dc_host, mode);
+		DCget_history_item(&items[i], dc_item, mode);
 
-		if (0 != (mode & ZBX_ITEM_GET_HOUSEKEEPING))
-			config_hk = config->config->hk;
+		config_hk = config->config->hk;
 	}
 
 	UNLOCK_CACHE2;
@@ -9371,11 +9380,28 @@ void	DCconfig_history_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *i
 
 		items[i].itemid = itemids[i];
 
-		if (0 != (mode & ZBX_ITEM_GET_HOUSEKEEPING))
-			dc_items_convert_hk_periods(&config_hk, &items[i]);
+		dc_items_convert_hk_periods(&config_hk, &items[i]);
 	}
 
 	zbx_dc_close_user_macros(um_handle);
+}
+
+void	DCconfig_clean_history_items(DC_HISTORY_ITEM *items, int *errcodes, size_t num)
+{
+	size_t	i;
+
+	for (i = 0; i < num; i++)
+	{
+		if (NULL != errcodes && SUCCEED != errcodes[i])
+			continue;
+
+		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
+			zbx_free(items[i].units);
+
+		zbx_free(items[i].error);
+		zbx_free(items[i].history_period);
+		zbx_free(items[i].trends_period);
+	}
 }
 
 static void	dc_preproc_dump(zbx_hashset_t *items)
