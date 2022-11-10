@@ -786,10 +786,10 @@ char	*zbx_get_proxy_protocol_version_str(const struct zbx_json_parse *jp);
 int	zbx_get_proxy_protocol_version_int(const char *version_str);
 
 /* condition evaluation types */
-#define ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR			0
-#define ZBX_ACTION_CONDITION_EVAL_TYPE_AND			1
-#define ZBX_ACTION_CONDITION_EVAL_TYPE_OR			2
-#define ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION		3
+#define ZBX_CONDITION_EVAL_TYPE_AND_OR			0
+#define ZBX_CONDITION_EVAL_TYPE_AND			1
+#define ZBX_CONDITION_EVAL_TYPE_OR			2
+#define ZBX_CONDITION_EVAL_TYPE_EXPRESSION		3
 
 /* condition types */
 #define ZBX_CONDITION_TYPE_HOST_GROUP			0
