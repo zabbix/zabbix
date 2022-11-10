@@ -19,13 +19,14 @@
 
 #include "zbxprometheus.h"
 
-#include "zbxregexp.h"
 #include "log.h"
-#include "zbxjson.h"
+#include "zbxalgo.h"
 #include "zbxeval.h"
-#include "zbxstr.h"
-#include "zbxnum.h"
 #include "zbxexpr.h"
+#include "zbxjson.h"
+#include "zbxnum.h"
+#include "zbxregexp.h"
+#include "zbxstr.h"
 
 /* Defines maximum row length to be written in error message in the case of parsing failure */
 #define ZBX_PROMEHTEUS_ERROR_MAX_ROW_LENGTH	50
@@ -59,35 +60,19 @@ typedef struct
 }
 zbx_prometheus_condition_t;
 
+ZBX_PTR_VECTOR_DECL(prometheus_condition, zbx_prometheus_condition_t *)
+
 /* the prometheus pattern filter */
 typedef struct
 {
 	/* metric filter, optional - can be NULL */
-	zbx_prometheus_condition_t	*metric;
+	zbx_prometheus_condition_t		*metric;
 	/* value filter, optional - can be NULL */
-	zbx_prometheus_condition_t	*value;
+	zbx_prometheus_condition_t		*value;
 	/* label filters */
-	zbx_vector_ptr_t		labels;
+	zbx_vector_prometheus_condition_t	labels;
 }
 zbx_prometheus_filter_t;
-
-/* the prometheus label */
-typedef struct
-{
-	char	*name;
-	char	*value;
-}
-zbx_prometheus_label_t;
-
-/* the prometheus data row */
-typedef struct
-{
-	char			*metric;
-	char			*value;
-	zbx_vector_ptr_t	labels;
-	char			*raw;
-}
-zbx_prometheus_row_t;
 
 /* the prometheus metric HELP, TYPE hints in comments */
 typedef struct
@@ -97,6 +82,15 @@ typedef struct
 	char	*help;
 }
 zbx_prometheus_hint_t;
+
+/* indexing support */
+
+typedef struct
+{
+	char				*value;
+	zbx_vector_prometheus_row_t	rows;
+}
+zbx_prometheus_index_t;
 
 /* TYPE, HELP hint hashset support */
 
@@ -115,21 +109,11 @@ static int	prometheus_hint_compare(const void *d1, const void *d2)
 	return strcmp(hint1->metric, hint2->metric);
 }
 
-/* indexing support */
+ZBX_PTR_VECTOR_IMPL(prometheus_label, zbx_prometheus_label_t *)
+ZBX_PTR_VECTOR_IMPL(prometheus_row, zbx_prometheus_row_t *)
+ZBX_PTR_VECTOR_IMPL(prometheus_label_index, zbx_prometheus_label_index_t *)
 
-typedef struct
-{
-	char			*value;
-	zbx_vector_ptr_t	rows;
-}
-zbx_prometheus_index_t;
-
-typedef struct
-{
-	char		*label;
-	zbx_hashset_t	index;
-}
-zbx_prometheus_label_index_t;
+ZBX_PTR_VECTOR_IMPL(prometheus_condition, zbx_prometheus_condition_t *)
 
 /******************************************************************************
  *                                                                            *
@@ -622,8 +606,8 @@ static void	prometheus_filter_clear(zbx_prometheus_filter_t *filter)
 	if (NULL != filter->value)
 		prometheus_condition_free(filter->value);
 
-	zbx_vector_ptr_clear_ext(&filter->labels, (zbx_clean_func_t)prometheus_condition_free);
-	zbx_vector_ptr_destroy(&filter->labels);
+	zbx_vector_prometheus_condition_clear_ext(&filter->labels, prometheus_condition_free);
+	zbx_vector_prometheus_condition_destroy(&filter->labels);
 }
 
 /******************************************************************************
@@ -706,7 +690,7 @@ static int	prometheus_filter_parse_labels(zbx_prometheus_filter_t *filter, const
 
 			condition = prometheus_condition_create(str_loc_dup(data, &loc_key),
 					str_loc_unquote_dyn(data, &loc_value), str_loc_op(data, &loc_op));
-			zbx_vector_ptr_append(&filter->labels, condition);
+			zbx_vector_prometheus_condition_append(&filter->labels, condition);
 		}
 
 		pos = skip_spaces(data, loc_value.r + 1);
@@ -749,7 +733,7 @@ static int	prometheus_filter_init(zbx_prometheus_filter_t *filter, const char *d
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	memset(filter, 0, sizeof(zbx_prometheus_filter_t));
-	zbx_vector_ptr_create(&filter->labels);
+	zbx_vector_prometheus_condition_create(&filter->labels);
 
 	if (NULL == data)
 		return SUCCEED;
@@ -831,8 +815,8 @@ static void	prometheus_row_free(zbx_prometheus_row_t *row)
 	zbx_free(row->metric);
 	zbx_free(row->value);
 	zbx_free(row->raw);
-	zbx_vector_ptr_clear_ext(&row->labels, (zbx_clean_func_t)prometheus_label_free);
-	zbx_vector_ptr_destroy(&row->labels);
+	zbx_vector_prometheus_label_clear_ext(&row->labels, prometheus_label_free);
+	zbx_vector_prometheus_label_destroy(&row->labels);
 	zbx_free(row);
 }
 
@@ -934,7 +918,7 @@ static int	condition_match_metric_value(const char *pattern, const char *value)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	prometheus_metric_parse_labels(const char *data, size_t pos, zbx_vector_ptr_t *labels,
+static int	prometheus_metric_parse_labels(const char *data, size_t pos, zbx_vector_prometheus_label_t *labels,
 		zbx_strloc_t *loc, char **error)
 {
 	zbx_strloc_t		loc_key, loc_value, loc_op;
@@ -963,7 +947,7 @@ static int	prometheus_metric_parse_labels(const char *data, size_t pos, zbx_vect
 		label = (zbx_prometheus_label_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_label_t));
 		label->name = str_loc_dup(data, &loc_key);
 		label->value = str_loc_unquote_dyn(data, &loc_value);
-		zbx_vector_ptr_append(labels, label);
+		zbx_vector_prometheus_label_append(labels, label);
 
 		pos = skip_spaces(data, loc_value.r + 1);
 
@@ -1013,7 +997,7 @@ static int	prometheus_parse_row(zbx_prometheus_filter_t *filter, const char *dat
 
 	row = (zbx_prometheus_row_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_row_t));
 	memset(row, 0, sizeof(zbx_prometheus_row_t));
-	zbx_vector_ptr_create(&row->labels);
+	zbx_vector_prometheus_label_create(&row->labels);
 
 	/* parse metric and check against the filter */
 
@@ -1348,8 +1332,8 @@ static int	prometheus_parse_hint(zbx_prometheus_filter_t *filter, const char *da
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *data, zbx_vector_ptr_t *rows,
-		zbx_hashset_t *hints, char **error)
+static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *data,
+		zbx_vector_prometheus_row_t *rows, zbx_hashset_t *hints, char **error)
 {
 	size_t			pos = 0;
 	int			row_num = 1, ret = FAIL;
@@ -1384,7 +1368,7 @@ static int	prometheus_parse_rows(zbx_prometheus_filter_t *filter, const char *da
 		if (NULL != row)
 		{
 			row->raw = str_loc_dup(data, &loc);
-			zbx_vector_ptr_append(rows, row);
+			zbx_vector_prometheus_row_append(rows, row);
 		}
 
 		pos = loc.r + 1;
@@ -1430,7 +1414,8 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int prometheus_extract_value(const zbx_vector_ptr_t *rows, const char *output, char **value, char **error)
+static int prometheus_extract_value(const zbx_vector_prometheus_row_t *rows, const char *output, char **value,
+		char **error)
 {
 	const zbx_prometheus_row_t	*row;
 
@@ -1454,7 +1439,7 @@ static int prometheus_extract_value(const zbx_vector_ptr_t *rows, const char *ou
 
 		for (i = 0; i < rows_num; i++)
 		{
-			row = (zbx_prometheus_row_t *)rows->values[i];
+			row = rows->values[i];
 			zbx_strcpy_alloc(error, &error_alloc, &error_offset, row->raw);
 			zbx_chrcpy_alloc(error, &error_alloc, &error_offset, '\n');
 		}
@@ -1467,7 +1452,7 @@ static int prometheus_extract_value(const zbx_vector_ptr_t *rows, const char *ou
 		return FAIL;
 	}
 
-	row = (const zbx_prometheus_row_t *)rows->values[0];
+	row = rows->values[0];
 
 	if ('\0' != *output)
 	{
@@ -1509,7 +1494,8 @@ static int prometheus_extract_value(const zbx_vector_ptr_t *rows, const char *ou
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	prometheus_aggregate_values(const zbx_vector_ptr_t *rows, const char *function, char **value, char **error)
+static int	prometheus_aggregate_values(const zbx_vector_prometheus_row_t *rows, const char *function,
+		char **value, char **error)
 {
 	zbx_vector_dbl_t		values;
 	int				i, ret;
@@ -1520,7 +1506,7 @@ static int	prometheus_aggregate_values(const zbx_vector_ptr_t *rows, const char 
 
 	for (i = 0; i < rows->values_num; i++)
 	{
-		row = (const zbx_prometheus_row_t *)rows->values[i];
+		row = rows->values[i];
 
 		value_dbl = atof(row->value);
 
@@ -1582,7 +1568,7 @@ static int	prometheus_aggregate_values(const zbx_vector_ptr_t *rows, const char 
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	prometheus_query_rows(const zbx_vector_ptr_t *rows, const char *request, const char *output,
+static int	prometheus_query_rows(const zbx_vector_prometheus_row_t *rows, const char *request, const char *output,
 		char **value, char **error)
 {
 	if (0 == strcmp(request, "function"))
@@ -1600,8 +1586,8 @@ static int	prometheus_query_rows(const zbx_vector_ptr_t *rows, const char *reque
  *             rows_out - [OUT] the filtered rows                             *
  *                                                                            *
  ******************************************************************************/
-static void	prometheus_filter_rows(zbx_vector_ptr_t *rows, zbx_prometheus_filter_t *filter,
-		zbx_vector_ptr_t *rows_out)
+static void	prometheus_filter_rows(zbx_vector_prometheus_row_t *rows, zbx_prometheus_filter_t *filter,
+		zbx_vector_prometheus_row_t *rows_out)
 {
 	int			i, j, k;
 	zbx_prometheus_row_t	*row;
@@ -1610,7 +1596,7 @@ static void	prometheus_filter_rows(zbx_vector_ptr_t *rows, zbx_prometheus_filter
 
 	for (i = 0; i < rows->values_num; i++)
 	{
-		row = (zbx_prometheus_row_t *)rows->values[i];
+		row = rows->values[i];
 
 		if (NULL != filter->metric)
 		{
@@ -1646,7 +1632,7 @@ static void	prometheus_filter_rows(zbx_vector_ptr_t *rows, zbx_prometheus_filter
 				continue;
 		}
 
-		zbx_vector_ptr_append(rows_out, row);
+		zbx_vector_prometheus_row_append(rows_out, row);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, rows_out->values_num);
@@ -1669,8 +1655,8 @@ int	zbx_prometheus_init(zbx_prometheus_t *prom, const char *data, char **error)
 	zbx_prometheus_filter_t	filter;
 	int			ret = FAIL;
 
-	zbx_vector_ptr_create(&prom->rows);
-	zbx_vector_ptr_create(&prom->indexes);
+	zbx_vector_prometheus_row_create(&prom->rows);
+	zbx_vector_prometheus_label_index_create(&prom->indexes);
 
 	if (SUCCEED != prometheus_filter_init(&filter, NULL, error))
 		return FAIL;
@@ -1697,7 +1683,7 @@ static void	prometheus_label_index_free(zbx_prometheus_label_index_t *label_inde
 
 	zbx_hashset_iter_reset(&label_index->index, &iter);
 	while (NULL != (index = (zbx_prometheus_index_t *)zbx_hashset_iter_next(&iter)))
-		zbx_vector_ptr_destroy(&index->rows);
+		zbx_vector_prometheus_row_destroy(&index->rows);
 
 	zbx_hashset_destroy(&label_index->index);
 	zbx_free(label_index);
@@ -1712,11 +1698,11 @@ static void	prometheus_label_index_free(zbx_prometheus_label_index_t *label_inde
  ******************************************************************************/
 void	zbx_prometheus_clear(zbx_prometheus_t *prom)
 {
-	zbx_vector_ptr_clear_ext(&prom->indexes, (zbx_clean_func_t)prometheus_label_index_free);
-	zbx_vector_ptr_destroy(&prom->indexes);
+	zbx_vector_prometheus_label_index_clear_ext(&prom->indexes, prometheus_label_index_free);
+	zbx_vector_prometheus_label_index_destroy(&prom->indexes);
 
-	zbx_vector_ptr_clear_ext(&prom->rows, (zbx_clean_func_t)prometheus_row_free);
-	zbx_vector_ptr_destroy(&prom->rows);
+	zbx_vector_prometheus_row_clear_ext(&prom->rows, prometheus_row_free);
+	zbx_vector_prometheus_row_destroy(&prom->rows);
 }
 
 /******************************************************************************
@@ -1731,7 +1717,7 @@ static	zbx_prometheus_label_index_t	*prometheus_get_index(zbx_prometheus_t *prom
 
 	for (i = 0; i < prom->indexes.values_num; i++)
 	{
-		zbx_prometheus_label_index_t	*label_index = (zbx_prometheus_label_index_t *)prom->indexes.values[i];
+		zbx_prometheus_label_index_t	*label_index = prom->indexes.values[i];
 
 		if (0 == strcmp(label_index->label, label))
 			return label_index;
@@ -1742,7 +1728,7 @@ static	zbx_prometheus_label_index_t	*prometheus_get_index(zbx_prometheus_t *prom
 
 static void	prometheus_add_index(zbx_prometheus_t *prom, zbx_prometheus_label_index_t *index)
 {
-	zbx_vector_ptr_append(&prom->indexes, index);
+	zbx_vector_prometheus_label_index_append(&prom->indexes, index);
 }
 
 static zbx_hash_t	prometheus_index_hash_func(const void *d)
@@ -1805,7 +1791,7 @@ static zbx_prometheus_label_t	*prometheus_get_row_label(zbx_prometheus_row_t *ro
  *                                                                            *
  ******************************************************************************/
 static int	prometheus_get_indexed_rows_by_label(zbx_prometheus_t *prom, zbx_prometheus_filter_t *filter,
-		zbx_vector_ptr_t **rows)
+		zbx_vector_prometheus_row_t **rows)
 {
 	int				i;
 	zbx_prometheus_condition_t	*condition;
@@ -1833,7 +1819,7 @@ static int	prometheus_get_indexed_rows_by_label(zbx_prometheus_t *prom, zbx_prom
 
 		for (i = 0; i < prom->rows.values_num; i++)
 		{
-			zbx_prometheus_row_t	*row = (zbx_prometheus_row_t *)prom->rows.values[i];
+			zbx_prometheus_row_t	*row = prom->rows.values[i];
 			zbx_prometheus_label_t	*label;
 
 			if (NULL == (label = prometheus_get_row_label(row, label_index->label)))
@@ -1846,10 +1832,10 @@ static int	prometheus_get_indexed_rows_by_label(zbx_prometheus_t *prom, zbx_prom
 			{
 				index = (zbx_prometheus_index_t *)zbx_hashset_insert(&label_index->index, &index_local,
 						sizeof(index_local));
-				zbx_vector_ptr_create(&index->rows);
+				zbx_vector_prometheus_row_create(&index->rows);
 			}
 
-			zbx_vector_ptr_append(&index->rows, row);
+			zbx_vector_prometheus_row_append(&index->rows, row);
 		}
 	}
 
@@ -1910,10 +1896,10 @@ static int	prometheus_validate_request(const char *request, const char *output, 
 int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, const char *request,
 		const char *output, char **value, char **error)
 {
-	zbx_prometheus_filter_t	filter;
-	int			ret = FAIL;
-	char			*errmsg = NULL;
-	zbx_vector_ptr_t	rows, *prows;
+	zbx_prometheus_filter_t		filter;
+	int				ret = FAIL;
+	char				*errmsg = NULL;
+	zbx_vector_prometheus_row_t	rows, *prows;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1924,7 +1910,7 @@ int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, c
 		goto out;
 	}
 
-	zbx_vector_ptr_create(&rows);
+	zbx_vector_prometheus_row_create(&rows);
 
 	if (SUCCEED != prometheus_validate_request(request, output, error))
 		return FAIL;
@@ -1941,7 +1927,7 @@ int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, c
 	}
 
 	prometheus_filter_clear(&filter);
-	zbx_vector_ptr_destroy(&rows);
+	zbx_vector_prometheus_row_destroy(&rows);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1966,10 +1952,10 @@ out:
 int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char *request, const char *output,
 		char **value, char **error)
 {
-	zbx_prometheus_filter_t	filter;
-	char			*errmsg = NULL;
-	int			ret = FAIL;
-	zbx_vector_ptr_t	rows;
+	zbx_prometheus_filter_t		filter;
+	char				*errmsg = NULL;
+	int				ret = FAIL;
+	zbx_vector_prometheus_row_t	rows;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1980,7 +1966,7 @@ int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char
 		goto out;
 	}
 
-	zbx_vector_ptr_create(&rows);
+	zbx_vector_prometheus_row_create(&rows);
 
 	if (SUCCEED != prometheus_validate_request(request, output, error))
 		return FAIL;
@@ -1998,8 +1984,8 @@ int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): output:%s", __func__, *value);
 	ret = SUCCEED;
 cleanup:
-	zbx_vector_ptr_clear_ext(&rows, (zbx_clean_func_t)prometheus_row_free);
-	zbx_vector_ptr_destroy(&rows);
+	zbx_vector_prometheus_row_clear_ext(&rows, prometheus_row_free);
+	zbx_vector_prometheus_row_destroy(&rows);
 	prometheus_filter_clear(&filter);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -2021,14 +2007,14 @@ out:
  ******************************************************************************/
 int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **value, char **error)
 {
-	zbx_prometheus_filter_t	filter;
-	char			*errmsg = NULL;
-	int			ret = FAIL, i, j;
-	zbx_vector_ptr_t	rows;
-	zbx_hashset_t		hints;
-	zbx_prometheus_hint_t	*hint, hint_local;
-	zbx_hashset_iter_t	iter;
-	struct zbx_json		json;
+	zbx_prometheus_filter_t		filter;
+	char				*errmsg = NULL;
+	int				ret = FAIL, i, j;
+	zbx_vector_prometheus_row_t	rows;
+	zbx_hashset_t			hints;
+	zbx_prometheus_hint_t		*hint, hint_local;
+	zbx_hashset_iter_t		iter;
+	struct zbx_json			json;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2039,7 +2025,7 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 		goto out;
 	}
 
-	zbx_vector_ptr_create(&rows);
+	zbx_vector_prometheus_row_create(&rows);
 	zbx_hashset_create(&hints, 100, prometheus_hint_hash, prometheus_hint_compare);
 
 	if (FAIL == prometheus_parse_rows(&filter, data, &rows, &hints, error))
@@ -2049,7 +2035,7 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 
 	for (i = 0; i < rows.values_num; i++)
 	{
-		zbx_prometheus_row_t	*row = (zbx_prometheus_row_t *)rows.values[i];
+		zbx_prometheus_row_t	*row = rows.values[i];
 		char			*hint_type;
 
 		zbx_json_addobject(&json, NULL);
@@ -2063,7 +2049,8 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 
 			for (j = 0; j < row->labels.values_num; j++)
 			{
-				zbx_prometheus_label_t	*label = (zbx_prometheus_label_t *)row->labels.values[j];
+				zbx_prometheus_label_t	*label = row->labels.values[j];
+
 				zbx_json_addstring(&json, label->name, label->value, ZBX_JSON_TYPE_STRING);
 			}
 
@@ -2096,8 +2083,8 @@ cleanup:
 	}
 	zbx_hashset_destroy(&hints);
 
-	zbx_vector_ptr_clear_ext(&rows, (zbx_clean_func_t)prometheus_row_free);
-	zbx_vector_ptr_destroy(&rows);
+	zbx_vector_prometheus_row_clear_ext(&rows, prometheus_row_free);
+	zbx_vector_prometheus_row_destroy(&rows);
 	prometheus_filter_clear(&filter);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
