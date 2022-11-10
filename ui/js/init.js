@@ -102,14 +102,19 @@ jQuery(function($) {
 	}
 
 	$('input[unchecked-value]').each(function() {
-		uncheckedHandler(this);
-		this.addEventListener('change', (e) => uncheckedHandler(e.target));
+		const $this = $(this);
+
+		$this.on('change', function () {
+			uncheckedHandler($this)
+		})
+
 		const observer = new MutationObserver((mutation) => {
 			uncheckedHandler(mutation[0].target)
 		});
+
 		observer.observe(this, {
 			attributes: true,
-			attributeFilter: ['disabled']
+			attributeFilter: ['disabled', 'readonly']
 		});
 	});
 
