@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
+#include "zbxtasks.h"
+
 #include "log.h"
+#include "zbxcommon.h"
 #include "zbxdbhigh.h"
 #include "zbxjson.h"
-
-#include "zbxtasks.h"
 
 /******************************************************************************
  *                                                                            *

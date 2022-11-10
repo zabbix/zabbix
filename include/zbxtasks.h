@@ -148,7 +148,6 @@ int	zbx_tm_execute_task_data(const char *data, size_t len, zbx_uint64_t proxy_ho
 void	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks);
 int	zbx_tm_save_task(zbx_tm_task_t *task);
 
-void	zbx_tm_get_proxy_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid);
 void	zbx_tm_update_task_status(zbx_vector_ptr_t *tasks, int status);
 void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_ptr_t *tasks);
 void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_ptr_t *tasks);
@@ -156,7 +155,5 @@ void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_p
 /* separate implementation for proxy and server */
 void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid,
 		zbx_proxy_compatibility_t compatibility);
-
-int	zbx_tm_get_diaginfo(const struct zbx_json_parse *jp, char **info);
 
 #endif
