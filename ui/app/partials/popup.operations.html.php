@@ -126,12 +126,15 @@ if ($data['table'] === 'operation') {
 		}
 		// Create row for operation with 1 type of data.
 		else {
-			$details_column = array_key_exists('data', $operation['details'])
-				? new CCol([
+			if (array_key_exists('data', $operation['details'])) {
+				$details_column = [
 					new CTag('b', true, $operation['details']['type'][0]),
-					implode(' ', $operation['details']['data'][0])
-				])
-				: new CCol([new CTag('b', true, $operation['details']['type'][0])]);
+					implode(' ', $operation['details']['data'][0])]
+				;
+			}
+			else {
+				$details_column = [new CTag('b', true, $operation['details']['type'][0])];
+			}
 		}
 
 		// Create hidden input fields for each row.
@@ -168,11 +171,11 @@ if ($data['table'] === 'operation') {
 		if (in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 			$operations_table->addRow([
 				$esc_steps_txt,
-				$details_column,
+				(new CCol($details_column))->addClass(ZBX_STYLE_WORDBREAK),
 				$esc_delay_txt,
 				$esc_period_txt,
 				$buttons
-			])->addClass(ZBX_STYLE_WORDBREAK);
+			]);
 		}
 		else {
 			$operations_table->addRow([
