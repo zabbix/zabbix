@@ -240,7 +240,7 @@ elseif ($data['table'] === 'recovery') {
 
 			$details = [];
 			if (count($operation['details']['type']) > 1) {
-				// Crate row for script with 3 types of details: current host, hosts and host groups.
+				// Create row for script with 3 types of details: current host, hosts and host groups.
 				if (array_key_exists('opcommand_hst', $operation)) {
 					if ($operation['opcommand_hst'][0]['hostid'] == 0) {
 						$details[] = [
