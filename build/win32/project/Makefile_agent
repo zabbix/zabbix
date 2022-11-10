@@ -37,7 +37,6 @@ ADD_RFLAGS = /d "ZABBIX_AGENT"
 OBJS = \
 	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \
-	..\..\..\src\libs\zbxcommon\alias.o \
 	..\..\..\src\libs\zbxalgo\hashset.o \
 	..\..\..\src\libs\zbxcommon\comms.o \
 	..\..\..\src\libs\zbxcommon\iprange.o \
