@@ -133,7 +133,7 @@ int	system_sw_os(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return ret;
 }
 
-static int	dpkg_parser(const char *line, char *package, size_t max_package_len)
+static int	dpkg_list(const char *line, char *package, size_t max_package_len)
 {
 	char	fmt[32], tmp[32];
 
@@ -144,6 +144,68 @@ static int	dpkg_parser(const char *line, char *package, size_t max_package_len)
 		return FAIL;
 
 	return SUCCEED;
+}
+
+static void	dpkg_details(const char *line, const char *regex, struct zbx_json *json)
+{
+	static char	fmt[64]     = "";
+
+	char		status[64]  = "",
+			name[64]    = "",
+			version[64] = "",
+			arch[64]    = "";
+	zbx_uint64_t	size;
+	int		rv;
+
+	if ('\0' == fmt[0])
+	{
+		zbx_snprintf(fmt, sizeof(fmt),
+				"%%" ZBX_FS_SIZE_T "[^,],"
+				"%%" ZBX_FS_SIZE_T "[^,],"
+				"%%" ZBX_FS_SIZE_T "[^,],"
+				"%%" ZBX_FS_SIZE_T "[^,],"
+				"%" ZBX_FS_UI64,
+				(zbx_fs_size_t)(sizeof(status) - 1),
+				(zbx_fs_size_t)(sizeof(name) - 1),
+				(zbx_fs_size_t)(sizeof(version) - 1),
+				(zbx_fs_size_t)(sizeof(arch) - 1));
+	}
+
+#define NUM_FIELDS	5
+	if (NUM_FIELDS != (rv = sscanf(line, fmt, status, name, version, arch, &size)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "could only collect %d (expected %d) values from line \"%s\", ignoring",
+				rv, NUM_FIELDS, line);
+		return;
+	}
+#undef NUM_FIELDS
+
+	if (0 != strcmp(status, "install ok installed"))
+		return;
+
+	if (NULL != regex && NULL == zbx_regexp_match(name, regex, NULL))
+		return;
+
+	zbx_json_addobject(json, NULL);
+
+	zbx_json_addstring(json, "name"   , name, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "manager", "dpkg", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "version", version, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "arch"   , arch, ZBX_JSON_TYPE_STRING);
+
+	zbx_json_addobject(json, "installtime");
+	zbx_json_addstring(json, "value"    , "", ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(json, "timestamp", 0);
+	zbx_json_close(json);
+
+	zbx_json_addobject(json, "buildtime");
+	zbx_json_addstring(json, "value"    , "", ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(json, "timestamp", 0);
+	zbx_json_close(json);
+
+	zbx_json_adduint64(json, "size", size);
+
+	zbx_json_close(json);
 }
 
 static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packages, const char *manager)
@@ -173,12 +235,26 @@ static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packag
 }
 
 static ZBX_PACKAGE_MANAGER	package_managers[] =
-/*	NAME		TEST_CMD					LIST_CMD			PARSER */
 {
-	{"dpkg",	"dpkg --version 2> /dev/null",			"dpkg --get-selections",	dpkg_parser},
-	{"pkgtools",	"[ -d /var/log/packages ] && echo true",	"ls /var/log/packages",		NULL},
-	{"rpm",		"rpm --version 2> /dev/null",			"rpm -qa",			NULL},
-	{"pacman",	"pacman --version 2> /dev/null",		"pacman -Q",			NULL},
+	/*
+	 * NAME
+	 * TEST_CMD
+	 * LIST_CMD
+	 * DETAILS_CMD
+	 * LIST_PARSER
+	 * DETAILS_PARSER
+	 */
+	{
+		"dpkg",
+		"dpkg --version 2> /dev/null",
+		"dpkg --get-selections",
+		"dpkg-query -W -f='${Status},${Package},${Version},${Architecture},${Installed-Size}\n'",
+		dpkg_list,
+		dpkg_details
+	},
+	{"pkgtools",	"[ -d /var/log/packages ] && echo true",	"ls /var/log/packages",		NULL, NULL, NULL},
+	{"rpm",		"rpm --version 2> /dev/null",			"rpm -qa",			NULL, NULL, NULL},
+	{"pacman",	"pacman --version 2> /dev/null",		"pacman -Q",			NULL, NULL, NULL},
 	{NULL}
 };
 
@@ -240,9 +316,9 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			while (NULL != package)
 			{
-				if (NULL != mng->parser)	/* check if the package name needs to be parsed */
+				if (NULL != mng->list_parser)	/* check if the package name needs to be parsed */
 				{
-					if (SUCCEED == mng->parser(package, tmp, sizeof(tmp)))
+					if (SUCCEED == mng->list_parser(package, tmp, sizeof(tmp)))
 						package = tmp;
 					else
 						goto next;
@@ -284,6 +360,69 @@ next:
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
 	else
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain package information."));
+
+	return ret;
+}
+
+int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	int			ret = SYSINFO_RET_FAIL, i, check_regex, check_manager;
+	char			*regex, *manager, *line, *buf = NULL, error[MAX_STRING_LEN];
+	ZBX_PACKAGE_MANAGER	*mng;
+	struct zbx_json		json;
+
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return ret;
+	}
+
+	regex = get_rparam(request, 0);
+	manager = get_rparam(request, 1);
+
+	check_regex = (NULL != regex && '\0' != *regex && 0 != strcmp(regex, "all"));
+	check_manager = (NULL != manager && '\0' != *manager && 0 != strcmp(manager, "all"));
+
+	zbx_json_initarray(&json, 10 * ZBX_KIBIBYTE);
+
+	for (i = 0; NULL != package_managers[i].name; i++)
+	{
+		mng = &package_managers[i];
+
+		if (1 == check_manager && 0 != strcmp(manager, mng->name))
+			continue;
+
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT,
+				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
+				'\0' != *buf)	/* consider PMS present, if test_cmd outputs anything to stdout */
+		{
+			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error), CONFIG_TIMEOUT,
+					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
+			{
+				continue;
+			}
+
+			ret = SYSINFO_RET_OK;
+
+			line = strtok(buf, "\n");
+
+			while (NULL != line)
+			{
+				mng->details_parser(line, (1 == check_regex ? regex : NULL), &json);
+
+				line = strtok(NULL, "\n");
+			}
+		}
+	}
+
+	zbx_free(buf);
+
+	if (SYSINFO_RET_OK == ret)
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, json.buffer));
+	else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain package information."));
+
+	zbx_json_free(&json);
 
 	return ret;
 }

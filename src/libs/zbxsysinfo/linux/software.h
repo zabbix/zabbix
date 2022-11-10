@@ -21,6 +21,7 @@
 #define ZABBIX_SOFTWARE_H
 
 #include "zbxtypes.h"
+#include "zbxjson.h"
 
 #define SW_OS_FULL			"/proc/version"
 #define SW_OS_SHORT 			"/proc/version_signature"
@@ -31,10 +32,18 @@
 
 typedef struct
 {
+	/* package manager name */
 	const char	*name;
-	const char	*test_cmd;	/* if this shell command has stdout output, package manager is present */
-	const char	*list_cmd;	/* this command lists the installed packages */
-	int		(*parser)(const char *line, char *package, size_t max_package_len);	/* for non-standard list (package per line), add a parser function */
+	/* if this shell command has stdout output, package manager is present */
+	const char	*test_cmd;
+	/* this command lists the installed packages */
+	const char	*list_cmd;
+	/* this command lists the installed packages with details */
+	const char	*details_cmd;
+	/* for non-standard list (not just package name per line) specify a parser function to get the package name */
+	int		(*list_parser)(const char *line, char *package, size_t max_package_len);
+	/* specify a parser function to generate JSON */
+	void		(*details_parser)(const char *line, const char *regex, struct zbx_json *json);
 }
 ZBX_PACKAGE_MANAGER;
 
