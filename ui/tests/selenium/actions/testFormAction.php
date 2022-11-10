@@ -947,9 +947,9 @@ class testFormAction extends CLegacyWebTest {
 				case 'Reboot':
 					$this->zbxTestTextPresent('Steps');
 					COverlayDialogElement::find()->one()->waitUntilReady();
-					$this->zbxTestAssertVisibleId('step-from');
-					$this->zbxTestAssertAttribute('//input[@id=\'step-from\']', 'maxlength', 5);
-					$this->zbxTestAssertAttribute('//input[@id=\'step-from\']', 'value', 1);
+					$this->zbxTestAssertVisibleId('operation_esc_step_from');
+					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_from\']', 'maxlength', 5);
+					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_from\']', 'value', 1);
 
 					$this->zbxTestTextPresent('(0 - infinitely)');
 					$this->zbxTestAssertVisibleId('operation_esc_step_to');
@@ -957,9 +957,9 @@ class testFormAction extends CLegacyWebTest {
 					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_step_to\']', 'value', 1);
 
 					$this->zbxTestTextPresent(['Step duration', '(0 - use action default)']);
-					$this->zbxTestAssertVisibleId('step-duration');
-					$this->zbxTestAssertAttribute('//input[@id=\'step-duration\']', 'maxlength', 255);
-					$this->zbxTestAssertAttribute('//input[@id=\'step-duration\']', 'value', 0);
+					$this->zbxTestAssertVisibleId('operation_esc_period');
+					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'maxlength', 255);
+					$this->zbxTestAssertAttribute('//input[@id=\'operation_esc_period\']', 'value', 0);
 					break;
 				}
 			}

@@ -82,9 +82,9 @@ $step_from->onChange($step_from->getAttribute('onchange').' if (this.value < 1) 
 if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL ||
 		$data['eventsource'] == EVENT_SOURCE_SERVICE) && $data['recovery'] == ACTION_OPERATION) {
 	$form_grid->addItem([
-		(new CLabel(_('Steps'), 'step-from'))->setId('operation-step-range-label'),
+		(new CLabel(_('Steps'), 'operation_esc_step_from'))->setId('operation-step-range-label'),
 		(new CFormField([
-			$step_from->setId('step-from'),
+			$step_from->setId('operation_esc_step_from'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), '-',
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CNumericBox('operation[esc_step_to]', 0, 5, false, false, false))
@@ -96,11 +96,11 @@ if (($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EV
 
 // Operation steps duration row.
 	$form_grid->addItem([
-		(new CLabel(_('Step duration'), 'step-duration'))->setId('operation-step-duration-label'),
+		(new CLabel(_('Step duration'), 'operation_esc_period'))->setId('operation-step-duration-label'),
 		(new CFormField([
 			(new CTextBox('operation[esc_period]', 0))
 				->setAttribute('value', $operation['esc_period'] ?? 0)
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setId('step-duration'),
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)->setId('operation_esc_period'),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), _('(0 - use action default)')
 		]))->setId('operation-step-duration')
 	]);
