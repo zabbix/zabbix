@@ -22,7 +22,7 @@
 #include "zbxmockutil.h"
 #include "valuecache_mock.h"
 
-#include "valuecache.h"
+#include "zbxcachevalue.h"
 #include "zbxnum.h"
 #include "log.h"
 #include "zbxmutexs.h"
@@ -30,7 +30,7 @@
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "history.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 #include <setjmp.h>
 #include <cmocka.h>

@@ -63,7 +63,7 @@ $current_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'action.list')
 	->setArgument('eventsource', $data['eventsource']);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle($title)
 	->setTitleSubmenu(['main_section' => ['items' => $submenu]])
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_ACTION_LIST))
@@ -192,13 +192,13 @@ $actionForm->addItem([
 	], 'action_'.$data['eventsource'])
 ]);
 
-$widget->addItem($actionForm);
-$widget->show();
-
 (new CScriptTag('
 	view.init('.json_encode([
 		'eventsource' => $data['eventsource'],
 	]).');
 '))
-	->setOnDocumentReady()
+	->setOnDocumentReady();
+
+$html_page
+	->addItem($actionForm)
 	->show();

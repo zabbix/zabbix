@@ -114,7 +114,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', '0'));
 			$this->get_value_from_host = (bool) $this->getInput('get_value');
 			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
-			$this->preproc_item = self::getPreprocessingItemClassInstance($this->getInput('test_type'));
+			$this->test_type = $this->getInput('test_type');
 			$this->is_item_testable = in_array($this->item_type, $testable_item_types);
 
 			$interface = $this->getInput('interface', []);
@@ -158,9 +158,32 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			}
 
 			// Check preprocessing steps.
-			if ($steps && ($error = $this->preproc_item->validateItemPreprocessingSteps($steps)) !== true) {
-				error($error);
-				$ret = false;
+			if ($steps) {
+				if ($this->test_type == self::ZBX_TEST_TYPE_LLD) {
+					$lld_instance = new CDiscoveryRule();
+					$steps_validation_response = $lld_instance->validateItemPreprocessingSteps($steps);
+
+					if ($steps_validation_response !== true) {
+						error($steps_validation_response);
+						$ret = false;
+					}
+				}
+				else {
+					switch ($this->test_type) {
+						case self::ZBX_TEST_TYPE_ITEM:
+							$api_input_rules = CItem::getPreprocessingValidationRules();
+							break;
+
+						case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
+							$api_input_rules = CItemPrototype::getPreprocessingValidationRules();
+							break;
+					}
+
+					if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
+						error($error);
+						$ret = false;
+					}
+				}
 			}
 
 			// Check previous time.

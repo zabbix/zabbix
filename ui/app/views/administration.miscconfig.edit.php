@@ -26,7 +26,7 @@
 
 $this->includeJsFile('administration.miscconfig.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Other configuration parameters'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MISCCONFIG_EDIT));
@@ -189,7 +189,7 @@ $form = (new CForm())
 		->setArgument('action', 'miscconfig.update')
 		->getUrl()
 	)
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem(
 		(new CTabView())
 			->addTab('other', _('Other parameters'), $from_list)
@@ -199,7 +199,7 @@ $form = (new CForm())
 			))
 	);
 
-$widget
+$html_page
 	->addItem($form)
 	->show();
 

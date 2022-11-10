@@ -21,7 +21,7 @@
 #define ZABBIX_PROXYDATA_H
 
 #include "zbxjson.h"
-#include "dbcache.h"
+#include "zbxcachehistory.h"
 
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TRAPPER_TIMEOUT;

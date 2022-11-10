@@ -83,7 +83,7 @@ $filter = (new CFilter())
 		(new CFormList())->addRow(_('Tags'), $filter_tags_table)
 	]);
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Templates'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TEMPLATES_LIST))
 	->setControls((new CTag('nav', true,
@@ -296,6 +296,6 @@ $form->addItem([
 	)
 ]);
 
-$widget->addItem($form);
-
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

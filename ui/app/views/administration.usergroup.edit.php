@@ -26,14 +26,14 @@
 
 $this->includeJsFile('administration.usergroup.edit.js.php');
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('User groups'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USERGROUP_EDIT));
 
 $form = (new CForm())
 	->setId('user-group-form')
 	->setName('user_group_form')
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 if ($data['usrgrpid'] != 0) {
 	$form->addVar('usrgrpid', $data['usrgrpid']);
@@ -347,5 +347,7 @@ else {
 
 // append tab to form
 $form->addItem($tabs);
-$widget->addItem($form);
-$widget->show();
+
+$html_page
+	->addItem($form)
+	->show();
