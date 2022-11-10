@@ -32,6 +32,8 @@
 #       include <sys/utsname.h>
 #endif
 
+#define TIME_FMT	"%b %d %H:%M:%S %Y %Z"
+
 int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct utsname	name;
@@ -146,14 +148,36 @@ static int	dpkg_list(const char *line, char *package, size_t max_package_len)
 	return SUCCEED;
 }
 
-static void	dpkg_details(const char *line, const char *regex, struct zbx_json *json)
+static void	add_package_to_json(struct zbx_json *json, const char *name, const char *manager, const char *version,
+		const char *arch, zbx_uint64_t size, const char *buildtime_value, zbx_uint64_t buildtime_timestamp,
+		const char *installtime_value, zbx_uint64_t installtime_timestamp)
 {
-	static char	fmt[64]     = "";
+	zbx_json_addobject(json, NULL);
 
-	char		status[64]  = "",
-			name[64]    = "",
-			version[64] = "",
-			arch[64]    = "";
+	zbx_json_addstring(json, "name"   , name, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "manager", manager, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "version", version, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "arch"   , arch, ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(json, "size"   , size);
+
+	zbx_json_addobject(json, "buildtime");
+	zbx_json_addstring(json, "value"    , buildtime_value, ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(json, "timestamp", buildtime_timestamp);
+	zbx_json_close(json);
+
+	zbx_json_addobject(json, "installtime");
+	zbx_json_addstring(json, "value"    , installtime_value, ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(json, "timestamp", installtime_timestamp);
+	zbx_json_close(json);
+
+	zbx_json_close(json);
+}
+
+static void	dpkg_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
+{
+	static char	fmt[64] = "";
+
+	char		status[64] = "", name[64] = "", version[64] = "", arch[64] = "";
 	zbx_uint64_t	size;
 	int		rv;
 
@@ -186,26 +210,52 @@ static void	dpkg_details(const char *line, const char *regex, struct zbx_json *j
 	if (NULL != regex && NULL == zbx_regexp_match(name, regex, NULL))
 		return;
 
-	zbx_json_addobject(json, NULL);
+	/* the reported size is in kB, we want bytes */
+	size *= ZBX_KIBIBYTE;
 
-	zbx_json_addstring(json, "name"   , name, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(json, "manager", "dpkg", ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(json, "version", version, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(json, "arch"   , arch, ZBX_JSON_TYPE_STRING);
+	add_package_to_json(json, name, manager, version, arch, size, "", 0, "", 0);
+}
 
-	zbx_json_addobject(json, "installtime");
-	zbx_json_addstring(json, "value"    , "", ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(json, "timestamp", 0);
-	zbx_json_close(json);
+static void	rpm_details(const char *manager, const char *line, const char *regex, struct zbx_json *json)
+{
+	static char	fmt[64] = "";
 
-	zbx_json_addobject(json, "buildtime");
-	zbx_json_addstring(json, "value"    , "", ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(json, "timestamp", 0);
-	zbx_json_close(json);
+	char		name[128] = "", version[64] = "", arch[32] = "", buildtime_value[32], installtime_value[32];
+	zbx_uint64_t	size, buildtime_timestamp, installtime_timestamp;
+	int		rv;
 
-	zbx_json_adduint64(json, "size", size);
+	if ('\0' == fmt[0])
+	{
+		zbx_snprintf(fmt, sizeof(fmt),
+				"%%" ZBX_FS_SIZE_T "[^,],"
+				"%%" ZBX_FS_SIZE_T "[^,],"
+				"%%" ZBX_FS_SIZE_T "[^,],"
+				"%" ZBX_FS_UI64 ","
+				"%" ZBX_FS_UI64 ","
+				"%" ZBX_FS_UI64,
+				(zbx_fs_size_t)(sizeof(name) - 1),
+				(zbx_fs_size_t)(sizeof(version) - 1),
+				(zbx_fs_size_t)(sizeof(arch) - 1));
+	}
 
-	zbx_json_close(json);
+#define NUM_FIELDS	6
+	if (NUM_FIELDS != (rv = sscanf(line, fmt, name, version, arch, &size, &buildtime_timestamp,
+			&installtime_timestamp)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "could only collect %d (expected %d) values from line \"%s\", ignoring",
+				rv, NUM_FIELDS, line);
+		return;
+	}
+#undef NUM_FIELDS
+
+	if (NULL != regex && NULL == zbx_regexp_match(name, regex, NULL))
+		return;
+
+	strftime(buildtime_value, sizeof(buildtime_value), TIME_FMT, localtime(&buildtime_timestamp));
+	strftime(installtime_value, sizeof(installtime_value), TIME_FMT, localtime(&installtime_timestamp));
+
+	add_package_to_json(json, name, manager, version, arch, size, buildtime_value, buildtime_timestamp,
+			installtime_value, installtime_timestamp);
 }
 
 static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packages, const char *manager)
@@ -234,16 +284,16 @@ static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packag
 	return offset;
 }
 
+/**
+ * NAME
+ * TEST_CMD
+ * LIST_CMD
+ * DETAILS_CMD
+ * LIST_PARSER
+ * DETAILS_PARSER
+ */
 static ZBX_PACKAGE_MANAGER	package_managers[] =
 {
-	/*
-	 * NAME
-	 * TEST_CMD
-	 * LIST_CMD
-	 * DETAILS_CMD
-	 * LIST_PARSER
-	 * DETAILS_PARSER
-	 */
 	{
 		"dpkg",
 		"dpkg --version 2> /dev/null",
@@ -253,7 +303,14 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 		dpkg_details
 	},
 	{"pkgtools",	"[ -d /var/log/packages ] && echo true",	"ls /var/log/packages",		NULL, NULL, NULL},
-	{"rpm",		"rpm --version 2> /dev/null",			"rpm -qa",			NULL, NULL, NULL},
+	{
+		"rpm",
+		"rpm --version 2> /dev/null",
+		"rpm -qa",
+		"rpm -qa --queryformat '%{NAME},%{VERSION}-%{RELEASE},%{ARCH},%{SIZE},%{BUILDTIME},%{INSTALLTIME}\n'",
+		NULL,
+		rpm_details
+	},
 	{"pacman",	"pacman --version 2> /dev/null",		"pacman -Q",			NULL, NULL, NULL},
 	{NULL}
 };
@@ -408,7 +465,7 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			while (NULL != line)
 			{
-				mng->details_parser(line, (1 == check_regex ? regex : NULL), &json);
+				mng->details_parser(mng->name, line, (1 == check_regex ? regex : NULL), &json);
 
 				line = strtok(NULL, "\n");
 			}

@@ -42,8 +42,8 @@ typedef struct
 	const char	*details_cmd;
 	/* for non-standard list (not just package name per line) specify a parser function to get the package name */
 	int		(*list_parser)(const char *line, char *package, size_t max_package_len);
-	/* specify a parser function to generate JSON */
-	void		(*details_parser)(const char *line, const char *regex, struct zbx_json *json);
+	/* specify a parser function to add package details to JSON */
+	void		(*details_parser)(const char *manager, const char *line, const char *regex, struct zbx_json *json);
 }
 ZBX_PACKAGE_MANAGER;
 
