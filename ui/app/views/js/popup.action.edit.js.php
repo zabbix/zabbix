@@ -332,9 +332,14 @@ window.action_edit_popup = new class {
 					result.push(input.conditiontype === conditiontype);
 				}
 				else {
-					result.push(
-						input.conditiontype === conditiontype && input.value === value && input.value2 === value2
-					);
+					if (input.value2) {
+						result.push(
+							input.conditiontype === conditiontype && input.value === value && input.value2 === value2
+						)
+					}
+					else {
+						result.push(input.conditiontype === conditiontype && input.value === value)
+					}
 				}
 
 				if (input.row_index == it.getAttribute('data-row_index')) {
