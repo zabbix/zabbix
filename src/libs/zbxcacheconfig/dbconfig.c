@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "zbxtasks.h"
-#include "zbxserver.h" ////// for zbx_substitute_simple_macros and MACRO_TYPE_... defines
+#include "zbxserver.h"
 #include "zbxshmem.h"
 #include "zbxregexp.h"
 #include "cfg.h"

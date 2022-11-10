@@ -22,7 +22,7 @@
 
 #include "log.h"
 #include "zbxmutexs.h"
-#include "zbxserver.h" ////for zbx_prepare_triggers, zbx_determine_items_in_expressions, zbx_evaluate_expressions, zbx_format_value
+#include "zbxserver.h"
 #include "events.h"
 #include "zbxmodules.h"
 #include "module.h"
