@@ -22,7 +22,8 @@
 
 #include "log.h"
 #include "zbxalgo.h"
-#include "dbcache.h"
+#include "zbxdb.h"
+#include "zbxstr.h"
 #include "zbxnum.h"
 
 /* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */

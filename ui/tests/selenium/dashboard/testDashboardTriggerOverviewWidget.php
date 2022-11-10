@@ -415,21 +415,6 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Filter triggers by tag with default operator'
-					],
-					'tags' => [
-						['name' => 'server', 'operator' => 'Contains', 'value' => 'sel']
-					],
-					'expected' => [
-						'Host for triggers filtering' => [
-							'Inheritance trigger with tags'
-						]
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
 						'Name' => 'Filter triggers by 2 tags with Or operator',
 						'Tags' => 'Or'
 					],
@@ -795,7 +780,6 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 
 		$widget_name = (array_key_exists('fields', $data)) ? $data['fields']['Name'] : 'Trigger overview';
 		$widget = $dashboard->getWidget($widget_name);
-		$widget->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 

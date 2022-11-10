@@ -129,7 +129,7 @@ class TopHostsWidget {
 									[
 										'type' => 0,
 										'name' => 'column',
-										'value' => 0
+										'value' => 1
 									],
 									[
 										'type' => 1,

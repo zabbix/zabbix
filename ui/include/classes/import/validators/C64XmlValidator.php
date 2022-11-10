@@ -374,15 +374,6 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::CUSTOM_INTERFACES_YES => CXmlConstantName::YES
 	];
 
-	private $DASHBOARD_WIDGET_TYPE = [
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_CLOCK => CXmlConstantName::DASHBOARD_WIDGET_TYPE_CLOCK,
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC => CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC,
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE => CXmlConstantName::DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE,
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_ITEM => CXmlConstantName::DASHBOARD_WIDGET_TYPE_ITEM,
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_PLAIN_TEXT => CXmlConstantName::DASHBOARD_WIDGET_TYPE_PLAIN_TEXT,
-		CXmlConstantValue::DASHBOARD_WIDGET_TYPE_URL => CXmlConstantName::DASHBOARD_WIDGET_TYPE_URL
-	];
-
 	private $DASHBOARD_WIDGET_FIELD_TYPE = [
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_STRING => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
@@ -638,7 +629,6 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'publickey' =>				['type' => XML_STRING, 'default' => ''],
 									'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
-									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
 									'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 										'name' =>					['type' => XML_STRING | XML_REQUIRED]
 									]],
@@ -1324,7 +1314,6 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'publickey' =>				['type' => XML_STRING, 'default' => ''],
 									'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 									'description' =>			['type' => XML_STRING, 'default' => ''],
-									'inventory_link' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->ITEM_INVENTORY_LINK],
 									'valuemap' =>				['type' => XML_ARRAY, 'rules' => [
 										'name' =>					['type' => XML_STRING | XML_REQUIRED]
 									]],
@@ -1747,7 +1736,7 @@ class C64XmlValidator extends CXmlValidatorGeneral {
 									'display_period' =>				['type' => XML_STRING, 'default' => '0'],
 									'widgets' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'widget', 'rules' => [
 										'widget' =>						['type' => XML_ARRAY, 'rules' => [
-											'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_TYPE],
+											'type' =>						['type' => XML_STRING | XML_REQUIRED],
 											'name' =>						['type' => XML_STRING, 'default' => ''],
 											'x' =>							['type' => XML_STRING, 'default' => '0'],
 											'y' =>							['type' => XML_STRING, 'default' => '0'],

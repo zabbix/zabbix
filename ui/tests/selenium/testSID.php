@@ -248,13 +248,6 @@ class testSID extends CWebTest {
 				'json_output' => true
 			]],
 
-			// Dashboard widget configure.
-			[[
-				'link' => 'zabbix.php?action=dashboard.widget.configure&type=actionlog&view_mode=0&fields=%7B%22rf_rate'.
-					'%22%3A%22-1%22%2C%22sort_triggers%22%3A%224%22%2C%22show_lines%22%3A%2225%22%7D',
-				'json_output' => true
-			]],
-
 			// Dashboard widget refresh rate.
 			[[
 				'link' => 'zabbix.php?action=dashboard.widget.rfrate&widgetid=2002&rf_rate=120',
@@ -276,12 +269,6 @@ class testSID extends CWebTest {
 			// Template dashboard delete.
 			[[
 				'link' => 'zabbix.php?form_refresh=1&templateid=10076&dashboardids%5B146%5D=146&action=template.dashboard.delete'
-			]],
-
-			// Template dashboard widget edit.
-			[[
-				'link' => 'zabbix.php?action=dashboard.widget.edit&templateid=10076',
-				'json_output' => true
 			]],
 
 			// User token delete.
@@ -606,11 +593,11 @@ class testSID extends CWebTest {
 			// Export.
 			[['link' => 'zabbix.php?action=export.hosts&format=yaml&backurl=hosts.php&form_refresh=1&hosts%5B50011%5D=50011']],
 
-			// Favourite create.
-			[['link' => 'zabbix.php?action=favourite.create&object=screenid&objectid=200021']],
+			// Favorite create.
+			[['link' => 'zabbix.php?action=favorite.create&object=screenid&objectid=200021']],
 
-			// Favourite delete.
-			[['link' => 'zabbix.php?action=favourite.delete&object=screenid&objectid=200021']],
+			// Favorite delete.
+			[['link' => 'zabbix.php?action=favorite.delete&object=screenid&objectid=200021']],
 
 			// Host creation.
 			[[

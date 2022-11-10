@@ -229,7 +229,7 @@ $form->addItem(
 	], 'proxy')
 );
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Proxies'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_PROXY_LIST))
 	->setControls(

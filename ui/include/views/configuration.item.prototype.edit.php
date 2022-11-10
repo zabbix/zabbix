@@ -24,12 +24,12 @@
  * @var array $data
  */
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Item prototypes'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_PROTOTYPE_EDIT));
 
 if (!empty($data['hostid'])) {
-	$widget->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
+	$html_page->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
 }
 
 $url = (new CUrl('disc_prototypes.php'))
@@ -40,7 +40,7 @@ $url = (new CUrl('disc_prototypes.php'))
 $form = (new CForm('post', $url))
 	->setId('item-prototype-form')
 	->setName('itemForm')
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('parent_discoveryid', $data['parent_discoveryid']);
 
@@ -597,8 +597,7 @@ if ($data['display_interfaces']) {
 		->setValue($data['interfaceid'])
 		->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
 		->setFocusableElementId('interfaceid')
-		->setAriaRequired()
-		->setReadonly(($data['type'] == ITEM_TYPE_HTTPAGENT) ? $readonly : false);
+		->setAriaRequired();
 
 	$item_tab->addItem([
 		(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
@@ -629,9 +628,12 @@ $item_tab->addItem([
 
 $item_tab
 	->addItem([
-		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setId('js-item-impi-sensor-label'),
+		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))
+			->setAsteriskMark()
+			->setId('js-item-impi-sensor-label'),
 		(new CFormField((new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAriaRequired()
 		))->setId('js-item-impi-sensor-field')
 	])
 	->addItem([
@@ -940,11 +942,11 @@ else {
 }
 
 $form->addItem($item_tabs);
-$widget->addItem($form);
+$html_page->addItem($form);
 
 require_once __DIR__.'/js/configuration.item.prototype.edit.js.php';
 
-$widget->show();
+$html_page->show();
 
 (new CScriptTag('
 	item_form.init('.json_encode([

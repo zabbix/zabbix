@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.4.0beta3])
+AC_INIT([Zabbix],[6.4.0beta4])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -1953,7 +1953,9 @@ AC_CONFIG_FILES([
 	src/libs/zbxcrypto/Makefile
 	src/libs/zbxcyberark/Makefile
 	src/libs/zbxdb/Makefile
-	src/libs/zbxdbcache/Makefile
+	src/libs/zbxcacheconfig/Makefile
+	src/libs/zbxcachehistory/Makefile
+	src/libs/zbxcachevalue/Makefile
 	src/libs/zbxdbhigh/Makefile
 	src/libs/zbxdbwrap/Makefile
 	src/libs/zbxdbschema/Makefile

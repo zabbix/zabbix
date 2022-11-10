@@ -25,7 +25,7 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 #include "module.h"
 #include "zbxalgo.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 int	check_vcenter_cluster_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);

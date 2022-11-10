@@ -1,0 +1,22 @@
+{
+	"manifest_version": 2.0,
+	"id": "url",
+	"type": "widget",
+	"name": "URL",
+	"namespace": "Url",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"js_class": "CWidgetUrl",
+		"template_support": true,
+		"refresh_rate": 0
+	},
+	"actions": {
+		"widget.url.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

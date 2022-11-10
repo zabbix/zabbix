@@ -21,7 +21,7 @@
 
 #include "zbxalgo.h"
 #include "zbxnum.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "trapper_auth.h"
 #include "zbxcommshigh.h"
 

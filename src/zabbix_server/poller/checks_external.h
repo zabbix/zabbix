@@ -20,7 +20,7 @@
 #ifndef ZABBIX_CHECKS_EXTERNAL_H
 #define ZABBIX_CHECKS_EXTERNAL_H
 
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "module.h"
 
 int	get_value_external(const DC_ITEM *item, AGENT_RESULT *result);

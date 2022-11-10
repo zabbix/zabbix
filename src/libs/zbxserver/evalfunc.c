@@ -23,7 +23,7 @@
 
 #include "log.h"
 #include "zbxregexp.h"
-#include "valuecache.h"
+#include "zbxcachevalue.h"
 #include "zbxtrends.h"
 #include "anomalystl.h"
 #include "zbxnum.h"

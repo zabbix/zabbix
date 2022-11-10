@@ -25,7 +25,7 @@
 #include "zbxself.h"
 #include "zbxexec.h"
 #include "zbxipcservice.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "alerter_protocol.h"
 #include "zbxembed.h"
 #include "zbxhash.h"

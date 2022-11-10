@@ -101,7 +101,6 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 			'report.users['.self::$before_user['reportuserid'].'].reportuserid' => ['add', self::$before_user['reportuserid']],
 			'report.user_groups['.self::$before_usrgrp['reportusrgrpid'].']' => ['add'],
 			'report.user_groups['.self::$before_usrgrp['reportusrgrpid'].'].usrgrpid' => ['add', '7'],
-			'report.user_groups['.self::$before_usrgrp['reportusrgrpid'].'].access_userid' => ['add', '0'],
 			'report.user_groups['.self::$before_usrgrp['reportusrgrpid'].'].reportusrgrpid'
 				=> ['add', self::$before_usrgrp['reportusrgrpid']],
 			'report.reportid' => ['add', self::$resourceid]
@@ -167,7 +166,6 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 			'report.status' => ['update', '0', '1'],
 			'report.description' => ['update', 'Updated description', 'Report description'],
 			'report.users['.$user['reportuserid'].'].userid' => ['add', '2'],
-			'report.users['.$user['reportuserid'].'].access_userid' => ['add', '0'],
 			'report.users['.$user['reportuserid'].'].exclude' => ['add', '1'],
 			'report.users['.$user['reportuserid'].'].reportuserid' => ['add', $user['reportuserid']],
 			'report.user_groups['.$usrgrp['reportusrgrpid'].'].usrgrpid' => ['add', '8'],

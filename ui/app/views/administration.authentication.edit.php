@@ -554,7 +554,6 @@ $saml_tab = (new CFormGrid())
 			->addClass('saml-provision-status')
 	]);
 
-
 	$form->addItem((new CTabView())
 		->setSelected($data['form_refresh'] ? null : 0)
 		->addTab('auth', _('Authentication'), $auth_tab)

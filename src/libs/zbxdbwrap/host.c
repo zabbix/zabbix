@@ -21,7 +21,7 @@
 #include "zbxdbwrap.h"
 
 #include "log.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxserver.h"
 #include "audit/zbxaudit_host.h"
 #include "audit/zbxaudit_item.h"

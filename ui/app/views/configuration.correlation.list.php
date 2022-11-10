@@ -27,7 +27,7 @@ if ($data['uncheck']) {
 	uncheckTableRows('correlation');
 }
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Event correlation'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_LIST))
 	->setControls(
@@ -148,6 +148,6 @@ $form->addItem([
 	], 'correlation')
 ]);
 
-$widget->addItem($form);
-
-$widget->show();
+$html_page
+	->addItem($form)
+	->show();

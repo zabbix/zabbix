@@ -24,7 +24,7 @@
 #include "module.h"
 
 #ifdef HAVE_LIBCURL
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result);
 #endif
