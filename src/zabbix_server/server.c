@@ -191,31 +191,6 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
-char	*config_tmpdir = NULL;
-static const char	*get_config_tmpdir(void)
-{
-	return config_tmpdir;
-}
-
-char	*config_fping_location= NULL;
-static const char	*get_config_fping_location(void)
-{
-	return config_fping_location;
-}
-
-char	*config_fping6_location = NULL;
-#ifdef HAVE_IPV6
-static const char	*get_config_fping6_location(void)
-{
-	return config_fping6_location;
-}
-#endif
-
-char	*CONFIG_SOURCE_IP		= NULL;
-static const char	*get_config_source_ip(void) {
-	return CONFIG_SOURCE_IP;
-}
-
 int	CONFIG_ALERTER_FORKS		= 3;
 int	CONFIG_DISCOVERER_FORKS		= 1;
 int	CONFIG_HOUSEKEEPER_FORKS	= 1;
@@ -252,6 +227,7 @@ int	CONFIG_ODBCPOLLER_FORKS		= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
+char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
 char	*CONFIG_SERVER			= NULL;		/* not used in zabbix_server, required for linking */
 
@@ -284,6 +260,9 @@ int	CONFIG_UNAVAILABLE_DELAY	= 60;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
+char	*CONFIG_TMPDIR			= NULL;
+char	*CONFIG_FPING_LOCATION		= NULL;
+char	*CONFIG_FPING6_LOCATION		= NULL;
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
@@ -574,14 +553,14 @@ static void	zbx_set_defaults(void)
 	if (NULL == CONFIG_LOAD_MODULE_PATH)
 		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, DEFAULT_LOAD_MODULE_PATH);
 
-	if (NULL == config_tmpdir)
-		config_tmpdir = zbx_strdup(config_tmpdir, "/tmp");
+	if (NULL == CONFIG_TMPDIR)
+		CONFIG_TMPDIR = zbx_strdup(CONFIG_TMPDIR, "/tmp");
 
-	if (NULL == config_fping_location)
-		config_fping_location = zbx_strdup(config_fping_location, "/usr/sbin/fping");
+	if (NULL == CONFIG_FPING_LOCATION)
+		CONFIG_FPING_LOCATION = zbx_strdup(CONFIG_FPING_LOCATION, "/usr/sbin/fping");
 #ifdef HAVE_IPV6
-	if (NULL == config_fping6_location)
-		config_fping6_location = zbx_strdup(config_fping6_location, "/usr/sbin/fping6");
+	if (NULL == CONFIG_FPING6_LOCATION)
+		CONFIG_FPING6_LOCATION = zbx_strdup(CONFIG_FPING6_LOCATION, "/usr/sbin/fping6");
 #endif
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
 		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DEFAULT_EXTERNAL_SCRIPTS_PATH);
@@ -686,7 +665,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	zbx_free(address);
 
 #if !defined(HAVE_IPV6)
-	err |= (FAIL == check_cfg_feature_str("Fping6Location", config_fping6_location, "IPv6 support"));
+	err |= (FAIL == check_cfg_feature_str("Fping6Location", CONFIG_FPING6_LOCATION, "IPv6 support"));
 #endif
 #if !defined(HAVE_LIBCURL)
 	err |= (FAIL == check_cfg_feature_str("SSLCALocation", CONFIG_SSL_CA_LOCATION, "cURL library"));
@@ -813,11 +792,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			24},
 		{"MaxHousekeeperDelete",	&CONFIG_MAX_HOUSEKEEPER_DELETE,		TYPE_INT,
 			PARM_OPT,	0,			1000000},
-		{"TmpDir",			&config_tmpdir,				TYPE_STRING,
+		{"TmpDir",			&CONFIG_TMPDIR,				TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"FpingLocation",		&config_fping_location,			TYPE_STRING,
+		{"FpingLocation",		&CONFIG_FPING_LOCATION,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"Fping6Location",		&config_fping6_location,		TYPE_STRING,
+		{"Fping6Location",		&CONFIG_FPING6_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
 			PARM_OPT,	1,			30},
@@ -1095,32 +1074,22 @@ static void	zbx_on_exit(int ret)
  ******************************************************************************/
 int	main(int argc, char **argv)
 {
-	ZBX_TASK_EX	t = {ZBX_TASK_START};
-	char		ch;
-	int		opt_c = 0, opt_r = 0;
+	static zbx_config_icmpping_t	config_icmpping;
+	ZBX_TASK_EX			t = {ZBX_TASK_START};
+	char				ch;
+	int				opt_c = 0, opt_r = 0;
 
 	/* see description of 'optarg' in 'man 3 getopt' */
-	char		*zbx_optarg = NULL;
+	char				*zbx_optarg = NULL;
 
 	/* see description of 'optind' in 'man 3 getopt' */
-	int		zbx_optind = 0;
-
-static const zbx_config_icmpping_t	zbx_config_icmpping = {
-	get_config_source_ip,
-	get_config_fping_location,
-#ifdef HAVE_IPV6
-	get_config_fping6_location,
-#endif
-	get_config_tmpdir
-};
+	int				zbx_optind = 0;
 
 	zbx_config_tls = zbx_config_tls_new();
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
 	progname = get_program_name(argv[0]);
-
-	zbx_init_library_icmpping(&zbx_config_icmpping);
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
@@ -1189,6 +1158,15 @@ static const zbx_config_icmpping_t	zbx_config_icmpping = {
 	/* required for simple checks */
 	zbx_init_metrics();
 	zbx_load_config(&t);
+
+	config_icmpping.source_ip = CONFIG_SOURCE_IP;
+	config_icmpping.fping_location = CONFIG_FPING_LOCATION;
+#ifdef HAVE_IPV6
+	config_icmpping.fping6_location = CONFIG_FPING6_LOCATION;
+#endif
+	config_icmpping.tmpdir = CONFIG_TMPDIR;
+
+	zbx_init_library_icmpping(&config_icmpping);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{

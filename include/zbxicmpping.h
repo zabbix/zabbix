@@ -24,12 +24,12 @@
 
 typedef struct
 {
-	zbx_get_config_str_f	get_source_ip_cb;
-	zbx_get_config_str_f	get_fping_location_cb;
+	const char	*source_ip;
+	const char	*fping_location;
 #ifdef HAVE_IPV6
-	zbx_get_config_str_f	get_fping6_location_cb;
+	const char	*fping6_location;
 #endif
-	zbx_get_config_str_f	get_tmpdir_cb;
+	const char	*tmpdir;
 }
 zbx_config_icmpping_t;
 
