@@ -241,6 +241,7 @@ static char	*str_loc_unescape_hint_dyn(const char *src, const zbx_strloc_t *loc)
 static int	str_loc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len)
 {
 	ZBX_RETURN_IF_NOT_EQUAL(loc->r - loc->l + 1, text_len);
+
 	return memcmp(src + loc->l, text, text_len);
 }
 
@@ -254,18 +255,18 @@ static int	str_loc_cmp(const char *src, const zbx_strloc_t *loc, const char *tex
  * Return value: The condition operation.                                     *
  *                                                                            *
  ******************************************************************************/
-static zbx_prometheus_condition_op_t	str_loc_op(const char *data, const zbx_strloc_t *loc)
+static zbx_prometheus_condition_op_t	str_loc_op(const char *src, const zbx_strloc_t *loc)
 {
-	if ('=' == data[loc->l])
+	if ('=' == src[loc->l])
 	{
-		if ('~' == data[loc->r])
+		if ('~' == src[loc->r])
 			return ZBX_PROMETHEUS_CONDITION_OP_REGEX;
 		else
 			return ZBX_PROMETHEUS_CONDITION_OP_EQUAL;
 	}
-	else if ('!' == data[loc->l])
+	else if ('!' == src[loc->l])
 	{
-		if ('~' == data[loc->r])
+		if ('~' == src[loc->r])
 			return ZBX_PROMETHEUS_CONDITION_OP_REGEX_NOT_MATCHED;
 		else
 			return ZBX_PROMETHEUS_CONDITION_OP_NOT_EQUAL;
@@ -302,14 +303,14 @@ static size_t	skip_spaces(const char *data, size_t pos)
  * Return value: The position of the next row space character.                *
  *                                                                            *
  ******************************************************************************/
-static size_t	skip_row(const char *data, size_t pos)
+static size_t	skip_row(const char *src, size_t pos)
 {
 	const char	*ptr;
 
-	if (NULL == (ptr = strchr(data + pos, '\n')))
-		return strlen(data + pos) + pos;
+	if (NULL == (ptr = strchr(src + pos, '\n')))
+		return strlen(src + pos) + pos;
 
-	return (size_t)(ptr - data + 1);
+	return (size_t)(ptr - src + 1);
 }
 
 /******************************************************************************
@@ -1247,6 +1248,7 @@ static int	prometheus_register_hint(zbx_hashset_t *hints, const char *data, char
  *             data       - [IN] the prometheus data                          *
  *             pos        - [IN] the position of comments in prometheus data  *
  *             hints      - [IN/OUT] the hint registry                        *
+ *             loc        - [OUT] the location of hint
  *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - the hint was registered successfully               *
@@ -1782,7 +1784,7 @@ static zbx_prometheus_label_t	*prometheus_get_row_label(zbx_prometheus_row_t *ro
  *                                                                            *
  * Parameters: prom   - [IN] the prometheus cache                             *
  *             filter - [IN] the filter                                       *
- *             rows   - [IN] the rows matching filter label or NULL if there  *
+ *             rows   - [OUT] the rows matching filter label or NULL if there *
  *                           are now matching rows                            *
  *                                                                            *
  * Return value: SUCCEED - the matched rows were returned successfully        *
@@ -1856,6 +1858,10 @@ static int	prometheus_get_indexed_rows_by_label(zbx_prometheus_t *prom, zbx_prom
 /******************************************************************************
  *                                                                            *
  * Purpose: validate prometheus pattern request and output                    *
+ *                                                                            *
+ * Parameters: request - [IN] the prometheus request                          *
+ *             output  - [IN] the prometheus output                           *
+ *             error   - [OUT] the error message                              *
  *                                                                            *
  * Return value: SUCCEED - valid request and output combination               *
  *               FAIL    - invalid request and output combination             *
