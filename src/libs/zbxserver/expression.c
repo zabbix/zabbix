@@ -3222,10 +3222,16 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 
 			c_event = ((NULL != r_event) ? r_event : event);
 
-			if (0 == strncmp(m, MVAR_EVENT_CAUSE, ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE)))
+			if (EVENT_SOURCE_TRIGGERS == event->source && EVENT_OBJECT_TRIGGER == event->object &&
+					0 == strncmp(m, MVAR_EVENT_CAUSE, ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE)))
 			{
-				get_event_cause_value(m, &replace_to, event, userid, service_alarm, ack, tz, macro_type,
-						error, maxerrlen);
+				get_event_cause_value(m, &replace_to, event, userid, service_alarm, ack, tz,
+						macro_type, error, maxerrlen);
+			}
+			else if (EVENT_SOURCE_TRIGGERS == event->source && EVENT_OBJECT_TRIGGER == event->object &&
+					0 == strcmp(m, MVAR_EVENT_SYMPTOMS))
+			{
+				get_event_symptoms(event, &replace_to);
 			}
 			else if (EVENT_SOURCE_TRIGGERS == c_event->source)
 			{
@@ -3262,6 +3268,11 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 						zbx_strlcpy(error, errmsg, maxerrlen);
 						zbx_free(errmsg);
 					}
+				}
+				else if (0 == strncmp(m, MVAR_EVENT_CAUSE, ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE)))
+				{
+					get_event_cause_value(m, &replace_to, event, userid, service_alarm, ack, tz,
+							macro_type, error, maxerrlen);
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_SYMPTOMS))
 				{
