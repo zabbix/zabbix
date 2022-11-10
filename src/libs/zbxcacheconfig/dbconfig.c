@@ -45,6 +45,9 @@ int	sync_in_progress = 0;
 #define START_SYNC	WRLOCK_CACHE; sync_in_progress = 1
 #define FINISH_SYNC	sync_in_progress = 0; UNLOCK_CACHE
 
+#define START_HISTORY_SYNC	WRLOCK_CACHE2
+#define FINISH_HISTORY_SYNC	UNLOCK_CACHE2
+
 #define ZBX_LOC_NOWHERE	0
 #define ZBX_LOC_QUEUE	1
 #define ZBX_LOC_POLLER	2
@@ -97,6 +100,7 @@ typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, 
 
 ZBX_DC_CONFIG		*config = NULL;
 zbx_rwlock_t		config_lock = ZBX_RWLOCK_NULL;
+zbx_rwlock_t		config_history_lock = ZBX_RWLOCK_NULL;
 zbx_shmem_info_t	*config_mem;
 
 extern unsigned char	program_type;
@@ -6787,6 +6791,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 		goto out;
 	itemscrp_sec = zbx_time() - sec;
 
+	START_HISTORY_SYNC;
 	START_SYNC;
 
 	/* resolves macros for interface_snmpaddrs, must be after DCsync_hmacros() */
@@ -6824,6 +6829,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 
 	config->item_sync_ts = time(NULL);
 	FINISH_SYNC;
+	FINISH_HISTORY_SYNC;
 
 	dc_flush_history();	/* misconfigured items generate pseudo-historic values to become notsupported */
 
@@ -6840,11 +6846,13 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 		goto out;
 	fsec = zbx_time() - sec;
 
+	START_HISTORY_SYNC;
 	START_SYNC;
 	sec = zbx_time();
 	DCsync_functions(&func_sync, new_revision);
 	fsec2 = zbx_time() - sec;
 	FINISH_SYNC;
+	FINISH_HISTORY_SYNC;
 
 	/* sync rest of the data */
 	sec = zbx_time();
@@ -6897,6 +6905,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 		goto out;
 	corr_operation_sec = zbx_time() - sec;
 
+	START_HISTORY_SYNC;
 	START_SYNC;
 
 	sec = zbx_time();
@@ -7317,6 +7326,9 @@ out:
 
 	FINISH_SYNC;
 
+	if (dberr == ZBX_DB_OK)
+		FINISH_HISTORY_SYNC;
+
 #ifdef HAVE_ORACLE
 	if (ZBX_DB_OK == dberr)
 		dberr = DBcommit();
@@ -7733,6 +7745,9 @@ int	init_configuration_cache(char **error)
 	if (SUCCEED != (ret = zbx_rwlock_create(&config_lock, ZBX_RWLOCK_CONFIG, error)))
 		goto out;
 
+	if (SUCCEED != (ret = zbx_rwlock_create(&config_history_lock, ZBX_RWLOCK_CONFIG_HISTORY, error)))
+		goto out;
+
 	if (SUCCEED != (ret = zbx_shmem_create(&config_mem, CONFIG_CONF_CACHE_SIZE, "configuration cache",
 			"CacheSize", 0, error)))
 	{
@@ -7961,6 +7976,7 @@ void	free_configuration_cache(void)
 
 	zbx_shmem_destroy(config_mem);
 	config_mem = NULL;
+	zbx_rwlock_destroy(&config_history_lock);
 	zbx_rwlock_destroy(&config_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -9266,6 +9282,62 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 	zbx_dc_close_user_macros(um_handle);
 }
 
+void	DCconfig_history_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
+		unsigned int mode)
+{
+	int			i;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_HOST	*dc_host = NULL;
+	zbx_config_hk_t		config_hk;
+	zbx_dc_um_handle_t	*um_handle;
+
+	memset(errcodes, 0, sizeof(int) * num);
+
+	RDLOCK_CACHE2;
+
+	for (i = 0; i < num; i++)
+	{
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])))
+		{
+			errcodes[i] = FAIL;
+			continue;
+		}
+
+		if (NULL == dc_host || dc_host->hostid != dc_item->hostid)
+		{
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			{
+				errcodes[i] = FAIL;
+				continue;
+			}
+		}
+
+		DCget_host(&items[i].host, dc_host, mode);
+		DCget_item(&items[i], dc_item, mode);
+
+		if (0 != (mode & ZBX_ITEM_GET_HOUSEKEEPING))
+			config_hk = config->config->hk;
+	}
+
+	UNLOCK_CACHE2;
+
+	um_handle = zbx_dc_open_user_macros();
+
+	/* avoid unnecessary allocations inside lock if there are no error or units */
+	for (i = 0; i < num; i++)
+	{
+		if (FAIL == errcodes[i])
+			continue;
+
+		items[i].itemid = itemids[i];
+
+		if (0 != (mode & ZBX_ITEM_GET_HOUSEKEEPING))
+			dc_items_convert_hk_periods(&config_hk, &items[i]);
+	}
+
+	zbx_dc_close_user_macros(um_handle);
+}
+
 static void	dc_preproc_dump(zbx_hashset_t *items)
 {
 	zbx_hashset_iter_t	iter;
@@ -9671,6 +9743,39 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t 
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Get functions by IDs                                              *
+ *                                                                            *
+ * Parameters: functions   - [OUT] pointer to DC_FUNCTION structures          *
+ *             functionids - [IN] array of function IDs                       *
+ *             errcodes    - [OUT] SUCCEED if item found, otherwise FAIL      *
+ *             num         - [IN] number of elements                          *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_history_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes,
+		size_t num)
+{
+	size_t			i;
+	const ZBX_DC_FUNCTION	*dc_function;
+
+	RDLOCK_CACHE2;
+
+	for (i = 0; i < num; i++)
+	{
+		if (NULL == (dc_function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &functionids[i])))
+		{
+			errcodes[i] = FAIL;
+			continue;
+		}
+
+		DCget_function(&functions[i], dc_function);
+		errcodes[i] = SUCCEED;
+	}
+
+	UNLOCK_CACHE2;
+}
+
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num)
 {
 	size_t	i;
@@ -9865,7 +9970,7 @@ void	DCconfig_unlock_all_triggers(void)
  * Purpose: get enabled triggers for specified items                          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
+void	DCconfig_history_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num)
 {
 	int			i, j, found;
@@ -9873,7 +9978,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 	const ZBX_DC_TRIGGER	*dc_trigger;
 	DC_TRIGGER		*trigger;
 
-	RDLOCK_CACHE;
+	RDLOCK_CACHE2;
 
 	for (i = 0; i < itemids_num; i++)
 	{
@@ -9916,7 +10021,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 		}
 	}
 
-	UNLOCK_CACHE;
+	UNLOCK_CACHE2;
 }
 
 /******************************************************************************

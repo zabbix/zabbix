@@ -958,6 +958,12 @@ extern zbx_rwlock_t	config_lock;
 #define	WRLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_wrlock(config_lock)
 #define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_rwlock_unlock(config_lock)
 
+extern zbx_rwlock_t	config_history_lock;
+
+#define	RDLOCK_CACHE2	zbx_rwlock_rdlock(config_history_lock)
+#define	WRLOCK_CACHE2	zbx_rwlock_wrlock(config_history_lock)
+#define	UNLOCK_CACHE2	zbx_rwlock_unlock(config_history_lock)
+
 #define ZBX_IPMI_DEFAULT_AUTHTYPE	-1
 #define ZBX_IPMI_DEFAULT_PRIVILEGE	2
 
