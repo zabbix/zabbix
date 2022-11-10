@@ -679,6 +679,8 @@ function getMenuPopupTrigger(options, trigger_element) {
 							}
 							else if('success' in response) {
 								addMessage(makeMessageBox('good', [], response.success.title, true, false));
+
+								$.publish('event.rank_change');
 							}
 						})
 						.catch(() => {
@@ -729,6 +731,8 @@ function getMenuPopupTrigger(options, trigger_element) {
 								uncheckTableRows('problem', []);
 								chkbxRange.checkObjects('eventids', uncheckids, false);
 								chkbxRange.update('eventids');
+
+								$.publish('event.rank_change');
 							}
 						})
 						.catch(() => {

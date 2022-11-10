@@ -54,6 +54,12 @@ class CWidgetProblems extends CWidget {
 				}
 			},
 
+			rankChanged: (e) => {
+				if (this._state === WIDGET_STATE_ACTIVE) {
+					this._startUpdating();
+				}
+			},
+
 			showSymptoms: (e) => {
 				const button = e.target;
 
@@ -99,6 +105,7 @@ class CWidgetProblems extends CWidget {
 		super._activateEvents();
 
 		$.subscribe('acknowledge.create', this._events.acknowledgeCreated);
+		$.subscribe('event.rank_change', this._events.rankChanged);
 	}
 
 	_doActivate() {
@@ -119,6 +126,7 @@ class CWidgetProblems extends CWidget {
 		super._deactivateEvents();
 
 		$.unsubscribe('acknowledge.create', this._events.acknowledgeCreated);
+		$.unsubscribe('event.rank_change', this._events.rankChanged);
 	}
 
 	_processUpdateResponse(response) {

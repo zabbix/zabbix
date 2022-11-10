@@ -50,6 +50,8 @@
 			this.refresh_simple_url = url.getUrl();
 
 			this.initFilter(filter_options);
+			$.subscribe('event.rank_change', () => view.refreshNow());
+
 			this.initAcknowledge();
 			this.initExpandables();
 
