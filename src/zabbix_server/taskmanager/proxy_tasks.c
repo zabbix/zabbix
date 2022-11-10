@@ -21,6 +21,7 @@
 #include "zbxnum.h"
 #include "zbxtasks.h"
 #include "zbxversion.h"
+#include "taskmanager.h"
 
 /******************************************************************************
  *                                                                            *

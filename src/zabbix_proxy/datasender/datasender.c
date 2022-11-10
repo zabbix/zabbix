@@ -30,6 +30,7 @@
 #include "zbxavailability.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "../taskmanager/taskmanager.h"
 
 extern zbx_vector_ptr_t	zbx_addrs;
 extern char		*CONFIG_HOSTNAME;

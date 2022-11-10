@@ -29,6 +29,7 @@
 #include "zbxcommshigh.h"
 #include "zbxavailability.h"
 #include "zbxnum.h"
+#include "../taskmanager/taskmanager.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
