@@ -101,6 +101,8 @@ class CControllerPopupActionEdit extends CController {
 				: '';
 
 			sortOperations($eventsource, $this->action['operations']);
+			CArrayHelper::sort($this->action['recovery_operations'], ['operationtype']);
+			CArrayHelper::sort($this->action['update_operations'], ['operationtype']);
 
 			$data = [
 				'eventsource' => $eventsource,

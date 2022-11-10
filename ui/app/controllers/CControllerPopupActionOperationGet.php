@@ -38,7 +38,8 @@ class CControllerPopupActionOperationGet extends CController {
 			'recovery_operations'=>	'array',
 			'update_operations'=>	'array',
 			'new_operation' =>		'array',
-			'eventsource' =>		'required|db actions.eventsource|in '.implode(',', $eventsource)
+			'eventsource' =>		'required|db actions.eventsource|in '.implode(',', $eventsource),
+			'actionid'=>			'db actions.actionid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -57,15 +58,26 @@ class CControllerPopupActionOperationGet extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
-		// todo : add permission check
+		if ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN) {
+			if (!$this->getInput('actionid', '0')) {
+				return true;
+			}
+
+			return (bool) API::Action()->get([
+				'output' => [],
+				'actionids' => $this->getInput('actionid'),
+				'editable' => true
+			]);
+		}
+
+		return false;
 	}
 
 	protected function doAction() {
 		$data['esc_period'] = $this->getInput('esc_period');
 		$eventsource = $this->getInput('eventsource');
 
-		$new_operation = array_key_exists('operation', $this->getInput('new_operation'))
+		$new_operation = $this->hasInput('new_operation')
 			? $this->getInput('new_operation')['operation']
 			: null;
 
@@ -130,7 +142,6 @@ class CControllerPopupActionOperationGet extends CController {
 		}
 		unset($operation);
 
-
 		foreach ($data['operations'] as $operation) {
 			if ($operation['recovery'] == ACTION_OPERATION) {
 				$data['action']['operations'][] = $operation;
@@ -138,11 +149,11 @@ class CControllerPopupActionOperationGet extends CController {
 			}
 			if ($operation['recovery'] == ACTION_RECOVERY_OPERATION) {
 				$data['action']['recovery_operations'][] = $operation;
-				sortOperations($eventsource, $data['action']['recovery_operations']);
+				CArrayHelper::sort($data['action']['recovery_operations'], ['operationtype']);
 			}
 			if ($operation['recovery'] == ACTION_UPDATE_OPERATION) {
 				$data['action']['update_operations'][] = $operation;
-				sortOperations($eventsource, $data['action']['udpate_operations']);
+				CArrayHelper::sort($data['action']['update_operations'], ['operationtype']);
 			}
 		}
 

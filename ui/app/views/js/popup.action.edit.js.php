@@ -21,8 +21,6 @@
 
 
 window.action_edit_popup = new class {
-	// todo : CLEAN CODE, REMOVE UNNECESSARY FUNCTIONS
-
 	init({condition_operators, condition_types, conditions, actionid, eventsource}) {
 		this.overlay = overlays_stack.getById('action-edit');
 		this.dialogue = this.overlay.$dialogue[0];
@@ -36,10 +34,10 @@ window.action_edit_popup = new class {
 		this._initActionButtons();
 		this._processTypeOfCalculation();
 
+		// Add existing conditions in action edit popup.
 		if (typeof(conditions) === 'object') {
 			conditions = Object.values(conditions)
 		}
-
 		for (const condition of conditions) {
 			this._createConditionsRow(condition);
 		}
@@ -54,8 +52,7 @@ window.action_edit_popup = new class {
 	}
 
 	_loadOperationTable(e = null) {
-
-		if (e.type == 'change'){
+		if (e.type === 'change'){
 			this.recovery = <?= ACTION_OPERATION ?>
 		}
 		else if (e && e.type != 'change') {
@@ -98,7 +95,8 @@ window.action_edit_popup = new class {
 				'recovery_operations': fields.recovery_operations,
 				'update_operations': fields.update_operations,
 				'new_operation': new_operation,
-				'eventsource': this.eventsource
+				'eventsource': this.eventsource,
+				'actionid': this.actionid
 			})
 		})
 			.then((response) => response.json())
@@ -148,7 +146,7 @@ window.action_edit_popup = new class {
 				this._openOperationPopup(this.eventsource, <?= ACTION_UPDATE_OPERATION ?>, this.actionid);
 			}
 			else if (e.target.classList.contains('js-edit-operation')) {
-				this._openEditOperationPopup(e, JSON.parse(e.target.getAttribute('data_operation')), $(e.target).closest('tr').attr('id'));
+				this._openEditOperationPopup(e, JSON.parse(e.target.getAttribute('data_operation')));
 			}
 			else if (e.target.classList.contains('js-remove')) {
 				e.target.closest('tr').remove();
@@ -343,292 +341,8 @@ window.action_edit_popup = new class {
 					this.condition_operators[input.operator] + ' ' + input.name;
 				break;
 		}
+
 		return this.condition_name
-	}
-
-	/**
-	 * Add hidden inputs to template for each possible eventsource/operation type/data combination.
-	 */
-	_prepareOperationsRow(operation, op_template) {
-		const template = document.createElement('template');
-		let prefix = operation.prefix;
-		template.innerHTML = op_template.evaluate(operation);
-		const row = template.content.firstElementChild;
-		const except_keys = [
-			'details', 'data_operation', 'prefix', 'row_index', 'data', 'steps', 'start_in', 'duration', 'usr_data',
-			'usrgrp_data', 'usr_details', 'usrgrp_details', 'current', 'host_details', 'host_data', 'hostgr_details',
-			'hostgr_data'
-		];
-
-		for (const [key, value] of Object.entries(operation)) {
-			if (!except_keys.includes(key)) {
-				let input = document.createElement('input');
-				let first = row.getElementsByTagName('td')[0];
-
-				if (is_array(value)) {
-					value.map((element, index) => {
-						for (const element_id in element) {
-							if (element.hasOwnProperty(element_id)) {
-								let input = document.createElement('input');
-								input.setAttribute('type', 'hidden');
-								input.setAttribute(
-									'name',
-									`${prefix}operations[${operation.row_index}][${key}][${index}][${element_id}]`
-								);
-								input.setAttribute(
-									'id',
-									`${prefix}operations_${operation.row_index}_${key}_${index}_${element_id}`
-								);
-								input.setAttribute('value', element[element_id]);
-								first.append(input);
-							}
-						}
-					})
-				}
-				else if (is_object(value) && !is_array(value)) {
-					for (const [id, val] of Object.entries(value)) {
-						let input = document.createElement('input');
-						input.setAttribute('type', 'hidden');
-						input.setAttribute('name', `${prefix}operations[${operation.row_index}][${key}][${id}]`);
-						input.setAttribute('id', `${prefix}operations_${operation.row_index}_${key}_${id}`);
-						input.setAttribute('value', val);
-						first.append(input);
-					}
-				}
-
-				else {
-					input.setAttribute('type', 'hidden');
-					input.setAttribute('id', `${prefix}operations_${operation.row_index}_${key}`);
-					input.setAttribute('name', `${prefix}operations[${operation.row_index}][${key}]`);
-					input.setAttribute('value', `${value}`);
-					first.append(input);
-				}
-			}
-		}
-
-		return row
-	}
-
-	/**
-	 * Add data to specific template based on operation recovery type, input data and eventsource.
-	 */
-	_createOperationsRow(input, row_id = null) {
-		let operation = input.detail.operation;
-
-		if (this.recovery == undefined) {
-			this.recovery  = operation.recovery;
-		}
-
-		let operation_obj = {...operation};
-
-		let row_index;
-		if (row_id !== null) {
-			operation_obj.row_index = row_id;
-		}
-
-		let data = input.detail.operation.details.data ? input.detail.operation.details.data[0] : [];
-		operation_obj.data = data.join(' ');
-		operation_obj.details = input.detail.operation.details.type;
-
-		let template = new Template(document.getElementById('operation-basic-row-tmpl').innerHTML);
-
-		if (input.detail.operation.details.data) {
-			if (operation.details.type.length > 2 && operation.details.data.length == 2) {
-				operation_obj.current = operation.details.type[0];
-				operation_obj.host_data = operation.details.data[0].join('');
-				operation_obj.host_details = operation.details.type[1];
-				operation_obj.hostgr_data = operation.details.data[1].join('');
-				operation_obj.hostgr_details = operation.details.type[2];
-				template = new Template(document.getElementById('operation-script-row-tmpl').innerHTML);
-			}
-			else if (operation.details.data.length > 1) {
-				operation_obj.usr_data = operation.details.data[0].join('');
-				operation_obj.usr_details = operation.details.type[0];
-				operation_obj.usrgrp_data = operation.details.data[1].join(' ');
-				operation_obj.usrgrp_details = operation.details.type[1];
-				template = new Template(document.getElementById('operation-usr-usrgrp-row-tmpl').innerHTML);
-			}
-			else if (operation.details.type.length > 1) {
-				operation_obj.usr_details = operation.details.type[0];
-				operation_obj.usrgrp_data = operation.details.data[0].join('');
-				operation_obj.usrgrp_details = operation.details.type[1];
-				template = new Template(document.getElementById('operation-usr-usrgrp-row-tmpl').innerHTML);
-			}
-		}
-
-		if (row_id) {
-			document.getElementById(row_id).remove();
-		}
-
-		operation_obj.data_operation = JSON.stringify(operation);
-		let index;
-		let input_index;
-
-		if (row_id !== null) {
-			index = operation.row_index;
-		}
-
-		switch (parseInt(this.recovery)) {
-			case <?=ACTION_RECOVERY_OPERATION?>:
-				row_index = 0;
-
-				while (document.querySelector(`#rec-table [id="recovery_operations_${row_index}"]`) !== null) {
-					row_index++;
-				}
-				operation_obj.row_index = row_index
-				operation_obj.prefix = 'recovery_';
-
-				if (index) {
-					input_index = parseInt(index) -1;
-					input_index >= 0
-						? $(`#rec-table > tbody tr:eq(${input_index})`)
-							.after(this._prepareOperationsRow(operation_obj, template))
-						: $(`#rec-table tbody`).prepend(this._prepareOperationsRow(operation_obj, template));
-				}
-				else {
-					document
-						.querySelector('#rec-table tbody')
-						.appendChild(this._prepareOperationsRow(operation_obj, template));
-				}
-
-				break;
-
-			case <?=ACTION_UPDATE_OPERATION?>:
-				row_index = 0;
-
-				while (document.querySelector(`#upd-table [id="update_operations_${row_index}"]`) !== null) {
-					row_index++;
-				}
-				operation_obj.row_index = row_index;
-				operation_obj.prefix = 'update_';
-
-				if (index) {
-					input_index = parseInt(index) -1;
-					input_index >= 0
-						? $(`#upd-table > tbody tr:eq(${input_index})`)
-							.after(this._prepareOperationsRow(operation_obj, template))
-						: $(`#upd-table tbody`).prepend(this._prepareOperationsRow(operation_obj, template))
-				}
-				else {
-					document
-						.querySelector('#upd-table tbody')
-						.appendChild(this._prepareOperationsRow(operation_obj, template));
-				}
-				break;
-
-			case <?=ACTION_OPERATION?>:
-				row_index = 0;
-				while (document.querySelector(`#op-table [id="operations_${row_index}"]`) !== null) {
-					row_index++;
-				}
-
-				operation_obj.row_index = row_index;
-
-				switch (parseInt(this.eventsource)) {
-					case <?= EVENT_SOURCE_TRIGGERS ?>:
-					case <?= EVENT_SOURCE_SERVICE ?>:
-					case <?= EVENT_SOURCE_INTERNAL ?>:
-
-						template = new Template(document.getElementById('operation-additional-row-tmpl').innerHTML);
-						operation_obj.prefix = '';
-						operation_obj.steps = input.detail.operation.steps;
-						operation_obj.start_in = input.detail.operation.start_in;
-						operation_obj.duration = input.detail.operation.duration;
-
-						if (input.detail.operation.details.data) {
-							if (operation.details.type.length > 2 && operation.details.data.length == 2) {
-								template = new Template(
-									document.getElementById('operation-script-additional-row-tmpl').innerHTML
-								)
-							}
-							else if (operation.details.data.length > 1) {
-								template = new Template(
-									document.getElementById('operation-usr-usrgrp-additional-row-tmpl').innerHTML
-								);
-							}
-							else if (operation.details.type.length > 1) {
-								operation_obj.usr_details = operation.details.type[0];
-								operation_obj.usrgrp_data = operation.details.data[0].join('');
-								operation_obj.usrgrp_details = operation.details.type[1];
-								template = new Template(
-									document.getElementById('operation-usr-usrgrp-row-tmpl').innerHTML
-								)
-								template = new Template(
-									document.getElementById('operation-usr-usrgrp-additional-row-tmpl').innerHTML
-								);
-							}
-						}
-
-						let new_step_from = operation_obj.esc_step_from;
-						let new_step_to = operation_obj.esc_step_to
-
-						const new_combined = new_step_from === new_step_to
-							? parseInt(`${new_step_from}0`)
-							: parseInt(`${new_step_from}${new_step_to}`);
-
-						let result = [];
-						let rows = document.querySelector('#op-table tbody').getElementsByTagName('tr');
-
-						if (rows.length == 0) {
-							document
-								.querySelector('#op-table tbody')
-								.appendChild(this._prepareOperationsRow(operation_obj, template));
-						}
-						else {
-							Array.from(rows).forEach(row => {
-								let esc_step_from = row.querySelector("input[id*='esc_step_from']").value;
-								let esc_step_to = row.querySelector("input[id*='esc_step_to']").value;
-								row_id = row.id;
-
-								const existing_combined = esc_step_from === esc_step_to
-									? parseInt(`${esc_step_from}0`)
-									: parseInt(`${esc_step_from}${esc_step_to}`);
-
-								if (new_combined < existing_combined) {
-									result.push(row_id);
-								}
-							})
-
-							if (result.length > 0) {
-								document
-									.getElementById(result[0])
-									.before(this._prepareOperationsRow(operation_obj, template));
-							}
-							else {
-								document
-									.querySelector('#op-table tbody')
-									.appendChild(this._prepareOperationsRow(operation_obj, template));
-							}
-						}
-						break;
-
-					default:
-						operation_obj.row_index = row_index;
-						operation_obj.prefix = ''
-						if (input.detail.operation.details.data) {
-							if (operation.details.data.length > 1) {
-								template = new Template(
-									document.getElementById('operation-usr-usrgrp-row-tmpl').innerHTML
-								)
-							}
-						}
-
-						if (index) {
-							input_index = parseInt(index) -1;
-							input_index >= 0
-								? $(`#op-table > tbody tr:eq(${input_index})`)
-									.after(this._prepareOperationsRow(operation_obj, template))
-								: $(`#op-table tbody`).prepend(this._prepareOperationsRow(operation_obj, template))
-						}
-						else {
-							document
-								.querySelector('#op-table tbody')
-								.appendChild(this._prepareOperationsRow(operation_obj, template));
-						}
-						break;
-				}
-				break;
-		}
 	}
 
 	submit() {
@@ -710,28 +424,12 @@ window.action_edit_popup = new class {
 		curl.setArgument('action', 'action.delete');
 		curl.setArgument('eventsource', this.eventsource);
 
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData({actionids: [this.actionid]})
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
 
-				overlayDialogueDestroy(this.overlay.dialogueid);
+		this._post(curl.getUrl(), {actionids: [this.actionid]}, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
-					detail: {
-						success: response.success
-					}
-				}));
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+		});
 	}
 
 	_processTypeOfCalculation() {
