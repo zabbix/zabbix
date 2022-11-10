@@ -13278,14 +13278,14 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
  *           zbx_action_eval_free() function later.                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags)
+void	zbx_dc_config_history_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags)
 {
 	const zbx_dc_action_t		*dc_action;
 	zbx_hashset_iter_t		iter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	RDLOCK_CACHE;
+	RDLOCK_CACHE2;
 
 	zbx_hashset_iter_reset(&config->actions, &iter);
 
@@ -13295,7 +13295,7 @@ void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags)
 			zbx_vector_ptr_append(actions, dc_action_eval_create(dc_action));
 	}
 
-	UNLOCK_CACHE;
+	UNLOCK_CACHE2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() actions:%d", __func__, actions->values_num);
 }
