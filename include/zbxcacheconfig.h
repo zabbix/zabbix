@@ -758,7 +758,7 @@ int	DCset_interfaces_availability(zbx_vector_availability_ptr_t *availabilities)
 
 int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces);
 
-void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
+void	zbx_dc_config_history_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
 
 int	DCget_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);
 void	DCtouch_interfaces_availability(const zbx_vector_uint64_t *interfaceids);
