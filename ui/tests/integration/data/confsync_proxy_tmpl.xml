@@ -83,7 +83,7 @@
                             <uuid>f988e57fcdc541668c3c32919d3cfa60</uuid>
                             <name>DepItemProtoDependsOnNormalItem</name>
                             <type>DEPENDENT</type>
-                            <key>depitemproto_deponnormal</key>
+			    <key>depitemproto_deponnormal[{#LLDMACRO}]</key>
                             <delay>0</delay>
                             <master_item>
                                 <key>tmpltrap</key>
@@ -91,12 +91,12 @@
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <uuid>ebc83aff113846518d3e1c88532274e1</uuid>
-                                    <expression>last(/SampleTemplate/depitemproto_deponnormal)=0</expression>
+                                    <expression>last(/SampleTemplate/depitemproto_deponnormal[{#LLDMACRO}])=0</expression>
                                     <name>proto_dep {#LLDMACRO}</name>
                                     <dependencies>
                                         <dependency>
                                             <name>proto {#LLDMACRO}</name>
-                                            <expression>last(/SampleTemplate/depitemproto_deponnormal)=1</expression>
+                                            <expression>last(/SampleTemplate/depitemproto_deponnormal[{#LLDMACRO}])=1</expression>
                                         </dependency>
                                     </dependencies>
                                     <tags>
@@ -108,7 +108,7 @@
                                 </trigger_prototype>
                                 <trigger_prototype>
                                     <uuid>6032b6444698467c8f41587858f089e5</uuid>
-                                    <expression>last(/SampleTemplate/depitemproto_deponnormal)=1</expression>
+                                    <expression>last(/SampleTemplate/depitemproto_deponnormal[{#LLDMACRO}])=1</expression>
                                     <name>proto {#LLDMACRO}</name>
                                     <tags>
                                         <tag>

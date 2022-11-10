@@ -203,7 +203,7 @@
             </interfaces>
             <items>
                 <item>
-                    <name>Hostname</name>
+                    <name>Hostname1</name>
                     <key>agent.hostname</key>
                     <trends>0</trends>
                     <delay>25s</delay>
@@ -212,7 +212,7 @@
                     <interface_ref>if1</interface_ref>
                 </item>
                 <item>
-                    <name>Chassis</name>
+                    <name>Chassis1</name>
                     <key>system.hw.chassis[model]</key>
                     <trends>0</trends>
                     <delay>25s</delay>
@@ -221,7 +221,7 @@
                     <interface_ref>if1</interface_ref>
                 </item>
                 <item>
-                    <name>Uname</name>
+                    <name>Uname1</name>
                     <key>system.uname</key>
                     <trends>0</trends>
                     <delay>25s</delay>
@@ -256,8 +256,8 @@
             </interfaces>
             <items>
                 <item>
-                    <name>ItemWithMultilevelMacros</name>
-                    <key>vfs.dir.count[/{$UU},{$CHLDTMPLMACRO},{$PRNTTMPLMACRO}]</key>
+                    <name>ItemWithMultilevelMacros11</name>
+		    <key>vfs.dir.count[/tmp/{$UU},{$CHLDTMPLMACRO},{$PRNTTMPLMACRO}]</key>
                     <delay>{$PRNTTMPLMACRO}</delay>
                     <interface_ref>if1</interface_ref>
                 </item>
@@ -293,13 +293,13 @@
                     </filter>
                     <item_prototypes>
                         <item_prototype>
-                            <name>ItemProto</name>
+                            <name>ItemProto1</name>
                             <type>CALCULATED</type>
-                            <key>proto</key>
+			    <key>proto[{#X}]</key>
                             <params>1</params>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>last(/HostWithDiscovery/proto)=2</expression>
+                                    <expression>last(/HostWithDiscovery/proto[{#X}])=2</expression>
                                     <name>TriggerPrototype</name>
                                     <priority>HIGH</priority>
                                     <manual_close>YES</manual_close>
@@ -395,7 +395,7 @@
             </interfaces>
             <items>
                 <item>
-                    <name>NormalItemPreproc</name>
+                    <name>NormalItemPreproc11</name>
                     <key>agent.hostmetadata</key>
                     <trends>0</trends>
 		    <delay>20s</delay>
@@ -412,7 +412,7 @@
                     <interface_ref>if1</interface_ref>
                 </item>
                 <item>
-                    <name>Agent ping (active)</name>
+                    <name>Agent ping (active)1</name>
                     <type>ZABBIX_ACTIVE</type>
                     <key>agent.ping</key>
 		    <delay>20s</delay>
@@ -432,7 +432,7 @@
                     </triggers>
                 </item>
                 <item>
-                    <name>Agent version (passive)</name>
+                    <name>Agent version (1passive)</name>
                     <key>agent.version</key>
 		    <delay>20s</delay>
                     <trends>0</trends>
@@ -440,7 +440,7 @@
                     <interface_ref>if1</interface_ref>
                 </item>
                 <item>
-                    <name>Calculated</name>
+                    <name>alculated1</name>
                     <type>CALCULATED</type>
                     <key>calc</key>
                     <params>1+1+1</params>
@@ -489,13 +489,13 @@
                     </triggers>
                 </item>
                 <item>
-                    <name>CalculatedAsAggregated</name>
+                    <name>CalculatedAsAggregated1</name>
                     <type>CALCULATED</type>
                     <key>calc_as_aggr</key>
                     <params>sum(last_foreach(/*/agent.version?[group=&quot;HG1&quot;]))</params>
                 </item>
                 <item>
-                    <name>CalculatedPreproc</name>
+                    <name>CalculatedPreproc1</name>
                     <type>CALCULATED</type>
                     <key>calc_preproc</key>
                     <params>1</params>
@@ -510,13 +510,13 @@
                     </preprocessing>
                 </item>
                 <item>
-                    <name>ODBC monitor</name>
+                    <name>ODBC monito1r</name>
                     <type>ODBC</type>
                     <key>db.odbc.select[x,y,z]</key>
                     <params>select null from dual;</params>
                 </item>
                 <item>
-                    <name>Dependent item</name>
+                    <name>Dependent item1</name>
                     <type>DEPENDENT</type>
                     <key>depitem</key>
                     <delay>10s</delay>
@@ -525,7 +525,7 @@
                     </master_item>
                 </item>
                 <item>
-                    <name>DepItemOnCalcPreproc</name>
+                    <name>DepItemOnCalcPreproc1</name>
                     <type>DEPENDENT</type>
                     <key>depitem_calc_preproc</key>
                     <delay>10s</delay>
@@ -543,7 +543,7 @@
                     </master_item>
                 </item>
                 <item>
-                    <name>DepItemOnDepCalcItem</name>
+                    <name>DepItemOnDepCalcItem1</name>
                     <type>DEPENDENT</type>
                     <key>depitem_depitem</key>
                     <delay>10s</delay>
@@ -561,7 +561,7 @@
                     </master_item>
                 </item>
                 <item>
-                    <name>DepItemOnNormalDepItem</name>
+                    <name>DepItemOnNormalDepItem1</name>
                     <type>DEPENDENT</type>
                     <key>depitem_depitem_normal</key>
                     <delay>10s</delay>
@@ -579,12 +579,12 @@
                     </master_item>
                 </item>
                 <item>
-                    <name>Zabbix internal</name>
+                    <name>Zabbix internal1</name>
                     <type>INTERNAL</type>
                     <key>zabbix[boottime]</key>
                 </item>
                 <item>
-                    <name>DepItemOnInternalItem</name>
+                    <name>DepItemOnInternalItem1</name>
                     <type>DEPENDENT</type>
                     <key>depitem_internal</key>
                     <delay>30s</delay>
@@ -602,7 +602,7 @@
                     </master_item>
                 </item>
                 <item>
-                    <name>DepItemOnNormalItem</name>
+                    <name>DepItemOnNormalItem1</name>
                     <type>DEPENDENT</type>
                     <key>depitem_normalitem</key>
                     <delay>30s</delay>
@@ -620,7 +620,7 @@
                     </master_item>
                 </item>
                 <item>
-                    <name>DepItemOnInternalItemPreproc</name>
+                    <name>DepItemOnInternalItemPreproc1</name>
                     <type>DEPENDENT</type>
                     <key>depitem_normal_preproc</key>
                     <delay>10s</delay>
@@ -638,13 +638,13 @@
                     </master_item>
                 </item>
                 <item>
-                    <name>External check</name>
+                    <name>External check1</name>
                     <type>EXTERNAL</type>
                     <key>extcheck</key>
                     <interface_ref>if1</interface_ref>
                 </item>
                 <item>
-                    <name>HTTP agent</name>
+                    <name>HTTP agent1</name>
                     <type>HTTP_AGENT</type>
                     <key>httpagent</key>
                     <authtype>BASIC</authtype>
@@ -670,13 +670,13 @@
                     <allow_traps>YES</allow_traps>
                 </item>
                 <item>
-                    <name>Simple check</name>
+                    <name>Simple chec1k</name>
                     <type>SIMPLE</type>
                     <key>icmpping[127.1.0.1]</key>
                     <interface_ref>if1</interface_ref>
                 </item>
                 <item>
-                    <name>IPMI agent</name>
+                    <name>IPMI agent1</name>
                     <type>IPMI</type>
                     <key>ipmi.get</key>
                     <trends>0</trends>
@@ -685,7 +685,7 @@
                     <interface_ref>if3</interface_ref>
                 </item>
                 <item>
-                    <name>ItemPreproc</name>
+                    <name>ItemPreproc1</name>
                     <type>CALCULATED</type>
                     <key>preproc</key>
                     <params>1</params>
@@ -702,7 +702,7 @@
                     </preprocessing>
                 </item>
                 <item>
-                    <name>Script</name>
+                    <name>Script1</name>
                     <type>SCRIPT</type>
                     <key>script</key>
                     <params>return &quot;1&quot;;</params>
@@ -715,21 +715,21 @@
                     </parameters>
                 </item>
                 <item>
-                    <name>SNMP trap</name>
+                    <name>SNMP trap1</name>
                     <type>SNMP_TRAP</type>
                     <key>snmptrap.fallback</key>
                     <delay>10s</delay>
                     <interface_ref>if2</interface_ref>
                 </item>
                 <item>
-                    <name>SNMP agent</name>
+                    <name>SNMP agent1</name>
                     <type>SNMP_AGENT</type>
                     <snmp_oid>SNMPv2-MIB::sysContact.0</snmp_oid>
                     <key>snmp_test</key>
                     <interface_ref>if2</interface_ref>
                 </item>
                 <item>
-                    <name>SSH agent</name>
+                    <name>SSH agent1</name>
                     <type>SSH</type>
                     <key>ssh.run[x,localhost]</key>
                     <params>echo</params>
@@ -738,7 +738,7 @@
                     <interface_ref>if1</interface_ref>
                 </item>
                 <item>
-                    <name>Telnet agent</name>
+                    <name>Telnet agent1</name>
                     <type>TELNET</type>
                     <key>telnet.run[a,localhost]</key>
                     <params>echo</params>
@@ -746,14 +746,14 @@
                     <interface_ref>if1</interface_ref>
                 </item>
                 <item>
-                    <name>Zabbix trapper</name>
+                    <name>Zabbix trapper1</name>
                     <type>TRAP</type>
                     <key>trap</key>
                     <delay>10s</delay>
                 </item>
                 <item>
-                    <name>delay_globmacro</name>
-                    <key>vfs.file.get[{$UU}]</key>
+                    <name>delay_globmacro11</name>
+		    <key>vfs.file.get[/tmp/{$UU}]</key>
                     <delay>{$GLOBDELAY}</delay>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
@@ -781,7 +781,7 @@
             </interfaces>
             <items>
                 <item>
-                    <name>item1</name>
+                    <name>item11</name>
                     <type>CALCULATED</type>
                     <key>itm</key>
                     <trends>0</trends>
@@ -796,15 +796,15 @@
                     </triggers>
                 </item>
                 <item>
-                    <name>ItemWithGlobalAndHostMacro</name>
-                    <key>sensor[{$HM1},{$UU}]</key>
+                    <name>ItemWithGlobalAndHostMacro11</name>
+                    <key>sensor[{$UU},{$HM1}]</key>
                     <delay>{$GLOBDELAY}</delay>
                     <value_type>FLOAT</value_type>
                     <interface_ref>if1</interface_ref>
                 </item>
                 <item>
-                    <name>ItemWithMacro</name>
-                    <key>vfs.file.get[/{$HM1}]</key>
+                    <name>ItemWithMacro1</name>
+		    <key>vfs.file.get[/tmp/{$HM1}]</key>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <interface_ref>if1</interface_ref>
@@ -882,7 +882,7 @@
             </groups>
             <items>
                 <item>
-                    <name>DepItemOnWebScenario</name>
+                    <name>DepItemOnWebScenario11</name>
                     <type>DEPENDENT</type>
                     <key>dep_webscenario</key>
                     <delay>20s</delay>

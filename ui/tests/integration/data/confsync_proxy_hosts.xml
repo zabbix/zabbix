@@ -290,13 +290,13 @@
                     </filter>
                     <item_prototypes>
                         <item_prototype>
-                            <name>ItemProto</name>
+                            <name>ItemProto1</name>
                             <type>CALCULATED</type>
-                            <key>proto</key>
+			    <key>proto[{#X}]</key>
                             <params>1</params>
                             <trigger_prototypes>
                                 <trigger_prototype>
-                                    <expression>last(/HostWithDiscovery/proto)=1</expression>
+                                    <expression>last(/HostWithDiscovery/proto[{#X}])=1</expression>
                                     <name>TriggerPrototype</name>
                                     <priority>DISASTER</priority>
                                     <manual_close>YES</manual_close>
@@ -656,7 +656,7 @@
                 <item>
                     <name>Simple check</name>
                     <type>SIMPLE</type>
-                    <key>icmpping[127.0.0.1]</key>
+                    <key>icmpping[127.1.0.1]</key>
                     <interface_ref>if1</interface_ref>
                 </item>
                 <item>
