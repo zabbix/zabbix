@@ -21,10 +21,11 @@
 #define ZABBIX_SERVER_TASKMANAGER_H
 
 #include "zbxalgo.h"
+#include "zbxtasks.h"
 #include "zbxthreads.h"
 #include "zbxversion.h"
 
-void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid,
+void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hostid,
 		zbx_proxy_compatibility_t compatibility);
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args);

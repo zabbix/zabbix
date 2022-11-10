@@ -24,6 +24,8 @@
 #include "zbxdbhigh.h"
 #include "zbxjson.h"
 
+ZBX_PTR_VECTOR_IMPL(tm_task, zbx_tm_task_t *)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: frees remote command task resources                               *
@@ -598,11 +600,11 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
  * Parameters: tasks - [IN] the tasks                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks)
+void	zbx_tm_save_tasks(zbx_vector_tm_task_t *tasks)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks_num:%d", __func__, tasks->values_num);
 
-	tm_save_tasks((zbx_tm_task_t **)tasks->values, tasks->values_num);
+	tm_save_tasks(tasks->values, tasks->values_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -638,7 +640,7 @@ int	zbx_tm_save_task(zbx_tm_task_t *task)
  *             status - [IN] the new status                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_update_task_status(zbx_vector_ptr_t *tasks, int status)
+void	zbx_tm_update_task_status(zbx_vector_tm_task_t *tasks, int status)
 {
 	zbx_vector_uint64_t	taskids;
 	int			i;
@@ -651,7 +653,8 @@ void	zbx_tm_update_task_status(zbx_vector_ptr_t *tasks, int status)
 
 	for (i = 0; i < tasks->values_num; i++)
 	{
-		zbx_tm_task_t	*task = (zbx_tm_task_t *)tasks->values[i];
+		zbx_tm_task_t	*task = tasks->values[i];
+
 		zbx_vector_uint64_append(&taskids, task->taskid);
 	}
 
@@ -773,7 +776,7 @@ static void	tm_json_serialize_data_result(struct zbx_json *json, const zbx_tm_da
  *             tasks - [IN] the tasks to serialize                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_ptr_t *tasks)
+void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_tm_task_t *tasks)
 {
 	int	i;
 
@@ -781,7 +784,7 @@ void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_ptr_t *
 
 	for (i = 0; i < tasks->values_num; i++)
 	{
-		const zbx_tm_task_t	*task = (const zbx_tm_task_t *)tasks->values[i];
+		const zbx_tm_task_t	*task = tasks->values[i];
 
 		zbx_json_addobject(json, NULL);
 		tm_json_serialize_task(json, task);
@@ -1085,7 +1088,7 @@ static zbx_tm_task_t	*tm_json_deserialize_task(const struct zbx_json_parse *jp)
  *             tasks - [OUT] the deserialized tasks                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_ptr_t *tasks)
+void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_tm_task_t *tasks)
 {
 	const char		*pnext = NULL;
 	struct zbx_json_parse	jp_task;
@@ -1138,7 +1141,7 @@ void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_p
 			continue;
 		}
 
-		zbx_vector_ptr_append(tasks, task);
+		zbx_vector_tm_task_append(tasks, task);
 	}
 }
 

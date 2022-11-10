@@ -126,6 +126,8 @@ typedef struct
 }
 zbx_tm_task_t;
 
+ZBX_PTR_VECTOR_DECL(tm_task, zbx_tm_task_t *)
+
 zbx_tm_task_t	*zbx_tm_task_create(zbx_uint64_t taskid, unsigned char type, unsigned char status, int clock, int ttl,
 		zbx_uint64_t proxy_hostid);
 void	zbx_tm_task_clear(zbx_tm_task_t *task);
@@ -145,11 +147,11 @@ zbx_tm_data_result_t	*zbx_tm_data_result_create(zbx_uint64_t parent_taskid, int 
 
 int	zbx_tm_execute_task_data(const char *data, size_t len, zbx_uint64_t proxy_hostid, char **info);
 
-void	zbx_tm_save_tasks(zbx_vector_ptr_t *tasks);
+void	zbx_tm_save_tasks(zbx_vector_tm_task_t *tasks);
 int	zbx_tm_save_task(zbx_tm_task_t *task);
 
-void	zbx_tm_update_task_status(zbx_vector_ptr_t *tasks, int status);
-void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_ptr_t *tasks);
-void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_ptr_t *tasks);
+void	zbx_tm_update_task_status(zbx_vector_tm_task_t *tasks, int status);
+void	zbx_tm_json_serialize_tasks(struct zbx_json *json, const zbx_vector_tm_task_t *tasks);
+void	zbx_tm_json_deserialize_tasks(const struct zbx_json_parse *jp, zbx_vector_tm_task_t *tasks);
 
 #endif
