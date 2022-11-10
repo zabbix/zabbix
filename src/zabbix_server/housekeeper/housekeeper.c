@@ -1053,7 +1053,7 @@ static int	housekeeping_events(int now)
 			ZBX_HK_EVENT_RULE ZBX_HK_TRIGGER_EVENT_RULE, 0, &cfg.hk.events_trigger},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			ZBX_HK_EVENT_RULE ZBX_HK_TRIGGER_EVENT_RULE, 0, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_ITEM)
 			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
