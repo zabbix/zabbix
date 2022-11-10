@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-10-28T13:02:38Z'
+  date: '2022-11-10T10:55:27Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -895,11 +895,6 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.items[?(@.metadata.name == "{#NAME}")].first()'
-                  error_handler: DISCARD_VALUE
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 3h
               master_item:
                 key: kube.nodes
               tags:
@@ -1753,11 +1748,6 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].first()'
-                  error_handler: DISCARD_VALUE
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 3h
               master_item:
                 key: kube.nodes
               tags:
