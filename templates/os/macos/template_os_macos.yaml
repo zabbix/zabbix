@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-22T13:44:05Z'
+  date: '2022-10-24T16:59:55Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -11,7 +11,7 @@ zabbix_export:
       template: macOS
       name: macOS
       description: |
-        Official macOS template. Requires Zabbix agent 4.0.0 or newer.
+        It is an official macOS template. It requires Zabbix agent 4.0.0 or newer.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
@@ -42,7 +42,7 @@ zabbix_export:
           name: 'Zabbix agent ping'
           key: agent.ping
           history: 7d
-          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check'
+          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for the availability check.'
           valuemap:
             name: 'Zabbix agent ping status'
           tags:
@@ -72,7 +72,7 @@ zabbix_export:
           key: kernel.maxfiles
           delay: 1h
           history: 7d
-          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
+          description: 'It could be increased by using sysctl utility or modifying the file /etc/sysctl.conf.'
           tags:
             -
               tag: component
@@ -96,7 +96,7 @@ zabbix_export:
           key: kernel.maxproc
           delay: 1h
           history: 7d
-          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
+          description: 'It could be increased by using sysctl utility or modifying the file /etc/sysctl.conf.'
           tags:
             -
               tag: component
@@ -169,7 +169,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg1]'
           history: 7d
           value_type: FLOAT
-          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             -
               tag: component
@@ -193,7 +193,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg5]'
           history: 7d
           value_type: FLOAT
-          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             -
               tag: component
@@ -204,7 +204,7 @@ zabbix_export:
           key: 'system.cpu.load[percpu,avg15]'
           history: 7d
           value_type: FLOAT
-          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          description: 'The processor load is calculated as the system CPU load divided by the number of CPU cores.'
           tags:
             -
               tag: component
@@ -217,7 +217,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'System host name.'
+          description: 'A host name of the system.'
           inventory_link: NAME
           preprocessing:
             -
@@ -256,7 +256,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The information as normally returned by ''uname -a''.'
+          description: 'The information as normally returned by the ''uname -a''.'
           inventory_link: OS
           preprocessing:
             -
@@ -303,7 +303,7 @@ zabbix_export:
           name: 'Number of logged in users'
           key: system.users.num
           history: 7d
-          description: 'Number of users who are currently logged in.'
+          description: 'The number of users who are currently logged in.'
           tags:
             -
               tag: component
@@ -315,10 +315,15 @@ zabbix_export:
           uuid: 6df0d9e8694d45dfa11e433d8de7be41
           name: 'Checksum of /etc/passwd'
           key: 'vfs.file.cksum[/etc/passwd,sha256]'
-          delay: 1h
+          delay: 15m
           history: 7d
           trends: '0'
           value_type: CHAR
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             -
               tag: component
@@ -339,7 +344,7 @@ zabbix_export:
           key: 'vm.memory.size[available]'
           history: 7d
           units: B
-          description: 'Available memory is defined as free+cached+buffers memory.'
+          description: 'The available memory is defined as free+cached+buffers memory.'
           tags:
             -
               tag: component
@@ -374,7 +379,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[host,agent,available]'
           history: 7d
-          description: 'Monitoring agent availability status'
+          description: 'Monitoring the availability status of the agent.'
           valuemap:
             name: zabbix.host.available
           tags:
@@ -388,7 +393,7 @@ zabbix_export:
               name: 'Zabbix agent is not available'
               event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
-              description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
+              description: 'For passive checks only the availability of the agents and a host is used with {$AGENT.TIMEOUT} as the time threshold.'
               manual_close: 'YES'
               tags:
                 -
@@ -406,7 +411,7 @@ zabbix_export:
                 macro: '{#FSTYPE}'
                 value: '@File systems for discovery'
                 formulaid: A
-          description: 'Discovery of file systems of different types as defined in global regular expression "File systems for discovery".'
+          description: 'Discovery of different types of file systems as defined in the global regular expression "File systems for discovery".'
           item_prototypes:
             -
               uuid: b7560dc2b6f743458128961cc962bcd3
@@ -536,7 +541,7 @@ zabbix_export:
         -
           macro: '{$AGENT.TIMEOUT}'
           value: 3m
-          description: 'Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode).'
+          description: 'The timeout after which the agent is considered unavailable. It works only for the agents reachable from Zabbix server/proxy (in passive mode).'
       dashboards:
         -
           uuid: d66f39e86e2047289acea0bc9a218807
@@ -557,8 +562,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: macOS
                         name: 'CPU load'
+                        host: macOS
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -573,8 +578,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: macOS
                         name: 'Memory usage'
+                        host: macOS
       valuemaps:
         -
           uuid: 0355844b2bee4fb59bddda6175ef4810
