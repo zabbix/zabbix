@@ -260,7 +260,7 @@ class CControllerPopupActionEdit extends CController {
 						order_result($user_names_list);
 
 						$result['type'][] = (_('Send message to users').': ');
-						$result['data'][] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $media_type];
+						$result['data'][] = [implode(', ', $user_names_list), _('via'), $media_type];
 					}
 
 					if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
@@ -411,7 +411,7 @@ class CControllerPopupActionEdit extends CController {
 						order_result($user_names_list);
 
 						$result['type'][] = _('Send message to users').': ';
-						$result['data'][] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $media_type];
+						$result['data'][] = [implode(', ', $user_names_list), _('via'), $media_type];
 					}
 
 					if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
@@ -426,7 +426,7 @@ class CControllerPopupActionEdit extends CController {
 						order_result($user_groups_list);
 
 						$result['type'][] = _('Send message to user groups').': ';
-						$result['data'][] = [implode(', ', $user_groups_list), ' ', _('via'), ' ', $media_type];
+						$result['data'][] = [implode(', ', $user_groups_list), _('via'), $media_type];
 					}
 					break;
 

@@ -74,7 +74,9 @@ class CControllerPopupActionOperationGet extends CController {
 	}
 
 	protected function doAction() {
-		$data['esc_period'] = $this->getInput('esc_period');
+		$data['esc_period'] = $this->hasInput('esc_period')
+			? $this->getInput('esc_period')
+			: DB::getDefault('actions', 'esc_period');
 		$eventsource = $this->getInput('eventsource');
 
 		$new_operation = $this->hasInput('new_operation')
@@ -84,23 +86,27 @@ class CControllerPopupActionOperationGet extends CController {
 		if ($new_operation) {
 			if ($new_operation['recovery'] == ACTION_OPERATION) {
 				$data['table'] = 'operation';
-				$data['operations'] = $this->getInput('operations');
+				$data['operations'] = $this->hasInput('operations') ? $this->getInput('operations') : [];
 				$data['operations'][] = $new_operation;
 			}
 			elseif ($new_operation['recovery'] == ACTION_RECOVERY_OPERATION) {
 				$data['table'] = 'recovery';
-				$data['operations'] = $this->getInput('recovery_operations');
+				$data['operations'] = $this->hasInput('recovery_operations')
+					? $this->getInput('recovery_operations')
+					: [];
 				$data['operations'][] = $new_operation;
 			}
 			elseif ($new_operation['recovery'] == ACTION_UPDATE_OPERATION) {
 				$data['table'] = 'update';
-				$data['operations'] = $this->getInput('update_operations');
+				$data['operations'] = $this->hasInput('update_operations')
+					? $this->getInput('update_operations')
+					: [];
 				$data['operations'][] = $new_operation;
 			}
 		}
 		else {
 			$data['table'] = 'operation';
-			$data['operations'] = $this->getInput('operations');
+			$data['operations'] = $this->hasInput('operations') ? $this->getInput('operations') : [];
 		}
 
 		$operations = [];
@@ -113,7 +119,7 @@ class CControllerPopupActionOperationGet extends CController {
 
 		$action = [
 			'name' => '',
-			'esc_period' => DB::getDefault('actions', 'esc_period'),
+			'esc_period' => $data['esc_period'],
 			'eventsource' => $eventsource,
 			'operations' => $operations,
 			'recovery_operations' => [],
@@ -159,7 +165,7 @@ class CControllerPopupActionOperationGet extends CController {
 
 		$data['allowedOperations'] = getAllowedOperations($eventsource);
 		$data['eventsource'] = $eventsource;
-		$data['action']['esc_period'] = $this->getInput('esc_period');
+		$data['action']['esc_period'] = $data['esc_period'];
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
@@ -214,7 +220,7 @@ class CControllerPopupActionOperationGet extends CController {
 						order_result($user_names_list);
 
 						$result['type'][] = (_('Send message to users').': ');
-						$result['data'][] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $media_type];
+						$result['data'][] = [implode(', ', $user_names_list),_('via'), $media_type];
 					}
 
 					if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
@@ -365,7 +371,7 @@ class CControllerPopupActionOperationGet extends CController {
 						order_result($user_names_list);
 
 						$result['type'][] = _('Send message to users').': ';
-						$result['data'][] = [implode(', ', $user_names_list), ' ', _('via'), ' ', $media_type];
+						$result['data'][] = [implode(', ', $user_names_list), _('via'), $media_type];
 					}
 
 					if (array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp']) {
@@ -380,7 +386,7 @@ class CControllerPopupActionOperationGet extends CController {
 						order_result($user_groups_list);
 
 						$result['type'][] = _('Send message to user groups').': ';
-						$result['data'][] = [implode(', ', $user_groups_list), ' ', _('via'), ' ', $media_type];
+						$result['data'][] = [implode(', ', $user_groups_list), _('via'), $media_type];
 					}
 					break;
 
