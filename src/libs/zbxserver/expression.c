@@ -5103,7 +5103,7 @@ void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const z
 	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
 	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
 
-	DCconfig_get_functions_by_functionids(functions, functionids.values, errcodes, functionids.values_num);
+	DCconfig_history_get_functions_by_functionids(functions, functionids.values, errcodes, functionids.values_num);
 
 	for (t = 0; t < triggers_func_pos.values_num; t++)
 	{
