@@ -30,7 +30,7 @@ $form = (new CForm())
 	->addVar('action', $data['action_submit'])
 	->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
 	->setId('authentication-form')
-	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
 	->disablePasswordAutofill();
 
 // Authentication general fields.
@@ -565,7 +565,7 @@ $saml_tab = (new CFormGrid())
 		))
 	);
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Authentication'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_AUTHENTICATION_EDIT))
 	->addItem($form)
