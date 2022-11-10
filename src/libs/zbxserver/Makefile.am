@@ -21,4 +21,4 @@ libzbxserver_a_SOURCES = \
 	calc_checks_eval.c \
 	evaluate_simple.c
 
-libzbxserver_a_CFLAGS = -I$(top_srcdir)/src/libs/zbxdbcache $(LIBXML2_CFLAGS)
+libzbxserver_a_CFLAGS = $(LIBXML2_CFLAGS)

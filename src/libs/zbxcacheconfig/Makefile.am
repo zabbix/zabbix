@@ -1,9 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libzbxdbcache.a
+noinst_LIBRARIES = libzbxcacheconfig.a
 
-libzbxdbcache_a_SOURCES = \
-	dbcache.c \
+libzbxcacheconfig_a_SOURCES = \
 	dbconfig.c \
 	dbconfig.h \
 	dbconfig_dump.c \
@@ -11,12 +10,10 @@ libzbxdbcache_a_SOURCES = \
 	dbsync.c \
 	dbsync.h \
 	lld_macro.c \
-	valuecache.c \
-	valuecache.h \
 	user_macro.c \
 	user_macro.h
 
-libzbxdbcache_a_CFLAGS = \
+libzbxcacheconfig_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \
 	$(TLS_CFLAGS) \
 	$(TEST_FLAGS)

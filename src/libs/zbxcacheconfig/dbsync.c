@@ -17,11 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxcacheconfig.h"
 #include "dbsync.h"
 
 #include "log.h"
-#include "dbcache.h"
-#include "zbxserialize.h"
 #include "base64.h"
 #include "zbxeval.h"
 #include "zbxnum.h"
@@ -38,7 +37,7 @@
 #define ZBX_DBSYNC_OBJ_DCHECK		10
 #define ZBX_DBSYNC_OBJ_HTTPTEST		11
 #define ZBX_DBSYNC_OBJ_HTTPTEST_FIELD	12
-#define ZBX_DBSYNC_OBJ_HTTPTESTITEM	13
+#define ZBX_DBSYNC_OBJ_HTTPTEST_ITEM	13
 #define ZBX_DBSYNC_OBJ_HTTPSTEP		14
 #define ZBX_DBSYNC_OBJ_HTTPSTEP_FIELD	15
 #define ZBX_DBSYNC_OBJ_HTTPSTEP_ITEM	16
