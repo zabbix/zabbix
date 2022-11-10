@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @onBefore prepareUserData
@@ -93,15 +93,11 @@ class testPasswordComplexity extends CWebTest {
 		$this->page->assertTitle('Configuration of authentication');
 		$form = $this->query('id:authentication-form')->asForm()->one();
 
-		// Check authentication switcher options and default value.
-		$auth_radio = $form->getField('Default authentication')->asSegmentedRadio();
-		$this->assertEquals(['Internal', 'LDAP'], $auth_radio->getLabels()->asText());
-		$this->assertEquals('Internal', $auth_radio->getSelected());
-
 		// Check that 'Password policy' header presents.
 		$this->assertTrue($form->query('xpath://h4[text()="Password policy"]')->exists());
 
 		$this->assertEquals(2, $form->getField('Minimum password length')->getAttribute('maxlength'));
+
 		// Check default texts in hint-boxes.
 		$hintboxes = [
 			[
@@ -211,7 +207,7 @@ class testPasswordComplexity extends CWebTest {
 	}
 
 	/**
-	 * Check authentication form fields validation.
+	 * Check password form fields validation.
 	 *
 	 * @dataProvider getFormValidationData
 	 */

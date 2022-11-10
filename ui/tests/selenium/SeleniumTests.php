@@ -33,9 +33,11 @@ require_once dirname(__FILE__).'/apiTokens/testFormApiTokensAdministrationGenera
 require_once dirname(__FILE__).'/apiTokens/testFormApiTokensUserSettings.php';
 
 // Authentication.
+require_once dirname(__FILE__).'/authentication/testFormAdministrationAuthentication.php';
 require_once dirname(__FILE__).'/authentication/testFormAdministrationAuthenticationHttp.php';
 require_once dirname(__FILE__).'/authentication/testFormAdministrationAuthenticationLdap.php';
 require_once dirname(__FILE__).'/authentication/testFormAdministrationAuthenticationSaml.php';
+require_once dirname(__FILE__).'/authentication/testPasswordComplexity.php';
 
 // Dashboards.
 require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
@@ -205,7 +207,6 @@ require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
 require_once dirname(__FILE__).'/testPageNetworkDiscovery.php';
-require_once dirname(__FILE__).'/testPasswordComplexity.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
@@ -286,9 +287,11 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageApiTokensUserSettings');
 
 		// Authentication.
+		$suite->addTestSuite('testFormAdministrationAuthentication');
 		$suite->addTestSuite('testFormAdministrationAuthenticationHttp');
 		$suite->addTestSuite('testFormAdministrationAuthenticationLdap');
 		$suite->addTestSuite('testFormAdministrationAuthenticationSaml');
+		$suite->addTestSuite('testPasswordComplexity');
 
 		// Dashboards.
 		$suite->addTestSuite('testDashboardCopyWidgets');
@@ -466,7 +469,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testPageWeb');
-		$suite->addTestSuite('testPasswordComplexity');
 		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormAdministrationGeneralAuditLog');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');

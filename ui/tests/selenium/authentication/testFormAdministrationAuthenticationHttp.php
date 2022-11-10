@@ -29,8 +29,8 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 
 	const LOGIN_GUEST	= 1;
-	const LOGIN_USER		= 2;
-	const LOGIN_HTTP		= 3;
+	const LOGIN_USER	= 2;
+	const LOGIN_HTTP	= 3;
 
 	public function getHttpData() {
 		return [
