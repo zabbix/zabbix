@@ -1,8 +1,11 @@
 Changes for 5.0.30rc1
 
 New features:
+.......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
 
 Bug fixes:
+.......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)
+.........T [ZBX-21844] fixed script in OPSgenie media (atocko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.29

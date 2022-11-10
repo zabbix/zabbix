@@ -416,7 +416,7 @@ try {&#13;
         else {&#13;
             method = &quot;notes&quot;;&#13;
         }&#13;
-
+&#13;
         if (method !== &quot;skip&quot;) {&#13;
         resp = Media.request('post', params.event_id + '/' + method +'?identifierType=alias', fields);&#13;
 &#13;
