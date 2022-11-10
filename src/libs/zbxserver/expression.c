@@ -43,10 +43,10 @@ typedef struct
 	int		clock;
 	unsigned char	nseverity;
 }
-zbx_rootcause_t;
+zbx_eventdata_t;
 
-ZBX_VECTOR_DECL(rootcause, zbx_rootcause_t)
-ZBX_VECTOR_IMPL(rootcause, zbx_rootcause_t)
+ZBX_VECTOR_DECL(eventdata, zbx_eventdata_t)
+ZBX_VECTOR_IMPL(eventdata, zbx_eventdata_t)
 
 /* The following definitions are used to identify the request field */
 /* for various value getters grouped by their scope:                */
@@ -1498,6 +1498,8 @@ static int	get_autoreg_value_by_event(const ZBX_DB_EVENT *event, char **replace_
 #define MVAR_EVENT_CAUSE_UPDATE_NSEVERITY	MVAR_EVENT_CAUSE_UPDATE "NSEVERITY}"
 #define MVAR_EVENT_CAUSE_UPDATE_SEVERITY	MVAR_EVENT_CAUSE_UPDATE "SEVERITY}"
 
+#define MVAR_EVENT_SYMPTOMS			"{EVENT.SYMPTOMS}"
+
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_PROXY_NAME			"{PROXY.NAME}"
 #define MVAR_PROXY_DESCRIPTION		"{PROXY.DESCRIPTION}"
@@ -2313,26 +2315,82 @@ static void	get_event_value(const char *macro, const ZBX_DB_EVENT *event, char *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free memory allocated for root cause                              *
+ * Purpose: free memory allocated for temporary event data                    *
  *                                                                            *
  ******************************************************************************/
-static void	rootcause_free(zbx_rootcause_t *rootcause)
+void	eventdata_free(zbx_eventdata_t *eventdata)
 {
-	zbx_free(rootcause->host);
-	zbx_free(rootcause->severity);
-	zbx_free(rootcause->tags);
+	zbx_free(eventdata->host);
+	zbx_free(eventdata->severity);
+	zbx_free(eventdata->tags);
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare root cause to sort by highest severity and host name      *
+ * Purpose: compare events to sort by highest severity and host name          *
  *                                                                            *
  ******************************************************************************/
-static int	rootcause_compare(const zbx_rootcause_t *d1, const zbx_rootcause_t *d2)
+static int	eventdata_compare(const zbx_eventdata_t *d1, const zbx_eventdata_t *d2)
 {
 	ZBX_RETURN_IF_NOT_EQUAL(d2->nseverity, d1->nseverity);
 
 	return strcmp(d1->host, d2->host);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compose temporary vector containing event data                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	eventdata_compose(const zbx_vector_ptr_t *events, zbx_vector_eventdata_t *vect_eventdata)
+{
+	int i;
+
+	for (i = 0; i < events->values_num; i++)
+	{
+		int		ret;
+		ZBX_DB_EVENT	*event;
+		zbx_eventdata_t	eventdata = {0};
+
+		event = (ZBX_DB_EVENT *)events->values[i];
+
+		if (FAIL == (ret = DBget_trigger_value(&event->trigger, &eventdata.host, 1, ZBX_REQUEST_HOST_HOST)))
+			goto fail;
+
+		eventdata.nseverity = event->severity;
+		if (FAIL == (ret = get_trigger_severity_name(event->severity, &eventdata.severity)))
+			goto fail;
+
+		get_event_tags(event, &eventdata.tags);
+		eventdata.name = event->name;
+		eventdata.clock = event->clock;
+fail:
+		if (FAIL == ret)
+			eventdata_free(&eventdata);
+		else
+			zbx_vector_eventdata_append(vect_eventdata, eventdata);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: build string from event data                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	eventdata_to_str(const zbx_vector_eventdata_t *eventdata, char **replace_to)
+{
+	int	i;
+	char	*d = "";
+
+	for (i = 0; i < eventdata->values_num; i++)
+	{
+		zbx_eventdata_t	*e = &eventdata->values[i];
+
+		*replace_to = zbx_strdcatf(*replace_to, "%sHost: \"%s\" Problem name: \"%s\" Severity: \"%s\" Age: %s"
+				" Problem tags: \"%s\"", d, e->host, e->name, e->severity,
+				zbx_age2str(time(NULL) - e->clock), e->tags);
+		d = "\n";
+	}
 }
 
 /******************************************************************************
@@ -2344,51 +2402,67 @@ static void	get_rootcause(const ZBX_DB_SERVICE *service, char **replace_to)
 {
 	int			i;
 	char			*d = "";
-	zbx_vector_rootcause_t	rootcauses;
+	zbx_vector_eventdata_t	rootcauses;
 
-	zbx_vector_rootcause_create(&rootcauses);
+	zbx_vector_eventdata_create(&rootcauses);
 
-	for (i = 0; i < service->events.values_num; i++)
-	{
-		ZBX_DB_EVENT		*event;
-		zbx_rootcause_t		rootcause = {0};
-		int			ret;
-
-		event = (ZBX_DB_EVENT *)service->events.values[i];
-
-		if (FAIL == (ret = DBget_trigger_value(&event->trigger, &rootcause.host, 1, ZBX_REQUEST_HOST_HOST)))
-			goto fail;
-
-		rootcause.nseverity = event->severity;
-		if (FAIL == (ret = get_trigger_severity_name(event->severity, &rootcause.severity)))
-			goto fail;
-
-		get_event_tags(event, &rootcause.tags);
-		rootcause.name = event->name;
-		rootcause.clock = event->clock;
-fail:
-		if (FAIL == ret)
-			rootcause_free(&rootcause);
-		else
-			zbx_vector_rootcause_append(&rootcauses, rootcause);
-	}
-
-	zbx_vector_rootcause_sort(&rootcauses, (zbx_compare_func_t)rootcause_compare);
+	eventdata_compose(&service->events, &rootcauses);
+	zbx_vector_eventdata_sort(&rootcauses, (zbx_compare_func_t)eventdata_compare);
+	eventdata_to_str(&rootcauses, replace_to);
 
 	for (i = 0; i < rootcauses.values_num; i++)
-	{
-		zbx_rootcause_t	*rootcause = &rootcauses.values[i];
+		eventdata_free(&rootcauses.values[i]);
 
-		*replace_to = zbx_strdcatf(*replace_to, "%sHost: \"%s\" Problem name: \"%s\" Severity: \"%s\""
-				" Age: %s Problem tags: \"%s\"", d, rootcause->host, rootcause->name,
-				rootcause->severity, zbx_age2str(time(NULL) - rootcause->clock), rootcause->tags);
-		d = "\n";
+	zbx_vector_eventdata_destroy(&rootcauses);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get event symptoms                                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_event_symptoms(const ZBX_DB_EVENT *event, char **replace_to)
+{
+	int			i;
+	DB_ROW			row;
+	DB_RESULT		result;
+	zbx_vector_uint64_t	symptom_eventids;
+
+	zbx_vector_uint64_create(&symptom_eventids);
+
+	result = DBselect("select eventid from event_symptom where cause_eventid=" ZBX_FS_UI64, event->eventid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	symptom_eventid;
+
+		ZBX_STR2UINT64(symptom_eventid, row[0]);
+		zbx_vector_uint64_append(&symptom_eventids, symptom_eventid);
 	}
 
-	for (i = 0; i < rootcauses.values_num; i++)
-		rootcause_free(&rootcauses.values[i]);
+	if (symptom_eventids.values_num > 0)
+	{
+		zbx_vector_eventdata_t	symptoms;
+		zbx_vector_ptr_t	symptom_events;
 
-	zbx_vector_rootcause_destroy(&rootcauses);
+		zbx_vector_eventdata_create(&symptoms);
+		zbx_vector_ptr_create(&symptom_events);
+
+		zbx_db_get_events_by_eventids(&symptom_eventids, &symptom_events);
+		eventdata_compose(&symptom_events, &symptoms);
+		zbx_vector_eventdata_sort(&symptoms, (zbx_compare_func_t)eventdata_compare);
+		eventdata_to_str(&symptoms, replace_to);
+
+		for (i = 0; i < symptoms.values_num; i++)
+			eventdata_free(&symptoms.values[i]);
+
+		zbx_vector_eventdata_destroy(&symptoms);
+
+		zbx_vector_ptr_clear_ext(&symptom_events, (zbx_clean_func_t)zbx_db_free_event);
+		zbx_vector_ptr_destroy(&symptom_events);
+	}
+
+	zbx_vector_uint64_destroy(&symptom_eventids);
 }
 
 /******************************************************************************
@@ -3188,6 +3262,10 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 						zbx_strlcpy(error, errmsg, maxerrlen);
 						zbx_free(errmsg);
 					}
+				}
+				else if (0 == strcmp(m, MVAR_EVENT_SYMPTOMS))
+				{
+					get_event_symptoms(event, &replace_to);
 				}
 				else if (NULL != actionid &&
 						0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
