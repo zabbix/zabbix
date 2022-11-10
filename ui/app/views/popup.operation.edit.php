@@ -133,7 +133,7 @@ $form_grid->addItem([
 	(new CLabel(_('Send to user groups')))->setId('operation-message-user-groups-label'),
 	(new CFormField([
 		$usergroup_table,
-		(new CScriptTemplate('operation-usergroup-row-tmpl'))->addItem(
+		(new CTemplateTag('operation-usergroup-row-tmpl'))->addItem(
 			(new CRow([
 				new CCol('#{name}'),
 				(new CCol([
@@ -174,7 +174,7 @@ $form_grid->addItem([
 	(new CLabel(_('Send to users')))->setId('operation-message-users-label'),
 	(new CFormField([
 		$user_table,
-		(new CScriptTemplate('operation-user-row-tmpl'))->addItem(
+		(new CTemplateTag('operation-user-row-tmpl'))->addItem(
 			(new CRow([
 				new CCol('#{name}'),
 				(new CCol([
@@ -484,7 +484,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS && $data['recovery'] == ACTION
 		(new CLabel(_('Conditions')))->setId('operation-condition-list-label'),
 		(new CFormField([
 			$conditions_table,
-			(new CScriptTemplate('operation-condition-row-tmpl'))->addItem(
+			(new CTemplateTag('operation-condition-row-tmpl'))->addItem(
 				(new CRow([
 					(new CCol('#{label}'))
 						->setAttribute('data-conditiontype', '#{conditiontype}')

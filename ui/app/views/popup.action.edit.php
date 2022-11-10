@@ -73,7 +73,7 @@ $condition_hidden_data = (new CCol([
 		->setName('conditions[#{row_index}][formulaid]'),
 ]));
 
-$condition_suppressed_template = (new CScriptTemplate('condition-suppressed-row-tmpl'))->addItem(
+$condition_suppressed_template = (new CTemplateTag('condition-suppressed-row-tmpl'))->addItem(
 	(new CRow([
 		(new CCol('#{label}'))
 			->addClass('label')
@@ -86,7 +86,7 @@ $condition_suppressed_template = (new CScriptTemplate('condition-suppressed-row-
 	]))->setAttribute('data-row_index', '#{row_index}')
 );
 
-$condition_template_default = (new CScriptTemplate('condition-row-tmpl'))->addItem(
+$condition_template_default = (new CTemplateTag('condition-row-tmpl'))->addItem(
 	(new CRow([
 		(new CCol('#{label}'))
 			->addClass('label')
@@ -101,7 +101,7 @@ $condition_template_default = (new CScriptTemplate('condition-row-tmpl'))->addIt
 	]))->setAttribute('data-row_index', '#{row_index}')
 );
 
-$condition_tag_value_template = (new CScriptTemplate('condition-tag-value-row-tmpl'))->addItem(
+$condition_tag_value_template = (new CTemplateTag('condition-tag-value-row-tmpl'))->addItem(
 	(new CRow([
 		(new CCol('#{label}'))
 			->addClass('label')

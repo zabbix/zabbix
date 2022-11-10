@@ -64,7 +64,10 @@ $current_url = (new CUrl('zabbix.php'))
 	->setArgument('eventsource', $data['eventsource']);
 
 $html_page = (new CHtmlPage())
-	->setTitle($title)
+	->setTitle(_('Actions'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_ACTION_EDIT));
+
+$html_page
 	->setTitleSubmenu(['main_section' => ['items' => $submenu]])
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_ACTION_LIST))
 	->setControls(
@@ -99,13 +102,13 @@ $filter = (new CFilter())
 		])
 	]);
 
-$widget->addItem($filter);
 $current_url->removeArgument('filter_rst');
 
 // create form
 $actionForm = (new CForm())
 	->setName('actionForm')
-	->setAction($current_url->getUrl());
+	->setAction($current_url->getUrl())
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 // create table
 $actionTable = (new CTableInfo())
@@ -168,6 +171,7 @@ if ($this->data['actions']) {
 }
 
 $actionForm->addItem([
+	$filter,
 	$actionTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'actionids', [
@@ -192,12 +196,13 @@ $actionForm->addItem([
 	], 'action_'.$data['eventsource'])
 ]);
 
-(new CScriptTag('
+$actionForm->addItem(
+	(new CScriptTag('
 	view.init('.json_encode([
-		'eventsource' => $data['eventsource'],
-	]).');
-'))
-	->setOnDocumentReady();
+			'eventsource' => $data['eventsource'],
+		]).');
+'))->setOnDocumentReady()
+);
 
 $html_page
 	->addItem($actionForm)
