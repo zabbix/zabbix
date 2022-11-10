@@ -21,22 +21,17 @@
 
 #include "log.h"
 #include "zbxalgo.h"
+#include "zbxcommon.h"
 #include "zbxeval.h"
 #include "zbxexpr.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxregexp.h"
 #include "zbxstr.h"
-
-/* Defines maximum row length to be written in error message in the case of parsing failure */
-#define ZBX_PROMEHTEUS_ERROR_MAX_ROW_LENGTH	50
+#include "zbxtypes.h"
 
 #define ZBX_PROMETHEUS_HINT_HELP	0
 #define ZBX_PROMETHEUS_HINT_TYPE	1
-
-#define ZBX_PROMETHEUS_TYPE_UNTYPED	"untyped"
-
-#define ZBX_PROMETHEUS_ERROR_ROW_NUM	10
 
 typedef enum
 {
@@ -1386,6 +1381,9 @@ out:
 		else
 			len = strlen(data + pos);
 
+/* Defines maximum row length to be written in error message in the case of parsing failure */
+#define ZBX_PROMEHTEUS_ERROR_MAX_ROW_LENGTH	50
+
 		if (ZBX_PROMEHTEUS_ERROR_MAX_ROW_LENGTH < len)
 		{
 			len = ZBX_PROMEHTEUS_ERROR_MAX_ROW_LENGTH;
@@ -1394,6 +1392,8 @@ out:
 		*error = zbx_dsprintf(*error, "data parsing error at row %d \"%.*s%s\": %s", row_num, len, data + pos,
 				suffix, errmsg);
 		zbx_free(errmsg);
+
+#undef ZBX_PROMEHTEUS_ERROR_MAX_ROW_LENGTH
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s rows:%d hints:%d", __func__, zbx_result_string(ret),
@@ -1427,6 +1427,8 @@ static int prometheus_extract_value(const zbx_vector_prometheus_row_t *rows, con
 
 	if (1 < rows->values_num)
 	{
+#define ZBX_PROMETHEUS_ERROR_ROW_NUM	10
+
 		int	i, rows_num = ZBX_PROMETHEUS_ERROR_ROW_NUM;
 		size_t	error_alloc, error_offset = 0;
 
@@ -1450,6 +1452,8 @@ static int prometheus_extract_value(const zbx_vector_prometheus_row_t *rows, con
 			(*error)[error_offset - 1] = '\0';
 
 		return FAIL;
+
+#undef ZBX_PROMETHEUS_ERROR_ROW_NUM
 	}
 
 	row = rows->values[0];
@@ -2060,8 +2064,12 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 		hint_local.metric = row->metric;
 		hint = (zbx_prometheus_hint_t *)zbx_hashset_search(&hints, &hint_local);
 
+#define ZBX_PROMETHEUS_TYPE_UNTYPED	"untyped"
+
 		hint_type = (NULL != hint && NULL != hint->type ? hint->type : ZBX_PROMETHEUS_TYPE_UNTYPED);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_TYPE, hint_type, ZBX_JSON_TYPE_STRING);
+
+#undef ZBX_PROMETHEUS_TYPE_UNTYPED
 
 		if (NULL != hint && NULL != hint->help)
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_HELP, hint->help, ZBX_JSON_TYPE_STRING);
