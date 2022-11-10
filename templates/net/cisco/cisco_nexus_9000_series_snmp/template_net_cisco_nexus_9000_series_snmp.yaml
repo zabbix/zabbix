@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-11-08T13:47:55Z'
+  date: '2022-11-10T15:52:57Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -53,7 +53,7 @@ zabbix_export:
               expression: 'max(/Cisco Nexus 9000 Series SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
-              description: 'Last three attempts returned timeout. Please check device connectivity.'
+              description: 'The last three attempts returned a timeout. Check the connectivity of a device.'
               tags:
                 -
                   tag: scope
@@ -135,7 +135,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: LOG
-          description: 'Item is used to collect all SNMP traps unmatched by other snmptrap items'
+          description: 'The item is used to collect all the SNMP traps unmatched by the other snmptrap items.'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
             -
@@ -152,8 +152,8 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: |
-            MIB: SNMPv2-MIB
-            The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
+            MIB: SNMPv2-MIB.
+            The textual identification of the contact person for the managed node (or: this node), together with the contact information of this person. If no contact information is known, the value is a zero-length string.
           inventory_link: CONTACT
           preprocessing:
             -
@@ -175,10 +175,8 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: |
-            MIB: SNMPv2-MIB
-            A textual description of the entity. This value should
-            include the full name and version identification of the system's hardware type, software operating-system, and
-            networking software.
+            MIB: SNMPv2-MIB.
+            The textual description of the entity. This value should include the full name and version identification number of the system's hardware type, software operating-system, and the networking software.
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -198,7 +196,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'MIB: ENTITY-MIB'
+          description: 'MIB: ENTITY-MIB.'
           inventory_link: MODEL
           preprocessing:
             -
@@ -219,7 +217,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'MIB: ENTITY-MIB'
+          description: 'MIB: ENTITY-MIB.'
           inventory_link: SERIALNO_A
           preprocessing:
             -
@@ -237,7 +235,7 @@ zabbix_export:
               name: 'Device has been replaced'
               event_name: 'Device has been replaced (new serial number received)'
               priority: INFO
-              description: 'Device serial number has changed. Ack to close'
+              description: 'The serial number of a device has changed. Acknowledge (Ack) to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -254,8 +252,9 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: |
-            MIB: SNMPv2-MIB
-            The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
+            MIB: SNMPv2-MIB.
+            The physical location of this node (e.g., telephone closet, the third floor).
+            If the location is unknown, the value is a zero-length string.
           inventory_link: LOCATION
           preprocessing:
             -
@@ -277,8 +276,8 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: |
-            MIB: SNMPv2-MIB
-            An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
+            MIB: SNMPv2-MIB.
+            The administratively-assigned name for this node. By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is a zero-length string.
           inventory_link: NAME
           preprocessing:
             -
@@ -296,7 +295,7 @@ zabbix_export:
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
-              description: 'System name has changed. Ack to close.'
+              description: 'The system name has changed. Acknowledge (Ack) to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -312,8 +311,9 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: |
-            MIB: SNMPv2-MIB
-            The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
+            MIB: SNMPv2-MIB.
+            The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprise's subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining 'what kind of box' is being managed.
+            For example, if the vendor 'Flintstones, Inc.' was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its 'Fred Router'.
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -356,7 +356,7 @@ zabbix_export:
               recovery_mode: NONE
               name: 'Operating system description has changed'
               priority: INFO
-              description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
+              description: 'The description of the operating system has changed. Possible reasons that system has been updated or replaced. Acknowledge (Ack) to close manually.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -376,10 +376,9 @@ zabbix_export:
           trends: 0d
           units: uptime
           description: |
-            MIB: SNMP-FRAMEWORK-MIB::snmpEngineTime
-            The number of seconds since the value of the snmpEngineBoots object last changed.
-            When incrementing this object's value would cause it to exceed its maximum,
-            snmpEngineBoots is incremented as if a re-initialization had occurred, and this
+            MIB: SNMP-FRAMEWORK-MIB::snmpEngineTime.
+            The number of seconds since the value of the snmpEngineBoots object has had a last change.
+            When incrementing this object's value would cause it to exceed its maximum, the snmpEngineBoots is incremented as if a re-initialization had occurred, and this
             object's value consequently reverts to zero.
           tags:
             -
@@ -392,7 +391,7 @@ zabbix_export:
               name: 'Device has been restarted or reinitialized'
               event_name: '{HOST.NAME} has been restarted or reinitialized (uptime < 10m)'
               priority: WARNING
-              description: 'SNMP Boots record changed less than in 10 minutes. Device Restarts also counts.'
+              description: 'The record of SNMP Boots has changed less than in 10 minutes. The restart of a device also counts.'
               manual_close: 'YES'
               tags:
                 -
@@ -417,7 +416,7 @@ zabbix_export:
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              description: 'SNMP is not available for polling. Check the connectivity of a device and SNMP settings.'
               tags:
                 -
                   tag: scope
@@ -431,11 +430,8 @@ zabbix_export:
           key: cpu.discovery
           delay: 1h
           description: |
-            You must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable,
-            indexed with cpmCPUTotalPhysicalIndex.
-            
-            The table cpmCPUTotalTable allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,
-            like different CPU chips, group of CPUs, or CPUs in different modules/cards.
+            You must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable, indexed with cpmCPUTotalPhysicalIndex.
+            The table cpmCPUTotalTable allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router, like different CPU chips, group of CPUs, or CPUs in different modules/cards.
             In case of a single CPU, cpmCPUTotalTable has only one entry.
           item_prototypes:
             -
@@ -450,16 +446,13 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: CISCO-PROCESS-MIB
-                Object name: cpmCPUTotal5minRev
+                The object name: cpmCPUTotal5minRev
                 
-                The cpmCPUTotal5minRev MIB object provides a more accurate view of the performance of the router over time than the MIB objects cpmCPUTotal1minRev and cpmCPUTotal5secRev. These MIB objects are not accurate because they look at CPU at one minute and five second intervals, respectively. These MIBs enable you to monitor the trends and plan the capacity of your network. The recommended baseline rising threshold for cpmCPUTotal5minRev is 90 percent. Depending on the platform, some routers that run at 90 percent, for example, 2500s, can exhibit performance degradation versus a high-end router, for example, the 7500 series, which can operate fine.
+                The MIB object cpmCPUTotal5minRev provides a more accurate view of the performance of the router over time than the MIB objects cpmCPUTotal1minRev and cpmCPUTotal5secRev. These MIB objects are not accurate because they look at the CPU with an interval of one minute and five seconds, respectively. These MIBs enable to monitor the trends and plan the capacity of your network. The recommended baseline rising threshold for the cpmCPUTotal5minRev is 90 percent. Depending on the platform, some routers that run at 90 percent, for example, 2500 series can exhibit performance degradation versus a high-end router, for example, the 7500 series, which can operate fine.
               tags:
                 -
                   tag: component
                   value: cpu
-                -
-                  tag: cpu-index
-                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 1ac7652bda474762aa0b0c354728307e
@@ -468,7 +461,7 @@ zabbix_export:
                   event_name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE}'
                   priority: WARNING
-                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  description: 'The CPU utilization is too high. The system might be slow to respond.'
                   tags:
                     -
                       tag: scope
@@ -507,7 +500,7 @@ zabbix_export:
                 macro: '{#ENT_CLASS}'
                 value: '[^3]'
                 formulaid: A
-          description: 'Discovering entities serial numbers from ENTITY-MIB.'
+          description: 'The discovery of serial numbers of the entities from ENTITY-MIB.'
           item_prototypes:
             -
               uuid: 873d648619bf45168d8008ea32596838
@@ -520,9 +513,8 @@ zabbix_export:
               trends: '0'
               value_type: CHAR
               description: |
-                MIB: ENTITY-MIB
-                Object name: entPhysicalSerialNum
-                
+                MIB: ENTITY-MIB.
+                The object name: entPhysicalSerialNum.
                 The vendor-specific serial number string for the physical entity. The preferred value is the serial number string actually printed on the component itself (if present).
               preprocessing:
                 -
@@ -562,7 +554,7 @@ zabbix_export:
                 macro: '{#SNMPVALUE}'
                 value: '{$CISCO.LLD.FILTER.FAN.NAME.MATCHES}'
                 formulaid: A
-          description: 'Discovering fan status metrics from ENTITY-MIB and CISCO-ENTITY-FRU-CONTROL-MIB.'
+          description: 'The discovery of metrics for the fan''s status from ENTITY-MIB and CISCO-ENTITY-FRU-CONTROL-MIB.'
           item_prototypes:
             -
               uuid: 16047f29242444f284e81f6b87a22c50
@@ -572,24 +564,20 @@ zabbix_export:
               key: 'sensor.fan.status[{#SNMPINDEX}]'
               history: 7d
               description: |
-                MIB: CISCO-ENTITY-FRU-CONTROL-MIB
-                Object name: cefcFanTrayOperStatus
-                
-                The operational state of the fan or fan tray. Possible values:
-                
-                unknown(1) - unknown.
-                up(2) - powered on.
-                down(3) - powered down.
-                warning(4) - partial failure, needs replacement as soon as possible.
+                MIB: CISCO-ENTITY-FRU-CONTROL-MIB.
+                The object name: cefcFanTrayOperStatus.
+                The operational state of the fan or a fan tray.
+                Possible values:
+                - unknown (1) - unknown;
+                - up (2) - powered on;
+                - down (3) - powered down;
+                - warning (4) - partial failure; needs replacement as soon as possible.
               valuemap:
                 name: 'CISCO-ENTITY-FRU-CONTROL-MIB::cefcFanTrayOperStatus'
               tags:
                 -
                   tag: component
                   value: fan
-                -
-                  tag: fan
-                  value: '{#SNMPVALUE}'
               trigger_prototypes:
                 -
                   uuid: c06b2cf2183d40348b3f688a7fbcb479
@@ -597,7 +585,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: Fan is down'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'Please check the fan unit.'
+                  description: 'The fan unit requires immediate attention.'
                   tags:
                     -
                       tag: scope
@@ -611,7 +599,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: Fan is in unknown state'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: INFO
-                  description: 'Please check the fan unit.'
+                  description: 'The fan unit requires attention.'
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Fan is down'
@@ -629,7 +617,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: Fan is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: WARNING
-                  description: 'Please check the fan unit.'
+                  description: 'The fan unit requires attention.'
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Fan is down'
@@ -649,7 +637,7 @@ zabbix_export:
           key: memory.discovery
           delay: 1h
           description: |
-            Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.
+            The discovery of ciscoMemoryPoolTable - the table that contains monitoring entries of the memory pool.
             http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
           item_prototypes:
             -
@@ -661,10 +649,9 @@ zabbix_export:
               history: 7d
               units: B
               description: |
-                MIB: CISCO-ENHANCED-MEMPOOL-MIB
-                Object name: cempMemPoolFree
-                
-                Indicates the number of bytes from the memory pool that are currently unused on the physical entity.
+                MIB: CISCO-ENHANCED-MEMPOOL-MIB.
+                The object name: cempMemPoolFree.
+                It indicates the number of bytes from the memory pool that are currently unused on the physical entity.
               tags:
                 -
                   tag: component
@@ -681,10 +668,9 @@ zabbix_export:
               history: 7d
               units: B
               description: |
-                MIB: CISCO-ENHANCED-MEMPOOL-MIB
-                Object name: cempMemPoolUsed
-                
-                Indicates the number of bytes from the memory pool that are currently in use by applications on the physical entity.
+                MIB: CISCO-ENHANCED-MEMPOOL-MIB.
+                The object name: cempMemPoolUsed.
+                It indicates the number of bytes from the memory pool that are currently in use by applications on the physical entity.
               tags:
                 -
                   tag: component
@@ -701,7 +687,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               params: 'last(//vm.memory.used[{#SNMPINDEX}])/(last(//vm.memory.free[{#SNMPINDEX}])+last(//vm.memory.used[{#SNMPINDEX}]))*100'
-              description: 'Memory utilization in %.'
+              description: 'The memory utilization expressed in %.'
               tags:
                 -
                   tag: component
@@ -801,7 +787,7 @@ zabbix_export:
                 value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: L
-          description: 'Discovering interfaces from IF-MIB.'
+          description: 'The discovery of interfaces from IF-MIB.'
           item_prototypes:
             -
               uuid: ad58c092ed604092a06ba518779c3294
@@ -811,12 +797,10 @@ zabbix_export:
               key: 'net.if.in.discards[{#SNMPINDEX}]'
               history: 7d
               description: |
-                MIB: IF-MIB
-                The number of inbound packets which were chosen to be discarded
-                even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
-                One possible reason for discarding such a packet could be to free up buffer space.
-                Discontinuities in the value of this counter can occur at re-initialization of the management system,
-                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                MIB: IF-MIB.
+                The number of inbound packets, which were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                One possible reason for discarding such a packet could be the necessity to free up the buffer space.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -825,7 +809,7 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
+                  value: network
                 -
                   tag: description
                   value: '{#IFALIAS}'
@@ -840,8 +824,10 @@ zabbix_export:
               key: 'net.if.in.errors[{#SNMPINDEX}]'
               history: 7d
               description: |
-                MIB: IF-MIB
-                For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                MIB: IF-MIB.
+                For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.
+                For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -850,7 +836,7 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
+                  value: network
                 -
                   tag: description
                   value: '{#IFALIAS}'
@@ -867,7 +853,7 @@ zabbix_export:
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors in: {ITEM.LASTVALUE}'
                   priority: WARNING
-                  description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
+                  description: 'It recovers when it goes below 80% of the {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
                   manual_close: 'YES'
                   dependencies:
                     -
@@ -889,8 +875,9 @@ zabbix_export:
               history: 7d
               units: bps
               description: |
-                MIB: IF-MIB
-                The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                MIB: IF-MIB.
+                The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -903,7 +890,7 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
+                  value: network
                 -
                   tag: description
                   value: '{#IFALIAS}'
@@ -918,12 +905,10 @@ zabbix_export:
               key: 'net.if.out.discards[{#SNMPINDEX}]'
               history: 7d
               description: |
-                MIB: IF-MIB
-                The number of outbound packets which were chosen to be discarded
-                even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                MIB: IF-MIB.
+                The number of outbound packets, which were chosen to be discarded, even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
                 One possible reason for discarding such a packet could be to free up buffer space.
-                Discontinuities in the value of this counter can occur at re-initialization of the management system,
-                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -932,7 +917,7 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
+                  value: network
                 -
                   tag: description
                   value: '{#IFALIAS}'
@@ -947,8 +932,10 @@ zabbix_export:
               key: 'net.if.out.errors[{#SNMPINDEX}]'
               history: 7d
               description: |
-                MIB: IF-MIB
-                For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                MIB: IF-MIB.
+                For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.
+                For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -957,7 +944,7 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
+                  value: network
                 -
                   tag: description
                   value: '{#IFALIAS}'
@@ -974,7 +961,7 @@ zabbix_export:
                   event_name: 'Interface {#IFNAME}({#IFALIAS}): High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
                   opdata: 'errors out: {ITEM.LASTVALUE2}'
                   priority: WARNING
-                  description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
+                  description: 'It recovers when it goes below 80% of the {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
                   manual_close: 'YES'
                   dependencies:
                     -
@@ -996,8 +983,9 @@ zabbix_export:
               history: 7d
               units: bps
               description: |
-                MIB: IF-MIB
-                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                MIB: IF-MIB.
+                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of the ifOutOctets.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of the ifCounterDiscontinuityTime.
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -1010,7 +998,7 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
+                  value: network
                 -
                   tag: description
                   value: '{#IFALIAS}'
@@ -1026,8 +1014,10 @@ zabbix_export:
               history: 7d
               units: bps
               description: |
-                MIB: IF-MIB
-                An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.
+                MIB: IF-MIB.
+                An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of _n_, then the speed of the interface is somewhere in the range from _n-500,000_ to _n+499,999_.
+                For the interfaces, which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth.
+                For a sub-layer, which has no concept of bandwidth, this object should be zero.
               preprocessing:
                 -
                   type: MULTIPLIER
@@ -1040,7 +1030,7 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
+                  value: network
                 -
                   tag: description
                   value: '{#IFALIAS}'
@@ -1055,14 +1045,14 @@ zabbix_export:
               key: 'net.if.status[{#SNMPINDEX}]'
               history: 7d
               description: |
-                MIB: IF-MIB
-                The current operational state of the interface.
-                - The testing(3) state indicates that no operational packet scan be passed
-                - If ifAdminStatus is down(2) then ifOperStatus should be down(2)
-                - If ifAdminStatus is changed to up(1) then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic
-                - It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)
-                - It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state
-                - It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
+                MIB: IF-MIB.
+                The current operational state of the interface:
+                - The testing (3) state indicates that no operational packet scan be passed.
+                - If ifAdminStatus is down (2), then ifOperStatus should be down (2).
+                - If ifAdminStatus is changed to up (1), then ifOperStatus should change to up (1), provided the interface is ready to transmit and receive network traffic.
+                - It should change to dormant (5) if the interface is waiting for external actions, such as a serial line waiting for an incoming connection.
+                - It should remain in the down (2) state if and only when there is a fault that prevents it from going to the up (1) state.
+                - It should remain in the notPresent (6) state if the interface has missing components (typically, hardware).
               valuemap:
                 name: 'IF-MIB::ifOperStatus'
               preprocessing:
@@ -1073,7 +1063,7 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
+                  value: network
                 -
                   tag: description
                   value: '{#IFALIAS}'
@@ -1094,8 +1084,8 @@ zabbix_export:
                     This trigger expression works as follows:
                     1. Can be triggered if operations status is down.
                     2. Use $IFCONTROL macro with context "{#IFNAME}" to void trigger firing on specific interfaces. Values:
-                        0 : Marks an interface as not important. Trigger does not fire when interface is down.
-                        1 : Default value to fire the trigger when interface is down
+                    - 0 : Marks an interface as not important. Trigger does not fire when interface is down.
+                    - 1 : Default value to fire the trigger when interface is down
                     3. change(//net.if.status[{#IFNAME}]) - condition prevents firing of trigger if status did not change. It helps in cases, when interfaces were initially down.
                     BEWARE, manual close will ceasefire until at least two status changes happens again!
                   tags:
@@ -1110,9 +1100,9 @@ zabbix_export:
               key: 'net.if.type[{#SNMPINDEX}]'
               history: 7d
               description: |
-                MIB: IF-MIB
-                The type of interface.
-                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),
+                MIB: IF-MIB.
+                The type of an interface.
+                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA)
                 through updating the syntax of the IANAifType textual convention.
               valuemap:
                 name: 'IF-MIB::ifType'
@@ -1124,7 +1114,7 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: interface
+                  value: network
                 -
                   tag: description
                   value: '{#IFALIAS}'
@@ -1146,7 +1136,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
-              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.'
+              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of issues with autonegotiation. Ack to close manually.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1158,7 +1148,7 @@ zabbix_export:
               tags:
                 -
                   tag: scope
-                  value: notice
+                  value: performance
             -
               uuid: 9dc308a5f30a45689eb2b9b3c2d9d453
               expression: |
@@ -1170,7 +1160,7 @@ zabbix_export:
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'In: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
+              description: 'The utilization of the network interface is close to its estimated maximum bandwidth.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1194,7 +1184,7 @@ zabbix_export:
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
               opdata: 'Out: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
-              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
+              description: 'The utilization of the network interface is close to its estimated maximum bandwidth.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1270,7 +1260,7 @@ zabbix_export:
                 macro: '{#IFOPERSTATUS}'
                 value: '1'
                 formulaid: A
-          description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with up(1) operational status are discovered.'
+          description: 'The discovery of interfaces from IF-MIB and EtherLike-MIB. The interfaces that have up (1) operational status are discovered.'
           item_prototypes:
             -
               uuid: 17792bed5be34b21a4c8a4069374d7f7
@@ -1280,40 +1270,26 @@ zabbix_export:
               key: 'net.if.duplex[{#SNMPINDEX}]'
               history: 7d
               description: |
-                MIB: EtherLike-MIB
-                Object name: dot3StatsDuplexStatus
-                
-                The current mode of operation of the MAC
-                entity.  'unknown' indicates that the current
-                duplex mode could not be determined.
-                
-                Management control of the duplex mode is
-                accomplished through the MAU MIB.  When
-                an interface does not support autonegotiation,
-                or when autonegotiation is not enabled, the
-                duplex mode is controlled using
-                ifMauDefaultType.  When autonegotiation is
-                supported and enabled, duplex mode is controlled
-                using ifMauAutoNegAdvertisedBits.  In either
-                case, the currently operating duplex mode is
-                reflected both in this object and in ifMauType.
-                
-                Note that this object provides redundant
-                information with ifMauType.  Normally, redundant
-                objects are discouraged.  However, in this
-                instance, it allows a management application to
-                determine the duplex status of an interface
-                without having to know every possible value of
-                ifMauType.  This was felt to be sufficiently
-                valuable to justify the redundancy.
-                
-                Reference: [IEEE 802.3 Std.], 30.3.1.1.32,aDuplexStatus.
+                MIB: EtherLike-MIB.
+                The object name: dot3StatsDuplexStatus.
+                The current mode of operation of the MAC entity 'unknown' indicates that the current duplex mode could not be determined.
+                The management control of the duplex mode is accomplished through the MAU MIB. When
+                the interface does not support autonegotiation, or when autonegotiation is not enabled, the
+                duplex mode is controlled using ifMauDefaultType.
+                When autonegotiation is supported and enabled, duplex mode is controlled using ifMauAutoNegAdvertisedBits.
+                In either case, the currently operating duplex mode is reflected in both: in this object and in ifMauType.
+                Note that this object provides redundant information with ifMauType. Normally, redundant
+                objects are discouraged. However, in this instance, it allows the management application to
+                determine the duplex status of an interface without having to know every possible value of
+                ifMauType. This was felt to be sufficiently valuable to justify the redundancy.
+                For the reference see: [IEEE 802.3 Std.], 30.3.1.1.32, aDuplexStatus.
+                I guess the link is missing in the last line.
               valuemap:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
               tags:
                 -
                   tag: component
-                  value: interface
+                  value: network
                 -
                   tag: description
                   value: '{#IFALIAS}'
@@ -1326,7 +1302,7 @@ zabbix_export:
                   expression: 'last(/Cisco Nexus 9000 Series SNMP/net.if.duplex[{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
-                  description: 'Please check autonegotiation settings and cabling.'
+                  description: 'Check the autonegotiation settings and cabling.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1363,7 +1339,7 @@ zabbix_export:
                 macro: '{#SNMPVALUE}'
                 value: '{$CISCO.LLD.FILTER.PSU.NAME.MATCHES}'
                 formulaid: A
-          description: 'Discovering power supplies from ENTITY-MIB and CISCO-ENTITY-FRU-CONTROL-MIB.'
+          description: 'The discovery of power supplies from ENTITY-MIB and CISCO-ENTITY-FRU-CONTROL-MIB.'
           item_prototypes:
             -
               uuid: 8a083945d7e244099095b022169de86c
@@ -1373,32 +1349,28 @@ zabbix_export:
               key: 'sensor.psu.status[{#SNMPINDEX}]'
               history: 7d
               description: |
-                MIB: CISCO-ENTITY-FRU-CONTROL-MIB
-                Object name: cefcFRUPowerOperStatus
-                
-                Operational FRU Status types. Valid values are:
-                
-                offEnvOther(1): FRU is powered off because of a problem not listed below.
-                on(2): FRU is powered on.
-                offAdmin(3): Administratively off.
-                offDenied(4): FRU is powered off because available system power is insufficient.
-                offEnvPower(5): FRU is powered off because of power problem in the FRU. for example, the FRU's power translation (DC-DC converter) or distribution failed.
-                offEnvTemp(6): FRU is powered off because of temperature problem.
-                offEnvFan(7): FRU is powered off because of fan problems.
-                failed(8): FRU is in failed state. 
-                onButFanFail(9): FRU is on, but fan has failed.
-                offCooling(10): FRU is powered off because of the system's insufficient cooling capacity.
-                offConnectorRating(11): FRU is powered off because of the system's connector rating exceeded.
-                onButInlinePowerFail(12): The FRU on, but no inline power is being delivered as the data/inline power component of the FRU has failed."
+                MIB: CISCO-ENTITY-FRU-CONTROL-MIB.
+                The object name: cefcFRUPowerOperStatus.
+                The Operational field-replaceable unit (FRU) Status types.
+                The valid values are:
+                - offEnvOther (1): FRU is powered off because of a problem not listed below;
+                - on (2): FRU is powered on;
+                - offAdmin (3): administratively off;
+                - offDenied (4): FRU is powered off because available system power is insufficient;
+                - offEnvPower (5): FRU is powered off because of a power problem in the FRU. For example, the FRU's power translation (DC-DC converter) or distribution failed;
+                - offEnvTemp (6): FRU is powered off because of temperature problem;
+                - offEnvFan (7): FRU is powered off because of fan problems;
+                - failed (8): FRU is in failed state;
+                - onButFanFail (9): FRU is on but fan has failed;
+                - offCooling (10): FRU is powered off because of the system's insufficient cooling capacity;
+                - offConnectorRating (11): FRU is powered off because of the system's connector rating exceeded;
+                - onButInlinePowerFail (12): The FRU is on but no inline power is being delivered as the data/inline power component of the FRU has failed.
               valuemap:
                 name: 'CISCO-ENTITY-FRU-CONTROL-MIB::cefcFRUPowerOperStatus'
               tags:
                 -
                   tag: component
                   value: power
-                -
-                  tag: power-supply
-                  value: '{#SNMPVALUE}'
               trigger_prototypes:
                 -
                   uuid: f2ed73c3d4ca407b86b3a53299e76373
@@ -1406,7 +1378,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: PSU fan failed'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'FRU is on, but fan has failed.'
+                  description: 'The FRU is on, but the fan has failed.'
                   tags:
                     -
                       tag: scope
@@ -1417,7 +1389,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: PSU inline power component failed'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'The FRU on, but no inline power is being delivered as the data/inline power component of the FRU has failed.'
+                  description: 'The FRU is on, but no inline power is being delivered as the data/inline power component of the FRU has failed.'
                   tags:
                     -
                       tag: scope
@@ -1428,7 +1400,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: PSU is in failed state'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: HIGH
-                  description: 'FRU is in failed state.'
+                  description: 'The FRU is in a failed state.'
                   tags:
                     -
                       tag: scope
@@ -1439,7 +1411,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: PSU is off: Administratively'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: WARNING
-                  description: 'FRU is administratively off.'
+                  description: 'The FRU is administratively off.'
                   tags:
                     -
                       tag: scope
@@ -1450,7 +1422,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: PSU is off: Connector rating exceeded'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'FRU is powered off because of the system''s connector rating exceeded.'
+                  description: 'The FRU is powered off because of the system''s connector rating exceeded.'
                   tags:
                     -
                       tag: scope
@@ -1461,7 +1433,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: PSU is off: Fan problem'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'FRU is powered off because of fan problems.'
+                  description: 'The FRU is powered off because of fan problems.'
                   tags:
                     -
                       tag: scope
@@ -1472,7 +1444,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: PSU is off: Insufficient cooling capacity'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'FRU is powered off because of the system''s insufficient cooling capacity.'
+                  description: 'The FRU is powered off because of the system''s insufficient cooling capacity.'
                   tags:
                     -
                       tag: scope
@@ -1483,7 +1455,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: PSU is off: Insufficient power available'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'FRU is powered off because available system power is insufficient.'
+                  description: 'The FRU is powered off because available system power is insufficient.'
                   tags:
                     -
                       tag: scope
@@ -1494,7 +1466,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: PSU is off: Power problem'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'FRU is powered off because of power problem in the FRU. for example, the FRU''s power translation (DC-DC converter) or distribution failed.'
+                  description: 'The FRU is powered off because of a power problem in the FRU. For example, the FRU''s power translation (DC-DC converter) or distribution failed.'
                   tags:
                     -
                       tag: scope
@@ -1505,7 +1477,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: PSU is off: Temperature problem'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'FRU is powered off because of temperature problem.'
+                  description: 'The FRU is powered off because of a temperature problem.'
                   tags:
                     -
                       tag: scope
@@ -1516,7 +1488,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: PSU is off: Unknown'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: AVERAGE
-                  description: 'FRU is powered off because of a unknown problem.'
+                  description: 'The FRU is powered off because of an unknown problem.'
                   tags:
                     -
                       tag: scope
@@ -1528,7 +1500,7 @@ zabbix_export:
           snmp_oid: 'discovery[{#SENSOR_TYPE},1.3.6.1.4.1.9.9.91.1.1.1.1.1,{#SENSOR_SCALE},1.3.6.1.4.1.9.9.91.1.1.1.1.2,{#SNMPVALUE},1.3.6.1.2.1.47.1.1.1.1.7]'
           key: temperature.discovery
           delay: 1h
-          description: 'Discovering temperature sensors from CISCO-ENTITY-SENSOR-MIB and ENTITY-MIB. Sensors with celsius(8) entSensorType are discovered. Scale of gathered values is taken from entSensorScale and applied in item preporcessing'
+          description: 'The discovery of temperature sensors from CISCO-ENTITY-SENSOR-MIB and ENTITY-MIB. The sensors that have celsius (8) entSensorType are discovered. The scale of gathered values is taken from the entSensorScale and applied in item preprocessing.'
           item_prototypes:
             -
               uuid: d4e13b5e26164a2ca240bfb93fdd9b77
@@ -1538,14 +1510,13 @@ zabbix_export:
               key: 'sensor.temp.status[{#SNMPINDEX}]'
               history: 7d
               description: |
-                MIB: CISCO-ENTITY-SENSOR-MIB
-                Object name: entSensorStatus
-                
-                This variable indicates the present operational status of the sensor. Possible values:
-                
-                ok(1): means the agent can read the sensor value.
-                unavailable(2): means that the agent presently can not report the sensor value.
-                nonoperational(3) means that the agent believes the sensor is broken. The sensor could have a hard failure (disconnected wire), or a soft failure such as out-of-range, jittery, or wildly fluctuating readings.
+                MIB: CISCO-ENTITY-SENSOR-MIB.
+                The object name: entSensorStatus.
+                This variable indicates the present operational status of the sensor.
+                Possible values:
+                - ok (1): means the agent can read the sensor value;
+                - unavailable (2): means that the agent presently can not report the sensor value;
+                - nonoperational (3) means that the agent believes the sensor is broken. The sensor could have a hard failure (e.g., disconnected wire), or a soft failure (e.g., out-of-range, jittery, or wildly fluctuating readings).
               valuemap:
                 name: 'CISCO-ENTITY-SENSOR-MIB::entSensorStatus'
               tags:
@@ -1576,7 +1547,7 @@ zabbix_export:
                   name: '{#SNMPVALUE}: Temperature sensor is not operational'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
                   priority: HIGH
-                  description: 'It means that the agent believes the sensor is broken. The sensor could have a hard failure (disconnected wire), or a soft failure such as out-of-range, jittery, or wildly fluctuating readings.'
+                  description: 'It means that the agent considers that the sensor is broken. The sensor could have a hard failure (e.g., disconnected wire), or a soft failure (e.g., out-of-range, jittery, or wildly fluctuating readings).'
                   tags:
                     -
                       tag: scope
@@ -1594,9 +1565,8 @@ zabbix_export:
               value_type: FLOAT
               units: '!°C'
               description: |
-                MIB: CISCO-ENTITY-SENSOR-MIB
-                Object name: entSensorValue
-                
+                MIB: CISCO-ENTITY-SENSOR-MIB.
+                The object name: entSensorValue.
                 This variable reports the most recent measurement seen by the sensor.
               preprocessing:
                 -
@@ -1620,7 +1590,7 @@ zabbix_export:
                   event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}°C'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
                   priority: HIGH
-                  description: 'This trigger uses temperature sensor values.'
+                  description: 'This trigger uses the values of the temperature sensor.'
                   tags:
                     -
                       tag: scope
@@ -1637,7 +1607,7 @@ zabbix_export:
                   event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}°C"}'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
                   priority: WARNING
-                  description: 'This trigger uses temperature sensor values as well as temperature sensor status if available.'
+                  description: 'This trigger uses the values of the temperature sensor.'
                   dependencies:
                     -
                       name: '{#SNMPVALUE}: Temperature is above critical threshold'
@@ -1684,32 +1654,23 @@ zabbix_export:
               type: JAVASCRIPT
               parameters:
                 - |
-                  function replace_scale(val) {
-                      switch (val) {
-                          case '9':
-                              return 1;
-                          case '8':
-                              return 0.001;
-                          case '7':
-                              return 0.000001;
-                          default:
-                              return False;
-                      }
+                  try {
+                  var sensors = JSON.parse(value);
+                  } catch (e) {
+                  throw "Failed to parse JSON of temperature discovery.";
                   }
                   
-                  try {
-                    var sensors = JSON.parse(value);
-                  } catch (e) {
-                    throw "Failed to parse JSON of Temperature discovery.";
-                  }
+                  var scales = {'9': 1, '8': 0.001, '7': 0.000001};
                   var result = sensors.filter(function (sensor) {      
-                      if ( sensor['{#SENSOR_TYPE}'] === '8' ) {
-                        sensor['{#SENSOR_SCALE}'] = replace_scale(sensor['{#SENSOR_SCALE}']);
-                        if ( sensor['{#SENSOR_SCALE}'] ) {
-                          return sensor;
-                        }
-                      };
+                  if (sensor['{#SENSOR_TYPE}'] !== '8' || typeof(scales[sensor['{#SENSOR_SCALE}']]) === 'undefined') {
+                    return false;
+                  }
+                  
+                  sensor['{#SENSOR_SCALE}'] = scales[sensor['{#SENSOR_SCALE}']];
+                  
+                  return true;
                   });
+                  
                   return JSON.stringify(result);
       tags:
         -
@@ -1728,11 +1689,11 @@ zabbix_export:
         -
           macro: '{$CISCO.LLD.FILTER.FAN.NAME.MATCHES}'
           value: '^(?:Fan Module-\d+|PowerSupply-\d+ Fan-\d+)$'
-          description: 'Filter by discoverable fans names.'
+          description: 'Leaves only the matching FAN names as indicated in the filter string.'
         -
           macro: '{$CISCO.LLD.FILTER.PSU.NAME.MATCHES}'
           value: '^(?:PowerSupply-\d+)$'
-          description: 'Filter by discoverable power supply names.'
+          description: 'Leaves only the matching power supply names as indicated in the filter string.'
         -
           macro: '{$CPU.UTIL.CRIT}'
           value: '90'
@@ -1760,7 +1721,7 @@ zabbix_export:
         -
           macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
-          description: 'Ignore down(2) administrative status'
+          description: 'If the administrative status is *down* (2), then an interface is excluded.'
         -
           macro: '{$NET.IF.IFALIAS.MATCHES}'
           value: '.*'
@@ -1779,14 +1740,14 @@ zabbix_export:
         -
           macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
-          description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default'
+          description: 'It filters out loopbacks, nulls, docker veth links and docker0 bridge by default.'
         -
           macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
         -
           macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^6$
-          description: 'Ignore notPresent(6)'
+          description: 'If the operational status is notPresent (6), then an interfaces is excluded.'
         -
           macro: '{$NET.IF.IFTYPE.MATCHES}'
           value: '.*'
