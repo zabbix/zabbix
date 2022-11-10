@@ -42,7 +42,7 @@ No specific Zabbix configuration is required.
 |{$NET.IF.IFNAME.MATCHES} |<p>-</p> |`^.*$` |
 |{$NET.IF.IFNAME.NOT_MATCHES} |<p>It filters out loopbacks, nulls, docker veth links and docker0 bridge by default.</p> |`(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})` |
 |{$NET.IF.IFOPERSTATUS.MATCHES} |<p>-</p> |`^.*$` |
-|{$NET.IF.IFOPERSTATUS.NOT_MATCHES} |<p>If the operational status is notPresent (6), then an interfaces is excluded.</p> |`^6$` |
+|{$NET.IF.IFOPERSTATUS.NOT_MATCHES} |<p>If the operational status is *notPresent* (6), then an interface is excluded.</p> |`^6$` |
 |{$NET.IF.IFTYPE.MATCHES} |<p>-</p> |`.*` |
 |{$NET.IF.IFTYPE.NOT_MATCHES} |<p>-</p> |`CHANGE_IF_NEEDED` |
 |{$SNMP.TIMEOUT} |<p>-</p> |`5m` |

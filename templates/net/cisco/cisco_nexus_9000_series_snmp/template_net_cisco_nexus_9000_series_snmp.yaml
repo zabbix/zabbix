@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-11-10T15:52:57Z'
+  date: '2022-11-10T16:30:01Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -1747,7 +1747,7 @@ zabbix_export:
         -
           macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
           value: ^6$
-          description: 'If the operational status is notPresent (6), then an interfaces is excluded.'
+          description: 'If the operational status is *notPresent* (6), then an interface is excluded.'
         -
           macro: '{$NET.IF.IFTYPE.MATCHES}'
           value: '.*'
