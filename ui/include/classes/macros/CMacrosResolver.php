@@ -2663,7 +2663,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = [
 			'macros' => [
 				'event' => ['{EVENT.ID}', '{EVENT.NAME}', '{EVENT.NSEVERITY}', '{EVENT.SEVERITY}', '{EVENT.STATUS}',
-					'{EVENT.VALUE}'
+					'{EVENT.VALUE}', '{EVENT.CAUSE.ID}', '{EVENT.CAUSE.NAME}', '{EVENT.CAUSE.NSEVERITY}',
+					'{EVENT.CAUSE.SEVERITY}', '{EVENT.CAUSE.STATUS}', '{EVENT.CAUSE.VALUE}'
 				],
 				'user_data' => ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}']
 			],
@@ -2792,6 +2793,42 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 					case '{EVENT.VALUE}':
 						$macro_values[$eventid][$macro] = $event['value'];
+						break;
+
+					// For cause events, it will return 0.
+					case '{EVENT.CAUSE.ID}':
+						$macro_values[$eventid][$macro] = $event['cause_eventid'];
+						break;
+
+					// If event is already cause event, $event['cause'] does not exist and returns empty string.
+					case '{EVENT.CAUSE.NAME}':
+						$macro_values[$eventid][$macro] = array_key_exists('cause', $event)
+							? $event['cause']['name']
+							: '';
+						break;
+
+					case '{EVENT.CAUSE.NSEVERITY}':
+						$macro_values[$eventid][$macro] = array_key_exists('cause', $event)
+							? $event['cause']['severity']
+							: '';
+						break;
+
+					case '{EVENT.CAUSE.SEVERITY}':
+						$macro_values[$eventid][$macro] = array_key_exists('cause', $event)
+							? CSeverityHelper::getName($event['cause']['severity'])
+							: '';
+						break;
+
+					case '{EVENT.CAUSE.STATUS}':
+						$macro_values[$eventid][$macro] = array_key_exists('cause', $event)
+							? trigger_value2str($event['cause']['value'])
+							: '';
+						break;
+
+					case '{EVENT.CAUSE.VALUE}':
+						$macro_values[$eventid][$macro] = array_key_exists('cause', $event)
+							? $event['cause']['value']
+							: '';
 						break;
 				}
 			}

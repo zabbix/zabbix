@@ -854,7 +854,7 @@ class CEvent extends CApiService {
 						'data' => json_encode([
 							'acknowledgeid' => $id,
 							'eventid' => $tasks_update_event_rank_cause[$k]['eventid'],
-							'userid' => $acknowledgement[$k]['userid']
+							'userid' => $acknowledgement['userid']
 						])
 					];
 				}
@@ -904,7 +904,7 @@ class CEvent extends CApiService {
 							'acknowledgeid' => $id,
 							'eventid' => $tasks_update_event_rank_symptom[$k]['eventid'],
 							'cause_eventid' => $tasks_update_event_rank_symptom[$k]['cause_eventid'],
-							'userid' => $acknowledgement[$k]['userid']
+							'userid' => $acknowledgement['userid']
 						])
 					];
 				}
