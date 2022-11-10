@@ -89,7 +89,8 @@ window.action_edit_popup = new class {
 			curl.setArgument('esc_period', esc_period);
 		}
 
-		// todo : add loader somewhere
+		this.loaderStart();
+
 		fetch(curl.getUrl(), {
 			method: 'POST',
 			headers: {
@@ -107,11 +108,13 @@ window.action_edit_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
+
 				if (typeof response === 'object' && 'error' in response) {
-					const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
+					const message_box = makeMessageBox('bad', response.error.messages, response.error.title)[0];
 
 					this.$operation_table.empty();
-					this.$operation_table.append(message_box);
+					this.loaderStart();
+					this.form.parentNode.insertBefore(message_box, this.form);
 				}
 				else {
 					this.$operation_table.empty();
@@ -119,22 +122,36 @@ window.action_edit_popup = new class {
 				}
 			})
 			.catch((exception) => {
-				// todo : add actions for situation when exception
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
+
+				this.form.parentNode.insertBefore(message_box, this.form);
 			})
 			.finally(
-				// todo : remove loader
+				this.$preloader.remove()
 			);
 	}
 
 	loaderStart() {
-		// todo : add functionality to add loader
-		// this.operation_table.setAttribute('class', 'is-loading');
-	}
-
-	loaderStop() {
-		// todo : add functionality to remove loader
-		// this.operation_table.removeAttribute('class');
-		// this.$preloader.remove();
+		this.$preloader = $('<span>', {class: 'is-loading'});
+		this.$operation_table
+			.empty()
+			.append(this.$preloader);
 	}
 
 	_initActionButtons() {
