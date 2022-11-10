@@ -258,9 +258,14 @@ function make_event_details(array $event, array $allowed) {
 }
 
 /**
- * @param bool  $in_closing
- * @param array $event
- * @param array $tasks
+ * Calculate and return event status string: PROBLEM, RESOLVED, CLOSING or UPDATING depending on acknowledges and tasks.
+ *
+ * @param bool   $in_closing                         True if problem is in CLOSING state.
+ * @param array  $event                              Event data.
+ * @param array  $event['acknowledges']              List of event acknowledges.
+ * @param int    $event['acknowledges'][]['action']  Event action type.
+ * @param string $event['acknowledges'][]['taskid']  Task ID.
+ * @param array  $tasks                              List of tasks.
  *
  * @return string
  */
@@ -280,7 +285,6 @@ function getEventStatusString(bool $in_closing, array $event, array $tasks): str
 						ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_CAUSE
 						|| ($acknowledge['action'] & ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) ==
 						ZBX_PROBLEM_UPDATE_EVENT_RANK_TO_SYMPTOM) {
-					$taskid = $acknowledge['taskid'];
 
 					// If currently is symptom.
 					if (array_key_exists($acknowledge['taskid'], $tasks)) {

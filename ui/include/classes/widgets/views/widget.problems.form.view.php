@@ -128,6 +128,12 @@ $form_grid->addItem([
 	new CFormField(CWidgetHelper::getRadioButtonList($fields['show_opdata']))
 ]);
 
+// Show symptoms.
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['show_symptoms']),
+	new CFormField(CWidgetHelper::getCheckBox($fields['show_symptoms']))
+]);
+
 // Show suppressed problems.
 $form_grid->addItem([
 	CWidgetHelper::getLabel($fields['show_suppressed']),

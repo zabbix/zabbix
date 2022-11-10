@@ -808,7 +808,7 @@ class CScreenProblem extends CScreenBase {
 
 		$symptom_cause_eventids = [];
 		$cause_eventids_with_symptoms = [];
-		$has_symptoms_on_page = false;
+		$do_causes_have_symptoms = false;
 		$symptom_data['problems'] = [];
 
 		if ($data['problems']) {
@@ -831,7 +831,7 @@ class CScreenProblem extends CScreenBase {
 						: API::Problem()->get($options);
 
 					if ($problem['symptom_count'] > 0) {
-						$has_symptoms_on_page = true;
+						$do_causes_have_symptoms = true;
 						$cause_eventids_with_symptoms[] = $problem['eventid'];
 					}
 				}
@@ -942,7 +942,7 @@ class CScreenProblem extends CScreenBase {
 			$header = [$header_check_box];
 
 			// There are cause events displayed on page that have symptoms. Maximum column count.
-			if ($has_symptoms_on_page) {
+			if ($do_causes_have_symptoms) {
 				if ($this->data['filter']['compact_view']) {
 					$header[] = (new CColHeader())->addStyle('width: 20px;');
 					$header[] = (new CColHeader())->addStyle('width: 20px;');
@@ -1054,9 +1054,6 @@ class CScreenProblem extends CScreenBase {
 
 			$triggers_hosts = $data['problems'] ? makeTriggersHostsList($triggers_hosts) : [];
 
-			$last_clock = 0;
-			$today = strtotime('today');
-
 			// Make trigger dependencies.
 			$dependencies = $data['triggers'] ? getTriggerDependencies($data['triggers']) : [];
 
@@ -1070,24 +1067,23 @@ class CScreenProblem extends CScreenBase {
 			];
 
 			$data += [
-				'today' => $today,
+				'today' => strtotime('today'),
 				'allowed' => $allowed,
 				'tasks' => $tasks,
 				'dependencies' => $dependencies,
 				'show_opdata' =>  $show_opdata,
-				'has_symptoms_on_page' => $has_symptoms_on_page,
+				'do_causes_have_symptoms' => $do_causes_have_symptoms,
 				'show_timeline' => $show_timeline,
-				'last_clock' => $last_clock,
+				'last_clock' => 0,
 				'show_recovery_data' => $show_recovery_data,
 				'tags' => $tags,
 				'triggers_hosts' => $triggers_hosts,
 				'sortorder' => $this->data['sortorder'],
-				'filter' => $this->data['filter'],
-				//'profile_eventids' => $this->data['profile_eventids']
+				'filter' => $this->data['filter']
 			];
 
 			// Add problems to table.
-			self::addProblemsToTable($table, $data['problems'], $data);
+			$table = self::addProblemsToTable($table, $data['problems'], $data);
 
 			$footer = new CActionButtonList('action', 'eventids', [
 				'popup.acknowledge.edit' => [
@@ -1234,22 +1230,22 @@ class CScreenProblem extends CScreenBase {
 	 *
 	 * @param CTableInfo $table                                 Table object to which problems are added to.
 	 * @param array      $problems                              List of problems.
-	 * @param array      $data                                   Additional data to build the table.
+	 * @param array      $data                                  Additional data to build the table.
 	 * @param array      $data['triggers']                      List of triggers.
-	 * @param int        $data['today']                         Today's date in integer format.
+	 * @param int        $data['today']                         Timestamp of today's date.
 	 * @param array      $data['tasks']                         List of tasks. Used to determine current problem status.
 	 * @param array      $data['users']                         List of users.
 	 * @param array      $data['correlations']                  List of correlations.
-	 * @param array      $data['dependencies']                  List of trigger dependencies
+	 * @param array      $data['dependencies']                  List of trigger dependencies.
 	 * @param array      $data['filter']                        Problem filter.
 	 * @param int        $data['filter']['show_suppressed']     "Show suppressed problems" filter option.
-	 * @param int        $data['filter']['highlight_row']       "Highlight whole row" filter option
-	 * @param int        $data['filter']['show_tags']           "Show tags" filter option
+	 * @param int        $data['filter']['highlight_row']       "Highlight whole row" filter option.
+	 * @param int        $data['filter']['show_tags']           "Show tags" filter option.
 	 * @param int        $data['filter']['compact_view']        "Compact view" filter option.
 	 * @param int        $data['filter']['details']             "Show details" filter option.
 	 * @param int        $data['show_opdata']                   "Show operational data" filter option.
-	 * @param int        $data['show_timeline']                 "Show timeline" filter option.
-	 * @param int        $data['has_symptoms_on_page']          True if there is not only cause problems.
+	 * @param bool       $data['show_timeline']                 "Show timeline" filter option.
+	 * @param int        $data['do_causes_have_symptoms']       True if cause problems have symptoms.
 	 * @param int        $data['last_clock']                    Problem time. Used to show timeline breaks.
 	 * @param int        $data['sortorder']                     Sort problems in ascending or descending order.
 	 * @param array      $data['allowed']                       An array of user role rules.
@@ -1266,8 +1262,11 @@ class CScreenProblem extends CScreenBase {
 	 * @param array      $data['actions']                       List of actions.
 	 * @param array      $data['tags']                          List of tags.
 	 * @param bool       $nested                                If true, show the symptom rows with indentation.
+	 *
+	 * @return CTableInfo
 	 */
-	private static function addProblemsToTable(CTableInfo $table, array $problems, array $data, $nested = false): void {
+	private static function addProblemsToTable(CTableInfo $table, array $problems, array $data,
+			$nested = false): CTableInfo {
 		foreach ($problems as $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -1368,8 +1367,7 @@ class CScreenProblem extends CScreenBase {
 				}
 			}
 
-			if ($data['filter']['compact_view'] && $data['filter']['show_suppressed']
-					&& count($info_icons) > 1) {
+			if ($data['filter']['compact_view'] && $data['filter']['show_suppressed'] && count($info_icons) > 1) {
 				$cell_info = (new CButton(null))
 					->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
 					->addStyle('margin-left: -3px;')
@@ -1452,7 +1450,7 @@ class CScreenProblem extends CScreenBase {
 					$row->addItem($icon);
 				}
 				else {
-					if ($data['has_symptoms_on_page']) {
+					if ($data['do_causes_have_symptoms']) {
 						// Show two empty columns.
 						$row->addItem([new CCol(''), new CCol('')]);
 					}
@@ -1480,7 +1478,7 @@ class CScreenProblem extends CScreenBase {
 				));
 
 				// If there are causes as well, show additional empty column.
-				if (!$nested && $data['has_symptoms_on_page']) {
+				if (!$nested && $data['do_causes_have_symptoms']) {
 					$row->addItem(new CCol(''));
 				}
 			}
@@ -1548,7 +1546,7 @@ class CScreenProblem extends CScreenBase {
 			);
 
 			if ($problem['cause_eventid'] == 0 && $problem['symptoms']) {
-				self::addProblemsToTable($table, $problem['symptoms'], $data, true);
+				$table = self::addProblemsToTable($table, $problem['symptoms'], $data, true);
 
 				if ($problem['symptom_count'] > ZBX_PROBLEM_SYMPTOM_LIMIT) {
 					$table->addRow(
@@ -1565,6 +1563,8 @@ class CScreenProblem extends CScreenBase {
 				}
 			}
 		}
+
+		return $table;
 	}
 
 	/**

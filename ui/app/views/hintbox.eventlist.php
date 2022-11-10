@@ -102,7 +102,7 @@ if (array_key_exists('problems', $data)) {
 			$can_be_closed = false;
 		}
 		else {
-			if (hasEventCloseAction($event['acknowledges'])) {
+			if (hasEventCloseAction($problem['acknowledges'])) {
 				$in_closing = true;
 				$can_be_closed = false;
 			}

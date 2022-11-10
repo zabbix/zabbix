@@ -170,6 +170,15 @@ class CWidgetFormProblems extends CWidgetForm {
 
 		$this->fields[$field_show_opdata->getName()] = $field_show_opdata;
 
+		$field_show_symptoms = (new CWidgetFieldCheckBox('show_symptoms', _('Show symptoms')))
+			->setDefault(0);
+
+		if (array_key_exists('show_symptoms', $this->data)) {
+			$field_show_symptoms->setValue($this->data['show_symptoms']);
+		}
+
+		$this->fields[$field_show_symptoms->getName()] = $field_show_symptoms;
+
 		// Show suppressed problems.
 		$field_show_suppressed = (new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems')))
 			->setDefault(ZBX_PROBLEM_SUPPRESSED_FALSE);
