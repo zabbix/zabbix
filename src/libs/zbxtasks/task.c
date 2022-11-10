@@ -82,7 +82,7 @@ static void	tm_data_clear(zbx_tm_data_t *data)
  *                                                                            *
  * Purpose: frees task resources                                              *
  *                                                                            *
- * Parameters: task - [IN]                                                    *
+ * Parameters: task - [IN] the task to free                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_tm_task_clear(zbx_tm_task_t *task)
@@ -674,8 +674,8 @@ void	zbx_tm_update_task_status(zbx_vector_tm_task_t *tasks, int status)
  *                                                                            *
  * Purpose: serializes common task data in json format                        *
  *                                                                            *
- * Parameters: json - [OUT] the json data                                     *
- *             data - [IN] the task to serialize                              *
+ * Parameters: json - [IN/OUT] the json data                                  *
+ *             task - [IN] the task to serialize                              *
  *                                                                            *
  ******************************************************************************/
 static void	tm_json_serialize_task(struct zbx_json *json, const zbx_tm_task_t *task)
@@ -689,7 +689,7 @@ static void	tm_json_serialize_task(struct zbx_json *json, const zbx_tm_task_t *t
  *                                                                            *
  * Purpose: serializes remote command data in json format                     *
  *                                                                            *
- * Parameters: json - [OUT] the json data                                     *
+ * Parameters: json - [IN/OUT] the json data                                  *
  *             data - [IN] the remote command to serialize                    *
  *                                                                            *
  ******************************************************************************/
@@ -713,7 +713,7 @@ static void	tm_json_serialize_remote_command(struct zbx_json *json, const zbx_tm
  *                                                                            *
  * Purpose: serializes remote command result data in json format              *
  *                                                                            *
- * Parameters: json - [OUT] the json data                                     *
+ * Parameters: json - [IN/OUT] the json data                                  *
  *             data - [IN] the remote command result to serialize             *
  *                                                                            *
  ******************************************************************************/
@@ -729,7 +729,7 @@ static void	tm_json_serialize_remote_command_result(struct zbx_json *json,
  *                                                                            *
  * Purpose: serializes check now data in json format                          *
  *                                                                            *
- * Parameters: json - [OUT] the json data                                     *
+ * Parameters: json - [IN/OUT] the json data                                  *
  *             data - [IN] the check now to serialize                         *
  *                                                                            *
  ******************************************************************************/
@@ -742,7 +742,7 @@ static void	tm_json_serialize_check_now(struct zbx_json *json, const zbx_tm_chec
  *                                                                            *
  * Purpose: serializes data task in json format                               *
  *                                                                            *
- * Parameters: json - [OUT] the json data                                     *
+ * Parameters: json - [IN/OUT] the json data                                  *
  *             data - [IN] the data task to serialize                         *
  *                                                                            *
  ******************************************************************************/
@@ -757,7 +757,7 @@ static void	tm_json_serialize_data(struct zbx_json *json, const zbx_tm_data_t *d
  *                                                                            *
  * Purpose: serializes data task result in json format                        *
  *                                                                            *
- * Parameters: json - [OUT] the json data                                     *
+ * Parameters: json - [IN/OUT] the json data                                  *
  *             data - [IN] the data task result to serialize                  *
  *                                                                            *
  ******************************************************************************/
@@ -772,7 +772,7 @@ static void	tm_json_serialize_data_result(struct zbx_json *json, const zbx_tm_da
  *                                                                            *
  * Purpose: serializes remote command data in json format                     *
  *                                                                            *
- * Parameters: json  - [OUT] the json data                                    *
+ * Parameters: json  - [IN/OUT] the json data                                 *
  *             tasks - [IN] the tasks to serialize                            *
  *                                                                            *
  ******************************************************************************/
