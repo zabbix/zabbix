@@ -57,8 +57,9 @@ $menu-main-arrow-hover-bg-position: -606px -434px !default;
 			&::after {
 				display: inline-block;
 				float: right;
+				top: 1px;
 
-				font-size: 8px;
+				font-size: 7px;
 				font-family: 'zabbix-icons' !important;
 				font-style:normal;
 				content: "\ea22";
@@ -105,7 +106,7 @@ $menu-main-arrow-hover-bg-position: -606px -434px !default;
 	a {
 		position: relative;
 		display: block;
-		padding: 12px 12px 12px 10px;
+		padding: 12px 14px 12px 10px;
 		font-size: 14px;
 		line-height: inherit;
 		white-space: nowrap;
@@ -250,7 +251,8 @@ $menu-main-arrow-hover-bg-position: -606px -434px !default;
 
 	[class^="zi-"], [class*=" zi-"]{
 		&::before {
-			padding-right: 10px;
+			top: -1px;
+			padding-right: 11px;
 			font-size: 23px;
 			color: $menu-icon-color;
 			opacity: $menu-main-icons-opacity;

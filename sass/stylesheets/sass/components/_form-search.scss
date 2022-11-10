@@ -77,8 +77,8 @@ $form-search-focused-icon-hover-opacity: $form-search-icon-focused-opacity !defa
 		}
 
 		&::before {
-			font-size: 24px;
-
+			font-size: 22px;
+			color: $menu-icon-color-light-blue;
 			@if $ui-transitions {
 				transition: opacity $ui-transition-duration ease-out;
 			}

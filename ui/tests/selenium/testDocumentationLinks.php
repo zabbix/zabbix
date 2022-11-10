@@ -117,7 +117,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath:(//button[contains(@class, "btn-widget-edit")])[1]'
+							'element' => 'xpath:(//button[@class="btn-widget-edit"])[1]'
 						]
 					]
 				]
@@ -688,7 +688,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath:(//button[contains(@class, "btn-widget-edit")])[1]'
+							'element' => 'xpath:(//button[@class="btn-widget-edit"])[1]'
 						]
 					],
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets'
@@ -1889,7 +1889,7 @@ class testDocumentationLinks extends CWebTest {
 		$location = ($dialog->isValid()) ? $dialog->waitUntilReady() : $this;
 
 		// Get the documentation link and compare it with expected result.
-		$link = $location->query('class:icon-doc-link')->one();
+		$link = $location->query('class:icon-doc-link')->one(); // todo zi
 		$this->assertEquals(self::$path_start.self::$version.$data['doc_link'], $link->getAttribute('href'));
 
 		// If the link was located in a popup - close this popup.
@@ -1983,7 +1983,7 @@ class testDocumentationLinks extends CWebTest {
 		$dialog = $this->query('id:map-window')->one()->waitUntilVisible();
 
 		// Maps contain headers for all map elements, so only the visible one should be checked.
-		$link = $dialog->query('class:icon-doc-link')->all()->filter(new CElementFilter(CElementFilter::VISIBLE))->first();
+		$link = $dialog->query('class:icon-doc-link')->all()->filter(new CElementFilter(CElementFilter::VISIBLE))->first(); // todo zi
 
 		$this->assertEquals(self::$path_start.self::$version.$data['doc_link'], $link->getAttribute('href'));
 	}

@@ -642,6 +642,7 @@ function createFontSelect(string $name): CSelect {
 			(new CLink(null, CDocHelper::getUrl(CDocHelper::POPUP_MAP_MASSUPDATE_ELEMENTS)))
 				->setTitle(_('Help'))
 				->addClass(ZBX_STYLE_ICON_DOC_LINK)
+				->addClass('zi-help')
 				->setTarget('_blank')
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)

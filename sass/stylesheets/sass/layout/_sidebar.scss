@@ -28,6 +28,30 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		display: flex;
 		width: 48px;
 		justify-content: flex-end;
+
+		[class^="zi-"], [class*=" zi-"]{
+			padding: 0;
+			width: 24px;
+			height: 24px;
+
+			font-size: 0;
+
+			background-color: transparent;
+			border: none;
+			border-radius: 0;
+
+			&::before {
+				font-size: 15px;
+				opacity: .75;
+			}
+
+			&:hover,
+			&:focus {
+				&::before {
+					opacity: 1;
+				}
+			}
+		}
 	}
 
 	.server-name {
@@ -93,40 +117,12 @@ $sidebar-toggle-bg-position: -540px -592px !default;
 		}
 	}
 
-	.button-hide,
-	.button-show,
-	.button-compact,
-	.button-expand {
-		width: 24px;
-		height: 24px;
-		background: url($sprite-path) no-repeat;
-		border: none;
-		border-radius: 0;
-		text-indent: -9999px;
-		opacity: .75;
-
-		&:focus,
-		&:hover {
-			opacity: 1;
-		}
-	}
-
-	.button-hide {
-		background-position: -540px -568px;
-	}
-
 	.button-show {
 		display: none;
-		background-position: -570px -568px;
-	}
-
-	.button-compact {
-		background-position: -540px -544px;
 	}
 
 	.button-expand {
 		display: none;
-		background-position: -540px -520px;
 	}
 
 	@if $ui-transitions {
