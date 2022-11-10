@@ -1219,7 +1219,8 @@ static int	process_history_data_value(DC_ITEM *item, zbx_agent_value_t *value, i
 	if (ITEM_STATE_NOTSUPPORTED == value->state ||
 			(NULL != value->value && 0 == strcmp(value->value, ZBX_NOTSUPPORTED)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s", item->host.host, item->key_orig, value->value);
+		zabbix_log(LOG_LEVEL_DEBUG, "hostid:" ZBX_FS_UI64 " item %s error: %s", item->host.hostid,
+				item->key_orig, value->value);
 
 		item->state = ITEM_STATE_NOTSUPPORTED;
 		process_item_value(item, NULL, &value->ts, h_num, value->value);
@@ -1797,7 +1798,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 	while (SUCCEED == parse_history_data_by_itemids(jp_data, &pnext, values, itemids, &values_num, &read_num,
 			&unique_shift, &error) && 0 != values_num)
 	{
-		DCconfig_get_items_by_itemids_partial(items, itemids, errcodes, values_num, mode);
+		DCconfig_history_data_get_items_by_itemids(items, itemids, errcodes, values_num, mode);
 
 		for (i = 0; i < values_num; i++)
 		{
@@ -1991,14 +1992,14 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 
 	sec = zbx_time();
 
-	items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
+	items = (DC_ITEM *)zbx_calloc(NULL, 1, sizeof(DC_ITEM) * ZBX_HISTORY_VALUES_MAX);
 	hostkeys = (zbx_host_key_t *)zbx_malloc(NULL, sizeof(zbx_host_key_t) * ZBX_HISTORY_VALUES_MAX);
 	memset(hostkeys, 0, sizeof(zbx_host_key_t) * ZBX_HISTORY_VALUES_MAX);
 
 	while (SUCCEED == parse_history_data(jp_data, &pnext, values, hostkeys, &values_num, &read_num,
 			&unique_shift) && 0 != values_num)
 	{
-		DCconfig_get_items_by_keys(items, hostkeys, errcodes, values_num);
+		DCconfig_history_data_get_items_by_keys(items, hostkeys, errcodes, values_num);
 
 		for (i = 0; i < values_num; i++)
 		{

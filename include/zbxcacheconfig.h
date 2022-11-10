@@ -569,7 +569,7 @@ zbx_synced_new_config_t;
 
 #define ZBX_ITEM_GET_MISC		0x0001
 #define ZBX_ITEM_GET_DELAY		0x0002
-#define ZBX_ITEM_GET_EMPTY_ERROR	0x0004
+#define ZBX_ITEM_GET_DYNAMIC		0x0004
 #define ZBX_ITEM_GET_NUM		0x0008
 #define ZBX_ITEM_GET_EMPTY_UNITS	0x0010
 #define ZBX_ITEM_GET_LOGTIMEFMT		0x0020
@@ -580,13 +580,13 @@ zbx_synced_new_config_t;
 #define ZBX_ITEM_GET_MAINTENANCE	0x0400
 #define ZBX_ITEM_GET_INVENTORY		0x0800
 #define ZBX_ITEM_GET_HOUSEKEEPING	0x1000
+#define ZBX_ITEM_GET_HOST		0x2000
+#define ZBX_ITEM_GET_DEFAULT		(~(unsigned int)(ZBX_ITEM_GET_HOUSEKEEPING|ZBX_ITEM_GET_DYNAMIC))
 
-#define ZBX_ITEM_GET_DEFAULT		(~(unsigned int)ZBX_ITEM_GET_HOUSEKEEPING)
-#define ZBX_ITEM_GET_ALL		(~(unsigned int)0)
-
-#define ZBX_ITEM_GET_SYNC		(ZBX_ITEM_GET_INVENTORY | ZBX_ITEM_GET_NUM | ZBX_ITEM_GET_HOUSEKEEPING)
+#define ZBX_ITEM_GET_SYNC		(ZBX_ITEM_GET_INVENTORY | ZBX_ITEM_GET_NUM | ZBX_ITEM_GET_HOUSEKEEPING | \
+					ZBX_ITEM_GET_DYNAMIC | ZBX_ITEM_GET_HOST)
 #define ZBX_ITEM_GET_SYNC_EXPORT	(ZBX_ITEM_GET_INVENTORY | ZBX_ITEM_GET_NUM | ZBX_ITEM_GET_HOSTNAME | \
-					ZBX_ITEM_GET_HOUSEKEEPING)
+					ZBX_ITEM_GET_HOUSEKEEPING | ZBX_ITEM_GET_DYNAMIC | ZBX_ITEM_GET_HOST)
 
 #define ZBX_ITEM_GET_PROCESS		(ZBX_ITEM_GET_MAINTENANCE|ZBX_ITEM_GET_MISC|ZBX_ITEM_GET_LOGTIMEFMT)
 
@@ -608,8 +608,9 @@ int	DCconfig_get_hostid_by_name(const char *host, zbx_uint64_t *hostid);
 void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_get_hosts_by_hostids(DC_HOST *hosts, const zbx_uint64_t *hostids, int *errcodes, int num);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
+void	DCconfig_history_data_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
-void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
+void	DCconfig_history_data_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
 		unsigned int mode);
 void	DCconfig_history_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
 		unsigned int mode);
