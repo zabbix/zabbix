@@ -64,16 +64,14 @@ $current_url = (new CUrl('zabbix.php'))
 	->setArgument('eventsource', $data['eventsource']);
 
 $html_page = (new CHtmlPage())
-	->setTitle(_('Actions'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_ACTION_EDIT));
-
-$html_page
+	->setTitle($title)
 	->setTitleSubmenu(['main_section' => ['items' => $submenu]])
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_ACTION_LIST))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())
-				->addItem((new CSimpleButton(_('Create action')))->addClass('js-action-create'))
+			(new CList())->addItem(
+				(new CSimpleButton(_('Create action')))->addClass('js-action-create')
+			)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
