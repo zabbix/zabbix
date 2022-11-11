@@ -168,10 +168,9 @@ typedef struct
 	unsigned char		verify_peer;
 	unsigned char		verify_host;
 	unsigned char		allow_traps;
-	int			mtime;
 	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
 	char			*delay;
-	char			*error;
+	int			mtime;
 	char			trapper_hosts[ZBX_ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char			logtimefmt[ZBX_ITEM_LOGTIMEFMT_LEN_MAX];
 	char			snmp_community_orig[ZBX_ITEM_SNMP_COMMUNITY_LEN_MAX], *snmp_community;
@@ -200,6 +199,7 @@ typedef struct
 	char			ssl_key_file_orig[ZBX_ITEM_SSL_KEY_FILE_LEN_MAX], *ssl_key_file;
 	char			ssl_key_password_orig[ZBX_ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
 	char			*script_params;
+	char			*error;
 	unsigned char		*formula_bin;
 }
 DC_ITEM;
@@ -632,24 +632,26 @@ void	free_configuration_cache(void);
 void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode,
 		size_t num);
 void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num);
-void	DCconfig_clean_history_items(DC_HISTORY_ITEM *items, int *errcodes, size_t num);
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_hostid_by_name(const char *host, zbx_uint64_t *hostid);
 void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_get_hosts_by_hostids(DC_HOST *hosts, const zbx_uint64_t *hostids, int *errcodes, int num);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
-void	DCconfig_history_data_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
-void	DCconfig_history_data_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
-		unsigned int mode);
 void	DCconfig_history_get_items_by_itemids(DC_HISTORY_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
+		unsigned int mode);
+void	DCconfig_history_get_functions_by_functionids(DC_FUNCTION *functions,
+		zbx_uint64_t *functionids, int *errcodes, size_t num);
+void	DCconfig_history_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
+		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num);
+void	DCconfig_clean_history_items(DC_HISTORY_ITEM *items, int *errcodes, size_t num);
+void	DCconfig_history_data_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
+void	DCconfig_history_data_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
 		unsigned int mode);
 int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid);
 void	DCconfig_get_active_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, int *errcodes, size_t num);
 void	DCconfig_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revision);
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
-		zbx_uint64_t *functionids, int *errcodes, size_t num);
-void	DCconfig_history_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
 void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num);
@@ -657,8 +659,6 @@ int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx
 void	DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in, zbx_vector_uint64_t *triggerids_out);
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_all_triggers(void);
-void	DCconfig_history_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
-		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num);
 int	DCconfig_trigger_exists(zbx_uint64_t triggerid);
 void	DCfree_triggers(zbx_vector_ptr_t *triggers);
 void	DCconfig_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail);
