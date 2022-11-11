@@ -177,6 +177,13 @@ class CValueMap extends CApiService {
 				];
 			}
 
+			if (array_key_exists('uuid', $valuemap) && $valuemap['uuid'] !== $db_valuemap['uuid']) {
+				$upd_valuemaps[] = [
+					'values' => ['uuid' => $valuemap['uuid'], 'name' => $valuemap['name']],
+					'where' => ['valuemapid' => $valuemap['valuemapid']]
+				];
+			}
+
 			if (array_key_exists('mappings', $valuemap)) {
 				$valuemaps_mappings[$valuemapid] = [];
 				$sortorder = 0;
@@ -455,6 +462,7 @@ class CValueMap extends CApiService {
 	 */
 	private function validateUpdate(array &$valuemaps, array &$db_valuemaps = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['valuemapid']], 'fields' => [
+			'uuid' => ['type' => API_UUID],
 			'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('valuemap', 'name')],
 			'mappings' =>	['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
@@ -496,7 +504,7 @@ class CValueMap extends CApiService {
 
 		$this->validateValuemapMappings($valuemaps);
 		$db_valuemaps = $this->get([
-			'output' => ['valuemapid', 'hostid', 'name'],
+			'output' => ['valuemapid', 'hostid', 'name', 'uuid'],
 			'valuemapids' => array_column($valuemaps, 'valuemapid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -506,6 +514,14 @@ class CValueMap extends CApiService {
 			if (!array_key_exists($valuemap['valuemapid'], $db_valuemaps)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			if (APP::getMode() !== APP::EXEC_MODE_DEFAULT && array_column($valuemaps, 'uuid')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/1',
+						_s('unexpected parameter "%1$s"', 'uuid')
+					)
 				);
 			}
 		}

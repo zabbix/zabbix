@@ -420,6 +420,7 @@ class CHttpTest extends CApiService {
 	 */
 	protected function validateUpdate(array &$httptests, array &$db_httptests = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['httptestid']], 'fields' => [
+			'uuid' => 				['type' => API_UUID],
 			'httptestid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('httptest', 'name')],
 			'delay' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:'.SEC_PER_DAY],
@@ -503,6 +504,14 @@ class CHttpTest extends CApiService {
 			if (!array_key_exists($httptest['httptestid'], $db_httptests)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			if (APP::getMode() !== APP::EXEC_MODE_DEFAULT && array_key_exists('uuid', $httptest)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/1',
+						_s('unexpected parameter "%1$s"', 'uuid')
+					)
 				);
 			}
 

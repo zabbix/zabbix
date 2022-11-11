@@ -33,6 +33,8 @@ class CConfigurationImportcompare {
 	 */
 	protected $uuid_structure;
 
+	protected $unique_fields_keys_by_type;
+
 	/**
 	 * CConfigurationImportcompare constructor.
 	 *
@@ -63,6 +65,23 @@ class CConfigurationImportcompare {
 			],
 			'triggers' => [],
 			'graphs' => []
+		];
+
+		$this->unique_fields_keys_by_type = [
+			'groups' => ['name'],
+			'templates' => ['name'],
+			'items' => ['name', 'key'],
+			'triggers' => ['name', 'expression', 'recovery_expression'],
+			'dashboards' => ['name'],
+			'httptests' => ['name'],
+			'valuemaps' => ['name'],
+			'discovery_rules' => ['name', 'key'],
+			'item_prototypes' => ['name', 'key'],
+			'trigger_prototypes' => ['name', 'expression', 'recovery_expression'],
+			'graph_prototypes' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]],
+			'host_prototypes' => ['host'],
+			'graphs' => ['name', ['graph_items' => ['numeric_keys' => ['item' => 'host']]]],
+
 		];
 
 		$this->options = $options;
@@ -108,7 +127,8 @@ class CConfigurationImportcompare {
 			$before += [$key => []];
 			$after += [$key => []];
 
-			$diff = $this->compareArrayByUuid($before[$key], $after[$key]);
+			$diff = $this->compareArrayByUniqueness($before[$key], $after[$key], $key);
+
 
 			if (array_key_exists('added', $diff)) {
 				foreach ($diff['added'] as &$entity) {
@@ -160,42 +180,78 @@ class CConfigurationImportcompare {
 
 	/**
 	 * Compare two entities and separate all their keys into added/removed/updated.
+	 * First entities gets compared by uuid then by its unique field values.
 	 *
 	 * @param array $before
 	 * @param array $after
+	 * @param string $type
 	 *
 	 * @return array
 	 */
-	protected function compareArrayByUuid(array $before, array $after): array {
+	protected function compareArrayByUniqueness(array $before, array $after, string $type): array {
+		if (!$before && !$after) {
+			return [];
+		}
+
 		$diff = [
 			'added' => [],
 			'removed' => [],
 			'updated' => []
 		];
 
-		$before = zbx_toHash($before, 'uuid');
-		$after = zbx_toHash($after, 'uuid');
+		$before = $this->addUniquenessParameterByEntityType($before, $type);
+		$after = $this->addUniquenessParameterByEntityType($after, $type);
 
-		$before_keys = array_keys($before);
-		$after_keys = array_keys($after);
+		// Be sure that every entity has uuid.
+		foreach ($before as &$entity) {
+			$entity += ['uuid' => ''];
+		}
+		unset($entity);
 
-		$same_keys = array_intersect($before_keys, $after_keys);
-		$added_keys = array_diff($after_keys, $before_keys);
-		$removed_keys = array_diff($before_keys, $after_keys);
+		foreach ($after as &$entity) {
+			$entity += ['uuid' => ''];
+		}
+		unset($entity);
 
-		foreach ($added_keys as $key) {
-			$diff['added'][] = $after[$key];
+		$same_entities = [];
+
+		foreach ($before as $b_key => $before_entity){
+			foreach ($after as $a_key => $after_entity) {
+				if ($before_entity['uuid'] == $after_entity['uuid']
+						|| $before_entity['uniqueness'] == $after_entity['uniqueness']) {
+					unset($before_entity['uniqueness'], $after_entity['uniqueness']);
+
+					$before_entity['uuid'] = $after_entity['uuid'];
+
+					$same_entities[$b_key]['before'] = $before_entity;
+					$same_entities[$b_key]['after'] = $after_entity;
+
+					unset($before[$b_key], $after[$a_key]);
+
+					break;
+				}
+			}
 		}
 
-		foreach ($removed_keys as $key) {
-			$diff['removed'][] = $before[$key];
+		$removed_entities = $before;
+		$added_entities = $after;
+
+		foreach ($added_entities as $entity) {
+			unset($entity['uniqueness']);
+			$diff['added'][] = $entity;
 		}
 
-		foreach ($same_keys as $key) {
-			if ($before[$key] != $after[$key]) {
+		foreach ($removed_entities as $entity) {
+			unset($entity['uniqueness']);
+			$diff['removed'][] = $entity;
+		}
+
+		foreach ($same_entities as $entity) {
+			$uuid = ['uuid' => null];
+			if (array_diff_key($entity['before'], $uuid) != array_diff_key($entity['after'], $uuid)) {
 				$diff['updated'][] = [
-					'before' => $before[$key],
-					'after' => $after[$key]
+					'before' => $entity['before'],
+					'after' => $entity['after']
 				];
 			}
 		}
@@ -209,6 +265,59 @@ class CConfigurationImportcompare {
 		return $diff;
 	}
 
+	private function addUniquenessParameterByEntityType(array $entities,string $type): array {
+		foreach ($entities as &$entity) {
+			foreach ($this->unique_fields_keys_by_type[$type] as $unique_field_keys) {
+				$unique_values = $this->getUniqueValuesByFieldPath($entity, $unique_field_keys);
+				$entity['uniqueness'][] = $unique_values;
+			}
+
+			// To make unique string get one dimensional results, get rid of value duplicates and sort them.
+			$entity['uniqueness'] = array_unique(CArrayHelper::flatten($entity['uniqueness']));
+			sort($entity['uniqueness']);
+			$entity['uniqueness'] = implode('/', $entity['uniqueness']);
+		}
+		unset($entity);
+
+		return $entities;
+	}
+
+	private function getUniqueValuesByFieldPath(array $entity, $field_key) {
+		if (is_array($field_key)) {
+			foreach ($field_key as $sub_key => $sub_field) {
+				if ($sub_key != 'numeric_keys') {
+					$sub_entities = $entity[$sub_key];
+				}
+				else {
+					if (is_array($sub_field)) {
+						foreach ($sub_field as $key => $field) {
+							foreach ($entity as $sub_entity) {
+								$sub_entities[] = $sub_entity[$key];
+							}
+
+							$sub_field = $field;
+							}
+					}
+					else {
+						$sub_entities = $entity;
+					}
+				}
+
+				$result = $this->getUniqueValuesByFieldPath($sub_entities, $sub_field);
+			}
+		}
+		else {
+			if (array_key_exists($field_key, $entity)){
+				$result = $entity[$field_key];
+			}
+			else {
+				$result = array_column($entity, $field_key);
+			}
+		}
+
+		return $result;
+	}
+
 	/**
 	 * Compare two entities and separate all their keys into added/removed/updated.
 	 *
@@ -218,6 +327,7 @@ class CConfigurationImportcompare {
 	 *
 	 * @return array
 	 */
+
 	protected function applyOptions(array $options, string $entity_key, array $diff): array {
 		$option_key_map = [
 			'template_groups' => 'template_groups',
@@ -244,7 +354,9 @@ class CConfigurationImportcompare {
 		if ($entity_key === 'templates' && array_key_exists('updated', $diff)) {
 			$updated_count = count($diff['updated']);
 			for ($key = 0; $key < $updated_count; $key++) {
+
 				$entity = $diff['updated'][$key];
+
 				$has_before_templates = array_key_exists('templates', $entity['before']);
 				$has_after_templates = array_key_exists('templates', $entity['after']);
 
