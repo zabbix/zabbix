@@ -33,6 +33,9 @@ class CConfigurationImportcompare {
 	 */
 	protected $uuid_structure;
 
+	/**
+	 * @var array  contains unique fields path for import entities
+	 */
 	protected $unique_fields_keys_by_type;
 
 	/**
@@ -238,16 +241,19 @@ class CConfigurationImportcompare {
 
 		foreach ($added_entities as $entity) {
 			unset($entity['uniqueness']);
+
 			$diff['added'][] = $entity;
 		}
 
 		foreach ($removed_entities as $entity) {
 			unset($entity['uniqueness']);
+
 			$diff['removed'][] = $entity;
 		}
 
 		foreach ($same_entities as $entity) {
 			$uuid = ['uuid' => null];
+
 			if (array_diff_key($entity['before'], $uuid) != array_diff_key($entity['after'], $uuid)) {
 				$diff['updated'][] = [
 					'before' => $entity['before'],
@@ -265,16 +271,17 @@ class CConfigurationImportcompare {
 		return $diff;
 	}
 
-	private function addUniquenessParameterByEntityType(array $entities,string $type): array {
+	private function addUniquenessParameterByEntityType(array $entities, string $type): array {
 		foreach ($entities as &$entity) {
-			foreach ($this->unique_fields_keys_by_type[$type] as $unique_field_keys) {
-				$unique_values = $this->getUniqueValuesByFieldPath($entity, $unique_field_keys);
+			foreach ($this->unique_fields_keys_by_type[$type] as $unique_field_key) {
+				$unique_values = $this->getUniqueValuesByFieldPath($entity, $unique_field_key);
+
 				$entity['uniqueness'][] = $unique_values;
 			}
-
-			// To make unique string get one dimensional results, get rid of value duplicates and sort them.
+			// To make unique entity string, get result values, get rid of value duplicates and sort them.
 			$entity['uniqueness'] = array_unique(CArrayHelper::flatten($entity['uniqueness']));
 			sort($entity['uniqueness']);
+
 			$entity['uniqueness'] = implode('/', $entity['uniqueness']);
 		}
 		unset($entity);
@@ -282,7 +289,15 @@ class CConfigurationImportcompare {
 		return $entities;
 	}
 
-	private function getUniqueValuesByFieldPath(array $entity, $field_key) {
+	/**
+	 * Get entity field values by giving field key path constructed.
+	 *
+	 * @param array  $entity            entity
+	 * @param string|array  $field_key  string when field key to get and array when field key path given.
+	 *
+	 * @return string|array
+	 */
+	private function getUniqueValuesByFieldPath(array $entity,array|string $field_key) {
 		if (is_array($field_key)) {
 			foreach ($field_key as $sub_key => $sub_field) {
 				if ($sub_key != 'numeric_keys') {
@@ -327,7 +342,6 @@ class CConfigurationImportcompare {
 	 *
 	 * @return array
 	 */
-
 	protected function applyOptions(array $options, string $entity_key, array $diff): array {
 		$option_key_map = [
 			'template_groups' => 'template_groups',
@@ -354,9 +368,7 @@ class CConfigurationImportcompare {
 		if ($entity_key === 'templates' && array_key_exists('updated', $diff)) {
 			$updated_count = count($diff['updated']);
 			for ($key = 0; $key < $updated_count; $key++) {
-
 				$entity = $diff['updated'][$key];
-
 				$has_before_templates = array_key_exists('templates', $entity['before']);
 				$has_after_templates = array_key_exists('templates', $entity['after']);
 
