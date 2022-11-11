@@ -1,10 +1,22 @@
 Changes for 6.0.11rc1
 
 New features:
+.........T [ZBX-21588] optimized template k8s nodes by http (egordymov)
+.......PS. [ZBXNEXT-8040] added object based json parsing and jsonpath optimizations (wiper)
+.........T [ZBXNEXT-7949] added a suffix "by" of template names (egordymov)
+.........T [ZBX-20478] fixed script k8s cluster state (egordymov)
 .........T [ZBXNEXT-6844] added Cisco Meraki template (abiba, vkhaliev)
 .......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
 
 Bug fixes:
+........S. [ZBX-19813] reworked inteface updates in template linking and lld (wiper)
+..F....... [ZBX-20320] fixed order of checkboxes in user role view; added vertical display to CCheckBoxList; removed CSeverityCheckBoxList (epulke)
+.......... [ZBX-21869] fixed database upgrade from 5.0 on setups requiring primary keys for tables (wiper)
+.........T [ZBX-21620] changed update interval for passwd checksum item in OS templates to 15m (drasihov)
+........S. [ZBX-21616] fixed error due to non-existent macros in custom expressions (dgoloscapov, wiper)
+........S. [ZBX-21825] improved history syncer performance (vso)
+.......PS. [ZBX-21786] fixed 'invalid timeout' error occurring after script item parameters removal (asestakovs)
+...G...... [ZBX-21823] fixed vfs.fs.inode and vfs.fs.get to handle file systems with zero total inodes count (asestakovs)
 ........S. [ZBX-21765] removed HTTP header "Accept-Encoding" from defaults in a web scenario step request (dimir)
 .......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)
 ........S. [ZBX-21655] fixed VMware datastore discovery to not return same datastore multiple times (asestakovs)
