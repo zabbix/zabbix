@@ -1025,7 +1025,7 @@ class testProxyConfSync extends CIntegrationTest
 				"port" => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX
 			]
 		]);
-		//$this->assertArrayHasKey("proxyids", $response['result']);
+		$this->assertArrayHasKey("proxyids", $response['result']);
 	}
 
 	/**
