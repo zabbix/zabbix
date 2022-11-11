@@ -117,10 +117,11 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				[
 					'type' => 'Email',
 					'defaults' => [
+						'Email provider' => 'Generic SMTP',
 						'SMTP server' => 'mail.example.com',
 						'SMTP server port' => 25,
-						'SMTP helo' => '',
 						'Email' => 'zabbix@example.com',
+						'SMTP helo' => '',
 						'Connection security' => 'None',
 						'Authentication' => 'None',
 						'Message format' => 'HTML'
@@ -218,6 +219,61 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					$this->assertEquals('', $auth_field->getValue());
 					$this->assertEquals(255, $auth_field->getAttribute('maxlength'));
 				}
+
+				// Check configuration for different email providers.
+				$email_providers = $form->getField('Email provider')->getOptions()->asText();
+				$this->assertEquals(['Generic SMTP', 'Gmail', 'Gmail relay', 'Office365', 'Office365 relay'], $email_providers);
+
+				$auth = [
+					'none' => [
+						'defaults' => [
+							'Email' => 'zabbix@example.com',
+							'Authentication' => 'None',
+							'Message format' => 'HTML'
+						],
+						'maxlength' => [
+							'Email' => 255
+						],
+						'mandatory' => ['Email']
+					],
+					'password' => [
+						'defaults' => [
+							'Email' => 'zabbix@example.com',
+							'Password' => '',
+							'Message format' => 'HTML'
+						],
+						'maxlength' => [
+							'Email' => 255,
+							'Password' => 255
+						],
+						'mandatory' => ['Email', 'Password']
+					]
+				];
+
+				// Remove "Generic SMTP" from list and check layout for other email providers.
+				unset($email_providers[0]);
+
+				foreach ($email_providers as $email_provider) {
+					$form->getField('Email provider')->fill($email_provider);
+
+					// Check that certain fields are not displayed depending on email provider.
+					$hidden_fields = ['SMTP server', 'SMTP server port', 'SMTP helo', 'Connection security'];
+					$hidden_fields[] = (in_array($email_provider, ['Gmail', 'Office365'])) ? 'Authentication' : 'Password';
+					$this->assertEquals([], array_intersect($hidden_fields, $form->getLabels()
+							->filter(new CElementFilter(CElementFilter::VISIBLE))->asText())
+					);
+
+					if (in_array($email_provider, ['Gmail relay', 'Office365 relay'])) {
+						$this->checkTabFields($form, $auth['none']);
+
+						$auth_field = $form->getField('Authentication');
+						$this->assertEquals(['None', 'Email and password'], $auth_field->getLabels()->asText());
+						$auth_field->fill('Email and password');
+					}
+
+					$this->checkTabFields($form, $auth['password']);
+				}
+
 				break;
 
 			case 'SMS':
@@ -329,8 +385,8 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		}
 
 		// Check mandatory fields marking.
-		foreach ($parameters['mandatory'] as $label) {
-			$this->assertEquals('form-label-asterisk', $form->getLabel($label)->getAttribute('class'));
+		foreach ($parameters['mandatory'] as $field) {
+			$this->assertTrue($form->isRequired($field));
 		}
 	}
 
@@ -402,28 +458,6 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'error' => 'Invalid parameter "/1/smtp_port": value must be one of 0-65535.'
 				]
 			],
-//			// Empty SMTP helo.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'mediatype_tab' => [
-//						'Name' => 'Empty SMTP helo',
-//						'SMTP helo' => ''
-//					],
-//					'error' => 'Field "smtp_helo" is missing a value for media type "Empty SMTP helo"'
-//				]
-//			],
-//			// Empty space in SMTP helo.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'mediatype_tab' => [
-//						'Name' => 'Empty space in SMTP helo',
-//						'SMTP helo' => '   '
-//					],
-//					'error' => 'Field "smtp_helo" is missing a value for media type "Empty space in SMTP helo"'
-//				]
-//			],
 			// Empty Email.
 			[
 				[
@@ -444,6 +478,56 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Email' => '   '
 					],
 					'error' => 'Invalid email address "".'
+				]
+			],
+			// Empty password for Gmail provider email.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Empty password in for Gmail',
+						'Email provider' => 'Gmail',
+						'Password' => ''
+					],
+					'error' => 'Invalid parameter "/1/passwd": cannot be empty.'
+				]
+			],
+			// Empty password for Gmail relay provider email.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Empty password in for Gmail relay',
+						'Email provider' => 'Gmail relay',
+						'Authentication' => 'Email and password',
+						'Password' => ''
+					],
+					'error' => 'Invalid parameter "/1/passwd": cannot be empty.'
+				]
+			],
+			// Empty password for Office365 provider email.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Empty password in for Office365',
+						'Email provider' => 'Office365',
+						'Password' => ''
+					],
+					'error' => 'Invalid parameter "/1/passwd": cannot be empty.'
+				]
+			],
+			// Empty password for Office365 relay provider email.
+			[
+				[
+					'expected' => TEST_BAD,
+					'mediatype_tab' => [
+						'Name' => 'Empty password in for Office365 relay',
+						'Email provider' => 'Office365 relay',
+						'Authentication' => 'Email and password',
+						'Password' => ''
+					],
+					'error' => 'Invalid parameter "/1/passwd": cannot be empty.'
 				]
 			],
 			// Empty GSM modem.
@@ -686,6 +770,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					]
 				]
 			],
+			// SMTP generic email with all possible parameters defined
 			[
 				[
 					'mediatype_tab' => [
@@ -712,6 +797,49 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					]
 				]
 			],
+			// Gmail relay email with all possible parameters defined
+			[
+				[
+					'mediatype_tab' => [
+						'Name' => 'Gmail relay with all possible parameters',
+						'Email provider' => 'Gmail relay',
+						'Email' => 'gmail@zabbix.com',
+						'Authentication' => 'Email and password',
+						'Password' => 'παράδειγμα',
+						'Message format' => 'Plain text',
+						'Description' => 'If only χρήστης was παράδειγμα then everyone would be happy',
+						'Enabled' => false
+					],
+					'options_tab' => [
+						'id:maxsessions_type' => 'Custom',
+						'id:maxsessions' => 3,
+						'Attempts' => 2,
+						'Attempt interval' => 1
+					]
+				]
+			],
+			// TODO: uncomment the below case when ZBX-21915 is fixed.
+//			// Offise365 relay email with all possible parameters defined
+//			[
+//				[
+//					'mediatype_tab' => [
+//						'Name' => 'Office365 relay with all possible parameters',
+//						'Email provider' => 'Office365 relay',
+//						'Email' => 'office365@zabbix.com',
+//						'Authentication' => 'Email and password',
+//						'Password' => '1',
+//						'Message format' => 'Plain text',
+//						'Description' => 'One more time: If only χρήστης was παράδειγμα then everyone would be happy',
+//						'Enabled' => false
+//					],
+//					'options_tab' => [
+//						'id:maxsessions_type' => 'Custom',
+//						'id:maxsessions' => 4,
+//						'Attempts' => 3,
+//						'Attempt interval' => 2
+//					]
+//				]
+//			],
 			[
 				[
 					'mediatype_tab' => [
@@ -779,7 +907,9 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'mediatype_tab' => [
-						'Name' => 'Email with options: unlimited concurrent sessions and 0h interval'
+						'Name' => 'Gmail email with options: unlimited concurrent sessions and 0h interval',
+						'Email provider' => 'Gmail',
+						'Password' => 'qwerty'
 					],
 					'options_tab' => [
 						'id:maxsessions_type' => 'Unlimited',
@@ -791,7 +921,9 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'mediatype_tab' => [
-						'Name' => 'Email with options: 1h interval and default maxsessions (0)'
+						'Name' => 'Office365 email with options: 1h interval and default maxsessions (0)',
+						'Email provider' => 'Office365',
+						'Password' => '12345'
 					],
 					'options_tab' => [
 						'id:maxsessions_type' => 'Custom',
@@ -805,6 +937,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				[
 					'mediatype_tab' => [
 						'Name' => '   Email with trailing and leading spaces in params   ',
+						'Email provider' => 'Generic SMTP',
 						'SMTP server' => '   παράδειγμα.%^&*(.com   ',
 						'SMTP server port' => ' 25 ',
 						'Email' => '   zabbix@zabbix.com   ',
@@ -1041,6 +1174,11 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->page->waitUntilReady();
 
 		$form = $this->query('id:media-type-form')->asForm()->one();
+
+		if ($form->query('button:Change password')->one(false)->isValid() && array_key_exists('Password', $data['mediatype_tab'])) {
+			$form->query('button:Change password')->one()->click();
+		}
+
 		$form->fill($data['mediatype_tab']);
 
 		if (array_key_exists('script_parameters', $data)) {
