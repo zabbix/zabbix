@@ -204,10 +204,11 @@ static void	ha_update_parent(zbx_ipc_async_socket_t *rtc_socket, zbx_ha_info_t *
  * Purpose: send heartbeat message to main process                            *
  *                                                                            *
  ******************************************************************************/
-static void	ha_send_heartbeat(zbx_ipc_async_socket_t *rtc_socket)
+static void	ha_send_heartbeat(zbx_ha_info_t *info, zbx_ipc_async_socket_t *rtc_socket)
 {
-	if (SUCCEED != zbx_ipc_async_socket_send(rtc_socket, ZBX_IPC_SERVICE_HA_HEARTBEAT, NULL, 0) ||
-		SUCCEED != zbx_ipc_async_socket_flush(rtc_socket, ZBX_HA_SERVICE_TIMEOUT))
+	if (SUCCEED != zbx_ipc_async_socket_send(rtc_socket, ZBX_IPC_SERVICE_HA_HEARTBEAT, (void *)&info->db_status,
+			(zbx_uint32_t)sizeof(info->db_status)) ||
+			SUCCEED != zbx_ipc_async_socket_flush(rtc_socket, ZBX_HA_SERVICE_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send HA heartbeat to main process");
 		exit(EXIT_FAILURE);
@@ -1527,8 +1528,8 @@ int	zbx_ha_get_status(int *ha_status, int *ha_failover_delay, char **error)
  ******************************************************************************/
 int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_failover_delay, char **error)
 {
-	static time_t	last_hb;
-	int		ret = SUCCEED, ha_status_old;
+	static time_t	last_hb, last_db_hb;
+	int		ret = SUCCEED, ha_status_old, db_status;
 	time_t		now;
 	unsigned char	*ptr;
 	zbx_uint32_t	len;
@@ -1557,19 +1558,38 @@ int	zbx_ha_dispatch_message(zbx_ipc_message_t *message, int *ha_status, int *ha_
 
 				/* reset heartbeat on status change */
 				if (ha_status_old != *ha_status)
-					last_hb = now;
+					last_db_hb = now;
 
 				break;
 			case ZBX_IPC_SERVICE_HA_HEARTBEAT:
-				last_hb = now;
+				memcpy(&db_status, message->data, sizeof(db_status));
+				if (ZBX_DB_OK <= db_status)
+					last_db_hb = now;
 				break;
 		}
+
+		last_hb = now;
 	}
 
-	if (ZBX_HA_IS_CLUSTER() && *ha_status == ZBX_NODE_STATUS_ACTIVE && 0 != last_hb)
+	if (ZBX_HA_IS_CLUSTER())
 	{
-		if (last_hb + *ha_failover_delay - ZBX_HA_POLL_PERIOD <= now || now < last_hb)
-			*ha_status = ZBX_NODE_STATUS_STANDBY;
+		if (0 != last_hb)
+		{
+			if (last_hb + *ha_failover_delay - ZBX_HA_POLL_PERIOD <= now || now < last_hb)
+			{
+				last_hb = 0;
+				*ha_status = ZBX_NODE_STATUS_HATIMEOUT;
+			}
+		}
+
+		if (*ha_status == ZBX_NODE_STATUS_ACTIVE && 0 != last_db_hb)
+		{
+			if (last_db_hb + *ha_failover_delay - ZBX_HA_POLL_PERIOD <= now || now < last_db_hb)
+			{
+				last_db_hb = 0;
+				*ha_status = ZBX_NODE_STATUS_STANDBY;
+			}
+		}
 	}
 out:
 	return ret;
@@ -1841,8 +1861,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 					nextcheck += delay;
 			}
 
-			if (ZBX_DB_OK <= info.db_status)
-				ha_send_heartbeat(&rtc_socket);
+			ha_send_heartbeat(&info, &rtc_socket);
 
 			while (tick <= now)
 				tick++;
