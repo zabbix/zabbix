@@ -892,10 +892,7 @@ class CConfigurationImport {
 			}
 			unset($item);
 
-			$updated_items = $api_service->update(array_map(function($item) {
-
-				return $item;
-			}, $items_to_update));
+			$updated_items = $api_service->update($items_to_update);
 
 			foreach ($items_to_update as $index => $item) {
 				$this->referencer->setDbItem($updated_items['itemids'][$index], $item);
@@ -1312,8 +1309,6 @@ class CConfigurationImport {
 				);
 			}
 		}
-//		sdii($host_prototypes_to_update);
-//		sdii($host_prototypes_to_create);
 
 		if ($host_prototypes_to_update) {
 			API::HostPrototype()->update($host_prototypes_to_update);

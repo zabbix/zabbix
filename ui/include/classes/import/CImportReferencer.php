@@ -611,7 +611,6 @@ class CImportReferencer {
 			$this->selectHostPrototypes();
 		}
 
-
 		foreach ($this->db_host_prototypes as $host_prototypeid => $host_prototype) {
 			if ($host_prototype['parent_hostid'] === $parent_hostid
 					&& $host_prototype['discovery_ruleid'] === $discovery_ruleid

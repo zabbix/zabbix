@@ -47,7 +47,12 @@ class CConfigurationExport {
 
 	protected $options;
 
-	protected $unlink_templates_data = [];
+	/**
+	 * Array with templates to be unlinked entity data.
+	 *
+	 * @var array
+	 */
+	protected $unlink_templates_data;
 
 	/**
 	 * Constructor.
@@ -94,23 +99,23 @@ class CConfigurationExport {
 				'preservekeys' => true
 			]);
 
-			foreach ($unlink_templates_entities as $template_entities) {
+			foreach ($unlink_templates_entities as $template_entity) {
 				foreach ($this->unlink_templates_data as &$template_data) {
-					if (in_array($template_entities['templateid'], $template_data['unlink_templateids'])) {
+					if (in_array($template_entity['templateid'], $template_data['unlink_templateids'])) {
 						$template_data['unlink_itemids'] = array_merge($template_data['unlink_itemids'],
-							array_column($template_entities['items'], 'itemid')
+							array_column($template_entity['items'], 'itemid')
 						);
 						$template_data['unlink_discoveries'] = array_merge($template_data['unlink_discoveries'],
-							array_column($template_entities['discoveries'], 'itemid')
+							array_column($template_entity['discoveries'], 'itemid')
 						);
 						$template_data['unlink_httptests'] = array_merge($template_data['unlink_httptests'],
-							array_column($template_entities['httpTests'], 'httptestid')
+							array_column($template_entity['httpTests'], 'httptestid')
 						);
 						$template_data['unlink_graphs'] = array_merge($template_data['unlink_graphs'],
-							array_column($template_entities['graphs'], 'graphid')
+							array_column($template_entity['graphs'], 'graphid')
 						);
 						$template_data['unlink_triggers'] = array_merge($template_data['unlink_triggers'],
-							array_column($template_entities['triggers'], 'triggerid')
+							array_column($template_entity['triggers'], 'triggerid')
 						);
 					}
 				}
@@ -390,7 +395,6 @@ class CConfigurationExport {
 			$templates = $this->gatherItems($templates);
 			$templates = $this->gatherDiscoveryRules($templates);
 			$templates = $this->gatherHttpTests($templates);
-
 		}
 
 		$this->data['templates'] = $templates;
@@ -582,7 +586,7 @@ class CConfigurationExport {
 			'preservekeys' => true
 		];
 
-		// Find template items it will inherit after unlink process.
+		// Find inherited template items.
 		$inherited_items = [];
 
 		if ($this->unlink_templates_data) {
@@ -694,7 +698,7 @@ class CConfigurationExport {
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
 			'preservekeys' => true
 		];
-		// Get template discovery rules and discovery rules to be unlinked.
+		// Find inherited discovery rules.
 		$inherited_discovery_rules = [];
 
 		if ($this->unlink_templates_data) {
@@ -717,7 +721,6 @@ class CConfigurationExport {
 					}
 				}
 			}
-			// Maybe will have to unset templateid.
 		}
 
 		$options += [
@@ -747,6 +750,10 @@ class CConfigurationExport {
 				}
 
 				$discovery_rule['master_item'] = ['key_' => $itemids[$discovery_rule['master_itemid']]];
+			}
+
+			foreach ($discovery_rule['itemPrototypes'] as $itemid => $item_prototype) {
+				$discovery_rule['itemPrototypes'][$itemid]['host'] = $hosts[$discovery_rule['hostid']]['host'];
 			}
 
 			$hosts[$discovery_rule['hostid']]['discoveryRules'][] = $discovery_rule;
@@ -1038,7 +1045,7 @@ class CConfigurationExport {
 			'preservekeys' => true
 		];
 
-		// Get http tests templates will inherit during unlink process.
+		// Get inherited templates http tests.
 		$inherited_httptests = [];
 
 		if ($this->unlink_templates_data) {
@@ -1056,7 +1063,7 @@ class CConfigurationExport {
 			foreach ($inherited_httptests as $id => $httptest) {
 				foreach ($this->unlink_templates_data as $templates_data) {
 					if($httptest['hostid'] == $templates_data['templateid']
-						&& !in_array($httptest['templateid'], $templates_data['unlink_httptests'])) {
+							&& !in_array($httptest['templateid'], $templates_data['unlink_httptests'])) {
 						unset($inherited_httptests[$id]);
 					}
 				}
@@ -1094,7 +1101,7 @@ class CConfigurationExport {
 			'preservekeys' => true
 		];
 
-		// Get graphs for linked templates.
+		// Get inherited template graphs.
 		$inherited_graphs = [];
 
 		if ($this->unlink_templates_data) {
@@ -1152,7 +1159,6 @@ class CConfigurationExport {
 				$graphItemIds[$graph['ymax_itemid']] = $graph['ymax_itemid'];
 			}
 		}
-
 
 		$graph_items = API::Item()->get([
 			'output' => ['key_'],
@@ -1234,7 +1240,7 @@ class CConfigurationExport {
 			'preservekeys' => true
 		];
 
-		// Get graphs for linked templates.
+		// Get templates inherited triggers.
 		$inherited_triggers = [];
 
 		if ($this->unlink_templates_data) {
