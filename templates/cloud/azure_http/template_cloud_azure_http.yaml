@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-11T07:34:17Z'
+  date: '2022-11-11T10:35:54Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -1534,6 +1534,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.diff_backup_size_bytes.maximum
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
           master_item:
             key: azure.db.mssql.data.get
           tags:
@@ -1555,6 +1559,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.log_backup_size_bytes.maximum
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
           master_item:
             key: azure.db.mssql.data.get
           tags:
@@ -1576,6 +1584,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.full_backup_size_bytes.maximum
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
           master_item:
             key: azure.db.mssql.data.get
           tags:
