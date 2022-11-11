@@ -1250,8 +1250,8 @@ static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxy_h
 
 	if (0 < proxy_hostid)
 	{
-		DB_ROW				row;
-		DB_RESULT			result;
+		DB_ROW		row;
+		DB_RESULT	result;
 
 		result = DBselect(
 				"select compatibility"
@@ -1265,6 +1265,28 @@ static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxy_h
 	}
 
 	return compatibility;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get task data type                                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	tm_get_task_data_type(zbx_uint64_t taskid)
+{
+	int		task_data_type = -1;
+	DB_ROW		row;
+	DB_RESULT	result;
+
+	result = DBselect(
+			"select type"
+			" from task_data"
+			" where taskid=" ZBX_FS_UI64, taskid);
+
+	if (NULL != (row = DBfetch(result)))
+		task_data_type = atoi(row[0]);
+
+	return task_data_type;
 }
 
 /******************************************************************************
@@ -1295,6 +1317,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		int				task_data_type;
 		zbx_proxy_compatibility_t	compatibility;
 
 		ZBX_STR2UINT64(taskid, row[0]);
@@ -1356,8 +1379,9 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 					zbx_vector_uint64_append(&check_now_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_DATA:
-			case ZBX_TM_PROXYDATA:
-				if (ZBX_TM_TASK_DATA == type)
+				task_data_type = tm_get_task_data_type(taskid);
+
+				if (ZBX_TM_DATA_TYPE_RANK_EVENT != task_data_type)
 				{
 					compatibility = tm_get_proxy_compatibility(proxy_hostid);
 
@@ -1379,7 +1403,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 						break;
 					}
 				}
-
+			case ZBX_TM_PROXYDATA:
 				/* both - 'new' and 'in progress' tasks should expire */
 				if (0 != ttl && clock + ttl < now)
 					zbx_vector_uint64_append(&expire_taskids, taskid);
