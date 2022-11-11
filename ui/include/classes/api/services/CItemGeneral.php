@@ -136,7 +136,8 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function checkInput(array &$items, $update = false) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)]
+			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)],
+			'uuid' => ['type' => API_UUID]
 		]];
 		if ($update) {
 			unset($api_input_rules['fields']['type']['flags']);
@@ -611,6 +612,10 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected function checkAndAddUuid(array &$items_to_create, array $db_hosts, bool $is_update): void {
 		if ($is_update) {
+			if (APP::getMode() === APP::EXEC_MODE_DEFAULT) {
+				return;
+			}
+
 			foreach ($items_to_create as $index => &$item) {
 				if (array_key_exists('uuid', $item)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,

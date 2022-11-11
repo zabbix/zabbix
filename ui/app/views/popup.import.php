@@ -129,12 +129,6 @@ foreach ($titles as $key => $title) {
 			->setChecked($data['rules'][$key]['deleteMissing'])
 			->addClass('deleteMissing')
 			->onClick('updateAllCheckbox("delete", this);');
-
-		if ($key === 'templateLinkage') {
-			$checkbox_delete->onClick('updateWarning(this, '.json_encode(
-				_('Template and host properties that are inherited through template linkage will be unlinked and cleared.')
-			).');');
-		}
 	}
 
 	switch ($key) {
