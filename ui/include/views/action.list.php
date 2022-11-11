@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-require_once __DIR__ .'/js/action.list.js.php';
+$this->includeJsFile('action.list.js.php');
 
 $submenu_source = [];
 
@@ -102,18 +102,15 @@ $filter = (new CFilter())
 
 $current_url->removeArgument('filter_rst');
 
-// create form
-$actionForm = (new CForm())
-	->setName('actionForm')
-	->setAction($current_url->getUrl())
-	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
+$form = (new CForm())
+	->setId('action-list')
+	->setName('action_list');
 
-// create table
-$actionTable = (new CTableInfo())
+$action_list = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_items'))
-				->onClick("checkAll('".$actionForm->getName()."', 'all_items', 'actionids');")
+			(new CCheckBox('all_actions'))
+				->onClick("checkAll('".$form->getName()."', 'all_actions', 'actionids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $current_url->getUrl()),
 		_('Conditions'),
@@ -121,11 +118,11 @@ $actionTable = (new CTableInfo())
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $current_url->getUrl())
 	]);
 
-if ($this->data['actions']) {
+if ($data['actions']) {
 	$actionConditionStringValues = $data['actionConditionStringValues'];
 	$actionOperationDescriptions = $data['actionOperationDescriptions'];
 
-	foreach ($this->data['actions'] as $aIdx => $action) {
+	foreach ($data['actions'] as $aIdx => $action) {
 		$conditions = [];
 		$operations = [];
 
@@ -156,7 +153,7 @@ if ($this->data['actions']) {
 				->addClass('js-enable-action')
 				->setAttribute('actionid', $action['actionid']);
 
-		$actionTable->addRow([
+		$action_list->addRow([
 			new CCheckBox('actionids['.$action['actionid'].']', $action['actionid']),
 			(new CLink($action['name']))
 				->addClass('js-action-edit')
@@ -168,40 +165,40 @@ if ($this->data['actions']) {
 	}
 }
 
-$actionForm->addItem($actionTable);
-
-$actionForm->addItem(
-	(new CScriptTag('
-	view.init('.json_encode([
-			'eventsource' => $data['eventsource'],
-		]).');
-'))->setOnDocumentReady()
-);
+$form->addItem([
+	$action_list,
+	$data['paging'],
+	new CActionButtonList('action', 'actionids', [
+		'action.massenable' => [
+			'content' => (new CSimpleButton(_('Enable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massenable-action')
+				->addClass('no-chkbxrange')
+		],
+		'action.massdisable' => [
+			'content' => (new CSimpleButton(_('Disable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdisable-action')
+				->addClass('no-chkbxrange')
+		],
+		'action.massdelete' => [
+			'content' => (new CSimpleButton(_('Delete')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-action')
+				->addClass('no-chkbxrange')
+		]
+	], 'action_'.$data['eventsource'])
+]);
 
 $html_page
-	->addItem([
-		$filter,
-		$actionForm,
-		$this->data['paging'],
-		new CActionButtonList('action', 'actionids', [
-			'action.massenable' => [
-				'content' => (new CSimpleButton(_('Enable')))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massenable-action')
-					->addClass('no-chkbxrange')
-			],
-			'action.massdisable' => [
-				'content' => (new CSimpleButton(_('Disable')))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdisable-action')
-					->addClass('no-chkbxrange')
-			],
-			'action.massdelete' => [
-				'content' => (new CSimpleButton(_('Delete')))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdelete-action')
-					->addClass('no-chkbxrange')
-			]
-		], 'action_'.$data['eventsource'])
-	])
+	->addItem($filter)
+	->addItem($form)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'eventsource' => $data['eventsource'],
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();
