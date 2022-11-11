@@ -32,18 +32,20 @@ $sort_div = (new CSpan())->addClass(($data['sortorder'] === ZBX_SORT_DOWN) ? ZBX
 $show_timeline = ($data['sortfield'] === 'clock' && $data['fields']['show_timeline']);
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
 
-$header_time = new CColHeader(($data['sortfield'] === 'clock')
+$header_time = (new CColHeader(($data['sortfield'] === 'clock')
 	? [_x('Time', 'compact table header'), $sort_div]
-	: _x('Time', 'compact table header'));
+	: _x('Time', 'compact table header')))->addStyle('width: 120px;');
 
 $header = [];
 
-if ($data['do_causes_have_symptoms']) {
-	$header[] = (new CColHeader())->addClass(ZBX_STYLE_CELL_WIDTH);
-	$header[] = (new CColHeader())->addClass(ZBX_STYLE_CELL_WIDTH);
+if ($data['show_three_columns']) {
+	$header[] = new CColHeader();
+	$header[] = (new CColHeader())
+		->addClass(ZBX_STYLE_CELL_WIDTH)
+		->addStyle('padding-left: 0;');
 }
-elseif ($data['has_symptoms']) {
-	$header[] = (new CColHeader())->addClass(ZBX_STYLE_CELL_WIDTH);
+elseif ($data['show_two_columns']) {
+	$header[] = new CColHeader();
 }
 
 if ($show_timeline) {
@@ -94,7 +96,7 @@ $data += [
 	'show_recovery_data' => $show_recovery_data
 ];
 
-$table = addProblemsToTable($table, $data['problems'], $data);
+addProblemsToTable($table, $data['problems'], $data);
 
 if ($data['info'] !== '') {
 	$table->setFooter([
@@ -126,7 +128,8 @@ if ($data['info'] !== '') {
  * @param int        $data['fields']['tag_name_format']     "Tag name" filter.
  * @param string     $data['fields']['tag_priority']        "Tag display priority" filter.
  * @param bool       $data['show_timeline']                 "Show timeline" filter option.
- * @param int        $data['do_causes_have_symptoms']       True if cause problems have symptoms.
+ * @param bool       $data['show_three_columns']            True if 3 columns should be displayed.
+ * @param bool       $data['show_two_columns']               True if 2 column should be displayed.
  * @param int        $data['last_clock']                    Problem time. Used to show timeline breaks.
  * @param int        $data['sortorder']                     Sort problems in ascending or descending order.
  * @param array      $data['allowed']                       An array of user role rules.
@@ -144,10 +147,8 @@ if ($data['info'] !== '') {
  * @param array      $data['actions']                       List of actions.
  * @param array      $data['tags']                          List of tags.
  * @param bool       $nested                                If true, show the symptom rows with indentation.
- *
- * @return CTableInfo
  */
-function addProblemsToTable(CTableInfo $table, array $problems, array $data, $nested = false): CTableInfo {
+function addProblemsToTable(CTableInfo $table, array $problems, array $data, $nested = false): void {
 	foreach ($problems as $problem) {
 		$trigger = $data['triggers'][$problem['objectid']];
 
@@ -338,56 +339,89 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 			}
 		}
 
+		// Build rows and columns.
 		if ($problem['cause_eventid'] == 0) {
 			$row = new CRow();
 
 			if ($problem['symptom_count'] > 0) {
-				$row->addItem((new CSpan($problem['symptom_count']))->addClass(ZBX_STYLE_TAG));
-
-				$icon = (new CButton(null))
-					->setAttribute('data-eventid', $problem['eventid'])
-					->setAttribute('data-action', 'show_symptoms')
-					->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
-					->setTitle(_('Expand'));
-
-				$row->addItem($icon);
+				// Show symptom counter and collapse/expand button.
+				$row->addItem([
+						(new CCol(
+							(new CSpan($problem['symptom_count']))
+								->addClass(ZBX_STYLE_TAG)
+								->setHint($problem['symptom_count'])
+						))->addClass(ZBX_STYLE_RIGHT),
+						(new CCol(
+							(new CButton(null))
+								->setAttribute('data-eventid', $problem['eventid'])
+								->setAttribute('data-action', 'show_symptoms')
+								->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
+								->setTitle(_('Expand'))
+						))
+							->addClass(ZBX_STYLE_RIGHT)
+							->addStyle('padding-left: 0;')
+					]);
 			}
 			else {
-				if ($data['do_causes_have_symptoms']) {
+				if ($data['show_three_columns']) {
 					// Show two empty columns.
-					$row->addItem([new CCol(''), new CCol('')]);
+					$row->addItem([
+						'',
+						(new CCol())->addStyle('padding-left: 0;')
+					]);
+				}
+				elseif ($data['show_two_columns']) {
+					$row->addItem(
+						(new CCol())->addStyle('padding-left: 0;')
+					);
 				}
 			}
 		}
 		else {
 			if ($nested) {
 				// First and second column empty for symptom event.
-				$row = (new CRow(['']))
+				$row = (new CRow(''))
 					->setAttribute('data-cause-eventid', $problem['cause_eventid'])
-					->addClass('nested')
 					->addStyle('display: none');
+
+					$row->addItem(
+						(new CCol(
+							makeActionIcon([
+								'icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM,
+								'title' => _('Symptom'),
+								'style' => 'margin: 0'
+							])
+						))
+							->addClass(ZBX_STYLE_RIGHT)
+							->addStyle('padding-left: 0;')
+					);
 			}
 			else {
 				// First column empty stand-alone symptom event.
 				$row = new CRow();
+
+				$row->addItem(
+					(new CCol(
+						makeActionIcon([
+							'icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM,
+							'title' => _('Symptom'),
+							'style' => 'margin: 0'
+						])
+					))->addClass(ZBX_STYLE_RIGHT)
+				);
 			}
 
-			// Next column symptom icon.
-			$row->addItem(new CCol(
-				makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM, 'title' => _('Symptom')])
-			));
-
 			// If there are causes as well, show additional empty column.
-			if (!$nested && $data['do_causes_have_symptoms']) {
-				$row->addItem(new CCol(''));
+			if (!$nested && $data['show_three_columns']) {
+				$row->addItem(
+					(new CCol())->addStyle('padding-left: 0;')
+				);
 			}
 		}
 
 		if ($data['show_timeline']) {
 			if ($data['last_clock'] != 0) {
-				CScreenProblem::addTimelineBreakpoint($table, $data['last_clock'], $problem['clock'],
-					$data['sortorder']
-				);
+				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, $nested, true);
 			}
 			$data['last_clock'] = $problem['clock'];
 
@@ -446,7 +480,7 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 		$table->addRow($row);
 
 		if ($problem['cause_eventid'] == 0 && $problem['symptoms']) {
-			$table = addProblemsToTable($table, $problem['symptoms'], $data, true);
+			addProblemsToTable($table, $problem['symptoms'], $data, true);
 
 			if ($problem['symptom_count'] > ZBX_PROBLEM_SYMPTOM_LIMIT) {
 				$table->addRow(
@@ -458,11 +492,9 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 								)))->addClass(ZBX_STYLE_TABLE_STATS)
 							))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
 						))->setColSpan($table->getNumCols())
-					))->addClass('no-hover')
+					))->addClass('hover-nobg')
 				);
 			}
 		}
 	}
-
-	return $table;
 }

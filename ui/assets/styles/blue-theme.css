@@ -2696,7 +2696,7 @@ section {
     width: 24px;
     height: 24px;
     margin: 2px 2px 0 auto;
-    background: url("../img/icon-sprite.svg?20220722") no-repeat -6px -654px; }
+    background: url("../img/icon-sprite.svg?20221026") no-repeat -6px -654px; }
   section .section-foot {
     padding: 0 10px;
     text-align: right;
@@ -3366,6 +3366,21 @@ form.is-loading {
   .list-table td .icon-depend-down,
   .list-table td .icon-ackn {
     margin: 0 4px -3px 0; }
+  .list-table td .tag, .list-table td .btn-tag {
+    margin-top: -2px; }
+  .list-table td .checkbox-radio + label span {
+    margin-top: 1px; }
+  .list-table td .btn-widget-expand, .list-table td .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .list-vertical-accordion .list-accordion-item-closed .list-table td .list-accordion-item-toggle,
+  .list-table td .btn-widget-collapse,
+  .list-table td .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle,
+  .list-vertical-accordion .list-accordion-item-opened .list-table td .list-accordion-item-toggle {
+    position: relative;
+    top: -3px;
+    width: 18px;
+    height: 18px;
+    background-position-x: -9px;
+    background-position-y: -693px;
+    margin: 0; }
   .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td {
     color: #1f2c33; }
     .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td sup,
@@ -3458,6 +3473,13 @@ form.is-loading {
       position: relative; }
     .list-table.compact-view td .icon-description {
       margin-left: 2px; }
+    .list-table.compact-view td [class*='icon-action'] {
+      margin-top: -2px; }
+    .list-table.compact-view td .btn-widget-expand, .list-table.compact-view td .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .list-vertical-accordion .list-accordion-item-closed .list-table.compact-view td .list-accordion-item-toggle,
+    .list-table.compact-view td .btn-widget-collapse,
+    .list-table.compact-view td .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle,
+    .list-vertical-accordion .list-accordion-item-opened .list-table.compact-view td .list-accordion-item-toggle {
+      top: -2px; }
   .list-table thead th {
     color: #768d99;
     height: 100%;

@@ -341,6 +341,30 @@ form {
 		.icon-ackn {
 			margin: 0 4px -3px 0;
 		}
+
+		.tag {
+			margin-top: -2px;
+		}
+
+		// Align tags and checkboxes.
+		.checkbox-radio {
+			& + label {
+				span {
+					margin-top: 1px;
+				}
+			}
+		}
+
+		.btn-widget-expand,
+		.btn-widget-collapse {
+			position: relative;
+			top: -3px;
+			width: 18px;
+			height: 18px;
+			background-position-x: -9px;
+			background-position-y: -693px;
+			margin: 0;
+		}
 	}
 
 	&.compact-view {
@@ -531,6 +555,17 @@ form {
 
 			.icon-description {
 				margin-left: 2px;
+			}
+
+			// Align action icons according to tags and problem description icons in compact view.
+			[class*='icon-action'] {
+				margin-top: -2px;
+			}
+
+			// Align the expand and collapse icons in compact view.
+			.btn-widget-expand,
+			.btn-widget-collapse {
+				top: -2px;
 			}
 		}
 	}

@@ -188,8 +188,8 @@
 							row.style.display = null;
 						});
 
-						btn.classList.remove('btn-widget-expand');
-						btn.classList.add('btn-widget-collapse');
+						btn.classList.remove('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
+						btn.classList.add('<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
 					}
 				});
 			});
@@ -217,14 +217,14 @@
 
 			// Store or remove opened cause event IDs localy.
 			if (state) {
-				btn.classList.remove('btn-widget-expand');
-				btn.classList.add('btn-widget-collapse');
+				btn.classList.remove('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
+				btn.classList.add('<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
 
 				this.opened_eventids.push(btn.dataset.eventid);
 			}
 			else {
-				btn.classList.remove('btn-widget-collapse');
-				btn.classList.add('btn-widget-expand');
+				btn.classList.remove('<?= ZBX_STYLE_BTN_WIDGET_COLLAPSE ?>');
+				btn.classList.add('<?= ZBX_STYLE_BTN_WIDGET_EXPAND ?>');
 
 				this.opened_eventids = this.opened_eventids.filter((id) => id !== btn.dataset.eventid);
 			}

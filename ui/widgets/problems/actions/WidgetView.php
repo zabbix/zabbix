@@ -79,8 +79,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		]);
 
 		$data += [
-			'do_causes_have_symptoms' => false,
-			'has_symptoms' => false
+			'show_three_columns' => false,
+			'show_two_columns' => false
 		];
 
 		$cause_eventids_with_symptoms = [];
@@ -105,14 +105,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 						: API::Problem()->get($options);
 
 					if ($problem['symptom_count'] > 0) {
-						$data['do_causes_have_symptoms'] = true;
+						$data['show_three_columns'] = true;
 						$cause_eventids_with_symptoms[] = $problem['eventid'];
 					}
 				}
 
 				// There is at least one independent symptom event.
 				if ($problem['cause_eventid'] != 0) {
-					$data['has_symptoms'] = true;
+					$data['show_two_columns'] = true;
 				}
 			}
 			unset($problem);

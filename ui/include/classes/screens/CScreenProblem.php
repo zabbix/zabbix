@@ -706,15 +706,19 @@ class CScreenProblem extends CScreenBase {
 	 * Add timeline breakpoint to a table if needed.
 	 *
 	 * @param CTableInfo $table
-	 * @param int        $last_clock  timestamp of the previous record
-	 * @param int        $clock       timestamp of the current record
-	 * @param string     $sortorder
-	 *
-	 * @static
+	 * @param array  $data                        Various table data.
+	 * @param int    $data['last_clock']          Timestamp of the previous record.
+	 * @param string $data['sortorder']           Order by which column is sorted.
+	 * @param bool   $data['show_three_columns']  True if 3 columns should be displayed.
+	 * @param bool   $data['show_two_columns']    True if 2 columns should be displayed.
+	 * @param array  $problem                     Problem data.
+	 * @param int    $problem['clock']            Timestamp of the current record.
+	 * @param int    $problem['symptom_count']    Problem symptom count.
+	 * @param bool   $nested                      True, if this is a nested block.
 	 */
-	public static function addTimelineBreakpoint(CTableInfo $table, $last_clock, $clock, $sortorder) {
-		if ($sortorder === ZBX_SORT_UP) {
-			list($clock, $last_clock) = [$last_clock, $clock];
+	public static function addTimelineBreakpoint(CTableInfo $table, $data, $problem, $nested, $widget = false): void {
+		if ($data['sortorder'] === ZBX_SORT_UP) {
+			[$problem['clock'], $data['last_clock']] = [$data['last_clock'], $problem['clock']];
 		}
 
 		$breakpoint = null;
@@ -722,35 +726,66 @@ class CScreenProblem extends CScreenBase {
 		$yesterday = strtotime('yesterday');
 		$this_year = strtotime('first day of January '.date('Y', $today));
 
-		if ($last_clock >= $today) {
-			if ($clock < $today) {
+		if ($data['last_clock'] >= $today) {
+			if ($problem['clock'] < $today) {
 				$breakpoint = _('Today');
 			}
-			elseif (date('H', $last_clock) != date('H', $clock)) {
-				$breakpoint = date('H:00', $last_clock);
+			elseif (date('H', $data['last_clock']) != date('H', $problem['clock'])) {
+				$breakpoint = date('H:00', $data['last_clock']);
 			}
 		}
-		elseif ($last_clock >= $yesterday) {
-			if ($clock < $yesterday) {
+		elseif ($data['last_clock'] >= $yesterday) {
+			if ($problem['clock'] < $yesterday) {
 				$breakpoint = _('Yesterday');
 			}
 		}
-		elseif ($last_clock >= $this_year && $clock < $this_year) {
-			$breakpoint = date('Y', $last_clock);
+		elseif ($data['last_clock'] >= $this_year && $problem['clock'] < $this_year) {
+			$breakpoint = date('Y', $data['last_clock']);
 		}
-		elseif (date('Ym', $last_clock) != date('Ym', $clock)) {
-			$breakpoint = getMonthCaption(date('m', $last_clock));
+		elseif (date('Ym', $data['last_clock']) != date('Ym', $problem['clock'])) {
+			$breakpoint = getMonthCaption(date('m', $data['last_clock']));
 		}
 
 		if ($breakpoint !== null) {
-			$table->addRow((new CRow([
-				(new CCol(new CTag('h4', true, $breakpoint)))->addClass(ZBX_STYLE_TIMELINE_DATE),
+
+			$colspan = 1;
+
+			if ($data['show_three_columns']) {
+				// Checkbox, symptom count, collapse/expand button and date column.
+				$colspan = 3;
+			}
+			elseif ($data['show_two_columns']) {
+				// Checkbox, symptom icon and date column.
+				$colspan = 2;
+			}
+
+			if (!$widget) {
+				$colspan++;
+			}
+
+			$breakpoint_col = (new CCol(new CTag('h4', true, $breakpoint)))->addClass(ZBX_STYLE_TIMELINE_DATE);
+
+			if ($colspan > 1) {
+				$breakpoint_col->setColSpan($colspan);
+			}
+
+			$row = (new CRow([
+				$breakpoint_col,
 				(new CCol())
 					->addClass(ZBX_STYLE_TIMELINE_AXIS)
 					->addClass(ZBX_STYLE_TIMELINE_DOT_BIG),
 				(new CCol())->addClass(ZBX_STYLE_TIMELINE_TD),
-				(new CCol())->setColSpan($table->getNumCols() - 3)
-			]))->addClass(ZBX_STYLE_HOVER_NOBG));
+				(new CCol())->setColSpan($table->getNumCols() - $colspan - 2)
+			]))->addClass(ZBX_STYLE_HOVER_NOBG);
+
+			// Hide row and show when expanded for nested symptom problems.
+			if ($nested && $problem['cause_eventid'] != 0) {
+				$row
+					->setAttribute('data-cause-eventid', $problem['cause_eventid'])
+					->addStyle('display: none');
+			}
+
+			$table->addRow($row);
 		}
 	}
 
@@ -944,21 +979,28 @@ class CScreenProblem extends CScreenBase {
 			// There are cause events displayed on page that have symptoms. Maximum column count.
 			if ($do_causes_have_symptoms) {
 				if ($this->data['filter']['compact_view']) {
-					$header[] = (new CColHeader())->addStyle('width: 20px;');
-					$header[] = (new CColHeader())->addStyle('width: 20px;');
+					$header[] = (new CColHeader())->addStyle('width: 20px; padding-left: 0; padding-right: 0;');
+					$header[] = (new CColHeader())->addStyle('width: 20px; padding-left: 0;');
 				}
 				else {
-					$header[] = (new CColHeader())->addClass(ZBX_STYLE_CELL_WIDTH);
-					$header[] = (new CColHeader())->addClass(ZBX_STYLE_CELL_WIDTH);
+					$header[] = (new CColHeader())
+						->addClass(ZBX_STYLE_CELL_WIDTH)
+						->addStyle('padding-left: 0; padding-right: 0;');
+					$header[] = (new CColHeader())
+						->addClass(ZBX_STYLE_CELL_WIDTH)
+						->addStyle('padding-left: 0;');
 				}
 			}
 			// There might be cause events without symptoms or only symptoms.
 			elseif ($symptom_cause_eventids) {
 				if ($this->data['filter']['compact_view']) {
-					$header[] = (new CColHeader())->addStyle('width: 20px;');
+					$header[] = (new CColHeader())
+						->addStyle('width: 20px; padding-left: 0;');
 				}
 				else {
-					$header[] = (new CColHeader())->addClass(ZBX_STYLE_CELL_WIDTH);
+					$header[] = (new CColHeader())
+						->addClass(ZBX_STYLE_CELL_WIDTH)
+						->addStyle('padding-left: 0;');
 				}
 			}
 
@@ -1072,7 +1114,8 @@ class CScreenProblem extends CScreenBase {
 				'tasks' => $tasks,
 				'dependencies' => $dependencies,
 				'show_opdata' =>  $show_opdata,
-				'do_causes_have_symptoms' => $do_causes_have_symptoms,
+				'show_three_columns' => $do_causes_have_symptoms,
+				'show_two_columns' => (bool) $symptom_cause_eventids,
 				'show_timeline' => $show_timeline,
 				'last_clock' => 0,
 				'show_recovery_data' => $show_recovery_data,
@@ -1083,7 +1126,7 @@ class CScreenProblem extends CScreenBase {
 			];
 
 			// Add problems to table.
-			$table = self::addProblemsToTable($table, $data['problems'], $data);
+			self::addProblemsToTable($table, $data['problems'], $data);
 
 			$footer = new CActionButtonList('action', 'eventids', [
 				'popup.acknowledge.edit' => [
@@ -1245,7 +1288,8 @@ class CScreenProblem extends CScreenBase {
 	 * @param int        $data['filter']['details']             "Show details" filter option.
 	 * @param int        $data['show_opdata']                   "Show operational data" filter option.
 	 * @param bool       $data['show_timeline']                 "Show timeline" filter option.
-	 * @param int        $data['do_causes_have_symptoms']       True if cause problems have symptoms.
+	 * @param bool       $data['show_three_columns']            True if 3 columns should be displayed.
+	 * @param bool       $data['show_two_columns']              True if 2 columns should be displayed.
 	 * @param int        $data['last_clock']                    Problem time. Used to show timeline breaks.
 	 * @param int        $data['sortorder']                     Sort problems in ascending or descending order.
 	 * @param array      $data['allowed']                       An array of user role rules.
@@ -1262,11 +1306,8 @@ class CScreenProblem extends CScreenBase {
 	 * @param array      $data['actions']                       List of actions.
 	 * @param array      $data['tags']                          List of tags.
 	 * @param bool       $nested                                If true, show the symptom rows with indentation.
-	 *
-	 * @return CTableInfo
 	 */
-	private static function addProblemsToTable(CTableInfo $table, array $problems, array $data,
-			$nested = false): CTableInfo {
+	private static function addProblemsToTable(CTableInfo $table, array $problems, array $data, $nested = false): void {
 		foreach ($problems as $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -1433,59 +1474,99 @@ class CScreenProblem extends CScreenBase {
 				}
 			}
 
+			$checkbox = new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']);
+
+			// Build rows and columns.
 			if ($problem['cause_eventid'] == 0) {
 				// First column checkbox for cause event.
-				$row = (new CRow([new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid'])]));
+				$row = (new CRow([$checkbox]));
 
 				if ($problem['symptom_count'] > 0) {
 					// Show symptom counter and collapse/expand button.
-					$row->addItem((new CSpan($problem['symptom_count']))->addClass(ZBX_STYLE_TAG));
-
-					$icon = (new CButton(null))
-						->setAttribute('data-eventid', $problem['eventid'])
-						->setAttribute('data-action', 'show_symptoms')
-						->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
-						->setTitle(_('Expand'));
-
-					$row->addItem($icon);
+					$row->addItem([
+						(new CCol(
+							(new CSpan($problem['symptom_count']))
+								->addClass(ZBX_STYLE_TAG)
+								->addStyle('max-width: 24px;')
+								->setHint($problem['symptom_count'])
+						))->addStyle('padding-left: 0; padding-right: 0;'),
+						(new CCol(
+							(new CButton(null))
+								->setAttribute('data-eventid', $problem['eventid'])
+								->setAttribute('data-action', 'show_symptoms')
+								->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
+								->setTitle(_('Expand'))
+						))->addStyle('padding-left: 0;')
+					]);
 				}
 				else {
-					if ($data['do_causes_have_symptoms']) {
-						// Show two empty columns.
-						$row->addItem([new CCol(''), new CCol('')]);
+					if ($data['show_three_columns']) {
+						/*
+						 * Page has cause events and some of them had collapse/expand button. This event does not. So
+						 * instead of number and icon show two more empty columns where the middle column has no padding
+						 * from both sides. Retain zero the paddings even if columns are empty, they too cause extra
+						 * width.
+						 */
+						$row->addItem([
+							(new CCol())->addStyle('padding-left: 0; padding-right: 0;'),
+							(new CCol())->addStyle('padding-left: 0;')
+						]);
 					}
+					elseif ($data['show_two_columns']) {
+						/*
+						 * Page has cause events but none of them had collapse/expand button. But page has
+						 * "Show symptoms" filter enabled, so stand-alone events are shown. So only one empty column is
+						 * required which has no padding from both sides.
+						 */
+						$row->addItem(
+							(new CCol())->addStyle('padding-left: 0; padding-right: 0;')
+						);
+					}
+					// Otherwise page has only cause events with no symptoms at all.
 				}
 			}
 			else {
 				if ($nested) {
-					// First column empty and second column checkbox for symptom event.
+					/*
+					 * If this is a nested block (when collapse/expand button is pressed), the first column should be
+					 * empty. Second column is checkbox for the nested symptom event. After that, the third column is
+					 * Symptom icon. The row is hidden by default.
+					 */
 					$row = (new CRow([
 						'',
-						new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid'])
+						(new CCol($checkbox))->addStyle('padding-left: 0; padding-right: 0;'),
+						(new CCol(
+							makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM, 'title' => _('Symptom')])
+						))->addStyle('padding-left: 0;')
 					]))
 						->setAttribute('data-cause-eventid', $problem['cause_eventid'])
-						->addClass('nested')
 						->addStyle('display: none');
 				}
 				else {
-					// First column checkbox for stand-alone symptom event.
-					$row = (new CRow([new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid'])]));
+					// This is a stand-alone symptom event. First column is checkbox, followed by a Symptom icon.
+					$row = new CRow([
+						$checkbox,
+						(new CCol(
+							makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM, 'title' => _('Symptom')])
+						))->addStyle('padding-left: 0; padding-right: 0;')
+					]);
 				}
 
-				// Next column symptom icon.
-				$row->addItem(new CCol(
-					makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM, 'title' => _('Symptom')])
-				));
-
-				// If there are causes as well, show additional empty column.
-				if (!$nested && $data['do_causes_have_symptoms']) {
-					$row->addItem(new CCol(''));
+				/*
+				 * Page has cause events and some of them had collapse/expand button and page also has "Show symptoms"
+				 * filter enabled, but this event is stand-alone symptom event, so after the symptom icon, show empty
+				 * column.
+				 */
+				if (!$nested && $data['show_three_columns']) {
+					$row->addItem(
+						(new CCol())->addStyle('padding-left: 0;')
+					);
 				}
 			}
 
 			if ($data['show_timeline']) {
 				if ($data['last_clock'] != 0) {
-					self::addTimelineBreakpoint($table, $data['last_clock'], $problem['clock'], $data['sortorder']);
+					self::addTimelineBreakpoint($table, $data, $problem, $nested);
 				}
 				$data['last_clock'] = $problem['clock'];
 
@@ -1546,7 +1627,7 @@ class CScreenProblem extends CScreenBase {
 			);
 
 			if ($problem['cause_eventid'] == 0 && $problem['symptoms']) {
-				$table = self::addProblemsToTable($table, $problem['symptoms'], $data, true);
+				self::addProblemsToTable($table, $problem['symptoms'], $data, true);
 
 				if ($problem['symptom_count'] > ZBX_PROBLEM_SYMPTOM_LIMIT) {
 					$table->addRow(
@@ -1558,13 +1639,11 @@ class CScreenProblem extends CScreenBase {
 									)))->addClass(ZBX_STYLE_TABLE_STATS)
 								))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
 							))->setColSpan($table->getNumCols())
-						))->addClass('no-hover')
+						))->addClass('hover-nobg')
 					);
 				}
 			}
 		}
-
-		return $table;
 	}
 
 	/**
