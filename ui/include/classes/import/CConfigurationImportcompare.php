@@ -290,13 +290,12 @@ class CConfigurationImportcompare {
 	 * Get entity field values by giving field key path constructed.
 	 *
 	 * @param array  $entity            entity
-	 * @param string|array  $field_key  string when field key to get and array when field key path given.
+	 * @param        $field_key         string when field key to get and array when field key path given.
 	 *
-	 * @return string|array
 	 */
-	private function getUniqueValuesByFieldPath(array $entity,array|string $field_key) {
-		if (is_array($field_key)) {
-			foreach ($field_key as $sub_key => $sub_field) {
+	private function getUniqueValuesByFieldPath(array $entity, $field_key_path) {
+		if (is_array($field_key_path)) {
+			foreach ($field_key_path as $sub_key => $sub_field) {
 				if ($sub_key != 'numeric_keys') {
 					$sub_entities = $entity[$sub_key];
 				}
@@ -319,11 +318,11 @@ class CConfigurationImportcompare {
 			}
 		}
 		else {
-			if (array_key_exists($field_key, $entity)){
-				$result = $entity[$field_key];
+			if (array_key_exists($field_key_path, $entity)){
+				$result = $entity[$field_key_path];
 			}
 			else {
-				$result = array_column($entity, $field_key);
+				$result = array_column($entity, $field_key_path);
 			}
 		}
 
