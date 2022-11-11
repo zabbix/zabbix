@@ -1528,7 +1528,7 @@ class CItem extends CItemGeneral {
 					}
 					else {
 						$error = $item['host_status'] == HOST_STATUS_TEMPLATE
-							? _('Cannot assign the inventory field "%1$s" to the item with key "%2$s" of template "%3$s", because it is already populated by the item with key "%4$s"')
+							? _('Cannot assign the inventory field "%1$s" to the item with key "%2$s" of template "%3$s", because it is already populated by the item with key "%4$s".')
 							: _('Cannot assign the inventory field "%1$s" to the item with key "%2$s" of host "%3$s", because it is already populated by the item with key "%4$s".');
 
 						$inventory_fields = getHostInventories();
