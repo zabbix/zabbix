@@ -421,11 +421,12 @@ class CTemplate extends CHostGeneral {
 
 	/**
 	 * @param array $templates
+	 * @param bool  $allowed_uuid_update
 	 *
 	 * @return array
 	 */
-	public function update(array $templates): array {
-		$this->validateUpdate($templates, $db_templates);
+	public function update(array $templates, bool $allowed_uuid_update = false): array {
+		$this->validateUpdate($templates, $db_templates, $allowed_uuid_update);
 
 		$upd_templates =[];
 
@@ -457,12 +458,12 @@ class CTemplate extends CHostGeneral {
 	/**
 	 * @param array      $templates
 	 * @param array|null $db_templates
+	 * @param bool       $allowed_uuid_update
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$templates, array &$db_templates = null) {
+	protected function validateUpdate(array &$templates, array &$db_templates = null, bool $allowed_uuid_update) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid'], ['host'], ['name']], 'fields' => [
-			'uuid' => 				['type' => API_UUID],
 			'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'host' =>				['type' => API_H_NAME, 'length' => DB::getFieldLength('hosts', 'host')],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('hosts', 'name')],
@@ -489,16 +490,12 @@ class CTemplate extends CHostGeneral {
 			]]
 		]];
 
-		if (!CApiInputValidator::validate($api_input_rules, $templates, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		if ($allowed_uuid_update) {
+			$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
 		}
 
-		if (APP::getMode() !== APP::EXEC_MODE_DEFAULT && array_column($templates, 'uuid')) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Invalid parameter "%1$s": %2$s.', '/1',
-					_s('unexpected parameter "%1$s"', 'uuid')
-				)
-			);
+		if (!CApiInputValidator::validate($api_input_rules, $templates, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$db_templates = $this->get([

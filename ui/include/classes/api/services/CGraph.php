@@ -434,8 +434,9 @@ class CGraph extends CGraphGeneral {
 	 *
 	 * @param array $graphs
 	 * @param array $dbGraphs
+	 * @param bool  $allowed_uuid_update
 	 */
-	protected function validateUpdate(array $graphs, array $dbGraphs) {
+	protected function validateUpdate(array $graphs, array $dbGraphs, bool $allowed_uuid_update = false) {
 		// check for "itemid" when updating graph with only "gitemid" passed
 		foreach ($graphs as &$graph) {
 			if (isset($graph['gitems'])) {
@@ -453,7 +454,7 @@ class CGraph extends CGraphGeneral {
 		$itemIds = $this->validateItemsUpdate($graphs, $dbGraphs);
 		$this->validateItems($itemIds, $graphs);
 
-		parent::validateUpdate($graphs, $dbGraphs);
+		parent::validateUpdate($graphs, $dbGraphs, $allowed_uuid_update);
 	}
 
 	/**

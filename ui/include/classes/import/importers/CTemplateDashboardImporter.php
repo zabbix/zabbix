@@ -68,7 +68,7 @@ class CTemplateDashboardImporter extends CImporter {
 		}
 
 		if ($this->options['templateDashboards']['updateExisting'] && $dashboards_to_update) {
-			API::TemplateDashboard()->update($dashboards_to_update);
+			API::TemplateDashboard()->update($dashboards_to_update, true);
 		}
 
 		if ($this->options['templateDashboards']['createMissing'] && $dashboards_to_create) {

@@ -41,10 +41,11 @@ abstract class CGraphGeneral extends CApiService {
 	 * Update graphs.
 	 *
 	 * @param array $graphs
+	 * @param bool  $allowed_uuid_update
 	 *
 	 * @return array
 	 */
-	public function update(array $graphs) {
+	public function update(array $graphs, bool $allowed_uuid_update = false) {
 		$graphs = zbx_toArray($graphs);
 		$graphids = array_column($graphs, 'graphid');
 
@@ -102,7 +103,7 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($graph);
 
-		$this->validateUpdate($graphs, $db_graphs);
+		$this->validateUpdate($graphs, $db_graphs, $allowed_uuid_update);
 
 		foreach ($graphs as &$graph) {
 			unset($graph['templateid']);
@@ -761,28 +762,30 @@ abstract class CGraphGeneral extends CApiService {
 	 *
 	 * @param array $graphs
 	 * @param array $dbGraphs
+	 * @param bool  $allowed_uuid_update
 	 */
-	protected function validateUpdate(array $graphs, array $dbGraphs) {
+	protected function validateUpdate(array $graphs, array $dbGraphs, bool $allowed_uuid_update) {
 		$colorValidator = new CColorValidator();
 
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_update = _('Cannot update "%1$s" for graph "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'uuid' => ['type' => API_UUID]
-				]];
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_update = _('Cannot update "%1$s" for graph prototype "%2$s".');
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])],
-					'uuid' => ['type' => API_UUID]
+					'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
 				]];
 				break;
 
 			default:
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
+		}
+
+		if ($allowed_uuid_update) {
+			$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
 		}
 
 		$read_only_fields = ['templateid', 'flags'];
@@ -794,12 +797,6 @@ abstract class CGraphGeneral extends CApiService {
 
 			if (!CApiInputValidator::validate($api_input_rules, $data, '/'.($key + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-
-			if (APP::getMode() !== APP::EXEC_MODE_DEFAULT && array_key_exists('uuid', $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', '/' . ($key + 1), _s('unexpected parameter "%1$s"', 'uuid'))
-				);
 			}
 
 			$templatedGraph = false;
