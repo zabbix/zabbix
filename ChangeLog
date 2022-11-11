@@ -2208,6 +2208,9 @@ New features:
 .......PS. [ZBXNEXT-8009] added jsonpath optimizations (wiper)
 
 Bug fixes:
+..F....... [ZBX-21816] fixed incorrect "i" icon alignment in Problems compact view Info column (kkuzmina)
+........S. [ZBX-21825] improved history syncer performance (vso)
+...G...... [ZBX-21823] fixed vfs.fs.inode and vfs.fs.get to handle file systems with zero total inodes count (asestakovs)
 .......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)
 .........T [ZBX-21844] fixed script in OPSgenie media (atocko)
 
