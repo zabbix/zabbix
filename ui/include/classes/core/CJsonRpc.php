@@ -73,8 +73,9 @@ class CJsonRpc {
 
 			list($api, $method) = explode('.', $call['method']) + [1 => ''];
 
-			if (array_key_exists('HTTP_AUTHORIZATION', $_SERVER)) {
-				$call['auth'] = str_replace(ZBX_API_HEADER_AUTHENTICATE_PREFIX, '', $_SERVER['HTTP_AUTHORIZATION']);
+			$headers = getallheaders();
+			if (array_key_exists('Authorization', $headers)) {
+				$call['auth'] = str_replace(ZBX_API_HEADER_AUTHENTICATE_PREFIX, '', $headers['Authorization']);
 			}
 			elseif ($call['auth'] === null) {
 				$session = new CEncryptedCookieSession();
