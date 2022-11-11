@@ -728,13 +728,16 @@ abstract class CGraphGeneral extends CApiService {
 		switch (get_class($this)) {
 			case 'CGraph':
 				$error_cannot_update = _('Cannot update "%1$s" for graph "%2$s".');
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'uuid' => ['type' => API_UUID]
+				]];
 				break;
 
 			case 'CGraphPrototype':
 				$error_cannot_update = _('Cannot update "%1$s" for graph prototype "%2$s".');
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])]
+					'discover' => ['type' => API_INT32, 'in' => implode(',', [GRAPH_DISCOVER, GRAPH_NO_DISCOVER])],
+					'uuid' => ['type' => API_UUID]
 				]];
 				break;
 
@@ -753,7 +756,7 @@ abstract class CGraphGeneral extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 
-			if (array_key_exists('uuid', $graph)) {
+			if (APP::getMode() !== APP::EXEC_MODE_DEFAULT && array_key_exists('uuid', $graph)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Invalid parameter "%1$s": %2$s.', '/' . ($key + 1), _s('unexpected parameter "%1$s"', 'uuid'))
 				);

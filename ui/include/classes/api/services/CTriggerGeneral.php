@@ -967,6 +967,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 */
 	protected function validateUpdate(array &$triggers, array &$db_triggers = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['description', 'expression']], 'fields' => [
+			'uuid' => 					['type' => API_UUID],
 			'triggerid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'description' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('triggers', 'description')],
 			'expression' =>				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_NOT_EMPTY | API_ALLOW_LLD_MACRO],
@@ -999,6 +1000,14 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 		if (!CApiInputValidator::validate($api_input_rules, $triggers, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if (APP::getMode() !== APP::EXEC_MODE_DEFAULT && array_column($triggers, 'uuid')) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Invalid parameter "%1$s": %2$s.', '/1',
+					_s('unexpected parameter "%1$s"', 'uuid')
+				)
+			);
 		}
 
 		$options = [
