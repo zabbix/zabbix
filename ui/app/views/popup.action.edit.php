@@ -187,15 +187,9 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 
 // Operations table.
 $data['esc_period'] = $data['action']['esc_period'];
+$data['table'] = 'operation';
 
-if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
-	$data['table'] = 'operation';
-}
-else {
-	$data['table'] = 'operation';
-}
-
-	$operations_tab->addItem([
+$operations_tab->addItem([
 	new CLabel('Operations'),
 	(new CFormField(new CPartial('popup.operations.html', $data)))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
