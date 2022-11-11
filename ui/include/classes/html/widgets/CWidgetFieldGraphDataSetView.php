@@ -92,6 +92,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 	private function getGraphDataSetLayout(array $value, int $dataset_type, bool $is_opened,
 			$row_num = '#{rowNum}'): CListItem {
 		$field_name = $this->field->getName();
+		$dataset_num = (string) ((int) $row_num + 1);
 
 		$dataset_head = [
 			new CDiv((new CSimpleButton('&nbsp;'))->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE)),
@@ -290,8 +291,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 									->setMin(0)
 									->setMax(10)
 							)
-						]),
-					(new CFormGrid())
+						])
 						->addItem([
 							new CLabel(_('Missing data')),
 							new CFormField(
@@ -311,7 +311,8 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setModern()
 							)
-						])
+						]),
+					(new CFormGrid())
 						->addItem([
 							new CLabel(_('Y-axis')),
 							new CFormField(
@@ -393,6 +394,18 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 										APPROXIMATION_MAX => _('max')
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							)
+						])
+						->addItem([
+							new CLabel(_('Legend label'),
+								'label-'.$field_name.'_'.$row_num.'_legend_label'
+							),
+							new CFormField(
+								(new CTextBox($field_name.'['.$row_num.'][legend_label]',
+									$value['legend_label']
+								))
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+									->setAttribute('placeholder', _('Data set').' #'.$dataset_num)
 							)
 						])
 				])

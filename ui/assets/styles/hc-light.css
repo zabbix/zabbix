@@ -1785,7 +1785,7 @@ form.dashboard-widget-svggraph .list-vertical-accordion {
   form.dashboard-widget-svggraph .list-vertical-accordion.sortable {
     overflow: visible;
     margin-top: -5px;
-    margin-bottom: -5px; }
+    margin-bottom: 5px; }
 form.dashboard-widget-svggraph .list-accordion-item {
   position: relative;
   display: grid;

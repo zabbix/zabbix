@@ -125,7 +125,7 @@ class CSvgGraphLegend extends CDiv {
 			->addClass(self::ZBX_STYLE_CLASS)
 			->addClass($this->show_statistic ? self::ZBX_STYLE_GRAPH_LEGEND_STATISTIC : null)
 			->addStyle('--lines: '.$this->getLinesCount().';');
-
+//sdii($this);exit;
 		if (!$this->show_statistic) {
 			$this->addStyle('--columns: '. min($this->columns_count, count($this->legend_items)).';');
 		}
