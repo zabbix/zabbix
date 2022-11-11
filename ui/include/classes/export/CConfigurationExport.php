@@ -590,11 +590,16 @@ class CConfigurationExport {
 		$inherited_items = [];
 
 		if ($this->unlink_templates_data) {
-			$templateids = array_column($this->unlink_templates_data, 'templateid');
-			$output = array_merge($this->dataFields['item'], ['templateid']);
+			$templateids = [];
+
+			foreach ($this->unlink_templates_data as $unlink_template_data) {
+				if ($unlink_template_data['unlink_itemids']) {
+					$templateids[] = $unlink_template_data['templateid'];
+				}
+			}
 
 			$inherit_options = [
-				'output' => $output,
+				'output' => array_merge($this->dataFields['item'], ['templateid']),
 				'templateids' => $templateids,
 				'inherited' => true
 			];
@@ -702,12 +707,17 @@ class CConfigurationExport {
 		$inherited_discovery_rules = [];
 
 		if ($this->unlink_templates_data) {
-			$unlink_templateids = array_column($this->unlink_templates_data, 'templateid');
-			$output = array_merge($this->dataFields['drule'], ['templateid']);
+			$templateids = [];
+
+			foreach ($this->unlink_templates_data as $unlink_template_data) {
+				if ($unlink_template_data['unlink_discoveries']) {
+					$templateids[] = $unlink_template_data['templateid'];
+				}
+			}
 
 			$inherit_options = [
-				'output' => $output,
-				'templateids' => $unlink_templateids,
+				'output' => array_merge($this->dataFields['drule'], ['templateid']),
+				'templateids' => $templateids,
 				'inherited' => true
 			];
 
@@ -716,7 +726,7 @@ class CConfigurationExport {
 			foreach ($inherited_discovery_rules as $id => $discovery_rule) {
 				foreach ($this->unlink_templates_data as $templates_data) {
 					if($discovery_rule['hostid'] == $templates_data['templateid']
-						&& !in_array($discovery_rule['templateid'], $templates_data['unlink_itemids'])) {
+							&& !in_array($discovery_rule['templateid'], $templates_data['unlink_discoveries'])) {
 						unset($discovery_rule[$id]);
 					}
 				}
@@ -1049,11 +1059,16 @@ class CConfigurationExport {
 		$inherited_httptests = [];
 
 		if ($this->unlink_templates_data) {
-			$templateids = array_column($this->unlink_templates_data, 'templateid');
-			$output = array_merge($this->dataFields['httptests'], ['templateid']);
+			$templateids = [];
+
+			foreach ($this->unlink_templates_data as $unlink_template_data) {
+				if ($unlink_template_data['unlink_httptests']) {
+					$templateids[] = $unlink_template_data['templateid'];
+				}
+			}
 
 			$inherit_options = [
-				'output' => $output,
+				'output' => array_merge($this->dataFields['httptests'], ['templateid']),
 				'templateids' => $templateids,
 				'inherited' => true,
 			];
@@ -1105,7 +1120,13 @@ class CConfigurationExport {
 		$inherited_graphs = [];
 
 		if ($this->unlink_templates_data) {
-			$templateids = array_column($this->unlink_templates_data, 'templateid');
+			$templateids = [];
+
+			foreach ($this->unlink_templates_data as $unlink_template_data) {
+				if ($unlink_template_data['unlink_graphs']) {
+					$templateids[] = $unlink_template_data['templateid'];
+				}
+			}
 
 			$inherit_options = [
 				'selectHosts' => ['hostid'],
@@ -1244,11 +1265,16 @@ class CConfigurationExport {
 		$inherited_triggers = [];
 
 		if ($this->unlink_templates_data) {
-			$templateids = array_column($this->unlink_templates_data, 'templateid');
-			$output = array_merge($this->dataFields['trigger'], ['templateid']);
+			$templateids = [];
+
+			foreach ($this->unlink_templates_data as $unlink_template_data) {
+				if ($unlink_template_data['unlink_triggers']) {
+					$templateids[] = $unlink_template_data['templateid'];
+				}
+			}
 
 			$inherit_options = [
-				'output' => $output,
+				'output' => array_merge($this->dataFields['trigger'], ['templateid']),
 				'templateids' => $templateids,
 				'inherited' => true
 			];
