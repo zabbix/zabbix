@@ -1305,7 +1305,7 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 }
 
 int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
-		const char *original_column_name, const char *indexed_column_name, const char *func_name,
+		const char *original_column_name, const char *indexed_column_name, const char *function,
 		const char *idname)
 {
 	char	*sql = NULL;
@@ -1320,7 +1320,7 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 			"begin\n"
 				":new.%s:=%s(:new.%s);\n"
 			"end;",
-			table_name, indexed_column_name, table_name, indexed_column_name, func_name,
+			table_name, indexed_column_name, table_name, indexed_column_name, function,
 			original_column_name);
 #elif HAVE_MYSQL
 	ZBX_UNUSED(idname);
@@ -1329,7 +1329,7 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 			"create trigger %s_%s_insert\n"
 			"before insert on %s for each row\n"
 				"set new.%s=%s(new.%s)",
-			table_name, indexed_column_name, table_name, indexed_column_name, func_name,
+			table_name, indexed_column_name, table_name, indexed_column_name, function,
 			original_column_name);
 #elif defined(HAVE_POSTGRESQL)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -1344,9 +1344,9 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 			"create trigger %s_%s_insert after insert\n"
 				"on %s\n"
 				"for each row execute function %s_%s_%s();",
-			table_name, indexed_column_name, func_name, table_name, indexed_column_name, func_name,
+			table_name, indexed_column_name, function, table_name, indexed_column_name, function,
 			original_column_name, idname, idname, table_name, indexed_column_name, table_name,
-			table_name, indexed_column_name, func_name);
+			table_name, indexed_column_name, function);
 #endif
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
@@ -1357,7 +1357,7 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 }
 
 int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
-		const char *original_column_name, const char *indexed_column_name, const char *func_name,
+		const char *original_column_name, const char *indexed_column_name, const char *function,
 		const char *idname)
 {
 	char	*sql = NULL;
@@ -1376,7 +1376,7 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 				"end if;\n"
 			"end;",
 			table_name, indexed_column_name, table_name, original_column_name,
-			original_column_name, indexed_column_name, func_name, original_column_name);
+			original_column_name, indexed_column_name, function, original_column_name);
 #elif HAVE_MYSQL
 	ZBX_UNUSED(idname);
 
@@ -1390,7 +1390,7 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 				"end if;\n"
 			"end",
 			table_name, indexed_column_name, table_name, original_column_name,
-			original_column_name, indexed_column_name, func_name, original_column_name);
+			original_column_name, indexed_column_name, function, original_column_name);
 #elif defined(HAVE_POSTGRESQL)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"create or replace function %s_%s_%s()\n"
@@ -1403,9 +1403,9 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 
 			"create trigger %s_%s_update after update of %s on %s\n"
 				"for each row execute function %s_%s_%s();",
-			table_name, indexed_column_name, func_name, table_name, indexed_column_name, func_name,
+			table_name, indexed_column_name, function, table_name, indexed_column_name, function,
 			original_column_name, idname, idname, table_name, indexed_column_name,
-			original_column_name, table_name, table_name, indexed_column_name, func_name);
+			original_column_name, table_name, table_name, indexed_column_name, function);
 #endif
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
