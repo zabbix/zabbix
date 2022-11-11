@@ -1048,7 +1048,7 @@ class testProxyConfSync extends CIntegrationTest
 				'LogFileSize' => 0,
 				'Hostname' => 'Proxy',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX
-			],
+			]
 		];
 	}
 
