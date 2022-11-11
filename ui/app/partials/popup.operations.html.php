@@ -175,13 +175,13 @@ if ($data['table'] === 'operation') {
 				$esc_delay_txt,
 				$esc_period_txt,
 				$buttons
-			]);
+			], null, 'operations_' . $operationid);
 		}
 		else {
 			$operations_table->addRow([
 				$details_column,
 				$buttons
-			])->addClass(ZBX_STYLE_WORDBREAK);
+			], null, 'operations_' . $operationid)->addClass(ZBX_STYLE_WORDBREAK);
 		}
 	}
 
