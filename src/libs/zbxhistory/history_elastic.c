@@ -92,9 +92,9 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 	return r_size;
 }
 
-static history_value_t	history_str2value(char *str, unsigned char value_type)
+static zbx_history_value_t	history_str2value(char *str, unsigned char value_type)
 {
-	history_value_t	value;
+	zbx_history_value_t	value;
 
 	switch (value_type)
 	{

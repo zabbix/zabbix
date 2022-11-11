@@ -36,18 +36,18 @@ typedef union
 	double		dbl;
 	zbx_uint128_t	ui64;
 }
-value_avg_t;
+zbx_value_avg_t;
 
 typedef struct
 {
-	zbx_uint64_t	itemid;
-	history_value_t	value_min;
-	value_avg_t	value_avg;
-	history_value_t	value_max;
-	int		clock;
-	int		num;
-	int		disable_from;
-	unsigned char	value_type;
+	zbx_uint64_t		itemid;
+	zbx_history_value_t	value_min;
+	zbx_value_avg_t		value_avg;
+	zbx_history_value_t	value_max;
+	int			clock;
+	int			num;
+	int			disable_from;
+	unsigned char		value_type;
 }
 ZBX_DC_TREND;
 
