@@ -42,11 +42,8 @@
 
 int	sync_in_progress = 0;
 
-#define START_SYNC	WRLOCK_CACHE; sync_in_progress = 1
-#define FINISH_SYNC	sync_in_progress = 0; UNLOCK_CACHE
-
-#define START_CONFIG_HISTORY_SYNC	WRLOCK_CACHE2
-#define FINISH_CONFIG_HISTORY_SYNC	UNLOCK_CACHE2
+#define START_SYNC	WRLOCK_CACHE2; WRLOCK_CACHE; sync_in_progress = 1
+#define FINISH_SYNC	sync_in_progress = 0; UNLOCK_CACHE; UNLOCK_CACHE2;
 
 #define ZBX_LOC_NOWHERE	0
 #define ZBX_LOC_QUEUE	1
@@ -6712,6 +6709,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	httptest_sec = zbx_time() - sec;
 
 	START_SYNC;
+
 	sec = zbx_time();
 	zbx_vector_uint64_create(&active_avail_diff);
 	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff, &activated_hosts);
@@ -6791,7 +6789,6 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 		goto out;
 	itemscrp_sec = zbx_time() - sec;
 
-	START_CONFIG_HISTORY_SYNC;
 	START_SYNC;
 
 	/* resolves macros for interface_snmpaddrs, must be after DCsync_hmacros() */
@@ -6829,7 +6826,6 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 
 	config->item_sync_ts = time(NULL);
 	FINISH_SYNC;
-	FINISH_CONFIG_HISTORY_SYNC;
 
 	dc_flush_history();	/* misconfigured items generate pseudo-historic values to become notsupported */
 
@@ -6846,13 +6842,11 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 		goto out;
 	fsec = zbx_time() - sec;
 
-	START_CONFIG_HISTORY_SYNC;
 	START_SYNC;
 	sec = zbx_time();
 	DCsync_functions(&func_sync, new_revision);
 	fsec2 = zbx_time() - sec;
 	FINISH_SYNC;
-	FINISH_CONFIG_HISTORY_SYNC;
 
 	/* sync rest of the data */
 	sec = zbx_time();
@@ -6905,7 +6899,6 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 		goto out;
 	corr_operation_sec = zbx_time() - sec;
 
-	START_CONFIG_HISTORY_SYNC;
 	START_SYNC;
 
 	sec = zbx_time();
@@ -7325,9 +7318,6 @@ out:
 	config->sync_ts = time(NULL);
 
 	FINISH_SYNC;
-
-	if (dberr == ZBX_DB_OK)
-		FINISH_CONFIG_HISTORY_SYNC;
 
 #ifdef HAVE_ORACLE
 	if (ZBX_DB_OK == dberr)
