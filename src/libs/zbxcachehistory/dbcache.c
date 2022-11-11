@@ -3076,7 +3076,7 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num)
 	for (i = 0; i < history_num; i++)
 		zbx_vector_uint64_append(&itemids, history[i].itemid);
 
-	items = (DC_HISTORY_ITEM *)zbx_calloc(NULL, 1, sizeof(DC_HISTORY_ITEM) * (size_t)history_num);
+	items = (DC_HISTORY_ITEM *)zbx_malloc(NULL, sizeof(DC_HISTORY_ITEM) * (size_t)history_num);
 	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
 
 	DCconfig_history_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num, ZBX_ITEM_GET_MISC);
@@ -3339,7 +3339,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 			if (NULL == items)
 			{
-				items = (DC_HISTORY_ITEM *)zbx_calloc(NULL, 1, sizeof(DC_HISTORY_ITEM) *
+				items = (DC_HISTORY_ITEM *)zbx_malloc(NULL, sizeof(DC_HISTORY_ITEM) *
 						(size_t)ZBX_HC_SYNC_MAX);
 			}
 

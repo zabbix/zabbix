@@ -9299,13 +9299,14 @@ static void	DCget_history_item(DC_HISTORY_ITEM *dst_item, const ZBX_DC_ITEM *src
 
 	if ('\0' != *src_item->error)
 		dst_item->error = zbx_strdup(NULL, src_item->error);
+	else
+		dst_item->error = NULL;
 
 	dst_item->inventory_link = src_item->inventory_link;
 	dst_item->valuemapid = src_item->valuemapid;
 	dst_item->status = src_item->status;
 
 	dst_item->history_period = zbx_strdup(NULL, src_item->history_period);
-	dst_item->trends_period = NULL;
 	dst_item->flags = src_item->flags;
 
 	zbx_strscpy(dst_item->key_orig, src_item->key);
@@ -9320,7 +9321,12 @@ static void	DCget_history_item(DC_HISTORY_ITEM *dst_item, const ZBX_DC_ITEM *src
 
 			if ('\0' != *numitem->units)
 				dst_item->units = zbx_strdup(NULL, numitem->units);
+			else
+				dst_item->units = NULL;
 			break;
+		default:
+			dst_item->trends_period = NULL;
+			dst_item->units = NULL;
 	}
 }
 
