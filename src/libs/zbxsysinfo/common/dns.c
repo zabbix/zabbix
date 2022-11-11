@@ -24,7 +24,6 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxcomms.h"
-#include "log.h"
 #include "zbxalgo.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)

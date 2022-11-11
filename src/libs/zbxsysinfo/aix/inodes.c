@@ -21,8 +21,6 @@
 #include "../sysinfo.h"
 #include "inodes.h"
 
-#include "log.h"
-
 int	get_fs_inode_stat(const char *fs, zbx_uint64_t *itotal, zbx_uint64_t *ifree, zbx_uint64_t *iused, double *pfree,
 		double *pused, const char *mode, char **error)
 {
