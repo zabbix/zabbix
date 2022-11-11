@@ -622,7 +622,7 @@ class CConfigurationImport {
 		}
 
 		if ($this->options['groups']['updateExisting'] && $groups_to_update) {
-			API::HostGroup()->update($groups_to_update);
+			API::HostGroup()->update($groups_to_update, true);
 
 			foreach ($groups_to_update as $group) {
 				$this->referencer->setDbGroup($group['groupid'], $group);
@@ -892,7 +892,7 @@ class CConfigurationImport {
 			}
 			unset($item);
 
-			$updated_items = $api_service->update($items_to_update);
+			$updated_items = $api_service->update($items_to_update, true);
 
 			foreach ($items_to_update as $index => $item) {
 				$this->referencer->setDbItem($updated_items['itemids'][$index], $item);
@@ -1063,7 +1063,7 @@ class CConfigurationImport {
 		}
 
 		if ($this->options['discoveryRules']['updateExisting'] && $discovery_rules_to_update) {
-			API::DiscoveryRule()->update($discovery_rules_to_update);
+			API::DiscoveryRule()->update($discovery_rules_to_update, true);
 
 			foreach ($discovery_rules_to_update as $discovery_rule) {
 				$processed_discovery_rules[$discovery_rule['hostid']][$discovery_rule['key_']] = 1;
@@ -1311,7 +1311,7 @@ class CConfigurationImport {
 		}
 
 		if ($host_prototypes_to_update) {
-			API::HostPrototype()->update($host_prototypes_to_update);
+			API::HostPrototype()->update($host_prototypes_to_update, true);
 		}
 
 		if ($host_prototypes_to_create) {
@@ -1450,7 +1450,7 @@ class CConfigurationImport {
 		}
 
 		if ($triggers_to_update) {
-			$updated_triggers = API::TriggerPrototype()->update($triggers_to_update);
+			$updated_triggers = API::TriggerPrototype()->update($triggers_to_update, true);
 
 			foreach ($updated_triggers['triggerids'] as $index => $triggerid) {
 				$trigger = $triggers_to_update[$index];
@@ -1468,7 +1468,7 @@ class CConfigurationImport {
 		}
 
 		if ($graphs_to_update) {
-			API::GraphPrototype()->update($graphs_to_update);
+			API::GraphPrototype()->update($graphs_to_update, true);
 			$this->referencer->refreshGraphs();
 		}
 
@@ -1580,7 +1580,7 @@ class CConfigurationImport {
 		}
 
 		if ($this->options['httptests']['updateExisting'] && $httptests_to_update) {
-			API::HttpTest()->update($httptests_to_update);
+			API::HttpTest()->update($httptests_to_update, true);
 		}
 
 		if ($this->options['httptests']['createMissing'] && $httptests_to_create) {
@@ -1681,7 +1681,7 @@ class CConfigurationImport {
 		}
 
 		if ($this->options['graphs']['updateExisting'] && $graphs_to_update) {
-			API::Graph()->update($graphs_to_update);
+			API::Graph()->update($graphs_to_update, true);
 		}
 
 		if ($this->options['graphs']['createMissing'] && $graphs_to_create) {
@@ -1767,7 +1767,7 @@ class CConfigurationImport {
 		}
 
 		if ($triggers_to_update) {
-			API::Trigger()->update($triggers_to_update);
+			API::Trigger()->update($triggers_to_update, true);
 		}
 
 		if ($triggers_to_create) {

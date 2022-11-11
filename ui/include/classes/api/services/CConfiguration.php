@@ -32,10 +32,11 @@ class CConfiguration extends CApiService {
 
 	/**
 	 * @param array $params
+	 * @param bool  $allow_unlink_parent_templates
 	 *
 	 * @return string
 	 */
-	public function export(array $params) {
+	public function export(array $params, bool $allow_unlink_parent_templates = false) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'format' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON, CExportWriterFactory::RAW])],
 			'prettyprint' => ['type' => API_BOOLEAN, 'default' => false],
@@ -46,22 +47,18 @@ class CConfiguration extends CApiService {
 				'maps' =>		['type' => API_IDS],
 				'mediaTypes' =>	['type' => API_IDS],
 				'templates' =>	['type' => API_IDS]
-			]],
-			'unlink_parent_templates' => ['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL, 'default' => [], 'fields' => [
-				'templateid' => ['type' => API_ID],
-				'unlink_templateids' => ['type' => API_IDS]
 			]]
 		]];
-		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+
+		if ($allow_unlink_parent_templates) {
+			$api_input_rules['fields'] += ['unlink_parent_templates' => ['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL, 'default' => [], 'fields' => [
+				'templateid' => ['type' => API_ID],
+				'unlink_templateids' => ['type' => API_IDS]
+			]]];
 		}
 
-		if (APP::getMode() !== APP::EXEC_MODE_DEFAULT && array_key_exists('unlink_parent_templates', $params)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Invalid parameter "%1$s": %2$s.', '/1',
-					_s('unexpected parameter "%1$s"', 'unlink_parent_templates')
-				)
-			);
+		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		if ($params['format'] === CExportWriterFactory::XML) {
@@ -78,7 +75,11 @@ class CConfiguration extends CApiService {
 			}
 		}
 
-		$export = new CConfigurationExport($params['options'], $params['unlink_parent_templates']);
+		$unlink_parent_templates = array_key_exists('unlink_parent_templates', $params)
+			? $params['unlink_parent_templates']
+			: [];
+
+		$export = new CConfigurationExport($params['options'], $unlink_parent_templates);
 		$export->setBuilder(new CConfigurationExportBuilder());
 		$writer = CExportWriterFactory::getWriter($params['format']);
 		$writer->formatOutput($params['prettyprint']);
@@ -393,7 +394,7 @@ class CConfiguration extends CApiService {
 			'prettyprint' => false,
 			'options' => $imported_ids,
 			'unlink_parent_templates' => $unlink_templates_data
-		]);
+		], true);
 
 		// Normalize array keys and strings.
 		$export = (new CImportDataNormalizer($schema))->normalize($export);

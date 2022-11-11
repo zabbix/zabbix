@@ -962,12 +962,12 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param int    $db_triggers[<tnum>]['correlation_mode']    [OUT]
 	 * @param string $db_triggers[<tnum>]['correlation_tag']     [OUT]
 	 * @param int    $db_triggers[<tnum>]['discover']            [OUT] for trigger prototypes only
+	 * @param bool   $allowed_uuid_update
 	 *
 	 * @throws APIException if validation failed.
 	 */
-	protected function validateUpdate(array &$triggers, array &$db_triggers = null) {
+	protected function validateUpdate(array &$triggers, array &$db_triggers = null, bool $allowed_uuid_update) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['description', 'expression']], 'fields' => [
-			'uuid' => 					['type' => API_UUID],
 			'triggerid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'description' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('triggers', 'description')],
 			'expression' =>				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_NOT_EMPTY | API_ALLOW_LLD_MACRO],
@@ -991,6 +991,11 @@ abstract class CTriggerGeneral extends CApiService {
 				'triggerid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
+
+		if ($allowed_uuid_update) {
+			$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
+		}
+
 		if ($this instanceof CTriggerPrototype) {
 			$api_input_rules['fields']['discover'] = ['type' => API_INT32, 'in' => implode(',', [TRIGGER_DISCOVER, TRIGGER_NO_DISCOVER])];
 		}
@@ -1000,14 +1005,6 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 		if (!CApiInputValidator::validate($api_input_rules, $triggers, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		if (APP::getMode() !== APP::EXEC_MODE_DEFAULT && array_column($triggers, 'uuid')) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Invalid parameter "%1$s": %2$s.', '/1',
-					_s('unexpected parameter "%1$s"', 'uuid')
-				)
-			);
 		}
 
 		$options = [
