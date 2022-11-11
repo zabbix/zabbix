@@ -168,31 +168,7 @@ if ($this->data['actions']) {
 	}
 }
 
-$actionForm->addItem([
-	$filter,
-	$actionTable,
-	$this->data['paging'],
-	new CActionButtonList('action', 'actionids', [
-		'action.massenable' => [
-			'content' => (new CSimpleButton(_('Enable')))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massenable-action')
-				->addClass('no-chkbxrange')
-		],
-		'action.massdisable' => [
-			'content' => (new CSimpleButton(_('Disable')))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massdisable-action')
-				->addClass('no-chkbxrange')
-		],
-		'action.massdelete' => [
-			'content' => (new CSimpleButton(_('Delete')))
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-massdelete-action')
-				->addClass('no-chkbxrange')
-		]
-	], 'action_'.$data['eventsource'])
-]);
+$actionForm->addItem($actionTable);
 
 $actionForm->addItem(
 	(new CScriptTag('
@@ -203,5 +179,29 @@ $actionForm->addItem(
 );
 
 $html_page
-	->addItem($actionForm)
+	->addItem([
+		$filter,
+		$actionForm,
+		$this->data['paging'],
+		new CActionButtonList('action', 'actionids', [
+			'action.massenable' => [
+				'content' => (new CSimpleButton(_('Enable')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massenable-action')
+					->addClass('no-chkbxrange')
+			],
+			'action.massdisable' => [
+				'content' => (new CSimpleButton(_('Disable')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdisable-action')
+					->addClass('no-chkbxrange')
+			],
+			'action.massdelete' => [
+				'content' => (new CSimpleButton(_('Delete')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdelete-action')
+					->addClass('no-chkbxrange')
+			]
+		], 'action_'.$data['eventsource'])
+	])
 	->show();
