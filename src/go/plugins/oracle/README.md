@@ -15,14 +15,15 @@ You can extend it or create your own template to cater specific needs.
 
 ## Supported versions
 
-* Oracle Database 12c2;
-* Oracle Database 18c;
-* Oracle Database 19c;
+* Oracle Database 12c2
+* Oracle Database 18c
+* Oracle Database 19c
 
 ## Installation
 
 1. [Install Oracle Instant Client](https://www.oracle.com/database/technologies/instant-client/downloads.html)
 2. Create an Oracle DB user and grant permissions 
+
 ```
 CREATE USER zabbix_mon IDENTIFIED BY <PASSWORD>;
 -- Grant access to the zabbix_mon user.
@@ -49,11 +50,11 @@ GRANT SELECT ON V_$SGASTAT TO zabbix_mon;
 GRANT SELECT ON V_$SYSMETRIC TO zabbix_mon;
 GRANT SELECT ON V_$SYSTEM_PARAMETER TO zabbix_mon;
 ```
-3. Make sure a TNS Listener and an Oracle instance are available for connection.  
+3. Make sure a TNS Listener and an Oracle instance are available for the connection.  
 
 ## Configuration
 
-To configure plugins Zabbix agent 2 configuration file is used.
+To configure plugins, Zabbix agent 2 configuration file is used.
 
 **Plugins.Oracle.CallTimeout** — the maximum time in seconds for waiting when a request has to be done.  
 *Default value:* equals the global Timeout configuration parameter.  
@@ -87,9 +88,11 @@ The connection can be configured using either key parameters or named sessions.
       
 * The only supported URI network schema is "tcp".
 Examples of valid URIs:
+
     - tcp://127.0.0.1:1521;
     - tcp://localhost;
-    - localhost;
+    - localhost.
+    
 * Usernames are supported only if written in uppercase characters.
       
 #### Using key parameters
@@ -103,8 +106,7 @@ If you use `ConnString` as a session name, you can skip the rest of the connecti
 Named sessions allow to define specific parameters for each Oracle instance. Currently, there are only four supported parameters: `Uri`, `User`, `Password` and `Service`.
 This option to store the credentials is slightly more secure way compared to item keys or macros.
 
-For example, if you have two Oracle instances: "Oracle12" and "Oracle19". 
-You should add the following options to the agent configuration file:   
+For example, if you have two Oracle instances: "Oracle12" and "Oracle19", you should add the following options to the agent configuration file:   
 
     Plugins.Oracle.Sessions.Oracle12.Uri=tcp://192.168.1.1:1521
     Plugins.Oracle.Sessions.Oracle12.User=<USERFORORACLE12>
@@ -116,7 +118,8 @@ You should add the following options to the agent configuration file:
     Plugins.Oracle.Sessions.Oracle19.Password=<PasswordForOracle19>
     Plugins.Oracle.Sessions.Oracle19.Service=orcl
         
-Then you will be able to use these names as the first parameter (ConnString) in keys instead of URIs, for example:
+Then you will be able to use these names as the first parameter (ConnString) in keys instead of URIs.
+For example:
 
     oracle.ping[Oracle12]
     oracle.ping[Oracle19]
@@ -135,9 +138,10 @@ Note: session names are case-sensitive.
 
 **oracle.cdb.info[\<commonParams\>]** — returns the Container Databases (CDBs) info.
 
-**oracle.custom.query[\<commonParams\>,queryName[,args...]]** —  — returns the result of a custom query.
+**oracle.custom.query[\<commonParams\>,queryName[,args...]]** — returns the result of a custom query.
+
 *Parameters:*  
-`queryName` (required) — the name of a custom query (must be equal to the name of an sql file without an extension).
+`queryName` (required) — the name of a custom query (must be equal to the name of an *sql* file without an extension).
 `args` (optional) — one or more arguments to pass to a query.
 
 **oracle.datafiles.stats[\<commonParams\>]** — returns the data files statistics.
@@ -148,29 +152,32 @@ Note: session names are case-sensitive.
 
 **oracle.instance.info[\<commonParams\>]** — returns instance statistics.
 
-**oracle.pdb.info[\<commonParams\>]** — returns the Pluggable Databases (PDBs) info.
+**oracle.pdb.info[\<commonParams\>]** — returns the Pluggable Databases (PDBs) information.
 
 **oracle.pdb.discovery[\<commonParams\>]** — returns the list of PDBs in LLD format.
 
-**oracle.pga.stats[\<commonParams\>]** — returns Program Global Area (PGA) statistics.  
+**oracle.pga.stats[\<commonParams\>]** — returns the Program Global Area (PGA) statistics.  
 
 **oracle.ping[\<commonParams\>]** —  performs a simple ping to check if the connection is alive or not.
+
 *Returns:*
 - "1" if a connection is alive.
 - "0" if a connection is broken (if there is any error presented including authorization and configuration issues).
 
-**oracle.proc.stats[\<commonParams\>]** — returns the processes statistics. 
+**oracle.proc.stats[\<commonParams\>]** — returns the processes' statistics. 
 
 **oracle.redolog.info[\<commonParams\>]** — returns the log file information from the control file.
 
 **oracle.sga.stats[\<commonParams\>]** —  returns the System Global Area (SGA) statistics.
 
-**oracle.sessions.stats[\<commonParams\>,[lockMaxTime]]** — returns the session statistics.
+**oracle.sessions.stats[\<commonParams\>,[lockMaxTime]]** — returns the sessions' statistics.
+
 *Parameters:*    
 `lockMaxTime` (optional) — the maximum duration of the session lock in seconds to count the session as locked prolongedly.
 Default: 600 seconds.    
 
 **oracle.sys.metrics[\<commonParams\>[,duration]]** —  returns a set of the system metric values.
+
 *Parameters:*  
 Duration (optional) — capturing interval in seconds of the system metric values.
 Possible values:  
@@ -181,16 +188,17 @@ Possible values:
 
 **oracle.ts.stats[\<commonParams\>]** — returns the tablespace statistics. 
 
-**oracle.ts.discovery[\<commonParams\>]** — returns the list of tablespaces in LLD format.
+**oracle.ts.discovery[\<commonParams\>]** — returns the list of tablespaces in Low-level discovery (LLD) format.
 
 **oracle.user.info[\<commonParams\>[,username]]** — returns the user information.
+
 *Parameters:*  
-Username (optional) — the username for which the information is needed. Usernames written in lowercase characters are not supported.
+Username (optional) — the username for which the information is required. Usernames written in lowercase characters are not supported.
 Default: the current user.
 
 ## Custom queries
 
-It is possible to extend the functionality of the plugin using user-defined queries. In order to do it, you should place all your queries in a specified directory in `Plugins.Oracle.CustomQueriesPath` (there is no default path) as it is for .sql files.
+It is possible to extend the functionality of the plugin using user-defined queries. In order to do it, you should place all your queries in a specified directory in `Plugins.Oracle.CustomQueriesPath` (there is no default path) as it is for *.sql* files.
 For example, you can have a following tree:
 
     /etc/zabbix/oracle/sql/  
@@ -208,6 +216,7 @@ Finally, when the queries are located in the right place, you can execute them:
 You can pass as many parameters to a query as you need.   
 The syntax for the placeholder parameters uses ":#" where "#" is an index number of the parameter. 
 For example: 
+
 ```
 /* payment.sql */
 
@@ -231,5 +240,5 @@ WHERE
 ## Troubleshooting
 
 The plugin uses logs of Zabbix agent 2. You can increase debugging level of Zabbix agent 2 if you need more details about the current situation.
-The environment variable DPI_DEBUG_LEVEL can be used to selectively turn on the printing of various logging messages
-from Oracle Database Programming Interface for C (ODPI-C). See [ODPI-C Debugging](https://oracle.github.io/odpi/doc/user_guide/debugging.html) for details.
+The environment variable DPI_DEBUG_LEVEL can be used to selectively turn on the printing of various logging messages from Oracle Database Programming Interface for C (ODPI-C).
+See [ODPI-C Debugging](https://oracle.github.io/odpi/doc/user_guide/debugging.html) for details.
