@@ -21,8 +21,8 @@ You can extend it or create your own template to cater specific needs.
 
 ## Installation
 
-1. [Install Oracle Instant Client](https://www.oracle.com/database/technologies/instant-client/downloads.html)
-2. Create an Oracle DB user and grant permissions 
+1. [Install Oracle Instant Client](https://www.oracle.com/database/technologies/instant-client/downloads.html).
+2. Create an Oracle DB user and grant permissions. 
 
 ```
 CREATE USER zabbix_mon IDENTIFIED BY <PASSWORD>;
