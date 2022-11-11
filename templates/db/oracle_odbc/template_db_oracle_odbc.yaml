@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-11-10T09:28:22Z'
+  date: '2022-11-11T11:20:40Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -94,7 +94,7 @@ zabbix_export:
             FROM v$database
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'Get info about CDB and  No-CDB databases on instance.'
+          description: 'It gets the information about the container database (CDB) and non-CDB databases on an instance.'
           tags:
             -
               tag: component
@@ -122,7 +122,7 @@ zabbix_export:
             FROM v$instance;
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'The item gets state of the current instance.'
+          description: 'The item gets its state of the current instance.'
           tags:
             -
               tag: component
@@ -142,7 +142,7 @@ zabbix_export:
             FROM v$pdbs;
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'Get info about PDB databases on instance.'
+          description: 'It gets the information about the PDB databases on an instance.'
           tags:
             -
               tag: component
@@ -219,7 +219,7 @@ zabbix_export:
             FROM dba_users u WHERE username = UPPER('{$ORACLE.USER}');
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'The item gets system metric values.'
+          description: 'The item gets the values of the system metrics.'
           tags:
             -
               tag: component
@@ -298,7 +298,7 @@ zabbix_export:
                GROUP BY Y.name, Y.TYPE, Y.tbs_status;
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
-          description: 'Get tablespaces stats.'
+          description: 'It gets the statistics of the tablespaces.'
           tags:
             -
               tag: component
@@ -844,7 +844,7 @@ zabbix_export:
               name: 'Oracle: Instance name has changed'
               event_name: 'Oracle: Instance name has changed (new name received: {ITEM.VALUE})'
               priority: INFO
-              description: 'Oracle DB Instance name has changed. Ack to close.'
+              description: 'The Oracle DB instance has changed. Ack to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1270,7 +1270,7 @@ zabbix_export:
               name: 'Oracle: Too high database concurrency'
               event_name: 'Oracle: Too high database concurrency (over {$ORACLE.CONCURRENCY.MAX.WARN}% for 5 min)'
               priority: WARNING
-              description: 'Concurrency rate is over {$ORACLE.CONCURRENCY.MAX.WARN}%. A high contention value does not indicate the root cause of the problem, but is a signal to search for it. In the case of high competition, an analysis of resource consumption should be carried out, the most "heavy" queries made in the database, possibly - session tracing. All this will help determine the root cause and possible optimization points both in the database configuration and in the logic of building queries of the application itself.'
+              description: 'The concurrency rate exceeds {$ORACLE.CONCURRENCY.MAX.WARN}%. A high contention value does not indicate the root cause of the problem, but it is a signal to search for it. In the case of high competition, the analysis of resource consumption should be carried out. Which are the most "heavy" queries made in the database? Possibly, also session tracing. All this will help to determine the root cause and possible optimization points both in the database configuration and in the logic of building queries of the application itself.'
               tags:
                 -
                   tag: scope
@@ -1364,7 +1364,7 @@ zabbix_export:
               name: 'Oracle: Too many locked sessions'
               event_name: 'Oracle: Too many locked sessions (over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% for 5 min)'
               priority: WARNING
-              description: 'Number of locked sessions is over {$ORACLE.SESSIONS.LOCK.MAX.WARN}% of the running sessions.'
+              description: 'The number of locked sessions exceeds {$ORACLE.SESSIONS.LOCK.MAX.WARN}% of the running sessions.'
               tags:
                 -
                   tag: scope
@@ -1396,7 +1396,7 @@ zabbix_export:
               name: 'Oracle: Too many sessions locked'
               event_name: 'Oracle: Too many sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s (over {$ORACLE.SESSION.LONG.LOCK.MAX.WARN} for 5 min)'
               priority: WARNING
-              description: 'Number of sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME} seconds is too high. Long-term locks can negatively affect database performance, therefore, if they are detected, you should first find the most difficult queries from the database point of view and analyze possible resource leaks.'
+              description: 'The number of locked sessions exceeding {$ORACLE.SESSION.LOCK.MAX.TIME} seconds is too high. Long-term locks can negatively affect the database performance. Therefore, if they are detected, you should first find the most difficult queries from the database point of view and then analyze possible resource leaks.'
               tags:
                 -
                   tag: scope
@@ -1579,7 +1579,7 @@ zabbix_export:
               name: 'Oracle: Shared pool free is too low'
               event_name: 'Oracle: Shared pool free is too low (less {$ORACLE.SHARED.FREE.MIN.WARN}% for 5m)'
               priority: WARNING
-              description: 'The shared pool free memory percent has been less than {$ORACLE.SHARED.FREE.MIN.WARN}% in the last 5 minutes.'
+              description: 'The free memory percent of the shared pool has been less than {$ORACLE.SHARED.FREE.MIN.WARN}% for the last 5 minutes.'
               tags:
                 -
                   tag: scope
@@ -1722,7 +1722,7 @@ zabbix_export:
               name: 'Oracle: Failed to fetch info data'
               event_name: 'Oracle: Failed to fetch info data (or no data for 5m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 5 minutes. The database might be unavailable for connecting.'
+              description: 'Zabbix has not received data for the items for the last 5 minutes. The database might be unavailable for connecting.'
               dependencies:
                 -
                   name: 'Oracle: Port {$ORACLE.PORT} is unavailable'
@@ -1829,7 +1829,7 @@ zabbix_export:
               name: 'Oracle: Version has changed'
               event_name: 'Oracle: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
-              description: 'Oracle DB version has changed. Ack to close.'
+              description: 'The Oracle DB version has changed. Acknowledge (Ack) to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -1988,7 +1988,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Free size of ASM disk group.'
+              description: 'The free size of the ASM disk group.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2011,7 +2011,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Total size of ASM disk group.'
+              description: 'The total size of the ASM disk group.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2035,7 +2035,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'Usage percent of ASM disk group.'
+              description: 'Usage of the ASM disk group expressed in %.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2057,7 +2057,7 @@ zabbix_export:
                   name: 'ASM ''{#DG_NAME}'': Disk group usage is too high'
                   event_name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.HIGH}% for 5m)'
                   priority: HIGH
-                  description: 'Usage percent of ASM disk group is over {$ORACLE.ASM.USED.PCT.MAX.WARN}'
+                  description: 'The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.WARN}.'
                   tags:
                     -
                       tag: scope
@@ -2068,7 +2068,7 @@ zabbix_export:
                   name: 'ASM ''{#DG_NAME}'': Disk group usage is too high'
                   event_name: 'ASM ''{#DG_NAME}'': Disk group usage is too high (over {$ORACLE.ASM.USED.PCT.MAX.WARN}% for 5m)'
                   priority: WARNING
-                  description: 'Usage percent of ASM disk group is over {$ORACLE.ASM.USED.PCT.MAX.WARN}'
+                  description: 'The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.WARN}.'
                   dependencies:
                     -
                       name: 'ASM ''{#DG_NAME}'': Disk group usage is too high'
@@ -3006,7 +3006,7 @@ zabbix_export:
       name: 'Oracle: Too many database files'
       event_name: 'Oracle: Too many database files (over {$ORACLE.DB.FILE.MAX.WARN}% for 5 min)'
       priority: WARNING
-      description: 'Number of datafiles is higher than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafile files limit.'
+      description: 'The number of datafiles is higher than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafiles limit.'
       tags:
         -
           tag: scope
