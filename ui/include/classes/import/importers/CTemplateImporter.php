@@ -122,7 +122,7 @@ class CTemplateImporter extends CImporter {
 				}
 
 				if ($this->options['templates']['updateExisting']) {
-					API::Template()->update($templates_to_update);
+					API::Template()->update($templates_to_update, true);
 				}
 
 				foreach ($templates_to_update as $template) {
@@ -134,7 +134,7 @@ class CTemplateImporter extends CImporter {
 							&& $templates_to_unlink[$template['templateid']]) {
 						$template['templates'] = [];
 
-						API::Template()->update($template);
+						API::Template()->update($template, true);
 					}
 
 					// Make new template linkages.
@@ -184,7 +184,7 @@ class CTemplateImporter extends CImporter {
 						}
 
 						if ($valuemaps_to_update) {
-							API::ValueMap()->update($valuemaps_to_update);
+							API::ValueMap()->update($valuemaps_to_update, true);
 						}
 					}
 

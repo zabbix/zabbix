@@ -133,12 +133,17 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @param array $items passed by reference
 	 * @param bool  $update
+	 * @param bool  $allowed_uuid_update
 	 */
-	protected function checkInput(array &$items, $update = false) {
+	protected function checkInput(array &$items, $update = false, bool $allowed_uuid_update = false) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)],
-			'uuid' => ['type' => API_UUID]
+			'type' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_ITEM_TYPES)]
 		]];
+
+		if ($allowed_uuid_update) {
+			$api_input_rules['fields'] += ['uuid' => ['type' => API_UUID]];
+		}
+
 		if ($update) {
 			unset($api_input_rules['fields']['type']['flags']);
 		}
@@ -596,7 +601,7 @@ abstract class CItemGeneral extends CApiService {
 
 		$this->validateValueMaps($items);
 
-		$this->checkAndAddUuid($items, $dbHosts, $update);
+		$this->checkAndAddUuid($items, $dbHosts, $update, $allowed_uuid_update);
 		$this->checkExistingItems($items);
 	}
 
@@ -610,9 +615,9 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function checkAndAddUuid(array &$items_to_create, array $db_hosts, bool $is_update): void {
+	protected function checkAndAddUuid(array &$items_to_create, array $db_hosts, bool $is_update, bool $allowed_uuid_update): void {
 		if ($is_update) {
-			if (APP::getMode() === APP::EXEC_MODE_DEFAULT) {
+			if ($allowed_uuid_update) {
 				return;
 			}
 

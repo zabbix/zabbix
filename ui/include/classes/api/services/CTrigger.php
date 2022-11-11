@@ -543,11 +543,12 @@ class CTrigger extends CTriggerGeneral {
 	 * If a trigger expression is passed in any of the triggers, it must be in it's exploded form.
 	 *
 	 * @param array $triggers
+	 * @param bool  $allowed_uuid_update
 	 *
 	 * @return array
 	 */
-	public function update(array $triggers): array {
-		$this->validateUpdate($triggers, $db_triggers);
+	public function update(array $triggers, bool $allowed_uuid_update = false): array {
+		$this->validateUpdate($triggers, $db_triggers, $allowed_uuid_update);
 
 		$this->updateReal($triggers, $db_triggers);
 		self::checkExistingDependencies($triggers, $db_triggers);
