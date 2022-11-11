@@ -8860,8 +8860,8 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 				break;
 		}
 
-		zbx_free(items[i].error);
 		zbx_free(items[i].delay);
+		zbx_free(items[i].error);
 	}
 }
 
