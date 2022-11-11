@@ -26,8 +26,6 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 
-extern int		CONFIG_TIMER_FORKS;
-
 typedef struct
 {
 	zbx_uint64_t			hostid;
@@ -694,7 +692,7 @@ void	zbx_dc_maintenance_set_update_flags(void)
 
 	memset(config->maintenance_update_flags, 0xff, sizeof(zbx_uint64_t) * slots_num);
 
-	if (0 != (timers_left = (CONFIG_TIMER_FORKS % (sizeof(uint64_t) * 8))))
+	if (0 != (timers_left = (CONFIG_FORKS[ZBX_PROCESS_TYPE_TIMER] % (sizeof(uint64_t) * 8))))
 		config->maintenance_update_flags[slots_num - 1] >>= (sizeof(zbx_uint64_t) * 8 - timers_left);
 
 	UNLOCK_CACHE;

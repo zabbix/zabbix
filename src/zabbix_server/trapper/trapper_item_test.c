@@ -310,7 +310,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		else
 		{
 #ifdef HAVE_OPENIPMI
-			if (0 == CONFIG_IPMIPOLLER_FORKS)
+			if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
 			{
 				*info = zbx_strdup(NULL, "Cannot perform IPMI request: configuration parameter"
 						" \"StartIPMIPollers\" is 0.");

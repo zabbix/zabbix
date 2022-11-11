@@ -40,7 +40,6 @@ extern char	*CONFIG_DB_TLS_CA_FILE;
 extern char	*CONFIG_DB_TLS_CIPHER;
 extern char	*CONFIG_DB_TLS_CIPHER_13;
 extern int	CONFIG_DBPORT;
-extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_UNAVAILABLE_DELAY;
 
 #define ZBX_DB_CONNECT_NORMAL	0

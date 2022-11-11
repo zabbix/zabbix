@@ -476,7 +476,7 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 			goto out;
 		}
 
-		process_forks = get_process_type_forks(process_type);
+		process_forks = CONFIG_FORKS[process_type];
 
 		if (NULL == (tmp = get_rparam(&request, 2)))
 			tmp = "";
