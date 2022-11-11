@@ -517,13 +517,16 @@ class CWidgetHelper {
 	/**
 	 * @param CWidgetFieldSeverities $field
 	 *
-	 * @return CSeverityCheckBoxList
+	 * @return CCheckBoxList
 	 */
 	public static function getSeverities($field) {
-		return (new CSeverityCheckBoxList($field->getName()))
+		return (new CCheckBoxList($field->getName()))
+			->setOptions(CSeverityHelper::getSeverities())
 			->setChecked($field->getValue())
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setColumns(3)
+			->setVertical();
 	}
 
 	/**
