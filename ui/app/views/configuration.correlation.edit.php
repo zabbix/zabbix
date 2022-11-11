@@ -56,7 +56,7 @@ $remove_button = (new CButton(null, _('Remove')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('js-remove');
 
-$condition_tag_template = (new CScriptTemplate('condition-tag-row-tmpl'))->addItem(
+$condition_tag_template = (new CTemplateTag('condition-tag-row-tmpl'))->addItem(
 	(new CRow([
 		(new CCol('#{label}'))
 			->addClass('label')
@@ -85,7 +85,7 @@ $condition_tag_template = (new CScriptTemplate('condition-tag-row-tmpl'))->addIt
 	]))->setAttribute('data-row_index','#{row_index}')
 );
 
-$condition_hostgroup_template = (new CScriptTemplate('condition-hostgr-row-tmpl'))->addItem(
+$condition_hostgroup_template = (new CTemplateTag('condition-hostgr-row-tmpl'))->addItem(
 	(new CRow([
 		(new CCol('#{label}'))
 			->addClass('label')
@@ -114,7 +114,7 @@ $condition_hostgroup_template = (new CScriptTemplate('condition-hostgr-row-tmpl'
 	]))->setAttribute('data-row_index','#{row_index}')
 );
 
-$condition_tag_pair_template = (new CScriptTemplate('condition-tag-pair-row-tmpl'))->addItem(
+$condition_tag_pair_template = (new CTemplateTag('condition-tag-pair-row-tmpl'))->addItem(
 	(new CRow([
 		(new CCol('#{label}'))
 			->addClass('label')
@@ -147,7 +147,7 @@ $condition_tag_pair_template = (new CScriptTemplate('condition-tag-pair-row-tmpl
 	]))->setAttribute('data-row_index','#{row_index}')
 );
 
-$condition_old_new_tag_template = (new CScriptTemplate('condition-old-new-tag-row-tmpl'))->addItem(
+$condition_old_new_tag_template = (new CTemplateTag('condition-old-new-tag-row-tmpl'))->addItem(
 	(new CRow([
 		(new CCol('#{label}'))
 			->addClass('label')
