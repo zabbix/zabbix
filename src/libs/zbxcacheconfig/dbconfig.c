@@ -6709,7 +6709,6 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced, zb
 	httptest_sec = zbx_time() - sec;
 
 	START_SYNC;
-
 	sec = zbx_time();
 	zbx_vector_uint64_create(&active_avail_diff);
 	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff, &activated_hosts);
@@ -8003,7 +8002,6 @@ int	in_maintenance_without_data_collection(unsigned char maintenance_status, uns
 static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned int mode)
 {
 	const ZBX_DC_IPMIHOST		*ipmihost;
-	const ZBX_DC_HOST_INVENTORY	*host_inventory;
 
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxy_hostid = src_host->proxy_hostid;
@@ -8496,7 +8494,6 @@ static void	DCget_interface(DC_INTERFACE *dst_interface, const ZBX_DC_INTERFACE 
 
 static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned int mode)
 {
-	const ZBX_DC_NUMITEM		*numitem;
 	const ZBX_DC_LOGITEM		*logitem;
 	const ZBX_DC_SNMPITEM		*snmpitem;
 	const ZBX_DC_SNMPINTERFACE	*snmp;
@@ -8514,17 +8511,14 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
-	dst_item->status = src_item->status;
 
-	zbx_strscpy(dst_item->key_orig, src_item->key);
-
+	dst_item->state = src_item->state;
 	dst_item->lastlogsize = src_item->lastlogsize;
 	dst_item->mtime = src_item->mtime;
 
-	if ('\0' != *src_item->error)
-		dst_item->error = zbx_strdup(NULL, src_item->error);
-	else
-		dst_item->error = NULL;
+	dst_item->status = src_item->status;
+
+	zbx_strscpy(dst_item->key_orig, src_item->key);
 
 	if (ZBX_ITEM_GET_MISC & mode)
 	{
@@ -8535,6 +8529,11 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned 
 
 	if (ZBX_ITEM_GET_DELAY & mode)
 		dst_item->delay = zbx_strdup(NULL, src_item->delay);	/* not used, should be initialized */
+
+	if ('\0' != *src_item->error)
+		dst_item->error = zbx_strdup(NULL, src_item->error);
+	else
+		dst_item->error = NULL;
 
 	switch (src_item->value_type)
 	{
@@ -9287,9 +9286,9 @@ static void	DCget_history_host(DC_HISTORY_HOST *dst_host, const ZBX_DC_HOST *src
 		dst_host->inventory_mode = HOST_INVENTORY_DISABLED;
 }
 
-static void	DCget_history_item(DC_HISTORY_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned int mode)
+static void	DCget_history_item(DC_HISTORY_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 {
-	const ZBX_DC_NUMITEM		*numitem;
+	const ZBX_DC_NUMITEM	*numitem;
 
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
@@ -9356,7 +9355,7 @@ void	DCconfig_history_get_items_by_itemids(DC_HISTORY_ITEM *items, const zbx_uin
 		}
 
 		DCget_history_host(&items[i].host, dc_host, mode);
-		DCget_history_item(&items[i], dc_item, mode);
+		DCget_history_item(&items[i], dc_item);
 
 		config_hk = config->config->hk;
 	}
