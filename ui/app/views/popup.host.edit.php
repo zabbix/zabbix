@@ -66,14 +66,14 @@ else {
 		],
 		[
 			'title' => _('Clone'),
-			'class' => 'btn-alt',
+			'class' => 'btn-alt', // todo zi
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'host_edit_popup.clone();'
 		],
 		[
 			'title' => _('Full clone'),
-			'class' => 'btn-alt',
+			'class' => 'btn-alt', // todo zi
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'host_edit_popup.fullClone();'
@@ -81,7 +81,7 @@ else {
 		[
 			'title' => _('Delete'),
 			'confirmation' => _('Delete selected host?'),
-			'class' => 'btn-alt',
+			'class' => 'btn-alt', // todo zi
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'host_edit_popup.delete('.json_encode($data['hostid']).');'

@@ -23,6 +23,7 @@ $fonts-path: '../fonts/';
 	}
 	&::after {
 		position: relative;
+		font-family: 'zabbix-icons';
 	}
 }
 
@@ -60,6 +61,7 @@ $fonts-path: '../fonts/';
 .zi-chevron-double-right:before { content: "\ea20"; }
 .zi-chevron-double-up:before { content: "\ea21"; }
 .zi-chevron-down:before { content: "\ea22"; }
+.zi-chevron-down:after { content: "\ea22"; }
 .zi-chevron-left:before { content: "\ea23"; }
 .zi-chevron-right:before { content: "\ea24"; }
 .zi-chevron-up:before { content: "\ea25"; }

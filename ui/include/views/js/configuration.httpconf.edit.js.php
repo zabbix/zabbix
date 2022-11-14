@@ -1002,7 +1002,7 @@
 			'content': jQuery('<span>').html(msg),
 			'buttons': [{
 				title: httpconf.msg.ok,
-				class: 'btn-alt',
+				class: 'btn-alt', // todo zi
 				focused: true,
 				action: function() {}
 			}]

@@ -10,35 +10,16 @@ z-select,
 		font-style: italic;
 	}
 
-	button.focusable {
-		position: relative;
-		width: 100%;
-		height: 24px;
-		padding: 3px 18px 3px 4px;
-		overflow: hidden;
-		font-size: $font-form-size;
-		line-height: initial;
-		text-align: left;
-		text-overflow: ellipsis;
-		word-break: break-all;
-		white-space: pre;
-		cursor: default;
+	.zi-chevron-down {
+		background-color: transparent;
+		border: none;
 		border-radius: 0;
+
+		text-align: left;
+		padding: 3px 2px 3px 4px;
 
 		@extend %form-input-style;
 		@extend %webkit-scrollbar;
-
-		&::after {
-			content: '';
-			position: absolute;
-			top: 6px;
-			right: 5px;
-			width: 5px;
-			height: 5px;
-			border-right: 1.4px solid;
-			border-bottom: 1.4px solid;
-			transform: rotate(45deg);
-		}
 
 		&:active,
 		&:hover,
@@ -49,12 +30,21 @@ z-select,
 			box-shadow: none;
 		}
 
-		&.red {
-			color: $red;
+		//&.red {
+		//	color: $red;
+		//
+		//	&:after {
+		//		color: $font-color;
+		//	}
+		//}
 
-			&:after {
-				color: $font-color;
-			}
+		&::after {
+			float: right;
+			top: 1px;
+		}
+
+		&::before {
+			display: none;
 		}
 	}
 

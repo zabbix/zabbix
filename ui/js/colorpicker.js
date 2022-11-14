@@ -181,7 +181,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 
 				$button_use_default = $('<button>', {
 					type: 'button',
-					class: 'btn-alt',
+					class: 'btn-alt', // todo zi
 					title: t('Use default'),
 					'aria-label': t('Use default')
 				})

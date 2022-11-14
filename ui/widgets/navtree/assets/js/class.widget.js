@@ -977,7 +977,7 @@ class CWidgetNavTree extends CWidget {
 						},
 						{
 							'title': t('Cancel'),
-							'class': 'btn-alt',
+							'class': 'btn-alt', // todo zi
 							'action': () => {}
 						}
 					],

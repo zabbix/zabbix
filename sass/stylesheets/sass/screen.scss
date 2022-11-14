@@ -1890,55 +1890,30 @@ button {
 	}
 }
 
-.btn-alt {
-	color: $btn-alt-font-color;
-	background-color: $btn-alt-bg-color;
-
-	.plus-icon {
-		background-color: $btn-alt-font-color;
-		margin-right: 8px;
-
-		&::after {
-			background-color: $btn-alt-font-color;
-		}
-	}
-
-	&:hover {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-
-		.plus-icon {
-			background-color: $btn-font-color;
-
-			&::after {
-				background-color: $btn-font-color;
-			}
-		}
-	}
-
-	&:focus {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-
-		.plus-icon {
-			background-color: $btn-font-color;
-
-			&::after {
-				background-color: $btn-font-color;
-			}
-		}
-	}
-
-	&:active {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-
-		.plus-icon {
-			background-color: $btn-font-color;
-
-			&::after {
-				background-color: $btn-font-color;
-			}
-		}
-	}
-}
+//.btn-alt {
+//	color: $btn-alt-font-color;
+//	background-color: $btn-alt-bg-color;
+//
+//	&:hover {
+//		@include btn-hover-active($btn-font-color, $btn-bg-color);
+//
+//		.plus-icon {
+//			background-color: $btn-font-color;
+//
+//			&::after {
+//				background-color: $btn-font-color;
+//			}
+//		}
+//	}
+//
+//	&:focus {
+//		@include btn-hover-active($btn-font-color, $btn-bg-color);
+//	}
+//
+//	&:active {
+//		@include btn-hover-active($btn-font-color, $btn-bg-color);
+//	}
+//}
 
 .btn-tag {
 	@extend .tag;
@@ -2018,11 +1993,9 @@ button {
 }
 
 $icon-btn: (
-	kiosk: $btn-bg-color url($sprite-path) no-repeat -79px -259px,
 	min: $btn-bg-color url($sprite-path) no-repeat -7px -259px,
 	add-fav: $btn-bg-color url($sprite-path) no-repeat -7px -295px,
 	remove-fav: $btn-bg-color url($sprite-path) no-repeat -7px -329px,
-	action: $btn-bg-color url($sprite-path) no-repeat -7px -367px,
 	info: $btn-bg-color url($sprite-path) no-repeat -7px -403px,
 	"dashboard-kioskmode-toggle-slideshow.slideshow-state-started": $btn-bg-color url($sprite-path) no-repeat -432px -582px,
 	"dashboard-kioskmode-toggle-slideshow.slideshow-state-stopped": $btn-bg-color url($sprite-path) no-repeat -433px -546px,
@@ -2031,11 +2004,9 @@ $icon-btn: (
 );
 
 // Dynamically generated classes:
-//  .btn-kiosk
 //  .btn-min
 //  .btn-add-fav
 //  .btn-remove-fav
-//  .btn-action
 //  .btn-info
 //  .btn-dashboard-kioskmode-toggle-slideshow
 //  .btn-dashboard-kioskmode-previous-page
@@ -2048,13 +2019,10 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
-	dashboard-page-properties: url($sprite-path) no-repeat -318px -618px,
 	iterator-page-previous: url($sprite-path) no-repeat -85px -657px,
 	iterator-page-next: url($sprite-path) no-repeat -83px -623px,
-	widget-action: url($sprite-path) no-repeat -6px -618px,
 	widget-collapse: url($sprite-path) no-repeat -6px -654px,
 	widget-expand: url($sprite-path) no-repeat -6px -689px,
-	widget-edit: url($sprite-path) no-repeat -42px -619px,
 	alarm-on: url($sprite-path) no-repeat -6px -546px,
 	alarm-off: url($sprite-path) no-repeat -6px -582px,
 	sound-on: url($sprite-path) no-repeat -6px -474px,
@@ -2063,13 +2031,10 @@ $icon-widget-btn: (
 );
 
 // Dynamically generated classes:
-//  .btn-dashboard-page-properties
 //  .btn-iterator-page-previous
 //  .btn-iterator-page-next
-//  .btn-widget-action
 //  .btn-widget-collapse
 //  .btn-widget-expand // TODO ZI
-//  .btn-widget-edit
 //  .btn-alarm-on
 //  .btn-alarm-off
 //  .btn-sound-on
@@ -2471,11 +2436,6 @@ $icon-widget-btn: (
 			margin-right: 10px;
 		}
 	}
-}
-
-.btn-dashboard-conf {
-	background: url($sprite-path) no-repeat -42px -619px;
-	@extend %btn-dashboard;
 }
 
 .btn-dashboard-normal {
@@ -4288,27 +4248,6 @@ td.inactive-bg {
 	background-color: $lighter-yellow;
 }
 
-// Plus/Add icon.
-.plus-icon {
-	display: inline-block;
-	@extend %plus-icon;
-}
-
-%plus-icon {
-	width: 2px;
-	height: 8px;
-	position: relative;
-
-	&::after {
-		content: '';
-		width: 8px;
-		height: 2px;
-		top: 3px;
-		left: -3px;
-		position: absolute;
-	}
-}
-
 // Preloader.
 @keyframes is-loading-kf {
 	to {
@@ -5444,34 +5383,22 @@ button {
 	}
 }
 
-.icon-help-hint {
-	display: inline-block;
-	height: 14px;
-	width: 14px;
-	margin: 0 0 0 5px;
-	border-radius: 50%;
-	background-color: $ui-bg-selected-color;
-	position: relative;
-	line-height: 1.4;
-
-	&::after {
-		content: '?';
-		position: relative;
+.zi-circle-question-filled {
+	&::before {
 		top: -2px;
-		left: -4px;
-		font-size: 10px;
-		font-weight: bold;
-		color: $btn-font-color;
+		color: $icon-hint-color;
 	}
-
-	&:link,
+	&:focus,
 	&:hover,
-	&:focus {
-		border-bottom: none;
+	&:active {
+		border: none;
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 2px $btn-border-focus-color;
+		&::before {
+			border-radius: 50%;
+			box-shadow: inset 0 0 0 2px $btn-border-focus-color;
+		}
 	}
 }
 
@@ -5814,54 +5741,6 @@ button {
 
 		&:only-child button {
 			border-radius: 2px;
-		}
-	}
-}
-
-.btn-toggle-chevron {
-	position: relative;
-	text-indent: -9999px;
-
-	&[aria-expanded="true"] {
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
-
-	&::after {
-		content: '';
-		position: absolute;
-		right: 8px;
-		top: calc(50% - 3px);
-		width: 5px;
-		height: 5px;
-		border-top: 1px solid $btn-alt-font-color;
-		border-right: 1px solid $btn-alt-font-color;
-		transform: rotate(135deg) translate(-1px,1px);
-		transition: transform .3s;
-	}
-
-	&[disabled] {
-		&::after {
-			border-top-color: $btn-disabled-font-color;
-			border-right-color: $btn-disabled-font-color;
-		}
-	}
-
-	&:enabled {
-		&:active,
-		&[aria-expanded="true"] {
-			&::after {
-				transform: rotate(315deg) translate(-1px,1px);
-			}
-		}
-
-		&:hover,
-		&:focus,
-		&:active,
-		&[aria-expanded="true"] {
-			&::after {
-				border-top-color:  $btn-font-color;
-				border-right-color: $btn-font-color;
-			}
 		}
 	}
 }

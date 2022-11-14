@@ -366,7 +366,7 @@ function PopUp(action, parameters, {
 					buttons: [
 						{
 							'title': t('Cancel'),
-							'class': 'btn-alt js-cancel',
+							'class': 'btn-alt js-cancel', // todo zi
 							'cancel': true,
 							'action': function() {}
 						}
@@ -390,7 +390,7 @@ function PopUp(action, parameters, {
 					default:
 						buttons.push({
 							'title': t('Cancel'),
-							'class': 'btn-alt js-cancel',
+							'class': 'btn-alt js-cancel', // todo zi
 							'cancel': true,
 							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
 						});
@@ -421,7 +421,7 @@ function PopUp(action, parameters, {
 				buttons: [
 					{
 						'title': t('Cancel'),
-						'class': 'btn-alt js-cancel',
+						'class': 'btn-alt js-cancel', // todo zi
 						'cancel': true,
 						'action': function() {}
 					}

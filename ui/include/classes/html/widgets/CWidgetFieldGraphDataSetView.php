@@ -63,7 +63,9 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 			->addClass(ZBX_STYLE_BTN_SPLIT)
 			->addItem([
 				(new CButton(null, [
-					(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON),
+					(new CSpan())
+						->addClass(ZBX_STYLE_PLUS_ICON)
+						->addClass('zi-plus'),
 					_('Add new data set')
 				]))
 					->setId('dataset-add')
@@ -71,7 +73,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 				(new CButton(null, '&#8203;'))
 					->setId('dataset-menu')
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
+					->addClass('zi-chevron-down')
 			]);
 	}
 

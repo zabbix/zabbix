@@ -45,16 +45,21 @@ $html_page = (new CHtmlPage())
 			->setId('dashboard-control')
 			->addItem(
 				(new CTag('nav', true, new CList([
-					(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF), // todo zi
+					(new CButton('dashboard-config'))
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF) // todo zi
+						->addClass('zi-cog-filled'), // todo zi
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
 						->addItem((new CButton('dashboard-add-widget',
-							[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
+							[(new CSpan())
+								->addClass(ZBX_STYLE_PLUS_ICON)
+								->addClass('zi-plus')
+								, _('Add')]
 						))->addClass(ZBX_STYLE_BTN_ALT))
 						->addItem(
 							(new CButton('dashboard-add', '&#8203;'))
 								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON) // todo zi
+								->addClass('zi-chevron-down') // todo zi
 						),
 					(new CButton('dashboard-save', _('Save changes'))),
 					(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),

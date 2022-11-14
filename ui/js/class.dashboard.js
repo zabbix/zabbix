@@ -1711,6 +1711,7 @@ class CDashboard extends CBaseComponent {
 			properties_button.setAttribute('aria-expanded', 'false');
 			properties_button.setAttribute('aria-haspopup', 'true');
 			properties_button.classList.add('btn-dashboard-page-properties'); // todo zi
+			properties_button.classList.add('zi-more'); // todo zi
 
 			tab_contents.append(properties_button);
 		}

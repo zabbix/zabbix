@@ -171,7 +171,8 @@ function get_icon($type, $params = []) {
 					->setTitle(_('Kiosk mode'))
 					->setAttribute('data-layout-mode', ZBX_LAYOUT_KIOSKMODE)
 					->addClass(ZBX_LAYOUT_MODE)
-					->addClass(ZBX_STYLE_BTN_KIOSK); // TODO ZI:
+					->addClass(ZBX_STYLE_BTN_KIOSK) // TODO ZI:
+					->addClass('zi-fullscreen');
 			}
 
 			return $icon;
@@ -1071,6 +1072,7 @@ function makeErrorIcon($error) {
 function makeHelpIcon($help_text): CLink {
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_HELP_HINT)
+		->addClass('zi-circle-question-filled')
 		->setHint($help_text, ZBX_STYLE_HINTBOX_WRAP);
 }
 

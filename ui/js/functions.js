@@ -580,7 +580,7 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 			'buttons': [
 				{
 					'title': t('Cancel'),
-					'class': 'btn-alt',
+					'class': 'btn-alt', // todo zi
 					'focused': (hostid === null && eventid === null),
 					'action': function() {}
 				},
