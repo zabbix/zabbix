@@ -6,7 +6,7 @@
 For Zabbix version: 6.2 and higher.
 This template is developed to monitor Apache HTTPD by Zabbix that works without any external scripts. external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.  
-Template Apache by Zabbix agent - collects metrics by polling [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html) locally with Zabbix agent:
+The template Apache by Zabbix agent - collects metrics by polling [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html) locally with Zabbix agent:
 
 ```text
 127.0.0.1
@@ -49,7 +49,7 @@ Scoreboard: __________________________________________W_____________W___________
 
 ```
 
-It also uses Zabbix agent to collect `Apache` Linux process stats like CPU usage, memory usage and whether process is running or not.
+It also uses Zabbix agent to collect `Apache` Linux process statistics, such as CPU usage, memory usage, and whether the process is running or not.
 
 
 
@@ -88,7 +88,7 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$APACHE.PROCESS_NAME} |<p>The process name of the Apache web server (Apache).</p> |`(httpd|apache2)` |
 |{$APACHE.RESPONSE_TIME.MAX.WARN} |<p>The maximum Apache response time in seconds for a trigger expression.</p> |`10` |
-|{$APACHE.STATUS.HOST} |<p>Hostname or IP address of the Apache status page</p> |`127.0.0.1` |
+|{$APACHE.STATUS.HOST} |<p>The Hostname or IP address of the Apache status page.</p> |`127.0.0.1` |
 |{$APACHE.STATUS.PATH} |<p>The URL path.</p> |`server-status?auto` |
 |{$APACHE.STATUS.PORT} |<p>The port of Apache status page.</p> |`80` |
 |{$APACHE.STATUS.SCHEME} |<p>The request scheme which may be either HTTP or HTTPS.</p> |`http` |

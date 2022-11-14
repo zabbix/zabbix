@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-14T07:39:54Z'
+  date: '2022-11-14T08:58:56Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -958,7 +958,7 @@ zabbix_export:
         -
           macro: '{$APACHE.STATUS.HOST}'
           value: 127.0.0.1
-          description: 'Hostname or IP address of the Apache status page'
+          description: 'The Hostname or IP address of the Apache status page.'
         -
           macro: '{$APACHE.STATUS.PATH}'
           value: 'server-status?auto'
