@@ -119,9 +119,9 @@ There are no template links in this template.
 |Apache |Apache: Total workers busy |<p>The total number of busy worker threads/processes.</p> |DEPENDENT |apache.workers_total.busy<p>**Preprocessing**:</p><p>- JSONPATH: `$.BusyWorkers`</p> |
 |Apache |Apache: Total workers idle |<p>The total number of idle worker threads/processes.</p> |DEPENDENT |apache.workers_total.idle<p>**Preprocessing**:</p><p>- JSONPATH: `$.IdleWorkers`</p> |
 |Apache |Apache: Workers closing connection |<p>The number of workers in a closing state.</p> |DEPENDENT |apache.workers.closing<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.closing`</p> |
-|Apache |Apache: Workers DNS lookup |<p>Number of workers in dnslookup state.</p> |DEPENDENT |apache.workers.dnslookup<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.dnslookup`</p> |
-|Apache |Apache: Workers finishing |<p>Number of workers in finishing state.</p> |DEPENDENT |apache.workers.finishing<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.finishing`</p> |
-|Apache |Apache: Workers idle cleanup |<p>Number of workers in cleanup state.</p> |DEPENDENT |apache.workers.cleanup<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.cleanup`</p> |
+|Apache |Apache: Workers DNS lookup |<p>The number of workers in dnslookup state.</p> |DEPENDENT |apache.workers.dnslookup<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.dnslookup`</p> |
+|Apache |Apache: Workers finishing |<p>The number of workers in finishing state.</p> |DEPENDENT |apache.workers.finishing<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.finishing`</p> |
+|Apache |Apache: Workers idle cleanup |<p>The number of workers in cleanup state.</p> |DEPENDENT |apache.workers.cleanup<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.cleanup`</p> |
 |Apache |Apache: Workers keepalive (read) |<p>The number of workers in keepalive state.</p> |DEPENDENT |apache.workers.keepalive<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.keepalive`</p> |
 |Apache |Apache: Workers logging |<p>The number of workers in logging state.</p> |DEPENDENT |apache.workers.logging<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.logging`</p> |
 |Apache |Apache: Workers reading request |<p>The number of workers in reading state.</p> |DEPENDENT |apache.workers.reading<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.reading`</p> |

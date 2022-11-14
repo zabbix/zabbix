@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-14T09:11:56Z'
+  date: '2022-11-14T09:23:36Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -200,7 +200,7 @@ zabbix_export:
           key: apache.workers.cleanup
           delay: '0'
           history: 7d
-          description: 'Number of workers in cleanup state.'
+          description: 'The number of workers in cleanup state.'
           preprocessing:
             -
               type: JSONPATH
@@ -238,7 +238,7 @@ zabbix_export:
           key: apache.workers.dnslookup
           delay: '0'
           history: 7d
-          description: 'Number of workers in dnslookup state.'
+          description: 'The number of workers in dnslookup state.'
           preprocessing:
             -
               type: JSONPATH
@@ -257,7 +257,7 @@ zabbix_export:
           key: apache.workers.finishing
           delay: '0'
           history: 7d
-          description: 'Number of workers in finishing state.'
+          description: 'The number of workers in finishing state.'
           preprocessing:
             -
               type: JSONPATH
