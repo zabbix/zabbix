@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-11-10 14:15+0000\n"
+"PO-Revision-Date: 2022-11-13 20:36+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -3712,7 +3712,7 @@ msgstr "Tanca el nou event"
 
 #: app/views/configuration.correlation.edit.php:154
 msgid "Close new events"
-msgstr ""
+msgstr "Tancar els nous esdeveniments"
 
 #: app/views/configuration.correlation.edit.php:149
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -18122,7 +18122,7 @@ msgstr "Opcions de visualització dels triggers"
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] "Trigger activat"
-msgstr[1] ""
+msgstr[1] "Triggers activats"
 
 #: include/classes/api/services/CHostBase.php:1189
 #, c-format
