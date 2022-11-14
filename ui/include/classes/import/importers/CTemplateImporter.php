@@ -378,7 +378,7 @@ class CTemplateImporter extends CImporter {
 		$templateid = $this->referencer->findTemplateidByUuid($template['uuid']);
 
 		if ($templateid === null) {
-			$templateid = $this->referencer->findTemplateidByHost($template['name']);
+			$templateid = $this->referencer->findTemplateidByHost($template['host']);
 		}
 
 		if ($templateid !== null) {
