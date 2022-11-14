@@ -9023,12 +9023,22 @@ void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errco
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve item maintenances information from configuration cache   *
+ *                                                                            *
+ * Parameters: items    - [OUT] pointer to array of DC_ITEM structures        *
+ *             errcodes - [IN] SUCCEED if record located and FAIL otherwise   *
+ *             num      - [IN] number of elements in items, keys, errcodes    *
+ *                                                                            *
+ ******************************************************************************/
 static	void	get_items_maintenances(DC_ITEM *items, const int *errcodes, int num)
 {
 	int			i;
 	const ZBX_DC_HOST	*dc_host = NULL;
 
 	RDLOCK_CACHE;
+
 	for (i = 0; i < num; i++)
 	{
 		if (FAIL == errcodes[i])
@@ -9045,9 +9055,24 @@ static	void	get_items_maintenances(DC_ITEM *items, const int *errcodes, int num)
 
 		DCget_host(&items[i].host, dc_host, ZBX_ITEM_GET_MAINTENANCE);
 	}
+
 	UNLOCK_CACHE;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: locate item in configuration cache by host and key                *
+ *                                                                            *
+ * Parameters: items    - [OUT] pointer to array of DC_ITEM structures        *
+ *             keys     - [IN] list of item keys with host names              *
+ *             errcodes - [OUT] SUCCEED if record located and FAIL otherwise  *
+ *             num      - [IN] number of elements in items, keys, errcodes    *
+ *                                                                            *
+ * NOTE: Item and host is retrieved using history read lock that must be      *
+ *       write locked only when configuration sync occurs to avoid processes  *
+ *       blocking each other.                                                 *
+ *                                                                            *
+ ******************************************************************************/
 void	DCconfig_history_data_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num)
 {
 	size_t			i;
@@ -9227,6 +9252,20 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, DC_HIS
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Get item with specified ID                                        *
+ *                                                                            *
+ * Parameters: items    - [OUT] pointer to DC_ITEM structures                 *
+ *             itemids  - [IN] array of item IDs                              *
+ *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
+ *             num      - [IN] number of elements                             *
+ *                                                                            *
+ * NOTE: Item and host is retrieved using history read lock that must be      *
+ *       write locked only when configuration sync occurs to avoid processes  *
+ *       blocking each other.                                                 *
+ *                                                                            *
+ ******************************************************************************/
 void	DCconfig_history_data_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
 		unsigned int mode)
 {
@@ -9330,6 +9369,20 @@ static void	DCget_history_item(DC_HISTORY_ITEM *dst_item, const ZBX_DC_ITEM *src
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Get item with specified ID                                        *
+ *                                                                            *
+ * Parameters: items    - [OUT] pointer to DC_ITEM structures                 *
+ *             itemids  - [IN] array of item IDs                              *
+ *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
+ *             num      - [IN] number of elements                             *
+ *                                                                            *
+ * NOTE: Item and host is retrieved using history read lock that must be      *
+ *       write locked only when configuration sync occurs to avoid processes  *
+ *       blocking each other.                                                 *
+ *                                                                            *
+ ******************************************************************************/
 void	DCconfig_history_get_items_by_itemids(DC_HISTORY_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
 		unsigned int mode)
 {
@@ -9815,6 +9868,10 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t 
  *             functionids - [IN] array of function IDs                       *
  *             errcodes    - [OUT] SUCCEED if item found, otherwise FAIL      *
  *             num         - [IN] number of elements                          *
+ *                                                                            *
+ * NOTE: Data is retrieved using history read lock that must be write locked  *
+ *       only when configuration sync occurs to avoid processes blocking      *
+ *       each other.                                                          *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_history_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes,
