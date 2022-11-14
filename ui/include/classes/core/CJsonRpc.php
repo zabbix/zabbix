@@ -73,10 +73,9 @@ class CJsonRpc {
 
 			list($api, $method) = explode('.', $call['method']) + [1 => ''];
 
-			$headers = getallheaders();
-			if (array_key_exists('Authorization', $headers)
-					&& strpos($headers['Authorization'], ZBX_API_HEADER_AUTHENTICATE_PREFIX) === 0) {
-				$call['auth'] = substr($headers['Authorization'], strlen(ZBX_API_HEADER_AUTHENTICATE_PREFIX));
+			$header = $this->getAuthorizationHeader();
+			if ($header !== null && strpos($header, ZBX_API_HEADER_AUTHENTICATE_PREFIX) === 0) {
+				$call['auth'] = substr($header, strlen(ZBX_API_HEADER_AUTHENTICATE_PREFIX));
 			}
 			elseif ($call['auth'] === null) {
 				$session = new CEncryptedCookieSession();
@@ -227,5 +226,25 @@ class CJsonRpc {
 			ZBX_API_ERROR_PERMISSIONS => '-32500',
 			ZBX_API_ERROR_INTERNAL => '-32500'
 		];
+	}
+
+	private function getAuthorizationHeader(): ?string {
+		$header = null;
+
+		if (array_key_exists('Authorization', $_SERVER)) {
+			$header = $_SERVER['Authorization'];
+		}
+		elseif (array_key_exists('HTTP_AUTHORIZATION', $_SERVER)) {
+			$header = $_SERVER['HTTP_AUTHORIZATION'];
+		}
+		elseif (function_exists('getallheaders')) {
+			$headers = getallheaders();
+
+			if (array_key_exists('Authorization', $headers)) {
+				$header = $headers['Authorization'];
+			}
+		}
+
+		return $header;
 	}
 }
