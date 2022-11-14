@@ -671,7 +671,7 @@ class CConfigurationImport {
 			}
 		}
 
-		if ($this->options['groups']['updateExisting'] && $groups_to_update) {
+		if ($this->options['host_groups']['updateExisting'] && $groups_to_update) {
 			API::HostGroup()->update($groups_to_update, true);
 
 			foreach ($groups_to_update as $group) {
