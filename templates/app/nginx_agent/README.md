@@ -16,7 +16,7 @@ server accepts handled requests
 Reading: 6 Writing: 179 Waiting: 106
 ```
 
-Note that this template doesn't support https and redirects (limitations of web.page.get).
+Note that this template doesn't support HTTPS and redirects (limitations of web.page.get).
 
 It also uses Zabbix agent to collect `nginx` Linux process stats like CPU usage, memory usage and whether process is running or not.
 
@@ -59,7 +59,7 @@ No specific Zabbix configuration is required.
 |{$NGINX.RESPONSE_TIME.MAX.WARN} |<p>The maximum response time of Nginx expressed in seconds for a trigger expression.</p> |`10` |
 |{$NGINX.STUB_STATUS.HOST} |<p>The Hostname or an IP addess of the Nginx host or Nginx container of astub_status.</p> |`localhost` |
 |{$NGINX.STUB_STATUS.PATH} |<p>The path of the Nginx stub_status page.</p> |`basic_status` |
-|{$NGINX.STUB_STATUS.PORT} |<p>The port of Nginx stub_status host or container.</p> |`80` |
+|{$NGINX.STUB_STATUS.PORT} |<p>The port of the Nginx stub_status host or container.</p> |`80` |
 
 ## Template links
 
@@ -81,11 +81,11 @@ There are no template links in this template.
 |Nginx |Nginx: Requests per second |<p>The total number of client requests.</p> |DEPENDENT |nginx.requests.total.rate<p>**Preprocessing**:</p><p>- REGEX: `server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+) \3`</p><p>- CHANGE_PER_SECOND</p> |
 |Nginx |Nginx: Connections accepted per second |<p>The total number of accepted client connections.</p> |DEPENDENT |nginx.connections.accepted.rate<p>**Preprocessing**:</p><p>- REGEX: `server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+) \1`</p><p>- CHANGE_PER_SECOND</p> |
 |Nginx |Nginx: Connections dropped per second |<p>The total number of dropped client connections.</p> |DEPENDENT |nginx.connections.dropped.rate<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- CHANGE_PER_SECOND</p> |
-|Nginx |Nginx: Connections handled per second |<p>The total number of handled connections. Generally, the parameter value is the same as accepts unless some resource limits have been reached (for example, the worker_connections limit).</p> |DEPENDENT |nginx.connections.handled.rate<p>**Preprocessing**:</p><p>- REGEX: `server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+) \2`</p><p>- CHANGE_PER_SECOND</p> |
-|Nginx |Nginx: Connections active |<p>The current number of active client connections including Waiting connections.</p> |DEPENDENT |nginx.connections.active<p>**Preprocessing**:</p><p>- REGEX: `Active connections: ([0-9]+) \1`</p> |
-|Nginx |Nginx: Connections reading |<p>The current number of connections where nginx is reading the request header.</p> |DEPENDENT |nginx.connections.reading<p>**Preprocessing**:</p><p>- REGEX: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \1`</p> |
+|Nginx |Nginx: Connections handled per second |<p>The total number of handled connections. Generally, the parameter value is the same as for accepted connections, unless some resource limits have been reached (for example, the worker_connections limit).</p> |DEPENDENT |nginx.connections.handled.rate<p>**Preprocessing**:</p><p>- REGEX: `server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+) \2`</p><p>- CHANGE_PER_SECOND</p> |
+|Nginx |Nginx: Connections active |<p>The current number of active client connections including waiting connections.</p> |DEPENDENT |nginx.connections.active<p>**Preprocessing**:</p><p>- REGEX: `Active connections: ([0-9]+) \1`</p> |
+|Nginx |Nginx: Connections reading |<p>The current number of connections where Nginx is reading the request header.</p> |DEPENDENT |nginx.connections.reading<p>**Preprocessing**:</p><p>- REGEX: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \1`</p> |
 |Nginx |Nginx: Connections waiting |<p>The current number of idle client connections waiting for a request.</p> |DEPENDENT |nginx.connections.waiting<p>**Preprocessing**:</p><p>- REGEX: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \3`</p> |
-|Nginx |Nginx: Connections writing |<p>The current number of connections where nginx is writing the response back to the client.</p> |DEPENDENT |nginx.connections.writing<p>**Preprocessing**:</p><p>- REGEX: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \2`</p> |
+|Nginx |Nginx: Connections writing |<p>The current number of connections where Nginx is writing the response back to the client.</p> |DEPENDENT |nginx.connections.writing<p>**Preprocessing**:</p><p>- REGEX: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \2`</p> |
 |Nginx |Nginx: Get processes summary |<p>The aggregated data of summary metrics for all processes.</p> |ZABBIX_PASSIVE |proc.get[,,,summary] |
 |Nginx |Nginx: Version |<p>-</p> |DEPENDENT |nginx.version<p>**Preprocessing**:</p><p>- REGEX: `Server: nginx\/(.+(?<!\r)) \1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Nginx |Nginx: CPU utilization |<p>The percentage of the CPU utilization by a process {#NAME}.</p> |ZABBIX_PASSIVE |proc.cpu.util[{#NAME}] |

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-14T13:27:24Z'
+  date: '2022-11-14T14:42:37Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -87,7 +87,7 @@ zabbix_export:
           key: nginx.connections.active
           delay: '0'
           history: 7d
-          description: 'The current number of active client connections including Waiting connections.'
+          description: 'The current number of active client connections including waiting connections.'
           preprocessing:
             -
               type: REGEX
@@ -136,7 +136,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The total number of handled connections. Generally, the parameter value is the same as accepts unless some resource limits have been reached (for example, the worker_connections limit).'
+          description: 'The total number of handled connections. Generally, the parameter value is the same as for accepted connections, unless some resource limits have been reached (for example, the worker_connections limit).'
           preprocessing:
             -
               type: REGEX
@@ -160,7 +160,7 @@ zabbix_export:
           key: nginx.connections.reading
           delay: '0'
           history: 7d
-          description: 'The current number of connections where nginx is reading the request header.'
+          description: 'The current number of connections where Nginx is reading the request header.'
           preprocessing:
             -
               type: REGEX
@@ -200,7 +200,7 @@ zabbix_export:
           key: nginx.connections.writing
           delay: '0'
           history: 7d
-          description: 'The current number of connections where nginx is writing the response back to the client.'
+          description: 'The current number of connections where Nginx is writing the response back to the client.'
           preprocessing:
             -
               type: REGEX
@@ -597,7 +597,7 @@ zabbix_export:
         -
           macro: '{$NGINX.STUB_STATUS.PORT}'
           value: '80'
-          description: 'The port of Nginx stub_status host or container.'
+          description: 'The port of the Nginx stub_status host or container.'
       dashboards:
         -
           uuid: 9d071e3a148c405e85c53ef25d54efaf
