@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-14T08:58:56Z'
+  date: '2022-11-14T09:11:56Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -56,7 +56,7 @@ zabbix_export:
           value_type: FLOAT
           units: Bps
           description: |
-            It is calculated as a rate of change for Total bytes statistics.
+            It is calculated as a rate of change for total bytes statistics.
             ReqPerSec is not used, as it counts the average since the last Apache server start.
           preprocessing:
             -
