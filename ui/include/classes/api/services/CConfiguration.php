@@ -320,11 +320,14 @@ class CConfiguration extends CApiService {
 		$import = $adapter->getData();
 		$imported_entities = [];
 
-		foreach (['groups', 'templates'] as $first_level) {
-			if (array_key_exists($first_level, $import)) {
-				$imported_entities[$first_level]['uuid'] = array_column($import[$first_level], 'uuid');
-				$imported_entities[$first_level]['name'] = array_column($import[$first_level], 'name');
-			}
+		if (array_key_exists('groups', $import)) {
+			$imported_entities['groups']['uuid'] = array_column($import['groups'], 'uuid');
+			$imported_entities['groups']['name'] = array_column($import['groups'], 'name');
+		}
+
+		if (array_key_exists('templates', $import)) {
+			$imported_entities['templates']['uuid'] = array_column($import['templates'], 'uuid');
+			$imported_entities['templates']['template'] = array_column($import['templates'], 'template');
 		}
 
 		$imported_ids = [];
@@ -352,7 +355,7 @@ class CConfiguration extends CApiService {
 						'output' => ['templateid'],
 						'filter' => [
 							'uuid' => $data['uuid'],
-							'name' => $data['name']
+							'host' => $data['template']
 						],
 						'selectParentTemplates' => ['templateid', 'name'],
 						'preservekeys' => true,
