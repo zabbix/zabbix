@@ -63,6 +63,7 @@
 #include "reporter/report_writer.h"
 #include "events.h"
 #include "zbxcachevalue.h"
+#include "zbxcachehistory.h"
 #include "setproctitle.h"
 #include "zbxhistory.h"
 #include "postinit.h"

@@ -499,7 +499,7 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
  ******************************************************************************/
 static void	dc_trends_update_float(ZBX_DC_TREND *trend, DB_ROW row, int num, size_t *sql_offset)
 {
-	history_value_t	value_min, value_avg, value_max;
+	zbx_history_value_t	value_min, value_avg, value_max;
 
 	value_min.dbl = atof(row[2]);
 	value_avg.dbl = atof(row[3]);
@@ -530,8 +530,8 @@ static void	dc_trends_update_float(ZBX_DC_TREND *trend, DB_ROW row, int num, siz
  ******************************************************************************/
 static void	dc_trends_update_uint(ZBX_DC_TREND *trend, DB_ROW row, int num, size_t *sql_offset)
 {
-	history_value_t	value_min, value_avg, value_max;
-	zbx_uint128_t	avg;
+	zbx_history_value_t	value_min, value_avg, value_max;
+	zbx_uint128_t		avg;
 
 	ZBX_STR2UINT64(value_min.ui64, row[2]);
 	ZBX_STR2UINT64(value_avg.ui64, row[3]);
@@ -775,9 +775,9 @@ static void	DCflush_trend(ZBX_DC_TREND *trend, ZBX_DC_TREND **trends, int *trend
 
 	trend->clock = 0;
 	trend->num = 0;
-	memset(&trend->value_min, 0, sizeof(history_value_t));
-	memset(&trend->value_avg, 0, sizeof(value_avg_t));
-	memset(&trend->value_max, 0, sizeof(history_value_t));
+	memset(&trend->value_min, 0, sizeof(zbx_history_value_t));
+	memset(&trend->value_avg, 0, sizeof(zbx_value_avg_t));
+	memset(&trend->value_max, 0, sizeof(zbx_history_value_t));
 }
 
 /******************************************************************************
