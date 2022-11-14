@@ -60,13 +60,13 @@ window.action_edit_popup = new class {
 		}
 
 		if (this.recovery == <?= ACTION_RECOVERY_OPERATION ?>){
-			this.$operation_table = $('#rec-operations-table-div');
+			this.$operation_table = $('#recovery-operations-container');
 		}
 		else if (this.recovery == <?= ACTION_UPDATE_OPERATION ?>){
-			this.$operation_table = $('#upd-operations-table-div');
+			this.$operation_table = $('#update-operations-container');
 		}
 		else {
-			this.$operation_table = $('#operations-table-div');
+			this.$operation_table = $('#operations-container');
 		}
 
 		let new_operation = {};

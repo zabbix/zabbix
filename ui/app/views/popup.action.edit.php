@@ -193,7 +193,7 @@ $operations_tab->addItem([
 	new CLabel('Operations'),
 	(new CFormField(new CPartial('popup.operations.html', $data)))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setId('operations-table-div')
+		->setId('operations-container')
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 ]);
 unset ($data['table']);
@@ -206,7 +206,7 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 		new CLabel('Recovery operations'),
 		(new CFormField(new CPartial('popup.operations.html', $data)))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setId('rec-operations-table-div')
+			->setId('recovery-operations-container')
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
 	unset ($data['table']);
@@ -220,7 +220,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 		new CLabel('Update operations'),
 		(new CFormField(new CPartial('popup.operations.html', $data)))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setId('upd-operations-table-div')
+			->setId('update-operations-container')
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
 	unset ($data['table']);
