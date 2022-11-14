@@ -23,6 +23,7 @@
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxnum.h"
+#include "zbxvariant.h"
 
 typedef struct
 {
