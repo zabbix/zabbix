@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-27T15:52:28Z'
+  date: '2022-11-14T15:50:41Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -49,7 +49,7 @@ zabbix_export:
           key: php-fpm.listen_queue
           delay: '0'
           history: 7d
-          description: 'The current number of connections that have been initiated, but not yet accepted.'
+          description: 'The current number of connections that have been initiated but not yet accepted.'
           preprocessing:
             -
               type: JSONPATH
@@ -68,7 +68,7 @@ zabbix_export:
           key: php-fpm.listen_queue_len
           delay: '0'
           history: 7d
-          description: 'Size of the socket queue of pending connections.'
+          description: 'The size of the socket queue of pending connections.'
           preprocessing:
             -
               type: JSONPATH
@@ -87,7 +87,7 @@ zabbix_export:
           key: php-fpm.listen_queue_max
           delay: '0'
           history: 7d
-          description: 'The maximum number of requests in the queue of pending connections since this FPM pool has started.'
+          description: 'The maximum number of requests in the queue of pending connections since this FPM pool was started.'
           preprocessing:
             -
               type: JSONPATH
@@ -108,7 +108,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//php-fpm.listen_queue)/(last(//php-fpm.listen_queue_len)+(last(//php-fpm.listen_queue_len)=0))*100'
-          description: 'Queue utilization'
+          description: 'The utilization of the queue.'
           tags:
             -
               tag: component
@@ -132,7 +132,7 @@ zabbix_export:
           key: php-fpm.max_children
           delay: '0'
           history: 7d
-          description: 'The number of times that pm.max_children has been reached since the php-fpm pool started'
+          description: 'The number of times that pm.max_children has been reached since the php-fpm pool was started.'
           preprocessing:
             -
               type: JSONPATH
@@ -157,7 +157,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The name of current pool.'
+          description: 'The name of the current pool.'
           preprocessing:
             -
               type: JSONPATH
@@ -241,7 +241,7 @@ zabbix_export:
           key: php-fpm.processes_max_active
           delay: '0'
           history: 7d
-          description: 'The highest value that ''active processes'' has reached since the php-fpm server started.'
+          description: 'The highest value that ''active processes'' has reached since the PHP-FPM server was started.'
           preprocessing:
             -
               type: JSONPATH
@@ -260,7 +260,7 @@ zabbix_export:
           key: php-fpm.processes_total
           delay: '0'
           history: 7d
-          description: 'The total number of server processes currently running.'
+          description: 'The total number of server processes running currently.'
           preprocessing:
             -
               type: JSONPATH
@@ -304,7 +304,7 @@ zabbix_export:
               name: 'PHP-FPM: Manager  changed'
               event_name: 'PHP-FPM: Manager  changed (new value received: {ITEM.VALUE})'
               priority: INFO
-              description: 'PHP-FPM manager changed. Ack to close.'
+              description: 'The PHP-FPM manager has changed. Ack to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -372,7 +372,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: s
-          description: 'How long has this pool been running.'
+          description: 'It indicates how long has this pool been running.'
           preprocessing:
             -
               type: JSONPATH
@@ -406,7 +406,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Current version PHP. Get from HTTP-Header "X-Powered-By" and may not work if you change default HTTP-headers.'
+          description: 'Current version PHP. You can get it from the HTTP-Header "X-Powered-By"; it may not work if you change the default HTTP-headers.'
           preprocessing:
             -
               type: REGEX
@@ -431,7 +431,7 @@ zabbix_export:
               name: 'PHP-FPM: Version has changed'
               event_name: 'PHP-FPM: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'PHP-FPM version has changed. Ack to close.'
+              description: 'The PHP-FPM version has changed. Acknowledge (Ack) to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -444,7 +444,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Summary metrics data for all processes.'
+          description: 'The aggregated data of summary metrics for all processes.'
           tags:
             -
               tag: component
@@ -491,7 +491,7 @@ zabbix_export:
                 macro: '{#NAME}'
                 value: '{$PHP_FPM.PROCESS_NAME}'
                 formulaid: A
-          description: 'Discovery for summary process PHP-FPM.'
+          description: 'The discovery of PHP-FPM summary processes.'
           item_prototypes:
             -
               uuid: 985005cdf7b44332a59a5f7da7528d88
@@ -502,7 +502,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Summary metrics by process {#NAME}.'
+              description: 'The summary metrics aggregated by a process {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -523,7 +523,7 @@ zabbix_export:
               key: 'php-fpm.proc.num[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'Number of running processes {#NAME}.'
+              description: 'The number of running processes {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -560,7 +560,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'Percentage of real memory used by process {#NAME}.'
+              description: 'The percentage of real memory used by a process {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -581,7 +581,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Summary of resident set size memory used by process {#NAME} in bytes.'
+              description: 'The summary of resident set size memory used by a process {#NAME} expressed in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -602,7 +602,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Summary of virtual memory used by process {#NAME} in bytes.'
+              description: 'The summary of virtual memory used by a process {#NAME} expressed in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -622,7 +622,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'Process {#NAME} CPU utilization percentage.'
+              description: 'The percentage of the CPU utilization by a process {#NAME}.'
               tags:
                 -
                   tag: component
@@ -634,7 +634,7 @@ zabbix_export:
               name: 'PHP-FPM: Failed to fetch info data'
               event_name: 'PHP-FPM: Failed to fetch info data (or no data for 30m)'
               priority: INFO
-              description: 'Zabbix has not received data for items for the last 30 minutes'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -685,11 +685,11 @@ zabbix_export:
         -
           macro: '{$PHP_FPM.HOST}'
           value: localhost
-          description: 'Hostname or IP of PHP-FPM status host or container.'
+          description: 'The Hostname or an IP address of the PHP-FPM status for a host or container.'
         -
           macro: '{$PHP_FPM.PING.PAGE}'
           value: ping
-          description: 'The path of PHP-FPM ping page.'
+          description: 'The path of the PHP-FPM ping page.'
         -
           macro: '{$PHP_FPM.PING.REPLY}'
           value: pong
@@ -705,11 +705,11 @@ zabbix_export:
         -
           macro: '{$PHP_FPM.QUEUE.WARN.MAX}'
           value: '80'
-          description: 'The maximum PHP-FPM queue usage percent for trigger expression.'
+          description: 'The maximum percent of the PHP-FPM queue usage for a trigger expression.'
         -
           macro: '{$PHP_FPM.STATUS.PAGE}'
           value: status
-          description: 'The path of PHP-FPM status page.'
+          description: 'The path of the PHP-FPM status page.'
       valuemaps:
         -
           uuid: 1caa1e7c41e14c7492ab8112f93ea068
