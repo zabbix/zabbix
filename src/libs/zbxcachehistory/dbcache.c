@@ -3079,7 +3079,7 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num)
 	items = (DC_HISTORY_ITEM *)zbx_malloc(NULL, sizeof(DC_HISTORY_ITEM) * (size_t)history_num);
 	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
 
-	DCconfig_history_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num, ZBX_ITEM_GET_MISC);
+	DCconfig_history_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num, 0);
 
 	for (i = 0; i < history_num; i++)
 	{
