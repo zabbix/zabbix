@@ -193,6 +193,15 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 	zbx_log_sync_history_cache_progress();
 
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
+		zbx_history_export_deinit();
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
+		zbx_trends_export_deinit();
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
+		zbx_problems_export_deinit();
+
 	zbx_free(stats);
 
 	exit(EXIT_SUCCESS);

@@ -1058,6 +1058,15 @@ static void	zbx_on_exit(int ret)
 	setproctitle_free_env();
 #endif
 
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
+		zbx_problems_export_deinit();
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
+		zbx_history_export_deinit();
+
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
+		zbx_trends_export_deinit();
+
 	zbx_config_tls_free(zbx_config_tls);
 	zbx_deinit_library_export();
 

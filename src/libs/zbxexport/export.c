@@ -201,17 +201,8 @@ int	zbx_init_library_export(zbx_config_export_t *zbx_config_export, char **error
 
 void	zbx_deinit_library_export(void)
 {
-	zbx_fclose(history_file->file);
-	zbx_free(history_file->name);
-	zbx_free(history_file);
-
-	zbx_fclose(trends_file->file);
-	zbx_free(trends_file->name);
-	zbx_free(trends_file);
-
-	zbx_fclose(problems_file->file);
-	zbx_free(problems_file->name);
-	zbx_free(problems_file);
+	zbx_free(config_export->dir);
+	zbx_free(config_export->type);
 }
 
 static int	open_export_file(zbx_export_file_t *file, char **error)
@@ -271,6 +262,28 @@ void	zbx_trends_export_init(const char *process_name, int process_num)
 void	zbx_problems_export_init(const char *process_name, int process_num)
 {
 	problems_file = export_init(problems_file, "problems", process_name, process_num);
+}
+
+static void	export_deinit(zbx_export_file_t **file)
+{
+	zbx_fclose((*file)->file);
+	zbx_free((*file)->name);
+	zbx_free(*file);
+}
+
+void	zbx_history_export_deinit(void)
+{
+	export_deinit(&history_file);
+}
+
+void	zbx_trends_export_deinit(void)
+{
+	export_deinit(&trends_file);
+}
+
+void	zbx_problems_export_deinit(void)
+{
+	export_deinit(&problems_file);
 }
 
 static void	export_write(const char *buf, size_t count, zbx_export_file_t *file)
@@ -394,26 +407,27 @@ void	zbx_trends_export_write(const char *buf, size_t count)
 	export_write(buf, count, trends_file);
 }
 
-static void	export_flush(FILE *file, const char *file_name)
+static void	export_flush(zbx_export_file_t *file)
 {
-	if (0 != fflush(file))
-		zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", file_name, zbx_strerror(errno));
+	if(NULL != file && NULL != file->file)
+	{
+		if (0 != fflush(file->file))
+			zabbix_log(LOG_LEVEL_ERR, "cannot flush export file '%s': %s", file->name,
+					zbx_strerror(errno));
+	}
 }
 
 void	zbx_problems_export_flush(void)
 {
-	if (NULL != problems_file->file)
-		export_flush(problems_file->file, problems_file->name);
+	export_flush(problems_file);
 }
 
 void	zbx_history_export_flush(void)
 {
-	if (NULL != history_file->file)
-		export_flush(history_file->file, history_file->name);
+	export_flush(history_file);
 }
 
 void	zbx_trends_export_flush(void)
 {
-	if (NULL != trends_file->file)
-		export_flush(trends_file->file, trends_file->name);
+	export_flush(trends_file);
 }

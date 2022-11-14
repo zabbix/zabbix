@@ -1447,6 +1447,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 				get_process_type_string(process_type), tasks_num, sec2 - sec1, sleeptime);
 	}
 
+	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
+		zbx_problems_export_deinit();
+
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
