@@ -712,26 +712,27 @@ class testFormTabIndicators extends CWebTest {
 	}
 
 	public function testFormTabIndicators_CheckActionOperationsCounter() {
-		$this->page->login()->open('actionconf.php?eventsource=0&form=Create+action')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=action.list&eventsource=0')->waitUntilReady();
+		$this->query('class:js-action-create')->one()->click()->waitUntilReady();
 
 		// Open Operations tab and check indicator value.
+
 		$form = $this->query('id:action-form')->asForm()->one();
 		$form->selectTab('Operations');
-		$tab_selector = $form->query('xpath:.//a[text()="Operations"]')->one();
+		$tab_selector = $form->query('xpath:.//a[text()="Operations"]')->one()->waitUntilVisible();
 		$this->assertTabIndicator($tab_selector, 0);
 
 		// Specify an operation of each type and check indicator value.
 		foreach (['Operations', 'Recovery operations', 'Update operations'] as $operation) {
 			$form->getField($operation)->query('button:Add')->one()->waitUntilClickable()->click();
-			$operations_overlay = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
-			$operations_overlay->getField('Send to users')->query('button:Add')->one()->click();
+			$operations_overlay = COverlayDialogElement::find()->asForm()->one();
+			$operations_overlay->query('xpath://button[@class="btn-link operation-message-users-footer"]')->one()->click();
 
 			$users_overlay = COverlayDialogElement::find()->all()->asForm()->last();
 			$users_overlay->query('id:item_1')->asCheckbox()->one()->check();
 			$users_overlay->submit();
 			$operations_overlay->submit();
-
-			COverlayDialogElement::ensureNotPresent();
+			$operations_overlay->query('xpath://button[@class="js-add"]')->one()->click()->waitUntilNotVisible();
 		}
 		$this->assertTabIndicator($tab_selector, 3);
 

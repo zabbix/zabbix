@@ -1421,10 +1421,10 @@ class testFormAction extends CLegacyWebTest {
 						]
 					],
 					'expected conditions' => [
-						'A' => 'Service name contains Part of service name',
-						'B' => 'Service does not equal Reference service',
-						'C' => 'Value of tag Service tag does not contain Service tag value',
-						'D' => 'Tag name contains Service tag name'
+						'A' => 'Service does not equal Reference service',
+						'B' => 'Service name contains Part of service name',
+						'C' => 'Tag name contains Service tag name',
+						'D' => 'Value of tag Service tag does not contain Service tag value'
 					],
 					'operations' => [
 						[
@@ -1471,8 +1471,7 @@ class testFormAction extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormAction_SimpleCreate($data) {
-		sleep(5);
-		$this->zbxTestLogin('zabbix.php?action=action.list&eventsource='.$data['eventsource']);
+		$this->page->login()->open('zabbix.php?action=action.list&eventsource='.$data['eventsource']);
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestClickButtonText('Create action');
 		$this->assertEquals('New action', $this->query('tag:h4')->waitUntilVisible()->one()->getText());
@@ -1495,7 +1494,7 @@ class testFormAction extends CLegacyWebTest {
 		if (isset($data['operations'])) {
 			$action_form->selectTab('Operations');
 			foreach ($data['operations'] as $operation) {
-				$action_form->query('xpath:.//table[@id="op-table"]//button[text()="Add"]')->one()->click();
+				$action_form->query('xpath://table[@id="op-table"]//button[text()="Add"]')->waitUntilVisible()->one()->click();
 				COverlayDialogElement::find()->waitUntilReady()->one();
 				$operation_form = $this->query('id:popup.operation')->asForm()->one();
 
@@ -1569,71 +1568,80 @@ class testFormAction extends CLegacyWebTest {
 					$saved_operations[] = $operations_table->getRow($i)->getColumn('Details')->getText();
 				}
 				$this->assertEquals($expected_operations, $saved_operations);
+				$action_form->submit();
+				$this->query('xpath://button[@class="overlay-close-btn"]')->waitUntilVisible()->one()->click();
 			}
 		}
 		else {
 			$title = CTestArrayHelper::get($data, 'error_title', 'Cannot add action');
 			$this->assertMessage(TEST_BAD, $title, $data['errors']);
+			$this->query('xpath://output[@aria-label="Error message"]//button[@title="Close"]')->one()->click();
 			$this->assertEquals(0, CDBHelper::getCount($sql), 'Action has not been created in the DB.');
+			$this->query('xpath://button[text()="Cancel"]')->waitUntilVisible()->one()->click();
 		}
 	}
 
 	public function testFormAction_Create() {
 		$this->zbxTestLogin('zabbix.php?action=action.list&eventsource=0');
 		$this->zbxTestCheckTitle('Configuration of actions');
-
-		$this->zbxTestInputTypeWait('name', 'action test');
+		$this->query('class:js-action-create')->one()->click()->waitUntilReady();
+		$dialog = $this->query('class:overlay-dialogue-body')->asOverlayDialog()->one()->waitUntilReady();
+		$form = $dialog->asForm();
+		$form->getField('id:name')->fill('action test');
 
 		// adding conditions
-		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
+		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@class, "condition-create")]');
 		$this->zbxTestLaunchOverlayDialog('New condition');
 		$this->zbxTestDropdownSelectWait('condition_type', 'Trigger name');
 		$this->zbxTestInputTypeWait('value', 'trigger');
-		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
-		$this->zbxTestAssertElementText("//tr[@id='conditions_0']/td[2]", 'Trigger name contains trigger');
+		COverlayDialogElement::find()->waitUntilReady()->one();
+		$condition_form = $this->query('id:popup.condition')->asForm()->one();
+		$condition_form->submit();
+		$this->zbxTestAssertElementText('//tr[@data-row_index="0"]//td[@class="wordwrap"]', 'Trigger name contains trigger');
 
-		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
+		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@class, "condition-create")]');
 		$this->zbxTestLaunchOverlayDialog('New condition');
 		$this->zbxTestDropdownSelectWait('condition_type', 'Trigger severity');
 		$this->zbxTestClickXpathWait('//label[text()="Average"]');
-		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
-		$this->zbxTestAssertElementText("//tr[@id='conditions_1']/td[2]", 'Trigger severity equals Average');
+		$condition_form->submit();
+		$this->zbxTestAssertElementText('//tr[@data-row_index="1"]//td[@class="wordwrap"]', 'Trigger severity equals Average');
 
-		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
+		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@class, "condition-create")]');
 		$this->zbxTestLaunchOverlayDialog('New condition');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition-type'));
 		$this->zbxTestDropdownSelectWait('condition_type', 'Tag name');
 		$this->zbxTestInputTypeWait('value', 'zabbix');
-		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
-		$this->zbxTestAssertElementText("//tr[@id='conditions_2']/td[2]", 'Tag name equals zabbix');
+		$condition_form->submit();
+		$this->zbxTestAssertElementText('//tr[@data-row_index="2"]//td[@class="wordwrap"]', 'Tag name equals zabbix');
 
 		// adding operations
 		$this->zbxTestTabSwitch('Operations');
-		$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
+		$this->zbxTestClickXpathWait('//table[@id="op-table"]//button[text()="Add"]');
 
-		$this->zbxTestClickXpathWait('//tr[@id="operation-message-user-groups-footer"]//button');
+		$this->zbxTestClickXpathWait('//button[@class="btn-link operation-message-user-groups-footer"]');
 		$this->zbxTestLaunchOverlayDialog('User groups');
 		$this->zbxTestCheckboxSelect('item_7');
 		$this->zbxTestCheckboxSelect('item_11');
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 
-		$this->zbxTestClickXpath('//tr[@id="operation-message-users-footer"]//button');
+		$this->zbxTestClickXpathWait('//button[@class="btn-link operation-message-users-footer"]');
 		$this->zbxTestLaunchOverlayDialog('Users');
 		$this->zbxTestCheckboxSelect('item_1');
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 
-		$this->zbxTestDropdownSelect('operation[opmessage][mediatypeid]', 'SMS');
-		$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
-		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
+		$operation_form = $this->query('id:popup.operation')->asForm()->one();
+		$operation_form->getField('Send only to')->select('SMS');
+		$operation_form->submit();
+		$this->zbxTestAssertElementText("//tr[@id='operations_0']//td[@class='wordbreak']",
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
 			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");
 
-		$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
+		$this->zbxTestClickXpathWait('//table[@id="op-table"]//button[text()="Add"]');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]'));
-		$this->zbxTestDropdownSelectWait('operation-type-select', 'Reboot');
+		$operation_form->getField('Operation')->select('Reboot');
 
 		// add target current host
-		$this->zbxTestCheckboxSelect('operation-command-chst');
+		$this->zbxTestCheckboxSelect('operation_opcommand_hst__hostid_current_host');
 
 		// add target host Zabbix server
 		$this->zbxTestClickButtonMultiselect('operation_opcommand_hst__hostid');
@@ -1648,57 +1656,44 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Host groups');
 		$this->zbxTestClickLinkTextWait('Zabbix servers');
 
-		$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
-		COverlayDialogElement::ensureNotPresent();
+		$operation_form->submit();
 		$this->page->waitUntilReady();
-		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('add'));
-		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
+		$this->zbxTestWaitUntilElementClickable(WebDriverBy::className('js-add'));
+		$this->zbxTestAssertElementText("//tr[@id='operations_0']//td[@class='wordbreak']",
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
 			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");
-		$this->zbxTestAssertElementText("//tr[@id='operations_1']//span",
+		$this->zbxTestAssertElementText("//tr[@id='operations_1']//td[@class='wordbreak']",
 			"Run script \"Reboot\" on current host ".
 			"Run script \"Reboot\" on hosts: Simple form test host ".
 			"Run script \"Reboot\" on host groups: Zabbix servers");
 
-		$this->zbxTestClickXpathWait('//div[@id="operationTab"]//button[text()="Add"]');
+		$this->zbxTestClickXpathWait('//table[@id="op-table"]//button[text()="Add"]');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]'));
 		$this->zbxTestInputTypeOverwrite('operation_esc_step_to', '2');
 		$this->zbxTestDropdownSelectWait('operation-type-select', 'Reboot');
-		$this->zbxTestCheckboxSelect('operation-command-chst');
+		$this->zbxTestCheckboxSelect('operation_opcommand_hst__hostid_current_host');
 
-		$this->zbxTestClickXpathWait('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
-		$this->page->waitUntilReady();
-		$this->zbxTestAssertElementText("//tr[@id='operations_0']//span",
+		$operation_form->submit()->waitUntilNotVisible();
+		$this->zbxTestAssertElementText("//tr[@id='operations_0']//td[@class='wordbreak']",
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
 			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");
-		$this->zbxTestAssertElementText("//tr[@id='operations_1']//span",
+		$this->zbxTestAssertElementText("//tr[@id='operations_1']//td[@class='wordbreak']",
 			"Run script \"Reboot\" on current host ".
 			"Run script \"Reboot\" on hosts: Simple form test host ".
 			"Run script \"Reboot\" on host groups: Zabbix servers");
-		$this->zbxTestAssertElementText("//tr[@id='operations_2']//span",
+		$this->zbxTestAssertElementText("//tr[@id='operations_2']//td[@class='wordbreak']",
 			"Run script \"Reboot\" on current host");
-		$this->zbxTestAssertElementText('//tr[@id="operations_2"]//td', '1 - 2');
+		$this->zbxTestAssertElementText("//tr[@id='operations_2']//td", '1 - 2');
+		$form->getField('id:esc_period')->fill('123');
 
-		$this->zbxTestInputTypeOverwrite('esc_period', '123');
 		// Fire onchange event.
 		$this->webDriver->executeScript('var event = document.createEvent("HTMLEvents");'.
 				'event.initEvent("change", false, true);'.
 				'document.getElementById("esc_period").dispatchEvent(event);'
 		);
-		$this->zbxTestWaitForPageToLoad();
 
 		$this->zbxTestAssertElementValue('esc_period', '123');
-		$this->zbxTestClickXpath('//div[@id="operationTab"]//button[text()="Add"]');
-
-		$this->zbxTestWaitUntilElementClickable(WebDriverBy::xpath('//tr[@id="operation-message-users-footer"]//button'));
-
-		$this->zbxTestClickXpath('//tr[@id="operation-message-users-footer"]//button');
-		$this->page->query('xpath://div[contains(@class, "overlay-dialogue modal")][2]'.
-				'//button[text()="Cancel"]')->waitUntilClickable()->one()->click();
-		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
-		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('add'));
-
-		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
+		$form->submit();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
 
 		$sql = "SELECT actionid FROM actions WHERE name='action test'";
