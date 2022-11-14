@@ -345,7 +345,8 @@ class CConfiguration extends CApiService {
 								'uuid' => $data['uuid'],
 								'name' => $data['name']
 							],
-							'preservekeys' => true
+							'preservekeys' => true,
+							'searchByAny' => true
 						]);
 						$imported_ids['template_groups'] = array_keys($imported_ids['groups']);
 						unset($imported_ids['groups']);
@@ -356,7 +357,8 @@ class CConfiguration extends CApiService {
 								'uuid' => $data['uuid'],
 								'name' => $data['name']
 							],
-							'preservekeys' => true
+							'preservekeys' => true,
+							'searchByAny' => true
 						]);
 						$imported_ids['host_groups'] = array_keys($imported_ids['groups']);
 						unset($imported_ids['groups']);
@@ -392,6 +394,7 @@ class CConfiguration extends CApiService {
 					]);
 
 					$imported_ids['templates'] = array_keys($templates_to_export);
+
 					break;
 
 				default:

@@ -613,9 +613,14 @@ class CConfigurationImport {
 		$groups_to_update = [];
 
 		foreach ($this->getFormattedTemplateGroups() as $group) {
+
 			$groupid = $this->referencer->findTemplateGroupidByUuid($group['uuid']);
 
-			if ($groupid) {
+			if ($groupid === null) {
+				$groupid = $this->referencer->findTemplateGroupidByName($group['name']);
+			}
+
+			if ($groupid !== null) {
 				$groups_to_update[] = $group + ['groupid' => $groupid];
 			}
 			else {
@@ -624,10 +629,7 @@ class CConfigurationImport {
 		}
 
 		if ($this->options['template_groups']['updateExisting'] && $groups_to_update) {
-			API::TemplateGroup()->update(array_map(function($group) {
-				unset($group['uuid']);
-				return $group;
-			}, $groups_to_update));
+			API::TemplateGroup()->update($groups_to_update, true);
 
 			foreach ($groups_to_update as $group) {
 				$this->referencer->setDbTemplateGroup($group['groupid'], $group);
@@ -658,7 +660,7 @@ class CConfigurationImport {
 			$groupid = $this->referencer->findHostGroupidByUuid($group['uuid']);
 
 			if ($groupid === null) {
-				$groupid = $this->referencer->findGroupidByName($group['name']);
+				$groupid = $this->referencer->findHostGroupidByName($group['name']);
 			}
 
 			if ($groupid !== null) {
