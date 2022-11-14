@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-14T16:42:15Z'
+  date: '2022-11-14T16:51:58Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1631,7 +1631,7 @@ zabbix_export:
           key: rabbitmq.node.running
           delay: '0'
           history: 7d
-          description: 'Is the node running or not'
+          description: 'It "sees" whether the node is running or not.'
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -2473,7 +2473,7 @@ zabbix_export:
               key: 'rabbitmq.queue.messages.ack["{#VHOST}/{#QUEUE}"]'
               delay: '0'
               history: 7d
-              description: 'Number of messages delivered to clients and acknowledged'
+              description: 'The number of messages delivered to clients and acknowledged.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2556,7 +2556,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate per second of the sum of messages delivered in acknowledgement mode to consumers, in no-acknowledgement mode to consumers, in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get'
+              description: 'The rate of delivery per second. The sum of messages per second delivered to consumers in acknowledgement mode, in no-acknowledgement mode; in acknowledgement mode in response to basic.get, and in no-acknowledgement mode in response to basic.get.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2611,7 +2611,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate per second of messages published'
+              description: 'The rate per second of published messages.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2638,7 +2638,7 @@ zabbix_export:
               key: 'rabbitmq.queue.messages.publish["{#VHOST}/{#QUEUE}"]'
               delay: '0'
               history: 7d
-              description: 'Count of messages published'
+              description: 'The count of published messages.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2784,7 +2784,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Number per second of messages ready to be delivered to clients'
+              description: 'The number of messages per second ready to be delivered to clients.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2809,7 +2809,7 @@ zabbix_export:
               key: 'rabbitmq.queue.messages_ready["{#VHOST}/{#QUEUE}"]'
               delay: '0'
               history: 7d
-              description: 'Number of messages ready to be delivered to clients'
+              description: 'The number of messages ready to be delivered to clients.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2835,7 +2835,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Number per second of messages delivered to clients but not yet acknowledged'
+              description: 'The number of messages per second delivered to clients but not yet acknowledged.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2860,7 +2860,7 @@ zabbix_export:
               key: 'rabbitmq.queue.messages_unacknowledged["{#VHOST}/{#QUEUE}"]'
               delay: '0'
               history: 7d
-              description: 'Number of messages delivered to clients but not yet acknowledged'
+              description: 'The number of messages delivered to clients but not yet acknowledged.'
               preprocessing:
                 -
                   type: JSONPATH
