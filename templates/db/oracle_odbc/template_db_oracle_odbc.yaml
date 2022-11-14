@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-11-11T11:20:40Z'
+  date: '2022-11-14T09:32:50Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -1148,7 +1148,7 @@ zabbix_export:
               name: 'Oracle: Number of REDO logs available for switching is too low'
               event_name: 'Oracle: Number of REDO logs available for switching is too low (less {$ORACLE.REDO.MIN.WARN} for 5 min)'
               priority: WARNING
-              description: 'Number of available for log switching inactive/unused REDOs is low (Database down risk)'
+              description: 'The number of inactive/unused REDOs available for log switching is low (database down risk)'
               tags:
                 -
                   tag: scope
@@ -1771,7 +1771,7 @@ zabbix_export:
               name: 'Oracle: Zabbix account will expire soon'
               event_name: 'Oracle: Zabbix account will expire soon (under {$ORACLE.EXPIRE.PASSWORD.MIN.WARN} days)'
               priority: WARNING
-              description: 'Password for zabbix user in the database will expire soon.'
+              description: 'The password for Zabbix user in the database expires soon.'
               tags:
                 -
                   tag: scope
@@ -2224,7 +2224,7 @@ zabbix_export:
                   name: 'Oracle Database ''{#DBNAME}'': Open status has changed'
                   event_name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'Oracle DB open status has changed. Ack to close.'
+                  description: 'The Oracle DB open status has changed. Ack to close manually.'
                   manual_close: 'YES'
                   dependencies:
                     -
@@ -2239,7 +2239,7 @@ zabbix_export:
                   expression: 'last(/Oracle by ODBC/oracle.db_open_mode["{#DBNAME}"])=1'
                   name: 'Oracle Database ''{#DBNAME}'': Open status in mount mode'
                   priority: WARNING
-                  description: 'The Oracle DB has a MOUNTED state.'
+                  description: 'The Oracle DB is in a mounted state.'
                   tags:
                     -
                       tag: scope
@@ -2288,7 +2288,7 @@ zabbix_export:
                   name: 'Oracle Database ''{#DBNAME}'': Role has changed'
                   event_name: 'Oracle Database ''{#DBNAME}'': Role has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'Oracle DB role has changed. Ack to close.'
+                  description: 'The Oracle DB role has changed. Ack to close manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -2300,7 +2300,7 @@ zabbix_export:
               expression: 'last(/Oracle by ODBC/oracle.db_force_logging["{#DBNAME}"]) = 0 and last(/Oracle by ODBC/oracle.db_log_mode["{#DBNAME}"]) = 1'
               name: 'Oracle Database ''{#DBNAME}'': Force logging is deactivated for DB with active Archivelog'
               priority: WARNING
-              description: 'Force Logging mode  - it is very important metric for Databases in ''ARCHIVELOG''. This feature allows to forcibly write all transactions to the REDO.'
+              description: 'Force Logging mode - it is very important metric for Databases in ''ARCHIVELOG''. This feature allows to forcibly write all the transactions to the REDO.'
               tags:
                 -
                   tag: scope
@@ -2370,7 +2370,7 @@ zabbix_export:
                   name: 'Oracle Database ''{#DBNAME}'': Open status has changed'
                   event_name: 'Oracle Database ''{#DBNAME}'': Open status has changed (new value received: {ITEM.VALUE})'
                   priority: INFO
-                  description: 'Oracle DB open status has changed. Ack to close.'
+                  description: 'The Oracle DB open status has changed. Ack to close manually.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -2381,7 +2381,7 @@ zabbix_export:
                   expression: 'last(/Oracle by ODBC/oracle.pdb_open_mode["{#DBNAME}"])=1'
                   name: 'Oracle Database ''{#DBNAME}'': Open status in mount mode'
                   priority: WARNING
-                  description: 'The Oracle DB has a MOUNTED state.'
+                  description: 'The Oracle DB is in a mounted state.'
                   tags:
                     -
                       tag: scope
@@ -3017,7 +3017,7 @@ zabbix_export:
       name: 'Oracle: Total PGA inuse is too high'
       event_name: 'Oracle: Total PGA inuse is too high (over {$ORACLE.PGA.USE.MAX.WARN}% for 5 min)'
       priority: WARNING
-      description: 'Total PGA in use is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.'
+      description: 'The total PGA in use is more than {$ORACLE.PGA.USE.MAX.WARN}% of PGA_AGGREGATE_TARGET.'
       tags:
         -
           tag: scope
