@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
@@ -67,6 +68,7 @@ class testFormAdministrationAuthentication extends CWebTest {
 
 	public function getFormData() {
 		return [
+			// Save default config without changes.
 			[
 				[
 					'fields' => [],
@@ -80,6 +82,7 @@ class testFormAdministrationAuthentication extends CWebTest {
 					]
 				]
 			],
+			// Add Deprovisioned user group.
 			[
 				[
 					'fields' => ['Deprovisioned users group' => 'Disabled'],
@@ -87,6 +90,20 @@ class testFormAdministrationAuthentication extends CWebTest {
 						[
 							'authentication_type' => 0,
 							'disabled_usrgrpid' => 9,
+							'passwd_min_length' => 8,
+							'passwd_check_rules' => 8
+						]
+					]
+				]
+			],
+			// Remove Deprovisioned user group.
+			[
+				[
+					'fields' => ['Deprovisioned users group' => ''],
+					'db_check' => [
+						[
+							'authentication_type' => 0,
+							'disabled_usrgrpid' => 0,
 							'passwd_min_length' => 8,
 							'passwd_check_rules' => 8
 						]
