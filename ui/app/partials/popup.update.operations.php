@@ -24,65 +24,54 @@
  * @var array $data
  */
 
-
 $operations = $data['action']['update_operations'];
 $operations_table = (new CTable())
-		->setId('upd-table')
-		->setAttribute('style', 'width: 100%;')
-		->setHeader([_('Details'), _('Action')]);
+	->setId('upd-table')
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Details'), _('Action')]);
 
-	foreach ($operations as $operationid => $operation) {
-		if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_UPDATE_OPERATION])) {
-			continue;
+foreach ($operations as $operationid => $operation) {
+	if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_UPDATE_OPERATION])) {
+		continue;
+	}
+
+	$operation += [
+		'opconditions' => []
+	];
+
+	$operation_for_popup = array_merge($operation, ['id' => $operationid]);
+	foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
+		if (array_key_exists($var, $operation_for_popup)) {
+			$operation_for_popup[$var] = zbx_objectValues($operation_for_popup[$var], $field);
 		}
+	}
 
-		$operation += [
-			'opconditions' => []
-		];
+	$details = [];
 
-		$operation_for_popup = array_merge($operation, ['id' => $operationid]);
-		foreach (['opcommand_grp' => 'groupid', 'opcommand_hst' => 'hostid'] as $var => $field) {
-			if (array_key_exists($var, $operation_for_popup)) {
-				$operation_for_popup[$var] = zbx_objectValues($operation_for_popup[$var], $field);
-			}
-		}
+	if (count($operation['details']['type']) > 1) {
+		// Create row for script with 3 types of details: current host, hosts and host groups.
+		if (array_key_exists('opcommand_hst', $operation)) {
+			if ($operation['opcommand_hst'][0]['hostid'] == 0) {
+				$details[] = [
+					new CTag('b', true, $operation['details']['type'][0]), BR()
+				];
 
-		$details = [];
-
-		if (count($operation['details']['type']) > 1) {
-			// Create row for script with 3 types of details: current host, hosts and host groups.
-			if (array_key_exists('opcommand_hst', $operation)) {
-				if ($operation['opcommand_hst'][0]['hostid'] == 0) {
+				if (array_key_exists('1',  $operation['opcommand_hst'])) {
 					$details[] = [
-						new CTag('b', true, $operation['details']['type'][0]), BR()
+						new CTag('b', true, $operation['details']['type'][1]),
+						implode(' ', $operation['details']['data'][0]), BR()
 					];
-
-					if (array_key_exists('1',  $operation['opcommand_hst'])) {
-						$details[] = [
-							new CTag('b', true, $operation['details']['type'][1]),
-							implode(' ', $operation['details']['data'][0]), BR()
-						];
-					}
-					if (array_key_exists('opcommand_grp', $operation)) {
-						if (count($operation['opcommand_grp']) > 0) {
-							$details[] = [
-								new CTag('b', true, $operation['details']['type'][2]),
-								implode(' ', $operation['details']['data'][1]), BR()
-							];
-						}
-					}
 				}
-				// Create row for script with 2 types of details:hosts and host groups.
-				else {
-					foreach ($operation['details']['type'] as $id => $type) {
+				if (array_key_exists('opcommand_grp', $operation)) {
+					if (count($operation['opcommand_grp']) > 0) {
 						$details[] = [
-							new CTag('b', true, $type), implode(' ', $operation['details']['data'][$id]), BR()
+							new CTag('b', true, $operation['details']['type'][2]),
+							implode(' ', $operation['details']['data'][1]), BR()
 						];
 					}
 				}
-				$details_column = $details;
 			}
-			// Create row for operation with more than 1 type of data.
+			// Create row for script with 2 types of details:hosts and host groups.
 			else {
 				foreach ($operation['details']['type'] as $id => $type) {
 					$details[] = [
@@ -92,52 +81,61 @@ $operations_table = (new CTable())
 			}
 			$details_column = $details;
 		}
-		// Create row for operation with 1 type of data.
+		// Create row for operation with more than 1 type of data.
 		else {
-			$details_column = array_key_exists('data', $operation['details'])
-				? new CCol([
-					new CTag('b', true, $operation['details']['type'][0]),
-					implode(' ', $operation['details']['data'][0])
-				])
-				: new CCol([new CTag('b', true, $operation['details']['type'][0])]);
+			foreach ($operation['details']['type'] as $id => $type) {
+				$details[] = [
+					new CTag('b', true, $type), implode(' ', $operation['details']['data'][$id]), BR()
+				];
+			}
 		}
-
-		// Create hidden input fields for each row.
-		$hidden_data = array_filter($operation, function ($key) {
-			return !in_array($key, [
-				'row_index', 'duration', 'steps', 'details'
-			]);
-		}, ARRAY_FILTER_USE_KEY);
-
-		$operations_table->addRow([
-			$details_column,
-			(new CCol(
-				new CHorList([
-					(new CSimpleButton(_('Edit')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('js-edit-operation')
-						->setAttribute('data_operation', json_encode([
-							'operationid' => $operationid,
-							'actionid' => array_key_exists('actionid', $data) ? $data['actionid'] : 0,
-							'eventsource' => array_key_exists('eventsource', $data)
-								? $data['eventsource']
-								: $operation['eventsource'],
-							'operationtype' => ACTION_UPDATE_OPERATION,
-							'data' => $operation
-						])),
-					[
-						(new CButton('remove', _('Remove')))
-							->setAttribute('data_operationid', $operationid)
-							->addClass('js-remove')
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->removeId(),
-						new CVar('update_operations['.$operationid.']', $hidden_data)
-					]
-				])
-			))->addClass(ZBX_STYLE_NOWRAP)
-		], null, 'update_operations_'.$operationid)->addClass(ZBX_STYLE_WORDBREAK);
+		$details_column = $details;
+	}
+	// Create row for operation with 1 type of data.
+	else {
+		$details_column = array_key_exists('data', $operation['details'])
+			? new CCol([
+				new CTag('b', true, $operation['details']['type'][0]),
+				implode(' ', $operation['details']['data'][0])
+			])
+			: new CCol([new CTag('b', true, $operation['details']['type'][0])]);
 	}
 
+	// Create hidden input fields for each row.
+	$hidden_data = array_filter($operation, function ($key) {
+		return !in_array($key, [
+			'row_index', 'duration', 'steps', 'details'
+		]);
+	}, ARRAY_FILTER_USE_KEY);
+
+	$operations_table->addRow([
+		$details_column,
+		(new CCol(
+			new CHorList([
+				(new CSimpleButton(_('Edit')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('js-edit-operation')
+					->setAttribute('data_operation', json_encode([
+						'operationid' => $operationid,
+						'actionid' => array_key_exists('actionid', $data) ? $data['actionid'] : 0,
+						'eventsource' => array_key_exists('eventsource', $data)
+							? $data['eventsource']
+							: $operation['eventsource'],
+						'operationtype' => ACTION_UPDATE_OPERATION,
+						'data' => $operation
+					])),
+				[
+					(new CButton('remove', _('Remove')))
+						->setAttribute('data_operationid', $operationid)
+						->addClass('js-remove')
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->removeId(),
+					new CVar('update_operations['.$operationid.']', $hidden_data)
+				]
+			])
+		))->addClass(ZBX_STYLE_NOWRAP)
+	], null, 'update_operations_'.$operationid)->addClass(ZBX_STYLE_WORDBREAK);
+}
 
 $operations_table->addItem(
 		(new CTag('tfoot', true))
@@ -156,4 +154,3 @@ $operations_table->addItem(
 	);
 
 $operations_table->show();
-

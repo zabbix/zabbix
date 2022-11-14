@@ -24,7 +24,6 @@
  * @var array $data
  */
 
-
 $operations_table = (new CTable())
 	->setId('rec-table')
 	->setAttribute('style', 'width: 100%;');

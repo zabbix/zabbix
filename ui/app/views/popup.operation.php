@@ -24,7 +24,6 @@
  * @var array $data
  */
 
-
 if ($data['recovery'] === ACTION_OPERATION) {
 	$partial = 'popup.operations';
 }
