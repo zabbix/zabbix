@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-08-15T17:51:56Z'
+  date: '2022-10-27T12:56:01Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: 26674f62500e4e79b9f470bbf962130d
-      template: 'Arista SNMP'
-      name: 'Arista SNMP'
+      template: 'Arista by SNMP'
+      name: 'Arista by SNMP'
       description: |
         Template Net Arista
         
@@ -45,7 +45,7 @@ zabbix_export:
           triggers:
             -
               uuid: 736dc5694fc741e6bcb96e2ba27a0898
-              expression: 'max(/Arista SNMP/icmpping,#3)=0'
+              expression: 'max(/Arista by SNMP/icmpping,#3)=0'
               name: 'Unavailable by ICMP ping'
               priority: HIGH
               description: 'Last three attempts returned timeout.  Please check device connectivity.'
@@ -71,14 +71,14 @@ zabbix_export:
           triggers:
             -
               uuid: dfa6f280b6304bfdb0063be94f7a4c5e
-              expression: 'min(/Arista SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Arista SNMP/icmppingloss,5m)<100'
+              expression: 'min(/Arista by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Arista by SNMP/icmppingloss,5m)<100'
               name: 'High ICMP ping loss'
               opdata: 'Loss: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Arista SNMP/icmpping,#3)=0'
+                  expression: 'max(/Arista by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -104,17 +104,17 @@ zabbix_export:
           triggers:
             -
               uuid: 18aeec70f72d43ceb4994501fb36d434
-              expression: 'avg(/Arista SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              expression: 'avg(/Arista by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
               name: 'High ICMP ping response time'
               opdata: 'Value: {ITEM.LASTVALUE1}'
               priority: WARNING
               dependencies:
                 -
                   name: 'High ICMP ping loss'
-                  expression: 'min(/Arista SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Arista SNMP/icmppingloss,5m)<100'
+                  expression: 'min(/Arista by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Arista by SNMP/icmppingloss,5m)<100'
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Arista SNMP/icmpping,#3)=0'
+                  expression: 'max(/Arista by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -217,7 +217,7 @@ zabbix_export:
           triggers:
             -
               uuid: 6737f0672c244e048509358d220874a6
-              expression: 'min(/Arista SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
+              expression: 'min(/Arista by SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}'
               name: 'High CPU utilization'
               event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -328,7 +328,7 @@ zabbix_export:
           triggers:
             -
               uuid: 362d455c9d9944cea7c37d58bcabc0a0
-              expression: 'last(/Arista SNMP/system.name,#1)<>last(/Arista SNMP/system.name,#2) and length(last(/Arista SNMP/system.name))>0'
+              expression: 'last(/Arista by SNMP/system.name,#1)<>last(/Arista by SNMP/system.name,#2) and length(last(/Arista by SNMP/system.name))>0'
               name: 'System name has changed'
               event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
@@ -409,7 +409,7 @@ zabbix_export:
           triggers:
             -
               uuid: 53501c72392a4bbc8fa0f5ed086d2591
-              expression: 'max(/Arista SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              expression: 'max(/Arista by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
               name: 'No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
@@ -417,7 +417,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Unavailable by ICMP ping'
-                  expression: 'max(/Arista SNMP/icmpping,#3)=0'
+                  expression: 'max(/Arista by SNMP/icmpping,#3)=0'
               tags:
                 -
                   tag: scope
@@ -480,7 +480,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 218209a40ec54a489738345c4485be83
-                  expression: 'last(/Arista SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Arista SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Arista SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
+                  expression: 'last(/Arista by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Arista by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Arista by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
                   name: '{#ENT_NAME}: Device has been replaced'
                   event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
                   priority: INFO
@@ -524,7 +524,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 660fd32236464fd69409099c67478ff5
-                  expression: 'min(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
+                  expression: 'min(/Arista by SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                   name: '{#SENSOR_INFO}: Fan speed is above the critical threshold'
                   event_name: '{#SENSOR_INFO}: Fan speed is above the critical threshold of {#THRESHOLD_HI_CRIT}rpm for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -533,14 +533,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
-                      expression: 'count(/Arista SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                      expression: 'count(/Arista by SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   tags:
                     -
                       tag: scope
                       value: notice
                 -
                   uuid: b1131f42627047ca9629693b91d9185e
-                  expression: 'min(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
+                  expression: 'min(/Arista by SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
                   name: '{#SENSOR_INFO}: Fan speed is above the warning threshold'
                   event_name: '{#SENSOR_INFO}: Fan speed is above the warning threshold of {#THRESHOLD_HI_WARN}rpm for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -549,17 +549,17 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
-                      expression: 'count(/Arista SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                      expression: 'count(/Arista by SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                     -
                       name: '{#SENSOR_INFO}: Fan speed is above the critical threshold'
-                      expression: 'min(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
+                      expression: 'min(/Arista by SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                   tags:
                     -
                       tag: scope
                       value: notice
                 -
                   uuid: 0cd8e252a77b4c90a155e57aab963e5e
-                  expression: 'max(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
+                  expression: 'max(/Arista by SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
                   name: '{#SENSOR_INFO}: Fan speed is below the critical threshold'
                   event_name: '{#SENSOR_INFO}: Fan speed is below the critical threshold of {#THRESHOLD_LO_CRIT}rpm for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -568,14 +568,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
-                      expression: 'count(/Arista SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                      expression: 'count(/Arista by SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   tags:
                     -
                       tag: scope
                       value: notice
                 -
                   uuid: d37c360fea9143bab6ff07699ed4acb1
-                  expression: 'max(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
+                  expression: 'max(/Arista by SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
                   name: '{#SENSOR_INFO}: Fan speed is below the warning threshold'
                   event_name: '{#SENSOR_INFO}: Fan speed is below the warning threshold of {#THRESHOLD_LO_WARN}rpm for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -584,10 +584,10 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Fan is in critical state'
-                      expression: 'count(/Arista SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                      expression: 'count(/Arista by SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                     -
                       name: '{#SENSOR_INFO}: Fan speed is below the critical threshold'
-                      expression: 'max(/Arista SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
+                      expression: 'max(/Arista by SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
                   tags:
                     -
                       tag: scope
@@ -613,7 +613,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 11dddf9f12a0423bb886808759cd429d
-                  expression: 'count(/Arista SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
+                  expression: 'count(/Arista by SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1'
                   name: '{#SENSOR_INFO}: Fan is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -642,7 +642,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: 'Fan speed is above the critical threshold'
-                  status: ENABLED
                   discover: NO_DISCOVER
             -
               name: 'trigger THRESHOLD_HI_WARN'
@@ -658,7 +657,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: 'Fan speed is above the warning threshold'
-                  status: ENABLED
                   discover: NO_DISCOVER
             -
               name: 'trigger THRESHOLD_LO_CRIT'
@@ -674,7 +672,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: 'Fan speed is below the critical threshold'
-                  status: ENABLED
                   discover: NO_DISCOVER
             -
               name: 'trigger THRESHOLD_LO_WARN'
@@ -690,7 +687,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: 'Fan speed is below the warning threshold'
-                  status: ENABLED
                   discover: NO_DISCOVER
         -
           uuid: 9b75135925654cedbd5a270b67e68d51
@@ -996,9 +992,9 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 11c5b8073b3540e4b0698a8db9e3c33e
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  recovery_expression: 'last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1049,21 +1045,21 @@ zabbix_export:
             -
               uuid: 9715da7cb2404bf2a3cb3e80d4bb3bde
               expression: |
-                change(/Arista SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Arista SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                change(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
                 and (
-                last(/Arista SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
-                last(/Arista SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
-                last(/Arista SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
-                last(/Arista SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
-                last(/Arista SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
-                last(/Arista SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
+                last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
+                last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
+                last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
+                last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
+                last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
+                last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
                 )
                 and
-                (last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                (last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/Arista SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Arista SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
-                (last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
+                (change(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
+                (last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
               priority: INFO
@@ -1072,8 +1068,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1081,13 +1077,13 @@ zabbix_export:
             -
               uuid: 32c978fecfcb42738cd179c19bcd2360
               expression: |
-                (avg(/Arista SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Arista SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
-                avg(/Arista SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Arista SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
-                last(/Arista SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
+                (avg(/Arista by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or
+                avg(/Arista by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and
+                last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Arista SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Arista SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
-                avg(/Arista SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Arista SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
+                avg(/Arista by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and
+                avg(/Arista by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -1097,8 +1093,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1106,12 +1102,12 @@ zabbix_export:
             -
               uuid: 47d5a599bc574ccea4baeebc3aad34f5
               expression: |
-                min(/Arista SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Arista SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Arista by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
+                or min(/Arista by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Arista SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Arista SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Arista by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                and max(/Arista by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1121,8 +1117,8 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Interface {#IFNAME}({#IFALIAS}): Link down'
-                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
-                  recovery_expression: 'last(/Arista SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
+                  recovery_expression: 'last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
               tags:
                 -
                   tag: scope
@@ -1139,42 +1135,42 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Arista SNMP'
+                    host: 'Arista by SNMP'
                     key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   drawtype: BOLD_LINE
                   color: 2774A4
                   item:
-                    host: 'Arista SNMP'
+                    host: 'Arista by SNMP'
                     key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 -
                   sortorder: '2'
                   color: F63100
                   yaxisside: RIGHT
                   item:
-                    host: 'Arista SNMP'
+                    host: 'Arista by SNMP'
                     key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '3'
                   color: A54F10
                   yaxisside: RIGHT
                   item:
-                    host: 'Arista SNMP'
+                    host: 'Arista by SNMP'
                     key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
                 -
                   sortorder: '4'
                   color: FC6EA3
                   yaxisside: RIGHT
                   item:
-                    host: 'Arista SNMP'
+                    host: 'Arista by SNMP'
                     key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
                 -
                   sortorder: '5'
                   color: 6C59DC
                   yaxisside: RIGHT
                   item:
-                    host: 'Arista SNMP'
+                    host: 'Arista by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
         -
           uuid: 4906974da5ab45cd9f7996d6d295165a
@@ -1244,7 +1240,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: c1bddd15c68243aeb69dc47f57eb6631
-                  expression: 'last(/Arista SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
+                  expression: 'last(/Arista by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
                   description: 'Please check autonegotiation settings and cabling'
@@ -1304,7 +1300,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 4faa99278cd94abaace8b09529a6efaa
-                  expression: 'count(/Arista SNMP/sensor.psu.status[entStateOper.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
+                  expression: 'count(/Arista by SNMP/sensor.psu.status[entStateOper.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1'
                   name: '{#ENT_NAME}: Power supply is in critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1379,7 +1375,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 791d55e21828472e93c97d8fa4f96d26
-                  expression: 'min(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
+                  expression: 'min(/Arista by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                   name: '{#SENSOR_INFO}: Temperature is above the critical threshold'
                   event_name: '{#SENSOR_INFO}: Temperature is above the critical threshold of {#THRESHOLD_HI_CRIT}°C for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1391,7 +1387,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: c65457a8a6d4427995626ff9ff12e339
-                  expression: 'min(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
+                  expression: 'min(/Arista by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
                   name: '{#SENSOR_INFO}: Temperature is above the warning threshold'
                   event_name: '{#SENSOR_INFO}: Temperature is above the warning threshold of {#THRESHOLD_HI_WARN}°C for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1400,14 +1396,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Temperature is above the critical threshold'
-                      expression: 'min(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
+                      expression: 'min(/Arista by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                   tags:
                     -
                       tag: scope
                       value: notice
                 -
                   uuid: b521cd99d9fb4f6f9d1241ac33c01a86
-                  expression: 'max(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
+                  expression: 'max(/Arista by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
                   name: '{#SENSOR_INFO}: Temperature is below the critical threshold'
                   event_name: '{#SENSOR_INFO}: Temperature is below the critical threshold of {#THRESHOLD_LO_CRIT}°C for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1419,7 +1415,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 750888bd98fa475dba03591945416b89
-                  expression: 'max(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
+                  expression: 'max(/Arista by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
                   name: '{#SENSOR_INFO}: Temperature is below the warning threshold'
                   event_name: '{#SENSOR_INFO}: Temperature is below the warning threshold of {#THRESHOLD_LO_WARN}°C for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1428,7 +1424,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Temperature is below the critical threshold'
-                      expression: 'max(/Arista SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
+                      expression: 'max(/Arista by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
                   tags:
                     -
                       tag: scope
@@ -1450,7 +1446,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: 'Temperature is above the critical threshold'
-                  status: ENABLED
                   discover: NO_DISCOVER
             -
               name: 'trigger THRESHOLD_HI_WARN'
@@ -1466,7 +1461,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: 'Temperature is above the warning threshold'
-                  status: ENABLED
                   discover: NO_DISCOVER
             -
               name: 'trigger THRESHOLD_LO_CRIT'
@@ -1482,7 +1476,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: 'Temperature is below the critical threshold'
-                  status: ENABLED
                   discover: NO_DISCOVER
             -
               name: 'trigger THRESHOLD_LO_WARN'
@@ -1498,7 +1491,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: 'Temperature is below the warning threshold'
-                  status: ENABLED
                   discover: NO_DISCOVER
         -
           uuid: 77e7bb250b714e8ea3fff7ec1f3ac2c3
@@ -1599,8 +1591,8 @@ zabbix_export:
             -
               uuid: f4bfac8d247144b3bebac7245248553e
               expression: |
-                last(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Arista SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                last(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                ((last(/Arista by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               name: '{#FSNAME}: Disk space is critically low'
               event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1621,8 +1613,8 @@ zabbix_export:
             -
               uuid: 9912ab9619ce46b88afe358ab50a2c4f
               expression: |
-                last(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Arista SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                last(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
+                ((last(/Arista by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               name: '{#FSNAME}: Disk space is low'
               event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1637,8 +1629,8 @@ zabbix_export:
                 -
                   name: '{#FSNAME}: Disk space is critically low'
                   expression: |
-                    last(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Arista SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Arista SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
+                    last(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                    ((last(/Arista by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
               tags:
                 -
                   tag: scope
@@ -1660,14 +1652,14 @@ zabbix_export:
                   calc_fnc: LAST
                   type: GRAPH_SUM
                   item:
-                    host: 'Arista SNMP'
+                    host: 'Arista by SNMP'
                     key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
                 -
                   sortorder: '1'
                   color: C80000
                   calc_fnc: LAST
                   item:
-                    host: 'Arista SNMP'
+                    host: 'Arista by SNMP'
                     key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
         -
           uuid: 58bc77f12c17410bbba1cefb5e5fac3d
@@ -1758,7 +1750,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 6b9010e0ad4e4549ac91a91d4bb3983a
-                  expression: 'min(/Arista SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  expression: 'min(/Arista by SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
                   name: '{#MEMNAME}: High memory utilization'
                   event_name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
                   priority: AVERAGE
@@ -1781,7 +1773,7 @@ zabbix_export:
                   drawtype: GRADIENT_LINE
                   color: 1A7C11
                   item:
-                    host: 'Arista SNMP'
+                    host: 'Arista by SNMP'
                     key: 'vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]'
         -
           uuid: 3002dbe2caa042dcb2beb058b25500f8
@@ -1818,7 +1810,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 1c78dea0380a4bf68b05c1323a208c3a
-                  expression: 'min(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
+                  expression: 'min(/Arista by SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                   name: '{#SENSOR_INFO}: Voltage is above the critical threshold'
                   event_name: '{#SENSOR_INFO}: Voltage is above the critical threshold of {#THRESHOLD_HI_CRIT}V for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1830,7 +1822,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 08b4f59d66ea45eaa95426a27586c4bd
-                  expression: 'min(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
+                  expression: 'min(/Arista by SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}'
                   name: '{#SENSOR_INFO}: Voltage is above the warning threshold'
                   event_name: '{#SENSOR_INFO}: Voltage is above the warning threshold of {#THRESHOLD_HI_WARN}V for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1839,14 +1831,14 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Voltage is above the critical threshold'
-                      expression: 'min(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
+                      expression: 'min(/Arista by SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}'
                   tags:
                     -
                       tag: scope
                       value: notice
                 -
                   uuid: d2df35a764234716a286a8019e6c9411
-                  expression: 'max(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
+                  expression: 'max(/Arista by SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
                   name: '{#SENSOR_INFO}: Voltage is below the critical threshold'
                   event_name: '{#SENSOR_INFO}: Voltage is below the critical threshold of {#THRESHOLD_LO_CRIT}V for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1858,7 +1850,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 481908babd3f44b3a73f3e0a628fe6d4
-                  expression: 'max(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
+                  expression: 'max(/Arista by SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}'
                   name: '{#SENSOR_INFO}: Voltage is below the warning threshold'
                   event_name: '{#SENSOR_INFO}: Voltage is below the warning threshold of {#THRESHOLD_LO_WARN}V for 5m'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1867,7 +1859,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: '{#SENSOR_INFO}: Voltage is below the critical threshold'
-                      expression: 'max(/Arista SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
+                      expression: 'max(/Arista by SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}'
                   tags:
                     -
                       tag: scope
@@ -1889,7 +1881,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: 'Voltage is above the critical threshold'
-                  status: ENABLED
                   discover: NO_DISCOVER
             -
               name: 'trigger THRESHOLD_HI_WARN'
@@ -1905,7 +1896,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: 'Voltage is above the warning threshold'
-                  status: ENABLED
                   discover: NO_DISCOVER
             -
               name: 'trigger THRESHOLD_LO_CRIT'
@@ -1921,7 +1911,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: 'Voltage is below the critical threshold'
-                  status: ENABLED
                   discover: NO_DISCOVER
             -
               name: 'trigger THRESHOLD_LO_WARN'
@@ -1937,7 +1926,6 @@ zabbix_export:
                   operationobject: TRIGGER_PROTOTYPE
                   operator: REGEXP
                   value: 'Voltage is below the warning threshold'
-                  status: ENABLED
                   discover: NO_DISCOVER
       tags:
         -
@@ -2092,7 +2080,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Arista SNMP'
+                        host: 'Arista by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
         -
           uuid: 1e995dbde06f4d869f2cc4314117c397
@@ -2113,7 +2101,7 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        host: 'Arista SNMP'
+                        host: 'Arista by SNMP'
                         name: 'CPU utilization'
                 -
                   type: GRAPH_PROTOTYPE
@@ -2137,7 +2125,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Arista SNMP'
+                        host: 'Arista by SNMP'
                         name: '{#MEMNAME}: Memory utilization'
                 -
                   type: GRAPH_PROTOTYPE
@@ -2161,7 +2149,7 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'Arista SNMP'
+                        host: 'Arista by SNMP'
                         name: '{#FSNAME}: Disk space usage'
       valuemaps:
         -
@@ -3116,7 +3104,7 @@ zabbix_export:
   triggers:
     -
       uuid: e3907a8b6aba4512a24a677ed31e4362
-      expression: '(last(/Arista SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Arista SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Arista SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Arista SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: '(last(/Arista by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Arista by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Arista by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Arista by SNMP/system.net.uptime[sysUpTime.0])<10m)'
       name: 'Host has been restarted'
       event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -3125,7 +3113,7 @@ zabbix_export:
       dependencies:
         -
           name: 'No SNMP data collection'
-          expression: 'max(/Arista SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+          expression: 'max(/Arista by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
       tags:
         -
           tag: scope
@@ -3141,5 +3129,5 @@ zabbix_export:
           drawtype: GRADIENT_LINE
           color: 1A7C11
           item:
-            host: 'Arista SNMP'
+            host: 'Arista by SNMP'
             key: system.cpu.util

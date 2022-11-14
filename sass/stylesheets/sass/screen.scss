@@ -28,6 +28,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20211222';
 @import "layout/form-grid";
 
 @import "components/buttons";
+@import "components/checkbox-list";
 @import "components/color-picker";
 @import "components/dashboard/dashboard";
 @import "components/dashboard/widget-item";
@@ -451,8 +452,6 @@ form {
 			white-space: nowrap;
 
 			[class*='icon-'] {
-				vertical-align: middle;
-
 				&::after {
 					margin: 0;
 					line-height: 14px;
@@ -4871,14 +4870,6 @@ svg {
 
 .visibility-hidden {
 	visibility: hidden;
-}
-
-.checkbox-list {
-	li {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		line-height: 24px;
-	}
 }
 
 .columns-wrapper {
