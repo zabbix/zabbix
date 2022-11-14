@@ -9313,10 +9313,10 @@ return [
 			]
 		]
 	],
-	'users_scim_group' => [
-		'key' => 'users_scim_groupid',
+	'user_scim_group' => [
+		'key' => 'user_scim_groupid',
 		'fields' => [
-			'users_scim_groupid' => [
+			'user_scim_groupid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20

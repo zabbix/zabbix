@@ -262,7 +262,7 @@ class User extends ScimApiService {
 			$this->setData($db_user['userid'], $db_user['userdirectoryid'], $options);
 		}
 		else {
-			DB::delete('users_scim_group', [
+			DB::delete('user_scim_group', [
 				'userid' => $user_data['userid'],
 			]);
 
@@ -335,7 +335,7 @@ class User extends ScimApiService {
 		$user_data['medias'] = $provisioning->getUserMedias($options);
 		$user_data['usrgrps'] = [];
 
-		DB::delete('users_scim_group', [
+		DB::delete('user_scim_group', [
 			'userid' => $user_data['userid'],
 		]);
 
