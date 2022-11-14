@@ -562,6 +562,624 @@ static int	DBpatch_6030063(void)
 	return ret;
 }
 
+/* patches for ZBXNEXT-276 */
+/* create new tables */
+
+static int	DBpatch_6030064(void)
+{
+	const ZBX_TABLE table =
+		{"scim_group", "scim_groupid", 0,
+			{
+				{"scim_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030065(void)
+{
+	return DBcreate_index("scim_group", "scim_group_1", "name", 1);
+}
+
+static int	DBpatch_6030066(void)
+{
+	const ZBX_TABLE table =
+		{"user_scim_group", "user_scim_groupid", 0,
+			{
+				{"user_scim_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"scim_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030067(void)
+{
+	return DBcreate_index("user_scim_group", "user_scim_group_1", "userid", 0);
+}
+
+static int	DBpatch_6030068(void)
+{
+	return DBcreate_index("user_scim_group", "user_scim_group_2", "scim_groupid", 0);
+}
+
+static int	DBpatch_6030069(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, "users", "userid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("user_scim_group", 1, &field);
+}
+
+static int	DBpatch_6030070(void)
+{
+	const ZBX_FIELD field = {"scim_groupid", NULL, "scim_group", "scim_groupid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("user_scim_group", 2, &field);
+}
+
+static int	DBpatch_6030071(void)
+{
+	const ZBX_TABLE	table =
+		{"userdirectory_saml", "userdirectoryid", 0,
+			{
+				{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"idp_entityid", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"sso_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"slo_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"username_attribute", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"sp_entityid", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"nameid_format", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"sign_messages", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"sign_assertions", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"sign_authn_requests", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"sign_logout_requests", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"sign_logout_responses", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"encrypt_nameid", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"encrypt_assertions", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"group_name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"user_username", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"user_lastname", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"scim_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030072(void)
+{
+	const ZBX_FIELD	field = {"userdirectoryid", NULL, "userdirectory", "userdirectoryid", 0, ZBX_TYPE_ID,
+			ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("userdirectory_saml", 1, &field);
+}
+
+static int	DBpatch_6030073(void)
+{
+	const ZBX_TABLE	table =
+		{"userdirectory_ldap", "userdirectoryid", 0,
+			{
+				{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"host", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"port", "389", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"base_dn", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"search_attribute", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"bind_dn", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"bind_password", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"start_tls", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"search_filter", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"group_basedn", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"group_name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"group_member", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"user_ref_attr", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"group_filter", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"group_membership", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"user_username", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"user_lastname", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030074(void)
+{
+	const ZBX_FIELD	field = {"userdirectoryid", NULL, "userdirectory", "userdirectoryid", 0, ZBX_TYPE_ID,
+			ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("userdirectory_ldap", 1, &field);
+}
+
+static int	DBpatch_6030075(void)
+{
+	const ZBX_TABLE	table =
+		{"userdirectory_media", "userdirectory_mediaid", 0,
+			{
+				{"userdirectory_mediaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"mediatypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"attribute", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030076(void)
+{
+	return DBcreate_index("userdirectory_media", "userdirectory_media_1", "userdirectoryid", 0);
+}
+
+static int	DBpatch_6030077(void)
+{
+	return DBcreate_index("userdirectory_media", "userdirectory_media_2", "mediatypeid", 0);
+}
+
+static int	DBpatch_6030078(void)
+{
+	const ZBX_FIELD	field = {"userdirectoryid", NULL, "userdirectory", "userdirectoryid", 0, ZBX_TYPE_ID,
+			ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("userdirectory_media", 1, &field);
+}
+
+static int	DBpatch_6030079(void)
+{
+	const ZBX_FIELD	field = {"mediatypeid", NULL, "media_type", "mediatypeid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("userdirectory_media", 2, &field);
+}
+
+static int	DBpatch_6030080(void)
+{
+	const ZBX_TABLE	table =
+		{"userdirectory_idpgroup", "userdirectory_idpgroupid", 0,
+			{
+				{"userdirectory_idpgroupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"roleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030081(void)
+{
+	return DBcreate_index("userdirectory_idpgroup", "userdirectory_idpgroup_1", "userdirectoryid", 0);
+}
+
+static int	DBpatch_6030082(void)
+{
+	return DBcreate_index("userdirectory_idpgroup", "userdirectory_idpgroup_2", "roleid", 0);
+}
+
+static int	DBpatch_6030083(void)
+{
+	const ZBX_FIELD	field = {"userdirectoryid", NULL, "userdirectory", "userdirectoryid", 0, ZBX_TYPE_ID,
+			ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("userdirectory_idpgroup", 1, &field);
+}
+
+static int	DBpatch_6030084(void)
+{
+	const ZBX_FIELD	field = {"roleid", NULL, "role", "roleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("userdirectory_idpgroup", 2, &field);
+}
+
+static int	DBpatch_6030085(void)
+{
+	const ZBX_TABLE	table =
+		{"userdirectory_usrgrp", "userdirectory_usrgrpid", 0,
+			{
+				{"userdirectory_usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"userdirectory_idpgroupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6030086(void)
+{
+	return DBcreate_index("userdirectory_usrgrp", "userdirectory_usrgrp_1", "userdirectory_idpgroupid,usrgrpid", 1);
+}
+
+static int	DBpatch_6030087(void)
+{
+	return DBcreate_index("userdirectory_usrgrp", "userdirectory_usrgrp_2", "usrgrpid", 0);
+}
+
+static int	DBpatch_6030088(void)
+{
+	return DBcreate_index("userdirectory_usrgrp", "userdirectory_usrgrp_3", "userdirectory_idpgroupid", 0);
+}
+
+static int	DBpatch_6030089(void)
+{
+	const ZBX_FIELD	field = {"userdirectory_idpgroupid", NULL, "userdirectory_idpgroup", "userdirectory_idpgroupid",
+			0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("userdirectory_usrgrp", 1, &field);
+}
+
+static int	DBpatch_6030090(void)
+{
+	const ZBX_FIELD	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("userdirectory_usrgrp", 2, &field);
+}
+
+/* add new fields to existing tables */
+
+static int	DBpatch_6030091(void)
+{
+	const ZBX_FIELD	field = {"jit_provision_interval", "1h", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6030092(void)
+{
+	const ZBX_FIELD	field = {"saml_jit_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6030093(void)
+{
+	const ZBX_FIELD field = {"ldap_jit_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6030094(void)
+{
+	const ZBX_FIELD	field = {"disabled_usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6030095(void)
+{
+	return DBcreate_index("config", "config_4", "disabled_usrgrpid", 0);
+}
+
+static int	DBpatch_6030096(void)
+{
+	const ZBX_FIELD	field = {"disabled_usrgrpid", NULL, "usrgrp", "usrgrpid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("config", 4, &field);
+}
+
+static int	DBpatch_6030097(void)
+{
+	const ZBX_FIELD field = {"idp_type", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory", &field);
+}
+
+static int	DBpatch_6030098(void)
+{
+	const ZBX_FIELD field = {"provision_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory", &field);
+}
+
+static int	DBpatch_6030099(void)
+{
+	return DBcreate_index("userdirectory", "userdirectory_1", "idp_type", 0);
+}
+
+static int	DBpatch_6030100(void)
+{
+	const ZBX_FIELD field = {"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("users", &field);
+}
+
+static int	DBpatch_6030101(void)
+{
+	const ZBX_FIELD field = {"ts_provisioned", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("users", &field);
+}
+
+static int	DBpatch_6030102(void)
+{
+	return DBcreate_index("users", "users_2", "userdirectoryid", 0);
+}
+
+static int	DBpatch_6030103(void)
+{
+	const ZBX_FIELD field = {"userdirectoryid", NULL, "userdirectory", "userdirectoryid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("users", 2, &field);
+}
+
+/* migrate data */
+
+static int	migrate_ldap_data(void)
+{
+	DB_RESULT	result = DBselect("select userdirectoryid,host,port,base_dn,bind_dn,bind_password,"
+					"search_attribute,start_tls,search_filter"
+					" from userdirectory");
+	if (NULL == result)
+		return FAIL;
+
+	DB_ROW	row;
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		char	*host = DBdyn_escape_string(row[1]);
+		char	*base_dn = DBdyn_escape_string(row[3]);
+		char	*bind_dn = DBdyn_escape_string(row[4]);
+		char	*bind_password = DBdyn_escape_string(row[5]);
+		char	*search_attribute = DBdyn_escape_string(row[6]);
+		char	*search_filter = DBdyn_escape_string(row[8]);
+
+		int	rc = DBexecute("insert into userdirectory_ldap (userdirectoryid,host,port,"
+					"base_dn,search_attribute,bind_dn,bind_password,start_tls,search_filter)"
+					" values (%s,'%s',%s,'%s','%s','%s','%s',%s,'%s')", row[0], host, row[2],
+					base_dn, search_attribute, bind_dn, bind_password, row[7], search_filter);
+
+		zbx_free(search_filter);
+		zbx_free(search_attribute);
+		zbx_free(bind_password);
+		zbx_free(bind_dn);
+		zbx_free(base_dn);
+		zbx_free(host);
+
+		if (ZBX_DB_OK > rc)
+		{
+			DBfree_result(result);
+			return FAIL;
+		}
+
+#define IDP_TYPE_LDAP	1	/* user directory of type LDAP */
+		if (ZBX_DB_OK > DBexecute("update userdirectory set idp_type=%d where userdirectoryid=%s",
+				IDP_TYPE_LDAP, row[0]))
+		{
+			DBfree_result(result);
+			return FAIL;
+		}
+#undef IDP_TYPE_LDAP
+	}
+
+	DBfree_result(result);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6030104(void)
+{
+	return migrate_ldap_data();
+}
+
+static int	migrate_saml_data(void)
+{
+	DB_RESULT	result = DBselect("select saml_idp_entityid,saml_sso_url,saml_slo_url,saml_username_attribute,"
+					"saml_sp_entityid,saml_nameid_format,saml_sign_messages,saml_sign_assertions,"
+					"saml_sign_authn_requests,saml_sign_logout_requests,saml_sign_logout_responses,"
+					"saml_encrypt_nameid,saml_encrypt_assertions"
+					" from config");
+	if (NULL == result)
+		return FAIL;
+
+	DB_ROW	row = DBfetch(result);
+
+	if (NULL == row)
+	{
+		DBfree_result(result);
+		return FAIL;
+	}
+
+	if ('\0' == *row[0] && '\0' == *row[1] && '\0' == *row[2] && '\0' == *row[3] && '\0' == *row[4] &&
+			'\0' == *row[5] && 0 == atoi(row[6]) && 0 == atoi(row[7]) && 0 == atoi(row[8]) &&
+			0 == atoi(row[9]) && 0 == atoi(row[10]) && 0 == atoi(row[11]) && 0 == atoi(row[12]))
+	{
+		DBfree_result(result);
+		return SUCCEED;
+	}
+
+	zbx_uint64_t	userdirectoryid = DBget_maxid("userdirectory");
+
+#define IDP_TYPE_SAML	2	/* user directory of type SAML */
+	int	rc = DBexecute("insert into userdirectory (userdirectoryid,idp_type) values (" ZBX_FS_UI64 ",%d)",
+			userdirectoryid, IDP_TYPE_SAML);
+#undef IDP_TYPE_SAML
+	if (ZBX_DB_OK > rc)
+	{
+		DBfree_result(result);
+		return FAIL;
+	}
+
+	char	*idp_entityid = DBdyn_escape_string(row[0]);
+	char	*sso_url = DBdyn_escape_string(row[1]);
+	char	*slo_url = DBdyn_escape_string(row[2]);
+	char	*username_attribute = DBdyn_escape_string(row[3]);
+	char	*sp_entityid = DBdyn_escape_string(row[4]);
+	char	*nameid_format = DBdyn_escape_string(row[5]);
+
+	int	rc2 = DBexecute("insert into userdirectory_saml (userdirectoryid,idp_entityid,sso_url,slo_url,"
+				"username_attribute,sp_entityid,nameid_format,sign_messages,sign_assertions,"
+				"sign_authn_requests,sign_logout_requests,sign_logout_responses,encrypt_nameid,"
+				"encrypt_assertions) values (" ZBX_FS_UI64 ",'%s','%s','%s','%s','%s','%s',%s,%s,%s,%s,"
+				"%s,%s,%s)", userdirectoryid, idp_entityid, sso_url, slo_url, username_attribute,
+				sp_entityid, nameid_format, row[6], row[7], row[8], row[9], row[10], row[11], row[12]);
+
+	zbx_free(nameid_format);
+	zbx_free(sp_entityid);
+	zbx_free(username_attribute);
+	zbx_free(slo_url);
+	zbx_free(sso_url);
+	zbx_free(idp_entityid);
+
+	DBfree_result(result);
+
+	if (ZBX_DB_OK > rc2)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6030105(void)
+{
+	return migrate_saml_data();
+}
+
+/* rename fields */
+
+static int	DBpatch_6030106(void)
+{
+	const ZBX_FIELD	field = {"ldap_auth_enabled", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("config", "ldap_configured", &field);
+}
+
+/* modify fields in tables */
+
+static int	DBpatch_6030107(void)
+{
+	const ZBX_FIELD field = {"roleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("users", &field);
+}
+
+/* drop fields */
+
+static int	DBpatch_6030108(void)
+{
+	return DBdrop_field("config", "saml_idp_entityid");
+}
+
+static int	DBpatch_6030109(void)
+{
+	return DBdrop_field("config", "saml_sso_url");
+}
+
+static int	DBpatch_6030110(void)
+{
+	return DBdrop_field("config", "saml_slo_url");
+}
+
+static int	DBpatch_6030111(void)
+{
+	return DBdrop_field("config", "saml_username_attribute");
+}
+
+static int	DBpatch_6030112(void)
+{
+	return DBdrop_field("config", "saml_sp_entityid");
+}
+
+static int	DBpatch_6030113(void)
+{
+	return DBdrop_field("config", "saml_nameid_format");
+}
+
+static int	DBpatch_6030114(void)
+{
+	return DBdrop_field("config", "saml_sign_messages");
+}
+
+static int	DBpatch_6030115(void)
+{
+	return DBdrop_field("config", "saml_sign_assertions");
+}
+
+static int	DBpatch_6030116(void)
+{
+	return DBdrop_field("config", "saml_sign_authn_requests");
+}
+
+static int	DBpatch_6030117(void)
+{
+	return DBdrop_field("config", "saml_sign_logout_requests");
+}
+
+static int	DBpatch_6030118(void)
+{
+	return DBdrop_field("config", "saml_sign_logout_responses");
+}
+
+static int	DBpatch_6030119(void)
+{
+	return DBdrop_field("config", "saml_encrypt_nameid");
+}
+
+static int	DBpatch_6030120(void)
+{
+	return DBdrop_field("config", "saml_encrypt_assertions");
+}
+
+static int	DBpatch_6030121(void)
+{
+	return DBdrop_field("userdirectory", "host");
+}
+
+static int	DBpatch_6030122(void)
+{
+	return DBdrop_field("userdirectory", "port");
+}
+
+static int	DBpatch_6030123(void)
+{
+	return DBdrop_field("userdirectory", "base_dn");
+}
+
+static int	DBpatch_6030124(void)
+{
+	return DBdrop_field("userdirectory", "bind_dn");
+}
+
+static int	DBpatch_6030125(void)
+{
+	return DBdrop_field("userdirectory", "bind_password");
+}
+
+static int	DBpatch_6030126(void)
+{
+	return DBdrop_field("userdirectory", "search_attribute");
+}
+
+static int	DBpatch_6030127(void)
+{
+	return DBdrop_field("userdirectory", "start_tls");
+}
+
+static int	DBpatch_6030128(void)
+{
+	return DBdrop_field("userdirectory", "search_filter");
+}
+/* end of ZBXNEXT-276 patches */
 #endif
 
 DBPATCH_START(6030)
@@ -632,5 +1250,70 @@ DBPATCH_ADD(6030060, 0, 1)
 DBPATCH_ADD(6030061, 0, 1)
 DBPATCH_ADD(6030062, 0, 1)
 DBPATCH_ADD(6030063, 0, 1)
+DBPATCH_ADD(6030064, 0, 1)
+DBPATCH_ADD(6030065, 0, 1)
+DBPATCH_ADD(6030066, 0, 1)
+DBPATCH_ADD(6030067, 0, 1)
+DBPATCH_ADD(6030068, 0, 1)
+DBPATCH_ADD(6030069, 0, 1)
+DBPATCH_ADD(6030070, 0, 1)
+DBPATCH_ADD(6030071, 0, 1)
+DBPATCH_ADD(6030072, 0, 1)
+DBPATCH_ADD(6030073, 0, 1)
+DBPATCH_ADD(6030074, 0, 1)
+DBPATCH_ADD(6030075, 0, 1)
+DBPATCH_ADD(6030076, 0, 1)
+DBPATCH_ADD(6030077, 0, 1)
+DBPATCH_ADD(6030078, 0, 1)
+DBPATCH_ADD(6030079, 0, 1)
+DBPATCH_ADD(6030080, 0, 1)
+DBPATCH_ADD(6030081, 0, 1)
+DBPATCH_ADD(6030082, 0, 1)
+DBPATCH_ADD(6030083, 0, 1)
+DBPATCH_ADD(6030084, 0, 1)
+DBPATCH_ADD(6030085, 0, 1)
+DBPATCH_ADD(6030086, 0, 1)
+DBPATCH_ADD(6030087, 0, 1)
+DBPATCH_ADD(6030088, 0, 1)
+DBPATCH_ADD(6030089, 0, 1)
+DBPATCH_ADD(6030090, 0, 1)
+DBPATCH_ADD(6030091, 0, 1)
+DBPATCH_ADD(6030092, 0, 1)
+DBPATCH_ADD(6030093, 0, 1)
+DBPATCH_ADD(6030094, 0, 1)
+DBPATCH_ADD(6030095, 0, 1)
+DBPATCH_ADD(6030096, 0, 1)
+DBPATCH_ADD(6030097, 0, 1)
+DBPATCH_ADD(6030098, 0, 1)
+DBPATCH_ADD(6030099, 0, 1)
+DBPATCH_ADD(6030100, 0, 1)
+DBPATCH_ADD(6030101, 0, 1)
+DBPATCH_ADD(6030102, 0, 1)
+DBPATCH_ADD(6030103, 0, 1)
+DBPATCH_ADD(6030104, 0, 1)
+DBPATCH_ADD(6030105, 0, 1)
+DBPATCH_ADD(6030106, 0, 1)
+DBPATCH_ADD(6030107, 0, 1)
+DBPATCH_ADD(6030108, 0, 1)
+DBPATCH_ADD(6030109, 0, 1)
+DBPATCH_ADD(6030110, 0, 1)
+DBPATCH_ADD(6030111, 0, 1)
+DBPATCH_ADD(6030112, 0, 1)
+DBPATCH_ADD(6030113, 0, 1)
+DBPATCH_ADD(6030114, 0, 1)
+DBPATCH_ADD(6030115, 0, 1)
+DBPATCH_ADD(6030116, 0, 1)
+DBPATCH_ADD(6030117, 0, 1)
+DBPATCH_ADD(6030118, 0, 1)
+DBPATCH_ADD(6030119, 0, 1)
+DBPATCH_ADD(6030120, 0, 1)
+DBPATCH_ADD(6030121, 0, 1)
+DBPATCH_ADD(6030122, 0, 1)
+DBPATCH_ADD(6030123, 0, 1)
+DBPATCH_ADD(6030124, 0, 1)
+DBPATCH_ADD(6030125, 0, 1)
+DBPATCH_ADD(6030126, 0, 1)
+DBPATCH_ADD(6030127, 0, 1)
+DBPATCH_ADD(6030128, 0, 1)
 
 DBPATCH_END()
