@@ -85,19 +85,19 @@ class CControllerPopupActionOperationGet extends CController {
 
 		if ($new_operation) {
 			if ($new_operation['recovery'] == ACTION_OPERATION) {
-				$data['table'] = 'operation';
+				$data['recovery'] = ACTION_OPERATION;
 				$data['operations'] = $this->hasInput('operations') ? $this->getInput('operations') : [];
 				$data['operations'][] = $new_operation;
 			}
 			elseif ($new_operation['recovery'] == ACTION_RECOVERY_OPERATION) {
-				$data['table'] = 'recovery';
+				$data['recovery'] = ACTION_RECOVERY_OPERATION;
 				$data['operations'] = $this->hasInput('recovery_operations')
 					? $this->getInput('recovery_operations')
 					: [];
 				$data['operations'][] = $new_operation;
 			}
 			elseif ($new_operation['recovery'] == ACTION_UPDATE_OPERATION) {
-				$data['table'] = 'update';
+				$data['recovery'] = ACTION_UPDATE_OPERATION;
 				$data['operations'] = $this->hasInput('update_operations')
 					? $this->getInput('update_operations')
 					: [];
@@ -105,7 +105,7 @@ class CControllerPopupActionOperationGet extends CController {
 			}
 		}
 		else {
-			$data['table'] = 'operation';
+			$data['recovery'] = ACTION_OPERATION;
 			$data['operations'] = $this->hasInput('operations') ? $this->getInput('operations') : [];
 		}
 

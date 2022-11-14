@@ -25,8 +25,18 @@
  */
 
 
+if ($data['recovery'] === ACTION_OPERATION) {
+	$partial = 'popup.operations';
+}
+elseif ($data['recovery'] === ACTION_RECOVERY_OPERATION) {
+	$partial = 'popup.recovery.operations';
+}
+elseif ($data['recovery'] === ACTION_UPDATE_OPERATION) {
+	$partial = 'popup.update.operations';
+}
+
 $output = [
-	'body' => (new CPartial('popup.operations.html', $data))->getOutput()
+	'body' => (new CPartial($partial, $data))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {

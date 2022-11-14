@@ -187,43 +187,35 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 
 // Operations table.
 $data['esc_period'] = $data['action']['esc_period'];
-$data['table'] = 'operation';
 
 $operations_tab->addItem([
 	new CLabel('Operations'),
-	(new CFormField(new CPartial('popup.operations.html', $data)))
+	(new CFormField(new CPartial('popup.operations', $data)))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setId('operations-container')
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 ]);
-unset ($data['table']);
 
 // Recovery operations table.
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
-	$data['table'] = 'recovery';
-
 	$operations_tab->addItem([
 		new CLabel('Recovery operations'),
-		(new CFormField(new CPartial('popup.operations.html', $data)))
+		(new CFormField(new CPartial('popup.recovery.operations', $data)))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setId('recovery-operations-container')
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
-	unset ($data['table']);
 }
 
 // Update operations table.
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_SERVICE) {
-	$data['table'] = 'update';
-
 	$operations_tab->addItem([
 		new CLabel('Update operations'),
-		(new CFormField(new CPartial('popup.operations.html', $data)))
+		(new CFormField(new CPartial('popup.update.operations', $data)))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setId('update-operations-container')
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
-	unset ($data['table']);
 }
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
