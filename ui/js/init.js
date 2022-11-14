@@ -104,7 +104,7 @@ jQuery(function($) {
 	$('input[unchecked-value]').each(function() {
 		const $this = $(this);
 		uncheckedHandler($this);
-		$this.on('change', function () {
+		$this.on('change enable disable', function () {
 			uncheckedHandler($this)
 		})
 
@@ -114,7 +114,7 @@ jQuery(function($) {
 
 		observer.observe(this, {
 			attributes: true,
-			attributeFilter: ['disabled', 'readonly']
+			attributeFilter: ['disabled']
 		});
 	});
 
