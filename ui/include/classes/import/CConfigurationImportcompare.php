@@ -71,8 +71,10 @@ class CConfigurationImportcompare {
 		];
 
 		$this->unique_fields_keys_by_type = [
-			'groups' => ['name'],
+			'template_groups' => ['name'],
+			'host_groups' => ['name'],
 			'templates' => ['name'],
+			'groups' => ['name'],
 			'items' => ['name', 'key'],
 			'triggers' => ['name', 'expression', 'recovery_expression'],
 			'dashboards' => ['name'],
@@ -274,6 +276,7 @@ class CConfigurationImportcompare {
 	private function addUniquenessParameterByEntityType(array $entities, string $type): array {
 		foreach ($entities as &$entity) {
 			foreach ($this->unique_fields_keys_by_type[$type] as $unique_field_key) {
+
 				$unique_values = $this->getUniqueValuesByFieldPath($entity, $unique_field_key);
 
 				$entity['uniqueness'][] = $unique_values;
