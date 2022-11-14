@@ -2731,6 +2731,11 @@ return [
 				'ref_table' => 'userdirectory',
 				'ref_field' => 'userdirectoryid'
 			],
+			'server_status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => ''
+			],
 			'jit_provision_interval' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -2756,11 +2761,6 @@ return [
 				'default' => NULL,
 				'ref_table' => 'usrgrp',
 				'ref_field' => 'usrgrpid'
-			],
-			'server_status' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_TEXT,
-				'default' => ''
 			]
 		]
 	],
@@ -9297,7 +9297,7 @@ return [
 			]
 		]
 	],
-	'scim_groups' => [
+	'scim_group' => [
 		'key' => 'scim_groupid',
 		'fields' => [
 			'scim_groupid' => [
@@ -9313,7 +9313,7 @@ return [
 			]
 		]
 	],
-	'users_scim_groups' => [
+	'users_scim_group' => [
 		'key' => 'users_scim_groupid',
 		'fields' => [
 			'users_scim_groupid' => [
@@ -9332,7 +9332,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'scim_groups',
+				'ref_table' => 'scim_group',
 				'ref_field' => 'scim_groupid'
 			]
 		]
