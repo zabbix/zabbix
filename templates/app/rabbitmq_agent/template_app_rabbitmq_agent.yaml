@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-14T16:51:58Z'
+  date: '2022-11-14T16:56:52Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -3042,7 +3042,7 @@ zabbix_export:
         -
           macro: '{$RABBITMQ.RESPONSE_TIME.MAX.WARN}'
           value: '10'
-          description: 'Maximum RabbitMQ response time in seconds for trigger expression'
+          description: 'The maximum response time by the RabbitMQ expressed in seconds for a trigger expression.'
       dashboards:
         -
           uuid: ce0af043ed2c4e7c988674c9ecb787d6

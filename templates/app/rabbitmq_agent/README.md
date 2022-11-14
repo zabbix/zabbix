@@ -152,7 +152,7 @@ This template was tested on:
 
 ## Setup
 
-Enable the RabbitMQ management plugin. See [RabbitMQ's documentation](https://www.rabbitmq.com/management.html) to enable it.
+Enable the RabbitMQ management plugin. See [RabbitMQ's documentation](https://www.rabbitmq.com/management.html) for the instructions.
 
 Create a user to monitor the service:
 
@@ -189,7 +189,7 @@ No specific Zabbix configuration is required.
 |{$RABBITMQ.LLD.FILTER.QUEUE.NOT_MATCHES} |<p>Filter to exclude discovered queues</p> |`CHANGE_IF_NEEDED` |
 |{$RABBITMQ.MESSAGES.MAX.WARN} |<p>Maximum number of messages in the queue for trigger expression</p> |`1000` |
 |{$RABBITMQ.PROCESS_NAME} |<p>RabbitMQ server process name</p> |`beam.smp` |
-|{$RABBITMQ.RESPONSE_TIME.MAX.WARN} |<p>Maximum RabbitMQ response time in seconds for trigger expression</p> |`10` |
+|{$RABBITMQ.RESPONSE_TIME.MAX.WARN} |<p>The maximum response time by the RabbitMQ expressed in seconds for a trigger expression.</p> |`10` |
 
 ## Template links
 
