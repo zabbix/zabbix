@@ -4,9 +4,9 @@
 ## Overview
 
 For Zabbix version: 6.2 and higher.
-The template to monitor Apache HTTPD by Zabbix that work without any external scripts.
+This template is developed to monitor Apache HTTPD by Zabbix that works without any external scripts. external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.  
-Template `Apache by Zabbix agent` - collects metrics by polling [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html) locally with Zabbix agent:
+Template Apache by Zabbix agent - collects metrics by polling [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html) locally with Zabbix agent:
 
 ```text
 127.0.0.1
@@ -86,12 +86,12 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$APACHE.PROCESS_NAME} |<p>Apache server process name</p> |`(httpd|apache2)` |
-|{$APACHE.RESPONSE_TIME.MAX.WARN} |<p>Maximum Apache response time in seconds for trigger expression</p> |`10` |
+|{$APACHE.PROCESS_NAME} |<p>The process name of the Apache web server (Apache).</p> |`(httpd|apache2)` |
+|{$APACHE.RESPONSE_TIME.MAX.WARN} |<p>The maximum Apache response time in seconds for a trigger expression.</p> |`10` |
 |{$APACHE.STATUS.HOST} |<p>Hostname or IP address of the Apache status page</p> |`127.0.0.1` |
-|{$APACHE.STATUS.PATH} |<p>The URL path</p> |`server-status?auto` |
-|{$APACHE.STATUS.PORT} |<p>The port of Apache status page</p> |`80` |
-|{$APACHE.STATUS.SCHEME} |<p>Request scheme which may be http or https</p> |`http` |
+|{$APACHE.STATUS.PATH} |<p>The URL path.</p> |`server-status?auto` |
+|{$APACHE.STATUS.PORT} |<p>The port of Apache status page.</p> |`80` |
+|{$APACHE.STATUS.SCHEME} |<p>The request scheme which may be either HTTP or HTTPS.</p> |`http` |
 
 ## Template links
 
@@ -101,8 +101,8 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Apache process discovery |<p>Discovery for summary process Apache.</p> |DEPENDENT |apache.proc.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$APACHE.PROCESS_NAME}`</p> |
-|Event MPM discovery |<p>Additional metrics if event MPM is used</p><p>https://httpd.apache.org/docs/current/mod/event.html</p> |DEPENDENT |apache.mpm.event.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(JSON.parse(value).ServerMPM === 'event'     ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
+|Apache process discovery |<p>The discovery summary of Apache process.</p> |DEPENDENT |apache.proc.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$APACHE.PROCESS_NAME}`</p> |
+|Event MPM discovery |<p>The discovery of additional metrics if the event Multi-Processing Module (MPM) is used.</p><p>For more details see [Apache MPM event](https://httpd.apache.org/docs/current/mod/event.html).</p> |DEPENDENT |apache.mpm.event.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `return JSON.stringify(JSON.parse(value).ServerMPM === 'event'     ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 
 ## Items collected
 
@@ -110,8 +110,8 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |Apache |Apache: Service ping |<p>-</p> |ZABBIX_PASSIVE |net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Apache |Apache: Service response time |<p>-</p> |ZABBIX_PASSIVE |net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"] |
-|Apache |Apache: Total bytes |<p>Total bytes served</p> |DEPENDENT |apache.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total kBytes"]`</p><p>- MULTIPLIER: `1024`</p> |
-|Apache |Apache: Bytes per second |<p>Calculated as change rate for 'Total bytes' stat.</p><p>BytesPerSec is not used, as it counts average since last Apache server start.</p> |DEPENDENT |apache.bytes.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total kBytes"]`</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND</p> |
+|Apache |Apache: Total bytes |<p>Total bytes served.</p> |DEPENDENT |apache.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total kBytes"]`</p><p>- MULTIPLIER: `1024`</p> |
+|Apache |Apache: Bytes per second |<p>It is calculated as a rate of change for Total bytes statistics.</p><p>ReqPerSec is not used, as it counts the average since the last Apache server start.</p> |DEPENDENT |apache.bytes.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total kBytes"]`</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND</p> |
 |Apache |Apache: Requests per second |<p>Calculated as change rate for 'Total requests' stat.</p><p>ReqPerSec is not used, as it counts average since last Apache server start.</p> |DEPENDENT |apache.requests.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total Accesses"]`</p><p>- CHANGE_PER_SECOND</p> |
 |Apache |Apache: Total requests |<p>A total number of accesses</p> |DEPENDENT |apache.requests<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total Accesses"]`</p> |
 |Apache |Apache: Uptime |<p>Service uptime in seconds</p> |DEPENDENT |apache.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.ServerUptimeSeconds`</p> |
@@ -119,30 +119,30 @@ There are no template links in this template.
 |Apache |Apache: Total workers busy |<p>Total number of busy worker threads/processes</p> |DEPENDENT |apache.workers_total.busy<p>**Preprocessing**:</p><p>- JSONPATH: `$.BusyWorkers`</p> |
 |Apache |Apache: Total workers idle |<p>Total number of idle worker threads/processes</p> |DEPENDENT |apache.workers_total.idle<p>**Preprocessing**:</p><p>- JSONPATH: `$.IdleWorkers`</p> |
 |Apache |Apache: Workers closing connection |<p>Number of workers in closing state</p> |DEPENDENT |apache.workers.closing<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.closing`</p> |
-|Apache |Apache: Workers DNS lookup |<p>Number of workers in dnslookup state</p> |DEPENDENT |apache.workers.dnslookup<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.dnslookup`</p> |
-|Apache |Apache: Workers finishing |<p>Number of workers in finishing state</p> |DEPENDENT |apache.workers.finishing<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.finishing`</p> |
-|Apache |Apache: Workers idle cleanup |<p>Number of workers in cleanup state</p> |DEPENDENT |apache.workers.cleanup<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.cleanup`</p> |
-|Apache |Apache: Workers keepalive (read) |<p>Number of workers in keepalive state</p> |DEPENDENT |apache.workers.keepalive<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.keepalive`</p> |
-|Apache |Apache: Workers logging |<p>Number of workers in logging state</p> |DEPENDENT |apache.workers.logging<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.logging`</p> |
-|Apache |Apache: Workers reading request |<p>Number of workers in reading state</p> |DEPENDENT |apache.workers.reading<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.reading`</p> |
-|Apache |Apache: Workers sending reply |<p>Number of workers in sending state</p> |DEPENDENT |apache.workers.sending<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.sending`</p> |
-|Apache |Apache: Workers slot with no current process |<p>Number of slots with no current process</p> |DEPENDENT |apache.workers.slot<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.slot`</p> |
-|Apache |Apache: Workers starting up |<p>Number of workers in starting state</p> |DEPENDENT |apache.workers.starting<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.starting`</p> |
-|Apache |Apache: Workers waiting for connection |<p>Number of workers in waiting state</p> |DEPENDENT |apache.workers.waiting<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.waiting`</p> |
-|Apache |Apache: Get processes summary |<p>Summary metrics data for all processes.</p> |ZABBIX_PASSIVE |proc.get[,,,summary] |
-|Apache |Apache: CPU utilization |<p>Process {#NAME} CPU utilization percentage.</p> |ZABBIX_PASSIVE |proc.cpu.util[{#NAME}] |
-|Apache |Apache: Get process data |<p>Summary metrics by process {#NAME}.</p> |DEPENDENT |apache.proc.get[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@["name"]=="{#NAME}")].first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> Failed to retrieve process {#NAME} data`</p> |
-|Apache |Apache: Memory usage (rss) |<p>Summary of resident set size memory used by process {#NAME} in bytes.</p> |DEPENDENT |apache.proc.rss[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.rss`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Apache |Apache: Memory usage (vsize) |<p>Summary of virtual memory used by process {#NAME} in bytes.</p> |DEPENDENT |apache.proc.vmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.vsize`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Apache |Apache: Memory usage, % |<p>Percentage of real memory used by process {#NAME}.</p> |DEPENDENT |apache.proc.pmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pmem`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Apache |Apache: Number of running processes |<p>Number of running processes {#NAME}.</p> |DEPENDENT |apache.proc.num[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.processes`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Apache |Apache: Connections async closing |<p>Number of async connections in closing state (only applicable to event MPM)</p> |DEPENDENT |apache.connections[async_closing{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsAsyncClosing`</p> |
-|Apache |Apache: Connections async keep alive |<p>Number of async connections in keep-alive state (only applicable to event MPM)</p> |DEPENDENT |apache.connections[async_keep_alive{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsAsyncKeepAlive`</p> |
-|Apache |Apache: Connections async writing |<p>Number of async connections in writing state (only applicable to event MPM)</p> |DEPENDENT |apache.connections[async_writing{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsAsyncWriting`</p> |
-|Apache |Apache: Connections total |<p>Number of total connections</p> |DEPENDENT |apache.connections[total{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsTotal`</p> |
-|Apache |Apache: Bytes per request |<p>Average number of client requests per second</p> |DEPENDENT |apache.bytes[per_request{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.BytesPerReq`</p> |
-|Apache |Apache: Number of async processes |<p>Number of async processes</p> |DEPENDENT |apache.process[num{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Processes`</p> |
-|Zabbix raw items |Apache: Get status |<p>Getting data from a machine-readable version of the Apache status page.</p><p>https://httpd.apache.org/docs/current/mod/mod_status.html</p> |ZABBIX_PASSIVE |web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
+|Apache |Apache: Workers DNS lookup |<p>Number of workers in dnslookup state.</p> |DEPENDENT |apache.workers.dnslookup<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.dnslookup`</p> |
+|Apache |Apache: Workers finishing |<p>Number of workers in finishing state.</p> |DEPENDENT |apache.workers.finishing<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.finishing`</p> |
+|Apache |Apache: Workers idle cleanup |<p>Number of workers in cleanup state.</p> |DEPENDENT |apache.workers.cleanup<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.cleanup`</p> |
+|Apache |Apache: Workers keepalive (read) |<p>The number of workers in keepalive state.</p> |DEPENDENT |apache.workers.keepalive<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.keepalive`</p> |
+|Apache |Apache: Workers logging |<p>The number of workers in logging state.</p> |DEPENDENT |apache.workers.logging<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.logging`</p> |
+|Apache |Apache: Workers reading request |<p>The number of workers in reading state.</p> |DEPENDENT |apache.workers.reading<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.reading`</p> |
+|Apache |Apache: Workers sending reply |<p>The number of workers in sending state.</p> |DEPENDENT |apache.workers.sending<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.sending`</p> |
+|Apache |Apache: Workers slot with no current process |<p>The number of slots with no current process.</p> |DEPENDENT |apache.workers.slot<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.slot`</p> |
+|Apache |Apache: Workers starting up |<p>The number of workers in starting state.</p> |DEPENDENT |apache.workers.starting<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.starting`</p> |
+|Apache |Apache: Workers waiting for connection |<p>The number of workers in waiting state.</p> |DEPENDENT |apache.workers.waiting<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.waiting`</p> |
+|Apache |Apache: Get processes summary |<p>The aggregated data of summary metrics for all processes.</p> |ZABBIX_PASSIVE |proc.get[,,,summary] |
+|Apache |Apache: CPU utilization |<p>A process {#NAME} - the percentage of the CPU utilization.</p> |ZABBIX_PASSIVE |proc.cpu.util[{#NAME}] |
+|Apache |Apache: Get process data |<p>The summary metrics aggregated by a process {#NAME}.</p> |DEPENDENT |apache.proc.get[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@["name"]=="{#NAME}")].first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> Failed to retrieve process {#NAME} data`</p> |
+|Apache |Apache: Memory usage (rss) |<p>The summary of resident set size memory used by a process {#NAME} expressed in bytes.</p> |DEPENDENT |apache.proc.rss[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.rss`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Apache |Apache: Memory usage (vsize) |<p>The summary of virtual memory used by a process {#NAME} expressed in bytes.</p> |DEPENDENT |apache.proc.vmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.vsize`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Apache |Apache: Memory usage, % |<p>The percentage of real memory used by a process {#NAME}.</p> |DEPENDENT |apache.proc.pmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pmem`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Apache |Apache: Number of running processes |<p>The number of running processes {#NAME}.</p> |DEPENDENT |apache.proc.num[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.processes`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Apache |Apache: Connections async closing |<p>The number of asynchronous connections in a closing state (applicable only to the event MPM).</p> |DEPENDENT |apache.connections[async_closing{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsAsyncClosing`</p> |
+|Apache |Apache: Connections async keepalive |<p>The number of asynchronous connections in a keepalive state (applicable only to the event MPM).</p> |DEPENDENT |apache.connections[async_keep_alive{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsAsyncKeepAlive`</p> |
+|Apache |Apache: Connections async writing |<p>The number of asynchronous connections in a writing state (applicable only to the event MPM).</p> |DEPENDENT |apache.connections[async_writing{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsAsyncWriting`</p> |
+|Apache |Apache: Connections total |<p>The number of total connections.</p> |DEPENDENT |apache.connections[total{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.ConnsTotal`</p> |
+|Apache |Apache: Bytes per request |<p>The average number of client requests per second.</p> |DEPENDENT |apache.bytes[per_request{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.BytesPerReq`</p> |
+|Apache |Apache: Number of async processes |<p>The number of asynchronous processes.</p> |DEPENDENT |apache.process[num{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.Processes`</p> |
+|Zabbix raw items |Apache: Get status |<p>Getting data from a machine-readable version of the Apache status page.</p><p> For more information see Apache Module [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html).</p> |ZABBIX_PASSIVE |web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"]<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p> |
 
 ## Triggers
 
