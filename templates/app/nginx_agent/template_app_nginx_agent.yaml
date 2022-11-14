@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-09-27T15:08:59Z'
+  date: '2022-11-14T13:27:24Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -290,7 +290,7 @@ zabbix_export:
               name: 'Nginx: Version has changed'
               event_name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
-              description: 'Nginx version has changed. Ack to close.'
+              description: 'The Nginx version has changed. Acknowledge (Ack) to close manually.'
               manual_close: 'YES'
               tags:
                 -
@@ -303,7 +303,7 @@ zabbix_export:
           history: 0d
           trends: '0'
           value_type: TEXT
-          description: 'Summary metrics data for all processes.'
+          description: 'The aggregated data of summary metrics for all processes.'
           tags:
             -
               tag: component
@@ -317,14 +317,14 @@ zabbix_export:
           value_type: TEXT
           description: |
             The following status information is provided:
-            Active connections - the current number of active client connections including Waiting connections.
-            Accepts - the total number of accepted client connections.
-            Handled - the total number of handled connections. Generally, the parameter value is the same as accepts unless some resource limits have been reached (for example, the worker_connections limit).
-            Requests - the total number of client requests.
-            Reading - the current number of connections where nginx is reading the request header.
-            Writing - the current number of connections where nginx is writing the response back to the client.
-            Waiting - the current number of idle client connections waiting for a request.
-            https://nginx.org/en/docs/http/ngx_http_stub_status_module.html
+             Active connections - the current number of active client connections including waiting connections.
+             Accepts - the total number of accepted client connections.
+             Handled - the total number of handled connections. Generally, the parameter value is the same as for accepted connections, unless some resource limits have been reached (for example, the worker_connections limit).
+             Requests - the total number of client requests.
+             Reading - the current number of connections where Nginx is reading the request header.
+             Writing - the current number of connections where Nginx is writing the response back to the client.
+             Waiting - the current number of idle client connections waiting for a request.
+             See also [Module ngx_http_stub_status_module](https://nginx.org/en/docs/http/ngx_http_stub_status_module.html).
           tags:
             -
               tag: component
@@ -346,7 +346,7 @@ zabbix_export:
                 macro: '{#NAME}'
                 value: '{$NGINX.PROCESS_NAME}'
                 formulaid: A
-          description: 'Discovery of summary process Nginx.'
+          description: 'The discovery of Nginx summary process.'
           item_prototypes:
             -
               uuid: 632e441011674f04886096475180dcbb
@@ -357,7 +357,7 @@ zabbix_export:
               history: 0d
               trends: '0'
               value_type: TEXT
-              description: 'Summary metrics by process {#NAME}.'
+              description: 'The summary metrics aggregated by a process {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -378,7 +378,7 @@ zabbix_export:
               key: 'nginx.proc.num[{#NAME}]'
               delay: '0'
               history: 7d
-              description: 'Number of running processes {#NAME}.'
+              description: 'The number of running processes {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -415,7 +415,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'Percentage of real memory used by process {#NAME}.'
+              description: 'The percentage of real memory used by a process {#NAME}.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -436,7 +436,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Summary of resident set size memory used by process {#NAME} in bytes.'
+              description: 'The summary of resident set size memory used by a process {#NAME} expressed in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -457,7 +457,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: B
-              description: 'Summary of virtual memory used by process {#NAME} in bytes.'
+              description: 'The summary of virtual memory used by a process {#NAME} expressed in bytes.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -477,7 +477,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              description: 'Process {#NAME} CPU utilization percentage.'
+              description: 'The percentage of the CPU utilization by a process {#NAME}.'
               tags:
                 -
                   tag: component
@@ -491,7 +491,7 @@ zabbix_export:
               name: 'Nginx: Failed to fetch stub status page'
               event_name: 'Nginx: Failed to fetch stub status page (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              description: 'Zabbix has not received any data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -508,7 +508,7 @@ zabbix_export:
               event_name: 'Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
               opdata: 'Current rate: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.'
+              description: 'The rate of dropping connections has been greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.'
               dependencies:
                 -
                   name: 'Nginx: Service is down'
@@ -577,23 +577,23 @@ zabbix_export:
         -
           macro: '{$NGINX.DROP_RATE.MAX.WARN}'
           value: '1'
-          description: 'The critical rate of the dropped connections for trigger expression.'
+          description: 'The critical rate of the dropped connections for a trigger expression.'
         -
           macro: '{$NGINX.PROCESS_NAME}'
           value: nginx
-          description: 'Nginx server process name'
+          description: 'The process name of the Nginx server.'
         -
           macro: '{$NGINX.RESPONSE_TIME.MAX.WARN}'
           value: '10'
-          description: 'The Nginx maximum response time in seconds for trigger expression.'
+          description: 'The maximum response time of Nginx expressed in seconds for a trigger expression.'
         -
           macro: '{$NGINX.STUB_STATUS.HOST}'
           value: localhost
-          description: 'Hostname or IP of Nginx stub_status host or container.'
+          description: 'The Hostname or an IP addess of the Nginx host or Nginx container of astub_status.'
         -
           macro: '{$NGINX.STUB_STATUS.PATH}'
           value: basic_status
-          description: 'The path of Nginx stub_status page.'
+          description: 'The path of the Nginx stub_status page.'
         -
           macro: '{$NGINX.STUB_STATUS.PORT}'
           value: '80'

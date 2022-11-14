@@ -4,10 +4,10 @@
 ## Overview
 
 For Zabbix version: 6.2 and higher.
-The template to monitor Nginx by Zabbix that work without any external scripts.
+This template is developed to monitor Nginx by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `Nginx by Zabbix agent` collects metrics by polling [ngx_http_stub_status_module](https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html) locally with Zabbix agent:
+The template Nginx by Zabbix agent collects metrics by polling [ngx_http_stub_status_module](https://nginx.ru/en/docs/http/ngx_http_stub_status_module.html) locally with Zabbix agent:
 
 ```text
 Active connections: 291
@@ -54,11 +54,11 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$NGINX.DROP_RATE.MAX.WARN} |<p>The critical rate of the dropped connections for trigger expression.</p> |`1` |
-|{$NGINX.PROCESS_NAME} |<p>Nginx server process name</p> |`nginx` |
-|{$NGINX.RESPONSE_TIME.MAX.WARN} |<p>The Nginx maximum response time in seconds for trigger expression.</p> |`10` |
-|{$NGINX.STUB_STATUS.HOST} |<p>Hostname or IP of Nginx stub_status host or container.</p> |`localhost` |
-|{$NGINX.STUB_STATUS.PATH} |<p>The path of Nginx stub_status page.</p> |`basic_status` |
+|{$NGINX.DROP_RATE.MAX.WARN} |<p>The critical rate of the dropped connections for a trigger expression.</p> |`1` |
+|{$NGINX.PROCESS_NAME} |<p>The process name of the Nginx server.</p> |`nginx` |
+|{$NGINX.RESPONSE_TIME.MAX.WARN} |<p>The maximum response time of Nginx expressed in seconds for a trigger expression.</p> |`10` |
+|{$NGINX.STUB_STATUS.HOST} |<p>The Hostname or an IP addess of the Nginx host or Nginx container of astub_status.</p> |`localhost` |
+|{$NGINX.STUB_STATUS.PATH} |<p>The path of the Nginx stub_status page.</p> |`basic_status` |
 |{$NGINX.STUB_STATUS.PORT} |<p>The port of Nginx stub_status host or container.</p> |`80` |
 
 ## Template links
@@ -69,7 +69,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Nginx process discovery |<p>Discovery of summary process Nginx.</p> |DEPENDENT |nginx.proc.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$NGINX.PROCESS_NAME}`</p> |
+|Nginx process discovery |<p>The discovery of Nginx summary process.</p> |DEPENDENT |nginx.proc.discovery<p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$NGINX.PROCESS_NAME}`</p> |
 
 ## Items collected
 
@@ -86,26 +86,26 @@ There are no template links in this template.
 |Nginx |Nginx: Connections reading |<p>The current number of connections where nginx is reading the request header.</p> |DEPENDENT |nginx.connections.reading<p>**Preprocessing**:</p><p>- REGEX: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \1`</p> |
 |Nginx |Nginx: Connections waiting |<p>The current number of idle client connections waiting for a request.</p> |DEPENDENT |nginx.connections.waiting<p>**Preprocessing**:</p><p>- REGEX: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \3`</p> |
 |Nginx |Nginx: Connections writing |<p>The current number of connections where nginx is writing the response back to the client.</p> |DEPENDENT |nginx.connections.writing<p>**Preprocessing**:</p><p>- REGEX: `Reading: ([0-9]+) Writing: ([0-9]+) Waiting: ([0-9]+) \2`</p> |
-|Nginx |Nginx: Get processes summary |<p>Summary metrics data for all processes.</p> |ZABBIX_PASSIVE |proc.get[,,,summary] |
+|Nginx |Nginx: Get processes summary |<p>The aggregated data of summary metrics for all processes.</p> |ZABBIX_PASSIVE |proc.get[,,,summary] |
 |Nginx |Nginx: Version |<p>-</p> |DEPENDENT |nginx.version<p>**Preprocessing**:</p><p>- REGEX: `Server: nginx\/(.+(?<!\r)) \1`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Nginx |Nginx: CPU utilization |<p>Process {#NAME} CPU utilization percentage.</p> |ZABBIX_PASSIVE |proc.cpu.util[{#NAME}] |
-|Nginx |Nginx: Get process data |<p>Summary metrics by process {#NAME}.</p> |DEPENDENT |nginx.proc.get[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@["name"]=="{#NAME}")].first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> Failed to retrieve process {#NAME} data`</p> |
-|Nginx |Nginx: Memory usage (vsize) |<p>Summary of virtual memory used by process {#NAME} in bytes.</p> |DEPENDENT |nginx.proc.vmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.vsize`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Nginx |Nginx: Memory usage (rss) |<p>Summary of resident set size memory used by process {#NAME} in bytes.</p> |DEPENDENT |nginx.proc.rss[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.rss`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Nginx |Nginx: Memory usage, % |<p>Percentage of real memory used by process {#NAME}.</p> |DEPENDENT |nginx.proc.pmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pmem`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
-|Nginx |Nginx: Number of running processes |<p>Number of running processes {#NAME}.</p> |DEPENDENT |nginx.proc.num[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.processes`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Zabbix raw items |Nginx: Get stub status page |<p>The following status information is provided:</p><p>Active connections - the current number of active client connections including Waiting connections.</p><p>Accepts - the total number of accepted client connections.</p><p>Handled - the total number of handled connections. Generally, the parameter value is the same as accepts unless some resource limits have been reached (for example, the worker_connections limit).</p><p>Requests - the total number of client requests.</p><p>Reading - the current number of connections where nginx is reading the request header.</p><p>Writing - the current number of connections where nginx is writing the response back to the client.</p><p>Waiting - the current number of idle client connections waiting for a request.</p><p>https://nginx.org/en/docs/http/ngx_http_stub_status_module.html</p> |ZABBIX_PASSIVE |web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"] |
+|Nginx |Nginx: CPU utilization |<p>The percentage of the CPU utilization by a process {#NAME}.</p> |ZABBIX_PASSIVE |proc.cpu.util[{#NAME}] |
+|Nginx |Nginx: Get process data |<p>The summary metrics aggregated by a process {#NAME}.</p> |DEPENDENT |nginx.proc.get[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@["name"]=="{#NAME}")].first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> Failed to retrieve process {#NAME} data`</p> |
+|Nginx |Nginx: Memory usage (vsize) |<p>The summary of virtual memory used by a process {#NAME} expressed in bytes.</p> |DEPENDENT |nginx.proc.vmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.vsize`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Nginx |Nginx: Memory usage (rss) |<p>The summary of resident set size memory used by a process {#NAME} expressed in bytes.</p> |DEPENDENT |nginx.proc.rss[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.rss`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Nginx |Nginx: Memory usage, % |<p>The percentage of real memory used by a process {#NAME}.</p> |DEPENDENT |nginx.proc.pmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.pmem`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
+|Nginx |Nginx: Number of running processes |<p>The number of running processes {#NAME}.</p> |DEPENDENT |nginx.proc.num[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.processes`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Zabbix raw items |Nginx: Get stub status page |<p>The following status information is provided:</p><p> Active connections - the current number of active client connections including waiting connections.</p><p> Accepts - the total number of accepted client connections.</p><p> Handled - the total number of handled connections. Generally, the parameter value is the same as for accepted connections, unless some resource limits have been reached (for example, the worker_connections limit).</p><p> Requests - the total number of client requests.</p><p> Reading - the current number of connections where Nginx is reading the request header.</p><p> Writing - the current number of connections where Nginx is writing the response back to the client.</p><p> Waiting - the current number of idle client connections waiting for a request.</p><p> See also [Module ngx_http_stub_status_module](https://nginx.org/en/docs/http/ngx_http_stub_status_module.html).</p> |ZABBIX_PASSIVE |web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"] |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Nginx: Version has changed |<p>Nginx version has changed. Ack to close.</p> |`last(/Nginx by Zabbix agent/nginx.version,#1)<>last(/Nginx by Zabbix agent/nginx.version,#2) and length(last(/Nginx by Zabbix agent/nginx.version))>0` |INFO |<p>Manual close: YES</p> |
+|Nginx: Version has changed |<p>The Nginx version has changed. Acknowledge (Ack) to close manually.</p> |`last(/Nginx by Zabbix agent/nginx.version,#1)<>last(/Nginx by Zabbix agent/nginx.version,#2) and length(last(/Nginx by Zabbix agent/nginx.version))>0` |INFO |<p>Manual close: YES</p> |
 |Nginx: Process is not running |<p>-</p> |`last(/Nginx by Zabbix agent/nginx.proc.num[{#NAME}])=0` |HIGH | |
 |Nginx: Service is down |<p>-</p> |`last(/Nginx by Zabbix agent/net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"])=0 and last(/Nginx by Zabbix agent/nginx.proc.num[{#NAME}])>0` |AVERAGE |<p>Manual close: YES</p> |
-|Nginx: High connections drop rate |<p>The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.</p> |`min(/Nginx by Zabbix agent/nginx.connections.dropped.rate,5m) > {$NGINX.DROP_RATE.MAX.WARN} and last(/Nginx by Zabbix agent/nginx.proc.num[{#NAME}])>0` |WARNING |<p>**Depends on**:</p><p>- Nginx: Service is down</p> |
+|Nginx: High connections drop rate |<p>The rate of dropping connections has been greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.</p> |`min(/Nginx by Zabbix agent/nginx.connections.dropped.rate,5m) > {$NGINX.DROP_RATE.MAX.WARN} and last(/Nginx by Zabbix agent/nginx.proc.num[{#NAME}])>0` |WARNING |<p>**Depends on**:</p><p>- Nginx: Service is down</p> |
 |Nginx: Service response time is too high |<p>-</p> |`min(/Nginx by Zabbix agent/net.tcp.service.perf[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"],5m)>{$NGINX.RESPONSE_TIME.MAX.WARN} and last(/Nginx by Zabbix agent/nginx.proc.num[{#NAME}])>0` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Service is down</p> |
-|Nginx: Failed to fetch stub status page |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`(find(/Nginx by Zabbix agent/web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"],,"like","HTTP/1.1 200")=0 or nodata(/Nginx by Zabbix agent/web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"],30m)) and last(/Nginx by Zabbix agent/nginx.proc.num[{#NAME}])>0               ` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Service is down</p> |
+|Nginx: Failed to fetch stub status page |<p>Zabbix has not received any data for items for the last 30 minutes.</p> |`(find(/Nginx by Zabbix agent/web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"],,"like","HTTP/1.1 200")=0 or nodata(/Nginx by Zabbix agent/web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"],30m)) and last(/Nginx by Zabbix agent/nginx.proc.num[{#NAME}])>0               ` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Nginx: Service is down</p> |
 
 ## Feedback
 
