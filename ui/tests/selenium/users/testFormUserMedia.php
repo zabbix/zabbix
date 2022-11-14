@@ -394,6 +394,50 @@ class testFormUserMedia extends CWebTest {
 		}
 	}
 
+	public function testFormUserMedia_DisabledMediaTypes() {
+		$this->page->login()->open('zabbix.php?action=user.list');
+		$this->query('link:Admin')->waitUntilVisible()->one()->click();
+		$user_form = $this->query('name:user_form')->asForm()->waitUntilPresent()->one();
+		$user_form->selectTab('Media');
+
+		// Edit selected media
+		$mediatype_table = $user_form->getField('Media')->asTable();
+
+		// Check that disabled media types have popup icon in Type column.
+		$discord_row = $mediatype_table->findRow('Type', 'Discord', true);
+		$type_column = $discord_row->getColumn('Type');
+		$this->assertTrue($type_column->query('xpath:.//a['.CXPathHelper::fromClass('icon-info').']')->one()->isValid());
+
+		$this->assertEquals('Media type disabled by Administration.', $type_column->query('class:hint-box')->one()->getText());
+
+		// Check that status of disabled media types is not cickable.
+		$this->assertFalse($discord_row->getColumn('Status')->query('xpath:.//a')->one(false)->isValid());
+
+		// Check that disabled media types are shown in red color in media configuration form
+		$discord_row->query('button:Edit')->one()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->assertEquals('focusable red', $dialog->asForm()->getField('Type')->query('button:Discord')->one()->getAttribute('class'));
+		$dialog->close();
+
+		// Check that there is no icon and no hintbox for disabled user mediathat belong to enabled media type.
+		$email_row = $mediatype_table->findRow('Send to', 'test2@zabbix.com');
+		$type_column = $email_row->getColumn('Type');
+
+		foreach (["xpath:.//a[".CXPathHelper::fromClass('icon-info')."]", 'class:hint-box'] as $selector) {
+			$this->assertFalse($type_column->query($selector)->one(false)->isValid());
+		}
+
+		// Check that status of disabled user media is cickable.
+		$this->assertTrue($email_row->getColumn('Status')->query('xpath:.//a')->one()->isValid());
+
+		// Check that disabled media types are not shown if user media with enabled media type is edited.
+		$email_row->query('button:Edit')->one()->click();
+		$type_field = COverlayDialogElement::find()->waitUntilReady()->one()->asForm()->getField('Type');
+
+		$this->assertFalse($type_field->query('button:Discord')->one(false)->isValid());
+		$this->assertFalse($type_field->query('class:focusable red')->one(false)->isValid());
+	}
+
 	public function testFormUserMedia_StatusChangeAndRemove() {
 		$sql = 'SELECT * FROM media';
 		$old_hash = CDBHelper::getHash($sql);
