@@ -113,12 +113,12 @@ There are no template links in this template.
 |Apache |Apache: Total bytes |<p>Total bytes served.</p> |DEPENDENT |apache.bytes<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total kBytes"]`</p><p>- MULTIPLIER: `1024`</p> |
 |Apache |Apache: Bytes per second |<p>It is calculated as a rate of change for Total bytes statistics.</p><p>ReqPerSec is not used, as it counts the average since the last Apache server start.</p> |DEPENDENT |apache.bytes.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total kBytes"]`</p><p>- MULTIPLIER: `1024`</p><p>- CHANGE_PER_SECOND</p> |
 |Apache |Apache: Requests per second |<p>Calculated as change rate for 'Total requests' stat.</p><p>ReqPerSec is not used, as it counts average since last Apache server start.</p> |DEPENDENT |apache.requests.rate<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total Accesses"]`</p><p>- CHANGE_PER_SECOND</p> |
-|Apache |Apache: Total requests |<p>A total number of accesses</p> |DEPENDENT |apache.requests<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total Accesses"]`</p> |
-|Apache |Apache: Uptime |<p>Service uptime in seconds</p> |DEPENDENT |apache.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.ServerUptimeSeconds`</p> |
-|Apache |Apache: Version |<p>Service version</p> |DEPENDENT |apache.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.ServerVersion`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Apache |Apache: Total workers busy |<p>Total number of busy worker threads/processes</p> |DEPENDENT |apache.workers_total.busy<p>**Preprocessing**:</p><p>- JSONPATH: `$.BusyWorkers`</p> |
-|Apache |Apache: Total workers idle |<p>Total number of idle worker threads/processes</p> |DEPENDENT |apache.workers_total.idle<p>**Preprocessing**:</p><p>- JSONPATH: `$.IdleWorkers`</p> |
-|Apache |Apache: Workers closing connection |<p>Number of workers in closing state</p> |DEPENDENT |apache.workers.closing<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.closing`</p> |
+|Apache |Apache: Total requests |<p>The total number of the Apache server accesses.</p> |DEPENDENT |apache.requests<p>**Preprocessing**:</p><p>- JSONPATH: `$["Total Accesses"]`</p> |
+|Apache |Apache: Uptime |<p>The service uptime expressed in seconds.</p> |DEPENDENT |apache.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.ServerUptimeSeconds`</p> |
+|Apache |Apache: Version |<p>The Apache service version.</p> |DEPENDENT |apache.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.ServerVersion`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Apache |Apache: Total workers busy |<p>The total number of busy worker threads/processes.</p> |DEPENDENT |apache.workers_total.busy<p>**Preprocessing**:</p><p>- JSONPATH: `$.BusyWorkers`</p> |
+|Apache |Apache: Total workers idle |<p>The total number of idle worker threads/processes.</p> |DEPENDENT |apache.workers_total.idle<p>**Preprocessing**:</p><p>- JSONPATH: `$.IdleWorkers`</p> |
+|Apache |Apache: Workers closing connection |<p>The number of workers in a closing state.</p> |DEPENDENT |apache.workers.closing<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.closing`</p> |
 |Apache |Apache: Workers DNS lookup |<p>Number of workers in dnslookup state.</p> |DEPENDENT |apache.workers.dnslookup<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.dnslookup`</p> |
 |Apache |Apache: Workers finishing |<p>Number of workers in finishing state.</p> |DEPENDENT |apache.workers.finishing<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.finishing`</p> |
 |Apache |Apache: Workers idle cleanup |<p>Number of workers in cleanup state.</p> |DEPENDENT |apache.workers.cleanup<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.cleanup`</p> |
