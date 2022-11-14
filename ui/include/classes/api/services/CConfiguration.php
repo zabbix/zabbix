@@ -41,7 +41,6 @@ class CConfiguration extends CApiService {
 			'format' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON, CExportWriterFactory::RAW])],
 			'prettyprint' => ['type' => API_BOOLEAN, 'default' => false],
 			'options' =>	['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-				'groups' =>				['type' => API_IDS],
 				'hosts' =>				['type' => API_IDS],
 				'images' =>				['type' => API_IDS],
 				'maps' =>				['type' => API_IDS],
@@ -327,11 +326,16 @@ class CConfiguration extends CApiService {
 
 		$imported_entities = [];
 
-		foreach (['host_groups', 'template_groups', 'templates'] as $first_level) {
+		foreach (['host_groups', 'template_groups'] as $first_level) {
 			if (array_key_exists($first_level, $import)) {
 				$imported_entities[$first_level]['uuid'] = array_column($import[$first_level], 'uuid');
 				$imported_entities[$first_level]['name'] = array_column($import[$first_level], 'name');
 			}
+		}
+
+		if (array_key_exists('templates', $import)) {
+			$imported_entities['templates']['uuid'] = array_column($import['templates'], 'uuid');
+			$imported_entities['templates']['template'] = array_column($import['templates'], 'template');
 		}
 
 		$imported_ids = [];
@@ -373,7 +377,7 @@ class CConfiguration extends CApiService {
 						'output' => ['templateid'],
 						'filter' => [
 							'uuid' => $data['uuid'],
-							'name' => $data['name']
+							'host' => $data['template']
 						],
 						'selectParentTemplates' => ['templateid', 'name'],
 						'preservekeys' => true,
