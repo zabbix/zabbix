@@ -874,7 +874,7 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver() {
-		const target_node_op = document.querySelector('#op-table tbody');
+		const target_node_op = document.querySelector('#operations-container');
 
 		if (target_node_op !== null) {
 			const observer_op = new MutationObserver(() => {
@@ -887,7 +887,7 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 			});
 		}
 
-		const target_node_rec = document.querySelector('#rec-table tbody');
+		const target_node_rec = document.querySelector('#recovery-operations-container');
 
 		if (target_node_rec !== null) {
 			const observer_rec = new MutationObserver(() => {
@@ -900,7 +900,7 @@ class OperationsTabIndicatorItem extends TabIndicatorItem {
 			});
 		}
 
-		const target_node_upd = document.querySelector('#upd-table tbody');
+		const target_node_upd = document.querySelector('#update-operations-container');
 
 		if (target_node_upd !== null) {
 			const observer_upd = new MutationObserver(() => {
