@@ -754,8 +754,8 @@ static int 	DBpatch_3030060_pair_cmp_func(const void *d1, const void *d2)
 	return strcmp((char *)pair1->first, (char *)pair2->first);
 }
 
-#define TRIM_LEADING_WHITESPACE(ptr)	while (' ' == *ptr || '\t' == *ptr) ptr++;
-#define TRIM_TRAILING_WHITESPACE(ptr)	do { ptr--; } while (' ' == *ptr || '\t' == *ptr);
+#define TRIM_LEADING_WHITESPACE(ptr)	do { while (' ' == *ptr || '\t' == *ptr) ptr++; } while(0)
+#define TRIM_TRAILING_WHITESPACE(ptr)	do { do { ptr--; } while (' ' == *ptr || '\t' == *ptr); } while(0)
 
 static void	DBpatch_3030060_append_pairs(zbx_db_insert_t *db_insert, zbx_uint64_t parentid, int type,
 		const char *source, const char separator, int unique, int allow_empty)

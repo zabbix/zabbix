@@ -43,12 +43,14 @@
  ******************************************************************************/
 int	zbx_get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type)
 {
-#define ZBX_ASSIGN_PARAM				\
-{							\
-	if (buf_i == max_len)				\
-		return 1;	/* buffer overflow */	\
-	buf[buf_i++] = *p;				\
-}
+#define ZBX_ASSIGN_PARAM					\
+	do							\
+	{							\
+		if (buf_i == max_len)				\
+			return 1;	/* buffer overflow */	\
+		buf[buf_i++] = *p;				\
+	}							\
+	while(0)
 
 	int	state;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
 	int	array, idx = 1;

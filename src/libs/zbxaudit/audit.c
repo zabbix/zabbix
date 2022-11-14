@@ -540,7 +540,7 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_tab
 void	zbx_audit_update_json_append_no_value(const zbx_uint64_t id, const int id_table, const char *audit_op,
 		const char *key)
 {
-	PREPARE_UPDATE_JSON_APPEND_OP();
+	PREPARE_UPDATE_JSON_APPEND_OP()
 	append_json_no_value(&((*found_audit_entry)->details_json), audit_op, key);
 }
 
@@ -557,7 +557,7 @@ void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const int id_table,
 	}
 	else
 	{
-		PREPARE_UPDATE_JSON_APPEND_OP();
+		PREPARE_UPDATE_JSON_APPEND_OP()
 		append_int_json(&((*found_audit_entry)->details_json), audit_op, key, value);
 	}
 }
@@ -575,7 +575,7 @@ void	zbx_audit_update_json_append_double(const zbx_uint64_t id, const int id_tab
 	}
 	else
 	{
-		PREPARE_UPDATE_JSON_APPEND_OP();
+		PREPARE_UPDATE_JSON_APPEND_OP()
 		append_double_json(&((*found_audit_entry)->details_json), audit_op, key, value);
 	}
 }
@@ -583,34 +583,34 @@ void	zbx_audit_update_json_append_double(const zbx_uint64_t id, const int id_tab
 void	zbx_audit_update_json_update_string(const zbx_uint64_t id, const int id_table, const char *key,
 		const char *value_old, const char *value_new)
 {
-	PREPARE_UPDATE_JSON_APPEND_OP();
+	PREPARE_UPDATE_JSON_APPEND_OP()
 	update_str_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
 }
 
 void	zbx_audit_update_json_update_uint64(const zbx_uint64_t id, const int id_table, const char *key,
 		uint64_t value_old, uint64_t value_new)
 {
-	PREPARE_UPDATE_JSON_APPEND_OP();
+	PREPARE_UPDATE_JSON_APPEND_OP()
 	update_uint64_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
 }
 
 void	zbx_audit_update_json_update_int(const zbx_uint64_t id, const int id_table, const char *key, int value_old,
 		int value_new)
 {
-	PREPARE_UPDATE_JSON_APPEND_OP();
+	PREPARE_UPDATE_JSON_APPEND_OP()
 	update_int_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
 }
 
 void	zbx_audit_update_json_update_double(const zbx_uint64_t id, const int id_table, const char *key,
 		double value_old, double value_new)
 {
-	PREPARE_UPDATE_JSON_APPEND_OP();
+	PREPARE_UPDATE_JSON_APPEND_OP()
 	update_double_json(&((*found_audit_entry)->details_json), key, value_old, value_new);
 }
 
 void	zbx_audit_update_json_delete(const zbx_uint64_t id, const int id_table, const char *audit_op, const char *key)
 {
-	PREPARE_UPDATE_JSON_APPEND_OP();
+	PREPARE_UPDATE_JSON_APPEND_OP()
 	delete_json(&((*found_audit_entry)->details_json), audit_op, key);
 }
 

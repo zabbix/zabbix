@@ -754,9 +754,13 @@ static void	db_snmpinterface_free(dbu_snmp_if_t snmp)
 
 static int	db_snmp_if_cmp(const dbu_snmp_if_t *snmp1, const dbu_snmp_if_t *snmp2)
 {
-#define ZBX_RETURN_IF_NOT_EQUAL_STR(s1, s2)	\
-	if (0 != (ret = strcmp(s1, s2)))	\
-		return ret;
+#define ZBX_RETURN_IF_NOT_EQUAL_STR(s1, s2)		\
+	do 						\
+	{						\
+		if (0 != (ret = strcmp(s1, s2)))	\
+			return ret;			\
+	} 						\
+	while(0)
 
 	int	ret;
 
@@ -1208,9 +1212,13 @@ static int	DBpatch_4050046(void)
 
 static int	db_if_cmp(const dbu_interface_t *if1, const dbu_interface_t *if2)
 {
-#define ZBX_RETURN_IF_NOT_EQUAL_STR(s1, s2)	\
-	if (0 != (ret = strcmp(s1, s2)))	\
-		return ret;
+#define ZBX_RETURN_IF_NOT_EQUAL_STR(s1, s2)		\
+	do						\
+	{						\
+		if (0 != (ret = strcmp(s1, s2)))	\
+			return ret;			\
+	}						\
+	while(0)
 
 	int	ret;
 

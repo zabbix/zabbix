@@ -33,11 +33,15 @@
 #define ZBX_AM_LOCATION_NOWHERE		0
 #define ZBX_AM_LOCATION_QUEUE		1
 
-#define ZBX_UPDATE_STR(dst, src)			\
-	if (NULL == src)				\
-		zbx_free(dst);				\
-	else if (NULL == dst || 0 != strcmp(dst, src))	\
-		dst = zbx_strdup(dst, src);
+#define ZBX_UPDATE_STR(dst, src)				\
+	do							\
+	{							\
+		if (NULL == src)				\
+			zbx_free(dst);				\
+		else if (NULL == dst || 0 != strcmp(dst, src))	\
+			dst = zbx_strdup(dst, src);		\
+	}							\
+	while(0)
 
 #define ZBX_AM_DB_POLL_DELAY	1
 

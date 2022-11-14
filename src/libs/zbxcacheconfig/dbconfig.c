@@ -11118,23 +11118,31 @@ static void	DCinterface_get_agent_availability(const ZBX_DC_INTERFACE *dc_interf
 static void	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned char *available, const char **error,
 		int *errors_from, int *disable_until)
 {
-#define AGENT_AVAILABILITY_ASSIGN(flags, mask, dst, src)	\
-	if (0 != (flags & mask))				\
-	{							\
-		if (dst != src)					\
-			dst = src;				\
-		else						\
-			flags &= (unsigned char)(~(mask));	\
-	}
+#define AGENT_AVAILABILITY_ASSIGN(flags, mask, dst, src)		\
+	do								\
+	{								\
+		if (0 != (flags & mask))				\
+		{							\
+			if (dst != src)					\
+				dst = src;				\
+			else						\
+				flags &= (unsigned char)(~(mask));	\
+		}							\
+	}								\
+	while(0)
 
-#define AGENT_AVAILABILITY_ASSIGN_STR(flags, mask, dst, src)	\
-	if (0 != (flags & mask))				\
-	{							\
-		if (0 != strcmp(dst, src))			\
-			dc_strpool_replace(1, &dst, src);	\
-		else						\
-			flags &= (unsigned char)(~(mask));	\
-	}
+#define AGENT_AVAILABILITY_ASSIGN_STR(flags, mask, dst, src)		\
+	do								\
+	{								\
+		if (0 != (flags & mask))				\
+		{							\
+			if (0 != strcmp(dst, src))			\
+				dc_strpool_replace(1, &dst, src);	\
+			else						\
+				flags &= (unsigned char)(~(mask));	\
+		}							\
+	}								\
+	while(0)
 
 	AGENT_AVAILABILITY_ASSIGN(av->flags, ZBX_FLAGS_AGENT_STATUS_AVAILABLE, *available, av->available);
 	AGENT_AVAILABILITY_ASSIGN_STR(av->flags, ZBX_FLAGS_AGENT_STATUS_ERROR, *error, av->error);

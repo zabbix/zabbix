@@ -1204,7 +1204,7 @@ int	DBcreate_changelog_update_trigger(const char *table_name, const char *field_
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
-	int	table_type, ret = FAIL;;
+	int	table_type, ret = FAIL;
 
 	if (FAIL == (table_type = DBget_changelog_table_by_name(table_name)))
 	{
@@ -1256,7 +1256,7 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
-	int	table_type, ret = FAIL;;
+	int	table_type, ret = FAIL;
 
 	if (FAIL == (table_type = DBget_changelog_table_by_name(table_name)))
 	{

@@ -387,39 +387,44 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 			unsigned char	uchar_orig;
 			zbx_uint64_t	uint64_orig;
 
-#define SET_FLAG_STR(r, i, f)			\
-{						\
-	if (0 != strcmp(r, (i)))		\
-	{					\
-		item->upd_flags |= f;		\
-		i##_orig = zbx_strdup(NULL, r);	\
-	}					\
-}
-
-#define SET_FLAG_UCHAR(r, i, f)		\
-					\
-{					\
-	ZBX_STR2UCHAR(uchar_orig, (r));	\
-	if (uchar_orig != (i))		\
-	{				\
-		item->upd_flags |= f;	\
-		i##_orig = uchar_orig;	\
-	}				\
-}
-
-#define SET_FLAG_UINT64(r, i, f)			\
-							\
-{							\
-	if (SUCCEED == DBis_null(r))			\
-		uint64_orig = 0;			\
-	else						\
-		ZBX_STR2UINT64(uint64_orig, (r));	\
-	if (uint64_orig != (i))				\
+#define SET_FLAG_STR(r, i, f)				\
+	do						\
 	{						\
-		item->upd_flags |= f;			\
-		i##_orig = uint64_orig;			\
+		if (0 != strcmp(r, (i)))		\
+		{					\
+			item->upd_flags |= f;		\
+			i##_orig = zbx_strdup(NULL, r);	\
+		}					\
 	}						\
-}
+	while(0)
+
+#define SET_FLAG_UCHAR(r, i, f)			\
+	do					\
+	{					\
+		ZBX_STR2UCHAR(uchar_orig, (r));	\
+		if (uchar_orig != (i))		\
+		{				\
+			item->upd_flags |= f;	\
+			i##_orig = uchar_orig;	\
+		}				\
+	}					\
+	while(0)
+
+#define SET_FLAG_UINT64(r, i, f)				\
+	do							\
+	{							\
+		if (SUCCEED == DBis_null(r))			\
+			uint64_orig = 0;			\
+		else						\
+			ZBX_STR2UINT64(uint64_orig, (r));	\
+		if (uint64_orig != (i))				\
+		{						\
+			item->upd_flags |= f;			\
+			i##_orig = uint64_orig;			\
+		}						\
+	}							\
+	while(0)
+
 			item->key = NULL;
 			ZBX_STR2UINT64(item->itemid, row[26]);
 
@@ -857,7 +862,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		PREPARE_UPDATE_UC(TYPE, type)
 		PREPARE_UPDATE_UINT64(TEMPLATEID, templateid)
 		PREPARE_UPDATE_UC(VALUE_TYPE, value_type)
-		PREPARE_UPDATE_STR(DELAY, delay);
+		PREPARE_UPDATE_STR(DELAY, delay)
 		PREPARE_UPDATE_STR(HISTORY, history)
 		PREPARE_UPDATE_STR(TRENDS, trends)
 		PREPARE_UPDATE_UC(STATUS, status)

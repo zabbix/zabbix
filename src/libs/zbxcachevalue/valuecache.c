@@ -273,9 +273,9 @@ static void	vc_cache_item_update(zbx_uint64_t itemid, zbx_vc_item_update_type_t 
 /* the value cache */
 static zbx_vc_cache_t	*vc_cache = NULL;
 
-#define	RDLOCK_CACHE	zbx_rwlock_rdlock(vc_lock);
-#define	WRLOCK_CACHE	zbx_rwlock_wrlock(vc_lock);
-#define	UNLOCK_CACHE	zbx_rwlock_unlock(vc_lock);
+#define	RDLOCK_CACHE	zbx_rwlock_rdlock(vc_lock)
+#define	WRLOCK_CACHE	zbx_rwlock_wrlock(vc_lock)
+#define	UNLOCK_CACHE	zbx_rwlock_unlock(vc_lock)
 
 /* function prototypes */
 static void	vc_history_record_copy(zbx_history_record_t *dst, const zbx_history_record_t *src, int value_type);

@@ -1749,11 +1749,15 @@ static int	evaluate_LAST(zbx_variant_t *value, const DC_ITEM *item, const char *
 #define EVALUATE_MAX	1
 
 #define LOOP_FIND_MIN_OR_MAX(type, mode_op)							\
-	for (i = 1; i < values.values_num; i++)							\
+	do											\
 	{											\
-		if (values.values[i].value.type mode_op values.values[index].value.type)	\
-			index = i;								\
-	}											\
+		for (i = 1; i < values.values_num; i++)							\
+		{											\
+			if (values.values[i].value.type mode_op values.values[index].value.type)	\
+				index = i;								\
+		}											\
+	}												\
+	while(0)
 
 /******************************************************************************
  *                                                                            *
@@ -2987,22 +2991,26 @@ out:
 #define MONOINC		0
 #define MONODEC		1
 
-#define CHECK_MONOTONICITY(type, mode_op, epsi_op)					\
-	for (i = 0; i < values.values_num - 1; i++)					\
-	{										\
-		if (0 == strict && values.values[i + 1].value.type mode_op		\
-				(epsi_op + values.values[i].value.type))		\
-		{									\
-			res = 0;							\
-			break;								\
-		}									\
-		else if (1 == strict && values.values[i + 1].value.type mode_op##=	\
-				(epsi_op + values.values[i].value.type ) )		\
-		{									\
-			res = 0;							\
-			break;								\
-		}									\
-	}										\
+#define CHECK_MONOTONICITY(type, mode_op, epsi_op)						\
+	do											\
+	{											\
+		for (i = 0; i < values.values_num - 1; i++)					\
+		{										\
+			if (0 == strict && values.values[i + 1].value.type mode_op		\
+					(epsi_op + values.values[i].value.type))		\
+			{									\
+				res = 0;							\
+				break;								\
+			}									\
+			else if (1 == strict && values.values[i + 1].value.type mode_op##=	\
+					(epsi_op + values.values[i].value.type ) )		\
+			{									\
+				res = 0;							\
+				break;								\
+			}									\
+		}										\
+	}											\
+	while(0)
 
 /******************************************************************************
  *                                                                            *
@@ -3302,30 +3310,42 @@ int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameter
 #define PREV(v, type) v.values[i + 1].value.type
 
 #define CHANGECOUNT_DBL(op)										\
-	for (i = 0; i < values.values_num - 1; i++)							\
+	do												\
 	{												\
-		if (SUCCEED != zbx_double_compare(PREV(values, dbl), LAST(values, dbl)) &&		\
-				PREV(values, dbl) op LAST(values, dbl))					\
+		for (i = 0; i < values.values_num - 1; i++)						\
 		{											\
-			count++;									\
+			if (SUCCEED != zbx_double_compare(PREV(values, dbl), LAST(values, dbl)) &&	\
+					PREV(values, dbl) op LAST(values, dbl))				\
+			{										\
+				count++;								\
+			}										\
 		}											\
 	}												\
+	while(0)
 
 #define CHANGECOUNT_UI64(op)						\
-	for (i = 0; i < values.values_num - 1; i++)			\
+	do								\
 	{								\
-		if (PREV(values, ui64) op LAST(values, ui64))		\
-			count++;					\
-	}								\
-
-#define CHANGECOUNT_STR(type)						\
-	for (i = 0; i < values.values_num - 1; i++)			\
-	{								\
-		if (0 != strcmp(PREV(values, type), LAST(values, type)))\
+		for (i = 0; i < values.values_num - 1; i++)		\
 		{							\
-			count++;					\
+			if (PREV(values, ui64) op LAST(values, ui64))	\
+				count++;				\
 		}							\
 	}								\
+	while(0)
+
+#define CHANGECOUNT_STR(type)							\
+	do									\
+	{									\
+		for (i = 0; i < values.values_num - 1; i++)			\
+		{								\
+			if (0 != strcmp(PREV(values, type), LAST(values, type)))\
+			{							\
+				count++;					\
+			}							\
+		}								\
+	}									\
+	while(0)
 
 /* flags for evaluate_CHANGECOUNT() */
 #define CHANGE_ALL	0

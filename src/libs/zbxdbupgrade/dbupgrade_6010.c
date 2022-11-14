@@ -694,16 +694,19 @@ out:
 	return ret;
 }
 
-#define ADD_GROUPIDS_FROM_FIELD(table,field)								\
-													\
-	result = DBselect("select distinct " field " from " table " where " field " is not null");	\
-													\
-	while (NULL != (row = DBfetch(result)))								\
-	{												\
-		ZBX_STR2UINT64(groupid, row[0]);							\
-		zbx_vector_uint64_append(&host_groupids, groupid);					\
-	}												\
-	DBfree_result(result);
+#define ADD_GROUPIDS_FROM_FIELD(table,field)									\
+	do													\
+	{													\
+		result = DBselect("select distinct " field " from " table " where " field " is not null");	\
+														\
+		while (NULL != (row = DBfetch(result)))								\
+		{												\
+			ZBX_STR2UINT64(groupid, row[0]);							\
+			zbx_vector_uint64_append(&host_groupids, groupid);					\
+		}												\
+		DBfree_result(result);										\
+	}													\
+	while(0)
 #define ADD_GROUPIDS_FROM(table) ADD_GROUPIDS_FROM_FIELD(table, "groupid")
 
 static int	DBpatch_6010033_split_groups(void)

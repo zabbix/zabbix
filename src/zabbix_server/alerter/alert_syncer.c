@@ -219,19 +219,27 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 	return ret;
 }
 
-#define ZBX_UPDATE_STR(dst, src, ret)			\
-	if (NULL == dst || 0 != strcmp(dst, src))	\
-	{						\
-		dst = zbx_strdup(dst, src);		\
-		ret = SUCCEED;				\
-	}
+#define ZBX_UPDATE_STR(dst, src, ret)				\
+	do							\
+	{							\
+		if (NULL == dst || 0 != strcmp(dst, src))	\
+		{						\
+			dst = zbx_strdup(dst, src);		\
+			ret = SUCCEED;				\
+		}						\
+	}							\
+	while(0)
 
-#define ZBX_UPDATE_VALUE(dst, src, ret)			\
-	if (dst != src)					\
-	{						\
-		dst = src;				\
-		ret = SUCCEED;				\
-	}
+#define ZBX_UPDATE_VALUE(dst, src, ret)	\
+	do				\
+	{				\
+		if (dst != src)		\
+		{			\
+			dst = src;	\
+			ret = SUCCEED;	\
+		}			\
+	}				\
+	while(0)
 
 /******************************************************************************
  *                                                                            *

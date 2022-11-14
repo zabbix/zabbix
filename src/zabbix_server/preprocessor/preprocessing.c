@@ -30,7 +30,7 @@
 #define MAX_VALUES_LOCAL	256
 
 #define PACKED_FIELD(value, size)	\
-		(zbx_packed_field_t){(value), (size), (0 == (size) ? PACKED_FIELD_STRING : PACKED_FIELD_RAW)};
+		(zbx_packed_field_t){(value), (size), (0 == (size) ? PACKED_FIELD_STRING : PACKED_FIELD_RAW)}
 
 static zbx_ipc_message_t	cached_message;
 static int			cached_values;

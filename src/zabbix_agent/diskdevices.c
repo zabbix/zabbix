@@ -58,12 +58,16 @@ static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_u
 		if (0 == device->clock[i])
 			continue;
 
-#define DISKSTAT(t)\
-		if ((device->clock[i] >= (now - (t * 60))) && (clock[ZBX_AVG ## t] > device->clock[i]))\
-		{\
-			clock[ZBX_AVG ## t] = device->clock[i];\
-			index[ZBX_AVG ## t] = i;\
-		}
+#define DISKSTAT(t)											\
+	do												\
+	{												\
+		if ((device->clock[i] >= (now - (t * 60))) && (clock[ZBX_AVG ## t] > device->clock[i]))	\
+		{											\
+			clock[ZBX_AVG ## t] = device->clock[i];						\
+			index[ZBX_AVG ## t] = i;							\
+		}											\
+	}												\
+	while(0)
 
 		DISKSTAT(1);
 		DISKSTAT(5);
@@ -71,25 +75,35 @@ static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_u
 	}
 
 #define SAVE_DISKSTAT(t)\
-	if (-1 == index[ZBX_AVG ## t] || 0 == now - device->clock[index[ZBX_AVG ## t]])\
-	{\
-		device->r_sps[ZBX_AVG ## t] = 0;\
-		device->r_ops[ZBX_AVG ## t] = 0;\
-		device->r_bps[ZBX_AVG ## t] = 0;\
-		device->w_sps[ZBX_AVG ## t] = 0;\
-		device->w_ops[ZBX_AVG ## t] = 0;\
-		device->w_bps[ZBX_AVG ## t] = 0;\
-	}\
-	else\
-	{\
-		sec = now - device->clock[index[ZBX_AVG ## t]];\
-		device->r_sps[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_R_SECT] - device->r_sect[index[ZBX_AVG ## t]]) / (double)sec;\
-		device->r_ops[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_R_OPER] - device->r_oper[index[ZBX_AVG ## t]]) / (double)sec;\
-		device->r_bps[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_R_BYTE] - device->r_byte[index[ZBX_AVG ## t]]) / (double)sec;\
-		device->w_sps[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_W_SECT] - device->w_sect[index[ZBX_AVG ## t]]) / (double)sec;\
-		device->w_ops[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_W_OPER] - device->w_oper[index[ZBX_AVG ## t]]) / (double)sec;\
-		device->w_bps[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_W_BYTE] - device->w_byte[index[ZBX_AVG ## t]]) / (double)sec;\
-	}
+	do											\
+	{											\
+		if (-1 == index[ZBX_AVG ## t] || 0 == now - device->clock[index[ZBX_AVG ## t]])	\
+		{										\
+			device->r_sps[ZBX_AVG ## t] = 0;					\
+			device->r_ops[ZBX_AVG ## t] = 0;					\
+			device->r_bps[ZBX_AVG ## t] = 0;					\
+			device->w_sps[ZBX_AVG ## t] = 0;					\
+			device->w_ops[ZBX_AVG ## t] = 0;					\
+			device->w_bps[ZBX_AVG ## t] = 0;					\
+		}										\
+		else										\
+		{										\
+			sec = now - device->clock[index[ZBX_AVG ## t]];				\
+			device->r_sps[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_R_SECT] - 		\
+					device->r_sect[index[ZBX_AVG ## t]]) / (double)sec;	\
+			device->r_ops[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_R_OPER] - 		\
+					device->r_oper[index[ZBX_AVG ## t]]) / (double)sec;	\
+			device->r_bps[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_R_BYTE] - 		\
+					device->r_byte[index[ZBX_AVG ## t]]) / (double)sec;	\
+			device->w_sps[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_W_SECT] - 		\
+					device->w_sect[index[ZBX_AVG ## t]]) / (double)sec;	\
+			device->w_ops[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_W_OPER] - 		\
+					device->w_oper[index[ZBX_AVG ## t]]) / (double)sec;	\
+			device->w_bps[ZBX_AVG ## t] = (dstat[ZBX_DSTAT_W_BYTE] - 		\
+					device->w_byte[index[ZBX_AVG ## t]]) / (double)sec;	\
+		}										\
+	}											\
+	while(0)
 
 	SAVE_DISKSTAT(1);
 	SAVE_DISKSTAT(5);

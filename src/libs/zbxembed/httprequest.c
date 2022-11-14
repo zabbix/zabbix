@@ -58,13 +58,17 @@ zbx_es_httprequest_t;
 /* in case of error. Be careful with using ZBX_CURL_SETOPT(), duk_push_error_object() and duk_error()  */
 /* in functions - it is easy to get memory leaks because duk_error() causes longjmp().                 */
 /* Note that the caller of ZBX_CURL_SETOPT() must define variable 'int err_index' and label 'out'.     */
-#define ZBX_CURL_SETOPT(ctx, handle, opt, value, err)							\
-	if (CURLE_OK != (err = curl_easy_setopt(handle, opt, value)))					\
-	{												\
-		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR,					\
-				"cannot set cURL option " #opt ": %s.", curl_easy_strerror(err));	\
-		goto out;										\
-	}
+#define ZBX_CURL_SETOPT(ctx, handle, opt, value, err)								\
+	do													\
+	{													\
+		if (CURLE_OK != (err = curl_easy_setopt(handle, opt, value)))					\
+		{												\
+			err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR,				\
+					"cannot set cURL option " #opt ": %s.", curl_easy_strerror(err));	\
+			goto out;										\
+		}												\
+	}													\
+	while(0)
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
