@@ -22,6 +22,11 @@
 
 #include "zbxthreads.h"
 
+typedef struct
+{
+	int config_timeout;
+}
+
 ZBX_THREAD_ENTRY(pinger_thread, args);
 
 #endif

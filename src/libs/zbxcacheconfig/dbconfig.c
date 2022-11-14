@@ -375,6 +375,7 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 #define ZBX_ITEM_DELAY_CHANGED		0x10
 #define ZBX_ITEM_NEW			0x20
 
+
 static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface)
 {
 	switch (item->type)
@@ -10611,8 +10612,9 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  *                                                                            *
  * Purpose: Get array of items for selected poller                            *
  *                                                                            *
- * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
- *             items       - [OUT] array of items                             *
+ * Parameters: poller_type    - [IN] poller type (ZBX_POLLER_TYPE_...)        *
+ *             config_timeout - [IN]                                          *
+ *             items          - [OUT] array of items                          *
  *                                                                            *
  * Return value: number of items in items array                               *
  *                                                                            *
@@ -10628,7 +10630,7 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  *           function.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
+int	DCconfig_get_poller_items(unsigned char poller_type, int config_timeout, DC_ITEM **items)
 {
 	int			now, num = 0, max_items;
 	zbx_binary_heap_t	*queue;
@@ -10728,7 +10730,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
 					continue;
 				}
 
-				DCincrease_disable_until(dc_interface, now);
+				DCincrease_disable_until(dc_interface, now, config_timeout);
 			}
 		}
 
@@ -10771,8 +10773,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
  * Purpose: Get array of items for IPMI poller                                *
  *                                                                            *
  * Parameters: now       - [IN] current timestamp                             *
- *             items     - [OUT] array of items                               *
  *             items_num - [IN] the number of items to get                    *
+ *             items     - [OUT] array of items                               *
  *             nextcheck - [OUT] the next scheduled check                     *
  *                                                                            *
  * Return value: number of items in items array                               *
@@ -10782,7 +10784,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
  *           DCrequeue_items() or DCpoller_requeue_items().                   *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *nextcheck)
+int	DCconfig_get_ipmi_poller_items(int now, int items_num, int config_timeout DC_ITEM *items, int *nextcheck)
 {
 	int			num = 0;
 	zbx_binary_heap_t	*queue;
@@ -10840,7 +10842,7 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 					continue;
 				}
 
-				DCincrease_disable_until(dc_interface, now);
+				DCincrease_disable_until(dc_interface, now, config_timeout);
 			}
 		}
 

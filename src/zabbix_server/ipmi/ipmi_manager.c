@@ -748,7 +748,7 @@ static int	ipmi_manager_schedule_requests(zbx_ipmi_manager_t *manager, int now, 
 	zbx_ipmi_request_t	*request;
 	char			*error = NULL;
 
-	num = DCconfig_get_ipmi_poller_items(now, items, MAX_POLLER_ITEMS, nextcheck);
+	num = DCconfig_get_ipmi_poller_items(now, MAX_POLLER_ITEMS, config_timeout, items,nextcheck);
 
 	for (i = 0; i < num; i++)
 	{
