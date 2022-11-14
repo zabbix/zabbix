@@ -50,12 +50,9 @@ $html_page = (new CHtmlPage())
 						->addClass('zi-cog-filled'), // todo zi
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
-						->addItem((new CButton('dashboard-add-widget',
-							[(new CSpan())
-								->addClass(ZBX_STYLE_PLUS_ICON)
-								->addClass('zi-plus')
-								, _('Add')]
-						))->addClass(ZBX_STYLE_BTN_ALT))
+						->addItem((new CButton('dashboard-add-widget', _('Add')))
+							->addClass('zi-plus')
+							->addClass(ZBX_STYLE_BTN_ALT))
 						->addItem(
 							(new CButton('dashboard-add', '&#8203;'))
 								->addClass(ZBX_STYLE_BTN_ALT)

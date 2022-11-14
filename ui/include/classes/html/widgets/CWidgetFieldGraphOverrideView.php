@@ -39,9 +39,8 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 
 		$list->addItem(
 			(new CDiv(
-				(new CButton('override_add', [(new CSpan())
-					->addClass(ZBX_STYLE_PLUS_ICON)
-					->addClass('zi-plus'), _('Add new override')]))
+				(new CButton('override_add', _('Add new override')))
+					->addClass('zi-plus')
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->setId('override-add')
 			)),
@@ -341,9 +340,8 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 			(new CList($inputs))
 				->addClass(ZBX_STYLE_OVERRIDES_OPTIONS_LIST)
 				->addItem(
-					(new CButton(null, (new CSpan())
-						->addClass(ZBX_STYLE_PLUS_ICON)
-						->addClass('zi-plus')))
+					(new CButton())
+						->addClass('zi-plus')
 						->setAttribute('data-row', $row_num)
 						->addClass(ZBX_STYLE_BTN_ALT)
 				)

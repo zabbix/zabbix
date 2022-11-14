@@ -909,7 +909,7 @@ function makeInformationList($info_icons) {
  *
  * @return CLink
  */
-function makeInformationIcon($message) {
+function makeInformationIcon($message) { // TODO ZI: a new icon should be added to the font
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INFO) // todo zi
 		->addClass(ZBX_STYLE_STATUS_GREEN)

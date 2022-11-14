@@ -2374,12 +2374,6 @@ $icon-widget-btn: (
 			display: inline-block;
 			vertical-align: baseline;
 			padding: 0 0 0 10px;
-
-			.icon-cal {
-				position: relative;
-				vertical-align: middle;
-				margin-left: 2px;
-			}
 		}
 	}
 
@@ -2407,9 +2401,29 @@ $icon-widget-btn: (
 }
 
 .calendar-control {
-	.icon-cal {
+	.zi-calendar {
+		background-color: transparent;
+		border: none;
+		border-radius: 2px;
+
 		position: relative;
 		top: -1px;
+		padding: 0 1px;
+
+		opacity: .7;
+
+		&::before {
+			font-size: 24px;
+			color: $icon-calendar-color;
+		}
+
+		&:focus,
+		&:hover,
+		&:active {
+			opacity: 1;
+		}
+
+		transition: opacity .3s ease-out;
 	}
 }
 
@@ -2489,7 +2503,7 @@ $icon-widget-btn: (
 	border-color: $btn-disabled-border-color;
 	cursor: default;
 
-	&.icon-cal {
+	&.zi-calendar {
 		opacity: .3;
 		background-color: transparent;
 	}
@@ -2615,12 +2629,10 @@ $trigger-expression-tree-icons: (
 }
 
 $form-icon-btn: (
-	cal: url($sprite-path) no-repeat -42px -834px,
 	wizard-action: url($sprite-path) no-repeat -6px -617px
 );
 
 // Dynamically generated classes:
-//  .icon-cal
 //  .icon-wizard-action
 @each $form-icon-btn, $bgimage in $form-icon-btn {
 	.icon-#{$form-icon-btn} {
@@ -5402,6 +5414,35 @@ button {
 	}
 }
 
+.zi-plus {
+	width: unset;
+	height: unset;
+
+	padding: 0 11px 0 8px;
+	color: $btn-alt-font-color;
+	background-color: $btn-alt-bg-color;
+	font-size: 100%;
+
+	&::before {
+		padding-right: 5px;
+		vertical-align: unset;
+
+		font-size: 8px;
+	}
+
+	&:hover {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:focus {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:active {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+}
+
 .icon-doc-link {
 	display: inline-block;
 	width: 24px;
@@ -5741,6 +5782,66 @@ button {
 
 		&:only-child button {
 			border-radius: 2px;
+		}
+
+		.zi-chevron-down {
+			vertical-align: top;
+			line-height: 0;
+			font-size: 0;
+
+			&::before {
+				font-size: 17px;
+			}
+
+			@extend %button-icon-size;
+		}
+
+		.zi-chevron-down {
+			position: relative;
+			background-color: transparent;
+
+			color: $btn-alt-font-color;
+
+			&::before {
+				display: inline-block;
+				top: 1px;
+				font-size: 12px;
+
+				transition: .3s;
+			}
+
+			&[aria-expanded="true"] {
+				@include btn-hover-active($btn-font-color, $btn-bg-color);
+			}
+
+			&[disabled] {
+				&::before {
+					border-top-color: $btn-disabled-font-color;
+					border-right-color: $btn-disabled-font-color;
+				}
+			}
+
+			&:enabled {
+				&:active,
+				&[aria-expanded="true"] {
+					&::before {
+						transform: rotate(180deg) translate(-1px,1px);
+					}
+				}
+
+				&:hover,
+				&:focus,
+				&:active,
+				&[aria-expanded="true"] {
+					@include btn-hover-active($btn-font-color, $btn-bg-color);
+
+					&::before {
+						border-top-color:  $btn-font-color;
+						border-right-color: $btn-font-color;
+					}
+
+				}
+			}
 		}
 	}
 }
