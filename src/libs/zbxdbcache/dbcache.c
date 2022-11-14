@@ -1544,6 +1544,11 @@ static void	DCsync_trends(void)
  *             history_errcodes  - [IN] item error codes                      *
  *             timers            - [IN] the trigger timers                    *
  *             trigger_diff      - [OUT] trigger updates                      *
+ *             itemids           - [OUT] the item identifiers                 *
+ *                                      (used for item lookup)                *
+ *             timespecs         - [OUT] timestamp for item identifiers       *
+ *             trigger_info      - [OUT] triggers                             *
+ *             trigger_order     - [OUT] pointer to the list of triggers      *
  *                                                                            *
  ******************************************************************************/
 static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
@@ -1581,7 +1586,10 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 	if (0 == item_num && 0 == timers_num)
 		goto out;
 
-	zbx_hashset_reserve(trigger_info, MAX(100, 2 * item_num + timers_num));
+	if (SUCCEED != zbx_hashset_reserve(trigger_info, MAX(100, 2 * item_num + timers_num)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
 
 	zbx_vector_ptr_reserve(trigger_order, trigger_info->num_slots);
 
