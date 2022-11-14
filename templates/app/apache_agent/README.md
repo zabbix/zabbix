@@ -63,9 +63,9 @@ This template was tested on:
 
 Setup [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html)
 
-Check module availability: `httpd -M 2>/dev/null | grep status_module`
+Check the availability of the module with this command line: httpd -M 2>/dev/null | grep status_module
 
-Example configuration of Apache:
+An example configuration of the Apache web server:
 
 ```text
 <Location "/server-status">
@@ -74,7 +74,7 @@ Example configuration of Apache:
 </Location>
 ```
 
-If you use another path, then don't forget to change `{$APACHE.STATUS.PATH}` macro.
+If you use another path, then do not forget to change the `{$APACHE.STATUS.PATH}` macro.
 Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual/installation/install_from_packages).
 
 
