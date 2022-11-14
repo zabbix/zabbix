@@ -495,7 +495,7 @@ fail:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp)
+int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp, int config_timeout)
 {
 	char			*result = NULL, *send = NULL, *debug = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
 				clientip[MAX_STRING_LEN];
@@ -610,7 +610,7 @@ finish:
 		send = j.buffer;
 	}
 
-	zbx_alarm_on(CONFIG_TIMEOUT);
+	zbx_alarm_on(config_timeout);
 	if (SUCCEED != zbx_tcp_send(sock, send))
 		zabbix_log(LOG_LEVEL_WARNING, "Error sending result of command");
 	else

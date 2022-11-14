@@ -138,12 +138,12 @@ static void	disconnect_proxy(zbx_socket_t *sock)
  *                                                                            *
  * Purpose: get historical data from proxy                                    *
  *                                                                            *
- * Parameters: proxy   - [IN/OUT] proxy data                                  *
- *             request - [IN] requested data type                             *
- *             data    - [OUT] data received from proxy                       *
- *             ts      - [OUT] timestamp when the proxy connection was        *
- *                             established                                    *
- *             tasks   - [IN] proxy task response flag                        *
+ * Parameters: proxy          - [IN/OUT] proxy data                           *
+ *             request        - [IN] requested data type                      *
+ *             config_timeout - [IN] requested data type                      *
+ *             data           - [OUT] data received from proxy                *
+ *             ts             - [OUT] timestamp when the proxy connection was *
+ *                                    established                             *
  *                                                                            *
  * Return value: SUCCESS - processed successfully                             *
  *               other code - an error occurred                               *
@@ -152,7 +152,8 @@ static void	disconnect_proxy(zbx_socket_t *sock)
  *           protocol flags sent by proxy.                                    *
  *                                                                            *
  ******************************************************************************/
-static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data, zbx_timespec_t *ts)
+static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, int config_timeout, char **data,
+		zbx_timespec_t *ts)
 {
 	zbx_socket_t	s;
 	struct zbx_json	j;
@@ -212,7 +213,7 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 						flags_response |= ZBX_TCP_COMPRESS;
 
 					zbx_send_response_ext(&s, FAIL, "Zabbix server shutdown in progress", NULL,
-							flags_response, CONFIG_TIMEOUT);
+							flags_response, config_timeout);
 
 					zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy data from passive proxy at"
 							" \"%s\": Zabbix server shutdown in progress", s.peer);
@@ -667,7 +668,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_rtc_subscribe(&rtc, process_type, process_num);
+	zbx_rtc_subscribe(process_type, process_num, proxy_poller_args_in->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
 	{

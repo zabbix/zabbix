@@ -23,7 +23,6 @@
 #include "zbxcomms.h"
 #include "zbxjson.h"
 
-extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern char	*CONFIG_SOURCE_IP;
 

@@ -337,7 +337,7 @@ int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
-
+int		CONFIG_TIMEOUT		= 3;
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
@@ -1169,7 +1169,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != (ret = rtc_process(t.opts, &error)))
+		if (SUCCEED != (ret = rtc_process(t.opts, CONFIG_TIMEOUT, &error)))
 		{
 			zbx_error("Cannot perform runtime control command: %s", error);
 			zbx_free(error);
@@ -1279,11 +1279,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	int				i, ret = SUCCEED;
 	char				*error = NULL;
 
-	zbx_config_comms_args_t		zbx_config = {zbx_config_tls, NULL, 0};
+	zbx_config_comms_args_t		zbx_config_comms = {zbx_config_tls, NULL, 0};
 
 	zbx_thread_args_t		thread_args;
-	zbx_thread_poller_args		poller_args = {&zbx_config, get_program_type, ZBX_NO_POLLER};
-	zbx_thread_trapper_args		trapper_args = {&zbx_config, get_program_type, listen_sock};
+	zbx_thread_poller_args		poller_args = {&zbx_config_comms, get_program_type, ZBX_NO_POLLER};
+	zbx_thread_trapper_args		trapper_args = {&zbx_config_comms, get_program_type, listen_sock};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, get_program_type};
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type};

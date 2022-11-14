@@ -40,7 +40,7 @@ extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
-		const zbx_config_tls_t *zbx_config_tls, const zbx_thread_info_t *thread_info)
+		const zbx_config_tls_t *zbx_config_tls, const zbx_thread_info_t *thread_info, int config_timeout)
 {
 	zbx_socket_t		sock;
 	struct	zbx_json_parse	jp, jp_kvs_paths = {0};
@@ -72,7 +72,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 
 	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_IDLE);
 
-	if (FAIL == zbx_connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
+	if (FAIL == zbx_connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, config_timeout,
 			CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING, zbx_config_tls))	/* retry till have a connection */
 	{
 		zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
@@ -256,7 +256,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_tls_init_child(proxyconfig_args_in->zbx_config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg);
 #endif
 
-	zbx_rtc_subscribe(&rtc, process_type, process_num);
+	zbx_rtc_subscribe(process_type, process_num, proxyconfig_args_in->config_timeout, &rtc);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

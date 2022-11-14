@@ -290,6 +290,8 @@ int	CONFIG_TRIGGERHOUSEKEEPER_FORKS = 0;
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
 
+int		CONFIG_TIMEOUT		= 3;
+
 static zbx_config_log_t	log_file_cfg	= {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
 char	*opt = NULL;
@@ -1279,7 +1281,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_tcp_close(&listen_sock);
 
 		/* Wait for the service worker thread to terminate us. Listener threads may not exit up to */
-		/* CONFIG_TIMEOUT seconds if they're waiting for external processes to finish / timeout */
+		/* config_timeout    seconds if they're waiting for external processes to finish / timeout */
 		zbx_sleep(CONFIG_TIMEOUT);
 
 		THIS_SHOULD_NEVER_HAPPEN;

@@ -25,7 +25,6 @@
 #include "zbxcacheconfig.h"
 
 extern char	*CONFIG_SOURCE_IP;
-extern int	CONFIG_TIMEOUT;
 
 #ifdef HAVE_NETSNMP
 

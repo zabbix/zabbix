@@ -284,7 +284,7 @@ void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 }
 
 static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,
-		const zbx_config_comms_args_t *zbx_config)
+		const zbx_config_comms_args_t *zbx_config_comms)
 {
 	int	res = FAIL;
 
@@ -293,7 +293,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			zbx_alarm_on(CONFIG_TIMEOUT);
+			zbx_alarm_on(zbx_config_comms->config_timeout);
 			res = get_value_agent(item, result);
 			zbx_alarm_off();
 			break;
@@ -302,7 +302,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 			res = get_value_simple(item, result, add_results);
 			break;
 		case ITEM_TYPE_INTERNAL:
-			res = get_value_internal(item, result, zbx_config);
+			res = get_value_internal(item, result, zbx_config_comms);
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 #ifdef HAVE_UNIXODBC
@@ -319,7 +319,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 			break;
 		case ITEM_TYPE_SSH:
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-			zbx_alarm_on(CONFIG_TIMEOUT);
+			zbx_alarm_on(zbx_config_comms->config_timeout);
 			res = get_value_ssh(item, result);
 			zbx_alarm_off();
 #else
@@ -328,7 +328,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 #endif
 			break;
 		case ITEM_TYPE_TELNET:
-			zbx_alarm_on(CONFIG_TIMEOUT);
+			zbx_alarm_on(zbx_config_comms->config_timeout);
 			res = get_value_telnet(item, result);
 			zbx_alarm_off();
 			break;
@@ -696,7 +696,7 @@ void	zbx_prepare_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *res
 }
 
 void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *results, zbx_vector_ptr_t *add_results,
-		unsigned char poller_type, const zbx_config_comms_args_t *zbx_config)
+		unsigned char poller_type, const zbx_config_comms_args_t *zbx_config_comms)
 {
 	if (ITEM_TYPE_SNMP == items[0].type)
 	{
@@ -720,14 +720,14 @@ void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *resul
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
 	{
-		zbx_alarm_on(CONFIG_TIMEOUT);
+		zbx_alarm_on(zbx_config_comms->config_timeout);
 		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num);
 		zbx_alarm_off();
 	}
 	else if (1 == num)
 	{
 		if (SUCCEED == errcodes[0])
-			errcodes[0] = get_value(&items[0], &results[0], add_results, zbx_config);
+			errcodes[0] = get_value(&items[0], &results[0], add_results, zbx_config_comms);
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -795,9 +795,9 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  *                                                                            *
  * Purpose: retrieve values of metrics from monitored hosts                   *
  *                                                                            *
- * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
- *             nextcheck   - [OUT] item nextcheck                             *
- *             zbx_config  - [IN] server/proxy config                         *
+ * Parameters: poller_type       - [IN] poller type (ZBX_POLLER_TYPE_...)     *
+ *             nextcheck         - [OUT] item nextcheck                       *
+ *             zbx_config_comms  - [IN] server/proxy comms config             *
  *                                                                            *
  * Return value: number of items processed                                    *
  *                                                                            *
@@ -805,7 +805,7 @@ void	zbx_clean_items(DC_ITEM *items, int num, AGENT_RESULT *results)
  *           see DCconfig_get_poller_items()                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *zbx_config)
+static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *zbx_config_comms)
 {
 	DC_ITEM			item, *items;
 	AGENT_RESULT		results[MAX_POLLER_ITEMS];
@@ -830,7 +830,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zbx_vector_ptr_create(&add_results);
 
 	zbx_prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
-	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, zbx_config);
+	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, zbx_config_comms);
 
 	zbx_timespec(&timespec);
 
@@ -976,14 +976,15 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 #endif
 	if (ZBX_POLLER_TYPE_HISTORY == poller_type)
 	{
-		zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
+		zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type),
+				process_num);
 
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 	}
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 
-	zbx_rtc_subscribe(&rtc, process_type, process_num);
+	zbx_rtc_subscribe(process_type, process_num, poller_args_in->zbx_config_comms->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
 	{

@@ -485,10 +485,10 @@ static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *d
 	}
 }
 
-static void	DCincrease_disable_until(ZBX_DC_INTERFACE *interface, int now)
+static void	DCincrease_disable_until(ZBX_DC_INTERFACE *interface, int now, int config_timeout)
 {
 	if (NULL != interface && 0 != interface->errors_from)
-		interface->disable_until = now + CONFIG_TIMEOUT;
+		interface->disable_until = now + config_timeout;
 }
 
 /******************************************************************************

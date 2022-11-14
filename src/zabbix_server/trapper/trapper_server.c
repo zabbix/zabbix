@@ -32,7 +32,7 @@
 
 extern int	CONFIG_REPORTMANAGER_FORKS;
 
-static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
+static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data;
@@ -40,7 +40,7 @@ static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_jso
 
 	if (0 == CONFIG_REPORTMANAGER_FORKS)
 	{
-		zbx_send_response(sock, FAIL, "Report manager is disabled.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, FAIL, "Report manager is disabled.", config_timeout);
 		return;
 	}
 
@@ -48,7 +48,7 @@ static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_jso
 
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL))
 	{
-		zbx_send_response(sock, FAIL, "Permission denied.", CONFIG_TIMEOUT);
+		zbx_send_response(sock, FAIL, "Permission denied.", config_timeout);
 		goto out;
 	}
 
@@ -57,13 +57,13 @@ static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_jso
 		char	*error;
 
 		error = zbx_dsprintf(NULL, "cannot find tag: %s", ZBX_PROTO_TAG_DATA);
-		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
+		zbx_send_response(sock, FAIL, error, config_timeout);
 		zbx_free(error);
 		goto out;
 	}
 
 	zbx_report_test(&jp_data, user.userid, &j);
-	zbx_tcp_send_bytes_to(sock, j.buffer, j.buffer_size, CONFIG_TIMEOUT);
+	zbx_tcp_send_bytes_to(sock, j.buffer, j.buffer_size, config_timeout);
 	zbx_json_clean(&j);
 out:
 	zbx_user_free(&user);
@@ -216,7 +216,7 @@ fail:
 }
 
 int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f get_program_type_cb)
+		const zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f get_program_type_cb, int config_timeout)
 {
 	ZBX_UNUSED(zbx_config_tls);
 	ZBX_UNUSED(get_program_type_cb);
