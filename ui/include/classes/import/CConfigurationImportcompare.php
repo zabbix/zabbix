@@ -47,7 +47,6 @@ class CConfigurationImportcompare {
 		$this->uuid_structure = [
 			'groups' => [],
 			'templates' => [
-				'groups' => [],
 				'items' => [
 					'triggers' => []
 				],
