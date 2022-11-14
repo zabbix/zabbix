@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-11-14T09:32:09Z'
+  date: '2022-11-14T10:54:49Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -1917,7 +1917,7 @@ zabbix_export:
                   expression: 'last(/Oracle by Zabbix agent 2/oracle.db_open_mode["{#DBNAME}"])=1'
                   name: 'Oracle Database ''{#DBNAME}'': Open status in mount mode'
                   priority: WARNING
-                  description: 'The Oracle DB is in a a mounted state.'
+                  description: 'The Oracle DB is in a mounted state.'
                   tags:
                     -
                       tag: scope
@@ -2498,7 +2498,7 @@ zabbix_export:
         -
           macro: '{$ORACLE.ASM.USED.PCT.MAX.HIGH}'
           value: '95'
-          description: 'The maximum percentage of used the ASM disk group for high trigger expression.'
+          description: 'The maximum percentage of used ASM disk group for high trigger expression.'
         -
           macro: '{$ORACLE.ASM.USED.PCT.MAX.WARN}'
           value: '90'

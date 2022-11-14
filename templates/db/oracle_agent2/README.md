@@ -30,7 +30,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ORACLE.ASM.USED.PCT.MAX.HIGH} |<p>The maximum percentage of used the ASM disk group for high trigger expression.</p> |`95` |
+|{$ORACLE.ASM.USED.PCT.MAX.HIGH} |<p>The maximum percentage of used ASM disk group for high trigger expression.</p> |`95` |
 |{$ORACLE.ASM.USED.PCT.MAX.WARN} |<p>The maximum percentage of used Automatic Storage Management (ASM) disk group for warning trigger expression.</p> |`90` |
 |{$ORACLE.CONCURRENCY.MAX.WARN} |<p>The maximum percentage of sessions concurrency usage for trigger expression.</p> |`80` |
 |{$ORACLE.CONNSTRING} |<p>-</p> |`tcp://localhost:1521` |
@@ -190,7 +190,7 @@ There are no template links in this template.
 |Oracle: Number of REDO logs available for switching is too low |<p>The number of inactive/unused REDOs available for log switching is low (database down risk).</p> |`max(/Oracle by Zabbix agent 2/oracle.redolog.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"],5m) < {$ORACLE.REDO.MIN.WARN}` |WARNING | |
 |Oracle: Too many active processes |<p>Active processes are using more than {$ORACLE.PROCESSES.MAX.WARN}% of the available number of processes.</p> |`min(/Oracle by Zabbix agent 2/oracle.proc.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"],5m) * 100 / last(/Oracle by Zabbix agent 2/oracle.processes_limit) > {$ORACLE.PROCESSES.MAX.WARN}` |WARNING | |
 |Oracle: Too many database files |<p>The number of datafiles is higher than {$ORACLE.DB.FILE.MAX.WARN}% of the available datafiles limit.</p> |`min(/Oracle by Zabbix agent 2/oracle.datafiles.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"],5m) * 100 / last(/Oracle by Zabbix agent 2/oracle.db_files_limit) > {$ORACLE.DB.FILE.MAX.WARN}` |WARNING | |
-|Oracle Database '{#DBNAME}': Open status in mount mode |<p>The Oracle DB is in a a mounted state.</p> |`last(/Oracle by Zabbix agent 2/oracle.db_open_mode["{#DBNAME}"])=1` |WARNING | |
+|Oracle Database '{#DBNAME}': Open status in mount mode |<p>The Oracle DB is in a mounted state.</p> |`last(/Oracle by Zabbix agent 2/oracle.db_open_mode["{#DBNAME}"])=1` |WARNING | |
 |Oracle Database '{#DBNAME}': Open status has changed |<p>The Oracle DB open status has changed. Ack to close manually.</p> |`last(/Oracle by Zabbix agent 2/oracle.db_open_mode["{#DBNAME}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.db_open_mode["{#DBNAME}"],#2)` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Oracle Database '{#DBNAME}': Open status in mount mode</p> |
 |Oracle Database '{#DBNAME}': Role has changed |<p>The Oracle DB role has changed. Ack to close manually.</p> |`last(/Oracle by Zabbix agent 2/oracle.db_role["{#DBNAME}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.db_role["{#DBNAME}"],#2)` |INFO |<p>Manual close: YES</p> |
 |Oracle Database '{#DBNAME}': Force logging is deactivated for DB with active Archivelog |<p>Force Logging mode - it is very important metric for Databases in 'ARCHIVELOG'. This feature allows to forcibly write all the transactions to the REDO.</p> |`last(/Oracle by Zabbix agent 2/oracle.db_force_logging["{#DBNAME}"]) = 0 and last(/Oracle by Zabbix agent 2/oracle.db_log_mode["{#DBNAME}"]) = 1` |WARNING | |
