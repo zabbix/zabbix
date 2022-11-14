@@ -345,7 +345,7 @@ class testFormUserMedia extends CWebTest {
 	public function testFormUserMedia_Add($data) {
 		$old_hash = CDBHelper::getHash(self::$mediatype_sql);
 
-		// Open the user media tab for Admin user.
+		// Open the user media tab for user-zabbix user.
 		$user_form = $this->getUserMediaTab('user-zabbix');
 
 		// Check that no medias are configured.
@@ -397,15 +397,6 @@ class testFormUserMedia extends CWebTest {
 			$this->assertMessage(TEST_BAD, null, $data['error_message']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
 		}
-	}
-
-	private function getUserMediaTab($user) {
-		$this->page->login()->open('zabbix.php?action=user.list');
-		$this->query('link', $user)->waitUntilVisible()->one()->click();
-		$user_form = $this->query('name:user_form')->asForm()->waitUntilPresent()->one();
-		$user_form->selectTab('Media');
-
-		return $user_form;
 	}
 
 	public function testFormUserMedia_DisabledMediaTypes() {
@@ -569,7 +560,6 @@ class testFormUserMedia extends CWebTest {
 
 			$user_form->selectTab('Permissions');
 			$user_form->fill(['Role' => $data['role']]);
-
 		}
 		else {
 			$this->query('link', $data['username'])->waitUntilVisible()->one()->click();
@@ -619,6 +609,22 @@ class testFormUserMedia extends CWebTest {
 				$this->assertEquals($row->getColumn($field)->getText(), $value);
 			}
 		}
+	}
+
+	/**
+	 * Open Media tab of user configuration form for a defined user.
+	 *
+	 * @param string	$user	User for which the Media tab should be opened.
+	 *
+	 * @return CFormElement
+	 */
+	private function getUserMediaTab($user) {
+		$this->page->login()->open('zabbix.php?action=user.list');
+		$this->query('link', $user)->waitUntilVisible()->one()->click();
+		$user_form = $this->query('name:user_form')->asForm()->waitUntilPresent()->one();
+		$user_form->selectTab('Media');
+
+		return $user_form;
 	}
 
 	/**
