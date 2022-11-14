@@ -1059,6 +1059,7 @@ static void	zbx_on_exit(int ret)
 #endif
 
 	zbx_config_tls_free(zbx_config_tls);
+	zbx_deinit_library_export();
 
 	exit(EXIT_SUCCESS);
 }

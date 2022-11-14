@@ -199,6 +199,21 @@ int	zbx_init_library_export(zbx_config_export_t *zbx_config_export, char **error
 	return SUCCEED;
 }
 
+void	zbx_deinit_library_export(void)
+{
+	zbx_fclose(history_file->file);
+	zbx_free(history_file->name);
+	zbx_free(history_file);
+
+	zbx_fclose(trends_file->file);
+	zbx_free(trends_file->name);
+	zbx_free(trends_file);
+
+	zbx_fclose(problems_file->file);
+	zbx_free(problems_file->name);
+	zbx_free(problems_file);
+}
+
 static int	open_export_file(zbx_export_file_t *file, char **error)
 {
 	if (NULL == (file->file = fopen(file->name, "a")))
@@ -229,6 +244,8 @@ static zbx_export_file_t	*export_init(zbx_export_file_t *file, const char *proce
 
 	file = (zbx_export_file_t *)zbx_malloc(NULL, sizeof(zbx_export_file_t));
 	file->name = zbx_dsprintf(NULL, "%s/%s-%s-%d.ndjson", export_dir, process_type, process_name, process_num);
+
+	free(export_dir);
 
 	if (FAIL == open_export_file(file, &error))
 	{
