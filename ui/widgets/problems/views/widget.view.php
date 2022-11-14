@@ -42,7 +42,7 @@ if ($data['show_three_columns']) {
 	$header[] = new CColHeader();
 	$header[] = (new CColHeader())
 		->addClass(ZBX_STYLE_CELL_WIDTH)
-		->addStyle('padding-left: 0;');
+		->addClass('pl-2');
 }
 elseif ($data['show_two_columns']) {
 	$header[] = new CColHeader();
@@ -339,40 +339,58 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 			}
 		}
 
+		$symptom_col = (new CCol(
+			makeActionIcon([
+				'icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM,
+				'title' => _('Symptom'),
+				'style' => 'margin: 0'
+			])
+		))
+			->addClass('no-border')
+			->addClass(ZBX_STYLE_RIGHT);
+
+		$empty_col = (new CCol())->addClass('no-border');
+
 		// Build rows and columns.
 		if ($problem['cause_eventid'] == 0) {
 			$row = new CRow();
 
 			if ($problem['symptom_count'] > 0) {
 				// Show symptom counter and collapse/expand button.
-				$row->addItem([
-						(new CCol(
-							(new CSpan($problem['symptom_count']))
-								->addClass(ZBX_STYLE_TAG)
-								->setHint($problem['symptom_count'])
-						))->addClass(ZBX_STYLE_RIGHT),
-						(new CCol(
-							(new CButton(null))
-								->setAttribute('data-eventid', $problem['eventid'])
-								->setAttribute('data-action', 'show_symptoms')
-								->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
-								->setTitle(_('Expand'))
-						))
-							->addClass(ZBX_STYLE_RIGHT)
-							->addStyle('padding-left: 0;')
-					]);
+				$symptom_count_col = (new CCol(
+					(new CSpan($problem['symptom_count']))
+						->addClass(ZBX_STYLE_TAG)
+						->setHint($problem['symptom_count'])
+				))->addClass(ZBX_STYLE_RIGHT);
+
+				$collapse_expand_col = (new CCol(
+					(new CButton(null))
+						->setAttribute('data-eventid', $problem['eventid'])
+						->setAttribute('data-action', 'show_symptoms')
+						->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
+						->setTitle(_('Expand'))
+				))
+					->addClass(ZBX_STYLE_RIGHT)
+					->addClass('pl-2');
+
+				if ($data['show_timeline']) {
+					$symptom_count_col->addClass('no-border');
+					$collapse_expand_col->addClass('no-border');
+				}
+
+				$row->addItem([$symptom_count_col, $collapse_expand_col]);
 			}
 			else {
 				if ($data['show_three_columns']) {
 					// Show two empty columns.
 					$row->addItem([
-						'',
-						(new CCol())->addStyle('padding-left: 0;')
+						$empty_col,
+						$empty_col->addClass('pl-2')
 					]);
 				}
 				elseif ($data['show_two_columns']) {
 					$row->addItem(
-						(new CCol())->addStyle('padding-left: 0;')
+						$empty_col->addClass('pl-2')
 					);
 				}
 			}
@@ -380,41 +398,29 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 		else {
 			if ($nested) {
 				// First and second column empty for symptom event.
-				$row = (new CRow(''))
+				$row = (new CRow($empty_col))
+					->addClass('nested-small')
 					->setAttribute('data-cause-eventid', $problem['cause_eventid'])
 					->addStyle('display: none');
 
-					$row->addItem(
-						(new CCol(
-							makeActionIcon([
-								'icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM,
-								'title' => _('Symptom'),
-								'style' => 'margin: 0'
-							])
-						))
-							->addClass(ZBX_STYLE_RIGHT)
-							->addStyle('padding-left: 0;')
-					);
+				if (getUserTheme(CWebUser::$data) === 'dark-theme'
+						|| getUserTheme(CWebUser::$data) === 'blue-theme') {
+					$row->addClass('nested');
+				}
+
+				$row->addItem(
+					$symptom_col->addClass('pl-2')
+				);
 			}
 			else {
 				// First column empty stand-alone symptom event.
-				$row = new CRow();
-
-				$row->addItem(
-					(new CCol(
-						makeActionIcon([
-							'icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM,
-							'title' => _('Symptom'),
-							'style' => 'margin: 0'
-						])
-					))->addClass(ZBX_STYLE_RIGHT)
-				);
+				$row = new CRow($symptom_col);
 			}
 
 			// If there are causes as well, show additional empty column.
 			if (!$nested && $data['show_three_columns']) {
 				$row->addItem(
-					(new CCol())->addStyle('padding-left: 0;')
+					$empty_col->addClass('pl-2')
 				);
 			}
 		}
@@ -483,17 +489,57 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 			addProblemsToTable($table, $problem['symptoms'], $data, true);
 
 			if ($problem['symptom_count'] > ZBX_PROBLEM_SYMPTOM_LIMIT) {
-				$table->addRow(
-					(new CRow(
-						(new CCol(
-							(new CDiv(
-								(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_PROBLEM_SYMPTOM_LIMIT,
-									$problem['symptom_count']
-								)))->addClass(ZBX_STYLE_TABLE_STATS)
-							))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-						))->setColSpan($table->getNumCols())
-					))->addClass('hover-nobg')
-				);
+				$row = (new CRow())
+					->setAttribute('data-cause-eventid', $problem['eventid'])
+					->addClass('hover-nobg')
+					->addStyle('display: none;');
+
+				$symptom_limit_col = (new CCol(
+					(new CDiv(
+						(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_PROBLEM_SYMPTOM_LIMIT,
+							$problem['symptom_count']
+						)))->addClass(ZBX_STYLE_TABLE_STATS)
+					))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+				))->addClass('nested-small');
+
+				if ($data['show_timeline']) {
+					$colspan = 1;
+					if ($data['show_three_columns']) {
+						$colspan = 3;
+					}
+					elseif ($data['show_two_columns']) {
+						$colspan = 2;
+					}
+
+					$empty_col = (new CCol())->addClass('no-border');
+
+					if ($colspan > 1) {
+						$empty_col->setColSpan($colspan);
+					}
+
+					$row->addItem([
+						$empty_col,
+						(new CCol())
+							->addClass(ZBX_STYLE_TIMELINE_AXIS)
+							->addClass('pt-0')
+							->addClass('pb-0'),
+						(new CCol())
+							->addClass(ZBX_STYLE_TIMELINE_TD)
+							->addClass('pt-0')
+							->addClass('pb-0'),
+						$symptom_limit_col
+							->addClass('pt-0')
+							->addClass('pb-0')
+							->setColSpan($table->getNumCols() - $colspan - 2)
+					]);
+				}
+				else {
+					$row->addItem(
+						$symptom_limit_col->setColSpan($table->getNumCols())
+					);
+				}
+
+				$table->addRow($row);
 			}
 		}
 	}

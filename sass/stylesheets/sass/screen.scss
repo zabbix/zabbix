@@ -357,6 +357,7 @@ form {
 
 		.btn-widget-expand,
 		.btn-widget-collapse {
+			background-color: $ui-bg-color;
 			position: relative;
 			top: -3px;
 			width: 18px;
@@ -364,6 +365,43 @@ form {
 			background-position-x: -9px;
 			background-position-y: -693px;
 			margin: 0;
+			opacity: 1;
+		}
+	}
+
+	.no-border {
+		border-bottom: 0;
+	}
+
+	.pl-0 {
+		padding-left: 0;
+	}
+
+	.pr-0 {
+		padding-right: 0;
+	}
+
+	.pl-2 {
+		padding-left: 2px;
+	}
+
+	.pt-0 {
+		padding-top: 0;
+	}
+
+	.pb-0 {
+		padding-bottom: 0;
+	}
+
+	.nested:not[class*='flh-'] {
+		background-color: darken($ui-bg-color, 5%);
+	}
+
+	.nested-small {
+		font-size: calc(#{$font-mono-size} - 1px);
+
+		.tag {
+			font-size: 12px;
 		}
 	}
 
@@ -439,6 +477,12 @@ form {
 							.icon-wizard-action {
 								background-color: transparent;
 							}
+
+
+							/* .btn-widget-expand,
+							.btn-widget-collapse {
+								background-color: $ui-bg-color;
+							} */
 						}
 					}
 				}
@@ -681,32 +725,26 @@ form {
 		&:hover {
 			background-color: $ui-hover-color;
 
-			.timeline-axis {
-				background-color: $ui-bg-color;
+			%timeline-td {
+				border-bottom-color: $ui-hover-color !important;
 			}
 
-			.timeline-date {
-				background-color: $ui-bg-color;
-			}
-
-			.timeline-td {
-				background-color: $ui-bg-color !important;
+			.btn-widget-expand,
+			.btn-widget-collapse {
+				background-color: $ui-hover-color;
 			}
 		}
 
 		&.row-selected {
 			@extend %found-bg;
 
-			.timeline-axis {
-				background-color: $ui-bg-color;
+			%timeline-td {
+				border-bottom-color: $lighter-yellow !important;
 			}
 
-			.timeline-date {
-				background-color: $ui-bg-color;
-			}
-
-			.timeline-td {
-				background-color: $ui-bg-color;
+			.btn-widget-expand,
+			.btn-widget-collapse {
+				background-color: $lighter-yellow;
 			}
 		}
 
@@ -721,6 +759,10 @@ form {
 
 		&.hover-nobg {
 			background-color: $ui-bg-color;
+
+			%timeline-td {
+				border-bottom-color: $ui-bg-color !important;
+			}
 		}
 	}
 

@@ -978,29 +978,29 @@ class CScreenProblem extends CScreenBase {
 
 			// There are cause events displayed on page that have symptoms. Maximum column count.
 			if ($do_causes_have_symptoms) {
+				$col_header_1 = (new CColHeader())
+					->addClass('pl-0')
+					->addClass('pr-0');
+				$col_header_2 = (new CColHeader())->addClass('pl-2');
+
 				if ($this->data['filter']['compact_view']) {
-					$header[] = (new CColHeader())->addStyle('width: 20px; padding-left: 0; padding-right: 0;');
-					$header[] = (new CColHeader())->addStyle('width: 20px; padding-left: 0;');
+					$header[] = $col_header_1->addStyle('width: 20px;');
+					$header[] = $col_header_2->addStyle('width: 20px;');
 				}
 				else {
-					$header[] = (new CColHeader())
-						->addClass(ZBX_STYLE_CELL_WIDTH)
-						->addStyle('padding-left: 0; padding-right: 0;');
-					$header[] = (new CColHeader())
-						->addClass(ZBX_STYLE_CELL_WIDTH)
-						->addStyle('padding-left: 0;');
+					$header[] = $col_header_1->addClass(ZBX_STYLE_CELL_WIDTH);
+					$header[] = $col_header_2->addClass(ZBX_STYLE_CELL_WIDTH);
 				}
 			}
 			// There might be cause events without symptoms or only symptoms.
 			elseif ($symptom_cause_eventids) {
+				$col_header = (new CColHeader())->addClass('pl-2');
+
 				if ($this->data['filter']['compact_view']) {
-					$header[] = (new CColHeader())
-						->addStyle('width: 20px; padding-left: 0;');
+					$header[] = $col_header->addStyle('width: 20px;');
 				}
 				else {
-					$header[] = (new CColHeader())
-						->addClass(ZBX_STYLE_CELL_WIDTH)
-						->addStyle('padding-left: 0;');
+					$header[] = $col_header->addClass(ZBX_STYLE_CELL_WIDTH);
 				}
 			}
 
@@ -1475,29 +1475,48 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			$checkbox = new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']);
+			$checkbox_col = new CCol($checkbox);
+			$empty_col = new CCol();
+			$symptom_col = (new CCol(
+				makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM, 'title' => _('Symptom')])
+			));
+
+			if ($data['show_timeline']) {
+				$checkbox_col->addClass('no-border');
+				$empty_col->addClass('no-border');
+				$symptom_col->addClass('no-border');
+			}
 
 			// Build rows and columns.
 			if ($problem['cause_eventid'] == 0) {
 				// First column checkbox for cause event.
-				$row = (new CRow([$checkbox]));
+				$row = new CRow($checkbox_col);
 
 				if ($problem['symptom_count'] > 0) {
 					// Show symptom counter and collapse/expand button.
-					$row->addItem([
-						(new CCol(
-							(new CSpan($problem['symptom_count']))
-								->addClass(ZBX_STYLE_TAG)
-								->addStyle('max-width: 24px;')
-								->setHint($problem['symptom_count'])
-						))->addStyle('padding-left: 0; padding-right: 0;'),
-						(new CCol(
-							(new CButton(null))
-								->setAttribute('data-eventid', $problem['eventid'])
-								->setAttribute('data-action', 'show_symptoms')
-								->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
-								->setTitle(_('Expand'))
-						))->addStyle('padding-left: 0;')
-					]);
+					$symptom_count_col = (new CCol(
+						(new CSpan($problem['symptom_count']))
+							->addClass(ZBX_STYLE_TAG)
+							->addStyle('max-width: 24px;')
+							->setHint($problem['symptom_count'])
+					))
+					->addClass('pl-0')
+					->addClass('pr-0');
+
+					$collapse_expand_col = (new CCol(
+						(new CButton(null))
+							->setAttribute('data-eventid', $problem['eventid'])
+							->setAttribute('data-action', 'show_symptoms')
+							->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
+							->setTitle(_('Expand'))
+					))->addClass('pl-2');
+
+					if ($data['show_timeline']) {
+						$symptom_count_col->addClass('no-border');
+						$collapse_expand_col->addClass('no-border');
+					}
+
+					$row->addItem([$symptom_count_col, $collapse_expand_col]);
 				}
 				else {
 					if ($data['show_three_columns']) {
@@ -1508,8 +1527,10 @@ class CScreenProblem extends CScreenBase {
 						 * width.
 						 */
 						$row->addItem([
-							(new CCol())->addStyle('padding-left: 0; padding-right: 0;'),
-							(new CCol())->addStyle('padding-left: 0;')
+							$empty_col
+								->addClass('pl-0')
+								->addClass('pr-0'),
+							$empty_col->addClass('pl-2')
 						]);
 					}
 					elseif ($data['show_two_columns']) {
@@ -1519,7 +1540,9 @@ class CScreenProblem extends CScreenBase {
 						 * required which has no padding from both sides.
 						 */
 						$row->addItem(
-							(new CCol())->addStyle('padding-left: 0; padding-right: 0;')
+							$empty_col
+								->addClass('pl-0')
+								->addClass('pr-0')
 						);
 					}
 					// Otherwise page has only cause events with no symptoms at all.
@@ -1532,23 +1555,31 @@ class CScreenProblem extends CScreenBase {
 					 * empty. Second column is checkbox for the nested symptom event. After that, the third column is
 					 * Symptom icon. The row is hidden by default.
 					 */
+					$checkbox_col
+						->addClass('pl-0')
+						->addClass('pr-0');
+
 					$row = (new CRow([
-						'',
-						(new CCol($checkbox))->addStyle('padding-left: 0; padding-right: 0;'),
-						(new CCol(
-							makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM, 'title' => _('Symptom')])
-						))->addStyle('padding-left: 0;')
+						$empty_col,
+						$checkbox_col,
+						$symptom_col->addClass('pl-2')
 					]))
+						->addClass('nested-small')
 						->setAttribute('data-cause-eventid', $problem['cause_eventid'])
 						->addStyle('display: none');
+
+					if (getUserTheme(CWebUser::$data) === 'dark-theme'
+							|| getUserTheme(CWebUser::$data) === 'blue-theme') {
+						$row->addClass('nested');
+					}
 				}
 				else {
 					// This is a stand-alone symptom event. First column is checkbox, followed by a Symptom icon.
 					$row = new CRow([
-						$checkbox,
-						(new CCol(
-							makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM, 'title' => _('Symptom')])
-						))->addStyle('padding-left: 0; padding-right: 0;')
+						$checkbox_col,
+						$symptom_col
+							->addClass('pl-0')
+							->addClass('pr-0')
 					]);
 				}
 
@@ -1559,7 +1590,7 @@ class CScreenProblem extends CScreenBase {
 				 */
 				if (!$nested && $data['show_three_columns']) {
 					$row->addItem(
-						(new CCol())->addStyle('padding-left: 0;')
+						$empty_col->addClass('pl-2')
 					);
 				}
 			}
@@ -1630,17 +1661,60 @@ class CScreenProblem extends CScreenBase {
 				self::addProblemsToTable($table, $problem['symptoms'], $data, true);
 
 				if ($problem['symptom_count'] > ZBX_PROBLEM_SYMPTOM_LIMIT) {
-					$table->addRow(
-						(new CRow(
-							(new CCol(
-								(new CDiv(
-									(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_PROBLEM_SYMPTOM_LIMIT,
-										$problem['symptom_count']
-									)))->addClass(ZBX_STYLE_TABLE_STATS)
-								))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-							))->setColSpan($table->getNumCols())
-						))->addClass('hover-nobg')
-					);
+					$row = (new CRow())
+						->setAttribute('data-cause-eventid', $problem['eventid'])
+						->addClass('hover-nobg')
+						->addStyle('display: none;');
+
+					$symptom_limit_col = (new CCol(
+						(new CDiv(
+							(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_PROBLEM_SYMPTOM_LIMIT,
+								$problem['symptom_count']
+							)))->addClass(ZBX_STYLE_TABLE_STATS)
+						))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+					))->addClass('nested-small');
+
+					if ($data['show_timeline']) {
+						$colspan = 1;
+						if ($data['show_three_columns']) {
+							$colspan = 4;
+						}
+						elseif ($data['show_two_columns']) {
+							$colspan = 3;
+						}
+
+						$empty_col = (new CCol())
+							->addClass('no-border')
+							->addClass('pt-0')
+							->addClass('pb-0');
+
+						if ($colspan > 1) {
+							$empty_col->setColSpan($colspan);
+						}
+
+						$row->addItem([
+							$empty_col,
+							(new CCol())
+								->addClass(ZBX_STYLE_TIMELINE_AXIS)
+								->addClass('pt-0')
+								->addClass('pb-0'),
+							(new CCol())
+								->addClass(ZBX_STYLE_TIMELINE_TD)
+								->addClass('pt-0')
+								->addClass('pb-0'),
+							$symptom_limit_col
+								->addClass('pt-0')
+								->addClass('pb-0')
+								->setColSpan($table->getNumCols() - $colspan - 2)
+						]);
+					}
+					else {
+						$row->addItem(
+							$symptom_limit_col->setColSpan($table->getNumCols())
+						);
+					}
+
+					$table->addRow($row);
 				}
 			}
 		}

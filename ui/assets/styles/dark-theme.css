@@ -3387,13 +3387,33 @@ form.is-loading {
   .list-table td .btn-widget-collapse,
   .list-table td .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle,
   .list-vertical-accordion .list-accordion-item-opened .list-table td .list-accordion-item-toggle {
+    background-color: #2b2b2b;
     position: relative;
     top: -3px;
     width: 18px;
     height: 18px;
     background-position-x: -9px;
     background-position-y: -693px;
-    margin: 0; }
+    margin: 0;
+    opacity: 1; }
+  .list-table .no-border {
+    border-bottom: 0; }
+  .list-table .pl-0 {
+    padding-left: 0; }
+  .list-table .pr-0 {
+    padding-right: 0; }
+  .list-table .pl-2 {
+    padding-left: 2px; }
+  .list-table .pt-0 {
+    padding-top: 0; }
+  .list-table .pb-0 {
+    padding-bottom: 0; }
+  .list-table .nested:not[class*='flh-'] {
+    background-color: #1e1e1e; }
+  .list-table .nested-small {
+    font-size: calc(1em - 1px); }
+    .list-table .nested-small .tag, .list-table .nested-small .btn-tag {
+      font-size: 12px; }
   .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td {
     color: #000000; }
     .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td sup,
@@ -3408,13 +3428,18 @@ form.is-loading {
       background-position: -165px -624px; }
     .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td button:focus {
       box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5); }
-  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-'] {
-    background-color: #2b2b2b;
-    border-radius: 2px; }
-  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-depend-'],
-  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-description,
-  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-wizard-action {
-    background-color: transparent; }
+  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td {
+    /* .btn-widget-expand,
+    .btn-widget-collapse {
+    	background-color: $ui-bg-color;
+    } */ }
+    .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-'] {
+      background-color: #2b2b2b;
+      border-radius: 2px; }
+    .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-depend-'],
+    .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-description,
+    .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-wizard-action {
+      background-color: transparent; }
   .list-table.compact-view .link-action {
     color: #f2f2f2; }
     .list-table.compact-view .link-action.red {
@@ -3553,22 +3578,26 @@ form.is-loading {
         background-color: #383838; }
   .list-table tbody tr:hover {
     background-color: #383838; }
-    .list-table tbody tr:hover .timeline-axis {
-      background-color: #2b2b2b; }
-    .list-table tbody tr:hover .timeline-date {
-      background-color: #2b2b2b; }
-    .list-table tbody tr:hover .timeline-td {
-      background-color: #2b2b2b !important; }
-  .list-table tbody tr.row-selected .timeline-axis {
-    background-color: #2b2b2b; }
-  .list-table tbody tr.row-selected .timeline-date {
-    background-color: #2b2b2b; }
-  .list-table tbody tr.row-selected .timeline-td {
-    background-color: #2b2b2b; }
+    .list-table tbody tr:hover .timeline-axis, .list-table tbody tr:hover .timeline-td {
+      border-bottom-color: #383838 !important; }
+    .list-table tbody tr:hover .btn-widget-expand, .list-table tbody tr:hover .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .list-vertical-accordion .list-accordion-item-closed .list-table tbody tr:hover .list-accordion-item-toggle,
+    .list-table tbody tr:hover .btn-widget-collapse,
+    .list-table tbody tr:hover .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle,
+    .list-vertical-accordion .list-accordion-item-opened .list-table tbody tr:hover .list-accordion-item-toggle {
+      background-color: #383838; }
+  .list-table tbody tr.row-selected .timeline-axis, .list-table tbody tr.row-selected .timeline-td {
+    border-bottom-color: #2f280a !important; }
+  .list-table tbody tr.row-selected .btn-widget-expand, .list-table tbody tr.row-selected .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .list-vertical-accordion .list-accordion-item-closed .list-table tbody tr.row-selected .list-accordion-item-toggle,
+  .list-table tbody tr.row-selected .btn-widget-collapse,
+  .list-table tbody tr.row-selected .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle,
+  .list-vertical-accordion .list-accordion-item-opened .list-table tbody tr.row-selected .list-accordion-item-toggle {
+    background-color: #2f280a; }
   .list-table tbody tr:last-child th, .list-table tbody tr:last-child td {
     border-bottom: 0; }
   .list-table tbody tr.hover-nobg {
     background-color: #2b2b2b; }
+    .list-table tbody tr.hover-nobg .timeline-axis, .list-table tbody tr.hover-nobg .timeline-td {
+      border-bottom-color: #2b2b2b !important; }
   .list-table tbody th,
   .list-table td {
     padding: 6px 5px;
