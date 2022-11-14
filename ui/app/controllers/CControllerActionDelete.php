@@ -91,6 +91,15 @@ class CControllerActionDelete extends CController {
 				'title' => (_n('Cannot delete action', 'Cannot delete actions', $actions_count)),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
+
+			$actions = API::Action()->get([
+				'output' => [],
+				'actionids' => $actionids,
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			$output['keepids'] = array_keys($actions);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
