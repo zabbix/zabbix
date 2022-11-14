@@ -48,7 +48,6 @@ class CConfigurationImportcompare {
 			'template_groups' => [],
 			'host_groups' => [],
 			'templates' => [
-				'groups' => [],
 				'items' => [
 					'triggers' => []
 				],
@@ -58,9 +57,7 @@ class CConfigurationImportcompare {
 					],
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
-					'host_prototypes' => [
-						'group_links' => []
-					]
+					'host_prototypes' => []
 				],
 				'dashboards' => [],
 				'httptests' => [],
@@ -74,7 +71,6 @@ class CConfigurationImportcompare {
 			'template_groups' => ['name'],
 			'host_groups' => ['name'],
 			'templates' => ['name'],
-			'groups' => ['name'],
 			'items' => ['name', 'key'],
 			'triggers' => ['name', 'expression', 'recovery_expression'],
 			'dashboards' => ['name'],
