@@ -1076,10 +1076,13 @@ class CUserDirectory extends CApiService {
 			'user_username' =>		['type' => API_STRING_UTF8],
 			'user_lastname' =>		['type' => API_STRING_UTF8],
 			'idp_type' =>			['type' => API_INT32, 'in' => implode(',', [IDP_TYPE_LDAP]), 'default' => IDP_TYPE_LDAP],
-			'provision_media' =>	['type' => API_OBJECTS, 'fields' => [
-				'mediatypeid' =>		['type' => API_ID],
-				'attribute' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+			'provision_media' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => [
+											'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
+											'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+											'attribute' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')]
+										]],
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
 			'provision_groups' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'provision_status', 'in' => JIT_PROVISIONING_ENABLED],
@@ -1091,7 +1094,7 @@ class CUserDirectory extends CApiService {
 												]]
 											]
 										],
-										['else' => false, 'type' => API_OBJECTS]
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
 			'test_username' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'test_password' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
