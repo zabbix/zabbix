@@ -229,22 +229,20 @@ class CJsonRpc {
 	}
 
 	private function getAuthorizationHeader(): ?string {
-		$header = null;
-
 		if (array_key_exists('Authorization', $_SERVER)) {
-			$header = $_SERVER['Authorization'];
+			return $_SERVER['Authorization'];
 		}
 		elseif (array_key_exists('HTTP_AUTHORIZATION', $_SERVER)) {
-			$header = $_SERVER['HTTP_AUTHORIZATION'];
+			return $_SERVER['HTTP_AUTHORIZATION'];
 		}
 		elseif (function_exists('getallheaders')) {
 			$headers = getallheaders();
 
 			if (array_key_exists('Authorization', $headers)) {
-				$header = $headers['Authorization'];
+				return $headers['Authorization'];
 			}
 		}
 
-		return $header;
+		return null;
 	}
 }
