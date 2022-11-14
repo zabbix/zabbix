@@ -130,7 +130,7 @@ There are no template links in this template.
 |Apache |Apache: Workers starting up |<p>The number of workers in starting state.</p> |DEPENDENT |apache.workers.starting<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.starting`</p> |
 |Apache |Apache: Workers waiting for connection |<p>The number of workers in waiting state.</p> |DEPENDENT |apache.workers.waiting<p>**Preprocessing**:</p><p>- JSONPATH: `$.Workers.waiting`</p> |
 |Apache |Apache: Get processes summary |<p>The aggregated data of summary metrics for all processes.</p> |ZABBIX_PASSIVE |proc.get[,,,summary] |
-|Apache |Apache: CPU utilization |<p>A process {#NAME} - the percentage of the CPU utilization.</p> |ZABBIX_PASSIVE |proc.cpu.util[{#NAME}] |
+|Apache |Apache: CPU utilization |<p>The percentage of the CPU utilization by a process {#NAME}.</p> |ZABBIX_PASSIVE |proc.cpu.util[{#NAME}] |
 |Apache |Apache: Get process data |<p>The summary metrics aggregated by a process {#NAME}.</p> |DEPENDENT |apache.proc.get[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.[?(@["name"]=="{#NAME}")].first()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> Failed to retrieve process {#NAME} data`</p> |
 |Apache |Apache: Memory usage (rss) |<p>The summary of resident set size memory used by a process {#NAME} expressed in bytes.</p> |DEPENDENT |apache.proc.rss[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.rss`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
 |Apache |Apache: Memory usage (vsize) |<p>The summary of virtual memory used by a process {#NAME} expressed in bytes.</p> |DEPENDENT |apache.proc.vmem[{#NAME}]<p>**Preprocessing**:</p><p>- JSONPATH: `$.vsize`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p> |
@@ -149,9 +149,9 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Apache: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Apache by Zabbix agent/apache.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|Apache: Version has changed |<p>Apache version has changed. Ack to close.</p> |`last(/Apache by Zabbix agent/apache.version,#1)<>last(/Apache by Zabbix agent/apache.version,#2) and length(last(/Apache by Zabbix agent/apache.version))>0` |INFO |<p>Manual close: YES</p> |
+|Apache: Version has changed |<p>The Apache version has changed. Acknowledge (Ack) to close manually.</p> |`last(/Apache by Zabbix agent/apache.version,#1)<>last(/Apache by Zabbix agent/apache.version,#2) and length(last(/Apache by Zabbix agent/apache.version))>0` |INFO |<p>Manual close: YES</p> |
 |Apache: Process is not running |<p>-</p> |`last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])=0` |HIGH | |
-|Apache: Failed to fetch status page |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/Apache by Zabbix agent/web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"],30m)=1 and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p> |
+|Apache: Failed to fetch status page |<p>Zabbix has not received any data for items for the last 30 minutes.</p> |`nodata(/Apache by Zabbix agent/web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"],30m)=1 and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p> |
 |Apache: Service is down |<p>-</p> |`last(/Apache by Zabbix agent/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0` |AVERAGE |<p>Manual close: YES</p> |
 |Apache: Service response time is too high |<p>-</p> |`min(/Apache by Zabbix agent/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN} and last(/Apache by Zabbix agent/apache.proc.num[{#NAME}])>0` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p> |
 
