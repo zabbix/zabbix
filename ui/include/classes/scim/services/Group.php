@@ -404,7 +404,7 @@ class Group extends ScimApiService {
 		]);
 
 		if (!$db_scim_groups_members) {
-			return [];
+			return array_fill_keys($groupids, []);
 		}
 
 		$users = APIRPC::User()->get([

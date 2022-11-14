@@ -21,9 +21,11 @@
 
 namespace SCIM;
 
+use API as APIRPC;
 use Exception;
 use CHttpRequest;
 use CApiClientResponse;
+use CAuthenticationHelper;
 use SCIM\clients\ScimApiClient;
 
 class API {
@@ -36,6 +38,15 @@ class API {
 	 * @return HttpResponse
 	 */
 	public function execute(ScimApiClient $client, CHttpRequest $request): HttpResponse {
+		[$scim_status] = APIRPC::UserDirectory()->get([
+			'output' => ['scim_status'],
+			'userdirectoryids' => CAuthenticationHelper::getSamlUserdirectoryid()
+		]);
+
+		if (!$scim_status['scim_status']) {
+			throw new Exception(_('SCIM provisioning is not enabled.'), 400);
+		}
+
 		[$input, $auth, $class] = $this->parseRequestData($request);
 
 		/** @var CApiClientResponse $response */
