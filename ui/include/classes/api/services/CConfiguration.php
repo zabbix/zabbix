@@ -47,6 +47,7 @@ class CConfiguration extends CApiService {
 				'maps' =>				['type' => API_IDS],
 				'mediaTypes' =>			['type' => API_IDS],
 				'template_groups' =>	['type' => API_IDS],
+				'host_groups' => 		['type' => API_IDS],
 				'templates' =>			['type' => API_IDS]
 			]]
 		]];
@@ -326,7 +327,7 @@ class CConfiguration extends CApiService {
 
 		$imported_entities = [];
 
-		foreach (['groups', 'template_groups', 'templates'] as $first_level) {
+		foreach (['host_groups', 'template_groups', 'templates'] as $first_level) {
 			if (array_key_exists($first_level, $import)) {
 				$imported_entities[$first_level]['uuid'] = array_column($import[$first_level], 'uuid');
 				$imported_entities[$first_level]['name'] = array_column($import[$first_level], 'name');
@@ -338,31 +339,17 @@ class CConfiguration extends CApiService {
 
 		foreach ($imported_entities as $entity => $data) {
 			switch ($entity) {
-				case 'groups':
-					if (array_key_exists('templates', $data)) {
-						$imported_ids['groups'] = API::TemplateGroup()->get([
-							'filter' => [
-								'uuid' => $data['uuid'],
-								'name' => $data['name']
-							],
-							'preservekeys' => true,
-							'searchByAny' => true
-						]);
-						$imported_ids['template_groups'] = array_keys($imported_ids['groups']);
-						unset($imported_ids['groups']);
-					}
-					else {
-						$imported_ids['groups'] = API::HostGroup()->get([
-							'filter' => [
-								'uuid' => $data['uuid'],
-								'name' => $data['name']
-							],
-							'preservekeys' => true,
-							'searchByAny' => true
-						]);
-						$imported_ids['host_groups'] = array_keys($imported_ids['groups']);
-						unset($imported_ids['groups']);
-					}
+				case 'host_groups':
+					$imported_ids['host_groups'] = API::HostGroup()->get([
+						'filter' => [
+							'uuid' => $data['uuid'],
+							'name' => $data['name']
+						],
+						'preservekeys' => true,
+						'searchByAny' => true
+					]);
+
+					$imported_ids['host_groups'] = array_keys($imported_ids['host_groups']);
 
 					break;
 
