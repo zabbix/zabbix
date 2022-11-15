@@ -129,6 +129,9 @@ static void	DCget_history_data_item(DC_HISTORY_DATA_ITEM *dst_item, const ZBX_DC
  *             errcodes - [IN] SUCCEED if record located and FAIL otherwise   *
  *             num      - [IN] number of elements in items, keys, errcodes    *
  *                                                                            *
+ * NOTE: Maintenances can be dynamically updated by timer processes that      *
+ *       currently only lock configuration cache.                             *
+ *                                                                            *
  ******************************************************************************/
 static	void	get_items_maintenances(DC_HISTORY_DATA_ITEM *items, const int *errcodes, int num)
 {
@@ -365,7 +368,9 @@ static void	DCget_history_item(DC_HISTORY_ITEM *dst_item, const ZBX_DC_ITEM *src
  *                                                                            *
  * NOTE: Item and host is retrieved using history read lock that must be      *
  *       write locked only when configuration sync occurs to avoid processes  *
- *       blocking each other.                                                 *
+ *       blocking each other. Item can only be processed by one history       *
+ *       syncer at a time, thus it is safe to read dynamic data such as error *
+ *       as no other process will update it.                                  *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_history_get_items_by_itemids(DC_HISTORY_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
@@ -480,6 +485,12 @@ void	DCconfig_history_get_functions_by_functionids(DC_FUNCTION *functions, zbx_u
 /******************************************************************************
  *                                                                            *
  * Purpose: get enabled triggers for specified items                          *
+ *                                                                            *
+ * NOTE: Trigger is retrieved using history read lock that must be            *
+ *       write locked only when configuration sync occurs to avoid processes  *
+ *       blocking each other. Trigger can only be processed by one process at *
+ *       a time, thus it is safe to read dynamic data such as error as no     *
+ *       other process will update it.                                        *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_history_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
