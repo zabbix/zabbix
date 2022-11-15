@@ -68,6 +68,7 @@ static void	DCget_history_data_item(DC_HISTORY_DATA_ITEM *dst_item, const ZBX_DC
 {
 	const ZBX_DC_LOGITEM	*logitem;
 	const ZBX_DC_TRAPITEM	*trapitem;
+	const ZBX_DC_HTTPITEM	*httpitem;
 
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
@@ -115,6 +116,19 @@ static void	DCget_history_data_item(DC_HISTORY_DATA_ITEM *dst_item, const ZBX_DC
 			}
 			else
 				*dst_item->trapper_hosts = '\0';
+			break;
+		case ITEM_TYPE_HTTPAGENT:
+			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems,
+					&src_item->itemid)))
+			{
+				dst_item->allow_traps = httpitem->allow_traps;
+				zbx_strscpy(dst_item->trapper_hosts, httpitem->trapper_hosts);
+			}
+			else
+			{
+				dst_item->allow_traps = 0;
+				*dst_item->trapper_hosts = '\0';
+			}
 			break;
 		default:
 			/* nothing to do */;
