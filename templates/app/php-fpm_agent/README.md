@@ -58,10 +58,10 @@ This template was tested on:
     # fastcgi_pass unix:/run/php-fpm/your_socket.sock;
     }
     ```
-5. Check the syntax
+5. Check the syntax again.
   ```$ nginx -t```
 
-6. Reload Nginx
+6. Reload Nginx server.
   ```$ systemctl reload nginx```
 
 7. Verify it with this command line.

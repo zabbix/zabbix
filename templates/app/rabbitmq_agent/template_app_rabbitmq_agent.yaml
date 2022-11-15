@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-14T16:56:52Z'
+  date: '2022-11-15T07:10:05Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -541,7 +541,7 @@ zabbix_export:
           history: 1h
           trends: '0'
           value_type: TEXT
-          description: 'The HTTP API endpoint that returns cluster-wide metrics'
+          description: 'The HTTP API endpoint that returns cluster-wide metrics.'
           preprocessing:
             -
               type: REGEX
@@ -1403,7 +1403,7 @@ zabbix_export:
               event_name: 'RabbitMQ: Free disk space alarm (Free space threshold has been reached)'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'https://www.rabbitmq.com/disk-alarms.html'
+              description: 'For more details see [Free Disk Space Alarms](https://www.rabbitmq.com/disk-alarms.html).'
               tags:
                 -
                   tag: scope
@@ -1480,7 +1480,7 @@ zabbix_export:
               event_name: 'RabbitMQ: Memory alarm (Memory usage threshold has been reached)'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'https://www.rabbitmq.com/memory.html'
+              description: 'For more details see [Detecting Network Partitions](https://www.rabbitmq.com/memory.html).'
               tags:
                 -
                   tag: scope
@@ -1769,7 +1769,7 @@ zabbix_export:
           history: 1h
           trends: '0'
           value_type: TEXT
-          description: 'The HTTP API endpoint that returns cluster-wide metrics'
+          description: 'The HTTP API endpoint that returns cluster-wide metrics.'
           preprocessing:
             -
               type: REGEX
@@ -1787,7 +1787,7 @@ zabbix_export:
           history: 1h
           trends: '0'
           value_type: TEXT
-          description: 'The HTTP API endpoint that returns queues metrics'
+          description: 'The HTTP API endpoint that returns metrics of the queues metrics.'
           preprocessing:
             -
               type: REGEX
@@ -1845,7 +1845,7 @@ zabbix_export:
                   name: 'RabbitMQ: Node healthcheck failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'https://www.rabbitmq.com/monitoring.html#health-checks'
+                  description: 'For more details see [Health Checks](https://www.rabbitmq.com/monitoring.html#health-checks).'
                   tags:
                     -
                       tag: scope
@@ -1917,7 +1917,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are valid TLS certificates expiring in the next month'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  description: 'It checks if there are valid TLS certificates expiring in the next month. Example URL: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
                   tags:
                     -
                       tag: scope
@@ -1966,7 +1966,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are active alarms in the node'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  description: 'It checks the active alarms in the nodes via API. Example URL: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
                   tags:
                     -
                       tag: scope
@@ -2015,7 +2015,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are queues that could potentially lose data if this node goes offline.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  description: 'It checks if there are queues that could potentially lose data if this node goes offline via API. Example URL: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
                   tags:
                     -
                       tag: scope
@@ -2064,7 +2064,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are queues that would lose their quorum and availability if this node is shut down.'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  description: 'It checks if there are queues that could potentially lose data if this node goes offline via API. Example URL: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
                   tags:
                     -
                       tag: scope
@@ -2113,7 +2113,7 @@ zabbix_export:
                   name: 'RabbitMQ: There are not running virtual hosts'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
+                  description: 'It checks if there are not running virtual hosts via API. Example URL: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html'
                   tags:
                     -
                       tag: scope
@@ -2305,7 +2305,7 @@ zabbix_export:
               name: 'RabbitMQ: Node is not running'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'RabbitMQ node is not running'
+              description: 'The RabbitMQ node is not running.'
               dependencies:
                 -
                   name: 'RabbitMQ: Service is down'
@@ -2692,7 +2692,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Rate per second of subset of messages in deliver_get which had the redelivered flag set'
+              description: 'The rate of messages redelivered per second.'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2719,7 +2719,7 @@ zabbix_export:
               key: 'rabbitmq.queue.messages.redeliver["{#VHOST}/{#QUEUE}"]'
               delay: '0'
               history: 7d
-              description: 'Count of subset of messages in deliver_get which had the redelivered flag set'
+              description: 'The count of subset of messages in the deliver_get queue with the redelivered flag set.'
               preprocessing:
                 -
                   type: JSONPATH
