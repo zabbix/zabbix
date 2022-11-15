@@ -14,7 +14,7 @@ The template RabbitMQ Cluster — collects metrics by polling [RabbitMQ manageme
 
 This template was tested on:
 
-- RabbitMQ, versions: 3.5.7, 3.7.17, 3.7.18, 3.7.7, 3.8.5, 3.8.12
+- RabbitMQ versions: 3.5.7, 3.7.17, 3.7.18, 3.7.7, 3.8.5, 3.8.12
 
 ## Setup
 
@@ -30,7 +30,7 @@ rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
 rabbitmqctl set_user_tags zbx_monitor monitoring
 ```
 
-Login and password are also set in macros:
+A login name and password are also supported in macros functions:
 
 - {$RABBITMQ.API.USER}
 - {$RABBITMQ.API.PASSWORD}
@@ -51,13 +51,13 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$RABBITMQ.API.CLUSTER_HOST} |<p>The hostname or IP of RabbitMQ cluster API endpoint</p> |`127.0.0.1` |
+|{$RABBITMQ.API.CLUSTER_HOST} |<p>The hostname or IP of RabbitMQ cluster API endpoint.</p> |`127.0.0.1` |
 |{$RABBITMQ.API.PASSWORD} |<p>-</p> |`zabbix` |
-|{$RABBITMQ.API.PORT} |<p>The port of RabbitMQ API endpoint</p> |`15672` |
-|{$RABBITMQ.API.SCHEME} |<p>Request scheme which may be http or https</p> |`http` |
+|{$RABBITMQ.API.PORT} |<p>The port of RabbitMQ API endpoint.</p> |`15672` |
+|{$RABBITMQ.API.SCHEME} |<p>The request scheme, which may be HTTP or HTTPS.</p> |`http` |
 |{$RABBITMQ.API.USER} |<p>-</p> |`zbx_monitor` |
-|{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES} |<p>Filter of discoverable exchanges</p> |`.*` |
-|{$RABBITMQ.LLD.FILTER.EXCHANGE.NOT_MATCHES} |<p>Filter to exclude discovered exchanges</p> |`CHANGE_IF_NEEDED` |
+|{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES} |<p>Filter of discoverable exchanges.</p> |`.*` |
+|{$RABBITMQ.LLD.FILTER.EXCHANGE.NOT_MATCHES} |<p>Filter to exclude discovered exchanges.</p> |`CHANGE_IF_NEEDED` |
 
 ## Template links
 
@@ -148,7 +148,7 @@ It also uses Zabbix agent to collect RabbitMQ Linux process statistics, such as 
 
 This template was tested on:
 
-- RabbitMQ, versions: 3.5.7, 3.7.17, 3.7.18, 3.7.7, 3.8.5, 3.8.12
+- RabbitMQ versions: 3.5.7, 3.7.17, 3.7.18, 3.7.7, 3.8.5, 3.8.12
 
 ## Setup
 
@@ -162,7 +162,7 @@ rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
 rabbitmqctl set_user_tags zbx_monitor monitoring
 ```
 
-Login and password are also set in macros:
+A login name and password are also supported in macros functions:
 
 - {$RABBITMQ.API.USER}
 - {$RABBITMQ.API.PASSWORD}
@@ -185,8 +185,8 @@ No specific Zabbix configuration is required.
 |{$RABBITMQ.API.SCHEME} |<p>Request scheme which may be http or https</p> |`http` |
 |{$RABBITMQ.API.USER} |<p>-</p> |`zbx_monitor` |
 |{$RABBITMQ.CLUSTER.NAME} |<p>The name of RabbitMQ cluster</p> |`rabbit` |
-|{$RABBITMQ.LLD.FILTER.QUEUE.MATCHES} |<p>Filter of discoverable queues</p> |`.*` |
-|{$RABBITMQ.LLD.FILTER.QUEUE.NOT_MATCHES} |<p>Filter to exclude discovered queues</p> |`CHANGE_IF_NEEDED` |
+|{$RABBITMQ.LLD.FILTER.QUEUE.MATCHES} |<p>This macro is used in the discovery of queues. It can be overridden at host or its linked template level.</p> |`.*` |
+|{$RABBITMQ.LLD.FILTER.QUEUE.NOT_MATCHES} |<p>This macro is used in the discovery of queues. It can be overridden at host or its linked template level.</p> |`CHANGE_IF_NEEDED` |
 |{$RABBITMQ.MESSAGES.MAX.WARN} |<p>Maximum number of messages in the queue for trigger expression</p> |`1000` |
 |{$RABBITMQ.PROCESS_NAME} |<p>RabbitMQ server process name</p> |`beam.smp` |
 |{$RABBITMQ.RESPONSE_TIME.MAX.WARN} |<p>The maximum response time by the RabbitMQ expressed in seconds for a trigger expression.</p> |`10` |
@@ -265,8 +265,8 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |RabbitMQ: Version has changed |<p>The RabbitMQ version has changed. Acknowledge (Ack) to close manually.</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#2) and length(last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version))>0` |INFO |<p>Manual close: YES</p> |
-|RabbitMQ: Number of network partitions is too high |<p>https://www.rabbitmq.com/partitions.html#detecting</p> |`min(/RabbitMQ node by Zabbix agent/rabbitmq.node.partitions,5m)>0` |WARNING | |
-|RabbitMQ: Memory alarm |<p>For more details see [Detecting Network Partitions](https://www.rabbitmq.com/memory.html).</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.mem_alarm)=1` |AVERAGE | |
+|RabbitMQ: Number of network partitions is too high |<p>For more details see [Detecting Network Partitions](https://www.rabbitmq.com/partitions.html#detecting).</p> |`min(/RabbitMQ node by Zabbix agent/rabbitmq.node.partitions,5m)>0` |WARNING | |
+|RabbitMQ: Memory alarm |<p>For more details see [Memory Alarms](https://www.rabbitmq.com/memory.html).</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.mem_alarm)=1` |AVERAGE | |
 |RabbitMQ: Free disk space alarm |<p>For more details see [Free Disk Space Alarms](https://www.rabbitmq.com/disk-alarms.html).</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.disk_free_alarm)=1` |AVERAGE | |
 |RabbitMQ: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |RabbitMQ: Process is not running |<p>-</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#NAME}])=0` |HIGH | |

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-11-15T07:10:05Z'
+  date: '2022-11-15T19:50:12Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1099,8 +1099,6 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck: alarms in effect in the cluster{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"]'
               history: 7d
-              username: '{$RABBITMQ.API.USER}'
-              password: '{$RABBITMQ.API.PASSWORD}'
               description: 'Responds a 200 OK if there are no alarms in effect in the cluster, otherwise responds with a 503 Service Unavailable.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -1122,9 +1120,6 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              url: '{$RABBITMQ.API.SCHEME}://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/health/checks/alarms'
-              status_codes: '200,503,404'
-              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -1170,29 +1165,29 @@ zabbix_export:
         -
           macro: '{$RABBITMQ.API.CLUSTER_HOST}'
           value: 127.0.0.1
-          description: 'The hostname or IP of RabbitMQ cluster API endpoint'
+          description: 'The hostname or IP of RabbitMQ cluster API endpoint.'
         -
           macro: '{$RABBITMQ.API.PASSWORD}'
           value: zabbix
         -
           macro: '{$RABBITMQ.API.PORT}'
           value: '15672'
-          description: 'The port of RabbitMQ API endpoint'
+          description: 'The port of RabbitMQ API endpoint.'
         -
           macro: '{$RABBITMQ.API.SCHEME}'
           value: http
-          description: 'Request scheme which may be http or https'
+          description: 'The request scheme, which may be HTTP or HTTPS.'
         -
           macro: '{$RABBITMQ.API.USER}'
           value: zbx_monitor
         -
           macro: '{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable exchanges'
+          description: 'Filter of discoverable exchanges.'
         -
           macro: '{$RABBITMQ.LLD.FILTER.EXCHANGE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered exchanges'
+          description: 'Filter to exclude discovered exchanges.'
       dashboards:
         -
           uuid: a886a871a00d47e28b8648cadae3bc99
@@ -1480,7 +1475,7 @@ zabbix_export:
               event_name: 'RabbitMQ: Memory alarm (Memory usage threshold has been reached)'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'For more details see [Detecting Network Partitions](https://www.rabbitmq.com/memory.html).'
+              description: 'For more details see [Memory Alarms](https://www.rabbitmq.com/memory.html).'
               tags:
                 -
                   tag: scope
@@ -1619,7 +1614,7 @@ zabbix_export:
               event_name: 'RabbitMQ: Number of network partitions is too high (more than 0 for 5m)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'https://www.rabbitmq.com/partitions.html#detecting'
+              description: 'For more details see [Detecting Network Partitions](https://www.rabbitmq.com/partitions.html#detecting).'
               tags:
                 -
                   tag: scope
@@ -1878,8 +1873,6 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck: expiration date on the certificates{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months{#SINGLETON}"]'
               history: 7d
-              username: '{$RABBITMQ.API.USER}'
-              password: '{$RABBITMQ.API.PASSWORD}'
               description: 'It checks the expiration date on the certificates for every listener configured to use the Transport Layer Security (TLS). It responds with a status code -200 OK- if all the certificates are valid (have not expired); otherwise it responds with a status code -503 Service Unavailable.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -1901,8 +1894,6 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              status_codes: '200,503,404'
-              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -1927,8 +1918,6 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck: local alarms in effect on this node{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"]'
               history: 7d
-              username: '{$RABBITMQ.API.USER}'
-              password: '{$RABBITMQ.API.PASSWORD}'
               description: 'It responds with a status code - 200 OK- if there are no local alarms in effect on the target node; otherwise it responds with a status code - 503 Service Unavailable.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -1950,8 +1939,6 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              status_codes: '200,503,404'
-              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -1976,8 +1963,6 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck: classic mirrored queues without synchronized mirrors online{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"]'
               history: 7d
-              username: '{$RABBITMQ.API.USER}'
-              password: '{$RABBITMQ.API.PASSWORD}'
               description: 'It checks if there are classic mirrored queues without synchronized mirrors online (queues that would potentially lose data if the target node is shut down). It responds with a status code -200 OK- if there are no such classic mirrored queues; otherwise it responds with a status code -503 Service Unavailable.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -1999,8 +1984,6 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              status_codes: '200,503,404'
-              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -2025,8 +2008,6 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck: queues with minimum online quorum{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"]'
               history: 7d
-              username: '{$RABBITMQ.API.USER}'
-              password: '{$RABBITMQ.API.PASSWORD}'
               description: 'It checks if there are quorum queues with minimum online quorum (queues that would lose their quorum and availability if the target node is shut down). It responds with a status code -200 OK- if there are no such quorum queues; otherwise it responds with a status code -503 Service Unavailable.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -2048,8 +2029,6 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              status_codes: '200,503,404'
-              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -2074,8 +2053,6 @@ zabbix_export:
               name: 'RabbitMQ: Healthcheck: virtual hosts on this node{#SINGLETON}'
               key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"]'
               history: 7d
-              username: '{$RABBITMQ.API.USER}'
-              password: '{$RABBITMQ.API.PASSWORD}'
               description: 'It responds with It responds with a status code -200 OK- if all virtual hosts are running on the target node; otherwise it responds with a status code -503 Service Unavailable.'
               valuemap:
                 name: 'RabbitMQ healthcheck'
@@ -2097,8 +2074,6 @@ zabbix_export:
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
-              status_codes: '200,503,404'
-              retrieve_mode: HEADERS
               tags:
                 -
                   tag: component
@@ -3026,11 +3001,11 @@ zabbix_export:
         -
           macro: '{$RABBITMQ.LLD.FILTER.QUEUE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable queues'
+          description: 'This macro is used in the discovery of queues. It can be overridden at host or its linked template level.'
         -
           macro: '{$RABBITMQ.LLD.FILTER.QUEUE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered queues'
+          description: 'This macro is used in the discovery of queues. It can be overridden at host or its linked template level.'
         -
           macro: '{$RABBITMQ.MESSAGES.MAX.WARN}'
           value: '1000'
