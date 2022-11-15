@@ -25,7 +25,6 @@ use API as APIRPC;
 use Exception;
 use CHttpRequest;
 use CApiClientResponse;
-use CAuthenticationHelper;
 use SCIM\clients\ScimApiClient;
 
 class API {
@@ -40,11 +39,11 @@ class API {
 	public function execute(ScimApiClient $client, CHttpRequest $request): HttpResponse {
 		[$scim_status] = APIRPC::UserDirectory()->get([
 			'output' => ['scim_status'],
-			'userdirectoryids' => CAuthenticationHelper::getSamlUserdirectoryid()
+			'filter' => ['idp_type' => IDP_TYPE_SAML]
 		]);
 
 		if (!$scim_status['scim_status']) {
-			throw new Exception(_('SCIM provisioning is not enabled.'), 400);
+			throw new Exception(_('Unable to find SAML userdirectory.'), 400);
 		}
 
 		[$input, $auth, $class] = $this->parseRequestData($request);
