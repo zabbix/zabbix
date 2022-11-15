@@ -182,13 +182,17 @@ window.action_edit_popup = new class {
 	}
 
 	_openEditOperationPopup(e, operation_data) {
-		let row = e.target.closest('tr');
+		let row_index = 0;
+		if (operation_data !== null ){
+			row_index = parseInt(operation_data.operationid);
+		}
 
 		this.parameters = {
 			eventsource: this.eventsource,
 			recovery: operation_data.data.recovery,
 			actionid: this.actionid,
-			data: operation_data.data
+			data: operation_data.data,
+			row_index: row_index
 		}
 
 		const overlay = PopUp('popup.action.operation.edit', this.parameters, {
@@ -197,7 +201,6 @@ window.action_edit_popup = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('operation.submit', (e) => {
-			row.remove();
 			this._loadOperationTable(e);
 		});
 	}

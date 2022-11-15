@@ -95,7 +95,7 @@ class CControllerPopupActionOperationEdit extends CController {
 		$media_types = API::MediaType()->get(['output' => ['mediatypeid', 'name', 'status']]);
 		CArrayHelper::sort($media_types, ['name']);
 		$media_types = array_values($media_types);
-		$operation['row_index'] = $this->hasInput('row_index') ? $this->getInput('row_index') : 0;
+		$operation['row_index'] = $this->hasInput('row_index') ? $this->getInput('row_index') : -1;
 
 		$operation_data = $this->getData($operation);
 

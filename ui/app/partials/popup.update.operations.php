@@ -117,7 +117,7 @@ foreach ($operations as $operationid => $operation) {
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('js-edit-operation')
 					->setAttribute('data_operation', json_encode([
-						'operationid' => $operationid,
+						'operationid' => $i,
 						'actionid' => array_key_exists('actionid', $data) ? $data['actionid'] : 0,
 						'eventsource' => array_key_exists('eventsource', $data)
 							? $data['eventsource']
