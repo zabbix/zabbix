@@ -26,21 +26,19 @@ class CControllerActionList extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$eventsource = [
-			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
-			EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
-		];
-
 		$fields = [
-			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', $eventsource),
-			'actionids' =>		'array_id',
+			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', [
+									EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+									EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+								]),
 			'filter_set' =>		'in 1',
 			'filter_rst' =>		'in 1',
 			'filter_name' =>	'string',
+			'filter_status' =>	'in '.implode(',', [-1, ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),
 			'sort' =>			'in '.implode(',', ['name', 'status']),
-			'sortorder' =>		'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
-			'filter_status' =>	'in '.implode(',', [-1, ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED])
+			'sortorder' =>		'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN])
 		];
+
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
@@ -51,32 +49,24 @@ class CControllerActionList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$eventsource = $this->getInput('eventsource');
-		$has_permission = false;
-
-		switch ($eventsource) {
+		switch ($this->getInput('eventsource')) {
 			case EVENT_SOURCE_TRIGGERS:
-				$has_permission = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
 
 			case EVENT_SOURCE_DISCOVERY:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
 
 			case EVENT_SOURCE_AUTOREGISTRATION:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
 
 			case EVENT_SOURCE_INTERNAL:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
 
 			case EVENT_SOURCE_SERVICE:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
 		}
 
-		return $has_permission;
+		return false;
 	}
 
 	protected function doAction(): void {

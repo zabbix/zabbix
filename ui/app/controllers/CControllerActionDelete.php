@@ -26,14 +26,12 @@ class CControllerActionDelete extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$eventsource = [
-			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
-			EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
-		];
-
 		$fields = [
-			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', $eventsource),
-			'actionids' =>		'array_id|required|not_empty'
+			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', [
+									EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+									EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+								]),
+			'actionids' =>		'required|array_db actions.actionid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -78,8 +76,9 @@ class CControllerActionDelete extends CController {
 
 		$result = API::Action()->delete($actionids);
 
-		if ($result) {
+		$output = [];
 
+		if ($result) {
 			$output['success']['title'] = (_n('Action deleted', 'Actions deleted', $actions_count));
 
 			if ($messages = get_and_clear_messages()) {
@@ -88,7 +87,7 @@ class CControllerActionDelete extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => (_n('Cannot delete action', 'Cannot delete actions', $actions_count)),
+				'title' => _n('Cannot delete action', 'Cannot delete actions', $actions_count),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 

@@ -96,11 +96,12 @@ class CControllerCorrelationEdit extends CController {
 			'evaltype', 'formula', 'conditions'
 		]);
 
-		foreach ($data['conditions'] as  $row_index => &$condition) {
+		foreach ($data['conditions'] as $row_index => &$condition) {
 			$condition += [
 				'row_index' => $row_index
 			];
 		}
+		unset($condition);
 
 		$groupids = array_column($data['conditions'], 'groupid', 'groupid');
 		if ($groupids) {

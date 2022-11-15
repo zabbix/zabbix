@@ -26,20 +26,17 @@ class CControllerActionCreate extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$eventsource = [
-			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
-			EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
-		];
-
 		$fields = [
-			'eventsource' =>			'required|db actions.eventsource|in '.implode(',', $eventsource),
+			'eventsource' =>			'required|db actions.eventsource|in '.implode(',', [
+											EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,
+											EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+										]),
 			'name' =>					'required|db actions.name|not_empty',
 			'status' =>					'db actions.status|in '.ACTION_STATUS_ENABLED,
 			'operations' =>				'array',
 			'recovery_operations' =>	'array',
 			'update_operations' =>		'array',
 			'esc_period' =>				'db actions.esc_period|not_empty',
-			'filter' =>					'db actions.filter',
 			'conditions' =>				'array',
 			'evaltype' =>				'db actions.evaltype|in '.implode(',', [
 											CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
@@ -247,8 +244,7 @@ class CControllerActionCreate extends CController {
 		switch ($eventsource) {
 			case EVENT_SOURCE_DISCOVERY:
 			case EVENT_SOURCE_AUTOREGISTRATION:
-				unset($action['recovery_operations']);
-				unset($action['update_operations']);
+				unset($action['recovery_operations'], $action['update_operations']);
 				break;
 
 			case EVENT_SOURCE_INTERNAL:

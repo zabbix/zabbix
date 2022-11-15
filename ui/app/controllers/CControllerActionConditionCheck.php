@@ -27,22 +27,18 @@ class CControllerActionConditionCheck extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$condition_types = array_keys(condition_type2str());
-		$condition_operators = array_keys(condition_operator2str());
-
 		$fields = [
-			'actionid' =>			'db actions.actionid',
+			'row_index' =>			'required|int32',
 			'type' =>				'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION,
 			'source' =>				'required|in '.implode(',', [
 										EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
 										EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
 									]),
-			'condition_type' =>		'in '.implode(',', $condition_types),
+			'condition_type' =>		'db conditions.conditiontype|in '.implode(',', array_keys(condition_type2str())),
 			'trigger_context' =>	'in '.implode(',', ['host', 'template']),
-			'operator' =>			'in '.implode(',', $condition_operators),
+			'operator' =>			'db conditions.operator|in '.implode(',', array_keys(condition_operator2str())),
 			'value' =>				'',
-			'value2' =>				'not_empty',
-			'row_index' =>			'int32'
+			'value2' =>				'db conditions.value2|not_empty'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateCondition();
@@ -93,7 +89,7 @@ class CControllerActionConditionCheck extends CController {
 			'value2' => $value2
 		];
 
-		if (is_array($value)){
+		if (is_array($value)) {
 			foreach ($value as $condition_value) {
 				$condition['value'] = $condition_value;
 				$action = $this->getDefaultAction();

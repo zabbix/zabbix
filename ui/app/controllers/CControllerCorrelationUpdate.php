@@ -98,7 +98,7 @@ class CControllerCorrelationUpdate extends CController {
 			unset($condition);
 		}
 
-		foreach($correlation['filter']['conditions'] as &$condition){
+		foreach ($correlation['filter']['conditions'] as &$condition) {
 			unset($condition['row_index']);
 		}
 		unset($condition);

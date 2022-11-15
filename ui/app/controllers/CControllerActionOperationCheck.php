@@ -65,7 +65,7 @@ class CControllerActionOperationCheck extends CController {
 		$operationtype = preg_replace('[\D]', '', $operation['operationtype']);
 		$allowed_operations = getAllowedOperations($eventsource);
 
-		if (preg_match('/\bscriptid\b/', $operation['operationtype'])){
+		if (preg_match('/\bscriptid\b/', $operation['operationtype'])) {
 			$operationtype = OPERATION_TYPE_COMMAND;
 		}
 
@@ -229,7 +229,7 @@ class CControllerActionOperationCheck extends CController {
 			}
 		}
 		else {
-			$operationtype = (int)preg_replace('[\D]', '', $operation['operationtype']);
+			$operationtype = (int) preg_replace('[\D]', '', $operation['operationtype']);
 		}
 
 		if (array_key_exists('opmessage', $operation)) {

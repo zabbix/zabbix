@@ -26,14 +26,12 @@ class CControllerActionDisable extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$eventsource = [
-			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
-			EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
-		];
-
 		$fields = [
-			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', $eventsource),
-			'actionids' =>		'array_id|required|not_empty'
+			'eventsource' =>	'required|db actions.eventsource|in '.implode(',', [
+									EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+									EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+								]),
+			'actionids' =>		'required|array_db actions.actionid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -83,6 +81,8 @@ class CControllerActionDisable extends CController {
 
 		$result = API::Action()->update($actions);
 
+		$output = [];
+
 		if ($result) {
 			$output['success']['title'] = _n('Action disabled', 'Actions disabled', $actions_count);
 
@@ -95,6 +95,15 @@ class CControllerActionDisable extends CController {
 				'title' => _n('Cannot disable action', 'Cannot disable actions', $actions_count),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
+
+			$actions = API::Action()->get([
+				'output' => [],
+				'actionids' => $actionids,
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			$output['keepids'] = array_keys($actions);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
