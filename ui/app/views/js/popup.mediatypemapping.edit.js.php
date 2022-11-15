@@ -42,7 +42,7 @@ window.media_type_mapping_edit_popup = new class {
 		this.removePopupMessages();
 		this.overlay.setLoading();
 
-		const fields = getFormFields(this.form);
+		const fields = this.trimFields(getFormFields(this.form));
 		const curl = new Curl(this.form.getAttribute('action'), false);
 
 		fetch(curl.getUrl(), {
@@ -79,6 +79,18 @@ window.media_type_mapping_edit_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	trimFields(fields) {
+		const fields_to_trim = ['name', 'attribute'];
+
+		for (const field of fields_to_trim) {
+			if (field in fields) {
+				fields[field] = fields[field].trim();
+			}
+		}
+
+		return fields;
 	}
 
 	removePopupMessages() {

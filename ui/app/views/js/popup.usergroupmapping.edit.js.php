@@ -42,7 +42,7 @@ window.user_group_mapping_edit_popup = new class {
 		this.removePopupMessages();
 		this.overlay.setLoading();
 
-		const fields = getFormFields(this.form);
+		const fields = this.trimFields(getFormFields(this.form));
 		const curl = new Curl(this.form.getAttribute('action'), false);
 
 		fetch(curl.getUrl(), {
@@ -79,6 +79,16 @@ window.user_group_mapping_edit_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	trimFields(fields) {
+		const field_to_trim = 'name';
+
+		if (field_to_trim in fields) {
+			fields[field_to_trim] = fields[field_to_trim].trim();
+		}
+
+		return fields;
 	}
 
 	removePopupMessages() {
