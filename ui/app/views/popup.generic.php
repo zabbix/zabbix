@@ -201,8 +201,8 @@ switch ($data['popup_type']) {
 					$check_box->setChecked(1);
 					$check_box->setEnabled(false);
 				}
-				$username = ($user['username']);
-				$table->addRow([$check_box, $username, $user['name'], $user['surname']]);
+
+				$table->addRow([$check_box, $user['username'], $user['name'], $user['surname']]);
 			}
 			else {
 				$username = (new CLink($user['username']))
@@ -211,9 +211,10 @@ switch ($data['popup_type']) {
 					->setAttribute('data-userid', $user['userid'])
 					->setAttribute('data-parentid', $options['parentid'])
 					->onClick('
-					addValue(this.dataset.reference, this.dataset.userid, this.dataset.parentid ?? null);
-					popup_generic.closePopup(event);
-				');
+						addValue(this.dataset.reference, this.dataset.userid, this.dataset.parentid ?? null);
+						popup_generic.closePopup(event);
+					');
+
 				$table->addRow([$check_box, $username, $user['name'], $user['surname']]);
 
 				$entry = [];
@@ -232,9 +233,9 @@ switch ($data['popup_type']) {
 				elseif (array_key_exists($srcfld2, $user)) {
 					$entry[$srcfld2] = $user[$srcfld2];
 				}
+
 				$user = $entry;
 			}
-
 		}
 		unset($user);
 		break;
@@ -260,14 +261,14 @@ switch ($data['popup_type']) {
 					->setAttribute('data-usrgrpid', $item['usrgrpid'])
 					->setAttribute('data-parentid', $options['parentid'])
 					->onClick('
-					addValue(this.dataset.reference, this.dataset.usrgrpid, this.dataset.parentid ?? null);
-					popup_generic.closePopup(event);
-				');
+						addValue(this.dataset.reference, this.dataset.usrgrpid, this.dataset.parentid ?? null);
+						popup_generic.closePopup(event);
+					');
 
 				$item['id'] = $item['usrgrpid'];
 			}
-			$table->addRow([$check_box, $name]);
 
+			$table->addRow([$check_box, $name]);
 		}
 		unset($item);
 		break;
