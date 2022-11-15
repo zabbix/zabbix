@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-11-15T14:07:23Z'
+  date: '2022-11-15T14:40:26Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -360,7 +360,7 @@ zabbix_export:
           key: oracle.fra_number_of_files
           delay: '0'
           history: 7d
-          description: 'The number of files in the fast recovery area.'
+          description: 'The number of files in the FRA.'
           preprocessing:
             -
               type: JSONPATH
@@ -399,7 +399,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'The maximum amount of disk space (in bytes) that the database can use for the fast recovery area.'
+          description: 'The maximum amount of disk space (in bytes) that the database can use for the Fast Recovery Area (FRA).'
           preprocessing:
             -
               type: JSONPATH
@@ -419,7 +419,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'The total amount of disk space (in bytes) that can be created by deleting obsolete, redundant, and other low priority files from the fast recovery area.'
+          description: 'The total amount of disk space (in bytes) that can be created by deleting obsolete, redundant, and other low priority files from the FRA.'
           preprocessing:
             -
               type: JSONPATH
@@ -439,7 +439,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'The amount of disk space (in bytes) used by fast recovery area files created in the current and all the previous fast recovery areas.'
+          description: 'The amount of disk space (in bytes) used by FRA files created in the current and all the previous FRAs.'
           preprocessing:
             -
               type: JSONPATH
