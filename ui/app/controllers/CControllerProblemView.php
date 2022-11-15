@@ -19,7 +19,10 @@
 **/
 
 
-class CControllerProblemView extends CController {
+/**
+ * Controller for the "Problems" page and Problems CSV export.
+ */
+class CControllerProblemView extends CControllerProblem {
 
 	protected function init() {
 		$this->disableSIDValidation();
@@ -60,30 +63,8 @@ class CControllerProblemView extends CController {
 			'to' =>						'range_time'
 		];
 
-		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
-
-		if ($ret && $this->hasInput('filter_inventory')) {
-			foreach ($this->getInput('filter_inventory') as $filter_inventory) {
-				if (count($filter_inventory) != 2
-						|| !array_key_exists('field', $filter_inventory) || !is_string($filter_inventory['field'])
-						|| !array_key_exists('value', $filter_inventory) || !is_string($filter_inventory['value'])) {
-					$ret = false;
-					break;
-				}
-			}
-		}
-
-		if ($ret && $this->hasInput('filter_tags')) {
-			foreach ($this->getInput('filter_tags') as $filter_tag) {
-				if (count($filter_tag) != 3
-						|| !array_key_exists('tag', $filter_tag) || !is_string($filter_tag['tag'])
-						|| !array_key_exists('value', $filter_tag) || !is_string($filter_tag['value'])
-						|| !array_key_exists('operator', $filter_tag) || !is_string($filter_tag['operator'])) {
-					$ret = false;
-					break;
-				}
-			}
-		}
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventory()
+			&& $this->validateTags();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -328,11 +309,64 @@ class CControllerProblemView extends CController {
 			];
 			updateTimeSelectorPeriod($timeselector_options);
 
+			$data['timeline'] = getTimeSelectorPeriod($timeselector_options);
+
 			$data += $timeselector_options;
 		}
 		else {
 			$data['profileIdx'] = 'web.problem.filter';
 		}
+
+		// Prepare URL for asynchronous refresh requests.
+		$refresh_curl = (new CUrl('zabbix.php'))->setArgument('action', 'problem.view.refresh');
+
+		$refresh_url_arguments = [
+			'show' => 'filter_show',
+			'groupids' => 'filter_groupids',
+			'hostids' => 'filter_hostids',
+			'application' => 'filter_application',
+			'triggerids' => 'filter_triggerids',
+			'name' => 'filter_name',
+			'severities' => 'filter_severities',
+			'inventory' => 'filter_inventory',
+			'evaltype' => 'filter_evaltype',
+			'tags' => 'filter_tags',
+			'show_tags' => 'filter_show_tags',
+			'show_suppressed' => 'filter_show_suppressed',
+			'unacknowledged' => 'filter_unacknowledged',
+			'compact_view' => 'filter_compact_view',
+			'show_timeline' => 'filter_show_timeline',
+			'details' => 'filter_details',
+			'highlight_row' => 'filter_highlight_row',
+			'show_opdata' => 'filter_show_opdata',
+			'tag_name_format' => 'filter_tag_name_format',
+			'tag_priority' => 'filter_tag_priority'
+		];
+		foreach (array_filter(array_intersect_key($data['filter'], $refresh_url_arguments)) as $key => $value) {
+			$refresh_curl->setArgument($refresh_url_arguments[$key], $value);
+		}
+
+		if ($data['filter']['show_tags'] == PROBLEMS_SHOW_TAGS_NONE) {
+			$refresh_curl->setArgument('filter_show_tags', $data['filter']['show_tags']);
+		}
+
+		if ($data['filter']['age_state'] == 1) {
+			$refresh_curl
+				->setArgument('filter_age_state', $data['filter']['age_state'])
+				->setArgument('filter_age', $data['filter']['age']);
+		}
+
+		$refresh_curl
+			->setArgument('sort', $sortField)
+			->setArgument('sortorder', $sortOrder)
+			->setArgument('from', $this->hasInput('from') ? $this->getInput('from') : null)
+			->setArgument('to', $this->hasInput('to') ? $this->getInput('to') : null)
+			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null);
+
+		$data += [
+			'refresh_url' => $refresh_curl->getUrl(),
+			'refresh_interval' => CWebUser::getRefresh() * 1000
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Problems'));

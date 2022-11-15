@@ -12908,6 +12908,10 @@ msgstr ""
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Alleen triggers gekoppeld aan ingeschakelde hosts en afhankelijk van ingeschakelde items worden meegeteld."
 
+#: app/views/popup.mediatypetest.edit.php:52
+msgid "Open log"
+msgstr ""
+
 #: include/httptest.inc.php:430
 msgid "Opera"
 msgstr "Opera"
@@ -16933,6 +16937,16 @@ msgstr ""
 
 #: include/classes/screens/CScreenBuilder.php:559
 msgid "This screen row is not empty. Delete it?"
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:134
+#: include/blocks.inc.php:714
+msgid "This setting should be enabled, because history tables contain compressed chunks."
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:164
+#: include/blocks.inc.php:730
+msgid "This setting should be enabled, because trend tables contain compressed chunks."
 msgstr ""
 
 #: include/func.inc.php:2592 srv_status.php:39

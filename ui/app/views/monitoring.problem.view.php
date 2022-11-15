@@ -23,63 +23,11 @@
  * @var CView $this
  */
 
-$options = [
-	'resourcetype' => SCREEN_RESOURCE_PROBLEM,
-	'mode' => SCREEN_MODE_JS,
-	'dataId' => 'problem',
-	'page' => $data['page'],
-	'data' => [
-		'action' => $data['action'],
-		'sort' => $data['sort'],
-		'sortorder' => $data['sortorder'],
-		'filter' => [
-			'show' => $data['filter']['show'],
-			'groupids' => $data['filter']['groupids'],
-			'hostids' => $data['filter']['hostids'],
-			'application' => $data['filter']['application'],
-			'triggerids' => $data['filter']['triggerids'],
-			'name' => $data['filter']['name'],
-			'severities' => $data['filter']['severities'],
-			'inventory' => $data['filter']['inventory'],
-			'evaltype' => $data['filter']['evaltype'],
-			'tags' => $data['filter']['tags'],
-			'show_tags' => $data['filter']['show_tags'],
-			'tag_name_format' => $data['filter']['tag_name_format'],
-			'tag_priority' => $data['filter']['tag_priority'],
-			'show_suppressed' => $data['filter']['show_suppressed'],
-			'unacknowledged' => $data['filter']['unacknowledged'],
-			'compact_view' => $data['filter']['compact_view'],
-			'show_timeline' => $data['filter']['show_timeline'],
-			'details' => $data['filter']['details'],
-			'highlight_row' => $data['filter']['highlight_row'],
-			'show_opdata' => $data['filter']['show_opdata']
-		]
-	]
-];
-
-switch ($data['filter']['show']) {
-	case TRIGGERS_OPTION_RECENT_PROBLEM:
-	case TRIGGERS_OPTION_IN_PROBLEM:
-		$options['data']['filter']['age_state'] = $data['filter']['age_state'];
-		$options['data']['filter']['age'] = $data['filter']['age'];
-		break;
-
-	case TRIGGERS_OPTION_ALL:
-		$options['profileIdx'] = $data['profileIdx'];
-		$options['profileIdx2'] = $data['profileIdx2'];
-		$options['from'] = $data['from'];
-		$options['to'] = $data['to'];
-		break;
-}
-
-$screen = CScreenBuilder::getScreen($options);
-
 if ($data['action'] === 'problem.view') {
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
 		$this->addJsFile('class.calendar.js');
 	}
 	$this->addJsFile('gtlc.js');
-	$this->addJsFile('flickerfreescreen.js');
 	$this->addJsFile('multiselect.js');
 	$this->addJsFile('layout.mode.js');
 
@@ -350,12 +298,12 @@ if ($data['action'] === 'problem.view') {
 		->addFormItem((new CVar('action', 'problem.view'))->removeId());
 
 	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
-		$filter->addTimeSelector($screen->timeline['from'], $screen->timeline['to']);
+		$filter->addTimeSelector($data['timeline']['from'], $data['timeline']['to']);
 	}
 
 	$filter->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
-	$widget = (new CWidget())
+	(new CWidget())
 		->setTitle(_('Problems'))
 		->setWebLayoutMode($web_layout_mode)
 		->setControls(
@@ -366,34 +314,23 @@ if ($data['action'] === 'problem.view') {
 					))
 					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 			))->setAttribute('aria-label', _('Content controls'))
-		);
-
-	if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-		$widget->addItem($filter);
-	}
-
-	$widget
-		->addItem($screen->get())
+		)
+		->addItem(($web_layout_mode == ZBX_LAYOUT_NORMAL) ? $filter : null)
+		->addItem(new CPartial('monitoring.problem.view.html', array_intersect_key($data,
+			array_flip(['page', 'action', 'sort', 'sortorder', 'filter', 'profileIdx', 'profileIdx2', 'from', 'to'])
+		)))
 		->show();
 
 	// Activate blinking.
 	(new CScriptTag('jqBlink.blink();'))->show();
 
-	if ($data['filter']['show'] == TRIGGERS_OPTION_ALL) {
-		$objData = [
-			'id' => 'timeline_1',
-			'loadSBox' => 0,
-			'loadImage' => 0,
-			'dynamic' => 0,
-			'mainObject' => 1
-		];
-
-		(new CScriptTag(
-			'timeControl.addObject("scroll_events_id", '.zbx_jsvalue($screen->timeline).', '.zbx_jsvalue($objData).');'.
-			'timeControl.processObjects();'
-		))->show();
-	}
+	// Initialize page refresh.
+	(new CScriptTag('problems_page.start();'))
+		->setOnDocumentReady()
+		->show();
 }
 else {
-	echo $screen->get();
+	echo (new CPartial('monitoring.problem.view.html', array_intersect_key($data,
+		array_flip(['page', 'action', 'sort', 'sortorder', 'filter', 'profileIdx', 'profileIdx2', 'from', 'to'])
+	)))->getOutput();
 }
