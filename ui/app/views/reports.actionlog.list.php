@@ -197,13 +197,7 @@ foreach ($data['alerts'] as $alert) {
 	->show();
 
 (new CScriptTag('
-	view.init('.json_encode($data['timeline'], JSON_THROW_ON_ERROR).', '.json_encode([
-		'id' => 'timeline_1',
-		'domid' => 'events',
-		'loadSBox' => 0,
-		'loadImage' => 0,
-		'dynamic' => 0
-	], JSON_THROW_ON_ERROR).');
+	view.init('.json_encode($data['timeline'], JSON_THROW_ON_ERROR).');
 '))
 	->setOnDocumentReady()
 	->show();

@@ -27,8 +27,15 @@
 <script>
 	const view = new class {
 
-		init({timeline, object_data}) {
-			timeControl.addObject('actionlog', timeline, object_data);
+		init({timeline}) {
+			timeControl.addObject('actionlog', timeline, {
+				id: 'timeline_1',
+				domid: 'events',
+				loadSBox: 0,
+				loadImage: 0,
+				dynamic: 0
+			});
+
 			timeControl.processObjects();
 		}
 	}
