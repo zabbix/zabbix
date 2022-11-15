@@ -164,6 +164,13 @@ class CProxy extends CApiService {
 		}
 
 		if ($result) {
+			if (array_key_exists('name_upper', reset($result))) {
+				foreach ($result as &$proxy) {
+					unset($proxy['name_upper']);
+				}
+				unset($proxy);
+			}
+
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 		}
@@ -482,6 +489,12 @@ class CProxy extends CApiService {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
 
 		if (!$options['countOutput'] && $options['selectInterface'] !== null) {
 			$sqlParts = $this->addQuerySelect('h.hostid', $sqlParts);
