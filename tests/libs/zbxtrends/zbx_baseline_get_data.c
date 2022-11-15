@@ -24,6 +24,7 @@
 
 #include "zbxcommon.h"
 #include "zbxtrends.h"
+#include "zbxdb.h"
 #include "log.h"
 #include "../../../src/libs/zbxtrends/trends.h"
 
