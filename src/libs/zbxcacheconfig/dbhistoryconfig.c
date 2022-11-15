@@ -539,37 +539,11 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
  *       currently only lock configuration cache.                             *
  *                                                                            *
  ******************************************************************************/
-static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items, const int *errcodes, int num)
+static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items, const int *errcodes, int num,
+		int maintenances_num)
 {
 	int			i;
 	const ZBX_DC_HOST	*dc_host = NULL;
-	int			maintenances_num;
-
-	RDLOCK_CACHE;
-
-	if (0 != (maintenances_num = config->maintenances.num_data))
-	{
-		for (i = 0; i < num; i++)
-		{
-			if (FAIL == errcodes[i])
-				continue;
-
-			if (NULL == dc_host || dc_host->hostid != items[i].host.hostid)
-			{
-				if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts,
-						&items[i].host.hostid)))
-				{
-					continue;
-				}
-			}
-
-			items[i].host.maintenance_status = dc_host->maintenance_status;
-			items[i].host.maintenance_type = dc_host->maintenance_type;
-			items[i].host.maintenance_from = dc_host->maintenance_from;
-		}
-	}
-
-	UNLOCK_CACHE;
 
 	if (0 == maintenances_num)
 	{
@@ -582,7 +556,33 @@ static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items
 			items[i].host.maintenance_type = 0;
 			items[i].host.maintenance_from = 0;
 		}
+
+		return;
 	}
+
+	RDLOCK_CACHE;
+
+	for (i = 0; i < num; i++)
+	{
+		if (FAIL == errcodes[i])
+			continue;
+
+		if (NULL == dc_host || dc_host->hostid != items[i].host.hostid)
+		{
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts,
+					&items[i].host.hostid)))
+			{
+				continue;
+			}
+		}
+
+		items[i].host.maintenance_status = dc_host->maintenance_status;
+		items[i].host.maintenance_type = dc_host->maintenance_type;
+		items[i].host.maintenance_from = dc_host->maintenance_from;
+	}
+
+	UNLOCK_CACHE;
+
 }
 
 /******************************************************************************
@@ -602,7 +602,7 @@ static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items
 void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items, const zbx_host_key_t *keys,
 		int *errcodes, size_t num)
 {
-	size_t			i;
+	int			i, maintenances_num;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host;
 
@@ -623,9 +623,10 @@ void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items
 		dc_get_history_recv_item(&items[i], dc_item, ZBX_ITEM_GET_DEFAULT);
 	}
 
+	maintenances_num = config->maintenances.num_data;
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
-	dc_get_history_recv_item_maintenances(items, errcodes, num);
+	dc_get_history_recv_item_maintenances(items, errcodes, num, maintenances_num);
 }
 
 /******************************************************************************
@@ -645,7 +646,7 @@ void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items
 void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *items, const zbx_uint64_t *itemids,
 		int *errcodes, int num, unsigned int mode)
 {
-	int			i;
+	int			i, maintenances_num;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host = NULL;
 
@@ -674,9 +675,11 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 		dc_get_history_recv_item(&items[i], dc_item, mode);
 	}
 
+	maintenances_num = config->maintenances.num_data;
+
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
-	dc_get_history_recv_item_maintenances(items, errcodes, num);
+	dc_get_history_recv_item_maintenances(items, errcodes, num, maintenances_num);
 }
 
 /******************************************************************************
