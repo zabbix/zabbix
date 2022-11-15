@@ -538,7 +538,7 @@ class testPageWeb extends CWebTest {
 						'Web scenario 1 step'
 					]
 				]
-			],
+			]
 		];
 	}
 
