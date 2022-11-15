@@ -180,7 +180,7 @@ void	DCconfig_history_data_get_items_by_keys(DC_HISTORY_DATA_ITEM *items, zbx_ho
 
 	memset(errcodes, 0, sizeof(int) * num);
 
-	RDLOCK_CACHE2;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	for (i = 0; i < num; i++)
 	{
@@ -195,7 +195,7 @@ void	DCconfig_history_data_get_items_by_keys(DC_HISTORY_DATA_ITEM *items, zbx_ho
 		DCget_history_data_item(&items[i], dc_item, ZBX_ITEM_GET_DEFAULT);
 	}
 
-	UNLOCK_CACHE2;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	get_items_maintenances(items, errcodes, num);
 }
@@ -260,7 +260,7 @@ void	DCconfig_history_data_get_items_by_itemids(DC_HISTORY_DATA_ITEM *items, con
 
 	memset(errcodes, 0, sizeof(int) * num);
 
-	RDLOCK_CACHE2;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	for (i = 0; i < num; i++)
 	{
@@ -283,7 +283,7 @@ void	DCconfig_history_data_get_items_by_itemids(DC_HISTORY_DATA_ITEM *items, con
 		DCget_history_data_item(&items[i], dc_item, mode);
 	}
 
-	UNLOCK_CACHE2;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	get_items_maintenances(items, errcodes, num);
 }
@@ -379,7 +379,7 @@ void	DCconfig_history_get_items_by_itemids(DC_HISTORY_ITEM *items, const zbx_uin
 
 	memset(errcodes, 0, sizeof(int) * num);
 
-	RDLOCK_CACHE2;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	for (i = 0; i < num; i++)
 	{
@@ -404,7 +404,7 @@ void	DCconfig_history_get_items_by_itemids(DC_HISTORY_ITEM *items, const zbx_uin
 		config_hk = config->config->hk;
 	}
 
-	UNLOCK_CACHE2;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	um_handle = zbx_dc_open_user_macros();
 
@@ -460,7 +460,7 @@ void	DCconfig_history_get_functions_by_functionids(DC_FUNCTION *functions, zbx_u
 	size_t			i;
 	const ZBX_DC_FUNCTION	*dc_function;
 
-	RDLOCK_CACHE2;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	for (i = 0; i < num; i++)
 	{
@@ -474,7 +474,7 @@ void	DCconfig_history_get_functions_by_functionids(DC_FUNCTION *functions, zbx_u
 		errcodes[i] = SUCCEED;
 	}
 
-	UNLOCK_CACHE2;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 }
 
 /******************************************************************************
@@ -490,7 +490,7 @@ void	DCconfig_history_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_v
 	const ZBX_DC_TRIGGER	*dc_trigger;
 	DC_TRIGGER		*trigger;
 
-	RDLOCK_CACHE2;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	for (i = 0; i < itemids_num; i++)
 	{
@@ -533,7 +533,7 @@ void	DCconfig_history_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_v
 		}
 	}
 
-	UNLOCK_CACHE2;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 }
 
 /******************************************************************************
@@ -623,7 +623,7 @@ void	zbx_dc_config_history_get_actions_eval(zbx_vector_ptr_t *actions, unsigned 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	RDLOCK_CACHE2;
+	RDLOCK_CACHE_CONFIG_HISTORY;
 
 	zbx_hashset_iter_reset(&config->actions, &iter);
 
@@ -633,7 +633,7 @@ void	zbx_dc_config_history_get_actions_eval(zbx_vector_ptr_t *actions, unsigned 
 			zbx_vector_ptr_append(actions, dc_action_eval_create(dc_action));
 	}
 
-	UNLOCK_CACHE2;
+	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() actions:%d", __func__, actions->values_num);
 }
