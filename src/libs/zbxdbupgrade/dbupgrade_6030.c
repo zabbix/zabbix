@@ -752,6 +752,11 @@ static int	DBpatch_6030080(void)
 	return DBadd_field("acknowledges", &field);
 }
 
+static int	DBpatch_6030081(void)
+{
+	return DBcreate_index("event_symptom", "event_symptom_1", "cause_eventid", 0);
+}
+
 #endif
 
 DBPATCH_START(6030)
@@ -839,5 +844,6 @@ DBPATCH_ADD(6030077, 0, 1)
 DBPATCH_ADD(6030078, 0, 1)
 DBPATCH_ADD(6030079, 0, 1)
 DBPATCH_ADD(6030080, 0, 1)
+DBPATCH_ADD(6030081, 0, 1)
 
 DBPATCH_END()
