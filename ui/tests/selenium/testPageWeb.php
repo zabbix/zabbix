@@ -304,8 +304,49 @@ class testPageWeb extends CWebTest {
 	 * Function which checks number of steps for web services displayed.
 	 */
 	public function testPageWeb_CheckWebServiceNumberOfSteps() {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
+		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill(['Hosts' => 'WebData Host'])->submit();
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Host', 'WebData Host');
+		$count_before = $row->getColumn('Number of steps')->getText();
+		$this->assertEquals('3', $count_before);
+		$row->query('link', 'WebData Host')->one()->click();
+		$this->page->waitUntilReady();
+		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$popup->query('xpath://a[@aria-label="Host, Configuration"]')->one()->click();
 
+		// Check if Host is opened.
+		$this->page->assertTitle('Configuration of hosts');
+		$this->page->assertHeader('Hosts');
 
+		// Open hosts Web scenarios steps.
+		$this->query('xpath://a[normalize-space()="Web scenarios"]')->one()->click();
+		$this->query('xpath://a[normalize-space()="Web scenario 3 step"]')->one()->click();
+		$this->query('xpath://a[@id="tab_stepTab"]')->one()->click();
+
+		// Add one more Web Scenarios step.
+		$this->query('xpath://button[@class="element-table-add btn-link"]')->one()->click();
+		$this->page->waitUntilReady();
+		$form = $this->query('id:http_step')->asForm()->one();
+		//var_dump($form->getLabels()->asText());
+		$form->fill(['Name' => 'Step number 4']);
+		sleep(2);
+		$form->fill(['URL' => 'test.com']); // xpath//div[@class="overlay-dialogue-body"]//input[@id="url"]
+
+		$form->submit();
+		$this->query('xpath://button[@id="update"]')->one()->click();
+
+		// Check that successfully step was added without unexpected errors.
+		$message = CMessageElement::find()->waitUntilVisible()->one();
+		$this->assertTrue($message->isGood());
+		$this->assertEquals('Web scenario updated', $message->getTitle());
+
+		// Return to the "Web monitoring" and check if the "Number of steps" is correctly displayed.
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
+		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill(['Hosts' => 'WebData Host'])->submit();
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Host', 'WebData Host');
+		$count_after = $row->getColumn('Number of steps')->getValue();
+		$this->assertEquals('4', $count_after);
+		$this->resetFilter();
 	}
 
 	/**
