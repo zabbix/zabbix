@@ -131,13 +131,17 @@ class CControllerPopupActionOperationEdit extends CController {
 			$operation['optemplate'] = $operation_data['optemplate'][0];
 		}
 
+		$action = [
+			'operations' => $operation
+		];
+
 		$data = [
 			'eventsource' => $eventsource,
 			'actionid' => $this->getInput('actionid', []),
 			'recovery' => $recovery,
 			'operation' => $operation,
 			'operation_types' => $operation_type,
-			'mediatype_options' => $media_types,
+			'mediatype_options' => $media_types
 		];
 
 		$this->setResponse(new CControllerResponseData($data));
@@ -278,7 +282,8 @@ class CControllerPopupActionOperationEdit extends CController {
 	 *
 	 * @param array $operation  Operation object.
 	 * @param int $eventsource  Action event source.
-	 * @param int $recovery     Action event phase.
+	 * @param int $recovery     Action operation mode. Possible values:
+	 *                          ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION
 	 *
 	 * @return array
 	 */

@@ -127,10 +127,8 @@ class CControllerActionList extends CController {
 			'limit' => $limit
 		]);
 
-		$data['actionOperationDescriptions'] = getActionOperationDescriptions(
-			$data['eventsource'], $data['actions'], ACTION_OPERATION
-		);
 		$data['actionConditionStringValues'] = actionConditionValueToString($data['actions']);
+		$data['operation_descriptions'] = getActionOperationData($data['actions'],  ACTION_OPERATION);
 
 		order_result($data['actions'], $sort_field, $sort_order);
 

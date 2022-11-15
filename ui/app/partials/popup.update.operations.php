@@ -47,60 +47,7 @@ foreach ($operations as $operationid => $operation) {
 		}
 	}
 
-	$details = [];
-
-	if (count($operation['details']['type']) > 1) {
-		// Create row for script with 3 types of details: current host, hosts and host groups.
-		if (array_key_exists('opcommand_hst', $operation)) {
-			if ($operation['opcommand_hst'][0]['hostid'] == 0) {
-				$details[] = [
-					new CTag('b', true, $operation['details']['type'][0]), BR()
-				];
-
-				if (array_key_exists('1',  $operation['opcommand_hst'])) {
-					$details[] = [
-						new CTag('b', true, $operation['details']['type'][1]),
-						implode(' ', $operation['details']['data'][0]), BR()
-					];
-				}
-				if (array_key_exists('opcommand_grp', $operation)) {
-					if (count($operation['opcommand_grp']) > 0) {
-						$details[] = [
-							new CTag('b', true, $operation['details']['type'][2]),
-							implode(' ', $operation['details']['data'][1]), BR()
-						];
-					}
-				}
-			}
-			// Create row for script with 2 types of details:hosts and host groups.
-			else {
-				foreach ($operation['details']['type'] as $id => $type) {
-					$details[] = [
-						new CTag('b', true, $type), implode(' ', $operation['details']['data'][$id]), BR()
-					];
-				}
-			}
-			$details_column = $details;
-		}
-		// Create row for operation with more than 1 type of data.
-		else {
-			foreach ($operation['details']['type'] as $id => $type) {
-				$details[] = [
-					new CTag('b', true, $type), implode(' ', $operation['details']['data'][$id]), BR()
-				];
-			}
-		}
-		$details_column = $details;
-	}
-	// Create row for operation with 1 type of data.
-	else {
-		$details_column = array_key_exists('data', $operation['details'])
-			? new CCol([
-				new CTag('b', true, $operation['details']['type'][0]),
-				implode(' ', $operation['details']['data'][0])
-			])
-			: new CCol([new CTag('b', true, $operation['details']['type'][0])]);
-	}
+	$details_column = getActionOperationDescriptions([$data['action']], ACTION_UPDATE_OPERATION, $data['descriptions'])[0][$i];
 
 	// Create hidden input fields for each row.
 	$hidden_data = array_filter($operation, function ($key) {

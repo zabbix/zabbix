@@ -378,13 +378,21 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
 	return $description;
 }
 
-function getActionOperationData(array $actions, int $type): array {
+/**
+ * Gathers operation data and processes it based on operation type.
+ *
+ * @param array $actions      Array of actions.
+ * @param int   $type         Operations recovery type.
+ *
+ * @return array  Returns an array of processed data
+ */
+
+function getActionOperationData(array $actions, int $type) {
 	$data = [];
 
 	foreach ($actions as $action) {
 		if ($type == ACTION_OPERATION) {
 			foreach ($action['operations'] as $operation) {
-
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
 						$data['media_typeid'] = $operation['opmessage']['mediatypeid'];
@@ -488,10 +496,7 @@ function getActionOperationData(array $actions, int $type): array {
 			}
 		}
 	}
-	return $data;
-}
 
-function getOperationDataValues($data): array {
 	$result = [];
 	if (array_key_exists('media_typeids', $data)) {
 		$result['media_types'] = API::Mediatype()->get([
@@ -514,7 +519,7 @@ function getOperationDataValues($data): array {
 	}
 
 	if (array_key_exists('usr_grpids', $data)) {
-			$result['user_groups'] = API::UserGroup()->get([
+		$result['user_groups'] = API::UserGroup()->get([
 			'output' => ['name'],
 			'usrgrpids' => $data['usr_grpids'],
 			'preservekeys' => true
@@ -558,18 +563,15 @@ function getOperationDataValues($data): array {
 }
 
 /**
- * Gathers media types, user groups, users, host groups, hosts and templates for actions and their operations, and
- * returns the HTML representation of action operation values according to action operation type.
+ *  returns the HTML representation of action operation values according to action operation type.
  *
- * @param int   $eventsource  Action event source.
- * @param array $actions      Array of actions.
- * @param int   $type         Operations recovery type (ACTION_OPERATION or ACTION_RECOVERY_OPERATION).
+ * @param array $actions            Array of actions.
+ * @param int   $type               Operations recovery type.
+ * @param array $operation_values   All processed data of operation values.
  *
- * @return array  Returns an array of actions operation descriptions.
+ * @return array Returns an array of actions operation descriptions.
  */
-function getActionOperationDescriptions(int $eventsource, array $actions, int $type): array {
-	$data = getActionOperationData($actions, $type);
-	$operation_values = getOperationDataValues($data);
+function getActionOperationDescriptions(array $actions, int $type, array $operation_values): array {
 	$result = [];
 
 	$media_types = array_key_exists('media_types', $operation_values) ? $operation_values['media_types'] : [];
@@ -581,6 +583,8 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 
 	// Format the HTML output.
 	foreach ($actions as $i => $action) {
+		$eventsource = $action['eventsource'];
+
 		if ($type == ACTION_OPERATION) {
 			foreach ($action['operations'] as $j => $operation) {
 				switch ($operation['operationtype']) {
@@ -597,7 +601,7 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 
 							foreach ($operation['opmessage_usr'] as $user) {
 								if (array_key_exists($user['userid'], $operation_values['users']['fullnames'])){
-									$user_names_list[] =$operation_values['users']['fullnames'][$user['userid']];
+									$user_names_list[] = $operation_values['users']['fullnames'][$user['userid']];
 								}
 							}
 

@@ -120,7 +120,6 @@ $action_list = (new CTableInfo())
 
 if ($data['actions']) {
 	$actionConditionStringValues = $data['actionConditionStringValues'];
-	$actionOperationDescriptions = $data['actionOperationDescriptions'];
 
 	foreach ($data['actions'] as $aIdx => $action) {
 		$conditions = [];
@@ -138,7 +137,9 @@ if ($data['actions']) {
 		sortOperations($data['eventsource'], $action['operations']);
 
 		foreach ($action['operations'] as $oIdx => $operation) {
-			$operations[] = $actionOperationDescriptions[$aIdx][$oIdx];
+			$operations[] = getActionOperationDescriptions(
+				$data['actions'], ACTION_OPERATION, $data['operation_descriptions']
+			)[$aIdx][$oIdx];
 		}
 
 		$status = ($action['status'] == ACTION_STATUS_ENABLED)
