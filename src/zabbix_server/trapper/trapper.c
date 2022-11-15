@@ -1235,7 +1235,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		if (0 == strcmp(av.value, ZBX_NOTSUPPORTED))
 			av.state = ITEM_STATE_NOTSUPPORTED;
 
-		DCconfig_history_recv_get_items_by_keys(&item, &hk, &errcode, 1);
+		zbx_dc_config_history_recv_get_items_by_keys(&item, &hk, &errcode, 1);
 		process_history_data(&item, &av, &errcode, 1, NULL);
 
 		zbx_alarm_on(CONFIG_TIMEOUT);

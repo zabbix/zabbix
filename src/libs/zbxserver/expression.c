@@ -5121,7 +5121,7 @@ void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const z
 	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
 	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
 
-	DCconfig_history_sync_get_functions_by_functionids(functions, functionids.values, errcodes,
+	zbx_dc_config_history_sync_get_functions_by_functionids(functions, functionids.values, errcodes,
 			functionids.values_num);
 
 	for (t = 0; t < triggers_func_pos.values_num; t++)
@@ -5249,7 +5249,7 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids->values_num);
 	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids->values_num);
 
-	DCconfig_history_sync_get_functions_by_functionids(functions, functionids->values, errcodes,
+	zbx_dc_config_history_sync_get_functions_by_functionids(functions, functionids->values, errcodes,
 			functionids->values_num);
 
 	for (i = 0; i < functionids->values_num; i++)
@@ -5327,7 +5327,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 				(size_t)itemids.values_num);
 		*items_err = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)itemids.values_num);
 
-		DCconfig_history_sync_get_items_by_itemids(*items, itemids.values, *items_err, itemids.values_num,
+		zbx_dc_config_history_sync_get_items_by_itemids(*items, itemids.values, *items_err, itemids.values_num,
 				ZBX_ITEM_GET_SYNC);
 	}
 
@@ -5766,7 +5766,7 @@ void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint6
 
 	if (0 != items_num)
 	{
-		DCconfig_clean_history_sync_items(items, items_err, (size_t)items_num);
+		zbx_dc_config_clean_history_sync_items(items, items_err, (size_t)items_num);
 		zbx_free(items);
 		zbx_free(items_err);
 	}
