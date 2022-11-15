@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-11-14 14:24+0000\n"
+"PO-Revision-Date: 2022-11-15 07:08+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -274,7 +274,7 @@ msgstr "%1$s. %2$s: %3$s. %4$s."
 #: include/classes/core/CModuleManager.php:153
 #, c-format
 msgid "%1$s.php class must extend %2$s for module located at %3$s."
-msgstr ""
+msgstr "המחלקה %1$s.php חייבת להרחיב %2$s למודול שממוקם תחת %3$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
@@ -904,7 +904,7 @@ msgstr "הוספת פריט צאצא"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
-msgstr ""
+msgstr "הוספת פריטים צאצאיים"
 
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
@@ -1236,32 +1236,32 @@ msgstr "כמות הזיכרון הפיזי שנצרך לטובת גיבוי עמ
 #: include/classes/api/services/CItemGeneral.php:1544
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "כלל גילוי ברמה נמוכה עם המפתח „%1$s” כבר קיים במארח „%2$s”."
 
 #: include/classes/api/services/CItemGeneral.php:1543
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "כלל גילוי ברמה נמוכה עם המפתח „%1$s” כבר קיים בתבנית „%2$s”."
 
 #: include/classes/api/services/CItemGeneral.php:1538
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "אבטיפוס פריט עם המפתח „%1$s” כבר קיים במארח „%2$s”."
 
 #: include/classes/api/services/CItemGeneral.php:1537
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "אבטיפוס פריט עם המפתח „%1$s” כבר קיים בתבנית „%2$s”."
 
 #: include/classes/api/services/CItemGeneral.php:1532
 #, c-format
 msgid "An item with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "פריט עם המפתח „%1$s” כבר קיים במארח „%2$s”."
 
 #: include/classes/api/services/CItemGeneral.php:1531
 #, c-format
 msgid "An item with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "פריט עם המפתח „%1$s” כבר קיים בתבנית „%2$s”."
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
