@@ -297,7 +297,6 @@ int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
 
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
-int		CONFIG_TIMEOUT = 3;
 
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
@@ -1112,7 +1111,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 
-		if (SUCCEED != (ret = rtc_process(t.opts, &error)))
+		if (SUCCEED != (ret = rtc_process(t.opts, CONFIG_TIMEOUT, &error)))
 		{
 			zbx_error("Cannot perform runtime control command: %s", error);
 			zbx_free(error);

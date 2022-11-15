@@ -223,7 +223,7 @@ int	trapper_process_request(const char *request, zbx_socket_t *sock, const struc
 
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_REPORT_TEST))
 	{
-		trapper_process_report_test(sock, jp);
+		trapper_process_report_test(sock, jp, config_timeout);
 		return SUCCEED;
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND))
@@ -233,7 +233,7 @@ int	trapper_process_request(const char *request, zbx_socket_t *sock, const struc
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
 	{
-		zbx_send_proxyconfig(sock, jp);
+		zbx_send_proxyconfig(sock, jp, config_timeout);
 		return SUCCEED;
 	}
 

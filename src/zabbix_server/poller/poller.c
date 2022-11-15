@@ -315,7 +315,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 			break;
 		case ITEM_TYPE_EXTERNAL:
 			/* external checks use their own timeouts */
-			res = get_value_external(item, result);
+			res = get_value_external(item, zbx_config_comms->config_timeout, result);
 			break;
 		case ITEM_TYPE_SSH:
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
@@ -715,13 +715,14 @@ void	zbx_check_items(DC_ITEM *items, int *errcodes, int num, AGENT_RESULT *resul
 		}
 #else
 		/* SNMP checks use their own timeouts */
-		get_values_snmp(items, results, errcodes, num, poller_type);
+		get_values_snmp(items, results, errcodes, num, poller_type, zbx_config_comms->config_timeout);
 #endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
 	{
 		zbx_alarm_on(zbx_config_comms->config_timeout);
-		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num);
+		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num,
+				zbx_config_comms->config_timeout);
 		zbx_alarm_off();
 	}
 	else if (1 == num)
@@ -819,7 +820,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	items = &item;
-	num = DCconfig_get_poller_items(poller_type, &items);
+	num = DCconfig_get_poller_items(poller_type, zbx_config_comms->config_timeout, &items);
 
 	if (0 == num)
 	{
@@ -1001,7 +1002,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 					old_total_sec);
 		}
 
-		processed += get_values(poller_type, &nextcheck, poller_args_in->zbx_config);
+		processed += get_values(poller_type, &nextcheck, poller_args_in->zbx_config_comms);
 		total_sec += zbx_time() - sec;
 
 		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);

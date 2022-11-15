@@ -48,16 +48,17 @@ extern char 				*CONFIG_HOSTNAME;
  *                                                                            *
  * Purpose: execute remote command task                                       *
  *                                                                            *
- * Parameters: taskid - [IN] the task identifier                              *
- *             clock  - [IN] the task creation time                           *
- *             ttl    - [IN] the task expiration period in seconds            *
- *             now    - [IN] the current time                                 *
+ * Parameters: taskid         - [IN]     task identifier                      *
+ *             clock          - [IN]     task creation time                   *
+ *             ttl            - [IN]     task expiration period in seconds    *
+ *             now            - [IN]     current time                         *
+ *             config_timeout - [IN]                                          *
  *                                                                            *
- * Return value: SUCCEED - the remote command was executed                    *
+ * Return value: SUCCEED -     remote command was executed                    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, int now)
+static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, int now, int config_timeout)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -134,7 +135,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 		ZBX_DBROW2UINT64(alertid, row[11]);
 	}
 
-	if (SUCCEED != (ret = zbx_script_execute(&script, &host, NULL, 0 == alertid ? &info : NULL,
+	if (SUCCEED != (ret = zbx_script_execute(&script, &host, NULL, config_timeout, 0 == alertid ? &info : NULL,
 			error, sizeof(error), NULL)))
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
@@ -324,7 +325,7 @@ finish:
  * Return value: The number of successfully processed tasks                   *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_config_comms_args_t *zbx_config)
+static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_config_comms_args_t *zbx_config_comms)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -352,14 +353,16 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_conf
 		switch (type)
 		{
 			case ZBX_TM_TASK_REMOTE_COMMAND:
-				if (SUCCEED == tm_execute_remote_command(taskid, clock, ttl, now))
+				if (SUCCEED == tm_execute_remote_command(taskid, clock, ttl, now, zbx_config_comms->config_timeout))
+				{
 					processed_num++;
+				}
 				break;
 			case ZBX_TM_TASK_CHECK_NOW:
 				zbx_vector_uint64_append(&check_now_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_DATA:
-				if (SUCCEED == tm_execute_data(rtc, taskid, clock, ttl, now, zbx_config))
+				if (SUCCEED == tm_execute_data(rtc, taskid, clock, ttl, now, zbx_config_comms))
 					processed_num++;
 				break;
 			default:

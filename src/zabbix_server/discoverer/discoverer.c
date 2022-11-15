@@ -295,7 +295,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
 								&item.snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
 					}
 
-					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER) &&
+					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER, config_timeout) &&
 							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
@@ -350,10 +350,9 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, int con
  *                                                                            *
  * Purpose: check if service is available and update database                 *
  *                                                                            *
- * Parameters: service - service info                                         *
- *                                                                            *
  ******************************************************************************/
-static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, int now, zbx_vector_ptr_t *services)
+static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, int now, zbx_vector_ptr_t *services,
+		int config_timeout)
 {
 	const char	*start;
 	char		*value = NULL;
@@ -388,8 +387,8 @@ static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, i
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() port:%d", __func__, port);
 
 			service = (zbx_service_t *)zbx_malloc(NULL, sizeof(zbx_service_t));
-			service->status = (SUCCEED == discover_service(dcheck, ip, port, &value, &value_alloc) ?
-					DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN);
+			service->status = (SUCCEED == discover_service(dcheck, ip, port, config_timeout, &value,
+					&value_alloc) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN);
 			service->dcheckid = dcheck->dcheckid;
 			service->itemtime = (time_t)now;
 			service->port = port;
@@ -862,8 +861,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_rtc_subscribe(process_type, process_num, discoverer_args_in->config_timeout, &rtc,
-		discoverer_args_in->config_timeout);
+	zbx_rtc_subscribe(process_type, process_num, discoverer_args_in->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
 	{

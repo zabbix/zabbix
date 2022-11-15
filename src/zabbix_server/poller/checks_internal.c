@@ -428,7 +428,8 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result, const zbx_conf
 		int	res;
 
 		zbx_alarm_on(zbx_config_comms->config_timeout);
-		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result);
+		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result,
+				zbx_config_comms->config_timeout);
 		zbx_alarm_off();
 
 		if (SUCCEED != res)

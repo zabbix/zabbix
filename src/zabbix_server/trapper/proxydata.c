@@ -315,7 +315,8 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_confi
 	reserved = j.buffer_size;
 	zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
-	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, &error))
+	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, zbx_config_comms->config_timeout,
+			&error))
 	{
 		zbx_set_availability_diff_ts(availability_ts);
 
@@ -426,7 +427,8 @@ void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config
 	reserved = j.buffer_size;
 	zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
-	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, &error))
+	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, zbx_config_comms->config_timeout,
+			&error))
 	{
 		DBbegin();
 

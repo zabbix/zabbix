@@ -297,7 +297,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 				DCsync_configuration(ZBX_DBSYNC_UPDATE, synced, NULL);
 				synced = ZBX_SYNCED_NEW_CONFIG_YES;
 				DCupdate_interfaces_availability();
-				zbx_rtc_notify_config_sync(&rtc);
+				zbx_rtc_notify_config_sync(proxyconfig_args_in->config_timeout, &rtc);
 
 				if (SEC_PER_HOUR < sec - last_template_cleanup_sec)
 				{

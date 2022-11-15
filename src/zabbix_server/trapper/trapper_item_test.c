@@ -351,7 +351,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			zbx_eval_clear(&ctx);
 		}
 
-		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, zbx_config);
+		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, zbx_config_comms);
 
 		switch (errcode)
 		{

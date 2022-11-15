@@ -1233,7 +1233,8 @@ static void	get_operation_groupids(zbx_uint64_t operationid, zbx_vector_uint64_t
 
 static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event, const DB_ACKNOWLEDGE *ack,
 		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, zbx_uint64_t actionid,
-		zbx_uint64_t operationid, int esc_step, int macro_type, const char *default_timezone)
+		zbx_uint64_t operationid, int esc_step, int macro_type, const char *default_timezone,
+		int config_timeout)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -1515,8 +1516,8 @@ fail:
 				if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
 						ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 				{
-					rc = zbx_script_execute(&script, &host, webhook_params_json, NULL, error,
-							sizeof(error), NULL);
+					rc = zbx_script_execute(&script, &host, webhook_params_json, config_timeout,
+							NULL, error, sizeof(error), NULL);
 					status = ALERT_STATUS_SENT;
 				}
 				else
@@ -1880,7 +1881,7 @@ succeed:
 
 static void	escalation_execute_operations(DB_ESCALATION *escalation, const ZBX_DB_EVENT *event,
 		const DB_ACTION *action, const ZBX_DB_SERVICE *service, const char *default_timezone,
-		zbx_hashset_t *roles)
+		zbx_hashset_t *roles, int config_timeout)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1944,7 +1945,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const ZBX_D
 				case OPERATION_TYPE_COMMAND:
 					execute_commands(event, NULL, NULL, NULL, service, action->actionid, operationid,
 							escalation->esc_step, MACRO_TYPE_MESSAGE_NORMAL,
-							default_timezone);
+							default_timezone, config_timeout);
 					break;
 			}
 		}
@@ -1995,9 +1996,13 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const ZBX_D
  *                                                                            *
  * Purpose: execute escalation recovery operations                            *
  *                                                                            *
- * Parameters: event      - [IN] the event                                    *
- *             r_event    - [IN] the recovery event                           *
- *             action     - [IN] the action                                   *
+ * Parameters: event            - [IN]                                        *
+ *             r_event          - [IN] recovery event                         *
+ *             action           - [IN]                                        *
+ *             service          - [IN]                                        *
+ *             default_timezone - [IN]                                        *
+ *             roles            - [IN]                                        *
+ *             config_timeout   - [IN]                                        *
  *                                                                            *
  * Comments: Action recovery operations have a single escalation step, so     *
  *           alerts created by escalation recovery operations must have       *
@@ -2006,7 +2011,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const ZBX_D
  ******************************************************************************/
 static void	escalation_execute_recovery_operations(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
 		const DB_ACTION *action, const ZBX_DB_SERVICE *service, const char *default_timezone,
-		zbx_hashset_t *roles)
+		zbx_hashset_t *roles, int config_timeout)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2045,7 +2050,7 @@ static void	escalation_execute_recovery_operations(const ZBX_DB_EVENT *event, co
 				break;
 			case OPERATION_TYPE_COMMAND:
 				execute_commands(event, r_event, NULL, NULL, service, action->actionid, operationid, 1,
-						MACRO_TYPE_MESSAGE_RECOVERY, default_timezone);
+						MACRO_TYPE_MESSAGE_RECOVERY, default_timezone, config_timeout);
 				break;
 		}
 	}
@@ -2060,9 +2065,15 @@ static void	escalation_execute_recovery_operations(const ZBX_DB_EVENT *event, co
  *                                                                            *
  * Purpose: execute escalation update operations                              *
  *                                                                            *
- * Parameters: event  - [IN] the event                                        *
- *             action - [IN] the action                                       *
- *             ack    - [IN] the acknowledgment                               *
+ * Parameters: event            - [IN]                                        *
+ *             r_event          - [IN]                                        *
+ *             action           - [IN]                                        *
+ *             ack              - [IN]                                        *
+ *             service_alarm    - [IN]                                        *
+ *             service          - [IN]                                        *
+ *             default_timezone - [IN]                                        *
+ *             roles            - [IN]                                        *
+ *             config_timeout   - [IN]                                        *
  *                                                                            *
  * Comments: Action update operations have a single escalation step, so       *
  *           alerts created by escalation update operations must have         *
@@ -2071,7 +2082,7 @@ static void	escalation_execute_recovery_operations(const ZBX_DB_EVENT *event, co
  ******************************************************************************/
 static void	escalation_execute_update_operations(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_event,
 		const DB_ACTION *action, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const ZBX_DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
+		const ZBX_DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles, int config_timeout)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -2115,7 +2126,8 @@ static void	escalation_execute_update_operations(const ZBX_DB_EVENT *event, cons
 				break;
 			case OPERATION_TYPE_COMMAND:
 				execute_commands(event, r_event, ack, service_alarm, service, action->actionid,
-						operationid, 1, MACRO_TYPE_MESSAGE_UPDATE, default_timezone);
+						operationid, 1, MACRO_TYPE_MESSAGE_UPDATE, default_timezone,
+						config_timeout);
 				break;
 		}
 	}
@@ -2473,18 +2485,22 @@ static void	escalation_cancel(DB_ESCALATION *escalation, const DB_ACTION *action
  *                                                                            *
  * Purpose: execute next escalation step                                      *
  *                                                                            *
- * Parameters: escalation - [IN/OUT] the escalation to execute                *
- *             action     - [IN]     the action                               *
- *             event      - [IN]     the event                                *
+ * Parameters: escalation       - [IN/OUT]     escalation to execute          *
+ *             action           - [IN]                                        *
+ *             event            - [IN]                                        *
+ *             service          - [IN]                                        *
+ *             default_timezone - [IN]                                        *
+ *             roles            - [IN]                                        *
+ *             config_timeout   - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *action, const ZBX_DB_EVENT *event,
-		const ZBX_DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles)
+		const ZBX_DB_SERVICE *service, const char *default_timezone, zbx_hashset_t *roles, int config_timeout)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
-	escalation_execute_operations(escalation, event, action, service, default_timezone, roles);
+	escalation_execute_operations(escalation, event, action, service, default_timezone, roles, config_timeout);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2493,20 +2509,22 @@ static void	escalation_execute(DB_ESCALATION *escalation, const DB_ACTION *actio
  *                                                                            *
  * Purpose: process escalation recovery                                       *
  *                                                                            *
- * Parameters: escalation - [IN/OUT] the escalation to recovery               *
- *             action     - [IN]     the action                               *
- *             event      - [IN]     the event                                *
- *             r_event    - [IN]     the recovery event                       *
+ * Parameters: escalation     - [IN/OUT] the escalation to recovery           *
+ *             action         - [IN]                                          *
+ *             event          - [IN]                                          *
+ *             r_event        - [IN]     the recovery event                   *
+ *             config_timeout - [IN]                                          *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *action, const ZBX_DB_EVENT *event,
 		const ZBX_DB_EVENT *r_event, const ZBX_DB_SERVICE *service, const char *default_timezone,
-		zbx_hashset_t *roles)
+		zbx_hashset_t *roles, int config_timeout)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation_status_string(escalation->status));
 
-	escalation_execute_recovery_operations(event, r_event, action, service, default_timezone, roles);
+	escalation_execute_recovery_operations(event, r_event, action, service, default_timezone, roles,
+			config_timeout);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
@@ -2517,14 +2535,17 @@ static void	escalation_recover(DB_ESCALATION *escalation, const DB_ACTION *actio
  *                                                                            *
  * Purpose: process escalation acknowledgment                                 *
  *                                                                            *
- * Parameters: escalation - [IN/OUT] the escalation to recovery               *
- *             action     - [IN]     the action                               *
- *             event      - [IN]     the event                                *
- *             r_event    - [IN]     the recovery event                       *
+ * Parameters: escalation       - [IN/OUT] the escalation to recovery         *
+ *             action           - [IN]     the action                         *
+ *             event            - [IN]     the event                          *
+ *             r_event          - [IN]     the recovery event                 *
+ *             default_timezone - [IN]                                        *
+ *             roles            - [IN]                                        *
+ *             config_timeout   - [IN]     the recovery event                 *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *action, const ZBX_DB_EVENT *event,
-		const ZBX_DB_EVENT *r_event, const char *default_timezone, zbx_hashset_t *roles)
+		const ZBX_DB_EVENT *r_event, const char *default_timezone, zbx_hashset_t *roles, int config_timeout)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -2551,7 +2572,8 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 		ack.new_severity = atoi(row[5]);
 		ack.suppress_until = atoi(row[6]);
 
-		escalation_execute_update_operations(event, r_event, action, &ack, NULL, NULL, default_timezone, roles);
+		escalation_execute_update_operations(event, r_event, action, &ack, NULL, NULL, default_timezone, roles,
+				config_timeout);
 	}
 
 	DBfree_result(result);
@@ -2565,23 +2587,26 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
  *                                                                            *
  * Purpose: process update escalation                                         *
  *                                                                            *
- * Parameters: escalation       - [IN/OUT] the escalation to recovery         *
- *             action           - [IN] the action                             *
- *             event            - [IN] the event                              *
- *             service_alarm    - [IN] the service alarm                      *
- *             service          - [IN] the service                            *
- *             default_timezone - [IN] the time zone                          *
+ * Parameters: escalation       - [IN/OUT]     escalation to recovery         *
+ *             action           - [IN]                                        *
+ *             event            - [IN]                                        *
+ *             service_alarm    - [IN]                                        *
+ *             service          - [IN]                                        *
+ *             default_timezone - [IN]                                        *
+ *             roles            - [IN]                                        *
+ *             config_timeout   - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
 static void	escalation_update(DB_ESCALATION *escalation, const DB_ACTION *action,
 		const ZBX_DB_EVENT *event, const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service,
-		const char *default_timezone, zbx_hashset_t *roles)
+		const char *default_timezone, zbx_hashset_t *roles, int config_timeout)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " servicealarmid:" ZBX_FS_UI64 " status:%s",
 			__func__, escalation->escalationid, escalation->servicealarmid,
 			escalation_status_string(escalation->status));
 
-	escalation_execute_update_operations(event, NULL, action, NULL, service_alarm, service, default_timezone, roles);
+	escalation_execute_update_operations(event, NULL, action, NULL, service_alarm, service, default_timezone,
+			roles, config_timeout);
 
 	escalation->status = ESCALATION_STATUS_COMPLETED;
 
@@ -2909,7 +2934,8 @@ static void	service_role_clean(zbx_service_role_t *role)
 }
 
 static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *escalations,
-		zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *actionids, const char *default_timezone)
+		zbx_vector_uint64_t *eventids, zbx_vector_uint64_t *actionids, const char *default_timezone,
+		int config_timeout)
 {
 	int				i, ret;
 	zbx_vector_uint64_t		escalationids;
@@ -3089,7 +3115,8 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 		{
 			/* service_alarm is either initialized when servicealarmid is set or */
 			/* the escalation is cancelled and this code will not be reached     */
-			escalation_update(escalation, action, event, service_alarm, service, default_timezone, &service_roles);
+			escalation_update(escalation, action, event, service_alarm, service, default_timezone,
+					&service_roles, config_timeout);
 		}
 		else if (0 != escalation->acknowledgeid)
 		{
@@ -3112,20 +3139,28 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 			}
 
-			escalation_acknowledge(escalation, action, event, r_event, default_timezone, &service_roles);
+			escalation_acknowledge(escalation, action, event, r_event, default_timezone, &service_roles,
+					config_timeout);
 		}
 		else if (NULL != r_event)
 		{
 			if (0 == escalation->esc_step)
-				escalation_execute(escalation, action, event, service, default_timezone, &service_roles);
+			{
+				escalation_execute(escalation, action, event, service, default_timezone, &service_roles,
+						config_timeout);
+			}
 			else
-				escalation_recover(escalation, action, event, r_event, service, default_timezone, &service_roles);
+			{
+				escalation_recover(escalation, action, event, r_event, service, default_timezone, &service_roles,
+						config_timeout);
+			}
 		}
 		else if (escalation->nextcheck <= now)
 		{
 			if (ESCALATION_STATUS_ACTIVE == escalation->status)
 			{
-				escalation_execute(escalation, action, event, service, default_timezone, &service_roles);
+				escalation_execute(escalation, action, event, service, default_timezone, &service_roles,
+						config_timeout);
 			}
 			else if (ESCALATION_STATUS_SLEEP == escalation->status)
 			{
@@ -3262,10 +3297,12 @@ out:
  *          delete completed escalations from the database;                   *
  *          cancel escalations due to changed configuration, etc.             *
  *                                                                            *
- * Parameters: now               - [IN] the current time                      *
+ * Parameters: now               - [IN]     current time                      *
  *             nextcheck         - [IN/OUT] time of the next invocation       *
  *             escalation_source - [IN] type of escalations to be handled     *
+ *             default_timezone  - [IN]                                       *
  *             process_num       - [IN] process number                        *
+ *             config_timeout    - [IN]                                       *
  *                                                                            *
  * Return value: the count of deleted escalations                             *
  *                                                                            *
@@ -3277,7 +3314,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	process_escalations(int now, int *nextcheck, unsigned int escalation_source,
-		const char *default_timezone, int process_num)
+		const char *default_timezone, int process_num, int config_timeout)
 {
 	int			ret = 0;
 	DB_RESULT		result;
@@ -3398,7 +3435,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		if (escalations.values_num >= ZBX_ESCALATIONS_PER_STEP)
 		{
 			ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &actionids,
-					default_timezone);
+					default_timezone, config_timeout);
 			zbx_vector_ptr_clear_ext(&escalations, zbx_ptr_free);
 			zbx_vector_uint64_clear(&actionids);
 			zbx_vector_uint64_clear(&eventids);
@@ -3408,7 +3445,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 
 	if (0 < escalations.values_num)
 	{
-		ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &actionids, default_timezone);
+		ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &actionids, default_timezone,
+				config_timeout);
 		zbx_vector_ptr_clear_ext(&escalations, zbx_ptr_free);
 	}
 
@@ -3475,13 +3513,13 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 		nextcheck = time(NULL) + CONFIG_ESCALATOR_FREQUENCY;
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_TRIGGER,
-				cfg.default_timezone, process_num);
+				cfg.default_timezone, process_num, escalator_args_in->config_timeout);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_ITEM,
-				cfg.default_timezone, process_num);
+				cfg.default_timezone, process_num, escalator_args_in->config_timeout);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_SERVICE,
-				cfg.default_timezone, process_num);
+				cfg.default_timezone, process_num, escalator_args_in->config_timeout);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_DEFAULT,
-				cfg.default_timezone, process_num);
+				cfg.default_timezone, process_num, escalator_args_in->config_timeout);
 
 		zbx_config_clean(&cfg);
 		total_sec += zbx_time() - sec;

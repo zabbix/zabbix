@@ -153,16 +153,17 @@ out:
  *                                                                            *
  * Purpose: check for host name and return hostid                             *
  *                                                                            *
- * Parameters: sock          - [IN] open socket of server-agent connection    *
- *             host          - [IN] host name                                 *
- *             ip            - [IN] IP address of the host                    *
- *             port          - [IN] port of the host                          *
- *             host_metadata - [IN] host metadata                             *
- *             flag          - [IN] flag describing interface type            *
- *             interface     - [IN] interface value if flag is not default    *
- *             revision      - [OUT] host configuration revision              *
- *             hostid        - [OUT] host ID                                  *
- *             error         - [OUT] error message                            *
+ * Parameters: sock           - [IN] open socket of server-agent connection   *
+ *             host           - [IN] host name                                *
+ *             ip             - [IN] IP address of the host                   *
+ *             port           - [IN] port of the host                         *
+ *             host_metadata  - [IN] host metadata                            *
+ *             flag           - [IN] flag describing interface type           *
+ *             interface      - [IN] interface value if flag is not default   *
+ *             config_timeout - [IN]                                          *
+ *             revision       - [OUT] host configuration revision             *
+ *             hostid         - [OUT] host ID                                 *
+ *             error          - [OUT] error message                           *
  *                                                                            *
  * Return value:  SUCCEED - host is found                                     *
  *                FAIL - an error occurred or host not found                  *
@@ -173,8 +174,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
-		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, zbx_uint64_t *hostid,
-		zbx_uint64_t *revision, char *error)
+		const char *host_metadata, zbx_conn_flags_t flag, const char *interface, int config_timeout,
+		zbx_uint64_t *hostid, zbx_uint64_t *revision, char *error)
 {
 #define AUTO_REGISTRATION_HEARTBEAT	120
 	char	*ch_error;
@@ -210,7 +211,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 						(int)time(NULL), AUTO_REGISTRATION_HEARTBEAT))
 				{
 					db_register_host(host, ip, port, sock->connection_type, host_metadata, flag,
-							interface);
+							interface, config_timeout);
 				}
 			}
 		}
@@ -228,7 +229,8 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		if (SUCCEED == DCis_autoreg_host_changed(host, port, host_metadata, flag, interface, (int)time(NULL),
 				heartbeat))
 		{
-			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
+			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface,
+					config_timeout);
 		}
 	}
 
