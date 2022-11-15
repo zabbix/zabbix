@@ -1106,7 +1106,6 @@ void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates)
 
 	now = time(NULL);
 
-	WRLOCK_CACHE_CONFIG_HISTORY;
 	WRLOCK_CACHE;
 
 	for (i = 0; i < updates->values_num; i++)
@@ -1147,7 +1146,6 @@ void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates)
 	}
 
 	UNLOCK_CACHE;
-	UNLOCK_CACHE_CONFIG_HISTORY;
 }
 
 /******************************************************************************
