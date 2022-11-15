@@ -980,6 +980,9 @@ static int	migrate_ldap_data(void)
 
 static int	DBpatch_6030104(void)
 {
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	return migrate_ldap_data();
 }
 
@@ -1052,6 +1055,9 @@ static int	migrate_saml_data(void)
 
 static int	DBpatch_6030105(void)
 {
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	return migrate_saml_data();
 }
 
