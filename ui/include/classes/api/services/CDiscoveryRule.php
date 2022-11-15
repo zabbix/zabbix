@@ -298,6 +298,14 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 
 			$result = $this->addRelatedObjects($options, $result);
+
+			if (array_key_exists('name_upper', reset($result))) {
+				foreach ($result as &$row) {
+					unset($row['name_upper']);
+				}
+				unset($row);
+			}
+
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 
 			foreach ($result as &$rule) {
@@ -2633,6 +2641,12 @@ class CDiscoveryRule extends CItemGeneral {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
 
 		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
 				|| $this->outputIsRequested('error', $options['output'])))

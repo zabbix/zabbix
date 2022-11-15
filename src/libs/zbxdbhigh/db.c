@@ -2293,6 +2293,46 @@ int	DBfield_exists(const char *table_name, const char *field_name)
 }
 
 #ifndef HAVE_SQLITE3
+int	DBtrigger_exists(const char *table_name, const char *trigger_name)
+{
+	char		*table_name_esc, *trigger_name_esc;
+	DB_RESULT	result;
+	int		ret;
+
+	table_name_esc = DBdyn_escape_string(table_name);
+	trigger_name_esc = DBdyn_escape_string(trigger_name);
+
+#if defined(HAVE_MYSQL)
+	result = DBselect(
+			"show triggers where `table`='%s'"
+			" and `trigger`='%s'",
+			table_name_esc, trigger_name_esc);
+#elif defined(HAVE_ORACLE)
+	result = DBselect(
+			"select 1"
+			" from all_triggers"
+			" where lower(table_name)='%s'"
+				" and lower(trigger_name)='%s'",
+			table_name_esc, trigger_name_esc);
+#elif defined(HAVE_POSTGRESQL)
+	result = DBselect(
+			"select 1"
+			" from information_schema.triggers"
+			" where event_object_table='%s'"
+			" and trigger_name='%s'"
+			" and trigger_schema='%s'",
+			table_name_esc, trigger_name_esc, zbx_db_get_schema_esc());
+#endif
+	ret = (NULL == DBfetch(result) ? FAIL : SUCCEED);
+
+	DBfree_result(result);
+
+	zbx_free(table_name_esc);
+	zbx_free(trigger_name_esc);
+
+	return ret;
+}
+
 int	DBindex_exists(const char *table_name, const char *index_name)
 {
 	char		*table_name_esc, *index_name_esc;
