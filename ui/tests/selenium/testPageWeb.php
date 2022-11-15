@@ -248,6 +248,15 @@ class testPageWeb extends CWebTest {
 		$filter->query('button:Reset')->one()->click();
 	}
 
+
+	/**
+	 * Function which checks if disabled web services aren't displayed.
+	 */
+	public function testPageWeb_CheckDisabledWebServices() {
+
+
+	}
+
 	/**
 	 * Function which checks number of steps for web services displayed.
 	 */
@@ -389,7 +398,68 @@ class testPageWeb extends CWebTest {
 						'testFormWeb1'
 					]
 				]
-			]
+			],
+			[
+				[
+					'filter' => [
+						'Host groups' => 'WebData HostGroup',
+						'Hosts' => ['WebData Host']
+					],
+					'expected' => [
+						'Web scenario 3 step',
+						'Web scenario 2 step',
+						'Web scenario 1 step'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Hosts' => [
+							'Host ZBX6663',
+							'Simple form test host',
+							'Template inheritance test host',
+							'WebData Host'
+						]
+					],
+					'expected' => [
+						'Web ZBX6663 Second',
+						'Web ZBX6663',
+						'Web scenario 3 step',
+						'Web scenario 2 step',
+						'Web scenario 1 step',
+						'testInheritanceWeb4',
+						'testInheritanceWeb3',
+						'testInheritanceWeb2',
+						'testInheritanceWeb1',
+						'testFormWeb4',
+						'testFormWeb3',
+						'testFormWeb2',
+						'testFormWeb1'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Host groups' => [
+							'WebData HostGroup',
+							'Zabbix servers'
+						],
+						'Hosts' => [
+							'Host ZBX6663',
+							'WebData Host'
+						]
+					],
+					'expected' => [
+						'Web ZBX6663 Second',
+						'Web ZBX6663',
+						'Web scenario 3 step',
+						'Web scenario 2 step',
+						'Web scenario 1 step'
+					]
+				]
+			],
 		];
 	}
 
