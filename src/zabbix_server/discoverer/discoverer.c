@@ -111,7 +111,7 @@ static void	proxy_update_host(zbx_uint64_t druleid, const char *ip, const char *
  *             ip             - [IN]                                          *
  *             port           - [IN]                                          *
  *             config_timeout - [IN]                                          *
- *	       value          - [OUT]                                         *
+ *             value          - [OUT]                                         *
  *             value_alloc    - [IN/OUT]                                      *
  *                                                                            *
  * Return value: SUCCEED - service is UP, FAIL - service not discovered       *

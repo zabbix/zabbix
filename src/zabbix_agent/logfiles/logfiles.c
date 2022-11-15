@@ -2403,6 +2403,7 @@ out:
  *     prep_vec        - [IN/OUT] vector with data for writing into           *
  *                                persistent files                            *
  *     zbx_config_tls  - [IN]                                                 *
+ *     config_timeout  - [IN]                                                 *
  *     err_msg         - [IN/OUT] error message why an item became            *
  *                       NOTSUPPORTED                                         *
  *                                                                            *
@@ -3273,6 +3274,7 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *     prep_vec         - [IN/OUT] vector with data for writing into          *
  *                                 persistent files                           *
  *     zbx_config_tls   - [IN]                                                *
+ *     config_timeout   - [IN]                                                *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *

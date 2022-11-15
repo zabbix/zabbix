@@ -289,9 +289,10 @@ int	zbx_rtc_reload_config_cache(char **error)
  *                                                                            *
  * Purpose: exchange RTC data                                                 *
  *                                                                            *
- * Parameters: data         - [IN/OUT] the data                               *
- *             code         - [IN] the message code                           *
- *             error        - [OUT] the error message                         *
+ * Parameters: data           - [IN/OUT]                                      *
+ *             code           - [IN]     message code                         *
+ *             config_timeout - [IN]                                          *
+ *             error          - [OUT]     error message                       *
  *                                                                            *
  * Return value: SUCCEED - successfully sent message and received response    *
  *               FAIL    - error occurred                                     *

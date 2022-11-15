@@ -348,6 +348,7 @@ int	get_active_proxy_from_request(const struct zbx_json_parse *jp, DC_PROXY *pro
  *                          ZBX_DO_NOT_SEND_RESPONSE                          *
  *     req            - [IN] request, included into error message             *
  *     zbx_config_tls - [IN] configured requirements to allow access          *
+ *     config_timeout - [IN]                                                  *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - access is allowed                                            *
