@@ -24,18 +24,15 @@
  * @var array $data
  */
 
-if ($data['recovery'] === ACTION_OPERATION) {
-	$partial = 'popup.operations';
-}
-elseif ($data['recovery'] === ACTION_RECOVERY_OPERATION) {
-	$partial = 'popup.recovery.operations';
-}
-elseif ($data['recovery'] === ACTION_UPDATE_OPERATION) {
-	$partial = 'popup.update.operations';
-}
+
+$partials = [
+	ACTION_OPERATION => 'popup.operations',
+	ACTION_RECOVERY_OPERATION => 'popup.recovery.operations',
+	ACTION_UPDATE_OPERATION => 'popup.update.operations'
+];
 
 $output = [
-	'body' => (new CPartial($partial, $data))->getOutput()
+	'body' => (new CPartial($partials[$data['recovery']], $data))->getOutput()
 ];
 
 if (($messages = getMessages()) !== null) {

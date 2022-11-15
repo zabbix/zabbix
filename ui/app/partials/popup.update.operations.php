@@ -30,6 +30,7 @@ $operations_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Details'), _('Action')]);
 
+$i = 0;
 foreach ($operations as $operationid => $operation) {
 	if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_UPDATE_OPERATION])) {
 		continue;
@@ -126,15 +127,17 @@ foreach ($operations as $operationid => $operation) {
 					])),
 				[
 					(new CButton('remove', _('Remove')))
-						->setAttribute('data_operationid', $operationid)
+						->setAttribute('data_operationid', $i)
 						->addClass('js-remove')
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->removeId(),
-					new CVar('update_operations['.$operationid.']', $hidden_data)
+					new CVar('update_operations['.$i.']', $hidden_data)
 				]
 			])
 		))->addClass(ZBX_STYLE_NOWRAP)
-	], null, 'update_operations_'.$operationid)->addClass(ZBX_STYLE_WORDBREAK);
+	], null, 'update_operations_'.$i)->addClass(ZBX_STYLE_WORDBREAK);
+
+	$i ++;
 }
 
 $operations_table->addItem(
