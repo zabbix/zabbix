@@ -2181,6 +2181,11 @@ msgstr ""
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\""
 msgstr ""
 
+#: include/classes/api/services/CItem.php:1531
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
+msgstr ""
+
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
@@ -3024,6 +3029,11 @@ msgstr ""
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:704
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:769
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
@@ -3038,6 +3048,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:711
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:705
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:770
@@ -3071,6 +3086,11 @@ msgstr ""
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:725
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:775
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
@@ -3085,6 +3105,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:732
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:726
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:776

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-11-08 22:54+0000\n"
+"PO-Revision-Date: 2022-11-13 12:59+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -2183,6 +2183,11 @@ msgstr ""
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\""
 msgstr ""
 
+#: include/classes/api/services/CItem.php:1531
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
+msgstr ""
+
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
@@ -3023,6 +3028,11 @@ msgstr ""
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:704
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:769
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
@@ -3037,6 +3047,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:711
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:705
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:770
@@ -3070,6 +3085,11 @@ msgstr ""
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:725
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:775
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
@@ -3084,6 +3104,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:732
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:726
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:776
@@ -8567,8 +8592,8 @@ msgstr "Posição horizontal"
 #: jsLoader.php:373 report2.php:509
 msgid "Host"
 msgid_plural "Hosts"
-msgstr[0] "Host"
-msgstr[1] "Host"
+msgstr[0] "Servidor"
+msgstr[1] "Servidores"
 
 #: app/views/monitoring.widget.problems.view.php:66
 #: app/views/monitoring.widget.problems.view.php:67
@@ -8623,7 +8648,7 @@ msgstr "O host não pode ter mais do que uma interface padrão do mesmo tipo."
 #: app/views/administration.proxy.list.php:82 hostinventoriesoverview.php:89
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
-msgstr "Contagem de hosts"
+msgstr "Contagem de servidores"
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"

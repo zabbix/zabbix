@@ -1,1 +1,0 @@
-.......... [ZBX-21715] fixed Zabbix JS (zabbix_js) crash when parsing short version of "timeout" option -t (dimir)

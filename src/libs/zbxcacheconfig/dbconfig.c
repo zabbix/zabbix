@@ -22,6 +22,7 @@
 #include "log.h"
 #include "zbxtasks.h"
 #include "zbxserver.h"
+#include "zbxshmem.h"
 #include "zbxregexp.h"
 #include "cfg.h"
 #include "zbxcrypto.h"
@@ -9181,10 +9182,13 @@ void	DCconfig_get_active_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, in
  ******************************************************************************/
 static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, DC_ITEM *item)
 {
+	char	*tmp;
+
 	if (NULL != item->trends_period)
 	{
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->trends_period, MACRO_TYPE_COMMON, NULL, 0);
+		tmp = dc_expand_user_macros_dyn(item->trends_period, &item->host.hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		item->trends_period = zbx_strdup(item->trends_period, tmp);
+		zbx_free(tmp);
 
 		if (SUCCEED != zbx_is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
 			item->trends_sec = ZBX_HK_PERIOD_MAX;
@@ -9197,8 +9201,9 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, DC_ITE
 
 	if (NULL != item->history_period)
 	{
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->history_period, MACRO_TYPE_COMMON, NULL, 0);
+		tmp = dc_expand_user_macros_dyn(item->history_period, &item->host.hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		item->history_period = zbx_strdup(item->history_period, tmp);
+		zbx_free(tmp);
 
 		if (SUCCEED != zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
 			item->history_sec = ZBX_HK_PERIOD_MAX;
