@@ -10772,10 +10772,11 @@ int	DCconfig_get_poller_items(unsigned char poller_type, int config_timeout, DC_
  *                                                                            *
  * Purpose: Get array of items for IPMI poller                                *
  *                                                                            *
- * Parameters: now       - [IN] current timestamp                             *
- *             items_num - [IN] the number of items to get                    *
- *             items     - [OUT] array of items                               *
- *             nextcheck - [OUT] the next scheduled check                     *
+ * Parameters: now            - [IN] current timestamp                        *
+ *             items_num      - [IN] the number of items to get               *
+ *             config_timeout - [IN] the number of items to get               *
+ *             items          - [OUT] array of items                          *
+ *             nextcheck      - [OUT] the next scheduled check                *
  *                                                                            *
  * Return value: number of items in items array                               *
  *                                                                            *
@@ -10784,7 +10785,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, int config_timeout, DC_
  *           DCrequeue_items() or DCpoller_requeue_items().                   *
  *                                                                            *
  ******************************************************************************/
-int	DCconfig_get_ipmi_poller_items(int now, int items_num, int config_timeout DC_ITEM *items, int *nextcheck)
+int	DCconfig_get_ipmi_poller_items(int now, int items_num, int config_timeout, DC_ITEM *items, int *nextcheck)
 {
 	int			num = 0;
 	zbx_binary_heap_t	*queue;

@@ -69,7 +69,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 			get_process_type_string(process_type), (sec = zbx_time() - sec), CONFIG_CONFSYNCER_FREQUENCY);
 
-	zbx_rtc_notify_config_sync(&rtc);
+	zbx_rtc_notify_config_sync(dbconfig_args_in->config_timeout, &rtc);
 
 	nextcheck = (int)time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;
 
