@@ -3404,8 +3404,10 @@ form.is-loading {
   .list-table .symptom-limit-td {
     padding-top: 0;
     padding-bottom: 0; }
-  .list-table .problem-nested:not[class*='flh-'] {
+  .list-table .problem-nested:not([class*='flh-']):not(.row-selected) {
     background-color: #1e1e1e; }
+    .list-table .problem-nested:not([class*='flh-']):not(.row-selected) td, .list-table .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis, .list-table .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
+      border-bottom: 1px solid #1e1e1e !important; }
   .list-table .problem-nested-small {
     font-size: calc(1em - 1px); }
     .list-table .problem-nested-small .tag, .list-table .problem-nested-small .btn-tag {
@@ -3424,18 +3426,13 @@ form.is-loading {
       background-position: -165px -624px; }
     .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td button:focus {
       box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5); }
-  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td {
-    /* .btn-widget-expand,
-    .btn-widget-collapse {
-    	background-color: $ui-bg-color;
-    } */ }
-    .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-'] {
-      background-color: #2b2b2b;
-      border-radius: 2px; }
-    .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-depend-'],
-    .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-description,
-    .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-wizard-action {
-      background-color: transparent; }
+  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-'] {
+    background-color: #2b2b2b;
+    border-radius: 2px; }
+  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td [class*='icon-depend-'],
+  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-description,
+  .list-table.compact-view tr[class*='flh-']:not(.row-selected):not(:hover) td .icon-wizard-action {
+    background-color: transparent; }
   .list-table.compact-view .link-action {
     color: #f2f2f2; }
     .list-table.compact-view .link-action.red {
@@ -3448,6 +3445,8 @@ form.is-loading {
       color: #59db8f; }
     .list-table.compact-view .link-action:hover, .list-table.compact-view .link-action:focus {
       color: #4796c4; }
+  .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) td, .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis, .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
+    border-bottom: 0 !important; }
   .list-table.compact-view td {
     padding-top: 0;
     padding-bottom: 0;

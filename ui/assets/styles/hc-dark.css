@@ -3376,8 +3376,10 @@ form.is-loading {
   .list-table .symptom-limit-td {
     padding-top: 0;
     padding-bottom: 0; }
-  .list-table .problem-nested:not[class*='flh-'] {
+  .list-table .problem-nested:not([class*='flh-']):not(.row-selected) {
     background-color: black; }
+    .list-table .problem-nested:not([class*='flh-']):not(.row-selected) td, .list-table .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis, .list-table .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
+      border-bottom: 1px solid black !important; }
   .list-table .problem-nested-small {
     font-size: calc(1em - 1px); }
     .list-table .problem-nested-small .tag, .list-table .problem-nested-small .btn-tag {
@@ -3394,6 +3396,8 @@ form.is-loading {
       color: #23d545; }
     .list-table.compact-view .link-action:hover, .list-table.compact-view .link-action:focus {
       color: #ffffff; }
+  .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) td, .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis, .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
+    border-bottom: 0 !important; }
   .list-table.compact-view td {
     padding-top: 0;
     padding-bottom: 0;

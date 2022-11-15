@@ -383,8 +383,12 @@ form {
 		padding-bottom: 0;
 	}
 
-	.problem-nested:not[class*='flh-'] {
+	.problem-nested:not([class*='flh-']):not(.row-selected) {
 		background-color: darken($ui-bg-color, 5%);
+
+		td, .timeline-axis, .timeline-td {
+			border-bottom: 1px solid darken($ui-bg-color, 5%) !important;
+		}
 	}
 
 	.problem-nested-small {
@@ -467,12 +471,6 @@ form {
 							.icon-wizard-action {
 								background-color: transparent;
 							}
-
-
-							/* .btn-widget-expand,
-							.btn-widget-collapse {
-								background-color: $ui-bg-color;
-							} */
 						}
 					}
 				}
@@ -501,6 +499,12 @@ form {
 			&:hover,
 			&:focus {
 				color: $link-hover-color;
+			}
+		}
+
+		.problem-nested:not([class*='flh-']):not(.row-selected) {
+			td, .timeline-axis, .timeline-td {
+				border-bottom: 0 !important;
 			}
 		}
 
