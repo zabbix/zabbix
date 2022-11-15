@@ -630,7 +630,7 @@ void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items
  *       blocking each other.                                                 *
  *                                                                            *
  ******************************************************************************/
-void	dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *items, const zbx_uint64_t *itemids,
+void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *items, const zbx_uint64_t *itemids,
 		int *errcodes, int num, unsigned int mode)
 {
 	int			i;
