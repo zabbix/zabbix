@@ -74,7 +74,8 @@ class CAPIHelper {
 				'content' => $data,
 				'header' => [
 					'Content-type: application/json-rpc',
-					'Content-Length: '.strlen($data)
+					'Content-Length: '.strlen($data),
+					'Authorization: Bearer '.static::$session
 				]
 			]
 		];
@@ -126,11 +127,6 @@ class CAPIHelper {
 			'params' => $params,
 			'id' => static::$request_id
 		];
-
-		if (static::$session) {
-			$data['auth'] = static::$session;
-		}
-
 		return static::callRaw($data);
 	}
 
