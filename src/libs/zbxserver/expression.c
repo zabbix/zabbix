@@ -4447,7 +4447,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 			const char		*host, *name;
 			const DC_INTERFACE	*interface;
 
-			if (MACRO_TYPE_SCRIPT_PARAMS_FIELD & macro_type)
+			if (NULL != history_data_item)
 			{
 				hostid = history_data_item->host.hostid;
 				itemid = history_data_item->itemid;
@@ -6873,10 +6873,10 @@ int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const ZBX_DB_EVEN
 			service_alarm, service, tz, NULL, data, macro_type, error, maxerrlen);
 }
 
-void	zbx_substitute_simple_macros_allowed_hosts(const DC_HISTORY_DATA_ITEM *item, char **allowed_peers)
+void	zbx_substitute_simple_macros_allowed_hosts(DC_HISTORY_DATA_ITEM *item, char **allowed_peers)
 {
 	substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			NULL, allowed_peers, MACRO_TYPE_ALLOWED_HOSTS, NULL, 0);
+			item, allowed_peers, MACRO_TYPE_ALLOWED_HOSTS, NULL, 0);
 }
 
 /******************************************************************************
