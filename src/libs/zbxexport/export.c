@@ -201,8 +201,11 @@ int	zbx_init_library_export(zbx_config_export_t *zbx_config_export, char **error
 
 void	zbx_deinit_library_export(void)
 {
-	zbx_free(config_export->dir);
-	zbx_free(config_export->type);
+	if (NULL != config_export)
+	{
+		zbx_free(config_export->dir);
+		zbx_free(config_export->type);
+	}
 }
 
 static int	open_export_file(zbx_export_file_t *file, char **error)
