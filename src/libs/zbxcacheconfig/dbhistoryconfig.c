@@ -223,7 +223,7 @@ void	DCconfig_history_data_get_items_by_keys(DC_HISTORY_DATA_ITEM *items, zbx_ho
  *          expanding user macros and applying global housekeeping settings   *
  *                                                                            *
  ******************************************************************************/
-static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, DC_HISTORY_ITEM *item)
+static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_history_sync_item_t *item)
 {
 	if (NULL != item->trends_period)
 	{
@@ -305,7 +305,8 @@ void	DCconfig_history_data_get_items_by_itemids(DC_HISTORY_DATA_ITEM *items, con
 	get_items_maintenances(items, errcodes, num);
 }
 
-static void	DCget_history_host(DC_HISTORY_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned int mode)
+static void	DCget_history_sync_host(zbx_history_sync_host_t *dst_host, const ZBX_DC_HOST *src_host,
+		unsigned int mode)
 {
 	const ZBX_DC_HOST_INVENTORY	*host_inventory;
 
@@ -327,7 +328,7 @@ static void	DCget_history_host(DC_HISTORY_HOST *dst_host, const ZBX_DC_HOST *src
 		dst_host->inventory_mode = HOST_INVENTORY_DISABLED;
 }
 
-static void	DCget_history_item(DC_HISTORY_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
+static void	DCget_history_sync_item(zbx_history_sync_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 {
 	const ZBX_DC_NUMITEM	*numitem;
 
@@ -387,8 +388,8 @@ static void	DCget_history_item(DC_HISTORY_ITEM *dst_item, const ZBX_DC_ITEM *src
  *       as no other process will update it.                                  *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_history_get_items_by_itemids(DC_HISTORY_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
-		unsigned int mode)
+void	DCconfig_history_get_items_by_itemids(zbx_history_sync_item_t *items, const zbx_uint64_t *itemids,
+		int *errcodes, int num, unsigned int mode)
 {
 	int			i;
 	const ZBX_DC_ITEM	*dc_item;
@@ -417,8 +418,8 @@ void	DCconfig_history_get_items_by_itemids(DC_HISTORY_ITEM *items, const zbx_uin
 			}
 		}
 
-		DCget_history_host(&items[i].host, dc_host, mode);
-		DCget_history_item(&items[i], dc_item);
+		DCget_history_sync_host(&items[i].host, dc_host, mode);
+		DCget_history_sync_item(&items[i], dc_item);
 
 		config_hk = config->config->hk;
 	}
@@ -441,7 +442,7 @@ void	DCconfig_history_get_items_by_itemids(DC_HISTORY_ITEM *items, const zbx_uin
 	zbx_dc_close_user_macros(um_handle);
 }
 
-void	DCconfig_clean_history_items(DC_HISTORY_ITEM *items, int *errcodes, size_t num)
+void	DCconfig_clean_history_items(zbx_history_sync_item_t *items, int *errcodes, size_t num)
 {
 	size_t	i;
 

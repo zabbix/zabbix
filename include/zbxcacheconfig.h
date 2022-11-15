@@ -213,31 +213,31 @@ typedef struct
 	signed char	inventory_mode;
 	unsigned char	status;
 }
-DC_HISTORY_HOST;
+zbx_history_sync_host_t;
 
 typedef struct
 {
-	DC_HISTORY_HOST	host;
-	zbx_uint64_t	itemid;
-	zbx_uint64_t	lastlogsize;
-	zbx_uint64_t	valuemapid;
-	char		key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
-	char		*units;
-	char		*error;
-	char		*history_period, *trends_period;
-	int		mtime;
-	int		history_sec;
-	int		trends_sec;
-	int		flags;
-	unsigned char	type;
-	unsigned char	value_type;
-	unsigned char	state;
-	unsigned char	inventory_link;
-	unsigned char	status;
-	unsigned char	history;
-	unsigned char	trends;
+	zbx_history_sync_host_t	host;
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		lastlogsize;
+	zbx_uint64_t		valuemapid;
+	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char			*units;
+	char			*error;
+	char			*history_period, *trends_period;
+	int			mtime;
+	int			history_sec;
+	int			trends_sec;
+	int			flags;
+	unsigned char		type;
+	unsigned char		value_type;
+	unsigned char		state;
+	unsigned char		inventory_link;
+	unsigned char		status;
+	unsigned char		history;
+	unsigned char		trends;
 }
-DC_HISTORY_ITEM;
+zbx_history_sync_item_t;
 
 typedef struct
 {
@@ -674,13 +674,13 @@ void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, 
 void	DCconfig_get_hosts_by_hostids(DC_HOST *hosts, const zbx_uint64_t *hostids, int *errcodes, int num);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
-void	DCconfig_history_get_items_by_itemids(DC_HISTORY_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
+void	DCconfig_history_get_items_by_itemids(zbx_history_sync_item_t *items, const zbx_uint64_t *itemids, int *errcodes, int num,
 		unsigned int mode);
 void	DCconfig_history_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_history_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num);
-void	DCconfig_clean_history_items(DC_HISTORY_ITEM *items, int *errcodes, size_t num);
+void	DCconfig_clean_history_items(zbx_history_sync_item_t *items, int *errcodes, size_t num);
 void	DCconfig_history_data_get_items_by_keys(DC_HISTORY_DATA_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_history_data_get_items_by_itemids(DC_HISTORY_DATA_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
 		unsigned int mode);

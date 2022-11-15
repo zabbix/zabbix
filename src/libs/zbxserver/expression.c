@@ -5295,8 +5295,8 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 }
 
 static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint64_t *history_itemids,
-		const DC_HISTORY_ITEM *history_items, const int *history_errcodes, DC_HISTORY_ITEM **items,
-		int **items_err, int *items_num)
+		const zbx_history_sync_item_t *history_items, const int *history_errcodes,
+		zbx_history_sync_item_t **items, int **items_err, int *items_num)
 {
 	char			*error = NULL;
 	int			i;
@@ -5321,7 +5321,8 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 		zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		*items_num = itemids.values_num;
-		*items = (DC_HISTORY_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)itemids.values_num);
+		*items = (zbx_history_sync_item_t *)zbx_malloc(NULL, sizeof(zbx_history_sync_item_t) *
+				(size_t)itemids.values_num);
 		*items_err = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)itemids.values_num);
 
 		DCconfig_history_get_items_by_itemids(*items, itemids.values, *items_err, itemids.values_num,
@@ -5331,10 +5332,10 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 	zbx_hashset_iter_reset(funcs, &iter);
 	while (NULL != (func = (zbx_func_t *)zbx_hashset_iter_next(&iter)))
 	{
-		int			errcode, ret;
-		const DC_HISTORY_ITEM	*item;
-		char			*params;
-		DC_EVALUATE_ITEM	evaluate_item;
+		int				errcode, ret;
+		const zbx_history_sync_item_t	*item;
+		char				*params;
+		DC_EVALUATE_ITEM		evaluate_item;
 
 		/* avoid double copying from configuration cache if already retrieved when saving history */
 		if (FAIL != (i = zbx_vector_uint64_bsearch(history_itemids, func->itemid,
@@ -5546,8 +5547,8 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
  *                                                                            *
  ******************************************************************************/
 static void	substitute_functions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
-		const DC_HISTORY_ITEM *history_items, const int *history_errcodes, DC_HISTORY_ITEM **items, int **items_err,
-		int *items_num)
+		const zbx_history_sync_item_t *history_items, const int *history_errcodes,
+		zbx_history_sync_item_t **items, int **items_err, int *items_num)
 {
 	zbx_vector_uint64_t	functionids;
 	zbx_hashset_t		ifuncs, funcs;
@@ -5678,7 +5679,7 @@ static int	expand_trigger_macros(DC_TRIGGER *tr, ZBX_DB_EVENT *db_event, zbx_dc_
 static int	dc_item_compare_by_itemid(const void *d1, const void *d2)
 {
 	zbx_uint64_t	itemid = *(const zbx_uint64_t *)d1;
-	const DC_HISTORY_ITEM	*item = (const DC_HISTORY_ITEM *)d2;
+	const zbx_history_sync_item_t	*item = (const zbx_history_sync_item_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(itemid, item->itemid);
 	return 0;
@@ -5693,11 +5694,11 @@ static int	dc_item_compare_by_itemid(const void *d1, const void *d2)
  *                                                                            *
  ******************************************************************************/
 void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
-		const DC_HISTORY_ITEM *history_items, const int *history_errcodes)
+		const zbx_history_sync_item_t *history_items, const int *history_errcodes)
 {
 	ZBX_DB_EVENT		event;
 	DC_TRIGGER		*tr;
-	DC_HISTORY_ITEM		*items = NULL;
+	zbx_history_sync_item_t	*items = NULL;
 	int			i, *items_err, items_num = 0;
 	double			expr_result;
 	zbx_dc_um_handle_t	*um_handle;
@@ -5732,10 +5733,11 @@ void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint6
 			}
 			else
 			{
-				DC_HISTORY_ITEM	*item;
+				zbx_history_sync_item_t	*item;
 
-				item = (DC_HISTORY_ITEM *)bsearch(&tr->itemids.values[j], items, (size_t)items_num,
-						sizeof(DC_HISTORY_ITEM), dc_item_compare_by_itemid);
+				item = (zbx_history_sync_item_t *)bsearch(&tr->itemids.values[j], items,
+						(size_t)items_num, sizeof(zbx_history_sync_item_t),
+						dc_item_compare_by_itemid);
 
 				if (NULL == item || SUCCEED != items_err[item - items])
 					continue;
