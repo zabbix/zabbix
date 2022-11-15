@@ -108,17 +108,18 @@ class CControllerPopupActionOperationEdit extends CController {
 		}
 
 		if (array_key_exists('opcommand_hst', $operation)) {
-			foreach($operation['opcommand_hst'] as &$opcommand_hst){
-				if ($opcommand_hst['hostid'] == 0){
+			foreach ($operation['opcommand_hst'] as &$opcommand_hst) {
+				if ($opcommand_hst['hostid'] == 0) {
 					$opcommand_hst = ['hostid' => 0];
 				}
 				else {
 					$opcommand_hst = $operation_data['opcommand_hst'][0];
 				}
 			}
+			unset($opcommand_hst);
 		}
 
-			if (array_key_exists('opcommand_grp', $operation_data)) {
+		if (array_key_exists('opcommand_grp', $operation_data)) {
 			$operation['opcommand_grp'] = $operation_data['opcommand_grp'][0];
 		}
 
@@ -155,7 +156,7 @@ class CControllerPopupActionOperationEdit extends CController {
 			$i = 0;
 
 			$user_groups = API::UserGroup()->get([
-				'output' => ['name', 'usrgrpid'],
+				'output' => ['usrgrpid', 'name'],
 				'usrgrpids' => array_values($groupids),
 				'preservekeys' => true
 			]);
@@ -308,13 +309,13 @@ class CControllerPopupActionOperationEdit extends CController {
 
 		if ($scripts_allowed) {
 			$db_scripts = API::Script()->get([
-				'output' => ['name', 'scriptid'],
-				'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
-				'sortfield' => 'name',
-				'sortorder' => ZBX_SORT_UP
+				'output' => ['scriptid', 'name'],
+				'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION]
 			]);
 
 			if ($db_scripts) {
+				CArrayHelper::sort($db_scripts, ['name']);
+
 				foreach ($db_scripts as $db_script) {
 					$operation_type_options[] = [
 						'value' => 'scriptid['.$db_script['scriptid'].']',
