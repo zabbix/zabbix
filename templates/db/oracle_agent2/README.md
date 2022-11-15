@@ -16,7 +16,7 @@ This template was tested on:
 
 1. Setup and configure Zabbix agent 2 compiled with the Oracle monitoring plugin. See the setup instructions for [Oracle Database plugin](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/src/go/plugins/oracle/README.md).
 2. Set the {$ORACLE.CONNSTRING} macro value using either <protocol(host:port)> or named session.
-3. If you want to override parameters from the Zabbix agent configuration file, set the user name, password and service name in host macros ({$ORACLE.USER}, {$ORACLE.PASSWORD}, and {$ORACLE.SERVICE}).
+3. If you want to override parameters from Zabbix agent configuration file, set the user name, password and service name in host macros ({$ORACLE.USER}, {$ORACLE.PASSWORD}, and {$ORACLE.SERVICE}).
 
 Test availability:
  ```zabbix_get -s oracle-host -k  oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]```
@@ -31,7 +31,7 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$ORACLE.ASM.USED.PCT.MAX.HIGH} |<p>The maximum percentage of used Automatic Storage Management (ASM) disk group for a high trigger expression.</p> |`95` |
-|{$ORACLE.ASM.USED.PCT.MAX.WARN} |<p>The maximum percentage of used Automatic Storage Management (ASM) disk group for a warning trigger expression.</p> |`90` |
+|{$ORACLE.ASM.USED.PCT.MAX.WARN} |<p>The maximum percentage of used ASM disk group for a warning trigger expression.</p> |`90` |
 |{$ORACLE.CONCURRENCY.MAX.WARN} |<p>The maximum percentage of sessions concurrency usage for a trigger expression.</p> |`80` |
 |{$ORACLE.CONNSTRING} |<p>-</p> |`tcp://localhost:1521` |
 |{$ORACLE.DB.FILE.MAX.WARN} |<p>The maximum percentage of used database files for a trigger expression.</p> |`80` |
@@ -40,7 +40,7 @@ No specific Zabbix configuration is required.
 |{$ORACLE.EXPIRE.PASSWORD.MIN.WARN} |<p>The number of warning days before the password expires for a trigger expression.</p> |`7` |
 |{$ORACLE.PASSWORD} |<p>The Oracle user's password.</p> |`zabbix_password` |
 |{$ORACLE.PGA.USE.MAX.WARN} |<p>The maximum percentage of the Program Global Area (PGA) usage that alerts the threshold for a trigger expression.</p> |`90` |
-|{$ORACLE.PROCESSES.MAX.WARN} |<p>Alert threshold for the maximum percentage of active processes (for a trigger expression).</p> |`80` |
+|{$ORACLE.PROCESSES.MAX.WARN} |<p>Alert threshold for the maximum percentage of active processes for a trigger expression.</p> |`80` |
 |{$ORACLE.REDO.MIN.WARN} |<p>Alert threshold for the minimum number of REDO logs for a trigger expression.</p> |`3` |
 |{$ORACLE.SERVICE} |<p>Oracle Service Name.</p> |`ORA` |
 |{$ORACLE.SESSION.LOCK.MAX.TIME} |<p>The maximum duration of the session lock in seconds to count the session as a prolongedly locked query.</p> |`600` |
@@ -74,7 +74,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Oracle |Oracle: Ping |<p>Test the connection to Oracle Database state</p> |ZABBIX_PASSIVE |oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
+|Oracle |Oracle: Ping |<p>Test the connection to Oracle Database state.</p> |ZABBIX_PASSIVE |oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Oracle |Oracle: Version |<p>The Oracle Server version.</p> |DEPENDENT |oracle.version<p>**Preprocessing**:</p><p>- JSONPATH: `$.version`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Oracle |Oracle: Uptime |<p>The Oracle instance uptime expressed in seconds.</p> |DEPENDENT |oracle.uptime<p>**Preprocessing**:</p><p>- JSONPATH: `$.uptime`</p> |
 |Oracle |Oracle: Instance status |<p>The status of the instance.</p> |DEPENDENT |oracle.instance_status<p>**Preprocessing**:</p><p>- JSONPATH: `$.status`</p> |
@@ -82,10 +82,10 @@ There are no template links in this template.
 |Oracle |Oracle: Instance name |<p>The name of an instance.</p> |DEPENDENT |oracle.instance_name<p>**Preprocessing**:</p><p>- JSONPATH: `$.instance`</p> |
 |Oracle |Oracle: Instance hostname |<p>The name of the host machine.</p> |DEPENDENT |oracle.instance_hostname<p>**Preprocessing**:</p><p>- JSONPATH: `$..hostname.first()`</p> |
 |Oracle |Oracle: Instance role |<p>It indicates whether the instance is an active instance or an inactive secondary instance.</p> |DEPENDENT |oracle.instance.role<p>**Preprocessing**:</p><p>- JSONPATH: `$.role`</p> |
-|Oracle |Oracle: Buffer cache hit ratio |<p>The ratio of buffer cache hits ((LogRead - PhyRead)/LogRead)</p> |DEPENDENT |oracle.buffer_cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Buffer Cache Hit Ratio']`</p> |
-|Oracle |Oracle: Cursor cache hit ratio |<p>The ratio of cursor cache hits (CursorCacheHit/SoftParse)</p> |DEPENDENT |oracle.cursor_cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Cursor Cache Hit Ratio']`</p> |
-|Oracle |Oracle: Library cache hit ratio |<p>The ratio of library cache hits (Hits/Pins)</p> |DEPENDENT |oracle.library_cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Library Cache Hit Ratio']`</p> |
-|Oracle |Oracle: Shared pool free % |<p>Free memory of a shared pool expressed in %</p> |DEPENDENT |oracle.shared_pool_free<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Shared Pool Free %']`</p> |
+|Oracle |Oracle: Buffer cache hit ratio |<p>The ratio of buffer cache hits ((LogRead - PhyRead)/LogRead).</p> |DEPENDENT |oracle.buffer_cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Buffer Cache Hit Ratio']`</p> |
+|Oracle |Oracle: Cursor cache hit ratio |<p>The ratio of cursor cache hits (CursorCacheHit/SoftParse).</p> |DEPENDENT |oracle.cursor_cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Cursor Cache Hit Ratio']`</p> |
+|Oracle |Oracle: Library cache hit ratio |<p>The ratio of library cache hits (Hits/Pins).</p> |DEPENDENT |oracle.library_cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Library Cache Hit Ratio']`</p> |
+|Oracle |Oracle: Shared pool free % |<p>Free memory of a shared pool expressed in %.</p> |DEPENDENT |oracle.shared_pool_free<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Shared Pool Free %']`</p> |
 |Oracle |Oracle: Physical reads per second |<p>Reads per second.</p> |DEPENDENT |oracle.physical_reads_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Physical Reads Per Sec']`</p> |
 |Oracle |Oracle: Physical writes per second |<p>Writes per second.</p> |DEPENDENT |oracle.physical_writes_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Physical Writes Per Sec']`</p> |
 |Oracle |Oracle: Physical reads bytes per second |<p>Read bytes per second.</p> |DEPENDENT |oracle.physical_read_bytes_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Physical Read Bytes Per Sec']`</p> |
@@ -95,7 +95,7 @@ There are no template links in this template.
 |Oracle |Oracle: Global cache blocks corrupted |<p>The number of blocks that encountered corruption or checksum failure during the interconnect.</p> |DEPENDENT |oracle.cache_blocks_corrupt<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Global Cache Blocks Corrupted']`</p> |
 |Oracle |Oracle: Global cache blocks lost |<p>The number of lost global cache blocks.</p> |DEPENDENT |oracle.cache_blocks_lost<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Global Cache Blocks Lost']`</p> |
 |Oracle |Oracle: Logons per second |<p>The number of logon attempts.</p> |DEPENDENT |oracle.logons_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Logons Per Sec']`</p> |
-|Oracle |Oracle: Average active sessions |<p>The average active sessions at a point in time. It is the number of sessions that are either working or waiting.</p> |DEPENDENT |oracle.active_sessions<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Average Active Sessions']`</p> |
+|Oracle |Oracle: Average active sessions |<p>The average active sessions at a point in time. The number of sessions that are either working or waiting.</p> |DEPENDENT |oracle.active_sessions<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Average Active Sessions']`</p> |
 |Oracle |Oracle: Active serial sessions |<p>The number of active serial sessions.</p> |DEPENDENT |oracle.active_serial_sessions<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Active Serial Sessions']`</p> |
 |Oracle |Oracle: Active parallel sessions |<p>The number of active parallel sessions.</p> |DEPENDENT |oracle.active_parallel_sessions<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Active Parallel Sessions']`</p> |
 |Oracle |Oracle: Long table scans per second |<p>The number of long table scans per second. A table is considered 'long' if the table is not cached and if its high-water mark is greater than five blocks.</p> |DEPENDENT |oracle.long_table_scans_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Long Table Scans Per Sec']`</p> |
@@ -103,7 +103,7 @@ There are no template links in this template.
 |Oracle |Oracle: User rollbacks per second |<p>The number of times that users manually issue the ROLLBACK statement or an error occurred during the users' transactions.</p> |DEPENDENT |oracle.user_rollbacks_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['User Rollbacks Per Sec']`</p> |
 |Oracle |Oracle: Total sorts per user call |<p>The total sorts per user call.</p> |DEPENDENT |oracle.sorts_per_user_call<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Total Sorts Per User Call']`</p> |
 |Oracle |Oracle: Rows per sort |<p>The average number of rows per sort for all types of sorts performed.</p> |DEPENDENT |oracle.rows_per_sort<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Rows Per Sort']`</p> |
-|Oracle |Oracle: Disk sort per second |<p>The number of sorts going to disk per second</p> |DEPENDENT |oracle.disk_sorts<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Disk Sort Per Sec']`</p> |
+|Oracle |Oracle: Disk sort per second |<p>The number of sorts going to disk per second.</p> |DEPENDENT |oracle.disk_sorts<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Disk Sort Per Sec']`</p> |
 |Oracle |Oracle: Memory sorts ratio |<p>The percentage of sorts (from ORDER BY clauses or index building) that are done to disk vs in-memory.</p> |DEPENDENT |oracle.memory_sorts_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Memory Sorts Ratio']`</p> |
 |Oracle |Oracle: Database wait time ratio |<p>Wait time - the time that the server process spends waiting for available shared resources to be released by other server processes, such as latches, locks, data buffers, etc.</p> |DEPENDENT |oracle.database_wait_time_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Database Wait Time Ratio']`</p> |
 |Oracle |Oracle: Database CPU time ratio |<p>It is calculated by dividing the total CPU (used by the database) by the Oracle time model statistic DB time.</p> |DEPENDENT |oracle.database_cpu_time_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Database CPU Time Ratio']`</p> |
@@ -202,7 +202,7 @@ There are no template links in this template.
 |Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high |<p>-</p> |`min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}` |HIGH | |
 |Oracle TBS '{#TABLESPACE}': Tablespace is OFFLINE |<p>The tablespace is in the offline state.</p> |`last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"])=2` |WARNING | |
 |Oracle TBS '{#TABLESPACE}': Tablespace status has changed |<p>Oracle tablespace status has changed. Ack to close.</p> |`last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"],#2)` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Oracle TBS '{#TABLESPACE}': Tablespace is OFFLINE</p> |
-|Archivelog '{#DEST_NAME}': Log Archive is not valid |<p>Trigger will launch if the archive log destination is not in one of these states:</p><p>2 - 'DEFERRED';</p><p>3 - 'VALID'.</p> |`last(/Oracle by Zabbix agent 2/oracle.archivelog_log_status["{#DEST_NAME}"])<2` |HIGH | |
+|Archivelog '{#DEST_NAME}': Log Archive is not valid |<p>The trigger will launch if the archive log destination is not in one of these states:</p><p>2 - 'DEFERRED';</p><p>3 - 'VALID'.</p> |`last(/Oracle by Zabbix agent 2/oracle.archivelog_log_status["{#DEST_NAME}"])<2` |HIGH | |
 |ASM '{#DGNAME}': Disk group usage is too high |<p>The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.WARN}</p> |`min(/Oracle by Zabbix agent 2/oracle.asm_used_pct["{#DGNAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- ASM '{#DGNAME}': Disk group usage is too high</p> |
 |ASM '{#DGNAME}': Disk group usage is too high |<p>The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.HIGH}</p> |`min(/Oracle by Zabbix agent 2/oracle.asm_used_pct["{#DGNAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}` |HIGH | |
 

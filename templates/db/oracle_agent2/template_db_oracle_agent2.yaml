@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-11-15T12:15:21Z'
+  date: '2022-11-15T14:07:23Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -63,7 +63,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The average active sessions at a point in time. It is the number of sessions that are either working or waiting.'
+          description: 'The average active sessions at a point in time. The number of sessions that are either working or waiting.'
           preprocessing:
             -
               type: JSONPATH
@@ -120,7 +120,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The ratio of buffer cache hits ((LogRead - PhyRead)/LogRead)'
+          description: 'The ratio of buffer cache hits ((LogRead - PhyRead)/LogRead).'
           preprocessing:
             -
               type: JSONPATH
@@ -196,7 +196,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The ratio of cursor cache hits (CursorCacheHit/SoftParse)'
+          description: 'The ratio of cursor cache hits (CursorCacheHit/SoftParse).'
           preprocessing:
             -
               type: JSONPATH
@@ -308,7 +308,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Rps
-          description: 'The number of sorts going to disk per second'
+          description: 'The number of sorts going to disk per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -623,7 +623,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The ratio of library cache hits (Hits/Pins)'
+          description: 'The ratio of library cache hits (Hits/Pins).'
           preprocessing:
             -
               type: JSONPATH
@@ -861,7 +861,7 @@ zabbix_export:
           key: 'oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
           delay: 30s
           history: 7d
-          description: 'Test the connection to Oracle Database state'
+          description: 'Test the connection to Oracle Database state.'
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -1366,7 +1366,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'Free memory of a shared pool expressed in %'
+          description: 'Free memory of a shared pool expressed in %.'
           preprocessing:
             -
               type: JSONPATH
@@ -1771,7 +1771,7 @@ zabbix_export:
                   name: 'Archivelog ''{#DEST_NAME}'': Log Archive is not valid'
                   priority: HIGH
                   description: |
-                    Trigger will launch if the archive log destination is not in one of these states:
+                    The trigger will launch if the archive log destination is not in one of these states:
                     2 - 'DEFERRED';
                     3 - 'VALID'.
                   tags:
@@ -2505,7 +2505,7 @@ zabbix_export:
         -
           macro: '{$ORACLE.ASM.USED.PCT.MAX.WARN}'
           value: '90'
-          description: 'The maximum percentage of used Automatic Storage Management (ASM) disk group for a warning trigger expression.'
+          description: 'The maximum percentage of used ASM disk group for a warning trigger expression.'
         -
           macro: '{$ORACLE.CONCURRENCY.MAX.WARN}'
           value: '80'
@@ -2540,7 +2540,7 @@ zabbix_export:
         -
           macro: '{$ORACLE.PROCESSES.MAX.WARN}'
           value: '80'
-          description: 'Alert threshold for the maximum percentage of active processes (for a trigger expression).'
+          description: 'Alert threshold for the maximum percentage of active processes for a trigger expression.'
         -
           macro: '{$ORACLE.REDO.MIN.WARN}'
           value: '3'
