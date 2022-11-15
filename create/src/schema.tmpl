@@ -1080,7 +1080,6 @@ INDEX		|2		|source,object,clock
 TABLE|event_symptom|eventid|0
 FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events	|eventid|
 FIELD		|cause_eventid	|t_id		|	|NOT NULL	|0			|2|events	|eventid|	RESTRICT
-FIELD		|rank_userid	|t_id		|	|NOT NULL	|0
 
 TABLE|trends|itemid,clock|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
@@ -1400,7 +1399,6 @@ FIELD		|userid		|t_id		|	|NULL		|0			|-|users
 FIELD		|name		|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|rank_userid 	|t_id		|	|NULL		|0
 FIELD		|cause_eventid	|t_id		|	|NULL		|0			|3|events	|eventid	|RESTRICT
 INDEX		|1		|source,object,objectid
 INDEX		|2		|r_clock
@@ -1996,4 +1994,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6030071	|6030071
+ROW		|1		|6030070	|6030070

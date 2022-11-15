@@ -314,23 +314,18 @@ static void	tm_process_data_result(zbx_uint64_t taskid)
  * Purpose: rank event/problem as cause                                                                                *
  *                                                                                                                     *
  * Parameters: eventid     - [IN] the event/problem, which should be ranked as cause                                   *
- *             rank_userid - [IN] identifier of the user, who requested rank change change                             *
  *                                                                                                                     *
  * Return value: SUCCEED - if there are no database errors                                                             *
  *               FAIL    - otherwise                                                                                   *
  *                                                                                                                     *
  **********************************************************************************************************************/
-static int	tm_rank_event_as_cause(zbx_uint64_t eventid, zbx_uint64_t rank_userid)
+static int	tm_rank_event_as_cause(zbx_uint64_t eventid)
 {
 	int	ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid: " ZBX_FS_UI64, __func__, eventid);
 
-	if (ZBX_DB_OK > DBexecute(
-			"update problem"
-			" set cause_eventid=null,rank_userid=" ZBX_FS_UI64
-			" where eventid=" ZBX_FS_UI64,
-			rank_userid, eventid))
+	if (ZBX_DB_OK > DBexecute("update problem set cause_eventid=null where eventid=" ZBX_FS_UI64, eventid))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to convert problem " ZBX_FS_UI64 " from symptom to cause",
 				eventid);
@@ -359,14 +354,13 @@ out:
  *                                      should be ranked as symptom                                                    *
  *             old_cause_eventid - [IN] identifier of the cause of event/problem of the event having eventid before    *
  *                                      executing this task; 0 for cause events                                        *
- *             rank_userid       - [IN] identifier of the user, who requested the rank change                          *
  *                                                                                                                     *
  * Return value: SUCCEED - if there are no database errors                                                             *
  *               FAIL    - otherwise                                                                                   *
  *                                                                                                                     *
  **********************************************************************************************************************/
 static int	tm_rank_event_as_symptom(zbx_uint64_t eventid, zbx_uint64_t cause_eventid,
-		zbx_uint64_t old_cause_eventid, zbx_uint64_t rank_userid)
+		zbx_uint64_t old_cause_eventid)
 {
 	int	ret = SUCCEED;
 
@@ -375,9 +369,9 @@ static int	tm_rank_event_as_symptom(zbx_uint64_t eventid, zbx_uint64_t cause_eve
 
 	if (ZBX_DB_OK > DBexecute(
 			"update problem"
-			" set cause_eventid=" ZBX_FS_UI64 ",rank_userid=" ZBX_FS_UI64
+			" set cause_eventid=" ZBX_FS_UI64
 			" where eventid=" ZBX_FS_UI64 " or cause_eventid=" ZBX_FS_UI64,
-			cause_eventid, rank_userid, eventid, eventid))
+			cause_eventid, eventid, eventid))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to set new cause " ZBX_FS_UI64 " for problem " ZBX_FS_UI64,
 				cause_eventid, eventid);
@@ -387,9 +381,9 @@ static int	tm_rank_event_as_symptom(zbx_uint64_t eventid, zbx_uint64_t cause_eve
 
 	if (ZBX_DB_OK > DBexecute(
 			"update event_symptom"
-			" set cause_eventid=" ZBX_FS_UI64 ",rank_userid=" ZBX_FS_UI64
+			" set cause_eventid=" ZBX_FS_UI64
 			" where eventid=" ZBX_FS_UI64 " or cause_eventid=" ZBX_FS_UI64,
-			cause_eventid, rank_userid, eventid, eventid))
+			cause_eventid, eventid, eventid))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to set new cause " ZBX_FS_UI64 " for event " ZBX_FS_UI64,
 				cause_eventid, eventid);
@@ -398,9 +392,9 @@ static int	tm_rank_event_as_symptom(zbx_uint64_t eventid, zbx_uint64_t cause_eve
 	}
 
 	if (0 == old_cause_eventid && ZBX_DB_OK > DBexecute(
-			"insert into event_symptom (eventid,cause_eventid,rank_userid)"
-			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-			eventid, cause_eventid, rank_userid))
+			"insert into event_symptom (eventid,cause_eventid)"
+			" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+			eventid, cause_eventid))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to convert cause event " ZBX_FS_UI64 " to symptom of "
 				ZBX_FS_UI64, eventid, cause_eventid);
@@ -422,10 +416,9 @@ out:
 static void	tm_process_rank_event(zbx_uint64_t taskid, const char *data)
 {
 	int			action;
-	zbx_uint64_t		acknowledgeid, eventid, rank_userid;
+	zbx_uint64_t		acknowledgeid, eventid;
 	struct zbx_json_parse	jp;
-	char			tmp_acknowledgeid[MAX_ID_LEN], tmp_action[10+1], tmp_eventid[MAX_ID_LEN],
-			tmp_rank_userid[MAX_ID_LEN];
+	char			tmp_acknowledgeid[MAX_ID_LEN], tmp_action[10+1], tmp_eventid[MAX_ID_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() taskid: " ZBX_FS_UI64 ", data: '%s'",  __func__, taskid, data);
 
@@ -463,15 +456,7 @@ static void	tm_process_rank_event(zbx_uint64_t taskid, const char *data)
 		goto out;
 	}
 
-	if (FAIL == zbx_json_value_by_name(&jp, "userid", tmp_rank_userid, sizeof(tmp_rank_userid), NULL) ||
-			FAIL == zbx_is_uint64(tmp_rank_userid, &rank_userid))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to parse process rank event task data: failed to retrieve"
-				" \"userid\" tag");
-		goto out;
-	}
-
-	if (0 != (action & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) && SUCCEED != tm_rank_event_as_cause(eventid, rank_userid))
+	if (0 != (action & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) && SUCCEED != tm_rank_event_as_cause(eventid))
 	{
 		goto out;
 	}
@@ -506,7 +491,7 @@ static void	tm_process_rank_event(zbx_uint64_t taskid, const char *data)
 		if (target_cause_eventid == eventid)
 		{
 			/* cause and its symptom should be swapped, start by turning the symptom into a cause */
-			if (SUCCEED != tm_rank_event_as_cause(requested_cause_eventid, rank_userid))
+			if (SUCCEED != tm_rank_event_as_cause(requested_cause_eventid))
 				goto out;
 			target_cause_eventid = requested_cause_eventid;
 		}
@@ -522,7 +507,7 @@ static void	tm_process_rank_event(zbx_uint64_t taskid, const char *data)
 
 		DBfree_result(result);
 
-		if (SUCCEED != tm_rank_event_as_symptom(eventid, target_cause_eventid, old_cause_eventid, rank_userid))
+		if (SUCCEED != tm_rank_event_as_symptom(eventid, target_cause_eventid, old_cause_eventid))
 			goto out;
 	}
 

@@ -4942,11 +4942,6 @@ return [
 				'length' => 20,
 				'ref_table' => 'events',
 				'ref_field' => 'eventid'
-			],
-			'rank_userid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
 			]
 		]
 	],
@@ -6492,11 +6487,6 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
-			],
-			'rank_userid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
 			],
 			'cause_eventid' => [
 				'null' => true,
