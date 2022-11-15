@@ -327,11 +327,8 @@ class testPageWeb extends CWebTest {
 		$this->query('xpath://button[@class="element-table-add btn-link"]')->one()->click();
 		$this->page->waitUntilReady();
 		$form = $this->query('id:http_step')->asForm()->one();
-		//var_dump($form->getLabels()->asText());
 		$form->fill(['Name' => 'Step number 4']);
-		sleep(2);
-		$form->fill(['URL' => 'test.com']); // xpath//div[@class="overlay-dialogue-body"]//input[@id="url"]
-
+		$form->query('id:url')->one()->fill('test.com');
 		$form->submit();
 		$this->query('xpath://button[@id="update"]')->one()->click();
 
@@ -344,7 +341,7 @@ class testPageWeb extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC');
 		$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->fill(['Hosts' => 'WebData Host'])->submit();
 		$row = $this->query('class:list-table')->asTable()->one()->findRow('Host', 'WebData Host');
-		$count_after = $row->getColumn('Number of steps')->getValue();
+		$count_after = $row->getColumn('Number of steps')->getText();
 		$this->assertEquals('4', $count_after);
 		$this->resetFilter();
 	}
