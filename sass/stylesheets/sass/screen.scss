@@ -386,8 +386,10 @@ form {
 	.problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) {
 		background-color: darken($ui-bg-color, 5%);
 
-		td, .timeline-axis, .timeline-td {
-			border-bottom: 1px solid darken($ui-bg-color, 5%) !important;
+		td,
+		.timeline-axis,
+		.timeline-td {
+			border-bottom-color: darken($ui-bg-color, 5%) !important;
 		}
 	}
 

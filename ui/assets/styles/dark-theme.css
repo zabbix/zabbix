@@ -3406,8 +3406,10 @@ form.is-loading {
     padding-bottom: 0; }
   .list-table .problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) {
     background-color: #1e1e1e; }
-    .list-table .problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) td, .list-table .problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) .timeline-axis, .list-table .problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) .timeline-td {
-      border-bottom: 1px solid #1e1e1e !important; }
+    .list-table .problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) td,
+    .list-table .problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) .timeline-axis,
+    .list-table .problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) .timeline-td {
+      border-bottom-color: #1e1e1e !important; }
   .list-table .problem-nested-small {
     font-size: calc(1em - 1px); }
     .list-table .problem-nested-small .tag, .list-table .problem-nested-small .btn-tag {
