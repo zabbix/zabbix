@@ -1671,8 +1671,8 @@ class CScreenProblem extends CScreenBase {
 		if ($problem['symptom_count'] > ZBX_PROBLEM_SYMPTOM_LIMIT) {
 			$row = (new CRow())
 				->setAttribute('data-cause-eventid', $problem['eventid'])
-				->addClass('hover-nobg')
-				->addStyle('display: none;');
+				->addStyle('display: none;')
+				->addClass(ZBX_STYLE_NO_HOVER_PROBLEM_NESTED);
 
 			$symptom_limit_col = (new CCol(
 				(new CDiv(

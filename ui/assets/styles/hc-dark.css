@@ -3546,6 +3546,10 @@ form.is-loading {
     background-color: #000000; }
     .list-table tbody tr.hover-nobg .timeline-axis, .list-table tbody tr.hover-nobg .timeline-td {
       border-bottom-color: #000000 !important; }
+  .list-table tbody tr.hover-nobg-problem-nested {
+    background-color: black; }
+    .list-table tbody tr.hover-nobg-problem-nested .timeline-axis, .list-table tbody tr.hover-nobg-problem-nested .timeline-td {
+      border-bottom-color: black !important; }
   .list-table tbody th,
   .list-table td {
     padding: 6px 5px;

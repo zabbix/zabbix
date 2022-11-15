@@ -2089,6 +2089,7 @@ define('ZBX_STYLE_TIMELINE_TH', 'timeline-th');
 define('ZBX_STYLE_PROBLEM_EXPAND_TD', 'problem-expand-td');
 define('ZBX_STYLE_PROBLEM_NESTED', 'problem-nested');
 define('ZBX_STYLE_PROBLEM_NESTED_SMALL', 'problem-nested-small');
+define('ZBX_STYLE_NO_HOVER_PROBLEM_NESTED', 'hover-nobg-problem-nested');
 define('ZBX_STYLE_SYMPTOM_LIMIT_TD', 'symptom-limit-td');
 define('ZBX_STYLE_SECOND_COL', 'second-col');
 define('ZBX_STYLE_THIRD_COL', 'third-col');

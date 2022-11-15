@@ -760,6 +760,14 @@ form {
 				border-bottom-color: $ui-bg-color !important;
 			}
 		}
+
+		&.hover-nobg-problem-nested {
+			background-color: darken($ui-bg-color, 5%);
+
+			%timeline-td {
+				border-bottom-color: darken($ui-bg-color, 5%) !important;
+			}
+		}
 	}
 
 	tbody th,
