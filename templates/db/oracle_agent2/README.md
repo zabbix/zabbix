@@ -4,19 +4,19 @@
 ## Overview
 
 For Zabbix version: 6.0 and higher.  
-The template is developed for monitoring DBMS Oracle Database single instance via Zabbix agent 2.
+The template is developed to monitor a single DBMS Oracle Database instance with Zabbix agent 2.
 
 This template was tested on:
 
-- Oracle Database, version 12c2, 18c, 19c.
+- Oracle Database, version 12c2, 18c, 19c
 
 ## Setup
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
-1. Setup and configure zabbix-agent2 compiled with the [Oracle monitoring plugin](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/src/go/plugins/oracle/README.md).
-2. Set the {$ORACLE.CONNSTRING} such as <protocol(host:port)> or named session.
-3. Set the user name and password in host macros ({$ORACLE.USER}, {$ORACLE.PASSWORD}, {$ORACLE.SERVICE}) if you want to override parameters from the Zabbix agent configuration file.
+1. Setup and configure Zabbix agent 2 compiled with the Oracle monitoring plugin. See the setup instructions for [Oracle Database plugin](https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/src/go/plugins/oracle/README.md).
+2. Set the {$ORACLE.CONNSTRING} macro value using either <protocol(host:port)> or named session.
+3. If you want to override parameters from the Zabbix agent configuration file, set the user name, password and service name in host macros ({$ORACLE.USER}, {$ORACLE.PASSWORD}, and {$ORACLE.SERVICE}).
 
 Test availability:
  ```zabbix_get -s oracle-host -k  oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]```
@@ -30,30 +30,30 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ORACLE.ASM.USED.PCT.MAX.HIGH} |<p>The maximum percentage of used ASM disk group for high trigger expression.</p> |`95` |
-|{$ORACLE.ASM.USED.PCT.MAX.WARN} |<p>The maximum percentage of used Automatic Storage Management (ASM) disk group for warning trigger expression.</p> |`90` |
-|{$ORACLE.CONCURRENCY.MAX.WARN} |<p>The maximum percentage of sessions concurrency usage for trigger expression.</p> |`80` |
+|{$ORACLE.ASM.USED.PCT.MAX.HIGH} |<p>The maximum percentage of used Automatic Storage Management (ASM) disk group for a high trigger expression.</p> |`95` |
+|{$ORACLE.ASM.USED.PCT.MAX.WARN} |<p>The maximum percentage of used Automatic Storage Management (ASM) disk group for a warning trigger expression.</p> |`90` |
+|{$ORACLE.CONCURRENCY.MAX.WARN} |<p>The maximum percentage of sessions concurrency usage for a trigger expression.</p> |`80` |
 |{$ORACLE.CONNSTRING} |<p>-</p> |`tcp://localhost:1521` |
-|{$ORACLE.DB.FILE.MAX.WARN} |<p>The maximum percentage of used database files for trigger expression.</p> |`80` |
+|{$ORACLE.DB.FILE.MAX.WARN} |<p>The maximum percentage of used database files for a trigger expression.</p> |`80` |
 |{$ORACLE.DBNAME.MATCHES} |<p>This macro is used in discovery of the database. It can be overridden on host level or its linked template level.</p> |`.*` |
 |{$ORACLE.DBNAME.NOT_MATCHES} |<p>This macro is used in discovery of the database. It can be overridden on host level or its linked template level.</p> |`PDB\$SEED` |
-|{$ORACLE.EXPIRE.PASSWORD.MIN.WARN} |<p>The number of warning days before the password expires (for a trigger expression).</p> |`7` |
+|{$ORACLE.EXPIRE.PASSWORD.MIN.WARN} |<p>The number of warning days before the password expires for a trigger expression.</p> |`7` |
 |{$ORACLE.PASSWORD} |<p>The Oracle user's password.</p> |`zabbix_password` |
-|{$ORACLE.PGA.USE.MAX.WARN} |<p>The maximum percentage of the Program Global Area (PGA) usage that alerts the threshold (for a trigger expression).</p> |`90` |
-|{$ORACLE.PROCESSES.MAX.WARN} |<p>The maximum percentage of active processes alert threshold (for a trigger expression).</p> |`80` |
-|{$ORACLE.REDO.MIN.WARN} |<p>The minimum number of REDO logs alert threshold (for a trigger expression).</p> |`3` |
-|{$ORACLE.SERVICE} |<p>Oracle Service Name</p> |`ORA` |
+|{$ORACLE.PGA.USE.MAX.WARN} |<p>The maximum percentage of the Program Global Area (PGA) usage that alerts the threshold for a trigger expression.</p> |`90` |
+|{$ORACLE.PROCESSES.MAX.WARN} |<p>Alert threshold for the maximum percentage of active processes (for a trigger expression).</p> |`80` |
+|{$ORACLE.REDO.MIN.WARN} |<p>Alert threshold for the minimum number of REDO logs for a trigger expression.</p> |`3` |
+|{$ORACLE.SERVICE} |<p>Oracle Service Name.</p> |`ORA` |
 |{$ORACLE.SESSION.LOCK.MAX.TIME} |<p>The maximum duration of the session lock in seconds to count the session as a prolongedly locked query.</p> |`600` |
-|{$ORACLE.SESSION.LONG.LOCK.MAX.WARN} |<p>The maximum number of the prolongedly locked sessions alert threshold (for a trigger expression).</p> |`3` |
-|{$ORACLE.SESSIONS.LOCK.MAX.WARN} |<p>The maximum percentage of locked sessions alert threshold (for a trigger expression).</p> |`20` |
-|{$ORACLE.SESSIONS.MAX.WARN} |<p>The maximum percentage of active sessions alert threshold (for a trigger expression).</p> |`80` |
-|{$ORACLE.SHARED.FREE.MIN.WARN} |<p>The minimum percentage of free shared pool alert threshold (for a trigger expression).</p> |`5` |
+|{$ORACLE.SESSION.LONG.LOCK.MAX.WARN} |<p>Alert threshold for the maximum number of the prolongedly locked sessions for a trigger expression.</p> |`3` |
+|{$ORACLE.SESSIONS.LOCK.MAX.WARN} |<p>Alert threshold for the maximum percentage of locked sessions for a trigger expression.</p> |`20` |
+|{$ORACLE.SESSIONS.MAX.WARN} |<p>Alert threshold for the maximum percentage of active sessions for a trigger expression.</p> |`80` |
+|{$ORACLE.SHARED.FREE.MIN.WARN} |<p>Alert threshold for the minimum percentage of free shared pool for a trigger expression.</p> |`5` |
 |{$ORACLE.TABLESPACE.NAME.MATCHES} |<p>This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.</p> |`.*` |
 |{$ORACLE.TABLESPACE.NAME.NOT_MATCHES} |<p>This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.</p> |`CHANGE_IF_NEEDED` |
-|{$ORACLE.TBS.USED.PCT.MAX.HIGH} |<p>The maximum percentage of tablespace usage (used bytes/allocated bytes) for high severity alert threshold (for a trigger expression).</p> |`95` |
-|{$ORACLE.TBS.USED.PCT.MAX.WARN} |<p>The maximum percentage of tablespace usage (used bytes/allocated bytes) for warning severity alert threshold (for a trigger expression).</p> |`90` |
-|{$ORACLE.TBS.UTIL.PCT.MAX.HIGH} |<p>The maximum percentage of tablespace utilization (allocated bytes/max bytes) for high severity alert threshold (for a trigger expression).</p> |`90` |
-|{$ORACLE.TBS.UTIL.PCT.MAX.WARN} |<p>The maximum percentage of tablespace utilization (allocated bytes/max bytes) for warning severity alert threshold (for a trigger expression).</p> |`80` |
+|{$ORACLE.TBS.USED.PCT.MAX.HIGH} |<p>High severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for a trigger expression.</p> |`95` |
+|{$ORACLE.TBS.USED.PCT.MAX.WARN} |<p>Warning severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for a trigger expression.</p> |`90` |
+|{$ORACLE.TBS.UTIL.PCT.MAX.HIGH} |<p>High severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for a trigger expression.</p> |`90` |
+|{$ORACLE.TBS.UTIL.PCT.MAX.WARN} |<p>Warning severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for a trigger expression.</p> |`80` |
 |{$ORACLE.USER} |<p>Oracle username.</p> |`zabbix` |
 
 ## Template links
@@ -81,17 +81,17 @@ There are no template links in this template.
 |Oracle |Oracle: Archiver state |<p>The status of automatic archiving.</p> |DEPENDENT |oracle.archiver_state<p>**Preprocessing**:</p><p>- JSONPATH: `$..archiver.first()`</p> |
 |Oracle |Oracle: Instance name |<p>The name of an instance.</p> |DEPENDENT |oracle.instance_name<p>**Preprocessing**:</p><p>- JSONPATH: `$.instance`</p> |
 |Oracle |Oracle: Instance hostname |<p>The name of the host machine.</p> |DEPENDENT |oracle.instance_hostname<p>**Preprocessing**:</p><p>- JSONPATH: `$..hostname.first()`</p> |
-|Oracle |Oracle: Instance role |<p>Indicates whether the instance is an active instance or an inactive secondary instance.</p> |DEPENDENT |oracle.instance.role<p>**Preprocessing**:</p><p>- JSONPATH: `$.role`</p> |
-|Oracle |Oracle: Buffer cache hit ratio |<p>The ratio of buffer cache hits. (LogRead - PhyRead)/LogRead</p> |DEPENDENT |oracle.buffer_cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Buffer Cache Hit Ratio']`</p> |
-|Oracle |Oracle: Cursor cache hit ratio |<p>The ratio of cursor cache hits. CursorCacheHit/SoftParse</p> |DEPENDENT |oracle.cursor_cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Cursor Cache Hit Ratio']`</p> |
-|Oracle |Oracle: Library cache hit ratio |<p>The ratio of library cache hits. Hits/Pins</p> |DEPENDENT |oracle.library_cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Library Cache Hit Ratio']`</p> |
-|Oracle |Oracle: Shared pool free % |<p>The free memory of a shared pool expressed in %</p> |DEPENDENT |oracle.shared_pool_free<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Shared Pool Free %']`</p> |
+|Oracle |Oracle: Instance role |<p>It indicates whether the instance is an active instance or an inactive secondary instance.</p> |DEPENDENT |oracle.instance.role<p>**Preprocessing**:</p><p>- JSONPATH: `$.role`</p> |
+|Oracle |Oracle: Buffer cache hit ratio |<p>The ratio of buffer cache hits ((LogRead - PhyRead)/LogRead)</p> |DEPENDENT |oracle.buffer_cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Buffer Cache Hit Ratio']`</p> |
+|Oracle |Oracle: Cursor cache hit ratio |<p>The ratio of cursor cache hits (CursorCacheHit/SoftParse)</p> |DEPENDENT |oracle.cursor_cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Cursor Cache Hit Ratio']`</p> |
+|Oracle |Oracle: Library cache hit ratio |<p>The ratio of library cache hits (Hits/Pins)</p> |DEPENDENT |oracle.library_cache_hit_ratio<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Library Cache Hit Ratio']`</p> |
+|Oracle |Oracle: Shared pool free % |<p>Free memory of a shared pool expressed in %</p> |DEPENDENT |oracle.shared_pool_free<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Shared Pool Free %']`</p> |
 |Oracle |Oracle: Physical reads per second |<p>Reads per second.</p> |DEPENDENT |oracle.physical_reads_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Physical Reads Per Sec']`</p> |
 |Oracle |Oracle: Physical writes per second |<p>Writes per second.</p> |DEPENDENT |oracle.physical_writes_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Physical Writes Per Sec']`</p> |
 |Oracle |Oracle: Physical reads bytes per second |<p>Read bytes per second.</p> |DEPENDENT |oracle.physical_read_bytes_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Physical Read Bytes Per Sec']`</p> |
 |Oracle |Oracle: Physical writes bytes per second |<p>Write bytes per second.</p> |DEPENDENT |oracle.physical_write_bytes_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Physical Write Bytes Per Sec']`</p> |
 |Oracle |Oracle: Enqueue timeouts per second |<p>Enqueue timeouts per second.</p> |DEPENDENT |oracle.enqueue_timeouts_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Enqueue Timeouts Per Sec']`</p> |
-|Oracle |Oracle: GC CR block received per second |<p>The global cache (GC) the consistent read (CR) block received per second.</p> |DEPENDENT |oracle.gc_cr_block_received_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['GC CR Block Received Per Second']`</p> |
+|Oracle |Oracle: GC CR block received per second |<p>The global cache (GC) and the consistent read (CR) block received per second.</p> |DEPENDENT |oracle.gc_cr_block_received_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['GC CR Block Received Per Second']`</p> |
 |Oracle |Oracle: Global cache blocks corrupted |<p>The number of blocks that encountered corruption or checksum failure during the interconnect.</p> |DEPENDENT |oracle.cache_blocks_corrupt<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Global Cache Blocks Corrupted']`</p> |
 |Oracle |Oracle: Global cache blocks lost |<p>The number of lost global cache blocks.</p> |DEPENDENT |oracle.cache_blocks_lost<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Global Cache Blocks Lost']`</p> |
 |Oracle |Oracle: Logons per second |<p>The number of logon attempts.</p> |DEPENDENT |oracle.logons_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Logons Per Sec']`</p> |
@@ -99,7 +99,7 @@ There are no template links in this template.
 |Oracle |Oracle: Active serial sessions |<p>The number of active serial sessions.</p> |DEPENDENT |oracle.active_serial_sessions<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Active Serial Sessions']`</p> |
 |Oracle |Oracle: Active parallel sessions |<p>The number of active parallel sessions.</p> |DEPENDENT |oracle.active_parallel_sessions<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Active Parallel Sessions']`</p> |
 |Oracle |Oracle: Long table scans per second |<p>The number of long table scans per second. A table is considered 'long' if the table is not cached and if its high-water mark is greater than five blocks.</p> |DEPENDENT |oracle.long_table_scans_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Long Table Scans Per Sec']`</p> |
-|Oracle |Oracle: SQL service response time |<p>The SQL service response time expressed in seconds.</p> |DEPENDENT |oracle.service_response_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.['SQL Service Response Time']`</p><p>- MULTIPLIER: `0.01`</p> |
+|Oracle |Oracle: SQL service response time |<p>The Structured Query Language (SQL) service response time expressed in seconds.</p> |DEPENDENT |oracle.service_response_time<p>**Preprocessing**:</p><p>- JSONPATH: `$.['SQL Service Response Time']`</p><p>- MULTIPLIER: `0.01`</p> |
 |Oracle |Oracle: User rollbacks per second |<p>The number of times that users manually issue the ROLLBACK statement or an error occurred during the users' transactions.</p> |DEPENDENT |oracle.user_rollbacks_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.['User Rollbacks Per Sec']`</p> |
 |Oracle |Oracle: Total sorts per user call |<p>The total sorts per user call.</p> |DEPENDENT |oracle.sorts_per_user_call<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Total Sorts Per User Call']`</p> |
 |Oracle |Oracle: Rows per sort |<p>The average number of rows per sort for all types of sorts performed.</p> |DEPENDENT |oracle.rows_per_sort<p>**Preprocessing**:</p><p>- JSONPATH: `$.['Rows Per Sort']`</p> |
@@ -118,7 +118,7 @@ There are no template links in this template.
 |Oracle |Oracle: Sessions lock rate |<p>The percentage of locked sessions. Locks are mechanisms that prevent destructive interaction between transactions accessing the same resource — either user objects, such as tables and rows or system objects not visible to users, such as shared data structures in memory and data dictionary rows.</p> |DEPENDENT |oracle.session_lock_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.lock_rate`</p> |
 |Oracle |Oracle: Sessions locked over {$ORACLE.SESSION.LOCK.MAX.TIME}s |<p>The count of the prolongedly locked sessions. (You can change the duration of maximum session lock in seconds for a query by {$ORACLE.SESSION.LOCK.MAX.TIME} macro. Default is 600 sec).</p> |DEPENDENT |oracle.session_long_time_locked<p>**Preprocessing**:</p><p>- JSONPATH: `$.long_time_locked`</p> |
 |Oracle |Oracle: Sessions concurrency |<p>The percentage of concurrency. Concurrency is a DB behavior when different transactions request to change the same resource. In the case of modifying data transactions, it sequentially temporarily blocks the right to change the data, the rest of the transactions are waiting for the access. In the case when the access for the resource is locked for a long time, then the concurrency grows (like the transaction queue) and this often has an extremely negative impact on the performance. A high contention value does not indicate the root cause of the problem but is a signal to search for it.</p> |DEPENDENT |oracle.session_concurrency_rate<p>**Preprocessing**:</p><p>- JSONPATH: `$.concurrency_rate`</p> |
-|Oracle |Oracle: PGA, Total inuse |<p>It indicates how much PGA memory is currently consumed by work areas. This number can be used to determine how much memory is consumed by other consumers of the PGA memory (for example, PL/SQL or Java).</p> |DEPENDENT |oracle.total_pga_used<p>**Preprocessing**:</p><p>- JSONPATH: `$.['total PGA inuse']`</p> |
+|Oracle |Oracle: PGA, Total inuse |<p>It indicates how much the Program Global Area (PGA) memory is currently consumed by work areas. This number can be used to determine how much memory is consumed by other consumers of the PGA memory (for example, PL/SQL or Java).</p> |DEPENDENT |oracle.total_pga_used<p>**Preprocessing**:</p><p>- JSONPATH: `$.['total PGA inuse']`</p> |
 |Oracle |Oracle: PGA, Aggregate target parameter |<p>The current value of the PGA_AGGREGATE_TARGET initialization parameter. If this parameter is not set, then its value is 0 and automatic management of the PGA memory is disabled.</p> |DEPENDENT |oracle.pga_target<p>**Preprocessing**:</p><p>- JSONPATH: `$.['aggregate PGA target parameter']`</p> |
 |Oracle |Oracle: PGA, Total allocated |<p>The current amount of the PGA memory allocated by the instance. The Oracle Database attempts to keep this number below the value of the PGA_AGGREGATE_TARGET initialization parameter. However, it is possible for the PGA allocated to exceed that value by a small percentage and for a short period of time when the work area workload is increasing very rapidly or when PGA_AGGREGATE_TARGET is set to a small value.</p> |DEPENDENT |oracle.total_pga_allocated<p>**Preprocessing**:</p><p>- JSONPATH: `$.['total PGA allocated']`</p> |
 |Oracle |Oracle: PGA, Total freeable |<p>The number of bytes of the PGA memory in all processes that could be freed back to the operating system.</p> |DEPENDENT |oracle.total_pga_freeable<p>**Preprocessing**:</p><p>- JSONPATH: `$.['total freeable PGA memory']`</p> |
@@ -135,15 +135,15 @@ There are no template links in this template.
 |Oracle |Oracle: SGA, log buffer |<p>The number of bytes allocated for the redo log buffer.</p> |DEPENDENT |oracle.sga_log_buffer<p>**Preprocessing**:</p><p>- JSONPATH: `$.log_buffer`</p> |
 |Oracle |Oracle: SGA, fixed |<p>The fixed System Global Area (SGA) is an internal housekeeping area.</p> |DEPENDENT |oracle.sga_fixed<p>**Preprocessing**:</p><p>- JSONPATH: `$.fixed_sga`</p> |
 |Oracle |Oracle: SGA, buffer cache |<p>The size of standard block cache.</p> |DEPENDENT |oracle.sga_buffer_cache<p>**Preprocessing**:</p><p>- JSONPATH: `$.buffer_cache`</p> |
-|Oracle |Oracle: User's expire password |<p>The number of days before the password of Zabbix account expired.</p> |ZABBIX_PASSIVE |oracle.user.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.exp_passwd_days_before`</p> |
+|Oracle |Oracle: User's expire password |<p>The number of days before the password of Zabbix account expires.</p> |ZABBIX_PASSIVE |oracle.user.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.exp_passwd_days_before`</p> |
 |Oracle |Oracle: Redo logs available to switch |<p>The number of inactive/unused redo logs available for log switching.</p> |ZABBIX_PASSIVE |oracle.redolog.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.available`</p> |
 |Oracle |Oracle: Number of processes | |ZABBIX_PASSIVE |oracle.proc.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.proc_num`</p> |
 |Oracle |Oracle: Datafiles count |<p>The current number of datafiles.</p> |ZABBIX_PASSIVE |oracle.datafiles.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$.datafile_num`</p> |
-|Oracle |Oracle Database '{#DBNAME}': Open status |<p>1 - 'MOUNTED';</p><p>2 - 'READ WRITE';</p><p>3 - 'READ ONLY';</p><p>4 - 'READ ONLY WITH APPLY' (A physical standby database is open in real-time query mode).</p> |DEPENDENT |oracle.db_open_mode["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#DBNAME}.open_mode.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Oracle |Oracle Database '{#DBNAME}': Open status |<p>1 - 'MOUNTED';</p><p>2 - 'READ WRITE';</p><p>3 - 'READ ONLY';</p><p>4 - 'READ ONLY WITH APPLY' (a physical standby database is open in real-time query mode).</p> |DEPENDENT |oracle.db_open_mode["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#DBNAME}.open_mode.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
 |Oracle |Oracle Database '{#DBNAME}': Role |<p>The current role of the database where:</p><p>1 - 'SNAPSHOT STANDBY';</p><p>2 - 'LOGICAL STANDBY';</p><p>3 - 'PHYSICAL STANDBY';</p><p>4 - 'PRIMARY ';</p><p>5 - 'FAR SYNC'.</p> |DEPENDENT |oracle.db_role["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#DBNAME}.role.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
 |Oracle |Oracle Database '{#DBNAME}': Log mode |<p>The archive log mode where:</p><p>0 - 'NOARCHIVELOG';</p><p>1 - 'ARCHIVELOG';</p><p>2 - 'MANUAL'.</p> |DEPENDENT |oracle.db_log_mode["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#DBNAME}.log_mode.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
 |Oracle |Oracle Database '{#DBNAME}': Force logging |<p>It indicates whether the database is under force logging mode 'YES' or 'NO'.</p> |DEPENDENT |oracle.db_force_logging["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#DBNAME}.force_logging.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
-|Oracle |Oracle Database '{#DBNAME}': Open status |<p>1 - 'MOUNTED';</p><p>2 - 'READ WRITE';</p><p>3 - 'READ ONLY';</p><p>4 - 'READ ONLY WITH APPLY' (A physical standby database is open in real-time query mode).</p> |DEPENDENT |oracle.pdb_open_mode["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#DBNAME}.open_mode.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
+|Oracle |Oracle Database '{#DBNAME}': Open status |<p>1 - 'MOUNTED';</p><p>2 - 'READ WRITE';</p><p>3 - 'READ ONLY';</p><p>4 - 'READ ONLY WITH APPLY' (a physical standby database is open in real-time query mode).</p> |DEPENDENT |oracle.pdb_open_mode["{#DBNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..{#DBNAME}.open_mode.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `15m`</p> |
 |Oracle |Oracle TBS '{#TABLESPACE}': Tablespace allocated, bytes |<p>Currently allocated bytes for the tablespace (sum of the current size of datafiles).</p> |DEPENDENT |oracle.tbs_alloc_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#TABLESPACE}'].file_bytes.first()`</p> |
 |Oracle |Oracle TBS '{#TABLESPACE}': Tablespace MAX size, bytes |<p>The maximum size of the tablespace.</p> |DEPENDENT |oracle.tbs_max_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#TABLESPACE}'].max_bytes.first()`</p> |
 |Oracle |Oracle TBS '{#TABLESPACE}': Tablespace used, bytes |<p>Currently used bytes for the tablespace (current size of datafiles - the free space).</p> |DEPENDENT |oracle.tbs_used_bytes["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#TABLESPACE}'].used_bytes.first()`</p> |
@@ -153,10 +153,10 @@ There are no template links in this template.
 |Oracle |Oracle TBS '{#TABLESPACE}': Open status |<p>The tablespace status where:</p><p>1 - 'ONLINE';</p><p>2 - 'OFFLINE';</p><p>3 - 'READ ONLY'.</p> |DEPENDENT |oracle.tbs_status["{#TABLESPACE}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#TABLESPACE}'].status.first()`</p> |
 |Oracle |Archivelog '{#DEST_NAME}': Error |<p>It displays the error message.</p> |DEPENDENT |oracle.archivelog_error["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DEST_NAME}'].error.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |Oracle |Archivelog '{#DEST_NAME}': Last sequence |<p>It identifies the sequence number of the last archived redo log to be archived.</p> |DEPENDENT |oracle.archivelog_log_sequence["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DEST_NAME}'].log_sequence.first()`</p> |
-|Oracle |Archivelog '{#DEST_NAME}': Status |<p>It identifies the current status of the destination where:</p><p>1 - 'Valid';</p><p>2 - 'Deferred';</p><p>3 - 'Error';</p><p>0 - 'Unknown'.</p> |DEPENDENT |oracle.archivelog_log_status["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DEST_NAME}'].status.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
-|Oracle |ASM '{#DG_NAME}': Total size |<p>The total size of the ASM disk group.</p> |DEPENDENT |oracle.asm_total_size["{#DG_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DG_NAME}'].size_byte.first()`</p> |
-|Oracle |ASM '{#DG_NAME}': Free size |<p>The free size of the ASM disk group.</p> |DEPENDENT |oracle.asm_free_size["{#DG_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DG_NAME}'].free_size_byte.first()`</p> |
-|Oracle |ASM '{#DG_NAME}': Free size |<p>Usage of the ASM disk group expressed in %.</p> |DEPENDENT |oracle.asm_used_pct["{#DG_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DG_NAME}'].used_percent.first()`</p> |
+|Oracle |Archivelog '{#DEST_NAME}': Status |<p>It identifies the current status of the destination where:</p><p>1 - 'VALID';</p><p>2 - 'DEFERRED';</p><p>3 - 'ERROR';</p><p>0 - 'UNKNOWN'.</p> |DEPENDENT |oracle.archivelog_log_status["{#DEST_NAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DEST_NAME}'].status.first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|Oracle |ASM '{#DGNAME}': Total size |<p>The total size of the ASM disk group.</p> |DEPENDENT |oracle.asm_total_size["{#DGNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DGNAME}'].total_bytes.first()`</p> |
+|Oracle |ASM '{#DGNAME}': Free size |<p>The free size of the ASM disk group.</p> |DEPENDENT |oracle.asm_free_size["{#DGNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DGNAME}'].free_bytes.first()`</p> |
+|Oracle |ASM '{#DGNAME}': Free size |<p>Usage of the ASM disk group expressed in %.</p> |DEPENDENT |oracle.asm_used_pct["{#DGNAME}"]<p>**Preprocessing**:</p><p>- JSONPATH: `$..['{#DGNAME}'].used_pct.first()`</p> |
 |Zabbix raw items |Oracle: Get instance state |<p>The item gets its state of the current instance.</p> |ZABBIX_PASSIVE |oracle.instance.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle: Get system metrics |<p>The item gets the values of the system metrics.</p> |ZABBIX_PASSIVE |oracle.sys.metrics["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle: Get system parameters |<p>Get a set of system parameter values.</p> |ZABBIX_PASSIVE |oracle.sys.params["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
@@ -168,7 +168,7 @@ There are no template links in this template.
 |Zabbix raw items |Oracle: Get CDB and No-CDB info |<p>It gets the information about the container database (CDB) and non-CDB databases on an instance.</p> |ZABBIX_PASSIVE |oracle.cdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle: Get PDB info |<p>It gets the information about the PDB databases on an instance.</p> |ZABBIX_PASSIVE |oracle.pdb.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 |Zabbix raw items |Oracle: Get archive log info | |ZABBIX_PASSIVE |oracle.archive.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
-|Zabbix raw items |Oracle: Get ASM stats |<p>Get ASM disk groups stats.</p> |ZABBIX_PASSIVE |oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
+|Zabbix raw items |Oracle: Get ASM stats |<p>It gets the ASM disk groups statistics.</p> |ZABBIX_PASSIVE |oracle.diskgroups.stats["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"] |
 
 ## Triggers
 
@@ -176,7 +176,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Oracle: Connection to database is unavailable |<p>Connection to Oracle Database is currently unavailable.</p> |`last(/Oracle by Zabbix agent 2/oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"])=0` |DISASTER | |
 |Oracle: Version has changed |<p>The Oracle DB version has changed. Acknowledge (Ack) to close manually.</p> |`last(/Oracle by Zabbix agent 2/oracle.version,#1)<>last(/Oracle by Zabbix agent 2/oracle.version,#2) and length(last(/Oracle by Zabbix agent 2/oracle.version))>0` |INFO |<p>Manual close: YES</p> |
-|Oracle: Failed to fetch info data |<p>Zabbix has not received data for the items for the last 5 minutes. The database might be unavailable for connecting.</p> |`nodata(/Oracle by Zabbix agent 2/oracle.uptime,30m)=1` |INFO | |
+|Oracle: Failed to fetch info data |<p>Zabbix has not received any data for the items for the last 5 minutes. The database might be unavailable for connecting.</p> |`nodata(/Oracle by Zabbix agent 2/oracle.uptime,30m)=1` |INFO | |
 |Oracle: Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Oracle by Zabbix agent 2/oracle.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |Oracle: Instance name has changed |<p>Oracle DB Instance name has changed. Ack to close manually.</p> |`last(/Oracle by Zabbix agent 2/oracle.instance_name,#1)<>last(/Oracle by Zabbix agent 2/oracle.instance_name,#2) and length(last(/Oracle by Zabbix agent 2/oracle.instance_name))>0` |INFO |<p>Manual close: YES</p> |
 |Oracle: Instance hostname has changed |<p>Oracle DB Instance hostname has changed. Ack to close.</p> |`last(/Oracle by Zabbix agent 2/oracle.instance_hostname,#1)<>last(/Oracle by Zabbix agent 2/oracle.instance_hostname,#2) and length(last(/Oracle by Zabbix agent 2/oracle.instance_hostname))>0` |INFO |<p>Manual close: YES</p> |
@@ -202,9 +202,9 @@ There are no template links in this template.
 |Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high |<p>-</p> |`min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}` |HIGH | |
 |Oracle TBS '{#TABLESPACE}': Tablespace is OFFLINE |<p>The tablespace is in the offline state.</p> |`last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"])=2` |WARNING | |
 |Oracle TBS '{#TABLESPACE}': Tablespace status has changed |<p>Oracle tablespace status has changed. Ack to close.</p> |`last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"],#2)` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Oracle TBS '{#TABLESPACE}': Tablespace is OFFLINE</p> |
-|Archivelog '{#DEST_NAME}': Log Archive is not valid |<p>ARL destination not in 3 - Valid or 2 - Deferred.</p> |`last(/Oracle by Zabbix agent 2/oracle.archivelog_log_status["{#DEST_NAME}"])<2` |HIGH | |
-|ASM '{#DG_NAME}': Disk group usage is too high |<p>The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.WARN}</p> |`min(/Oracle by Zabbix agent 2/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- ASM '{#DG_NAME}': Disk group usage is too high</p> |
-|ASM '{#DG_NAME}': Disk group usage is too high |<p>The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.HIGH}</p> |`min(/Oracle by Zabbix agent 2/oracle.asm_used_pct["{#DG_NAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}` |HIGH | |
+|Archivelog '{#DEST_NAME}': Log Archive is not valid |<p>Trigger will launch if the archive log destination is not in one of these states:</p><p>2 - 'DEFERRED';</p><p>3 - 'VALID'.</p> |`last(/Oracle by Zabbix agent 2/oracle.archivelog_log_status["{#DEST_NAME}"])<2` |HIGH | |
+|ASM '{#DGNAME}': Disk group usage is too high |<p>The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.WARN}</p> |`min(/Oracle by Zabbix agent 2/oracle.asm_used_pct["{#DGNAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- ASM '{#DGNAME}': Disk group usage is too high</p> |
+|ASM '{#DGNAME}': Disk group usage is too high |<p>The usage of the ASM disk group expressed in % exceeds {$ORACLE.ASM.USED.PCT.MAX.HIGH}</p> |`min(/Oracle by Zabbix agent 2/oracle.asm_used_pct["{#DGNAME}"],5m)>{$ORACLE.ASM.USED.PCT.MAX.HIGH}` |HIGH | |
 
 ## Feedback
 
