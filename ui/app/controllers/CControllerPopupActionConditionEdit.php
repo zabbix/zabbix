@@ -1,4 +1,4 @@
-<?php declare(strict_types=0);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,14 +19,11 @@
 **/
 
 
-require_once __DIR__ . '/../../include/actions.inc.php';
+require_once __DIR__.'/../../include/actions.inc.php';
 
 class CControllerPopupActionConditionEdit extends CController {
 
 	protected function checkInput(): bool {
-		$condition_types = array_keys(condition_type2str());
-		$condition_operators = array_keys(condition_operator2str());
-
 		$fields = [
 			'actionid' =>			'db actions.actionid',
 			'type' =>				'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION,
@@ -34,8 +31,8 @@ class CControllerPopupActionConditionEdit extends CController {
 										EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
 										EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
 									]),
-			'condition_type' =>		'db conditions.conditiontype|in '.implode(',', $condition_types),
-			'operator' =>			'db conditions.operator|in '.implode(',', $condition_operators),
+			'condition_type' =>		'db conditions.conditiontype|in '.implode(',', array_keys(condition_type2str())),
+			'operator' =>			'db conditions.operator|in '.implode(',', array_keys(condition_operator2str())),
 			'trigger_context' =>	'in '.implode(',', ['host', 'template']),
 			'row_index' =>			'required|int32',
 		];
@@ -50,32 +47,22 @@ class CControllerPopupActionConditionEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$eventsource = $this->getInput('source');
-		$has_permission = false;
-
-		switch ($eventsource) {
+		switch ($this->getInput('source')) {
 			case EVENT_SOURCE_TRIGGERS:
-				$has_permission = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
 
 			case EVENT_SOURCE_DISCOVERY:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS);
 
 			case EVENT_SOURCE_AUTOREGISTRATION:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS);
 
 			case EVENT_SOURCE_INTERNAL:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS);
 
 			case EVENT_SOURCE_SERVICE:
-				$has_permission =  $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
-				break;
+				return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS);
 		}
-
-		return $has_permission;
 	}
 
 	protected function getConditionLastType(): string {

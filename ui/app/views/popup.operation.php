@@ -24,7 +24,6 @@
  * @var array $data
  */
 
-
 $partials = [
 	ACTION_OPERATION => 'popup.operations',
 	ACTION_RECOVERY_OPERATION => 'popup.recovery.operations',

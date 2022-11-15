@@ -96,9 +96,7 @@ class CControllerPopupActionEdit extends CController {
 		$eventsource = $this->getInput('eventsource', EVENT_SOURCE_TRIGGERS);
 
 		if ($this->action !== null) {
-			$formula = array_key_exists('formula', $this->action['filter'])
-				? $this->action['filter']['formula']
-				: '';
+			$formula = array_key_exists('formula', $this->action['filter']) ? $this->action['filter']['formula'] : '';
 
 			sortOperations($eventsource, $this->action['operations']);
 			CArrayHelper::sort($this->action['recovery_operations'], ['operationtype']);

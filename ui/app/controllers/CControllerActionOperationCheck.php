@@ -76,9 +76,7 @@ class CControllerActionOperationCheck extends CController {
 			return false;
 		}
 
-		$default_msg_validator = new CLimitedSetValidator([
-			'values' => [0, 1]
-		]);
+		$default_msg_validator = new CLimitedSetValidator(['values' => [0, 1]]);
 
 		if ($recovery == ACTION_OPERATION) {
 			if ((array_key_exists('esc_step_from', $operation) || array_key_exists('esc_step_to', $operation))
@@ -216,7 +214,7 @@ class CControllerActionOperationCheck extends CController {
 	protected function doAction(): void {
 		$operation = $this->getInput('operation');
 
-		if (preg_match('/\bscriptid\b/', $operation['operationtype'])){
+		if (preg_match('/\bscriptid\b/', $operation['operationtype'])) {
 			$operation['opcommand']['scriptid'] = preg_replace('[\D]', '', $operation['operationtype']);
 			$operationtype = OPERATION_TYPE_COMMAND;
 

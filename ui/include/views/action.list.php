@@ -134,8 +134,6 @@ if ($data['actions']) {
 			$conditions[] = BR();
 		}
 
-		sortOperations($data['eventsource'], $action['operations']);
-
 		foreach ($action['operations'] as $oIdx => $operation) {
 			$operations[] = getActionOperationDescriptions(
 				$data['actions'], ACTION_OPERATION, $data['operation_descriptions']

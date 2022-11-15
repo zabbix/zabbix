@@ -131,10 +131,6 @@ class CControllerPopupActionOperationEdit extends CController {
 			$operation['optemplate'] = $operation_data['optemplate'][0];
 		}
 
-		$action = [
-			'operations' => $operation
-		];
-
 		$data = [
 			'eventsource' => $eventsource,
 			'actionid' => $this->getInput('actionid', []),
@@ -147,7 +143,14 @@ class CControllerPopupActionOperationEdit extends CController {
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
-	private function getData($operation) {
+	/**
+	 * Returns necessarry operation 'element' data for operation popup multiselects.
+	 *
+	 * @param array $operation  Operation object.
+	 *
+	 * @return array
+	 */
+	private function getData(array $operation): array {
 		$result = [];
 
 		if ($operation['opmessage_grp']) {
@@ -248,6 +251,11 @@ class CControllerPopupActionOperationEdit extends CController {
 		return $result;
 	}
 
+	/**
+	 * Returns default Operation.
+	 *
+	 * @return array
+	 */
 	private function defaultOperationObject(): array {
 		return [
 			'opmessage_usr' => [],

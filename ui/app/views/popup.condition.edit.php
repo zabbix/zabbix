@@ -917,7 +917,7 @@ $form->addItem([
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => $inline_js . 'condition_popup.init();',
+	'script_inline' => $inline_js.'condition_popup.init();',
 	'body' => $form->toString(),
 	'buttons' => [
 		[

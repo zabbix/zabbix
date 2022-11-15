@@ -26,7 +26,7 @@ class CControllerPopupActionOperationGet extends CController {
 		$this->disableSIDvalidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$eventsource = [
 			EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
 			EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
@@ -57,7 +57,7 @@ class CControllerPopupActionOperationGet extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN) {
 			if (!$this->getInput('actionid', '0')) {
 				return true;
@@ -73,16 +73,13 @@ class CControllerPopupActionOperationGet extends CController {
 		return false;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data['esc_period'] = $this->hasInput('esc_period')
 			? $this->getInput('esc_period')
 			: DB::getDefault('actions', 'esc_period');
 
 		$eventsource = $this->getInput('eventsource');
-
-		$new_operation = $this->hasInput('new_operation')
-			? $this->getInput('new_operation')['operation']
-			: null;
+		$new_operation = $this->hasInput('new_operation') ? $this->getInput('new_operation')['operation'] : null;
 
 		if ($new_operation) {
 			if ($new_operation['recovery'] == ACTION_OPERATION) {

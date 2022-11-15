@@ -24,11 +24,10 @@
  * @var array $data
  */
 
+$operations = $data['action']['operations'];
 $operations_table = (new CTable())
 	->setId('op-table')
 	->setAttribute('style', 'width: 100%;');
-
-$operations = $data['action']['operations'];
 
 if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 	$operations_table->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration'), _('Action')]);
@@ -38,7 +37,7 @@ else {
 }
 
 $i = 0;
-foreach ($operations as $operationid => $operation) {
+foreach ($operations as $operation) {
 	if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_OPERATION])) {
 		continue;
 	}
@@ -126,7 +125,6 @@ foreach ($operations as $operationid => $operation) {
 
 	$i ++;
 }
-
 
 $operations_table->addItem(
 	(new CTag('tfoot', true))

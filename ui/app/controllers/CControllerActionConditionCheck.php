@@ -127,7 +127,12 @@ class CControllerActionConditionCheck extends CController {
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data, JSON_THROW_ON_ERROR)]));
 	}
 
-	protected function getDefaultAction() {
+	/**
+	 * Returns default Action object.
+	 *
+	 * @return array
+	 */
+	protected function getDefaultAction(): array {
 		return [
 			'name' => '',
 			'esc_period' => '',

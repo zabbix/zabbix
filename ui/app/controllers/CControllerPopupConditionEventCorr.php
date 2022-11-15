@@ -104,7 +104,7 @@ class CControllerPopupConditionEventCorr extends CControllerPopupConditionCommon
 			'preservekeys' => true
 		]);
 
-		foreach($groups as $group){
+		foreach($groups as $group) {
 			$group_data[$group['groupid']] = $group['name'];
 		}
 

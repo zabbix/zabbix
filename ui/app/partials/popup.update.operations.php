@@ -47,7 +47,9 @@ foreach ($operations as $operationid => $operation) {
 		}
 	}
 
-	$details_column = getActionOperationDescriptions([$data['action']], ACTION_UPDATE_OPERATION, $data['descriptions'])[0][$i];
+	$details_column = getActionOperationDescriptions(
+		[$data['action']], ACTION_UPDATE_OPERATION, $data['descriptions']
+	)[0][$i];
 
 	// Create hidden input fields for each row.
 	$hidden_data = array_filter($operation, function ($key) {

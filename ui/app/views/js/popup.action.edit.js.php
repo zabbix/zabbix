@@ -1,4 +1,4 @@
-<?php declare(strict_types=0);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -36,7 +36,7 @@ window.action_edit_popup = new class {
 
 		// Add existing conditions in action edit popup.
 		if (typeof(conditions) === 'object') {
-			conditions = Object.values(conditions)
+			conditions = Object.values(conditions);
 		}
 		for (const condition of conditions) {
 			this._createConditionsRow(condition);
@@ -52,17 +52,17 @@ window.action_edit_popup = new class {
 	}
 
 	_loadOperationTable(e = null) {
-		if (e.type === 'change'){
-			this.recovery = <?= ACTION_OPERATION ?>
+		if (e.type === 'change') {
+			this.recovery = <?= ACTION_OPERATION ?>;
 		}
-		else if (e && e.type != 'change') {
-			this.recovery = e.detail.operation.recovery;
+		else if (e && e.type !== 'change') {
+			this.recovery = parseInt(e.detail.operation.recovery);
 		}
 
-		if (this.recovery == <?= ACTION_RECOVERY_OPERATION ?>){
+		if (this.recovery === <?= ACTION_RECOVERY_OPERATION ?>) {
 			this.$operation_table = $('#recovery-operations-container');
 		}
-		else if (this.recovery == <?= ACTION_UPDATE_OPERATION ?>){
+		else if (this.recovery === <?= ACTION_UPDATE_OPERATION ?>) {
 			this.$operation_table = $('#update-operations-container');
 		}
 		else {
@@ -79,6 +79,7 @@ window.action_edit_popup = new class {
 		const curl = new Curl('zabbix.php', false);
 		curl.setArgument('action', 'popup.action.operation.get');
 		curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
+
 		if (document.querySelector('#esc_period')) {
 			let esc_period = (document.querySelector('#esc_period').value).trim();
 
@@ -108,7 +109,6 @@ window.action_edit_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-
 				if (typeof response === 'object' && 'error' in response) {
 					const message_box = makeMessageBox('bad', response.error.messages, response.error.title)[0];
 
@@ -183,7 +183,7 @@ window.action_edit_popup = new class {
 
 	_openEditOperationPopup(e, operation_data) {
 		let row_index = 0;
-		if (operation_data !== null ){
+		if (operation_data !== null) {
 			row_index = parseInt(operation_data.operationid);
 		}
 
@@ -206,7 +206,7 @@ window.action_edit_popup = new class {
 	}
 
 	_openOperationPopup(eventsource, recovery_phase, actionid) {
-		this.recovery = recovery_phase;
+		this.recovery = parseInt(recovery_phase);
 		const parameters = {
 			eventsource: eventsource,
 			recovery: recovery_phase,
@@ -278,8 +278,8 @@ window.action_edit_popup = new class {
 		}
 		else {
 			let has_row = this._checkConditionRow(input);
+			const result = [has_row.some(it => it === true)];
 
-			const result = [has_row.some(it => it === true)]
 			if (result[0] === true) {
 				return;
 			}
@@ -373,7 +373,7 @@ window.action_edit_popup = new class {
 				break;
 		}
 
-		return this.condition_name
+		return this.condition_name;
 	}
 
 	submit() {
@@ -475,8 +475,8 @@ window.action_edit_popup = new class {
 
 		const labels = document.querySelectorAll('#conditionTable .label');
 		let conditions = [];
-		[...labels].forEach(function (label) {
 
+		[...labels].forEach(function (label) {
 			conditions.push({
 				id: label.getAttribute('data-formulaid'),
 				type: label.getAttribute('data-conditiontype')
@@ -495,8 +495,8 @@ window.action_edit_popup = new class {
 
 			const labels = document.querySelectorAll('#conditionTable .label');
 			let conditions = [];
-			[...labels].forEach(function (label) {
 
+			[...labels].forEach(function (label) {
 				conditions.push({
 					id: label.getAttribute('data-formulaid'),
 					type: label.getAttribute('data-conditiontype')

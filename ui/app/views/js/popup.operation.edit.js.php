@@ -49,7 +49,7 @@ window.operation_popup = new class {
 		this._customMessageFields();
 		this._removeAllFields();
 		const operation_type = document.getElementById('operation-type-select').getAttribute('value');
-		this._changeView(operation_type)
+		this._changeView(operation_type);
 
 		document.querySelector('#operation-type-select').onchange = () => {
 			const operation_type = document.getElementById('operation-type-select').value;
@@ -131,7 +131,7 @@ window.operation_popup = new class {
 		const fields = [
 			'operation-message-custom', 'operation-message-subject', 'operation-message-body',
 			'operation-message-subject-label', 'operation_opmessage_default_msg'
-		]
+		];
 
 		this._enableFormFields(fields);
 		this._customMessageFields();
@@ -141,7 +141,7 @@ window.operation_popup = new class {
 		const fields = [
 			'operation-message-custom-label', 'operation-message-custom', 'operation-message-subject',
 			'operation-message-body', 'operation_opmessage_default_msg', 'operation-message-mediatype-default'
-		]
+		];
 
 		this._enableFormFields(fields);
 		this._customMessageFields();
@@ -198,7 +198,7 @@ window.operation_popup = new class {
 			if (input.name === 'operation[operationtype]') {
 				continue;
 			}
-			input.setAttribute('disabled', true)
+			input.setAttribute('disabled', true);
 			input.style.display = 'none';
 		}
 	}
@@ -216,7 +216,7 @@ window.operation_popup = new class {
 					'operation-message-custom', 'operation_esc_period', 'operation-message-custom-label',
 					'operation_opmessage_default_msg', 'operation-type', 'operation-condition-row',
 					'operation-condition-evaltype-formula', 'operation-evaltype-label'
-				]
+				];
 
 				this._customMessageFields();
 				break;
@@ -229,7 +229,7 @@ window.operation_popup = new class {
 					'operation-message-mediatype-only', 'operation-message-custom', 'operation_esc_period',
 					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
 					'operation-message-body'
-				]
+				];
 
 				this._customMessageFields();
 				break;
@@ -241,7 +241,7 @@ window.operation_popup = new class {
 					'operation-message-mediatype-only', 'operation-message-custom', 'operation_esc_period',
 					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
 					'operation-message-notice'
-				]
+				];
 
 				this._customMessageFields();
 				break;
@@ -291,7 +291,7 @@ window.operation_popup = new class {
 	}
 
 	_hostInventoryFields() {
-		const fields = ['operation-attr-inventory']
+		const fields = ['operation-attr-inventory'];
 		this._enableFormFields(fields);
 	}
 
@@ -323,7 +323,7 @@ window.operation_popup = new class {
 					'operation-opcommand-hst-label', 'operation-opcommand-grp', 'operation-command-targets',
 					'operation-condition-table', 'operation-condition-list-label', 'operation-condition-list',
 					'operation_opcommand_hst__hostidch'
-				]
+				];
 		}
 
 		this._enableFormFields(fields);
@@ -385,9 +385,9 @@ window.operation_popup = new class {
 	 * Check if row with the same conditiontype and value already exists.
 	 */
 	_checkConditionRow(input) {
-		let result = [];
-		[...document.getElementById('operation-condition-list').getElementsByTagName('tr')].map(it => {
-			const table_row = it.getElementsByTagName('td')[2];
+		const result = [];
+		[...document.getElementById('operation-condition-list').getElementsByTagName('tr')].map(element => {
+			const table_row = element.getElementsByTagName('td')[2];
 
 			if (table_row !== undefined) {
 				let conditiontype = table_row.getElementsByTagName('input')[0].value;
@@ -395,7 +395,7 @@ window.operation_popup = new class {
 
 				result.push(input.conditiontype === conditiontype && input.value === value);
 
-				if (input.row_index == it.getAttribute('data-row_index')) {
+				if (input.row_index == element.getAttribute('data-row_index')) {
 					input.row_index ++;
 				}
 			}
@@ -416,10 +416,10 @@ window.operation_popup = new class {
 		else {
 			if (input.conditiontype == <?= CONDITION_TYPE_EVENT_ACKNOWLEDGED ?>) {
 				if (input.value == 1) {
-					input.name = <?= json_encode(_('Event is acknowledged')) ?> + ' '
+					input.name = <?= json_encode(_('Event is acknowledged')) ?> + ' ';
 				}
 				else if (input.value == 0) {
-					input.name = <?= json_encode(_('Event is not acknowledged')) ?> + ' '
+					input.name = <?= json_encode(_('Event is not acknowledged')) ?> + ' ';
 				}
 			}
 
@@ -429,7 +429,7 @@ window.operation_popup = new class {
 
 			document
 				.querySelector('#operation-condition-list tbody')
-				.insertAdjacentHTML('beforeend', template.evaluate(input))
+				.insertAdjacentHTML('beforeend', template.evaluate(input));
 		}
 
 		this._processTypeOfCalculation();
@@ -489,7 +489,7 @@ window.operation_popup = new class {
 	}
 
 	_processTypeOfCalculation() {
-		let row_count
+		let row_count;
 		document.getElementById('operation-condition-list')
 			? row_count = document.getElementById('operation-condition-list').rows.length -2
 			: row_count = 0;
@@ -500,8 +500,8 @@ window.operation_popup = new class {
 
 		const labels = document.querySelectorAll('#operation-condition-list .label');
 		let conditions = [];
-		[...labels].forEach(function (label) {
 
+		[...labels].forEach(function (label) {
 			conditions.push({
 				id: label.getAttribute('data-formulaid'),
 				type: label.getAttribute('data-conditiontype')
@@ -513,9 +513,9 @@ window.operation_popup = new class {
 
 		document.querySelector('#operation-evaltype').onchange = function() {
 			const labels = document.querySelectorAll('#operation-condition-list .label');
-			let conditions = [];
-			[...labels].forEach(function (label) {
+			const conditions = [];
 
+			[...labels].forEach(function (label) {
 				conditions.push({
 					id: label.getAttribute('data-formulaid'),
 					type: label.getAttribute('data-conditiontype')
@@ -528,12 +528,11 @@ window.operation_popup = new class {
 	}
 
 	_customMessageFields() {
-		let default_msg = document.querySelector('#operation_opmessage_default_msg')
-
+		let default_msg = document.querySelector('#operation_opmessage_default_msg');
 		let message_fields = [
 			'operation-message-subject-label', 'operation-message-subject', 'operation-message-label',
 			'operation-message-body'
-		]
+		];
 
 		default_msg.onchange = function() {
 			if (document.querySelector('#operation_opmessage_default_msg').checked) {
