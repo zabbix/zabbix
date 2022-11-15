@@ -406,7 +406,7 @@ int	zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error)
  *                                                                            *
  * Parameters: filename - [IN] source filename (for tracking)                 *
  *             line     - [IN] source filename line number (for tracking)     *
- *             rwlock   - [IN] handle of read-write lock                      *
+ *             mutex    - [IN] handle of read-write lock                      *
  *                                                                            *
  ******************************************************************************/
 void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
@@ -478,7 +478,7 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
  *                                                                            *
  * Parameters: filename - [IN] source filename (for tracking)                 *
  *             line     - [IN] source filename line number (for tracking)     *
- *             rwlock   - [IN] handle of read-write lock                      *
+ *             mutex    - [IN] handle of read-write lock                      *
  *                                                                            *
  ******************************************************************************/
 void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t mutex)
