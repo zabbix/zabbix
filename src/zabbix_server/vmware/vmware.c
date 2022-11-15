@@ -393,6 +393,9 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 #define ZBX_XPATH_OBJECTS_BY_TYPE(type)									\
 	"/*/*/*/*/*[local-name()='objects'][*[local-name()='obj'][@type='" type "']]"
 
+#define ZBX_XPATH_OBJS_BY_TYPE(type)									\
+	"/*/*/*/*/*[local-name()='objects']/*[local-name()='obj'][@type='" type "']"
+
 #define ZBX_XPATH_NAME_BY_TYPE(type)									\
 	ZBX_XPATH_PROP_OBJECTS(type) "*[local-name()='propSet'][*[local-name()='name']]"		\
 	"/*[local-name()='val']"
@@ -2059,14 +2062,15 @@ typedef struct
 zbx_property_collection_iter;
 
 static int	zbx_property_collection_init(CURL *easyhandle, const char *property_collection_query,
-		const char *property_collector, zbx_property_collection_iter **iter, xmlDoc **xdoc, char **error)
+		const char *property_collector, const char *fn_parent, zbx_property_collection_iter **iter,
+		xmlDoc **xdoc, char **error)
 {
 	*iter = (zbx_property_collection_iter *)zbx_malloc(*iter, sizeof(zbx_property_collection_iter));
 	(*iter)->property_collector = property_collector;
 	(*iter)->easyhandle = easyhandle;
 	(*iter)->token = NULL;
 
-	if (SUCCEED != zbx_soap_post(__func__, (*iter)->easyhandle, property_collection_query, xdoc, &(*iter)->token,
+	if (SUCCEED != zbx_soap_post(fn_parent, (*iter)->easyhandle, property_collection_query, xdoc, &(*iter)->token,
 			error))
 	{
 		return FAIL;
@@ -2075,7 +2079,8 @@ static int	zbx_property_collection_init(CURL *easyhandle, const char *property_c
 	return SUCCEED;
 }
 
-static int	zbx_property_collection_next(zbx_property_collection_iter *iter, xmlDoc **xdoc, char **error)
+static int	zbx_property_collection_next(const char *fn_parent, zbx_property_collection_iter *iter, xmlDoc **xdoc,
+		char **error)
 {
 #	define ZBX_POST_CONTINUE_RETRIEVE_PROPERTIES								\
 		ZBX_POST_VSPHERE_HEADER										\
@@ -2099,7 +2104,7 @@ static int	zbx_property_collection_next(zbx_property_collection_iter *iter, xmlD
 	zbx_snprintf(post, sizeof(post), ZBX_POST_CONTINUE_RETRIEVE_PROPERTIES, iter->property_collector, token_esc);
 	zbx_free(token_esc);
 
-	if (SUCCEED != zbx_soap_post(__func__, iter->easyhandle, post, xdoc, NULL, error))
+	if (SUCCEED != zbx_soap_post(fn_parent, iter->easyhandle, post, xdoc, NULL, error))
 		return FAIL;
 
 	zbx_free(iter->token);
@@ -3873,7 +3878,7 @@ static int	vmware_hv_ds_access_update(zbx_vmware_service_t *service, CURL *easyh
 			hvid_esc, hvid_esc, hvid_esc, hvid_esc);
 	zbx_free(hvid_esc);
 
-	if (SUCCEED != zbx_property_collection_init(easyhandle, tmp, "propertyCollector", &iter, &doc, error))
+	if (SUCCEED != zbx_property_collection_init(easyhandle, tmp, "propertyCollector", __func__, &iter, &doc, error))
 		goto out;
 
 	updated += vmware_hv_ds_access_parse(doc, hv_dss, hv_uuid, hv_id, dss);
@@ -3883,7 +3888,7 @@ static int	vmware_hv_ds_access_update(zbx_vmware_service_t *service, CURL *easyh
 		zbx_xml_free_doc(doc);
 		doc = NULL;
 
-		if (SUCCEED != zbx_property_collection_next(iter, &doc, error))
+		if (SUCCEED != zbx_property_collection_next(__func__, iter, &doc, error))
 			goto out;
 
 		updated += vmware_hv_ds_access_parse(doc, hv_dss, hv_uuid, hv_id, dss);
@@ -4308,17 +4313,17 @@ static int	vmware_service_get_hv_ds_dc_list(const zbx_vmware_service_t *service,
 			vmware_service_objects[service->type].property_collector,
 			vmware_service_objects[service->type].root_folder);
 
-	if (SUCCEED != zbx_property_collection_init(easyhandle, tmp, "propertyCollector", &iter, &doc, error))
+	if (SUCCEED != zbx_property_collection_init(easyhandle, tmp, "propertyCollector", __func__, &iter, &doc, error))
 	{
 		goto out;
 	}
 
 	if (ZBX_VMWARE_TYPE_VCENTER == service->type)
-		zbx_xml_read_values(doc, "//*[@type='HostSystem']", hvs);
+		zbx_xml_read_values(doc, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_HV) , hvs);
 	else
 		zbx_vector_str_append(hvs, zbx_strdup(NULL, "ha-host"));
 
-	zbx_xml_read_values(doc, "//*[@type='Datastore']", dss);
+	zbx_xml_read_values(doc, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_DS), dss);
 	vmware_service_get_datacenters_list(doc, datacenters);
 
 	while (NULL != iter->token)
@@ -4326,13 +4331,13 @@ static int	vmware_service_get_hv_ds_dc_list(const zbx_vmware_service_t *service,
 		zbx_xml_free_doc(doc);
 		doc = NULL;
 
-		if (SUCCEED != zbx_property_collection_next(iter, &doc, error))
+		if (SUCCEED != zbx_property_collection_next(__func__, iter, &doc, error))
 			goto out;
 
 		if (ZBX_VMWARE_TYPE_VCENTER == service->type)
-			zbx_xml_read_values(doc, "//*[@type='HostSystem']", hvs);
+			zbx_xml_read_values(doc, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_HV), hvs);
 
-		zbx_xml_read_values(doc, "//*[@type='Datastore']", dss);
+		zbx_xml_read_values(doc, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_DS), dss);
 		vmware_service_get_datacenters_list(doc, datacenters);
 	}
 
@@ -5298,15 +5303,15 @@ static int	vmware_service_get_cluster_list(CURL *easyhandle, zbx_vector_ptr_t *c
 	if (SUCCEED != vmware_service_get_clusters(easyhandle, &cluster_data, error))
 		goto out;
 
-	zbx_xml_read_values(cluster_data, "//*[@type='ClusterComputeResource']", &ids);
+	zbx_xml_read_values(cluster_data, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_CLUSTER), &ids);
 	zbx_vector_ptr_reserve(clusters, ids.values_num + clusters->values_alloc);
 
 	for (i = 0; i < ids.values_num; i++)
 	{
 		char	*status;
 
-		zbx_snprintf(xpath, sizeof(xpath), "//*[@type='ClusterComputeResource'][.='%s']"
-				"/.." ZBX_XPATH_LN2("propSet", "val"), ids.values[i]);
+		zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_PROP_OBJECTS_ID(ZBX_VMWARE_SOAP_CLUSTER, "[text()='%s']")
+						"/" ZBX_XPATH_PROP_NAME_NODE("name"), ids.values[i]);
 
 		if (NULL == (name = zbx_xml_doc_read_value(cluster_data, xpath)))
 			continue;

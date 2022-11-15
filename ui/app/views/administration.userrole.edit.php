@@ -85,26 +85,24 @@ $form_grid->addItem(
 foreach ($data['labels']['sections'] as $section_key => $section_label) {
 	$ui = [];
 	foreach ($data['labels']['rules'][$section_key] as $rule_key => $rule_label) {
-		$ui[] = new CDiv(
-			(new CCheckBox(str_replace('.', '_', $rule_key), 1))
-				->setId($rule_key)
-				->setChecked(
-					array_key_exists($rule_key, $data['rules']['ui'])
-					&& $data['rules']['ui'][$rule_key]
-				)
-				->setReadonly($data['readonly'])
-				->setLabel($rule_label)
-				->setUncheckedValue(0)
-		);
+		$ui[] = [
+			'id' => $rule_key,
+			'name' => str_replace('.', '_', $rule_key),
+			'label' => $rule_label,
+			'value' => 1,
+			'checked' => array_key_exists($rule_key, $data['rules']['ui']) && $data['rules']['ui'][$rule_key],
+			'unchecked_value' => 0
+		];
 	}
 	$form_grid->addItem([
 		new CLabel($section_label, $section_key),
 		new CFormField(
-			(new CDiv(
-				(new CDiv($ui))
-					->addClass(ZBX_STYLE_COLUMNS)
-					->addClass(ZBX_STYLE_COLUMNS_3)
-			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CCheckBoxList())
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setOptions($ui)
+				->setVertical(true)
+				->setColumns(3)
+				->setEnabled(!$data['readonly'])
 		)
 	]);
 }

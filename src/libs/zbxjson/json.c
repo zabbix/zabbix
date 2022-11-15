@@ -19,7 +19,6 @@
 
 #include "json.h"
 
-#include "zbxjson.h"
 #include "json_parser.h"
 #include "jsonpath.h"
 
@@ -841,7 +840,7 @@ static unsigned int	zbx_json_decode_character(const char **p, unsigned char *byt
  *               string copying failed.                                       *
  *                                                                            *
  ******************************************************************************/
-static const char	*zbx_json_copy_string(const char *p, char *out, size_t size)
+const char	*json_copy_string(const char *p, char *out, size_t size)
 {
 	char	*start = out;
 
@@ -920,7 +919,7 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_j
 			/* only primitive values are decoded */
 			return NULL;
 		default:
-			if (0 == (len = json_parse_value(p, NULL)))
+			if (0 == (len = json_parse_value(p, NULL, NULL)))
 				return NULL;
 	}
 
@@ -930,7 +929,7 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_j
 	switch (type_local)
 	{
 		case ZBX_JSON_TYPE_STRING:
-			return zbx_json_copy_string(p, string, size);
+			return json_copy_string(p, string, size);
 		case ZBX_JSON_TYPE_NULL:
 			if (0 == size)
 				return NULL;
@@ -954,7 +953,7 @@ const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *strin
 			/* only primitive values are decoded */
 			return NULL;
 		default:
-			if (0 == (len = json_parse_value(p, NULL)))
+			if (0 == (len = json_parse_value(p, NULL, NULL)))
 				return NULL;
 	}
 
@@ -970,7 +969,7 @@ const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *strin
 	switch (type_local)
 	{
 		case ZBX_JSON_TYPE_STRING:
-			return zbx_json_copy_string(p, *string, *string_alloc);
+			return json_copy_string(p, *string, *string_alloc);
 		case ZBX_JSON_TYPE_NULL:
 			**string = '\0';
 			return p + len;
@@ -987,7 +986,7 @@ const char	*zbx_json_pair_next(const struct zbx_json_parse *jp, const char *p, c
 	if (ZBX_JSON_TYPE_STRING != __zbx_json_type(p))
 		return NULL;
 
-	if (NULL == (p = zbx_json_copy_string(p, name, len)))
+	if (NULL == (p = json_copy_string(p, name, len)))
 		return NULL;
 
 	SKIP_WHITESPACE(p);
@@ -1161,27 +1160,23 @@ int	zbx_json_count(const struct zbx_json_parse *jp)
  *           is supported.                                                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out)
+int	json_open_path(const struct zbx_json_parse *jp, const zbx_jsonpath_t *jsonpath, struct zbx_json_parse *out)
 {
 	int			i, ret = FAIL;
 	struct zbx_json_parse	object;
-	zbx_jsonpath_t		jsonpath;
 
 	object = *jp;
 
-	if (FAIL == zbx_jsonpath_compile(path, &jsonpath))
-		return FAIL;
-
-	if (0 == jsonpath.definite)
+	if (0 == jsonpath->definite)
 	{
 		zbx_set_json_strerror("cannot use indefinite path when opening sub element");
 		goto out;
 	}
 
-	for (i = 0; i < jsonpath.segments_num; i++)
+	for (i = 0; i < jsonpath->segments_num; i++)
 	{
 		const char		*p;
-		zbx_jsonpath_segment_t	*segment = &jsonpath.segments[i];
+		zbx_jsonpath_segment_t	*segment = &jsonpath->segments[i];
 
 		if (ZBX_JSONPATH_SEGMENT_MATCH_LIST != segment->type)
 		{
@@ -1219,13 +1214,40 @@ int	zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct
 		object.start = p;
 
 		if (NULL == (object.end = __zbx_json_rbracket(p)))
-			object.end = p + json_parse_value(p, NULL) - 1;
+			object.end = p + json_parse_value(p, NULL, NULL) - 1;
 	}
 
 	*out = object;
 	ret = SUCCEED;
 out:
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_json_open_path                                               *
+ *                                                                            *
+ * Purpose: opens an object by definite json path                             *
+ *                                                                            *
+ * Return value: SUCCESS - processed successfully                             *
+ *               FAIL - an error occurred                                     *
+ *                                                                            *
+ * Comments: Only direct path to single object in dot or bracket notation     *
+ *           is supported.                                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct zbx_json_parse *out)
+{
+	zbx_jsonpath_t		jsonpath;
+	int			ret;
+
+	if (FAIL == zbx_jsonpath_compile(path, &jsonpath))
+		return FAIL;
+
+	ret = json_open_path(jp, &jsonpath, out);
+
 	zbx_jsonpath_clear(&jsonpath);
+
 	return ret;
 }
 

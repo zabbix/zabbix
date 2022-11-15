@@ -19,6 +19,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
@@ -155,9 +156,9 @@ class testDashboardItemValueWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$form = $dashboard->edit()->addWidget()->waitUntilReady()->asForm();
-		$form->fill(['Type' => 'Item value']);
-		$form->waitUntilReloaded();
-		$form->invalidate();
+		if ($form->getField('Type') !== 'Item value') {
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
+		}
 
 		// Check default values with default Advanced configuration (false).
 		$default_values = [
@@ -182,9 +183,8 @@ class testDashboardItemValueWidget extends CWebTest {
 			'id:desc_h_pos',
 			'id:desc_v_pos',
 			'id:desc_size',
-			'id:desc_bold'
-			// TODO: uncomment after DEV-2154 is ready.
-//			'id:desc_color'
+			'id:desc_bold',
+			'xpath://input[@id="desc_color"]/..'
 		];
 
 		$values = [
@@ -193,43 +193,34 @@ class testDashboardItemValueWidget extends CWebTest {
 			'id:value_h_pos',
 			'id:value_size',
 			'id:value_v_pos',
-			'id:value_bold'
-			// TODO: uncomment after DEV-2154 is ready.
-//			'id:value_color'
+			'id:value_bold',
+			'xpath://input[@id="value_color"]/..'
 		];
 
 		$units = [
 			'id:units',
 			'id:units_pos',
 			'id:units_size',
-			'id:units_bold'
-			// TODO: uncomment after DEV-2154 is ready.
-//			'id:units_color'
+			'id:units_bold',
+			'xpath://input[@id="units_color"]/..'
 		];
 
 		$time = [
 			'id:time_h_pos',
 			'id:time_v_pos',
 			'id:time_size',
-			'id:time_bold'
-			// TODO: uncomment after DEV-2154 is ready.
-//			'id:time_color'
+			'id:time_bold',
+			'xpath://input[@id="time_color"]/..'
 		];
 
 		$indicator_colors = [
-			// TODO: uncomment after DEV-2154 is ready.
-//			'id:up_color',
-//			'id:down_color',
-//			'id:updown_color',
-		];
-
-		$background_color = [
-			// TODO: uncomment after DEV-2154 is ready.
-//			'lbl_bg_color'
+			'xpath://input[@id="up_color"]/..',
+			'xpath://input[@id="down_color"]/..',
+			'xpath://input[@id="updown_color"]/..'
 		];
 
 		// Merge all Advanced fields into one array.
-		$fields = array_merge($description, $values, $units, $time, $indicator_colors, $background_color);
+		$fields = array_merge($description, $values, $units, $time, $indicator_colors, ['Background color']);
 
 		foreach ([false, true] as $advanced_config) {
 			$form->fill(['Advanced configuration' => $advanced_config]);
@@ -661,18 +652,15 @@ class testDashboardItemValueWidget extends CWebTest {
 						'id:units_pos' => 'Below value',
 						// Value units size in % relative to the size of the widget.
 						'id:units_size' => '99',
-						'id:units_bold' => true
-					],
-					'colors' => [
-						'id:lbl_desc_color' => 'AABBCC',
-						'id:lbl_value_color' => 'CC11CC',
-						'id:lbl_units_color' => 'BBCC55',
-						'id:lbl_time_color' => '11AA00',
-						'id:lbl_up_color' => '00FF00',
-						'id:lbl_down_color' => 'FF0000',
-						'id:lbl_updown_color' => '0000FF',
-						// Background color.
-						'id:lbl_bg_color' => 'FFAAAA'
+						'id:units_bold' => true,
+						'Background color' => 'FFAAAA',
+						'xpath://button[@id="lbl_desc_color"]/..' => 'AABBCC',
+						'xpath://button[@id="lbl_value_color"]/..' => 'CC11CC',
+						'xpath://button[@id="lbl_units_color"]/..' => 'BBCC55',
+						'xpath://button[@id="lbl_time_color"]/..' => '11AA00',
+						'xpath://button[@id="lbl_up_color"]/..' => '00FF00',
+						'xpath://button[@id="lbl_down_color"]/..' => 'FF0000',
+						'xpath://button[@id="lbl_updown_color"]/..' => '0000FF'
 					]
 				]
 			]
@@ -715,15 +703,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			$form->fill(['Name' => '']);
 		}
 
-		if (array_key_exists('colors', $data)) {
-			foreach ($data['colors'] as $fieldid => $color) {
-				$form->query($fieldid)->one()->click()->waitUntilReady();
-				$this->query('xpath://div[@class="overlay-dialogue color-picker-dialogue"]')->asColorPicker()->one()->fill($color);
-			}
-		}
-
 		$values = $form->getFields()->asValues();
-
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -770,7 +750,7 @@ class testDashboardItemValueWidget extends CWebTest {
 
 			// Check that original widget was not left in DB.
 			if ($update) {
-				$this->assertEquals(0, CDBHelper::getCount('SELECT null from widget WHERE name = '.zbx_dbstr(self::$old_name)));
+				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM widget WHERE name='.zbx_dbstr(self::$old_name)));
 			}
 
 			// Close widget popup and check update interval.
