@@ -214,254 +214,6 @@ void	DCconfig_clean_history_sync_items(zbx_history_sync_item_t *items, int *errc
 	}
 }
 
-static void	DCget_history_data_host(DC_HISTORY_DATA_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned int mode)
-{
-	const ZBX_DC_IPMIHOST	*ipmihost;
-
-	dst_host->hostid = src_host->hostid;
-	dst_host->proxy_hostid = src_host->proxy_hostid;
-	dst_host->status = src_host->status;
-
-	if (ZBX_ITEM_GET_HOST & mode)
-		zbx_strscpy(dst_host->host, src_host->host);
-
-	if (ZBX_ITEM_GET_HOSTNAME & mode)
-		zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
-
-	if (ZBX_ITEM_GET_MAINTENANCE & mode)
-	{
-		dst_host->maintenance_status = src_host->maintenance_status;
-		dst_host->maintenance_type = src_host->maintenance_type;
-		dst_host->maintenance_from = src_host->maintenance_from;
-	}
-
-	if (ZBX_ITEM_GET_HOSTINFO & mode)
-	{
-		dst_host->tls_accept = src_host->tls_accept;
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_strscpy(dst_host->tls_issuer, src_host->tls_issuer);
-		zbx_strscpy(dst_host->tls_subject, src_host->tls_subject);
-
-		if (NULL == src_host->tls_dc_psk)
-		{
-			*dst_host->tls_psk_identity = '\0';
-			*dst_host->tls_psk = '\0';
-		}
-		else
-		{
-			zbx_strscpy(dst_host->tls_psk_identity, src_host->tls_dc_psk->tls_psk_identity);
-			zbx_strscpy(dst_host->tls_psk, src_host->tls_dc_psk->tls_psk);
-		}
-#endif
-	}
-}
-
-static void	DCget_history_data_item(DC_HISTORY_DATA_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned int mode)
-{
-	const ZBX_DC_LOGITEM	*logitem;
-	const ZBX_DC_TRAPITEM	*trapitem;
-	const ZBX_DC_HTTPITEM	*httpitem;
-
-	dst_item->type = src_item->type;
-	dst_item->value_type = src_item->value_type;
-	dst_item->state = ITEM_STATE_NORMAL;
-	dst_item->status = src_item->status;
-
-	zbx_strscpy(dst_item->key_orig, src_item->key);
-
-	dst_item->itemid = src_item->itemid;
-	dst_item->flags = src_item->flags;
-	dst_item->key = NULL;
-
-	switch (src_item->value_type)
-	{
-		case ITEM_VALUE_TYPE_LOG:
-			if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems,
-					&src_item->itemid)))
-			{
-				zbx_strscpy(dst_item->logtimefmt, logitem->logtimefmt);
-			}
-			else
-				*dst_item->logtimefmt = '\0';
-			break;
-	}
-
-	if (ZBX_ITEM_GET_INTERFACE & mode)
-	{
-		const ZBX_DC_INTERFACE		*dc_interface;
-
-		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
-
-		DCget_interface(&dst_item->interface, dc_interface);
-	}
-
-	if (0 == (ZBX_ITEM_GET_TRAPPER & mode))
-		return;
-
-	switch (src_item->type)
-	{
-		case ITEM_TYPE_TRAPPER:
-			if (NULL != (trapitem = (ZBX_DC_TRAPITEM *)zbx_hashset_search(&config->trapitems,
-					&src_item->itemid)))
-			{
-				zbx_strscpy(dst_item->trapper_hosts, trapitem->trapper_hosts);
-			}
-			else
-				*dst_item->trapper_hosts = '\0';
-			break;
-		case ITEM_TYPE_HTTPAGENT:
-			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems,
-					&src_item->itemid)))
-			{
-				dst_item->allow_traps = httpitem->allow_traps;
-				zbx_strscpy(dst_item->trapper_hosts, httpitem->trapper_hosts);
-			}
-			else
-			{
-				dst_item->allow_traps = 0;
-				*dst_item->trapper_hosts = '\0';
-			}
-			break;
-		default:
-			/* nothing to do */;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve item maintenances information from configuration cache   *
- *                                                                            *
- * Parameters: items    - [OUT] pointer to array of DC_ITEM structures        *
- *             errcodes - [IN] SUCCEED if record located and FAIL otherwise   *
- *             num      - [IN] number of elements in items, keys, errcodes    *
- *                                                                            *
- * NOTE: Maintenances can be dynamically updated by timer processes that      *
- *       currently only lock configuration cache.                             *
- *                                                                            *
- ******************************************************************************/
-static	void	get_items_maintenances(DC_HISTORY_DATA_ITEM *items, const int *errcodes, int num)
-{
-	int			i;
-	const ZBX_DC_HOST	*dc_host = NULL;
-
-	RDLOCK_CACHE;
-
-	for (i = 0; i < num; i++)
-	{
-		if (FAIL == errcodes[i])
-			continue;
-
-		if (NULL == dc_host || dc_host->hostid != items[i].host.hostid)
-		{
-			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts,
-					&items[i].host.hostid)))
-			{
-				continue;
-			}
-		}
-
-		DCget_history_data_host(&items[i].host, dc_host, ZBX_ITEM_GET_MAINTENANCE);
-	}
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: locate item in configuration cache by host and key                *
- *                                                                            *
- * Parameters: items    - [OUT] pointer to array of DC_ITEM structures        *
- *             keys     - [IN] list of item keys with host names              *
- *             errcodes - [OUT] SUCCEED if record located and FAIL otherwise  *
- *             num      - [IN] number of elements in items, keys, errcodes    *
- *                                                                            *
- * NOTE: Item and host is retrieved using history read lock that must be      *
- *       write locked only when configuration sync occurs to avoid processes  *
- *       blocking each other.                                                 *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_history_data_get_items_by_keys(DC_HISTORY_DATA_ITEM *items, zbx_host_key_t *keys, int *errcodes,
-		size_t num)
-{
-	size_t			i;
-	const ZBX_DC_ITEM	*dc_item;
-	const ZBX_DC_HOST	*dc_host;
-
-	memset(errcodes, 0, sizeof(int) * num);
-
-	RDLOCK_CACHE_CONFIG_HISTORY;
-
-	for (i = 0; i < num; i++)
-	{
-		if (NULL == (dc_host = DCfind_host(keys[i].host)) ||
-				NULL == (dc_item = DCfind_item(dc_host->hostid, keys[i].key)))
-		{
-			errcodes[i] = FAIL;
-			continue;
-		}
-
-		DCget_history_data_host(&items[i].host, dc_host, ZBX_ITEM_GET_DEFAULT & (~ZBX_ITEM_GET_MAINTENANCE));
-		DCget_history_data_item(&items[i], dc_item, ZBX_ITEM_GET_DEFAULT);
-	}
-
-	UNLOCK_CACHE_CONFIG_HISTORY;
-
-	get_items_maintenances(items, errcodes, num);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Get item with specified ID                                        *
- *                                                                            *
- * Parameters: items    - [OUT] pointer to DC_ITEM structures                 *
- *             itemids  - [IN] array of item IDs                              *
- *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
- *             num      - [IN] number of elements                             *
- *                                                                            *
- * NOTE: Item and host is retrieved using history read lock that must be      *
- *       write locked only when configuration sync occurs to avoid processes  *
- *       blocking each other.                                                 *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_history_data_get_items_by_itemids(DC_HISTORY_DATA_ITEM *items, const zbx_uint64_t *itemids,
-		int *errcodes, int num, unsigned int mode)
-{
-	int			i;
-	const ZBX_DC_ITEM	*dc_item;
-	const ZBX_DC_HOST	*dc_host = NULL;
-
-	memset(errcodes, 0, sizeof(int) * num);
-
-	RDLOCK_CACHE_CONFIG_HISTORY;
-
-	for (i = 0; i < num; i++)
-	{
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])))
-		{
-			errcodes[i] = FAIL;
-			continue;
-		}
-
-		if (NULL == dc_host || dc_host->hostid != dc_item->hostid)
-		{
-			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-			{
-				errcodes[i] = FAIL;
-				continue;
-			}
-		}
-
-		DCget_history_data_host(&items[i].host, dc_host, mode & (~ZBX_ITEM_GET_MAINTENANCE));
-		DCget_history_data_item(&items[i], dc_item, mode);
-	}
-
-	UNLOCK_CACHE_CONFIG_HISTORY;
-
-	get_items_maintenances(items, errcodes, num);
-}
-
-
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Get functions by IDs                                              *
@@ -476,7 +228,7 @@ void	DCconfig_history_data_get_items_by_itemids(DC_HISTORY_DATA_ITEM *items, con
  *       each other.                                                          *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_history_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes,
+void	DCconfig_history_sync_get_functions_by_functionids(DC_FUNCTION *functions, zbx_uint64_t *functionids, int *errcodes,
 		size_t num)
 {
 	size_t			i;
@@ -510,7 +262,7 @@ void	DCconfig_history_get_functions_by_functionids(DC_FUNCTION *functions, zbx_u
  *       other process will update it.                                        *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_history_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
+void	DCconfig_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num)
 {
 	int			i, j, found;
@@ -644,7 +396,7 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
  *           zbx_action_eval_free() function later.                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_config_history_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags)
+void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags)
 {
 	const zbx_dc_action_t		*dc_action;
 	zbx_hashset_iter_t		iter;
@@ -666,6 +418,253 @@ void	zbx_dc_config_history_get_actions_eval(zbx_vector_ptr_t *actions, unsigned 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() actions:%d", __func__, actions->values_num);
 }
 
+static void	DCget_history_recv_host(zbx_history_recv_host_t *dst_host, const ZBX_DC_HOST *src_host, unsigned int mode)
+{
+	const ZBX_DC_IPMIHOST	*ipmihost;
+
+	dst_host->hostid = src_host->hostid;
+	dst_host->proxy_hostid = src_host->proxy_hostid;
+	dst_host->status = src_host->status;
+
+	if (ZBX_ITEM_GET_HOST & mode)
+		zbx_strscpy(dst_host->host, src_host->host);
+
+	if (ZBX_ITEM_GET_HOSTNAME & mode)
+		zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
+
+	if (ZBX_ITEM_GET_MAINTENANCE & mode)
+	{
+		dst_host->maintenance_status = src_host->maintenance_status;
+		dst_host->maintenance_type = src_host->maintenance_type;
+		dst_host->maintenance_from = src_host->maintenance_from;
+	}
+
+	if (ZBX_ITEM_GET_HOSTINFO & mode)
+	{
+		dst_host->tls_accept = src_host->tls_accept;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		zbx_strscpy(dst_host->tls_issuer, src_host->tls_issuer);
+		zbx_strscpy(dst_host->tls_subject, src_host->tls_subject);
+
+		if (NULL == src_host->tls_dc_psk)
+		{
+			*dst_host->tls_psk_identity = '\0';
+			*dst_host->tls_psk = '\0';
+		}
+		else
+		{
+			zbx_strscpy(dst_host->tls_psk_identity, src_host->tls_dc_psk->tls_psk_identity);
+			zbx_strscpy(dst_host->tls_psk, src_host->tls_dc_psk->tls_psk);
+		}
+#endif
+	}
+}
+
+static void	DCget_history_recv_item(zbx_history_recv_item_t *dst_item, const ZBX_DC_ITEM *src_item,
+		unsigned int mode)
+{
+	const ZBX_DC_LOGITEM	*logitem;
+	const ZBX_DC_TRAPITEM	*trapitem;
+	const ZBX_DC_HTTPITEM	*httpitem;
+
+	dst_item->type = src_item->type;
+	dst_item->value_type = src_item->value_type;
+	dst_item->state = ITEM_STATE_NORMAL;
+	dst_item->status = src_item->status;
+
+	zbx_strscpy(dst_item->key_orig, src_item->key);
+
+	dst_item->itemid = src_item->itemid;
+	dst_item->flags = src_item->flags;
+	dst_item->key = NULL;
+
+	switch (src_item->value_type)
+	{
+		case ITEM_VALUE_TYPE_LOG:
+			if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems,
+					&src_item->itemid)))
+			{
+				zbx_strscpy(dst_item->logtimefmt, logitem->logtimefmt);
+			}
+			else
+				*dst_item->logtimefmt = '\0';
+			break;
+	}
+
+	if (ZBX_ITEM_GET_INTERFACE & mode)
+	{
+		const ZBX_DC_INTERFACE		*dc_interface;
+
+		dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
+
+		DCget_interface(&dst_item->interface, dc_interface);
+	}
+
+	if (0 == (ZBX_ITEM_GET_TRAPPER & mode))
+		return;
+
+	switch (src_item->type)
+	{
+		case ITEM_TYPE_TRAPPER:
+			if (NULL != (trapitem = (ZBX_DC_TRAPITEM *)zbx_hashset_search(&config->trapitems,
+					&src_item->itemid)))
+			{
+				zbx_strscpy(dst_item->trapper_hosts, trapitem->trapper_hosts);
+			}
+			else
+				*dst_item->trapper_hosts = '\0';
+			break;
+		case ITEM_TYPE_HTTPAGENT:
+			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems,
+					&src_item->itemid)))
+			{
+				dst_item->allow_traps = httpitem->allow_traps;
+				zbx_strscpy(dst_item->trapper_hosts, httpitem->trapper_hosts);
+			}
+			else
+			{
+				dst_item->allow_traps = 0;
+				*dst_item->trapper_hosts = '\0';
+			}
+			break;
+		default:
+			/* nothing to do */;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve item maintenances information from configuration cache   *
+ *                                                                            *
+ * Parameters: items    - [OUT] pointer to array of DC_ITEM structures        *
+ *             errcodes - [IN] SUCCEED if record located and FAIL otherwise   *
+ *             num      - [IN] number of elements in items, keys, errcodes    *
+ *                                                                            *
+ * NOTE: Maintenances can be dynamically updated by timer processes that      *
+ *       currently only lock configuration cache.                             *
+ *                                                                            *
+ ******************************************************************************/
+static	void	get_history_recv_item_maintenances(zbx_history_recv_item_t *items, const int *errcodes, int num)
+{
+	int			i;
+	const ZBX_DC_HOST	*dc_host = NULL;
+
+	RDLOCK_CACHE;
+
+	for (i = 0; i < num; i++)
+	{
+		if (FAIL == errcodes[i])
+			continue;
+
+		if (NULL == dc_host || dc_host->hostid != items[i].host.hostid)
+		{
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts,
+					&items[i].host.hostid)))
+			{
+				continue;
+			}
+		}
+
+		DCget_history_recv_host(&items[i].host, dc_host, ZBX_ITEM_GET_MAINTENANCE);
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: locate item in configuration cache by host and key                *
+ *                                                                            *
+ * Parameters: items    - [OUT] pointer to array of DC_ITEM structures        *
+ *             keys     - [IN] list of item keys with host names              *
+ *             errcodes - [OUT] SUCCEED if record located and FAIL otherwise  *
+ *             num      - [IN] number of elements in items, keys, errcodes    *
+ *                                                                            *
+ * NOTE: Item and host is retrieved using history read lock that must be      *
+ *       write locked only when configuration sync occurs to avoid processes  *
+ *       blocking each other.                                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_history_recv_get_items_by_keys(zbx_history_recv_item_t *items, zbx_host_key_t *keys, int *errcodes,
+		size_t num)
+{
+	size_t			i;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_HOST	*dc_host;
+
+	memset(errcodes, 0, sizeof(int) * num);
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	for (i = 0; i < num; i++)
+	{
+		if (NULL == (dc_host = DCfind_host(keys[i].host)) ||
+				NULL == (dc_item = DCfind_item(dc_host->hostid, keys[i].key)))
+		{
+			errcodes[i] = FAIL;
+			continue;
+		}
+
+		DCget_history_recv_host(&items[i].host, dc_host, ZBX_ITEM_GET_DEFAULT & (~ZBX_ITEM_GET_MAINTENANCE));
+		DCget_history_recv_item(&items[i], dc_item, ZBX_ITEM_GET_DEFAULT);
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+
+	get_history_recv_item_maintenances(items, errcodes, num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Get item with specified ID                                        *
+ *                                                                            *
+ * Parameters: items    - [OUT] pointer to DC_ITEM structures                 *
+ *             itemids  - [IN] array of item IDs                              *
+ *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
+ *             num      - [IN] number of elements                             *
+ *                                                                            *
+ * NOTE: Item and host is retrieved using history read lock that must be      *
+ *       write locked only when configuration sync occurs to avoid processes  *
+ *       blocking each other.                                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_history_recv_get_items_by_itemids(zbx_history_recv_item_t *items, const zbx_uint64_t *itemids,
+		int *errcodes, int num, unsigned int mode)
+{
+	int			i;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_HOST	*dc_host = NULL;
+
+	memset(errcodes, 0, sizeof(int) * num);
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	for (i = 0; i < num; i++)
+	{
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])))
+		{
+			errcodes[i] = FAIL;
+			continue;
+		}
+
+		if (NULL == dc_host || dc_host->hostid != dc_item->hostid)
+		{
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			{
+				errcodes[i] = FAIL;
+				continue;
+			}
+		}
+
+		DCget_history_recv_host(&items[i].host, dc_host, mode & (~ZBX_ITEM_GET_MAINTENANCE));
+		DCget_history_recv_item(&items[i], dc_item, mode);
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+
+	get_history_recv_item_maintenances(items, errcodes, num);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: updates item nextcheck values in configuration cache              *
@@ -678,7 +677,8 @@ void	zbx_dc_config_history_get_actions_eval(zbx_vector_ptr_t *actions, unsigned 
  *                               errcodes arrays                              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_items_update_nextcheck(DC_HISTORY_DATA_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num)
+void	zbx_dc_items_update_nextcheck(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
+		size_t values_num)
 {
 	size_t			i;
 	ZBX_DC_ITEM		*dc_item;

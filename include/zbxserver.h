@@ -67,7 +67,7 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const ZB
 		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, const char *tz, char **data,
 		int macro_type, char *error, int maxerrlen);
 
-void	zbx_substitute_simple_macros_allowed_hosts(DC_HISTORY_DATA_ITEM *item, char **allowed_peers);
+void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers);
 
 void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
 		const zbx_history_sync_item_t *history_items, const int *history_errcodes);

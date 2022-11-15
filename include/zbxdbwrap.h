@@ -58,8 +58,8 @@ int	proxy_get_host_active_availability(struct zbx_json *j);
 int	proxy_get_history_count(void);
 int	proxy_get_delay(zbx_uint64_t lastid);
 
-int	process_history_data(DC_HISTORY_DATA_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num,
-		zbx_proxy_suppress_t *nodata_win);
+int	process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
+		size_t values_num, zbx_proxy_suppress_t *nodata_win);
 
 void	zbx_update_proxy_data(DC_PROXY *proxy, char *version_str, int version_int, int lastaccess, int compress,
 		zbx_uint64_t flags_add);

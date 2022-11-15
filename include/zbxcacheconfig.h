@@ -257,11 +257,11 @@ typedef struct
 	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
 #endif
 }
-DC_HISTORY_DATA_HOST;
+zbx_history_recv_host_t;
 
 typedef struct
 {
-	DC_HISTORY_DATA_HOST	host;
+	zbx_history_recv_host_t	host;
 	DC_INTERFACE		interface;
 	zbx_uint64_t		itemid;
 	unsigned char		value_type;
@@ -274,7 +274,7 @@ typedef struct
 	char			trapper_hosts[ZBX_ITEM_TRAPPER_HOSTS_LEN_MAX];
 	char			logtimefmt[ZBX_ITEM_LOGTIMEFMT_LEN_MAX];
 }
-DC_HISTORY_DATA_ITEM;
+zbx_history_recv_item_t;
 
 typedef struct
 {
@@ -676,13 +676,13 @@ void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errco
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_history_sync_get_items_by_itemids(zbx_history_sync_item_t *items, const zbx_uint64_t *itemids,
 		int *errcodes, int num, unsigned int mode);
-void	DCconfig_history_get_functions_by_functionids(DC_FUNCTION *functions,
+void	DCconfig_history_sync_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
-void	DCconfig_history_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
+void	DCconfig_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num);
 void	DCconfig_clean_history_sync_items(zbx_history_sync_item_t *items, int *errcodes, size_t num);
-void	DCconfig_history_data_get_items_by_keys(DC_HISTORY_DATA_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
-void	DCconfig_history_data_get_items_by_itemids(DC_HISTORY_DATA_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
+void	DCconfig_history_recv_get_items_by_keys(zbx_history_recv_item_t *items, zbx_host_key_t *keys, int *errcodes, size_t num);
+void	DCconfig_history_recv_get_items_by_itemids(zbx_history_recv_item_t *items, const zbx_uint64_t *itemids, int *errcodes, int num,
 		unsigned int mode);
 int	DCconfig_get_active_items_count_by_hostid(zbx_uint64_t hostid);
 void	DCconfig_get_active_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, int *errcodes, size_t num);
@@ -825,7 +825,7 @@ int	DCset_interfaces_availability(zbx_vector_availability_ptr_t *availabilities)
 
 int	DCreset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces);
 
-void	zbx_dc_config_history_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
+void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
 
 int	DCget_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);
 void	DCtouch_interfaces_availability(const zbx_vector_uint64_t *interfaceids);
@@ -895,7 +895,8 @@ typedef struct
 }
 zbx_agent_value_t;
 
-void	zbx_dc_items_update_nextcheck(DC_HISTORY_DATA_ITEM *items, zbx_agent_value_t *values, int *errcodes, size_t values_num);
+void	zbx_dc_items_update_nextcheck(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
+		size_t values_num);
 int	zbx_dc_get_host_interfaces(zbx_uint64_t hostid, DC_INTERFACE2 **interfaces, int *n);
 
 void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff);

@@ -71,7 +71,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 		const ZBX_DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
 		const DC_HOST *dc_host, const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack,
 		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, const char *tz,
-		DC_HISTORY_DATA_ITEM *history_data_item, char **data, int macro_type, char *error, int maxerrlen);
+		zbx_history_recv_item_t *history_data_item, char **data, int macro_type, char *error, int maxerrlen);
 
 static int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item,
 		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, int macro_type,
@@ -2832,7 +2832,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 		const ZBX_DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
 		const DC_HOST *dc_host, const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack,
 		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service, const char *tz,
-		DC_HISTORY_DATA_ITEM *history_data_item, char **data, int macro_type, char *error, int maxerrlen)
+		zbx_history_recv_item_t *history_data_item, char **data, int macro_type, char *error, int maxerrlen)
 {
 	char				c, *replace_to = NULL, sql[64];
 	const char			*m;
@@ -5121,7 +5121,8 @@ void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const z
 	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids.values_num);
 	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
 
-	DCconfig_history_get_functions_by_functionids(functions, functionids.values, errcodes, functionids.values_num);
+	DCconfig_history_sync_get_functions_by_functionids(functions, functionids.values, errcodes,
+			functionids.values_num);
 
 	for (t = 0; t < triggers_func_pos.values_num; t++)
 	{
@@ -5248,7 +5249,8 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 	functions = (DC_FUNCTION *)zbx_malloc(functions, sizeof(DC_FUNCTION) * functionids->values_num);
 	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids->values_num);
 
-	DCconfig_history_get_functions_by_functionids(functions, functionids->values, errcodes, functionids->values_num);
+	DCconfig_history_sync_get_functions_by_functionids(functions, functionids->values, errcodes,
+			functionids->values_num);
 
 	for (i = 0; i < functionids->values_num; i++)
 	{
@@ -6875,7 +6877,7 @@ int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const ZBX_DB_EVEN
 			service_alarm, service, tz, NULL, data, macro_type, error, maxerrlen);
 }
 
-void	zbx_substitute_simple_macros_allowed_hosts(DC_HISTORY_DATA_ITEM *item, char **allowed_peers)
+void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers)
 {
 	substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			item, allowed_peers, MACRO_TYPE_ALLOWED_HOSTS, NULL, 0);
