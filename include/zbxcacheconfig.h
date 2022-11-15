@@ -779,13 +779,13 @@ void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hos
 
 typedef struct zbx_hc_data
 {
-	history_value_t	value;
-	zbx_uint64_t	lastlogsize;
-	zbx_timespec_t	ts;
-	int		mtime;
-	unsigned char	value_type;
-	unsigned char	flags;
-	unsigned char	state;
+	zbx_history_value_t	value;
+	zbx_uint64_t		lastlogsize;
+	zbx_timespec_t		ts;
+	int			mtime;
+	unsigned char		value_type;
+	unsigned char		flags;
+	unsigned char		state;
 
 	struct zbx_hc_data	*next;
 }

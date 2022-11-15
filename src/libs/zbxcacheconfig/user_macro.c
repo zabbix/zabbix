@@ -18,10 +18,10 @@
 **/
 
 #include "user_macro.h"
-
-#include "zbxshmem.h"
 #include "dbsync.h"
 #include "dbconfig.h"
+
+#include "zbxshmem.h"
 #include "zbxregexp.h"
 #include "zbxnum.h"
 

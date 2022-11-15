@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-10-28 08:40+0000\n"
+"PO-Revision-Date: 2022-11-10 03:50+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -263,7 +263,7 @@ msgstr "%1$s. %2$s: %3$s. %4$s."
 #: include/classes/core/CModuleManager.php:153
 #, c-format
 msgid "%1$s.php class must extend %2$s for module located at %3$s."
-msgstr ""
+msgstr "%1$s.php 类必须为位于 %3$s 的模块扩展 %2$s。"
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
@@ -886,7 +886,7 @@ msgstr "添加子节点元素"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
-msgstr ""
+msgstr "添加子节点"
 
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
@@ -1218,32 +1218,32 @@ msgstr "用于备份客户物理内存页面的主机物理内存量, <url> - VM
 #: include/classes/api/services/CItemGeneral.php:1544
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "主机“%2$s”上已存在具有键“%1$s”的 深层自动发现规则。"
 
 #: include/classes/api/services/CItemGeneral.php:1543
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "模板“%2$s”上已存在键为“%1$s”的 深层自动发现规则。"
 
 #: include/classes/api/services/CItemGeneral.php:1538
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "主机“%2$s”上已存在键为“%1$s”的监控项原型。"
 
 #: include/classes/api/services/CItemGeneral.php:1537
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "模板“%2$s”上已存在键为“%1$s”的监控项原型。"
 
 #: include/classes/api/services/CItemGeneral.php:1532
 #, c-format
 msgid "An item with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "主机“%2$s”上已存在键为“%1$s”的监控项。"
 
 #: include/classes/api/services/CItemGeneral.php:1531
 #, c-format
 msgid "An item with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "模板“%2$s”中已存在键为“%1$s”的监控项。"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
@@ -2162,6 +2162,11 @@ msgstr ""
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\""
 msgstr ""
 
+#: include/classes/api/services/CItem.php:1531
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
+msgstr ""
+
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
@@ -2954,6 +2959,11 @@ msgstr ""
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:704
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:769
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
@@ -2968,6 +2978,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:711
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:705
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:770
@@ -3001,6 +3016,11 @@ msgstr ""
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:725
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:775
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
@@ -3015,6 +3035,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:732
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:726
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:776
@@ -14540,7 +14565,7 @@ msgstr "页面显示周期"
 
 #: include/classes/core/ZBase.php:565
 msgid "Page not found"
-msgstr ""
+msgstr "网页未找到"
 
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:46
 #: include/validate.inc.php:435
@@ -21896,13 +21921,13 @@ msgstr "应为整数"
 #: include/classes/api/services/CItemGeneral.php:1827
 #: include/classes/api/services/CItemGeneral.php:1930
 msgid "an item ID is expected"
-msgstr ""
+msgstr "需要监控项 ID"
 
 #: include/classes/api/services/CItemGeneral.php:1805
 #: include/classes/api/services/CItemGeneral.php:1826
 #: include/classes/api/services/CItemGeneral.php:1929
 msgid "an item/item prototype ID is expected"
-msgstr ""
+msgstr "需要监控项或监控项原型的 ID"
 
 #: include/classes/validators/CApiInputValidator.php:716
 #: include/classes/validators/CApiInputValidator.php:2882
@@ -22202,11 +22227,11 @@ msgstr "无法转换到 JSON，结果值太长"
 
 #: include/classes/api/services/CItem.php:899
 msgid "cannot delete inherited item"
-msgstr ""
+msgstr "无法删除继承的监控项"
 
 #: include/classes/api/services/CItemPrototype.php:810
 msgid "cannot delete inherited item prototype"
-msgstr ""
+msgstr "无法删除继承的监控项原型"
 
 #: include/classes/api/services/CHostPrototype.php:2167
 msgid "cannot delete templated host prototype"
@@ -22637,7 +22662,7 @@ msgstr "事件源"
 
 #: include/classes/validators/CApiInputValidator.php:4155
 msgid "invalid Prometheus label"
-msgstr ""
+msgstr "无效的Prometheus标签"
 
 #: include/classes/api/services/CItemGeneral.php:1535
 #: include/classes/api/services/CItemGeneral.php:1545
@@ -23523,7 +23548,7 @@ msgstr "模板ID\"%1$s\"已传送%2$s次"
 #: include/classes/api/services/CItemGeneral.php:1612
 #: include/classes/api/services/CItemGeneral.php:1652
 msgid "the host interface ID is expected"
-msgstr ""
+msgstr "需要主机接口 ID"
 
 #: include/classes/api/services/CItemGeneral.php:1668
 #, c-format

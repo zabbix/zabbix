@@ -19,10 +19,10 @@
 
 #include "zbxcacheconfig.h"
 #include "dbconfig.h"
+#include "dbsync.h"
 
 #include "log.h"
 #include "zbxalgo.h"
-#include "dbsync.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 
