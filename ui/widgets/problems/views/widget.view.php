@@ -491,56 +491,7 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 		if ($problem['cause_eventid'] == 0 && $problem['symptoms']) {
 			addProblemsToTable($table, $problem['symptoms'], $data, true);
 
-			if ($problem['symptom_count'] > ZBX_PROBLEM_SYMPTOM_LIMIT) {
-				$row = (new CRow())
-					->setAttribute('data-cause-eventid', $problem['eventid'])
-					->addClass('hover-nobg')
-					->addStyle('display: none;');
-
-				$symptom_limit_col = (new CCol(
-					(new CDiv(
-						(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_PROBLEM_SYMPTOM_LIMIT,
-							$problem['symptom_count']
-						)))->addClass(ZBX_STYLE_TABLE_STATS)
-					))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-				))->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL);
-
-				if ($data['show_timeline']) {
-					$colspan = 1;
-					if ($data['show_three_columns']) {
-						$colspan = 3;
-					}
-					elseif ($data['show_two_columns']) {
-						$colspan = 2;
-					}
-
-					$empty_col = (new CCol())->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
-
-					if ($colspan > 1) {
-						$empty_col->setColSpan($colspan);
-					}
-
-					$row->addItem([
-						$empty_col,
-						(new CCol())
-							->addClass(ZBX_STYLE_TIMELINE_AXIS)
-							->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD),
-						(new CCol())
-							->addClass(ZBX_STYLE_TIMELINE_TD)
-							->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD),
-						$symptom_limit_col
-							->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD)
-							->setColSpan($table->getNumCols() - $colspan - 2)
-					]);
-				}
-				else {
-					$row->addItem(
-						$symptom_limit_col->setColSpan($table->getNumCols())
-					);
-				}
-
-				$table->addRow($row);
-			}
+			CScreenProblem::addSymptomLimitToTable($table, $problem, $data, true);
 		}
 	}
 }

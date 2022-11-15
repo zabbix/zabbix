@@ -714,7 +714,8 @@ class CScreenProblem extends CScreenBase {
 	 * @param array  $problem                     Problem data.
 	 * @param int    $problem['clock']            Timestamp of the current record.
 	 * @param int    $problem['symptom_count']    Problem symptom count.
-	 * @param bool   $nested                      True, if this is a nested block.
+	 * @param bool   $nested                      True if this is a nested block.
+	 * @param bool   $widget                      When false add one more column.
 	 */
 	public static function addTimelineBreakpoint(CTableInfo $table, $data, $problem, $nested, $widget = false): void {
 		if ($data['sortorder'] === ZBX_SORT_UP) {
@@ -1647,66 +1648,86 @@ class CScreenProblem extends CScreenBase {
 			if ($problem['cause_eventid'] == 0 && $problem['symptoms']) {
 				self::addProblemsToTable($table, $problem['symptoms'], $data, true);
 
-				if ($problem['symptom_count'] > ZBX_PROBLEM_SYMPTOM_LIMIT) {
-					$row = (new CRow())
-						->setAttribute('data-cause-eventid', $problem['eventid'])
-						->addClass('hover-nobg')
-						->addStyle('display: none;');
-
-					$symptom_limit_col = (new CCol(
-						(new CDiv(
-							(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_PROBLEM_SYMPTOM_LIMIT,
-								$problem['symptom_count']
-							)))->addClass(ZBX_STYLE_TABLE_STATS)
-						))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-					))->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL);
-
-					if ($data['show_timeline']) {
-						$colspan = 1;
-						if ($data['show_three_columns']) {
-							$colspan = 4;
-						}
-						elseif ($data['show_two_columns']) {
-							$colspan = 3;
-						}
-
-						$empty_col = (new CCol())
-							->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD)
-							->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD);
-
-						if ($colspan > 1) {
-							$empty_col->setColSpan($colspan);
-						}
-
-						$row->addItem([
-							$empty_col,
-							(new CCol())
-								->addClass(ZBX_STYLE_TIMELINE_AXIS)
-								->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD),
-							(new CCol())
-								->addClass(ZBX_STYLE_TIMELINE_TD)
-								->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD),
-							$symptom_limit_col
-								->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD)
-								->setColSpan($table->getNumCols() - $colspan - 2)
-						]);
-					}
-					else {
-						$row->addItem(
-							$symptom_limit_col->setColSpan($table->getNumCols())
-						);
-					}
-
-					$table->addRow($row);
-				}
+				self::addSymptomLimitToTable($table, $problem, $data);
 			}
 		}
 	}
 
 	/**
-	 * Get item latest values.
+	 * Add symptom limit row at the end of symptom block.
 	 *
-	 * @static
+	 * @param CTableInfo $table                                 Table object to which problems are added to.
+	 * @param array      $problem                               Problem data.
+	 * @param string     $problem['eventid']                    Problem ID.
+	 * @param int        $problem['symptom_count']              Problem symptom count.
+	 * @param array      $data                                  Additional data.
+	 * @param bool       $data['show_timeline']                 "Show timeline" filter option.
+	 * @param bool       $data['show_three_columns']            True if 3 columns should be displayed.
+	 * @param bool       $data['show_two_columns']              True if 2 columns should be displayed.
+	 * @param bool       $widget                                When false, add one more column.
+	 */
+	public static function addSymptomLimitToTable(CTableInfo $table, array $problem, array $data,
+			$widget = false): void {
+		if ($problem['symptom_count'] > ZBX_PROBLEM_SYMPTOM_LIMIT) {
+			$row = (new CRow())
+				->setAttribute('data-cause-eventid', $problem['eventid'])
+				->addClass('hover-nobg')
+				->addStyle('display: none;');
+
+			$symptom_limit_col = (new CCol(
+				(new CDiv(
+					(new CDiv(
+						_s('Displaying %1$s of %2$s found', ZBX_PROBLEM_SYMPTOM_LIMIT, $problem['symptom_count'])
+					))->addClass(ZBX_STYLE_TABLE_STATS)
+				))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+			))
+				->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL)
+				->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD);
+
+			if ($data['show_timeline']) {
+				$colspan = 1;
+				if ($data['show_three_columns']) {
+					$colspan = 3;
+				}
+				elseif ($data['show_two_columns']) {
+					$colspan = 3;
+				}
+
+				if (!$widget) {
+					$colspan++;
+				}
+
+				$empty_col = (new CCol())
+					->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD)
+					->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD);
+
+				if ($colspan > 1) {
+					$empty_col->setColSpan($colspan);
+				}
+
+				$row->addItem([
+					$empty_col,
+					(new CCol())
+						->addClass(ZBX_STYLE_TIMELINE_AXIS)
+						->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD),
+					(new CCol())
+						->addClass(ZBX_STYLE_TIMELINE_TD)
+						->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD),
+					$symptom_limit_col->setColSpan($table->getNumCols() - $colspan - 2)
+				]);
+			}
+			else {
+				$row->addItem(
+					$symptom_limit_col->setColSpan($table->getNumCols())
+				);
+			}
+
+			$table->addRow($row);
+		}
+	}
+
+	/**
+	 * Get item latest values.
 	 *
 	 * @param array $items    An array of trigger items.
 	 * @param bool  $html
