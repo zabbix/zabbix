@@ -419,6 +419,14 @@ void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_ptr_t *actions, unsi
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() actions:%d", __func__, actions->values_num);
 }
 
+/*
+ *
+ * The following functions are used to get data from configuration cache
+ * using CONFIG_HISTORY lock when handling incoming data from active agent,
+ * sender or proxy.
+ *
+ */
+
 static void	dc_get_history_recv_host(zbx_history_recv_host_t *dst_host, const ZBX_DC_HOST *src_host,
 		unsigned int mode)
 {
@@ -582,7 +590,6 @@ static void	dc_get_history_recv_item_maintenances(zbx_history_recv_item_t *items
 	}
 
 	UNLOCK_CACHE;
-
 }
 
 /******************************************************************************
@@ -676,7 +683,6 @@ void	zbx_dc_config_history_recv_get_items_by_itemids(zbx_history_recv_item_t *it
 	}
 
 	maintenances_num = config->maintenances.num_data;
-
 	UNLOCK_CACHE_CONFIG_HISTORY;
 
 	dc_get_history_recv_item_maintenances(items, errcodes, num, maintenances_num);
