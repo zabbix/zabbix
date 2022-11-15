@@ -43,12 +43,6 @@ window.operation_popup = new class {
 				this._createOperationConditionsRow(row, index);
 			})
 		}
-		if (data?.opmessage_grp) {
-			this._addUserGroup(data.opmessage_grp, data.opmessage_grp.length);
-		}
-		if (data?.opmessage_usr) {
-			this._addUser(data.opmessage_usr, data.opmessage_usr.length);
-		}
 	}
 
 	_loadViews() {
@@ -66,13 +60,7 @@ window.operation_popup = new class {
 		}
 
 		this.dialogue.addEventListener('click', (e) => {
-			if (e.target.classList.contains('operation-message-user-groups-footer')) {
-				this._openUserGroupPopup(e.target);
-			}
-			else if (e.target.classList.contains('operation-message-users-footer')) {
-				this._openUserPopup(e.target);
-			}
-			else if (e.target.classList.contains('operation-condition-list-footer')) {
+			if (e.target.classList.contains('operation-condition-list-footer')) {
 				this._openConditionsPopup(e.target);
 			}
 			else if (e.target.classList.contains('element-table-remove')) {
@@ -221,13 +209,13 @@ window.operation_popup = new class {
 		switch (this.eventsource) {
 			case <?= EVENT_SOURCE_TRIGGERS ?>:
 				this.fields = [
-					'operation-condition-table', 'operation-condition-list-label', 'operation-condition-list',
-					'step-from', 'operation-step-range', 'operation-step-duration', 'operation-message-notice',
-					'operation-message-user-groups', 'operation-message-notice', 'operation-message-users',
-					'operation-message-mediatype-only', 'operation-message-custom', 'operation_esc_period',
-					'operation-message-custom-label', 'operation_opmessage_default_msg', 'operation-type',
-					'operation-condition-row', 'operation-condition-evaltype-formula', 'operation-evaltype-label',
-					'operation-evaltype'
+					'operation-message-user-groups', 'operation-condition-table',
+					'operation-condition-list-label', 'operation-condition-list', 'step-from', 'operation-step-range',
+					'operation-step-duration', 'operation-message-notice', 'operation-message-notice',
+					'operation-message-users', 'operation-evaltype', 'operation-message-mediatype-only',
+					'operation-message-custom', 'operation_esc_period', 'operation-message-custom-label',
+					'operation_opmessage_default_msg', 'operation-type', 'operation-condition-row',
+					'operation-condition-evaltype-formula', 'operation-evaltype-label'
 				]
 
 				this._customMessageFields();
@@ -260,6 +248,21 @@ window.operation_popup = new class {
 		}
 
 		this._enableFormFields(this.fields);
+
+		const $usergroup_ms = $('#operation_opmessage_grp__usrgrpid');
+		const $user_ms = $('#operation_opmessage_usr__userid');
+
+		$usergroup_ms.on('change', () => {
+			$usergroup_ms.multiSelect('setDisabledEntries',
+				[... this.form.querySelectorAll('[name^="operation[opmessage_grp]["]')].map((input) => input.value)
+			);
+		});
+
+		$user_ms.on('change', () => {
+			$user_ms.multiSelect('setDisabledEntries',
+				[... this.form.querySelectorAll('[name^="operation[opmessage_usr]["]')].map((input) => input.value)
+			);
+		});
 	}
 
 	_enableFormFields(fields = []) {
@@ -342,84 +345,6 @@ window.operation_popup = new class {
 		});
 	}
 
-	_openUserGroupPopup(target) {
-		let usrgrp_table = document
-			.querySelector('#operation-message-user-groups-table tbody')
-			.getElementsByTagName('input');
-
-		let disabled_values = [];
-		for (let element of usrgrp_table) {
-			disabled_values.push(element.value)
-		}
-
-		const parameters = {
-			'srctbl': 'usrgrp',
-			'srcfld1': 'usrgrpid',
-			'srcfld2': 'name',
-			'dstfrm': 'popup.operation',
-			'dstfld1': 'operation-message-user-groups-footer',
-			'multiselect': '1',
-			'editable': 1,
-			'disableids': disabled_values
-		}
-
-		const overlay = PopUp('popup.generic', parameters, {
-			dialogue_class: 'modal-popup-generic', target, dialogueid: 'usergroup-popup'
-		});
-
-		window.addPopupValues = ({object: objectid, parentId: sourceid, values}) => {
-			if (sourceid === 'operation-message-user-groups-footer') {
-				overlay.$dialogue[0].dispatchEvent(new CustomEvent('submit-usergroups-popup', {detail:values}));
-			}
-		};
-
-		overlay.$dialogue[0].addEventListener('submit-usergroups-popup', (e) => {
-			this._addUserGroup(e.detail);
-		})
-	}
-
-	_addUserGroup(values) {
-		let usrgrp_table = document
-			.querySelector('#operation-message-user-groups-table tbody')
-			.getElementsByTagName('input');
-
-		let added_values = [];
-		for (let element of usrgrp_table) {
-			added_values.push(element.value);
-		}
-
-		let template = new Template(document.getElementById('operation-usergroup-row-tmpl').innerHTML);
-
-		values.forEach((value) => {
-			if (!added_values.includes(value.usrgrpid)) {
-				document
-					.querySelector('#operation-message-user-groups-table tbody')
-					.insertAdjacentHTML('beforeend', template.evaluate(value))
-			}
-		})
-	}
-
-	_addUser(values) {
-		let user_table = document.querySelector('#operation-message-user-table tbody').getElementsByTagName('input');
-		let added_values = [];
-		for (let element of user_table) {
-			added_values.push(element.value)
-		}
-
-		let template = new Template(document.getElementById('operation-user-row-tmpl').innerHTML);
-
-		values.forEach((value) => {
-			if (value.userid) {
-				value.id = value.userid;
-			}
-			if (!added_values.includes(value.id)) {
-				document
-					.querySelector('#operation-message-user-table tbody')
-					.insertAdjacentHTML('beforeend', template.evaluate(value))
-			}
-		});
-	}
-
 	_createHiddenInput(name, value) {
 		const input = document.createElement('input');
 		input.type = 'hidden';
@@ -427,37 +352,6 @@ window.operation_popup = new class {
 		input.value = value;
 
 		return input;
-	}
-
-	_openUserPopup(trigger_element) {
-		let user_table = document.querySelector('#operation-message-user-table tbody').getElementsByTagName('input');
-		let disabled_values = [];
-		for (let element of user_table) {
-			disabled_values.push(element.value)
-		}
-
-		let parameters = {
-			'srctbl': 'users',
-			'srcfld1': 'userid',
-			'srcfld2': 'fullname',
-			'dstfrm': 'popup.operation',
-			'dstfld1': 'operation-message-users-footer',
-			'multiselect': '1',
-			'editable': 1,
-			'disableids': Object.values(disabled_values)
-		}
-
-		const overlay = PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic', trigger_element});
-
-		window.addPopupValues = ({object: objectid, parentId: sourceid, values}) => {
-			if (sourceid === 'operation-message-users-footer') {
-				overlay.$dialogue[0].dispatchEvent(new CustomEvent('submit-users-popup', {detail: values}));
-			}
-		};
-
-		overlay.$dialogue[0].addEventListener('submit-users-popup', (e) => {
-			this._addUser(e.detail);
-		})
 	}
 
 	_openConditionsPopup(trigger_element) {
@@ -468,7 +362,7 @@ window.operation_popup = new class {
 
 		while (document.querySelector(`#operation-condition-list [data-id="${row_index}"]`) !== null) {
 			row_index++;
-		};
+		}
 
 		parameters = {
 			type: <?= ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION ?>,

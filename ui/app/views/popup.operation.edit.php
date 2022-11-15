@@ -113,86 +113,77 @@ $form_grid->addItem(
 	))->setId('operation-message-notice')
 );
 
-$usergroup_table = (new CTable())
-	->setId('operation-message-user-groups-table')
-	->addStyle('width: 100%;')
-	->setHeader([_('User group'), _('Action')]);
+$multiselect_values_usergroups = [];
 
-$usergroup_table->addItem(
-	(new CTag('tfoot', true))
-		->addItem(
-			(new CCol(
-				(new CSimpleButton(_('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('operation-message-user-groups-footer')
-			))->setColSpan(4)
-		)->setId('operation-message-user-groups-footer')
-);
+if ($operation['opmessage_grp']) {
+	foreach($operation['opmessage_grp'] as $user_group) {
+		$group['id'] = $user_group['usrgrpid'];
+		$group['name'] = $user_group['name'];
+		$multiselect_values_usergroups[] = $group;
+	}
+}
 
 $form_grid->addItem([
-	(new CLabel(_('Send to user groups')))->setId('operation-message-user-groups-label'),
-	(new CFormField([
-		$usergroup_table,
-		(new CTemplateTag('operation-usergroup-row-tmpl'))->addItem(
-			(new CRow([
-				new CCol('#{name}'),
-				(new CCol([
-					(new CButton(null, _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('js-remove'),
-					(new CInput('hidden'))
-						->setAttribute('value', '#{usrgrpid}')
-						->setName('operation[opmessage_grp][][usrgrpid]'),
-				]))
-			]))
-				->setAttribute('data-id','#{usrgrpid}')
-		)
-	]))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		->setId('operation-message-user-groups')
+	(new CLabel(_('Add to user groups'),'operation-message-user-groups'))
+		->setId('user-groups-label'),
+	(new CFormField(
+		(new CMultiSelect([
+			'name' => 'operation[opmessage_grp][][usrgrpid]',
+			'object_name' => 'usersGroups',
+			'data' => $multiselect_values_usergroups,
+			'popup' => [
+				'parameters' => [
+					'multiselect' => '1',
+					'srctbl' => 'usrgrp',
+					'srcfld1' => 'usrgrpid',
+					'dstfrm' => $form->getName(),
+					'dstfld1'=> 'operation_opmessage_grp__usrgrpid',
+					'editable' => '1',
+					'disableids' => array_column($multiselect_values_usergroups, 'id')
+				]
+			]
+		]))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
+	)->setId('operation-message-user-groups')
 ]);
 
-$user_table = (new CTable())
-	->setId('operation-message-user-table')
-	->addStyle('width: 100%;')
-	->setHeader([_('User'), _('Action')]);
+$multiselect_values_users = [];
 
-$user_table->addItem(
-	(new CTag('tfoot', true))
-		->addItem(
-			(new CCol(
-				(new CSimpleButton(_('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('operation-message-users-footer')
-			))->setColSpan(4)
-		)->setId('operation-message-users-footer')
-);
+if ($operation['opmessage_usr']) {
+	foreach($operation['opmessage_usr'] as $user) {
+		$users['id'] = $user['userid'];
+		$users['name'] = $user['name'];
+		$multiselect_values_users[] = $users;
+	}
+}
 
-// Message recipient (users) row.
 $form_grid->addItem([
-	(new CLabel(_('Send to users')))->setId('operation-message-users-label'),
-	(new CFormField([
-		$user_table,
-		(new CTemplateTag('operation-user-row-tmpl'))->addItem(
-			(new CRow([
-				new CCol('#{name}'),
-				(new CCol([
-					(new CButton(null, _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('js-remove'),
-					(new CInput('hidden'))
-						->setAttribute('value', '#{id}')
-						->setName('operation[opmessage_usr][][userid]'),
-				]))
-			]))
-				->setAttribute('data-id','#{id}')
-		)
-	]))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		->setId('operation-message-users')
+	(new CLabel(_('Send to users'),'operation-message-users'))
+		->setId('users-label'),
+	(new CFormField(
+		(new CMultiSelect([
+			'name' => 'operation[opmessage_usr][][userid]',
+			'object_name' => 'usersGroups',
+			'data' => $multiselect_values_users,
+			'popup' => [
+				'parameters' => [
+					'multiselect' => '1',
+					'srctbl' => 'users',
+					'srcfld1' => 'userid',
+					'srcfld2' => 'fullname',
+					'dstfrm' => $form->getName(),
+					'dstfld1'=> 'operation_opmessage_usr__userid',
+					'editable' => '1',
+					'disableids' => array_column($multiselect_values_users, 'id')
+				]
+			]
+		]))
+			->setAriaRequired()
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
+	)->setId('operation-message-users')
 ]);
+
 array_unshift($data['mediatype_options'], ['name' => '- '._('All').' -', 'mediatypeid' => 0, 'status' => 0]);
 
 $disabled = [];

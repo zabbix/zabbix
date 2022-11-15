@@ -155,7 +155,7 @@ class CControllerPopupActionOperationEdit extends CController {
 			$i = 0;
 
 			$user_groups = API::UserGroup()->get([
-				'output' => ['name'],
+				'output' => ['name', 'usrgrpid'],
 				'usrgrpids' => array_values($groupids),
 				'preservekeys' => true
 			]);
