@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-$widget = (new CWidget())->setTitle($data['title']);
+$html_page = (new CHtmlPage())->setTitle($data['title']);
 
 // append host summary to widget header
 if ($data['hostid'] != 0) {
@@ -42,13 +42,13 @@ if ($data['hostid'] != 0) {
 			$host_table_element = '';
 	}
 
-	$widget->setNavigation(getHostNavigation($host_table_element, $data['hostid']));
+	$html_page->setNavigation(getHostNavigation($host_table_element, $data['hostid']));
 }
 
 // create form
 $form = (new CForm('post', (new CUrl())->getUrl()))
 	->setName('elements_form')
-	->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['action'])
 	->addVar($data['elements_field'], $data['elements'])
 	->addVar('hostid', $data['hostid']);
@@ -81,11 +81,11 @@ $tab_view->setFooter(makeFormFooter(
 ));
 
 $form->addItem($tab_view);
-$widget->addItem($form);
+$html_page->addItem($form);
 
 require_once dirname(__FILE__).'/js/configuration.copy.elements.js.php';
 
-$widget->show();
+$html_page->show();
 
 (new CScriptTag('
 	view.init('.json_encode([

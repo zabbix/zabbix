@@ -1,0 +1,21 @@
+{
+	"manifest_version": 2.0,
+	"id": "favgraphs",
+	"type": "widget",
+	"name": "Favorite graphs",
+	"namespace": "FavGraphs",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"widget": {
+		"size": {
+			"width": 4,
+			"height": 3
+		},
+		"refresh_rate": 900
+	},
+	"actions": {
+		"widget.favgraphs.view": {
+			"class": "WidgetView"
+		}
+	}
+}

@@ -101,7 +101,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	]);
 }
 
-(new CWidget())
+(new CHtmlPage())
 	->setTitle(_('Services'))
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICES_SERVICE_LIST))

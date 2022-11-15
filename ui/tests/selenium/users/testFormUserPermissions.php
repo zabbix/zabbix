@@ -461,9 +461,20 @@ class testFormUserPermissions extends CWebTest {
 	 * Check enabled/disabled module.
 	 */
 	public function testFormUserPermissions_Module() {
+		$widget_modules = ['Action log', 'Clock', 'Data overview', 'Discovery status', 'Favorite graphs', 'Favorite maps',
+			'Geomap', 'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map',
+			'Map navigation tree', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
+			'System information', 'Top hosts', 'Trigger overview', 'URL', 'Web monitoring'
+		];
+
 		$this->page->login()->open('zabbix.php?action=user.edit&userid='.self::$admin_user)->waitUntilReady();
 		$this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm()->selectTab('Permissions');
-		$this->assertTrue($this->query('xpath://em[text()="No enabled modules found."]')->one()->isDisplayed());
+
+		// Check that the default modules are present in form.
+		$modules_selector = 'xpath://h4[text()="Access to modules"]/../../following::li[1]//span';
+		$modules = $this->query($modules_selector)->all()->asText();
+		$this->assertEquals($widget_modules, array_values($modules));
+
 		$this->page->open('zabbix.php?action=module.list')->waitUntilReady();
 		$this->query('button:Scan directory')->one()->click();
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -471,20 +482,24 @@ class testFormUserPermissions extends CWebTest {
 		$this->query('button:Enable')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
-		$selector = 'xpath://h4[text()="Access to modules"]/../../following::li/div/div/span[text()=';
+
 		foreach ([true, false] as $enable_modules) {
 			$this->page->open('zabbix.php?action=user.edit&userid='.self::$admin_user)->waitUntilReady();
 			$this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm()->selectTab('Permissions');
 
 			if ($enable_modules) {
-				$this->assertEquals('status-green', $this->query($selector.'"4"]')->one()->getAttribute('class'));
+				$this->assertEquals('status-green', $this->query($modules_selector.'[text()="4th Module"]')->one()
+						->getAttribute('class')
+				);
 				$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$admin_roleid);
 				$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 				$form->getField('4th Module')->uncheck();
 				$form->submit();
 			}
 			else {
-				$this->assertEquals('status-grey', $this->query($selector.'"4"]')->one()->getAttribute('class'));
+				$this->assertEquals('status-grey', $this->query($modules_selector.'[text()="4th Module"]')->one()
+						->getAttribute('class')
+				);
 			}
 		}
 	}

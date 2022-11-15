@@ -1,0 +1,14 @@
+{
+	"manifest_version": 2.0,
+	"id": "actionlog",
+	"type": "widget",
+	"name": "Action log",
+	"namespace": "ActionLog",
+	"version": "1.0",
+	"author": "Zabbix SIA",
+	"actions": {
+		"widget.actionlog.view": {
+			"class": "WidgetView"
+		}
+	}
+}

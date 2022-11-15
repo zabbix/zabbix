@@ -30,7 +30,7 @@
 #include "zbxdiag.h"
 #include "zbxrtc.h"
 #include "zbxdbwrap.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"

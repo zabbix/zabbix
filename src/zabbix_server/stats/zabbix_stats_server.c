@@ -20,8 +20,8 @@
 #include "zabbix_stats.h"
 
 #include "zbxcommon.h"
-#include "dbcache.h"
-#include "valuecache.h"
+#include "zbxcacheconfig.h"
+#include "zbxcachevalue.h"
 #include "zbxlld.h"
 #include "log.h"
 #include "zbxtrends.h"

@@ -26,7 +26,7 @@
 $this->includeJsFile('configuration.graph.list.js.php');
 
 if (!empty($this->data['parent_discoveryid'])) {
-	$widget = (new CWidget())
+	$html_page = (new CHtmlPage())
 		->setTitle(_('Graph prototypes'))
 		->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
 			? CDocHelper::DATA_COLLECTION_HOST_GRAPH_PROTOTYPE_LIST
@@ -48,7 +48,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 		->setNavigation(getHostNavigation('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 else {
-	$widget = (new CWidget())
+	$html_page = (new CHtmlPage())
 		->setTitle(_('Graphs'))
 		->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
 			? CDocHelper::DATA_COLLECTION_HOST_GRAPH_LIST
@@ -75,13 +75,13 @@ else {
 		);
 
 	if (!empty($this->data['hostid'])) {
-		$widget->setNavigation(getHostNavigation('graphs', $this->data['hostid']));
+		$html_page->setNavigation(getHostNavigation('graphs', $this->data['hostid']));
 	}
 
 	// Add filter tab.
 	$hg_ms_params = $data['context'] === 'host' ? ['with_hosts' => true] : ['with_templates' => true];
 
-	$widget->addItem(
+	$html_page->addItem(
 		(new CFilter())
 			->setResetUrl((new CUrl('graphs.php'))->setArgument('context', $data['context']))
 			->setProfile($data['profileIdx'])
@@ -270,7 +270,6 @@ $graphForm->addItem([
 	)
 ]);
 
-// append form to widget
-$widget->addItem($graphForm);
-
-$widget->show();
+$html_page
+	->addItem($graphForm)
+	->show();

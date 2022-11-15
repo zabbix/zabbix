@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$widget = (new CWidget())
+$html_page = (new CHtmlPage())
 	->setTitle(_('Queue overview by proxy'))
 	->setTitleSubmenu([
 		'main_section' => [
@@ -87,7 +87,7 @@ if (CWebUser::getRefresh()) {
 		->show();
 }
 
-$widget
+$html_page
 	->addItem($table)
 	->addItem((new CDiv())
 		->addClass(ZBX_STYLE_TABLE_PAGING)
