@@ -3368,23 +3368,19 @@ form.is-loading {
     background-position-y: -693px;
     margin: 0;
     opacity: 1; }
-  .list-table .no-border {
-    border-bottom: 0; }
-  .list-table .pl-0 {
-    padding-left: 0; }
-  .list-table .pr-0 {
+  .list-table .second-col {
+    padding-left: 0;
     padding-right: 0; }
-  .list-table .pl-2 {
+  .list-table .third-col {
     padding-left: 2px; }
-  .list-table .pt-0 {
-    padding-top: 0; }
-  .list-table .pb-0 {
+  .list-table .symptom-limit-td {
+    padding-top: 0;
     padding-bottom: 0; }
-  .list-table .nested:not[class*='flh-'] {
+  .list-table .problem-nested:not[class*='flh-'] {
     background-color: black; }
-  .list-table .nested-small {
+  .list-table .problem-nested-small {
     font-size: calc(1em - 1px); }
-    .list-table .nested-small .tag, .list-table .nested-small .btn-tag {
+    .list-table .problem-nested-small .tag, .list-table .problem-nested-small .btn-tag {
       font-size: 12px; }
   .list-table.compact-view .link-action {
     color: #ffffff; }
@@ -3748,6 +3744,9 @@ form.is-loading {
 .overflow-table {
   overflow-x: auto;
   position: relative; }
+
+.problem-expand-td {
+  border-bottom-color: transparent !important; }
 
 .timeline-date {
   text-align: right;

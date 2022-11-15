@@ -369,35 +369,25 @@ form {
 		}
 	}
 
-	.no-border {
-		border-bottom: 0;
-	}
-
-	.pl-0 {
+	.second-col {
 		padding-left: 0;
-	}
-
-	.pr-0 {
 		padding-right: 0;
 	}
 
-	.pl-2 {
+	.third-col {
 		padding-left: 2px;
 	}
 
-	.pt-0 {
+	.symptom-limit-td {
 		padding-top: 0;
-	}
-
-	.pb-0 {
 		padding-bottom: 0;
 	}
 
-	.nested:not[class*='flh-'] {
+	.problem-nested:not[class*='flh-'] {
 		background-color: darken($ui-bg-color, 5%);
 	}
 
-	.nested-small {
+	.problem-nested-small {
 		font-size: calc(#{$font-mono-size} - 1px);
 
 		.tag {
@@ -1073,6 +1063,10 @@ form {
 	overflow-x: auto;
 	position: relative;
 	@extend %webkit-hor-scrollbar;
+}
+
+.problem-expand-td {
+	border-bottom-color: $transparent !important;
 }
 
 // Timeline in table view.

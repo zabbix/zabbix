@@ -42,7 +42,7 @@ if ($data['show_three_columns']) {
 	$header[] = new CColHeader();
 	$header[] = (new CColHeader())
 		->addClass(ZBX_STYLE_CELL_WIDTH)
-		->addClass('pl-2');
+		->addClass(ZBX_STYLE_THIRD_COL);
 }
 elseif ($data['show_two_columns']) {
 	$header[] = new CColHeader();
@@ -345,11 +345,14 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 				'title' => _('Symptom'),
 				'style' => 'margin: 0'
 			])
-		))
-			->addClass('no-border')
-			->addClass(ZBX_STYLE_RIGHT);
+		))->addClass(ZBX_STYLE_RIGHT);
 
-		$empty_col = (new CCol())->addClass('no-border');
+		$empty_col = new CCol();
+
+		if ($data['show_timeline']) {
+			$symptom_col->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
+			$empty_col->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
+		}
 
 		// Build rows and columns.
 		if ($problem['cause_eventid'] == 0) {
@@ -371,11 +374,11 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 						->setTitle(_('Expand'))
 				))
 					->addClass(ZBX_STYLE_RIGHT)
-					->addClass('pl-2');
+					->addClass(ZBX_STYLE_THIRD_COL);
 
 				if ($data['show_timeline']) {
-					$symptom_count_col->addClass('no-border');
-					$collapse_expand_col->addClass('no-border');
+					$symptom_count_col->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
+					$collapse_expand_col->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
 				}
 
 				$row->addItem([$symptom_count_col, $collapse_expand_col]);
@@ -385,12 +388,12 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 					// Show two empty columns.
 					$row->addItem([
 						$empty_col,
-						$empty_col->addClass('pl-2')
+						$empty_col->addClass(ZBX_STYLE_THIRD_COL)
 					]);
 				}
 				elseif ($data['show_two_columns']) {
 					$row->addItem(
-						$empty_col->addClass('pl-2')
+						$empty_col->addClass(ZBX_STYLE_THIRD_COL)
 					);
 				}
 			}
@@ -399,17 +402,17 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 			if ($nested) {
 				// First and second column empty for symptom event.
 				$row = (new CRow($empty_col))
-					->addClass('nested-small')
+					->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL)
 					->setAttribute('data-cause-eventid', $problem['cause_eventid'])
 					->addStyle('display: none');
 
 				if (getUserTheme(CWebUser::$data) === 'dark-theme'
 						|| getUserTheme(CWebUser::$data) === 'blue-theme') {
-					$row->addClass('nested');
+					$row->addClass(ZBX_STYLE_PROBLEM_NESTED);
 				}
 
 				$row->addItem(
-					$symptom_col->addClass('pl-2')
+					$symptom_col->addClass(ZBX_STYLE_THIRD_COL)
 				);
 			}
 			else {
@@ -420,7 +423,7 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 			// If there are causes as well, show additional empty column.
 			if (!$nested && $data['show_three_columns']) {
 				$row->addItem(
-					$empty_col->addClass('pl-2')
+					$empty_col->addClass(ZBX_STYLE_THIRD_COL)
 				);
 			}
 		}
@@ -500,7 +503,7 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 							$problem['symptom_count']
 						)))->addClass(ZBX_STYLE_TABLE_STATS)
 					))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-				))->addClass('nested-small');
+				))->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL);
 
 				if ($data['show_timeline']) {
 					$colspan = 1;
@@ -511,7 +514,7 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 						$colspan = 2;
 					}
 
-					$empty_col = (new CCol())->addClass('no-border');
+					$empty_col = (new CCol())->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
 
 					if ($colspan > 1) {
 						$empty_col->setColSpan($colspan);
@@ -521,15 +524,12 @@ function addProblemsToTable(CTableInfo $table, array $problems, array $data, $ne
 						$empty_col,
 						(new CCol())
 							->addClass(ZBX_STYLE_TIMELINE_AXIS)
-							->addClass('pt-0')
-							->addClass('pb-0'),
+							->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD),
 						(new CCol())
 							->addClass(ZBX_STYLE_TIMELINE_TD)
-							->addClass('pt-0')
-							->addClass('pb-0'),
+							->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD),
 						$symptom_limit_col
-							->addClass('pt-0')
-							->addClass('pb-0')
+							->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD)
 							->setColSpan($table->getNumCols() - $colspan - 2)
 					]);
 				}
