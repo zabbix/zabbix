@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-10-27 18:28+0000\n"
+"PO-Revision-Date: 2022-11-13 10:24+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -275,7 +275,7 @@ msgstr "%1$s. %2$s : %3$s. %4$s."
 #: include/classes/core/CModuleManager.php:153
 #, c-format
 msgid "%1$s.php class must extend %2$s for module located at %3$s."
-msgstr ""
+msgstr "La classe %1$s.php doit étendre %2$s pour le module situé à %3$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
@@ -905,7 +905,7 @@ msgstr "Ajouter un élément enfant"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
-msgstr ""
+msgstr "Ajouter des éléments enfants"
 
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
@@ -1237,32 +1237,32 @@ msgstr "Quantité de mémoire physique de l'hôte consommée pour la sauvegarde 
 #: include/classes/api/services/CItemGeneral.php:1544
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Une règle LLD avec la clé \"%1$s\" existe déjà sur l'hôte \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1543
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Une règle LLD avec la clé \"%1$s\" existe déjà sur le modèle \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1538
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Un prototype d'élément avec la clé \"%1$s\" existe déjà sur l'hôte \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1537
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Un prototype d'élément avec la clé \"%1$s\" existe déjà sur le modèle \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1532
 #, c-format
 msgid "An item with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Un élément avec la clé \"%1$s\" existe déjà sur l'hôte \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1531
 #, c-format
 msgid "An item with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Un élément avec la clé \"%1$s\" existe déjà sur le modèle \"%2$s\"."
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
@@ -2168,7 +2168,7 @@ msgstr "Impossible d'ajouter le scénario web"
 
 #: jsLoader.php:129
 msgid "Cannot add widget: no widgets available."
-msgstr ""
+msgstr "Impossible d'ajouter un widget : aucun widget disponible."
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
@@ -2177,12 +2177,17 @@ msgstr "Impossible d'ajouter un widget : pas assez d'espace libre sur le tablea
 #: include/classes/api/services/CItem.php:1532
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of host \"%3$s\", because it is already populated by the item with key \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'attribuer le champ d'inventaire \"%1$s\" à l'élément avec la clé \"%2$s\" de l'hôte \"%3$s\", car il est déjà rempli par l'élément avec la clé \"%4$s\"."
 
 #: include/classes/api/services/CItem.php:1531
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\""
-msgstr ""
+msgstr "Impossible d'attribuer le champ d'inventaire \"%1$s\" à l'élément avec la clé \"%2$s\" du modèle \"%3$s\", car il est déjà rempli par l'élément avec la clé \"%4$s\""
+
+#: include/classes/api/services/CItem.php:1531
+#, c-format
+msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
+msgstr "Impossible d'attribuer le champ d'inventaire \"%1$s\" à l'élément avec la clé \"%2$s\" du modèle \"%3$s\", car il est déjà rempli par l'élément avec la clé \"%4$s\"."
 
 #: jsLoader.php:343
 msgctxt "screen reader"
@@ -2258,12 +2263,12 @@ msgstr[1] "Impossible de copier les éléments"
 #: include/classes/api/services/CDiscoveryRule.php:2475
 #, c-format
 msgid "Cannot copy item prototype with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Impossible de copier le prototype d'élément avec la clé \"%1$s\" sans son élément principal avec la clé \"%2$s\"."
 
 #: include/items.inc.php:590
 #, c-format
 msgid "Cannot copy item with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Impossible de copier l'élément avec la clé \"%1$s\" sans son élément principal avec la clé \"%2$s\"."
 
 #: triggers.php:538
 msgid "Cannot copy trigger"
@@ -2874,12 +2879,12 @@ msgstr "Impossible de trouver l'interface de l'hôte sur \"%1$s\" pour la clé d
 #: include/classes/api/services/CDiscoveryRule.php:2517
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item prototype with key \"%2$s\"."
-msgstr ""
+msgstr "Impossible de trouver l'interface de l'hôte \"%1$s\" pour le prototype d'élément avec la clé \"%2$s\"."
 
 #: include/items.inc.php:640
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item with key \"%2$s\"."
-msgstr ""
+msgstr "Impossible de trouver l'interface de l'hôte \"%1$s\" pour l'élément avec la clé \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:207
 #, c-format
@@ -3001,181 +3006,201 @@ msgstr[1] "Impossible d'importer le modèle \"%1$s\", les modèles liés \"%2$s\
 #: include/classes/api/services/CItemGeneral.php:588
 #, c-format
 msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter des règles LDD avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur l'hôte \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:589
 #, c-format
 msgid "Cannot inherit LDD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter des règles LDD avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur le modèle \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:704
 #: include/classes/api/services/CItemGeneral.php:716
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car un élément découvert avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:1030
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car une interface d'hôte de type \"%4$s\" est requise."
 
 #: include/classes/api/services/CItemGeneral.php:710
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car un prototype d'élément avec la même clé existe déjà."
+
+#: include/classes/api/services/CItemGeneral.php:704
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car un élément avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:769
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car un élément avec la même clé est déjà hérité du modèle \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:705
 #: include/classes/api/services/CItemGeneral.php:717
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle \"%2$s\" vers le modèle \"%3$s\", car un élément découvert avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:711
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle \"%2$s\" vers le modèle \"%3$s\", car un prototype d'élément avec la même clé existe déjà."
+
+#: include/classes/api/services/CItemGeneral.php:705
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
+msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle \"%2$s\" vers le modèle \"%3$s\", car un élément avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:770
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle \"%2$s\" vers le modèle \"%3$s\", car un élément avec la même clé est déjà hérité du modèle \"%4$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:1230
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to host \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du modèle \"%2$s\" et de la règle LLD \"%3$s\" sur l'hôte \"%4$s\", car un prototype d'élément avec la même clé appartient déjà à LLD règle \"%5$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:1231
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" and LLD rule \"%3$s\" to template \"%4$s\", because an item prototype with the same key already belongs to LLD rule \"%5$s\"."
-msgstr ""
+msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du modèle \"%2$s\" et de la règle LLD \"%3$s\" vers le modèle \"%4$s\", car un prototype d'élément avec la même clé appartient déjà à LLD règle \"%5$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:725
 #: include/classes/api/services/CItemGeneral.php:737
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car un élément découvert avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:1034
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car une interface d'hôte de type \"%4$s\" est requise."
 
 #: include/classes/api/services/CItemGeneral.php:731
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car une règle LLD avec la même clé existe déjà."
+
+#: include/classes/api/services/CItemGeneral.php:725
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
+msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car un élément avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:775
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car un élément avec la même clé est déjà hérité du modèle \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:726
 #: include/classes/api/services/CItemGeneral.php:738
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du modèle \"%2$s\" vers le modèle \"%3$s\", car un élément découvert avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:732
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du modèle \"%2$s\" vers le modèle \"%3$s\", car une règle LLD avec la même clé existe déjà."
+
+#: include/classes/api/services/CItemGeneral.php:726
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
+msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du modèle \"%2$s\" vers le modèle \"%3$s\", car un élément avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:776
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du modèle \"%2$s\" vers le modèle \"%3$s\", car un élément avec la même clé est déjà hérité du modèle \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:582
 #, c-format
 msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter des prototypes d'éléments avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur l'hôte \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:583
 #, c-format
 msgid "Cannot inherit item prototypes with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter des prototypes d'éléments avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur le modèle \"%4$s\"."
 
 #: include/classes/api/services/CItem.php:1455
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to host \"%5$s\", because they would populate the same inventory field \"%6$s\"."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"%2$s\" et de l'élément avec la clé \"%3$s\" du modèle \"%4$s\" sur l'hôte \"%5$s\", car ils rempliraient le même champ d'inventaire \"%6$s\"."
 
 #: include/classes/api/services/CItem.php:1454
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" and item with key \"%3$s\" of template \"%4$s\" to template \"%5$s\", because they would populate the same inventory field \"%6$s\"."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"%2$s\" et de l'élément avec la clé \"%3$s\" du modèle \"%4$s\" vers le modèle \"%5$s\", car ils rempliraient le même champ d'inventaire \"%6$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:695
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter du prototype d'élément avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car un élément découvert avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:1026
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car une interface hôte de type \"%4$s\" est requise."
 
 #: include/classes/api/services/CItemGeneral.php:683
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car une règle LLD avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:689
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car un prototype d'élément avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:763
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car un élément avec la même clé est déjà hérité du modèle \"%4$s\"."
 
 #: include/classes/api/services/CItem.php:1509
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"%2$s\" sur l'hôte \"%3$s\", car son champ d'inventaire \"%4$s\" est déjà rempli par l'élément avec la clé \"%5$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:696
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"%2$s\" sur le modèle \"%3$s\", car un élément découvert avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"%2$s\" vers le modèle \"%3$s\", car une règle LLD avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:690
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key already exists."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"%2$s\" vers le modèle \"%3$s\", car un prototype d'élément avec la même clé existe déjà."
 
 #: include/classes/api/services/CItemGeneral.php:764
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"%2$s\" vers le modèle \"%3$s\", car un élément avec la même clé est déjà hérité du modèle \"%4$s\"."
 
 #: include/classes/api/services/CItem.php:1508
 #, c-format
 msgid "Cannot inherit item with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because its inventory field \"%4$s\" is already populated by the item with key \"%5$s\"."
-msgstr ""
+msgstr "Impossible d'hériter de l'élément avec la clé \"%1$s\" du modèle \"%2$s\" vers le modèle \"%3$s\", car son champ d'inventaire \"%4$s\" est déjà rempli par l'élément avec la clé \"%5$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:576
 #, c-format
 msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter des éléments avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur l'hôte \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:577
 #, c-format
 msgid "Cannot inherit items with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter des éléments avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur le modèle \"%4$s\"."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1581
 msgid "Cannot insert trigger expression"
@@ -3209,7 +3234,7 @@ msgstr "Impossible de lier le modèle \"%1$s\" à l'hôte \"%2$s\" car son modè
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr "Impossible de lier le modèle \"%1$s\" au prototype hôte \"%2$s\" car son modèle parent \"%3$s\" serait lié deux fois."
+msgstr "Impossible de lier le modèle \"%1$s\" au prototype d'hôte \"%2$s\" car son modèle parent \"%3$s\" serait lié deux fois."
 
 #: include/classes/api/services/CHostBase.php:675
 #: include/classes/api/services/CHostBase.php:752
@@ -3225,7 +3250,7 @@ msgstr "Impossible de lier le modèle \"%1$s\" au prototype d'hôte \"%2$s\" en 
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr "Impossible de lier le modèle \"%1$s\" au prototype hôte \"%2$s\" car son modèle parent \"%3$s\" serait lié deux fois."
+msgstr "Impossible de lier le modèle \"%1$s\" au prototype d'hôte \"%2$s\" car son modèle parent \"%3$s\" serait lié deux fois."
 
 #: include/classes/api/services/CHostBase.php:381
 #, c-format
@@ -3276,7 +3301,7 @@ msgstr "Impossible de lier le modèle \"%1$s\" au prototype d'hôte \"%3$s\" san
 #: include/classes/api/services/CHostBase.php:829
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host prototype \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr "Impossible de lier le modèle \"%1$s\" au prototype hôte \"%3$s\" sans le modèle \"%2$s\" en raison de l'expression du déclencheur \"%4$s\"."
+msgstr "Impossible de lier le modèle \"%1$s\" au prototype d'hôte \"%3$s\" sans le modèle \"%2$s\" en raison de l'expression du déclencheur \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:699
 #, c-format
@@ -3315,7 +3340,7 @@ msgstr "Impossible de transmettre les ID de modèle en double pour la liaison : 
 
 #: jsLoader.php:130
 msgid "Cannot paste inaccessible widget."
-msgstr ""
+msgstr "Impossible de coller le widget inaccessible."
 
 #: include/classes/db/DB.php:958
 #, c-format
@@ -3406,42 +3431,42 @@ msgstr "Impossible de configurer \"%1$s\" pour l'élément \"%2$s\"."
 #: include/classes/api/services/CItemGeneral.php:2237
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "Impossible de définir la dépendance pour la règle LLD avec la clé \"%1$s\" sur l'élément principal avec la clé \"%2$s\" sur l'hôte \"%3$s\" : %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2236
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "Impossible de définir la dépendance pour la règle LLD avec la clé \"%1$s\" sur l'élément principal avec la clé \"%2$s\" sur le modèle \"%3$s\" : %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2231
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "Impossible de définir la dépendance du prototype d'élément avec la clé \"%1$s\" sur le prototype d'élément principal avec la clé \"%2$s\" sur l'hôte \"%3$s\" : %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2230
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item prototype with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "Impossible de définir la dépendance du prototype d'élément avec la clé \"%1$s\" sur le prototype d'élément principal avec la clé \"%2$s\" sur le modèle \"%3$s\" : %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2226
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "Impossible de définir la dépendance du prototype d'élément avec la clé \"%1$s\" sur l'élément principal avec la clé \"%2$s\" sur l'hôte \"%3$s\" : %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2225
 #, c-format
 msgid "Cannot set dependency for item prototype with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "Impossible de définir la dépendance pour le prototype d'élément avec la clé \"%1$s\" sur l'élément principal avec la clé \"%2$s\" sur le modèle \"%3$s\" : %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2220
 #, c-format
 msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr ""
+msgstr "Impossible de définir la dépendance pour l'élément avec la clé \"%1$s\" sur l'élément principal avec la clé \"%2$s\" sur l'hôte \"%3$s\" : %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2219
 #, c-format
 msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr ""
+msgstr "Impossible de définir la dépendance pour l'élément avec la clé \"%1$s\" sur l'élément principal avec la clé \"%2$s\" sur le modèle \"%3$s\" : %4$s."
 
 #: include/classes/api/services/CHost.php:1037
 #: include/classes/api/services/CHost.php:2015
@@ -9431,22 +9456,22 @@ msgstr "Groupe d'utilisateurs inaccessible"
 
 #: jsLoader.php:147 jsLoader.php:175
 msgid "Inaccessible widget"
-msgstr ""
+msgstr "Widget inaccessible"
 
 #: app/controllers/CControllerDashboardWidgetCheck.php:52
 #: app/controllers/CControllerDashboardWidgetEdit.php:65
 #: include/classes/helpers/CDashboardHelper.php:453
 #: include/classes/helpers/CDashboardHelper.php:461
 msgid "Inaccessible widget type."
-msgstr ""
+msgstr "Type de widget inaccessible."
 
 #: jsLoader.php:138
 msgid "Inaccessible widgets were not copied."
-msgstr ""
+msgstr "Les widgets inaccessibles n'ont pas été copiés."
 
 #: jsLoader.php:139
 msgid "Inaccessible widgets were not pasted."
-msgstr ""
+msgstr "Les widgets inaccessibles n'ont pas été collés."
 
 #: app/partials/js/scheduledreport.subscription.js.php:165
 #: app/partials/js/scheduledreport.subscription.js.php:181
@@ -14653,7 +14678,7 @@ msgstr "Période d'affichage de la page"
 
 #: include/classes/core/ZBase.php:565
 msgid "Page not found"
-msgstr ""
+msgstr "Page non trouvée"
 
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:46
 #: include/validate.inc.php:435
@@ -21404,7 +21429,7 @@ msgstr "Écriture"
 #: include/classes/core/CModuleManager.php:136
 #, c-format
 msgid "Wrong %1$s.php class name for module located at %2$s."
-msgstr ""
+msgstr "Mauvais nom de classe %1$s.php pour le module situé à %2$s."
 
 #: include/classes/core/CModuleManager.php:203
 #, c-format
@@ -21955,11 +21980,11 @@ msgstr "tous les médias"
 
 #: include/classes/api/services/CItemGeneral.php:1877
 msgid "allowed count of dependency levels would be exceeded"
-msgstr ""
+msgstr "le nombre autorisé de niveaux de dépendance serait dépassé"
 
 #: include/classes/api/services/CItemGeneral.php:1888
 msgid "allowed count of dependent items would be exceeded"
-msgstr ""
+msgstr "le nombre autorisé d'éléments dépendants serait dépassé"
 
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
@@ -22034,13 +22059,13 @@ msgstr "un entier est attendu"
 #: include/classes/api/services/CItemGeneral.php:1827
 #: include/classes/api/services/CItemGeneral.php:1930
 msgid "an item ID is expected"
-msgstr ""
+msgstr "un ID d'élément est attendu"
 
 #: include/classes/api/services/CItemGeneral.php:1805
 #: include/classes/api/services/CItemGeneral.php:1826
 #: include/classes/api/services/CItemGeneral.php:1929
 msgid "an item/item prototype ID is expected"
-msgstr ""
+msgstr "un ID d'élément/de prototype d'élément est attendu"
 
 #: include/classes/validators/CApiInputValidator.php:716
 #: include/classes/validators/CApiInputValidator.php:2882
@@ -22197,19 +22222,19 @@ msgstr "peut être utilisé pour ajouter \"@2x\" à l'URL pour charger les tuile
 
 #: include/classes/api/services/CItemGeneral.php:2383
 msgid "cannot be a value map ID from another host or template"
-msgstr ""
+msgstr "ne peut pas être un ID de carte d'un autre hôte ou modèle"
 
 #: include/classes/api/services/CItemGeneral.php:1942
 msgid "cannot be an item ID from another host or template"
-msgstr ""
+msgstr "ne peut pas être un ID d'élément d'un autre hôte ou modèle"
 
 #: include/classes/api/services/CItemGeneral.php:1956
 msgid "cannot be an item prototype ID from another LLD rule"
-msgstr ""
+msgstr "ne peut pas être un ID de prototype d'élément d'une autre règle LLD"
 
 #: include/classes/api/services/CItemGeneral.php:1941
 msgid "cannot be an item/item prototype ID from another host or template"
-msgstr ""
+msgstr "ne peut pas être un ID d'élément/de prototype d'élément d'un autre hôte ou modèle"
 
 #: include/classes/api/services/CItemGeneral.php:229
 msgid "cannot be changed"
@@ -22313,7 +22338,7 @@ msgstr "ne peut pas être vide"
 
 #: include/classes/validators/CApiInputValidator.php:3560
 msgid "cannot be equal to zero without custom intervals"
-msgstr ""
+msgstr "ne peut pas être égal à zéro sans intervalles personnalisés"
 
 #: include/classes/validators/CApiInputValidator.php:2982
 #, c-format
@@ -22328,7 +22353,7 @@ msgstr "impossible de définir la valeur du paramètre \"%1$s\""
 
 #: include/classes/api/services/CItemGeneral.php:1658
 msgid "cannot be the host interface ID from another host"
-msgstr ""
+msgstr "ne peut pas être l'ID d'interface d'hôte d'un autre hôte"
 
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
@@ -22340,11 +22365,11 @@ msgstr "impossible de convertir en JSON, la valeur du résultat est trop longue"
 
 #: include/classes/api/services/CItem.php:899
 msgid "cannot delete inherited item"
-msgstr ""
+msgstr "impossible de supprimer l'élément hérité"
 
 #: include/classes/api/services/CItemPrototype.php:810
 msgid "cannot delete inherited item prototype"
-msgstr ""
+msgstr "impossible de supprimer le prototype d'élément hérité"
 
 #: include/classes/api/services/CHostPrototype.php:2167
 msgid "cannot delete templated host prototype"
@@ -22775,7 +22800,7 @@ msgstr "interne"
 
 #: include/classes/validators/CApiInputValidator.php:4155
 msgid "invalid Prometheus label"
-msgstr ""
+msgstr "étiquette Prometheus invalide"
 
 #: include/classes/api/services/CItemGeneral.php:1535
 #: include/classes/api/services/CItemGeneral.php:1545
@@ -23164,11 +23189,11 @@ msgstr "doit contenir au moins un caractère spécial"
 
 #: include/classes/validators/CApiInputValidator.php:3818
 msgid "must have a polling interval not blocked by non-active interval periods"
-msgstr ""
+msgstr "doit avoir un intervalle d'interrogation non bloqué par des périodes d'intervalle non actives"
 
 #: include/classes/validators/CApiInputValidator.php:3653
 msgid "must have at least one interval greater than 0"
-msgstr ""
+msgstr "doit avoir au moins un intervalle supérieur à 0"
 
 #: app/views/administration.authentication.edit.php:98
 #: app/views/administration.user.edit.php:150
@@ -23261,7 +23286,7 @@ msgstr "nodata() - Aucune donnée reçue pendant la période de temps T (1 - vra
 
 #: include/classes/validators/CApiInputValidator.php:3681
 msgid "non-active intervals cannot fill the entire time"
-msgstr ""
+msgstr "les intervalles inactifs ne peuvent pas remplir toute la période"
 
 #: app/views/popup.tophosts.column.edit.php:113
 #: app/views/popup.tophosts.column.edit.php:125
@@ -23341,7 +23366,7 @@ msgstr "sur"
 #: include/classes/validators/CApiInputValidator.php:2388
 #, c-format
 msgid "only one object can exist within the combinations of %1$s"
-msgstr ""
+msgstr "un seul objet peut exister dans les combinaisons de %1$s"
 
 #: app/controllers/CControllerPopupItemTestSend.php:182
 msgid "only one time unit is allowed"
@@ -23661,12 +23686,12 @@ msgstr "ID du modèle \"%1$s\" passé %2$s fois"
 #: include/classes/api/services/CItemGeneral.php:1612
 #: include/classes/api/services/CItemGeneral.php:1652
 msgid "the host interface ID is expected"
-msgstr ""
+msgstr "l'ID de l'interface d'hôte est attendu"
 
 #: include/classes/api/services/CItemGeneral.php:1668
 #, c-format
 msgid "the host interface ID of type \"%1$s\" is expected"
-msgstr ""
+msgstr "l'ID d'interface d'hôte de type \"%1$s\" est attendu"
 
 #: include/classes/validators/CApiInputValidator.php:2813
 msgid "the last new line feed is missing"
@@ -23915,7 +23940,7 @@ msgstr "numéro de version non supporté"
 #: include/classes/validators/CApiInputValidator.php:3626
 #, c-format
 msgid "update interval \"%1$s\" is longer than period \"%2$s\""
-msgstr ""
+msgstr "l'intervalle de mise à jour \"%1$s\" est plus long que la période \"%2$s\""
 
 #: include/classes/validators/CApiInputValidator.php:509
 msgid "uppercase identifier expected"

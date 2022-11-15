@@ -22,6 +22,7 @@
 #include "log.h"
 #include "zbxtasks.h"
 #include "zbxserver.h"
+#include "zbxshmem.h"
 #include "zbxregexp.h"
 #include "cfg.h"
 #include "zbxcrypto.h"
@@ -4448,7 +4449,7 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 			zbx_vector_ptr_append(&action->conditions, condition);
 		}
 
-		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 			zbx_vector_ptr_append(&actions, action);
 	}
 
@@ -4468,7 +4469,7 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 			{
 				zbx_vector_ptr_remove_noorder(&action->conditions, index);
 
-				if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+				if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 					zbx_vector_ptr_append(&actions, action);
 			}
 		}
@@ -4488,7 +4489,7 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 	{
 		action = (zbx_dc_action_t *)actions.values[i];
 
-		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 			zbx_vector_ptr_sort(&action->conditions, dc_compare_action_conditions_by_type);
 	}
 
@@ -4755,7 +4756,7 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 			zbx_vector_ptr_append(&correlation->conditions, condition);
 
 		/* sort the conditions later */
-		if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
+		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
 			zbx_vector_ptr_append(&correlations, correlation);
 	}
 
@@ -4777,7 +4778,7 @@ static void	DCsync_corr_conditions(zbx_dbsync_t *sync)
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
 				/* sort the conditions later */
-				if (ZBX_ACTION_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
+				if (ZBX_CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
 					zbx_vector_ptr_append(&correlations, correlation);
 
 				zbx_vector_ptr_remove_noorder(&correlation->conditions, index);
@@ -9181,10 +9182,13 @@ void	DCconfig_get_active_items_by_hostid(DC_ITEM *items, zbx_uint64_t hostid, in
  ******************************************************************************/
 static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, DC_ITEM *item)
 {
+	char	*tmp;
+
 	if (NULL != item->trends_period)
 	{
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->trends_period, MACRO_TYPE_COMMON, NULL, 0);
+		tmp = dc_expand_user_macros_dyn(item->trends_period, &item->host.hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		item->trends_period = zbx_strdup(item->trends_period, tmp);
+		zbx_free(tmp);
 
 		if (SUCCEED != zbx_is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
 			item->trends_sec = ZBX_HK_PERIOD_MAX;
@@ -9197,8 +9201,9 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, DC_ITE
 
 	if (NULL != item->history_period)
 	{
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->history_period, MACRO_TYPE_COMMON, NULL, 0);
+		tmp = dc_expand_user_macros_dyn(item->history_period, &item->host.hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		item->history_period = zbx_strdup(item->history_period, tmp);
+		zbx_free(tmp);
 
 		if (SUCCEED != zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
 			item->history_sec = ZBX_HK_PERIOD_MAX;
@@ -9219,8 +9224,7 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 	zbx_config_hk_t		config_hk;
 	zbx_dc_um_handle_t	*um_handle;
 
-	memset(items, 0, sizeof(DC_ITEM) * (size_t)num);
-	memset(errcodes, 0, sizeof(int) * (size_t)num);
+	memset(errcodes, 0, sizeof(int) * num);
 
 	RDLOCK_CACHE;
 
@@ -9259,15 +9263,6 @@ void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *i
 			continue;
 
 		items[i].itemid = itemids[i];
-
-		if (NULL == items[i].error)
-			items[i].error = zbx_strdup(NULL, "");
-
-		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
-		{
-			if (NULL == items[i].units)
-				items[i].units = zbx_strdup(NULL, "");
-		}
 
 		if (0 != (mode & ZBX_ITEM_GET_HOUSEKEEPING))
 			dc_items_convert_hk_periods(&config_hk, &items[i]);
@@ -13349,7 +13344,7 @@ static char	*dc_correlation_formula_dup(const zbx_dc_correlation_t *dc_correlati
 	const zbx_dc_corr_condition_t	*dc_condition;
 	zbx_uint64_t			last_id;
 
-	if (ZBX_ACTION_CONDITION_EVAL_TYPE_EXPRESSION == dc_correlation->evaltype || 0 ==
+	if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == dc_correlation->evaltype || 0 ==
 			dc_correlation->conditions.values_num)
 	{
 		return zbx_strdup(NULL, dc_correlation->formula);
@@ -13359,10 +13354,10 @@ static char	*dc_correlation_formula_dup(const zbx_dc_correlation_t *dc_correlati
 
 	switch (dc_correlation->evaltype)
 	{
-		case ZBX_ACTION_CONDITION_EVAL_TYPE_OR:
+		case ZBX_CONDITION_EVAL_TYPE_OR:
 			op = " or";
 			break;
-		case ZBX_ACTION_CONDITION_EVAL_TYPE_AND:
+		case ZBX_CONDITION_EVAL_TYPE_AND:
 			op = " and";
 			break;
 	}
