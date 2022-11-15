@@ -27,8 +27,7 @@
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.calendar.js');
 
-$filter = (new CFilter())
-	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', $data['action']));
+$this->includeJsFile('reports.actionlog.list.js.php');
 
 $filter_status_options = [];
 
@@ -40,93 +39,80 @@ foreach ($data['statuses'] as $value => $name) {
 	];
 }
 
-$filter_actions = (new CCheckBoxList('filter_statuses'))
-	->setId('filter_status')
-	->addClass(ZBX_STYLE_COLUMNS)
-	->addClass(ZBX_STYLE_COLUMNS_3)
-	->setWidth(360)
-	->setOptions($filter_status_options);
-
-$html_page = (new CHtmlPage())
-	->setTitle(_('Action log'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_ACTIONLOG_LIST))
-	->setControls(
-		(new CTag('nav', true,
-			(new CList())
-				->addItem(
-					(new CRedirectButton(_('Export to CSV'), (new CUrl())->setArgument('action', 'actionlog.csv')))
-						->setId('export_csv')
-				)
-		))->setAttribute('aria-label', _('Content controls'))
-	)
-	->addItem($filter
-		->addVar('action', $data['action'])
-		->setProfile($data['timeline']['profileIdx'])
-		->setActiveTab($data['active_tab'])
-		->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
-		->addFilterTab(_('Filter'), [
-			(new CFormList())
-				->addRow(new CLabel(_('Recipients'), 'filter_userids__ms'), [
-					(new CMultiSelect([
-						'name' => 'filter_userids[]',
-						'object_name' => 'users',
-						'data' => $data['userids'],
-						'placeholder' => '',
-						'popup' => [
-							'parameters' => [
-								'srctbl' => 'users',
-								'srcfld1' => 'userid',
-								'srcfld2' => 'fullname',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_userids_'
-							]
+$filter = (new CFilter())
+	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', $data['action']))
+	->setProfile($data['timeline']['profileIdx'])
+	->addVar('action', $data['action'])
+	->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
+	->setActiveTab($data['active_tab'])
+	->addFilterTab(_('Filter'), [
+		(new CFormList())
+			->addRow(new CLabel(_('Recipients'), 'filter_userids__ms'), [
+				(new CMultiSelect([
+					'name' => 'filter_userids[]',
+					'object_name' => 'users',
+					'data' => $data['userids'],
+					'placeholder' => '',
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'users',
+							'srcfld1' => 'userid',
+							'srcfld2' => 'fullname',
+							'dstfrm' => 'zbx_filter',
+							'dstfld1' => 'filter_userids_'
 						]
-					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				])
-				->addRow(new CLabel(_('Actions'), 'filter_actionids__ms'), [
-					(new CMultiSelect([
-						'name' => 'filter_actionids[]',
-						'object_name' => 'actions',
-						'data' => $data['actionids'],
-						'placeholder' => '',
-						'popup' => [
-							'parameters' => [
-								'srctbl' => 'actions',
-								'srcfld1' => 'actionid',
-								'srcfld2' => 'name',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_actionids_'
-							]
+					]
+				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			])
+			->addRow(new CLabel(_('Actions'), 'filter_actionids__ms'), [
+				(new CMultiSelect([
+					'name' => 'filter_actionids[]',
+					'object_name' => 'actions',
+					'data' => $data['actionids'],
+					'placeholder' => '',
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'actions',
+							'srcfld1' => 'actionid',
+							'srcfld2' => 'name',
+							'dstfrm' => 'zbx_filter',
+							'dstfld1' => 'filter_actionids_'
 						]
-					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				])
-				->addRow(new CLabel(_('Media types'), 'filter_mediatypeids__ms'), [
-					(new CMultiSelect([
-						'name' => 'filter_mediatypeids[]',
-						'object_name' => 'media_types',
-						'data' => $data['mediatypeids'],
-						'placeholder' => '',
-						'popup' => [
-							'parameters' => [
-								'srctbl' => 'media_types',
-								'srcfld1' => 'mediatypeid',
-								'srcfld2' => 'name',
-								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_mediatypeids_'
-							]
+					]
+				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			])
+			->addRow(new CLabel(_('Media types'), 'filter_mediatypeids__ms'), [
+				(new CMultiSelect([
+					'name' => 'filter_mediatypeids[]',
+					'object_name' => 'media_types',
+					'data' => $data['mediatypeids'],
+					'placeholder' => '',
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'media_types',
+							'srcfld1' => 'mediatypeid',
+							'srcfld2' => 'name',
+							'dstfrm' => 'zbx_filter',
+							'dstfld1' => 'filter_mediatypeids_'
 						]
-					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				]),
-			(new CFormList())
-				->addRow(_('Status'), $filter_actions)
-				->addRow(_('Search string'),
-					(new CTextBox('filter_messages', $data['messages']))
+					]
+				]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			]),
+		(new CFormList())
+			->addRow(_('Status'),
+				(new CCheckBoxList('filter_statuses'))
+					->setId('filter_status')
+					->addClass(ZBX_STYLE_COLUMNS)
+					->addClass(ZBX_STYLE_COLUMNS_3)
+					->setWidth(360)
+					->setOptions($filter_status_options))
+			->addRow(_('Search string'),
+				(new CTextBox('filter_messages', $data['messages']))
 					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-				)
-		])
-	);
+			)
+	]);
 
-$table = (new CTableInfo())
+$actionlog_list = (new CTableInfo())
 	->setHeader([
 		_('Time'),
 		_('Action'),
@@ -137,8 +123,24 @@ $table = (new CTableInfo())
 		_('Info')
 	]);
 
-foreach ($this->data['alerts'] as $alert) {
+foreach ($data['alerts'] as $alert) {
 	$mediatype = array_pop($alert['mediatypes']);
+
+	$message = $alert['alerttype'] == ALERT_TYPE_MESSAGE
+		? [
+			bold(_('Subject').':'),
+			BR(),
+			(new CDiv($alert['subject']))->addClass(ZBX_STYLE_WORDBREAK),
+			BR(),
+			bold(_('Message').':'),
+			BR(),
+			(new CDiv(zbx_nl2br($alert['message'])))->addClass(ZBX_STYLE_WORDBREAK)
+		]
+		: [
+			bold(_('Command').':'),
+			BR(),
+			(new CDiv(zbx_nl2br($alert['message'])))->addClass(ZBX_STYLE_WORDBREAK)
+		];
 
 	if ($alert['status'] == ALERT_STATUS_SENT) {
 		$status = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
@@ -156,62 +158,52 @@ foreach ($this->data['alerts'] as $alert) {
 		$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
 	}
 
-	$message = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
-		? [
-			bold(_('Subject').':'),
-			BR(),
-			(new CDiv($alert['subject']))->addClass(ZBX_STYLE_WORDBREAK),
-			BR(),
-			bold(_('Message').':'),
-			BR(),
-			(new CDiv(zbx_nl2br($alert['message'])))->addClass(ZBX_STYLE_WORDBREAK)
-		]
-		: [
-			bold(_('Command').':'),
-			BR(),
-			(new CDiv(zbx_nl2br($alert['message'])))->addClass(ZBX_STYLE_WORDBREAK)
-		];
-
 	$info_icons = [];
 	if ($alert['error'] !== '') {
 		$info_icons[] = makeErrorIcon($alert['error']);
 	}
 
-	$recipient = (isset($alert['userid']) && $alert['userid'])
-		? makeEventDetailsTableUser($alert + ['action_type' => ZBX_EVENT_HISTORY_ALERT], $data['users'])
-		: zbx_nl2br($alert['sendto']);
-
-	$table->addRow([
+	$actionlog_list->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
-		$this->data['actions'][$alert['actionid']]['name'],
-		($mediatype) ? $mediatype['name'] : '',
-		$recipient,
+		$data['actions'][$alert['actionid']]['name'],
+		$mediatype ? $mediatype['name'] : '',
+		array_key_exists('userid', $alert) && $alert['userid']
+			? makeEventDetailsTableUser($alert + ['action_type' => ZBX_EVENT_HISTORY_ALERT], $data['users'])
+			: zbx_nl2br($alert['sendto']),
 		$message,
 		$status,
 		makeInformationList($info_icons)
 	]);
 }
 
-$obj = [
-	'id' => 'timeline_1',
-	'domid' => 'events',
-	'loadSBox' => 0,
-	'loadImage' => 0,
-	'dynamic' => 0
-];
-
-(new CScriptTag('timeControl.addObject("actionlog", '.json_encode($data['timeline']).', '.json_encode($obj).');'.
-	'timeControl.processObjects();')
-)->show();
-
-$html_page
+(new CHtmlPage())
+	->setTitle(_('Action log'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_ACTIONLOG_LIST))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					(new CRedirectButton(_('Export to CSV'), (new CUrl())->setArgument('action', 'actionlog.csv')))
+						->setId('export_csv')
+				)
+		))->setAttribute('aria-label', _('Content controls'))
+	)
+	->addItem($filter)
 	->addItem(
 		(new CForm('get'))
 			->setName('auditForm')
-			->addItem([$table, $data['paging']])
+			->addItem([$actionlog_list, $data['paging']])
 	)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode($data['timeline'], JSON_THROW_ON_ERROR).', '.json_encode([
+		'id' => 'timeline_1',
+		'domid' => 'events',
+		'loadSBox' => 0,
+		'loadImage' => 0,
+		'dynamic' => 0
+	], JSON_THROW_ON_ERROR).');
+'))
 	->setOnDocumentReady()
 	->show();

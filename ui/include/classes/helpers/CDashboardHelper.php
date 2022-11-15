@@ -316,7 +316,6 @@ class CDashboardHelper {
 			}
 		}
 
-
 		if ($ids[ZBX_WIDGET_FIELD_TYPE_ACTION]) {
 			$db_actions = API::Action()->get([
 				'output' => [],

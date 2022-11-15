@@ -31,13 +31,13 @@
 		new CWidgetFieldMultiSelectUserView($data['fields']['userids'], $data['captions']['ms']['users']['userids'])
 	)
 	->addField(
-		new CWidgetFieldMultiSelectActionView(
-			$data['fields']['actionids'], $data['captions']['ms']['actions']['actionids']
+		new CWidgetFieldMultiSelectActionView($data['fields']['actionids'],
+			$data['captions']['ms']['actions']['actionids']
 		)
 	)
 	->addField(
-		new CWidgetFieldMultiSelectMediaTypeView(
-			$data['fields']['mediatypeids'], $data['captions']['ms']['media_types']['mediatypeids']
+		new CWidgetFieldMultiSelectMediaTypeView($data['fields']['mediatypeids'],
+			$data['captions']['ms']['media_types']['mediatypeids']
 		)
 	)
 	->addField(

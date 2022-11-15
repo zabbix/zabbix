@@ -25,6 +25,10 @@
 
 class CControllerActionLogList extends CController {
 
+	protected function init(): void {
+		$this->disableSIDValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'page' =>					'ge 1',
@@ -96,7 +100,7 @@ class CControllerActionLogList extends CController {
 				'preservekeys' => true
 			]);
 
-			$userids = array_column($data['users'], 'userid');
+			$userids = array_keys($data['users']);
 			$data['userids'] = $this->prepareDataForMultiselect($data['users'], 'users');
 		}
 
@@ -109,7 +113,7 @@ class CControllerActionLogList extends CController {
 				'preservekeys' => true
 			]);
 
-			$actionids = array_column($data['actions'], 'actionid');
+			$actionids = array_keys($data['actions']);
 			$data['actionids'] = $this->prepareDataForMultiselect($data['actions'], 'actions');
 		}
 
@@ -122,7 +126,7 @@ class CControllerActionLogList extends CController {
 				'preservekeys' => true
 			]);
 
-			$mediatypeids = array_column($data['media_types'], 'mediatypeid');
+			$mediatypeids = array_keys($data['media_types']);
 			$data['mediatypeids'] = $this->prepareDataForMultiselect($data['media_types'], 'media_types');
 		}
 
@@ -133,16 +137,17 @@ class CControllerActionLogList extends CController {
 		}
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
-		foreach (eventSourceObjects() as $eventSource) {
+
+		foreach (eventSourceObjects() as $event_source) {
 			$data['alerts'] = array_merge($data['alerts'], API::Alert()->get([
 				'output' => ['alertid', 'actionid', 'userid', 'clock', 'sendto', 'subject', 'message', 'status',
 					'retries', 'error', 'alerttype'
 				],
 				'filter' => ['status' => $data['actionlog_statuses']],
 				'selectMediatypes' => ['mediatypeid', 'name', 'maxattempts'],
-				'userids' => $userids ? $userids : null,
-				'actionids' => $actionids ? $actionids : null,
-				'mediatypeids' => $mediatypeids ? $mediatypeids : null,
+				'userids' => $userids ?: null,
+				'actionids' => $actionids ?: null,
+				'mediatypeids' => $mediatypeids ?: null,
 				'search' => [
 					'subject' => $search_strings,
 					'message' => $search_strings
@@ -150,8 +155,8 @@ class CControllerActionLogList extends CController {
 				'searchByAny' => true,
 				'time_from' => $data['timeline']['from_ts'] - 1,
 				'time_till' => $data['timeline']['to_ts'] + 1,
-				'eventsource' => $eventSource['source'],
-				'eventobject' => $eventSource['object'],
+				'eventsource' => $event_source['source'],
+				'eventobject' => $event_source['object'],
 				'sortfield' => 'alertid',
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => $limit
@@ -192,10 +197,6 @@ class CControllerActionLogList extends CController {
 		}
 
 		$this->setResponse($response);
-	}
-
-	protected function init(): void {
-		$this->disableSIDValidation();
 	}
 
 	/**

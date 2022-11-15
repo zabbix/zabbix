@@ -27,19 +27,18 @@ use Zabbix\Core\{
 use Zabbix\Widgets\CWidgetForm;
 
 use Zabbix\Widgets\Fields\{
+	CWidgetFieldMultiSelectAction,
 	CWidgetFieldMultiSelectGraph,
 	CWidgetFieldMultiSelectGraphPrototype,
 	CWidgetFieldMultiSelectGroup,
 	CWidgetFieldMultiSelectHost,
 	CWidgetFieldMultiSelectItem,
 	CWidgetFieldMultiSelectItemPrototype,
+	CWidgetFieldMultiSelectMediaType,
 	CWidgetFieldMultiSelectService,
 	CWidgetFieldMultiSelectSla,
 	CWidgetFieldMultiSelectUser,
-	CWidgetFieldMultiSelectAction,
-	CWidgetFieldMultiSelectMediaType,
-	CWidgetFieldSelectResource
-};
+	CWidgetFieldSelectResource};
 
 class CControllerDashboardWidgetEdit extends CController {
 
@@ -59,6 +58,7 @@ class CControllerDashboardWidgetEdit extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
+			/** @var CWidget $widget */
 			$widget = APP::ModuleManager()->getModule($this->getInput('type'));
 
 			if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET) {

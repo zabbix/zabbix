@@ -58,7 +58,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'preservekeys' => true
 			]);
 
-			$userids = array_column($data['users'], 'userid');
+			$userids = array_keys($data['users']);
 			$data['userids'] = $this->prepareDataForMultiselect($data['users'], 'users');
 		}
 
@@ -71,7 +71,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'preservekeys' => true
 			]);
 
-			$actionids = array_column($data['actions'], 'actionid');
+			$actionids = array_keys($data['actions']);
 			$data['actionids'] = $this->prepareDataForMultiselect($data['actions'], 'actions');
 		}
 
@@ -84,7 +84,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'preservekeys' => true
 			]);
 
-			$mediatypeids = array_column($data['media_types'], 'mediatypeid');
+			$mediatypeids = array_keys($data['media_types']);
 			$data['mediatypeids'] = $this->prepareDataForMultiselect($data['media_types'], 'media_types');
 		}
 
@@ -99,9 +99,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'mediatypeid', 'alerttype'
 			],
 			'selectMediatypes' => ['name', 'maxattempts'],
-			'userids' => $userids ? $userids : null,
-			'actionids' => $actionids ? $actionids : null,
-			'mediatypeids' => $mediatypeids ? $mediatypeids : null,
+			'userids' => $userids ?: null,
+			'actionids' => $actionids ?: null,
+			'mediatypeids' => $mediatypeids ?: null,
 			'filter' => ['status' => $data['statuses']],
 			'search' => [
 				'subject' => $search_strings,

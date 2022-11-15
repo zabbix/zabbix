@@ -41,9 +41,15 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField(new CWidgetFieldMultiSelectUser('userids', _('Recipients')))
-			->addField(new CWidgetFieldMultiSelectAction('actionids', _('Actions')))
-			->addField(new CWidgetFieldMultiSelectMediaType('mediatypeids', _('Media types')))
+			->addField(
+				new CWidgetFieldMultiSelectUser('userids', _('Recipients'))
+			)
+			->addField(
+				new CWidgetFieldMultiSelectAction('actionids', _('Actions'))
+			)
+			->addField(
+				new CWidgetFieldMultiSelectMediaType('mediatypeids', _('Media types'))
+			)
 			->addField(
 				new CWidgetFieldCheckBoxList('statuses', _('Status'), [
 					ALERT_STATUS_NOT_SENT => _('In progress'),
