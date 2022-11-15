@@ -383,7 +383,7 @@ form {
 		padding-bottom: 0;
 	}
 
-	.problem-nested:not([class*='flh-']):not(.row-selected) {
+	.problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) {
 		background-color: darken($ui-bg-color, 5%);
 
 		td, .timeline-axis, .timeline-td {
