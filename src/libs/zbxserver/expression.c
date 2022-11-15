@@ -5325,7 +5325,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 				(size_t)itemids.values_num);
 		*items_err = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)itemids.values_num);
 
-		DCconfig_history_get_items_by_itemids(*items, itemids.values, *items_err, itemids.values_num,
+		DCconfig_history_sync_get_items_by_itemids(*items, itemids.values, *items_err, itemids.values_num,
 				ZBX_ITEM_GET_SYNC);
 	}
 
@@ -5764,7 +5764,7 @@ void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint6
 
 	if (0 != items_num)
 	{
-		DCconfig_clean_history_items(items, items_err, (size_t)items_num);
+		DCconfig_clean_history_sync_items(items, items_err, (size_t)items_num);
 		zbx_free(items);
 		zbx_free(items_err);
 	}

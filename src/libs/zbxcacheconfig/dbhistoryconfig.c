@@ -22,6 +22,198 @@
 #include "zbxserver.h"
 #include "actions.h"
 
+static void	DCget_history_sync_host(zbx_history_sync_host_t *dst_host, const ZBX_DC_HOST *src_host,
+		unsigned int mode)
+{
+	const ZBX_DC_HOST_INVENTORY	*host_inventory;
+
+	dst_host->hostid = src_host->hostid;
+	dst_host->proxy_hostid = src_host->proxy_hostid;
+	dst_host->status = src_host->status;
+
+	zbx_strscpy(dst_host->host, src_host->host);
+
+	if (ZBX_ITEM_GET_HOSTNAME & mode)
+		zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
+
+	if (NULL != (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories,
+			&src_host->hostid)))
+	{
+		dst_host->inventory_mode = (signed char)host_inventory->inventory_mode;
+	}
+	else
+		dst_host->inventory_mode = HOST_INVENTORY_DISABLED;
+}
+
+static void	DCget_history_sync_item(zbx_history_sync_item_t *dst_item, const ZBX_DC_ITEM *src_item)
+{
+	const ZBX_DC_NUMITEM	*numitem;
+
+	dst_item->type = src_item->type;
+	dst_item->value_type = src_item->value_type;
+
+	dst_item->state = src_item->state;
+	dst_item->lastlogsize = src_item->lastlogsize;
+	dst_item->mtime = src_item->mtime;
+
+	if ('\0' != *src_item->error)
+		dst_item->error = zbx_strdup(NULL, src_item->error);
+	else
+		dst_item->error = NULL;
+
+	dst_item->inventory_link = src_item->inventory_link;
+	dst_item->valuemapid = src_item->valuemapid;
+	dst_item->status = src_item->status;
+
+	dst_item->history_period = zbx_strdup(NULL, src_item->history_period);
+	dst_item->flags = src_item->flags;
+
+	zbx_strscpy(dst_item->key_orig, src_item->key);
+
+	switch (src_item->value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+		case ITEM_VALUE_TYPE_UINT64:
+			numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &src_item->itemid);
+
+			dst_item->trends_period = zbx_strdup(NULL, numitem->trends_period);
+
+			if ('\0' != *numitem->units)
+				dst_item->units = zbx_strdup(NULL, numitem->units);
+			else
+				dst_item->units = NULL;
+			break;
+		default:
+			dst_item->trends_period = NULL;
+			dst_item->units = NULL;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: convert item history/trends housekeeping period to numeric values *
+ *          expanding user macros and applying global housekeeping settings   *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_history_sync_item_t *item)
+{
+	if (NULL != item->trends_period)
+	{
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, &item->trends_period, MACRO_TYPE_COMMON, NULL, 0);
+
+		if (SUCCEED != zbx_is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
+			item->trends_sec = ZBX_HK_PERIOD_MAX;
+
+		if (0 != item->trends_sec && ZBX_HK_OPTION_ENABLED == config_hk->history_global)
+			item->trends_sec = config_hk->trends;
+
+		item->trends = (0 != item->trends_sec);
+	}
+
+	if (NULL != item->history_period)
+	{
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, &item->history_period, MACRO_TYPE_COMMON, NULL, 0);
+
+		if (SUCCEED != zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
+			item->history_sec = ZBX_HK_PERIOD_MAX;
+
+		if (0 != item->history_sec && ZBX_HK_OPTION_ENABLED == config_hk->history_global)
+			item->history_sec = config_hk->history;
+
+		item->history = (0 != item->history_sec);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Get item with specified ID                                        *
+ *                                                                            *
+ * Parameters: items    - [OUT] pointer to DC_ITEM structures                 *
+ *             itemids  - [IN] array of item IDs                              *
+ *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
+ *             num      - [IN] number of elements                             *
+ *                                                                            *
+ * NOTE: Item and host is retrieved using history read lock that must be      *
+ *       write locked only when configuration sync occurs to avoid processes  *
+ *       blocking each other. Item can only be processed by one history       *
+ *       syncer at a time, thus it is safe to read dynamic data such as error *
+ *       as no other process will update it.                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_history_sync_get_items_by_itemids(zbx_history_sync_item_t *items, const zbx_uint64_t *itemids,
+		int *errcodes, int num, unsigned int mode)
+{
+	int			i;
+	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_HOST	*dc_host = NULL;
+	zbx_config_hk_t		config_hk;
+	zbx_dc_um_handle_t	*um_handle;
+
+	memset(errcodes, 0, sizeof(int) * num);
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	for (i = 0; i < num; i++)
+	{
+		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])))
+		{
+			errcodes[i] = FAIL;
+			continue;
+		}
+
+		if (NULL == dc_host || dc_host->hostid != dc_item->hostid)
+		{
+			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
+			{
+				errcodes[i] = FAIL;
+				continue;
+			}
+		}
+
+		DCget_history_sync_host(&items[i].host, dc_host, mode);
+		DCget_history_sync_item(&items[i], dc_item);
+
+		config_hk = config->config->hk;
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+
+	um_handle = zbx_dc_open_user_macros();
+
+	/* avoid unnecessary allocations inside lock if there are no error or units */
+	for (i = 0; i < num; i++)
+	{
+		if (FAIL == errcodes[i])
+			continue;
+
+		items[i].itemid = itemids[i];
+
+		dc_items_convert_hk_periods(&config_hk, &items[i]);
+	}
+
+	zbx_dc_close_user_macros(um_handle);
+}
+
+void	DCconfig_clean_history_sync_items(zbx_history_sync_item_t *items, int *errcodes, size_t num)
+{
+	size_t	i;
+
+	for (i = 0; i < num; i++)
+	{
+		if (NULL != errcodes && SUCCEED != errcodes[i])
+			continue;
+
+		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
+			zbx_free(items[i].units);
+
+		zbx_free(items[i].error);
+		zbx_free(items[i].history_period);
+		zbx_free(items[i].trends_period);
+	}
+}
+
 static void	DCget_history_data_host(DC_HISTORY_DATA_HOST *dst_host, const ZBX_DC_HOST *src_host, unsigned int mode)
 {
 	const ZBX_DC_IPMIHOST	*ipmihost;
@@ -219,43 +411,6 @@ void	DCconfig_history_data_get_items_by_keys(DC_HISTORY_DATA_ITEM *items, zbx_ho
 
 /******************************************************************************
  *                                                                            *
- * Purpose: convert item history/trends housekeeping period to numeric values *
- *          expanding user macros and applying global housekeeping settings   *
- *                                                                            *
- ******************************************************************************/
-static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_history_sync_item_t *item)
-{
-	if (NULL != item->trends_period)
-	{
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->trends_period, MACRO_TYPE_COMMON, NULL, 0);
-
-		if (SUCCEED != zbx_is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
-			item->trends_sec = ZBX_HK_PERIOD_MAX;
-
-		if (0 != item->trends_sec && ZBX_HK_OPTION_ENABLED == config_hk->history_global)
-			item->trends_sec = config_hk->trends;
-
-		item->trends = (0 != item->trends_sec);
-	}
-
-	if (NULL != item->history_period)
-	{
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->history_period, MACRO_TYPE_COMMON, NULL, 0);
-
-		if (SUCCEED != zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
-			item->history_sec = ZBX_HK_PERIOD_MAX;
-
-		if (0 != item->history_sec && ZBX_HK_OPTION_ENABLED == config_hk->history_global)
-			item->history_sec = config_hk->history;
-
-		item->history = (0 != item->history_sec);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: Get item with specified ID                                        *
  *                                                                            *
  * Parameters: items    - [OUT] pointer to DC_ITEM structures                 *
@@ -305,160 +460,7 @@ void	DCconfig_history_data_get_items_by_itemids(DC_HISTORY_DATA_ITEM *items, con
 	get_items_maintenances(items, errcodes, num);
 }
 
-static void	DCget_history_sync_host(zbx_history_sync_host_t *dst_host, const ZBX_DC_HOST *src_host,
-		unsigned int mode)
-{
-	const ZBX_DC_HOST_INVENTORY	*host_inventory;
 
-	dst_host->hostid = src_host->hostid;
-	dst_host->proxy_hostid = src_host->proxy_hostid;
-	dst_host->status = src_host->status;
-
-	zbx_strscpy(dst_host->host, src_host->host);
-
-	if (ZBX_ITEM_GET_HOSTNAME & mode)
-		zbx_strlcpy_utf8(dst_host->name, src_host->name, sizeof(dst_host->name));
-
-	if (NULL != (host_inventory = (ZBX_DC_HOST_INVENTORY *)zbx_hashset_search(&config->host_inventories,
-			&src_host->hostid)))
-	{
-		dst_host->inventory_mode = (signed char)host_inventory->inventory_mode;
-	}
-	else
-		dst_host->inventory_mode = HOST_INVENTORY_DISABLED;
-}
-
-static void	DCget_history_sync_item(zbx_history_sync_item_t *dst_item, const ZBX_DC_ITEM *src_item)
-{
-	const ZBX_DC_NUMITEM	*numitem;
-
-	dst_item->type = src_item->type;
-	dst_item->value_type = src_item->value_type;
-
-	dst_item->state = src_item->state;
-	dst_item->lastlogsize = src_item->lastlogsize;
-	dst_item->mtime = src_item->mtime;
-
-	if ('\0' != *src_item->error)
-		dst_item->error = zbx_strdup(NULL, src_item->error);
-	else
-		dst_item->error = NULL;
-
-	dst_item->inventory_link = src_item->inventory_link;
-	dst_item->valuemapid = src_item->valuemapid;
-	dst_item->status = src_item->status;
-
-	dst_item->history_period = zbx_strdup(NULL, src_item->history_period);
-	dst_item->flags = src_item->flags;
-
-	zbx_strscpy(dst_item->key_orig, src_item->key);
-
-	switch (src_item->value_type)
-	{
-		case ITEM_VALUE_TYPE_FLOAT:
-		case ITEM_VALUE_TYPE_UINT64:
-			numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &src_item->itemid);
-
-			dst_item->trends_period = zbx_strdup(NULL, numitem->trends_period);
-
-			if ('\0' != *numitem->units)
-				dst_item->units = zbx_strdup(NULL, numitem->units);
-			else
-				dst_item->units = NULL;
-			break;
-		default:
-			dst_item->trends_period = NULL;
-			dst_item->units = NULL;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Get item with specified ID                                        *
- *                                                                            *
- * Parameters: items    - [OUT] pointer to DC_ITEM structures                 *
- *             itemids  - [IN] array of item IDs                              *
- *             errcodes - [OUT] SUCCEED if item found, otherwise FAIL         *
- *             num      - [IN] number of elements                             *
- *                                                                            *
- * NOTE: Item and host is retrieved using history read lock that must be      *
- *       write locked only when configuration sync occurs to avoid processes  *
- *       blocking each other. Item can only be processed by one history       *
- *       syncer at a time, thus it is safe to read dynamic data such as error *
- *       as no other process will update it.                                  *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_history_get_items_by_itemids(zbx_history_sync_item_t *items, const zbx_uint64_t *itemids,
-		int *errcodes, int num, unsigned int mode)
-{
-	int			i;
-	const ZBX_DC_ITEM	*dc_item;
-	const ZBX_DC_HOST	*dc_host = NULL;
-	zbx_config_hk_t		config_hk;
-	zbx_dc_um_handle_t	*um_handle;
-
-	memset(errcodes, 0, sizeof(int) * num);
-
-	RDLOCK_CACHE_CONFIG_HISTORY;
-
-	for (i = 0; i < num; i++)
-	{
-		if (NULL == (dc_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemids[i])))
-		{
-			errcodes[i] = FAIL;
-			continue;
-		}
-
-		if (NULL == dc_host || dc_host->hostid != dc_item->hostid)
-		{
-			if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_item->hostid)))
-			{
-				errcodes[i] = FAIL;
-				continue;
-			}
-		}
-
-		DCget_history_sync_host(&items[i].host, dc_host, mode);
-		DCget_history_sync_item(&items[i], dc_item);
-
-		config_hk = config->config->hk;
-	}
-
-	UNLOCK_CACHE_CONFIG_HISTORY;
-
-	um_handle = zbx_dc_open_user_macros();
-
-	/* avoid unnecessary allocations inside lock if there are no error or units */
-	for (i = 0; i < num; i++)
-	{
-		if (FAIL == errcodes[i])
-			continue;
-
-		items[i].itemid = itemids[i];
-
-		dc_items_convert_hk_periods(&config_hk, &items[i]);
-	}
-
-	zbx_dc_close_user_macros(um_handle);
-}
-
-void	DCconfig_clean_history_items(zbx_history_sync_item_t *items, int *errcodes, size_t num)
-{
-	size_t	i;
-
-	for (i = 0; i < num; i++)
-	{
-		if (NULL != errcodes && SUCCEED != errcodes[i])
-			continue;
-
-		if (ITEM_VALUE_TYPE_FLOAT == items[i].value_type || ITEM_VALUE_TYPE_UINT64 == items[i].value_type)
-			zbx_free(items[i].units);
-
-		zbx_free(items[i].error);
-		zbx_free(items[i].history_period);
-		zbx_free(items[i].trends_period);
-	}
-}
 
 /******************************************************************************
  *                                                                            *

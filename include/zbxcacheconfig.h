@@ -674,13 +674,13 @@ void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, 
 void	DCconfig_get_hosts_by_hostids(DC_HOST *hosts, const zbx_uint64_t *hostids, int *errcodes, int num);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
-void	DCconfig_history_get_items_by_itemids(zbx_history_sync_item_t *items, const zbx_uint64_t *itemids, int *errcodes, int num,
-		unsigned int mode);
+void	DCconfig_history_sync_get_items_by_itemids(zbx_history_sync_item_t *items, const zbx_uint64_t *itemids,
+		int *errcodes, int num, unsigned int mode);
 void	DCconfig_history_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_history_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, int itemids_num);
-void	DCconfig_clean_history_items(zbx_history_sync_item_t *items, int *errcodes, size_t num);
+void	DCconfig_clean_history_sync_items(zbx_history_sync_item_t *items, int *errcodes, size_t num);
 void	DCconfig_history_data_get_items_by_keys(DC_HISTORY_DATA_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_history_data_get_items_by_itemids(DC_HISTORY_DATA_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
 		unsigned int mode);
