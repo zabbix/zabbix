@@ -64,7 +64,6 @@ static void	DCget_history_data_host(DC_HISTORY_DATA_HOST *dst_host, const ZBX_DC
 	}
 }
 
-
 static void	DCget_history_data_item(DC_HISTORY_DATA_ITEM *dst_item, const ZBX_DC_ITEM *src_item, unsigned int mode)
 {
 	const ZBX_DC_LOGITEM	*logitem;
