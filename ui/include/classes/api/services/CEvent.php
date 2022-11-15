@@ -1273,12 +1273,10 @@ class CEvent extends CApiService {
 				$sqlParts = $this->addQuerySelect('e.objectid', $sqlParts);
 			}
 
-			$left_join_symptom = true;
-			foreach (['cause_eventid', 'rank_userid'] as $field) {
-				if ($this->outputIsRequested($field, $options['output'])) {
-					$sqlParts['select'][$field] = 'es1.'.$field;
-					$left_join_symptom = true;
-				}
+			$left_join_symptom = false;
+			if ($this->outputIsRequested('cause_eventid', $options['output'])) {
+				$sqlParts['select']['cause_eventid'] = 'es1.cause_eventid';
+				$left_join_symptom = true;
 			}
 
 			if ($left_join_symptom) {
