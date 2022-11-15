@@ -430,8 +430,6 @@ void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_ptr_t *actions, unsi
 static void	dc_get_history_recv_host(zbx_history_recv_host_t *dst_host, const ZBX_DC_HOST *src_host,
 		unsigned int mode)
 {
-	const ZBX_DC_IPMIHOST	*ipmihost;
-
 	dst_host->hostid = src_host->hostid;
 	dst_host->proxy_hostid = src_host->proxy_hostid;
 	dst_host->status = src_host->status;
