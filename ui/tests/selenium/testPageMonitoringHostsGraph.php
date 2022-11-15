@@ -28,6 +28,8 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
  */
 class testPageMonitoringHostsGraph extends CWebTest {
 
+	private static $time;
+
 	public function prepareGraphsData() {
 		$hosts = CDataHelper::call('host.create', [
 			[
@@ -73,6 +75,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		]);
 		$this->assertArrayHasKey('itemids', $items);
 		$itemids = CDataHelper::getIds('name');
+
+		self::$time = time()-300;
+		CDataHelper::addItemData($itemids['Item for graph 1'], 1, self::$time);
+		CDataHelper::addItemData($itemids['Item for graph 2'], 2, self::$time);
+		CDataHelper::addItemData($itemids['Item for graph 3'], 3, self::$time);
 
 		$graphs = CDataHelper::call('graph.create', [
 			[
@@ -185,11 +192,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 	}
 
 	/**
-	 * Check graph page in layout mode.
+	 * Check graph page in kiosk mode.
 	 */
 	public function testPageMonitoringHostsGraph_KioskMode() {
 		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to'.
-			'=now&filter_search_type=0&filter_set=1');
+				'=now&filter_search_type=0&filter_set=1');
 
 		// Check Kiosk mode.
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
@@ -218,7 +225,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Search type' => 'Strict'
 					],
 					'graphs_result' => 3,
-					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3']
+					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3'],
+					'view_result' => ["1\n2\n3"]
 				]
 			],
 			// #1
@@ -229,7 +237,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Search type' => 'Pattern'
 					],
 					'graphs_result' => 3,
-					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3']
+					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3'],
+					'view_result' => ["1\n2\n3"]
 				]
 			],
 			// #2
@@ -241,7 +250,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Graphs' => 'Graph 2'
 					],
 					'graphs_result' => 1,
-					'items_names' => ['Item for graph 2']
+					'items_names' => ['Item for graph 2'],
+					'view_result' => ["2"]
 				]
 			],
 			// #3
@@ -253,7 +263,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Graphs' => 'Graph 2'
 					],
 					'graphs_result' => 1,
-					'items_names' => ['Item for graph 2']
+					'items_names' => ['Item for graph 2'],
+					'view_result' => ["2"]
 				]
 			],
 			// #4
@@ -264,7 +275,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Graphs' => 'Graph 1'
 					],
 					'graphs_result' => 1,
-					'items_names' => ['Item for graph 1']
+					'items_names' => ['Item for graph 1'],
+					'view_result' => ["1"]
 				]
 			],
 			// #5
@@ -285,7 +297,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Graphs' => ['Graph 1', 'Graph 3']
 					],
 					'graphs_result' => 2,
-					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3']
+					'items_names' => ['Item for graph 1', 'Item for graph 2', 'Item for graph 3'],
+					'view_result' => ["1\n2\n3"]
 				]
 			],
 			// #7
@@ -328,7 +341,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Graphs' => ['non_existing_graph', 'Graph 1']
 					],
 					'graphs_result' => 1,
-					'items_names' => ['Item for graph 1']
+					'items_names' => ['Item for graph 1'],
+					'view_result' => ["1"]
 				]
 			]
 		];
@@ -376,7 +390,16 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			$this->query('id:view-as')->asDropdown()->one()->select('Values');
 			$this->page->waitUntilReady();
 			$table = $this->query('class:list-table')->asTable()->one();
-			$this->assertEquals(['No data found.'], $table->getRows()->asText());
+
+			// Transfer results from array to string.
+			$view_result = implode($data['view_result']);
+
+			// Change date/time format to string.
+			$string_time = date('Y-m-d H:i:s', self::$time);
+
+			// Make correct array with values that should be displayed in "Values view"
+			$last_result[] = $string_time."\n".$view_result;
+			$this->assertEquals($last_result, $table->getRows()->asText());
 			foreach ($data['items_names'] as $item) {
 				$this->assertTrue($table->query('xpath://tr/th[@title="'.$item.'"]')->exists());
 			}
