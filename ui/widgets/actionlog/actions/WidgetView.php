@@ -24,10 +24,19 @@ namespace Widgets\ActionLog\Actions;
 use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
-	CRoleHelper,
-	CArrayHelper;
+	CArrayHelper,
+	CRangeTimeParser;
 
 class WidgetView extends CControllerDashboardWidgetView {
+
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules([
+			'from' => 'string',
+			'to' => 'string'
+		]);
+	}
 
 	protected function doAction(): void {
 		[$sortfield, $sortorder] = self::getSorting($this->fields_values['sort_triggers']);
@@ -94,6 +103,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$search_strings = explode(' ', $data['message']);
 		}
 
+		$range_time_parser = new CRangeTimeParser();
+
+		$range_time_parser->parse($this->getInput('from'));
+		$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
+
+		$range_time_parser->parse($this->getInput('to'));
+		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
+
 		$alerts = API::Alert()->get([
 			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
 				'mediatypeid', 'alerttype'
@@ -108,6 +125,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'message' => $search_strings
 			],
 			'searchByAny' => true,
+			'time_from' => $time_from - 1,
+			'time_till' => $time_to + 1,
 			'sortfield' => $sortfield,
 			'sortorder' => $sortorder,
 			'limit' => $this->fields_values['show_lines']

@@ -5,5 +5,12 @@
 	"name": "Action log",
 	"namespace": "ActionLog",
 	"version": "1.0",
-	"author": "Zabbix SIA"
+	"author": "Zabbix SIA",
+	"widget": {
+		"js_class": "CWidgetActionLog",
+		"use_time_selector": true
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
 }

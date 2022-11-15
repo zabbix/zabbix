@@ -1,4 +1,3 @@
-<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,13 +18,21 @@
 **/
 
 
-namespace Widgets\ActionLog;
+class CWidgetActionLog extends CWidget {
 
-use Zabbix\Core\CWidget;
+	setTimePeriod(time_period) {
+		super.setTimePeriod(time_period);
 
-class Widget extends CWidget {
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._startUpdating();
+		}
+	}
 
-	public function getDefaultName(): string {
-		return _('Action log');
+	_getUpdateRequestData() {
+		return {
+			...super._getUpdateRequestData(),
+			from: this._time_period.from,
+			to: this._time_period.to
+		};
 	}
 }
