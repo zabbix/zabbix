@@ -52,10 +52,12 @@
 				const http_auth_enabled = document.getElementById('http_auth_enabled');
 
 				if (http_auth_enabled.checked) {
+					let warn_message = <?= json_encode(_('Enable HTTP authentication for all users.')) ?>;
+
 					overlayDialogue({
 						'title': <?= json_encode(_('Confirm changes')) ?>,
 						'class': 'position-middle',
-						'content': document.createElement('span').innerText = <?= json_encode(_('Enable HTTP authentication for all users.')) ?>,
+						'content': document.createElement('span').innerText = warn_message,
 						'buttons': [
 							{
 								'title': <?= json_encode(_('Cancel')) ?>,
@@ -76,12 +78,7 @@
 								'title': <?= json_encode(_('Ok')) ?>,
 								'focused': true,
 								'action': function() {
-									for (let i = 0; i<fields.length; i++) {
-										if(fields[i] !== document.getElementById('http_auth_enabled')) {
-											(fields[i]).disabled = false;
-										}
-									}
-									document.getElementById('http_auth_enabled').checked = true;
+
 								}
 							}
 						]
