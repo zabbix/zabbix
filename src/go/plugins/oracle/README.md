@@ -89,9 +89,9 @@ The connection can be configured using either key parameters or named sessions.
 * The only supported URI network schema is "tcp".
 Examples of valid URIs:
 
-    - tcp://127.0.0.1:1521;
-    - tcp://localhost;
-    - localhost.
+    - tcp://127.0.0.1:1521
+    - tcp://localhost
+    - localhost
     
 * Usernames are supported only if written in uppercase characters.
       
