@@ -100,6 +100,56 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 				margin-top: 0;
 			}
 		}
+
+		.zi-chevron-left,
+		.zi-chevron-right,
+		.zi-chevron-down {
+			margin: 0 1px;
+			width: 24px;
+			height: 24px;
+			color: $icon-header-controls-color;
+			opacity: .5;
+
+			@extend %btn-icon;
+
+			&::before {
+				font-size: 16px;
+			}
+
+			&:focus,
+			&:hover,
+			&:active {
+				opacity: 1;
+			}
+		}
+
+		.zi-chevron-down {
+			&::after {
+				display: none;
+			}
+		}
+
+		.btn-time-left,
+		.btn-time-right {
+			left: -1px;
+			top: -1px;
+
+			&:not(:disabled) {
+				opacity: 1;
+				cursor: pointer;
+				&:focus,
+				&:hover {
+					border: 1px solid $ui-border-color;
+					@include btn-hover-active($btn-font-color, $btn-bg-color);
+				}
+			}
+			&:disabled {
+				cursor: default;
+				border: 0;
+				opacity: .4;
+			}
+		}
+
 	}
 
 	// Tab filter label li element.
@@ -174,7 +224,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		border: 1px transparent;
 		line-height: 22px;
 		vertical-align: middle;
-		padding: 0 8px 7px 8px;
+		padding: 0 11px 7px 11px;
 		margin-bottom: -7px;
 	}
 
@@ -247,12 +297,3 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 	}
 }
 
-.icon-filter::before {
-	vertical-align: middle;
-	display: inline-block;
-	width: 24px;
-	height: 24px;
-	content: '';
-	// grey icon
-	background: url($sprite-path) no-repeat -246px -547px;
-}

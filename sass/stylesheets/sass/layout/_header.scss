@@ -60,54 +60,6 @@ header {
 
 			@extend %button-icon-size;
 		}
-
-		//.zi-chevron-down {
-		//	position: relative;
-		//	background-color: transparent;
-		//
-		//	color: $btn-alt-font-color;
-		//
-		//	&::before {
-		//		display: inline-block;
-		//		top: 1px;
-		//		font-size: 12px;
-		//
-		//		transition: .3s;
-		//	}
-		//
-		//	&[aria-expanded="true"] {
-		//		@include btn-hover-active($btn-font-color, $btn-bg-color);
-		//	}
-		//
-		//	&[disabled] {
-		//		&::before {
-		//			border-top-color: $btn-disabled-font-color;
-		//			border-right-color: $btn-disabled-font-color;
-		//		}
-		//	}
-		//
-		//	&:enabled {
-		//		&:active,
-		//		&[aria-expanded="true"] {
-		//			&::before {
-		//				transform: rotate(180deg) translate(-1px,1px);
-		//			}
-		//		}
-		//
-		//		&:hover,
-		//		&:focus,
-		//		&:active,
-		//		&[aria-expanded="true"] {
-		//			@include btn-hover-active($btn-font-color, $btn-bg-color);
-		//
-		//			&::before {
-		//				border-top-color:  $btn-font-color;
-		//				border-right-color: $btn-font-color;
-		//			}
-		//
-		//		}
-		//	}
-		//}
 	}
 
 	.header-kioskmode-controls {

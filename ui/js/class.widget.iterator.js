@@ -503,6 +503,7 @@ class CWidgetIterator extends CWidget {
 		this._button_previous_page.type = 'button';
 		this._button_previous_page.title = t('Previous page');
 		this._button_previous_page.classList.add('btn-iterator-page-previous'); // todo zi
+		this._button_previous_page.classList.add('zi-chevron-left'); // todo zi
 		this._pager.appendChild(this._button_previous_page);
 
 		this._pager_stats = document.createElement('span');
@@ -512,7 +513,8 @@ class CWidgetIterator extends CWidget {
 		this._button_next_page = document.createElement('button');
 		this._button_next_page.type = 'button';
 		this._button_next_page.title = t('Next page');
-		this._button_next_page.classList.add('btn-iterator-page-next'); // todo zi
+		this._button_next_page.classList.add('btn-iterator-page-next');
+		this._button_previous_page.classList.add('zi-chevron-right'); // todo zi// todo zi
 		this._pager.appendChild(this._button_next_page);
 
 		this._content_header.insertBefore(this._pager, this._actions);

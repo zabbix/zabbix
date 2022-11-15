@@ -724,7 +724,9 @@ footer {
 
 .btn-add,
 .btn-edit,
-.btn-import, .btn-remove, .overlay-close-btn, .subfilter-disable-btn {
+.btn-import, .btn-remove, .overlay-close-btn, .subfilter-disable-btn, .filter-container.tabfilter-container nav .zi-chevron-left,
+.filter-container.tabfilter-container nav .zi-chevron-right,
+.filter-container.tabfilter-container nav .zi-chevron-down {
   display: inline-block;
   width: 18px;
   height: 18px;
@@ -741,11 +743,17 @@ footer {
   transition: opacity .2s ease-out; }
   .btn-add:hover,
   .btn-edit:hover,
-  .btn-import:hover, .btn-remove:hover, .overlay-close-btn:hover, .subfilter-disable-btn:hover, .btn-add:focus,
+  .btn-import:hover, .btn-remove:hover, .overlay-close-btn:hover, .subfilter-disable-btn:hover, .filter-container.tabfilter-container nav .zi-chevron-left:hover,
+  .filter-container.tabfilter-container nav .zi-chevron-right:hover,
+  .filter-container.tabfilter-container nav .zi-chevron-down:hover, .btn-add:focus,
   .btn-edit:focus,
-  .btn-import:focus, .btn-remove:focus, .overlay-close-btn:focus, .subfilter-disable-btn:focus, .btn-add:active,
+  .btn-import:focus, .btn-remove:focus, .overlay-close-btn:focus, .subfilter-disable-btn:focus, .filter-container.tabfilter-container nav .zi-chevron-left:focus,
+  .filter-container.tabfilter-container nav .zi-chevron-right:focus,
+  .filter-container.tabfilter-container nav .zi-chevron-down:focus, .btn-add:active,
   .btn-edit:active,
-  .btn-import:active, .btn-remove:active, .overlay-close-btn:active, .subfilter-disable-btn:active {
+  .btn-import:active, .btn-remove:active, .overlay-close-btn:active, .subfilter-disable-btn:active, .filter-container.tabfilter-container nav .zi-chevron-left:active,
+  .filter-container.tabfilter-container nav .zi-chevron-right:active,
+  .filter-container.tabfilter-container nav .zi-chevron-down:active {
     text-decoration: none;
     background-color: transparent;
     outline: none;
@@ -3229,6 +3237,48 @@ section {
       .filter-container.tabfilter-container nav li button {
         vertical-align: middle;
         margin-top: 0; }
+    .filter-container.tabfilter-container nav .zi-chevron-left,
+    .filter-container.tabfilter-container nav .zi-chevron-right,
+    .filter-container.tabfilter-container nav .zi-chevron-down {
+      margin: 0 1px;
+      width: 24px;
+      height: 24px;
+      color: #768d99;
+      opacity: .5; }
+      .filter-container.tabfilter-container nav .zi-chevron-left::before,
+      .filter-container.tabfilter-container nav .zi-chevron-right::before,
+      .filter-container.tabfilter-container nav .zi-chevron-down::before {
+        font-size: 16px; }
+      .filter-container.tabfilter-container nav .zi-chevron-left:focus, .filter-container.tabfilter-container nav .zi-chevron-left:hover, .filter-container.tabfilter-container nav .zi-chevron-left:active,
+      .filter-container.tabfilter-container nav .zi-chevron-right:focus,
+      .filter-container.tabfilter-container nav .zi-chevron-right:hover,
+      .filter-container.tabfilter-container nav .zi-chevron-right:active,
+      .filter-container.tabfilter-container nav .zi-chevron-down:focus,
+      .filter-container.tabfilter-container nav .zi-chevron-down:hover,
+      .filter-container.tabfilter-container nav .zi-chevron-down:active {
+        opacity: 1; }
+    .filter-container.tabfilter-container nav .zi-chevron-down::after {
+      display: none; }
+    .filter-container.tabfilter-container nav .btn-time-left,
+    .filter-container.tabfilter-container nav .btn-time-right {
+      left: -1px;
+      top: -1px; }
+      .filter-container.tabfilter-container nav .btn-time-left:not(:disabled),
+      .filter-container.tabfilter-container nav .btn-time-right:not(:disabled) {
+        opacity: 1;
+        cursor: pointer; }
+        .filter-container.tabfilter-container nav .btn-time-left:not(:disabled):focus, .filter-container.tabfilter-container nav .btn-time-left:not(:disabled):hover,
+        .filter-container.tabfilter-container nav .btn-time-right:not(:disabled):focus,
+        .filter-container.tabfilter-container nav .btn-time-right:not(:disabled):hover {
+          border: 1px solid #dfe4e7;
+          color: #ffffff;
+          background-color: #02659f;
+          border-color: #02659f; }
+      .filter-container.tabfilter-container nav .btn-time-left:disabled,
+      .filter-container.tabfilter-container nav .btn-time-right:disabled {
+        cursor: default;
+        border: 0;
+        opacity: .4; }
   .filter-container.tabfilter-container .tabfilter-item-label {
     display: inline-block;
     border-radius: 2px;
@@ -3273,7 +3323,7 @@ section {
     border: 1px transparent;
     line-height: 22px;
     vertical-align: middle;
-    padding: 0 8px 7px 8px;
+    padding: 0 11px 7px 11px;
     margin-bottom: -7px; }
   .filter-container.tabfilter-container .ui-sortable-container .tabfilter-item-label.ui-sortable-helper + .tabfilter-item-label.ui-sortable-handle:not(.selected, .ui-sortable-helper) .tabfilter-item-link::before,
   .filter-container.tabfilter-container .ui-sortable-container .tabfilter-item-label:not(.selected) + .tabfilter-item-label.ui-sortable-handle:not(.selected, .ui-sortable-helper) .tabfilter-item-link::before {
@@ -3318,14 +3368,6 @@ section {
   line-height: 18px; }
 .menu-popup .menu-popup-item[data-counter] {
   padding-right: 35px; }
-
-.icon-filter::before {
-  vertical-align: middle;
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  content: '';
-  background: url("../img/icon-sprite.svg?20220722") no-repeat -246px -547px; }
 
 .toc .toc-row {
   padding: 8px 10px;
@@ -4641,17 +4683,8 @@ button {
 .btn-dashboard-kioskmode-next-page {
   background: #0275b8 url("../img/icon-sprite.svg?20220722") no-repeat -396px -624px; }
 
-.btn-iterator-page-previous {
-  background: url("../img/icon-sprite.svg?20220722") no-repeat -85px -657px; }
-
-.btn-iterator-page-next {
-  background: url("../img/icon-sprite.svg?20220722") no-repeat -83px -623px; }
-
 .btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle {
   background: url("../img/icon-sprite.svg?20220722") no-repeat -6px -654px; }
-
-.btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle {
-  background: url("../img/icon-sprite.svg?20220722") no-repeat -6px -689px; }
 
 .btn-alarm-on {
   background: url("../img/icon-sprite.svg?20220722") no-repeat -6px -546px; }
@@ -4797,40 +4830,6 @@ button {
       margin-bottom: 5px;
       text-align: center; }
 
-.btn-time-left,
-.btn-time-right {
-  background: url("../img/icon-sprite.svg?20220722") no-repeat;
-  content: '';
-  border: 0;
-  height: 24px;
-  width: 24px;
-  vertical-align: top; }
-  .btn-time-left:focus, .btn-time-left:hover,
-  .btn-time-right:focus,
-  .btn-time-right:hover {
-    border: 1px solid #dfe4e7;
-    color: #ffffff;
-    background-color: #02659f;
-    border-color: #02659f; }
-  .btn-time-left:disabled,
-  .btn-time-right:disabled {
-    border: 0;
-    opacity: .4; }
-
-.btn-time-right {
-  background-position: -83px -623px; }
-  .btn-time-right:focus, .btn-time-right:hover {
-    background-position: -396px -624px; }
-  .btn-time-right:disabled {
-    background-position: -83px -623px; }
-
-.btn-time-left {
-  background-position: -85px -657px; }
-  .btn-time-left:focus, .btn-time-left:hover {
-    background-position: -398px -658px; }
-  .btn-time-left:disabled {
-    background-position: -85px -657px; }
-
 .btn-time-out {
   background: none;
   border: 1px solid transparent;
@@ -4935,18 +4934,18 @@ button {
 .btn-dashboard-normal {
   box-shadow: 1px 1px 2px rgba(118, 141, 153, 0.5); }
 
-.btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock {
+.btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock {
   width: 24px;
   height: 24px;
   margin: 2px 2px 0 0; }
 
-section .section-toggle, .filter-container.tabfilter-container .icon-edit, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interfaces .interface-row[data-type="2"] .interface-btn-toggle {
+section .section-toggle, .filter-container.tabfilter-container .icon-edit, .btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interfaces .interface-row[data-type="2"] .interface-btn-toggle {
   border: 0;
   min-height: 0;
   padding: 0;
   opacity: .5;
   transition: opacity .2s ease-out; }
-  section [disabled].section-toggle, .filter-container.tabfilter-container [disabled].icon-edit, [disabled].btn-iterator-page-previous, [disabled].btn-iterator-page-next, [disabled].btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle, [disabled].btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle, section [disabled].section-toggle:hover, .filter-container.tabfilter-container [disabled].icon-edit:hover, [disabled].btn-iterator-page-previous:hover, [disabled].btn-iterator-page-next:hover, [disabled].btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:hover, [disabled].btn-widget-expand:hover, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:hover, section [disabled].section-toggle:focus, .filter-container.tabfilter-container [disabled].icon-edit:focus, [disabled].btn-iterator-page-previous:focus, [disabled].btn-iterator-page-next:focus, [disabled].btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:focus, [disabled].btn-widget-expand:focus, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:focus, section [disabled].section-toggle:active, .filter-container.tabfilter-container [disabled].icon-edit:active, [disabled].btn-iterator-page-previous:active, [disabled].btn-iterator-page-next:active, [disabled].btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:active, [disabled].btn-widget-expand:active, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:active {
+  section [disabled].section-toggle, .filter-container.tabfilter-container [disabled].icon-edit, [disabled].btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle, section [disabled].section-toggle:hover, .filter-container.tabfilter-container [disabled].icon-edit:hover, [disabled].btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:hover, section [disabled].section-toggle:focus, .filter-container.tabfilter-container [disabled].icon-edit:focus, [disabled].btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:focus, section [disabled].section-toggle:active, .filter-container.tabfilter-container [disabled].icon-edit:active, [disabled].btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active, .interfaces .interface-row[data-type="2"] [disabled].interface-btn-toggle:active {
     background-color: transparent;
     opacity: .25; }
 
@@ -4977,7 +4976,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .inaccessible .subfilter-enabled {
   color: #bfbfbf; }
 
-section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:hover, .btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:hover, .btn-widget-expand:hover, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:hover, section .section-toggle:focus, .filter-container.tabfilter-container .icon-edit:focus, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:focus, .btn-widget-expand:focus, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:focus, section .section-toggle:active, .filter-container.tabfilter-container .icon-edit:active, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:active, .btn-widget-expand:active, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:active {
+section .section-toggle:hover, .filter-container.tabfilter-container .icon-edit:hover, .btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:hover, section .section-toggle:focus, .filter-container.tabfilter-container .icon-edit:focus, .btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:focus, section .section-toggle:active, .filter-container.tabfilter-container .icon-edit:active, .btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .interfaces .interface-row[data-type="2"] .interface-btn-toggle:active {
   background-color: transparent;
   opacity: 1; }
 

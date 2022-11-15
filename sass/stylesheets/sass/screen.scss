@@ -1890,31 +1890,6 @@ button {
 	}
 }
 
-//.btn-alt {
-//	color: $btn-alt-font-color;
-//	background-color: $btn-alt-bg-color;
-//
-//	&:hover {
-//		@include btn-hover-active($btn-font-color, $btn-bg-color);
-//
-//		.plus-icon {
-//			background-color: $btn-font-color;
-//
-//			&::after {
-//				background-color: $btn-font-color;
-//			}
-//		}
-//	}
-//
-//	&:focus {
-//		@include btn-hover-active($btn-font-color, $btn-bg-color);
-//	}
-//
-//	&:active {
-//		@include btn-hover-active($btn-font-color, $btn-bg-color);
-//	}
-//}
-
 .btn-tag {
 	@extend .tag;
 
@@ -2019,10 +1994,7 @@ $icon-btn: (
 }
 
 $icon-widget-btn: (
-	iterator-page-previous: url($sprite-path) no-repeat -85px -657px,
-	iterator-page-next: url($sprite-path) no-repeat -83px -623px,
 	widget-collapse: url($sprite-path) no-repeat -6px -654px,
-	widget-expand: url($sprite-path) no-repeat -6px -689px,
 	alarm-on: url($sprite-path) no-repeat -6px -546px,
 	alarm-off: url($sprite-path) no-repeat -6px -582px,
 	sound-on: url($sprite-path) no-repeat -6px -474px,
@@ -2031,10 +2003,7 @@ $icon-widget-btn: (
 );
 
 // Dynamically generated classes:
-//  .btn-iterator-page-previous
-//  .btn-iterator-page-next
 //  .btn-widget-collapse
-//  .btn-widget-expand // TODO ZI
 //  .btn-alarm-on
 //  .btn-alarm-off
 //  .btn-sound-on
@@ -2242,53 +2211,6 @@ $icon-widget-btn: (
 			margin-bottom: 5px;
 			text-align: center;
 		}
-	}
-}
-
-.btn-time-left,
-.btn-time-right {
-	background: url($sprite-path) no-repeat;
-	content: '';
-	border: 0;
-	height: 24px;
-	width: 24px;
-	vertical-align: top;
-
-	&:focus,
-	&:hover {
-		border: 1px solid $ui-border-color;
-		@include btn-hover-active($btn-font-color, $btn-bg-color);
-	}
-
-	&:disabled {
-		border: 0;
-		opacity: .4;
-	}
-}
-
-.btn-time-right {
-	background-position: -83px -623px;
-
-	&:focus,
-	&:hover {
-		background-position: -396px -624px;
-	}
-
-	&:disabled {
-		background-position: -83px -623px;
-	}
-}
-
-.btn-time-left {
-	background-position: -85px -657px;
-
-	&:focus,
-	&:hover {
-		background-position: -398px -658px;
-	}
-
-	&:disabled {
-		background-position: -85px -657px;
 	}
 }
 
@@ -4720,7 +4642,7 @@ svg {
 		}
 
 		.list-accordion-item-toggle {
-			@extend .btn-widget-expand;
+			//@extend .btn-widget-expand; // TODO ZI
 			margin: 0;
 		}
 	}

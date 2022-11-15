@@ -164,7 +164,8 @@ class CTabFilter extends CDiv {
 			if ($tab_index == 0) {
 				$label = (new CLink(''))
 					->setAttribute('aria-label', _('Home'))
-					->addClass(self::CSS_TABFILTER_ICON_FILTER);
+					->addClass(self::CSS_TABFILTER_ICON_FILTER)
+					->addClass('zi-filter');
 				$data += [
 					'filter_sortable' => false,
 					'filter_configurable' => false
@@ -329,13 +330,15 @@ class CTabFilter extends CDiv {
 				->addClass($enabled ? null : ZBX_STYLE_DISABLED),
 			(new CSimpleButton())
 				->setEnabled($enabled)
-				->addClass(ZBX_STYLE_BTN_TIME_LEFT), // todo zi
+				->addClass(ZBX_STYLE_BTN_TIME_LEFT)
+				->addClass('zi-chevron-left'), // todo zi
 			(new CSimpleButton(_('Zoom out')))
 				->setEnabled($enabled)
 				->addClass(ZBX_STYLE_BTN_TIME_OUT), // todo zi
 			(new CSimpleButton())
 				->setEnabled($enabled)
-				->addClass(ZBX_STYLE_BTN_TIME_RIGHT) // todo zi
+				->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
+				->addClass('zi-chevron-right')// todo zi
 		];
 	}
 
@@ -363,10 +366,13 @@ class CTabFilter extends CDiv {
 		$nav_list = new CList([
 			(new CSimpleButton())
 				->setAttribute('data-action', 'toggleTabsList')
-				->addClass('btn-widget-expand'),
+				->addClass('btn-widget-expand')
+				->addClass('zi-chevron-down'),
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectNextTab')
 				->addClass('btn-iterator-page-next')
+				->addClass('zi-chevron-right')
+
 		]);// todo zi
 
 		if (array_key_exists('timeselector', $this->options)) {
@@ -376,7 +382,8 @@ class CTabFilter extends CDiv {
 		return new CTag('nav', true , new CList([
 			(new CSimpleButton())
 				->setAttribute('data-action', 'selectPrevTab')
-				->addClass('btn-iterator-page-previous'), // todo zi
+				->addClass('btn-iterator-page-previous')
+				->addClass('zi-chevron-left'), // todo zi
 			$sortable ? (new CList($sortable))->addClass(static::CSS_TAB_SORTABLE_CONTAINER) : null,
 			$static ? $static : null,
 			$nav_list

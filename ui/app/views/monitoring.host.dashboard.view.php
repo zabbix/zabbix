@@ -149,11 +149,13 @@ if (count($data['dashboard']['pages']) > 1
 						->addItem([
 							(new CSimpleButton())
 								->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
-								->addClass('btn-iterator-page-previous') // todo zi
+								->addClass('btn-iterator-page-previous')
+								->addClass('zi-chevron-left')// todo zi
 								->setEnabled(false),
 							(new CSimpleButton())
 								->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
-								->addClass('btn-iterator-page-next') // todo zi
+								->addClass('btn-iterator-page-next')
+								->addClass('zi-chevron-right')// todo zi
 								->setEnabled(false),
 							(new CSimpleButton([
 								(new CSpan(_s('Start slideshow')))->addClass('slideshow-state-stopped'),
