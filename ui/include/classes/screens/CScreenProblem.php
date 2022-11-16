@@ -1166,6 +1166,7 @@ class CScreenProblem extends CScreenBase {
 		$tags = makeTags($data['problems'] + $symptom_data['problems'], false);
 
 		// Get cause event names for symtoms.
+		$causes = [];
 		if ($symptom_cause_eventids) {
 			$options = [
 				'output' => ['cause_eventid', 'name'],

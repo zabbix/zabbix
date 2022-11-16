@@ -2944,38 +2944,40 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						$macro_values[$eventid][$macro] = $event['value'];
 						break;
 
-					// For cause events, it will return 0.
+					/*
+					 * If event is already cause event, $event['cause'] does not exist or is empty, macros resolve to
+					 * empty string.
+					 */
 					case '{EVENT.CAUSE.ID}':
-						$macro_values[$eventid][$macro] = $event['cause_eventid'];
+						$macro_values[$eventid][$macro] = $event['cause_eventid'] == 0 ? '' : $event['cause_eventid'];
 						break;
 
-					// If event is already cause event, $event['cause'] does not exist and returns empty string.
 					case '{EVENT.CAUSE.NAME}':
-						$macro_values[$eventid][$macro] = array_key_exists('cause', $event)
+						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
 							? $event['cause']['name']
 							: '';
 						break;
 
 					case '{EVENT.CAUSE.NSEVERITY}':
-						$macro_values[$eventid][$macro] = array_key_exists('cause', $event)
+						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
 							? $event['cause']['severity']
 							: '';
 						break;
 
 					case '{EVENT.CAUSE.SEVERITY}':
-						$macro_values[$eventid][$macro] = array_key_exists('cause', $event)
+						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
 							? CSeverityHelper::getName($event['cause']['severity'])
 							: '';
 						break;
 
 					case '{EVENT.CAUSE.STATUS}':
-						$macro_values[$eventid][$macro] = array_key_exists('cause', $event)
+						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
 							? trigger_value2str($event['cause']['value'])
 							: '';
 						break;
 
 					case '{EVENT.CAUSE.VALUE}':
-						$macro_values[$eventid][$macro] = array_key_exists('cause', $event)
+						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
 							? $event['cause']['value']
 							: '';
 						break;

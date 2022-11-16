@@ -301,6 +301,16 @@ function getEventStatusString(bool $in_closing, array $event, array $tasks): str
 	return $value_str;
 }
 
+/**
+ * Get current event tasks depeding on its acknowledges.
+ *
+ * @param array  $events                                List of events.
+ * @param array  $events[]['acknowledges']              List of event acknowledges.
+ * @param int    $events[]['acknowledges'][]['action']  Acknowledge action type.
+ * @param string $events[]['acknowledges'][]['taskid']  Acknowledge task ID.
+ *
+ * @return array
+ */
 function getActiveTasksByEventAcknowledges(array $events): array {
 	$tasks = [];
 	$taskids = [];
@@ -328,10 +338,15 @@ function getActiveTasksByEventAcknowledges(array $events): array {
 				return ($value['status'] == ZBX_TM_STATUS_NEW || $value['status'] == ZBX_TM_STATUS_INPROGRESS);
 			});
 		}
+		else {
+			// If user has no permissions to execute this API, it will return boolean, but function must return array.
+			$tasks = [];
+		}
 	}
 
 	return $tasks;
 }
+
 /**
  *
  * @param array  $startEvent                    An array of event data.
