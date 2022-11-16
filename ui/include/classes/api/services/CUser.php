@@ -820,7 +820,7 @@ class CUser extends CApiService {
 	 * Check does the user belong to at least one group with GROUP_GUI_ACCESS_INTERNAL frontend access.
 	 * Check does the user belong to at least one group with GROUP_GUI_ACCESS_SYSTEM when default frontend access
 	 * is set to GROUP_GUI_ACCESS_INTERNAL.
-	 * If user is without user gorups default frontend access method is checked.
+	 * If user is without user groups default frontend access method is checked.
 	 *
 	 * @param array  $user
 	 * @param int    $user['userdirectoryid']
