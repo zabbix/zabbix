@@ -88,9 +88,9 @@ jQuery(function($) {
 		});
 	}
 
-	function uncheckedHandler(checkbox) {
-		$checkbox = $(checkbox);
+	function uncheckedHandler($checkbox) {
 		var $hidden = $checkbox.prev('input[type=hidden][name="' + $checkbox.prop('name') + '"]');
+
 		if ($checkbox.is(':checked') || $checkbox.prop('disabled')) {
 			$hidden.remove();
 		}
@@ -102,20 +102,12 @@ jQuery(function($) {
 	}
 
 	$('input[unchecked-value]').each(function() {
-		const $this = $(this);
+		var $this = $(this);
+
 		uncheckedHandler($this);
 		$this.on('change enable disable', function () {
-			uncheckedHandler($this)
+			uncheckedHandler($(this))
 		})
-
-		const observer = new MutationObserver((mutation) => {
-			uncheckedHandler(mutation[0].target)
-		});
-
-		observer.observe(this, {
-			attributes: true,
-			attributeFilter: ['disabled']
-		});
 	});
 
 	function showMenuPopup($obj, data, event, options) {
