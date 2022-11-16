@@ -324,12 +324,15 @@ static void	set_daemon_signal_handlers(void)
  *                          name of PID file                                  *
  *       zbx_on_exit_cb_arg - callback function called when terminating       *
  *                            signal handler                                  *
+ *        config_log_type - [IN]                                              *
+ *        config_log_file - [IN]                                              *
  *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
-		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg)
+		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,
+		const char *config_log_file)
 {
 	struct passwd	*pwd;
 
@@ -423,7 +426,7 @@ int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		if (-1 == chdir("/"))	/* this is to eliminate warning: ignoring return value of chdir */
 			assert(0);
 
-		if (FAIL == zbx_redirect_stdio(LOG_TYPE_FILE == CONFIG_LOG_TYPE ? CONFIG_LOG_FILE : NULL))
+		if (FAIL == zbx_redirect_stdio(LOG_TYPE_FILE == config_log_type ? config_log_file : NULL))
 			exit(EXIT_FAILURE);
 	}
 

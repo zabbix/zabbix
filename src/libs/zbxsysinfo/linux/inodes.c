@@ -77,9 +77,10 @@ while(0)
 	}
 	else if (NULL != mode && (0 == strcmp(mode, "pfree") || 0 == strcmp(mode, "pused")))
 	{
-		*error = zbx_strdup(NULL, "Cannot calculate percentage because total is zero.");
-		return SYSINFO_RET_FAIL;
+		*pfree = 100.0;
+		*pused = 0.0;
 	}
+
 	return SYSINFO_RET_OK;
 #undef ZBX_STATFS
 #undef ZBX_FFREE

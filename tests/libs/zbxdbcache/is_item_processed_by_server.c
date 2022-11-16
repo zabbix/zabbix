@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxcommon.h"
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 
 void	zbx_mock_test_entry(void **state)
 {

@@ -20,7 +20,7 @@
 #ifndef ZABBIX_IPMI_H
 #define ZABBIX_IPMI_H
 
-#include "dbcache.h"
+#include "zbxcacheconfig.h"
 #include "zbxtypes.h"
 #include "config.h"
 
